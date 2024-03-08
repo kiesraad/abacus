@@ -1,0 +1,13 @@
+{
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    ".gitignore": ".gitattributes, .gitmodules, .gitmessage, .mailmap, .git-blame*",
+    "package.json": "package-lock.json, .babelrc, .editorconfig, .eslint*, .figma*, .github*, .huskyrc*, .prettier*, .vscode*, playwright.config.*, prettier*, tsconfig.*, vitest.config.*, yarn*, postcss.config.*, vite.config.ts, mockServiceWorker.js, .licenserc.yaml, LICENSE"
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#00305B",
+    "titleBar.activeBackground": "#00305B",
+    "titleBar.activeForeground": "#FFFBFB"
+  }
+}

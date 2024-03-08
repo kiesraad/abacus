@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "engines": {
-    "node": ">=20.11.1"
+    "node": ">=18"
   },
   "scripts": {
     "dev": "API_MODE=msw vite",

@@ -9,7 +9,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 export function Button({ isDisabled, isLoading, children, ...htmlButtonProps }: ButtonProps) {
   return (
-    <button role="button" className={classes["button-default"]} disabled={isDisabled || isLoading} {...htmlButtonProps}>
+    <button className={classes["button-default"]} disabled={isDisabled || isLoading} {...htmlButtonProps}>
       {children}
     </button>
   );

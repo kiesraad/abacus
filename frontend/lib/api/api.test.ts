@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 describe("Mock api works", () => {
-  it("echos a value", async () => {
+  test("echos a value", async () => {
     const resp = await fetch("http://testhost/v1/ping", {
       method: "POST",
       headers: {

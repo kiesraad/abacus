@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "API_MODE=msw vite",
     "build": "tsc && vite build",
+    "build:msw": "API_MODE=msw vite build && cp mockServiceWorker.js dist/",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest",

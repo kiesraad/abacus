@@ -1,16 +1,32 @@
 import * as React from "react";
-import classes from "./Button.module.less";
+import cls from "./Button.module.css";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isDisabled?: boolean;
   isLoading?: boolean;
+  variant?: "default" | "secondary";
+  size?: "sm" | "md" | "lg";
+  rightIcon?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export function Button({ isDisabled, isLoading, children, ...htmlButtonProps }: ButtonProps) {
+export function Button({
+  isDisabled,
+  isLoading,
+  variant = "default",
+  size = "md",
+  rightIcon,
+  children,
+  ...htmlButtonProps
+}: ButtonProps) {
   return (
-    <button className={classes["button-default"]} disabled={isDisabled || isLoading} {...htmlButtonProps}>
+    <button
+      className={`${cls["button"]} ${cls[variant]} ${cls[size]}`}
+      disabled={isDisabled || isLoading}
+      {...htmlButtonProps}
+    >
       {children}
+      {rightIcon && rightIcon}
     </button>
   );
 }

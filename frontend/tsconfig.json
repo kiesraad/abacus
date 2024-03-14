@@ -22,7 +22,8 @@
       "app/*": ["app/*"],
       "@kiesraad/api": ["lib/api/index.ts"],
       "@kiesraad/api-mocks": ["lib/api-mocks/index.ts"],
-      "@kiesraad/ui": ["lib/ui/index.ts"]
+      "@kiesraad/ui": ["lib/ui/index.ts"],
+      "@kiesraad/icon": ["lib/icon/index.ts"]
     },
     "types": ["node", "vite/client", "vitest/importMeta"]
   }

@@ -6,7 +6,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { startMockAPI } from "./msw-mock-api.ts";
 import { routes } from "./routes.tsx";
 
-const root = ReactDOM.createRoot(document.getElementById("root")!);
+const rootDiv = document.getElementById("root");
+if (!rootDiv) throw new Error("Root div not found");
+
+const root = ReactDOM.createRoot(rootDiv);
 
 function render() {
   const router = createBrowserRouter(routes, {
@@ -23,7 +26,7 @@ function render() {
 }
 
 if (process.env.MSW) {
-  startMockAPI().then(render);
+  startMockAPI().then(render).catch(console.error);
 } else {
   render();
 }

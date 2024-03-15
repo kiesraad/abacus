@@ -14,5 +14,8 @@ module.exports = {
   plugins: ["react-refresh", "jsx-a11y", "prettier", "@typescript-eslint"],
   rules: {
     "react-refresh/only-export-components": ["warn", { allowConstantExport: true }]
+  },
+  parserOptions: {
+    project: "./tsconfig.json"
   }
 };

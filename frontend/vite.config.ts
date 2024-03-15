@@ -21,7 +21,10 @@ export default defineConfig(() => ({
     alias: mapObj(
       tsConfig.compilerOptions.paths,
       (k) => k.replace("/*", ""),
-      (paths) => path.resolve(__dirname, paths[0].replace("/*", ""))
+      (paths) => {
+        if (!paths[0]) throw new Error("No path found");
+        return path.resolve(__dirname, paths[0].replace("/*", ""));
+      }
     )
   },
   css: {

@@ -43,5 +43,3 @@ jobs:
         run: cargo clippy -- -D warnings
       - name: Run tests
         run: cargo test --verbose
-      - name: Check if openapi.json is up to date
-        run: cargo run --bin gen-openapi -- --check

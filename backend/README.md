@@ -15,6 +15,10 @@ First run `sqlx database setup` to create the SQLite database. Then use `cargo b
 
 Use `cargo run --bin api` to run the API on port 8080 (http://localhost:8080).
 
+### Linting
+
+Use `cargo clippy` to lint the project. Warnings are treated as errors in the CI pipeline.
+
 ## Structure
 
 ### Dependencies

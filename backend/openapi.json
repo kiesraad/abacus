@@ -1,0 +1,52 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "backend",
+    "description": "",
+    "license": {
+      "name": "EUPL-1.2"
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/hello_world": {
+      "get": {
+        "tags": [
+          "crate"
+        ],
+        "operationId": "hello_world",
+        "responses": {
+          "200": {
+            "description": "Hello World",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HelloWorld"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HelloWorld": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}

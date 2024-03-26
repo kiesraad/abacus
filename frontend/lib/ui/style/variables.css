@@ -13,11 +13,16 @@
   src: url("/font/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf") format("TrueType");
 }
 
+@font-face {
+  font-family: "GeistMonoVF";
+  src: url("/font/Geist_Mono/GeistMonoVF.ttf") format("TrueType");
+}
+
 :root {
   /* FONTS */
   --font-header: "SpaceGrotesk";
   --font-text: "DMSans";
-  --font-number: "DMSans";
+  --font-number: "GeistMonoVF";
 
   /* TODO: pick a better font size scale */
   --font-size-sm: 0.8em;

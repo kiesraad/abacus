@@ -1,9 +1,12 @@
 import { Button, InputGrid, PollingStationNumber, ProgressList, Tag, WorkStationNumber } from "@kiesraad/ui";
 import { useParams } from "react-router-dom";
 import { IconCross } from "@kiesraad/icon";
+import { useInputMask } from "@kiesraad/util";
 
 export function PollingStationPage() {
   const { id } = useParams();
+
+  const { register } = useInputMask({});
   return (
     <>
       <header>
@@ -54,7 +57,7 @@ export function PollingStationPage() {
                 <InputGrid.Row key={index}>
                   <td>A</td>
                   <td>
-                    <input id={`input-1-${index}`} />
+                    <input id={`input-1-${index}`} {...register()} />
                   </td>
                   <td>Stempassen</td>
                 </InputGrid.Row>

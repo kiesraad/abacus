@@ -16,7 +16,8 @@
     "e2e": "playwright test",
     "e2eui": "playwright test --ui",
     "ladle": "ladle serve",
-    "start:msw": "API_MODE=msw vite"
+    "start:msw": "API_MODE=msw vite",
+    "gen:icons": "node scripts/gen_icons.js"
   },
   "dependencies": {
     "react": "^18.2.0",

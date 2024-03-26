@@ -1,3 +1,5 @@
+/* TODO: whitespace / padding will be variable / responsive */
+
 .app-frame {
   position: absolute;
   left: 0;
@@ -46,13 +48,12 @@
 
   > main {
     flex: 1 1 auto;
-
     display: flex;
+
     > nav {
-      flex: 0 0 240px;
-      padding: 32px 0;
+      flex: 0 0 420px;
+      padding: 32px 0 32px 64px;
       background-color: #f9fafb;
-      border-right: 1px solid #e4e7eb;
       display: flex;
       flex-direction: column;
       align-items: stretch;
@@ -62,6 +63,13 @@
       padding: 32px 64px;
       background-color: #f9fafb;
     }
+  }
+
+  > aside {
+    flex: 0 0 128px;
+    padding: 0 64px 0 320px;
+    display: flex;
+    align-items: center;
   }
 
   > footer {

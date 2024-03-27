@@ -41,3 +41,37 @@ async fn test_hello_world(pool: SqlitePool) {
         }
     );
 }
+
+#[sqlx::test]
+async fn test_polling_station_data_entry(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let request_body = backend::polling_station::DataEntryRequest {
+        entry_number: 1,
+        data: backend::polling_station::PollingStationResults {
+            voters_counts: backend::polling_station::VotersCounts {
+                poll_card_count: 1,
+                proxy_certificate_count: 2,
+                voter_card_count: 3,
+                total_admitted_voters_count: 4,
+            },
+            votes_counts: backend::polling_station::VotesCounts {
+                votes_candidates_counts: 5,
+                blank_votes_count: 6,
+                invalid_votes_count: 7,
+                total_cast_votes_count: 8,
+            },
+        },
+    };
+
+    let url = format!("http://{addr}/api/polling_stations/1/data_entry");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&request_body)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), 200);
+}

@@ -7,18 +7,41 @@ use serde::{Deserialize, Serialize};
 use sqlx::{query, SqlitePool};
 use utoipa::{OpenApi, ToSchema};
 
+pub mod polling_station;
+
+/// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let openapi = create_openapi();
     let app = Router::new()
         .route("/api-docs/openapi.json", get(Json(openapi)))
-        .route("/hello_world", routing::get(hello_world))
+        .route("/hello_world", get(hello_world))
+        .route(
+            "/api/polling_stations/:id/data_entry",
+            routing::post(polling_station::polling_station_data_entry),
+        )
         .with_state(pool);
     Ok(app)
 }
 
 pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[derive(OpenApi)]
-    #[openapi(paths(hello_world), components(schemas(HelloWorld)), tags())]
+    #[openapi(
+        paths(
+            polling_station::polling_station_data_entry,
+        ),
+        components(
+            schemas(
+                polling_station::DataEntryRequest,
+                polling_station::DataEntryError,
+                polling_station::PollingStationResults,
+                polling_station::VotersCounts,
+                polling_station::VotesCounts,
+            ),
+        ),
+        tags(
+            (name = "polling_station", description = "Polling station API"),
+        )
+    )]
     struct ApiDoc;
     ApiDoc::openapi()
 }

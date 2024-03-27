@@ -34,6 +34,9 @@ export function InputGrid({ zebra, children }: InputGridProps) {
 
     inputList.current[activeIndex].el.blur();
     inputList.current[targetIndex].el.focus();
+    setTimeout(() => {
+      inputList.current[targetIndex].el.select();
+    }, 1);
   }, []);
 
   React.useEffect(() => {

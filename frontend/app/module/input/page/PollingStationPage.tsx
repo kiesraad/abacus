@@ -4,7 +4,9 @@ import { IconCross } from "@kiesraad/icon";
 import { useInputMask } from "@kiesraad/util";
 
 export function PollingStationPage() {
-  const { id } = useParams();
+  const { id, section } = useParams();
+
+  const targetForm = section || "recount";
 
   const { register } = useInputMask({});
   return (
@@ -26,11 +28,13 @@ export function PollingStationPage() {
       <main>
         <nav>
           <ProgressList>
-            <ProgressList.Item status="accept">Is er herteld?</ProgressList.Item>
-            <ProgressList.Item status="reject" message="A message">
+            <ProgressList.Item status="accept" active={targetForm === "recount"}>
+              Is er herteld?
+            </ProgressList.Item>
+            <ProgressList.Item status="reject" message="A message" active={targetForm === "numbers"}>
               Aantal kiezers en stemmen
             </ProgressList.Item>
-            <ProgressList.Item status="idle" active>
+            <ProgressList.Item status="idle" active={targetForm === "differences"}>
               Verschillen?
             </ProgressList.Item>
             <ProgressList.Ruler />
@@ -57,7 +61,7 @@ export function PollingStationPage() {
                 <InputGrid.Row key={index}>
                   <td>A</td>
                   <td>
-                    <input id={`input-1-${index}`} {...register()} />
+                    <input id={`input-1-${index}`} {...register()} defaultValue={pickGoodTestNumber()} />
                   </td>
                   <td>Stempassen</td>
                 </InputGrid.Row>
@@ -67,7 +71,7 @@ export function PollingStationPage() {
                 <InputGrid.Row key={index}>
                   <td>A</td>
                   <td>
-                    <input id={`input-2-${index}`} />
+                    <input id={`input-2-${index}`} {...register()} defaultValue={pickGoodTestNumber()} />
                   </td>
                   <td>Stempassen</td>
                 </InputGrid.Row>
@@ -86,3 +90,9 @@ const lijsten: string[] = [
   "Lijst 2 - Wijzen van Water en Wind",
   "Lijst 3 - Eeuwenoude Aarde Unie"
 ];
+
+//currently I want zeroes in the value
+function pickGoodTestNumber() {
+  const n = Math.ceil(Math.random() * 4) * 10 * 10;
+  return Math.floor(Math.random() * n) * 10;
+}

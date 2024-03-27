@@ -10,7 +10,7 @@ export const routes = createRoutesFromElements(
 
     <Route path="input" element={<InputLayout />}>
       <Route index element={<InputHomePage />} />
-      <Route path=":id" element={<PollingStationPage />} />
+      <Route path=":id/:section?" element={<PollingStationPage />} />
     </Route>
   </Route>
 );

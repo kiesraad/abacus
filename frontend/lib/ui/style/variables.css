@@ -14,15 +14,16 @@
 }
 
 @font-face {
-  font-family: "GeistMonoVF";
-  src: url("/font/Geist_Mono/GeistMonoVF.ttf") format("TrueType");
+  font-family: "GeistMono";
+  src: url("/font/Geist_Mono/GeistMono-Regular.otf") format("opentype");
+  font-feature-settings: "ss09" on;
 }
 
 :root {
   /* FONTS */
   --font-header: "SpaceGrotesk";
   --font-text: "DMSans";
-  --font-number: "GeistMonoVF";
+  --font-number: "GeistMono";
 
   /* TODO: pick a better font size scale */
   --font-size-sm: 0.8em;

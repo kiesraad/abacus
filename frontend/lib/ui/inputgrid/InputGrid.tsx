@@ -32,11 +32,16 @@ export function InputGrid({ zebra, children }: InputGridProps) {
       targetIndex = 0;
     }
 
-    inputList.current[activeIndex].el.blur();
-    inputList.current[targetIndex].el.focus();
-    setTimeout(() => {
-      inputList.current[targetIndex].el.select();
-    }, 1);
+    const cur = inputList.current[activeIndex];
+    const next = inputList.current[targetIndex];
+
+    if (cur && next) {
+      cur.el.blur();
+      next.el.focus();
+      setTimeout(() => {
+        next.el.select();
+      }, 1);
+    }
   }, []);
 
   React.useEffect(() => {
@@ -89,11 +94,9 @@ export function InputGrid({ zebra, children }: InputGridProps) {
       });
 
       return () => {
-        if (tableEl) {
-          tableEl.querySelectorAll("input").forEach((input) => {
-            input.removeEventListener("focus", handleFocus);
-          });
-        }
+        tableEl.querySelectorAll("input").forEach((input) => {
+          input.removeEventListener("focus", handleFocus);
+        });
       };
     }
   }, []);

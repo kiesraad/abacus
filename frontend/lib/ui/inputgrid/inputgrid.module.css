@@ -45,6 +45,7 @@
           padding-left: 8px;
           padding-right: 8px;
           font-style: normal;
+          font-feature-settings: "ss09" on;
         }
       }
 

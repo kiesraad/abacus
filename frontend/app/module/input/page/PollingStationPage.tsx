@@ -8,7 +8,7 @@ export function PollingStationPage() {
 
   const targetForm = section || "recount";
 
-  const { register } = useInputMask({});
+  const { register, format } = useInputMask({});
   return (
     <>
       <header>
@@ -31,7 +31,7 @@ export function PollingStationPage() {
             <ProgressList.Item status="accept" active={targetForm === "recount"}>
               Is er herteld?
             </ProgressList.Item>
-            <ProgressList.Item status="reject" message="A message" active={targetForm === "numbers"}>
+            <ProgressList.Item status="idle" message="A message" active={targetForm === "numbers"}>
               Aantal kiezers en stemmen
             </ProgressList.Item>
             <ProgressList.Item status="idle" active={targetForm === "differences"}>
@@ -61,7 +61,7 @@ export function PollingStationPage() {
                 <InputGrid.Row key={index}>
                   <td>A</td>
                   <td>
-                    <input id={`input-1-${index}`} {...register()} defaultValue={pickGoodTestNumber()} />
+                    <input id={`input-1-${index}`} {...register()} defaultValue={format(pickGoodTestNumber())} />
                   </td>
                   <td>Stempassen</td>
                 </InputGrid.Row>
@@ -71,7 +71,7 @@ export function PollingStationPage() {
                 <InputGrid.Row key={index}>
                   <td>A</td>
                   <td>
-                    <input id={`input-2-${index}`} {...register()} defaultValue={pickGoodTestNumber()} />
+                    <input id={`input-2-${index}`} {...register()} defaultValue={format(pickGoodTestNumber())} />
                   </td>
                   <td>Stempassen</td>
                 </InputGrid.Row>

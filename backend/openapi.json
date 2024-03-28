@@ -145,7 +145,7 @@
           "votes_candidates_counts",
           "blank_votes_count",
           "invalid_votes_count",
-          "total_cast_votes_count"
+          "total_votes_cast_count"
         ],
         "properties": {
           "blank_votes_count": {
@@ -160,10 +160,10 @@
             "description": "Number of invalid votes (\"Aantal ongeldige stembiljetten\")",
             "minimum": 0
           },
-          "total_cast_votes_count": {
+          "total_votes_cast_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Total number of cast votes (\"Totaal aantal getelde stemmen\")",
+            "description": "Total number of votes cast (\"Totaal aantal getelde stemmen\")",
             "minimum": 0
           },
           "votes_candidates_counts": {

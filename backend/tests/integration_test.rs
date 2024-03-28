@@ -59,7 +59,7 @@ async fn test_polling_station_data_entry(pool: SqlitePool) {
                 votes_candidates_counts: 5,
                 blank_votes_count: 6,
                 invalid_votes_count: 7,
-                total_cast_votes_count: 8,
+                total_votes_cast_count: 8,
             },
         },
     };

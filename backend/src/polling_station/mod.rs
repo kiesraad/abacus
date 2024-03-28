@@ -51,8 +51,8 @@ pub struct VotesCounts {
     pub blank_votes_count: u32,
     /// Number of invalid votes ("Aantal ongeldige stembiljetten")
     pub invalid_votes_count: u32,
-    /// Total number of cast votes ("Totaal aantal getelde stemmen")
-    pub total_cast_votes_count: u32,
+    /// Total number of votes cast ("Totaal aantal getelde stemmen")
+    pub total_votes_cast_count: u32,
 }
 
 #[utoipa::path(
@@ -105,7 +105,7 @@ async fn test_polling_station_data_entry(pool: SqlitePool) {
                 votes_candidates_counts: 5,
                 blank_votes_count: 6,
                 invalid_votes_count: 7,
-                total_cast_votes_count: 8,
+                total_votes_cast_count: 8,
             },
         },
     };

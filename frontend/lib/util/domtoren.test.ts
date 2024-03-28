@@ -20,3 +20,12 @@ test("domtoren toggleClass", () => {
   domtoren(div).toggleClass("testclass");
   expect(div.classList.contains("testclass")).toBe(true);
 });
+
+test("domtoren removeClass", () => {
+  domtoren(div).removeClass("testclass");
+  expect(div.classList.contains("testclass")).toBe(false);
+});
+test("domtoren addclass", () => {
+  domtoren(div).addClass("testaddclass");
+  expect(div.classList.contains("testaddclass")).toBe(true);
+});

@@ -18,6 +18,16 @@ export class DomToren {
     return this;
   }
 
+  public removeClass(className: string) {
+    this._el.classList.remove(className);
+    return this;
+  }
+
+  public addClass(className: string) {
+    this._el.classList.add(className);
+    return this;
+  }
+
   public el() {
     return this._el;
   }

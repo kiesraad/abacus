@@ -1,14 +1,13 @@
-import { Button, InputGrid, PollingStationNumber, ProgressList, Tag, WorkStationNumber } from "@kiesraad/ui";
+import { Button, PollingStationNumber, ProgressList, Tag, WorkStationNumber } from "@kiesraad/ui";
 import { useParams } from "react-router-dom";
 import { IconCross } from "@kiesraad/icon";
-import { useInputMask } from "@kiesraad/util";
+import { VotersAndVotesForm } from "app/component/form/voters_and_votes/VotersAndVotesForm";
 
 export function PollingStationPage() {
   const { id, section } = useParams();
 
-  const targetForm = section || "recount";
+  const targetForm = section || "numbers";
 
-  const { register, format } = useInputMask({});
   return (
     <>
       <header>
@@ -48,39 +47,10 @@ export function PollingStationPage() {
           </ProgressList>
         </nav>
         <article>
-          <h3>Toegalaten kiezers en uitgebrachte stemmen</h3>
-
-          <InputGrid>
-            <InputGrid.Header>
-              <th>Veld</th>
-              <th>Geteld aantal</th>
-              <th>Omschrijving</th>
-            </InputGrid.Header>
-            <InputGrid.Body>
-              {new Array(4).fill("").map((_, index) => (
-                <InputGrid.Row key={index}>
-                  <td>A</td>
-                  <td>
-                    <input id={`input-1-${index}`} {...register()} defaultValue={format(pickGoodTestNumber())} />
-                  </td>
-                  <td>Stempassen</td>
-                </InputGrid.Row>
-              ))}
-              <InputGrid.Seperator />
-              {new Array(4).fill("").map((_, index) => (
-                <InputGrid.Row key={index}>
-                  <td>A</td>
-                  <td>
-                    <input id={`input-2-${index}`} {...register()} defaultValue={format(pickGoodTestNumber())} />
-                  </td>
-                  <td>Stempassen</td>
-                </InputGrid.Row>
-              ))}
-            </InputGrid.Body>
-          </InputGrid>
+          <VotersAndVotesForm />
         </article>
       </main>
-      <aside>Volgende</aside>
+      <aside>&nbsp;</aside>
     </>
   );
 }
@@ -90,9 +60,3 @@ const lijsten: string[] = [
   "Lijst 2 - Wijzen van Water en Wind",
   "Lijst 3 - Eeuwenoude Aarde Unie"
 ];
-
-//currently I want zeroes in the value
-function pickGoodTestNumber() {
-  const n = Math.ceil(Math.random() * 4) * 10 * 10;
-  return Math.floor(Math.random() * n) * 10;
-}

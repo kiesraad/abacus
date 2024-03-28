@@ -12,12 +12,12 @@ export interface InputGridProps {
 
 type InputEntry = {
   el: HTMLInputElement;
+  trEl: HTMLTableRowElement;
   active?: boolean;
 };
 
 export function InputGrid({ zebra, children }: InputGridProps) {
   const ref = React.useRef<HTMLTableElement>(null);
-  const lastFocused = React.useRef<HTMLElement | null>(null);
   const inputList = React.useRef<InputEntry[]>([]);
 
   const moveFocus = React.useCallback((dir: number) => {
@@ -67,39 +67,47 @@ export function InputGrid({ zebra, children }: InputGridProps) {
     };
   }, [moveFocus]);
 
-  const handleFocus = (event: FocusEvent) => {
+  const handleFocus = React.useCallback((event: FocusEvent) => {
     // Handle focus event
     if (event.target) {
       const el = event.target as HTMLElement;
       const entry = inputList.current.find((input) => input.el === el);
       if (entry) {
-        inputList.current.forEach((input) => (input.active = false));
         entry.active = true;
+        domtoren(entry.trEl).addClass("focused");
       }
-
-      const trEl = domtoren(el).closest("tr").toggleClass("focused").el();
-      if (lastFocused.current) {
-        domtoren(lastFocused.current).toggleClass("focused");
-      }
-      lastFocused.current = trEl as HTMLElement;
     }
-  };
+  }, []);
+
+  const handleBlur = React.useCallback((event: FocusEvent) => {
+    if (event.target) {
+      const el = event.target as HTMLElement;
+      const entry = inputList.current.find((input) => input.el === el);
+      if (entry) {
+        entry.active = false;
+        domtoren(entry.trEl).removeClass("focused");
+      }
+    }
+  }, []);
 
   React.useLayoutEffect(() => {
     const tableEl = ref.current;
     if (tableEl) {
       tableEl.querySelectorAll("input").forEach((input) => {
-        inputList.current.push({ el: input });
+        const trEl = domtoren(input).closest("tr").el() as HTMLTableRowElement;
+        inputList.current.push({ el: input, trEl });
         input.addEventListener("focus", handleFocus);
+        input.addEventListener("blur", handleBlur);
       });
 
       return () => {
         tableEl.querySelectorAll("input").forEach((input) => {
           input.removeEventListener("focus", handleFocus);
+          input.removeEventListener("blur", handleBlur);
         });
       };
     }
-  }, []);
+  }, [handleBlur, handleFocus]);
 
   return (
     <table ref={ref} className={cn(cls.inputgrid, { zebra: zebra })}>
@@ -120,6 +128,10 @@ InputGrid.Seperator = () => (
     <td className="sep" colSpan={3}></td>
   </tr>
 );
-InputGrid.Row = ({ children }: { children: [React.ReactElement, React.ReactElement, React.ReactElement] }) => (
-  <tr>{children}</tr>
-);
+InputGrid.Row = ({
+  children,
+  isTotal
+}: {
+  children: [React.ReactElement, React.ReactElement, React.ReactElement];
+  isTotal?: boolean;
+}) => <tr className={isTotal ? "is-total" : undefined}>{children}</tr>;

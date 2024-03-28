@@ -57,13 +57,19 @@
       &:global(.sep) {
         border: 0;
         border-bottom: 1px solid var(--bg-gray-darkest);
-        height: 16px;
+        height: 24px;
       }
     }
 
     &:global(.focused) {
       td {
         background-color: var(--bg-highlight);
+      }
+    }
+
+    &:global(.is-total) {
+      td:last-of-type {
+        font-weight: bold;
       }
     }
   }

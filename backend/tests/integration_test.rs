@@ -1,5 +1,6 @@
 use std::net::SocketAddr;
 
+use reqwest::StatusCode;
 use sqlx::SqlitePool;
 use tokio::net::TcpListener;
 
@@ -43,11 +44,10 @@ async fn test_hello_world(pool: SqlitePool) {
 }
 
 #[sqlx::test]
-async fn test_polling_station_data_entry(pool: SqlitePool) {
+async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let request_body = backend::polling_station::DataEntryRequest {
-        entry_number: 1,
         data: backend::polling_station::PollingStationResults {
             voters_counts: backend::polling_station::VotersCounts {
                 poll_card_count: 1,
@@ -64,7 +64,7 @@ async fn test_polling_station_data_entry(pool: SqlitePool) {
         },
     };
 
-    let url = format!("http://{addr}/api/polling_stations/1/data_entry");
+    let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
     let response = reqwest::Client::new()
         .post(&url)
         .json(&request_body)
@@ -73,5 +73,26 @@ async fn test_polling_station_data_entry(pool: SqlitePool) {
         .unwrap();
 
     // Ensure the response is what we expect
-    assert_eq!(response.status(), 200);
+    let status = response.status();
+    println!("response body: {:?}", &response.text().await.unwrap());
+    assert_eq!(status, StatusCode::OK);
+}
+
+#[sqlx::test]
+async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("content-type", "application/json")
+        .body(r##"{"data":null}"##)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    let status = response.status();
+    println!("response body: {:?}", &response.text().await.unwrap());
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
 }

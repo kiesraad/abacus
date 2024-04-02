@@ -8,7 +8,6 @@ use utoipa::ToSchema;
 /// Payload structure for data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct DataEntryRequest {
-    pub entry_number: u8,
     pub data: PollingStationResults,
 }
 
@@ -19,7 +18,7 @@ pub struct DataEntryError {
 
 /// PollingStationResults, following the fields in
 /// "Model N 10-1. Proces-verbaal van een stembureau"
-/// https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1
+/// <https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1>
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PollingStationResults {
     /// Voters counts ("3. Aantal toegelaten kiezers")
@@ -57,10 +56,11 @@ pub struct VotesCounts {
 
 #[utoipa::path(
         post,
-        path = "/api/polling_stations/{id}/data_entry",
+        path = "/api/polling_stations/{id}/data_entries/{entry_number}",
         request_body = DataEntryRequest,
         responses(
             (status = 200, description = "Data entry saved successfully"),
+            (status = 422, description = "JSON body parsing error (Unprocessable Content)"),
             (status = 500, description = "Data entry error", body = DataEntryError)
         ),
         params(
@@ -69,12 +69,12 @@ pub struct VotesCounts {
     )]
 pub async fn polling_station_data_entry(
     State(pool): State<SqlitePool>,
-    Path(id): Path<i64>,
-    Json(first_entry_request): Json<DataEntryRequest>,
+    Path((id, entry_number)): Path<(u32, u8)>,
+    Json(data_entry_request): Json<DataEntryRequest>,
 ) -> impl IntoResponse {
-    let data = serde_json::to_string(&first_entry_request.data).unwrap();
-    let result = query!("INSERT INTO polling_station_data_entry (polling_station_id, entry_number, data) VALUES (?, ?, ?)",
-        id, first_entry_request.entry_number, data)
+    let data = serde_json::to_string(&data_entry_request.data).unwrap();
+    let result = query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data) VALUES (?, ?, ?)",
+        id, entry_number, data)
         .execute(&pool)
         .await;
 
@@ -91,9 +91,8 @@ pub async fn polling_station_data_entry(
 }
 
 #[sqlx::test]
-async fn test_polling_station_data_entry(pool: SqlitePool) {
+async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let request_body = DataEntryRequest {
-        entry_number: 1,
         data: PollingStationResults {
             voters_counts: VotersCounts {
                 poll_card_count: 1,
@@ -110,13 +109,14 @@ async fn test_polling_station_data_entry(pool: SqlitePool) {
         },
     };
 
-    let response = polling_station_data_entry(State(pool.clone()), Path(1), Json(request_body))
-        .await
-        .into_response();
+    let response =
+        polling_station_data_entry(State(pool.clone()), Path((1, 1)), Json(request_body))
+            .await
+            .into_response();
     assert_eq!(response.status(), 200);
 
     // Check if a row was created
-    let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entry")
+    let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
         .fetch_one(&pool)
         .await
         .unwrap();

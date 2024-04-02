@@ -16,7 +16,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/api-docs/openapi.json", get(Json(openapi)))
         .route("/hello_world", get(hello_world))
         .route(
-            "/api/polling_stations/:id/data_entry",
+            "/api/polling_stations/:id/data_entries/:entry_number",
             routing::post(polling_station::polling_station_data_entry),
         )
         .with_state(pool);

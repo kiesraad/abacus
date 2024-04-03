@@ -4,4 +4,4 @@ export * from "./Button/Button";
 export * from "./frame/AppFrame";
 export * from "./tag";
 export * from "./ProgressList";
-export * from "./inputgrid/InputGrid";
+export * from "./InputGrid/InputGrid";

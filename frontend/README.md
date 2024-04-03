@@ -3,7 +3,7 @@
 ## Development
 
 ### Prerequisites
-- [Node](https://nodejs.org) v20.11.1
+- [Node](https://nodejs.org) v20
 
 
 ### Building

@@ -11,7 +11,7 @@
 Install javascript depenencies
 
 ```sh
-npm run install
+npm install
 ```
 
 Install playwright dependencies

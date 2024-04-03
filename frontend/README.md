@@ -50,12 +50,12 @@ npm run e2eui
 
 ### UI Component development
 
-View available UI components and their uses states.  
-Open: http://localhost:61000/
+Develop and test UI components in isolation.
 
 ```sh
 npm run ladle
 ```
+Open: http://localhost:61000/
 
 ## Structure
 

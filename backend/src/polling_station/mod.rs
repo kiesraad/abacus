@@ -81,7 +81,7 @@ pub async fn polling_station_data_entry(
     match result {
         Ok(_) => StatusCode::OK.into_response(),
         Err(_) => (
-            StatusCode::NOT_FOUND,
+            StatusCode::INTERNAL_SERVER_ERROR,
             Json(DataEntryError {
                 message: "Failed to save data entry".to_string(),
             }),

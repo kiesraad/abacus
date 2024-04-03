@@ -8,7 +8,7 @@
 
 ### Building
 
-Install javascript depenencies
+Install JavaScript dependencies
 
 ```sh
 npm install

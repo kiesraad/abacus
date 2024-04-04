@@ -9,7 +9,7 @@ export const EnabledButton: Story<{
     label:string;
 }> = ({label, text}) => <Button type="button" aria-label={label} >{text}</Button>;
 
-DefaultButton.args = {
+EnabledButton.args = {
     text: "Click me!",
     label: "I'm a label!",
 }

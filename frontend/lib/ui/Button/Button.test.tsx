@@ -12,18 +12,18 @@ test("The default button is enabled", () => {
   });
 
   buttonElement.click();
-  expect(buttonElement).not.toBeDisabled();
+  expect(buttonElement).toBeEnabled();
 
 });
 
 test("The enabled button is enabled", () => {
-  render(<EnabledButton text="Click me!" label="default-button"></EnabledButton>);
-
+  render(<EnabledButton text="Click me!" label="enabled-button"></EnabledButton>);
+  
   const buttonElement = screen.getByRole('button', {
-    name: 'default-button',
+    name: 'enabled-button',
   });
 
-  expect(buttonElement).not.toBeDisabled();
+  expect(buttonElement).toBeEnabled();
 });
 
 test("The disabled button is disabled", () => {

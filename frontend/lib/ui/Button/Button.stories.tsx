@@ -11,7 +11,7 @@ export const EnabledButton: Story<{
 
 EnabledButton.args = {
     text: "Click me!",
-    label: "I'm a label!",
+    label: "enabled-button",
 }
 
 export const DisabledButton: Story<{
@@ -22,6 +22,6 @@ export const DisabledButton: Story<{
 
 DisabledButton.args = {
     text: "I'm disabled!",
-    label: "I'm a dislabel!",
+    label: "disabled-button",
     disabled: true,
 }

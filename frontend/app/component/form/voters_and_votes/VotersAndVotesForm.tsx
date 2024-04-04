@@ -48,7 +48,7 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>A</td>
             <td>
-              <input id="pollCards" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input id="pollCards" data-testid="pollCards" {...register()} defaultValue={format(pickGoodTestNumber())} />
             </td>
             <td>Stempassen</td>
           </InputGrid.Row>

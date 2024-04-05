@@ -35,6 +35,9 @@ export function VotersAndVotesForm() {
     console.log(result);
   }
 
+// Instead of adding data-testid like below for pollCards, we could also set the config option testIdAttribute to id.
+// See https://testing-library.com/docs/dom-testing-library/api-configuration/#testidattribute
+
   return (
     <form onSubmit={handleSubmit}>
       <h3>Toegelaten kiezers en uitgebrachte stemmen</h3>

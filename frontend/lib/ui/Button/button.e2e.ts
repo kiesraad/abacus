@@ -8,7 +8,7 @@ test("default button is visible", async ({ page }) => {
   })
 
   await expect(button).toBeVisible();
-  expect(await button.isEnabled()).toBe(true);
+  await expect(button).toBeEnabled();
 });
 
 test("click enabled button", async ({ page }) => {
@@ -18,7 +18,7 @@ test("click enabled button", async ({ page }) => {
     name: 'enabled-button',
   })
 
-  expect(await button.isEnabled()).toBe(true);
+  await expect(button).toBeEnabled();
   await button.click();
 });
 
@@ -29,5 +29,5 @@ test("click disabled button", async ({ page }) => {
     name: 'disabled-button',
   })
 
-  expect(await button.isDisabled()).toBe(true);
+  await expect(button).toBeDisabled();
 });

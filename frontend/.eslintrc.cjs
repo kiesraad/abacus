@@ -6,7 +6,6 @@ module.exports = {
     "plugin:@typescript-eslint/strict-type-checked",
     "plugin:react-hooks/recommended",
     "plugin:jsx-a11y/recommended",
-    "plugin:playwright/recommended",
     "prettier"
   ],
   ignorePatterns: ["dist", ".eslintrc.cjs"],
@@ -17,5 +16,19 @@ module.exports = {
   },
   parserOptions: {
     project: "./tsconfig.json"
-  }
+  },
+  overrides: [
+      {
+        files: "*.e2e.ts",
+        extends: [
+          "eslint:recommended",
+          "plugin:@typescript-eslint/recommended-type-checked",
+          "plugin:playwright/recommended",
+        ],
+        plugins: ["@typescript-eslint"],
+        rules: {
+          "@typescript-eslint/no-floating-promises": "error",
+        }
+      }
+    ]
 };

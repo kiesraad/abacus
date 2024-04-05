@@ -5,7 +5,7 @@ import { expect, test } from "vitest";
 import {VotersAndVotesForm} from "./VotersAndVotesForm";
 
 
-test("Test one", async () => {
+test("Enter pollCards count", async () => {
   const user = userEvent.setup();
 
   render(<VotersAndVotesForm />);

@@ -1,5 +1,5 @@
 import * as React from "react";
-import classes from "./tag.module.css";
+import cls from "./tag.module.css";
 
 export interface TagProps {
   type?: "default";
@@ -7,5 +7,5 @@ export interface TagProps {
 }
 
 export function Tag({ type = "default", children }: TagProps) {
-  return <div className={`${classes.tag} ${type}`}>{children}</div>;
+  return <div className={`${cls.tag || ""} ${type}`}>{children}</div>;
 }

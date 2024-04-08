@@ -38,7 +38,7 @@ export function PollingStationPage() {
             </ProgressList.Item>
             <ProgressList.Ruler />
             {lijsten.map((lijst, index) => (
-              <ProgressList.Item key={`lijst${index}`} status="idle">
+              <ProgressList.Item key={`lijst${index.toString()}`} status="idle">
                 {lijst}
               </ProgressList.Item>
             ))}

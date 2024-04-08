@@ -1,7 +1,5 @@
 import * as React from "react";
 
-export interface UseInputMaskParams {}
-
 export type FormatFunc = (s: string | number | null | undefined) => string;
 
 export interface UseInputMaskReturn {
@@ -16,7 +14,7 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
   maximumFractionDigits: 0
 });
 
-export function useInputMask({}: UseInputMaskParams): UseInputMaskReturn {
+export function useInputMask(): UseInputMaskReturn {
   const format: FormatFunc = React.useCallback((s) => {
     if (!s) return "";
     if (s === "") {

@@ -26,7 +26,11 @@ function render() {
 }
 
 if (process.env.MSW) {
-  startMockAPI().then(render).catch(console.error);
+  startMockAPI()
+    .then(render)
+    .catch((e: unknown) => {
+      console.error(e);
+    });
 } else {
   render();
 }

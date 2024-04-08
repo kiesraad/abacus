@@ -17,7 +17,7 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const { register, format } = useInputMask({});
+  const { register, format } = useInputMask();
 
   function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
     event.preventDefault();
@@ -35,8 +35,8 @@ export function VotersAndVotesForm() {
     console.log(result);
   }
 
-// Instead of adding data-testid like below for pollCards, we could also set the config option testIdAttribute to id.
-// See https://testing-library.com/docs/dom-testing-library/api-configuration/#testidattribute
+  // Instead of adding data-testid like below for pollCards, we could also set the config option testIdAttribute to id.
+  // See https://testing-library.com/docs/dom-testing-library/api-configuration/#testidattribute
 
   return (
     <form onSubmit={handleSubmit}>
@@ -51,7 +51,12 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>A</td>
             <td>
-              <input id="pollCards" data-testid="pollCards" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="pollCards"
+                data-testid="pollCards"
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Stempassen</td>
           </InputGrid.Row>

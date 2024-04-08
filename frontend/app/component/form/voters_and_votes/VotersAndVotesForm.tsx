@@ -37,7 +37,7 @@ export function VotersAndVotesForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>Toegalaten kiezers en uitgebrachte stemmen</h3>
+      <h3>Toegelaten kiezers en uitgebrachte stemmen</h3>
       <InputGrid>
         <InputGrid.Header>
           <th>Veld</th>

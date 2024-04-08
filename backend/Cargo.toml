@@ -8,13 +8,13 @@ license = "EUPL-1.2"
 
 [dependencies]
 axum = "0.7"
-hyper = { version = "1.1", features = ["full"] }
+hyper = { version = "1", features = ["full"] }
 tokio = { version = "1", features = ["full"] }
 tower = "0.4"
-utoipa = { version = "4.2.0", features = ["axum_extras"] }
+utoipa = { version = "4.2", features = ["axum_extras"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-sqlx = { version = "0.7", features = ["runtime-tokio", "macros", "sqlite", "migrate"] }
+sqlx = { version = "0.7", features = ["runtime-tokio", "macros", "sqlite", "migrate"], default-features = false }
 
 [dev-dependencies]
-reqwest = { version = "0.11.24", default-features = false, features = ["json"] }
+reqwest = { version = "0.12", default-features = false, features = ["json"] }

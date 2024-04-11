@@ -1,3 +1,8 @@
+/**
+ * Modified from the original source:
+ * https://github.com/kogosoftwarellc/open-api/tree/main/packages/openapi-types
+ */
+
 export interface OpenAPIV3<T extends object = Record<string, never>> {
   openapi: string;
   info: InfoObject;

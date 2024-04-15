@@ -1,5 +1,5 @@
 import { Button, InputGrid } from "@kiesraad/ui";
-import { useInputMask } from "@kiesraad/util";
+import { usePositiveNumberInputMask } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
   pollCards: HTMLInputElement;
@@ -17,7 +17,7 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const { register, format } = useInputMask();
+  const { register, format } = usePositiveNumberInputMask();
 
   function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
     event.preventDefault();

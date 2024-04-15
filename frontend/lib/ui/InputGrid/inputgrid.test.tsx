@@ -40,11 +40,6 @@ const component = (
   </InputGrid>
 );
 
-//TODO: see below
-//TEST move focus arrow up and down and tab and enter
-//TEST handle focus (active table rrow)
-//TEST handle blur (inactive table row)
-
 describe("InputGrid", () => {
   test("InputGrid renders", () => {
     render(component);

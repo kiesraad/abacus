@@ -7,6 +7,7 @@ export interface UseInputMaskReturn {
   register: () => {
     onChange: React.ChangeEventHandler<HTMLInputElement>;
     onLoad: React.ChangeEventHandler<HTMLInputElement>;
+    onPaste: React.ClipboardEventHandler<HTMLInputElement>;
   };
 }
 
@@ -36,16 +37,20 @@ export function useInputMask(): UseInputMaskReturn {
 
   const onLoad: React.ChangeEventHandler<HTMLInputElement> = React.useCallback(
     (event) => {
-      console.log("Onload??", event.target.value);
       event.target.value = format(event.target.value);
     },
     [format]
   );
 
+  const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback((event) => {
+    console.log("Paste", event.clipboardData.getData("text/plain"));
+  }, []);
+
   const register = () => {
     return {
       onChange,
-      onLoad
+      onLoad,
+      onPaste
     };
   };
 

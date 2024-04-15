@@ -14,7 +14,7 @@ Install JavaScript dependencies
 npm install
 ```
 
-Install playwright dependencies
+Install Playwright dependencies
 
 ```sh
 npx playwright install --with-deps

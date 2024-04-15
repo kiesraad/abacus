@@ -1,5 +1,7 @@
 import * as React from "react";
 
+//TODO: rename to usePositiveNumberInputMask
+
 export type FormatFunc = (s: string | number | null | undefined) => string;
 
 export interface UseInputMaskReturn {
@@ -17,11 +19,10 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
 
 export function useInputMask(): UseInputMaskReturn {
   const format: FormatFunc = React.useCallback((s) => {
-    if (!s) return "";
+    if (s === null || s === undefined) return "";
     if (s === "") {
       return "";
     }
-
     let result = `${s}`.replace(/\D/g, "");
     result = numberFormatter.format(Number(result));
     return result;

@@ -44,7 +44,7 @@ e2e tests
 ```sh
 npm run e2e
 
-# with playwright web ui
+# with Playwright web ui
 npm run e2eui 
 ```
 

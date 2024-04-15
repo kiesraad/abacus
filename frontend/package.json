@@ -55,7 +55,7 @@
     "postcss-nesting": "^12.1.1",
     "postcss-pseudo-classes": "^0.4.0",
     "prettier": "^3.2.5",
-    "typescript": "^5.4.4",
+    "typescript": "^5.4.5",
     "vite": "^5.2.8",
     "vite-plugin-html": "^3.2.2",
     "vitest": "^1.4.0"

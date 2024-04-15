@@ -22,7 +22,7 @@ npx playwright install --with-deps
 
 ### Running
 
-This runs the client with a (clientside) mock API
+This runs the client with a (client-side) mock API
 
 ```sh
 npm run dev

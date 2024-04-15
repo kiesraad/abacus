@@ -28,6 +28,14 @@ export const DefaultGrid: Story = () => {
           </td>
           <td>Input field 2</td>
         </InputGrid.Row>
+
+        <InputGrid.Row>
+          <td>C</td>
+          <td>
+            <input id="input3" defaultValue={3} />
+          </td>
+          <td>Input field 3</td>
+        </InputGrid.Row>
       </InputGrid.Body>
     </InputGrid>
   );

@@ -1,0 +1,58 @@
+@font-face {
+  font-family: "SpaceGrotesk";
+  src: url("/font/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf") format("TrueType");
+}
+
+@font-face {
+  font-family: "DMSans";
+  src: url("/font/DM_Sans/DMSans-VariableFont_opsz,wght.ttf") format("TrueType");
+}
+
+@font-face {
+  font-family: "DMSansItalic";
+  src: url("/font/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf") format("TrueType");
+}
+
+@font-face {
+  font-family: "GeistMono";
+  src: url("/font/Geist_Mono/GeistMono-Regular.otf") format("opentype");
+  font-feature-settings: "ss09" on;
+}
+
+:root {
+  /* FONTS */
+  --font-header: "SpaceGrotesk";
+  --font-text: "DMSans";
+  --font-number: "GeistMono";
+
+  /* TODO: pick a better font size scale */
+  --font-size-sm: 0.8em;
+  --font-size-md: 1em;
+  --font-size-lg: 1.8em;
+  --font-size-xl: 3.75em;
+
+  /* COLORS */
+
+  --bg-gray: #f9fafb;
+  --bg-gray-darker: #f2f4f7;
+  --bg-gray-darkest: #d0d5dd;
+
+  --bg-highlight: #eff4ff;
+
+  --base-dark-blue: #00305b;
+  --base-red: #e3032e;
+  --base-light-grey: #f0f0f0;
+  --accent-blue: #4a75ba;
+  --accent-lime: #dddb00;
+  --accent-orange: #ef8050;
+  --accent-light-blue: #c9d8e9;
+  --accent-light-lime: #dddda6;
+  --accent-light-orange: #e9dace;
+  --accent-dark-blue: #00305b;
+  --accent-dark-green: #3d6315;
+  --accent-dark-red: #8f131e;
+  --accent-dark-grey: #878787;
+
+  --warning-bg: #fef0c7;
+  --warning-text: #93370d;
+}

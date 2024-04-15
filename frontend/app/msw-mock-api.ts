@@ -28,7 +28,8 @@ export async function startMockAPI() {
         path.startsWith("/app"),
         path.startsWith("/lib"),
         path.startsWith("/node_modules"),
-        path.startsWith("/js")
+        path.startsWith("/js"),
+        path.startsWith("/font")
       ].some(Boolean);
       if (!ignore) {
         // message format copied from MSW source

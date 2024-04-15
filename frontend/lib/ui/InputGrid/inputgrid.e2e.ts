@@ -5,6 +5,7 @@ const test = base.extend<{ gridPage: Locator }>({
     await page.goto("http://localhost:61000/?story=inputgrid--default-grid");
     const main = page.locator("main.ladle-main");
     const grid = main.locator("table");
+    await grid.waitFor();
 
     await use(grid);
   }
@@ -15,20 +16,18 @@ test.describe("InputGrid", () => {
     await expect(gridPage).toBeVisible();
   });
 
-  test("Row has focused class when input has focus", async ({ gridPage }) => {
+  test("Row has focused class when input has focus", async ({ gridPage, page }) => {
+    const firstTR = gridPage.locator("tr").filter({has: page.getByTestId("input1")})
     const firstInput = gridPage.getByTestId("input1");
+
+    const secondTR = gridPage.locator("tr").filter({has: page.getByTestId("input2")})
     const secondInput = gridPage.getByTestId("input2");
 
-    //TODO: use proper locator methods
-    const firstTR = firstInput.locator("..").locator("..");
     await firstInput.focus();
-
     await expect(firstTR).toHaveClass("focused");
+    await expect(secondTR).not.toHaveClass("focused");
 
     await secondInput.focus();
-    //TODO: use proper locator methods
-    const secondTR = secondInput.locator("..").locator("..");
-
     await expect(firstTR).not.toHaveClass("focused");
     await expect(secondTR).toHaveClass("focused");
   });

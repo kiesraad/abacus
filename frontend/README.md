@@ -65,7 +65,7 @@ The application uses the following dependencies:
 
 - `react`: creating efficient, declarative, and component-based web applications.
 - `react-dom`: DOM implementation for rendering UI
-- `react-dom-router`: Handling browser routing for react applications
+- `react-dom-router`: Handling browser routing for React applications
 
 #### Development dependencies
 

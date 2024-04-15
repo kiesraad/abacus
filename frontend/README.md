@@ -77,7 +77,7 @@ The application uses the following dependencies:
 #### Testing / linting dependencies
 
 - `vitest`: Jest compatible unit test framework
-- `testing-library`: (react) Component and dom test utilities
+- `testing-library`: (React) component and dom test utilities
 - `playwright`: e2e testing framework
 - `prettier`: Opinionated code formatter
 - `eslint`: Linter

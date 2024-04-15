@@ -69,7 +69,7 @@ The application uses the following dependencies:
 
 #### Development dependencies
 
-- `typescript`: Strongly typed layer ontop of javascript
+- `typescript`: Strongly typed layer on top of JavaScript
 - `msw`: Mock Service Worker for mocking the server, client side
 - `vite`: frontend build tool
 - `ladle`: simple development and test environment for UI components

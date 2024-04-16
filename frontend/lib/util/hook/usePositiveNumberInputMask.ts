@@ -1,7 +1,5 @@
 import * as React from "react";
 
-//TODO: rename to usePositiveNumberInputMask
-
 export type FormatFunc = (s: string | number | null | undefined) => string;
 
 export interface UsePositiveNumberInputMaskReturn {

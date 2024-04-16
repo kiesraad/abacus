@@ -16,7 +16,8 @@ const config: PlaywrightTestConfig = defineConfig({
   fullyParallel: true,
   use: {
     trace: "retain-on-failure",
-    baseURL: "http://localhost:4009"
+    baseURL: "http://localhost:4009",
+    testIdAttribute: "id"
   },
   projects: [
     {

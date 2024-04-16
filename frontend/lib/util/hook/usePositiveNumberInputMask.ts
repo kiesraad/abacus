@@ -2,7 +2,7 @@ import * as React from "react";
 
 export type FormatFunc = (s: string | number | null | undefined) => string;
 
-export interface UseInputMaskReturn {
+export interface UsePositiveNumberInputMaskReturn {
   format: FormatFunc;
   register: () => {
     onChange: React.ChangeEventHandler<HTMLInputElement>;
@@ -15,13 +15,12 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
   maximumFractionDigits: 0
 });
 
-export function useInputMask(): UseInputMaskReturn {
+export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
   const format: FormatFunc = React.useCallback((s) => {
-    if (!s) return "";
+    if (s === null || s === undefined) return "";
     if (s === "") {
       return "";
     }
-
     let result = `${s}`.replace(/\D/g, "");
     result = numberFormatter.format(Number(result));
     return result;

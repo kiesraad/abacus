@@ -4,7 +4,7 @@ import { devices, type PlaywrightTestConfig, defineConfig } from "@playwright/te
  * See https://playwright.dev/docs/test-configuration.
  */
 const config: PlaywrightTestConfig = defineConfig({
-  testDir: "./app/test/e2e",
+  testDir: "./",
   testMatch: /\.e2e\.ts/,
   // Fail the build on CI if you accidentally left test.only in the source code
   forbidOnly: !!process.env.CI,
@@ -12,11 +12,12 @@ const config: PlaywrightTestConfig = defineConfig({
   retries: process.env.CI ? 2 : 0,
   // use all available cores (2) on github actions. default is 50%, use that locally
   workers: process.env.CI ? "100%" : undefined,
-  timeout: 2 * 60 * 1000, // 2 minutes, surely overkill
+  timeout: 10 * 1000, // 10 seconds, because tests are small for now
   fullyParallel: true,
   use: {
     trace: "retain-on-failure",
-    baseURL: "http://localhost:4009"
+    baseURL: "http://localhost:4009",
+    testIdAttribute: "id"
   },
   projects: [
     {

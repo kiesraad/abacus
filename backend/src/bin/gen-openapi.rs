@@ -2,6 +2,7 @@ use std::fs;
 
 use backend::create_openapi;
 
+/// Write OpenAPI JSON documentation to `openapi.json`.
 fn main() {
     let doc = get_openapi_json();
     fs::write("./openapi.json", doc).expect("Could not write openapi.json");

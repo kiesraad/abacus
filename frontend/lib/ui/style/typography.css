@@ -1,0 +1,54 @@
+body {
+  font-family: var(--font-text), sans-serif;
+  font-size: 16px;
+  line-height: 1em;
+  color: #333;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  font-family: var(--font-header), sans-serif;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.72px;
+}
+
+h1 {
+  font-size: 2em;
+}
+h2 {
+  font-size: 1.75em;
+  margin-bottom: 1.2em;
+}
+h3 {
+  font-size: 1.5em;
+}
+h4 {
+  font-size: 1.25em;
+}
+h5 {
+  font-size: 1.125em;
+}
+h6 {
+  font-size: 1em;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 15px;
+  line-height: 1.3em;
+}
+
+a {
+  text-decoration: none;
+  &:hover,
+  &:focus {
+    text-decoration: underline;
+  }
+}

@@ -15,7 +15,7 @@ async function run() {
   const spec = JSON.parse(fileString) as OpenAPIV3;
 
   if (fs.existsSync(TARGET_PATH)) {
-    fs.rmdirSync(TARGET_PATH, { recursive: true });
+    fs.rmSync(TARGET_PATH, { recursive: true });
   }
   fs.mkdirSync(TARGET_PATH);
 

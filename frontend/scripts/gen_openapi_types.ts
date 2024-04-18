@@ -89,8 +89,6 @@ function addPath(path: string, v: PathsObject | undefined) {
             );
           }
         }
-        // result.push(`export interface ${id}_REQUEST_BODY {`);
-        // result.push('}');
       }
     }
   }
@@ -120,10 +118,6 @@ function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
   result.push("}");
 
   return result.join("\n");
-
-  // props.forEach(([k, v2]: [string, any]) => {
-  //   ar.push(`  ${k}${isRequired(k, v.required)}: ${tsType(v2.type)};`);
-  // });
 }
 
 function tsType(s: ReferenceObject | SchemaObject | undefined): string {
@@ -141,7 +135,7 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
     case "number":
       return "number";
     default:
-      //TODO: catch all types, any is not allowd
+      //TODO: catch all types, any is not allowed
       return "any";
   }
 }

@@ -7,6 +7,7 @@ pre-commit:
       root: "backend/"
       glob: "*.rs"
       run: cargo fmt
+      stage_fixed: true
     backend-linter:
       root: "backend/"
       glob: "*.rs"

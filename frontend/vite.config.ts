@@ -16,6 +16,7 @@ export default defineConfig(() => ({
     "process.env.MSW": true,
     "process.env.VERSION": JSON.stringify(pkgjson.version)
   },
+  optimizeDeps: { exclude: ["msw"] },
   plugins: [react()],
   resolve: {
     alias: mapObj(

@@ -2,7 +2,7 @@ import { Locator, test as base, expect } from "@playwright/test";
 
 const test = base.extend<{ gridPage: Locator }>({
   gridPage: async ({ page }, use) => {
-    await page.goto("http://localhost:61000/?story=inputgrid--default-grid");
+    await page.goto("http://localhost:61000/?story=input-grid--default-grid");
     const main = page.locator("main.ladle-main");
     const grid = main.locator("table");
     await grid.waitFor();

@@ -1,0 +1,73 @@
+.app-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  > nav {
+    flex: 0 0 44px;
+    padding: 0 64px;
+    background-color: #344054;
+    color: #fff;
+
+    display: flex;
+    align-items: center;
+  }
+
+  > header {
+    padding: 32px 64px;
+    display: flex;
+    min-height: 140px;
+    align-items: center;
+    justify-content: space-between;
+
+    display: flex;
+    justify-content: space-between;
+
+    section {
+      display: flex;
+      align-items: center;
+
+      h1 {
+        margin: 0 16px 0 16px;
+        padding: 0;
+      }
+    }
+  }
+
+  > main {
+    flex: 1 1 auto;
+    display: flex;
+
+    > nav {
+      flex: 0 0 420px;
+      padding: 32px 0 32px 64px;
+      background-color: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    > article {
+      flex: 1 1 auto;
+      padding: 32px 64px;
+      background-color: #f9fafb;
+    }
+  }
+
+  > aside {
+    flex: 0 0 128px;
+    padding: 0 64px 0 320px;
+    display: flex;
+    align-items: center;
+  }
+
+  > footer {
+    flex: 0 0 24px;
+    background-color: #151921;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 64px;
+    font-size: 10px;
+  }
+}

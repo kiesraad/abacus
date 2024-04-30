@@ -69,5 +69,8 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx,json}": "eslint --cache --fix"
+  },
+  "prettier": {
+    "printWidth": 100
   }
 }

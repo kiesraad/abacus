@@ -8,7 +8,7 @@ const test = base.extend<{ gridPage: Locator }>({
     await grid.waitFor();
 
     await use(grid);
-  }
+  },
 });
 
 test.describe("InputGrid", () => {
@@ -17,10 +17,10 @@ test.describe("InputGrid", () => {
   });
 
   test("Row has focused class when input has focus", async ({ gridPage, page }) => {
-    const firstTR = gridPage.locator("tr").filter({has: page.getByTestId("input1")})
+    const firstTR = gridPage.locator("tr").filter({ has: page.getByTestId("input1") });
     const firstInput = gridPage.getByTestId("input1");
 
-    const secondTR = gridPage.locator("tr").filter({has: page.getByTestId("input2")})
+    const secondTR = gridPage.locator("tr").filter({ has: page.getByTestId("input2") });
     const secondInput = gridPage.getByTestId("input2");
 
     await firstInput.focus();

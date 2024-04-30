@@ -29,7 +29,7 @@ export async function startMockAPI() {
         path.startsWith("/lib"),
         path.startsWith("/node_modules"),
         path.startsWith("/js"),
-        path.startsWith("/font")
+        path.startsWith("/font"),
       ].some(Boolean);
       if (!ignore) {
         // message format copied from MSW source
@@ -39,6 +39,6 @@ export async function startMockAPI() {
 
 If you want to intercept this unhandled request, create a request handler for it.`);
       }
-    }
+    },
   });
 }

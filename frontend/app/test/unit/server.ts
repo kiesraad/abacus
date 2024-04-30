@@ -15,7 +15,7 @@ export const server = setupServer(
     // Node's Fetch implementation does not accept URLs with a protocol and host
     h.info.path = "http://testhost" + h.info.path.toString();
     return h;
-  })
+  }),
 );
 
 // Override request handlers in order to test special cases
@@ -23,15 +23,17 @@ export function overrideOnce(
   method: keyof typeof http,
   path: string,
   status: number,
-  body: string | Record<string, unknown>
+  body: string | Record<string, unknown>,
 ) {
   server.use(
     http[method](
       path,
       () =>
         // https://mswjs.io/docs/api/response/once
-        typeof body === "string" ? new HttpResponse(body, { status }) : HttpResponse.json(body, { status }),
-      { once: true }
-    )
+        typeof body === "string"
+          ? new HttpResponse(body, { status })
+          : HttpResponse.json(body, { status }),
+      { once: true },
+    ),
   );
 }

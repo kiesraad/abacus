@@ -3,8 +3,8 @@
 ## Development
 
 ### Prerequisites
-- [Node](https://nodejs.org) v20
 
+- [Node](https://nodejs.org) v20
 
 ### Building
 
@@ -29,6 +29,7 @@ npm run dev
 ```
 
 ### Linting
+
 ```sh
 npm run lint
 ```
@@ -36,16 +37,18 @@ npm run lint
 ### Testing
 
 Unit tests
+
 ```sh
 npm run test
 ```
 
 e2e tests
+
 ```sh
 npm run e2e
 
 # with Playwright web ui
-npm run e2eui 
+npm run e2eui
 ```
 
 ### UI Component development
@@ -55,6 +58,7 @@ Develop and test UI components in isolation.
 ```sh
 npm run ladle
 ```
+
 Open: http://localhost:61000/
 
 ## Structure
@@ -82,16 +86,16 @@ The application uses the following dependencies:
 - `prettier`: Opinionated code formatter
 - `eslint`: Linter
 
-
 ### Scripts
 
 #### gen_openapi_types
 
-Generate Typescript types from `/backend/openapi.json`. 
+Generate Typescript types from `/backend/openapi.json`.
 
 ```sh
 npm run gen:openapi
 ```
+
 This results in `/frontend/lib/api/gen/openapi.ts`
 
 #### gen_icons
@@ -101,5 +105,5 @@ Generate React components from icons located in `/frontend/lib/ui/svg`
 ```sh
 npm run gen:icons
 ```
-This results in `/frontend/lib/icon/gen.tsx`
 
+This results in `/frontend/lib/icon/gen.tsx`

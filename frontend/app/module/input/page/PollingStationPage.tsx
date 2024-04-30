@@ -58,5 +58,5 @@ export function PollingStationPage() {
 const lijsten: string[] = [
   "Lijst 1 - Vurige Vleugels Partij",
   "Lijst 2 - Wijzen van Water en Wind",
-  "Lijst 3 - Eeuwenoude Aarde Unie"
+  "Lijst 3 - Eeuwenoude Aarde Unie",
 ];

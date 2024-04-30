@@ -9,12 +9,12 @@ export default defineConfig(() => ({
   build: {
     outDir: path.resolve(__dirname, "dist"),
     emptyOutDir: true,
-    sourcemap: true
+    sourcemap: true,
     // minify: false, // uncomment for debugging
   },
   define: {
     "process.env.MSW": true,
-    "process.env.VERSION": JSON.stringify(pkgjson.version)
+    "process.env.VERSION": JSON.stringify(pkgjson.version),
   },
   optimizeDeps: { exclude: ["msw"] },
   plugins: [react()],
@@ -25,22 +25,25 @@ export default defineConfig(() => ({
       (paths) => {
         if (!paths[0]) throw new Error("No path found");
         return path.resolve(__dirname, paths[0].replace("/*", ""));
-      }
-    )
+      },
+    ),
   },
   css: {
     preprocessorOptions: {
       less: {
-        javascriptEnabled: true
-      }
-    }
+        javascriptEnabled: true,
+      },
+    },
   },
   test: {
     environment: "jsdom",
     setupFiles: ["app/test/unit/setup.ts"],
-    includeSource: ["app/**/*.ts", "lib/**/*.ts"]
-  }
+    includeSource: ["app/**/*.ts", "lib/**/*.ts"],
+  },
 }));
 
-const mapObj = <V0, V>(obj: Record<string, V0>, kf: (t: string) => string, vf: (t: V0) => V): Record<string, V> =>
-  Object.fromEntries(Object.entries(obj).map(([k, v]) => [kf(k), vf(v)]));
+const mapObj = <V0, V>(
+  obj: Record<string, V0>,
+  kf: (t: string) => string,
+  vf: (t: V0) => V,
+): Record<string, V> => Object.fromEntries(Object.entries(obj).map(([k, v]) => [kf(k), vf(v)]));

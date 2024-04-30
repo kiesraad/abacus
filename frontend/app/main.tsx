@@ -14,14 +14,14 @@ const root = ReactDOM.createRoot(rootDiv);
 function render() {
   const router = createBrowserRouter(routes, {
     future: {
-      v7_normalizeFormMethod: true
-    }
+      v7_normalizeFormMethod: true,
+    },
   });
 
   root.render(
     <StrictMode>
       <RouterProvider router={router} />
-    </StrictMode>
+    </StrictMode>,
   );
 }
 

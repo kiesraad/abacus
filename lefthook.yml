@@ -19,4 +19,4 @@ pre-commit:
     frontend-linter:
       root: "frontend/"
       glob: "*.{ts,tsx}"
-      run: npm run lint
+      run: npm run lint {staged_files}

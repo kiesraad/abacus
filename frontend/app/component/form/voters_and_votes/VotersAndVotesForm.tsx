@@ -30,7 +30,7 @@ export function VotersAndVotesForm() {
       votesOnCandidates: elements.votesOnCandidates.value,
       blankVotes: elements.blankVotes.value,
       invalidVotes: elements.invalidVotes.value,
-      totalVotesCast: elements.totalVotesCast.value
+      totalVotesCast: elements.totalVotesCast.value,
     };
     console.log(result);
   }
@@ -55,7 +55,11 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>B</td>
             <td>
-              <input id="proxyCertificates" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="proxyCertificates"
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Volmachtbewijzen</td>
           </InputGrid.Row>
@@ -69,7 +73,11 @@ export function VotersAndVotesForm() {
           <InputGrid.Row isTotal>
             <td>D</td>
             <td>
-              <input id="totalAdmittedVoters" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="totalAdmittedVoters"
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Totaal toegelaten kiezers</td>
           </InputGrid.Row>
@@ -79,7 +87,11 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>E</td>
             <td>
-              <input id="votesOnCandidates" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="votesOnCandidates"
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Stemmen op kandidaten</td>
           </InputGrid.Row>
@@ -93,14 +105,22 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>G</td>
             <td>
-              <input id="invalidVotes" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="invalidVotes"
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Ongeldige stemmen</td>
           </InputGrid.Row>
           <InputGrid.Row isTotal>
             <td>H</td>
             <td>
-              <input id="totalVotesCast" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="totalVotesCast"
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Totaal uitgebrachte stemmen</td>
           </InputGrid.Row>

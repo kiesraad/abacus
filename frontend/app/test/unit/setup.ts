@@ -5,7 +5,7 @@ import { afterAll, afterEach, beforeAll } from "vitest";
 import { server } from "./server";
 
 configure({
-  testIdAttribute: "id"
+  testIdAttribute: "id",
 });
 
 beforeAll(() => {

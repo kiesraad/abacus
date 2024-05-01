@@ -6,7 +6,7 @@ module.exports = {
     "plugin:@typescript-eslint/strict-type-checked",
     "plugin:react-hooks/recommended",
     "plugin:jsx-a11y/recommended",
-    "prettier"
+    "prettier",
   ],
   ignorePatterns: ["dist", ".eslintrc.cjs"],
   parser: "@typescript-eslint/parser",
@@ -17,12 +17,12 @@ module.exports = {
       "error",
       {
         allowNumber: true,
-        allowBoolean: true
-      }
-    ]
+        allowBoolean: true,
+      },
+    ],
   },
   parserOptions: {
-    project: "./tsconfig.json"
+    project: "./tsconfig.json",
   },
   overrides: [
     {
@@ -30,12 +30,12 @@ module.exports = {
       extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended-type-checked",
-        "plugin:playwright/recommended"
+        "plugin:playwright/recommended",
       ],
       plugins: ["@typescript-eslint"],
       rules: {
-        "@typescript-eslint/no-floating-promises": "error"
-      }
-    }
-  ]
+        "@typescript-eslint/no-floating-promises": "error",
+      },
+    },
+  ],
 };

@@ -78,14 +78,14 @@ function addPath(path: string, v: PathsObject | undefined) {
     if (post.requestBody) {
       if ("$ref" in post.requestBody) {
         result.push(
-          `export type ${id}_REQUEST_BODY = ${post.requestBody.$ref.substring(post.requestBody.$ref.lastIndexOf("/") + 1)};`
+          `export type ${id}_REQUEST_BODY = ${post.requestBody.$ref.substring(post.requestBody.$ref.lastIndexOf("/") + 1)};`,
         );
       } else {
         const media = post.requestBody.content["application/json"];
         if (media?.schema) {
           if ("$ref" in media.schema) {
             result.push(
-              `export type ${id}_REQUEST_BODY = ${media.schema.$ref.substring(media.schema.$ref.lastIndexOf("/") + 1)};`
+              `export type ${id}_REQUEST_BODY = ${media.schema.$ref.substring(media.schema.$ref.lastIndexOf("/") + 1)};`,
             );
           }
         }

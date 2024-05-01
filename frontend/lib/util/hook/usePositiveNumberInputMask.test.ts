@@ -8,10 +8,13 @@ describe("useInputMask", () => {
     expect(result.current.format).toBeDefined();
   });
 
-  test.each(["", null, undefined])("%s renders as empty string", (input: string | null | undefined) => {
-    const { result } = renderHook(() => usePositiveNumberInputMask());
-    expect(result.current.format(input)).equals("");
-  });
+  test.each(["", null, undefined])(
+    "%s renders as empty string",
+    (input: string | null | undefined) => {
+      const { result } = renderHook(() => usePositiveNumberInputMask());
+      expect(result.current.format(input)).equals("");
+    },
+  );
 
   test.each([
     ["0", "0"],
@@ -20,7 +23,7 @@ describe("useInputMask", () => {
     ["1000", "1.000"],
     ["12345", "12.345"],
     ["123456", "123.456"],
-    ["1000000", "1.000.000"]
+    ["1000000", "1.000.000"],
   ])("format string %s as %s", (input: string, expected: string) => {
     const { result } = renderHook(() => usePositiveNumberInputMask());
     expect(result.current.format(input)).equals(expected);
@@ -33,7 +36,7 @@ describe("useInputMask", () => {
     [1000, "1.000"],
     [12345, "12.345"],
     [123456, "123.456"],
-    [1000000, "1.000.000"]
+    [1000000, "1.000.000"],
   ])("format number %i as %s", (input: number, expected: string) => {
     const { result } = renderHook(() => usePositiveNumberInputMask());
     expect(result.current.format(input)).equals(expected);
@@ -42,7 +45,7 @@ describe("useInputMask", () => {
   //TODO: is this the desired behavior?
   test.each([
     [-10, "10"],
-    [-1000000, "1.000.000"]
+    [-1000000, "1.000.000"],
   ])("format negative number %i as %s", (input: number, expected: string) => {
     const { result } = renderHook(() => usePositiveNumberInputMask());
     expect(result.current.format(input)).equals(expected);
@@ -52,7 +55,7 @@ describe("useInputMask", () => {
   test.each([
     ["A3asdb2", "32"],
     ["AAAA1234", "1.234"],
-    ["-", "0"]
+    ["-", "0"],
   ])("format unexpected input %s as %s", (input: string, expected: string) => {
     const { result } = renderHook(() => usePositiveNumberInputMask());
     expect(result.current.format(input)).equals(expected);

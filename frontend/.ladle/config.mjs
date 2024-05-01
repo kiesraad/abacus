@@ -1,3 +1,3 @@
 export default {
-  stories: "lib/ui/**/*.stories.tsx"
+  stories: "lib/ui/**/*.stories.tsx",
 };

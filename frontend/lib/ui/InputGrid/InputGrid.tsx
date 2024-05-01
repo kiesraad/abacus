@@ -116,7 +116,11 @@ export function InputGrid({ zebra, children }: InputGridProps) {
   );
 }
 
-InputGrid.Header = ({ children }: { children: [React.ReactElement, React.ReactElement, React.ReactElement] }) => (
+InputGrid.Header = ({
+  children,
+}: {
+  children: [React.ReactElement, React.ReactElement, React.ReactElement];
+}) => (
   <thead>
     <tr>{children}</tr>
   </thead>
@@ -130,7 +134,7 @@ InputGrid.Seperator = () => (
 );
 InputGrid.Row = ({
   children,
-  isTotal
+  isTotal,
 }: {
   children: [React.ReactElement, React.ReactElement, React.ReactElement];
   isTotal?: boolean;

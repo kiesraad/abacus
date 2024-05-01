@@ -14,12 +14,11 @@ const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>(
     const data = await request.json();
 
     const pong = data.ping || "pong";
-    
-    return HttpResponse.json({
-      pong
-    });
-  }
-);
 
+    return HttpResponse.json({
+      pong,
+    });
+  },
+);
 
 export const handlers: HttpHandler[] = [pingHandler];

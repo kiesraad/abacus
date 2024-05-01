@@ -12,7 +12,7 @@ export interface UsePositiveNumberInputMaskReturn {
 }
 
 const numberFormatter = new Intl.NumberFormat("nl-NL", {
-  maximumFractionDigits: 0
+  maximumFractionDigits: 0,
 });
 
 export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
@@ -31,14 +31,14 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
       //remove all non numbers
       event.target.value = format(event.target.value);
     },
-    [format]
+    [format],
   );
 
   const onLoad: React.ChangeEventHandler<HTMLInputElement> = React.useCallback(
     (event) => {
       event.target.value = format(event.target.value);
     },
-    [format]
+    [format],
   );
 
   const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback((event) => {
@@ -49,12 +49,12 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
     return {
       onChange,
       onLoad,
-      onPaste
+      onPaste,
     };
   };
 
   return {
     format,
-    register
+    register,
   };
 }

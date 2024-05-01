@@ -17,38 +17,38 @@ const config: PlaywrightTestConfig = defineConfig({
   use: {
     trace: "retain-on-failure",
     baseURL: "http://localhost:4009",
-    testIdAttribute: "id"
+    testIdAttribute: "id",
   },
   projects: [
     {
       name: "chrome",
       use: {
         contextOptions: {
-          permissions: ["clipboard-read", "clipboard-write"]
+          permissions: ["clipboard-read", "clipboard-write"],
         },
-        ...devices["Desktop Chrome"]
-      }
+        ...devices["Desktop Chrome"],
+      },
     },
     {
       name: "firefox",
-      use: { ...devices["Desktop Firefox"] }
+      use: { ...devices["Desktop Firefox"] },
     },
     {
       name: "safari",
-      use: { ...devices["Desktop Safari"] }
-    }
+      use: { ...devices["Desktop Safari"] },
+    },
   ],
   // use different port so it doesn't conflict with local dev server
   webServer: [
     {
       command: "npm run start:msw -- --port 4009",
-      port: 4009
+      port: 4009,
     },
     {
       command: "npm run ladle",
-      port: 61000
-    }
-  ]
+      port: 61000,
+    },
+  ],
 });
 
 export default config;

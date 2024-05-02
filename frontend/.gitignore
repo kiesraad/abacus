@@ -23,3 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 test-results
+mock
+
+# Automatically created: https://github.com/mswjs/msw/discussions/1015#discussioncomment-1747585
+mockServiceWorker.js

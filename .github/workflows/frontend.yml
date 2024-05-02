@@ -1,4 +1,4 @@
-name: Kiesraad-frontend
+name: Frontend
 
 on:
   push:
@@ -8,26 +8,29 @@ env:
   API_MODE: msw
 
 jobs:
-  test:
+  node:
+    name: Node
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v4
-      - name: Use node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
       - name: Install
         run: npm install
+      - name: Check formatting
+        run: npx prettier --check .
       - name: Lint
         run: npm run lint
       - name: Test
         run: npm test
-      - name: "e2e test install"
+      - name: e2e test install
         run: npx playwright install --with-deps
-      - name: "e2e test"
+      - name: e2e test
         run: npm run e2e
-      - name: "Build"
+      - name: Build
         run: npm run build

@@ -1,10 +1,11 @@
-import { Button, PollingStationNumber, ProgressList, Tag, WorkStationNumber } from "@kiesraad/ui";
+import { Button, PollingStationNumber, ProgressList, Tag, WorkStationNumber, useAppLayout } from "@kiesraad/ui";
 import { useParams } from "react-router-dom";
 import { IconCross } from "@kiesraad/icon";
 import { VotersAndVotesForm } from "app/component/form/voters_and_votes/VotersAndVotesForm";
 
 export function PollingStationPage() {
   const { id, section } = useParams();
+  useAppLayout({ fixedHeader: true });
 
   const targetForm = section || "numbers";
 
@@ -48,6 +49,58 @@ export function PollingStationPage() {
         </nav>
         <article>
           <VotersAndVotesForm />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
+          UI TEST
+          <br />
         </article>
       </main>
       <aside>&nbsp;</aside>

@@ -28,21 +28,23 @@
   /* TODO: pick a better font size scale */
   --font-size-sm: 0.8em;
   --font-size-md: 1em;
-  --font-size-lg: 1.8em;
-  --font-size-xl: 3.75em;
+  --font-size-md-lg: 1.2em;
+  --font-size-lg: 1.5em;
+  --font-size-xl: 2.25em;
+  --font-size-xxl: 3.75em;
 
   /* COLORS */
 
-  --bg-gray: #f9fafb;
+  --bg-gray: #f2f4f7;
   --bg-gray-darker: #f2f4f7;
   --bg-gray-darkest: #d0d5dd;
 
   --bg-highlight: #eff4ff;
 
-  --base-dark-blue: #00305b;
+  --base-dark-blue: #113051;
   --base-red: #e3032e;
   --base-light-grey: #f0f0f0;
-  --accent-blue: #4a75ba;
+  --accent-blue: #5d81b8;
   --accent-lime: #dddb00;
   --accent-orange: #ef8050;
   --accent-light-blue: #c9d8e9;

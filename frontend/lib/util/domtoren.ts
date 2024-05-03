@@ -13,6 +13,14 @@ export class DomToren {
     return this;
   }
 
+  public first(tag: string) {
+    const nextEl = this._el.querySelector(tag);
+    if (nextEl) {
+      this._el = nextEl;
+    }
+    return this;
+  }
+
   public toggleClass(className: string) {
     this._el.classList.toggle(className);
     return this;
@@ -28,7 +36,12 @@ export class DomToren {
     return this;
   }
 
-  public el() {
+  public el(isTag?: string) {
+    if (isTag) {
+      if (this._el.tagName.toLowerCase() !== isTag.toLowerCase()) {
+        return null;
+      }
+    }
     return this._el;
   }
 }

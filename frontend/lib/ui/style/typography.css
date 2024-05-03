@@ -17,11 +17,14 @@ h6 {
   font-style: normal;
   font-weight: 400;
   letter-spacing: -0.72px;
+
+  transition: font-size 0.3s;
 }
 
 h1 {
-  font-size: 2em;
+  font-size: var(--font-size-xl);
 }
+
 h2 {
   font-size: 1.75em;
   margin-bottom: 1.2em;
@@ -50,5 +53,11 @@ a {
   &:hover,
   &:focus {
     text-decoration: underline;
+  }
+}
+
+.compact {
+  h1 {
+    font-size: var(--font-size-lg);
   }
 }

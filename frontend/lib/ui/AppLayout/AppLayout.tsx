@@ -1,6 +1,6 @@
 import * as React from "react";
 import cls from "./applayout.module.css";
-import { FixedHeaderController } from "./FixedHeaderController";
+import { FixedHeaderController } from "./controller/FixedHeaderController";
 
 export interface AppLayoutConfig {
   fixedHeader: boolean;
@@ -26,7 +26,6 @@ const defaultAppLayoutConfig: AppLayoutConfig = {
 export const AppLayoutContext = React.createContext<iAppLayoutContext | null>(null);
 
 //Reduce the amount of rerenders (State changes) to a minimum
-
 export function AppLayout({ children }: AppLayoutProps) {
   const ref = React.useRef<HTMLDivElement>(null);
   const _config = React.useRef<AppLayoutConfig>(defaultAppLayoutConfig);
@@ -62,6 +61,12 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   React.useLayoutEffect(() => {
     processConfig(_config.current);
+    const controllers = _controllers.current;
+    return () => {
+      Object.values(controllers).forEach((controller) => {
+        controller.unregister();
+      });
+    };
   }, []);
 
   return (

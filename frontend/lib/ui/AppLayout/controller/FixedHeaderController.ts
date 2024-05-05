@@ -1,5 +1,5 @@
-import * as React from "react";
 import { domtoren } from "@kiesraad/util";
+import { UIController } from "./UIController";
 
 type Dimensions = {
   nav: {
@@ -13,8 +13,7 @@ type Dimensions = {
   };
 };
 
-export class FixedHeaderController {
-  private ref: React.RefObject<HTMLDivElement>;
+export class FixedHeaderController extends UIController {
   public registered = false;
 
   public dim: Dimensions = {
@@ -33,10 +32,6 @@ export class FixedHeaderController {
   private headerEl: HTMLElement | null = null;
 
   private lastY = 0;
-
-  constructor(ref: React.RefObject<HTMLDivElement>) {
-    this.ref = ref;
-  }
 
   register() {
     if (this.registered) return;
@@ -101,7 +96,7 @@ export class FixedHeaderController {
     const mouseY = e.clientY;
     if (mouseY < 10) {
       this.navEl?.classList.add("show");
-    } else {
+    } else if (mouseY > this.dim.nav.height + 10) {
       this.navEl?.classList.remove("show");
     }
   };
@@ -112,12 +107,6 @@ export class FixedHeaderController {
       return;
     }
     const [curY] = this.scrollTop();
-
-    //scroll up
-    // if (lastY > curY) {
-    //   this.navEl?.classList.add("show");
-    // }
-
     if (curY > this.dim.nav.height) {
       if (this.headerEl) {
         this.headerEl.classList.add("compact");

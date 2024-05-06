@@ -1,13 +1,7 @@
 import assert from "assert";
 import fs from "fs";
 import prettier from "prettier";
-import {
-  OpenAPIV3,
-  ReferenceObject,
-  SchemaObject,
-  PathsObject,
-  OperationObject,
-} from "./openapi";
+import { OpenAPIV3, ReferenceObject, SchemaObject, PathsObject, OperationObject } from "./openapi";
 
 const TARGET_PATH = "./lib/api/gen";
 const FILE_NAME = "openapi.ts";
@@ -33,12 +27,8 @@ async function run() {
     throw new Error("No schemas found in OpenAPI spec");
   }
 
-  const paths: string[] = Object.entries(spec.paths).map(([k, v]) =>
-    addPath(k, v),
-  );
-  const types: string[] = Object.entries(schemas).map(([k, v]) =>
-    addDefinition(k, v),
-  );
+  const paths: string[] = Object.entries(spec.paths).map(([k, v]) => addPath(k, v));
+  const types: string[] = Object.entries(schemas).map(([k, v]) => addDefinition(k, v));
 
   result.push("\n\n");
 

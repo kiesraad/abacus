@@ -1,6 +1,5 @@
 const sleep = async (ms: number) => new Promise((res) => setTimeout(res, ms));
-const randInt = (min: number, max: number) =>
-  min + Math.floor(Math.random() * (max - min));
+const randInt = (min: number, max: number) => min + Math.floor(Math.random() * (max - min));
 
 export async function startMockAPI() {
   const { handlers } = await import("@kiesraad/api-mocks");

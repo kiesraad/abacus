@@ -32,24 +32,18 @@ const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>(
 const pollingStationDataEntryHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY
->(
-  "/v1/api/polling_stations/:id/data_entries/:entry_number",
-  async ({ request }) => {
-    let json;
-    try {
-      json = await request.json();
-    } catch (e) {
-      //eslint-disable-next-line
-      return HttpResponse.text(`${e}`, { status: 422 });
-    }
-    if ("voters_counts" in json.data) {
-      return HttpResponse.text("", { status: 200 });
-    }
-    return HttpResponse.json({ message: "missing fields" }, { status: 500 });
-  },
-);
+>("/v1/api/polling_stations/:id/data_entries/:entry_number", async ({ request }) => {
+  let json;
+  try {
+    json = await request.json();
+  } catch (e) {
+    //eslint-disable-next-line
+    return HttpResponse.text(`${e}`, { status: 422 });
+  }
+  if ("voters_counts" in json.data) {
+    return HttpResponse.text("", { status: 200 });
+  }
+  return HttpResponse.json({ message: "missing fields" }, { status: 500 });
+});
 
-export const handlers: HttpHandler[] = [
-  pingHandler,
-  pollingStationDataEntryHandler,
-];
+export const handlers: HttpHandler[] = [pingHandler, pollingStationDataEntryHandler];

@@ -61,13 +61,10 @@ describe("useInputMask", () => {
     expect(result.current.format(input)).equals(expected);
   });
 
-  test.each(["A", "AB", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"])(
-    "String %s becomes '0'",
-    (input: string) => {
-      const { result } = renderHook(() => usePositiveNumberInputMask());
-      expect(result.current.format(input)).equals("0");
-    },
-  );
+  test.each(["A", "AB", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"])("String %s becomes '0'", (input: string) => {
+    const { result } = renderHook(() => usePositiveNumberInputMask());
+    expect(result.current.format(input)).equals("0");
+  });
 
   test("reverse format", () => {
     const { result } = renderHook(() => usePositiveNumberInputMask());

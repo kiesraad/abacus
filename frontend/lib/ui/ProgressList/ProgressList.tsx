@@ -32,11 +32,7 @@ export type ProgressListItemProps = BaseProgressListItemProps &
       }
   );
 
-ProgressList.Item = function ({
-  status,
-  active,
-  children,
-}: ProgressListItemProps) {
+ProgressList.Item = function ({ status, active, children }: ProgressListItemProps) {
   return (
     <li className={cn(active ? "active" : "idle", status)}>
       <aside>{active ? <IconArrowleft /> : renderStatusIcon(status)}</aside>

@@ -143,12 +143,7 @@ export interface ParameterBaseObject {
   examples?: { [media: string]: ReferenceObject | ExampleObject };
   content?: { [media: string]: MediaTypeObject };
 }
-export type NonArraySchemaObjectType =
-  | "boolean"
-  | "object"
-  | "number"
-  | "string"
-  | "integer";
+export type NonArraySchemaObjectType = "boolean" | "object" | "number" | "string" | "integer";
 export type ArraySchemaObjectType = "array";
 export type SchemaObject = ArraySchemaObject | NonArraySchemaObject;
 

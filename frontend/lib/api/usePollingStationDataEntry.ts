@@ -6,11 +6,7 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_REQUEST_PATH,
 } from "./gen/openapi";
-import {
-  ApiResponseClientError,
-  ApiResponseSuccess,
-  ApiResponseServerError,
-} from "./api";
+import { ApiResponseClientError, ApiResponseSuccess, ApiResponseServerError } from "./api";
 
 //TODO: add to generate script
 //TODO: Make camelcase
@@ -34,9 +30,7 @@ type POLLING_STATION_DATA_ENTRY_RESPONSE =
       json: () => never;
     });
 
-export function usePollingStationDataEntry(
-  params: POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
-) {
+export function usePollingStationDataEntry(params: POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS) {
   const path = React.useMemo(() => {
     const result: POLLING_STATION_DATA_ENTRY_REQUEST_PATH = `/api/polling_stations/${params.id}/data_entries/${params.entry_number}`;
     return result;

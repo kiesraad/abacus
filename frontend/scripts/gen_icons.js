@@ -11,9 +11,7 @@ async function run() {
     //replace kebab-case with camelCase
     content = content.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 
-    result.push(
-      `export const Icon${ucfirst(file.replace(".svg", ""))} = () => (${content});`,
-    );
+    result.push(`export const Icon${ucfirst(file.replace(".svg", ""))} = () => (${content});`);
   });
 
   let s = result.join("\n");

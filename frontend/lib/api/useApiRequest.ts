@@ -24,11 +24,7 @@ export function useApiRequest<
 >({
   path,
   responseHandler,
-}: UseApiRequestParams<DATA, ERROR>): UseApiRequestReturn<
-  REQUEST_BODY,
-  DATA,
-  ERROR
-> {
+}: UseApiRequestParams<DATA, ERROR>): UseApiRequestReturn<REQUEST_BODY, DATA, ERROR> {
   const { client } = useApi();
   const [data, setData] = React.useState<DATA | null>(null);
   const [error, setError] = React.useState<ERROR | null>(null);

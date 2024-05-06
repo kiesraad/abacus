@@ -5,8 +5,7 @@ export interface iApiProviderContext {
   client: ApiClient;
 }
 
-export const ApiProviderContext =
-  React.createContext<iApiProviderContext | null>(null);
+export const ApiProviderContext = React.createContext<iApiProviderContext | null>(null);
 
 export interface ApiProviderProps {
   host: string;
@@ -15,9 +14,5 @@ export interface ApiProviderProps {
 export function ApiProvider({ children, host }: ApiProviderProps) {
   const client = React.useMemo(() => new ApiClient(host), [host]);
 
-  return (
-    <ApiProviderContext.Provider value={{ client }}>
-      {children}
-    </ApiProviderContext.Provider>
-  );
+  return <ApiProviderContext.Provider value={{ client }}>{children}</ApiProviderContext.Provider>;
 }

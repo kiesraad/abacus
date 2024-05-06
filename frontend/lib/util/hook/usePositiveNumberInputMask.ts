@@ -1,9 +1,11 @@
 import * as React from "react";
 
 export type FormatFunc = (s: string | number | null | undefined) => string;
+export type DefomatFunc = (s: string) => number;
 
 export interface UsePositiveNumberInputMaskReturn {
   format: FormatFunc;
+  deformat: DefomatFunc;
   register: () => {
     onChange: React.ChangeEventHandler<HTMLInputElement>;
     onLoad: React.ChangeEventHandler<HTMLInputElement>;
@@ -24,6 +26,14 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
     let result = `${s}`.replace(/\D/g, "");
     result = numberFormatter.format(Number(result));
     return result;
+  }, []);
+
+  const deformat: DefomatFunc = React.useCallback((s: string) => {
+    const seperator = numberFormatter.format(11111).replace(/\p{Number}/gu, "");
+    const escapedSeparator = seperator.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+
+    const cleaned = s.replace(new RegExp(escapedSeparator, "g"), "");
+    return parseInt(cleaned, 10);
   }, []);
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = React.useCallback(
@@ -55,6 +65,7 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
 
   return {
     format,
+    deformat,
     register,
   };
 }

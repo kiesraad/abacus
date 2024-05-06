@@ -1,3 +1,4 @@
+import { usePollingStationDataEntry } from "@kiesraad/api";
 import { Button, InputGrid } from "@kiesraad/ui";
 import { usePositiveNumberInputMask } from "@kiesraad/util";
 
@@ -17,12 +18,17 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const { register, format } = usePositiveNumberInputMask();
+  const { register, format, deformat } = usePositiveNumberInputMask();
+  const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
+    id: 1,
+    entry_number: 1
+  });
 
   function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
     event.preventDefault();
     const elements = event.currentTarget.elements;
-    const request = {
+
+    doSubmit({
       data: {
         voters_counts: {
           poll_card_count: elements.pollCards.value,
@@ -44,6 +50,12 @@ export function VotersAndVotesForm() {
   return (
     <form onSubmit={handleSubmit}>
       <h3>Toegelaten kiezers en uitgebrachte stemmen</h3>
+      {data && <p>Success</p>}
+      {error && (
+        <p>
+          Error {error.code} {error.message || ""}
+        </p>
+      )}
       <InputGrid>
         <InputGrid.Header>
           <th>Veld</th>
@@ -133,7 +145,9 @@ export function VotersAndVotesForm() {
         </InputGrid.Body>
       </InputGrid>
       <br /> <br />
-      <Button type="submit">Volgende</Button>
+      <Button type="submit" disabled={loading}>
+        Volgende
+      </Button>
     </form>
   );
 }

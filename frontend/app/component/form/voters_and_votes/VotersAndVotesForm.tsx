@@ -22,17 +22,23 @@ export function VotersAndVotesForm() {
   function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
     event.preventDefault();
     const elements = event.currentTarget.elements;
-    const result = {
-      pollCards: elements.pollCards.value,
-      proxyCertificates: elements.proxyCertificates.value,
-      voterCards: elements.voterCards.value,
-      totalAdmittedVoters: elements.totalAdmittedVoters.value,
-      votesOnCandidates: elements.votesOnCandidates.value,
-      blankVotes: elements.blankVotes.value,
-      invalidVotes: elements.invalidVotes.value,
-      totalVotesCast: elements.totalVotesCast.value,
+    const request = {
+      data: {
+        voters_counts: {
+          poll_card_count: elements.pollCards.value,
+          proxy_certificate_count: elements.proxyCertificates.value,
+          voter_card_count: elements.voterCards.value,
+          total_admitted_voters_count: elements.totalAdmittedVoters.value,
+        },
+        votes_counts: {
+          votes_candidates_counts: elements.votesOnCandidates.value,
+          blank_votes_count: elements.blankVotes.value,
+          invalid_votes_count: elements.invalidVotes.value,
+          total_votes_cast_coun: elements.totalVotesCast.value,
+        },
+      },
     };
-    console.log(result);
+    console.log(request);
   }
 
   return (

@@ -5,12 +5,13 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_RESPONSE_BODY,
 } from "./gen/openapi";
 import { ApiResponseClientError, ApiResponseSuccess, ApiResponseServerError } from "./api";
 
 //TODO: add to generate script
 //TODO: Make camelcase
-type POLLING_STATION_DATA_ENTRY_RESPONSE =
+export type POLLING_STATION_DATA_ENTRY_RESPONSE =
   | (Omit<Response, "json"> & {
       status: 200;
       json: () => ApiResponseSuccess | PromiseLike<ApiResponseSuccess>;
@@ -29,6 +30,19 @@ type POLLING_STATION_DATA_ENTRY_RESPONSE =
       status: number;
       json: () => never;
     });
+
+
+
+
+export const error:object = {
+  status: 500,
+  code: "DATABASE_CONNECTION_ERROR",
+  message: "Could not connect to database",
+};
+
+
+
+
 
 export function usePollingStationDataEntry(params: POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS) {
   const path = React.useMemo(() => {

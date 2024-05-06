@@ -15,6 +15,13 @@ pub struct DataEntryRequest {
 pub struct DataEntryError {
     pub message: String,
 }
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct ApiResponse<Data> {
+    pub status: u32,
+    pub code: String, //should be an enum
+    pub messsage: String,
+    pub data: Data,
+}
 
 /// PollingStationResults, following the fields in
 /// "Model N 10-1. Proces-verbaal van een stembureau"

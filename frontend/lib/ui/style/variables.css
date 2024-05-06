@@ -1,6 +1,7 @@
 @font-face {
   font-family: "SpaceGrotesk";
-  src: url("/font/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf") format("TrueType");
+  src: url("/font/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf")
+    format("TrueType");
 }
 
 @font-face {
@@ -10,7 +11,8 @@
 
 @font-face {
   font-family: "DMSansItalic";
-  src: url("/font/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf") format("TrueType");
+  src: url("/font/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf")
+    format("TrueType");
 }
 
 @font-face {

@@ -9,7 +9,7 @@ export type UseApiRequestReturn<REQUEST_BODY, DATA, ERROR> = [
     loading: boolean;
     error: ERROR | null;
     data: DATA | null;
-  }
+  },
 ];
 
 export interface UseApiRequestParams<DATA, ERROR> {
@@ -17,10 +17,18 @@ export interface UseApiRequestParams<DATA, ERROR> {
   responseHandler: (response: Response) => Promise<DATA | ERROR>;
 }
 
-export function useApiRequest<REQUEST_BODY, DATA extends ApiResponseSuccess, ERROR extends ApiResponse>({
+export function useApiRequest<
+  REQUEST_BODY,
+  DATA extends ApiResponseSuccess,
+  ERROR extends ApiResponse,
+>({
   path,
-  responseHandler
-}: UseApiRequestParams<DATA, ERROR>): UseApiRequestReturn<REQUEST_BODY, DATA, ERROR> {
+  responseHandler,
+}: UseApiRequestParams<DATA, ERROR>): UseApiRequestReturn<
+  REQUEST_BODY,
+  DATA,
+  ERROR
+> {
   const { client } = useApi();
   const [data, setData] = React.useState<DATA | null>(null);
   const [error, setError] = React.useState<ERROR | null>(null);
@@ -56,7 +64,7 @@ export function useApiRequest<REQUEST_BODY, DATA extends ApiResponseSuccess, ERR
     {
       loading,
       error,
-      data
-    }
+      data,
+    },
   ];
 }

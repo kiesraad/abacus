@@ -21,7 +21,7 @@ export function VotersAndVotesForm() {
   const { register, format, deformat } = usePositiveNumberInputMask();
   const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
     id: 1,
-    entry_number: 1
+    entry_number: 1,
   });
 
   function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
@@ -31,20 +31,19 @@ export function VotersAndVotesForm() {
     doSubmit({
       data: {
         voters_counts: {
-          poll_card_count: elements.pollCards.value,
-          proxy_certificate_count: elements.proxyCertificates.value,
-          voter_card_count: elements.voterCards.value,
-          total_admitted_voters_count: elements.totalAdmittedVoters.value,
+          poll_card_count: deformat(elements.pollCards.value),
+          proxy_certificate_count: deformat(elements.proxyCertificates.value),
+          voter_card_count: deformat(elements.voterCards.value),
+          total_admitted_voters_count: deformat(elements.totalAdmittedVoters.value),
         },
         votes_counts: {
-          votes_candidates_counts: elements.votesOnCandidates.value,
-          blank_votes_count: elements.blankVotes.value,
-          invalid_votes_count: elements.invalidVotes.value,
-          total_votes_cast_coun: elements.totalVotesCast.value,
+          votes_candidates_counts: deformat(elements.votesOnCandidates.value),
+          blank_votes_count: deformat(elements.blankVotes.value),
+          invalid_votes_count: deformat(elements.invalidVotes.value),
+          total_votes_cast_count: deformat(elements.totalVotesCast.value),
         },
       },
-    };
-    console.log(request);
+    });
   }
 
   return (

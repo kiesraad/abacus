@@ -1,5 +1,9 @@
 export function classnames(
-  ...args: (string | undefined | Record<string, string | boolean | number | null | undefined>)[]
+  ...args: (
+    | string
+    | undefined
+    | Record<string, string | boolean | number | null | undefined>
+  )[]
 ): string {
   const classes: string[] = [];
 

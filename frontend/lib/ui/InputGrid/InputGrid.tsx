@@ -126,7 +126,9 @@ InputGrid.Header = ({
   </thead>
 );
 
-InputGrid.Body = ({ children }: { children: React.ReactNode }) => <tbody>{children}</tbody>;
+InputGrid.Body = ({ children }: { children: React.ReactNode }) => (
+  <tbody>{children}</tbody>
+);
 InputGrid.Seperator = () => (
   <tr>
     <td className="sep" colSpan={3}></td>

@@ -1,4 +1,10 @@
-import { Button, PollingStationNumber, ProgressList, Tag, WorkStationNumber } from "@kiesraad/ui";
+import {
+  Button,
+  PollingStationNumber,
+  ProgressList,
+  Tag,
+  WorkStationNumber,
+} from "@kiesraad/ui";
 import { useParams } from "react-router-dom";
 import { IconCross } from "@kiesraad/icon";
 import { VotersAndVotesForm } from "app/component/form/voters_and_votes/VotersAndVotesForm";
@@ -27,13 +33,23 @@ export function PollingStationPage() {
       <main>
         <nav>
           <ProgressList>
-            <ProgressList.Item status="accept" active={targetForm === "recount"}>
+            <ProgressList.Item
+              status="accept"
+              active={targetForm === "recount"}
+            >
               Is er herteld?
             </ProgressList.Item>
-            <ProgressList.Item status="idle" message="A message" active={targetForm === "numbers"}>
+            <ProgressList.Item
+              status="idle"
+              message="A message"
+              active={targetForm === "numbers"}
+            >
               Aantal kiezers en stemmen
             </ProgressList.Item>
-            <ProgressList.Item status="idle" active={targetForm === "differences"}>
+            <ProgressList.Item
+              status="idle"
+              active={targetForm === "differences"}
+            >
               Verschillen?
             </ProgressList.Item>
             <ProgressList.Ruler />
@@ -43,7 +59,9 @@ export function PollingStationPage() {
               </ProgressList.Item>
             ))}
             <ProgressList.Ruler />
-            <ProgressList.Item status="idle">Controleren en opslaan?</ProgressList.Item>
+            <ProgressList.Item status="idle">
+              Controleren en opslaan?
+            </ProgressList.Item>
           </ProgressList>
         </nav>
         <article>

@@ -14,7 +14,7 @@ export function AccountSetupPage() {
       </header>
       <main>
         <article>
-          {/* TODO: Add alert here */}
+          {/* TODO: Add alert here with below text */}
           <strong>Inloggen gelukt</strong>
           <br />
           We gaan je account instellen voor gebruik. Vul onderstaande gegevens in om verder te gaan.

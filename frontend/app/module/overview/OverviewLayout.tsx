@@ -4,7 +4,9 @@ import { Outlet } from "react-router-dom";
 export function OverviewLayout() {
   return (
     <div className="app-layout">
-      <nav>Overzicht</nav>
+      <nav>
+        <span className="active">Overzicht</span>
+      </nav>
 
       <Outlet />
 

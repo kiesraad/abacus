@@ -1,0 +1,44 @@
+.inputfield {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.625rem;
+  &:global(.small) {
+    width: 10rem;
+  }
+  &:global(.large),
+  &:global(.text-area) {
+    width: 32rem;
+  }
+  span {
+    font-family: var(--font-text);
+    font-size: var(--font-size-md);
+    font-style: normal;
+    line-height: 1.5rem; /* 150% */
+    &:global(.label) {
+      color: var(--Gray-900, #101828);
+      font-weight: 700;
+    }
+    &:global(.hint) {
+      color: var(--Gray-600, #475467);
+      font-weight: 400;
+    }
+  }
+  input {
+    display: flex;
+    padding: 1rem 1.5rem 1rem 1rem;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    border: 2px solid var(--Gray-300, #d0d5dd);
+    background: var(--Base-Wit, #fff);
+    :global(.large) &,
+    :global(.small) & {
+      height: 4.5rem;
+    }
+    :global(.text-area) & {
+      height: 9rem;
+      min-height: 9rem;
+    }
+  }
+}

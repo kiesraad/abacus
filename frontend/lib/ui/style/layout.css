@@ -17,32 +17,36 @@
 
   > nav {
     flex: 0 0 44px;
-    padding: 0 64px;
+    padding: 0 5rem;
     background-color: #344054;
     color: #fff;
-
+    height: 3rem;
     display: flex;
     align-items: center;
+
+    span {
+      display: flex;
+      height: 3rem;
+      padding: 0.5rem 0.75rem;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+    }
+    span.active {
+      border-bottom: 4px solid var(--Accent-Oranje, #e87c59);
+    }
   }
 
   > header {
-    padding: 32px 64px;
+    padding: 1rem 5rem;
     display: flex;
-    min-height: 140px;
+    min-height: 7rem;
     align-items: center;
-    justify-content: space-between;
-
-    display: flex;
     justify-content: space-between;
 
     section {
       display: flex;
       align-items: center;
-
-      h1 {
-        margin: 0 16px 0 16px;
-        padding: 0;
-      }
     }
   }
 
@@ -60,7 +64,7 @@
     }
     > article {
       flex: 1 1 auto;
-      padding: 32px 64px;
+      padding: 2rem 5rem;
       background-color: #f9fafb;
     }
   }
@@ -79,7 +83,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 64px;
+    padding: 0 5rem;
     font-size: 10px;
   }
 }

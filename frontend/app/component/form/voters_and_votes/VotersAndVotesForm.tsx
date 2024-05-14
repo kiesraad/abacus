@@ -52,7 +52,7 @@ export function VotersAndVotesForm() {
       {data && <p>Success</p>}
       {error && (
         <p>
-          Error {error.code} {error.message || ""}
+          Error {error.errorCode} {error.message || ""}
         </p>
       )}
       <InputGrid>

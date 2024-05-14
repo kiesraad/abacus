@@ -1,44 +1,39 @@
 import * as React from "react";
 
 import { useApi } from "./useApi";
-import { ApiResponse, ApiResponseSuccess } from "./api";
+import { ApiResponseErrorData } from "./ApiClient";
 
-export type UseApiRequestReturn<REQUEST_BODY, DATA, ERROR> = [
+export type UseApiRequestReturn<REQUEST_BODY, DATA> = [
   (requestBody: REQUEST_BODY) => void,
   {
     loading: boolean;
-    error: ERROR | null;
+    error: ApiResponseErrorData | null;
     data: DATA | null;
   },
 ];
 
-export interface UseApiRequestParams<DATA, ERROR> {
+export interface UseApiRequestParams {
   path: string;
-  responseHandler: (response: Response) => Promise<DATA | ERROR>;
 }
 
-export function useApiRequest<
-  REQUEST_BODY,
-  DATA extends ApiResponseSuccess,
-  ERROR extends ApiResponse,
->({
+export function useApiRequest<REQUEST_BODY, DATA>({
   path,
-  responseHandler,
-}: UseApiRequestParams<DATA, ERROR>): UseApiRequestReturn<REQUEST_BODY, DATA, ERROR> {
+}: UseApiRequestParams): UseApiRequestReturn<REQUEST_BODY, DATA> {
   const { client } = useApi();
   const [data, setData] = React.useState<DATA | null>(null);
-  const [error, setError] = React.useState<ERROR | null>(null);
+  const [error, setError] = React.useState<ApiResponseErrorData | null>(null);
   const [apiRequest, setApiRequest] = React.useState<REQUEST_BODY | null>(null);
 
   React.useEffect(() => {
+    let isSubscribed = true;
     const doRequest = async (b: REQUEST_BODY) => {
-      const response = await client.postRequest(path, b as object);
-
-      const result = await responseHandler(response);
-      if (result.status === "20x") {
-        setData(result as DATA);
-      } else {
-        setError(result as ERROR);
+      const response = await client.postRequest<DATA>(path, b as object);
+      if (isSubscribed) {
+        if (response.status === "success") {
+          setData(response.data as DATA);
+        } else {
+          setError(response.data as ApiResponseErrorData);
+        }
       }
     };
 
@@ -47,13 +42,20 @@ export function useApiRequest<
         console.error(e);
       });
     }
-  }, [apiRequest, client, path, responseHandler]);
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [apiRequest, client, path]);
 
   const makeRequest = React.useCallback((requestBody: REQUEST_BODY) => {
     setApiRequest(requestBody);
   }, []);
 
-  const loading = false;
+  const loading = React.useMemo(
+    () => apiRequest !== null && data === null && error === null,
+    [apiRequest, data, error],
+  );
 
   return [
     makeRequest,

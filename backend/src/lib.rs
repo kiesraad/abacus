@@ -8,6 +8,7 @@ use sqlx::{query, SqlitePool};
 use utoipa::{OpenApi, ToSchema};
 
 pub mod polling_station;
+pub mod validation;
 
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
@@ -31,8 +32,11 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         ),
         components(
             schemas(
+                validation::ValidationResult,
+                validation::ValidationResultCode,
+                validation::ValidationResults,
                 polling_station::DataEntryRequest,
-                polling_station::DataEntryError,
+                polling_station::DataEntryResponse,
                 polling_station::PollingStationResults,
                 polling_station::VotersCounts,
                 polling_station::VotesCounts,

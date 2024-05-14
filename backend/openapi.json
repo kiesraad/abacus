@@ -50,17 +50,24 @@
         },
         "responses": {
           "200": {
-            "description": "Data entry saved successfully"
+            "description": "Data entry saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataEntryResponse"
+                }
+              }
+            }
           },
           "422": {
             "description": "JSON body parsing error (Unprocessable Content)"
           },
           "500": {
-            "description": "Data entry error",
+            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DataEntryError"
+                  "$ref": "#/components/schemas/DataEntryResponse"
                 }
               }
             }
@@ -71,17 +78,6 @@
   },
   "components": {
     "schemas": {
-      "DataEntryError": {
-        "type": "object",
-        "required": [
-          "message"
-        ],
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        }
-      },
       "DataEntryRequest": {
         "type": "object",
         "description": "Payload structure for data entry of polling station results",
@@ -91,6 +87,25 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/PollingStationResults"
+          }
+        }
+      },
+      "DataEntryResponse": {
+        "type": "object",
+        "required": [
+          "saved",
+          "message",
+          "validation_results"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "saved": {
+            "type": "boolean"
+          },
+          "validation_results": {
+            "$ref": "#/components/schemas/ValidationResults"
           }
         }
       },
@@ -107,6 +122,53 @@
           },
           "votes_counts": {
             "$ref": "#/components/schemas/VotesCounts"
+          }
+        }
+      },
+      "ValidationResult": {
+        "type": "object",
+        "required": [
+          "fields",
+          "code"
+        ],
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ValidationResultCode"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ValidationResultCode": {
+        "type": "string",
+        "enum": [
+          "OutOfRange",
+          "IncorrectTotal",
+          "AboveThreshold"
+        ]
+      },
+      "ValidationResults": {
+        "type": "object",
+        "required": [
+          "errors",
+          "warnings"
+        ],
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValidationResult"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValidationResult"
+            }
           }
         }
       },

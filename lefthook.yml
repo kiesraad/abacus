@@ -12,6 +12,10 @@ pre-commit:
       root: "backend/"
       glob: "*.rs"
       run: cargo clippy
+    backend-openapi:
+      root: "backend/"
+      glob: "*.rs"
+      run: cargo run --package backend --bin gen-openapi
     frontend-formatter:
       root: "frontend/"
       run: npx prettier --ignore-unknown --write {staged_files}

@@ -8,6 +8,12 @@ export function HomePage() {
 
       <ul className="link-list">
         <li>
+          <Link to={`/login`}>Login module</Link>
+        </li>
+        <li>
+          <Link to={"/overview"}>Overzicht module</Link>
+        </li>
+        <li>
           <Link to={`/input`}>Input module</Link>
         </li>
       </ul>

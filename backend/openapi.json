@@ -14,6 +14,7 @@
         "tags": [
           "polling_station"
         ],
+        "summary": "Save or update the data entry for a polling station",
         "operationId": "polling_station_data_entry",
         "parameters": [
           {
@@ -80,7 +81,7 @@
     "schemas": {
       "DataEntryRequest": {
         "type": "object",
-        "description": "Payload structure for data entry of polling station results",
+        "description": "Request structure for data entry of polling station results",
         "required": [
           "data"
         ],
@@ -92,6 +93,7 @@
       },
       "DataEntryResponse": {
         "type": "object",
+        "description": "Response structure for data entry of polling station results",
         "required": [
           "saved",
           "message",

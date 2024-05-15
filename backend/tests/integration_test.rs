@@ -95,8 +95,14 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     let status = response.status();
-    println!("response body: {:?}", &response.text().await.unwrap());
+    let body: DataEntryResponse = response.json().await.unwrap();
+    println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(
+        body.message,
+        "Failed to deserialize the JSON body into the target type: data: \
+         invalid type: null, expected struct PollingStationResults at line 1 column 12"
+    );
 }
 
 #[sqlx::test]

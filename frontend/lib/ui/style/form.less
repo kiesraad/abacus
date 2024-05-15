@@ -1,0 +1,80 @@
+
+
+form {
+
+
+  input {
+    border: 1px solid #D0D5DD;
+    background-color: #fff;
+    font-size: 16px;
+    padding: 8px 16px;
+
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .field {
+    margin-bottom: 32px;
+    
+
+    p {
+      padding-top: 10px;
+      color: #475467;
+      max-width: 600px;
+    }
+    &.with-aside {
+      display: flex;
+      align-items: center;
+      main {
+        flex: 0 0 auto;
+      }
+      aside {
+        margin-left: 4px;
+        padding-left: 16px;
+        flex: 1 1 auto;
+        height: 38px;
+        margin-top: 24px;
+        background-color: #ECFDFF;
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+
+        span.entry-count {
+          border-radius: 8px;
+          background-color: #FEF0C7;
+          border: 1px solid white;
+          color: #93370D;
+          font-weight: norma;
+          font-size: 10px;
+          padding: 4px 8px;
+        }
+      }
+    }
+    
+    
+  }
+
+  &.large {
+    input {
+      font-size: 24px;
+      padding: 10px 20px;
+    }
+  }
+
+
+  .error {
+    border-radius: 4px;
+    padding: 8px 16px;
+    border: 1px solid red;
+    background-color: rgba(255, 0, 0, 0.1);
+
+    p {
+      padding: 0;
+      margin: 0;
+    }
+  }
+}

@@ -1,5 +1,3 @@
-#![forbid(unsafe_code)]
-
 use std::error::Error;
 use std::net::{Ipv4Addr, SocketAddr};
 use std::str::FromStr;

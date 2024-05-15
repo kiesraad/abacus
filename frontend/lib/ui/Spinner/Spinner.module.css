@@ -3,95 +3,64 @@
 }
 
 .spinner {
-  position: absolute;
-  width: 9px;
-  height: 9px;
-}
+  svg {
+    width: 24px;
+    height: 24px;
+    rect {
+      fill: black;
+      width: 4px;
+      height: 12px;
+      rx: 2;
+      ry: 2;
+      x: 23;
+      y: 2;
+      transform-origin: 50% 50%;
+      animation: spin 1.2s linear infinite;
 
-.spinner div {
-  position: absolute;
-  width: 50%;
-  height: 150%;
-  background: #474bff;
-  transform: rotate(calc(var(--rotation) * 1deg)) translate(0, calc(var(--translation) * 1%));
-  animation: spinner-fzua35 1s calc(var(--delay) * 1s) infinite ease;
-
-  &:nth-child(1) {
-    --delay: 0.1;
-    --rotation: 36;
-    --translation: 150;
-  }
-
-  &:nth-child(2) {
-    --delay: 0.2;
-    --rotation: 72;
-    --translation: 150;
-  }
-
-  &:nth-child(3) {
-    --delay: 0.3;
-    --rotation: 108;
-    --translation: 150;
-  }
-
-  &:nth-child(4) {
-    --delay: 0.4;
-    --rotation: 144;
-    --translation: 150;
-  }
-
-  &:nth-child(5) {
-    --delay: 0.5;
-    --rotation: 180;
-    --translation: 150;
-  }
-
-  &:nth-child(6) {
-    --delay: 0.6;
-    --rotation: 216;
-    --translation: 150;
-  }
-
-  &:nth-child(7) {
-    --delay: 0.7;
-    --rotation: 252;
-    --translation: 150;
-  }
-
-  &:nth-child(8) {
-    --delay: 0.8;
-    --rotation: 288;
-    --translation: 150;
-  }
-
-  &:nth-child(9) {
-    --delay: 0.9;
-    --rotation: 324;
-    --translation: 150;
-  }
-
-  &:nth-child(10) {
-    --delay: 1;
-    --rotation: 360;
-    --translation: 150;
+      &:nth-child(1) {
+        transform: rotate(0deg);
+        animation-delay: 0;
+      }
+      &:nth-child(2) {
+        transform: rotate(45deg);
+        animation-delay: 100ms;
+      }
+      &:nth-child(3) {
+        transform: rotate(90deg);
+        animation-delay: 200ms;
+      }
+      &:nth-child(4) {
+        transform: rotate(135deg);
+        animation-delay: 300ms;
+      }
+      &:nth-child(5) {
+        transform: rotate(180deg);
+        animation-delay: 400ms;
+      }
+      &:nth-child(6) {
+        transform: rotate(225deg);
+        animation-delay: 500ms;
+      }
+      &:nth-child(7) {
+        transform: rotate(270deg);
+        animation-delay: 600ms;
+      }
+      &:nth-child(8) {
+        transform: rotate(315deg);
+        animation-delay: 700ms;
+      }
+    }
   }
 }
 
-@keyframes spinner-fzua35 {
-  0%,
-  10%,
-  20%,
-  30%,
-  50%,
-  60%,
-  70%,
-  80%,
-  90%,
-  100% {
-    transform: rotate(calc(var(--rotation) * 1deg)) translate(0, calc(var(--translation) * 1%));
+@keyframes spin {
+  0% {
+    opacity: 0.5;
   }
-
   50% {
-    transform: rotate(calc(var(--rotation) * 1deg)) translate(0, calc(var(--translation) * 1.5%));
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
   }
 }

@@ -16,16 +16,16 @@ export function Spinner({ size = "md", children }: SpinnerProps) {
       })}
     >
       <div className={cls.spinner}>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+        <svg viewBox="0 0 50 50">
+          <rect />
+          <rect />
+          <rect />
+          <rect />
+          <rect />
+          <rect />
+          <rect />
+          <rect />
+        </svg>
       </div>
       {children && <label>{children}</label>}
     </div>

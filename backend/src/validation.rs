@@ -22,7 +22,7 @@ pub struct ValidationResult {
     pub code: ValidationResultCode,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq)]
 pub enum ValidationResultCode {
     OutOfRange,
     IncorrectTotal,

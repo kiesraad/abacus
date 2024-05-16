@@ -9,6 +9,7 @@ use tokio::net::TcpListener;
 
 use backend::polling_station::DataEntryResponse;
 use backend::router;
+use backend::validation::ValidationResultCode::IncorrectTotal;
 
 async fn serve_api(pool: SqlitePool) -> SocketAddr {
     let app = router(pool).unwrap();
@@ -114,6 +115,27 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let body: DataEntryResponse = response.json().await.unwrap();
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(body.validation_results.errors.len(), 2);
+    let errors = body.validation_results.errors;
+    assert_eq!(errors.len(), 2);
+    assert_eq!(
+        errors[0].fields,
+        vec![
+            "data.voters_counts.total_admitted_voters_count",
+            "data.voters_counts.poll_card_count",
+            "data.voters_counts.proxy_certificate_count",
+            "data.voters_counts.voter_card_count"
+        ]
+    );
+    assert_eq!(errors[0].code, IncorrectTotal);
+    assert_eq!(
+        errors[1].fields,
+        vec![
+            "data.votes_counts.total_votes_cast_count",
+            "data.votes_counts.votes_candidates_counts",
+            "data.votes_counts.blank_votes_count",
+            "data.votes_counts.invalid_votes_count"
+        ]
+    );
+    assert_eq!(errors[1].code, IncorrectTotal);
     assert_eq!(body.validation_results.warnings.len(), 0);
 }

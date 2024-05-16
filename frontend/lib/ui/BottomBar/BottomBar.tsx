@@ -6,6 +6,6 @@ export interface BottomBarProps {
 }
 
 export function BottomBar({ children }: BottomBarProps) {
-  // TODO: Fix scrolling issue
+  // TODO: Fix bottom bar not sticking to footer
   return <div className={cls.bottombar}>{children}</div>;
 }

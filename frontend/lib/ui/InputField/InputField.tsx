@@ -3,6 +3,7 @@ import cls from "./InputField.module.css";
 export interface InputFieldProps {
   name: string;
   label: string;
+  subtext?: string;
   hint?: string;
   value?: string;
   type?: string;
@@ -15,6 +16,7 @@ export interface InputFieldProps {
 export function InputField({
   name,
   label,
+  subtext = "",
   hint = "",
   value,
   type = "text",
@@ -25,7 +27,9 @@ export function InputField({
 }: InputFieldProps) {
   return (
     <label className={`${cls.inputfield} ${size} ${width} ${error ? "error" : ""}`}>
-      <span className="label">{label}</span>
+      <span className="label">
+        {label} <span className="subtext">{subtext}</span>
+      </span>
       {size == "text-area" ? (
         <textarea name={name} value={value} disabled={disabled} rows={7} />
       ) : (

@@ -17,6 +17,9 @@
       color: var(--Gray-900, #101828);
       font-weight: 700;
     }
+    &:global(.subtext) {
+      font-weight: 400;
+    }
     &:global(.hint) {
       color: var(--Gray-600, #475467);
       font-weight: 400;
@@ -56,7 +59,7 @@
       border: 2px solid var(--Error-400, #f97066);
       background-image: url("../../icon/svg/error.svg");
       background-repeat: no-repeat;
-      background-position: right;
+      background-position: right top;
       background-origin: content-box;
     }
   }

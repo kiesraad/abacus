@@ -7,6 +7,7 @@ export const DefaultSmallWideInputField: Story = () => {
     <InputField
       name="default-small-wide"
       label="Default Small Wide"
+      subtext="with subtext"
       hint="Default Small Wide hint"
       size="small"
     />

@@ -32,10 +32,10 @@ export function AccountSetupForm() {
       />
       <br />
       <br />
-      {/* TODO: Should it really be possible that part of the label is not bold? */}
       <InputField
         name="name"
-        label="Jouw naam (roepnaam + achternaam)"
+        label="Jouw naam"
+        subtext="(roepnaam + achternaam)"
         hint="Bijvoorbeeld Karel van Tellingen. Je naam wordt opgenomen in het verslag van deze
         invoersessie."
       />

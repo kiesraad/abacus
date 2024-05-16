@@ -3,15 +3,13 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0.625rem;
-  &:global(.small) {
+  &:global(.narrow) {
     width: 10rem;
   }
-  &:global(.large),
-  &:global(.text-area) {
+  &:global(.wide) {
     width: 32rem;
   }
   span {
-    font-family: var(--font-text);
     font-size: var(--font-size-md);
     font-style: normal;
     line-height: 1.5rem; /* 150% */
@@ -22,9 +20,13 @@
     &:global(.hint) {
       color: var(--Gray-600, #475467);
       font-weight: 400;
+      :global(.error) & {
+        color: var(--Error-600, #d92d20);
+      }
     }
   }
-  input {
+  input,
+  textarea {
     display: flex;
     padding: 1rem 1.5rem 1rem 1rem;
     justify-content: space-between;
@@ -32,13 +34,34 @@
     align-self: stretch;
     border: 2px solid var(--Gray-300, #d0d5dd);
     background: var(--Base-Wit, #fff);
-    :global(.large) &,
     :global(.small) & {
+      height: 3rem;
+    }
+    :global(.medium) & {
+      height: 3.5rem;
+    }
+    :global(.large) & {
       height: 4.5rem;
     }
-    :global(.text-area) & {
-      height: 9rem;
-      min-height: 9rem;
+    &:hover,
+    &:focus {
+      border: 2px solid var(--Blue-dark-400, #528bff);
+      outline: none;
     }
+    &:disabled {
+      background: var(--Gray-100, #f2f4f7);
+      border: 2px solid var(--Gray-300, #d0d5dd);
+    }
+    :global(.error) & {
+      border: 2px solid var(--Error-400, #f97066);
+      background-image: url("../../icon/svg/error.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+      background-origin: content-box;
+    }
+  }
+  textarea {
+    align-items: flex-start;
+    resize: none;
   }
 }

@@ -53,6 +53,15 @@
   --accent-dark-red: #8f131e;
   --accent-dark-grey: #878787;
 
+  --Base-Wit: #ffffff;
+  --Blue-dark-400: #528bff;
+  --Error-600: #d92d20;
+  --Error-400: #f97066;
+  --Gray-900: #101828;
+  --Gray-600: #475467;
+  --Gray-300: #d0d5dd;
+  --Gray-100: #f2f4f7;
+
   --warning-bg: #fef0c7;
   --warning-text: #93370d;
 }

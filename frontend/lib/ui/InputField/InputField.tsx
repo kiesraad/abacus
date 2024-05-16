@@ -6,7 +6,9 @@ export interface InputFieldProps {
   hint?: string;
   value?: string;
   type?: string;
-  size?: "small" | "large" | "text-area";
+  size?: "small" | "medium" | "large" | "text-area";
+  width?: "narrow" | "wide";
+  error?: string;
   disabled?: boolean;
 }
 
@@ -17,13 +19,19 @@ export function InputField({
   value,
   type = "text",
   size = "large",
+  width = "wide",
+  error = "",
   disabled = false,
 }: InputFieldProps) {
   return (
-    <label className={`${cls.inputfield} ${size}`}>
+    <label className={`${cls.inputfield} ${size} ${width} ${error ? "error" : ""}`}>
       <span className="label">{label}</span>
-      <input name={name} value={value} type={type} disabled={disabled} />
-      <span className="hint">{hint || <>&nbsp;</>}</span>
+      {size == "text-area" ? (
+        <textarea name={name} value={value} disabled={disabled} rows={7} />
+      ) : (
+        <input name={name} value={value} type={type} disabled={disabled} />
+      )}
+      <span className="hint">{error || hint || <>&nbsp;</>}</span>
     </label>
   );
 }

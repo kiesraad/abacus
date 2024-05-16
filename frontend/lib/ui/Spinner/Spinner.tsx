@@ -10,11 +10,7 @@ export interface SpinnerProps {
 
 export function Spinner({ size = "md", children }: SpinnerProps) {
   return (
-    <div
-      className={cn(cls.container, {
-        size,
-      })}
-    >
+    <div className={cn(cls.container, size)}>
       <div className={cls.spinner}>
         <svg viewBox="0 0 50 50">
           <rect />

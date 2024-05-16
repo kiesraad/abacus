@@ -1,55 +1,68 @@
 .container {
   color: red;
-}
 
-.spinner {
-  svg {
-    width: 24px;
-    height: 24px;
-    rect {
-      fill: black;
-      width: 4px;
-      height: 12px;
-      rx: 2;
-      ry: 2;
-      x: 23;
-      y: 2;
-      transform-origin: 50% 50%;
-      animation: spin 800ms linear infinite;
+  .spinner {
+    svg {
+      width: 24px;
+      height: 24px;
+      rect {
+        fill: black;
+        width: 4px;
+        height: 12px;
+        rx: 2;
+        ry: 2;
+        x: 23;
+        y: 36;
+        transform-origin: 50% 50%;
+        animation: spin 800ms ease-in-out infinite;
 
-      &:nth-child(1) {
-        transform: rotate(0deg);
-        fill: red;
-        animation-delay: 0;
+        &:nth-child(1) {
+          transform: rotate(180deg);
+          animation-delay: 0;
+        }
+        &:nth-child(2) {
+          transform: rotate(225deg);
+          animation-delay: 100ms;
+        }
+        &:nth-child(3) {
+          transform: rotate(270deg);
+          animation-delay: 200ms;
+        }
+        &:nth-child(4) {
+          transform: rotate(315deg);
+          animation-delay: 300ms;
+        }
+        &:nth-child(5) {
+          transform: rotate(0deg);
+          animation-delay: 400ms;
+        }
+        &:nth-child(6) {
+          transform: rotate(45deg);
+          animation-delay: 500ms;
+        }
+        &:nth-child(7) {
+          transform: rotate(90deg);
+          animation-delay: 600ms;
+        }
+        &:nth-child(8) {
+          transform: rotate(135deg);
+          animation-delay: 700ms;
+        }
       }
-      &:nth-child(2) {
-        transform: rotate(45deg);
-        animation-delay: 100ms;
-      }
-      &:nth-child(3) {
-        transform: rotate(90deg);
-        animation-delay: 200ms;
-      }
-      &:nth-child(4) {
-        transform: rotate(135deg);
-        animation-delay: 300ms;
-      }
-      &:nth-child(5) {
-        transform: rotate(180deg);
-        animation-delay: 400ms;
-      }
-      &:nth-child(6) {
-        transform: rotate(225deg);
-        animation-delay: 500ms;
-      }
-      &:nth-child(7) {
-        transform: rotate(270deg);
-        animation-delay: 600ms;
-      }
-      &:nth-child(8) {
-        transform: rotate(315deg);
-        animation-delay: 700ms;
-      }
+    }
+  }
+
+  &:global(.sm) {
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &:global(.lg) {
+    svg {
+      width: 32px;
+      height: 32px;
     }
   }
 }
@@ -58,10 +71,12 @@
   0% {
     height: 12px;
   }
-  25% {
+  15% {
     height: 4px;
+    opacity: 0.6;
   }
-  50% {
+  30% {
+    opacity: 1;
     height: 12px;
   }
   100% {

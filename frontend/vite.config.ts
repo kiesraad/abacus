@@ -13,7 +13,12 @@ export default defineConfig(() => ({
     outDir: path.resolve(__dirname, "dist"),
     emptyOutDir: true,
     sourcemap: true,
-    // minify: false, // uncomment for debugging
+    minify: false,
+    rollupOptions: {
+      input: {
+        app: "index.html",
+      },
+    },
   },
   define: {
     "process.env.MSW": apiMode === "mock",

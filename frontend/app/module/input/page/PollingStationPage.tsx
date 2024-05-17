@@ -19,8 +19,7 @@ export function PollingStationPage() {
         <section>
           <Button variant="secondary" size="sm" rightIcon={<IconCross />}>
             Invoer afbreken
-          </Button>{" "}
-          &nbsp; &nbsp; &nbsp;
+          </Button>
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>

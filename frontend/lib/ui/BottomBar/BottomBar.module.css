@@ -3,5 +3,5 @@
   margin: 0 -5rem -2rem -5rem;
   position: sticky;
   padding: 1.5rem 5rem;
-  background: #ffffff;
+  background: var(--base-white);
 }

@@ -44,7 +44,7 @@
   --base-light-grey: #f0f0f0;
   --accent-blue: #4a75ba;
   --accent-lime: #dddb00;
-  --accent-orange: #ef8050;
+  --accent-orange: #e87c59;
   --accent-light-blue: #c9d8e9;
   --accent-light-lime: #dddda6;
   --accent-light-orange: #e9dace;
@@ -53,14 +53,14 @@
   --accent-dark-red: #8f131e;
   --accent-dark-grey: #878787;
 
-  --Base-Wit: #ffffff;
-  --Blue-dark-400: #528bff;
-  --Error-600: #d92d20;
-  --Error-400: #f97066;
-  --Gray-900: #101828;
-  --Gray-600: #475467;
-  --Gray-300: #d0d5dd;
-  --Gray-100: #f2f4f7;
+  --base-white: #ffffff;
+  --blue-dark-400: #528bff;
+  --error-600: #d92d20;
+  --error-400: #f97066;
+  --gray-900: #101828;
+  --gray-600: #475467;
+  --gray-300: #d0d5dd;
+  --gray-100: #f2f4f7;
 
   --warning-bg: #fef0c7;
   --warning-text: #93370d;

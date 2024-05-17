@@ -14,17 +14,17 @@
     font-style: normal;
     line-height: 1.5rem; /* 150% */
     &:global(.label) {
-      color: var(--Gray-900, #101828);
+      color: var(--gray-900);
       font-weight: 700;
     }
     &:global(.subtext) {
       font-weight: 400;
     }
     &:global(.hint) {
-      color: var(--Gray-600, #475467);
+      color: var(--gray-600);
       font-weight: 400;
       :global(.error) & {
-        color: var(--Error-600, #d92d20);
+        color: var(--error-600);
       }
     }
   }
@@ -35,8 +35,8 @@
     justify-content: space-between;
     align-items: center;
     align-self: stretch;
-    border: 2px solid var(--Gray-300, #d0d5dd);
-    background: var(--Base-Wit, #fff);
+    border: 2px solid var(--gray-300);
+    background: var(--base-white);
     :global(.small) & {
       height: 3rem;
     }
@@ -48,15 +48,15 @@
     }
     &:hover,
     &:focus {
-      border: 2px solid var(--Blue-dark-400, #528bff);
+      border: 2px solid var(--blue-dark-400);
       outline: none;
     }
     &:disabled {
-      background: var(--Gray-100, #f2f4f7);
-      border: 2px solid var(--Gray-300, #d0d5dd);
+      background: var(--gray-100);
+      border: 2px solid var(--gray-300);
     }
     :global(.error) & {
-      border: 2px solid var(--Error-400, #f97066);
+      border: 2px solid var(--error-400);
       background-image: url("../../icon/svg/error.svg");
       background-repeat: no-repeat;
       background-position: right 1.5rem center;

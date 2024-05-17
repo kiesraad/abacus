@@ -40,7 +40,7 @@ export const ErrorLargeWideInputField: Story = () => {
     <InputField
       name="error-large-wide"
       label="Error Large Wide"
-      hint="Default Large Wide hint"
+      hint="Error Large Wide hint"
       error="There is an error"
     />
   );
@@ -63,6 +63,7 @@ export const DefaultMediumNarrowInputField: Story = () => {
     <InputField
       name="default-medium-narrow"
       label="Default Medium Narrow"
+      subtext="with subtext"
       hint="Default Medium Narrow hint"
       size="medium"
       width="narrow"
@@ -86,7 +87,7 @@ export const ErrorLargeNarrowInputField: Story = () => {
     <InputField
       name="error-large-narrow"
       label="Error Large Narrow"
-      hint="Default Large Narrow hint"
+      hint="Error Large Narrow hint"
       width="narrow"
       error="There is an error"
     />
@@ -98,6 +99,7 @@ export const DefaultTextAreaInputField: Story = () => {
     <InputField
       name="default-text-area"
       label="Default Text Area"
+      subtext="with subtext"
       hint="Default Text Area hint"
       size="text-area"
     />
@@ -109,7 +111,7 @@ export const ErrorTextAreaInputField: Story = () => {
     <InputField
       name="error-text-area"
       label="Error Text Area"
-      hint="Default Text Area hint"
+      hint="Error Text Area hint"
       size="text-area"
       error="There is an error"
     />

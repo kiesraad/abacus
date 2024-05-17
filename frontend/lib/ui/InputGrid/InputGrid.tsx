@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import cls from "./inputgrid.module.css";
+import cls from "./InputGrid.module.css";
 import { cn, domtoren } from "@kiesraad/util";
 
 export interface InputGridProps {

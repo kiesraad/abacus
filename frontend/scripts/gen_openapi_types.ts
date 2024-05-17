@@ -73,7 +73,7 @@ function addPath(path: string, v: PathsObject | undefined) {
       });
     }
     result.push("}");
-    result.push(`export type ${id}_REQUEST_PATH = \`${requestPath};\``);
+    result.push(`export type ${id}_REQUEST_PATH = \`${requestPath}\`;`);
 
     if (post.requestBody) {
       if ("$ref" in post.requestBody) {

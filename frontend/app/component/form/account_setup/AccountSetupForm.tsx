@@ -28,8 +28,6 @@ export function AccountSetupForm() {
         value="Gebruiker01"
         disabled
       />
-      <br />
-      <br />
       <InputField
         name="name"
         label="Jouw naam"
@@ -37,18 +35,13 @@ export function AccountSetupForm() {
         hint="Bijvoorbeeld Karel van Tellingen. Je naam wordt opgenomen in het verslag van deze
         invoersessie."
       />
-      <br />
-      <br />
       <InputField
         name="new_password1"
         label="Kies nieuw wachtwoord"
         hint="Je hebt dit wachtwoord nodig als je na een pauze opnieuw wilt inloggen. Gebruik minimaal 8 letters en 2 cijfers."
         type="password"
       />
-      <br />
-      <br />
       <InputField name="new_password2" label="Herhaal wachtwoord" type="password" />
-      <br />
       <BottomBar>
         <Button type="submit">Opslaan</Button>
       </BottomBar>

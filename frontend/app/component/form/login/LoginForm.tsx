@@ -26,15 +26,12 @@ export function LoginForm() {
         label="Gebruikersnaam"
         hint="De naam op het briefje dat je van de coördinator hebt gekregen."
       />
-      <br />
-      <br />
       <InputField
         name="password"
         label="Wachtwoord"
         hint="Eerder ingelogd? Vul het wachtwoord in dat je zelf hebt ingesteld. Nog niet eerder ingelogd? Gebruik het wachtwoord dat je van de coördinator hebt gekregen."
         type="password"
       />
-      <br />
       <BottomBar>
         <Button type="submit">Inloggen</Button>
       </BottomBar>

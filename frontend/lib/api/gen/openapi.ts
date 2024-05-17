@@ -8,7 +8,7 @@ export interface POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS {
   entry_number: number;
 }
 export type POLLING_STATION_DATA_ENTRY_REQUEST_PATH =
-  `/api/polling_stations/${number}/data_entries/${number};`;
+  `/api/polling_stations/${number}/data_entries/${number}`;
 export type POLLING_STATION_DATA_ENTRY_REQUEST_BODY = DataEntryRequest;
 
 /** TYPES **/

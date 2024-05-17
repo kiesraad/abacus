@@ -4,17 +4,26 @@ import react from "@vitejs/plugin-react-swc";
 import tsConfig from "./tsconfig.json";
 import pkgjson from "./package.json";
 
+const apiMode = process.env.API_MODE || "mock";
+const apiHost = process.env.API_HOST || apiMode === "mock" ? "" : "http://localhost:8080";
+
 // https://vitejs.dev/config/
 export default defineConfig(() => ({
   build: {
     outDir: path.resolve(__dirname, "dist"),
     emptyOutDir: true,
     sourcemap: true,
-    // minify: false, // uncomment for debugging
+    minify: false,
+    rollupOptions: {
+      input: {
+        app: "index.html",
+      },
+    },
   },
   define: {
-    "process.env.MSW": true,
+    "process.env.MSW": apiMode === "mock",
     "process.env.VERSION": JSON.stringify(pkgjson.version),
+    "process.env.API_HOST": JSON.stringify(apiHost),
   },
   optimizeDeps: { exclude: ["msw"] },
   plugins: [react()],
@@ -32,6 +41,16 @@ export default defineConfig(() => ({
     preprocessorOptions: {
       less: {
         javascriptEnabled: true,
+      },
+    },
+  },
+  server: {
+    port: 3000,
+    proxy: {
+      "/v1": {
+        target: apiHost,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/v1/, ""),
       },
     },
   },

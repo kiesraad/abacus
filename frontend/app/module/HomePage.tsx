@@ -8,7 +8,7 @@ export function HomePage() {
 
       <ul className="link-list">
         <li>
-          <Link to={`/login`}>Login module</Link>
+          <Link to={`/user`}>User module</Link>
         </li>
         <li>
           <Link to={"/overview"}>Overzicht module</Link>

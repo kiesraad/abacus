@@ -19,9 +19,7 @@ export function AccountSetupForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h4>
-        <strong>Personaliseer je account</strong>
-      </h4>
+      <h4 className="bold">Personaliseer je account</h4>
       <br />
       <InputField
         name="username"

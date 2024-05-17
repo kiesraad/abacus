@@ -1,13 +1,13 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { LoginHomePage } from "app/module/login";
+import { LoginPage } from "app/module/user";
 import { BrowserRouter } from "react-router-dom";
 
-describe("LoginHomePage", () => {
+describe("LoginPage", () => {
   test("Enter form field values", () => {
     render(
       <BrowserRouter>
-        <LoginHomePage />
+        <LoginPage />
       </BrowserRouter>,
     );
     expect(true).toBe(true);

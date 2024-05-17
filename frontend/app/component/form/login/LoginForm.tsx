@@ -16,7 +16,7 @@ export function LoginForm() {
 
   function handleSubmit(event: React.FormEvent<LoginFormElement>) {
     event.preventDefault();
-    navigate("account/setup");
+    navigate("../account/setup");
   }
 
   return (

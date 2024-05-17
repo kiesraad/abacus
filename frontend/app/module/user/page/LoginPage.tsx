@@ -1,7 +1,7 @@
 import { WorkStationNumber } from "@kiesraad/ui";
 import { LoginForm } from "app/component/form/login/LoginForm";
 
-export function LoginHomePage() {
+export function LoginPage() {
   return (
     <>
       <header>

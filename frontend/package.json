@@ -19,7 +19,8 @@
     "ladle": "ladle serve",
     "start:msw": "API_MODE=msw vite",
     "gen:icons": "node scripts/gen_icons.js",
-    "gen:openapi": "vite-node ./scripts/gen_openapi_types.ts"
+    "gen:openapi": "vite-node ./scripts/gen_openapi_types.ts",
+    "serve": "npm run build:msw && npx serve dist"
   },
   "dependencies": {
     "react": "^18.2.0",

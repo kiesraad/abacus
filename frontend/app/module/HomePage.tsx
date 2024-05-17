@@ -1,3 +1,4 @@
+import { MockTest } from "app/component/MockTest";
 import { Link } from "react-router-dom";
 
 export function HomePage() {
@@ -11,6 +12,8 @@ export function HomePage() {
           <Link to={`/input`}>Input module</Link>
         </li>
       </ul>
+
+      <MockTest />
     </div>
   );
 }

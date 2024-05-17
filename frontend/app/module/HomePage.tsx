@@ -13,7 +13,7 @@ export function HomePage() {
         </li>
       </ul>
 
-      <MockTest />
+      {process.env.MSW && <MockTest />}
     </div>
   );
 }

@@ -10,7 +10,7 @@
     "dev": "API_MODE=mock vite",
     "dev:server": "API_MODE=local vite",
     "build": "tsc && vite build",
-    "build:msw": "API_MODE=msw vite build && cp mockServiceWorker.js dist/",
+    "build:msw": "API_MODE=mock vite build && cp mockServiceWorker.js dist/",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest ",

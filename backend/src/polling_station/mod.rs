@@ -1,67 +1,109 @@
-use axum::extract::Path;
+use axum::extract::rejection::JsonRejection;
+use axum::extract::{FromRequest, Path};
 use axum::http::StatusCode;
+use axum::response::Response;
 use axum::{extract::State, response::IntoResponse, Json};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, SqlitePool};
 use utoipa::ToSchema;
 
-/// Payload structure for data entry of polling station results
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+use crate::validation::{Validate, ValidationResults};
+
+pub use self::structs::*;
+
+pub mod structs;
+
+/// Request structure for data entry of polling station results
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRequest)]
+#[from_request(via(axum::Json), rejection(DataEntryError))]
 pub struct DataEntryRequest {
     pub data: PollingStationResults,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct DataEntryError {
+/// Response structure for data entry of polling station results
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct DataEntryResponse {
+    pub saved: bool,
     pub message: String,
+    pub validation_results: ValidationResults,
 }
 
-/// PollingStationResults, following the fields in
-/// "Model N 10-1. Proces-verbaal van een stembureau"
-/// <https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1>
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct PollingStationResults {
-    /// Voters counts ("3. Aantal toegelaten kiezers")
-    pub voters_counts: VotersCounts,
-    /// Votes counts ("4. Aantal uitgebrachte stemmen")
-    pub votes_counts: VotesCounts,
+impl IntoResponse for DataEntryResponse {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
 }
 
-/// Voters counts, part of the polling station results.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct VotersCounts {
-    /// Number of valid poll cards ("Aantal geldige stempassen")
-    pub poll_card_count: u32,
-    /// Number of valid proxy certificates ("Aantal geldige volmachtbewijzen")
-    pub proxy_certificate_count: u32,
-    /// Number of valid voter cards ("Aantal geldige kiezerspassen")
-    pub voter_card_count: u32,
-    /// Total number of admitted voters ("Totaal aantal toegelaten kiezers")
-    pub total_admitted_voters_count: u32,
+/// Error type for data entry of polling station results, converted to
+/// a DataEntryResponse by the IntoResponse trait
+pub enum DataEntryError {
+    JsonRejection(JsonRejection),
+    SerdeJsonError(serde_json::Error),
+    SqlxError(sqlx::Error),
 }
 
-/// Votes counts, part of the polling station results.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct VotesCounts {
-    /// Number of valid votes on candidates
-    /// ("Aantal stembiljetten met een geldige stem op een kandidaat")
-    pub votes_candidates_counts: u32,
-    /// Number of blank votes ("Aantal blanco stembiljetten")
-    pub blank_votes_count: u32,
-    /// Number of invalid votes ("Aantal ongeldige stembiljetten")
-    pub invalid_votes_count: u32,
-    /// Total number of votes cast ("Totaal aantal getelde stemmen")
-    pub total_votes_cast_count: u32,
+impl IntoResponse for DataEntryError {
+    fn into_response(self) -> Response {
+        fn to_error(error: String) -> DataEntryResponse {
+            DataEntryResponse {
+                saved: false,
+                message: error,
+                validation_results: ValidationResults::default(),
+            }
+        }
+
+        let (status, response) = match self {
+            DataEntryError::JsonRejection(rejection) => (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                to_error(rejection.body_text()),
+            ),
+            DataEntryError::SerdeJsonError(err) => {
+                println!("Serde JSON error: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error("Internal server error".to_string()),
+                )
+            }
+            DataEntryError::SqlxError(err) => {
+                println!("SQLx error: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error("Internal server error".to_string()),
+                )
+            }
+        };
+
+        (status, response).into_response()
+    }
 }
 
+impl From<JsonRejection> for DataEntryError {
+    fn from(rejection: JsonRejection) -> Self {
+        DataEntryError::JsonRejection(rejection)
+    }
+}
+
+impl From<serde_json::Error> for DataEntryError {
+    fn from(err: serde_json::Error) -> Self {
+        DataEntryError::SerdeJsonError(err)
+    }
+}
+
+impl From<sqlx::Error> for DataEntryError {
+    fn from(err: sqlx::Error) -> Self {
+        DataEntryError::SqlxError(err)
+    }
+}
+
+/// Save or update the data entry for a polling station
 #[utoipa::path(
         post,
         path = "/api/polling_stations/{id}/data_entries/{entry_number}",
         request_body = DataEntryRequest,
         responses(
-            (status = 200, description = "Data entry saved successfully"),
+            (status = 200, description = "Data entry saved successfully", body = DataEntryResponse),
             (status = 422, description = "JSON body parsing error (Unprocessable Content)"),
-            (status = 500, description = "Data entry error", body = DataEntryError)
+            (status = 500, description = "Internal server error", body = DataEntryResponse)
         ),
         params(
             ("id" = i64, description = "Polling station database id")
@@ -70,55 +112,86 @@ pub struct VotesCounts {
 pub async fn polling_station_data_entry(
     State(pool): State<SqlitePool>,
     Path((id, entry_number)): Path<(u32, u8)>,
-    Json(data_entry_request): Json<DataEntryRequest>,
-) -> impl IntoResponse {
-    let data = serde_json::to_string(&data_entry_request.data).unwrap();
-    let result = query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data) VALUES (?, ?, ?)",
+    data_entry_request: DataEntryRequest,
+) -> Result<DataEntryResponse, DataEntryError> {
+    let mut validation_results = ValidationResults::default();
+    data_entry_request
+        .data
+        .validate(&mut validation_results, "data".to_string());
+
+    let data = serde_json::to_string(&data_entry_request.data)?;
+
+    // Save the data entry or update it if it already exists
+    query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data) VALUES (?, ?, ?)\
+              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET data = excluded.data",
         id, entry_number, data)
         .execute(&pool)
-        .await;
+        .await?;
 
-    match result {
-        Ok(_) => StatusCode::OK.into_response(),
-        Err(_) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(DataEntryError {
-                message: "Failed to save data entry".to_string(),
-            }),
-        )
-            .into_response(),
-    }
+    Ok(DataEntryResponse {
+        saved: true,
+        message: "Data entry saved successfully".to_string(),
+        validation_results,
+    })
 }
 
-#[sqlx::test]
-async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
-    let request_body = DataEntryRequest {
-        data: PollingStationResults {
-            voters_counts: VotersCounts {
-                poll_card_count: 1,
-                proxy_certificate_count: 2,
-                voter_card_count: 3,
-                total_admitted_voters_count: 4,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_counts: 5,
-                blank_votes_count: 6,
-                invalid_votes_count: 7,
-                total_votes_cast_count: 8,
-            },
-        },
-    };
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    let response =
-        polling_station_data_entry(State(pool.clone()), Path((1, 1)), Json(request_body))
+    #[sqlx::test]
+    async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
+        let mut request_body = DataEntryRequest {
+            data: PollingStationResults {
+                voters_counts: VotersCounts {
+                    poll_card_count: 1,
+                    proxy_certificate_count: 2,
+                    voter_card_count: 3,
+                    total_admitted_voters_count: 4,
+                },
+                votes_counts: VotesCounts {
+                    votes_candidates_counts: 5,
+                    blank_votes_count: 6,
+                    invalid_votes_count: 7,
+                    total_votes_cast_count: 8,
+                },
+            },
+        };
+
+        let response =
+            polling_station_data_entry(State(pool.clone()), Path((1, 1)), request_body.clone())
+                .await
+                .into_response();
+        assert_eq!(response.status(), 200);
+
+        // Check if a row was created
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 1);
+
+        // Test updating the same row
+        let new_value = 10;
+        request_body.data.voters_counts.poll_card_count = new_value;
+        let response = polling_station_data_entry(State(pool.clone()), Path((1, 1)), request_body)
             .await
             .into_response();
-    assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), 200);
 
-    // Check if a row was created
-    let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-        .fetch_one(&pool)
-        .await
-        .unwrap();
-    assert_eq!(row_count.count, 1);
+        // Check if there is still only one row
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 1);
+
+        // Check if the data was updated
+        let data = query!("SELECT data FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .expect("No data found");
+        let data: PollingStationResults = serde_json::from_slice(&data.data.unwrap()).unwrap();
+        assert_eq!(data.voters_counts.poll_card_count, new_value);
+    }
 }

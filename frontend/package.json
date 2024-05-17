@@ -7,18 +7,20 @@
     "node": ">=20.11.1"
   },
   "scripts": {
-    "dev": "API_MODE=msw vite",
+    "dev": "API_MODE=mock vite",
+    "dev:server": "API_MODE=local vite",
     "build": "tsc && vite build",
-    "build:msw": "API_MODE=msw vite build && cp mockServiceWorker.js dist/",
+    "build:msw": "API_MODE=mock vite build && cp mockServiceWorker.js dist/",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest ",
     "e2e": "playwright test",
     "e2eui": "playwright test --ui",
     "ladle": "ladle serve",
     "start:msw": "API_MODE=msw vite",
     "gen:icons": "node scripts/gen_icons.js",
-    "gen:openapi": "vite-node ./scripts/gen_openapi_types.ts"
+    "gen:openapi": "vite-node ./scripts/gen_openapi_types.ts",
+    "serve": "npm run build:msw && npx serve dist"
   },
   "dependencies": {
     "react": "^18.2.0",

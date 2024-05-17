@@ -65,4 +65,13 @@ describe("useInputMask", () => {
     const { result } = renderHook(() => usePositiveNumberInputMask());
     expect(result.current.format(input)).equals("0");
   });
+
+  test("reverse format", () => {
+    const { result } = renderHook(() => usePositiveNumberInputMask());
+
+    const testNumber = 12345;
+    const formatted = result.current.format(testNumber);
+    const deformatted = result.current.deformat(formatted);
+    expect(deformatted).equals(testNumber);
+  });
 });

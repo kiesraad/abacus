@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // ignore in prod
 import { startMockAPI } from "./msw-mock-api.ts";
 import { routes } from "./routes.tsx";
+import { ApiProvider } from "@kiesraad/api";
 
 const rootDiv = document.getElementById("root");
 if (!rootDiv) throw new Error("Root div not found");
@@ -20,7 +21,9 @@ function render() {
 
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <ApiProvider host={process.env.API_HOST || ""}>
+        <RouterProvider router={router} />
+      </ApiProvider>
     </StrictMode>,
   );
 }

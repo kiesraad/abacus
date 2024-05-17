@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render } from "app/test/unit/test-utils";
 import { describe, expect, test } from "vitest";
 import { PollingStationPage } from "./PollingStationPage";
 

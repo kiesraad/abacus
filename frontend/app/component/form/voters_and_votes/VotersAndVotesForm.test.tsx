@@ -4,8 +4,15 @@ import { describe, expect, test } from "vitest";
 
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
+import { overrideOnce } from "app/test/unit";
+
+// ToDo: overrideOnce() does not seem to be working, so first test passes and second/third
+// fail, not because of the overrideOnce(), but because of the pollingStationDataEntryHandler.
+
 describe("VotersAndVotesForm", () => {
-  test("Enter form field values", async () => {
+  test("Enter form field values successfully", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, "");
+
     const user = userEvent.setup();
 
     render(<VotersAndVotesForm />);
@@ -71,6 +78,43 @@ describe("VotersAndVotesForm", () => {
     await user.type(totalVotesCast, "555");
     expect(totalVotesCast).toHaveValue("555");
 
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    expect(screen.getByTestId("result")).toHaveTextContent("Success");
+
     // TODO: assert the call to the mocked API once that's been implemented
+  });
+
+  test("Enter form field values returns 422", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 422, {
+      message: "422 error from mock",
+      errorCode: "422_ERROR",
+    });
+
+    const user = userEvent.setup();
+
+    render(<VotersAndVotesForm />);
+
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    expect(screen.getByTestId("result")).toHaveTextContent("fake error from mock");
+  });
+
+  test("Enter form field values returns 500", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 500, {
+      message: "500 error from mock",
+      errorCode: "500_ERROR",
+    });
+
+    const user = userEvent.setup();
+
+    render(<VotersAndVotesForm />);
+
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    expect(screen.getByTestId("result")).toHaveTextContent("500 error from mock");
   });
 });

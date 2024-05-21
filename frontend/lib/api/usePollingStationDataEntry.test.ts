@@ -4,10 +4,16 @@ import { usePollingStationDataEntry } from "./usePollingStationDataEntry";
 import { overrideOnce } from "app/test/unit";
 
 describe("useApiRequest", () => {
-  test("it renders", async () => {
+  test("doSubmit parses ok response", async () => {
+    // overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, {
+    //   ok: true,
+    // });
+
     overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, {
-      ok: true,
+      ok: false,
     });
+
+    // overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, "");
 
     const { result } = renderHook(
       () =>

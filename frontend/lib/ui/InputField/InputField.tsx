@@ -11,6 +11,7 @@ export interface InputFieldProps {
   width?: "narrow" | "wide";
   error?: string;
   disabled?: boolean;
+  margin?: boolean;
 }
 
 export function InputField({
@@ -24,9 +25,10 @@ export function InputField({
   width = "wide",
   error = "",
   disabled = false,
+  margin = true,
 }: InputFieldProps) {
   return (
-    <div className={`${cls.question}`}>
+    <div className={`${margin ? cls.margin : ""}`}>
       <label className={`${cls.inputfield} ${size} ${width} ${error ? "error" : ""}`}>
         <span className="label">
           {label} <span className="subtext">{subtext}</span>

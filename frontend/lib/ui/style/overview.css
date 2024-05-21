@@ -1,0 +1,46 @@
+table.overview_table {
+  width: 100%;
+  th,
+  td {
+    border-bottom: 1px solid var(--gray-300);
+    padding: 12px 24px;
+  }
+  th {
+    text-align: left;
+    height: 44px;
+  }
+  td {
+    height: 56px;
+    font-size: 18px;
+  }
+  .align-right {
+    text-align: right;
+  }
+  .align-center {
+    text-align: center;
+  }
+  .link {
+    width: 80px;
+  }
+  .narrow {
+    width: 104px;
+  }
+}
+
+.button_hint {
+  margin-left: 32px;
+}
+
+details[open] {
+  summary {
+    display: none;
+  }
+}
+
+summary {
+  display: block;
+  .underlined {
+    text-decoration: underline;
+    color: #1570ef;
+  }
+}

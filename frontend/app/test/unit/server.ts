@@ -27,7 +27,7 @@ export function overrideOnce(
 ) {
   server.use(
     http[method](
-      path,
+      `http://testhost${path}`,
       () =>
         // https://mswjs.io/docs/api/response/once
         typeof body === "string"

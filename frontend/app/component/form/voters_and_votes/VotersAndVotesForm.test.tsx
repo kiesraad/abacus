@@ -6,11 +6,8 @@ import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 import { overrideOnce } from "app/test/unit";
 
-// ToDo: overrideOnce() does not seem to be working, so first test passes and second/third
-// fail, not because of the overrideOnce(), but because of the pollingStationDataEntryHandler.
-
 describe("VotersAndVotesForm", () => {
-  test("Enter form field values successfully", async () => {
+  test("Successfully enter form field values", async () => {
     overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, "");
 
     const user = userEvent.setup();
@@ -81,12 +78,12 @@ describe("VotersAndVotesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
-    expect(screen.getByTestId("result")).toHaveTextContent("Success");
+    expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
 
     // TODO: assert the call to the mocked API once that's been implemented
   });
 
-  test("Enter form field values returns 422", async () => {
+  test("422 response results in display of error message", async () => {
     overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 422, {
       message: "422 error from mock",
       errorCode: "422_ERROR",
@@ -99,10 +96,10 @@ describe("VotersAndVotesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
-    expect(screen.getByTestId("result")).toHaveTextContent("fake error from mock");
+    expect(screen.getByTestId("result")).toHaveTextContent(/^Error 422_ERROR 422 error from mock$/);
   });
 
-  test("Enter form field values returns 500", async () => {
+  test("500 response results in display of error message", async () => {
     overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 500, {
       message: "500 error from mock",
       errorCode: "500_ERROR",
@@ -115,6 +112,6 @@ describe("VotersAndVotesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
-    expect(screen.getByTestId("result")).toHaveTextContent("500 error from mock");
+    expect(screen.getByTestId("result")).toHaveTextContent(/^Error 500_ERROR 500 error from mock$/);
   });
 });

@@ -7,6 +7,34 @@ import { VotersAndVotesForm } from "./VotersAndVotesForm";
 import { overrideOnce } from "app/test/unit";
 
 describe("VotersAndVotesForm", () => {
+  test("tmp - demonstrate keyboard enter results in submit", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/1", 422, {
+      message: "422 error from mock",
+      errorCode: "422_ERROR",
+    });
+
+    const user = userEvent.setup();
+
+    render(<VotersAndVotesForm />);
+
+    const pollCards = screen.getByTestId("pollCards");
+    await user.clear(pollCards);
+    await user.type(pollCards, "12345");
+    expect(pollCards).toHaveValue("12.345");
+
+    await user.keyboard("{enter}");
+
+    expect(screen.getByTestId("result")).toHaveTextContent(/^Error 422_ERROR 422 error from mock$/);
+
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    const elems = screen.getAllByTestId("result");
+
+    expect(elems[0]).toHaveTextContent(/^Success$/);
+    expect(elems[1]).toHaveTextContent(/^Error 422_ERROR 422 error from mock$/);
+  });
+
   test("Successfully enter form field values", async () => {
     overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, "");
 

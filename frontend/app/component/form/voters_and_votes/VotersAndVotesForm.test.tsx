@@ -1,10 +1,10 @@
 import { render, screen } from "app/test/unit/test-utils";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
-
+import { http, HttpResponse } from "msw";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
-import { overrideOnce } from "app/test/unit";
+import { overrideOnce, server } from "app/test/unit";
 
 describe("VotersAndVotesForm", () => {
   test("tmp - demonstrate keyboard enter results in submit", async () => {
@@ -33,6 +33,110 @@ describe("VotersAndVotesForm", () => {
 
     expect(elems[0]).toHaveTextContent(/^Success$/);
     expect(elems[1]).toHaveTextContent(/^Error 422_ERROR 422 error from mock$/);
+  });
+
+  test("Submitting form sends the expected request", async () => {
+    const expectedRequest = {
+      data: {
+        voters_counts: {
+          poll_card_count: 1,
+          proxy_certificate_count: 2,
+          voter_card_count: 3,
+          total_admitted_voters_count: 6,
+        },
+        votes_counts: {
+          votes_candidates_counts: 4,
+          blank_votes_count: 5,
+          invalid_votes_count: 6,
+          total_votes_cast_count: 15,
+        },
+      },
+    };
+
+    server.use(
+      http.post(
+        `http://testhost/v1/api/polling_stations/:id/data_entries/:entry_number`,
+        async ({ request }) => {
+          const json = await request.json();
+
+          if (JSON.stringify(json) === JSON.stringify(expectedRequest)) {
+            return HttpResponse.json({ data: "ok" }, { status: 200 });
+          } else {
+            return HttpResponse.json(
+              {
+                message: "500 error from mock",
+                errorCode: "500_ERROR",
+              },
+              { status: 500 },
+            );
+          }
+        },
+        { once: true },
+      ),
+    );
+
+    const user = userEvent.setup();
+
+    render(<VotersAndVotesForm />);
+
+    const pollCards = screen.getByTestId("pollCards");
+    await user.clear(pollCards);
+    await user.type(pollCards, expectedRequest.data.voters_counts.poll_card_count.toString());
+    await user.keyboard("{tab}");
+
+    const proxyCertificates = screen.getByTestId("proxyCertificates");
+    await user.clear(proxyCertificates);
+    await user.type(
+      proxyCertificates,
+      expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
+    );
+    await user.keyboard("{tab}");
+
+    const voterCards = screen.getByTestId("voterCards");
+    await user.clear(voterCards);
+    await user.type(voterCards, expectedRequest.data.voters_counts.voter_card_count.toString());
+    await user.keyboard("{tab}");
+
+    const totalAdmittedVoters = screen.getByTestId("totalAdmittedVoters");
+    await user.clear(totalAdmittedVoters);
+    await user.type(
+      totalAdmittedVoters,
+      expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
+    );
+    await user.keyboard("{tab}");
+
+    const votesOnCandidates = screen.getByTestId("votesOnCandidates");
+    await user.clear(votesOnCandidates);
+    await user.type(
+      votesOnCandidates,
+      expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
+    );
+    await user.keyboard("{tab}");
+
+    const blankVotes = screen.getByTestId("blankVotes");
+    await user.clear(blankVotes);
+    await user.type(blankVotes, expectedRequest.data.votes_counts.blank_votes_count.toString());
+    await user.keyboard("{tab}");
+
+    const invalidVotes = screen.getByTestId("invalidVotes");
+    await user.clear(invalidVotes);
+    await user.type(invalidVotes, expectedRequest.data.votes_counts.invalid_votes_count.toString());
+    await user.keyboard("{tab}");
+
+    const totalVotesCast = screen.getByTestId("totalVotesCast");
+    await user.clear(totalVotesCast);
+    await user.type(
+      totalVotesCast,
+      expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
+    );
+    await user.keyboard("{tab}");
+
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
+
+    // TODO: assert the call to the mocked API once that's been implemented
   });
 
   test("Successfully enter form field values", async () => {

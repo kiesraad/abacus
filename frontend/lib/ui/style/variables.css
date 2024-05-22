@@ -22,21 +22,31 @@
 :root {
   /* FONTS */
   --font-header: "SpaceGrotesk";
+  --font-header-body: "DMSans";
   --font-text: "DMSans";
   --font-number: "GeistMono";
 
+  --font-size-body: 1.125rem;
   /* TODO: pick a better font size scale */
   --font-size-sm: 0.8em;
   --font-size-md: 1em;
   --font-size-lg: 1.8em;
   --font-size-xl: 3.75em;
 
+  /* SPACING and CORNERS */
+  --rounded-default: 8px;
+
   /* COLORS */
+  --text-color-header: #101828;
+  --text-color-body: #344054;
+
+  --button-color-primary: #113051;
+
+  --color-alert: #d92d20;
 
   --bg-gray: #f9fafb;
   --bg-gray-darker: #f2f4f7;
   --bg-gray-darkest: #d0d5dd;
-
   --bg-highlight: #eff4ff;
 
   --base-dark-blue: #00305b;

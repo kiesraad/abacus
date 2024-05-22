@@ -42,7 +42,6 @@ const pollingStationDataEntryHandler = http.post<
   }
   if ("voters_counts" in json.data) {
     return HttpResponse.text("", { status: 200 });
-    // return HttpResponse.json({ message: "fake error from mock", errorCode: "FAKE_ERROR" }, { status: 422 });
   }
   return HttpResponse.json({ message: "missing fields", errorCode: "TBD" }, { status: 500 });
 });

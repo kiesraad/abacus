@@ -1,15 +1,15 @@
 import * as React from "react";
-import cls from "./Button.module.css";
+import cls from "./IconButton.module.css";
 import { cn } from "@kiesraad/util";
+import { Size, Variant } from "../ui.types";
 
 export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: React.ReactNode;
   isDisabled?: boolean;
   isLoading?: boolean;
-  variant?: "default" | "secondary";
+  variant?: Variant;
   isRound?: boolean;
-  size?: "sm" | "md" | "lg";
-  children: React.ReactNode;
+  size?: Size;
 }
 
 export function IconButton({

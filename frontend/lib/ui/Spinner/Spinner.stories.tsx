@@ -1,19 +1,21 @@
 import type { Story } from "@ladle/react";
 
 import { Spinner } from "./Spinner";
+import { Size } from "../ui.types";
 
-export const SpinnerSizes: Story = () => {
-  return (
-    <>
-      <div>
-        <Spinner size="sm" />
-      </div>
-      <div>
-        <Spinner size="md" />
-      </div>
-      <div>
-        <Spinner size="lg" />
-      </div>
-    </>
-  );
+type Props = {
+  size: Size;
+};
+
+export const DefaultSpinner: Story<Props> = ({ size }) => {
+  return <Spinner size={size} />;
+};
+
+export default {
+  argTypes: {
+    size: {
+      options: ["sm", "md", "lg"],
+      control: { type: "radio" },
+    },
+  },
 };

@@ -1,6 +1,8 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
-
+import { IconButton } from "..";
+import { IconCross } from "@kiesraad/icon";
+import cls from "./Modal.module.css";
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,10 +16,10 @@ export function Modal({ isOpen, onClose, children }: ModalProps): JSX.Element | 
   if (!modalRoot) return null;
 
   return createPortal(
-    <div className="modal">
-      <div className="modal-container">
-        <div className="modal-body">{children}</div>
-        <button onClick={onClose}>Close</button>
+    <div className={cls.modal}>
+      <div className={cls["modal-container"]}>
+        <IconButton onClick={onClose} icon={<IconCross />} isRound variant="ghost" />
+        <div className={cls["modal-body"]}>{children}</div>
       </div>
     </div>,
     modalRoot,

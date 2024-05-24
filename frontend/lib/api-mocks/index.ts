@@ -29,7 +29,7 @@ const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>(
   },
 );
 
-const pollingStationDataEntryHandler = http.post<
+export const pollingStationDataEntryHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY
 >("/v1/api/polling_stations/:id/data_entries/:entry_number", async ({ request }) => {

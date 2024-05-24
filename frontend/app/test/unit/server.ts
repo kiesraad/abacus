@@ -1,11 +1,4 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, you can obtain one at https://mozilla.org/MPL/2.0/.
- *
- * Copyright Oxide Computer Company
- */
-import { http, HttpResponse } from "msw";
+import { http, HttpHandler, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
 import { handlers } from "@kiesraad/api-mocks";
@@ -18,6 +11,25 @@ export const server = setupServer(
   }),
 );
 
+//keep a stack of the last 10 requests bodies
+const _requestStack: { id: string; body: object }[] = [];
+
+const addRequest = (id: string, body: object) => {
+  _requestStack.push({ id, body });
+  if (_requestStack.length > 10) {
+    _requestStack.shift();
+  }
+};
+
+export function getRequestBody(id: string): object | null {
+  const requestItem = _requestStack.reverse().find((r) => r.id === id);
+  if (!requestItem) {
+    return null;
+  }
+
+  return requestItem.body;
+}
+
 // Override request handlers in order to test special cases
 export function overrideOnce(
   method: keyof typeof http,
@@ -28,11 +40,30 @@ export function overrideOnce(
   server.use(
     http[method](
       `http://testhost${path}`,
-      () =>
+      () => {
         // https://mswjs.io/docs/api/response/once
-        typeof body === "string"
+        return typeof body === "string"
           ? new HttpResponse(body, { status })
-          : HttpResponse.json(body, { status }),
+          : HttpResponse.json(body, { status });
+      },
+      { once: true },
+    ),
+  );
+}
+
+export function interceptBodyForHandler(id: string, handler: HttpHandler) {
+  const method = (handler.info.method as string).toLowerCase() as keyof typeof http;
+  server.use(
+    http[method](
+      handler.info.path,
+      async ({ request, requestId }) => {
+        const clone = request.clone();
+        const body = (await clone.json()) as object;
+        addRequest(id, body);
+        const result = await handler.run({ request, requestId });
+
+        return result?.response;
+      },
       { once: true },
     ),
   );

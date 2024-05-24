@@ -1,10 +1,11 @@
 import { render, screen } from "app/test/unit/test-utils";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, assert } from "vitest";
 import { http, HttpResponse } from "msw";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
-import { overrideOnce, server } from "app/test/unit";
+import { overrideOnce, getRequestBody, server, interceptBodyForHandler } from "app/test/unit";
+import { pollingStationDataEntryHandler } from "@kiesraad/api-mocks";
 
 describe("VotersAndVotesForm", () => {
   test("tmp - demonstrate keyboard enter results in submit", async () => {
@@ -33,6 +34,94 @@ describe("VotersAndVotesForm", () => {
 
     expect(elems[0]).toHaveTextContent(/^Success$/);
     expect(elems[1]).toHaveTextContent(/^Error 422_ERROR 422 error from mock$/);
+  });
+
+  test("tmp - intercept body for a specific handler", async () => {
+    const expectedRequest = {
+      data: {
+        voters_counts: {
+          poll_card_count: 1,
+          proxy_certificate_count: 2,
+          voter_card_count: 3,
+          total_admitted_voters_count: 6,
+        },
+        votes_counts: {
+          votes_candidates_counts: 4,
+          blank_votes_count: 5,
+          invalid_votes_count: 6,
+          total_votes_cast_count: 15,
+        },
+      },
+    };
+
+    interceptBodyForHandler("tmp-intercept-test", pollingStationDataEntryHandler);
+
+    const user = userEvent.setup();
+
+    render(<VotersAndVotesForm />);
+
+    const pollCards = screen.getByTestId("pollCards");
+    await user.clear(pollCards);
+    await user.type(pollCards, expectedRequest.data.voters_counts.poll_card_count.toString());
+    await user.keyboard("{tab}");
+
+    const proxyCertificates = screen.getByTestId("proxyCertificates");
+    await user.clear(proxyCertificates);
+    await user.type(
+      proxyCertificates,
+      expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
+    );
+    await user.keyboard("{tab}");
+
+    const voterCards = screen.getByTestId("voterCards");
+    await user.clear(voterCards);
+    await user.type(voterCards, expectedRequest.data.voters_counts.voter_card_count.toString());
+    await user.keyboard("{tab}");
+
+    const totalAdmittedVoters = screen.getByTestId("totalAdmittedVoters");
+    await user.clear(totalAdmittedVoters);
+    await user.type(
+      totalAdmittedVoters,
+      expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
+    );
+    await user.keyboard("{tab}");
+
+    const votesOnCandidates = screen.getByTestId("votesOnCandidates");
+    await user.clear(votesOnCandidates);
+    await user.type(
+      votesOnCandidates,
+      expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
+    );
+    await user.keyboard("{tab}");
+
+    const blankVotes = screen.getByTestId("blankVotes");
+    await user.clear(blankVotes);
+    await user.type(blankVotes, expectedRequest.data.votes_counts.blank_votes_count.toString());
+    await user.keyboard("{tab}");
+
+    const invalidVotes = screen.getByTestId("invalidVotes");
+    await user.clear(invalidVotes);
+    await user.type(invalidVotes, expectedRequest.data.votes_counts.invalid_votes_count.toString());
+    await user.keyboard("{tab}");
+
+    const totalVotesCast = screen.getByTestId("totalVotesCast");
+    await user.clear(totalVotesCast);
+    await user.type(
+      totalVotesCast,
+      expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
+    );
+    await user.keyboard("{tab}");
+
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    await screen.findByTestId("result", {}, { timeout: 10000 });
+
+    const requestBody = getRequestBody("tmp-intercept-test");
+    expect(requestBody).not.toBe(null);
+    assert(requestBody !== null, "request body is not null");
+    expect(objectIsEqual(requestBody, expectedRequest)).toBe(true);
+    console.log("requestBody", requestBody);
   });
 
   test("Submitting form sends the expected request", async () => {
@@ -247,3 +336,7 @@ describe("VotersAndVotesForm", () => {
     expect(screen.getByTestId("result")).toHaveTextContent(/^Error 500_ERROR 500 error from mock$/);
   });
 });
+
+function objectIsEqual(a: object, b: object) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}

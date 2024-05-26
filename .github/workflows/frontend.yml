@@ -20,8 +20,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install
-        run: npm install
+      - name: Install dependencies
+        run: npm ci
       - name: Check formatting
         run: npx prettier --check .
       - name: Lint

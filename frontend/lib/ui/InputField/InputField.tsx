@@ -12,6 +12,8 @@ export interface InputFieldProps {
   error?: string;
   disabled?: boolean;
   margin?: boolean;
+  pattern?: string;
+  title?: string;
 }
 
 export function InputField({
@@ -26,6 +28,8 @@ export function InputField({
   error = "",
   disabled = false,
   margin = true,
+  pattern = "",
+  title = "",
 }: InputFieldProps) {
   return (
     <div className={`${margin ? cls.margin : ""}`}>
@@ -36,7 +40,14 @@ export function InputField({
         {size == "text-area" ? (
           <textarea name={name} value={value} disabled={disabled} rows={7} />
         ) : (
-          <input name={name} value={value} type={type} disabled={disabled} />
+          <input
+            name={name}
+            value={value}
+            type={type}
+            disabled={disabled}
+            pattern={pattern}
+            title={title}
+          />
         )}
         <span className="hint">{error || hint || <>&nbsp;</>}</span>
       </label>

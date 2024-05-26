@@ -18,7 +18,7 @@
   > nav {
     flex: 0 0 44px;
     padding: 0 5rem;
-    background-color: #344054;
+    background-color: var(--base-brand-blue);
     color: var(--base-white);
     height: 3rem;
     display: flex;

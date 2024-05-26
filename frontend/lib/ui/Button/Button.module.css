@@ -1,8 +1,8 @@
 .button {
-  color: #fff;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid #113051;
   background: #113051;
+  color: var(--base-white);
   /* Shadow/xs */
   box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
 
@@ -11,7 +11,8 @@
   justify-content: center;
   align-items: center;
   gap: 12px;
-  font-weight: 700;
+  font-weight: bold;
+  cursor: pointer;
 
   &:focus {
     outline: none;
@@ -48,13 +49,24 @@
   }
 }
 
+.icon {
+  background: none;
+  border: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0.625rem;
+}
+
 .sm {
-  font-size: 14px;
-  padding: 8px 12px;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
 }
 
 .lg {
-  font-size: 18px;
-  height: 60px;
-  padding: 16px 28px;
+  min-width: 13rem;
+  font-size: 1.125rem;
+  height: 3.75rem;
+  padding: 1rem 1.75rem;
 }

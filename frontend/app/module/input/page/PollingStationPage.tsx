@@ -1,4 +1,10 @@
-import { Button, PollingStationNumber, ProgressList, Tag, WorkStationNumber } from "@kiesraad/ui";
+import {
+  BadgeFirstEntry,
+  Button,
+  PollingStationNumber,
+  ProgressList,
+  WorkStationNumber,
+} from "@kiesraad/ui";
 import { useParams } from "react-router-dom";
 import { IconCross } from "@kiesraad/icon";
 import { VotersAndVotesForm } from "app/component/form/voters_and_votes/VotersAndVotesForm";
@@ -14,7 +20,7 @@ export function PollingStationPage() {
         <section>
           <PollingStationNumber>{id}</PollingStationNumber>
           <h1>Fluisterbosdreef 8</h1>
-          <Tag>1e invoer</Tag>
+          <BadgeFirstEntry />
         </section>
         <section>
           <Button variant="secondary" size="sm" rightIcon={<IconCross />}>

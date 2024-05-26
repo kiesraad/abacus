@@ -12,6 +12,13 @@ table.overview_table {
   td {
     height: 56px;
     font-size: 18px;
+    > *:not(:last-child) {
+      margin-right: 0.5rem;
+    }
+  }
+  td.flex {
+    display: flex;
+    align-items: center;
   }
   .align-right {
     text-align: right;
@@ -20,15 +27,22 @@ table.overview_table {
     text-align: center;
   }
   .link {
-    width: 80px;
+    width: 5rem;
   }
   .narrow {
     width: 104px;
+  }
+  a {
+    padding: 0.625rem;
   }
 }
 
 .button_hint {
   margin-left: 32px;
+}
+
+details {
+  margin-top: 2rem;
 }
 
 details[open] {
@@ -43,4 +57,9 @@ summary {
     text-decoration: underline;
     color: #1570ef;
   }
+}
+
+h2.table_title {
+  padding-top: 1.25rem;
+  margin-bottom: 1rem;
 }

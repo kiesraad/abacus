@@ -6,4 +6,4 @@ export * from "./frame/AppFrame";
 export * from "./InputField/InputField";
 export * from "./InputGrid/InputGrid";
 export * from "./ProgressList";
-export * from "./tag";
+export * from "./badge";

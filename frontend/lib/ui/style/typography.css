@@ -1,7 +1,7 @@
 body {
   font-family: var(--font-text), sans-serif;
   font-size: 16px;
-  line-height: 1em;
+  line-height: 1.5rem;
   color: #333;
 }
 
@@ -12,15 +12,15 @@ h4,
 h5,
 h6 {
   margin-top: 0;
-  font-family: var(--font-header), sans-serif;
   font-size: 36px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: normal;
   letter-spacing: -0.72px;
 }
 
 h1 {
-  font-size: 2em;
+  font-size: 2.25em;
+  font-family: var(--font-header), sans-serif;
 }
 h2 {
   font-size: 1.75em;
@@ -54,5 +54,14 @@ a {
 }
 
 .bold {
-  font-weight: 700;
+  font-weight: bold;
+}
+
+h2.form_title {
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: bold;
+  line-height: 1.875rem;
+  color: var(--gray-900);
+  margin-bottom: 2rem;
 }

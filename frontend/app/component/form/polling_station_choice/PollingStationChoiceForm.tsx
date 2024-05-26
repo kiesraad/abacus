@@ -1,5 +1,16 @@
-import { Button, InputField } from "@kiesraad/ui";
+import {
+  BadgeCorrection,
+  BadgeDefinitive,
+  BadgeDifference,
+  BadgeExtraEntry,
+  BadgeFirstEntry,
+  BadgeObjections,
+  BadgeSecondEntry,
+  Button,
+  InputField,
+} from "@kiesraad/ui";
 import { useNavigate } from "react-router-dom";
+import { IconChevronright } from "@kiesraad/icon";
 
 interface FormElements extends HTMLFormControlsCollection {
   number: HTMLInputElement;
@@ -19,40 +30,33 @@ export function PollingStationChoiceForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h4 className="bold">Welk stembureau ga je invoeren?</h4>
-      <br />
+      <h2 className="form_title">Welk stembureau ga je invoeren?</h2>
       <InputField
         name="number"
         label="Voer het nummer in:"
-        type="number"
         width="narrow"
         margin={false}
+        pattern="\d+"
+        title="Alleen positieve nummers toegestaan"
       />
-      <span>
+      <p>
         Klopt de naam van het stembureau met de naam op je papieren proces verbaal?
         <br />
         Dan kan je beginnen.
-      </span>
-      <br />
-      <br />
-      <br />
+      </p>
       <Button type="submit" size="lg">
         Beginnen
       </Button>
       <span className="button_hint">SHIFT + Enter</span>
-      <br />
-      <br />
-      <br />
       <details>
         <summary>
-          <span>Weet je het nummer niet?</span>
-          <br />
-          <span className="underlined">Bekijk de lijst met alle stembureaus</span>
+          <p>
+            Weet je het nummer niet?
+            <br />
+            <span className="underlined">Bekijk de lijst met alle stembureaus</span>
+          </p>
         </summary>
-        <br />
-        <br />
-        <h4 className="bold">Kies het stembureau</h4>
-        <br />
+        <h2 className="form_title table_title">Kies het stembureau</h2>
         <table id="polling_station_list" className="overview_table">
           <thead>
             <tr>
@@ -62,33 +66,88 @@ export function PollingStationChoiceForm() {
             </tr>
           </thead>
           <tbody>
-            {/* TODO: Add icons and labels once Ellen has dev mode access to Figma again */}
             <tr>
               <td className="align-right narrow bold">1</td>
-              <td>Nachthemelstraat 21 1e invoer</td>
+              <td>
+                <span>Nachthemelstraat 21</span>
+                <BadgeFirstEntry />
+              </td>
               <td className="align-center link">
-                <a href="/input/030">Link</a>
+                <a href="/input/030">
+                  <IconChevronright />
+                </a>
               </td>
             </tr>
             <tr>
               <td className="align-right narrow bold">2</td>
-              <td>Schoolstraat 78 1e invoer</td>
+              <td>
+                <span>Schoolstraat 78</span>
+                <BadgeSecondEntry />
+              </td>
               <td className="align-center link">
-                <a href="/input/030">Link</a>
+                <a href="/input/030">
+                  <IconChevronright />
+                </a>
               </td>
             </tr>
             <tr>
               <td className="align-right narrow bold">3</td>
-              <td>Fluisterbosdreef 8 2e invoer</td>
+              <td>
+                <span>Fluisterbosdreef 8</span>
+                <BadgeExtraEntry />
+              </td>
               <td className="align-center link">
-                <a href="/input/030">Link</a>
+                <a href="/input/030">
+                  <IconChevronright />
+                </a>
               </td>
             </tr>
             <tr>
               <td className="align-right narrow bold">4</td>
-              <td>Wilhelminastraat 21 2e invoer</td>
+              <td>
+                <span>Wilhelminastraat 21</span>
+                <BadgeObjections />
+              </td>
               <td className="align-center link">
-                <a href="/input/030">Link</a>
+                <a href="/input/030">
+                  <IconChevronright />
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td className="align-right narrow bold">5</td>
+              <td>
+                <span>Tuinstraat 2</span>
+                <BadgeDifference />
+              </td>
+              <td className="align-center link">
+                <a href="/input/030">
+                  <IconChevronright />
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td className="align-right narrow bold">6</td>
+              <td>
+                <span>Rietland 31</span>
+                <BadgeCorrection />
+              </td>
+              <td className="align-center link">
+                <a href="/input/030">
+                  <IconChevronright />
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td className="align-right narrow bold">7</td>
+              <td>
+                <span>Grote Markt 1</span>
+                <BadgeDefinitive />
+              </td>
+              <td className="align-center link">
+                <a href="/input/030">
+                  <IconChevronright />
+                </a>
               </td>
             </tr>
           </tbody>

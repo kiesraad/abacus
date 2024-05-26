@@ -1,5 +1,5 @@
 .margin {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .inputfield {
@@ -16,17 +16,17 @@
   span {
     font-size: var(--font-size-md);
     font-style: normal;
-    line-height: 1.5rem; /* 150% */
+    line-height: 1.5rem;
     &:global(.label) {
       color: var(--gray-900);
-      font-weight: 700;
+      font-weight: bold;
     }
     &:global(.subtext) {
-      font-weight: 400;
+      font-weight: normal;
     }
     &:global(.hint) {
       color: var(--gray-600);
-      font-weight: 400;
+      font-weight: normal;
       :global(.error) & {
         color: var(--error-600);
       }

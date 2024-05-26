@@ -1,4 +1,11 @@
 import { WorkStationNumber } from "@kiesraad/ui";
+import {
+  IconCheckheart,
+  IconCheckverified,
+  IconChevronright,
+  IconClock,
+  IconHourglass,
+} from "@kiesraad/icon";
 
 export function OverviewPage() {
   return (
@@ -23,37 +30,56 @@ export function OverviewPage() {
               </tr>
             </thead>
             <tbody>
-              {/* TODO: Add icons once Ellen has dev mode access to Figma again */}
               <tr>
                 <td>Referendum uitbreiding stadshart 2026</td>
                 <td>GSB - Juinen (045)</td>
-                <td>Invoer opgeschort</td>
+                <td className="flex">
+                  <IconHourglass />
+                  <span>Invoer opgeschort</span>
+                </td>
                 <td className="align-center narrow">
-                  <a href="/input">Link</a>
+                  <a href="/input">
+                    <IconChevronright />
+                  </a>
                 </td>
               </tr>
               <tr>
                 <td>Wijkraad Grachtenkwartier 2026</td>
                 <td>Lokale verkiezing</td>
-                <td>Wachten op coordinator</td>
+                <td className="flex">
+                  <IconClock />
+                  <span>Wachten op coordinator</span>
+                </td>
                 <td className="align-center narrow">
-                  <a href="/input">Link</a>
+                  <a href="/input">
+                    <IconChevronright />
+                  </a>
                 </td>
               </tr>
               <tr>
                 <td>Europees Parlementsverkiezing 2024</td>
                 <td></td>
-                <td>Invoerders bezig</td>
+                <td className="flex">
+                  <IconCheckheart />
+                  <span>Invoerders bezig</span>
+                </td>
                 <td className="align-center narrow">
-                  <a href="/input">Link</a>
+                  <a href="/input">
+                    <IconChevronright />
+                  </a>
                 </td>
               </tr>
               <tr>
                 <td>Tweede Kamerverkiezing 2023</td>
                 <td></td>
-                <td>Steminvoer voltooid</td>
+                <td className="flex">
+                  <IconCheckverified />
+                  <span>Steminvoer voltooid</span>
+                </td>
                 <td className="align-center narrow">
-                  <a href="/input">Link</a>
+                  <a href="/input">
+                    <IconChevronright />
+                  </a>
                 </td>
               </tr>
             </tbody>

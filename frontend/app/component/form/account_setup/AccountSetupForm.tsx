@@ -19,8 +19,7 @@ export function AccountSetupForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h4 className="bold">Personaliseer je account</h4>
-      <br />
+      <h2 className="form_title">Personaliseer je account</h2>
       <InputField
         name="username"
         label="Gebruikersnaam"
@@ -43,7 +42,9 @@ export function AccountSetupForm() {
       />
       <InputField name="new_password2" label="Herhaal wachtwoord" type="password" />
       <BottomBar>
-        <Button type="submit">Opslaan</Button>
+        <Button type="submit" size="lg">
+          Opslaan
+        </Button>
       </BottomBar>
     </form>
   );

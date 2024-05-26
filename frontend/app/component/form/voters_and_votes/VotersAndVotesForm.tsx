@@ -144,7 +144,7 @@ export function VotersAndVotesForm() {
         </InputGrid.Body>
       </InputGrid>
       <br /> <br />
-      <Button type="submit" disabled={loading}>
+      <Button type="submit" size="lg" disabled={loading}>
         Volgende
       </Button>
     </form>

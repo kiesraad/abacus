@@ -32,7 +32,9 @@ export function LoginForm() {
         type="password"
       />
       <BottomBar>
-        <Button type="submit">Inloggen</Button>
+        <Button type="submit" size="lg">
+          Inloggen
+        </Button>
       </BottomBar>
     </form>
   );

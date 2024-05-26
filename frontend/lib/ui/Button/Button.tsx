@@ -4,7 +4,7 @@ import cls from "./Button.module.css";
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isDisabled?: boolean;
   isLoading?: boolean;
-  variant?: "default" | "secondary";
+  variant?: "default" | "secondary" | "icon";
   size?: "sm" | "md" | "lg";
   rightIcon?: React.ReactNode;
   children: React.ReactNode;

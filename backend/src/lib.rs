@@ -3,8 +3,8 @@ use std::error::Error;
 use axum::extract::rejection::JsonRejection;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use axum::routing::get;
-use axum::{routing, Json, Router};
+use axum::routing::{get, post};
+use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use utoipa::{OpenApi, ToSchema};
@@ -18,13 +18,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let openapi = create_openapi();
     let app = Router::new()
         .route("/api-docs/openapi.json", get(Json(openapi)))
-        .route(
-            "/api/elections/:id",
-            routing::get(election::election_details),
-        )
+        .route("/api/elections/:id", get(election::election_details))
         .route(
             "/api/polling_stations/:id/data_entries/:entry_number",
-            routing::post(polling_station::polling_station_data_entry),
+            post(polling_station::polling_station_data_entry),
         )
         .with_state(pool);
     Ok(app)

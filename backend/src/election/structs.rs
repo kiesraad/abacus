@@ -35,8 +35,13 @@ pub struct Candidate {
     pub number: u8,
     pub initials: String,
     pub first_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_name_prefix: Option<String>,
     pub last_name: String,
     pub locality: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country_code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub gender: Option<CandidateGender>,
 }
 

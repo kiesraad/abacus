@@ -140,6 +140,10 @@
           "locality"
         ],
         "properties": {
+          "country_code": {
+            "type": "string",
+            "nullable": true
+          },
           "first_name": {
             "type": "string"
           },
@@ -156,6 +160,10 @@
           },
           "last_name": {
             "type": "string"
+          },
+          "last_name_prefix": {
+            "type": "string",
+            "nullable": true
           },
           "locality": {
             "type": "string"

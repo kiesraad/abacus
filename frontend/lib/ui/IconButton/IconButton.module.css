@@ -34,10 +34,18 @@
 
   &.sm {
     padding: 4px;
+
+    svg {
+      height: 12px;
+    }
   }
 
   &.lg {
     padding: 16px;
+
+    svg {
+      height: 20px;
+    }
   }
 
   &.ghost {

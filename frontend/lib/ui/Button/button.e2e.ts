@@ -4,7 +4,7 @@ test("default button is visible", async ({ page }) => {
   await page.goto("http://localhost:61000/?story=button--default-button");
 
   const button = page.getByRole("button", {
-    name: "Click me",
+    name: "Invoer",
   });
 
   await expect(button).toBeVisible();

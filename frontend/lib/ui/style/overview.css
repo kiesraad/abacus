@@ -16,9 +16,12 @@ table.overview_table {
       margin-right: 0.5rem;
     }
   }
-  td.flex {
+  div.flex {
     display: flex;
     align-items: center;
+    > *:not(:last-child) {
+      margin-right: 0.5rem;
+    }
   }
   .align-right {
     text-align: right;

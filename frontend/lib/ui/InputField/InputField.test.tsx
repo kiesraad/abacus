@@ -1,111 +1,69 @@
 import { render, screen } from "@testing-library/react";
 import { expect, test } from "vitest";
 
-import {
-  ErrorTextAreaInputField,
-  DefaultLargeNarrowInputField,
-  DefaultLargeWideInputField,
-  DefaultMediumNarrowInputField,
-  DefaultMediumWideInputField,
-  DefaultSmallNarrowInputField,
-  DefaultSmallWideInputField,
-  DefaultTextAreaInputField,
-  ErrorLargeWideInputField,
-  ErrorLargeNarrowInputField,
-} from "./InputField.stories.tsx";
+import { NarrowInputField, TextAreaInputField, WideInputField } from "./InputField.stories.tsx";
 
-test("The default small wide input field is rendered", () => {
-  render(<DefaultSmallWideInputField />);
+test("The wide input fields are rendered", () => {
+  render(<WideInputField />);
 
-  const inputElement = screen.getByRole("textbox");
+  const smallElement = screen.getByRole("textbox", { name: "Default Small Wide with subtext" });
 
-  inputElement.click();
-  expect(inputElement).toBeEnabled();
+  smallElement.click();
+  expect(smallElement).toBeEnabled();
+
+  const mediumElement = screen.getByRole("textbox", { name: "Default Medium Wide" });
+
+  mediumElement.click();
+  expect(mediumElement).toBeEnabled();
+
+  const largeElement = screen.getByRole("textbox", { name: "Default Large Wide" });
+
+  largeElement.click();
+  expect(largeElement).toBeEnabled();
+
+  const errorElement = screen.getByRole("textbox", { name: "Error Large Wide" });
+
+  errorElement.click();
+  expect(errorElement).toBeEnabled();
+  expect(errorElement).toHaveAccessibleErrorMessage("There is an error");
 });
 
-test("The default medium wide input field is rendered", () => {
-  render(<DefaultMediumWideInputField />);
+test("The narrow input fields are rendered", () => {
+  render(<NarrowInputField />);
 
-  const inputElement = screen.getByRole("textbox");
+  const smallElement = screen.getByRole("textbox", { name: "Default Small Narrow" });
 
-  inputElement.click();
-  expect(inputElement).toBeEnabled();
+  smallElement.click();
+  expect(smallElement).toBeEnabled();
+
+  const mediumElement = screen.getByRole("textbox", { name: "Default Medium Narrow with subtext" });
+
+  mediumElement.click();
+  expect(mediumElement).toBeEnabled();
+
+  const largeElement = screen.getByRole("textbox", { name: "Default Large Narrow" });
+
+  largeElement.click();
+  expect(largeElement).toBeEnabled();
+
+  const errorElement = screen.getByRole("textbox", { name: "Error Large Narrow" });
+
+  errorElement.click();
+  expect(errorElement).toBeEnabled();
+  expect(errorElement).toHaveAccessibleErrorMessage("There is an error");
 });
 
-test("The default large wide input field is rendered", () => {
-  render(<DefaultLargeWideInputField />);
+test("The text area input fields are rendered", () => {
+  render(<TextAreaInputField />);
 
-  const inputElement = screen.getByRole("textbox");
+  const defaultElement = screen.getByRole("textbox", { name: "Default Text Area with subtext" });
 
-  inputElement.click();
-  expect(inputElement).toBeEnabled();
-});
+  defaultElement.click();
+  expect(defaultElement).toBeEnabled();
 
-test("The error large wide input field is rendered", () => {
-  render(<ErrorLargeWideInputField />);
+  const errorElement = screen.getByRole("textbox", { name: "Error Text Area" });
 
-  const inputElement = screen.getByRole("textbox");
-  const errorElement = screen.getByText("There is an error");
-
-  inputElement.click();
-  expect(inputElement).toBeEnabled();
-  expect(errorElement).toBeInTheDocument();
-});
-
-test("The default small narrow input field is rendered", () => {
-  render(<DefaultSmallNarrowInputField />);
-
-  const inputElement = screen.getByRole("textbox");
-
-  inputElement.click();
-  expect(inputElement).toBeEnabled();
-});
-
-test("The default medium narrow input field is rendered", () => {
-  render(<DefaultMediumNarrowInputField />);
-
-  const inputElement = screen.getByRole("textbox");
-
-  inputElement.click();
-  expect(inputElement).toBeEnabled();
-});
-
-test("The default large narrow input field is rendered", () => {
-  render(<DefaultLargeNarrowInputField />);
-
-  const inputElement = screen.getByRole("textbox");
-
-  inputElement.click();
-  expect(inputElement).toBeEnabled();
-});
-
-test("The error large narrow input field is rendered", () => {
-  render(<ErrorLargeNarrowInputField />);
-
-  const inputElement = screen.getByRole("textbox");
-  const errorElement = screen.getByText("There is an error");
-
-  inputElement.click();
-  expect(inputElement).toBeEnabled();
-  expect(errorElement).toBeInTheDocument();
-});
-
-test("The default text area input field is rendered", () => {
-  render(<DefaultTextAreaInputField />);
-
-  const inputElement = screen.getByRole("textbox");
-
-  inputElement.click();
-  expect(inputElement).toBeEnabled();
-});
-
-test("The error text area input field is rendered", () => {
-  render(<ErrorTextAreaInputField />);
-
-  const inputElement = screen.getByRole("textbox");
-  const errorElement = screen.getByText("There is an error");
-
-  inputElement.click();
-  expect(inputElement).toBeEnabled();
-  expect(errorElement).toBeInTheDocument();
+  errorElement.click();
+  expect(errorElement).toBeEnabled();
+  expect(errorElement).toHaveAccessibleErrorMessage("There is an error");
 });

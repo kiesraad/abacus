@@ -32,25 +32,36 @@ export function InputField({
   title = "",
 }: InputFieldProps) {
   return (
-    <div className={`${margin ? cls.margin : ""}`}>
-      <label className={`${cls.inputfield} ${size} ${width} ${error ? "error" : ""}`}>
+    <div className={`${cls.inputfield} ${margin ? "margin" : ""}`}>
+      <label className={`${size} ${width} ${error ? "error" : ""}`}>
         <span className="label">
           {label} <span className="subtext">{subtext}</span>
         </span>
         {size == "text-area" ? (
-          <textarea name={name} value={value} disabled={disabled} rows={7} />
+          <textarea
+            name={name}
+            value={value || undefined}
+            disabled={disabled}
+            aria-invalid={error ? "true" : "false"}
+            aria-errormessage={error ? `${name}-hint_or_error` : undefined}
+            rows={7}
+          />
         ) : (
           <input
             name={name}
-            value={value}
+            value={value || undefined}
             type={type}
             disabled={disabled}
-            pattern={pattern}
-            title={title}
+            pattern={pattern || undefined}
+            title={title || undefined}
+            aria-invalid={error ? "true" : "false"}
+            aria-errormessage={error ? `${name}-hint_or_error` : undefined}
           />
         )}
-        <span className="hint">{error || hint || <>&nbsp;</>}</span>
       </label>
+      <span id={`${name}-hint_or_error`} className={error ? "error" : "hint"}>
+        {error || hint || <>&nbsp;</>}
+      </span>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("default small wide input field is visible", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=input-field--default-small-wide-input-field");
+  await page.goto("http://localhost:61000/?story=input-field--wide-input-field");
 
   const input = page.getByRole("textbox", { name: "Default Small Wide" });
 
@@ -11,7 +11,7 @@ test("default small wide input field is visible", async ({ page }) => {
 });
 
 test("error large wide input field is visible", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=input-field--error-large-wide-input-field");
+  await page.goto("http://localhost:61000/?story=input-field--wide-input-field");
 
   const input = page.getByRole("textbox", { name: "Error Large Wide" });
 
@@ -22,7 +22,7 @@ test("error large wide input field is visible", async ({ page }) => {
 });
 
 test("default medium narrow input field is visible", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=input-field--default-medium-narrow-input-field");
+  await page.goto("http://localhost:61000/?story=input-field--narrow-input-field");
 
   const input = page.getByRole("textbox", { name: "Default Medium Narrow" });
 
@@ -32,7 +32,7 @@ test("default medium narrow input field is visible", async ({ page }) => {
 });
 
 test("error large narrow input field is visible", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=input-field--error-large-narrow-input-field");
+  await page.goto("http://localhost:61000/?story=input-field--narrow-input-field");
 
   const input = page.getByRole("textbox", { name: "Error Large Narrow" });
 
@@ -43,7 +43,7 @@ test("error large narrow input field is visible", async ({ page }) => {
 });
 
 test("default text area input field is visible", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=input-field--default-text-area-input-field");
+  await page.goto("http://localhost:61000/?story=input-field--text-area-input-field");
 
   const input = page.getByRole("textbox", { name: "Default Text Area" });
 
@@ -53,7 +53,7 @@ test("default text area input field is visible", async ({ page }) => {
 });
 
 test("error text area input field is visible", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=input-field--error-text-area-input-field");
+  await page.goto("http://localhost:61000/?story=input-field--text-area-input-field");
 
   const input = page.getByRole("textbox", { name: "Error Text Area" });
 

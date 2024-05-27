@@ -33,9 +33,11 @@ export function OverviewPage() {
               <tr>
                 <td>Referendum uitbreiding stadshart 2026</td>
                 <td>GSB - Juinen (045)</td>
-                <td className="flex">
-                  <IconHourglass />
-                  <span>Invoer opgeschort</span>
+                <td>
+                  <div className="flex">
+                    <IconHourglass />
+                    <span>Invoer opgeschort</span>
+                  </div>
                 </td>
                 <td className="align-center narrow">
                   <a href="/input">
@@ -46,9 +48,11 @@ export function OverviewPage() {
               <tr>
                 <td>Wijkraad Grachtenkwartier 2026</td>
                 <td>Lokale verkiezing</td>
-                <td className="flex">
-                  <IconClock />
-                  <span>Wachten op coordinator</span>
+                <td>
+                  <div className="flex">
+                    <IconClock />
+                    <span>Wachten op coordinator</span>
+                  </div>
                 </td>
                 <td className="align-center narrow">
                   <a href="/input">
@@ -59,9 +63,11 @@ export function OverviewPage() {
               <tr>
                 <td>Europees Parlementsverkiezing 2024</td>
                 <td></td>
-                <td className="flex">
-                  <IconCheckheart />
-                  <span>Invoerders bezig</span>
+                <td>
+                  <div className="flex">
+                    <IconCheckheart />
+                    <span>Invoerders bezig</span>
+                  </div>
                 </td>
                 <td className="align-center narrow">
                   <a href="/input">
@@ -72,9 +78,11 @@ export function OverviewPage() {
               <tr>
                 <td>Tweede Kamerverkiezing 2023</td>
                 <td></td>
-                <td className="flex">
-                  <IconCheckverified />
-                  <span>Steminvoer voltooid</span>
+                <td>
+                  <div className="flex">
+                    <IconCheckverified />
+                    <span>Steminvoer voltooid</span>
+                  </div>
                 </td>
                 <td className="align-center narrow">
                   <a href="/input">

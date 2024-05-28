@@ -37,11 +37,12 @@ export function InputField({
         <span className="label">
           {label} <span className="subtext">{subtext}</span>
         </span>
-        {size == "text-area" ? (
+        {disabled ? (
+          <div className={`${size} disabled_input`}>{value || undefined}</div>
+        ) : size == "text-area" ? (
           <textarea
             name={name}
             value={value || undefined}
-            disabled={disabled}
             aria-invalid={error ? "true" : "false"}
             aria-errormessage={error ? `${name}-hint_or_error` : undefined}
             rows={7}
@@ -51,7 +52,6 @@ export function InputField({
             name={name}
             value={value || undefined}
             type={type}
-            disabled={disabled}
             pattern={pattern || undefined}
             title={title || undefined}
             aria-invalid={error ? "true" : "false"}

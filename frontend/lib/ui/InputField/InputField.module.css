@@ -35,8 +35,10 @@
       font-weight: normal;
     }
   }
+
   input,
-  textarea {
+  textarea,
+  div:global(.disabled_input) {
     display: flex;
     padding: 1rem 1.5rem 1rem 1rem;
     justify-content: space-between;
@@ -53,15 +55,6 @@
     :global(.large) & {
       height: 4.5rem;
     }
-    &:hover,
-    &:focus {
-      border: 2px solid var(--blue-dark-400);
-      outline: none;
-    }
-    &:disabled {
-      background: var(--gray-100);
-      border: 2px solid var(--gray-300);
-    }
     :global(.error) & {
       border: 2px solid var(--error-400);
       background-image: url("../../icon/svg/error.svg");
@@ -70,11 +63,27 @@
       padding-right: 3rem;
     }
   }
+  input,
+  textarea {
+    &:hover,
+    &:focus {
+      border: 2px solid var(--blue-dark-400);
+      outline: none;
+    }
+  }
   textarea {
     align-items: flex-start;
     resize: none;
     :global(.error) & {
       background-position: right 1.5rem top 1rem;
+    }
+  }
+  div:global(.disabled_input) {
+    background: var(--gray-100);
+    border: 2px solid var(--gray-300);
+    :global(.text-area) & {
+      min-height: 204px;
+      word-wrap: anywhere;
     }
   }
 }

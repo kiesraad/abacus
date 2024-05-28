@@ -101,13 +101,5 @@
       min-height: 204px;
       word-wrap: anywhere;
     }
-    :global(.small) & {
-      border-width: 1px;
-    }
-    :global(.medium) &,
-    :global(.large) &,
-    :global(.text-area) & {
-      border-width: 2px;
-    }
   }
 }

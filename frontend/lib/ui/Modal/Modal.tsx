@@ -12,11 +12,10 @@ export interface ModalProps {
 export function Modal({ isOpen, onClose, children }: ModalProps): JSX.Element | null {
   if (!isOpen) return null;
 
-  const modalRoot = document.getElementById("modal");
-  if (!modalRoot) return null;
+  const modalRoot = document.body;
 
   return createPortal(
-    <div className={cls.modal}>
+    <div className={cls.modal} role="dialog">
       <div className={cls["modal-container"]}>
         <IconButton onClick={onClose} icon={<IconCross />} isRound variant="ghost" />
         <div className={cls["modal-body"]}>{children}</div>

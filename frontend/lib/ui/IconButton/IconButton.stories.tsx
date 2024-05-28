@@ -13,11 +13,26 @@ type Props = {
 
 export const DefaultIconButton: Story<Props> = ({ label, variant, size, isRound }) => (
   <IconButton
+    role="button"
+    title="Icon Button"
     icon={<IconCross />}
     aria-label={label}
     variant={variant}
     size={size}
     isRound={isRound}
+  />
+);
+
+export const DisabledIconButton: Story<Props> = ({ label, variant, size, isRound }) => (
+  <IconButton
+    role="button"
+    title="Icon Button"
+    icon={<IconCross />}
+    aria-label={label}
+    variant={variant}
+    size={size}
+    isRound={isRound}
+    isDisabled
   />
 );
 

@@ -13,9 +13,16 @@ export interface AlertProps {
 
 export function Alert({ type, onClose, children }: AlertProps) {
   return (
-    <div className={cn(cls.alert, cls[type])}>
+    <div className={cn(cls.alert, cls[type])} role="alert">
       {onClose && (
-        <IconButton icon={<IconCross />} variant="ghost" size="md" isRound onClick={onClose} />
+        <IconButton
+          title="close"
+          icon={<IconCross />}
+          variant="ghost"
+          size="md"
+          isRound
+          onClick={onClose}
+        />
       )}
       <aside>{renderIconForType(type)}</aside>
       <section>{children}</section>

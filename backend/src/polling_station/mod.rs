@@ -36,15 +36,16 @@ impl IntoResponse for DataEntryResponse {
 /// Save or update the data entry for a polling station
 #[utoipa::path(
         post,
-        path = "/api/polling_stations/{id}/data_entries/{entry_number}",
+        path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
         request_body = DataEntryRequest,
         responses(
             (status = 200, description = "Data entry saved successfully", body = DataEntryResponse),
             (status = 422, description = "JSON body parsing error (Unprocessable Content)", body = ErrorResponse),
-            (status = 500, description = "Internal server error", body = ErrorResponse)
+            (status = 500, description = "Internal server error", body = ErrorResponse),
         ),
         params(
-            ("id" = i64, description = "Polling station database id")
+            ("polling_station_id" = u32, description = "Polling station database id"),
+            ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
         ),
     )]
 pub async fn polling_station_data_entry(

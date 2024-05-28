@@ -18,18 +18,17 @@ pub struct ElectionDetailsResponse {
 
 /// Get election details including its candidate list
 #[utoipa::path(
-        post,
-        path = "/api/elections/{id}",
-        request_body = ElectionDetailsResponse,
+        get,
+        path = "/api/elections/{election_id}",
         responses(
-            (status = 200, description = "Election", body = ElectionDetailsResponse)
+            (status = 200, description = "Election", body = ElectionDetailsResponse),
         ),
         params(
-            ("id" = i64, description = "Election database id")
+            ("election_id" = u32, description = "Election database id"),
         ),
     )]
 pub async fn election_details(
-    Path(id): Path<i64>,
+    Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     Ok(Json(ElectionDetailsResponse {
         election: Election {

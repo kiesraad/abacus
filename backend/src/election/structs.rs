@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 /// Election with its political groups
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Election {
-    pub id: i64,
+    pub id: u32,
     pub name: String,
     pub category: ElectionCategory,
     #[schema(value_type = String, format = "date")]

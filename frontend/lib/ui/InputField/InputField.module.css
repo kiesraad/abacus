@@ -46,25 +46,41 @@
     align-self: stretch;
     :global(.small) & {
       height: 3rem;
+      border-width: 1px;
     }
     :global(.medium) & {
       height: 3.5rem;
+      border-width: 2px;
     }
     :global(.large) & {
       height: 4.5rem;
+      border-width: 2px;
+    }
+    :global(.text-area) & {
+      border-width: 2px;
     }
   }
   input,
   textarea {
-    border: 2px solid var(--gray-300);
+    border: solid var(--gray-300);
     background: var(--base-white);
     &:hover,
     &:focus {
-      border: 2px solid var(--blue-dark-400);
+      border: solid var(--blue-dark-400);
       outline: none;
     }
+    &:focus {
+      :global(.large) &,
+      :global(.text-area) & {
+        box-shadow: 0 0 0 4px var(--blue-dark-100);
+      }
+      :global(.medium) &,
+      :global(.small) & {
+        box-shadow: 0 0 0 3px var(--blue-dark-100);
+      }
+    }
     :global(.error) & {
-      border: 2px solid var(--error-400);
+      border: solid var(--error-400);
       background-image: url("../../icon/svg/error.svg");
       background-repeat: no-repeat;
       background-position: right 1.5rem center;
@@ -79,11 +95,19 @@
     }
   }
   div:global(.disabled_input) {
-    border: 2px solid var(--gray-300);
+    border: solid var(--gray-300);
     background: var(--gray-100);
     :global(.text-area) & {
       min-height: 204px;
       word-wrap: anywhere;
+    }
+    :global(.small) & {
+      border-width: 1px;
+    }
+    :global(.medium) &,
+    :global(.large) &,
+    :global(.text-area) & {
+      border-width: 2px;
     }
   }
 }

@@ -3,6 +3,10 @@ body {
   font-size: 16px;
   line-height: 1em;
   color: var(--text-color-body);
+
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,
@@ -16,7 +20,7 @@ h6 {
   color: var(--text-color-header);
   font-size: 1rem;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: -0.72px;
 }
 

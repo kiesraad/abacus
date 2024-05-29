@@ -9,7 +9,41 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/api/polling_stations/{id}/data_entries/{entry_number}": {
+    "/api/elections/{election_id}": {
+      "get": {
+        "tags": [
+          "election"
+        ],
+        "summary": "Get election details including its candidate list",
+        "operationId": "election_details",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Election",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectionDetailsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
         "tags": [
           "polling_station"
@@ -18,7 +52,7 @@
         "operationId": "polling_station_data_entry",
         "parameters": [
           {
-            "name": "id",
+            "name": "polling_station_id",
             "in": "path",
             "description": "Polling station database id",
             "required": true,
@@ -31,6 +65,7 @@
           {
             "name": "entry_number",
             "in": "path",
+            "description": "Data entry number (first or second data entry)",
             "required": true,
             "schema": {
               "type": "integer",
@@ -61,14 +96,21 @@
             }
           },
           "422": {
-            "description": "JSON body parsing error (Unprocessable Content)"
+            "description": "JSON body parsing error (Unprocessable Content)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DataEntryResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -79,6 +121,61 @@
   },
   "components": {
     "schemas": {
+      "Candidate": {
+        "type": "object",
+        "description": "Candidate",
+        "required": [
+          "number",
+          "initials",
+          "first_name",
+          "last_name",
+          "locality"
+        ],
+        "properties": {
+          "country_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "gender": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CandidateGender"
+              }
+            ],
+            "nullable": true
+          },
+          "initials": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "last_name_prefix": {
+            "type": "string",
+            "nullable": true
+          },
+          "locality": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "CandidateGender": {
+        "type": "string",
+        "description": "Candidate gender",
+        "enum": [
+          "Male",
+          "Female",
+          "X"
+        ]
+      },
       "DataEntryRequest": {
         "type": "object",
         "description": "Request structure for data entry of polling station results",
@@ -108,6 +205,101 @@
           },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
+          }
+        }
+      },
+      "Election": {
+        "type": "object",
+        "description": "Election with its political groups",
+        "required": [
+          "id",
+          "name",
+          "category",
+          "election_date",
+          "nomination_date",
+          "political_groups"
+        ],
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/ElectionCategory"
+          },
+          "election_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "nomination_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "political_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroup"
+            }
+          }
+        }
+      },
+      "ElectionCategory": {
+        "type": "string",
+        "description": "Election category (limited for now)",
+        "enum": [
+          "Municipal"
+        ]
+      },
+      "ElectionDetailsResponse": {
+        "type": "object",
+        "description": "Election details response",
+        "required": [
+          "election"
+        ],
+        "properties": {
+          "election": {
+            "$ref": "#/components/schemas/Election"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Response structure for errors",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "PoliticalGroup": {
+        "type": "object",
+        "description": "Political group with its candidates",
+        "required": [
+          "number",
+          "name",
+          "candidates"
+        ],
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         }
       },
@@ -249,6 +441,10 @@
     }
   },
   "tags": [
+    {
+      "name": "election",
+      "description": "Election API"
+    },
     {
       "name": "polling_station",
       "description": "Polling station API"

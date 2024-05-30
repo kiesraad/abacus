@@ -1,26 +1,11 @@
-import { render, screen } from "app/test/unit/test-utils";
+import { render, screen, fireEvent } from "app/test/unit/test-utils";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, assert, vi, afterEach } from "vitest";
-import { http, HttpResponse } from "msw";
+import { describe, expect, test, vi, afterEach } from "vitest";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
-import { overrideOnce, getRequestBody, server, interceptBodyForHandler } from "app/test/unit";
-import { pollingStationDataEntryHandler } from "@kiesraad/api-mocks";
+import { overrideOnce } from "app/test/unit";
 
-import { usePollingStationDataEntry } from "@kiesraad/api";
-
-// references on mocking
-// https://vitest.dev/guide/mocking.html#functions
-// https://runthatline.com/how-to-mock-fetch-api-with-vitest/
-// https://mayashavin.com/articles/two-shades-of-mocking-vitest
-// https://runthatline.com/how-to-mock-fetch-api-with-vitest/
-
-// Mocking global.fetch doesn't work:
-// mocking global.fetch with global.fetch = vi.fn().mockResolvedValue(createFetchResponse());
-// the test as such passes fine, but all the ones needed MSW fail,
-// because there doesn't seem to be a way to revert to the actual fetch() implementation
-
-describe("VotersAndVotesForm api call", () => {
+describe("VotersAndVotesForm Form", () => {
   afterEach(() => {
     vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
   });
@@ -42,373 +27,7 @@ describe("VotersAndVotesForm api call", () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
-  test("option 1 - use vite spy on fetch to check request", async () => {
-    const spy = vi.spyOn(global, "fetch");
-
-    const expectedRequest = {
-      data: {
-        voters_counts: {
-          poll_card_count: 1,
-          proxy_certificate_count: 2,
-          voter_card_count: 3,
-          total_admitted_voters_count: 6,
-        },
-        votes_counts: {
-          votes_candidates_counts: 4,
-          blank_votes_count: 5,
-          invalid_votes_count: 6,
-          total_votes_cast_count: 15,
-        },
-      },
-    };
-
-    const user = userEvent.setup();
-
-    render(<VotersAndVotesForm />);
-
-    const pollCards = screen.getByTestId("pollCards");
-    await user.clear(pollCards);
-    await user.type(pollCards, expectedRequest.data.voters_counts.poll_card_count.toString());
-    await user.keyboard("{tab}");
-
-    const proxyCertificates = screen.getByTestId("proxyCertificates");
-    await user.clear(proxyCertificates);
-    await user.type(
-      proxyCertificates,
-      expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const voterCards = screen.getByTestId("voterCards");
-    await user.clear(voterCards);
-    await user.type(voterCards, expectedRequest.data.voters_counts.voter_card_count.toString());
-    await user.keyboard("{tab}");
-
-    const totalAdmittedVoters = screen.getByTestId("totalAdmittedVoters");
-    await user.clear(totalAdmittedVoters);
-    await user.type(
-      totalAdmittedVoters,
-      expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const votesOnCandidates = screen.getByTestId("votesOnCandidates");
-    await user.clear(votesOnCandidates);
-    await user.type(
-      votesOnCandidates,
-      expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const blankVotes = screen.getByTestId("blankVotes");
-    await user.clear(blankVotes);
-    await user.type(blankVotes, expectedRequest.data.votes_counts.blank_votes_count.toString());
-    await user.keyboard("{tab}");
-
-    const invalidVotes = screen.getByTestId("invalidVotes");
-    await user.clear(invalidVotes);
-    await user.type(invalidVotes, expectedRequest.data.votes_counts.invalid_votes_count.toString());
-    await user.keyboard("{tab}");
-
-    const totalVotesCast = screen.getByTestId("totalVotesCast");
-    await user.clear(totalVotesCast);
-    await user.type(
-      totalVotesCast,
-      expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-
-    expect(spy).toHaveBeenCalledWith("http://testhost/v1/api/polling_stations/1/data_entries/1", {
-      method: "POST",
-      body: JSON.stringify(expectedRequest),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  });
-
-  test("option 2 - use custom intercept in msw to check request", async () => {
-    const expectedRequest = {
-      data: {
-        voters_counts: {
-          poll_card_count: 1,
-          proxy_certificate_count: 2,
-          voter_card_count: 3,
-          total_admitted_voters_count: 6,
-        },
-        votes_counts: {
-          votes_candidates_counts: 4,
-          blank_votes_count: 5,
-          invalid_votes_count: 6,
-          total_votes_cast_count: 15,
-        },
-      },
-    };
-
-    interceptBodyForHandler("tmp-intercept-test", pollingStationDataEntryHandler);
-
-    const user = userEvent.setup();
-
-    render(<VotersAndVotesForm />);
-
-    const pollCards = screen.getByTestId("pollCards");
-    await user.clear(pollCards);
-    await user.type(pollCards, expectedRequest.data.voters_counts.poll_card_count.toString());
-    await user.keyboard("{tab}");
-
-    const proxyCertificates = screen.getByTestId("proxyCertificates");
-    await user.clear(proxyCertificates);
-    await user.type(
-      proxyCertificates,
-      expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const voterCards = screen.getByTestId("voterCards");
-    await user.clear(voterCards);
-    await user.type(voterCards, expectedRequest.data.voters_counts.voter_card_count.toString());
-    await user.keyboard("{tab}");
-
-    const totalAdmittedVoters = screen.getByTestId("totalAdmittedVoters");
-    await user.clear(totalAdmittedVoters);
-    await user.type(
-      totalAdmittedVoters,
-      expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const votesOnCandidates = screen.getByTestId("votesOnCandidates");
-    await user.clear(votesOnCandidates);
-    await user.type(
-      votesOnCandidates,
-      expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const blankVotes = screen.getByTestId("blankVotes");
-    await user.clear(blankVotes);
-    await user.type(blankVotes, expectedRequest.data.votes_counts.blank_votes_count.toString());
-    await user.keyboard("{tab}");
-
-    const invalidVotes = screen.getByTestId("invalidVotes");
-    await user.clear(invalidVotes);
-    await user.type(invalidVotes, expectedRequest.data.votes_counts.invalid_votes_count.toString());
-    await user.keyboard("{tab}");
-
-    const totalVotesCast = screen.getByTestId("totalVotesCast");
-    await user.clear(totalVotesCast);
-    await user.type(
-      totalVotesCast,
-      expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-
-    // await screen.findByTestId("result", {}, { timeout: 10000 });
-    // expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/)
-
-    const requestBody = getRequestBody("tmp-intercept-test");
-    expect(requestBody).not.toBe(null);
-    assert(requestBody !== null, "request body is not null");
-    expect(objectIsEqual(requestBody, expectedRequest)).toBe(true);
-    // console.log("requestBody", requestBody);
-  });
-
-  test("option 3 - use msw handler specific to the test to check request", async () => {
-    const expectedRequest = {
-      data: {
-        voters_counts: {
-          poll_card_count: 1,
-          proxy_certificate_count: 2,
-          voter_card_count: 3,
-          total_admitted_voters_count: 6,
-        },
-        votes_counts: {
-          votes_candidates_counts: 4,
-          blank_votes_count: 5,
-          invalid_votes_count: 6,
-          total_votes_cast_count: 15,
-        },
-      },
-    };
-
-    server.use(
-      http.post(
-        `http://testhost/v1/api/polling_stations/:id/data_entries/:entry_number`,
-        async ({ request }) => {
-          const json = await request.json();
-
-          if (JSON.stringify(json) === JSON.stringify(expectedRequest)) {
-            return HttpResponse.json({ data: "ok" }, { status: 200 });
-          } else {
-            return HttpResponse.json(
-              {
-                message: "500 error from mock",
-                errorCode: "500_ERROR",
-              },
-              { status: 500 },
-            );
-          }
-        },
-        { once: true },
-      ),
-    );
-
-    const user = userEvent.setup();
-
-    render(<VotersAndVotesForm />);
-
-    const pollCards = screen.getByTestId("pollCards");
-    await user.clear(pollCards);
-    await user.type(pollCards, expectedRequest.data.voters_counts.poll_card_count.toString());
-    await user.keyboard("{tab}");
-
-    const proxyCertificates = screen.getByTestId("proxyCertificates");
-    await user.clear(proxyCertificates);
-    await user.type(
-      proxyCertificates,
-      expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const voterCards = screen.getByTestId("voterCards");
-    await user.clear(voterCards);
-    await user.type(voterCards, expectedRequest.data.voters_counts.voter_card_count.toString());
-    await user.keyboard("{tab}");
-
-    const totalAdmittedVoters = screen.getByTestId("totalAdmittedVoters");
-    await user.clear(totalAdmittedVoters);
-    await user.type(
-      totalAdmittedVoters,
-      expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const votesOnCandidates = screen.getByTestId("votesOnCandidates");
-    await user.clear(votesOnCandidates);
-    await user.type(
-      votesOnCandidates,
-      expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const blankVotes = screen.getByTestId("blankVotes");
-    await user.clear(blankVotes);
-    await user.type(blankVotes, expectedRequest.data.votes_counts.blank_votes_count.toString());
-    await user.keyboard("{tab}");
-
-    const invalidVotes = screen.getByTestId("invalidVotes");
-    await user.clear(invalidVotes);
-    await user.type(invalidVotes, expectedRequest.data.votes_counts.invalid_votes_count.toString());
-    await user.keyboard("{tab}");
-
-    const totalVotesCast = screen.getByTestId("totalVotesCast");
-    await user.clear(totalVotesCast);
-    await user.type(
-      totalVotesCast,
-      expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-
-    expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
-  });
-
-  // ToDo: get the spy to work, then use it to validate the request
-  test("option 4 - spy on usePollingStationDataEntry", async () => {
-    const spy = vi.fn(usePollingStationDataEntry);
-
-    const expectedRequest = {
-      data: {
-        voters_counts: {
-          poll_card_count: 1,
-          proxy_certificate_count: 2,
-          voter_card_count: 3,
-          total_admitted_voters_count: 6,
-        },
-        votes_counts: {
-          votes_candidates_counts: 4,
-          blank_votes_count: 5,
-          invalid_votes_count: 6,
-          total_votes_cast_count: 15,
-        },
-      },
-    };
-
-    const user = userEvent.setup();
-
-    render(<VotersAndVotesForm />);
-
-    const pollCards = screen.getByTestId("pollCards");
-    await user.clear(pollCards);
-    await user.type(pollCards, expectedRequest.data.voters_counts.poll_card_count.toString());
-    await user.keyboard("{tab}");
-
-    const proxyCertificates = screen.getByTestId("proxyCertificates");
-    await user.clear(proxyCertificates);
-    await user.type(
-      proxyCertificates,
-      expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const voterCards = screen.getByTestId("voterCards");
-    await user.clear(voterCards);
-    await user.type(voterCards, expectedRequest.data.voters_counts.voter_card_count.toString());
-    await user.keyboard("{tab}");
-
-    const totalAdmittedVoters = screen.getByTestId("totalAdmittedVoters");
-    await user.clear(totalAdmittedVoters);
-    await user.type(
-      totalAdmittedVoters,
-      expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const votesOnCandidates = screen.getByTestId("votesOnCandidates");
-    await user.clear(votesOnCandidates);
-    await user.type(
-      votesOnCandidates,
-      expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const blankVotes = screen.getByTestId("blankVotes");
-    await user.clear(blankVotes);
-    await user.type(blankVotes, expectedRequest.data.votes_counts.blank_votes_count.toString());
-    await user.keyboard("{tab}");
-
-    const invalidVotes = screen.getByTestId("invalidVotes");
-    await user.clear(invalidVotes);
-    await user.type(invalidVotes, expectedRequest.data.votes_counts.invalid_votes_count.toString());
-    await user.keyboard("{tab}");
-
-    const totalVotesCast = screen.getByTestId("totalVotesCast");
-    await user.clear(totalVotesCast);
-    await user.type(
-      totalVotesCast,
-      expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
-    );
-    await user.keyboard("{tab}");
-
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-
-    expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
-
-    expect(spy).toHaveBeenCalled(); // this fails, but should pass
-  });
-});
-
-describe("VotersAndVotesForm processes API response", () => {
-  test("200 response results in display of success message", async () => {
+  test("Form field entry and keybindings", async () => {
     overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, "");
 
     const user = userEvent.setup();
@@ -480,8 +99,88 @@ describe("VotersAndVotesForm processes API response", () => {
     await user.click(submitButton);
 
     expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
+  });
 
-    // TODO: assert the call to the mocked API once that's been implemented
+  describe("VotersAndVotesForm Api call", () => {
+    test("VotersAndVotesForm request body is equal to the form data", async () => {
+      const spy = vi.spyOn(global, "fetch");
+
+      const expectedRequest = {
+        data: {
+          voters_counts: {
+            poll_card_count: 1,
+            proxy_certificate_count: 2,
+            voter_card_count: 3,
+            total_admitted_voters_count: 6,
+          },
+          votes_counts: {
+            votes_candidates_counts: 4,
+            blank_votes_count: 5,
+            invalid_votes_count: 6,
+            total_votes_cast_count: 15,
+          },
+        },
+      };
+
+      const user = userEvent.setup();
+
+      const { getByTestId } = render(<VotersAndVotesForm />);
+
+      const pollCards = getByTestId("pollCards");
+      fireEvent.change(pollCards, {
+        target: { value: expectedRequest.data.voters_counts.poll_card_count.toString() },
+      });
+
+      const proxyCertificates = getByTestId("proxyCertificates");
+      fireEvent.change(proxyCertificates, {
+        target: { value: expectedRequest.data.voters_counts.proxy_certificate_count.toString() },
+      });
+
+      const voterCards = getByTestId("voterCards");
+      fireEvent.change(voterCards, {
+        target: { value: expectedRequest.data.voters_counts.voter_card_count.toString() },
+      });
+
+      const totalAdmittedVoters = getByTestId("totalAdmittedVoters");
+      fireEvent.change(totalAdmittedVoters, {
+        target: {
+          value: expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
+        },
+      });
+
+      const votesOnCandidates = getByTestId("votesOnCandidates");
+      fireEvent.change(votesOnCandidates, {
+        target: { value: expectedRequest.data.votes_counts.votes_candidates_counts.toString() },
+      });
+
+      const blankVotes = getByTestId("blankVotes");
+      fireEvent.change(blankVotes, {
+        target: { value: expectedRequest.data.votes_counts.blank_votes_count.toString() },
+      });
+
+      const invalidVotes = getByTestId("invalidVotes");
+      fireEvent.change(invalidVotes, {
+        target: { value: expectedRequest.data.votes_counts.invalid_votes_count.toString() },
+      });
+
+      const totalVotesCast = getByTestId("totalVotesCast");
+      fireEvent.change(totalVotesCast, {
+        target: { value: expectedRequest.data.votes_counts.total_votes_cast_count.toString() },
+      });
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(spy).toHaveBeenCalledWith("http://testhost/v1/api/polling_stations/1/data_entries/1", {
+        method: "POST",
+        body: JSON.stringify(expectedRequest),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
+    });
   });
 
   test("422 response results in display of error message", async () => {
@@ -516,8 +215,3 @@ describe("VotersAndVotesForm processes API response", () => {
     expect(screen.getByTestId("result")).toHaveTextContent(/^Error 500_ERROR 500 error from mock$/);
   });
 });
-
-// ToDo: move objectIsEqual function to e.g. test-utils.ts if we use the function
-function objectIsEqual(a: object, b: object) {
-  return JSON.stringify(a) === JSON.stringify(b);
-}

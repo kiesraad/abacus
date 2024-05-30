@@ -4,12 +4,6 @@ import { describe, expect, test, vi } from "vitest";
 import { DefaultAlert, ClosableAlert } from "./Alert.stories";
 
 describe("UI component: Alert", () => {
-  test("Alert renders", () => {
-    render(<DefaultAlert type="error" title="Alert" text="Alert body" />);
-
-    expect(true).toBe(true);
-  });
-
   test("Alert has expected children", () => {
     const { getByText } = render(
       <DefaultAlert type="error" title="Alert title" text="Alert body" />,

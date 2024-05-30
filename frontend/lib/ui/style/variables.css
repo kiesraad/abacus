@@ -47,12 +47,15 @@
 
   --color-warning: #f79009;
   --color-warning-bg: #fef0c7;
+  --color-warning-text: #93370d;
 
   --color-notify: #2e90fa;
   --color-notify-bg: #f0f9ff;
 
   --color-success: #12b76a;
   --color-success-bg: #d1fadf;
+
+  --color-help-text: #475467;
 
   --bg-gray: #f9fafb;
   --bg-gray-darker: #f2f4f7;
@@ -72,7 +75,4 @@
   --accent-dark-green: #3d6315;
   --accent-dark-red: #8f131e;
   --accent-dark-grey: #878787;
-
-  --warning-bg: #fef0c7;
-  --warning-text: #93370d;
 }

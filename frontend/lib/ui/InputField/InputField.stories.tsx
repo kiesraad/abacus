@@ -151,34 +151,32 @@ export const CustomizableInputField: Story<Props> = ({
   );
 };
 
-export default {
-  args: {
-    label: "Input Field Label",
-    subtext: "with subtext",
-    hint: "Input Field hint",
-    error: "",
-    value: "",
+CustomizableInputField.args = {
+  label: "Input Field Label",
+  subtext: "with subtext",
+  hint: "Input Field hint",
+  error: "",
+  value: "",
+};
+CustomizableInputField.argTypes = {
+  type: {
+    options: ["text", "password"],
+    control: { type: "radio" },
+    defaultValue: "text",
   },
-  argTypes: {
-    type: {
-      options: ["text", "password"],
-      control: { type: "radio" },
-      defaultValue: "text",
-    },
-    size: {
-      options: ["small", "medium", "large", "text-area"],
-      control: { type: "radio" },
-      defaultValue: "large",
-    },
-    width: {
-      options: ["narrow", "wide"],
-      control: { type: "radio" },
-      defaultValue: "wide",
-    },
-    disabled: {
-      options: [true, false],
-      control: { type: "radio" },
-      defaultValue: false,
-    },
+  size: {
+    options: ["small", "medium", "large", "text-area"],
+    control: { type: "radio" },
+    defaultValue: "large",
+  },
+  width: {
+    options: ["narrow", "wide"],
+    control: { type: "radio" },
+    defaultValue: "wide",
+  },
+  disabled: {
+    options: [true, false],
+    control: { type: "radio" },
+    defaultValue: false,
   },
 };

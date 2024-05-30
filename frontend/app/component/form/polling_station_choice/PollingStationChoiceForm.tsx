@@ -1,14 +1,4 @@
-import {
-  BadgeCorrection,
-  BadgeDefinitive,
-  BadgeDifference,
-  BadgeExtraEntry,
-  BadgeFirstEntry,
-  BadgeObjections,
-  BadgeSecondEntry,
-  Button,
-  InputField,
-} from "@kiesraad/ui";
+import { Badge, Button, InputField } from "@kiesraad/ui";
 import { useNavigate } from "react-router-dom";
 import { IconChevronright } from "@kiesraad/icon";
 
@@ -70,7 +60,7 @@ export function PollingStationChoiceForm() {
               <td className="align-right narrow bold">1</td>
               <td>
                 <span>Nachthemelstraat 21</span>
-                <BadgeFirstEntry />
+                <Badge type="first_entry" />
               </td>
               <td className="align-center link">
                 <a href="/input/030">
@@ -82,7 +72,7 @@ export function PollingStationChoiceForm() {
               <td className="align-right narrow bold">2</td>
               <td>
                 <span>Schoolstraat 78</span>
-                <BadgeSecondEntry />
+                <Badge type="second_entry" />
               </td>
               <td className="align-center link">
                 <a href="/input/030">
@@ -94,7 +84,7 @@ export function PollingStationChoiceForm() {
               <td className="align-right narrow bold">3</td>
               <td>
                 <span>Fluisterbosdreef 8</span>
-                <BadgeExtraEntry />
+                <Badge type="extra_entry" />
               </td>
               <td className="align-center link">
                 <a href="/input/030">
@@ -106,7 +96,7 @@ export function PollingStationChoiceForm() {
               <td className="align-right narrow bold">4</td>
               <td>
                 <span>Wilhelminastraat 21</span>
-                <BadgeObjections />
+                <Badge type="objections" />
               </td>
               <td className="align-center link">
                 <a href="/input/030">
@@ -118,7 +108,7 @@ export function PollingStationChoiceForm() {
               <td className="align-right narrow bold">5</td>
               <td>
                 <span>Tuinstraat 2</span>
-                <BadgeDifference />
+                <Badge type="difference" />
               </td>
               <td className="align-center link">
                 <a href="/input/030">
@@ -130,7 +120,7 @@ export function PollingStationChoiceForm() {
               <td className="align-right narrow bold">6</td>
               <td>
                 <span>Rietland 31</span>
-                <BadgeCorrection />
+                <Badge type="correction" />
               </td>
               <td className="align-center link">
                 <a href="/input/030">
@@ -142,7 +132,7 @@ export function PollingStationChoiceForm() {
               <td className="align-right narrow bold">7</td>
               <td>
                 <span>Grote Markt 1</span>
-                <BadgeDefinitive />
+                <Badge type="definitive" />
               </td>
               <td className="align-center link">
                 <a href="/input/030">

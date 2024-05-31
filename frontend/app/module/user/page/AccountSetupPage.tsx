@@ -1,8 +1,8 @@
 import { Alert, WorkStationNumber } from "@kiesraad/ui";
-import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
+import { AccountSetupForm } from "app/component/form/account_setup/AccountSetupForm";
 import { useState } from "react";
 
-export function InputHomePage() {
+export function AccountSetupPage() {
   const [showAlert, setShowAlert] = useState(true);
 
   function hideAlert() {
@@ -13,7 +13,7 @@ export function InputHomePage() {
     <>
       <header>
         <section>
-          <h1>Verkiezingsnaam</h1>
+          <h1>Account instellen</h1>
         </section>
         <section>
           <WorkStationNumber>16</WorkStationNumber>
@@ -21,15 +21,16 @@ export function InputHomePage() {
       </header>
       {showAlert && (
         <Alert type="success" onClose={hideAlert}>
-          <h2>Je account is ingesteld</h2>
+          <h2>Inloggen gelukt</h2>
           <p>
-            Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.
+            We gaan je account instellen voor gebruik. Vul onderstaande gegevens in om verder te
+            gaan.
           </p>
         </Alert>
       )}
       <main>
         <article>
-          <PollingStationChoiceForm />
+          <AccountSetupForm />
         </article>
       </main>
     </>

@@ -1,17 +1,15 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { IconButton } from "..";
+import { IconButton } from "@kiesraad/ui";
 import { IconCross } from "@kiesraad/icon";
 import cls from "./Modal.module.css";
+
 export interface ModalProps {
-  isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
 }
 
-export function Modal({ isOpen, onClose, children }: ModalProps): JSX.Element | null {
-  if (!isOpen) return null;
-
+export function Modal({ onClose, children }: ModalProps): React.ReactNode {
   const modalRoot = document.body;
 
   return createPortal(

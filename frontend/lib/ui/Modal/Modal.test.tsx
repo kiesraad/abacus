@@ -5,7 +5,7 @@ import { Modal } from "./Modal";
 const component = (onClose: () => void) => (
   <div>
     <div id="modal"></div>
-    <Modal isOpen={true} onClose={onClose}>
+    <Modal onClose={onClose}>
       <h2 id="modal-title">Modal</h2>
     </Modal>
   </div>

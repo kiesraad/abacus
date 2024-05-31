@@ -62,12 +62,15 @@
   --bg-gray-darkest: #d0d5dd;
   --bg-highlight: #eff4ff;
 
+  --base-brand-blue: #113051;
   --base-dark-blue: #00305b;
-  --base-red: #e3032e;
   --base-light-grey: #f0f0f0;
-  --accent-blue: #4a75ba;
+  --base-red: #e3032e;
+  --base-white: #ffffff;
+
+  --accent-blue: #5d81b8;
   --accent-lime: #dddb00;
-  --accent-orange: #ef8050;
+  --accent-orange: #e87c59;
   --accent-light-blue: #c9d8e9;
   --accent-light-lime: #dddda6;
   --accent-light-orange: #e9dace;
@@ -75,4 +78,21 @@
   --accent-dark-green: #3d6315;
   --accent-dark-red: #8f131e;
   --accent-dark-grey: #878787;
+
+  --blue-light-100: #e0f2fe;
+  --blue-light-800: #065986;
+  --blue-dark-100: #d1e0ff;
+  --blue-dark-400: #528bff;
+
+  --error-400: #f97066;
+  --error-600: #d92d20;
+
+  --gray-600: #475467;
+  --gray-900: #101828;
+
+  --green-100: #d3f8df;
+  --green-800: #095c37;
+
+  --purple-100: #ebe9fe;
+  --purple-800: #4a1fb8;
 }

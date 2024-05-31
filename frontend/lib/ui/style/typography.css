@@ -2,7 +2,11 @@ body {
   font-family: var(--font-text), sans-serif;
   font-size: 16px;
   line-height: 1em;
-  color: #333;
+  color: var(--text-color-body);
+
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,
@@ -12,37 +16,45 @@ h4,
 h5,
 h6 {
   margin-top: 0;
-  font-family: var(--font-header), sans-serif;
-  font-size: 36px;
+  font-family: var(--font-header-body), sans-serif;
+  color: var(--text-color-header);
+  font-size: 1rem;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: -0.72px;
 }
 
 h1 {
+  font-family: var(--font-header), sans-serif;
   font-size: 2em;
 }
 h2 {
-  font-size: 1.75em;
-  margin-bottom: 1.2em;
+  font-size: 1.25rem;
+  line-height: 1.875rem;
+  margin-bottom: 0.75rem;
 }
 h3 {
   font-size: 1.5em;
+  margin-bottom: 0.4rem;
 }
 h4 {
-  font-size: 1.25em;
+  font-size: 1.25rem;
 }
 h5 {
-  font-size: 1.125em;
+  font-size: 1.125rem;
 }
 h6 {
-  font-size: 1em;
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
 p {
   margin-top: 0;
-  margin-bottom: 15px;
-  line-height: 1.3em;
+  font-size: var(--font-size-body);
+  margin-bottom: 0.8rem;
+  line-height: 1.75rem;
+  color: var(--text-color-body);
 }
 
 a {

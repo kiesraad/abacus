@@ -26,6 +26,6 @@
   padding: 8px 16px;
   border-radius: 24px;
 
-  background-color: var(--warning-bg);
-  color: var(--warning-text);
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
 }

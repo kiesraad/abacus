@@ -22,21 +22,44 @@
 :root {
   /* FONTS */
   --font-header: "SpaceGrotesk";
+  --font-header-body: "DMSans";
   --font-text: "DMSans";
   --font-number: "GeistMono";
 
+  --font-size-body: 1.125rem;
   /* TODO: pick a better font size scale */
   --font-size-sm: 0.8em;
   --font-size-md: 1em;
   --font-size-lg: 1.8em;
   --font-size-xl: 3.75em;
 
+  /* SPACING and CORNERS */
+  --rounded-default: 8px;
+
   /* COLORS */
+  --text-color-header: #101828;
+  --text-color-body: #344054;
+
+  --button-color-primary: #113051;
+
+  --color-alert: #d92d20;
+  --color-alert-bg: #fee4e2;
+
+  --color-warning: #f79009;
+  --color-warning-bg: #fef0c7;
+  --color-warning-text: #93370d;
+
+  --color-notify: #2e90fa;
+  --color-notify-bg: #f0f9ff;
+
+  --color-success: #12b76a;
+  --color-success-bg: #d1fadf;
+
+  --color-help-text: #475467;
 
   --bg-gray: #f9fafb;
   --bg-gray-darker: #f2f4f7;
   --bg-gray-darkest: #d0d5dd;
-
   --bg-highlight: #eff4ff;
 
   --base-dark-blue: #00305b;
@@ -52,7 +75,4 @@
   --accent-dark-green: #3d6315;
   --accent-dark-red: #8f131e;
   --accent-dark-grey: #878787;
-
-  --warning-bg: #fef0c7;
-  --warning-text: #93370d;
 }

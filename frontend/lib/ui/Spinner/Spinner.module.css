@@ -1,0 +1,85 @@
+.container {
+  color: red;
+
+  .spinner {
+    svg {
+      width: 24px;
+      height: 24px;
+      rect {
+        fill: black;
+        width: 4px;
+        height: 12px;
+        rx: 2px;
+        ry: 2px;
+        x: 23px;
+        y: 36px;
+        transform-origin: 50% 50%;
+        animation: spin 800ms ease-in-out infinite;
+
+        &:nth-child(1) {
+          transform: rotate(180deg);
+          animation-delay: 0;
+        }
+        &:nth-child(2) {
+          transform: rotate(225deg);
+          animation-delay: 100ms;
+        }
+        &:nth-child(3) {
+          transform: rotate(270deg);
+          animation-delay: 200ms;
+        }
+        &:nth-child(4) {
+          transform: rotate(315deg);
+          animation-delay: 300ms;
+        }
+        &:nth-child(5) {
+          transform: rotate(0deg);
+          animation-delay: 400ms;
+        }
+        &:nth-child(6) {
+          transform: rotate(45deg);
+          animation-delay: 500ms;
+        }
+        &:nth-child(7) {
+          transform: rotate(90deg);
+          animation-delay: 600ms;
+        }
+        &:nth-child(8) {
+          transform: rotate(135deg);
+          animation-delay: 700ms;
+        }
+      }
+    }
+  }
+
+  &:global(.sm) {
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &:global(.lg) {
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+}
+
+@keyframes spin {
+  0% {
+    height: 12px;
+  }
+  15% {
+    height: 4px;
+    opacity: 0.6;
+  }
+  30% {
+    opacity: 1;
+    height: 12px;
+  }
+  100% {
+    height: 12px;
+  }
+}

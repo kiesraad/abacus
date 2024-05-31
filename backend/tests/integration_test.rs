@@ -141,7 +141,22 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(body.validation_results.warnings.len(), 0);
 }
 
-#[sqlx::test]
+#[sqlx::test(fixtures("elections"))]
+async fn test_election_list_works(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+
+    // Ensure the response is what we expect
+    let status = response.status();
+    let body: backend::election::ElectionListResponse = response.json().await.unwrap();
+    println!("response body: {:?}", &body);
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.elections.len(), 1);
+}
+
+#[sqlx::test(fixtures("elections"))]
 async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -154,4 +169,16 @@ async fn test_election_details_works(pool: SqlitePool) {
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert_eq!(body.election.name, "Municipal Election");
+}
+
+#[sqlx::test]
+async fn test_election_details_not_found(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/1");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+
+    // Ensure the response is what we expect
+    let status = response.status();
+    assert_eq!(status, StatusCode::NOT_FOUND);
 }

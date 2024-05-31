@@ -1,11 +1,12 @@
 import * as React from "react";
 import cls from "./Button.module.css";
+import { Size, Variant } from "../ui.types";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isDisabled?: boolean;
   isLoading?: boolean;
-  variant?: "default" | "secondary" | "icon";
-  size?: "sm" | "md" | "lg";
+  variant?: Variant;
+  size?: Size;
   rightIcon?: React.ReactNode;
   children: React.ReactNode;
 }

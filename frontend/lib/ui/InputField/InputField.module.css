@@ -62,7 +62,7 @@
   }
   input,
   textarea {
-    border: solid var(--gray-300);
+    border: solid var(--bg-gray-darkest);
     background: var(--base-white);
     &:hover,
     &:focus {
@@ -95,8 +95,8 @@
     }
   }
   div:global(.disabled_input) {
-    border: solid var(--gray-300);
-    background: var(--gray-100);
+    border: solid var(--bg-gray-darkest);
+    background: var(--bg-gray-darker);
     :global(.text-area) & {
       min-height: 204px;
       word-wrap: anywhere;

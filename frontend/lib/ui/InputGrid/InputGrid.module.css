@@ -7,7 +7,7 @@
     font-size: var(--font-size-sm);
     text-align: right;
     padding: 0 16px 8px 16px;
-    color: #475467;
+    color: var(--color-help-text);
     &:nth-of-type(3) {
       text-align: left;
     }
@@ -28,7 +28,7 @@
         border-right: 1px solid var(--bg-gray-darkest);
         text-align: right;
         padding-right: 16px;
-        color: #475467;
+        color: var(--color-help-text);
       }
 
       /* Input */
@@ -51,7 +51,7 @@
 
       &:last-of-type {
         padding-left: 16px;
-        color: #475467;
+        color: var(--color-help-text);
       }
 
       &:global(.sep) {

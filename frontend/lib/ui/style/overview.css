@@ -2,7 +2,7 @@ table.overview_table {
   width: 100%;
   th,
   td {
-    border-bottom: 1px solid var(--gray-300);
+    border-bottom: 1px solid var(--bg-gray-darkest);
     padding: 12px 24px;
   }
   th {

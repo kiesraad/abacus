@@ -20,7 +20,7 @@
   letter-spacing: -0.045rem;
   padding: 1.125rem 1.3125rem;
   border-radius: 0.5rem;
-  background: var(--gray-100);
+  background: var(--bg-gray-darker);
   color: var(--base-brand-blue);
 }
 
@@ -58,8 +58,8 @@
 }
 
 .first_entry {
-  background: var(--warning-100);
-  color: var(--warning-800);
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
 }
 
 .objections {

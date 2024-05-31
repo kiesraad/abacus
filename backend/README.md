@@ -37,6 +37,7 @@ The following dependencies (crates) are used:
 - `serde`: framework for serializing and deserializing data structures.
 - `serde_json`: JSON support for Serde.
 - `sqlx`: async SQL library featuring compile-time checked queries.
+- `chrono`: date and time library.
 
 Additionally, the following development dependencies are used:
 

@@ -1,3 +1,3 @@
-export * from "./Badge.tsx";
+export * from "./Badge";
 export * from "./PollingStationNumber";
 export * from "./WorkStationNumber";

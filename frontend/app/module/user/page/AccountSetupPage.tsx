@@ -1,7 +1,14 @@
-import { WorkStationNumber } from "@kiesraad/ui";
+import { Alert, WorkStationNumber } from "@kiesraad/ui";
 import { AccountSetupForm } from "app/component/form/account_setup/AccountSetupForm";
+import { useState } from "react";
 
 export function AccountSetupPage() {
+  const [showAlert, setShowAlert] = useState(true);
+
+  function hideAlert() {
+    setShowAlert(!showAlert);
+  }
+
   return (
     <>
       <header>
@@ -12,14 +19,17 @@ export function AccountSetupPage() {
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
+      {showAlert && (
+        <Alert type="success" onClose={hideAlert}>
+          <h2>Inloggen gelukt</h2>
+          <p>
+            We gaan je account instellen voor gebruik. Vul onderstaande gegevens in om verder te
+            gaan.
+          </p>
+        </Alert>
+      )}
       <main>
         <article>
-          {/* TODO: Add alert here with below text */}
-          <strong>Inloggen gelukt</strong>
-          <br />
-          We gaan je account instellen voor gebruik. Vul onderstaande gegevens in om verder te gaan.
-          <br />
-          <br />
           <AccountSetupForm />
         </article>
       </main>

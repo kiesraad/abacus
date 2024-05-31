@@ -9,10 +9,10 @@
         fill: black;
         width: 4px;
         height: 12px;
-        rx: 2;
-        ry: 2;
-        x: 23;
-        y: 36;
+        rx: 2px;
+        ry: 2px;
+        x: 23px;
+        y: 36px;
         transform-origin: 50% 50%;
         animation: spin 800ms ease-in-out infinite;
 

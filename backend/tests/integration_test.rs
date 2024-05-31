@@ -7,9 +7,10 @@ use serde_json::json;
 use sqlx::SqlitePool;
 use tokio::net::TcpListener;
 
+use backend::election::ElectionDetailsResponse;
 use backend::polling_station::DataEntryResponse;
-use backend::router;
 use backend::validation::ValidationResultCode::IncorrectTotal;
+use backend::{router, ErrorResponse};
 
 async fn serve_api(pool: SqlitePool) -> SocketAddr {
     let app = router(pool).unwrap();
@@ -71,11 +72,11 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     let status = response.status();
-    let body: DataEntryResponse = response.json().await.unwrap();
+    let body: ErrorResponse = response.json().await.unwrap();
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
     assert_eq!(
-        body.message,
+        body.error,
         "Failed to deserialize the JSON body into the target type: data: \
          invalid type: null, expected struct PollingStationResults at line 1 column 12"
     );
@@ -138,4 +139,19 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     );
     assert_eq!(errors[1].code, IncorrectTotal);
     assert_eq!(body.validation_results.warnings.len(), 0);
+}
+
+#[sqlx::test]
+async fn test_election_details_works(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/1");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+
+    // Ensure the response is what we expect
+    let status = response.status();
+    let body: ElectionDetailsResponse = response.json().await.unwrap();
+    println!("response body: {:?}", &body);
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body.election.name, "Municipal Election");
 }

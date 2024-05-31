@@ -30,6 +30,7 @@ h1 {
 }
 h2 {
   font-size: 1.25rem;
+  font-weight: bold;
   line-height: 1.875rem;
   margin-bottom: 0.75rem;
 }
@@ -70,8 +71,5 @@ a {
 }
 
 h2.form_title {
-  font-style: normal;
-  font-weight: bold;
-  color: var(--gray-900);
   margin-bottom: 2rem;
 }

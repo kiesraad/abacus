@@ -1,0 +1,14 @@
+.flex {
+  display: flex;
+  justify-content: flex-start;
+  gap: 32px;
+  .flex-3 {
+    > * {
+      flex: 1 1 auto;
+    }
+  }
+}
+
+.mb {
+  margin-bottom: 16px;
+}

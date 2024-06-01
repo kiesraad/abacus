@@ -4,7 +4,9 @@ import { expect, test } from "vitest";
 import { DefaultButton, EnabledButton, DisabledButton } from "./Button.stories";
 
 test("The default button is enabled", () => {
-  render(<DefaultButton></DefaultButton>);
+  render(
+    <DefaultButton label="Click me" variant="default" size="md" text="Click me"></DefaultButton>,
+  );
 
   const buttonElement = screen.getByRole("button", {
     name: "Click me",

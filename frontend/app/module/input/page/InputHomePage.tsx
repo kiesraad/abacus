@@ -1,23 +1,35 @@
-import { Button } from "@kiesraad/ui";
-import { useNavigate } from "react-router-dom";
+import { Alert, WorkStationNumber } from "@kiesraad/ui";
+import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
+import { useState } from "react";
 
 export function InputHomePage() {
-  const navigate = useNavigate();
+  const [showAlert, setShowAlert] = useState(true);
 
-  const handleStart = () => {
-    navigate("/input/030");
-  };
+  function hideAlert() {
+    setShowAlert(!showAlert);
+  }
 
   return (
     <>
       <header>
-        <h1>Input home page</h1>
+        <section>
+          <h1>Verkiezingsnaam</h1>
+        </section>
+        <section>
+          <WorkStationNumber>16</WorkStationNumber>
+        </section>
       </header>
+      {showAlert && (
+        <Alert type="success" onClose={hideAlert}>
+          <h2>Je account is ingesteld</h2>
+          <p>
+            Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.
+          </p>
+        </Alert>
+      )}
       <main>
         <article>
-          <h2>Welk stembureau ga je invoeren?</h2>
-
-          <Button onClick={handleStart}>Beginnen</Button>
+          <PollingStationChoiceForm />
         </article>
       </main>
     </>

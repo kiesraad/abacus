@@ -1,0 +1,108 @@
+.inputfield {
+  &:global(.margin) {
+    margin-bottom: 2rem;
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.625rem;
+    &:global(.narrow),
+    &:global(.narrow) ~ span {
+      width: 10rem;
+    }
+    &:global(.wide),
+    &:global(.wide) ~ span {
+      width: 32rem;
+    }
+  }
+
+  span {
+    display: inline-block;
+    font-size: var(--font-size-md);
+    font-style: normal;
+    line-height: 1.5rem;
+    &:global(.label) {
+      color: var(--gray-900);
+      font-weight: bold;
+    }
+    &:global(.subtext) {
+      font-weight: normal;
+    }
+    &:global(.hint) {
+      color: var(--gray-600);
+      font-weight: normal;
+    }
+    &:global(.error) {
+      color: var(--error-600);
+      font-weight: normal;
+    }
+  }
+
+  input,
+  textarea,
+  div:global(.disabled_input) {
+    display: flex;
+    padding: 1rem 1.5rem 1rem 1rem;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    :global(.small) & {
+      height: 3rem;
+      border-width: 1px;
+    }
+    :global(.medium) & {
+      height: 3.5rem;
+      border-width: 2px;
+    }
+    :global(.large) & {
+      height: 4.5rem;
+      border-width: 2px;
+    }
+    :global(.text-area) & {
+      border-width: 2px;
+    }
+  }
+  input,
+  textarea {
+    border: solid var(--bg-gray-darkest);
+    background: var(--base-white);
+    &:hover,
+    &:focus {
+      border: solid var(--blue-dark-400);
+      outline: none;
+    }
+    &:focus {
+      :global(.large) &,
+      :global(.text-area) & {
+        box-shadow: 0 0 0 4px var(--blue-dark-100);
+      }
+      :global(.medium) &,
+      :global(.small) & {
+        box-shadow: 0 0 0 3px var(--blue-dark-100);
+      }
+    }
+    :global(.error) & {
+      border: solid var(--error-400);
+      background-image: url("../../icon/svg/error.svg");
+      background-repeat: no-repeat;
+      background-position: right 1.5rem center;
+      padding-right: 3rem;
+    }
+  }
+  textarea {
+    align-items: flex-start;
+    resize: none;
+    :global(.error) & {
+      background-position: right 1.5rem top 1rem;
+    }
+  }
+  div:global(.disabled_input) {
+    border: solid var(--bg-gray-darkest);
+    background: var(--bg-gray-darker);
+    :global(.text-area) & {
+      min-height: 204px;
+      word-wrap: anywhere;
+    }
+  }
+}

@@ -1,0 +1,73 @@
+.pollingstation {
+  text-align: center;
+  font-family: var(--font-header);
+  font-size: 1.5rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 2rem;
+  padding: 0.5rem 1rem;
+  background: var(--accent-blue);
+  color: var(--base-white);
+}
+
+.workstation {
+  text-align: center;
+  font-family: var(--font-header);
+  font-size: 2.25rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 2.75rem;
+  letter-spacing: -0.045rem;
+  padding: 1.125rem 1.3125rem;
+  border-radius: 0.5rem;
+  background: var(--bg-gray-darker);
+  color: var(--base-brand-blue);
+}
+
+.badge {
+  text-align: center;
+  font-family: var(--font-text);
+  font-size: 0.875rem;
+  font-style: normal;
+  font-weight: bold;
+  line-height: 1.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  border: 2px solid var(--base-white);
+  display: inline-block;
+}
+
+.correction {
+  background: var(--blue-light-100);
+  color: var(--blue-light-800);
+}
+
+.definitive {
+  background: var(--base-brand-blue);
+  color: var(--base-white);
+}
+
+.difference {
+  background: var(--error-600);
+  color: var(--base-white);
+}
+
+.extra_entry {
+  background: var(--green-100);
+  color: var(--green-800);
+}
+
+.first_entry {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.objections {
+  background: var(--purple-100);
+  color: var(--purple-800);
+}
+
+.second_entry {
+  background: var(--green-100);
+  color: var(--green-800);
+}

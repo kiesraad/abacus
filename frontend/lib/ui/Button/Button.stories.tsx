@@ -1,8 +1,20 @@
 import type { Story } from "@ladle/react";
 
 import { Button } from "./Button";
+import { Size, Variant } from "../ui.types";
 
-export const DefaultButton: Story = () => <Button>Click me</Button>;
+type Props = {
+  label: string;
+  text: string;
+  variant: Variant;
+  size: Size;
+};
+
+export const DefaultButton: Story<Props> = ({ label, text, variant, size }) => (
+  <Button size={size} variant={variant} aria-label={label}>
+    {text}
+  </Button>
+);
 
 export const EnabledButton: Story<{
   text: string;
@@ -32,4 +44,21 @@ DisabledButton.args = {
   text: "I'm disabled!",
   label: "disabled-button",
   disabled: true,
+};
+
+export default {
+  args: {
+    label: "Invoer",
+    text: "Invoer",
+  },
+  argTypes: {
+    variant: {
+      options: ["default", "secondary", "ghost", "alert"],
+      control: { type: "radio" },
+    },
+    size: {
+      options: ["sm", "md", "lg"],
+      control: { type: "radio" },
+    },
+  },
 };

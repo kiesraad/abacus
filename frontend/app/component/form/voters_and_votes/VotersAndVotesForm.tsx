@@ -51,7 +51,6 @@ export function VotersAndVotesForm() {
   }
 
   return (
-
     <form onSubmit={handleSubmit} ref={formRef}>
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
       {data && <p id="result">Success</p>}

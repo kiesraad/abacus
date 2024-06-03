@@ -39,6 +39,16 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -210,14 +220,13 @@
       },
       "Election": {
         "type": "object",
-        "description": "Election with its political groups",
+        "description": "Election, optionally with its political groups",
         "required": [
           "id",
           "name",
           "category",
           "election_date",
-          "nomination_date",
-          "political_groups"
+          "nomination_date"
         ],
         "properties": {
           "category": {
@@ -243,7 +252,8 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
-            }
+            },
+            "nullable": true
           }
         }
       },
@@ -256,7 +266,7 @@
       },
       "ElectionDetailsResponse": {
         "type": "object",
-        "description": "Election details response",
+        "description": "Election details response, including the election's candidate list (political groups)",
         "required": [
           "election"
         ],

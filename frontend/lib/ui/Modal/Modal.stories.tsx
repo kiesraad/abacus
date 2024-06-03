@@ -1,11 +1,11 @@
 import type { Story } from "@ladle/react";
 
+import { Button } from "@kiesraad/ui";
 import { Modal } from "./Modal";
-import { Button } from "../Button/Button";
 
 export const DefaultModal: Story = () => (
   <>
-    <Modal isOpen={true} onClose={() => {}}>
+    <Modal onClose={() => {}}>
       <h2>Invoer bewaren?</h2>
       <p>Wil je de invoer bewaren zodat je later verder kan? Overleg met de verkiezingsleider.</p>
       <nav>

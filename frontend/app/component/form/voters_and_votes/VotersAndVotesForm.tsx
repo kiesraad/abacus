@@ -51,8 +51,9 @@ export function VotersAndVotesForm() {
   }
 
   return (
+
     <form onSubmit={handleSubmit} ref={formRef}>
-      <h3>Toegelaten kiezers en uitgebrachte stemmen</h3>
+      <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
       {data && <p id="result">Success</p>}
       {error && (
         <p id="result">
@@ -148,7 +149,7 @@ export function VotersAndVotesForm() {
         </InputGrid.Body>
       </InputGrid>
       <br /> <br />
-      <Button type="submit" disabled={loading}>
+      <Button type="submit" size="lg" disabled={loading}>
         Volgende
       </Button>
     </form>

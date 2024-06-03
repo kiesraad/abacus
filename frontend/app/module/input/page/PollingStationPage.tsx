@@ -1,12 +1,25 @@
-import { Button, PollingStationNumber, ProgressList, Tag, WorkStationNumber } from "@kiesraad/ui";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
+
 import { IconCross } from "@kiesraad/icon";
+import {
+  Badge,
+  Button,
+  Modal,
+  PollingStationNumber,
+  ProgressList,
+  WorkStationNumber,
+} from "@kiesraad/ui";
 import { VotersAndVotesForm } from "app/component/form/voters_and_votes/VotersAndVotesForm";
 
 export function PollingStationPage() {
   const { id, section } = useParams();
-
   const targetForm = section || "numbers";
+  const [openModal, setOpenModal] = useState(false);
+
+  function changeDialog() {
+    setOpenModal(!openModal);
+  }
 
   return (
     <>
@@ -14,13 +27,12 @@ export function PollingStationPage() {
         <section>
           <PollingStationNumber>{id}</PollingStationNumber>
           <h1>Fluisterbosdreef 8</h1>
-          <Tag>1e invoer</Tag>
+          <Badge type="first_entry" />
         </section>
         <section>
-          <Button variant="secondary" size="sm" rightIcon={<IconCross />}>
+          <Button variant="secondary" size="sm" onClick={changeDialog} rightIcon={<IconCross />}>
             Invoer afbreken
-          </Button>{" "}
-          &nbsp; &nbsp; &nbsp;
+          </Button>
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
@@ -51,6 +63,18 @@ export function PollingStationPage() {
         </article>
       </main>
       <aside>&nbsp;</aside>
+      {openModal && (
+        <Modal onClose={changeDialog}>
+          <h2>Invoer bewaren?</h2>
+          <p>
+            Wil je de invoer bewaren zodat je later verder kan? Overleg met de verkiezingsleider.
+          </p>
+          <nav>
+            <Button>Bewaar invoer</Button>
+            <Button variant="secondary">Verwijder invoer</Button>
+          </nav>
+        </Modal>
+      )}
     </>
   );
 }

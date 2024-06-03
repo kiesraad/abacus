@@ -6,6 +6,7 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
+use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
 use utoipa::{OpenApi, ToSchema};
 
@@ -19,6 +20,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let app = Router::new()
         .route("/api-docs/openapi.json", get(Json(openapi)))
         .route("/api/elections/:id", get(election::election_details))
+        .route("/api/elections", get(election::election_list))
         .route(
             "/api/polling_stations/:id/data_entries/:entry_number",
             post(polling_station::polling_station_data_entry),
@@ -100,6 +102,10 @@ impl IntoResponse for APIError {
                     to_error("Internal server error".to_string()),
                 )
             }
+            APIError::SqlxError(RowNotFound) => (
+                StatusCode::NOT_FOUND,
+                to_error("Resource not found".to_string()),
+            ),
             APIError::SqlxError(err) => {
                 println!("SQLx error: {:?}", err);
                 (

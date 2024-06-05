@@ -24,7 +24,7 @@ pub struct ElectionDetailsResponse {
     pub election: Election,
 }
 
-// Get a list of all elections, without their candidate lists
+/// Get a list of all elections, without their candidate lists
 #[utoipa::path(
         get,
         path = "/api/elections",

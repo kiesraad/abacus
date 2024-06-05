@@ -33,6 +33,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[derive(OpenApi)]
     #[openapi(
         paths(
+            election::election_list,
             election::election_details,
             polling_station::polling_station_data_entry,
         ),
@@ -47,6 +48,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 election::PoliticalGroup,
                 election::Candidate,
                 election::CandidateGender,
+                election::ElectionListResponse,
                 election::ElectionDetailsResponse,
                 polling_station::DataEntryRequest,
                 polling_station::DataEntryResponse,

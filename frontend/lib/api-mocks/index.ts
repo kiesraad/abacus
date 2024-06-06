@@ -29,7 +29,7 @@ const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>(
   },
 );
 
-const pollingStationDataEntryHandler = http.post<
+export const pollingStationDataEntryHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY
 >("/v1/api/polling_stations/:id/data_entries/:entry_number", async ({ request }) => {
@@ -43,7 +43,7 @@ const pollingStationDataEntryHandler = http.post<
   if ("voters_counts" in json.data) {
     return HttpResponse.text("", { status: 200 });
   }
-  return HttpResponse.json({ message: "missing fields" }, { status: 500 });
+  return HttpResponse.json({ message: "missing fields", errorCode: "TBD" }, { status: 500 });
 });
 
 export const handlers: HttpHandler[] = [pingHandler, pollingStationDataEntryHandler];

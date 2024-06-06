@@ -1,11 +1,11 @@
 import * as React from "react";
 
 export type FormatFunc = (s: string | number | null | undefined) => string;
-export type DefomatFunc = (s: string) => number;
+export type DeformatFunc = (s: string) => number;
 
 export interface UsePositiveNumberInputMaskReturn {
   format: FormatFunc;
-  deformat: DefomatFunc;
+  deformat: DeformatFunc;
   register: () => {
     onChange: React.ChangeEventHandler<HTMLInputElement>;
     onLoad: React.ChangeEventHandler<HTMLInputElement>;
@@ -19,18 +19,20 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
 
 export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
   const format: FormatFunc = React.useCallback((s) => {
-    if (s === null || s === undefined) return "";
-    if (s === "") {
+    if (s === null || s === undefined || s === "") return "";
+    let result = `${s}`.trim();
+    if (!result.match(/(\d{1,3}(\.\d{3})+\.?)|(\d*\.?)/g)) {
+      // not allowed
       return "";
     }
-    let result = `${s}`.replace(/\D/g, "");
+    result = result.replace(/\D/g, "");
     result = numberFormatter.format(Number(result));
     return result;
   }, []);
 
-  const deformat: DefomatFunc = React.useCallback((s: string) => {
-    const seperator = numberFormatter.format(11111).replace(/\p{Number}/gu, "");
-    const escapedSeparator = seperator.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+  const deformat: DeformatFunc = React.useCallback((s: string) => {
+    const separator = numberFormatter.format(11111).replace(/\p{Number}/gu, "");
+    const escapedSeparator = separator.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
 
     const cleaned = s.replace(new RegExp(escapedSeparator, "g"), "");
     return parseInt(cleaned, 10);

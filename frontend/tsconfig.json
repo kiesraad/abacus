@@ -36,5 +36,5 @@
     "scripts/**/*",
     "playwright.config.ts",
     "vite.config.ts"
-  ]
+  ],
 }

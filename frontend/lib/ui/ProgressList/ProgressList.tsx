@@ -1,5 +1,11 @@
 import * as React from "react";
-import { IconArrowleft, IconCheckmark, IconWarning } from "@kiesraad/icon";
+import {
+  IconArrownarrowright,
+  IconAsterisk,
+  IconCheckmark,
+  IconMinus,
+  IconWarning,
+} from "@kiesraad/icon";
 import cls from "./progresslist.module.css";
 import { cn } from "@kiesraad/util";
 
@@ -24,10 +30,10 @@ export type BaseProgressListItemProps = {
 export type ProgressListItemProps = BaseProgressListItemProps &
   (
     | {
-        status: "accept" | "idle";
+        status: "accept" | "updates" | "empty" | "idle";
       }
     | {
-        status: "reject";
+        status: "warning";
         message: string;
       }
   );
@@ -35,18 +41,22 @@ export type ProgressListItemProps = BaseProgressListItemProps &
 ProgressList.Item = function ({ status, active, children }: ProgressListItemProps) {
   return (
     <li className={cn(active ? "active" : "idle", status)}>
-      <aside>{active ? <IconArrowleft /> : renderStatusIcon(status)}</aside>
+      <aside>{active ? <IconArrownarrowright /> : renderStatusIcon(status)}</aside>
       <label>{children}</label>
     </li>
   );
 };
 
-function renderStatusIcon(status: "accept" | "reject" | "idle") {
+function renderStatusIcon(status: "accept" | "warning" | "empty" | "updates" | "idle") {
   switch (status) {
     case "accept":
       return <IconCheckmark />;
-    case "reject":
+    case "warning":
       return <IconWarning />;
+    case "empty":
+      return <IconMinus />;
+    case "updates":
+      return <IconAsterisk />;
     default:
       return null;
   }

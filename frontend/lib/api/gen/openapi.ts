@@ -2,9 +2,13 @@
 
 /** PATHS **/
 
-// /api/polling_stations/{id}/data_entries/{entry_number}
+// /api/elections
+
+// /api/elections/{election_id}
+
+// /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS {
-  id: number;
+  polling_station_id: number;
   entry_number: number;
 }
 export type POLLING_STATION_DATA_ENTRY_REQUEST_PATH =
@@ -13,15 +17,88 @@ export type POLLING_STATION_DATA_ENTRY_REQUEST_BODY = DataEntryRequest;
 
 /** TYPES **/
 
-export interface DataEntryError {
-  message: string;
+/**
+ * Candidate
+ */
+export interface Candidate {
+  country_code?: string;
+  first_name: string;
+  gender?: any;
+  initials: string;
+  last_name: string;
+  last_name_prefix?: string;
+  locality: string;
+  number: number;
 }
 
 /**
- * Payload structure for data entry of polling station results
+ * Candidate gender
+ */
+export interface CandidateGender {}
+
+/**
+ * Request structure for data entry of polling station results
  */
 export interface DataEntryRequest {
   data: PollingStationResults;
+}
+
+/**
+ * Response structure for data entry of polling station results
+ */
+export interface DataEntryResponse {
+  message: string;
+  saved: any;
+  validation_results: ValidationResults;
+}
+
+/**
+ * Election, optionally with its political groups
+ */
+export interface Election {
+  category: ElectionCategory;
+  election_date: string;
+  id: number;
+  name: string;
+  nomination_date: string;
+  political_groups?: any;
+}
+
+/**
+ * Election category (limited for now)
+ */
+export interface ElectionCategory {}
+
+/**
+ * Election details response, including the election's candidate list (political groups)
+ */
+export interface ElectionDetailsResponse {
+  election: Election;
+}
+
+/**
+ * Election list response
+
+Does not include the candidate list (political groups) to keep the response size small.
+ */
+export interface ElectionListResponse {
+  elections: any;
+}
+
+/**
+ * Response structure for errors
+ */
+export interface ErrorResponse {
+  error: string;
+}
+
+/**
+ * Political group with its candidates
+ */
+export interface PoliticalGroup {
+  candidates: any;
+  name: string;
+  number: number;
 }
 
 /**
@@ -32,6 +109,18 @@ export interface DataEntryRequest {
 export interface PollingStationResults {
   voters_counts: VotersCounts;
   votes_counts: VotesCounts;
+}
+
+export interface ValidationResult {
+  code: ValidationResultCode;
+  fields: any;
+}
+
+export interface ValidationResultCode {}
+
+export interface ValidationResults {
+  errors: any;
+  warnings: any;
 }
 
 /**

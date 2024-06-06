@@ -40,26 +40,35 @@ export function PollingStationPage() {
         <nav>
           <ProgressList>
             <ProgressList.Item status="accept" active={targetForm === "recount"}>
-              Is er herteld?
+              <a href="./recount">Is er herteld?</a>
             </ProgressList.Item>
-            <ProgressList.Item status="idle" message="A message" active={targetForm === "numbers"}>
-              Aantal kiezers en stemmen
+            <ProgressList.Item status="idle" active={targetForm === "numbers"}>
+              <a href="./numbers">Aantal kiezers en stemmen</a>
             </ProgressList.Item>
             <ProgressList.Item status="idle" active={targetForm === "differences"}>
-              Verschillen?
+              <a href="./differences">Verschillen</a>
             </ProgressList.Item>
             <ProgressList.Ruler />
-            {lijsten.map((lijst, index) => (
-              <ProgressList.Item key={`lijst${index.toString()}`} status="idle">
-                {lijst}
-              </ProgressList.Item>
-            ))}
+            {lists.map((list, index) => {
+              const listId = `list${index.toString()}`;
+              return (
+                <ProgressList.Item key={listId} status="idle" active={targetForm === listId}>
+                  <a href={`./${listId}`}>{list}</a>
+                </ProgressList.Item>
+              );
+            })}
             <ProgressList.Ruler />
-            <ProgressList.Item status="idle">Controleren en opslaan?</ProgressList.Item>
+            <ProgressList.Item status="idle" active={targetForm === "save"}>
+              <a href="./save">Controleren en opslaan</a>
+            </ProgressList.Item>
           </ProgressList>
         </nav>
         <article>
-          <VotersAndVotesForm />
+          {targetForm === "recount" && <div>Placeholder Recount Page</div>}
+          {targetForm === "numbers" && <VotersAndVotesForm />}
+          {targetForm === "differences" && <div>Placeholder Differences Page</div>}
+          {targetForm.startsWith("list") && <div>Placeholder List page</div>}
+          {targetForm === "save" && <div>Placeholder Check and Save Page</div>}
         </article>
       </main>
       <aside>&nbsp;</aside>
@@ -79,7 +88,7 @@ export function PollingStationPage() {
   );
 }
 
-const lijsten: string[] = [
+const lists: string[] = [
   "Lijst 1 - Vurige Vleugels Partij",
   "Lijst 2 - Wijzen van Water en Wind",
   "Lijst 3 - Eeuwenoude Aarde Unie",

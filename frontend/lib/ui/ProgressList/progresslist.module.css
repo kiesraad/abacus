@@ -4,14 +4,13 @@
   margin: 0;
 
   li {
-    margin-bottom: 8px;
-    padding: 0;
+    padding: 10px 12px;
     min-height: 28px;
-
     display: flex;
     align-items: center;
 
     aside {
+      display: flex;
       flex: 0 0 32px;
       svg {
         width: 24px;
@@ -22,15 +21,37 @@
       flex: 1 1 auto;
     }
 
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
     &:global(.active) {
-      background-color: var(--bg-gray-darker);
+      background: var(--gray-200);
+      border-radius: 8px;
       font-weight: bold;
     }
 
-    &:global(.reject) {
+    &:global(.updates) {
       aside {
         svg {
-          fill: var(--accent-dark-red);
+          fill: var(--blue-dark-700);
+        }
+      }
+    }
+
+    &:global(.empty) {
+      aside {
+        svg {
+          fill: var(--gray-500);
+        }
+      }
+    }
+
+    &:global(.warning) {
+      aside {
+        svg {
+          fill: var(--warning-600);
         }
       }
     }
@@ -38,14 +59,15 @@
     &:global(.accept) {
       aside {
         svg {
-          fill: var(--accent-dark-green);
+          fill: var(--green-500);
         }
       }
     }
   }
 
   li:global(.ruler) {
-    height: 16px;
+    min-height: 16px;
+    padding: 0;
     background-color: transparent;
   }
 }

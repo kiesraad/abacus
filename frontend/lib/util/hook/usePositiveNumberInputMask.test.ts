@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { usePositiveNumberInputMask } from "@kiesraad/util";
 import { renderHook } from "@testing-library/react";
+import { usePositiveNumberInputMask } from "@kiesraad/util";
 
 describe("useInputMask", () => {
   test("should render", () => {

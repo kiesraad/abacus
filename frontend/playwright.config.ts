@@ -10,7 +10,7 @@ const config: PlaywrightTestConfig = defineConfig({
   forbidOnly: !!process.env.CI,
   // Retry on CI only
   retries: process.env.CI ? 2 : 0,
-  // use all available cores (2) on github actions. default is 50%, use that locally
+  // use all available cores (2) on GitHub actions. default is 50%, use that locally
   workers: process.env.CI ? "100%" : undefined,
   timeout: 10 * 1000, // 10 seconds, because tests are small for now
   fullyParallel: true,
@@ -38,7 +38,7 @@ const config: PlaywrightTestConfig = defineConfig({
       use: { ...devices["Desktop Safari"] },
     },
   ],
-  // use different port so it doesn't conflict with local dev server
+  // use different port, so it doesn't conflict with local dev server
   webServer: [
     {
       command: "npm run start:msw -- --port 4009",

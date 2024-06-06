@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { ApiClient } from "./ApiClient";
 import { overrideOnce } from "app/test/unit";
 
-describe("Apiclient", () => {
+describe("ApiClient", () => {
   test("200 response is parsed as success", async () => {
     overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, { fizz: "buzz" });
 

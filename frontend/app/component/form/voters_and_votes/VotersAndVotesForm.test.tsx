@@ -1,11 +1,35 @@
-import { render, screen } from "app/test/unit/test-utils";
+import { render, screen, fireEvent } from "app/test/unit/test-utils";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test } from "vitest";
-
+import { describe, expect, test, vi, afterEach } from "vitest";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
-describe("VotersAndVotesForm", () => {
-  test("Enter form field values", async () => {
+import { overrideOnce } from "app/test/unit";
+
+describe("VotersAndVotesForm Form", () => {
+  afterEach(() => {
+    vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
+  });
+
+  test("hitting enter key does not result in api call", async () => {
+    const spy = vi.spyOn(global, "fetch");
+
+    const user = userEvent.setup();
+
+    render(<VotersAndVotesForm />);
+
+    const pollCards = screen.getByTestId("pollCards");
+    await user.clear(pollCards);
+    await user.type(pollCards, "12345");
+    expect(pollCards).toHaveValue("12.345");
+
+    await user.keyboard("{enter}");
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  test("Form field entry and keybindings", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, "");
+
     const user = userEvent.setup();
 
     render(<VotersAndVotesForm />);
@@ -71,6 +95,123 @@ describe("VotersAndVotesForm", () => {
     await user.type(totalVotesCast, "555");
     expect(totalVotesCast).toHaveValue("555");
 
-    // TODO: assert the call to the mocked API once that's been implemented
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
+  });
+
+  describe("VotersAndVotesForm Api call", () => {
+    test("VotersAndVotesForm request body is equal to the form data", async () => {
+      const spy = vi.spyOn(global, "fetch");
+
+      const expectedRequest = {
+        data: {
+          voters_counts: {
+            poll_card_count: 1,
+            proxy_certificate_count: 2,
+            voter_card_count: 3,
+            total_admitted_voters_count: 6,
+          },
+          votes_counts: {
+            votes_candidates_counts: 4,
+            blank_votes_count: 5,
+            invalid_votes_count: 6,
+            total_votes_cast_count: 15,
+          },
+        },
+      };
+
+      const user = userEvent.setup();
+
+      const { getByTestId } = render(<VotersAndVotesForm />);
+
+      const pollCards = getByTestId("pollCards");
+      fireEvent.change(pollCards, {
+        target: { value: expectedRequest.data.voters_counts.poll_card_count.toString() },
+      });
+
+      const proxyCertificates = getByTestId("proxyCertificates");
+      fireEvent.change(proxyCertificates, {
+        target: { value: expectedRequest.data.voters_counts.proxy_certificate_count.toString() },
+      });
+
+      const voterCards = getByTestId("voterCards");
+      fireEvent.change(voterCards, {
+        target: { value: expectedRequest.data.voters_counts.voter_card_count.toString() },
+      });
+
+      const totalAdmittedVoters = getByTestId("totalAdmittedVoters");
+      fireEvent.change(totalAdmittedVoters, {
+        target: {
+          value: expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
+        },
+      });
+
+      const votesOnCandidates = getByTestId("votesOnCandidates");
+      fireEvent.change(votesOnCandidates, {
+        target: { value: expectedRequest.data.votes_counts.votes_candidates_counts.toString() },
+      });
+
+      const blankVotes = getByTestId("blankVotes");
+      fireEvent.change(blankVotes, {
+        target: { value: expectedRequest.data.votes_counts.blank_votes_count.toString() },
+      });
+
+      const invalidVotes = getByTestId("invalidVotes");
+      fireEvent.change(invalidVotes, {
+        target: { value: expectedRequest.data.votes_counts.invalid_votes_count.toString() },
+      });
+
+      const totalVotesCast = getByTestId("totalVotesCast");
+      fireEvent.change(totalVotesCast, {
+        target: { value: expectedRequest.data.votes_counts.total_votes_cast_count.toString() },
+      });
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(spy).toHaveBeenCalledWith("http://testhost/v1/api/polling_stations/1/data_entries/1", {
+        method: "POST",
+        body: JSON.stringify(expectedRequest),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
+    });
+  });
+
+  test("422 response results in display of error message", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 422, {
+      message: "422 error from mock",
+      errorCode: "422_ERROR",
+    });
+
+    const user = userEvent.setup();
+
+    render(<VotersAndVotesForm />);
+
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    expect(screen.getByTestId("result")).toHaveTextContent(/^Error 422_ERROR 422 error from mock$/);
+  });
+
+  test("500 response results in display of error message", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 500, {
+      message: "500 error from mock",
+      errorCode: "500_ERROR",
+    });
+
+    const user = userEvent.setup();
+
+    render(<VotersAndVotesForm />);
+
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    expect(screen.getByTestId("result")).toHaveTextContent(/^Error 500_ERROR 500 error from mock$/);
   });
 });

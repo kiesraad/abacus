@@ -5,6 +5,7 @@
  *
  * Copyright Oxide Computer Company
  */
+
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
@@ -27,12 +28,13 @@ export function overrideOnce(
 ) {
   server.use(
     http[method](
-      path,
-      () =>
+      `http://testhost${path}`,
+      () => {
         // https://mswjs.io/docs/api/response/once
-        typeof body === "string"
+        return typeof body === "string"
           ? new HttpResponse(body, { status })
-          : HttpResponse.json(body, { status }),
+          : HttpResponse.json(body, { status });
+      },
       { once: true },
     ),
   );

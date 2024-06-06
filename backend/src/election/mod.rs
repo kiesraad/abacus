@@ -24,13 +24,12 @@ pub struct ElectionDetailsResponse {
     pub election: Election,
 }
 
-// Get a list of all elections, without their candidate lists
+/// Get a list of all elections, without their candidate lists
 #[utoipa::path(
         get,
         path = "/api/elections",
         responses(
             (status = 200, description = "Election list", body = ElectionListResponse),
-            (status = 404, description = "Not found", body = ErrorResponse),
             (status = 500, description = "Internal server error", body = ErrorResponse),
         ),
     )]
@@ -51,6 +50,7 @@ pub async fn election_list(
         path = "/api/elections/{election_id}",
         responses(
             (status = 200, description = "Election", body = ElectionDetailsResponse),
+            (status = 404, description = "Not found", body = ErrorResponse),
             (status = 500, description = "Internal server error", body = ErrorResponse),
         ),
         params(

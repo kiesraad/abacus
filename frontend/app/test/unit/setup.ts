@@ -9,7 +9,9 @@ configure({
 });
 
 beforeAll(() => {
-  server.listen();
+  server.listen({
+    onUnhandledRequest: "error",
+  });
 });
 afterEach(() => {
   cleanup();

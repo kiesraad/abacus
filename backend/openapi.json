@@ -9,6 +9,37 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/elections": {
+      "get": {
+        "tags": [
+          "election"
+        ],
+        "summary": "Get a list of all elections, without their candidate lists",
+        "operationId": "election_list",
+        "responses": {
+          "200": {
+            "description": "Election list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectionListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/elections/{election_id}": {
       "get": {
         "tags": [
@@ -36,6 +67,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ElectionDetailsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -273,6 +314,21 @@
         "properties": {
           "election": {
             "$ref": "#/components/schemas/Election"
+          }
+        }
+      },
+      "ElectionListResponse": {
+        "type": "object",
+        "description": "Election list response\n\nDoes not include the candidate list (political groups) to keep the response size small.",
+        "required": [
+          "elections"
+        ],
+        "properties": {
+          "elections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Election"
+            }
           }
         }
       },

@@ -13,7 +13,7 @@ type ResponseData = {
 
 export function usePollingStationDataEntry(params: POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS) {
   const path = React.useMemo(() => {
-    const result: POLLING_STATION_DATA_ENTRY_REQUEST_PATH = `/api/polling_stations/${params.id}/data_entries/${params.entry_number}`;
+    const result: POLLING_STATION_DATA_ENTRY_REQUEST_PATH = `/api/polling_stations/${params.polling_station_id}/data_entries/${params.entry_number}`;
     return result;
   }, [params]);
 

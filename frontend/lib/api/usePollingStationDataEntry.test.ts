@@ -12,7 +12,7 @@ describe("usePollingStationDataEntry", () => {
     const { result } = renderHook(
       () =>
         usePollingStationDataEntry({
-          id: 1,
+          polling_station_id: 1,
           entry_number: 1,
         }),
       { wrapper: Providers },

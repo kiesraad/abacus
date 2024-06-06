@@ -27,6 +27,7 @@ describe("useInputMask", () => {
     ["1000000", "1.000.000"],
   ])("format string %s as %s", (input: string, expected: string) => {
     const { result } = renderHook(() => usePositiveNumberInputMask());
+    expect(result.current.validate(input)).equals(true);
     expect(result.current.format(input)).equals(expected);
   });
 
@@ -41,6 +42,7 @@ describe("useInputMask", () => {
     [1000000, "1.000.000"],
   ])("format number %i as %s", (input: number, expected: string) => {
     const { result } = renderHook(() => usePositiveNumberInputMask());
+    expect(result.current.validate(input)).equals(true);
     expect(result.current.format(input)).equals(expected);
   });
 
@@ -54,6 +56,7 @@ describe("useInputMask", () => {
     ["1.000.000", "1.000.000"],
   ])("format string %s as %s", (input: string, expected: string) => {
     const { result } = renderHook(() => usePositiveNumberInputMask());
+    expect(result.current.validate(input)).equals(true);
     expect(result.current.format(input)).equals(expected);
   });
 
@@ -62,7 +65,7 @@ describe("useInputMask", () => {
     "unexpected string becomes empty and shows tooltip",
     (input: string) => {
       const { result } = renderHook(() => usePositiveNumberInputMask());
-      expect(result.current.format(input)).equals("");
+      expect(result.current.validate(input)).equals(false);
     },
   );
 

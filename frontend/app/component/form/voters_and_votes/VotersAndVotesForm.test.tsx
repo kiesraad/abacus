@@ -44,7 +44,7 @@ describe("VotersAndVotesForm Form", () => {
     const proxyCertificates = screen.getByTestId("proxyCertificates");
     expect(proxyCertificates).toHaveFocus();
     await user.clear(proxyCertificates);
-    await user.type(proxyCertificates, "6789");
+    await user.paste("6789");
     expect(proxyCertificates).toHaveValue("6.789");
 
     await user.keyboard("{enter}");
@@ -60,7 +60,7 @@ describe("VotersAndVotesForm Form", () => {
     const totalAdmittedVoters = screen.getByTestId("totalAdmittedVoters");
     expect(totalAdmittedVoters).toHaveFocus();
     await user.clear(totalAdmittedVoters);
-    await user.type(totalAdmittedVoters, "4242");
+    await user.paste("4242");
     expect(totalAdmittedVoters).toHaveValue("4.242");
 
     await user.keyboard("{enter}");

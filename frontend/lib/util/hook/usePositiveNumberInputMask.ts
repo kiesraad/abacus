@@ -2,10 +2,12 @@ import * as React from "react";
 
 export type FormatFunc = (s: string | number | null | undefined) => string;
 export type DeformatFunc = (s: string) => number;
+export type ValidateFunc = (s: string | number | null | undefined) => boolean;
 
 export interface UsePositiveNumberInputMaskReturn {
   format: FormatFunc;
   deformat: DeformatFunc;
+  validate: ValidateFunc;
   register: () => {
     onChange: React.ChangeEventHandler<HTMLInputElement>;
     onLoad: React.ChangeEventHandler<HTMLInputElement>;
@@ -19,16 +21,9 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
 
 export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
   const format: FormatFunc = React.useCallback((s) => {
-    if (s === null || s === undefined || s === "") return "";
-    let result = `${s}`.trim();
-    console.log(result);
-    if (!result.match(/^(\d*\.?)$|^(\d{1,3}(\.\d{3})+\.?)$/g)) {
-      console.log("not allowed");
-      // not allowed
-      return "";
-    }
-    console.log(result);
-    result = result.replace(/\D/g, "");
+    if (s === null || s === undefined) return "";
+    let result = `${s}`.replace(/\D/g, "");
+    if (result === "") return "";
     result = numberFormatter.format(Number(result));
     return result;
   }, []);
@@ -41,10 +36,15 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
     return parseInt(cleaned, 10);
   }, []);
 
+  const validate: ValidateFunc = React.useCallback((s) => {
+    if (s === null || s === undefined || s === "") return false;
+    const result = `${s}`.trim();
+    return !!result.match(/^(\d*\.?)$|^(\d{1,3}(\.\d{3})+\.?)$/g);
+  }, []);
+
   const onChange: React.ChangeEventHandler<HTMLInputElement> = React.useCallback(
     (event) => {
-      //remove all non numbers
-      console.log("onChange");
+      // remove all non digits
       event.target.value = format(event.target.value);
     },
     [format],
@@ -57,9 +57,16 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
     [format],
   );
 
-  const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback((event) => {
-    console.log("onPaste", event.clipboardData.getData("text/plain"));
-  }, []);
+  const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback(
+    (event) => {
+      const pastedInput = event.clipboardData.getData("text/plain");
+      if (!validate(pastedInput)) {
+        event.preventDefault();
+        // TODO: Add tooltip error here!
+      }
+    },
+    [validate],
+  );
 
   const register = () => {
     return {
@@ -72,6 +79,7 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
   return {
     format,
     deformat,
+    validate,
     register,
   };
 }

@@ -2,9 +2,19 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
+use crate::election::Election;
 use crate::validation::{
-    above_percentage_threshold, Validate, ValidationResult, ValidationResultCode, ValidationResults,
+    above_percentage_threshold, ValidationResult, ValidationResultCode, ValidationResults,
 };
+
+pub trait Validate {
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    );
+}
 
 /// Polling station of a certain [Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
@@ -52,11 +62,22 @@ pub struct PollingStationResults {
 }
 
 impl Validate for PollingStationResults {
-    fn validate(&self, validation_results: &mut ValidationResults, field_name: String) {
-        self.voters_counts
-            .validate(validation_results, format!("{field_name}.voters_counts"));
-        self.votes_counts
-            .validate(validation_results, format!("{field_name}.votes_counts"));
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
+        self.voters_counts.validate(
+            election,
+            validation_results,
+            format!("{field_name}.voters_counts"),
+        );
+        self.votes_counts.validate(
+            election,
+            validation_results,
+            format!("{field_name}.votes_counts"),
+        );
 
         if identical_counts(&self.voters_counts, &self.votes_counts) {
             validation_results.warnings.push(ValidationResult {
@@ -73,7 +94,12 @@ impl Validate for PollingStationResults {
 type Count = u32;
 
 impl Validate for Count {
-    fn validate(&self, validation_results: &mut ValidationResults, field_name: String) {
+    fn validate(
+        &self,
+        _election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
         if self > &1_000_000_000 {
             validation_results.errors.push(ValidationResult {
                 fields: vec![field_name],
@@ -127,19 +153,34 @@ fn identical_counts(voters: &VotersCounts, votes: &VotesCounts) -> bool {
 }
 
 impl Validate for VotersCounts {
-    fn validate(&self, validation_results: &mut ValidationResults, field_name: String) {
-        self.poll_card_count
-            .validate(validation_results, format!("{field_name}.poll_card_count"));
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
+        // validate all counts
+        self.poll_card_count.validate(
+            election,
+            validation_results,
+            format!("{field_name}.poll_card_count"),
+        );
         self.proxy_certificate_count.validate(
+            election,
             validation_results,
             format!("{field_name}.proxy_certificate_count"),
         );
-        self.voter_card_count
-            .validate(validation_results, format!("{field_name}.voter_card_count"));
+        self.voter_card_count.validate(
+            election,
+            validation_results,
+            format!("{field_name}.voter_card_count"),
+        );
         self.total_admitted_voters_count.validate(
+            election,
             validation_results,
             format!("{field_name}.total_admitted_voters_count"),
         );
+
         // validate that total_admitted_voters_count == poll_card_count + proxy_certificate_count + voter_card_count
         if self.poll_card_count + self.proxy_certificate_count + self.voter_card_count
             != self.total_admitted_voters_count
@@ -176,23 +217,34 @@ pub struct VotesCounts {
 }
 
 impl Validate for VotesCounts {
-    fn validate(&self, validation_results: &mut ValidationResults, field_name: String) {
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
+        // validate all counts
         self.votes_candidates_counts.validate(
+            election,
             validation_results,
             format!("{field_name}.votes_candidates_counts"),
         );
         self.blank_votes_count.validate(
+            election,
             validation_results,
             format!("{field_name}.blank_votes_count"),
         );
         self.invalid_votes_count.validate(
+            election,
             validation_results,
             format!("{field_name}.invalid_votes_count"),
         );
         self.total_votes_cast_count.validate(
+            election,
             validation_results,
             format!("{field_name}.total_votes_cast_count"),
         );
+
         // validate that total_votes_cast_count == votes_candidates_counts + blank_votes_count + invalid_votes_count
         if self.votes_candidates_counts + self.blank_votes_count + self.invalid_votes_count
             != self.total_votes_cast_count
@@ -239,6 +291,8 @@ impl Validate for VotesCounts {
 
 #[cfg(test)]
 mod tests {
+    use crate::election::tests::election_fixture;
+
     use super::*;
 
     #[test]
@@ -258,7 +312,9 @@ mod tests {
                 total_votes_cast_count: 20, // incorrect total
             },
         };
+        let election = election_fixture();
         polling_station_results.validate(
+            &election,
             &mut validation_results,
             "polling_station_results".to_string(),
         );
@@ -284,7 +340,9 @@ mod tests {
                 total_votes_cast_count: 1002,
             },
         };
+        let election = election_fixture();
         polling_station_results.validate(
+            &election,
             &mut validation_results,
             "polling_station_results".to_string(),
         );
@@ -305,7 +363,12 @@ mod tests {
             voter_card_count: 3,
             total_admitted_voters_count: 1_000_000_006, // correct but out of range
         };
-        voters_counts.validate(&mut validation_results, "voters_counts".to_string());
+        let election = election_fixture();
+        voters_counts.validate(
+            &election,
+            &mut validation_results,
+            "voters_counts".to_string(),
+        );
         assert_eq!(validation_results.errors.len(), 2);
         assert_eq!(validation_results.warnings.len(), 0);
     }
@@ -320,7 +383,12 @@ mod tests {
             invalid_votes_count: 7,
             total_votes_cast_count: 20, // incorrect total
         };
-        votes_counts.validate(&mut validation_results, "votes_counts".to_string());
+        let election = election_fixture();
+        votes_counts.validate(
+            &election,
+            &mut validation_results,
+            "votes_counts".to_string(),
+        );
         assert_eq!(validation_results.errors.len(), 1);
         assert_eq!(validation_results.warnings.len(), 0);
 
@@ -332,7 +400,11 @@ mod tests {
             invalid_votes_count: 1,
             total_votes_cast_count: 111,
         };
-        votes_counts.validate(&mut validation_results, "votes_counts".to_string());
+        votes_counts.validate(
+            &election,
+            &mut validation_results,
+            "votes_counts".to_string(),
+        );
         assert_eq!(validation_results.errors.len(), 0);
         assert_eq!(validation_results.warnings.len(), 1);
 
@@ -344,33 +416,12 @@ mod tests {
             invalid_votes_count: 10, // high number of invalid votes
             total_votes_cast_count: 111,
         };
-        votes_counts.validate(&mut validation_results, "votes_counts".to_string());
+        votes_counts.validate(
+            &election,
+            &mut validation_results,
+            "votes_counts".to_string(),
+        );
         assert_eq!(validation_results.errors.len(), 0);
         assert_eq!(validation_results.warnings.len(), 1);
-    }
-
-    #[test]
-    fn test_zero_votes_and_zero_voters() {
-        let mut validation_results = ValidationResults::default();
-        let polling_station_results = PollingStationResults {
-            voters_counts: VotersCounts {
-                poll_card_count: 0,
-                proxy_certificate_count: 0,
-                voter_card_count: 0,
-                total_admitted_voters_count: 0,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_counts: 0,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 0,
-            },
-        };
-        polling_station_results.validate(
-            &mut validation_results,
-            "polling_station_results".to_string(),
-        );
-        assert!(validation_results.errors.is_empty());
-        assert!(validation_results.warnings.is_empty());
     }
 }

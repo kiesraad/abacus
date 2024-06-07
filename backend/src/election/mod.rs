@@ -1,13 +1,14 @@
 use axum::extract::{Path, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};
-use sqlx::{query_as, SqlitePool};
+use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
 use crate::APIError;
 
 pub use self::structs::*;
 
+pub(crate) mod database;
 pub mod structs;
 
 /// Election list response
@@ -36,11 +37,7 @@ pub struct ElectionDetailsResponse {
 pub async fn election_list(
     State(pool): State<SqlitePool>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
-    let elections: Vec<Election> =
-        query_as("SELECT id, name, category, election_date, nomination_date FROM elections")
-            .fetch_all(&pool)
-            .await?;
-
+    let elections = database::get_elections(pool).await?;
     Ok(Json(ElectionListResponse { elections }))
 }
 
@@ -61,10 +58,6 @@ pub async fn election_details(
     State(pool): State<SqlitePool>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
-    let election: Election = query_as("SELECT * FROM elections WHERE id = ?")
-        .bind(id)
-        .fetch_one(&pool)
-        .await?;
-
+    let election = database::get_election(pool, id).await?;
     Ok(Json(ElectionDetailsResponse { election }))
 }

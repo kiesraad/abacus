@@ -13,7 +13,7 @@ use backend::ErrorResponse;
 
 use crate::utils::serve_api;
 
-#[sqlx::test]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections")))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -73,7 +73,7 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
     );
 }
 
-#[sqlx::test]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections")))]
 async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -132,7 +132,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(body.validation_results.warnings.len(), 0);
 }
 
-#[sqlx::test(fixtures("elections"))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections")))]
 async fn test_election_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -147,7 +147,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body.elections.len(), 2);
 }
 
-#[sqlx::test(fixtures("elections"))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections")))]
 async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

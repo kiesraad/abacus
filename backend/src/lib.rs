@@ -100,6 +100,7 @@ impl IntoResponse for ErrorResponse {
 /// Generic error type, converted to an ErrorResponse by the IntoResponse
 /// trait implementation
 pub enum APIError {
+    NotFound(String),
     JsonRejection(JsonRejection),
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
@@ -112,6 +113,7 @@ impl IntoResponse for APIError {
         }
 
         let (status, response) = match self {
+            APIError::NotFound(message) => (StatusCode::NOT_FOUND, to_error(message)),
             APIError::JsonRejection(rejection) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 to_error(rejection.body_text()),

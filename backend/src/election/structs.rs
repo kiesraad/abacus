@@ -55,3 +55,19 @@ pub enum CandidateGender {
     Female,
     X,
 }
+
+#[cfg(test)]
+pub(crate) mod tests {
+    use super::*;
+
+    pub fn election_fixture() -> Election {
+        Election {
+            id: 1,
+            name: "Test".to_string(),
+            category: ElectionCategory::Municipal,
+            election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
+            nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
+            political_groups: None,
+        }
+    }
+}

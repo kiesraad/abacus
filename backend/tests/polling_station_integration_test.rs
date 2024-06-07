@@ -1,7 +1,5 @@
 #![cfg(test)]
 
-mod utils;
-
 use reqwest::StatusCode;
 use sqlx::SqlitePool;
 
@@ -9,7 +7,9 @@ use backend::polling_station::PollingStationListResponse;
 
 use crate::utils::serve_api;
 
-#[sqlx::test(fixtures("elections", "polling_stations"))]
+mod utils;
+
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_listing_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

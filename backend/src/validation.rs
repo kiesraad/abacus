@@ -41,10 +41,6 @@ impl fmt::Display for ValidationResultCode {
     }
 }
 
-pub trait Validate {
-    fn validate(&self, validation_results: &mut ValidationResults, field_name: String);
-}
-
 /// Validate that a value is equal to or above a certain percentage threshold of the total,
 /// using only integers to avoid floating point arithmetic issues.
 /// The threshold is calculated as the percentage of the total, rounded up.

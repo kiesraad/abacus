@@ -1,9 +1,12 @@
 use axum::extract::{FromRequest, Path, State};
+use axum::response::{IntoResponse, Response};
+use axum::Json;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, SqlitePool};
 use utoipa::ToSchema;
 
-use crate::validation::{Validate, ValidationResults};
+use crate::election::database::get_election;
+use crate::validation::ValidationResults;
 use crate::{APIError, JsonResponse};
 
 pub use self::structs::*;
@@ -25,6 +28,12 @@ pub struct DataEntryResponse {
     pub validation_results: ValidationResults,
 }
 
+impl IntoResponse for DataEntryResponse {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
+}
+
 /// Save or update the data entry for a polling station
 #[utoipa::path(
         post,
@@ -32,6 +41,7 @@ pub struct DataEntryResponse {
         request_body = DataEntryRequest,
         responses(
             (status = 200, description = "Data entry saved successfully", body = DataEntryResponse),
+            (status = 404, description = "Not found", body = ErrorResponse),
             (status = 422, description = "JSON body parsing error (Unprocessable Content)", body = ErrorResponse),
             (status = 500, description = "Internal server error", body = ErrorResponse),
         ),
@@ -44,11 +54,22 @@ pub async fn polling_station_data_entry(
     State(pool): State<SqlitePool>,
     Path((id, entry_number)): Path<(u32, u8)>,
     data_entry_request: DataEntryRequest,
-) -> Result<JsonResponse<DataEntryResponse>, APIError> {
+) -> Result<DataEntryResponse, APIError> {
+    // only the first data entry is supported for now
+    if entry_number != 1 {
+        return Err(APIError::NotFound(
+            "Only the first data entry is supported".to_string(),
+        ));
+    }
+    // need to resolve election id from polling station once we have
+    // polling stations in the database
+    let election_id = 1;
+    let election = get_election(pool.clone(), election_id).await?;
+
     let mut validation_results = ValidationResults::default();
     data_entry_request
         .data
-        .validate(&mut validation_results, "data".to_string());
+        .validate(&election, &mut validation_results, "data".to_string());
 
     let data = serde_json::to_string(&data_entry_request.data)?;
 
@@ -59,11 +80,11 @@ pub async fn polling_station_data_entry(
         .execute(&pool)
         .await?;
 
-    Ok(JsonResponse(DataEntryResponse {
+    Ok(DataEntryResponse {
         saved: true,
         message: "Data entry saved successfully".to_string(),
         validation_results,
-    }))
+    })
 }
 
 /// Polling station list response
@@ -114,11 +135,9 @@ WHERE election_id = $1;
 
 #[cfg(test)]
 mod tests {
-    use axum::response::IntoResponse;
-
     use super::*;
 
-    #[sqlx::test]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections")))]
     async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
         let mut request_body = DataEntryRequest {
             data: PollingStationResults {
@@ -174,7 +193,7 @@ mod tests {
         assert_eq!(data.voters_counts.poll_card_count, new_value);
     }
 
-    #[sqlx::test(fixtures(path = "../../tests/fixtures", scripts("elections")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections")))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
         // Insert two unique polling stations
         let _ = query!(r#"
@@ -187,7 +206,7 @@ VALUES
             .await
             .unwrap();
 
-        // Add the same polling station, but for a differect election
+        // Add a polling station with the same number to a different election
         let _ = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, street, house_number, house_number_addition, postal_code, locality)
 VALUES
@@ -197,7 +216,7 @@ VALUES
             .await
             .unwrap();
 
-        // Add the same polling station, for the same election and see that it fails
+        // Add a polling station with a duplicate number and assert that it fails
         let result = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, street, house_number, house_number_addition, postal_code, locality)
 VALUES

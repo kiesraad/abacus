@@ -11,16 +11,14 @@ table.overview_table {
   }
   td {
     height: 56px;
-    font-size: 18px;
-    > *:not(:last-child) {
-      margin-right: 0.5rem;
-    }
+    font-size: 16px;
   }
-  div.flex {
+  div.table_flex {
     display: flex;
+    gap: 8px;
     align-items: center;
-    > *:not(:last-child) {
-      margin-right: 0.5rem;
+    svg {
+      width: 24px;
     }
   }
   .align-right {
@@ -37,6 +35,9 @@ table.overview_table {
   }
   a {
     padding: 0.625rem;
+    svg {
+      width: 20px;
+    }
   }
 }
 

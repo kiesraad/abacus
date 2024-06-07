@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { WorkStationNumber } from "@kiesraad/ui";
 import {
   IconCheckheart,
@@ -34,60 +35,60 @@ export function OverviewPage() {
                 <td>Referendum uitbreiding stadshart 2026</td>
                 <td>GSB - Juinen (045)</td>
                 <td>
-                  <div className="flex">
+                  <div className="table_flex">
                     <IconHourglass />
                     <span>Invoer opgeschort</span>
                   </div>
                 </td>
                 <td className="align-center narrow">
-                  <a href="/input">
+                  <Link to={`/input`}>
                     <IconChevronright />
-                  </a>
+                  </Link>
                 </td>
               </tr>
               <tr>
                 <td>Wijkraad Grachtenkwartier 2026</td>
                 <td>Lokale verkiezing</td>
                 <td>
-                  <div className="flex">
+                  <div className="table_flex">
                     <IconClock />
                     <span>Wachten op coordinator</span>
                   </div>
                 </td>
                 <td className="align-center narrow">
-                  <a href="/input">
+                  <Link to={`/input`}>
                     <IconChevronright />
-                  </a>
+                  </Link>
                 </td>
               </tr>
               <tr>
                 <td>Europees Parlementsverkiezing 2024</td>
                 <td></td>
                 <td>
-                  <div className="flex">
+                  <div className="table_flex">
                     <IconCheckheart />
                     <span>Invoerders bezig</span>
                   </div>
                 </td>
                 <td className="align-center narrow">
-                  <a href="/input">
+                  <Link to={`/input`}>
                     <IconChevronright />
-                  </a>
+                  </Link>
                 </td>
               </tr>
               <tr>
                 <td>Tweede Kamerverkiezing 2023</td>
                 <td></td>
                 <td>
-                  <div className="flex">
+                  <div className="table_flex">
                     <IconCheckverified />
                     <span>Steminvoer voltooid</span>
                   </div>
                 </td>
                 <td className="align-center narrow">
-                  <a href="/input">
+                  <Link to={`/input`}>
                     <IconChevronright />
-                  </a>
+                  </Link>
                 </td>
               </tr>
             </tbody>

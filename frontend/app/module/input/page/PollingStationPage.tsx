@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { IconCross } from "@kiesraad/icon";
 import {
@@ -14,6 +14,7 @@ import { VotersAndVotesForm } from "app/component/form/voters_and_votes/VotersAn
 
 export function PollingStationPage() {
   const { id, section } = useParams();
+  // TODO: Set default targetForm correctly once all pages are implemented
   const targetForm = section || "numbers";
   const [openModal, setOpenModal] = useState(false);
 
@@ -40,26 +41,26 @@ export function PollingStationPage() {
         <nav>
           <ProgressList>
             <ProgressList.Item status="accept" active={targetForm === "recount"}>
-              <a href="./recount">Is er herteld?</a>
+              <Link to={`/input/${id}/recount`}>Is er herteld?</Link>
             </ProgressList.Item>
             <ProgressList.Item status="idle" active={targetForm === "numbers"}>
-              <a href="./numbers">Aantal kiezers en stemmen</a>
+              <Link to={`/input/${id}/numbers`}>Aantal kiezers en stemmen</Link>
             </ProgressList.Item>
             <ProgressList.Item status="idle" active={targetForm === "differences"}>
-              <a href="./differences">Verschillen</a>
+              <Link to={`/input/${id}/differences`}>Verschillen</Link>
             </ProgressList.Item>
             <ProgressList.Ruler />
             {lists.map((list, index) => {
-              const listId = `list${index.toString()}`;
+              const listId = `list${(index + 1).toString()}`;
               return (
                 <ProgressList.Item key={listId} status="idle" active={targetForm === listId}>
-                  <a href={`./${listId}`}>{list}</a>
+                  <Link to={`/input/${id}/${listId}`}>{list}</Link>
                 </ProgressList.Item>
               );
             })}
             <ProgressList.Ruler />
             <ProgressList.Item status="idle" active={targetForm === "save"}>
-              <a href="./save">Controleren en opslaan</a>
+              <Link to={`/input/${id}/save`}>Controleren en opslaan</Link>
             </ProgressList.Item>
           </ProgressList>
         </nav>

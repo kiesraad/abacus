@@ -1,5 +1,5 @@
 import { Badge, Button, InputField } from "@kiesraad/ui";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IconChevronright } from "@kiesraad/icon";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -59,85 +59,99 @@ export function PollingStationChoiceForm() {
             <tr>
               <td className="align-right narrow bold">1</td>
               <td>
-                <span>Nachthemelstraat 21</span>
-                <Badge type="first_entry" />
+                <div className="table_flex">
+                  <span>Nachthemelstraat 21</span>
+                  <Badge type="first_entry" />
+                </div>
               </td>
               <td className="align-center link">
-                <a href="/input/030">
+                <Link to={`/input/030`}>
                   <IconChevronright />
-                </a>
+                </Link>
               </td>
             </tr>
             <tr>
               <td className="align-right narrow bold">2</td>
               <td>
-                <span>Schoolstraat 78</span>
-                <Badge type="second_entry" />
+                <div className="table_flex">
+                  <span>Schoolstraat 78</span>
+                  <Badge type="second_entry" />
+                </div>
               </td>
               <td className="align-center link">
-                <a href="/input/030">
+                <Link to={`/input/030`}>
                   <IconChevronright />
-                </a>
+                </Link>
               </td>
             </tr>
             <tr>
               <td className="align-right narrow bold">3</td>
               <td>
-                <span>Fluisterbosdreef 8</span>
-                <Badge type="extra_entry" />
+                <div className="table_flex">
+                  <span>Fluisterbosdreef 8</span>
+                  <Badge type="extra_entry" />
+                </div>
               </td>
               <td className="align-center link">
-                <a href="/input/030">
+                <Link to={`/input/030`}>
                   <IconChevronright />
-                </a>
+                </Link>
               </td>
             </tr>
             <tr>
               <td className="align-right narrow bold">4</td>
               <td>
-                <span>Wilhelminastraat 21</span>
-                <Badge type="objections" />
+                <div className="table_flex">
+                  <span>Wilhelminastraat 21</span>
+                  <Badge type="objections" />
+                </div>
               </td>
               <td className="align-center link">
-                <a href="/input/030">
+                <Link to={`/input/030`}>
                   <IconChevronright />
-                </a>
+                </Link>
               </td>
             </tr>
             <tr>
               <td className="align-right narrow bold">5</td>
               <td>
-                <span>Tuinstraat 2</span>
-                <Badge type="difference" />
+                <div className="table_flex">
+                  <span>Tuinstraat 2</span>
+                  <Badge type="difference" />
+                </div>
               </td>
               <td className="align-center link">
-                <a href="/input/030">
+                <Link to={`/input/030`}>
                   <IconChevronright />
-                </a>
+                </Link>
               </td>
             </tr>
             <tr>
               <td className="align-right narrow bold">6</td>
               <td>
-                <span>Rietland 31</span>
-                <Badge type="correction" />
+                <div className="table_flex">
+                  <span>Rietland 31</span>
+                  <Badge type="correction" />
+                </div>
               </td>
               <td className="align-center link">
-                <a href="/input/030">
+                <Link to={`/input/030`}>
                   <IconChevronright />
-                </a>
+                </Link>
               </td>
             </tr>
             <tr>
               <td className="align-right narrow bold">7</td>
               <td>
-                <span>Grote Markt 1</span>
-                <Badge type="definitive" />
+                <div className="table_flex">
+                  <span>Grote Markt 1</span>
+                  <Badge type="definitive" />
+                </div>
               </td>
               <td className="align-center link">
-                <a href="/input/030">
+                <Link to={`/input/030`}>
                   <IconChevronright />
-                </a>
+                </Link>
               </td>
             </tr>
           </tbody>

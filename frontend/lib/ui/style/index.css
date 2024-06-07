@@ -5,3 +5,6 @@
 @import "core.css";
 @import "util.css";
 @import "overview.css";
+
+/* Global Components */
+@import "../Tooltip/Tooltip.css";

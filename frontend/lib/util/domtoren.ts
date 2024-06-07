@@ -1,5 +1,5 @@
 export class DomToren {
-  _el: Element;
+  _el: HTMLElement;
 
   constructor(el: HTMLElement) {
     this._el = el;
@@ -8,7 +8,7 @@ export class DomToren {
   public closest(selector: string) {
     const nextEl = this._el.closest(selector);
     if (nextEl) {
-      this._el = nextEl;
+      this._el = nextEl as HTMLElement;
     }
     return this;
   }
@@ -25,6 +25,45 @@ export class DomToren {
 
   public addClass(className: string) {
     this._el.classList.add(className);
+    return this;
+  }
+
+  //TODO: add test
+  public text(text: string) {
+    this._el.textContent = text;
+    return this;
+  }
+
+  //TODO: add test
+  public first(selector: string) {
+    const nextEl = this._el.querySelector(selector);
+    if (nextEl) {
+      this._el = nextEl as HTMLElement;
+    }
+    return this;
+  }
+
+  //TODO: add test
+  public show() {
+    this._el.style.display = "block";
+    return this;
+  }
+
+  //TODO: add test
+  public hide() {
+    this._el.style.display = "none";
+    return this;
+  }
+
+  //TODO: add test
+  public left(left: number) {
+    this._el.style.left = `${left}px`;
+    return this;
+  }
+
+  //TODO: add test
+  public top(top: number) {
+    this._el.style.top = `${top}px`;
     return this;
   }
 

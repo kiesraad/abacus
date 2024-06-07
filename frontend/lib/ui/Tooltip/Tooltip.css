@@ -1,0 +1,52 @@
+#tooltip {
+  display: none;
+  position: absolute;
+  border-radius: 4px;
+  pointer-events: none;
+
+  aside {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 16px;
+    width: 10px;
+    height: 10px;
+    border-left: 1px solid var(--border-color-default);
+    border-top: 1px solid var(--border-color-default);
+    transform: rotate(45deg);
+    background-color: white;
+  }
+
+  article {
+    position: absolute;
+    z-index: 1;
+    top: 5px;
+    width: 400px;
+    border: 1px solid var(--border-color-default);
+    background: var(--Base-Wit, #fff);
+    border-radius: 4px;
+    padding: 8px;
+
+    display: flex;
+
+    > div {
+      flex: 0 0 24px;
+      height: 24px;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      background-color: var(--color-warning-darker);
+      color: #fff;
+      font-weight: bold;
+    }
+
+    > p {
+      flex: 1;
+      padding: 0 8px;
+      margin: 0;
+      font-size: var(--font-size-sm);
+      line-height: 1.2rem;
+    }
+  }
+}

@@ -8,5 +8,12 @@ export const Provider: GlobalProvider = ({ children }) => (
   <>
     <StaticRouter location="/">{children}</StaticRouter>
     <div id="modal"></div>
+    <div id="tooltip">
+      <aside />
+      <article>
+        <div>!</div>
+        <p></p>
+      </article>
+    </div>
   </>
 );

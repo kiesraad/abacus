@@ -12,7 +12,7 @@ export interface TooltipConfig {
   anchor: HTMLElement;
   position: "top" | "bottom" | "left" | "right";
   type?: "info" | "warning" | "error";
-  text: string;
+  html: string;
 }
 
 export interface UseTooltipReturn {
@@ -34,7 +34,7 @@ export function useTooltip(): UseTooltipReturn {
       const rect = config.anchor.getBoundingClientRect();
       const left = rect.left + 8;
       const top = rect.bottom + 8;
-      domtoren(tooltipRootEl).show().left(left).top(top).first("p").text(config.text);
+      domtoren(tooltipRootEl).show().left(left).top(top).first("p").html(config.html);
     },
     [tooltipRootEl],
   );

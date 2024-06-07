@@ -35,6 +35,12 @@ export class DomToren {
   }
 
   //TODO: add test
+  public html(html: string) {
+    this._el.innerHTML = html;
+    return this;
+  }
+
+  //TODO: add test
   public first(selector: string) {
     const nextEl = this._el.querySelector(selector);
     if (nextEl) {

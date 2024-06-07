@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTooltip } from "@kiesraad/ui";
 
 export type FormatFunc = (s: string | number | null | undefined) => string;
 export type DeformatFunc = (s: string) => number;
@@ -20,6 +21,8 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
 });
 
 export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
+  const { show, hide } = useTooltip();
+
   const format: FormatFunc = React.useCallback((s) => {
     if (s === null || s === undefined) return "";
     let result = `${s}`.replace(/\D/g, "");
@@ -46,8 +49,9 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
     (event) => {
       // remove all non digits
       event.target.value = format(event.target.value);
+      hide();
     },
-    [format],
+    [format, hide],
   );
 
   const onLoad: React.ChangeEventHandler<HTMLInputElement> = React.useCallback(
@@ -62,10 +66,14 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
       const pastedInput = event.clipboardData.getData("text/plain");
       if (!validate(pastedInput)) {
         event.preventDefault();
-        // TODO: Add tooltip error here!
+        show({
+          anchor: event.currentTarget,
+          position: "top",
+          html: `Je probeert <strong>${pastedInput}</strong> te plakken. Je kunt hier alleen cijfers invullen.`,
+        });
       }
     },
-    [validate],
+    [validate, show],
   );
 
   const register = () => {

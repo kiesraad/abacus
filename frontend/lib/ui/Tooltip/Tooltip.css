@@ -21,23 +21,21 @@
     position: absolute;
     z-index: 1;
     top: 5px;
-    width: 400px;
     border: 1px solid var(--border-color-default);
-    background: var(--Base-Wit, #fff);
+    background: var(--base-white);
     border-radius: 4px;
     padding: 8px;
-
-    display: flex;
+    display: ruby;
 
     > div {
-      flex: 0 0 24px;
+      width: 24px;
       height: 24px;
       border-radius: 2px;
       display: flex;
       align-items: center;
       justify-content: space-around;
       background-color: var(--color-warning-darker);
-      color: #fff;
+      color: var(--base-white);
       font-weight: bold;
     }
 

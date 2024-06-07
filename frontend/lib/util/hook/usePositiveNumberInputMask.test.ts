@@ -61,13 +61,21 @@ describe("useInputMask", () => {
   });
 
   // Disallowed cases
-  test.each(["a25", "-50", "75-", "100.00", "10000.000", "afasd382asd", "100 10"])(
-    "unexpected string becomes empty and shows tooltip",
-    (input: string) => {
-      const { result } = renderHook(() => usePositiveNumberInputMask());
-      expect(result.current.validate(input)).equals(false);
-    },
-  );
+  test.each([
+    "a25",
+    "-50",
+    "75-",
+    "100.00",
+    "10000.000",
+    "afasd382asd",
+    "100 10",
+    "100,000",
+    "100 000",
+    "11,00",
+  ])("unexpected string becomes empty and shows tooltip", (input: string) => {
+    const { result } = renderHook(() => usePositiveNumberInputMask());
+    expect(result.current.validate(input)).equals(false);
+  });
 
   test("reverse format", () => {
     const { result } = renderHook(() => usePositiveNumberInputMask());

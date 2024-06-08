@@ -3,22 +3,22 @@ import type { Story } from "@ladle/react";
 import { useTooltip } from "./useTooltip";
 
 type Props = {
-  html: string;
+  text: string;
 };
 
-export const DefaultTooltip: Story<Props> = ({ html }) => {
+export const DefaultTooltip: Story<Props> = ({ text }) => {
   const { show, hide } = useTooltip();
 
   const ref = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     if (ref.current) {
-      show({ anchor: ref.current, position: "top", html });
+      show({ anchor: ref.current, position: "top", text });
     }
-  }, [show, html, ref]);
+  }, [show, text, ref]);
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    show({ anchor: e.currentTarget, position: "top", html });
+    show({ anchor: e.currentTarget, position: "top", text });
   };
 
   const handleBlur = () => {
@@ -34,6 +34,6 @@ export const DefaultTooltip: Story<Props> = ({ html }) => {
 
 export default {
   args: {
-    html: "Je probeert <strong>24,29</strong> te plakken. Je kunt hier alleen cijfers invullen.",
+    text: "Je probeert 24,29 te plakken. Je kunt hier alleen cijfers invullen.",
   },
 };

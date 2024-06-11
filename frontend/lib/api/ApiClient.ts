@@ -54,10 +54,11 @@ export class ApiClient {
   async responseHandler<SuccessResponse>(response: Response) {
     const res = response as ApiServerResponse<SuccessResponse>;
     if (res.status === 200) {
+      const data = await res.json();
       return {
         status: "success",
         code: 200,
-        data: { ok: true },
+        data,
       } as ApiResponseSuccess<SuccessResponse>;
     } else if (res.status >= 400 && res.status <= 499) {
       const data = await res.json();

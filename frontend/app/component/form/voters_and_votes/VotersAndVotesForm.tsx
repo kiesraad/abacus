@@ -50,6 +50,7 @@ export function VotersAndVotesForm() {
     });
   }
 
+  console.log(data);
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>

@@ -53,8 +53,8 @@ function addPath(path: string, v: PathsObject | undefined) {
   if (!v) return "";
   const result: string[] = [`// ${path}`];
   let requestPath = path;
-  if (v.post) {
-    const post = v.post as OperationObject;
+  if (v.post || v.get) {
+    const post = (v.post || v.get) as OperationObject;
 
     assert(typeof post.operationId === "string");
     let id: string = post.operationId;

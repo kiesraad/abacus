@@ -1,9 +1,7 @@
-import { render, screen, fireEvent } from "app/test/unit/test-utils";
+import { overrideOnce, render, screen, fireEvent } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
-
-import { overrideOnce } from "app/test/unit";
 
 describe("VotersAndVotesForm Form", () => {
   afterEach(() => {

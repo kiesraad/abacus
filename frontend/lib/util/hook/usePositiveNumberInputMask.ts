@@ -69,7 +69,7 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
         show({
           anchor: event.currentTarget,
           position: "top",
-          text: `Je probeert ${pastedInput} te plakken. Je kunt hier alleen cijfers invullen.`,
+          text: `Je probeert "${pastedInput}" te plakken. Je kunt hier alleen cijfers invullen.`,
         });
       }
     },

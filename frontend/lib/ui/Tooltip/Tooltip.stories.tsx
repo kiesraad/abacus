@@ -34,6 +34,6 @@ export const DefaultTooltip: Story<Props> = ({ text }) => {
 
 export default {
   args: {
-    text: "Je probeert 24,29 te plakken. Je kunt hier alleen cijfers invullen.",
+    text: `Je probeert "24,29" te plakken. Je kunt hier alleen cijfers invullen.`,
   },
 };

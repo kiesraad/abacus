@@ -18,30 +18,32 @@
   }
 
   article {
-    position: absolute;
+    position: relative;
     z-index: 1;
     top: 5px;
     border: 1px solid var(--border-color-default);
     background: var(--base-white);
     border-radius: 4px;
     padding: 8px;
-    display: ruby;
+    display: flex;
+    align-items: center;
 
     > div {
-      width: 24px;
-      height: 24px;
+      min-width: 24px;
+      min-height: 24px;
       border-radius: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
       background-color: var(--color-warning-darker);
       color: var(--base-white);
       font-weight: bold;
+      margin-right: 8px;
+
+      /* To center ! in box, should not be needed using icons */
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
     }
 
     > p {
-      flex: 1;
-      padding: 0 8px;
       margin: 0;
       font-size: var(--font-size-sm);
       line-height: 1.2rem;

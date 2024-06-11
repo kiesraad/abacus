@@ -174,13 +174,11 @@ export function VotersAndVotesForm() {
         Volgende
       </Button>
       {warnings.map((warning) => {
-        const trimmedString =
-          warning.value.length > 20 ? warning.value.substring(0, 20) + "..." : warning.value;
         return (
           <Tooltip key={warning.anchor.id} anchor={warning.anchor} closeOnClickOrKeyboardEvent>
             <p>
-              Je probeert <strong>{trimmedString}</strong> te plakken. Je kunt hier alleen cijfers
-              invullen.
+              Je probeert <strong>{getTrimmedString(warning.value)}</strong> te plakken. Je kunt
+              hier alleen cijfers invullen.
             </p>
           </Tooltip>
         );
@@ -193,4 +191,11 @@ export function VotersAndVotesForm() {
 function pickGoodTestNumber() {
   const n = Math.ceil(Math.random() * 4) * 10 * 10;
   return Math.floor(Math.random() * n) * 10;
+}
+
+function getTrimmedString(s: string) {
+  if (s.length > 20) {
+    return s.substring(0, 20) + "...";
+  }
+  return s;
 }

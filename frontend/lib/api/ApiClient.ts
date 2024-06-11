@@ -94,4 +94,19 @@ export class ApiClient {
 
     return this.responseHandler<SuccessResponse>(response);
   }
+
+  async getRequest<SuccessResponse>(
+    path: string,
+  ): Promise<ApiResponseSuccess<SuccessResponse> | ApiResponse<ErrorResponse>> {
+    const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
+
+    const response = await fetch(host + "/v1" + path, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    return this.responseHandler<SuccessResponse>(response);
+  }
 }

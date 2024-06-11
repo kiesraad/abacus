@@ -22,7 +22,7 @@
     }
 
     &:global(.active) {
-      background-color: var(--bg-gray-darker);
+      background-color: var(--gray-200);
     }
 
     &:global(.reject) {

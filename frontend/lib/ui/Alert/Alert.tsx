@@ -19,7 +19,7 @@ export function Alert({ type, onClose, children }: AlertProps) {
           title="close"
           icon={<IconCross />}
           variant="ghost"
-          size="md"
+          size="lg"
           isRound
           onClick={onClose}
         />

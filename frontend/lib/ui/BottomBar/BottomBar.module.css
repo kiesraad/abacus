@@ -4,4 +4,10 @@
   position: sticky;
   padding: 1.5rem 5rem;
   background: var(--base-white);
+  &.form {
+    width: 100%;
+    margin: 2.5rem 0;
+    padding: 1.5rem 6.5rem;
+    border-radius: 1rem;
+  }
 }

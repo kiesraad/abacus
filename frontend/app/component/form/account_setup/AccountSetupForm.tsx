@@ -41,7 +41,7 @@ export function AccountSetupForm() {
         type="password"
       />
       <InputField name="new_password2" label="Herhaal wachtwoord" type="password" />
-      <BottomBar>
+      <BottomBar type="full">
         <Button type="submit" size="lg">
           Opslaan
         </Button>

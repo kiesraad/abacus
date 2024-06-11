@@ -90,3 +90,8 @@
     font-size: 10px;
   }
 }
+
+nav#progress {
+  width: 26.5rem;
+  padding: 2.5rem 5rem;
+}

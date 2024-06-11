@@ -29,7 +29,7 @@ export function PollingStationChoiceForm() {
         pattern="\d+"
         title="Alleen positieve nummers toegestaan"
       />
-      <p>
+      <p className="md">
         Klopt de naam van het stembureau met de naam op je papieren proces verbaal?
         <br />
         Dan kan je beginnen.

@@ -32,10 +32,12 @@
     &:global(.hint) {
       color: var(--gray-600);
       font-weight: normal;
+      margin-top: 8px;
     }
     &:global(.error) {
       color: var(--error-600);
       font-weight: normal;
+      margin-top: 8px;
     }
   }
 

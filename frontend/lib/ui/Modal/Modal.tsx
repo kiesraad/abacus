@@ -15,7 +15,7 @@ export function Modal({ onClose, children }: ModalProps): React.ReactNode {
   return createPortal(
     <div className={cls.modal} role="dialog">
       <div className={cls["modal-container"]}>
-        <IconButton onClick={onClose} icon={<IconCross />} isRound variant="ghost" />
+        <IconButton onClick={onClose} icon={<IconCross />} size="lg" isRound variant="ghost" />
         <div className={cls["modal-body"]}>{children}</div>
       </div>
     </div>,

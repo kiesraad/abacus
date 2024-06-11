@@ -9,8 +9,10 @@ export const DefaultModal: Story = () => (
       <h2>Invoer bewaren?</h2>
       <p>Wil je de invoer bewaren zodat je later verder kan? Overleg met de verkiezingsleider.</p>
       <nav>
-        <Button>Bewaar invoer</Button>
-        <Button variant="secondary">Verwijder invoer</Button>
+        <Button size="lg">Bewaar invoer</Button>
+        <Button size="lg" variant="secondary">
+          Verwijder invoer
+        </Button>
       </nav>
     </Modal>
   </>

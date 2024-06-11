@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { usePollingStationDataEntry } from "@kiesraad/api";
-import { Button, InputGrid } from "@kiesraad/ui";
+import { BottomBar, Button, InputGrid } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -147,10 +147,12 @@ export function VotersAndVotesForm() {
           </InputGrid.Row>
         </InputGrid.Body>
       </InputGrid>
-      <br /> <br />
-      <Button type="submit" size="lg" disabled={loading}>
-        Volgende
-      </Button>
+      <BottomBar type="form">
+        <Button type="submit" size="lg" disabled={loading}>
+          Volgende
+        </Button>
+        <span className="button_hint">SHIFT + Enter</span>
+      </BottomBar>
     </form>
   );
 }

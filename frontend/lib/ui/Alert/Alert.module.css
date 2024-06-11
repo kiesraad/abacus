@@ -1,13 +1,13 @@
 .alert {
   border-left: 4px solid gray;
   background-color: #f4f4f4;
-  padding: 32px 32px 32px 80px;
+  padding: 2rem 2rem 2rem 5rem;
   position: relative;
 
   > button {
     position: absolute;
-    right: 32px;
-    top: 26px;
+    right: 2rem;
+    top: 2rem;
   }
 
   display: flex;
@@ -20,6 +20,7 @@
   }
   section {
     flex: 1 1 auto;
+    max-width: 38rem;
     p {
       padding-bottom: 0;
       margin-bottom: 0;

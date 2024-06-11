@@ -51,7 +51,7 @@ export function OverviewPage() {
                 <td>
                   <div className="flex">
                     <IconClock />
-                    <span>Wachten op coordinator</span>
+                    <span>Wachten op coördinator</span>
                   </div>
                 </td>
                 <td className="align-center narrow">

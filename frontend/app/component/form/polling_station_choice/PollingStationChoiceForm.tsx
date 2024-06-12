@@ -34,10 +34,12 @@ export function PollingStationChoiceForm() {
         <br />
         Dan kan je beginnen.
       </p>
-      <Button type="submit" size="lg">
-        Beginnen
-      </Button>
-      <span className="button_hint">SHIFT + Enter</span>
+      <div>
+        <Button type="submit" size="lg">
+          Beginnen
+        </Button>
+        <span className="button_hint">SHIFT + Enter</span>
+      </div>
       <details>
         <summary>
           <p>

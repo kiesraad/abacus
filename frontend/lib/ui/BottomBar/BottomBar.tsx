@@ -8,6 +8,5 @@ export interface BottomBarProps {
 }
 
 export function BottomBar({ type, children }: BottomBarProps) {
-  // TODO: Fix full bottom bar not sticking to footer
   return <div className={cn(cls["bottombar"], cls[type])}>{children}</div>;
 }

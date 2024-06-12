@@ -40,7 +40,7 @@ export function AccountSetupForm() {
         hint="Je hebt dit wachtwoord nodig als je na een pauze opnieuw wilt inloggen. Gebruik minimaal 8 letters en 2 cijfers."
         type="password"
       />
-      <InputField name="new_password2" label="Herhaal wachtwoord" type="password" />
+      <InputField name="new_password2" label="Herhaal wachtwoord" type="password" margin={false} />
       <BottomBar type="full">
         <Button type="submit" size="lg">
           Opslaan

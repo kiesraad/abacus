@@ -12,7 +12,9 @@ interface PollingStationChoiceFormElement extends HTMLFormElement {
 
 export function PollingStationChoiceForm() {
   const navigate = useNavigate();
-
+  const handleRowClick = () => {
+    navigate(`./030`);
+  };
   function handleSubmit(event: React.FormEvent<PollingStationChoiceFormElement>) {
     event.preventDefault();
     navigate("./030");
@@ -58,88 +60,102 @@ export function PollingStationChoiceForm() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className="align-right narrow bold">1</td>
+            <tr onClick={handleRowClick}>
+              <td width="6.5rem" className="align-right bold">
+                1
+              </td>
               <td>
                 <span>Nachthemelstraat 21</span>
                 <Badge type="first_entry" />
               </td>
-              <td className="align-center link">
-                <a href="/input/030">
+              <td width="5rem" className="align-center">
+                <div className="link">
                   <IconChevronright />
-                </a>
+                </div>
               </td>
             </tr>
-            <tr>
-              <td className="align-right narrow bold">2</td>
+            <tr onClick={handleRowClick}>
+              <td width="6.5rem" className="align-right bold">
+                2
+              </td>
               <td>
                 <span>Schoolstraat 78</span>
                 <Badge type="second_entry" />
               </td>
-              <td className="align-center link">
-                <a href="/input/030">
+              <td width="5rem" className="align-center">
+                <div className="link">
                   <IconChevronright />
-                </a>
+                </div>
               </td>
             </tr>
-            <tr>
-              <td className="align-right narrow bold">3</td>
+            <tr onClick={handleRowClick}>
+              <td width="6.5rem" className="align-right bold">
+                3
+              </td>
               <td>
                 <span>Fluisterbosdreef 8</span>
                 <Badge type="extra_entry" />
               </td>
-              <td className="align-center link">
-                <a href="/input/030">
+              <td width="5rem" className="align-center">
+                <div className="link">
                   <IconChevronright />
-                </a>
+                </div>
               </td>
             </tr>
-            <tr>
-              <td className="align-right narrow bold">4</td>
+            <tr onClick={handleRowClick}>
+              <td width="6.5rem" className="align-right bold">
+                4
+              </td>
               <td>
                 <span>Wilhelminastraat 21</span>
                 <Badge type="objections" />
               </td>
-              <td className="align-center link">
-                <a href="/input/030">
+              <td width="5rem" className="align-center">
+                <div className="link">
                   <IconChevronright />
-                </a>
+                </div>
               </td>
             </tr>
-            <tr>
-              <td className="align-right narrow bold">5</td>
+            <tr onClick={handleRowClick}>
+              <td width="6.5rem" className="align-right bold">
+                5
+              </td>
               <td>
                 <span>Tuinstraat 2</span>
                 <Badge type="difference" />
               </td>
-              <td className="align-center link">
-                <a href="/input/030">
+              <td width="5rem" className="align-center">
+                <div className="link">
                   <IconChevronright />
-                </a>
+                </div>
               </td>
             </tr>
-            <tr>
-              <td className="align-right narrow bold">6</td>
+            <tr onClick={handleRowClick}>
+              <td width="6.5rem" className="align-right bold">
+                6
+              </td>
               <td>
                 <span>Rietland 31</span>
                 <Badge type="correction" />
               </td>
-              <td className="align-center link">
-                <a href="/input/030">
+              <td width="5rem" className="align-center">
+                <div className="link">
                   <IconChevronright />
-                </a>
+                </div>
               </td>
             </tr>
-            <tr>
-              <td className="align-right narrow bold">7</td>
+            <tr onClick={handleRowClick}>
+              <td width="6.5rem" className="align-right bold">
+                7
+              </td>
               <td>
                 <span>Grote Markt 1</span>
                 <Badge type="definitive" />
               </td>
-              <td className="align-center link">
-                <a href="/input/030">
+              <td width="5rem" className="align-center">
+                <div className="link">
                   <IconChevronright />
-                </a>
+                </div>
               </td>
             </tr>
           </tbody>

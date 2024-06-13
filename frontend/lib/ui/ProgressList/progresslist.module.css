@@ -22,7 +22,8 @@
     }
 
     &:global(.active) {
-      background-color: var(--gray-200);
+      background-color: var(--color-hover);
+      font-weight: 500;
     }
 
     &:global(.reject) {

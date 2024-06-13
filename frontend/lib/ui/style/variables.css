@@ -60,6 +60,7 @@
   --color-success-hover: #a6f4c5;
 
   --color-help-text: #475467;
+  --color-hover: #eaecf0;
 
   --bg-gray: #f9fafb;
   --bg-gray-darker: #f2f4f7;
@@ -91,9 +92,7 @@
   --error-400: #f97066;
   --error-600: #d92d20;
 
-  --gray-200: #eaecf0;
   --gray-500: #667085;
-  --gray-600: #475467;
   --gray-900: #101828;
 
   --green-100: #d3f8df;

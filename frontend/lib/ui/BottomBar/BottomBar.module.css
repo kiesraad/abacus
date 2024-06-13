@@ -5,6 +5,7 @@
   background: var(--base-white);
   display: grid;
   grid-template-columns: auto 1fr;
+  align-items: center;
   &.form {
     width: 100%;
     margin: 2.5rem 0;

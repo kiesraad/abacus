@@ -1,17 +1,24 @@
 table.overview_table {
   width: 100%;
   line-height: 1.5rem;
+  border-spacing: unset;
+  tbody tr {
+    cursor: pointer;
+    &:hover {
+      background: var(--color-hover);
+    }
+  }
   th,
   td {
     border-bottom: 1px solid var(--bg-gray-darkest);
-    padding: 12px 24px;
+    padding: 1rem 1.5rem;
   }
   th {
     text-align: left;
-    height: 44px;
+    height: 2.75rem;
   }
   td {
-    height: 56px;
+    height: 3.5rem;
     font-size: 18px;
     > *:not(:last-child) {
       margin-right: 0.5rem;
@@ -32,25 +39,23 @@ table.overview_table {
   .align-center {
     text-align: center;
   }
-  .link {
-    width: 5rem;
-  }
-  .narrow {
-    width: 104px;
-  }
-  a {
-    padding: 0.625rem;
+  div.link {
     display: flex;
     align-items: center;
+    justify-content: center;
     svg {
       width: 1.25rem;
       height: 1.25rem;
     }
   }
+  .narrow {
+    width: 3.75rem;
+    padding: 1rem 0.75rem;
+  }
 }
 
 .button_hint {
-  margin-left: 32px;
+  margin-left: 2rem;
 }
 
 details {

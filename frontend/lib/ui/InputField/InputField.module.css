@@ -30,7 +30,7 @@
       font-weight: normal;
     }
     &:global(.hint) {
-      color: var(--gray-600);
+      color: var(--color-help-text);
       font-weight: normal;
       margin-top: 0.5rem;
     }

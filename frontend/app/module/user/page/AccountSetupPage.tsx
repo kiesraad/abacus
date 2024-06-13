@@ -29,7 +29,7 @@ export function AccountSetupPage() {
         </Alert>
       )}
       <main>
-        <article>
+        <article className="grid">
           <AccountSetupForm />
         </article>
       </main>

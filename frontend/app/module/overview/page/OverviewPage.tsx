@@ -34,7 +34,7 @@ export function OverviewPage() {
                 <td>Referendum uitbreiding stadshart 2026</td>
                 <td>GSB - Juinen (045)</td>
                 <td>
-                  <div className="flex">
+                  <div className="flex_overview">
                     <IconHourglass />
                     <span>Invoer opgeschort</span>
                   </div>
@@ -49,7 +49,7 @@ export function OverviewPage() {
                 <td>Wijkraad Grachtenkwartier 2026</td>
                 <td>Lokale verkiezing</td>
                 <td>
-                  <div className="flex">
+                  <div className="flex_overview">
                     <IconClock />
                     <span>Wachten op coördinator</span>
                   </div>
@@ -64,7 +64,7 @@ export function OverviewPage() {
                 <td>Europees Parlementsverkiezing 2024</td>
                 <td></td>
                 <td>
-                  <div className="flex">
+                  <div className="flex_overview">
                     <IconCheckheart />
                     <span>Invoerders bezig</span>
                   </div>
@@ -79,7 +79,7 @@ export function OverviewPage() {
                 <td>Tweede Kamerverkiezing 2023</td>
                 <td></td>
                 <td>
-                  <div className="flex">
+                  <div className="flex_overview">
                     <IconCheckverified />
                     <span>Steminvoer voltooid</span>
                   </div>

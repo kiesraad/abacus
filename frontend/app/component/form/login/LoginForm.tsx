@@ -19,7 +19,7 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="grid" onSubmit={handleSubmit}>
       <InputField
         name="username"
         label="Gebruikersnaam"

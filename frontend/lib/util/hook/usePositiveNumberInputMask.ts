@@ -1,9 +1,14 @@
 import * as React from "react";
-import { useTooltip } from "@kiesraad/ui";
 
 export type FormatFunc = (s: string | number | null | undefined) => string;
 export type DeformatFunc = (s: string) => number;
 export type ValidateFunc = (s: string | number | null | undefined) => boolean;
+
+export type PositiveInputMaskWarning = {
+  id: string;
+  value: string;
+  warning: "REFORMAT_WARNING";
+};
 
 export interface UsePositiveNumberInputMaskReturn {
   format: FormatFunc;
@@ -14,6 +19,8 @@ export interface UsePositiveNumberInputMaskReturn {
     onLoad: React.ChangeEventHandler<HTMLInputElement>;
     onPaste: React.ClipboardEventHandler<HTMLInputElement>;
   };
+  warnings: PositiveInputMaskWarning[];
+  resetWarnings: () => void;
 }
 
 const numberFormatter = new Intl.NumberFormat("nl-NL", {
@@ -21,8 +28,7 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
 });
 
 export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
-  const { show, hide } = useTooltip();
-
+  const [warnings, setWarnings] = React.useState<PositiveInputMaskWarning[]>([]);
   const format: FormatFunc = React.useCallback((s) => {
     if (s === null || s === undefined) return "";
     let result = `${s}`.replace(/\D/g, "");
@@ -49,9 +55,8 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
     (event) => {
       // remove all non digits
       event.target.value = format(event.target.value);
-      hide();
     },
-    [format, hide],
+    [format],
   );
 
   const onLoad: React.ChangeEventHandler<HTMLInputElement> = React.useCallback(
@@ -66,14 +71,19 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
       const pastedInput = event.clipboardData.getData("text/plain");
       if (!validate(pastedInput)) {
         event.preventDefault();
-        show({
-          anchor: event.currentTarget,
-          position: "top",
-          text: `Je probeert "${pastedInput}" te plakken. Je kunt hier alleen cijfers invullen.`,
+        setWarnings((old) => {
+          return [
+            ...old,
+            {
+              id: event.currentTarget.id,
+              value: pastedInput,
+              warning: "REFORMAT_WARNING",
+            },
+          ];
         });
       }
     },
-    [validate, show],
+    [validate],
   );
 
   const register = () => {
@@ -84,10 +94,16 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
     };
   };
 
+  const resetWarnings = () => {
+    setWarnings([]);
+  };
+
   return {
     format,
     deformat,
     validate,
     register,
+    warnings,
+    resetWarnings,
   };
 }

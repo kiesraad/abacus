@@ -3,6 +3,7 @@ import * as React from "react";
 import { usePollingStationDataEntry } from "@kiesraad/api";
 import { Button, InputGrid } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
+import { Tooltip } from "lib/ui/Tooltip/Tooltip";
 
 interface FormElements extends HTMLFormControlsCollection {
   pollCards: HTMLInputElement;
@@ -20,7 +21,7 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const { register, format, deformat } = usePositiveNumberInputMask();
+  const { register, format, deformat, warnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
   const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
@@ -151,6 +152,14 @@ export function VotersAndVotesForm() {
       <Button type="submit" size="lg" disabled={loading}>
         Volgende
       </Button>
+      {warnings.map((warning) => (
+        <Tooltip key={warning.id} anchor={document.getElementById(warning.id)}>
+          <p>
+            Je probeert <strong>{warning.value}</strong> te plakken. Je kunt hier alleen cijfers
+            invullen.
+          </p>
+        </Tooltip>
+      ))}
     </form>
   );
 }

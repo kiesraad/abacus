@@ -1,6 +1,6 @@
 .alert {
   border-left: 4px solid gray;
-  background-color: #f4f4f4;
+  background-color: var(--base-white);
   padding: 2rem 2rem 2rem 5rem;
   position: relative;
 
@@ -28,16 +28,21 @@
   }
 
   &.error {
-    border-color: var(--color-alert);
-    background-color: var(--color-alert-bg);
-
+    border-color: var(--color-error);
+    background-color: var(--color-error-bg);
+    button:hover {
+      background: var(--color-error-hover);
+    }
     svg {
-      fill: var(--color-alert);
+      fill: var(--color-error);
     }
   }
   &.warning {
     border-color: var(--color-warning);
     background-color: var(--color-warning-bg);
+    button:hover {
+      background: var(--color-warning-hover);
+    }
     svg {
       fill: var(--color-warning);
     }
@@ -45,6 +50,9 @@
   &.notify {
     border-color: var(--color-notify);
     background-color: var(--color-notify-bg);
+    button:hover {
+      background: var(--color-notify-hover);
+    }
     svg {
       fill: var(--color-notify);
     }
@@ -52,7 +60,9 @@
   &.success {
     border-color: var(--color-success);
     background-color: var(--color-success-bg);
-
+    button:hover {
+      background: var(--color-success-hover);
+    }
     svg {
       fill: var(--color-success);
     }

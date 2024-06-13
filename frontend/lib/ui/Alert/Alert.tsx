@@ -16,11 +16,10 @@ export function Alert({ type, onClose, children }: AlertProps) {
     <div className={cn(cls.alert, cls[type])} role="alert">
       {onClose && (
         <IconButton
-          title="close"
           icon={<IconCross />}
+          title="Melding sluiten"
           variant="ghost"
           size="lg"
-          isRound
           onClick={onClose}
         />
       )}

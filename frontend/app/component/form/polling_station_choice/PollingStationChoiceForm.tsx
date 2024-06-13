@@ -1,5 +1,5 @@
 import { Badge, Button, InputField } from "@kiesraad/ui";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { IconChevronright } from "@kiesraad/icon";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -12,7 +12,9 @@ interface PollingStationChoiceFormElement extends HTMLFormElement {
 
 export function PollingStationChoiceForm() {
   const navigate = useNavigate();
-
+  const handleRowClick = () => {
+    navigate(`./030`);
+  };
   function handleSubmit(event: React.FormEvent<PollingStationChoiceFormElement>) {
     event.preventDefault();
     navigate("./030");
@@ -56,7 +58,7 @@ export function PollingStationChoiceForm() {
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr onClick={handleRowClick}>
               <td className="align-right narrow bold">1</td>
               <td>
                 <div className="table_flex">
@@ -65,9 +67,7 @@ export function PollingStationChoiceForm() {
                 </div>
               </td>
               <td className="align-center link">
-                <Link to={`/input/030`}>
-                  <IconChevronright />
-                </Link>
+                <IconChevronright />
               </td>
             </tr>
             <tr>
@@ -79,12 +79,10 @@ export function PollingStationChoiceForm() {
                 </div>
               </td>
               <td className="align-center link">
-                <Link to={`/input/030`}>
-                  <IconChevronright />
-                </Link>
+                <IconChevronright />
               </td>
             </tr>
-            <tr>
+            <tr onClick={handleRowClick}>
               <td className="align-right narrow bold">3</td>
               <td>
                 <div className="table_flex">
@@ -93,12 +91,10 @@ export function PollingStationChoiceForm() {
                 </div>
               </td>
               <td className="align-center link">
-                <Link to={`/input/030`}>
-                  <IconChevronright />
-                </Link>
+                <IconChevronright />
               </td>
             </tr>
-            <tr>
+            <tr onClick={handleRowClick}>
               <td className="align-right narrow bold">4</td>
               <td>
                 <div className="table_flex">
@@ -107,12 +103,10 @@ export function PollingStationChoiceForm() {
                 </div>
               </td>
               <td className="align-center link">
-                <Link to={`/input/030`}>
-                  <IconChevronright />
-                </Link>
+                <IconChevronright />
               </td>
             </tr>
-            <tr>
+            <tr onClick={handleRowClick}>
               <td className="align-right narrow bold">5</td>
               <td>
                 <div className="table_flex">
@@ -121,12 +115,10 @@ export function PollingStationChoiceForm() {
                 </div>
               </td>
               <td className="align-center link">
-                <Link to={`/input/030`}>
-                  <IconChevronright />
-                </Link>
+                <IconChevronright />
               </td>
             </tr>
-            <tr>
+            <tr onClick={handleRowClick}>
               <td className="align-right narrow bold">6</td>
               <td>
                 <div className="table_flex">
@@ -135,12 +127,10 @@ export function PollingStationChoiceForm() {
                 </div>
               </td>
               <td className="align-center link">
-                <Link to={`/input/030`}>
-                  <IconChevronright />
-                </Link>
+                <IconChevronright />
               </td>
             </tr>
-            <tr>
+            <tr onClick={handleRowClick}>
               <td className="align-right narrow bold">7</td>
               <td>
                 <div className="table_flex">
@@ -149,9 +139,7 @@ export function PollingStationChoiceForm() {
                 </div>
               </td>
               <td className="align-center link">
-                <Link to={`/input/030`}>
-                  <IconChevronright />
-                </Link>
+                <IconChevronright />
               </td>
             </tr>
           </tbody>

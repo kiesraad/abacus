@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { WorkStationNumber } from "@kiesraad/ui";
 import {
   IconCheckheart,
@@ -9,6 +9,11 @@ import {
 } from "@kiesraad/icon";
 
 export function OverviewPage() {
+  const navigate = useNavigate();
+  const handleRowClick = () => {
+    navigate(`/input`);
+  };
+
   return (
     <>
       <header>
@@ -31,7 +36,7 @@ export function OverviewPage() {
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr onClick={handleRowClick}>
                 <td>Referendum uitbreiding stadshart 2026</td>
                 <td>GSB - Juinen (045)</td>
                 <td>
@@ -41,12 +46,10 @@ export function OverviewPage() {
                   </div>
                 </td>
                 <td className="align-center narrow">
-                  <Link to={`/input`}>
-                    <IconChevronright />
-                  </Link>
+                  <IconChevronright />
                 </td>
               </tr>
-              <tr>
+              <tr onClick={handleRowClick}>
                 <td>Wijkraad Grachtenkwartier 2026</td>
                 <td>Lokale verkiezing</td>
                 <td>
@@ -56,12 +59,10 @@ export function OverviewPage() {
                   </div>
                 </td>
                 <td className="align-center narrow">
-                  <Link to={`/input`}>
-                    <IconChevronright />
-                  </Link>
+                  <IconChevronright />
                 </td>
               </tr>
-              <tr>
+              <tr onClick={handleRowClick}>
                 <td>Europees Parlementsverkiezing 2024</td>
                 <td></td>
                 <td>
@@ -71,12 +72,10 @@ export function OverviewPage() {
                   </div>
                 </td>
                 <td className="align-center narrow">
-                  <Link to={`/input`}>
-                    <IconChevronright />
-                  </Link>
+                  <IconChevronright />
                 </td>
               </tr>
-              <tr>
+              <tr onClick={handleRowClick}>
                 <td>Tweede Kamerverkiezing 2023</td>
                 <td></td>
                 <td>
@@ -86,9 +85,7 @@ export function OverviewPage() {
                   </div>
                 </td>
                 <td className="align-center narrow">
-                  <Link to={`/input`}>
-                    <IconChevronright />
-                  </Link>
+                  <IconChevronright />
                 </td>
               </tr>
             </tbody>

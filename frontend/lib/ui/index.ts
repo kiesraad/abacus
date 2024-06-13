@@ -11,4 +11,4 @@ export * from "./InputGrid/InputGrid";
 export * from "./Modal/Modal";
 export * from "./ProgressList/ProgressList";
 export * from "./Spinner/Spinner";
-export * from "./Tooltip/useTooltip";
+export * from "./Tooltip/Tooltip";

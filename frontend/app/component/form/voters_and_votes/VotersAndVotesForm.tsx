@@ -1,9 +1,8 @@
 import * as React from "react";
 
 import { usePollingStationDataEntry } from "@kiesraad/api";
-import { Button, InputGrid } from "@kiesraad/ui";
+import { Button, InputGrid, Tooltip } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
-import { Tooltip } from "lib/ui/Tooltip/Tooltip";
 
 interface FormElements extends HTMLFormControlsCollection {
   pollCards: HTMLInputElement;
@@ -153,7 +152,7 @@ export function VotersAndVotesForm() {
         Volgende
       </Button>
       {warnings.map((warning) => (
-        <Tooltip key={warning.id} anchor={document.getElementById(warning.id)}>
+        <Tooltip key={warning.id} anchor={document.getElementById(warning.id)} closeOnOutsideClick>
           <p>
             Je probeert <strong>{warning.value}</strong> te plakken. Je kunt hier alleen cijfers
             invullen.

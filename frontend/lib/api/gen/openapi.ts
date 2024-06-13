@@ -23,7 +23,7 @@ export type POLLING_STATION_DATA_ENTRY_REQUEST_BODY = DataEntryRequest;
 export interface Candidate {
   country_code?: string;
   first_name: string;
-  gender?: any;
+  gender?: CandidateGender;
   initials: string;
   last_name: string;
   last_name_prefix?: string;
@@ -34,7 +34,7 @@ export interface Candidate {
 /**
  * Candidate gender
  */
-export interface CandidateGender {}
+export type CandidateGender = "Male" | "Female" | "X";
 
 /**
  * Request structure for data entry of polling station results
@@ -48,7 +48,7 @@ export interface DataEntryRequest {
  */
 export interface DataEntryResponse {
   message: string;
-  saved: any;
+  saved: boolean;
   validation_results: ValidationResults;
 }
 
@@ -61,13 +61,13 @@ export interface Election {
   id: number;
   name: string;
   nomination_date: string;
-  political_groups?: any;
+  political_groups?: PoliticalGroup[];
 }
 
 /**
  * Election category (limited for now)
  */
-export interface ElectionCategory {}
+export type ElectionCategory = "Municipal";
 
 /**
  * Election details response, including the election's candidate list (political groups)
@@ -82,7 +82,7 @@ export interface ElectionDetailsResponse {
 Does not include the candidate list (political groups) to keep the response size small.
  */
 export interface ElectionListResponse {
-  elections: any;
+  elections: Election[];
 }
 
 /**
@@ -96,7 +96,7 @@ export interface ErrorResponse {
  * Political group with its candidates
  */
 export interface PoliticalGroup {
-  candidates: any;
+  candidates: Candidate[];
   name: string;
   number: number;
 }
@@ -113,14 +113,14 @@ export interface PollingStationResults {
 
 export interface ValidationResult {
   code: ValidationResultCode;
-  fields: any;
+  fields: string[];
 }
 
-export interface ValidationResultCode {}
+export type ValidationResultCode = "OutOfRange" | "IncorrectTotal" | "AboveThreshold";
 
 export interface ValidationResults {
-  errors: any;
-  warnings: any;
+  errors: ValidationResult[];
+  warnings: ValidationResult[];
 }
 
 /**

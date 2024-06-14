@@ -1,3 +1,7 @@
+ul {
+  padding-left: 16px;
+}
+
 ul.link-list {
   padding: 0;
   margin: 0;

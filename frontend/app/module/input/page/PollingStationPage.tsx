@@ -11,6 +11,7 @@ import {
   WorkStationNumber,
 } from "@kiesraad/ui";
 import { VotersAndVotesForm } from "app/component/form/voters_and_votes/VotersAndVotesForm";
+import { CandidatesVotesForm } from "app/component/form/candidates_votes_form/CandidatesVotesForm.tsx";
 
 export function PollingStationPage() {
   const { id, section } = useParams();
@@ -68,7 +69,7 @@ export function PollingStationPage() {
           {targetForm === "recount" && <div>Placeholder Recount Page</div>}
           {targetForm === "numbers" && <VotersAndVotesForm />}
           {targetForm === "differences" && <div>Placeholder Differences Page</div>}
-          {targetForm.startsWith("list") && <div>Placeholder List page</div>}
+          {targetForm.startsWith("list") && <CandidatesVotesForm />}
           {targetForm === "save" && <div>Placeholder Check and Save Page</div>}
         </article>
       </main>

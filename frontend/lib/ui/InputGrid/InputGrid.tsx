@@ -127,15 +127,36 @@ InputGrid.Header = ({
 );
 
 InputGrid.Body = ({ children }: { children: React.ReactNode }) => <tbody>{children}</tbody>;
-InputGrid.Seperator = () => (
-  <tr>
-    <td className="sep" colSpan={3}></td>
-  </tr>
+
+InputGrid.Separator = () => (
+  // 2 trs are needed to make sure zebra styling is according to design
+  <>
+    <tr className="sep_row"></tr>
+    <tr className="sep_row">
+      <td className="sep" colSpan={3}></td>
+    </tr>
+  </>
 );
+
 InputGrid.Row = ({
   children,
   isTotal,
 }: {
   children: [React.ReactElement, React.ReactElement, React.ReactElement];
   isTotal?: boolean;
-}) => <tr className={isTotal ? "is-total" : undefined}>{children}</tr>;
+}) => <tr className={isTotal ? "is-total" : ""}>{children}</tr>;
+
+InputGrid.Total = ({
+  children,
+}: {
+  children: [React.ReactElement, React.ReactElement, React.ReactElement];
+}) => (
+  <>
+    <tr className="sep_total">
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr className="list_total is-total">{children}</tr>
+  </>
+);

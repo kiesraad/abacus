@@ -19,7 +19,7 @@ const component = (
         <td>Input field 1</td>
       </InputGrid.Row>
 
-      <InputGrid.Seperator />
+      <InputGrid.Separator />
 
       <InputGrid.Row>
         <td>B</td>

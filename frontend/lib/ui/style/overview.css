@@ -59,13 +59,17 @@ table.overview_table {
 }
 
 details {
-  margin: 2rem 0 2.5rem 0;
+  margin: 2rem 0 0.5rem 0;
 }
 
 details[open] {
   summary {
     display: none;
   }
+}
+
+summary::-webkit-details-marker {
+  display: none;
 }
 
 summary {

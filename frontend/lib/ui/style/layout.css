@@ -67,10 +67,11 @@
     }
     > article {
       flex: 1 1 auto;
-      padding: 2rem 5rem 0 5rem;
+      padding: 2rem 5rem 2rem 5rem;
       background-color: var(--bg-gray);
       &.grid {
         display: grid;
+        padding-bottom: 0;
       }
       > form.grid {
         display: grid;

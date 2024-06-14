@@ -6,6 +6,7 @@
 @font-face {
   font-family: "DMSans";
   src: url("/font/DM_Sans/DMSans-VariableFont_opsz,wght.ttf") format("TrueType");
+  font-weight: 1 1000;
 }
 
 @font-face {

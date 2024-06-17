@@ -12,7 +12,7 @@ export const DefaultTooltip: Story<Props> = ({ text }) => {
   return (
     <div>
       <input defaultValue="Hello" ref={ref} />
-      <Tooltip anchor={ref} closeOnOutsideClick={false}>
+      <Tooltip anchor={ref} closeOnClickOrKeyboardEvent={false}>
         <p>
           {text || (
             <>

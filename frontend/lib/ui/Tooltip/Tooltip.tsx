@@ -5,22 +5,22 @@ import cls from "./Tooltip.module.css";
 export interface TooltipProps {
   children: React.ReactNode;
   anchor: React.RefObject<HTMLElement> | HTMLElement | null;
-  closeOnOutsideClick?: boolean;
+  closeOnClickOrKeyboardEvent?: boolean;
   onClose?: () => void;
 }
 
 export function Tooltip({
   children,
   anchor,
-  closeOnOutsideClick,
+  closeOnClickOrKeyboardEvent,
   onClose,
 }: TooltipProps): React.ReactNode {
   const tooltipRoot = document.body;
   const [tooltipStyle, setTooltipStyle] = React.useState<React.CSSProperties | null>(null);
   const tooltipRef = React.useRef<HTMLDivElement>(null);
 
-  const handleClickOutside = React.useCallback(
-    (event: MouseEvent) => {
+  const handleMouseAndKeyboardEvent = React.useCallback(
+    (event: MouseEvent | KeyboardEvent) => {
       if (tooltipRef.current && !tooltipRef.current.contains(event.target as Node)) {
         if (onClose) onClose();
         setTooltipStyle(null);
@@ -30,13 +30,15 @@ export function Tooltip({
   );
 
   React.useEffect(() => {
-    if (closeOnOutsideClick) {
-      document.addEventListener("mousedown", handleClickOutside);
+    if (closeOnClickOrKeyboardEvent) {
+      document.addEventListener("mousedown", handleMouseAndKeyboardEvent);
+      document.addEventListener("keydown", handleMouseAndKeyboardEvent);
       return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
+        document.removeEventListener("mousedown", handleMouseAndKeyboardEvent);
+        document.removeEventListener("keydown", handleMouseAndKeyboardEvent);
       };
     }
-  }, [handleClickOutside, closeOnOutsideClick]);
+  }, [handleMouseAndKeyboardEvent, closeOnClickOrKeyboardEvent]);
 
   React.useEffect(() => {
     if (anchor) {

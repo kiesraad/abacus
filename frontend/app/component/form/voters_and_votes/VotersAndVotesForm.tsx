@@ -152,7 +152,7 @@ export function VotersAndVotesForm() {
         Volgende
       </Button>
       {warnings.map((warning) => (
-        <Tooltip key={warning.anchor.id} anchor={warning.anchor} closeOnOutsideClick>
+        <Tooltip key={warning.anchor.id} anchor={warning.anchor} closeOnClickOrKeyboardEvent>
           <p>
             Je probeert <strong>{warning.value}</strong> te plakken. Je kunt hier alleen cijfers
             invullen.

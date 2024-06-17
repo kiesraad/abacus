@@ -3,8 +3,7 @@
   margin: 0 -5rem 0 -5rem;
   padding: 1.5rem 5rem;
   background: var(--base-white);
-  display: grid;
-  grid-template-columns: auto 1fr;
+  flex: 1 1 auto;
   align-items: center;
   &.form {
     width: 100%;

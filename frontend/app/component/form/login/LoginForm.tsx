@@ -19,7 +19,7 @@ export function LoginForm() {
   }
 
   return (
-    <form className="grid" onSubmit={handleSubmit}>
+    <form className="no_footer" onSubmit={handleSubmit}>
       <InputField
         name="username"
         label="Gebruikersnaam"

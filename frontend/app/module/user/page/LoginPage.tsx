@@ -13,7 +13,7 @@ export function LoginPage() {
         </section>
       </header>
       <main>
-        <article className="grid">
+        <article className="no_footer">
           <LoginForm />
         </article>
       </main>

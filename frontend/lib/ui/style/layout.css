@@ -69,13 +69,13 @@
       flex: 1 1 auto;
       padding: 2rem 5rem 2rem 5rem;
       background-color: var(--bg-gray);
-      &.grid {
-        display: grid;
+      &.no_footer {
         padding-bottom: 0;
       }
-      > form.grid {
-        display: grid;
-        grid-template-rows: auto 1fr;
+      > form.no_footer {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
       }
     }
   }

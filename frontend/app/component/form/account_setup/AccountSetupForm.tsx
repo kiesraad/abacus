@@ -18,7 +18,7 @@ export function AccountSetupForm() {
   }
 
   return (
-    <form className="grid" onSubmit={handleSubmit}>
+    <form className="no_footer" onSubmit={handleSubmit}>
       <h2 className="form_title">Personaliseer je account</h2>
       <InputField
         name="username"

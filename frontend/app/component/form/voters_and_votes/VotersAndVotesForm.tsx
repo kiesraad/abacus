@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { usePollingStationDataEntry } from "@kiesraad/api";
-import { Button, InputGrid, Tooltip, Alert } from "@kiesraad/ui";
+import { Button, InputGrid, Tooltip, Feedback } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -56,15 +56,15 @@ export function VotersAndVotesForm() {
     <form onSubmit={handleSubmit} ref={formRef}>
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
       {error && (
-        <Alert type="error">
+        <Feedback type="error" title="Error">
           <div>
             <h2>Error</h2>
             {error.message}
           </div>
-        </Alert>
+        </Feedback>
       )}
       {data && hasValidationError ? (
-        <Alert type="error">
+        <Feedback type="error" title="Error">
           <div>
             <h2>Validatie fouten</h2>
             <ul>
@@ -73,13 +73,13 @@ export function VotersAndVotesForm() {
               ))}
             </ul>
           </div>
-        </Alert>
+        </Feedback>
       ) : (
-        <Alert type="success">
+        <Feedback type="success" title="Success">
           <div>
             <h2>Success</h2>
           </div>
-        </Alert>
+        </Feedback>
       )}
       <InputGrid>
         <InputGrid.Header>

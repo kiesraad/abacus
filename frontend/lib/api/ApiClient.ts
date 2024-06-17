@@ -1,3 +1,4 @@
+import { ErrorResponse } from "@kiesraad/api";
 export interface ApiResponse<DATA = object> {
   status: string;
   code: number;
@@ -21,18 +22,22 @@ export interface ApiResponseErrorData {
   message: string;
 }
 
-export type ApiServerResponse<DATA> =
+export type ApiServerResponse<SuccessResponse> =
   | (Omit<Response, "json"> & {
       status: 200;
-      json: () => DATA | PromiseLike<DATA>;
+      json: () => SuccessResponse | PromiseLike<SuccessResponse>;
     })
   | (Omit<Response, "json"> & {
       status: 422;
-      json: () => ApiResponseErrorData | PromiseLike<ApiResponseErrorData>;
+      json: () => ErrorResponse | PromiseLike<ErrorResponse>;
+    })
+  | (Omit<Response, "json"> & {
+      status: 404;
+      json: () => ErrorResponse | PromiseLike<ErrorResponse>;
     })
   | (Omit<Response, "json"> & {
       status: 500;
-      json: () => ApiResponseErrorData | PromiseLike<ApiResponseErrorData>;
+      json: () => ErrorResponse | PromiseLike<ErrorResponse>;
     })
   | (Omit<Response, "json"> & {
       status: number;
@@ -46,32 +51,37 @@ export class ApiClient {
     this.host = host;
   }
 
-  async responseHandler<DATA>(response: Response) {
-    const res = response as ApiServerResponse<DATA>;
+  async responseHandler<SuccessResponse>(response: Response) {
+    const res = response as ApiServerResponse<SuccessResponse>;
     if (res.status === 200) {
-      return { status: "success", code: 200, data: { ok: true } } as ApiResponseSuccess<DATA>;
-    } else if (res.status === 422) {
+      const data = await res.json();
+      return {
+        status: "success",
+        code: 200,
+        data,
+      } as ApiResponseSuccess<SuccessResponse>;
+    } else if (res.status >= 400 && res.status <= 499) {
       const data = await res.json();
       return {
         status: "client_error",
-        code: 422,
+        code: res.status,
         data,
-      } as ApiResponseClientError<ApiResponseErrorData>;
-    } else if (res.status === 500) {
+      } as ApiResponseClientError<ErrorResponse>;
+    } else if (res.status >= 500 && res.status <= 599) {
       const data = await res.json();
       return {
         status: "server_error",
-        code: 500,
+        code: res.status,
         data,
-      } as ApiResponseServerError<ApiResponseErrorData>;
+      } as ApiResponseServerError<ErrorResponse>;
     }
     throw new Error(`Unexpected response status: ${res.status}`);
   }
 
-  async postRequest<DATA>(
+  async postRequest<SuccessResponse>(
     path: string,
     requestBody: object,
-  ): Promise<ApiResponseSuccess<DATA> | ApiResponse<ApiResponseErrorData>> {
+  ): Promise<ApiResponseSuccess<SuccessResponse> | ApiResponse<ErrorResponse>> {
     const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
 
     const response = await fetch(host + "/v1" + path, {
@@ -82,6 +92,21 @@ export class ApiClient {
       },
     });
 
-    return this.responseHandler<DATA>(response);
+    return this.responseHandler<SuccessResponse>(response);
+  }
+
+  async getRequest<SuccessResponse>(
+    path: string,
+  ): Promise<ApiResponseSuccess<SuccessResponse> | ApiResponse<ErrorResponse>> {
+    const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
+
+    const response = await fetch(host + "/v1" + path, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    return this.responseHandler<SuccessResponse>(response);
   }
 }

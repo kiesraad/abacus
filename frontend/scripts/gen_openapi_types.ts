@@ -53,8 +53,8 @@ function addPath(path: string, v: PathsObject | undefined) {
   if (!v) return "";
   const result: string[] = [`// ${path}`];
   let requestPath = path;
-  if (v.post) {
-    const post = v.post as OperationObject;
+  if (v.post || v.get) {
+    const post = (v.post || v.get) as OperationObject;
 
     assert(typeof post.operationId === "string");
     let id: string = post.operationId;
@@ -107,15 +107,20 @@ function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
     result.push(` * ${v.description}`);
     result.push(" */");
   }
-  result.push(`export interface ${name} {`);
+
   if (v.type === "object") {
     if (v.properties) {
+      result.push(`export interface ${name} {`);
       Object.entries(v.properties).forEach(([k, v2]) => {
         result.push(`  ${k}${isRequired(k, v.required)}: ${tsType(v2)};`);
       });
+      result.push("}");
+    }
+  } else if (v.type === "string") {
+    if (v.enum) {
+      result.push(`export type ${name} = ${v.enum.map((e) => `"${e}"`).join(" | ")};`);
     }
   }
-  result.push("}");
 
   return result.join("\n");
 }
@@ -127,6 +132,12 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
     return s.$ref.substring(s.$ref.lastIndexOf("/") + 1);
   }
 
+  if ("allOf" in s) {
+    if (s.allOf) {
+      return s.allOf.map((s2) => tsType(s2)).join(" & ");
+    }
+  }
+
   switch (s.type) {
     case "string":
       return "string";
@@ -134,6 +145,10 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
       return "number";
     case "number":
       return "number";
+    case "boolean":
+      return "boolean";
+    case "array":
+      return `${tsType(s.items)}[]`;
     default:
       //TODO: catch all types, any is not allowed
       return "any";

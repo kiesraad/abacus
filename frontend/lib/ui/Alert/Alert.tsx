@@ -3,7 +3,7 @@ import { AlertType } from "../ui.types";
 import cls from "./Alert.module.css";
 import { cn } from "@kiesraad/util";
 import { IconButton } from "@kiesraad/ui";
-import { IconCross, IconError, IconThumbsup, IconWarning, IconInfo } from "@kiesraad/icon";
+import { IconCross, IconError, IconThumbsUp, IconWarning, IconInfo } from "@kiesraad/icon";
 
 export interface AlertProps {
   type: AlertType;
@@ -38,6 +38,6 @@ function renderIconForType(type: AlertType) {
     case "notify":
       return <IconInfo />;
     case "success":
-      return <IconThumbsup />;
+      return <IconThumbsUp />;
   }
 }

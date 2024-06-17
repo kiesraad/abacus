@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { WorkStationNumber } from "@kiesraad/ui";
 import {
-  IconCheckheart,
-  IconCheckverified,
-  IconChevronright,
+  IconCheckHeart,
+  IconCheckVerified,
+  IconChevronRight,
   IconClock,
   IconHourglass,
 } from "@kiesraad/icon";
@@ -47,7 +47,7 @@ export function OverviewPage() {
                 </td>
                 <td className="align-center narrow">
                   <div className="link">
-                    <IconChevronright />
+                    <IconChevronRight />
                   </div>
                 </td>
               </tr>
@@ -62,7 +62,7 @@ export function OverviewPage() {
                 </td>
                 <td className="align-center narrow">
                   <div className="link">
-                    <IconChevronright />
+                    <IconChevronRight />
                   </div>
                 </td>
               </tr>
@@ -71,13 +71,13 @@ export function OverviewPage() {
                 <td></td>
                 <td>
                   <div className="flex_overview">
-                    <IconCheckheart />
+                    <IconCheckHeart />
                     <span>Invoerders bezig</span>
                   </div>
                 </td>
                 <td className="align-center narrow">
                   <div className="link">
-                    <IconChevronright />
+                    <IconChevronRight />
                   </div>
                 </td>
               </tr>
@@ -86,13 +86,13 @@ export function OverviewPage() {
                 <td></td>
                 <td>
                   <div className="flex_overview">
-                    <IconCheckverified />
+                    <IconCheckVerified />
                     <span>Steminvoer voltooid</span>
                   </div>
                 </td>
                 <td className="align-center narrow">
                   <div className="link">
-                    <IconChevronright />
+                    <IconChevronRight />
                   </div>
                 </td>
               </tr>

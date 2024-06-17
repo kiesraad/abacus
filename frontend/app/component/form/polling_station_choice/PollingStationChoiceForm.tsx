@@ -1,6 +1,6 @@
 import { Badge, Button, InputField } from "@kiesraad/ui";
 import { useNavigate } from "react-router-dom";
-import { IconChevronright } from "@kiesraad/icon";
+import { IconChevronRight } from "@kiesraad/icon";
 
 interface FormElements extends HTMLFormControlsCollection {
   number: HTMLInputElement;
@@ -70,7 +70,7 @@ export function PollingStationChoiceForm() {
               </td>
               <td width="5rem" className="align-center">
                 <div className="link">
-                  <IconChevronright />
+                  <IconChevronRight />
                 </div>
               </td>
             </tr>
@@ -84,7 +84,7 @@ export function PollingStationChoiceForm() {
               </td>
               <td width="5rem" className="align-center">
                 <div className="link">
-                  <IconChevronright />
+                  <IconChevronRight />
                 </div>
               </td>
             </tr>
@@ -98,7 +98,7 @@ export function PollingStationChoiceForm() {
               </td>
               <td width="5rem" className="align-center">
                 <div className="link">
-                  <IconChevronright />
+                  <IconChevronRight />
                 </div>
               </td>
             </tr>
@@ -112,7 +112,7 @@ export function PollingStationChoiceForm() {
               </td>
               <td width="5rem" className="align-center">
                 <div className="link">
-                  <IconChevronright />
+                  <IconChevronRight />
                 </div>
               </td>
             </tr>
@@ -126,7 +126,7 @@ export function PollingStationChoiceForm() {
               </td>
               <td width="5rem" className="align-center">
                 <div className="link">
-                  <IconChevronright />
+                  <IconChevronRight />
                 </div>
               </td>
             </tr>
@@ -140,7 +140,7 @@ export function PollingStationChoiceForm() {
               </td>
               <td width="5rem" className="align-center">
                 <div className="link">
-                  <IconChevronright />
+                  <IconChevronRight />
                 </div>
               </td>
             </tr>
@@ -154,7 +154,7 @@ export function PollingStationChoiceForm() {
               </td>
               <td width="5rem" className="align-center">
                 <div className="link">
-                  <IconChevronright />
+                  <IconChevronRight />
                 </div>
               </td>
             </tr>

@@ -38,8 +38,8 @@ describe("Apiclient", () => {
     expect(parsedResponse).toStrictEqual({ status: "server_error", code: 500, data: responseBody });
   });
 
-  test("418 response throws an error", async () => {
-    const responseStatus = 318; // 418: I'm a teapot
+  test("318 response throws an error", async () => {
+    const responseStatus = 318;
     overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", responseStatus, "");
 
     const client = new ApiClient("testhost");

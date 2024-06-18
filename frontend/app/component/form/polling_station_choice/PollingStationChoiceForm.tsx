@@ -61,98 +61,98 @@ export function PollingStationChoiceForm() {
           </thead>
           <tbody>
             <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="align-right bold">
+              <td width="6.5rem" className="number">
                 1
               </td>
               <td>
                 <span>Nachthemelstraat 21</span>
                 <Badge type="first_entry" />
               </td>
-              <td width="5rem" className="align-center">
+              <td width="5rem">
                 <div className="link">
                   <IconChevronRight />
                 </div>
               </td>
             </tr>
             <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="align-right bold">
+              <td width="6.5rem" className="number">
                 2
               </td>
               <td>
                 <span>Schoolstraat 78</span>
                 <Badge type="second_entry" />
               </td>
-              <td width="5rem" className="align-center">
+              <td width="5rem">
                 <div className="link">
                   <IconChevronRight />
                 </div>
               </td>
             </tr>
             <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="align-right bold">
+              <td width="6.5rem" className="number">
                 3
               </td>
               <td>
                 <span>Fluisterbosdreef 8</span>
                 <Badge type="extra_entry" />
               </td>
-              <td width="5rem" className="align-center">
+              <td width="5rem">
                 <div className="link">
                   <IconChevronRight />
                 </div>
               </td>
             </tr>
             <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="align-right bold">
+              <td width="6.5rem" className="number">
                 4
               </td>
               <td>
                 <span>Wilhelminastraat 21</span>
                 <Badge type="objections" />
               </td>
-              <td width="5rem" className="align-center">
+              <td width="5rem">
                 <div className="link">
                   <IconChevronRight />
                 </div>
               </td>
             </tr>
             <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="align-right bold">
+              <td width="6.5rem" className="number">
                 5
               </td>
               <td>
                 <span>Tuinstraat 2</span>
                 <Badge type="difference" />
               </td>
-              <td width="5rem" className="align-center">
+              <td width="5rem">
                 <div className="link">
                   <IconChevronRight />
                 </div>
               </td>
             </tr>
             <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="align-right bold">
+              <td width="6.5rem" className="number">
                 6
               </td>
               <td>
                 <span>Rietland 31</span>
                 <Badge type="correction" />
               </td>
-              <td width="5rem" className="align-center">
+              <td width="5rem">
                 <div className="link">
                   <IconChevronRight />
                 </div>
               </td>
             </tr>
             <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="align-right bold">
+              <td width="6.5rem" className="number">
                 7
               </td>
               <td>
                 <span>Grote Markt 1</span>
                 <Badge type="definitive" />
               </td>
-              <td width="5rem" className="align-center">
+              <td width="5rem">
                 <div className="link">
                   <IconChevronRight />
                 </div>

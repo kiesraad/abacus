@@ -24,6 +24,9 @@ table.overview_table {
       margin-right: 0.5rem;
     }
   }
+  td:last-of-type {
+    text-align: center;
+  }
   div.flex_overview {
     display: flex;
     align-items: center;
@@ -32,9 +35,6 @@ table.overview_table {
       min-width: 1.5rem;
       height: 1.5rem;
     }
-  }
-  .align-right {
-    text-align: right;
   }
   .align-center {
     text-align: center;
@@ -48,7 +48,11 @@ table.overview_table {
       height: 1.25rem;
     }
   }
-  .narrow {
+  td.number {
+    text-align: right;
+    font-weight: bold;
+  }
+  td.link {
     width: 3.75rem;
     padding: 1rem 0.75rem;
   }

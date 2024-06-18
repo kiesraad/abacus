@@ -45,7 +45,7 @@ export function OverviewPage() {
                     <span>Invoer opgeschort</span>
                   </div>
                 </td>
-                <td className="align-center narrow">
+                <td className="link">
                   <div className="link">
                     <IconChevronRight />
                   </div>
@@ -60,7 +60,7 @@ export function OverviewPage() {
                     <span>Wachten op coördinator</span>
                   </div>
                 </td>
-                <td className="align-center narrow">
+                <td className="link">
                   <div className="link">
                     <IconChevronRight />
                   </div>
@@ -75,7 +75,7 @@ export function OverviewPage() {
                     <span>Invoerders bezig</span>
                   </div>
                 </td>
-                <td className="align-center narrow">
+                <td className="link">
                   <div className="link">
                     <IconChevronRight />
                   </div>
@@ -90,7 +90,7 @@ export function OverviewPage() {
                     <span>Steminvoer voltooid</span>
                   </div>
                 </td>
-                <td className="align-center narrow">
+                <td className="link">
                   <div className="link">
                     <IconChevronRight />
                   </div>

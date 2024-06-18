@@ -24,10 +24,11 @@ export function PollingStationChoiceForm() {
       <InputField
         name="number"
         label="Voer het nummer in:"
-        width="narrow"
+        fieldWidth="narrow"
         margin={false}
         pattern="\d+"
         title="Alleen positieve nummers toegestaan"
+        maxLength={6}
       />
       <p>
         Klopt de naam van het stembureau met de naam op je papieren proces verbaal?

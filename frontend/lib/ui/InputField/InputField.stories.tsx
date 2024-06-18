@@ -8,8 +8,8 @@ type Props = {
   hint: string;
   value: string;
   type: string;
-  size: "small" | "medium" | "large" | "text-area";
-  width: "narrow" | "wide";
+  fieldSize: "small" | "medium" | "large" | "text-area";
+  fieldWidth: "narrow" | "wide";
   error: string;
   disabled: boolean;
 };
@@ -22,13 +22,13 @@ export const WideInputField: Story = () => {
         label="Default Small Wide"
         subtext="with subtext"
         hint="Default Small Wide hint"
-        size="small"
+        fieldSize="small"
       />
       <InputField
         name="default-medium-wide"
         label="Default Medium Wide"
         hint="Default Medium Wide hint"
-        size="medium"
+        fieldSize="medium"
       />
       <InputField
         name="default-large-wide"
@@ -59,36 +59,36 @@ export const NarrowInputField: Story = () => {
         name="default-small-narrow"
         label="Default Small Narrow"
         hint="Default Small Narrow hint"
-        size="small"
-        width="narrow"
+        fieldSize="small"
+        fieldWidth="narrow"
       />
       <InputField
         name="default-medium-narrow"
         label="Default Medium Narrow"
         subtext="with subtext"
         hint="Default Medium Narrow hint"
-        size="medium"
-        width="narrow"
+        fieldSize="medium"
+        fieldWidth="narrow"
       />
       <InputField
         name="default-large-narrow"
         label="Default Large Narrow"
         hint="Default Large Narrow hint"
-        width="narrow"
+        fieldWidth="narrow"
       />
       <InputField
         name="disabled-large-narrow"
         label="Disabled Large Narrow"
         hint="Disabled Large Narrow hint"
         value="Input Field value"
-        width="narrow"
+        fieldWidth="narrow"
         disabled
       />
       <InputField
         name="error-large-narrow"
         label="Error Large Narrow"
         hint="Error Large Narrow hint"
-        width="narrow"
+        fieldWidth="narrow"
         error="There is an error"
       />
     </>
@@ -103,21 +103,21 @@ export const TextAreaInputField: Story = () => {
         label="Default Text Area"
         subtext="with subtext"
         hint="Default Text Area hint"
-        size="text-area"
+        fieldSize="text-area"
       />
       <InputField
         name="disabled-text-area"
         label="Disabled Text Area"
         hint="Disabled Text Area hint"
         value="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. In nibh mauris cursus mattis molestie. Sollicitudin ac orci phasellus egestas tellus rutrum tellus. Aenean vel elit scelerisque mauris pellentesque pulvinar. Amet nisl purus in mollis nunc. Molestie ac feugiat sed lectus. Viverra orci sagittis eu volutpat odio facilisis. Elementum facilisis leo vel fringilla est ullamcorper. Faucibus scelerisque eleifend donec pretium vulputate sapien nec sagittis. Quisque egestas diam in arcu cursus euismod."
-        size="text-area"
+        fieldSize="text-area"
         disabled
       />
       <InputField
         name="error-text-area"
         label="Error Text Area"
         hint="Error Text Area hint"
-        size="text-area"
+        fieldSize="text-area"
         error="There is an error"
       />
     </>
@@ -130,8 +130,8 @@ export const CustomizableInputField: Story<Props> = ({
   hint,
   value,
   type,
-  size,
-  width,
+  fieldSize,
+  fieldWidth,
   error,
   disabled,
 }) => {
@@ -143,8 +143,8 @@ export const CustomizableInputField: Story<Props> = ({
       hint={hint}
       value={value}
       type={type}
-      size={size}
-      width={width}
+      fieldSize={fieldSize}
+      fieldWidth={fieldWidth}
       error={error}
       disabled={disabled}
     />
@@ -164,12 +164,12 @@ CustomizableInputField.argTypes = {
     control: { type: "radio" },
     defaultValue: "text",
   },
-  size: {
+  fieldSize: {
     options: ["small", "medium", "large", "text-area"],
     control: { type: "radio" },
     defaultValue: "large",
   },
-  width: {
+  fieldWidth: {
     options: ["narrow", "wide"],
     control: { type: "radio" },
     defaultValue: "wide",

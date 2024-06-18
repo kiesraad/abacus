@@ -1,3 +1,4 @@
+import * as React from "react";
 import cls from "./InputField.module.css";
 
 export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {

@@ -26,7 +26,11 @@ describe("VotersAndVotesForm Form", () => {
   });
 
   test("Form field entry and keybindings", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, "");
+    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, {
+      message: "Data saved",
+      saved: true,
+      validation_results: { errors: [], warnings: [] },
+    });
 
     const user = userEvent.setup();
 
@@ -96,7 +100,9 @@ describe("VotersAndVotesForm Form", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
-    expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
+    const result = await screen.findByTestId("result");
+
+    expect(result).toHaveTextContent(/^Success$/);
   });
 
   describe("VotersAndVotesForm Api call", () => {
@@ -177,7 +183,8 @@ describe("VotersAndVotesForm Form", () => {
         },
       });
 
-      expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
+      const result = await screen.findByTestId("result");
+      expect(result).toHaveTextContent(/^Success$/);
     });
   });
 
@@ -193,8 +200,8 @@ describe("VotersAndVotesForm Form", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-
-    expect(screen.getByTestId("result")).toHaveTextContent(/^Error 422_ERROR 422 error from mock$/);
+    const result = await screen.findByTestId("result");
+    expect(result).toHaveTextContent(/^Error 422_ERROR 422 error from mock$/);
   });
 
   test("500 response results in display of error message", async () => {
@@ -209,7 +216,7 @@ describe("VotersAndVotesForm Form", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-
-    expect(screen.getByTestId("result")).toHaveTextContent(/^Error 500_ERROR 500 error from mock$/);
+    const result = await screen.findByTestId("result");
+    expect(result).toHaveTextContent(/^Error 500_ERROR 500 error from mock$/);
   });
 });

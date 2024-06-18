@@ -57,4 +57,12 @@ describe("Apiclient", () => {
 
     expect(parsedResponse).toStrictEqual({ status: "success", code: 200, data: { fizz: "buzz" } });
   });
+
+  test("Invalid json returns a proper error", async () => {
+    overrideOnce("get", "/v1/api/test/1", 200, "invalid json");
+
+    const client = new ApiClient("testhost");
+    const parsedResponse = await client.getRequest("/api/test/1");
+    expect(parsedResponse.code).toEqual(400);
+  });
 });

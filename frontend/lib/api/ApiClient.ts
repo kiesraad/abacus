@@ -53,27 +53,45 @@ export class ApiClient {
 
   async responseHandler<SuccessResponse>(response: Response) {
     const res = response as ApiServerResponse<SuccessResponse>;
-    if (res.status === 200) {
-      const data = await res.json();
-      return {
-        status: "success",
-        code: 200,
-        data,
-      } as ApiResponseSuccess<SuccessResponse>;
-    } else if (res.status >= 400 && res.status <= 499) {
-      const data = await res.json();
+    try {
+      if (res.status === 200) {
+        const data = await res.json();
+        return {
+          status: "success",
+          code: 200,
+          data,
+        } as ApiResponseSuccess<SuccessResponse>;
+      } else if (res.status >= 400 && res.status <= 499) {
+        const data = await res.json();
+        return {
+          status: "client_error",
+          code: res.status,
+          data,
+        } as ApiResponseClientError<ErrorResponse>;
+      } else if (res.status >= 500 && res.status <= 599) {
+        const data = await res.json();
+        return {
+          status: "server_error",
+          code: res.status,
+          data,
+        } as ApiResponseServerError<ErrorResponse>;
+      }
+    } catch (err: unknown) {
+      let errorMessage: string;
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === "string") {
+        errorMessage = err;
+      } else {
+        errorMessage = "An unknown error occurred";
+      }
       return {
         status: "client_error",
-        code: res.status,
-        data,
-      } as ApiResponseClientError<ErrorResponse>;
-    } else if (res.status >= 500 && res.status <= 599) {
-      const data = await res.json();
-      return {
-        status: "server_error",
-        code: res.status,
-        data,
-      } as ApiResponseServerError<ErrorResponse>;
+        code: 400,
+        data: {
+          error: errorMessage,
+        },
+      };
     }
     throw new Error(`Unexpected response status: ${res.status}`);
   }

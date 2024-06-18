@@ -26,11 +26,16 @@ describe("VotersAndVotesForm Form", () => {
   });
 
   test("Form field entry and keybindings", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, {
-      message: "Data saved",
-      saved: true,
-      validation_results: { errors: [], warnings: [] },
-    });
+    overrideOnce(
+      "post",
+      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
+      200,
+      {
+        message: "Data saved",
+        saved: true,
+        validation_results: { errors: [], warnings: [] },
+      },
+    );
 
     const user = userEvent.setup();
 
@@ -189,10 +194,15 @@ describe("VotersAndVotesForm Form", () => {
   });
 
   test("422 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 422, {
-      message: "422 error from mock",
-      errorCode: "422_ERROR",
-    });
+    overrideOnce(
+      "post",
+      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
+      422,
+      {
+        message: "422 error from mock",
+        errorCode: "422_ERROR",
+      },
+    );
 
     const user = userEvent.setup();
 
@@ -205,10 +215,15 @@ describe("VotersAndVotesForm Form", () => {
   });
 
   test("500 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 500, {
-      message: "500 error from mock",
-      errorCode: "500_ERROR",
-    });
+    overrideOnce(
+      "post",
+      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
+      500,
+      {
+        message: "500 error from mock",
+        errorCode: "500_ERROR",
+      },
+    );
 
     const user = userEvent.setup();
 

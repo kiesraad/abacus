@@ -151,14 +151,18 @@ export function VotersAndVotesForm() {
       <Button type="submit" size="lg" disabled={loading}>
         Volgende
       </Button>
-      {warnings.map((warning) => (
-        <Tooltip key={warning.anchor.id} anchor={warning.anchor} closeOnClickOrKeyboardEvent>
-          <p>
-            Je probeert <strong>{warning.value}</strong> te plakken. Je kunt hier alleen cijfers
-            invullen.
-          </p>
-        </Tooltip>
-      ))}
+      {warnings.map((warning) => {
+        const trimmedString =
+          warning.value.length > 20 ? warning.value.substring(0, 20) + "..." : warning.value;
+        return (
+          <Tooltip key={warning.anchor.id} anchor={warning.anchor} closeOnClickOrKeyboardEvent>
+            <p>
+              Je probeert <strong>{trimmedString}</strong> te plakken. Je kunt hier alleen cijfers
+              invullen.
+            </p>
+          </Tooltip>
+        );
+      })}
     </form>
   );
 }

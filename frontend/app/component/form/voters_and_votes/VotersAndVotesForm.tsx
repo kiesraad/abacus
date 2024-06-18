@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { usePollingStationDataEntry } from "@kiesraad/api";
-import { Button, InputGrid, Alert } from "@kiesraad/ui";
+import { Button, InputGrid, Tooltip, Alert } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -20,7 +20,7 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const { register, format, deformat } = usePositiveNumberInputMask();
+  const { register, format, deformat, warnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
   const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
@@ -125,7 +125,7 @@ export function VotersAndVotesForm() {
             <td>Totaal toegelaten kiezers</td>
           </InputGrid.Row>
 
-          <InputGrid.Seperator />
+          <InputGrid.Separator />
 
           <InputGrid.Row>
             <td>E</td>
@@ -173,6 +173,18 @@ export function VotersAndVotesForm() {
       <Button type="submit" size="lg" disabled={loading}>
         Volgende
       </Button>
+      {warnings.map((warning) => {
+        const trimmedString =
+          warning.value.length > 20 ? warning.value.substring(0, 20) + "..." : warning.value;
+        return (
+          <Tooltip key={warning.anchor.id} anchor={warning.anchor} closeOnClickOrKeyboardEvent>
+            <p>
+              Je probeert <strong>{trimmedString}</strong> te plakken. Je kunt hier alleen cijfers
+              invullen.
+            </p>
+          </Tooltip>
+        );
+      })}
     </form>
   );
 }

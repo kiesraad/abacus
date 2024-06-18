@@ -42,10 +42,13 @@
 
   --button-color-primary: #113051;
 
+  --border-color-default: #d0d5dd;
+
   --color-alert: #d92d20;
   --color-alert-bg: #fee4e2;
 
   --color-warning: #f79009;
+  --color-warning-darker: #dc6803;
   --color-warning-bg: #fef0c7;
   --color-warning-text: #93370d;
 

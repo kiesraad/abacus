@@ -1,5 +1,5 @@
 export class DomToren {
-  _el: Element;
+  _el: HTMLElement;
 
   constructor(el: HTMLElement) {
     this._el = el;
@@ -8,7 +8,7 @@ export class DomToren {
   public closest(selector: string) {
     const nextEl = this._el.closest(selector);
     if (nextEl) {
-      this._el = nextEl;
+      this._el = nextEl as HTMLElement;
     }
     return this;
   }

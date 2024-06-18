@@ -13,9 +13,11 @@ beforeAll(() => {
     onUnhandledRequest: "error",
   });
 });
+
 afterEach(() => {
   cleanup();
 });
+
 afterAll(() => {
   server.restoreHandlers();
 });

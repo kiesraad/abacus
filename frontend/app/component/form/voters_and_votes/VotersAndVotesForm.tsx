@@ -98,11 +98,13 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>B</td>
             <td>
-              <input
-                id="proxyCertificates"
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <FormField tooltip="Test">
+                <input
+                  id="proxyCertificates"
+                  {...register()}
+                  defaultValue={format(pickGoodTestNumber())}
+                />
+              </FormField>
             </td>
             <td>Volmachtbewijzen</td>
           </InputGrid.Row>

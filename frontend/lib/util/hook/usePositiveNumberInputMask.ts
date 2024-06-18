@@ -1,16 +1,26 @@
 import * as React from "react";
 
 export type FormatFunc = (s: string | number | null | undefined) => string;
-export type DefomatFunc = (s: string) => number;
+export type DeformatFunc = (s: string) => number;
+export type ValidateFunc = (s: string | number | null | undefined) => boolean;
+
+export type PositiveInputMaskWarning = {
+  anchor: HTMLInputElement;
+  value: string;
+  warning: "REFORMAT_WARNING";
+};
 
 export interface UsePositiveNumberInputMaskReturn {
   format: FormatFunc;
-  deformat: DefomatFunc;
+  deformat: DeformatFunc;
+  validate: ValidateFunc;
   register: () => {
     onChange: React.ChangeEventHandler<HTMLInputElement>;
     onLoad: React.ChangeEventHandler<HTMLInputElement>;
     onPaste: React.ClipboardEventHandler<HTMLInputElement>;
   };
+  warnings: PositiveInputMaskWarning[];
+  resetWarnings: () => void;
 }
 
 const numberFormatter = new Intl.NumberFormat("nl-NL", {
@@ -18,27 +28,32 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
 });
 
 export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
+  const [warnings, setWarnings] = React.useState<PositiveInputMaskWarning[]>([]);
   const format: FormatFunc = React.useCallback((s) => {
     if (s === null || s === undefined) return "";
-    if (s === "") {
-      return "";
-    }
     let result = `${s}`.replace(/\D/g, "");
+    if (result === "") return "";
     result = numberFormatter.format(Number(result));
     return result;
   }, []);
 
-  const deformat: DefomatFunc = React.useCallback((s: string) => {
-    const seperator = numberFormatter.format(11111).replace(/\p{Number}/gu, "");
-    const escapedSeparator = seperator.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+  const deformat: DeformatFunc = React.useCallback((s: string) => {
+    const separator = numberFormatter.format(11111).replace(/\p{Number}/gu, "");
+    const escapedSeparator = separator.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
 
     const cleaned = s.replace(new RegExp(escapedSeparator, "g"), "");
     return parseInt(cleaned, 10);
   }, []);
 
+  const validate: ValidateFunc = React.useCallback((s) => {
+    if (s === null || s === undefined || s === "") return false;
+    const result = `${s}`.trim();
+    return !!result.match(/^(\d*\.?)$|^(\d{1,3}(\.\d{3})+\.?)$/g);
+  }, []);
+
   const onChange: React.ChangeEventHandler<HTMLInputElement> = React.useCallback(
     (event) => {
-      //remove all non numbers
+      // remove all non digits
       event.target.value = format(event.target.value);
     },
     [format],
@@ -51,9 +66,25 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
     [format],
   );
 
-  const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback((event) => {
-    console.log("Paste", event.clipboardData.getData("text/plain"));
-  }, []);
+  const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback(
+    (event) => {
+      const pastedInput = event.clipboardData.getData("text/plain");
+      if (!validate(pastedInput)) {
+        event.preventDefault();
+        setWarnings((old) => {
+          return [
+            ...old,
+            {
+              anchor: event.currentTarget,
+              value: pastedInput,
+              warning: "REFORMAT_WARNING",
+            },
+          ];
+        });
+      }
+    },
+    [validate],
+  );
 
   const register = () => {
     return {
@@ -63,9 +94,16 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
     };
   };
 
+  const resetWarnings = () => {
+    setWarnings([]);
+  };
+
   return {
     format,
     deformat,
+    validate,
     register,
+    warnings,
+    resetWarnings,
   };
 }

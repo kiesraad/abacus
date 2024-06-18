@@ -43,11 +43,14 @@
 
   --button-color-primary: #113051;
 
+  --border-color-default: #d0d5dd;
+
   --color-error: #d92d20;
   --color-error-bg: #fee4e2;
   --color-error-hover: #fecdca;
 
   --color-warning: #f79009;
+  --color-warning-darker: #dc6803;
   --color-warning-bg: #fef0c7;
   --color-warning-hover: #fedf89;
   --color-warning-text: #93370d;

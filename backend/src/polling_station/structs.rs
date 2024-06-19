@@ -22,6 +22,16 @@ impl Validate for PollingStationResults {
             .validate(validation_results, format!("{field_name}.voters_counts"));
         self.votes_counts
             .validate(validation_results, format!("{field_name}.votes_counts"));
+
+        if identical_counts(&self.voters_counts, &self.votes_counts) {
+            validation_results.warnings.push(ValidationResult {
+                fields: vec![
+                    format!("{field_name}.voters_counts"),
+                    format!("{field_name}.votes_counts"),
+                ],
+                code: ValidationResultCode::EqualInput,
+            });
+        }
     }
 }
 
@@ -53,6 +63,18 @@ pub struct VotersCounts {
     /// Total number of admitted voters ("Totaal aantal toegelaten kiezers")
     #[schema(value_type = u32)]
     pub total_admitted_voters_count: Count,
+}
+
+/// Check if the voters counts and votes counts are identical, which should
+/// result in a warning.
+///
+/// This is not implemented as Eq because there is no true equality relation
+/// between these two sets of numbers.
+fn identical_counts(voters: &VotersCounts, votes: &VotesCounts) -> bool {
+    voters.poll_card_count == votes.votes_candidates_counts
+        && voters.proxy_certificate_count == votes.blank_votes_count
+        && voters.voter_card_count == votes.invalid_votes_count
+        && voters.total_admitted_voters_count == votes.total_votes_cast_count
 }
 
 impl Validate for VotersCounts {
@@ -193,6 +215,36 @@ mod tests {
         );
         assert_eq!(validation_results.errors.len(), 2);
         assert_eq!(validation_results.warnings.len(), 0);
+    }
+
+    #[test]
+    fn test_polling_station_identical_counts_validation() {
+        let mut validation_results = ValidationResults::default();
+        let polling_station_results = PollingStationResults {
+            voters_counts: VotersCounts {
+                poll_card_count: 1000,
+                proxy_certificate_count: 1,
+                voter_card_count: 1,
+                total_admitted_voters_count: 1002,
+            },
+            // same as above
+            votes_counts: VotesCounts {
+                votes_candidates_counts: 1000,
+                blank_votes_count: 1,
+                invalid_votes_count: 1,
+                total_votes_cast_count: 1002,
+            },
+        };
+        polling_station_results.validate(
+            &mut validation_results,
+            "polling_station_results".to_string(),
+        );
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::EqualInput
+        );
     }
 
     #[test]

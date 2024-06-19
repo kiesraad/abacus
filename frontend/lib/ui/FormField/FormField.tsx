@@ -1,5 +1,6 @@
 import { ValidationResultCode } from "@kiesraad/api";
 import * as React from "react";
+import cls from "./FormField.module.css";
 
 export interface FormFieldProps {
   children: React.ReactNode;
@@ -9,7 +10,7 @@ export interface FormFieldProps {
 
 export function FormField({ children, error, tooltip }: FormFieldProps) {
   return (
-    <div>
+    <div className={cls.formField}>
       {tooltip ? (
         <div className="tooltip">
           {children}

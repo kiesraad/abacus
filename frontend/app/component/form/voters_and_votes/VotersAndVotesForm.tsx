@@ -1,26 +1,33 @@
 import * as React from "react";
 
-import { usePollingStationDataEntry } from "@kiesraad/api";
-import { Button, InputGrid, Tooltip, Feedback } from "@kiesraad/ui";
+import { type ResultCode, usePollingStationDataEntry } from "@kiesraad/api";
+import { Button, InputGrid, Feedback, FormField } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
+//TODO: force from openapi types
 interface FormElements extends HTMLFormControlsCollection {
-  pollCards: HTMLInputElement;
-  proxyCertificates: HTMLInputElement;
-  voterCards: HTMLInputElement;
-  totalAdmittedVoters: HTMLInputElement;
-  votesOnCandidates: HTMLInputElement;
-  blankVotes: HTMLInputElement;
-  invalidVotes: HTMLInputElement;
-  totalVotesCast: HTMLInputElement;
+  poll_card_count: HTMLInputElement;
+  proxy_certificate_count: HTMLInputElement;
+  voter_card_count: HTMLInputElement;
+  total_admitted_voters_count: HTMLInputElement;
+  votes_candidates_counts: HTMLInputElement;
+  blank_votes_count: HTMLInputElement;
+  invalid_votes_count: HTMLInputElement;
+  total_votes_cast_count: HTMLInputElement;
 }
+
+//Future: move to generic place, same as ValidationResult but with client side errors
+type ErrorsAndWarnings = {
+  errors: ResultCode[];
+  warnings: ResultCode[];
+};
 
 interface VotersAndVotesFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
 export function VotersAndVotesForm() {
-  const { register, format, deformat, warnings } = usePositiveNumberInputMask();
+  const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
   const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
@@ -35,20 +42,50 @@ export function VotersAndVotesForm() {
     doSubmit({
       data: {
         voters_counts: {
-          poll_card_count: deformat(elements.pollCards.value),
-          proxy_certificate_count: deformat(elements.proxyCertificates.value),
-          voter_card_count: deformat(elements.voterCards.value),
-          total_admitted_voters_count: deformat(elements.totalAdmittedVoters.value),
+          poll_card_count: deformat(elements.poll_card_count.value),
+          proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
+          voter_card_count: deformat(elements.voter_card_count.value),
+          total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
         },
         votes_counts: {
-          votes_candidates_counts: deformat(elements.votesOnCandidates.value),
-          blank_votes_count: deformat(elements.blankVotes.value),
-          invalid_votes_count: deformat(elements.invalidVotes.value),
-          total_votes_cast_count: deformat(elements.totalVotesCast.value),
+          votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
+          blank_votes_count: deformat(elements.blank_votes_count.value),
+          invalid_votes_count: deformat(elements.invalid_votes_count.value),
+          total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
         },
       },
     });
   }
+
+  const errorsAndWarnings: Map<string, ErrorsAndWarnings> = React.useMemo(() => {
+    const result = new Map<string, ErrorsAndWarnings>();
+    if (data && data.validation_results.errors.length > 0) {
+      data.validation_results.errors.forEach((error) => {
+        error.fields.forEach((f) => {
+          if (!result.has(f)) {
+            result.set(f, { errors: [], warnings: [] });
+          }
+          const field = result.get(f);
+          if (field) {
+            field.errors.push(error.code);
+          }
+        });
+      });
+    }
+
+    inputMaskWarnings.forEach((warning) => {
+      if (!result.has(warning.anchor.id)) {
+        result.set(warning.anchor.id, { errors: [], warnings: [] });
+      }
+      const field = result.get(warning.anchor.id);
+      if (field) {
+        //TODO: rename to code;
+        field.warnings.push(warning.warning as ResultCode);
+      }
+    });
+
+    return result;
+  }, [data, inputMaskWarnings]);
 
   const hasValidationError = data && data.validation_results.errors.length > 0;
 
@@ -63,7 +100,7 @@ export function VotersAndVotesForm() {
           </div>
         </Feedback>
       )}
-      {data && hasValidationError ? (
+      {data && hasValidationError && (
         <Feedback type="error" title="Error">
           <div>
             <h2>Validatie fouten</h2>
@@ -74,7 +111,8 @@ export function VotersAndVotesForm() {
             </ul>
           </div>
         </Feedback>
-      ) : (
+      )}
+      {data && !hasValidationError && (
         <Feedback type="success" title="Success">
           <div>
             <h2>Success</h2>
@@ -91,16 +129,24 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>A</td>
             <td>
-              <input id="pollCards" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <FormField error={errorsAndWarnings.get("poll_card_count")?.errors}>
+                <input
+                  name="poll_card_count"
+                  id="poll_card_count"
+                  {...register()}
+                  defaultValue={format(pickGoodTestNumber())}
+                />
+              </FormField>
             </td>
             <td>Stempassen</td>
           </InputGrid.Row>
           <InputGrid.Row>
             <td>B</td>
             <td>
-              <FormField tooltip="Test">
+              <FormField error={errorsAndWarnings.get("proxy_certificate_count")?.errors}>
                 <input
-                  id="proxyCertificates"
+                  id="proxy_certificate_count"
+                  name="proxy_certificate_count"
                   {...register()}
                   defaultValue={format(pickGoodTestNumber())}
                 />
@@ -111,18 +157,28 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>C</td>
             <td>
-              <input id="voterCards" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <FormField error={errorsAndWarnings.get("voter_card_count")?.errors}>
+                <input
+                  name="voter_card_count"
+                  id="voter_card_count"
+                  {...register()}
+                  defaultValue={format(pickGoodTestNumber())}
+                />
+              </FormField>
             </td>
             <td>Kiezerspassen</td>
           </InputGrid.Row>
           <InputGrid.Row isTotal>
             <td>D</td>
             <td>
-              <input
-                id="totalAdmittedVoters"
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <FormField error={errorsAndWarnings.get("total_admitted_voters_count")?.errors}>
+                <input
+                  id="total_admitted_voters_count"
+                  name="total_admitted_voters_count"
+                  {...register()}
+                  defaultValue={format(pickGoodTestNumber())}
+                />
+              </FormField>
             </td>
             <td>Totaal toegelaten kiezers</td>
           </InputGrid.Row>
@@ -132,40 +188,56 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>E</td>
             <td>
-              <input
-                id="votesOnCandidates"
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <FormField error={errorsAndWarnings.get("votes_candidates_counts")?.errors}>
+                <input
+                  id="votes_candidates_counts"
+                  name="votes_candidates_counts"
+                  {...register()}
+                  defaultValue={format(pickGoodTestNumber())}
+                />
+              </FormField>
             </td>
             <td>Stemmen op kandidaten</td>
           </InputGrid.Row>
           <InputGrid.Row>
             <td>F</td>
             <td>
-              <input id="blankVotes" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <FormField error={errorsAndWarnings.get("blank_votes_count")?.errors}>
+                <input
+                  id="blank_votes_count"
+                  name="blank_votes_count"
+                  {...register()}
+                  defaultValue={format(pickGoodTestNumber())}
+                />
+              </FormField>
             </td>
             <td>Blanco stemmen</td>
           </InputGrid.Row>
           <InputGrid.Row>
             <td>G</td>
             <td>
-              <input
-                id="invalidVotes"
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <FormField error={errorsAndWarnings.get("invalid_votes_count")?.errors}>
+                <input
+                  id="invalid_votes_count"
+                  name="invalid_votes_count"
+                  {...register()}
+                  defaultValue={format(pickGoodTestNumber())}
+                />
+              </FormField>
             </td>
             <td>Ongeldige stemmen</td>
           </InputGrid.Row>
           <InputGrid.Row isTotal>
             <td>H</td>
             <td>
-              <input
-                id="totalVotesCast"
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <FormField error={errorsAndWarnings.get("total_votes_cast_count")?.errors}>
+                <input
+                  id="total_votes_cast_count"
+                  name="total_votes_cast_count"
+                  {...register()}
+                  defaultValue={format(pickGoodTestNumber())}
+                />
+              </FormField>
             </td>
             <td>Totaal uitgebrachte stemmen</td>
           </InputGrid.Row>
@@ -175,16 +247,6 @@ export function VotersAndVotesForm() {
       <Button type="submit" size="lg" disabled={loading}>
         Volgende
       </Button>
-      {warnings.map((warning) => {
-        return (
-          <Tooltip key={warning.anchor.id} anchor={warning.anchor} closeOnClickOrKeyboardEvent>
-            <p>
-              Je probeert <strong>{getTrimmedString(warning.value)}</strong> te plakken. Je kunt
-              hier alleen cijfers invullen.
-            </p>
-          </Tooltip>
-        );
-      })}
     </form>
   );
 }
@@ -193,11 +255,4 @@ export function VotersAndVotesForm() {
 function pickGoodTestNumber() {
   const n = Math.ceil(Math.random() * 4) * 10 * 10;
   return Math.floor(Math.random() * n) * 10;
-}
-
-function getTrimmedString(s: string) {
-  if (s.length > 20) {
-    return s.substring(0, 20) + "...";
-  }
-  return s;
 }

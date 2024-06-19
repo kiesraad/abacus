@@ -1,3 +1,16 @@
 .form-field {
-  background-color: red;
+  position: relative;
+  aside {
+    position: absolute;
+    left: 24px;
+    top: 50%;
+    margin-top: -12px;
+    svg {
+      width: 24px;
+      fill: var(--color-error);
+    }
+  }
+
+  &:global(.has-icon) {
+  }
 }

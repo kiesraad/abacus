@@ -408,7 +408,8 @@
         "enum": [
           "OutOfRange",
           "IncorrectTotal",
-          "AboveThreshold"
+          "AboveThreshold",
+          "EqualInput"
         ]
       },
       "ValidationResults": {

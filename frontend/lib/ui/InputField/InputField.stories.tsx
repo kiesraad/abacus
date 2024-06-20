@@ -12,6 +12,7 @@ type Props = {
   fieldWidth: "narrow" | "wide";
   error: string;
   disabled: boolean;
+  maxLength: number;
 };
 
 export const WideInputField: Story = () => {
@@ -134,6 +135,7 @@ export const CustomizableInputField: Story<Props> = ({
   fieldWidth,
   error,
   disabled,
+  maxLength,
 }) => {
   return (
     <InputField
@@ -147,6 +149,7 @@ export const CustomizableInputField: Story<Props> = ({
       fieldWidth={fieldWidth}
       error={error}
       disabled={disabled}
+      maxLength={maxLength}
     />
   );
 };
@@ -156,7 +159,7 @@ CustomizableInputField.args = {
   subtext: "with subtext",
   hint: "Input Field hint",
   error: "",
-  value: "",
+  maxLength: undefined,
 };
 CustomizableInputField.argTypes = {
   type: {

@@ -62,6 +62,7 @@ export const NarrowInputField: Story = () => {
         hint="Default Small Narrow hint"
         fieldSize="small"
         fieldWidth="narrow"
+        maxLength={9}
       />
       <InputField
         name="default-medium-narrow"

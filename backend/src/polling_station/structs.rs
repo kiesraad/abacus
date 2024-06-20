@@ -299,4 +299,29 @@ mod tests {
         assert_eq!(validation_results.errors.len(), 0);
         assert_eq!(validation_results.warnings.len(), 1);
     }
+
+    #[test]
+    fn test_zero_votes_and_zero_voters() {
+        let mut validation_results = ValidationResults::default();
+        let polling_station_results = PollingStationResults {
+            voters_counts: VotersCounts {
+                poll_card_count: 0,
+                proxy_certificate_count: 0,
+                voter_card_count: 0,
+                total_admitted_voters_count: 0,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_counts: 0,
+                blank_votes_count: 0,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 0,
+            },
+        };
+        polling_station_results.validate(
+            &mut validation_results,
+            "polling_station_results".to_string(),
+        );
+        assert!(validation_results.errors.len() == 0);
+        assert!(validation_results.warnings.len() == 0);
+    }
 }

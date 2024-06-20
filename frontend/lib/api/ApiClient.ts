@@ -77,21 +77,7 @@ export class ApiClient {
         } as ApiResponseServerError<ErrorResponse>;
       }
     } catch (err: unknown) {
-      let errorMessage: string;
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      } else if (typeof err === "string") {
-        errorMessage = err;
-      } else {
-        errorMessage = "An unknown error occurred";
-      }
-      return {
-        status: "client_error",
-        code: 400,
-        data: {
-          error: errorMessage,
-        },
-      };
+      throw new Error(`Server response parse error: ${res.status}`);
     }
     throw new Error(`Unexpected response status: ${res.status}`);
   }

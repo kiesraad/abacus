@@ -58,11 +58,23 @@ describe("Apiclient", () => {
     expect(parsedResponse).toStrictEqual({ status: "success", code: 200, data: { fizz: "buzz" } });
   });
 
-  test("Invalid json returns a proper error", async () => {
+  test("Invalid server response throws an error", async () => {
     overrideOnce("get", "/v1/api/test/1", 200, "invalid json");
 
     const client = new ApiClient("testhost");
-    const parsedResponse = await client.getRequest("/api/test/1");
-    expect(parsedResponse.code).toEqual(400);
+
+    await expect(async () => client.getRequest("/api/test/1")).rejects.toThrowError(
+      "Server response parse error: 200",
+    );
+  });
+
+  test("Unexpcted status code throws an error", async () => {
+    overrideOnce("get", "/v1/api/test/1", 201, { fizz: "buzz" });
+
+    const client = new ApiClient("testhost");
+
+    await expect(async () => client.getRequest("/api/test/1")).rejects.toThrowError(
+      "Unexpected response status: 201",
+    );
   });
 });

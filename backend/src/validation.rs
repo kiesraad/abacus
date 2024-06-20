@@ -50,8 +50,12 @@ pub trait Validate {
 /// The threshold is calculated as the percentage of the total, rounded up.
 /// For example, if the total is 101 and the percentage is 10, the threshold is 11.
 pub fn above_percentage_threshold(value: u32, total: u32, percentage: u8) -> bool {
-    let threshold = (total as u64 * percentage as u64).div_ceil(100);
-    value as u64 >= threshold
+    if value == 0 && total == 0 {
+        false
+    } else {
+        let threshold = (total as u64 * percentage as u64).div_ceil(100);
+        value as u64 >= threshold
+    }
 }
 
 #[cfg(test)]
@@ -88,5 +92,13 @@ mod tests {
         assert!(above_percentage_threshold(11, 101, 10));
         assert!(!above_percentage_threshold(10, 101, 10));
         assert!(above_percentage_threshold(10, 100, 10));
+
+        assert!(above_percentage_threshold(10, 0, 10));
+    }
+
+    #[test]
+    fn test_below_percentage_threshold() {
+        assert!(!above_percentage_threshold(9, 100, 10));
+        assert!(!above_percentage_threshold(0, 0, 10));
     }
 }

@@ -200,7 +200,6 @@ describe("VotersAndVotesForm Form", () => {
       422,
       {
         message: "422 error from mock",
-        errorCode: "422_ERROR",
       },
     );
 
@@ -211,7 +210,7 @@ describe("VotersAndVotesForm Form", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^Error 422_ERROR 422 error from mock$/);
+    expect(result).toHaveTextContent(/^Error 422 error from mock$/);
   });
 
   test("500 response results in display of error message", async () => {

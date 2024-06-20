@@ -3,7 +3,7 @@
 ###### version 0.10 / 2024-6-19
 ###### adapted from the CLA of the Dutch Ministry of Public Health, Welfare and Sport
 
-The Electral Council of the Netherlands, (hereinafter: the Electoral Council) would like to utilise the knowledge of third parties in developing digital resources that help to support the elections.
+The Electoral Council of the Netherlands, (hereinafter: the Electoral Council) would like to utilise the knowledge of third parties in developing digital resources that help to support the elections.
 
 You (hereinafter: the Contributor) wish to contribute to the development of the Digital Resources, for example in the form of new or an adaptation of existing software, designs, documentation, digital files and/or other works to which intellectual property rights can attach (hereinafter: the Contributions).
 

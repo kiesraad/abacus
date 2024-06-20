@@ -68,7 +68,7 @@ describe("Apiclient", () => {
     );
   });
 
-  test("Unexpcted status code throws an error", async () => {
+  test("Unexpected status code throws an error", async () => {
     overrideOnce("get", "/v1/api/test/1", 201, { fizz: "buzz" });
 
     const client = new ApiClient("testhost");

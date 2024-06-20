@@ -122,7 +122,11 @@ export interface ValidationResult {
   fields: string[];
 }
 
-export type ValidationResultCode = "OutOfRange" | "IncorrectTotal" | "AboveThreshold";
+export type ValidationResultCode =
+  | "OutOfRange"
+  | "IncorrectTotal"
+  | "AboveThreshold"
+  | "EqualInput";
 
 export interface ValidationResults {
   errors: ValidationResult[];

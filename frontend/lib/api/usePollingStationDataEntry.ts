@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useApiRequest } from "./useApiRequest";
+import { useApiPostRequest } from "./useApiPostRequest";
 import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
@@ -13,7 +13,7 @@ export function usePollingStationDataEntry(params: POLLING_STATION_DATA_ENTRY_RE
     return result;
   }, [params]);
 
-  return useApiRequest<POLLING_STATION_DATA_ENTRY_REQUEST_BODY, DataEntryResponse>({
+  return useApiPostRequest<POLLING_STATION_DATA_ENTRY_REQUEST_BODY, DataEntryResponse>({
     path,
   });
 }

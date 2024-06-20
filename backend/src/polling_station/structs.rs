@@ -335,7 +335,7 @@ mod tests {
             &mut validation_results,
             "polling_station_results".to_string(),
         );
-        assert!(validation_results.errors.len() == 0);
-        assert!(validation_results.warnings.len() == 0);
+        assert!(validation_results.errors.is_empty());
+        assert!(validation_results.warnings.is_empty());
     }
 }

@@ -65,13 +65,27 @@ pub struct VotersCounts {
     pub total_admitted_voters_count: Count,
 }
 
+/// Check if all voters counts and votes counts are equal to zero.
+/// Used in validations where this is a edge case that needs to be handled.
+fn all_zero(voters: &VotersCounts, votes: &VotesCounts) -> bool {
+    voters.poll_card_count == 0
+        && voters.proxy_certificate_count == 0
+        && voters.voter_card_count == 0
+        && voters.total_admitted_voters_count == 0
+        && votes.votes_candidates_counts == 0
+        && votes.blank_votes_count == 0
+        && votes.invalid_votes_count == 0
+        && votes.total_votes_cast_count == 0
+}
+
 /// Check if the voters counts and votes counts are identical, which should
 /// result in a warning.
 ///
 /// This is not implemented as Eq because there is no true equality relation
 /// between these two sets of numbers.
 fn identical_counts(voters: &VotersCounts, votes: &VotesCounts) -> bool {
-    voters.poll_card_count == votes.votes_candidates_counts
+    !all_zero(voters, votes)
+        && voters.poll_card_count == votes.votes_candidates_counts
         && voters.proxy_certificate_count == votes.blank_votes_count
         && voters.voter_card_count == votes.invalid_votes_count
         && voters.total_admitted_voters_count == votes.total_votes_cast_count

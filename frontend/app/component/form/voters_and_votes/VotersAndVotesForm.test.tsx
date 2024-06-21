@@ -3,7 +3,7 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
-describe("VotersAndVotesForm Form", () => {
+describe("Test VotersAndVotesForm", () => {
   afterEach(() => {
     vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
   });
@@ -83,8 +83,9 @@ describe("VotersAndVotesForm Form", () => {
     const blankVotes = screen.getByTestId("blankVotes");
     expect(blankVotes).toHaveFocus();
     await user.clear(blankVotes);
-    await user.type(blankVotes, "1000000");
-    expect(blankVotes).toHaveValue("1.000.000");
+    // Test if maxLength on field works
+    await user.type(blankVotes, "1000000000");
+    expect(blankVotes).toHaveValue("100.000.000");
 
     await user.keyboard("{enter}");
 

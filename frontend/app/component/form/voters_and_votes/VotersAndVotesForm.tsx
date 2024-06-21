@@ -24,7 +24,7 @@ export function VotersAndVotesForm() {
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
   const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
-    id: 1,
+    polling_station_id: 1,
     entry_number: 1,
   });
 

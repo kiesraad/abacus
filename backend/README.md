@@ -17,7 +17,7 @@ Use `cargo run --bin api` to run the API on port 8080 (http://localhost:8080).
 
 ### Linting
 
-Use `cargo clippy` to lint the project. Warnings are treated as errors in the CI pipeline.
+Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the project. Warnings are treated as errors in the CI pipeline.
 
 ### Testing
 

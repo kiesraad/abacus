@@ -1,6 +1,6 @@
 import { Badge, Button, InputField } from "@kiesraad/ui";
 import { useNavigate } from "react-router-dom";
-import { IconChevronright } from "@kiesraad/icon";
+import { IconChevronRight } from "@kiesraad/icon";
 
 interface FormElements extends HTMLFormControlsCollection {
   number: HTMLInputElement;
@@ -24,28 +24,34 @@ export function PollingStationChoiceForm() {
     <form onSubmit={handleSubmit}>
       <h2 className="form_title">Welk stembureau ga je invoeren?</h2>
       <InputField
+        id="pollingStation"
         name="number"
         label="Voer het nummer in:"
-        width="narrow"
+        fieldWidth="narrow"
         margin={false}
         pattern="\d+"
         title="Alleen positieve nummers toegestaan"
+        maxLength={6}
       />
-      <p>
+      <p className="md">
         Klopt de naam van het stembureau met de naam op je papieren proces verbaal?
         <br />
         Dan kan je beginnen.
       </p>
-      <Button type="submit" size="lg">
-        Beginnen
-      </Button>
-      <span className="button_hint">SHIFT + Enter</span>
+      <div>
+        <Button type="submit" size="lg">
+          Beginnen
+        </Button>
+        <span className="button_hint">SHIFT + Enter</span>
+      </div>
       <details>
         <summary>
           <p>
             Weet je het nummer niet?
             <br />
-            <span className="underlined">Bekijk de lijst met alle stembureaus</span>
+            <span id="openPollingStationList" className="underlined">
+              Bekijk de lijst met alle stembureaus
+            </span>
           </p>
         </summary>
         <h2 className="form_title table_title">Kies het stembureau</h2>
@@ -59,87 +65,101 @@ export function PollingStationChoiceForm() {
           </thead>
           <tbody>
             <tr onClick={handleRowClick}>
-              <td className="align-right narrow bold">1</td>
+              <td width="6.5rem" className="number">
+                1
+              </td>
               <td>
-                <div className="table_flex">
-                  <span>Nachthemelstraat 21</span>
-                  <Badge type="first_entry" />
+                <span>Nachthemelstraat 21</span>
+                <Badge type="first_entry" />
+              </td>
+              <td width="5rem">
+                <div className="link">
+                  <IconChevronRight />
                 </div>
-              </td>
-              <td className="align-center link">
-                <IconChevronright />
-              </td>
-            </tr>
-            <tr>
-              <td className="align-right narrow bold">2</td>
-              <td>
-                <div className="table_flex">
-                  <span>Schoolstraat 78</span>
-                  <Badge type="second_entry" />
-                </div>
-              </td>
-              <td className="align-center link">
-                <IconChevronright />
               </td>
             </tr>
             <tr onClick={handleRowClick}>
-              <td className="align-right narrow bold">3</td>
-              <td>
-                <div className="table_flex">
-                  <span>Fluisterbosdreef 8</span>
-                  <Badge type="extra_entry" />
-                </div>
+              <td width="6.5rem" className="number">
+                2
               </td>
-              <td className="align-center link">
-                <IconChevronright />
+              <td>
+                <span>Schoolstraat 78</span>
+                <Badge type="second_entry" />
+              </td>
+              <td width="5rem">
+                <div className="link">
+                  <IconChevronRight />
+                </div>
               </td>
             </tr>
             <tr onClick={handleRowClick}>
-              <td className="align-right narrow bold">4</td>
-              <td>
-                <div className="table_flex">
-                  <span>Wilhelminastraat 21</span>
-                  <Badge type="objections" />
-                </div>
+              <td width="6.5rem" className="number">
+                3
               </td>
-              <td className="align-center link">
-                <IconChevronright />
+              <td>
+                <span>Fluisterbosdreef 8</span>
+                <Badge type="extra_entry" />
+              </td>
+              <td width="5rem">
+                <div className="link">
+                  <IconChevronRight />
+                </div>
               </td>
             </tr>
             <tr onClick={handleRowClick}>
-              <td className="align-right narrow bold">5</td>
-              <td>
-                <div className="table_flex">
-                  <span>Tuinstraat 2</span>
-                  <Badge type="difference" />
-                </div>
+              <td width="6.5rem" className="number">
+                4
               </td>
-              <td className="align-center link">
-                <IconChevronright />
+              <td>
+                <span>Wilhelminastraat 21</span>
+                <Badge type="objections" />
+              </td>
+              <td width="5rem">
+                <div className="link">
+                  <IconChevronRight />
+                </div>
               </td>
             </tr>
             <tr onClick={handleRowClick}>
-              <td className="align-right narrow bold">6</td>
-              <td>
-                <div className="table_flex">
-                  <span>Rietland 31</span>
-                  <Badge type="correction" />
-                </div>
+              <td width="6.5rem" className="number">
+                5
               </td>
-              <td className="align-center link">
-                <IconChevronright />
+              <td>
+                <span>Tuinstraat 2</span>
+                <Badge type="difference" />
+              </td>
+              <td width="5rem">
+                <div className="link">
+                  <IconChevronRight />
+                </div>
               </td>
             </tr>
             <tr onClick={handleRowClick}>
-              <td className="align-right narrow bold">7</td>
+              <td width="6.5rem" className="number">
+                6
+              </td>
               <td>
-                <div className="table_flex">
-                  <span>Grote Markt 1</span>
-                  <Badge type="definitive" />
+                <span>Rietland 31</span>
+                <Badge type="correction" />
+              </td>
+              <td width="5rem">
+                <div className="link">
+                  <IconChevronRight />
                 </div>
               </td>
-              <td className="align-center link">
-                <IconChevronright />
+            </tr>
+            <tr onClick={handleRowClick}>
+              <td width="6.5rem" className="number">
+                7
+              </td>
+              <td>
+                <span>Grote Markt 1</span>
+                <Badge type="definitive" />
+              </td>
+              <td width="5rem">
+                <div className="link">
+                  <IconChevronRight />
+                </div>
               </td>
             </tr>
           </tbody>

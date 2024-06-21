@@ -21,7 +21,7 @@ describe("UI component: Alert", () => {
     );
 
     fireEvent(
-      getByTitle("close"),
+      getByTitle("Melding sluiten"),
       new MouseEvent("click", {
         bubbles: true,
         cancelable: true,

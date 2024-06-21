@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { WorkStationNumber } from "@kiesraad/ui";
 import {
-  IconCheckheart,
-  IconCheckverified,
-  IconChevronright,
+  IconCheckHeart,
+  IconCheckVerified,
+  IconChevronRight,
   IconClock,
   IconHourglass,
 } from "@kiesraad/icon";
@@ -40,52 +40,60 @@ export function OverviewPage() {
                 <td>Referendum uitbreiding stadshart 2026</td>
                 <td>GSB - Juinen (045)</td>
                 <td>
-                  <div className="table_flex">
+                  <div className="flex_overview">
                     <IconHourglass />
                     <span>Invoer opgeschort</span>
                   </div>
                 </td>
-                <td className="align-center narrow">
-                  <IconChevronright />
+                <td className="link">
+                  <div className="link">
+                    <IconChevronRight />
+                  </div>
                 </td>
               </tr>
               <tr onClick={handleRowClick}>
                 <td>Wijkraad Grachtenkwartier 2026</td>
                 <td>Lokale verkiezing</td>
                 <td>
-                  <div className="table_flex">
+                  <div className="flex_overview">
                     <IconClock />
-                    <span>Wachten op coordinator</span>
+                    <span>Wachten op coördinator</span>
                   </div>
                 </td>
-                <td className="align-center narrow">
-                  <IconChevronright />
+                <td className="link">
+                  <div className="link">
+                    <IconChevronRight />
+                  </div>
                 </td>
               </tr>
               <tr onClick={handleRowClick}>
                 <td>Europees Parlementsverkiezing 2024</td>
                 <td></td>
                 <td>
-                  <div className="table_flex">
-                    <IconCheckheart />
+                  <div className="flex_overview">
+                    <IconCheckHeart />
                     <span>Invoerders bezig</span>
                   </div>
                 </td>
-                <td className="align-center narrow">
-                  <IconChevronright />
+                <td className="link">
+                  <div className="link">
+                    <IconChevronRight />
+                  </div>
                 </td>
               </tr>
               <tr onClick={handleRowClick}>
                 <td>Tweede Kamerverkiezing 2023</td>
                 <td></td>
                 <td>
-                  <div className="table_flex">
-                    <IconCheckverified />
+                  <div className="flex_overview">
+                    <IconCheckVerified />
                     <span>Steminvoer voltooid</span>
                   </div>
                 </td>
-                <td className="align-center narrow">
-                  <IconChevronright />
+                <td className="link">
+                  <div className="link">
+                    <IconChevronRight />
+                  </div>
                 </td>
               </tr>
             </tbody>

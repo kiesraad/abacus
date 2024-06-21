@@ -6,7 +6,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.625rem;
+    gap: 0.5rem;
     &:global(.narrow),
     &:global(.narrow) ~ span {
       width: 10rem;
@@ -30,12 +30,14 @@
       font-weight: normal;
     }
     &:global(.hint) {
-      color: var(--gray-600);
+      color: var(--color-help-text);
       font-weight: normal;
+      margin-top: 0.5rem;
     }
     &:global(.error) {
       color: var(--error-600);
       font-weight: normal;
+      margin-top: 0.5rem;
     }
   }
 
@@ -85,6 +87,7 @@
     :global(.error) & {
       border: solid var(--error-400);
       background-image: url("../../icon/svg/error.svg");
+      background-size: 1.5rem 1.5rem;
       background-repeat: no-repeat;
       background-position: right 1.5rem center;
       padding-right: 3rem;

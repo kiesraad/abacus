@@ -1,16 +1,16 @@
 .iconbutton {
-  color: #fff;
-  border-radius: 6px;
-  border: 1px solid #202939;
-  background: #202939;
+  color: var(--base-white);
+  border-radius: 0.25rem;
+  background: var(--base-white);
   /* Shadow/xs */
   box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
 
   display: inline-flex;
-  padding: 10px 10px;
+  padding: 0.5rem;
   justify-content: center;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
 
   &:focus {
     outline: none;
@@ -29,7 +29,7 @@
 
   svg {
     height: 16px;
-    fill: white;
+    fill: var(--base-white);
   }
 
   &.sm {
@@ -41,10 +41,8 @@
   }
 
   &.lg {
-    padding: 16px;
-
     svg {
-      height: 20px;
+      height: 1.5rem;
     }
   }
 
@@ -53,18 +51,17 @@
     border: 1px solid transparent;
     box-shadow: none;
     svg {
-      fill: black;
+      fill: var(--gray-500);
     }
 
     &:hover {
-      background: #f2f2f2;
-      border: 1px solid var(--bg-gray-darkest);
+      background: var(--bg-gray-darker);
     }
   }
 
   &.alert {
-    border: 1px solid var(--color-alert);
-    background: var(--color-alert);
+    border: 1px solid var(--color-error);
+    background: var(--color-error);
     svg {
       fill: var(--base-white);
     }

@@ -59,6 +59,11 @@ p {
   color: var(--text-color-body);
 }
 
+p.md {
+  font-size: var(--font-size-md);
+  margin-bottom: 2rem;
+}
+
 a {
   text-decoration: none;
   &:hover,

@@ -5,6 +5,7 @@ import { Size, Variant } from "../ui.types";
 
 export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: React.ReactNode;
+  title: string;
   isDisabled?: boolean;
   isLoading?: boolean;
   variant?: Variant;
@@ -14,6 +15,7 @@ export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
 
 export function IconButton({
   icon,
+  title,
   isDisabled,
   isLoading,
   isRound = false,
@@ -26,6 +28,7 @@ export function IconButton({
       className={cn(cls["iconbutton"], cls[variant], cls[size], {
         round: isRound,
       })}
+      title={title}
       disabled={isDisabled || isLoading}
       {...htmlButtonProps}
     >

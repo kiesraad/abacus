@@ -1,6 +1,6 @@
 import * as React from "react";
-import { IconArrowleft, IconCheckmark, IconWarning } from "@kiesraad/icon";
-import cls from "./progresslist.module.css";
+import { IconArrowNarrowRight, IconCheckmark, IconWarning } from "@kiesraad/icon";
+import cls from "./ProgressList.module.css";
 import { cn } from "@kiesraad/util";
 
 export interface ProgressListProps {
@@ -35,7 +35,7 @@ export type ProgressListItemProps = BaseProgressListItemProps &
 ProgressList.Item = function ({ status, active, children }: ProgressListItemProps) {
   return (
     <li className={cn(active ? "active" : "idle", status)}>
-      <aside>{active ? <IconArrowleft /> : renderStatusIcon(status)}</aside>
+      <aside>{active ? <IconArrowNarrowRight /> : renderStatusIcon(status)}</aside>
       <label>{children}</label>
     </li>
   );

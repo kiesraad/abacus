@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { type ResultCode, usePollingStationDataEntry } from "@kiesraad/api";
-import { Button, InputGrid, Feedback, FormField } from "@kiesraad/ui";
+import { Button, InputGrid, Feedback, FormField, BottomBar } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 //TODO: force from openapi types
@@ -242,10 +242,12 @@ export function VotersAndVotesForm() {
           </InputGrid.Row>
         </InputGrid.Body>
       </InputGrid>
-      <br /> <br />
-      <Button type="submit" size="lg" disabled={loading}>
-        Volgende
-      </Button>
+      <BottomBar type="form">
+        <Button type="submit" size="lg" disabled={loading}>
+          Volgende
+        </Button>
+        <span className="button_hint">SHIFT + Enter</span>
+      </BottomBar>
     </form>
   );
 }

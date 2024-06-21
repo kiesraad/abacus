@@ -6,6 +6,7 @@
 @font-face {
   font-family: "DMSans";
   src: url("/font/DM_Sans/DMSans-VariableFont_opsz,wght.ttf") format("TrueType");
+  font-weight: 1 1000;
 }
 
 @font-face {
@@ -47,19 +48,26 @@
   --color-alert: #d92d20;
   --color-alert-bg: #fee4e2;
   --color-error: #b42318;
+  --color-error: #d92d20;
+  --color-error-bg: #fee4e2;
+  --color-error-hover: #fecdca;
 
   --color-warning: #f79009;
   --color-warning-darker: #dc6803;
   --color-warning-bg: #fef0c7;
+  --color-warning-hover: #fedf89;
   --color-warning-text: #93370d;
 
   --color-notify: #2e90fa;
   --color-notify-bg: #f0f9ff;
+  --color-notify-hover: #b9e6fe;
 
   --color-success: #12b76a;
   --color-success-bg: #d1fadf;
+  --color-success-hover: #a6f4c5;
 
   --color-help-text: #475467;
+  --color-hover: #eaecf0;
 
   --bg-gray: #f9fafb;
   --bg-gray-darker: #f2f4f7;
@@ -91,10 +99,11 @@
   --error-400: #f97066;
   --error-600: #d92d20;
 
-  --gray-600: #475467;
+  --gray-500: #667085;
   --gray-900: #101828;
 
   --green-100: #d3f8df;
+  --green-500: #16b364;
   --green-800: #095c37;
 
   --purple-100: #ebe9fe;

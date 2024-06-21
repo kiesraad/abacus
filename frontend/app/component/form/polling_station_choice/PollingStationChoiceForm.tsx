@@ -24,12 +24,14 @@ export function PollingStationChoiceForm() {
     <form onSubmit={handleSubmit}>
       <h2 className="form_title">Welk stembureau ga je invoeren?</h2>
       <InputField
+        id="pollingStation"
         name="number"
         label="Voer het nummer in:"
-        width="narrow"
+        fieldWidth="narrow"
         margin={false}
         pattern="\d+"
         title="Alleen positieve nummers toegestaan"
+        maxLength={6}
       />
       <p className="md">
         Klopt de naam van het stembureau met de naam op je papieren proces verbaal?
@@ -47,7 +49,9 @@ export function PollingStationChoiceForm() {
           <p>
             Weet je het nummer niet?
             <br />
-            <span className="underlined">Bekijk de lijst met alle stembureaus</span>
+            <span id="openPollingStationList" className="underlined">
+              Bekijk de lijst met alle stembureaus
+            </span>
           </p>
         </summary>
         <h2 className="form_title table_title">Kies het stembureau</h2>

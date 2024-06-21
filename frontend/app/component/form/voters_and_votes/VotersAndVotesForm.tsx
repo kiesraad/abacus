@@ -24,7 +24,7 @@ export function VotersAndVotesForm() {
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
   const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
-    id: 1,
+    polling_station_id: 1,
     entry_number: 1,
   });
 
@@ -69,7 +69,12 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>A</td>
             <td>
-              <input id="pollCards" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="pollCards"
+                maxLength={11}
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Stempassen</td>
           </InputGrid.Row>
@@ -78,6 +83,7 @@ export function VotersAndVotesForm() {
             <td>
               <input
                 id="proxyCertificates"
+                maxLength={11}
                 {...register()}
                 defaultValue={format(pickGoodTestNumber())}
               />
@@ -87,7 +93,12 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>C</td>
             <td>
-              <input id="voterCards" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="voterCards"
+                maxLength={11}
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Kiezerspassen</td>
           </InputGrid.Row>
@@ -96,6 +107,7 @@ export function VotersAndVotesForm() {
             <td>
               <input
                 id="totalAdmittedVoters"
+                maxLength={11}
                 {...register()}
                 defaultValue={format(pickGoodTestNumber())}
               />
@@ -110,6 +122,7 @@ export function VotersAndVotesForm() {
             <td>
               <input
                 id="votesOnCandidates"
+                maxLength={11}
                 {...register()}
                 defaultValue={format(pickGoodTestNumber())}
               />
@@ -119,7 +132,12 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>F</td>
             <td>
-              <input id="blankVotes" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="blankVotes"
+                maxLength={11}
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Blanco stemmen</td>
           </InputGrid.Row>
@@ -128,6 +146,7 @@ export function VotersAndVotesForm() {
             <td>
               <input
                 id="invalidVotes"
+                maxLength={11}
                 {...register()}
                 defaultValue={format(pickGoodTestNumber())}
               />
@@ -139,6 +158,7 @@ export function VotersAndVotesForm() {
             <td>
               <input
                 id="totalVotesCast"
+                maxLength={11}
                 {...register()}
                 defaultValue={format(pickGoodTestNumber())}
               />

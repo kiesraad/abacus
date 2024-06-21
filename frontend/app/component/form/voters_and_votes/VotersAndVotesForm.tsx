@@ -96,14 +96,14 @@ export function VotersAndVotesForm() {
         <Feedback type="error" title="Error">
           <div>
             <h2>Error</h2>
-            {error.message}
+            <p id="result">{error.message}</p>
           </div>
         </Feedback>
       )}
       {data && hasValidationError && (
         <Feedback type="error" title="Error">
           <div>
-            <h2>Validatie fouten</h2>
+            <h2 id="result">Validatie fouten</h2>
             <ul>
               {data.validation_results.errors.map((error) => (
                 <li key={error.code}>{error.code}</li>
@@ -115,7 +115,7 @@ export function VotersAndVotesForm() {
       {data && !hasValidationError && (
         <Feedback type="success" title="Success">
           <div>
-            <h2>Success</h2>
+            <h2 id="result">Success</h2>
           </div>
         </Feedback>
       )}

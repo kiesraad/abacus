@@ -72,16 +72,21 @@ export function PollingStationPage() {
           {targetForm === "save" && <div>Placeholder Check and Save Page</div>}
         </article>
       </main>
-      <aside>&nbsp;</aside>
       {openModal && (
         <Modal onClose={changeDialog}>
-          <h2>Invoer bewaren?</h2>
+          <h2>Wat wil je doen met je invoer?</h2>
           <p>
-            Wil je de invoer bewaren zodat je later verder kan? Overleg met de verkiezingsleider.
+            Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de
+            invoer die je al hebt gedaan bewaren.
+            <br />
+            <br />
+            Twijfel je? Overleg dan met de coördinator.
           </p>
           <nav>
-            <Button>Bewaar invoer</Button>
-            <Button variant="secondary">Verwijder invoer</Button>
+            <Button size="lg">Invoer bewaren</Button>
+            <Button size="lg" variant="secondary">
+              Niet bewaren
+            </Button>
           </nav>
         </Modal>
       )}

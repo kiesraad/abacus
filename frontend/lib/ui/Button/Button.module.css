@@ -5,7 +5,7 @@
   background: var(--button-color-primary);
 
   font-size: var(--font-size-body);
-  font-weight: 600;
+  font-weight: 500;
 
   /* Shadow/xs */
   box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
@@ -51,8 +51,8 @@
   }
 
   &.alert {
-    border: 1px solid var(--color-alert);
-    background: var(--color-alert);
+    border: 1px solid var(--color-error);
+    background: var(--color-error);
     color: #fff;
   }
 
@@ -69,5 +69,10 @@
   &.sm {
     font-size: 14px;
     padding: 8px 12px;
+  }
+
+  &.lg {
+    min-width: 13rem;
+    font-weight: bold;
   }
 }

@@ -31,6 +31,10 @@ export function InputHomePage() {
         <article>
           <PollingStationChoiceForm />
         </article>
+        <nav id="progress">
+          <h2 className="form_title">Voortgang</h2>
+          {/* TODO: Add Progress bars */}
+        </nav>
       </main>
     </>
   );

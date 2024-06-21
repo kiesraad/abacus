@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { usePollingStationDataEntry } from "@kiesraad/api";
-import { Button, InputGrid } from "@kiesraad/ui";
+import { BottomBar, Button, InputGrid, Tooltip } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -20,7 +20,7 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const { register, format, deformat } = usePositiveNumberInputMask();
+  const { register, format, deformat, warnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
   const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
@@ -69,7 +69,12 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>A</td>
             <td>
-              <input id="pollCards" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="pollCards"
+                maxLength={11}
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Stempassen</td>
           </InputGrid.Row>
@@ -78,6 +83,7 @@ export function VotersAndVotesForm() {
             <td>
               <input
                 id="proxyCertificates"
+                maxLength={11}
                 {...register()}
                 defaultValue={format(pickGoodTestNumber())}
               />
@@ -87,7 +93,12 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>C</td>
             <td>
-              <input id="voterCards" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="voterCards"
+                maxLength={11}
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Kiezerspassen</td>
           </InputGrid.Row>
@@ -96,6 +107,7 @@ export function VotersAndVotesForm() {
             <td>
               <input
                 id="totalAdmittedVoters"
+                maxLength={11}
                 {...register()}
                 defaultValue={format(pickGoodTestNumber())}
               />
@@ -103,13 +115,14 @@ export function VotersAndVotesForm() {
             <td>Totaal toegelaten kiezers</td>
           </InputGrid.Row>
 
-          <InputGrid.Seperator />
+          <InputGrid.Separator />
 
           <InputGrid.Row>
             <td>E</td>
             <td>
               <input
                 id="votesOnCandidates"
+                maxLength={11}
                 {...register()}
                 defaultValue={format(pickGoodTestNumber())}
               />
@@ -119,7 +132,12 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>F</td>
             <td>
-              <input id="blankVotes" {...register()} defaultValue={format(pickGoodTestNumber())} />
+              <input
+                id="blankVotes"
+                maxLength={11}
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
             </td>
             <td>Blanco stemmen</td>
           </InputGrid.Row>
@@ -128,6 +146,7 @@ export function VotersAndVotesForm() {
             <td>
               <input
                 id="invalidVotes"
+                maxLength={11}
                 {...register()}
                 defaultValue={format(pickGoodTestNumber())}
               />
@@ -139,6 +158,7 @@ export function VotersAndVotesForm() {
             <td>
               <input
                 id="totalVotesCast"
+                maxLength={11}
                 {...register()}
                 defaultValue={format(pickGoodTestNumber())}
               />
@@ -147,10 +167,24 @@ export function VotersAndVotesForm() {
           </InputGrid.Row>
         </InputGrid.Body>
       </InputGrid>
-      <br /> <br />
-      <Button type="submit" size="lg" disabled={loading}>
-        Volgende
-      </Button>
+      <BottomBar type="form">
+        <Button type="submit" size="lg" disabled={loading}>
+          Volgende
+        </Button>
+        <span className="button_hint">SHIFT + Enter</span>
+      </BottomBar>
+      {warnings.map((warning) => {
+        const trimmedString =
+          warning.value.length > 20 ? warning.value.substring(0, 20) + "..." : warning.value;
+        return (
+          <Tooltip key={warning.anchor.id} anchor={warning.anchor} closeOnClickOrKeyboardEvent>
+            <p>
+              Je probeert <strong>{trimmedString}</strong> te plakken. Je kunt hier alleen cijfers
+              invullen.
+            </p>
+          </Tooltip>
+        );
+      })}
     </form>
   );
 }

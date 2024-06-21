@@ -21,14 +21,8 @@
       flex: 1 1 auto;
     }
 
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
-
     &:global(.active) {
-      background: var(--gray-200);
-      border-radius: 8px;
+      background-color: var(--color-hover);
       font-weight: 500;
     }
 

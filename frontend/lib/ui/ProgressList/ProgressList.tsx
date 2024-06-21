@@ -1,6 +1,6 @@
 import * as React from "react";
 import {
-  IconArrownarrowright,
+  IconArrowNarrowRight,
   IconAsterisk,
   IconCheckmark,
   IconMinus,
@@ -41,7 +41,7 @@ export type ProgressListItemProps = BaseProgressListItemProps &
 ProgressList.Item = function ({ status, active, children }: ProgressListItemProps) {
   return (
     <li className={cn(active ? "active" : "idle", status)}>
-      <aside>{active ? <IconArrownarrowright /> : renderStatusIcon(status)}</aside>
+      <aside>{active ? <IconArrowNarrowRight /> : renderStatusIcon(status)}</aside>
       <label>{children}</label>
     </li>
   );

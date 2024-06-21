@@ -1,15 +1,11 @@
 import * as React from "react";
-import { useApiRequest } from "./useApiRequest";
+import { useApiPostRequest } from "./useApiPostRequest";
 import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_REQUEST_PATH,
+  DataEntryResponse,
 } from "./gen/openapi";
-
-//TEMP
-type ResponseData = {
-  ok: boolean;
-};
 
 export function usePollingStationDataEntry(params: POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS) {
   const path = React.useMemo(() => {
@@ -17,7 +13,7 @@ export function usePollingStationDataEntry(params: POLLING_STATION_DATA_ENTRY_RE
     return result;
   }, [params]);
 
-  return useApiRequest<POLLING_STATION_DATA_ENTRY_REQUEST_BODY, ResponseData>({
+  return useApiPostRequest<POLLING_STATION_DATA_ENTRY_REQUEST_BODY, DataEntryResponse>({
     path,
   });
 }

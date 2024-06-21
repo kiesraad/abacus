@@ -1,19 +1,15 @@
+import * as React from "react";
 import cls from "./InputField.module.css";
 
-export interface InputFieldProps {
+export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   name: string;
   label: string;
   subtext?: string;
   hint?: string;
-  value?: string;
-  type?: string;
-  size?: "small" | "medium" | "large" | "text-area";
-  width?: "narrow" | "wide";
+  fieldSize?: "small" | "medium" | "large" | "text-area";
+  fieldWidth?: "narrow" | "wide";
   error?: string;
-  disabled?: boolean;
   margin?: boolean;
-  pattern?: string;
-  title?: string;
 }
 
 export function InputField({
@@ -21,28 +17,27 @@ export function InputField({
   label,
   subtext = "",
   hint = "",
-  value,
+  value = undefined,
   type = "text",
-  size = "large",
-  width = "wide",
+  fieldSize = "large",
+  fieldWidth = "wide",
   error = "",
   disabled = false,
   margin = true,
-  pattern = "",
-  title = "",
+  ...InputFieldProps
 }: InputFieldProps) {
   return (
     <div className={`${cls.inputfield} ${margin ? "margin" : ""}`}>
-      <label className={`${size} ${width} ${error ? "error" : ""}`}>
+      <label className={`${fieldSize} ${fieldWidth} ${error ? "error" : ""}`}>
         <span className="label">
-          {label} <span className="subtext">{subtext}</span>
+          {label} {subtext && <span className="subtext">{subtext}</span>}
         </span>
         {disabled ? (
-          <div className={`${size} disabled_input`}>{value || undefined}</div>
-        ) : size == "text-area" ? (
+          <div className={`${fieldSize} disabled_input`}>{value}</div>
+        ) : fieldSize == "text-area" ? (
           <textarea
             name={name}
-            value={value || undefined}
+            value={value}
             aria-invalid={error ? "true" : "false"}
             aria-errormessage={error ? `${name}-hint_or_error` : undefined}
             rows={7}
@@ -50,12 +45,11 @@ export function InputField({
         ) : (
           <input
             name={name}
-            value={value || undefined}
+            value={value}
             type={type}
-            pattern={pattern || undefined}
-            title={title || undefined}
             aria-invalid={error ? "true" : "false"}
             aria-errormessage={error ? `${name}-hint_or_error` : undefined}
+            {...InputFieldProps}
           />
         )}
       </label>

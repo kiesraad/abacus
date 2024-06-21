@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { expect, test } from "vitest";
 
 import { NarrowInputField, TextAreaInputField, WideInputField } from "./InputField.stories.tsx";
+import { userEvent } from "@testing-library/user-event";
 
 test("The wide input fields are rendered", () => {
   render(<WideInputField />);
@@ -28,13 +29,17 @@ test("The wide input fields are rendered", () => {
   expect(errorElement).toHaveAccessibleErrorMessage("There is an error");
 });
 
-test("The narrow input fields are rendered", () => {
+test("The narrow input fields are rendered", async () => {
   render(<NarrowInputField />);
 
   const smallElement = screen.getByRole("textbox", { name: "Default Small Narrow" });
 
   smallElement.click();
   expect(smallElement).toBeEnabled();
+  smallElement.focus();
+  // Test if maxLength on field works
+  await userEvent.keyboard("1234567891");
+  expect(smallElement).toHaveValue("123456789");
 
   const mediumElement = screen.getByRole("textbox", { name: "Default Medium Narrow with subtext" });
 

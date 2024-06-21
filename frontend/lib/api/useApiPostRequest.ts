@@ -3,7 +3,7 @@ import * as React from "react";
 import { useApi } from "./useApi";
 import { ApiResponseErrorData } from "./ApiClient";
 
-export type UseApiRequestReturn<REQUEST_BODY, DATA> = [
+export type UseApiPostRequestReturn<REQUEST_BODY, DATA> = [
   (requestBody: REQUEST_BODY) => void,
   {
     loading: boolean;
@@ -16,9 +16,9 @@ export interface UseApiRequestParams {
   path: string;
 }
 
-export function useApiRequest<REQUEST_BODY, DATA>({
+export function useApiPostRequest<REQUEST_BODY, DATA>({
   path,
-}: UseApiRequestParams): UseApiRequestReturn<REQUEST_BODY, DATA> {
+}: UseApiRequestParams): UseApiPostRequestReturn<REQUEST_BODY, DATA> {
   const { client } = useApi();
   const [data, setData] = React.useState<DATA | null>(null);
   const [error, setError] = React.useState<ApiResponseErrorData | null>(null);

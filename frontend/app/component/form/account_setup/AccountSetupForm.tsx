@@ -18,7 +18,7 @@ export function AccountSetupForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="no_footer" onSubmit={handleSubmit}>
       <h2 className="form_title">Personaliseer je account</h2>
       <InputField
         name="username"
@@ -40,8 +40,8 @@ export function AccountSetupForm() {
         hint="Je hebt dit wachtwoord nodig als je na een pauze opnieuw wilt inloggen. Gebruik minimaal 8 letters en 2 cijfers."
         type="password"
       />
-      <InputField name="new_password2" label="Herhaal wachtwoord" type="password" />
-      <BottomBar>
+      <InputField name="new_password2" label="Herhaal wachtwoord" type="password" margin={false} />
+      <BottomBar type="full">
         <Button type="submit" size="lg">
           Opslaan
         </Button>

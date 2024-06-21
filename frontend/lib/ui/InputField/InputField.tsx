@@ -30,7 +30,7 @@ export function InputField({
     <div className={`${cls.inputfield} ${margin ? "margin" : ""}`}>
       <label className={`${fieldSize} ${fieldWidth} ${error ? "error" : ""}`}>
         <span className="label">
-          {label} <span className="subtext">{subtext}</span>
+          {label} {subtext && <span className="subtext">{subtext}</span>}
         </span>
         {disabled ? (
           <div className={`${fieldSize} disabled_input`}>{value}</div>

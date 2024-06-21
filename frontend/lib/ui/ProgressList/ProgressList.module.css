@@ -4,10 +4,9 @@
   margin: 0;
 
   li {
-    margin-bottom: 8px;
-    padding: 0;
-    min-height: 28px;
-
+    padding: 0.625rem 0.75rem;
+    min-height: 2.75rem;
+    border-radius: 0.5rem;
     display: flex;
     align-items: center;
 
@@ -23,8 +22,8 @@
     }
 
     &:global(.active) {
-      background-color: var(--bg-gray-darker);
-      font-weight: bold;
+      background-color: var(--color-hover);
+      font-weight: 500;
     }
 
     &:global(.reject) {
@@ -38,14 +37,16 @@
     &:global(.accept) {
       aside {
         svg {
-          fill: var(--accent-dark-green);
+          fill: var(--green-500);
         }
       }
     }
   }
 
   li:global(.ruler) {
-    height: 16px;
+    min-height: 1rem;
+    height: 1rem;
+    padding: 0;
     background-color: transparent;
   }
 }

@@ -3,7 +3,7 @@ import { AlertType } from "../ui.types";
 import cls from "./Alert.module.css";
 import { cn } from "@kiesraad/util";
 import { IconButton } from "@kiesraad/ui";
-import { IconCross, IconError, IconThumbsup, IconWarning, IconInfo } from "@kiesraad/icon";
+import { IconCross, IconError, IconThumbsUp, IconWarning, IconInfo } from "@kiesraad/icon";
 
 export interface AlertProps {
   type: AlertType;
@@ -16,11 +16,10 @@ export function Alert({ type, onClose, children }: AlertProps) {
     <div className={cn(cls.alert, cls[type])} role="alert">
       {onClose && (
         <IconButton
-          title="close"
           icon={<IconCross />}
+          title="Melding sluiten"
           variant="ghost"
-          size="md"
-          isRound
+          size="lg"
           onClick={onClose}
         />
       )}
@@ -39,6 +38,6 @@ function renderIconForType(type: AlertType) {
     case "notify":
       return <IconInfo />;
     case "success":
-      return <IconThumbsup />;
+      return <IconThumbsUp />;
   }
 }

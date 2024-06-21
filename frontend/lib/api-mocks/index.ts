@@ -120,5 +120,5 @@ export const pollingStationDataEntryHandler = http.post<
 export const handlers: HttpHandler[] = [pingHandler, pollingStationDataEntryHandler];
 
 function valueOutOfRange(v: number): boolean {
-  return v < 0 || v > 100000000000;
+  return v < 0 || v > 999999999;
 }

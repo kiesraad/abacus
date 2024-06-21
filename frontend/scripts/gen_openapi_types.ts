@@ -54,15 +54,15 @@ function addPath(path: string, v: PathsObject | undefined) {
   const result: string[] = [`// ${path}`];
   let requestPath = path;
   if (v.post || v.get) {
-    const post = (v.post || v.get) as OperationObject;
+    const request = (v.post || v.get) as OperationObject;
 
-    assert(typeof post.operationId === "string");
-    let id: string = post.operationId;
+    assert(typeof request.operationId === "string");
+    let id: string = request.operationId;
     id = id.toUpperCase();
 
     result.push(`export interface ${id}_REQUEST_PARAMS {`);
-    if (post.parameters) {
-      post.parameters.forEach((p) => {
+    if (request.parameters) {
+      request.parameters.forEach((p) => {
         if ("$ref" in p) {
           result.push(`// ${p.$ref.substring(p.$ref.lastIndexOf("/") + 1)}`);
         } else {
@@ -75,13 +75,13 @@ function addPath(path: string, v: PathsObject | undefined) {
     result.push("}");
     result.push(`export type ${id}_REQUEST_PATH = \`${requestPath}\`;`);
 
-    if (post.requestBody) {
-      if ("$ref" in post.requestBody) {
+    if (request.requestBody) {
+      if ("$ref" in request.requestBody) {
         result.push(
-          `export type ${id}_REQUEST_BODY = ${post.requestBody.$ref.substring(post.requestBody.$ref.lastIndexOf("/") + 1)};`,
+          `export type ${id}_REQUEST_BODY = ${request.requestBody.$ref.substring(request.requestBody.$ref.lastIndexOf("/") + 1)};`,
         );
       } else {
-        const media = post.requestBody.content["application/json"];
+        const media = request.requestBody.content["application/json"];
         if (media?.schema) {
           if ("$ref" in media.schema) {
             result.push(

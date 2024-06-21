@@ -6,13 +6,13 @@ import { overrideOnce } from "app/test/unit";
 describe("usePollingStationDataEntry", () => {
   test("doSubmit parses ok response", async () => {
     overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
-      shouldWork: "yes",
+      message: "should work",
     });
 
     const { result } = renderHook(
       () =>
         usePollingStationDataEntry({
-          id: 1,
+          polling_station_id: 1,
           entry_number: 1,
         }),
       { wrapper: Providers },
@@ -43,6 +43,6 @@ describe("usePollingStationDataEntry", () => {
 
     const [, { data }] = result.current;
     assert(data !== null, "data is not null");
-    expect(data.ok).toBe(true);
+    expect(data.message).toBe("should work");
   });
 });

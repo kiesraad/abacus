@@ -3,8 +3,14 @@
 /** PATHS **/
 
 // /api/elections
+export interface ELECTION_LIST_REQUEST_PARAMS {}
+export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
 
 // /api/elections/{election_id}
+export interface ELECTION_DETAILS_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS {
@@ -116,7 +122,11 @@ export interface ValidationResult {
   fields: string[];
 }
 
-export type ValidationResultCode = "OutOfRange" | "IncorrectTotal" | "AboveThreshold";
+export type ValidationResultCode =
+  | "OutOfRange"
+  | "IncorrectTotal"
+  | "AboveThreshold"
+  | "EqualInput";
 
 export interface ValidationResults {
   errors: ValidationResult[];

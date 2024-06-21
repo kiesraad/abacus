@@ -6,7 +6,7 @@ import {
   IconMinus,
   IconWarning,
 } from "@kiesraad/icon";
-import cls from "./progresslist.module.css";
+import cls from "./ProgressList.module.css";
 import { cn } from "@kiesraad/util";
 
 export interface ProgressListProps {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useApiRequest } from "./useApiRequest";
+import { useApiGetRequest } from "./useApiGetRequest";
 import {
   Election,
   ELECTION_DETAILS_REQUEST_PARAMS,
@@ -12,7 +12,7 @@ export function useElectionDataRequest(params: ELECTION_DETAILS_REQUEST_PARAMS) 
     return result;
   }, [params]);
 
-  return useApiRequest<null, Election>({
+  return useApiGetRequest<Election>({
     path,
   });
 }

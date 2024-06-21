@@ -12,13 +12,13 @@ export type UseApiPostRequestReturn<REQUEST_BODY, DATA> = [
   },
 ];
 
-export interface UseApiRequestParams {
+export interface UseApiPostRequestParams {
   path: string;
 }
 
 export function useApiPostRequest<REQUEST_BODY, DATA>({
   path,
-}: UseApiRequestParams): UseApiPostRequestReturn<REQUEST_BODY, DATA> {
+}: UseApiPostRequestParams): UseApiPostRequestReturn<REQUEST_BODY, DATA> {
   const { client } = useApi();
   const [data, setData] = React.useState<DATA | null>(null);
   const [error, setError] = React.useState<ApiResponseErrorData | null>(null);
@@ -27,10 +27,16 @@ export function useApiPostRequest<REQUEST_BODY, DATA>({
   React.useEffect(() => {
     let isSubscribed = true;
     const doRequest = async (b: REQUEST_BODY) => {
+      console.log(isSubscribed);
       const response = await client.postRequest<DATA>(path, b as object);
+      console.log("response");
+      console.log(response);
       if (isSubscribed) {
+        console.log("isSubscribed");
         if (response.status === "success") {
+          console.log("success");
           setData(response.data as DATA);
+          console.log(data);
         } else {
           setError(response.data as ApiResponseErrorData);
         }

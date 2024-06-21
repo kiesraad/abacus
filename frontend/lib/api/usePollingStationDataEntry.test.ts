@@ -38,6 +38,7 @@ describe("usePollingStationDataEntry", () => {
 
     await waitFor(() => {
       const [, { data }] = result.current;
+      console.log(data);
       expect(data).not.toBe(null);
     });
 

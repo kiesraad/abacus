@@ -27,16 +27,10 @@ export function useApiPostRequest<REQUEST_BODY, DATA>({
   React.useEffect(() => {
     let isSubscribed = true;
     const doRequest = async (b: REQUEST_BODY) => {
-      console.log(isSubscribed);
       const response = await client.postRequest<DATA>(path, b as object);
-      console.log("response");
-      console.log(response);
       if (isSubscribed) {
-        console.log("isSubscribed");
         if (response.status === "success") {
-          console.log("success");
           setData(response.data as DATA);
-          console.log(data);
         } else {
           setError(response.data as ApiResponseErrorData);
         }

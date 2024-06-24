@@ -191,7 +191,7 @@ const returnData: Election = {
   ],
 };
 
-export const politicalPartiesRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
+export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/v1/api/elections/:id",
   () => {
     return HttpResponse.json(returnData, { status: 200 });
@@ -201,7 +201,7 @@ export const politicalPartiesRequestHandler = http.get<ParamsToString<{ election
 export const handlers: HttpHandler[] = [
   pingHandler,
   pollingStationDataEntryHandler,
-  politicalPartiesRequestHandler,
+  ElectionRequestHandler,
 ];
 
 function valueOutOfRange(v: number): boolean {

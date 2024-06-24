@@ -27,6 +27,9 @@ verduidelijken. Het omvat ook het systeemcontextdiagram.
 
 - Abacus is het systeem ter ondersteuning van de uitslagvaststelling van
   verkiezingen.
+- Abacus Afzenderverificatie is het systeem dat gebruikt wordt om de afzender
+  van de uitslagen te controleren. De architectuur van dit systeem wordt nog
+  verder uitgewerkt.
 - De gebruikers zijn onderverdeeld in de verschillende rollen die worden
   ondersteund door het systeem: beheerder, coördinator en invoerder.
 - Het Uitwisselingsplatform en Platform Teluitslagen zijn bestaande systemen
@@ -52,3 +55,15 @@ backend. Deze componenten zijn de belangrijkste bouwblokken van de backend. Deze
 componenten zijn in de praktijk verschillende modules in de Rust-codebase.
 
 ![Componenten](./structurizr/Components.svg)
+
+De volgende componenten zijn te onderscheiden:
+- Beheer: Beheer van verkiezingen, verkiezingsgegevens en de zitting. Hieronder valt ook het starten, stoppen, hervatten en sluiten van de zitting.
+- Gebruikers: Gebruikers en rollen: beheer, authenticatie, autorisatie.
+- Verkiezingen: Verkiezingsgegevens incl. politieke groeperingen, kandidatenlijsten en stembureau's.
+- Invoeren: Invoeren en validatie van telresultaten met dubbele invoer voor het vier-ogenprincipe. Eventuele conflicten worden opgelost door de coördinator.
+- Telresultaten: Gecontroleerde (dubbel ingevoerde) telresultaten van stembureau's.
+- Zetelverdeling: Zetelverdeling na invoer van alle telresultaten.  Eventuele input (loting, overleden kandidaten) wordt aan de beheerder gevraagd.
+- Exporteren: Exporteren van de uitslag als proces-verbaal in PDF-formaat en EML_NL.
+- EML_NL generator: EML_NL-bestandenexport.
+- PDF generator: PDF-bestandenexport via Typst.
+- Statistieken: Statistieken van het uitslagvaststellingsproces.

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { renderHook, waitFor, Providers } from "app/test/unit";
+import { renderHook, Providers, waitFor } from "app/test/unit";
 import { useElectionDataRequest } from "./useElectionDataRequest";
 import { overrideOnce } from "app/test/unit";
 
@@ -78,7 +78,6 @@ describe("Test useElectionDataRequest", () => {
       ],
     };
     overrideOnce("get", "/v1/api/elections/1", 200, election);
-
     const { result } = renderHook(
       () =>
         useElectionDataRequest({
@@ -87,11 +86,11 @@ describe("Test useElectionDataRequest", () => {
       { wrapper: Providers },
     );
 
+    expect(result.current.loading).toBe(true);
     await waitFor(() => {
-      const { data } = result.current;
-      console.log("data");
-      console.log(data);
-      expect(data).not.toBe(null);
+      expect(result.current.loading).toBe(false);
     });
+
+    expect(result.current.data).toEqual(election);
   });
 });

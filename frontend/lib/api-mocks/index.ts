@@ -121,14 +121,8 @@ const returnData = `{"election":{"id":1,"name":"Municipal Election","category":"
 
 export const politicalPartiesRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/v1/api/elections/:id",
-  async ({ request }) => {
-    try {
-      await request.json();
-    } catch (e) {
-      //eslint-disable-next-line
-      return HttpResponse.text(`${e}`, { status: 422 });
-    }
-    return HttpResponse.text(returnData, { status: 200 });
+  () => {
+    return HttpResponse.json(returnData, { status: 200 });
   },
 );
 

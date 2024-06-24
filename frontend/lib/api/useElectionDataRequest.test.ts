@@ -4,7 +4,7 @@ import { useElectionDataRequest } from "./useElectionDataRequest";
 import { overrideOnce } from "app/test/unit";
 
 describe("Test useElectionDataRequest", () => {
-  test("doRequest parses ok response", async () => {
+  test("doRequest returns expected data", async () => {
     const election = {
       id: 1,
       name: "Municipal Election",

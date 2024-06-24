@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { useElectionDataRequest } from "@kiesraad/api";
 import { IconCross } from "@kiesraad/icon";
 import {
   Badge,
@@ -17,6 +18,19 @@ export function PollingStationPage() {
   // TODO: Set default targetForm correctly once all pages are implemented
   const targetForm = section || "numbers";
   const [openModal, setOpenModal] = useState(false);
+  const { data } = useElectionDataRequest({
+    election_id: parseInt(id || ""),
+  });
+  const [lists, setLists] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      let parties: [] = [];
+      const parsedData = JSON.parse(data);
+      parsedData.election.political_groups.forEach((group) => parties.push(group.name));
+      setLists(parties);
+    }
+  }, [data]);
 
   function changeDialog() {
     setOpenModal(!openModal);
@@ -93,9 +107,3 @@ export function PollingStationPage() {
     </>
   );
 }
-
-const lists: string[] = [
-  "Lijst 1 - Vurige Vleugels Partij",
-  "Lijst 2 - Wijzen van Water en Wind",
-  "Lijst 3 - Eeuwenoude Aarde Unie",
-];

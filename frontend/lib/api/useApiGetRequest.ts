@@ -32,7 +32,7 @@ export function useApiGetRequest<DATA>(path: string): UseApiGetRequestReturn<DAT
     };
 
     doRequest(path).catch((e: unknown) => {
-      console.log("catch", e);
+      console.log("Error", e);
     });
 
     return () => {

@@ -14,7 +14,6 @@ export interface ApiProviderProps {
 
 export function ApiProvider({ children, host }: ApiProviderProps) {
   const context = React.useMemo(() => {
-    console.log("Use memo change");
     return {
       client: new ApiClient(host),
     };

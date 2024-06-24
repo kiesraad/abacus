@@ -45,10 +45,13 @@ Voor de ontwikkeling van issues op GitHub hanteren we de volgende werkwijze:
 - Maak een pull request aan:
   - Voer (indien nodig) een rebase van je branch uit op main met `git rebase origin/main --interactive`
   - Verwijs naar het issue in een comment, bijv. `closes #42`
-  - Wijs ten minste 2 reviewers toe.
+  - Wijs ten minste 2 reviewers aan.
 
 - Sluit de pull request met *Merge*:
+  - Zorg dat de branch up to date is met main
   - Zorg dat alle opmerkingen (conversations) opgelost zijn.
+  - Zorg dat je 2 approvals hebt
+  - Consolideer de merge message; behoud alleen de belangrijkste punten
   - Sluit de pull request met *Squash and Merge*.
 
 ### 4. Release

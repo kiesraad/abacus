@@ -21,13 +21,12 @@ export function PollingStationPage() {
   const { data } = useElectionDataRequest({
     election_id: parseInt(id || ""),
   });
-  const [lists, setLists] = useState([]);
+  const [lists, setLists] = useState<string[]>([]);
 
   useEffect(() => {
     if (data) {
-      let parties: [] = [];
-      const parsedData = JSON.parse(data);
-      parsedData.election.political_groups.forEach((group) => parties.push(group.name));
+      const parties: string[] = [];
+      data.political_groups?.forEach((group: { name: string }) => parties.push(group.name));
       setLists(parties);
     }
   }, [data]);

@@ -67,6 +67,7 @@ a {
   text-decoration: none;
   &:hover,
   &:focus {
+    /* TODO: Can this be removed? It's now undone in ProgressList.module.css for links there */
     text-decoration: underline;
   }
 }

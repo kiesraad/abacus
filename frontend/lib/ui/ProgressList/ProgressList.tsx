@@ -6,8 +6,8 @@ import {
   IconMinus,
   IconWarning,
 } from "@kiesraad/icon";
-import cls from "./ProgressList.module.css";
 import { cn } from "@kiesraad/util";
+import cls from "./ProgressList.module.css";
 
 export interface ProgressListProps {
   children?: React.ReactNode;

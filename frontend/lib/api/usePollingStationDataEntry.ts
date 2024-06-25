@@ -5,7 +5,6 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_REQUEST_PATH,
-  DataEntryResponse,
 } from "./gen/openapi";
 
 export function usePollingStationDataEntry(params: POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS) {

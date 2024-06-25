@@ -1,0 +1,431 @@
+import { Election } from "@kiesraad/api";
+
+export const electionMockData: Election = {
+  id: 1,
+  name: "Municipal Election",
+  category: "Municipal",
+  election_date: "2024-11-30",
+  nomination_date: "2024-11-01",
+  political_groups: [
+    {
+      number: 1,
+      name: "Lijst 1 - Vurige Vleugels Partij",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 2,
+      name: "Lijst 2 - Wijzen van Water en Wind",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 3,
+      name: "Lijst 3 - Eeuwenoude Aarde Unie",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 4,
+      name: "Lijst 4 - Verbond van Licht en Leven",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 5,
+      name: "Lijst 5 - Nieuwe Horizon Beweging",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 6,
+      name: "Lijst 6 - VRG",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 7,
+      name: "Lijst 7 - ABC",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 8,
+      name: "Lijst 8 - Hele hele hele hele lange lange lange naam",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 9,
+      name: "Lijst 9 - ABC",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 10,
+      name: "Lijst 10 - DEF",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 11,
+      name: "Lijst 11 - GHI",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 12,
+      name: "Lijst 12 - JKL",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 13,
+      name: "Lijst 13 - MNO",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 14,
+      name: "Lijst 14 - PQR",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 15,
+      name: "Lijst 15 - STU",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 16,
+      name: "Lijst 16 - VW",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 17,
+      name: "Lijst 17 - XYZ",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 18,
+      name: "Lijst 18 - Nog steeds niet de laatste partij",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 19,
+      name: "Lijst 19 - De op een na laatste",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+    {
+      number: 20,
+      name: "Lijst 20 - De allerlaatste groep",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+  ],
+};

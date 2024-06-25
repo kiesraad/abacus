@@ -2,6 +2,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  width: 19.5rem;
 
   li {
     padding: 0.625rem 0.75rem;
@@ -19,6 +20,10 @@
 
     label {
       flex: 1 1 auto;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      line-height: 1.5rem;
     }
 
     &:global(.active) {
@@ -59,8 +64,10 @@
     }
     a {
       color: inherit;
-      display: inline-block;
       width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
       &:hover,
       &:focus {
         text-decoration: none;

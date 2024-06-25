@@ -32,7 +32,7 @@ Warranties by the Contributor
 *	The Contributor grants the right of use to the Contributions on an ‘as is’ basis. The Contributor bears no responsibility for errors, defects and omissions in the Contributions.
 *	The Contributor guarantees that the Contributions are his/her own work. The Contributor may not provide Contributions from third parties to the Electoral Council.
 *	The Contributor guarantees that he/she is legally entitled to grant the right of use referred to in clause 1. If the intellectual property rights to Contributions accrue to the Contributor’s employer, the Contributor hereby declares that he/she has received permission from his/her employer to grant the right of use referred to in clause 1.
-*	The Contributor guarantees that he/she will not institute legal proceedings against the Ministry or third parties or suggest that such proceedings be instituted if they make use of the Contributions in accordance with this licence.
+*	The Contributor guarantees that he/she will not institute legal proceedings against the Electoral Council or third parties or suggest that such proceedings be instituted if they make use of the Contributions in accordance with this licence.
 *	The Contributor guarantees that he/she will inform the Electoral Council if he/she has unexpectedly provided the Electoral Council with incorrect information in any way whatsoever.
 
 Remaining provisions

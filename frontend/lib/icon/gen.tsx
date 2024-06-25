@@ -19,6 +19,17 @@ export const IconArrowNarrowRight = () => (
     />
   </svg>
 );
+export const IconAsterisk = () => (
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M12 4V20M18 6L6 18M20 12H4M18 18L6 6"
+      stroke="#004EEB"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 export const IconCheckHeart = () => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -102,6 +113,17 @@ export const IconHourglass = () => (
 export const IconInfo = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M12,23c-6.1,0-11-4.9-11-11S5.9,1,12,1s11,4.9,11,11-4.9,11-11,11ZM12,3C7,3,3,7,3,12s4,9,9,9,9-4,9-9S17,3,12,3ZM12,17c-.6,0-1-.4-1-1v-4c0-.6.4-1,1-1s1,.4,1,1v4c0,.6-.4,1-1,1ZM12,9c-.6,0-1-.4-1-1s.4-1,1-1h0c.6,0,1,.4,1,1s-.4,1-1,1Z" />
+  </svg>
+);
+export const IconMinus = () => (
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M5 12H19"
+      stroke="#667085"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 export const IconThumbsUp = () => (

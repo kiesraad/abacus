@@ -1,12 +1,13 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 import {
   DataEntryResponse,
+  ErrorResponse,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
-  ErrorResponse,
   VotesCounts,
   VotersCounts,
 } from "@kiesraad/api";
+import { electionMockData } from "./ElectionMockData.ts";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -117,7 +118,18 @@ export const pollingStationDataEntryHandler = http.post<
   }
 });
 
-export const handlers: HttpHandler[] = [pingHandler, pollingStationDataEntryHandler];
+export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
+  "/v1/api/elections/:id",
+  () => {
+    return HttpResponse.json(electionMockData, { status: 200 });
+  },
+);
+
+export const handlers: HttpHandler[] = [
+  pingHandler,
+  pollingStationDataEntryHandler,
+  ElectionRequestHandler,
+];
 
 function valueOutOfRange(v: number): boolean {
   return v < 0 || v > 999999999;

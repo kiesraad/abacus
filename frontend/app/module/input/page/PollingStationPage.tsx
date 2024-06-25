@@ -54,26 +54,32 @@ export function PollingStationPage() {
       <main>
         <nav>
           <ProgressList>
-            <ProgressList.Item status="accept" active={targetForm === "recount"}>
+            <ProgressList.Item key="recount" status="accept" active={targetForm === "recount"}>
               <Link to={`/input/${id}/recount`}>Is er herteld?</Link>
             </ProgressList.Item>
-            <ProgressList.Item status="idle" active={targetForm === "numbers"}>
+            <ProgressList.Item key="numbers" status="idle" active={targetForm === "numbers"}>
               <Link to={`/input/${id}/numbers`}>Aantal kiezers en stemmen</Link>
             </ProgressList.Item>
-            <ProgressList.Item status="idle" active={targetForm === "differences"}>
+            <ProgressList.Item
+              key="differences"
+              status="idle"
+              active={targetForm === "differences"}
+            >
               <Link to={`/input/${id}/differences`}>Verschillen</Link>
             </ProgressList.Item>
-            <ProgressList.Ruler />
+            <ProgressList.Ruler key="ruler1" />
             {lists.map((list, index) => {
               const listId = `list${(index + 1).toString()}`;
               return (
                 <ProgressList.Item key={listId} status="idle" active={targetForm === listId}>
-                  <Link to={`/input/${id}/${listId}`}>{list}</Link>
+                  <Link to={`/input/${id}/${listId}`} state={data}>
+                    {list}
+                  </Link>
                 </ProgressList.Item>
               );
             })}
-            <ProgressList.Ruler />
-            <ProgressList.Item status="idle" active={targetForm === "save"}>
+            <ProgressList.Ruler key="ruler2" />
+            <ProgressList.Item key="save" status="idle" active={targetForm === "save"}>
               <Link to={`/input/${id}/save`}>Controleren en opslaan</Link>
             </ProgressList.Item>
           </ProgressList>

@@ -1,7 +1,10 @@
 import * as React from "react";
 
-import { Button, InputGrid } from "@kiesraad/ui";
+import { BottomBar, Button, InputGrid } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useElectionDataRequest } from "@kiesraad/api";
 
 interface FormElements extends HTMLFormControlsCollection {
   pollCards: HTMLInputElement;
@@ -19,14 +22,36 @@ interface CandidatesVotesFormElement extends HTMLFormElement {
 }
 
 export function CandidatesVotesForm() {
+  const { id, section } = useParams();
   // const { register, format, deformat } = usePositiveNumberInputMask();
   const { register, format } = usePositiveNumberInputMask();
+  const [candidates, setCandidates] = useState<string[]>([]);
+  const [listName, setListName] = useState("");
   const formRef = React.useRef<HTMLFormElement>(null);
+  const { data, loading } = useElectionDataRequest({
+    election_id: parseInt(id || ""),
+  });
   usePreventFormEnterSubmit(formRef);
   // const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
   //   polling_station_id: 1,
   //   entry_number: 1,
   // });
+
+  useEffect(() => {
+    if (data) {
+      const names: string[] = [];
+      const listNumber = parseInt(section?.replace("list", "") || "");
+      const currentGroup = data.political_groups?.find((group) => group.number === listNumber);
+      if (currentGroup) {
+        setListName(currentGroup.name);
+        currentGroup.candidates.forEach(
+          (candidate: { initials: string; first_name: string; last_name: string }) =>
+            names.push(`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`),
+        );
+        setCandidates(names);
+      }
+    }
+  }, [data, section]);
 
   function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
     event.preventDefault();
@@ -52,7 +77,7 @@ export function CandidatesVotesForm() {
 
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
-      <h2>Lijst 1 - Vurige Vleugels Partij</h2>
+      <h2>{listName}</h2>
       {/*{data && <p id="result">Success</p>}*/}
       {/*{error && (*/}
       {/*  <p id="result">*/}
@@ -94,48 +119,15 @@ export function CandidatesVotesForm() {
           </InputGrid.Total>
         </InputGrid.Body>
       </InputGrid>
-      <br /> <br />
-      {/*<Button type="submit" size="lg" disabled={loading}>*/}
-      {/*  Volgende*/}
-      {/*</Button>*/}
-      <Button type="submit" size="lg">
-        Volgende
-      </Button>
+      <BottomBar type="form">
+        <Button type="submit" size="lg" disabled={loading}>
+          Volgende
+        </Button>
+        <span className="button_hint">SHIFT + Enter</span>
+      </BottomBar>
     </form>
   );
 }
-
-const candidates: string[] = [
-  "Zilverlicht, E. (Eldor)",
-  "Donderbrul, G. (Grom)",
-  "Fluisterwind, S. (Seraphina)",
-  "Nachtschaduw, V. (Vesper)",
-  "Stormvleugel, R. (Ravian)",
-  "Sterrenzwerver, M. (Mirella)",
-  "Maanfluisteraar, X. (Xander)",
-  "Windzanger, P. (Paxton)",
-  "Vuurvlinder, F. (Faelia)",
-  "Rotsbreker, H. (Helga)",
-  "Zonnewende, L. (Luna)",
-  "Groenhart, T. (Timo)",
-  "Veldbloem, N. (Naima)",
-  "IJzeren, V. (Vincent)",
-  "Blauwhof, P. (Priya)",
-  "Windmaker, J. (Jamal)",
-  "Sterrenveld, E. (Esmée)",
-  "Roodman, M. (Mohammed)",
-  "Zilverberg, C. (Chen)",
-  "Duinwalker, S. (Soraya)",
-  "Lichtveld, A. (Alex)",
-  "Kruidentuin, H. (Habiba)",
-  "Vlietstra, B. (Bram)",
-  "Meermin, K. (Kai)",
-  "Goudappel, D. (Diana)",
-  "Bosrank, F. (Finn)",
-  "Sterrenveld, J. (Julia)",
-  "Regenboog, G. (Giovanni)",
-  "Hemelrijk, M. (Milan)",
-];
 
 //currently I want zeroes in the value
 function pickGoodTestNumber() {

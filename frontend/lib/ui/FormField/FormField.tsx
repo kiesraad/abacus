@@ -6,7 +6,7 @@ import { IconError } from "@kiesraad/icon";
 
 export interface FormFieldProps {
   children: React.ReactNode;
-  error?: ResultCode | ResultCode[] | undefined;
+  error?: ResultCode[];
   tooltip?: string | React.ReactNode;
 }
 

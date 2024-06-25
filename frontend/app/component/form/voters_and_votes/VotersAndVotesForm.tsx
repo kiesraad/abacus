@@ -101,9 +101,8 @@ export function VotersAndVotesForm() {
         </Feedback>
       )}
       {data && hasValidationError && (
-        <Feedback type="error" title="Error">
+        <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div>
-            <h2 id="result">Validatie fouten</h2>
             <ul>
               {data.validation_results.errors.map((error) => (
                 <li key={error.code}>{error.code}</li>

@@ -11,6 +11,9 @@
     }
   }
 
-  &:global(.has-icon) {
+  &:global(.has-error) {
+    input {
+      padding-left: 56px !important;
+    }
   }
 }

@@ -85,7 +85,7 @@ describe("Test VotersAndVotesForm", () => {
     await user.clear(blankVotes);
     // Test if maxLength on field works
     await user.type(blankVotes, "1000000000");
-    expect(blankVotes).toHaveValue("100.000.000");
+    expect(blankVotes).toHaveValue("1.000.000.000");
 
     await user.keyboard("{enter}");
 
@@ -211,7 +211,7 @@ describe("Test VotersAndVotesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^Error 422 error from mock$/);
+    expect(result).toHaveTextContent(/^422 error from mock$/);
   });
 
   test("500 response results in display of error message", async () => {
@@ -232,6 +232,6 @@ describe("Test VotersAndVotesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^Error 500_ERROR 500 error from mock$/);
+    expect(result).toHaveTextContent(/^500 error from mock$/);
   });
 });

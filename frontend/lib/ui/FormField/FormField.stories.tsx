@@ -1,15 +1,15 @@
 import type { Story } from "@ladle/react";
 
 import { FormField } from "./FormField";
-import { ValidationResultCode } from "@kiesraad/api";
+import { ResultCode } from "@kiesraad/api";
 
 type Props = {
-  error?: ValidationResultCode;
+  error?: ResultCode;
 };
 
 export const DefaultFormField: Story<Props> = ({ error }) => (
-  <FormField error={error}>
-    <input type="text" />
+  <FormField error={error ? [error] : undefined}>
+    <input id="test-input" type="text" />
   </FormField>
 );
 

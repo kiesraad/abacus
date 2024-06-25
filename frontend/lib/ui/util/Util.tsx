@@ -1,4 +1,4 @@
-import { IconError, IconThumbsup, IconWarning, IconInfo } from "@kiesraad/icon";
+import { IconError, IconThumbsUp, IconWarning, IconInfo } from "@kiesraad/icon";
 import { AlertType } from "../ui.types";
 
 export function renderIconForType(type: AlertType) {
@@ -10,6 +10,6 @@ export function renderIconForType(type: AlertType) {
     case "notify":
       return <IconInfo />;
     case "success":
-      return <IconThumbsup />;
+      return <IconThumbsUp />;
   }
 }

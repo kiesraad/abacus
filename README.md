@@ -4,7 +4,7 @@
 De Kiesraad wil de software Ondersteunende Software Verkiezingen (OSV) vervangen. Het deel van de software dat het proces tijdens en na de verkiezingsdag zal ondersteunen wordt in huis gebouwd door een eigen ontwikkelteam.
 URN Uitslag ondersteunt het papieren proces, van het tellen van de stemmen tot en met de zetelverdeling, bij alle in Nederland gebruikelijke verkiezingsvormen.
 
-De eerste stap is het bouwen van de uitslagensoftware voor het Gemeentelijk Stembureau. Onderdeel hiervan zijn ook het datamodel en de in- en export van EML-bestanden. De module voor het Gemeentelijk Stembureau biedt zo houvast voor de ontwikkeling van de rest van de uitslagensoftware.
+De eerste stap is het bouwen van de uitslagensoftware voor het Gemeentelijk Stembureau. Onderdeel hiervan zijn ook het datamodel en de im- en export van EML-bestanden. De module voor het Gemeentelijk Stembureau biedt zo houvast voor de ontwikkeling van de rest van de uitslagensoftware.
 
 De software omvat de flow van stemmen tot en met de zetelverdeling:
 
@@ -46,7 +46,7 @@ directory.
 
 ## Bijdragen
 
-We ontwikkelen URN Uitslag open source, niet alleen omdat dit de transparantie bevordert maar ook omdat we bijdragen vanuit de community verwelkomen. Als je iets wilt bijdragen of als je een vraag hebt, kun je een issue openen op GitHub met daarin een gedetailleerde beschrijving. Ook kun je contact opnemen met onze teamlead Niels Hatzmann: [niels.hatzmann@kiesraad.nl](mailto:niels.hatzmann@kiesraad.nl).
+We ontwikkelen URN Uitslag open source, niet alleen omdat dit de transparantie bevordert, maar ook omdat we bijdragen vanuit de community verwelkomen. Als je iets wilt bijdragen of als je een vraag hebt, kun je een issue openen op GitHub met daarin een gedetailleerde beschrijving. Ook kun je contact opnemen met onze teamlead Niels Hatzmann: [niels.hatzmann@kiesraad.nl](mailto:niels.hatzmann@kiesraad.nl).
 
 ## Copyright en licenties
 

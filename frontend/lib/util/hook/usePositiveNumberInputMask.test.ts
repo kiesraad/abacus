@@ -81,8 +81,14 @@ describe("useInputMask", () => {
     const { result } = renderHook(() => usePositiveNumberInputMask());
 
     const testNumber = 12345;
-    const formatted = result.current.format(testNumber);
-    const deformatted = result.current.deformat(formatted);
+    let formatted = result.current.format(testNumber);
+    let deformatted = result.current.deformat(formatted);
     expect(deformatted).equals(testNumber);
+
+    // Make sure empty value is converted to 0 instead of null
+    const testString = "";
+    formatted = result.current.format(testString);
+    deformatted = result.current.deformat(formatted);
+    expect(deformatted).equals(0);
   });
 });

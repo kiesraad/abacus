@@ -95,17 +95,22 @@
   --blue-light-800: #065986;
   --blue-dark-100: #d1e0ff;
   --blue-dark-400: #528bff;
+  --menu-updates: #004eeb;
 
   --error-400: #f97066;
   --error-600: #d92d20;
 
-  --gray-500: #667085;
+  --gray-200: #eaecf0;
+  --menu-empty: #667085;
+  --gray-600: #475467;
   --gray-900: #101828;
 
   --green-100: #d3f8df;
-  --green-500: #16b364;
+  --menu-accept: #16b364;
   --green-800: #095c37;
 
   --purple-100: #ebe9fe;
   --purple-800: #4a1fb8;
+
+  --menu-warning: #dc6803;
 }

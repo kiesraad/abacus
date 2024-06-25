@@ -2,6 +2,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  width: 19.5rem;
 
   li {
     padding: 0.625rem 0.75rem;
@@ -19,11 +20,10 @@
 
     label {
       flex: 1 1 auto;
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      line-height: 1.5rem;
     }
 
     &:global(.active) {
@@ -34,7 +34,7 @@
     &:global(.updates) {
       aside {
         svg {
-          fill: var(--blue-dark-700);
+          fill: var(--menu-updates);
         }
       }
     }
@@ -42,7 +42,7 @@
     &:global(.empty) {
       aside {
         svg {
-          fill: var(--gray-500);
+          fill: var(--menu-empty);
         }
       }
     }
@@ -50,7 +50,7 @@
     &:global(.warning) {
       aside {
         svg {
-          fill: var(--warning-600);
+          fill: var(--menu-warning);
         }
       }
     }
@@ -58,8 +58,19 @@
     &:global(.accept) {
       aside {
         svg {
-          fill: var(--green-500);
+          fill: var(--menu-accept);
         }
+      }
+    }
+    a {
+      color: inherit;
+      width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      &:hover,
+      &:focus {
+        text-decoration: none;
       }
     }
   }

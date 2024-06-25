@@ -6,8 +6,9 @@ import {
   IconMinus,
   IconWarning,
 } from "@kiesraad/icon";
-import cls from "./ProgressList.module.css";
 import { cn } from "@kiesraad/util";
+import { MenuStatus } from "../ui.types";
+import cls from "./ProgressList.module.css";
 
 export interface ProgressListProps {
   children?: React.ReactNode;
@@ -47,7 +48,7 @@ ProgressList.Item = function ({ status, active, children }: ProgressListItemProp
   );
 };
 
-function renderStatusIcon(status: "accept" | "warning" | "empty" | "updates" | "idle") {
+function renderStatusIcon(status: MenuStatus) {
   switch (status) {
     case "accept":
       return <IconCheckmark />;

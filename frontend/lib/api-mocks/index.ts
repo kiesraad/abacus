@@ -1,12 +1,13 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 import {
   DataEntryResponse,
+  ErrorResponse,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
-  ErrorResponse,
   VotesCounts,
   VotersCounts,
 } from "@kiesraad/api";
+import { electionMockData } from "./ElectionMockData.ts";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -117,25 +118,17 @@ export const pollingStationDataEntryHandler = http.post<
   }
 });
 
-const returnData = `{"election":{"id":1,"name":"Municipal Election","category":"Municipal","election_date":"2024-11-30","nomination_date":"2024-11-01","political_groups":[{"number":1,"name":"Political Group A","candidates":[{"number":1,"initials":"A.","first_name":"Alice","last_name":"Foo","locality":"Amsterdam","gender":"Female"},{"number":2,"initials":"C.","first_name":"Charlie","last_name":"Doe","locality":"Rotterdam"}]}]}}`;
-
-export const politicalPartiesRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
+export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/v1/api/elections/:id",
-  async ({ request }) => {
-    try {
-      await request.json();
-    } catch (e) {
-      //eslint-disable-next-line
-      return HttpResponse.text(`${e}`, { status: 422 });
-    }
-    return HttpResponse.text(returnData, { status: 200 });
+  () => {
+    return HttpResponse.json(electionMockData, { status: 200 });
   },
 );
 
 export const handlers: HttpHandler[] = [
   pingHandler,
   pollingStationDataEntryHandler,
-  politicalPartiesRequestHandler,
+  ElectionRequestHandler,
 ];
 
 function valueOutOfRange(v: number): boolean {

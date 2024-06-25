@@ -85,7 +85,7 @@ describe("Test VotersAndVotesForm", () => {
     await user.clear(blankVotes);
     // Test if maxLength on field works
     await user.type(blankVotes, "1000000000");
-    expect(blankVotes).toHaveValue("1.000.000.000");
+    expect(blankVotes).toHaveValue("100.000.000");
 
     await user.keyboard("{enter}");
 

@@ -29,11 +29,11 @@
   }
 
   &.error {
-    border-color: var(--color-alert);
-    background-color: var(--color-alert-bg);
+    border-color: var(--color-error);
+    background-color: var(--color-error-bg);
 
     svg {
-      fill: var(--color-alert);
+      fill: var(--color-error);
     }
   }
   &.warning {

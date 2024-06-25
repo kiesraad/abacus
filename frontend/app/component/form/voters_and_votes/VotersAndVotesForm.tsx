@@ -130,8 +130,9 @@ export function VotersAndVotesForm() {
             <td>
               <FormField error={errorsAndWarnings.get("poll_card_count")?.errors}>
                 <input
-                  name="poll_card_count"
                   id="poll_card_count"
+                  name="poll_card_count"
+                  maxLength={11}
                   {...register()}
                   defaultValue={format(pickGoodTestNumber())}
                 />
@@ -146,6 +147,7 @@ export function VotersAndVotesForm() {
                 <input
                   id="proxy_certificate_count"
                   name="proxy_certificate_count"
+                  maxLength={11}
                   {...register()}
                   defaultValue={format(pickGoodTestNumber())}
                 />
@@ -158,8 +160,9 @@ export function VotersAndVotesForm() {
             <td>
               <FormField error={errorsAndWarnings.get("voter_card_count")?.errors}>
                 <input
-                  name="voter_card_count"
                   id="voter_card_count"
+                  name="voter_card_count"
+                  maxLength={11}
                   {...register()}
                   defaultValue={format(pickGoodTestNumber())}
                 />
@@ -174,6 +177,7 @@ export function VotersAndVotesForm() {
                 <input
                   id="total_admitted_voters_count"
                   name="total_admitted_voters_count"
+                  maxLength={11}
                   {...register()}
                   defaultValue={format(pickGoodTestNumber())}
                 />
@@ -191,6 +195,7 @@ export function VotersAndVotesForm() {
                 <input
                   id="votes_candidates_counts"
                   name="votes_candidates_counts"
+                  maxLength={11}
                   {...register()}
                   defaultValue={format(pickGoodTestNumber())}
                 />
@@ -205,6 +210,7 @@ export function VotersAndVotesForm() {
                 <input
                   id="blank_votes_count"
                   name="blank_votes_count"
+                  maxLength={11}
                   {...register()}
                   defaultValue={format(pickGoodTestNumber())}
                 />
@@ -219,6 +225,7 @@ export function VotersAndVotesForm() {
                 <input
                   id="invalid_votes_count"
                   name="invalid_votes_count"
+                  maxLength={11}
                   {...register()}
                   defaultValue={format(pickGoodTestNumber())}
                 />
@@ -233,6 +240,7 @@ export function VotersAndVotesForm() {
                 <input
                   id="total_votes_cast_count"
                   name="total_votes_cast_count"
+                  maxLength={11}
                   {...register()}
                   defaultValue={format(pickGoodTestNumber())}
                 />

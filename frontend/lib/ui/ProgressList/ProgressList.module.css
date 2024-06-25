@@ -34,7 +34,7 @@
     &:global(.updates) {
       aside {
         svg {
-          fill: var(--blue-dark-700);
+          fill: var(--menu-updates);
         }
       }
     }
@@ -42,7 +42,7 @@
     &:global(.empty) {
       aside {
         svg {
-          fill: var(--gray-500);
+          fill: var(--menu-empty);
         }
       }
     }
@@ -50,7 +50,7 @@
     &:global(.warning) {
       aside {
         svg {
-          fill: var(--warning-600);
+          fill: var(--menu-warning);
         }
       }
     }
@@ -58,7 +58,7 @@
     &:global(.accept) {
       aside {
         svg {
-          fill: var(--green-500);
+          fill: var(--menu-accept);
         }
       }
     }

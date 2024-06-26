@@ -22,9 +22,14 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let app = Router::new()
         .route("/api/elections/:id", get(election::election_details))
         .route("/api/elections", get(election::election_list))
-        .route(
-            "/api/polling_stations/:id/data_entries/:entry_number",
-            post(polling_station::polling_station_data_entry),
+        .nest(
+            "/api/polling_stations",
+            Router::new()
+                .route("/", get(polling_station::polling_station_list))
+                .route(
+                    "/:id/data_entries/:entry_number",
+                    post(polling_station::polling_station_data_entry),
+                ),
         )
         .with_state(pool);
 

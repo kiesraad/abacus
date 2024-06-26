@@ -1,9 +1,16 @@
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use utoipa::ToSchema;
 
 use crate::validation::{
     above_percentage_threshold, Validate, ValidationResult, ValidationResultCode, ValidationResults,
 };
+
+#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
+pub struct PollingStation {
+    pub polling_station_id: Option<i64>,
+    pub entry_number: Option<i64>,
+}
 
 /// PollingStationResults, following the fields in
 /// "Model N 10-1. Proces-verbaal van een stembureau"

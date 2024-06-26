@@ -1,6 +1,6 @@
 use axum::extract::{FromRequest, Path, State};
 use serde::{Deserialize, Serialize};
-use sqlx::{query, SqlitePool};
+use sqlx::{query, query_as, SqlitePool};
 use utoipa::ToSchema;
 
 use crate::validation::{Validate, ValidationResults};
@@ -66,6 +66,40 @@ pub async fn polling_station_data_entry(
     }))
 }
 
+/// Polling station list response
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct PollingStationListResponse {
+    pub polling_stations: Vec<PollingStation>,
+}
+
+impl IntoResponse for PollingStationListResponse {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
+}
+
+/// List all polling stations
+#[utoipa::path(
+        get,
+        path = "/api/polling_stations",
+        responses(
+            (status = 200, description = "Polling station listing successful", body = PollingStationListResponse),
+            (status = 500, description = "Internal server error", body = ErrorResponse),
+        ),
+    )]
+pub async fn polling_station_list(
+    State(pool): State<SqlitePool>,
+) -> Result<PollingStationListResponse, APIError> {
+    let polling_stations = query_as!(
+        PollingStation,
+        "SELECT polling_station_id, entry_number FROM polling_station_data_entries;"
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(PollingStationListResponse { polling_stations })
+}
+
 #[cfg(test)]
 mod tests {
     use axum::response::IntoResponse;
@@ -126,5 +160,13 @@ mod tests {
             .expect("No data found");
         let data: PollingStationResults = serde_json::from_slice(&data.data.unwrap()).unwrap();
         assert_eq!(data.voters_counts.poll_card_count, new_value);
+    }
+
+    #[sqlx::test]
+    async fn test_polling_station_listing(pool: SqlitePool) {
+        let response = polling_station_list(State(pool.clone()))
+            .await
+            .into_response();
+        assert_eq!(response.status(), 200);
     }
 }

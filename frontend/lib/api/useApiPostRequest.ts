@@ -12,13 +12,13 @@ export type UseApiPostRequestReturn<REQUEST_BODY, DATA> = [
   },
 ];
 
-export interface UseApiRequestParams {
+export interface UseApiPostRequestParams {
   path: string;
 }
 
 export function useApiPostRequest<REQUEST_BODY, DATA>({
   path,
-}: UseApiRequestParams): UseApiPostRequestReturn<REQUEST_BODY, DATA> {
+}: UseApiPostRequestParams): UseApiPostRequestReturn<REQUEST_BODY, DATA> {
   const { client } = useApi();
   const [data, setData] = React.useState<DATA | null>(null);
   const [error, setError] = React.useState<ApiResponseErrorData | null>(null);

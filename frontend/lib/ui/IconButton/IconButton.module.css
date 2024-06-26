@@ -51,7 +51,7 @@
     border: 1px solid transparent;
     box-shadow: none;
     svg {
-      fill: var(--gray-500);
+      fill: var(--menu-empty);
     }
 
     &:hover {

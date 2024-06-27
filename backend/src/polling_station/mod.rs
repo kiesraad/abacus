@@ -68,6 +68,8 @@ pub async fn polling_station_data_entry(
 
 #[cfg(test)]
 mod tests {
+    use axum::response::IntoResponse;
+
     use super::*;
 
     #[sqlx::test]

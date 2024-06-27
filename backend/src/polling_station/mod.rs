@@ -72,24 +72,18 @@ pub struct PollingStationListResponse {
     pub polling_stations: Vec<PollingStation>,
 }
 
-impl IntoResponse for PollingStationListResponse {
-    fn into_response(self) -> Response {
-        Json(self).into_response()
-    }
-}
-
 /// List all polling stations
 #[utoipa::path(
-        get,
-        path = "/api/polling_stations",
-        responses(
-            (status = 200, description = "Polling station listing successful", body = PollingStationListResponse),
-            (status = 500, description = "Internal server error", body = ErrorResponse),
-        ),
-    )]
+    get,
+    path = "/api/polling_stations",
+    responses(
+        (status = 200, description = "Polling station listing successful", body = PollingStationListResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
 pub async fn polling_station_list(
     State(pool): State<SqlitePool>,
-) -> Result<PollingStationListResponse, APIError> {
+) -> Result<JsonResponse<PollingStationListResponse>, APIError> {
     let polling_stations = query_as!(
         PollingStation,
         "SELECT polling_station_id, entry_number FROM polling_station_data_entries;"
@@ -97,7 +91,9 @@ pub async fn polling_station_list(
     .fetch_all(&pool)
     .await?;
 
-    Ok(PollingStationListResponse { polling_stations })
+    Ok(JsonResponse(PollingStationListResponse {
+        polling_stations,
+    }))
 }
 
 #[cfg(test)]

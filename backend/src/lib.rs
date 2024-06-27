@@ -51,6 +51,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             election::election_list,
             election::election_details,
             polling_station::polling_station_data_entry,
+            polling_station::polling_station_list,
         ),
         components(
             schemas(
@@ -68,6 +69,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 polling_station::DataEntryRequest,
                 polling_station::DataEntryResponse,
                 polling_station::PollingStationResults,
+                polling_station::PollingStationListResponse,
                 polling_station::VotersCounts,
                 polling_station::VotesCounts,
             ),

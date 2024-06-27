@@ -138,3 +138,12 @@ impl From<sqlx::Error> for APIError {
         APIError::SqlxError(err)
     }
 }
+
+#[derive(Debug, Serialize)]
+pub struct JsonResponse<T>(T);
+
+impl<T: Serialize> IntoResponse for JsonResponse<T> {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
+}

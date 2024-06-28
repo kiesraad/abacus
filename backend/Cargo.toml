@@ -5,8 +5,8 @@ edition = "2021"
 license = "EUPL-1.2"
 
 [features]
-default = ["swagger"]
-swagger = ["dep:utoipa-swagger-ui"]
+default = ["openapi"]
+openapi = ["dep:utoipa-swagger-ui"]
 
 [dependencies]
 axum = { version = "0.7", features = ["macros"] }

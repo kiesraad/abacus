@@ -94,6 +94,37 @@
         }
       }
     },
+    "/api/polling_stations": {
+      "get": {
+        "tags": [
+          "polling_station"
+        ],
+        "summary": "List all polling stations",
+        "operationId": "polling_station_list",
+        "responses": {
+          "200": {
+            "description": "Polling station listing successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
         "tags": [
@@ -366,6 +397,21 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "PollingStationListResponse": {
+        "type": "object",
+        "description": "Polling station list response",
+        "required": [
+          "polling_stations"
+        ],
+        "properties": {
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStation"
+            }
           }
         }
       },

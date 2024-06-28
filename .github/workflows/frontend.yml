@@ -3,6 +3,8 @@ name: Frontend
 on:
   push:
   workflow_dispatch:
+  merge_group:
+    types: [checks_requested]
 
 env:
   API_MODE: msw

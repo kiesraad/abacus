@@ -83,10 +83,26 @@ pub struct PollingStationListResponse {
 )]
 pub async fn polling_station_list(
     State(pool): State<SqlitePool>,
+    Path(election_id): Path<u32>,
 ) -> Result<JsonResponse<PollingStationListResponse>, APIError> {
     let polling_stations = query_as!(
         PollingStation,
-        "SELECT id, name, number, voter_amount, polling_station_type, street, housenumber, addition, postal_code, locality FROM polling_stations;"
+        r#"
+SELECT
+  id,
+  name,
+  number,
+  voter_amount,
+  polling_station_type,
+  street,
+  housenumber,
+  addition,
+  postal_code,
+  locality
+FROM polling_stations
+WHERE election_id = $1;
+"#,
+        election_id
     )
     .fetch_all(&pool)
     .await?;
@@ -160,7 +176,7 @@ mod tests {
 
     #[sqlx::test]
     async fn test_polling_station_listing(pool: SqlitePool) {
-        let response = polling_station_list(State(pool.clone()))
+        let response = polling_station_list(State(pool.clone()), Path(0))
             .await
             .into_response();
         assert_eq!(response.status(), 200);

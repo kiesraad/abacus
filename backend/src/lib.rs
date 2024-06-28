@@ -25,7 +25,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .nest(
             "/api/polling_stations",
             Router::new()
-                .route("/", get(polling_station::polling_station_list))
+                .route("/:election_id", get(polling_station::polling_station_list))
                 .route(
                     "/:id/data_entries/:entry_number",
                     post(polling_station::polling_station_data_entry),

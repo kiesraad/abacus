@@ -1,4 +1,4 @@
-# Abacus 🧮
+# Abacus 🧮 software voor verkiezingsuitslagen en zetelverdeling
 
 ## Wat is Abacus?
 

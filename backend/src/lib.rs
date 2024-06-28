@@ -10,15 +10,16 @@ use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
 use utoipa::{OpenApi, ToSchema};
 
+#[cfg(debug_assertions)]
+use utoipa_swagger_ui::SwaggerUi;
+
 pub mod election;
 pub mod polling_station;
 pub mod validation;
 
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
-    let openapi = create_openapi();
     let app = Router::new()
-        .route("/api-docs/openapi.json", get(Json(openapi)))
         .route("/api/elections/:id", get(election::election_details))
         .route("/api/elections", get(election::election_list))
         .route(
@@ -26,6 +27,17 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             post(polling_station::polling_station_data_entry),
         )
         .with_state(pool);
+
+    // Always create an OpenAPI Json spec, but only provide a swagger frontend in release builds
+    let openapi = create_openapi();
+
+    #[cfg(debug_assertions)]
+    let app =
+        app.merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", openapi.clone()));
+
+    #[cfg(not(debug_assertions))]
+    let app = app.route("/api-docs/openapi.json", get(Json(openapi.clone())));
+
     Ok(app)
 }
 

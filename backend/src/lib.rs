@@ -32,8 +32,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let openapi = create_openapi();
 
     #[cfg(debug_assertions)]
-    let app =
-        app.merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", openapi.clone()));
+    let app = app.merge(SwaggerUi::new("/api-docs").url("/api-docs/openapi.json", openapi.clone()));
 
     #[cfg(not(debug_assertions))]
     let app = app.route("/api-docs/openapi.json", get(Json(openapi.clone())));

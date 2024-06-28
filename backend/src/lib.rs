@@ -10,7 +10,7 @@ use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
 use utoipa::{OpenApi, ToSchema};
 
-#[cfg(debug_assertions)]
+#[cfg(feature = "swagger")]
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod election;
@@ -31,10 +31,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     // Always create an OpenAPI Json spec, but only provide a swagger frontend in release builds
     let openapi = create_openapi();
 
-    #[cfg(debug_assertions)]
+    #[cfg(feature = "swagger")]
     let app = app.merge(SwaggerUi::new("/api-docs").url("/api-docs/openapi.json", openapi.clone()));
 
-    #[cfg(not(debug_assertions))]
+    #[cfg(not(feature = "swagger"))]
     let app = app.route("/api-docs/openapi.json", get(Json(openapi.clone())));
 
     Ok(app)

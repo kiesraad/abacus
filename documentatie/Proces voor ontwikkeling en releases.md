@@ -64,8 +64,8 @@ Voor de ontwikkeling via GitHub hanteren we de volgende werkwijze:
     - Maak testen aan voor de functionaliteit en voer ze uit.
 
 - Maak een pull request aan:
-    - Voer (indien nodig) een rebase van je branch uit op `main` met
-      `git fetch; git rebase origin/main --interactive`
+    - Als de branch commits bevat die al eerder gemerged zijn, kun je die verwijderen met een _interactive rebase_:
+      `git fetch; git rebase origin/main --interactive` en verwijder de betreffende commits uit de lijst.
     - Verwijs naar het issue in een comment, bijv. `Closes #42`
     - Wijs ten minste 2 reviewers aan.
 

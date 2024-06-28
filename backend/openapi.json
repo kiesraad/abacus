@@ -94,13 +94,25 @@
         }
       }
     },
-    "/api/polling_stations": {
+    "/api/polling_stations/{election_id}": {
       "get": {
         "tags": [
           "polling_station"
         ],
         "summary": "List all polling stations",
         "operationId": "polling_station_list",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Polling station listing successful",

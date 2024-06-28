@@ -6,16 +6,17 @@ use crate::validation::{
     above_percentage_threshold, Validate, ValidationResult, ValidationResultCode, ValidationResults,
 };
 
+/// Polling station of a certain [Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
 pub struct PollingStation {
     pub id: Option<i64>,
     pub name: String,
     pub number: Option<i64>,
-    pub voter_amount: Option<i64>,
+    pub number_of_voters: Option<i64>,
     pub polling_station_type: String, // TODO: Should this be an enum?
     pub street: String,
-    pub housenumber: String,
-    pub addition: Option<String>,
+    pub house_number: String,
+    pub house_number_addition: Option<String>,
     pub postal_code: String,
     pub locality: String,
 }

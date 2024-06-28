@@ -75,7 +75,7 @@ pub struct PollingStationListResponse {
 /// List all polling stations
 #[utoipa::path(
     get,
-    path = "/api/polling_stations",
+    path = "/api/polling_stations/{election_id}",
     responses(
         (status = 200, description = "Polling station listing successful", body = PollingStationListResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -92,11 +92,11 @@ SELECT
   id,
   name,
   number,
-  voter_amount,
+  number_of_voters,
   polling_station_type,
   street,
-  housenumber,
-  addition,
+  house_number,
+  house_number_addition,
   postal_code,
   locality
 FROM polling_stations

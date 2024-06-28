@@ -102,7 +102,7 @@ export function VotersAndVotesForm() {
             </td>
             <td>Kiezerspassen</td>
           </InputGrid.Row>
-          <InputGrid.Row isTotal>
+          <InputGrid.Row isTotal addSeparator>
             <td>D</td>
             <td>
               <input
@@ -114,9 +114,6 @@ export function VotersAndVotesForm() {
             </td>
             <td>Totaal toegelaten kiezers</td>
           </InputGrid.Row>
-
-          <InputGrid.Separator />
-
           <InputGrid.Row>
             <td>E</td>
             <td>

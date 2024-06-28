@@ -18,6 +18,7 @@ type InputEntry = {
 
 export function InputGrid({ zebra, children }: InputGridProps) {
   const ref = React.useRef<HTMLTableElement>(null);
+  // TODO: This does not work when rendering table rows via map, need to fix
   const inputList = React.useRef<InputEntry[]>([]);
 
   const moveFocus = React.useCallback((dir: number) => {
@@ -141,10 +142,17 @@ InputGrid.Separator = () => (
 InputGrid.Row = ({
   children,
   isTotal,
+  addSeparator,
 }: {
   children: [React.ReactElement, React.ReactElement, React.ReactElement];
   isTotal?: boolean;
-}) => <tr className={isTotal ? "is-total" : ""}>{children}</tr>;
+  addSeparator?: boolean;
+}) => (
+  <>
+    <tr className={isTotal ? "is-total" : ""}>{children}</tr>
+    {addSeparator && <InputGrid.Separator />}
+  </>
+);
 
 InputGrid.Total = ({
   children,

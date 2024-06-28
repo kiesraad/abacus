@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 export function HomePage() {
   return (
     <div style={{ padding: "32px" }}>
-      <h1>Kiesraad uitslag app work in progress</h1>
-      <p>Home page</p>
+      <h1>Abacus 🧮</h1>
+      <h2>🚧 Work in progress 🚧</h2>
 
       <ul className="link-list">
         <li>

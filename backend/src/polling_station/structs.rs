@@ -8,8 +8,16 @@ use crate::validation::{
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
 pub struct PollingStation {
-    pub polling_station_id: Option<i64>,
-    pub entry_number: Option<i64>,
+    pub id: Option<i64>,
+    pub name: String,
+    pub number: Option<i64>,
+    pub voter_amount: Option<i64>,
+    pub polling_station_type: String, // TODO: Should this be an enum?
+    pub street: String,
+    pub housenumber: String,
+    pub addition: Option<String>,
+    pub postal_code: String,
+    pub locality: String,
 }
 
 /// PollingStationResults, following the fields in

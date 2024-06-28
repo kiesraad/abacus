@@ -86,7 +86,7 @@ pub async fn polling_station_list(
 ) -> Result<JsonResponse<PollingStationListResponse>, APIError> {
     let polling_stations = query_as!(
         PollingStation,
-        "SELECT polling_station_id, entry_number FROM polling_station_data_entries;"
+        "SELECT id, name, number, voter_amount, polling_station_type, street, housenumber, addition, postal_code, locality FROM polling_stations;"
     )
     .fetch_all(&pool)
     .await?;

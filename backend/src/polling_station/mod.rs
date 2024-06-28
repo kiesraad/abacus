@@ -1,12 +1,10 @@
 use axum::extract::{FromRequest, Path, State};
-use axum::response::{IntoResponse, Response};
-use axum::Json;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, SqlitePool};
 use utoipa::ToSchema;
 
 use crate::validation::{Validate, ValidationResults};
-use crate::APIError;
+use crate::{APIError, JsonResponse};
 
 pub use self::structs::*;
 
@@ -25,12 +23,6 @@ pub struct DataEntryResponse {
     pub saved: bool,
     pub message: String,
     pub validation_results: ValidationResults,
-}
-
-impl IntoResponse for DataEntryResponse {
-    fn into_response(self) -> Response {
-        Json(self).into_response()
-    }
 }
 
 /// Save or update the data entry for a polling station
@@ -52,7 +44,7 @@ pub async fn polling_station_data_entry(
     State(pool): State<SqlitePool>,
     Path((id, entry_number)): Path<(u32, u8)>,
     data_entry_request: DataEntryRequest,
-) -> Result<DataEntryResponse, APIError> {
+) -> Result<JsonResponse<DataEntryResponse>, APIError> {
     let mut validation_results = ValidationResults::default();
     data_entry_request
         .data
@@ -67,15 +59,17 @@ pub async fn polling_station_data_entry(
         .execute(&pool)
         .await?;
 
-    Ok(DataEntryResponse {
+    Ok(JsonResponse(DataEntryResponse {
         saved: true,
         message: "Data entry saved successfully".to_string(),
         validation_results,
-    })
+    }))
 }
 
 #[cfg(test)]
 mod tests {
+    use axum::response::IntoResponse;
+
     use super::*;
 
     #[sqlx::test]

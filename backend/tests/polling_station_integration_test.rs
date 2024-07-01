@@ -21,7 +21,7 @@ async fn test_polling_station_listing_works(pool: SqlitePool) {
     let body: PollingStationListResponse = response.json().await.unwrap();
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
-    assert!(!body.polling_stations.is_empty());
+    assert_eq!(body.polling_stations.len(), 2);
     assert!(body
         .polling_stations
         .iter()

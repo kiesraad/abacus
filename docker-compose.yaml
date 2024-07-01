@@ -1,0 +1,9 @@
+services:
+  frontend:
+    image: node:20
+    user: "$USER_ID:$GROUP_ID"
+    volumes: ["./frontend:/abacus"]
+    working_dir: "/abacus"
+    expose: [3000]
+    ports: ["127.0.0.1:3000:3000"]
+    command: [yarn, dev:server]

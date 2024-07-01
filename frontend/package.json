@@ -7,8 +7,8 @@
     "node": ">=20.11.1"
   },
   "scripts": {
-    "dev": "API_MODE=mock vite",
-    "dev:server": "API_MODE=local vite",
+    "dev": "API_MODE=mock vite --host",
+    "dev:server": "API_MODE=local vite --host",
     "build": "tsc && vite build",
     "build:msw": "API_MODE=mock vite build && cp mockServiceWorker.js dist/",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

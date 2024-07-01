@@ -2,7 +2,15 @@
 
 ## Development
 
+The frontend can be run directly, or via `docker compose`. All example commands below can also be executed in Docker by prefixing them with:
+
+```sh
+docker compose run frontend [COMMAND]
+```
+
 ### Prerequisites
+
+You can provide the prerequisites yourself, or you can use `docker compose`, which provides them for you.
 
 - [Node](https://nodejs.org) v20
 
@@ -24,9 +32,17 @@ npx playwright install --with-deps
 
 This runs the client with a (client-side) mock API
 
+To run it directly:
 ```sh
 npm run dev
 ```
+
+Or via `docker compose`:
+```sh
+docker compose up
+```
+
+After running, you can access the client in the browser via `localhost:3000`.
 
 ### Linting
 

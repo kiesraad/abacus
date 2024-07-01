@@ -7,7 +7,7 @@
     "node": ">=20.11.1"
   },
   "scripts": {
-    "dev": "API_MODE=mock vite --host",
+    "dev": "API_MODE=mock vite",
     "dev:server": "API_MODE=local vite --host",
     "build": "tsc && vite build",
     "build:msw": "API_MODE=mock vite build && cp mockServiceWorker.js dist/",

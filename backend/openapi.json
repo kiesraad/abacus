@@ -412,6 +412,57 @@
           }
         }
       },
+      "PollingStation": {
+        "type": "object",
+        "description": "Polling station of a certain [Election]",
+        "required": [
+          "id",
+          "name",
+          "number",
+          "polling_station_type",
+          "street",
+          "house_number",
+          "postal_code",
+          "locality"
+        ],
+        "properties": {
+          "house_number": {
+            "type": "string"
+          },
+          "house_number_addition": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "locality": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "polling_station_type": {
+            "$ref": "#/components/schemas/PollingStationType"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          }
+        }
+      },
       "PollingStationListResponse": {
         "type": "object",
         "description": "Polling station list response",

@@ -92,7 +92,7 @@ export function VotersAndVotesForm() {
   }, [data, inputMaskWarnings]);
 
   const hasValidationError = data && data.validation_results.errors.length > 0;
-  console.log(data);
+
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
@@ -104,7 +104,7 @@ export function VotersAndVotesForm() {
           </div>
         </Feedback>
       )}
-      {data && hasValidationError && (
+      {hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div>
             <ul>

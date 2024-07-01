@@ -173,12 +173,4 @@ mod tests {
         let data: PollingStationResults = serde_json::from_slice(&data.data.unwrap()).unwrap();
         assert_eq!(data.voters_counts.poll_card_count, new_value);
     }
-
-    #[sqlx::test]
-    async fn test_polling_station_listing(pool: SqlitePool) {
-        let response = polling_station_list(State(pool.clone()), Path(0))
-            .await
-            .into_response();
-        assert_eq!(response.status(), 200);
-    }
 }

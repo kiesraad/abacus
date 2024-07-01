@@ -1,5 +1,5 @@
 .feedback {
-  border: 1px solid #ccc;
+  border: 2px solid #ccc;
   border-radius: var(--rounded-default);
   padding: 24px;
 
@@ -29,7 +29,7 @@
   }
 
   &.error {
-    border-color: var(--color-error);
+    border-color: var(--color-error-border);
     background-color: var(--color-error-bg);
 
     svg {

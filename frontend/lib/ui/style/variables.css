@@ -45,7 +45,11 @@
 
   --border-color-default: #d0d5dd;
 
-  --color-error: #d92d20;
+  --color-alert: #d92d20;
+  --color-alert-bg: #fee4e2;
+
+  --color-error: #b42318;
+  --color-error-border: #fda29b;
   --color-error-bg: #fee4e2;
   --color-error-hover: #fecdca;
 

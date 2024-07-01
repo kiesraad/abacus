@@ -2,7 +2,11 @@ import * as React from "react";
 
 import { type ResultCode, usePollingStationDataEntry } from "@kiesraad/api";
 import { Button, InputGrid, Feedback, FormField, BottomBar } from "@kiesraad/ui";
-import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
+import {
+  usePositiveNumberInputMask,
+  usePreventFormEnterSubmit,
+  fieldNameFromPath,
+} from "@kiesraad/util";
 
 //TODO: force from openapi types
 interface FormElements extends HTMLFormControlsCollection {
@@ -62,10 +66,11 @@ export function VotersAndVotesForm() {
     if (data && data.validation_results.errors.length > 0) {
       data.validation_results.errors.forEach((error) => {
         error.fields.forEach((f) => {
-          if (!result.has(f)) {
-            result.set(f, { errors: [], warnings: [] });
+          const fieldName = fieldNameFromPath(f);
+          if (!result.has(fieldName)) {
+            result.set(fieldName, { errors: [], warnings: [] });
           }
-          const field = result.get(f);
+          const field = result.get(fieldName);
           if (field) {
             field.errors.push(error.code);
           }
@@ -79,8 +84,7 @@ export function VotersAndVotesForm() {
       }
       const field = result.get(warning.anchor.id);
       if (field) {
-        //TODO: rename to code;
-        field.warnings.push(warning.warning as ResultCode);
+        field.warnings.push(warning.code as ResultCode);
       }
     });
 
@@ -88,7 +92,7 @@ export function VotersAndVotesForm() {
   }, [data, inputMaskWarnings]);
 
   const hasValidationError = data && data.validation_results.errors.length > 0;
-
+  console.log(data);
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>

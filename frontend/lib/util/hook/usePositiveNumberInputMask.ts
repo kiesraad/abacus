@@ -7,7 +7,7 @@ export type ValidateFunc = (s: string | number | null | undefined) => boolean;
 export type PositiveInputMaskWarning = {
   anchor: HTMLInputElement;
   value: string;
-  warning: "REFORMAT_WARNING";
+  code: "REFORMAT_WARNING";
 };
 
 export interface UsePositiveNumberInputMaskReturn {
@@ -81,7 +81,7 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
             {
               anchor: event.currentTarget,
               value: pastedInput,
-              warning: "REFORMAT_WARNING",
+              code: "REFORMAT_WARNING",
             },
           ];
         });

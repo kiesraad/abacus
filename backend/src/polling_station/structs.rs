@@ -35,7 +35,7 @@ impl From<String> for PollingStationType {
             "vaste_locatie" => Self::VasteLocatie,
             "bijzonder" => Self::Bijzonder,
             "mobiel" => Self::Mobiel,
-            _ => panic!("invalid PollingStationType")
+            _ => panic!("invalid PollingStationType"),
         }
     }
 }

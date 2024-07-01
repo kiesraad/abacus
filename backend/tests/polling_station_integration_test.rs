@@ -5,10 +5,9 @@ mod utils;
 use reqwest::StatusCode;
 use sqlx::SqlitePool;
 
-use backend::polling_station::{PollingStationListResponse};
+use backend::polling_station::PollingStationListResponse;
 
 use crate::utils::serve_api;
-
 
 #[sqlx::test(fixtures("polling_stations"))]
 async fn test_polling_station_listing_works(pool: SqlitePool) {
@@ -22,6 +21,10 @@ async fn test_polling_station_listing_works(pool: SqlitePool) {
     let body: PollingStationListResponse = response.json().await.unwrap();
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
-    assert!(body.polling_stations.len() >  0);
-    assert!(body.polling_stations.iter().find(|ps| ps.name == "Stembureau \"Op Rolletjes\"").is_some());
+    assert!(body.polling_stations.len() > 0);
+    assert!(body
+        .polling_stations
+        .iter()
+        .find(|ps| ps.name == "Stembureau \"Op Rolletjes\"")
+        .is_some());
 }

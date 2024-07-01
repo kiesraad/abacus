@@ -9,7 +9,7 @@ use backend::polling_station::PollingStationListResponse;
 
 use crate::utils::serve_api;
 
-#[sqlx::test(fixtures("polling_stations"))]
+#[sqlx::test(fixtures("elections", "polling_stations"))]
 async fn test_polling_station_listing_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

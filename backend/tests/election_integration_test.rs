@@ -144,7 +144,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     let body: backend::election::ElectionListResponse = response.json().await.unwrap();
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(body.elections.len(), 1);
+    assert_eq!(body.elections.len(), 2);
 }
 
 #[sqlx::test(fixtures("elections"))]

@@ -173,4 +173,39 @@ mod tests {
         let data: PollingStationResults = serde_json::from_slice(&data.data.unwrap()).unwrap();
         assert_eq!(data.voters_counts.poll_card_count, new_value);
     }
+
+    #[sqlx::test(fixtures(path = "../../tests/fixtures", scripts("elections")))]
+    async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
+        // Insert two unique polling stations
+        let _ = query!(r#"
+INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, street, house_number, house_number_addition, postal_code, locality)
+VALUES
+(1, 1, 'Stembureau "Op Rolletjes"', 33, NULL, 'mobiel', 'Rijksweg A12', '1', NULL, '1234 YQ', 'Den Haag'),
+(2, 1, 'Testplek', 34, NULL, 'bijzonder', 'Teststraat', '2', 'b', '1234 QY', 'Testdorp')
+"#)
+            .execute(&pool)
+            .await
+            .unwrap();
+
+        // Add the same polling station, but for a differect election
+        let _ = query!(r#"
+INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, street, house_number, house_number_addition, postal_code, locality)
+VALUES
+(3, 2, 'Stembureau "Op Rolletjes"', 33, NULL, 'mobiel', 'Rijksweg A12', '1', NULL, '1234 YQ', 'Den Haag');
+"#)
+            .execute(&pool)
+            .await
+            .unwrap();
+
+        // Add the same polling station, for the same election and see that it fails
+        let result = query!(r#"
+INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, street, house_number, house_number_addition, postal_code, locality)
+VALUES
+(4, 1, 'Stembureau "Op Rolletjes"', 33, NULL, 'mobiel', 'Rijksweg A12', '1', NULL, '1234 YQ', 'Den Haag');
+"#)
+            .execute(&pool)
+            .await;
+
+        assert!(result.is_err());
+    }
 }

@@ -33,11 +33,13 @@ npx playwright install --with-deps
 This runs the client with a (client-side) mock API
 
 To run it directly:
+
 ```sh
 npm run dev
 ```
 
 Or via `docker compose`:
+
 ```sh
 docker compose up
 ```

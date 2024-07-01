@@ -443,6 +443,15 @@
           }
         }
       },
+      "PollingStationType": {
+        "type": "string",
+        "description": "Type of Polling station",
+        "enum": [
+          "VasteLocatie",
+          "Bijzonder",
+          "Mobiel"
+        ]
+      },
       "ValidationResult": {
         "type": "object",
         "required": [

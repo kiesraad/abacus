@@ -76,9 +76,22 @@ Voor de ontwikkeling via GitHub hanteren we de volgende werkwijze:
     - Consolideer de merge message; behoud alleen de belangrijkste punten
     - Sluit de pull request met *Squash and Merge*.
 
-### 4. Release
+### 4. Releases
 
-Er vinden releases plaats voor verkiezingen waar Abacus gebruikt wordt. Voordat
+Er vinden twee soorten releases plaats: 
+
+- tussentijdse releases of builds
+- releases voor verkiezingen
+
+#### Tussentijds
+
+Tijdens de bouwfase en tussen verkiezingen kunnen releases worden gedaan als onderdeel van het ontwikkelproces, bijvoorbeeld gericht op het testen of trainen met de software. Dit kan in principe een build van de `main` branch zijn.
+
+Zo worden tussentijdse pentests en andere vormen van toetsing uitgevoerd om ervoor te zorgen dat de toets op de release voor de verkiezingen geen verrassingen oplevert.
+
+#### Releases voor verkiezingen
+
+De release voor een verkiezing waar Abacus gebruikt wordt moet voldoen aan wettelijke vereisten. Voordat
 er een versie getoetst gaat worden maken we een release branch aan zodat het
 aantal wijzigingen tussen de getoetste en de definitieve versie minimaal blijft.
 
@@ -90,9 +103,6 @@ Een release moet aan een aantal vereisten voldoen:
 - Alle documentatie is bijgewerkt voor de wijzigingen in deze release.
 - De release is voorzien van release notes.
 
-We kunnen tijdens het ontwikkelproces ook tussentijdse builds maken om te
-laten toetsen. Dit kan in principe een build van de `main` branch zijn.
-
 ### 5. Evaluatie
 
 Na de release evalueren we hoe het is verlopen en hoe de release wordt ontvangen. Het verloop van het ontwikkelproces
@@ -101,17 +111,16 @@ mee.
 
 ## Security checks
 
-- Pentest
-- Dreigingsanalyse
+De formele checks zijn: 
 
-<!-- 
-Wordt later aangevuld
--->
+- Pentest
+- Toets wettelijke kaders
 
 ## Testen en valideren
 
 - Testrapportages
 - Code reviews
+- time based pentests en andere onderzoeken
 - Zero bug policy
 
 <!-- 

@@ -78,7 +78,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 *Deze punten zijn zeer gewenst en worden geïmplementeerd als het kan, maar zonder is de software ook bruikbaar.*
 
 - De lijst met stembureaus kan worden geïmporteerd in EML 110b-formaat.
-- De uitslag van een stembureau/GSB kan na de eerst uitslagvaststelling worden gecorrigeerd in de vorm van een corrigenda.
+- De uitslag van een stembureau/GSB kan na de eerst uitslagvaststelling worden gecorrigeerd in de vorm van een corrigendum.
 - De uitslag GSB wordt voorzien van een cryptografische handtekening.
 
 ### Gewenst (could have)

@@ -1,7 +1,12 @@
 import * as React from "react";
 
-import { type ResultCode, usePollingStationDataEntry } from "@kiesraad/api";
-import { Button, InputGrid, Feedback, FormField, BottomBar } from "@kiesraad/ui";
+import {
+  type ResultCode,
+  usePollingStationDataEntry,
+  ValidationResult,
+  ErrorsAndWarnings,
+} from "@kiesraad/api";
+import { Button, InputGrid, Feedback, BottomBar, InputGridRow } from "@kiesraad/ui";
 import {
   usePositiveNumberInputMask,
   usePreventFormEnterSubmit,
@@ -19,12 +24,6 @@ interface FormElements extends HTMLFormControlsCollection {
   invalid_votes_count: HTMLInputElement;
   total_votes_cast_count: HTMLInputElement;
 }
-
-//Future: move to generic place, same as ValidationResult but with client side errors
-type ErrorsAndWarnings = {
-  errors: ResultCode[];
-  warnings: ResultCode[];
-};
 
 interface VotersAndVotesFormElement extends HTMLFormElement {
   readonly elements: FormElements;
@@ -63,19 +62,27 @@ export function VotersAndVotesForm() {
 
   const errorsAndWarnings: Map<string, ErrorsAndWarnings> = React.useMemo(() => {
     const result = new Map<string, ErrorsAndWarnings>();
-    if (data && data.validation_results.errors.length > 0) {
-      data.validation_results.errors.forEach((error) => {
-        error.fields.forEach((f) => {
+
+    const process = (target: keyof ErrorsAndWarnings, arr: ValidationResult[]) => {
+      arr.forEach((v) => {
+        v.fields.forEach((f) => {
           const fieldName = fieldNameFromPath(f);
           if (!result.has(fieldName)) {
             result.set(fieldName, { errors: [], warnings: [] });
           }
           const field = result.get(fieldName);
           if (field) {
-            field.errors.push(error.code);
+            field[target].push(v.code);
           }
         });
       });
+    };
+
+    if (data && data.validation_results.errors.length > 0) {
+      process("errors", data.validation_results.errors);
+    }
+    if (data && data.validation_results.warnings.length > 0) {
+      process("warnings", data.validation_results.warnings);
     }
 
     inputMaskWarnings.forEach((warning) => {
@@ -92,6 +99,7 @@ export function VotersAndVotesForm() {
   }, [data, inputMaskWarnings]);
 
   const hasValidationError = data && data.validation_results.errors.length > 0;
+  const hasValidationWarning = data && data.validation_results.warnings.length > 0;
 
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
@@ -115,6 +123,19 @@ export function VotersAndVotesForm() {
           </div>
         </Feedback>
       )}
+
+      {hasValidationWarning && (
+        <Feedback type="warning" title="Controleer uitgebrachte stemmen">
+          <div>
+            <ul>
+              {data.validation_results.warnings.map((warning) => (
+                <li key={warning.code}>{warning.code}</li>
+              ))}
+            </ul>
+          </div>
+        </Feedback>
+      )}
+
       {data && !hasValidationError && (
         <Feedback type="success" title="Success">
           <div>
@@ -129,129 +150,79 @@ export function VotersAndVotesForm() {
           <th>Omschrijving</th>
         </InputGrid.Header>
         <InputGrid.Body>
-          <InputGrid.Row>
-            <td>A</td>
-            <td>
-              <FormField error={errorsAndWarnings.get("poll_card_count")?.errors}>
-                <input
-                  id="poll_card_count"
-                  name="poll_card_count"
-                  maxLength={11}
-                  {...register()}
-                  defaultValue={format(pickGoodTestNumber())}
-                />
-              </FormField>
-            </td>
-            <td>Stempassen</td>
-          </InputGrid.Row>
-          <InputGrid.Row>
-            <td>B</td>
-            <td>
-              <FormField error={errorsAndWarnings.get("proxy_certificate_count")?.errors}>
-                <input
-                  id="proxy_certificate_count"
-                  name="proxy_certificate_count"
-                  maxLength={11}
-                  {...register()}
-                  defaultValue={format(pickGoodTestNumber())}
-                />
-              </FormField>
-            </td>
-            <td>Volmachtbewijzen</td>
-          </InputGrid.Row>
-          <InputGrid.Row>
-            <td>C</td>
-            <td>
-              <FormField error={errorsAndWarnings.get("voter_card_count")?.errors}>
-                <input
-                  id="voter_card_count"
-                  name="voter_card_count"
-                  maxLength={11}
-                  {...register()}
-                  defaultValue={format(pickGoodTestNumber())}
-                />
-              </FormField>
-            </td>
-            <td>Kiezerspassen</td>
-          </InputGrid.Row>
-          <InputGrid.Row isTotal>
-            <td>D</td>
-            <td>
-              <FormField error={errorsAndWarnings.get("total_admitted_voters_count")?.errors}>
-                <input
-                  id="total_admitted_voters_count"
-                  name="total_admitted_voters_count"
-                  maxLength={11}
-                  {...register()}
-                  defaultValue={format(pickGoodTestNumber())}
-                />
-              </FormField>
-            </td>
-            <td>Totaal toegelaten kiezers</td>
-          </InputGrid.Row>
+          <InputGridRow
+            field="A"
+            name="poll_card_count"
+            title="Stempassen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            defaultValue={format(pickGoodTestNumber())}
+          />
+          <InputGridRow
+            field="B"
+            name="proxy_certificate_count"
+            title="Volmachtbewijzen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            defaultValue={format(pickGoodTestNumber())}
+          />
+          <InputGridRow
+            field="C"
+            name="voter_card_count"
+            title="Kiezerspassen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            defaultValue={format(pickGoodTestNumber())}
+          />
+
+          <InputGridRow
+            field="D"
+            name="total_admitted_voters_count"
+            title="Totaal toegelaten kiezers"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            defaultValue={format(pickGoodTestNumber())}
+            isTotal
+          />
 
           <InputGrid.Separator />
 
-          <InputGrid.Row>
-            <td>E</td>
-            <td>
-              <FormField error={errorsAndWarnings.get("votes_candidates_counts")?.errors}>
-                <input
-                  id="votes_candidates_counts"
-                  name="votes_candidates_counts"
-                  maxLength={11}
-                  {...register()}
-                  defaultValue={format(pickGoodTestNumber())}
-                />
-              </FormField>
-            </td>
-            <td>Stemmen op kandidaten</td>
-          </InputGrid.Row>
-          <InputGrid.Row>
-            <td>F</td>
-            <td>
-              <FormField error={errorsAndWarnings.get("blank_votes_count")?.errors}>
-                <input
-                  id="blank_votes_count"
-                  name="blank_votes_count"
-                  maxLength={11}
-                  {...register()}
-                  defaultValue={format(pickGoodTestNumber())}
-                />
-              </FormField>
-            </td>
-            <td>Blanco stemmen</td>
-          </InputGrid.Row>
-          <InputGrid.Row>
-            <td>G</td>
-            <td>
-              <FormField error={errorsAndWarnings.get("invalid_votes_count")?.errors}>
-                <input
-                  id="invalid_votes_count"
-                  name="invalid_votes_count"
-                  maxLength={11}
-                  {...register()}
-                  defaultValue={format(pickGoodTestNumber())}
-                />
-              </FormField>
-            </td>
-            <td>Ongeldige stemmen</td>
-          </InputGrid.Row>
-          <InputGrid.Row isTotal>
-            <td>H</td>
-            <td>
-              <FormField error={errorsAndWarnings.get("total_votes_cast_count")?.errors}>
-                <input
-                  id="total_votes_cast_count"
-                  name="total_votes_cast_count"
-                  maxLength={11}
-                  {...register()}
-                  defaultValue={format(pickGoodTestNumber())}
-                />
-              </FormField>
-            </td>
-            <td>Totaal uitgebrachte stemmen</td>
-          </InputGrid.Row>
+          <InputGridRow
+            field="E"
+            name="votes_candidates_counts"
+            title="Stemmen op kandidaten"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            defaultValue={format(pickGoodTestNumber())}
+          />
+
+          <InputGridRow
+            field="F"
+            name="blank_votes_count"
+            title="Blanco stemmen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            defaultValue={format(pickGoodTestNumber())}
+          />
+
+          <InputGridRow
+            field="G"
+            name="invalid_votes_count"
+            title="Ongeldige stemmen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            defaultValue={format(pickGoodTestNumber())}
+          />
+
+          <InputGridRow
+            field="H"
+            name="total_votes_cast_count"
+            title="Totaal uitgebrachte stemmen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            defaultValue={format(pickGoodTestNumber())}
+            isTotal
+          />
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="form">

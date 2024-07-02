@@ -280,6 +280,25 @@
           "X"
         ]
       },
+      "CandidateVotes": {
+        "type": "object",
+        "required": [
+          "number",
+          "votes"
+        ],
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "votes": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "DataEntryRequest": {
         "type": "object",
         "description": "Request structure for data entry of polling station results",
@@ -422,6 +441,32 @@
           }
         }
       },
+      "PoliticalGroupVotes": {
+        "type": "object",
+        "required": [
+          "number",
+          "total",
+          "candidate_votes"
+        ],
+        "properties": {
+          "candidate_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateVotes"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "PollingStation": {
         "type": "object",
         "description": "Polling station of a certain [Election]",
@@ -493,9 +538,17 @@
         "description": "PollingStationResults, following the fields in\n\"Model N 10-1. Proces-verbaal van een stembureau\"\n<https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1>",
         "required": [
           "voters_counts",
-          "votes_counts"
+          "votes_counts",
+          "political_group_votes"
         ],
         "properties": {
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupVotes"
+            },
+            "description": "Vote counts for each candidate in each political group (\"Aantal stemmen per lijst en kandidaat\")"
+          },
           "voters_counts": {
             "$ref": "#/components/schemas/VotersCounts"
           },
@@ -537,7 +590,8 @@
           "OutOfRange",
           "IncorrectTotal",
           "AboveThreshold",
-          "EqualInput"
+          "EqualInput",
+          "IncorrectCandidatesList"
         ]
       },
       "ValidationResults": {

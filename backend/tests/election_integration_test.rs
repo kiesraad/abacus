@@ -1,17 +1,17 @@
 #![cfg(test)]
 
-mod utils;
-
 use reqwest::StatusCode;
 use serde_json::json;
 use sqlx::SqlitePool;
 
 use backend::election::ElectionDetailsResponse;
-use backend::polling_station::DataEntryResponse;
+use backend::polling_station::{CandidateVotes, DataEntryResponse, PoliticalGroupVotes};
 use backend::validation::ValidationResultCode::IncorrectTotal;
 use backend::ErrorResponse;
 
 use crate::utils::serve_api;
+
+mod utils;
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections")))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
@@ -31,6 +31,14 @@ async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
                 invalid_votes_count: 7,
                 total_votes_cast_count: 8,
             },
+            political_group_votes: vec![PoliticalGroupVotes {
+                number: 1,
+                total: 9,
+                candidate_votes: vec![CandidateVotes {
+                    number: 1,
+                    votes: 10,
+                }],
+            }],
         },
     };
 
@@ -78,20 +86,36 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let request_body = json!({
-        "data": {
-            "voters_counts": {
-                "poll_card_count": 1,
-                "proxy_certificate_count": 2,
-                "voter_card_count": 3,
-                "total_admitted_voters_count": 4
-            },
-            "votes_counts": {
-                "votes_candidates_counts": 5,
-                "blank_votes_count": 6,
-                "invalid_votes_count": 7,
-                "total_votes_cast_count": 8
-            }
-        }
+      "data": {
+        "voters_counts": {
+          "poll_card_count": 1,
+          "proxy_certificate_count": 2,
+          "voter_card_count": 3,
+          "total_admitted_voters_count": 4
+        },
+        "votes_counts": {
+          "votes_candidates_counts": 5,
+          "blank_votes_count": 6,
+          "invalid_votes_count": 7,
+          "total_votes_cast_count": 8
+        },
+        "political_group_votes": [
+          {
+            "number": 1,
+            "total": 11,
+            "candidate_votes": [
+              {
+                "number": 1,
+                "votes": 6
+              },
+              {
+                "number": 2,
+                "votes": 4
+              }
+            ]
+          }
+        ]
+      }
     });
 
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
@@ -104,11 +128,13 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     let status = response.status();
+    if status != StatusCode::OK {
+        println!("response body: {:?}", &response.text().await.unwrap());
+        panic!("Unexpected response status: {:?}", status);
+    }
     let body: DataEntryResponse = response.json().await.unwrap();
-    println!("response body: {:?}", &body);
-    assert_eq!(status, StatusCode::OK);
     let errors = body.validation_results.errors;
-    assert_eq!(errors.len(), 2);
+    assert_eq!(errors.len(), 3);
     assert_eq!(
         errors[0].fields,
         vec![
@@ -129,6 +155,11 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         ]
     );
     assert_eq!(errors[1].code, IncorrectTotal);
+    assert_eq!(
+        errors[2].fields,
+        vec!["data.political_group_votes[0].total"]
+    );
+    assert_eq!(errors[2].code, IncorrectTotal);
     assert_eq!(body.validation_results.warnings.len(), 0);
 }
 

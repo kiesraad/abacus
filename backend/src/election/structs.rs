@@ -58,16 +58,45 @@ pub enum CandidateGender {
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use chrono::NaiveDate;
+
+    use crate::election::CandidateGender::X;
+    use crate::election::{Candidate, ElectionCategory, PoliticalGroup};
+
     use super::*;
 
-    pub fn election_fixture() -> Election {
+    /// Create a test election with some political groups.
+    /// The number of political groups is the length of the `political_groups_candidates` slice.
+    /// The number of candidates in each political group is equal to the value in the slice at that index.
+    pub fn election_fixture(political_groups_candidates: &[u8]) -> Election {
+        let political_groups = political_groups_candidates
+            .iter()
+            .enumerate()
+            .map(|(i, &candidates)| PoliticalGroup {
+                number: (i + 1) as u8,
+                name: format!("Political group {}", i + 1),
+                candidates: (0..candidates)
+                    .map(|j| Candidate {
+                        number: j + 1,
+                        initials: "A.B.".to_string(),
+                        first_name: "Test".to_string(),
+                        last_name_prefix: Some("van".to_string()),
+                        last_name: "Test".to_string(),
+                        locality: "Test".to_string(),
+                        country_code: Some("NL".to_string()),
+                        gender: Some(X),
+                    })
+                    .collect(),
+            })
+            .collect();
+
         Election {
             id: 1,
             name: "Test".to_string(),
             category: ElectionCategory::Municipal,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
-            political_groups: None,
+            political_groups: Some(political_groups),
         }
     }
 }

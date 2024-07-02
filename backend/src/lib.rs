@@ -9,7 +9,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
 use utoipa::{OpenApi, ToSchema};
-
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -66,8 +65,10 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 election::CandidateGender,
                 election::ElectionListResponse,
                 election::ElectionDetailsResponse,
+                polling_station::CandidateVotes,
                 polling_station::DataEntryRequest,
                 polling_station::DataEntryResponse,
+                polling_station::PoliticalGroupVotes,
                 polling_station::PollingStationResults,
                 polling_station::PollingStationListResponse,
                 polling_station::PollingStationType,

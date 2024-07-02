@@ -153,6 +153,14 @@ mod tests {
                     invalid_votes_count: 7,
                     total_votes_cast_count: 8,
                 },
+                political_group_votes: vec![PoliticalGroupVotes {
+                    number: 1,
+                    total: 9,
+                    candidate_votes: vec![CandidateVotes {
+                        number: 1,
+                        votes: 10,
+                    }],
+                }],
             },
         };
 

@@ -66,7 +66,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 - Het EML-bestand met de verkiezingsdefinitie voor de betreffende verkiezing kan worden geïmporteerd.
 - Het EML-bestand met de kandidatenlijst voor de betreffende verkiezing kan worden geïmporteerd.
 - Het EML-bestand met de stembureaus kan worden geïmporteerd.
-- Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende gebruikers.
+- Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders.
 - De uitslagen per stembureau kunnen worden opgeteld en dit leidt vervolgens tot de uitslag van het gemeentelijk stembureau (GSB).
 - De uitslagen kunnen worden geëxporteerd als XML-bestand volgens de EML-standaard (Election Markup Language).
 - De uitslag van het GSB wordt gegenereerd als proces-verbaal in PDF-formaat.

@@ -11,16 +11,21 @@
     }
   }
 
-  &:global(.has-error) {
-    input {
-      padding-left: 56px !important;
-    }
-  }
-
   &:global(.has-warning) {
     aside {
       svg {
         fill: var(--color-warning);
+      }
+    }
+  }
+
+  &:global(.has-error) {
+    input {
+      padding-left: 56px !important;
+    }
+    aside {
+      svg {
+        fill: var(--color-error);
       }
     }
   }

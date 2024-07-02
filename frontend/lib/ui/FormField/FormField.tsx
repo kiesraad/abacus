@@ -27,7 +27,7 @@ export function FormField({ children, error, warning, tooltip }: FormFieldProps)
       className={cn(cls["form-field"], {
         "has-icon": !!icon,
         "has-error": hasError,
-        "has-warning": hasWarning,
+        "has-warning": hasWarning && !hasError,
       })}
     >
       <aside>{icon}</aside>

@@ -1,7 +1,6 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
 
-import { useElectionDataRequest } from "@kiesraad/api";
+import { Election } from "@kiesraad/api";
 import { BottomBar, Button, InputGrid } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
@@ -20,16 +19,18 @@ interface CandidatesVotesFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
-export function CandidatesVotesForm() {
-  const { id, section } = useParams();
+export interface CandidatesVotesFormProps {
+  election: Election;
+  listNumber: number;
+}
+
+export function CandidatesVotesForm({ election, listNumber }: CandidatesVotesFormProps) {
   // const { register, format, deformat } = usePositiveNumberInputMask();
   const { register, format } = usePositiveNumberInputMask();
   const [candidates, setCandidates] = React.useState<string[]>([]);
   const [listName, setListName] = React.useState("");
   const formRef = React.useRef<HTMLFormElement>(null);
-  const { data, loading } = useElectionDataRequest({
-    election_id: parseInt(id || ""),
-  });
+
   usePreventFormEnterSubmit(formRef);
   // const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
   //   polling_station_id: 1,
@@ -39,20 +40,18 @@ export function CandidatesVotesForm() {
   React.useEffect(() => {
     // TODO: Sometimes this does not seem to work...
     window.scrollTo(0, 0);
-    if (data) {
-      const names: string[] = [];
-      const listNumber = parseInt(section?.replace("list", "") || "");
-      const currentGroup = data.political_groups?.find((group) => group.number === listNumber);
-      if (currentGroup) {
-        setListName(currentGroup.name);
-        currentGroup.candidates.forEach(
-          (candidate: { initials: string; first_name: string; last_name: string }) =>
-            names.push(`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`),
-        );
-        setCandidates(names);
-      }
+
+    const names: string[] = [];
+    const currentGroup = election.political_groups?.find((group) => group.number === listNumber);
+    if (currentGroup) {
+      setListName(currentGroup.name);
+      currentGroup.candidates.forEach(
+        (candidate: { initials: string; first_name: string; last_name: string }) =>
+          names.push(`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`),
+      );
+      setCandidates(names);
     }
-  }, [data, section]);
+  }, [election, listNumber]);
 
   function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
     event.preventDefault();
@@ -85,54 +84,50 @@ export function CandidatesVotesForm() {
       {/*    Error {error.errorCode} {error.message || ""}*/}
       {/*  </p>*/}
       {/*)}*/}
-      {data && (
-        <>
-          <InputGrid zebra>
-            <InputGrid.Header>
-              <th>Nummer</th>
-              <th>Aantal stemmen</th>
-              <th>Kandidaat</th>
-            </InputGrid.Header>
-            <InputGrid.Body>
-              {candidates.map((candidate, index) => {
-                const addSeparator = (index + 1) % 25 == 0;
-                return (
-                  <InputGrid.Row addSeparator={addSeparator} key={`candidate${index + 1}`}>
-                    <td>{index + 1}</td>
-                    <td>
-                      <input
-                        id={`candidate${index + 1}`}
-                        maxLength={11}
-                        {...register()}
-                        defaultValue={format(pickGoodTestNumber())}
-                      />
-                    </td>
-                    <td>{candidate}</td>
-                  </InputGrid.Row>
-                );
-              })}
-              <InputGrid.Total>
-                <td></td>
+      <InputGrid zebra>
+        <InputGrid.Header>
+          <th>Nummer</th>
+          <th>Aantal stemmen</th>
+          <th>Kandidaat</th>
+        </InputGrid.Header>
+        <InputGrid.Body>
+          {candidates.map((candidate, index) => {
+            const addSeparator = (index + 1) % 25 == 0;
+            return (
+              <InputGrid.Row addSeparator={addSeparator} key={`candidate${index + 1}`}>
+                <td>{index + 1}</td>
                 <td>
                   <input
-                    id="list1_total"
+                    id={`candidate${index + 1}`}
                     maxLength={11}
                     {...register()}
                     defaultValue={format(pickGoodTestNumber())}
                   />
                 </td>
-                <td>Totaal lijst 1</td>
-              </InputGrid.Total>
-            </InputGrid.Body>
-          </InputGrid>
-          <BottomBar type="form">
-            <Button type="submit" size="lg" disabled={loading}>
-              Volgende
-            </Button>
-            <span className="button_hint">SHIFT + Enter</span>
-          </BottomBar>
-        </>
-      )}
+                <td>{candidate}</td>
+              </InputGrid.Row>
+            );
+          })}
+          <InputGrid.Total>
+            <td></td>
+            <td>
+              <input
+                id="list1_total"
+                maxLength={11}
+                {...register()}
+                defaultValue={format(pickGoodTestNumber())}
+              />
+            </td>
+            <td>Totaal lijst 1</td>
+          </InputGrid.Total>
+        </InputGrid.Body>
+      </InputGrid>
+      <BottomBar type="form">
+        <Button type="submit" size="lg">
+          Volgende
+        </Button>
+        <span className="button_hint">SHIFT + Enter</span>
+      </BottomBar>
     </form>
   );
 }

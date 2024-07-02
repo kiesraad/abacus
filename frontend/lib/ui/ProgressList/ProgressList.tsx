@@ -1,7 +1,14 @@
 import * as React from "react";
-import { IconArrowNarrowRight, IconCheckmark, IconWarning } from "@kiesraad/icon";
-import cls from "./ProgressList.module.css";
+import {
+  IconArrowNarrowRight,
+  IconAsterisk,
+  IconCheckmark,
+  IconMinus,
+  IconWarning,
+} from "@kiesraad/icon";
 import { cn } from "@kiesraad/util";
+import { MenuStatus } from "../ui.types";
+import cls from "./ProgressList.module.css";
 
 export interface ProgressListProps {
   children?: React.ReactNode;
@@ -24,10 +31,10 @@ export type BaseProgressListItemProps = {
 export type ProgressListItemProps = BaseProgressListItemProps &
   (
     | {
-        status: "accept" | "idle";
+        status: "accept" | "updates" | "empty" | "idle";
       }
     | {
-        status: "reject";
+        status: "warning";
         message: string;
       }
   );
@@ -41,12 +48,16 @@ ProgressList.Item = function ({ status, active, children }: ProgressListItemProp
   );
 };
 
-function renderStatusIcon(status: "accept" | "reject" | "idle") {
+function renderStatusIcon(status: MenuStatus) {
   switch (status) {
     case "accept":
       return <IconCheckmark />;
-    case "reject":
+    case "warning":
       return <IconWarning />;
+    case "empty":
+      return <IconMinus />;
+    case "updates":
+      return <IconAsterisk />;
     default:
       return null;
   }

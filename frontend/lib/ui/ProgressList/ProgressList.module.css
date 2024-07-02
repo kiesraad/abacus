@@ -2,6 +2,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  width: 19.5rem;
 
   li {
     padding: 0.625rem 0.75rem;
@@ -19,6 +20,10 @@
 
     label {
       flex: 1 1 auto;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      line-height: 1.5rem;
     }
 
     &:global(.active) {
@@ -26,10 +31,26 @@
       font-weight: 500;
     }
 
-    &:global(.reject) {
+    &:global(.updates) {
       aside {
         svg {
-          fill: var(--accent-dark-red);
+          fill: var(--menu-updates);
+        }
+      }
+    }
+
+    &:global(.empty) {
+      aside {
+        svg {
+          fill: var(--menu-empty);
+        }
+      }
+    }
+
+    &:global(.warning) {
+      aside {
+        svg {
+          fill: var(--menu-warning);
         }
       }
     }
@@ -37,8 +58,19 @@
     &:global(.accept) {
       aside {
         svg {
-          fill: var(--green-500);
+          fill: var(--menu-accept);
         }
+      }
+    }
+    a {
+      color: inherit;
+      width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      &:hover,
+      &:focus {
+        text-decoration: none;
       }
     }
   }

@@ -41,7 +41,11 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
     const separator = numberFormatter.format(11111).replace(/\p{Number}/gu, "");
     const escapedSeparator = separator.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
 
-    const cleaned = s.replace(new RegExp(escapedSeparator, "g"), "");
+    let cleaned = s.replace(new RegExp(escapedSeparator, "g"), "");
+    // Make sure empty value is converted to 0 instead of null
+    if (cleaned == "") {
+      cleaned = "0";
+    }
     return parseInt(cleaned, 10);
   }, []);
 

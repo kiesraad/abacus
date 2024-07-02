@@ -94,6 +94,49 @@
         }
       }
     },
+    "/api/polling_stations/{election_id}": {
+      "get": {
+        "tags": [
+          "polling_station"
+        ],
+        "summary": "List all polling stations",
+        "operationId": "polling_station_list",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Polling station listing successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
         "tags": [
@@ -369,6 +412,72 @@
           }
         }
       },
+      "PollingStation": {
+        "type": "object",
+        "description": "Polling station of a certain [Election]",
+        "required": [
+          "id",
+          "name",
+          "number",
+          "polling_station_type",
+          "street",
+          "house_number",
+          "postal_code",
+          "locality"
+        ],
+        "properties": {
+          "house_number": {
+            "type": "string"
+          },
+          "house_number_addition": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "locality": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "polling_station_type": {
+            "$ref": "#/components/schemas/PollingStationType"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          }
+        }
+      },
+      "PollingStationListResponse": {
+        "type": "object",
+        "description": "Polling station list response",
+        "required": [
+          "polling_stations"
+        ],
+        "properties": {
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStation"
+            }
+          }
+        }
+      },
       "PollingStationResults": {
         "type": "object",
         "description": "PollingStationResults, following the fields in\n\"Model N 10-1. Proces-verbaal van een stembureau\"\n<https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1>",
@@ -384,6 +493,15 @@
             "$ref": "#/components/schemas/VotesCounts"
           }
         }
+      },
+      "PollingStationType": {
+        "type": "string",
+        "description": "Type of Polling station",
+        "enum": [
+          "VasteLocatie",
+          "Bijzonder",
+          "Mobiel"
+        ]
       },
       "ValidationResult": {
         "type": "object",

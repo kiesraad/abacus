@@ -1,9 +1,44 @@
 use serde::{Deserialize, Serialize};
+use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use crate::validation::{
     above_percentage_threshold, Validate, ValidationResult, ValidationResultCode, ValidationResults,
 };
+
+/// Polling station of a certain [Election]
+#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
+pub struct PollingStation {
+    pub id: i64,
+    pub name: String,
+    pub number: i64,
+    pub number_of_voters: Option<i64>,
+    pub polling_station_type: PollingStationType,
+    pub street: String,
+    pub house_number: String,
+    pub house_number_addition: Option<String>,
+    pub postal_code: String,
+    pub locality: String,
+}
+
+/// Type of Polling station
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
+pub enum PollingStationType {
+    VasteLocatie,
+    Bijzonder,
+    Mobiel,
+}
+
+impl From<String> for PollingStationType {
+    fn from(value: String) -> Self {
+        match value.as_str() {
+            "vaste_locatie" => Self::VasteLocatie,
+            "bijzonder" => Self::Bijzonder,
+            "mobiel" => Self::Mobiel,
+            _ => panic!("invalid PollingStationType"),
+        }
+    }
+}
 
 /// PollingStationResults, following the fields in
 /// "Model N 10-1. Proces-verbaal van een stembureau"

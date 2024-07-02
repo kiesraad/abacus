@@ -1,26 +1,17 @@
 #![cfg(test)]
 
-use std::net::SocketAddr;
+mod utils;
 
 use reqwest::StatusCode;
 use serde_json::json;
 use sqlx::SqlitePool;
-use tokio::net::TcpListener;
 
 use backend::election::ElectionDetailsResponse;
 use backend::polling_station::DataEntryResponse;
 use backend::validation::ValidationResultCode::IncorrectTotal;
-use backend::{router, ErrorResponse};
+use backend::ErrorResponse;
 
-async fn serve_api(pool: SqlitePool) -> SocketAddr {
-    let app = router(pool).unwrap();
-    let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
-    let addr = listener.local_addr().unwrap();
-    tokio::spawn(async move {
-        axum::serve(listener, app).await.unwrap();
-    });
-    addr
-}
+use crate::utils::serve_api;
 
 #[sqlx::test]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
@@ -153,7 +144,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     let body: backend::election::ElectionListResponse = response.json().await.unwrap();
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(body.elections.len(), 1);
+    assert_eq!(body.elections.len(), 2);
 }
 
 #[sqlx::test(fixtures("elections"))]

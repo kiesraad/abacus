@@ -56,7 +56,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 
 ### Vereist (must have)
 
-*De onderstaande eisen (requirements) moeten in het eindresultaat terugkomen. Zonder deze eisen is het product niet bruikbaar.*
+*De onderstaande eisen (requirements) moeten in het eindresultaat dat gebruikt wordt bij de gemeenteraadverkiezingen in 2026 terugkomen. Zonder deze eisen is het product niet bruikbaar.*
 
 - Gebruikers en rollen:
   - Gebruikers kunnen lokaal worden aangemaakt met eenvoudige authenticatie, dus alleen een gebruikersnaam en wachtwoord.

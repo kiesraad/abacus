@@ -1,7 +1,7 @@
 # Functionaliteit van Abacus: eisen en wensen
 
 De nieuwe uitslagensoftware Abacus zal in meerdere stappen worden ontwikkeld. Eerst wordt de software ontwikkeld voor het GSB (gemeentelijk stembureau), en daarna wordt de functionaliteit uitgebreid naar het HSB (hoofdstembureau) en CSB (centraal stembureau).
-De allereerste stap is het maken van een bruikbare demoversie, die begin september wordt gepubliceerd.
+De allereerste stap is het maken van een bruikbare demoversie, die begin september 2024 wordt gepubliceerd.
 
 In dit document staan de eisen en wensen voor de demoversie en voor de volledige GSB-versie van Abacus.
 In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid. De specificaties voor de andere versies zullen op een later moment worden vastgesteld.

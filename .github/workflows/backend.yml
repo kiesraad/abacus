@@ -3,6 +3,8 @@ name: Backend
 on:
   push:
   workflow_dispatch:
+  merge_group:
+    types: [checks_requested]
 
 env:
   CARGO_TERM_COLOR: always

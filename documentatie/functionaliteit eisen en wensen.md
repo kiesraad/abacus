@@ -60,7 +60,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 
 - Gebruikers en rollen:
   - Gebruikers kunnen lokaal worden aangemaakt met eenvoudige authenticatie, dus alleen een gebruikersnaam en wachtwoord.
-  - Gebruikers hebben verschillende autorisatieniveaus op basis van de toegewezen rol: Beheerder, Coördinator/verkiezingsleider, Invoerder of Typist (CSO).
+  - Gebruikers hebben verschillende autorisatieniveaus op basis van de toegewezen rol: Beheerder, Coördinator of Invoerder.
 - De beheerder kan stembureaus aanmaken.
 - Invoerders kunnen uitslagen van stembureaus invoeren.
 - Het EML-bestand met de verkiezingsdefinitie voor de betreffende verkiezing kan worden geïmporteerd.

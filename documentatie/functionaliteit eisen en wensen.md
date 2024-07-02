@@ -27,7 +27,6 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 - De flow voor de tweede invoer van een stembureau in een CSO-gemeente is compleet.
 - Er is een statuspagina met daarop de voortgang van de invoer van stembureaus.
 - Verschillen tussen de eerste en tweede invoer worden weergegeven en kunnen worden opgelost.
-- Bezwaren en bijzonderheden kunnen worden ingevuld tijdens het invoeren van de GSB-zitting.
 
 ### Gewenst (could have)
 
@@ -37,6 +36,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 - De frontend wordt aangestuurd vanuit de backend.
 - Stembureaus kunnen worden aangemaakt.
 - Bezwaren en bijzonderheden kunnen per stembureau worden ingevoerd (bij CSO).
+- Bezwaren en bijzonderheden kunnen worden ingevuld tijdens het invoeren van de GSB-zitting.
 
 ### Niet binnen scope (won't have)
 
@@ -72,13 +72,15 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 - De uitslag van het GSB wordt gegenereerd als proces-verbaal in PDF-formaat.
 - De processen-verbaal kunnen worden gegenereerd in het Nederlands en Fries.
 - Validatie en consistentiechecks
+- Er is ondersteuning voor het gebruik van Abacus op meerdere werkstations.
+- Zetelverdeling Gemeenteraad
+
 
 ### Zeer gewenst (should have)
 
 *Deze punten zijn zeer gewenst en worden geïmplementeerd als het kan, maar zonder is de software ook bruikbaar.*
 
-- De lijst met stembureaus kan worden geïmporteerd in EML 110b-formaat.
-- De uitslag van een stembureau/GSB kan na de eerst uitslagvaststelling worden gecorrigeerd in de vorm van een corrigendum.
+- De uitslag van een stembureau/GSB kan na de eerste uitslagvaststelling worden gecorrigeerd in de vorm van een corrigendum.
 - De uitslag GSB wordt voorzien van een cryptografische handtekening.
 
 ### Gewenst (could have)
@@ -86,7 +88,6 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 *Deze eisen zullen alleen aan bod komen als er tijd genoeg is.*
 
 - De software biedt ondersteuning voor meerdere verkiezingen tegelijkertijd. Dit is een vereiste die we sowieso zullen uitwerken na de GSB-fase, maar hier kan al in deze fase al een aanzet toe worden gedaan.
-- Er is ondersteuning voor het gebruik van Abacus op meerdere werkstations.
 - De interface is beschikbaar in meerdere talen: Nederlands, Engels, Fries en Papiaments.
 
 ### Niet binnen scope (won't have)

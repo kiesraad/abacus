@@ -16,4 +16,12 @@
       padding-left: 56px !important;
     }
   }
+
+  &:global(.has-warning) {
+    aside {
+      svg {
+        fill: var(--color-warning);
+      }
+    }
+  }
 }

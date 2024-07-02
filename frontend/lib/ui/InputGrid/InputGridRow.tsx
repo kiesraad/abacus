@@ -25,7 +25,10 @@ export function InputGridRow({
     <InputGrid.Row isTotal={isTotal}>
       <td>{field}</td>
       <td>
-        <FormField error={errorsAndWarnings.get(name)?.errors}>
+        <FormField
+          error={errorsAndWarnings.get(name)?.errors}
+          warning={errorsAndWarnings.get(name)?.warnings}
+        >
           <input id={name} name={name} maxLength={11} {...inputProps} defaultValue={defaultValue} />
         </FormField>
       </td>

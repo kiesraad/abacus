@@ -71,7 +71,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 - De uitslagen kunnen worden geëxporteerd als XML-bestand volgens de EML-standaard (Election Markup Language).
 - De uitslag van het GSB wordt gegenereerd als proces-verbaal in PDF-formaat.
 - De processen-verbaal kunnen worden gegenereerd in het Nederlands en Fries.
-- Validatie en consistentiechecks
+- Validatie en consistentiechecks op de ingevoerde tellingen van stembureaus
 - Er is ondersteuning voor het gebruik van Abacus op meerdere werkstations.
 - Zetelverdeling Gemeenteraad
 

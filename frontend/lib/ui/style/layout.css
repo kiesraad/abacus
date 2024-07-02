@@ -67,8 +67,16 @@
     }
     > article {
       flex: 1 1 auto;
-      padding: 2rem 5rem;
+      padding: 2rem 5rem 2rem 5rem;
       background-color: var(--bg-gray);
+      &.no_footer {
+        padding-bottom: 0;
+      }
+      > form.no_footer {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
     }
   }
 
@@ -80,13 +88,19 @@
   }
 
   > footer {
-    flex: 0 0 24px;
-    background-color: #151921;
-    color: var(--base-white);
+    flex: 0 0 5rem;
+    background-color: var(--base-white);
+    color: var(--color-help-text);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 5rem;
-    font-size: 10px;
+    padding: 2rem 5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
   }
+}
+
+nav#progress {
+  width: 26.5rem;
+  padding: 2.5rem 5rem;
 }

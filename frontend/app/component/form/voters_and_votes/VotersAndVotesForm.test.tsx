@@ -3,7 +3,7 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
-describe("VotersAndVotesForm Form", () => {
+describe("Test VotersAndVotesForm", () => {
   afterEach(() => {
     vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
   });
@@ -26,7 +26,16 @@ describe("VotersAndVotesForm Form", () => {
   });
 
   test("Form field entry and keybindings", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 200, "");
+    overrideOnce(
+      "post",
+      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
+      200,
+      {
+        message: "Data saved",
+        saved: true,
+        validation_results: { errors: [], warnings: [] },
+      },
+    );
 
     const user = userEvent.setup();
 
@@ -74,8 +83,9 @@ describe("VotersAndVotesForm Form", () => {
     const blankVotes = screen.getByTestId("blankVotes");
     expect(blankVotes).toHaveFocus();
     await user.clear(blankVotes);
-    await user.type(blankVotes, "1000000");
-    expect(blankVotes).toHaveValue("1.000.000");
+    // Test if maxLength on field works
+    await user.type(blankVotes, "1000000000");
+    expect(blankVotes).toHaveValue("100.000.000");
 
     await user.keyboard("{enter}");
 
@@ -96,7 +106,9 @@ describe("VotersAndVotesForm Form", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
-    expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
+    const result = await screen.findByTestId("result");
+
+    expect(result).toHaveTextContent(/^Success$/);
   });
 
   describe("VotersAndVotesForm Api call", () => {
@@ -177,15 +189,20 @@ describe("VotersAndVotesForm Form", () => {
         },
       });
 
-      expect(screen.getByTestId("result")).toHaveTextContent(/^Success$/);
+      const result = await screen.findByTestId("result");
+      expect(result).toHaveTextContent(/^Success$/);
     });
   });
 
   test("422 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 422, {
-      message: "422 error from mock",
-      errorCode: "422_ERROR",
-    });
+    overrideOnce(
+      "post",
+      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
+      422,
+      {
+        message: "422 error from mock",
+      },
+    );
 
     const user = userEvent.setup();
 
@@ -193,15 +210,20 @@ describe("VotersAndVotesForm Form", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-
-    expect(screen.getByTestId("result")).toHaveTextContent(/^Error 422_ERROR 422 error from mock$/);
+    const result = await screen.findByTestId("result");
+    expect(result).toHaveTextContent(/^Error 422 error from mock$/);
   });
 
   test("500 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/:id/data_entries/:entry_number", 500, {
-      message: "500 error from mock",
-      errorCode: "500_ERROR",
-    });
+    overrideOnce(
+      "post",
+      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
+      500,
+      {
+        message: "500 error from mock",
+        errorCode: "500_ERROR",
+      },
+    );
 
     const user = userEvent.setup();
 
@@ -209,7 +231,7 @@ describe("VotersAndVotesForm Form", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-
-    expect(screen.getByTestId("result")).toHaveTextContent(/^Error 500_ERROR 500 error from mock$/);
+    const result = await screen.findByTestId("result");
+    expect(result).toHaveTextContent(/^Error 500_ERROR 500 error from mock$/);
   });
 });

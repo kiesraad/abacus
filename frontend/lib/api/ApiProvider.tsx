@@ -11,8 +11,13 @@ export interface ApiProviderProps {
   host: string;
   children: React.ReactNode;
 }
-export function ApiProvider({ children, host }: ApiProviderProps) {
-  const client = React.useMemo(() => new ApiClient(host), [host]);
 
-  return <ApiProviderContext.Provider value={{ client }}>{children}</ApiProviderContext.Provider>;
+export function ApiProvider({ children, host }: ApiProviderProps) {
+  const context = React.useMemo(() => {
+    return {
+      client: new ApiClient(host),
+    };
+  }, [host]);
+
+  return <ApiProviderContext.Provider value={context}>{children}</ApiProviderContext.Provider>;
 }

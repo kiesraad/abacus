@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 
+import { useElectionDataRequest } from "@kiesraad/api";
 import { IconCross } from "@kiesraad/icon";
 import {
   Badge,
@@ -14,8 +15,21 @@ import { VotersAndVotesForm } from "app/component/form/voters_and_votes/VotersAn
 
 export function PollingStationPage() {
   const { id, section } = useParams();
+  // TODO: Set default targetForm correctly once all pages are implemented
   const targetForm = section || "numbers";
   const [openModal, setOpenModal] = useState(false);
+  const { data } = useElectionDataRequest({
+    election_id: parseInt(id || ""),
+  });
+  const [lists, setLists] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (data) {
+      const parties: string[] = [];
+      data.political_groups?.forEach((group: { name: string }) => parties.push(group.name));
+      setLists(parties);
+    }
+  }, [data]);
 
   function changeDialog() {
     setOpenModal(!openModal);
@@ -40,47 +54,55 @@ export function PollingStationPage() {
         <nav>
           <ProgressList>
             <ProgressList.Item status="accept" active={targetForm === "recount"}>
-              Is er herteld?
+              <Link to={`/input/${id}/recount`}>Is er herteld?</Link>
             </ProgressList.Item>
-            <ProgressList.Item status="idle" message="A message" active={targetForm === "numbers"}>
-              Aantal kiezers en stemmen
+            <ProgressList.Item status="idle" active={targetForm === "numbers"}>
+              <Link to={`/input/${id}/numbers`}>Aantal kiezers en stemmen</Link>
             </ProgressList.Item>
             <ProgressList.Item status="idle" active={targetForm === "differences"}>
-              Verschillen?
+              <Link to={`/input/${id}/differences`}>Verschillen</Link>
             </ProgressList.Item>
             <ProgressList.Ruler />
-            {lijsten.map((lijst, index) => (
-              <ProgressList.Item key={`lijst${index.toString()}`} status="idle">
-                {lijst}
-              </ProgressList.Item>
-            ))}
+            {lists.map((list, index) => {
+              const listId = `list${(index + 1).toString()}`;
+              return (
+                <ProgressList.Item key={listId} status="idle" active={targetForm === listId}>
+                  <Link to={`/input/${id}/${listId}`}>{list}</Link>
+                </ProgressList.Item>
+              );
+            })}
             <ProgressList.Ruler />
-            <ProgressList.Item status="idle">Controleren en opslaan?</ProgressList.Item>
+            <ProgressList.Item status="idle" active={targetForm === "save"}>
+              <Link to={`/input/${id}/save`}>Controleren en opslaan</Link>
+            </ProgressList.Item>
           </ProgressList>
         </nav>
         <article>
-          <VotersAndVotesForm />
+          {targetForm === "recount" && <div>Placeholder Recount Page</div>}
+          {targetForm === "numbers" && <VotersAndVotesForm />}
+          {targetForm === "differences" && <div>Placeholder Differences Page</div>}
+          {targetForm.startsWith("list") && <div>Placeholder List page</div>}
+          {targetForm === "save" && <div>Placeholder Check and Save Page</div>}
         </article>
       </main>
-      <aside>&nbsp;</aside>
       {openModal && (
         <Modal onClose={changeDialog}>
-          <h2>Invoer bewaren?</h2>
+          <h2>Wat wil je doen met je invoer?</h2>
           <p>
-            Wil je de invoer bewaren zodat je later verder kan? Overleg met de verkiezingsleider.
+            Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de
+            invoer die je al hebt gedaan bewaren.
+            <br />
+            <br />
+            Twijfel je? Overleg dan met de coördinator.
           </p>
           <nav>
-            <Button>Bewaar invoer</Button>
-            <Button variant="secondary">Verwijder invoer</Button>
+            <Button size="lg">Invoer bewaren</Button>
+            <Button size="lg" variant="secondary">
+              Niet bewaren
+            </Button>
           </nav>
         </Modal>
       )}
     </>
   );
 }
-
-const lijsten: string[] = [
-  "Lijst 1 - Vurige Vleugels Partij",
-  "Lijst 2 - Wijzen van Water en Wind",
-  "Lijst 3 - Eeuwenoude Aarde Unie",
-];

@@ -69,7 +69,7 @@ We ontwikkelen Abacus open source, niet alleen omdat dit de transparantie bevord
 
 De software wordt beschikbaar gesteld onder de EUPL v1.2-licentie. 
 
-Om bij te kunnen dragen aan de software vragen we je om een contributor licence agreement (CLA) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. De CLA kun je aanvragen via het mailadres van het team. 
+Om bij te kunnen dragen aan de software vragen we je om een contributor licence agreement (CLA) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. Stuur de getekende CLA naar [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). Dank alvast!
 
 ## Meldingen en security issues
 

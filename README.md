@@ -7,7 +7,7 @@ proces tijdens en na de verkiezingsdag zal ondersteunen wordt in huis gebouwd do
 Abacus ondersteunt het papieren proces, van het tellen van de stemmen tot en met de zetelverdeling, bij alle in
 Nederland gebruikelijke verkiezingsvormen. De naam van de software is "Abacus software voor verkiezingsuitslagen en zetelverdeling", kortweg "Abacus".
 
-Een Abacus is een telraam, dat veel in wiskundeonderwijs en in de handel wordt gebruikt. Het is de meest transparante en eenvoudige manier om grote berekeningen uit te voeren en sluit zo aan bij de waarden die we in het verkiezingsproces belangrijk vinden. 
+Een abacus is een telraam, dat veel in wiskundeonderwijs en in de handel wordt gebruikt. Het is de meest transparante en eenvoudige manier om grote berekeningen uit te voeren en sluit zo aan bij de waarden die we in het verkiezingsproces belangrijk vinden. 
 
 ## Aanpak
 
@@ -17,7 +17,7 @@ Abacus wordt voor het GSB gebouwd als een stand-alone binary die in een lokaal n
 
 De uitgangspunten bij het ontwerp en de bouw van Abacus zijn gebruiksvriendelijkheid en eenvoud, naast de waarden integriteit, transparantie en controleerbaarheid. De software dient voor het correct invoeren van de resultaten van de stembureaus volgens het vier-ogen principe, voor het maken van de optelling van alle ingevoerde stembureaus en het leveren van een PDF met de resultaten. 
 
-Meer informatie over het proces en de uitvoering van de verkiezingen in Nederland is te vinden op de website van de Kiesraad onder 'verkiezingen' [https://www.kiesraad.nl/verkiezingen](https://www.kiesraad.nl/verkiezingen)
+Meer informatie over het proces en de uitvoering van de verkiezingen in Nederland is te vinden op de website van de Kiesraad onder 'verkiezingen': [https://www.kiesraad.nl/verkiezingen](https://www.kiesraad.nl/verkiezingen)
 
 ## Functies
 
@@ -42,7 +42,7 @@ Er zijn enkele zaken waar we nog over nadenken:
 
 ## Techniek en beveiliging
 
-Abacus wordt gebouwd als een binary met een backend in Rust, frontend in Typescript/React. De [visualisatie van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie. De integriteit van het proces van uitslagvaststelling is een geheel van maatregelen waarin de software zelf ook gecontroleerd wordt en een eigen bijdrage levert:
+Abacus heeft een backend in Rust en frontend in Typescript/React. De [visualisatie van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie. De integriteit van het proces van uitslagvaststelling wordt beschermd door een geheel van maatregelen:
 
 * Externe validatie: resultaten worden onafhankelijk van de software gecontroleerd
 * Interface dwingt controleslagen en vier-ogen principe bij invoer af

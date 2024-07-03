@@ -21,7 +21,7 @@ Meer informatie over het proces en de uitvoering van de verkiezingen in Nederlan
 
 ## Functies
 
-De eerste stap is het bouwen van de uitslagensoftware voor het Gemeentelijk Stembureau. De software omvat de flow van stemmen tot en met de zetelverdeling:
+De eerste stap is het bouwen van de uitslagensoftware voor het gemeentelijk en stembureau (GSB) en centraal stembureau (CSB) bij gemeenteraadsverkiezingen. De software omvat de flow van stemmen tot en met de zetelverdeling:
 
 - Invoer uitslagen en correcties
 - Optelling GSB

@@ -65,14 +65,6 @@ Lees voor meer informatie het bestand `README.md` in elke directory.
 
 Hier komen t.z.t. de installatie-instructies.
 
-### Git pre-commit hook using Lefthook
-
-This project uses [Lefthook] to manage the Git pre-commit hook. Lefthook will
-be installed automatically when `npm install` is run in the `frontend`
-directory.
-
-[Lefthook]: https://github.com/evilmartians/lefthook
-
 ## Bijdragen
 
 We ontwikkelen Abacus open source, niet alleen omdat dit de transparantie bevordert, maar ook omdat we bijdragen vanuit de community verwelkomen. Als je iets wilt bijdragen of als je een vraag hebt, kun je een issue openen op GitHub. Ook kun je contact opnemen met het team via e-mail: [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). 

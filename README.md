@@ -7,7 +7,7 @@ proces tijdens en na de verkiezingsdag zal ondersteunen wordt in huis gebouwd do
 Abacus ondersteunt het papieren proces, van het tellen van de stemmen tot en met de zetelverdeling, bij alle in
 Nederland gebruikelijke verkiezingsvormen. De naam van de software is "Abacus software voor verkiezingsuitslagen en zetelverdeling", kortweg "Abacus".
 
-De naam abacus komt uit het Latijn en is een telraam dat veel in wiskundeonderwijs en in de handel wordt gebruikt. Het is de meest transparante en eenvoudige manier om grote berekeningen uit te voeren en sluit zo aan bij de waarden die we in het verkiezingsproces belangrijk vinden. 
+De naam abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonderwijs en in de handel wordt gebruikt. Het is de meest transparante en eenvoudige manier om grote berekeningen uit te voeren en sluit zo aan bij de waarden die we in het verkiezingsproces belangrijk vinden. 
 
 ## Aanpak
 
@@ -69,13 +69,11 @@ Hier komen t.z.t. de installatie-instructies.
 
 We ontwikkelen Abacus open source, niet alleen omdat dit de transparantie bevordert, maar ook omdat we bijdragen vanuit de community verwelkomen. Als je iets wilt bijdragen of als je een vraag hebt, kun je een issue openen op GitHub. Ook kun je contact opnemen met het team via e-mail: [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). 
 
-De software valt onder de EUPL - v1.2. Om te kunnen bijdragen aan de software vragen we je om een contributer licence agreement (CLA) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. De CLA kun je aanvragen via het mailadres van het team. 
+De software heeft de EUPL v1.2-licentie. Om te kunnen bijdragen aan de software vragen we je om een contributor licence agreement (CLA) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. De CLA kun je aanvragen via het mailadres van het team. 
 
 ## Meldingen en security issues
 
 Alle meldingen over onze software zijn welkom. Je kunt het team direct bereiken via [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl) of contact opnemen met onze CISO Fleur van Leusden via [security@kiesraad.nl](mailto:security@kiesraad.nl). 
-
-In 2023 vond Maarten Boone een kwetsbaarheid in OSV2020. Bekijk hier [de presentatie over hoe we ermee zijn omgegaan](https://www.youtube.com/watch?v=b_SbxiOjs8I). 
 
 ## Copyright en licenties
 

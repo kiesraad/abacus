@@ -76,6 +76,12 @@ Voor de ontwikkeling via GitHub hanteren we de volgende werkwijze:
     - Consolideer de merge message; behoud alleen de belangrijkste punten
     - Sluit de pull request met *Squash and Merge*.
 
+Dit project gebruikt [Lefthook] om de Git pre-commit hook te beheren. Lefthook zal
+automatisch geïnstalleerd worden wanneer `npm install` wordt uitgevoerd in de `frontend`
+directory.
+
+[Lefthook]: https://github.com/evilmartians/lefthook
+
 ### 4. Releases
 
 Er vinden twee soorten releases plaats: 

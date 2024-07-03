@@ -55,15 +55,11 @@ Abacus heeft een backend in Rust en frontend in Typescript/React. De [visualisat
 
 ## Projectstructuur
 
-- [Backend](/backend/)
-- [Frontend](/frontend/)
 - [Documentatie](/documentatie/)
+- [Backend codebase](/backend/)
+- [Frontend codebase](/frontend/)
 
 Lees voor meer informatie het bestand `README.md` in elke directory.
-
-## Installatie en configuratie
-
-Hier komen t.z.t. de installatie-instructies.
 
 ## Bijdragen
 

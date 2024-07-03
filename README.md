@@ -42,18 +42,18 @@ Er zijn enkele zaken waar we nog over nadenken:
 
 Abacus wordt voor het GSB gebouwd als een stand-alone binary die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in Rust, de frontend in TypeScript/React. Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie. 
 
-## Beveiliging
+## Papier is leidend: beveiligingsmaatregelen
 
-Het uitgangspunt in Nederland is dat het papier leidend is bij het bepalen van de uitslag en dat de software hierbij ondersteunt. Hiervoor wordt een systeem van controles uitgevoerd, waarbij steeds teruggekeken wordt of de invoer, optelling en berekening van de software klopt met het papier. 
+Het uitgangspunt in Nederland is dat het papier leidend is bij het bepalen van de verkiezingsuitslag en dat de software hierbij ondersteunt. Hiervoor worden controles uitgevoerd, waarbij steeds teruggekeken wordt of de invoer, optelling en berekening van de software klopt met het papier.
 
-Daarnaast zijn onder andere de volgende maatregelen genomen:
+Daarnaast zijn voor de software, de ontwikkeling en het gebruik onder andere de volgende maatregelen genomen:
 
 * Eenvoud als uitgangspunt: minimale functies, eenvoudige en overzichtelijke techniek
 * Veilige programmeertaal (Rust)
-* Lokale installatie zonder internet
-* Afzender- en bestandsverificatie (weten van wie een bestand komt en dat het compleet is)
 * Ontwikkel- en releaseproces met reviews en beveiligingsonderzoek
 * Definitieve release: pentest en toets op wettelijke kaders
+* Lokale installatie zonder internet
+* Afzender- en bestandsverificatie (weten van wie een bestand komt en dat het compleet is)
 
 ## Projectstructuur
 

@@ -11,7 +11,7 @@ De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonder
 
 ## Aanpak
 
-Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de GSB-U module van OSV2020 voor de uitslagvaststelling van het Gemeentelijk Stembureau. 
+Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de GSB-U module van OSV2020 voor de uitslagvaststelling en zetelverdeling voor gemeenteraadsverkiezingen. 
 
 Abacus wordt voor het GSB gebouwd als een stand-alone binary die in een lokaal netwerk met een webbrowser benaderbaar is, als drop in vervanging van OSV2020. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen.
 

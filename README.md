@@ -11,9 +11,7 @@ De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonder
 
 ## Aanpak
 
-Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de GSB-U module van OSV2020 voor de uitslagvaststelling en zetelverdeling voor gemeenteraadsverkiezingen. 
-
-Abacus wordt voor het GSB gebouwd als een stand-alone binary die in een lokaal netwerk met een webbrowser benaderbaar is, als drop in vervanging van OSV2020. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen.
+Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de GSB-U module van OSV2020 voor de uitslagvaststelling en zetelverdeling voor gemeenteraadsverkiezingen. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen.
 
 De uitgangspunten bij het ontwerp en de bouw van Abacus zijn gebruiksvriendelijkheid en eenvoud, naast de waarden integriteit, transparantie en controleerbaarheid. De software dient voor het correct invoeren van de resultaten van de stembureaus volgens het vier-ogen principe, voor het maken van de optelling van alle ingevoerde stembureaus en het opstellen van het proces-verbaal met de resultaten. 
 
@@ -40,16 +38,20 @@ Er zijn enkele zaken waar we nog over nadenken:
 - Bestandsuitwisseling
 - Installatie en configuratie van de software en invoerstations
 
-## Techniek en beveiliging
+## Techniek
 
-Abacus heeft een backend in Rust en frontend in TypeScript/React. Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie. De integriteit van het proces van uitslagvaststelling wordt beschermd door een geheel van maatregelen:
+Abacus wordt voor het GSB gebouwd als een stand-alone binary die in een lokaal netwerk met een webbrowser benaderbaar is, als drop in vervanging van OSV2020. De backend wordt geschreven in Rust, de frontend in TypeScript/React. Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie. 
 
-* Externe validatie: resultaten worden onafhankelijk van de software gecontroleerd
-* Interface dwingt controleslagen en vier-ogen principe bij invoer af
-* Eenvoud als uitgangspunt: minimale functies, eenvoudige techniek
-* Technische keuzes zoals Rust
+## Beveiliging
+
+De belangrijkste beveiliging in het verkiezingsproces zit niet in de software. Het uitgangspunt in Nederland is dat het papier leidend is bij het bepalen van de uitslag en dat de software hierbij ondersteunt. Hiervoor wordt een systeem van controles uitgevoerd, waarbij steeds teruggekeken wordt of de invoer, optelling en berekening van de software klopt met het papier.
+
+Daarnaast zijn onder andere de volgende maatregelen genomen:
+
+* Eenvoud als uitgangspunt: minimale functies, eenvoudige en overzichtelijke techniek
+* Veilige programmeertaal (Rust)
 * Lokale installatie zonder internet
-* Afzender- en bestandsverificatie
+* Afzender- en bestandsverificatie (weten van wie een bestand komt en dat het compleet is)
 * Ontwikkel- en releaseproces met reviews en beveiligingsonderzoek
 * Definitieve release: pentest en toets op wettelijke kaders
 

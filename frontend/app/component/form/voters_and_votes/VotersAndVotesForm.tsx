@@ -96,6 +96,12 @@ export function VotersAndVotesForm() {
     return result;
   }, [data, inputMaskWarnings]);
 
+  React.useEffect(() => {
+    if (data) {
+      window.scrollTo(0, 0);
+    }
+  }, [data]);
+
   const hasValidationError = data && data.validation_results.errors.length > 0;
   const hasValidationWarning = data && data.validation_results.warnings.length > 0;
 

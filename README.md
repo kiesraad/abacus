@@ -40,6 +40,19 @@ Er zijn enkele zaken waar we nog over nadenken:
 - Bestandsuitwisseling
 - Installatie en configuratie van de software en invoerstations
 
+## Techniek en beveiliging
+
+Abacus wordt gebouwd als een binary met een backend in Rust, frontend in Typescript/React. De [visualisatie van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie. De integriteit van het proces van uitslagvaststelling is een geheel van maatregelen waarin de software zelf ook gecontroleerd wordt en een eigen bijdrage levert:
+
+* Externe validatie: resultaten worden onafhankelijk van de software gecontroleerd
+* Interface dwingt controleslagen en vier-ogen principe bij invoer af
+* Eenvoud als uitgangspunt: minimale functies, eenvoudige techniek
+* Technische keuzes zoals Rust
+* Lokale installatie zonder internet
+* Afzender- en bestandsverificatie
+* Ontwikkel- en releaseproces met reviews en beveiligingsonderzoek
+* Definitieve release: pentest en toets op wettelijke kaders
+
 ## Projectstructuur
 
 - [Backend](/backend/)

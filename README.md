@@ -79,7 +79,9 @@ We ontwikkelen Abacus open source, niet alleen omdat dit de transparantie bevord
 
 ## Meldingen en security issues
 
-Alle meldingen over onze software zijn welkom. Je kunt het team direct bereiken via [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl) of contact opnemen met onze CISO Fleur van Leusden via [security@kiesraad.nl](mailto:security@kiesraad.nl). Algemene contactgegevens van de Kiesraad zijn hier te vinden: [https://www.kiesraad.nl/contact](https://www.kiesraad.nl/contact). In 2023 vond Maarten Boone een kwetsbaarheid in OSV2020. Bekijk hier [de presentatie over hoe we ermee zijn omgegaan](https://www.youtube.com/watch?v=b_SbxiOjs8I). 
+Alle meldingen over onze software zijn welkom. Je kunt het team direct bereiken via [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl) of contact opnemen met onze CISO Fleur van Leusden via [security@kiesraad.nl](mailto:security@kiesraad.nl). 
+
+In 2023 vond Maarten Boone een kwetsbaarheid in OSV2020. Bekijk hier [de presentatie over hoe we ermee zijn omgegaan](https://www.youtube.com/watch?v=b_SbxiOjs8I). 
 
 ## Copyright en licenties
 

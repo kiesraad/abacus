@@ -44,7 +44,7 @@ Abacus wordt voor het GSB gebouwd als een stand-alone binary die net als OSV2020
 
 ## Beveiliging
 
-De belangrijkste beveiliging in het verkiezingsproces zit niet in de software. Het uitgangspunt in Nederland is dat het papier leidend is bij het bepalen van de uitslag en dat de software hierbij ondersteunt. Hiervoor wordt een systeem van controles uitgevoerd, waarbij steeds teruggekeken wordt of de invoer, optelling en berekening van de software klopt met het papier.
+Het uitgangspunt in Nederland is dat het papier leidend is bij het bepalen van de uitslag en dat de software hierbij ondersteunt. Hiervoor wordt een systeem van controles uitgevoerd, waarbij steeds teruggekeken wordt of de invoer, optelling en berekening van de software klopt met het papier. 
 
 Daarnaast zijn onder andere de volgende maatregelen genomen:
 

@@ -8,7 +8,7 @@ use crate::APIError;
 
 pub use self::structs::*;
 
-pub(crate) mod database;
+pub(crate) mod repository;
 pub mod structs;
 
 /// Election list response
@@ -37,7 +37,7 @@ pub struct ElectionDetailsResponse {
 pub async fn election_list(
     State(pool): State<SqlitePool>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
-    let elections = database::get_elections(pool).await?;
+    let elections = repository::get_elections(pool).await?;
     Ok(Json(ElectionListResponse { elections }))
 }
 
@@ -58,6 +58,6 @@ pub async fn election_details(
     State(pool): State<SqlitePool>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
-    let election = database::get_election(pool, id).await?;
+    let election = repository::get_election(pool, id).await?;
     Ok(Json(ElectionDetailsResponse { election }))
 }

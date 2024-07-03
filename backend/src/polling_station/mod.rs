@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, SqlitePool};
 use utoipa::ToSchema;
 
-use crate::election::database::get_election;
+use crate::election::repository::get_election;
 use crate::validation::ValidationResults;
 use crate::{APIError, JsonResponse};
 

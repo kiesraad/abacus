@@ -11,7 +11,7 @@ De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonder
 
 ## Aanpak
 
-Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de GSB-U module van OSV2020 voor de uitslagvaststelling en zetelverdeling voor gemeenteraadsverkiezingen. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen.
+Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de GSB-U module van OSV2020 voor de uitslagvaststelling en zetelverdeling voor gemeenteraadsverkiezingen. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen.
 
 De uitgangspunten bij het ontwerp en de bouw van Abacus zijn gebruiksvriendelijkheid en eenvoud, naast de waarden integriteit, transparantie en controleerbaarheid. De software dient voor het correct invoeren van de resultaten van de stembureaus volgens het vier-ogen principe, voor het maken van de optelling van alle ingevoerde stembureaus en het opstellen van het proces-verbaal met de resultaten. 
 
@@ -40,7 +40,7 @@ Er zijn enkele zaken waar we nog over nadenken:
 
 ## Techniek
 
-Abacus wordt voor het GSB gebouwd als een stand-alone binary die in een lokaal netwerk met een webbrowser benaderbaar is, als drop in vervanging van OSV2020. De backend wordt geschreven in Rust, de frontend in TypeScript/React. Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie. 
+Abacus wordt voor het GSB gebouwd als een stand-alone binary die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in Rust, de frontend in TypeScript/React. Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie. 
 
 ## Beveiliging
 

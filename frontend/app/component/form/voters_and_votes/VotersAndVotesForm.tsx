@@ -1,11 +1,6 @@
 import * as React from "react";
 
-import {
-  type ResultCode,
-  usePollingStationDataEntry,
-  ValidationResult,
-  ErrorsAndWarnings,
-} from "@kiesraad/api";
+import { usePollingStationDataEntry, ValidationResult, ErrorsAndWarnings } from "@kiesraad/api";
 import { Button, InputGrid, Feedback, BottomBar, InputGridRow } from "@kiesraad/ui";
 import {
   usePositiveNumberInputMask,
@@ -72,7 +67,10 @@ export function VotersAndVotesForm() {
           }
           const field = result.get(fieldName);
           if (field) {
-            field[target].push(v.code);
+            field[target].push({
+              code: v.code,
+              id: fieldName,
+            });
           }
         });
       });
@@ -86,12 +84,12 @@ export function VotersAndVotesForm() {
     }
 
     inputMaskWarnings.forEach((warning) => {
-      if (!result.has(warning.anchor.id)) {
-        result.set(warning.anchor.id, { errors: [], warnings: [] });
+      if (!result.has(warning.id)) {
+        result.set(warning.id, { errors: [], warnings: [] });
       }
-      const field = result.get(warning.anchor.id);
+      const field = result.get(warning.id);
       if (field) {
-        field.warnings.push(warning.code as ResultCode);
+        field.warnings.push(warning);
       }
     });
 

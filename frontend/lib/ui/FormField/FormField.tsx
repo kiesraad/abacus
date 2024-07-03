@@ -1,13 +1,14 @@
-import { type ResultCode } from "@kiesraad/api";
+import { type FieldValidationResult } from "@kiesraad/api";
 import * as React from "react";
 import cls from "./FormField.module.css";
 import { cn } from "@kiesraad/util";
 import { IconError, IconWarning } from "@kiesraad/icon";
+import { Tooltip } from "../Tooltip/Tooltip";
 
 export interface FormFieldProps {
   children: React.ReactNode;
-  error?: ResultCode[];
-  warning?: ResultCode[];
+  error?: FieldValidationResult[];
+  warning?: FieldValidationResult[];
   tooltip?: string | React.ReactNode;
 }
 
@@ -31,7 +32,7 @@ export function FormField({ children, error, warning, tooltip }: FormFieldProps)
       })}
     >
       <aside>{icon}</aside>
-      {tooltip ? <div className="tooltip">{children}</div> : children}
+      {tooltip ? <Tooltip content={tooltip}>{children}</Tooltip> : children}
     </div>
   );
 }

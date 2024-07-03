@@ -1,14 +1,9 @@
+import { FieldValidationResult } from "@kiesraad/api";
 import * as React from "react";
 
 export type FormatFunc = (s: string | number | null | undefined) => string;
 export type DeformatFunc = (s: string) => number;
 export type ValidateFunc = (s: string | number | null | undefined) => boolean;
-
-export type PositiveInputMaskWarning = {
-  anchor: HTMLInputElement;
-  value: string;
-  code: "REFORMAT_WARNING";
-};
 
 export interface UsePositiveNumberInputMaskReturn {
   format: FormatFunc;
@@ -19,7 +14,7 @@ export interface UsePositiveNumberInputMaskReturn {
     onLoad: React.ChangeEventHandler<HTMLInputElement>;
     onPaste: React.ClipboardEventHandler<HTMLInputElement>;
   };
-  warnings: PositiveInputMaskWarning[];
+  warnings: FieldValidationResult[];
   resetWarnings: () => void;
 }
 
@@ -28,7 +23,7 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
 });
 
 export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
-  const [warnings, setWarnings] = React.useState<PositiveInputMaskWarning[]>([]);
+  const [warnings, setWarnings] = React.useState<FieldValidationResult[]>([]);
   const format: FormatFunc = React.useCallback((s) => {
     if (s === null || s === undefined) return "";
     let result = `${s}`.replace(/\D/g, "");
@@ -75,11 +70,12 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
       const pastedInput = event.clipboardData.getData("text/plain");
       if (!validate(pastedInput)) {
         event.preventDefault();
+        const id = event.currentTarget.id;
         setWarnings((old) => {
           return [
             ...old,
             {
-              anchor: event.currentTarget,
+              id,
               value: pastedInput,
               code: "REFORMAT_WARNING",
             },

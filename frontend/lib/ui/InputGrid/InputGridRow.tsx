@@ -21,13 +21,29 @@ export function InputGridRow({
   inputProps,
   isTotal,
 }: InputGridRowProps) {
+  const errors = errorsAndWarnings.get(name)?.errors;
+  const warnings = errorsAndWarnings
+    .get(name)
+    ?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING");
+  const tooltip = errorsAndWarnings
+    .get(name)
+    ?.warnings.find((warning) => warning.code === "REFORMAT_WARNING")?.value;
+
   return (
     <InputGrid.Row isTotal={isTotal}>
       <td>{field}</td>
       <td>
         <FormField
-          error={errorsAndWarnings.get(name)?.errors}
-          warning={errorsAndWarnings.get(name)?.warnings}
+          error={errors}
+          warning={warnings}
+          tooltip={
+            tooltip && (
+              <div>
+                Je probeert <strong>{tooltip}</strong> te plakken. Je kunt hier alleen cijfers
+                invullen.
+              </div>
+            )
+          }
         >
           <input id={name} name={name} maxLength={11} {...inputProps} defaultValue={defaultValue} />
         </FormField>

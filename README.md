@@ -4,7 +4,7 @@
 
 De Kiesraad gaat de software Ondersteunende Software Verkiezingen (OSV2020) vervangen. Het deel van de software dat het
 proces tijdens en na de verkiezingsdag zal ondersteunen wordt in huis gebouwd door een eigen ontwikkelteam.
-Abacus ondersteunt het papieren proces, van het tellen van de stemmen tot en met de zetelverdeling, bij alle in
+Abacus ondersteunt het papieren proces, van het optellen van de stemmen tot en met de zetelverdeling, bij alle in
 Nederland gebruikelijke verkiezingsvormen. De naam van de software is "Abacus software voor verkiezingsuitslagen en zetelverdeling", kortweg "Abacus".
 
 De naam abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonderwijs en in de handel wordt gebruikt. Het is de meest transparante en eenvoudige manier om grote berekeningen uit te voeren en sluit zo aan bij de waarden die we in het verkiezingsproces belangrijk vinden. 

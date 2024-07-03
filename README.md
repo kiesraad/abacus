@@ -65,7 +65,9 @@ Lees voor meer informatie het bestand `README.md` in elke directory.
 
 We ontwikkelen Abacus open source, niet alleen omdat dit de transparantie bevordert, maar ook omdat we bijdragen vanuit de community verwelkomen. Als je iets wilt bijdragen of als je een vraag hebt, kun je een issue openen op GitHub. Ook kun je contact opnemen met het team via e-mail: [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). 
 
-De software heeft de EUPL v1.2-licentie. Om te kunnen bijdragen aan de software vragen we je om een contributor licence agreement (CLA) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. De CLA kun je aanvragen via het mailadres van het team. 
+De software wordt beschikbaar gesteld onder de EUPL v1.2-licentie. 
+
+Om bij te kunnen dragen aan de software vragen we je om een contributor licence agreement (CLA) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. De CLA kun je aanvragen via het mailadres van het team. 
 
 ## Meldingen en security issues
 

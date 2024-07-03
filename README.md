@@ -42,7 +42,7 @@ Er zijn enkele zaken waar we nog over nadenken:
 
 ## Techniek en beveiliging
 
-Abacus heeft een backend in Rust en frontend in Typescript/React. De [visualisatie van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie. De integriteit van het proces van uitslagvaststelling wordt beschermd door een geheel van maatregelen:
+Abacus heeft een backend in Rust en frontend in TypeScript/React. Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie. De integriteit van het proces van uitslagvaststelling wordt beschermd door een geheel van maatregelen:
 
 * Externe validatie: resultaten worden onafhankelijk van de software gecontroleerd
 * Interface dwingt controleslagen en vier-ogen principe bij invoer af

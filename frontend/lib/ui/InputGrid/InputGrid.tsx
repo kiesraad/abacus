@@ -91,9 +91,10 @@ export function InputGrid({ zebra, children }: InputGridProps) {
     }
   }, []);
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     const tableEl = ref.current;
     if (tableEl) {
+      inputList.current = [];
       tableEl.querySelectorAll("input").forEach((input) => {
         const trEl = domtoren(input).closest("tr").el() as HTMLTableRowElement;
         inputList.current.push({ el: input, trEl });

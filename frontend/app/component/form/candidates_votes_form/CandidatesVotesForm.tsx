@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Election } from "@kiesraad/api";
+import { PoliticalGroup } from "@kiesraad/api";
 import { BottomBar, Button, InputGrid } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
@@ -20,15 +20,13 @@ interface CandidatesVotesFormElement extends HTMLFormElement {
 }
 
 export interface CandidatesVotesFormProps {
-  election: Election;
-  listNumber: number;
+  group: PoliticalGroup;
 }
 
-export function CandidatesVotesForm({ election, listNumber }: CandidatesVotesFormProps) {
+export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   // const { register, format, deformat } = usePositiveNumberInputMask();
+
   const { register, format } = usePositiveNumberInputMask();
-  const [candidates, setCandidates] = React.useState<string[]>([]);
-  const [listName, setListName] = React.useState("");
   const formRef = React.useRef<HTMLFormElement>(null);
 
   usePreventFormEnterSubmit(formRef);
@@ -37,21 +35,11 @@ export function CandidatesVotesForm({ election, listNumber }: CandidatesVotesFor
   //   entry_number: 1,
   // });
 
-  React.useEffect(() => {
-    // TODO: Sometimes this does not seem to work...
-    window.scrollTo(0, 0);
-
-    const names: string[] = [];
-    const currentGroup = election.political_groups?.find((group) => group.number === listNumber);
-    if (currentGroup) {
-      setListName(currentGroup.name);
-      currentGroup.candidates.forEach(
-        (candidate: { initials: string; first_name: string; last_name: string }) =>
-          names.push(`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`),
-      );
-      setCandidates(names);
-    }
-  }, [election, listNumber]);
+  const candidates = React.useMemo(() => {
+    return group.candidates.map((candidate) => {
+      return `${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`;
+    });
+  }, [group]);
 
   function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
     event.preventDefault();
@@ -77,7 +65,7 @@ export function CandidatesVotesForm({ election, listNumber }: CandidatesVotesFor
 
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
-      <h2>{listName}</h2>
+      <h2>{group.name}</h2>
       {/*{data && <p id="result">Success</p>}*/}
       {/*{error && (*/}
       {/*  <p id="result">*/}

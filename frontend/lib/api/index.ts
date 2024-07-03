@@ -7,4 +7,4 @@ export * from "./useElectionDataRequest";
 export * from "./usePollingStationDataEntry";
 export * from "./gen/openapi";
 
-export * from "./election/ElectionProvider";
+export * from "./election";

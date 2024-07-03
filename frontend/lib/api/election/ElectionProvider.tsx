@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Election } from "../gen/openapi";
-import { useElectionListRequest } from "../useElectionListRequest";
+import { useElectionDataRequest } from "../useElectionDataRequest";
+import { useElectionList } from "./useElectionList";
 
 export interface iElectionProviderContext {
-  elections: Election[];
-  activeElection: Election;
+  election: Election;
 }
 
 export const ElectionProviderContext = React.createContext<iElectionProviderContext | undefined>(
@@ -16,21 +16,22 @@ export interface ElectionProviderProps {
 }
 
 export function ElectionProvider({ children }: ElectionProviderProps) {
-  const { data, loading } = useElectionListRequest();
-  console.log("HUH", data);
+  const { electionList } = useElectionList();
+
+  const { data, loading } = useElectionDataRequest({
+    election_id: electionList.length && electionList[0] ? electionList[0].id : 0,
+  });
+
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (!data || !data.elections.length) {
+  if (!data) {
     return <div>Error no election data</div>;
   }
 
-  // Temporary: just use the first election as the active one
-  const activeElection = data.elections[0] as Election;
-
   return (
-    <ElectionProviderContext.Provider value={{ elections: data.elections, activeElection }}>
+    <ElectionProviderContext.Provider value={{ election: data }}>
       {children}
     </ElectionProviderContext.Provider>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, Outlet, useParams } from "react-router-dom";
+import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 
 import { useElectionDataRequest } from "@kiesraad/api";
 import { IconCross } from "@kiesraad/icon";
@@ -14,13 +14,15 @@ import {
 
 export function PollingStationLayout() {
   const { id, listNumber } = useParams();
-  // TODO: Set default targetForm correctly once all pages are implemented
-  const targetForm: string = "numbers";
+
   const [openModal, setOpenModal] = useState(false);
   const { data } = useElectionDataRequest({
     election_id: parseInt(id || ""),
   });
   const [lists, setLists] = useState<string[]>([]);
+  const { pathname } = useLocation();
+
+  const targetForm = currentSectionFromPath(pathname);
 
   useEffect(() => {
     if (data) {
@@ -110,4 +112,13 @@ export function PollingStationLayout() {
       )}
     </>
   );
+}
+
+function currentSectionFromPath(pathname: string): string {
+  //3 deep;
+  const pathParts = pathname.split("/");
+  if (pathParts.length >= 3) {
+    return pathParts[2] || "";
+  }
+  return "";
 }

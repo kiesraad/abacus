@@ -20,24 +20,30 @@ async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let request_body = backend::polling_station::DataEntryRequest {
         data: backend::polling_station::PollingStationResults {
             voters_counts: backend::polling_station::VotersCounts {
-                poll_card_count: 1,
+                poll_card_count: 100,
                 proxy_certificate_count: 2,
-                voter_card_count: 3,
-                total_admitted_voters_count: 4,
+                voter_card_count: 2,
+                total_admitted_voters_count: 104,
             },
             votes_counts: backend::polling_station::VotesCounts {
-                votes_candidates_counts: 5,
-                blank_votes_count: 6,
-                invalid_votes_count: 7,
-                total_votes_cast_count: 8,
+                votes_candidates_counts: 102,
+                blank_votes_count: 1,
+                invalid_votes_count: 1,
+                total_votes_cast_count: 104,
             },
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,
-                total: 9,
-                candidate_votes: vec![CandidateVotes {
-                    number: 1,
-                    votes: 10,
-                }],
+                total: 102,
+                candidate_votes: vec![
+                    CandidateVotes {
+                        number: 1,
+                        votes: 54,
+                    },
+                    CandidateVotes {
+                        number: 2,
+                        votes: 48,
+                    },
+                ],
             }],
         },
     };
@@ -52,8 +58,14 @@ async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     let status = response.status();
-    println!("response body: {:?}", &response.text().await.unwrap());
-    assert_eq!(status, StatusCode::OK);
+    if status != StatusCode::OK {
+        println!("Response body: {:?}", &response.text().await.unwrap());
+        panic!("Unexpected response status: {:?}", status);
+    }
+    let validation_results: DataEntryResponse = response.json().await.unwrap();
+    assert!(validation_results.saved);
+    assert_eq!(validation_results.validation_results.errors.len(), 0);
+    assert_eq!(validation_results.validation_results.warnings.len(), 0);
 }
 
 #[sqlx::test]
@@ -134,7 +146,9 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     }
     let body: DataEntryResponse = response.json().await.unwrap();
     let errors = body.validation_results.errors;
-    assert_eq!(errors.len(), 3);
+    assert_eq!(errors.len(), 4);
+    // error 1
+    assert_eq!(errors[0].code, IncorrectTotal);
     assert_eq!(
         errors[0].fields,
         vec![
@@ -144,7 +158,8 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
             "data.voters_counts.voter_card_count"
         ]
     );
-    assert_eq!(errors[0].code, IncorrectTotal);
+    // error 2
+    assert_eq!(errors[1].code, IncorrectTotal);
     assert_eq!(
         errors[1].fields,
         vec![
@@ -154,12 +169,21 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
             "data.votes_counts.invalid_votes_count"
         ]
     );
-    assert_eq!(errors[1].code, IncorrectTotal);
+    // error 3
+    assert_eq!(errors[2].code, IncorrectTotal);
     assert_eq!(
         errors[2].fields,
         vec!["data.political_group_votes[0].total"]
     );
-    assert_eq!(errors[2].code, IncorrectTotal);
+    // error 4
+    assert_eq!(errors[3].code, IncorrectTotal);
+    assert_eq!(
+        errors[3].fields,
+        vec![
+            "data.votes_counts.votes_candidates_counts",
+            "data.political_group_votes"
+        ]
+    );
     assert_eq!(body.validation_results.warnings.len(), 0);
 }
 

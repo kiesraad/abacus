@@ -79,10 +79,10 @@ pub(crate) mod tests {
                     .map(|j| Candidate {
                         number: j + 1,
                         initials: "A.B.".to_string(),
-                        first_name: "Test".to_string(),
+                        first_name: "John".to_string(),
                         last_name_prefix: Some("van".to_string()),
-                        last_name: "Test".to_string(),
-                        locality: "Test".to_string(),
+                        last_name: "Doe".to_string(),
+                        locality: "Juinen".to_string(),
                         country_code: Some("NL".to_string()),
                         gender: Some(X),
                     })

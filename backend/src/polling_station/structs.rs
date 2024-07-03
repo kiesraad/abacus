@@ -95,6 +95,23 @@ impl Validate for PollingStationResults {
                 code: ValidationResultCode::EqualInput,
             });
         }
+
+        // validate that the total number of valid votes is equal to the sum of all political group totals
+        if self.votes_counts.votes_candidates_counts as u64
+            != self
+                .political_group_votes
+                .iter()
+                .map(|pgv| pgv.total as u64)
+                .sum::<u64>()
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    format!("{field_name}.votes_counts.votes_candidates_counts"),
+                    format!("{field_name}.political_group_votes"),
+                ],
+                code: ValidationResultCode::IncorrectTotal,
+            });
+        }
     }
 }
 
@@ -441,10 +458,10 @@ mod tests {
             },
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,
-                total: 10,
+                total: 5,
                 candidate_votes: vec![CandidateVotes {
                     number: 1,
-                    votes: 10,
+                    votes: 5,
                 }],
             }],
         };
@@ -477,10 +494,10 @@ mod tests {
             },
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,
-                total: 10,
+                total: 1000,
                 candidate_votes: vec![CandidateVotes {
                     number: 1,
-                    votes: 10,
+                    votes: 1000,
                 }],
             }],
         };

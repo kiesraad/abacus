@@ -14,6 +14,7 @@ use utoipa_swagger_ui::SwaggerUi;
 
 pub mod election;
 pub mod polling_station;
+pub mod repository;
 pub mod validation;
 
 /// Axum router for the application

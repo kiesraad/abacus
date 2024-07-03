@@ -1,9 +1,9 @@
-use axum::extract::{Path, State};
+use axum::extract::Path;
 use axum::Json;
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
+use crate::repository::Repository;
 use crate::APIError;
 
 pub use self::structs::*;
@@ -34,10 +34,8 @@ pub struct ElectionDetailsResponse {
             (status = 500, description = "Internal server error", body = ErrorResponse),
         ),
     )]
-pub async fn election_list(
-    State(pool): State<SqlitePool>,
-) -> Result<Json<ElectionListResponse>, APIError> {
-    let elections = repository::get_elections(pool).await?;
+pub async fn election_list(repo: Repository) -> Result<Json<ElectionListResponse>, APIError> {
+    let elections = repo.elections().list().await?;
     Ok(Json(ElectionListResponse { elections }))
 }
 
@@ -55,9 +53,9 @@ pub async fn election_list(
         ),
     )]
 pub async fn election_details(
-    State(pool): State<SqlitePool>,
+    repo: Repository,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
-    let election = repository::get_election(pool, id).await?;
+    let election = repo.elections().get(id).await?;
     Ok(Json(ElectionDetailsResponse { election }))
 }

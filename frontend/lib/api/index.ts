@@ -1,11 +1,4 @@
 export * from "./election";
-export * from "./ApiProvider";
-export * from "./ApiClient";
-export * from "./useApiPostRequest";
-export * from "./useApiGetRequest";
-export * from "./useElectionDataRequest";
-export * from "./usePollingStationDataEntry";
-export * from "./usePollingStation";
 export * from "./gen/openapi";
 export type * from "./api.d.ts";
 export * from "./ApiClient";
@@ -15,4 +8,5 @@ export * from "./useApiPostRequest";
 export * from "./useElectionDataRequest";
 export * from "./useElectionListRequest";
 export * from "./usePollingStationDataEntry";
+export * from "./usePollingStation";
 export * from "./form";

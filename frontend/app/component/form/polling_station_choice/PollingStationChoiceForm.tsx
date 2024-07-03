@@ -16,13 +16,11 @@ export function PollingStationChoiceForm() {
   const navigate = useNavigate();
   const pollingStations = usePollingStationListRequest({
     //election_id: parseInt(id || ""),
-    election_id: 1,
+    election_id: 1, // TODO
   });
-
-  console.log(pollingStations);
   
-  const handleRowClick = () => {
-    navigate(`./030/recounted`);
+  const handleRowClick = (pollingStationNumber: number) => () => {
+    navigate(`./${pollingStationNumber}`);
   };
   function handleSubmit(event: React.FormEvent<PollingStationChoiceFormElement>) {
     event.preventDefault();
@@ -73,20 +71,22 @@ export function PollingStationChoiceForm() {
             </tr>
           </thead>
           <tbody>
-            <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="number">
-                1
-              </td>
-              <td>
-                <span>Nachthemelstraat 21</span>
-                <Badge type="first_entry" />
-              </td>
-              <td width="5rem">
-                <div className="link">
-                  <IconChevronRight />
-                </div>
-              </td>
-            </tr>
+            {pollingStations.data?.polling_stations.map((pollingStation: any) => (
+              <tr onClick={handleRowClick(pollingStation.number)} key={pollingStation.number}>
+                <td width="6.5rem" className="number">
+                  {pollingStation.number}
+                </td>
+                <td>
+                  <span>{pollingStation.name}</span>
+                  <Badge type="first_entry" />
+                </td>
+                <td width="5rem">
+                  <div className="link">
+                    <IconChevronRight />
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </details>

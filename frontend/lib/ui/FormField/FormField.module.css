@@ -3,6 +3,7 @@
   aside {
     position: absolute;
     left: 24px;
+    z-index: 4;
     top: 50%;
     margin-top: -12px;
     svg {

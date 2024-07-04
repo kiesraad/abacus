@@ -7,12 +7,16 @@ export interface TooltipProps {
   onClose?: () => void;
 }
 
+export const EVENT_TOOLTIP_HIDE = "tooltiphide";
+const hideEvent = new CustomEvent(EVENT_TOOLTIP_HIDE);
+
 export function Tooltip({ children, content, onClose }: TooltipProps): React.ReactNode {
   const [visible, setVisible] = React.useState(true);
 
   const handleMouseAndKeyboardEvent = React.useCallback(() => {
     if (onClose) onClose();
     setVisible(false);
+    window.dispatchEvent(hideEvent);
   }, [onClose]);
 
   React.useEffect(() => {

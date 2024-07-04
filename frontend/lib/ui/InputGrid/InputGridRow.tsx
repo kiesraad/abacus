@@ -22,9 +22,7 @@ export function InputGridRow({
   isTotal,
 }: InputGridRowProps) {
   const errors = errorsAndWarnings.get(name)?.errors;
-  const warnings = errorsAndWarnings
-    .get(name)
-    ?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING");
+  const warnings = errorsAndWarnings.get(name)?.warnings;
   const tooltip = errorsAndWarnings
     .get(name)
     ?.warnings.find((warning) => warning.code === "REFORMAT_WARNING")?.value;

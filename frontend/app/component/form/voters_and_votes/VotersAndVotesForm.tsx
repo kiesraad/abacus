@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { usePollingStationDataEntry, ValidationResult, ErrorsAndWarnings } from "@kiesraad/api";
-import { Button, InputGrid, Feedback, BottomBar, InputGridRow } from "@kiesraad/ui";
+import { Button, InputGrid, Feedback, BottomBar, InputGridRow, useTooltip } from "@kiesraad/ui";
 import {
   usePositiveNumberInputMask,
   usePreventFormEnterSubmit,
@@ -25,12 +25,22 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
+  const {
+    register,
+    format,
+    deformat,
+    warnings: inputMaskWarnings,
+    resetWarnings,
+  } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
   const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
     polling_station_id: 1,
     entry_number: 1,
+  });
+
+  useTooltip({
+    onDismiss: resetWarnings,
   });
 
   function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {

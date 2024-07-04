@@ -1,4 +1,4 @@
-use axum::extract::{FromRequest, Path};
+use axum::extract::{FromRequest, Path, State};
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde::{Deserialize, Serialize};
@@ -51,7 +51,7 @@ impl IntoResponse for DataEntryResponse {
         ),
     )]
 pub async fn polling_station_data_entry(
-    repo: Repository,
+    State(repo): State<Repository>,
     Path((id, entry_number)): Path<(u32, u8)>,
     data_entry_request: DataEntryRequest,
 ) -> Result<DataEntryResponse, APIError> {
@@ -101,7 +101,7 @@ pub struct PollingStationListResponse {
     ),
 )]
 pub async fn polling_station_list(
-    repo: Repository,
+    State(repo): State<Repository>,
     Path(election_id): Path<u32>,
 ) -> Result<JsonResponse<PollingStationListResponse>, APIError> {
     Ok(JsonResponse(PollingStationListResponse {
@@ -143,7 +143,7 @@ mod tests {
         };
 
         let response = polling_station_data_entry(
-            Repository::new(pool.clone()),
+            State(Repository::new(pool.clone())),
             Path((1, 1)),
             request_body.clone(),
         )
@@ -161,10 +161,13 @@ mod tests {
         // Test updating the same row
         let new_value = 10;
         request_body.data.voters_counts.poll_card_count = new_value;
-        let response =
-            polling_station_data_entry(Repository::new(pool.clone()), Path((1, 1)), request_body)
-                .await
-                .into_response();
+        let response = polling_station_data_entry(
+            State(Repository::new(pool.clone())),
+            Path((1, 1)),
+            request_body,
+        )
+        .await
+        .into_response();
         assert_eq!(response.status(), 200);
 
         // Check if there is still only one row

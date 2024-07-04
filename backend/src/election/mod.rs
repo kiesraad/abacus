@@ -1,4 +1,4 @@
-use axum::extract::Path;
+use axum::extract::{Path, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -34,7 +34,9 @@ pub struct ElectionDetailsResponse {
             (status = 500, description = "Internal server error", body = ErrorResponse),
         ),
     )]
-pub async fn election_list(repo: Repository) -> Result<Json<ElectionListResponse>, APIError> {
+pub async fn election_list(
+    State(repo): State<Repository>,
+) -> Result<Json<ElectionListResponse>, APIError> {
     let elections = repo.elections().list().await?;
     Ok(Json(ElectionListResponse { elections }))
 }
@@ -53,7 +55,7 @@ pub async fn election_list(repo: Repository) -> Result<Json<ElectionListResponse
         ),
     )]
 pub async fn election_details(
-    repo: Repository,
+    State(repo): State<Repository>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let election = repo.elections().get(id).await?;

@@ -1,10 +1,12 @@
 use std::error::Error;
 
 use axum::extract::rejection::JsonRejection;
+use axum::extract::FromRef;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
+use repository::Repository;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
@@ -17,8 +19,32 @@ pub mod polling_station;
 pub mod repository;
 pub mod validation;
 
+#[derive(Clone)]
+pub struct AppState {
+    pool: SqlitePool,
+    repository: Repository,
+}
+
+impl FromRef<AppState> for SqlitePool {
+    fn from_ref(input: &AppState) -> Self {
+        input.pool.clone()
+    }
+}
+
+impl<'pool> FromRef<AppState> for Repository {
+    fn from_ref(input: &AppState) -> Self {
+        input.repository.clone()
+    }
+}
+
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
+
+    let state = AppState {
+        pool: pool.clone(),
+        repository: Repository::new(pool),
+    };
+    
     let app = Router::new()
         .route("/api/elections/:id", get(election::election_details))
         .route("/api/elections", get(election::election_list))
@@ -31,7 +57,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
                     post(polling_station::polling_station_data_entry),
                 ),
         )
-        .with_state(pool);
+        .with_state(state);
 
     // Always create an OpenAPI Json spec, but only provide a swagger frontend in release builds
     #[cfg(feature = "openapi")]

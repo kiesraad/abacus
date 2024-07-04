@@ -14,7 +14,6 @@ import {
 
 export function PollingStationLayout() {
   const { id, listNumber } = useParams();
-
   const [openModal, setOpenModal] = useState(false);
   const { data } = useElectionDataRequest({
     election_id: parseInt(id || ""),
@@ -118,7 +117,7 @@ function currentSectionFromPath(pathname: string): string {
   //3 deep;
   const pathParts = pathname.split("/");
   if (pathParts.length >= 3) {
-    return pathParts[2] || "";
+    return pathParts[3] || "";
   }
   return "";
 }

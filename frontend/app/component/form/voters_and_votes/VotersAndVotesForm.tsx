@@ -20,7 +20,7 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const { register, format, deformat, warnings } = usePositiveNumberInputMask();
+  const { register, deformat, warnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
   const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
@@ -69,96 +69,56 @@ export function VotersAndVotesForm() {
           <InputGrid.Row>
             <td>A</td>
             <td>
-              <input
-                id="pollCards"
-                maxLength={11}
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <input id="pollCards" maxLength={11} {...register()} />
             </td>
             <td>Stempassen</td>
           </InputGrid.Row>
           <InputGrid.Row>
             <td>B</td>
             <td>
-              <input
-                id="proxyCertificates"
-                maxLength={11}
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <input id="proxyCertificates" maxLength={11} {...register()} />
             </td>
             <td>Volmachtbewijzen</td>
           </InputGrid.Row>
           <InputGrid.Row>
             <td>C</td>
             <td>
-              <input
-                id="voterCards"
-                maxLength={11}
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <input id="voterCards" maxLength={11} {...register()} />
             </td>
             <td>Kiezerspassen</td>
           </InputGrid.Row>
           <InputGrid.Row isTotal addSeparator>
             <td>D</td>
             <td>
-              <input
-                id="totalAdmittedVoters"
-                maxLength={11}
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <input id="totalAdmittedVoters" maxLength={11} {...register()} />
             </td>
             <td>Totaal toegelaten kiezers</td>
           </InputGrid.Row>
           <InputGrid.Row>
             <td>E</td>
             <td>
-              <input
-                id="votesOnCandidates"
-                maxLength={11}
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <input id="votesOnCandidates" maxLength={11} {...register()} />
             </td>
             <td>Stemmen op kandidaten</td>
           </InputGrid.Row>
           <InputGrid.Row>
             <td>F</td>
             <td>
-              <input
-                id="blankVotes"
-                maxLength={11}
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <input id="blankVotes" maxLength={11} {...register()} />
             </td>
             <td>Blanco stemmen</td>
           </InputGrid.Row>
           <InputGrid.Row>
             <td>G</td>
             <td>
-              <input
-                id="invalidVotes"
-                maxLength={11}
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <input id="invalidVotes" maxLength={11} {...register()} />
             </td>
             <td>Ongeldige stemmen</td>
           </InputGrid.Row>
           <InputGrid.Row isTotal>
             <td>H</td>
             <td>
-              <input
-                id="totalVotesCast"
-                maxLength={11}
-                {...register()}
-                defaultValue={format(pickGoodTestNumber())}
-              />
+              <input id="totalVotesCast" maxLength={11} {...register()} />
             </td>
             <td>Totaal uitgebrachte stemmen</td>
           </InputGrid.Row>
@@ -184,10 +144,4 @@ export function VotersAndVotesForm() {
       })}
     </form>
   );
-}
-
-//currently I want zeroes in the value
-function pickGoodTestNumber() {
-  const n = Math.ceil(Math.random() * 4) * 10 * 10;
-  return Math.floor(Math.random() * n) * 10;
 }

@@ -1,11 +1,7 @@
-import { useElection } from "@kiesraad/api";
 import { MockTest } from "app/component/MockTest";
 import { Link } from "react-router-dom";
 
 export function HomePage() {
-  const { election } = useElection();
-
-  console.log(election);
   return (
     <div style={{ padding: "32px" }}>
       <h1>Abacus 🧮</h1>

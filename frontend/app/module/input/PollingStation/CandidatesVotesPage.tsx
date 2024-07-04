@@ -15,7 +15,7 @@ export function CandidatesVotesPage() {
   );
 
   if (!group) {
-    return <div>Geen lijst gevonden voor {listNumber} </div>;
+    return <div>Geen lijst gevonden voor {listNumber}</div>;
   }
 
   return <CandidatesVotesForm group={group} />;

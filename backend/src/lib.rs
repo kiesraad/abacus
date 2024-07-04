@@ -17,15 +17,9 @@ pub mod election;
 pub mod polling_station;
 pub mod validation;
 
-#[derive(Clone)]
+#[derive(FromRef, Clone)]
 pub struct AppState {
     pool: SqlitePool,
-}
-
-impl FromRef<AppState> for SqlitePool {
-    fn from_ref(input: &AppState) -> Self {
-        input.pool.clone()
-    }
 }
 
 /// Axum router for the application

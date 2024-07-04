@@ -8,7 +8,18 @@ type Props = {
 };
 
 export const DefaultFormField: Story<Props> = ({ error }) => (
-  <FormField error={error ? [error] : undefined}>
+  <FormField
+    error={
+      error
+        ? [
+            {
+              id: "test-input",
+              code: error,
+            },
+          ]
+        : undefined
+    }
+  >
     <input id="test-input" type="text" />
   </FormField>
 );

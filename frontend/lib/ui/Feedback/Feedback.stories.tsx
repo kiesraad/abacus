@@ -31,7 +31,7 @@ export default {
   },
   argTypes: {
     type: {
-      options: ["error", "warning", "notify", "success"],
+      options: ["error", "warning"],
       control: { type: "radio" },
       defaultValue: "error",
     },

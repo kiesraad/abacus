@@ -31,16 +31,15 @@
   &.error {
     border-color: var(--color-error-border);
     background-color: var(--color-error-bg);
-
     svg {
-      fill: var(--color-error);
+      fill: var(--color-error-darkest);
     }
   }
   &.warning {
-    border-color: var(--color-warning);
+    border-color: var(--color-warning-border);
     background-color: var(--color-warning-bg);
     svg {
-      fill: var(--color-warning);
+      fill: var(--color-warning-darker);
     }
   }
   &.notify {
@@ -53,7 +52,6 @@
   &.success {
     border-color: var(--color-success);
     background-color: var(--color-success-bg);
-
     svg {
       fill: var(--color-success);
     }

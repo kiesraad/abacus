@@ -7,14 +7,14 @@
     margin-top: -12px;
     svg {
       width: 24px;
-      fill: var(--color-error);
+      fill: var(--color-error-darker);
     }
   }
 
   &:global(.has-warning) {
     aside {
       svg {
-        fill: var(--color-warning);
+        fill: var(--color-warning-darker);
       }
     }
   }
@@ -25,7 +25,7 @@
     }
     aside {
       svg {
-        fill: var(--color-error);
+        fill: var(--color-error-darker);
       }
     }
   }

@@ -1,9 +1,54 @@
 use serde::{Deserialize, Serialize};
+use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
+use crate::election::Election;
 use crate::validation::{
-    above_percentage_threshold, Validate, ValidationResult, ValidationResultCode, ValidationResults,
+    above_percentage_threshold, ValidationResult, ValidationResultCode, ValidationResults,
 };
+
+pub trait Validate {
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    );
+}
+
+/// Polling station of a certain [Election]
+#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
+pub struct PollingStation {
+    pub id: i64,
+    pub name: String,
+    pub number: i64,
+    pub number_of_voters: Option<i64>,
+    pub polling_station_type: PollingStationType,
+    pub street: String,
+    pub house_number: String,
+    pub house_number_addition: Option<String>,
+    pub postal_code: String,
+    pub locality: String,
+}
+
+/// Type of Polling station
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
+pub enum PollingStationType {
+    VasteLocatie,
+    Bijzonder,
+    Mobiel,
+}
+
+impl From<String> for PollingStationType {
+    fn from(value: String) -> Self {
+        match value.as_str() {
+            "vaste_locatie" => Self::VasteLocatie,
+            "bijzonder" => Self::Bijzonder,
+            "mobiel" => Self::Mobiel,
+            _ => panic!("invalid PollingStationType"),
+        }
+    }
+}
 
 /// PollingStationResults, following the fields in
 /// "Model N 10-1. Proces-verbaal van een stembureau"
@@ -14,14 +59,32 @@ pub struct PollingStationResults {
     pub voters_counts: VotersCounts,
     /// Votes counts ("4. Aantal uitgebrachte stemmen")
     pub votes_counts: VotesCounts,
+    /// Vote counts for each candidate in each political group ("Aantal stemmen per lijst en kandidaat")
+    pub political_group_votes: Vec<PoliticalGroupVotes>,
 }
 
 impl Validate for PollingStationResults {
-    fn validate(&self, validation_results: &mut ValidationResults, field_name: String) {
-        self.voters_counts
-            .validate(validation_results, format!("{field_name}.voters_counts"));
-        self.votes_counts
-            .validate(validation_results, format!("{field_name}.votes_counts"));
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
+        self.voters_counts.validate(
+            election,
+            validation_results,
+            format!("{field_name}.voters_counts"),
+        );
+        self.votes_counts.validate(
+            election,
+            validation_results,
+            format!("{field_name}.votes_counts"),
+        );
+        self.political_group_votes.validate(
+            election,
+            validation_results,
+            format!("{field_name}.political_group_votes"),
+        );
 
         if identical_counts(&self.voters_counts, &self.votes_counts) {
             validation_results.warnings.push(ValidationResult {
@@ -32,13 +95,35 @@ impl Validate for PollingStationResults {
                 code: ValidationResultCode::EqualInput,
             });
         }
+
+        // validate that the total number of valid votes is equal to the sum of all political group totals
+        if self.votes_counts.votes_candidates_counts as u64
+            != self
+                .political_group_votes
+                .iter()
+                .map(|pgv| pgv.total as u64)
+                .sum::<u64>()
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    format!("{field_name}.votes_counts.votes_candidates_counts"),
+                    format!("{field_name}.political_group_votes"),
+                ],
+                code: ValidationResultCode::IncorrectTotal,
+            });
+        }
     }
 }
 
 type Count = u32;
 
 impl Validate for Count {
-    fn validate(&self, validation_results: &mut ValidationResults, field_name: String) {
+    fn validate(
+        &self,
+        _election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
         if self > &1_000_000_000 {
             validation_results.errors.push(ValidationResult {
                 fields: vec![field_name],
@@ -92,19 +177,34 @@ fn identical_counts(voters: &VotersCounts, votes: &VotesCounts) -> bool {
 }
 
 impl Validate for VotersCounts {
-    fn validate(&self, validation_results: &mut ValidationResults, field_name: String) {
-        self.poll_card_count
-            .validate(validation_results, format!("{field_name}.poll_card_count"));
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
+        // validate all counts
+        self.poll_card_count.validate(
+            election,
+            validation_results,
+            format!("{field_name}.poll_card_count"),
+        );
         self.proxy_certificate_count.validate(
+            election,
             validation_results,
             format!("{field_name}.proxy_certificate_count"),
         );
-        self.voter_card_count
-            .validate(validation_results, format!("{field_name}.voter_card_count"));
+        self.voter_card_count.validate(
+            election,
+            validation_results,
+            format!("{field_name}.voter_card_count"),
+        );
         self.total_admitted_voters_count.validate(
+            election,
             validation_results,
             format!("{field_name}.total_admitted_voters_count"),
         );
+
         // validate that total_admitted_voters_count == poll_card_count + proxy_certificate_count + voter_card_count
         if self.poll_card_count + self.proxy_certificate_count + self.voter_card_count
             != self.total_admitted_voters_count
@@ -141,23 +241,34 @@ pub struct VotesCounts {
 }
 
 impl Validate for VotesCounts {
-    fn validate(&self, validation_results: &mut ValidationResults, field_name: String) {
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
+        // validate all counts
         self.votes_candidates_counts.validate(
+            election,
             validation_results,
             format!("{field_name}.votes_candidates_counts"),
         );
         self.blank_votes_count.validate(
+            election,
             validation_results,
             format!("{field_name}.blank_votes_count"),
         );
         self.invalid_votes_count.validate(
+            election,
             validation_results,
             format!("{field_name}.invalid_votes_count"),
         );
         self.total_votes_cast_count.validate(
+            election,
             validation_results,
             format!("{field_name}.total_votes_cast_count"),
         );
+
         // validate that total_votes_cast_count == votes_candidates_counts + blank_votes_count + invalid_votes_count
         if self.votes_candidates_counts + self.blank_votes_count + self.invalid_votes_count
             != self.total_votes_cast_count
@@ -202,8 +313,131 @@ impl Validate for VotesCounts {
     }
 }
 
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct PoliticalGroupVotes {
+    pub number: u8,
+    #[schema(value_type = u32)]
+    pub total: Count,
+    pub candidate_votes: Vec<CandidateVotes>,
+}
+
+impl Validate for Vec<PoliticalGroupVotes> {
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
+        // check if the list of political groups has the correct length
+        let pg = election.political_groups.as_ref();
+        if pg.is_none() || pg.expect("candidate list should not be None").len() != self.len() {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![field_name],
+                code: ValidationResultCode::IncorrectCandidatesList,
+            });
+            return;
+        }
+
+        // check each political group
+        self.iter().enumerate().for_each(|(i, pgv)| {
+            let number = pgv.number;
+            if number as usize != i + 1 {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![format!("{field_name}[{i}].number")],
+                    code: ValidationResultCode::IncorrectCandidatesList,
+                });
+                return;
+            }
+            pgv.validate(election, validation_results, format!("{field_name}[{i}]"));
+        });
+    }
+}
+
+impl Validate for PoliticalGroupVotes {
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
+        // check if the list of candidates has the correct length
+        let pg = election
+            .political_groups
+            .as_ref()
+            .expect("candidate list should not be None")
+            .get(self.number as usize - 1)
+            .expect("political group should exist");
+
+        // check if the number of candidates is correct
+        if pg.candidates.len() != self.candidate_votes.len() {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![format!("{field_name}.candidate_votes")],
+                code: ValidationResultCode::IncorrectCandidatesList,
+            });
+            return;
+        }
+
+        // validate all candidates
+        self.candidate_votes.iter().enumerate().for_each(|(i, cv)| {
+            let number = cv.number;
+            if number as usize != i + 1 {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![format!("{field_name}.candidate_votes[{i}].number")],
+                    code: ValidationResultCode::IncorrectCandidatesList,
+                });
+                return;
+            }
+            cv.validate(
+                election,
+                validation_results,
+                format!("{field_name}.candidate_votes[{i}]"),
+            );
+        });
+
+        // validate the total number of votes
+        self.total
+            .validate(election, validation_results, format!("{field_name}.total"));
+
+        // validate whether if the total number of votes matches the sum of all candidate votes,
+        // cast to u64 to avoid overflow
+        if self.total as u64
+            != self
+                .candidate_votes
+                .iter()
+                .map(|cv| cv.votes as u64)
+                .sum::<u64>()
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![format!("{field_name}.total")],
+                code: ValidationResultCode::IncorrectTotal,
+            });
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct CandidateVotes {
+    pub number: u8,
+    #[schema(value_type = u32)]
+    pub votes: Count,
+}
+
+impl Validate for CandidateVotes {
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
+        self.votes
+            .validate(election, validation_results, format!("{field_name}.votes"));
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use crate::election::tests::election_fixture;
+
     use super::*;
 
     #[test]
@@ -222,8 +456,18 @@ mod tests {
                 invalid_votes_count: 7,
                 total_votes_cast_count: 20, // incorrect total
             },
+            political_group_votes: vec![PoliticalGroupVotes {
+                number: 1,
+                total: 5,
+                candidate_votes: vec![CandidateVotes {
+                    number: 1,
+                    votes: 5,
+                }],
+            }],
         };
+        let election = election_fixture(&[1]);
         polling_station_results.validate(
+            &election,
             &mut validation_results,
             "polling_station_results".to_string(),
         );
@@ -248,8 +492,18 @@ mod tests {
                 invalid_votes_count: 1,
                 total_votes_cast_count: 1002,
             },
+            political_group_votes: vec![PoliticalGroupVotes {
+                number: 1,
+                total: 1000,
+                candidate_votes: vec![CandidateVotes {
+                    number: 1,
+                    votes: 1000,
+                }],
+            }],
         };
+        let election = election_fixture(&[1]);
         polling_station_results.validate(
+            &election,
             &mut validation_results,
             "polling_station_results".to_string(),
         );
@@ -270,7 +524,12 @@ mod tests {
             voter_card_count: 3,
             total_admitted_voters_count: 1_000_000_006, // correct but out of range
         };
-        voters_counts.validate(&mut validation_results, "voters_counts".to_string());
+        let election = election_fixture(&[]);
+        voters_counts.validate(
+            &election,
+            &mut validation_results,
+            "voters_counts".to_string(),
+        );
         assert_eq!(validation_results.errors.len(), 2);
         assert_eq!(validation_results.warnings.len(), 0);
     }
@@ -285,7 +544,12 @@ mod tests {
             invalid_votes_count: 7,
             total_votes_cast_count: 20, // incorrect total
         };
-        votes_counts.validate(&mut validation_results, "votes_counts".to_string());
+        let election = election_fixture(&[]);
+        votes_counts.validate(
+            &election,
+            &mut validation_results,
+            "votes_counts".to_string(),
+        );
         assert_eq!(validation_results.errors.len(), 1);
         assert_eq!(validation_results.warnings.len(), 0);
 
@@ -297,7 +561,11 @@ mod tests {
             invalid_votes_count: 1,
             total_votes_cast_count: 111,
         };
-        votes_counts.validate(&mut validation_results, "votes_counts".to_string());
+        votes_counts.validate(
+            &election,
+            &mut validation_results,
+            "votes_counts".to_string(),
+        );
         assert_eq!(validation_results.errors.len(), 0);
         assert_eq!(validation_results.warnings.len(), 1);
 
@@ -309,33 +577,120 @@ mod tests {
             invalid_votes_count: 10, // high number of invalid votes
             total_votes_cast_count: 111,
         };
-        votes_counts.validate(&mut validation_results, "votes_counts".to_string());
+        votes_counts.validate(
+            &election,
+            &mut validation_results,
+            "votes_counts".to_string(),
+        );
         assert_eq!(validation_results.errors.len(), 0);
         assert_eq!(validation_results.warnings.len(), 1);
     }
 
     #[test]
-    fn test_zero_votes_and_zero_voters() {
+    fn test_political_group_votes_validation() {
+        // create a valid political group votes with two groups and two candidates each
+        let mut political_group_votes = vec![
+            PoliticalGroupVotes {
+                number: 1,
+                total: 25,
+                candidate_votes: vec![
+                    CandidateVotes {
+                        number: 1,
+                        votes: 14,
+                    },
+                    CandidateVotes {
+                        number: 2,
+                        votes: 11,
+                    },
+                ],
+            },
+            PoliticalGroupVotes {
+                number: 2,
+                total: 20,
+                candidate_votes: vec![
+                    CandidateVotes {
+                        number: 1,
+                        votes: 0,
+                    },
+                    CandidateVotes {
+                        number: 2,
+                        votes: 20,
+                    },
+                ],
+            },
+        ];
+        let election = election_fixture(&[2, 2]);
+
+        // validate with correct totals and correct number of candidates
         let mut validation_results = ValidationResults::default();
-        let polling_station_results = PollingStationResults {
-            voters_counts: VotersCounts {
-                poll_card_count: 0,
-                proxy_certificate_count: 0,
-                voter_card_count: 0,
-                total_admitted_voters_count: 0,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_counts: 0,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 0,
-            },
-        };
-        polling_station_results.validate(
+        political_group_votes.validate(
+            &election,
             &mut validation_results,
-            "polling_station_results".to_string(),
+            "political_group_votes".to_string(),
         );
-        assert!(validation_results.errors.is_empty());
-        assert!(validation_results.warnings.is_empty());
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 0);
+
+        // validate with incorrect totals
+        political_group_votes[0].total = 20;
+        let mut validation_results = ValidationResults::default();
+        political_group_votes.validate(
+            &election,
+            &mut validation_results,
+            "political_group_votes".to_string(),
+        );
+        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(
+            validation_results.errors[0].code,
+            ValidationResultCode::IncorrectTotal
+        );
+
+        // validate with incorrect number of candidates for the first political group
+        political_group_votes[0].total = 25;
+        let election = election_fixture(&[3, 2]);
+        let mut validation_results = ValidationResults::default();
+        political_group_votes.validate(
+            &election,
+            &mut validation_results,
+            "political_group_votes".to_string(),
+        );
+        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(
+            validation_results.errors[0].code,
+            ValidationResultCode::IncorrectCandidatesList
+        );
+
+        // validate with incorrect number of political groups
+        let election = election_fixture(&[2, 2, 2]);
+        let mut validation_results = ValidationResults::default();
+        political_group_votes.validate(
+            &election,
+            &mut validation_results,
+            "political_group_votes".to_string(),
+        );
+        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(
+            validation_results.errors[0].code,
+            ValidationResultCode::IncorrectCandidatesList
+        );
+
+        // validate with correct number of political groups but mixed up numbers
+        let election = election_fixture(&[2, 2]);
+        political_group_votes[0].number = 2;
+        let mut validation_results = ValidationResults::default();
+        political_group_votes.validate(
+            &election,
+            &mut validation_results,
+            "political_group_votes".to_string(),
+        );
+        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(
+            validation_results.errors[0].code,
+            ValidationResultCode::IncorrectCandidatesList
+        );
     }
 }

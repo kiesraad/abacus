@@ -9,6 +9,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
 use utoipa::{OpenApi, ToSchema};
+#[cfg(feature = "openapi")]
+use utoipa_swagger_ui::SwaggerUi;
 
 pub mod election;
 pub mod polling_station;
@@ -16,19 +18,31 @@ pub mod validation;
 
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
-    let openapi = create_openapi();
     let app = Router::new()
-        .route("/api-docs/openapi.json", get(Json(openapi)))
         .route("/api/elections/:id", get(election::election_details))
         .route("/api/elections", get(election::election_list))
-        .route(
-            "/api/polling_stations/:id/data_entries/:entry_number",
-            post(polling_station::polling_station_data_entry),
+        .nest(
+            "/api/polling_stations",
+            Router::new()
+                .route("/:election_id", get(polling_station::polling_station_list))
+                .route(
+                    "/:id/data_entries/:entry_number",
+                    post(polling_station::polling_station_data_entry),
+                ),
         )
         .with_state(pool);
+
+    // Always create an OpenAPI Json spec, but only provide a swagger frontend in release builds
+    #[cfg(feature = "openapi")]
+    let app = {
+        let openapi = create_openapi();
+        app.merge(SwaggerUi::new("/api-docs").url("/api-docs/openapi.json", openapi.clone()))
+    };
+
     Ok(app)
 }
 
+#[cfg(feature = "openapi")]
 pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[derive(OpenApi)]
     #[openapi(
@@ -36,6 +50,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             election::election_list,
             election::election_details,
             polling_station::polling_station_data_entry,
+            polling_station::polling_station_list,
         ),
         components(
             schemas(
@@ -50,9 +65,14 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 election::CandidateGender,
                 election::ElectionListResponse,
                 election::ElectionDetailsResponse,
+                polling_station::CandidateVotes,
                 polling_station::DataEntryRequest,
                 polling_station::DataEntryResponse,
+                polling_station::PoliticalGroupVotes,
                 polling_station::PollingStationResults,
+                polling_station::PollingStationListResponse,
+                polling_station::PollingStationType,
+                polling_station::PollingStation,
                 polling_station::VotersCounts,
                 polling_station::VotesCounts,
             ),
@@ -81,6 +101,7 @@ impl IntoResponse for ErrorResponse {
 /// Generic error type, converted to an ErrorResponse by the IntoResponse
 /// trait implementation
 pub enum APIError {
+    NotFound(String),
     JsonRejection(JsonRejection),
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
@@ -93,6 +114,7 @@ impl IntoResponse for APIError {
         }
 
         let (status, response) = match self {
+            APIError::NotFound(message) => (StatusCode::NOT_FOUND, to_error(message)),
             APIError::JsonRejection(rejection) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 to_error(rejection.body_text()),
@@ -136,5 +158,14 @@ impl From<serde_json::Error> for APIError {
 impl From<sqlx::Error> for APIError {
     fn from(err: sqlx::Error) -> Self {
         APIError::SqlxError(err)
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct JsonResponse<T>(T);
+
+impl<T: Serialize> IntoResponse for JsonResponse<T> {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
     }
 }

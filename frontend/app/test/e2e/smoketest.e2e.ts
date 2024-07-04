@@ -1,9 +1,9 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test("smoke test", async ({ page }) => {
   await page.goto("/");
   const appFrame = page.locator("css=#root .app-frame");
-  await expect(appFrame).toContainText("Kiesraad uitslag app work in progress");
+  await expect(appFrame).toContainText("Abacus");
 });
 
 test("input form", async ({ page }) => {

@@ -4,10 +4,11 @@ use axum::Json;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::repository::Repository;
+use crate::election::repository::Elections;
 use crate::validation::ValidationResults;
 use crate::{APIError, JsonResponse};
 
+use self::repository::{PollingStationDataEntries, PollingStations};
 pub use self::structs::*;
 
 pub mod repository;
@@ -51,7 +52,8 @@ impl IntoResponse for DataEntryResponse {
         ),
     )]
 pub async fn polling_station_data_entry(
-    State(repo): State<Repository>,
+    State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(elections): State<Elections>,
     Path((id, entry_number)): Path<(u32, u8)>,
     data_entry_request: DataEntryRequest,
 ) -> Result<DataEntryResponse, APIError> {
@@ -64,7 +66,7 @@ pub async fn polling_station_data_entry(
     // need to resolve election id from polling station once we have
     // polling stations in the database
     let election_id = 1;
-    let election = repo.elections().get(election_id).await?;
+    let election = elections.get(election_id).await?;
 
     let mut validation_results = ValidationResults::default();
     data_entry_request
@@ -74,7 +76,7 @@ pub async fn polling_station_data_entry(
     let data = serde_json::to_string(&data_entry_request.data)?;
 
     // Save the data entry or update it if it already exists
-    repo.polling_station_data_entries()
+    polling_station_data_entries
         .upsert(id, entry_number, data)
         .await?;
 
@@ -101,11 +103,11 @@ pub struct PollingStationListResponse {
     ),
 )]
 pub async fn polling_station_list(
-    State(repo): State<Repository>,
+    State(polling_stations): State<PollingStations>,
     Path(election_id): Path<u32>,
 ) -> Result<JsonResponse<PollingStationListResponse>, APIError> {
     Ok(JsonResponse(PollingStationListResponse {
-        polling_stations: repo.polling_stations().list(election_id).await?,
+        polling_stations: polling_stations.list(election_id).await?,
     }))
 }
 
@@ -143,7 +145,8 @@ mod tests {
         };
 
         let response = polling_station_data_entry(
-            State(Repository::new(pool.clone())),
+            State(PollingStationDataEntries::new(pool.clone())),
+            State(Elections::new(pool.clone())),
             Path((1, 1)),
             request_body.clone(),
         )
@@ -162,7 +165,8 @@ mod tests {
         let new_value = 10;
         request_body.data.voters_counts.poll_card_count = new_value;
         let response = polling_station_data_entry(
-            State(Repository::new(pool.clone())),
+            State(PollingStationDataEntries::new(pool.clone())),
+            State(Elections::new(pool.clone())),
             Path((1, 1)),
             request_body,
         )

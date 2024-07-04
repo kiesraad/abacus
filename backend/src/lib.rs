@@ -6,7 +6,6 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use repository::Repository;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
@@ -16,13 +15,11 @@ use utoipa_swagger_ui::SwaggerUi;
 
 pub mod election;
 pub mod polling_station;
-pub mod repository;
 pub mod validation;
 
 #[derive(Clone)]
 pub struct AppState {
     pool: SqlitePool,
-    repository: Repository,
 }
 
 impl FromRef<AppState> for SqlitePool {
@@ -31,20 +28,11 @@ impl FromRef<AppState> for SqlitePool {
     }
 }
 
-impl FromRef<AppState> for Repository {
-    fn from_ref(input: &AppState) -> Self {
-        input.repository.clone()
-    }
-}
-
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
-    let state = AppState {
-        pool: pool.clone(),
-        repository: Repository::new(pool),
-    };
+    let state = AppState { pool };
 
-    let app = Router::new()
+    let app: Router = Router::new()
         .route("/api/elections/:id", get(election::election_details))
         .route("/api/elections", get(election::election_list))
         .nest(

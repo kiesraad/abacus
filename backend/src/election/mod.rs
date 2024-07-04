@@ -3,9 +3,9 @@ use axum::Json;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::repository::Repository;
 use crate::APIError;
 
+use self::repository::Elections;
 pub use self::structs::*;
 
 pub(crate) mod repository;
@@ -35,9 +35,9 @@ pub struct ElectionDetailsResponse {
         ),
     )]
 pub async fn election_list(
-    State(repo): State<Repository>,
+    State(elections_repo): State<Elections>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
-    let elections = repo.elections().list().await?;
+    let elections = elections_repo.list().await?;
     Ok(Json(ElectionListResponse { elections }))
 }
 
@@ -55,9 +55,9 @@ pub async fn election_list(
         ),
     )]
 pub async fn election_details(
-    State(repo): State<Repository>,
+    State(elections_repo): State<Elections>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
-    let election = repo.elections().get(id).await?;
+    let election = elections_repo.get(id).await?;
     Ok(Json(ElectionDetailsResponse { election }))
 }

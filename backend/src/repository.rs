@@ -11,23 +11,22 @@ pub struct Repository {
 }
 
 impl Repository {
-
-    pub fn new(pool: SqlitePool) -> Self {
+    pub const fn new(pool: SqlitePool) -> Self {
         Self { pool }
     }
 
-    pub fn elections(&self) -> Elections<'_> {
+    pub const fn elections(&self) -> Elections<'_> {
         Elections(self)
     }
-    pub fn polling_stations(&self) -> PollingStations<'_> {
+    pub const fn polling_stations(&self) -> PollingStations<'_> {
         PollingStations(self)
     }
 
-    pub fn polling_station_data_entries(&self) -> PollingStationDataEntries<'_> {
+    pub const fn polling_station_data_entries(&self) -> PollingStationDataEntries<'_> {
         PollingStationDataEntries(self)
     }
 
-    pub fn pool(&self) -> &SqlitePool {
+    pub const fn pool(&self) -> &SqlitePool {
         &self.pool
     }
 }

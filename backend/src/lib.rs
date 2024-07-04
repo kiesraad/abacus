@@ -31,7 +31,7 @@ impl FromRef<AppState> for SqlitePool {
     }
 }
 
-impl<'pool> FromRef<AppState> for Repository {
+impl FromRef<AppState> for Repository {
     fn from_ref(input: &AppState) -> Self {
         input.repository.clone()
     }
@@ -39,12 +39,11 @@ impl<'pool> FromRef<AppState> for Repository {
 
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
-
     let state = AppState {
         pool: pool.clone(),
         repository: Repository::new(pool),
     };
-    
+
     let app = Router::new()
         .route("/api/elections/:id", get(election::election_details))
         .route("/api/elections", get(election::election_list))

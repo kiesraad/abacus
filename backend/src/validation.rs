@@ -28,6 +28,7 @@ pub enum ValidationResultCode {
     IncorrectTotal,
     AboveThreshold,
     EqualInput,
+    IncorrectCandidatesList,
 }
 
 impl fmt::Display for ValidationResultCode {
@@ -37,12 +38,9 @@ impl fmt::Display for ValidationResultCode {
             ValidationResultCode::IncorrectTotal => write!(f, "Incorrect sum"),
             ValidationResultCode::AboveThreshold => write!(f, "Above threshold"),
             ValidationResultCode::EqualInput => write!(f, "Equal input"),
+            ValidationResultCode::IncorrectCandidatesList => write!(f, "Incorrect candidates list"),
         }
     }
-}
-
-pub trait Validate {
-    fn validate(&self, validation_results: &mut ValidationResults, field_name: String);
 }
 
 /// Validate that a value is equal to or above a certain percentage threshold of the total,

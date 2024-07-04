@@ -6,6 +6,8 @@ import failOnConsole from "vitest-fail-on-console";
 
 import { server } from "./server";
 
+window.scrollTo = () => {};
+
 configure({
   testIdAttribute: "id",
 });

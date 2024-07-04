@@ -1,3 +1,7 @@
+/**
+ * @vitest-environment jsdom
+ */
+
 import { overrideOnce, render, screen, fireEvent } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
@@ -233,5 +237,33 @@ describe("Test VotersAndVotesForm", () => {
     await user.click(submitButton);
     const result = await screen.findByTestId("result");
     expect(result).toHaveTextContent(/^500 error from mock$/);
+  });
+
+  test("Incorrect total is caught by validation", async () => {
+    const { getByTestId } = render(<VotersAndVotesForm />);
+
+    const setValue = (id: string, value: string | number) => {
+      const el = getByTestId(id);
+      fireEvent.change(el, {
+        target: { value: `${value}` },
+      });
+    };
+
+    setValue("poll_card_count", 1);
+    setValue("proxy_certificate_count", 1);
+    setValue("voter_card_count", 1);
+    setValue("total_admitted_voters_count", 4);
+
+    setValue("votes_candidates_counts", 1);
+    setValue("blank_votes_count", 1);
+    setValue("invalid_votes_count", 1);
+    setValue("total_votes_cast_count", 4);
+
+    const user = userEvent.setup();
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    const result = await screen.findByTestId("error-codes");
+    expect(result).toHaveTextContent(/^IncorrectTotal,IncorrectTotal$/);
   });
 });

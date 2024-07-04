@@ -107,6 +107,9 @@ export function VotersAndVotesForm() {
 
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
+      <div id="error-codes" className="hidden">
+        {data && data.validation_results.errors.map((r) => r.code).join(",")}
+      </div>
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
       {error && (
         <Feedback type="error" title="Error">
@@ -120,8 +123,8 @@ export function VotersAndVotesForm() {
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div>
             <ul>
-              {data.validation_results.errors.map((error) => (
-                <li key={error.code}>{error.code}</li>
+              {data.validation_results.errors.map((error, n) => (
+                <li key={`${error.code}-${n}`}>{error.code}</li>
               ))}
             </ul>
           </div>
@@ -132,8 +135,8 @@ export function VotersAndVotesForm() {
         <Feedback type="warning" title="Controleer uitgebrachte stemmen">
           <div>
             <ul>
-              {data.validation_results.warnings.map((warning) => (
-                <li key={warning.code}>{warning.code}</li>
+              {data.validation_results.warnings.map((warning, n) => (
+                <li key={`${warning.code}-${n}`}>{warning.code}</li>
               ))}
             </ul>
           </div>

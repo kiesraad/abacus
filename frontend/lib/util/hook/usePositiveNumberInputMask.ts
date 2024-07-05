@@ -95,7 +95,6 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
   };
 
   const resetWarnings = () => {
-    console.log("RESET warnings?");
     setWarnings([]);
   };
 

@@ -21,7 +21,6 @@ export function InputGrid({ zebra, children }: InputGridProps) {
   const inputList = React.useRef<InputEntry[]>([]);
 
   const moveFocus = React.useCallback((dir: number) => {
-    console.log("Move focus", dir);
     let activeIndex = inputList.current.findIndex((input) => input.active);
     if (activeIndex === -1) {
       activeIndex = 0;
@@ -72,7 +71,6 @@ export function InputGrid({ zebra, children }: InputGridProps) {
     // Handle focus event
     if (event.target) {
       const el = event.target as HTMLElement;
-      console.log("Focus", el.id);
       const entry = inputList.current.find((input) => input.el.id === el.id);
       if (entry) {
         entry.active = true;
@@ -84,7 +82,6 @@ export function InputGrid({ zebra, children }: InputGridProps) {
   const handleBlur = React.useCallback((event: FocusEvent) => {
     if (event.target) {
       const el = event.target as HTMLElement;
-      console.log("Blur", el.id);
       const entry = inputList.current.find((input) => input.el.id === el.id);
       if (entry) {
         entry.active = false;

@@ -38,7 +38,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       <h2>{group.name}</h2>
-      <InputGrid zebra>
+      <InputGrid key={`list${group.number}`} zebra>
         <InputGrid.Header>
           <th>Nummer</th>
           <th>Aantal stemmen</th>
@@ -58,6 +58,8 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                     id={`list${group.number}-candidate${index + 1}`}
                     maxLength={11}
                     {...register()}
+                    /* eslint-disable-next-line jsx-a11y/no-autofocus */
+                    autoFocus={index === 0}
                   />
                 </td>
                 <td>{candidate}</td>

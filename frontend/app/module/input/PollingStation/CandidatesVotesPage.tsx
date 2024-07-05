@@ -1,6 +1,7 @@
+import { useParams } from "react-router-dom";
+
 import { useElection } from "@kiesraad/api";
 import { CandidatesVotesForm } from "app/component/form/candidates_votes_form/CandidatesVotesForm";
-import { useParams } from "react-router-dom";
 
 export function CandidatesVotesPage() {
   const { listNumber } = useParams();

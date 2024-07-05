@@ -59,63 +59,64 @@ export function VotersAndVotesForm() {
           Error {error.errorCode} {error.message || ""}
         </p>
       )}
-      <InputGrid>
+      <InputGrid key="numbers">
         <InputGrid.Header>
           <th>Veld</th>
           <th>Geteld aantal</th>
           <th>Omschrijving</th>
         </InputGrid.Header>
         <InputGrid.Body>
-          <InputGrid.Row>
+          <InputGrid.Row key="pollCards">
             <td>A</td>
             <td>
-              <input id="pollCards" maxLength={11} {...register()} />
+              {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
+              <input id="pollCards" maxLength={11} {...register()} autoFocus />
             </td>
             <td>Stempassen</td>
           </InputGrid.Row>
-          <InputGrid.Row>
+          <InputGrid.Row key="proxyCertificates">
             <td>B</td>
             <td>
               <input id="proxyCertificates" maxLength={11} {...register()} />
             </td>
             <td>Volmachtbewijzen</td>
           </InputGrid.Row>
-          <InputGrid.Row>
+          <InputGrid.Row key="voterCards">
             <td>C</td>
             <td>
               <input id="voterCards" maxLength={11} {...register()} />
             </td>
             <td>Kiezerspassen</td>
           </InputGrid.Row>
-          <InputGrid.Row isTotal addSeparator>
+          <InputGrid.Row key="totalAdmittedVoters" isTotal addSeparator>
             <td>D</td>
             <td>
               <input id="totalAdmittedVoters" maxLength={11} {...register()} />
             </td>
             <td>Totaal toegelaten kiezers</td>
           </InputGrid.Row>
-          <InputGrid.Row>
+          <InputGrid.Row key="votesOnCandidates">
             <td>E</td>
             <td>
               <input id="votesOnCandidates" maxLength={11} {...register()} />
             </td>
             <td>Stemmen op kandidaten</td>
           </InputGrid.Row>
-          <InputGrid.Row>
+          <InputGrid.Row key="blankVotes">
             <td>F</td>
             <td>
               <input id="blankVotes" maxLength={11} {...register()} />
             </td>
             <td>Blanco stemmen</td>
           </InputGrid.Row>
-          <InputGrid.Row>
+          <InputGrid.Row key="invalidVotes">
             <td>G</td>
             <td>
               <input id="invalidVotes" maxLength={11} {...register()} />
             </td>
             <td>Ongeldige stemmen</td>
           </InputGrid.Row>
-          <InputGrid.Row isTotal>
+          <InputGrid.Row key="totalVotesCast" isTotal>
             <td>H</td>
             <td>
               <input id="totalVotesCast" maxLength={11} {...register()} />

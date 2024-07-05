@@ -69,9 +69,10 @@ export function InputGrid({ zebra, children }: InputGridProps) {
 
   const handleFocus = React.useCallback((event: FocusEvent) => {
     // Handle focus event
+    console.log(inputList.current);
     if (event.target) {
       const el = event.target as HTMLElement;
-      const entry = inputList.current.find((input) => input.el === el);
+      const entry = inputList.current.find((input) => input.el.id === el.id);
       if (entry) {
         entry.active = true;
         domtoren(entry.trEl).addClass("focused");
@@ -82,7 +83,7 @@ export function InputGrid({ zebra, children }: InputGridProps) {
   const handleBlur = React.useCallback((event: FocusEvent) => {
     if (event.target) {
       const el = event.target as HTMLElement;
-      const entry = inputList.current.find((input) => input.el === el);
+      const entry = inputList.current.find((input) => input.el.id === el.id);
       if (entry) {
         entry.active = false;
         domtoren(entry.trEl).removeClass("focused");
@@ -93,6 +94,7 @@ export function InputGrid({ zebra, children }: InputGridProps) {
   React.useLayoutEffect(() => {
     const tableEl = ref.current;
     if (tableEl) {
+      inputList.current = [];
       tableEl.querySelectorAll("input").forEach((input) => {
         const trEl = domtoren(input).closest("tr").el() as HTMLTableRowElement;
         inputList.current.push({ el: input, trEl });

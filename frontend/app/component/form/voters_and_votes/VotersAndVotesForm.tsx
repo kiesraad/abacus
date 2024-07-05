@@ -19,6 +19,17 @@ interface FormElements extends HTMLFormControlsCollection {
   total_votes_cast_count: HTMLInputElement;
 }
 
+const defaultValues = {
+  poll_card_count: 1,
+  proxy_certificate_count: 2,
+  voter_card_count: 3,
+  total_admitted_voters_count: 6,
+  votes_candidates_counts: 7,
+  blank_votes_count: 8,
+  invalid_votes_count: 9,
+  total_votes_cast_count: 24,
+};
+
 interface VotersAndVotesFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
@@ -167,28 +178,34 @@ export function VotersAndVotesForm() {
         </InputGrid.Header>
         <InputGrid.Body>
           <InputGridRow
+            key="A"
             field="A"
             name="poll_card_count"
             title="Stempassen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(pickGoodTestNumber())}
+            defaultValue={format(defaultValues.poll_card_count)}
+            format={format}
           />
           <InputGridRow
+            key="B"
             field="B"
             name="proxy_certificate_count"
             title="Volmachtbewijzen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(pickGoodTestNumber())}
+            defaultValue={format(defaultValues.proxy_certificate_count)}
+            format={format}
           />
           <InputGridRow
+            key="C"
             field="C"
             name="voter_card_count"
             title="Kiezerspassen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(pickGoodTestNumber())}
+            defaultValue={format(defaultValues.voter_card_count)}
+            format={format}
           />
 
           <InputGridRow
@@ -197,7 +214,8 @@ export function VotersAndVotesForm() {
             title="Totaal toegelaten kiezers"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(pickGoodTestNumber())}
+            defaultValue={format(defaultValues.total_admitted_voters_count)}
+            format={format}
             isTotal
           />
 
@@ -209,7 +227,8 @@ export function VotersAndVotesForm() {
             title="Stemmen op kandidaten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(pickGoodTestNumber())}
+            defaultValue={format(defaultValues.votes_candidates_counts)}
+            format={format}
           />
 
           <InputGridRow
@@ -218,7 +237,8 @@ export function VotersAndVotesForm() {
             title="Blanco stemmen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(pickGoodTestNumber())}
+            defaultValue={format(defaultValues.blank_votes_count)}
+            format={format}
           />
 
           <InputGridRow
@@ -227,7 +247,8 @@ export function VotersAndVotesForm() {
             title="Ongeldige stemmen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(pickGoodTestNumber())}
+            defaultValue={format(defaultValues.invalid_votes_count)}
+            format={format}
           />
 
           <InputGridRow
@@ -236,7 +257,8 @@ export function VotersAndVotesForm() {
             title="Totaal uitgebrachte stemmen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(pickGoodTestNumber())}
+            defaultValue={format(defaultValues.total_votes_cast_count)}
+            format={format}
             isTotal
           />
         </InputGrid.Body>
@@ -249,10 +271,4 @@ export function VotersAndVotesForm() {
       </BottomBar>
     </form>
   );
-}
-
-//currently I want zeroes in the value
-function pickGoodTestNumber() {
-  const n = Math.ceil(Math.random() * 4) * 10 * 10;
-  return Math.floor(Math.random() * n) * 10;
 }

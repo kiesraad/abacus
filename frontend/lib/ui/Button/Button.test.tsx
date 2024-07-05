@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
 import { expect, test } from "vitest";
 
+import { render, screen } from "app/test/unit";
 import { DefaultButton, EnabledButton, DisabledButton } from "./Button.stories";
 
 test("The default button is enabled", () => {

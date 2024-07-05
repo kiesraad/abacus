@@ -66,7 +66,7 @@ export function VotersAndVotesForm() {
           <th>Omschrijving</th>
         </InputGrid.Header>
         <InputGrid.Body>
-          <InputGrid.Row key="pollCards">
+          <InputGrid.Row isFocused key="pollCards">
             <td>A</td>
             <td>
               {/* eslint-disable-next-line jsx-a11y/no-autofocus */}

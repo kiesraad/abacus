@@ -5,8 +5,6 @@ import { cn, domtoren } from "@kiesraad/util";
 
 export interface InputGridProps {
   zebra?: boolean;
-  focusIds?: string[];
-  currentFocusId?: string;
   children: React.ReactNode;
 }
 
@@ -18,7 +16,6 @@ type InputEntry = {
 
 export function InputGrid({ zebra, children }: InputGridProps) {
   const ref = React.useRef<HTMLTableElement>(null);
-  // TODO: This does not work when rendering table rows via map, need to fix
   const inputList = React.useRef<InputEntry[]>([]);
 
   const moveFocus = React.useCallback((dir: number) => {
@@ -143,14 +140,16 @@ InputGrid.Separator = () => (
 InputGrid.Row = ({
   children,
   isTotal,
+  isFocused,
   addSeparator,
 }: {
   children: [React.ReactElement, React.ReactElement, React.ReactElement];
   isTotal?: boolean;
+  isFocused?: boolean;
   addSeparator?: boolean;
 }) => (
   <>
-    <tr className={isTotal ? "is-total" : ""}>{children}</tr>
+    <tr className={(isTotal ? "is-total" : "") + " " + (isFocused ? "focused" : "")}>{children}</tr>
     {addSeparator && <InputGrid.Separator />}
   </>
 );

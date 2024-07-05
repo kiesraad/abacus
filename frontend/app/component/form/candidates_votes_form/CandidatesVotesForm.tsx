@@ -49,6 +49,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             const addSeparator = (index + 1) % 25 == 0;
             return (
               <InputGrid.Row
+                isFocused={index === 0}
                 addSeparator={addSeparator}
                 key={`list${group.number}-candidate${index + 1}`}
               >

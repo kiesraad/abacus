@@ -8,7 +8,6 @@ import {
   fieldNameFromPath,
 } from "@kiesraad/util";
 
-//TODO: force from openapi types
 interface FormElements extends HTMLFormControlsCollection {
   poll_card_count: HTMLInputElement;
   proxy_certificate_count: HTMLInputElement;

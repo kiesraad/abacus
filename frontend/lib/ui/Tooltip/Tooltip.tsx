@@ -43,7 +43,7 @@ export function Tooltip({ children, content, onClose }: TooltipProps): React.Rea
     <div className={cls.container} ref={ref}>
       {children}
       <div className={cls.tooltip} role="dialog">
-        <aside></aside>
+        <span></span>
         <article>{content}</article>
       </div>
     </div>

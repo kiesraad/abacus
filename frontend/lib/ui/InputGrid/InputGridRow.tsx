@@ -1,6 +1,8 @@
 import { InputGrid } from "./InputGrid";
 import { FormField } from "../FormField/FormField";
 import { ErrorsAndWarnings } from "@kiesraad/api";
+import { Icon } from "../Icon/Icon";
+import { IconWarningSquare } from "@kiesraad/icon";
 
 export interface InputGridRowProps {
   field: string;
@@ -37,6 +39,7 @@ export function InputGridRow({
           tooltip={
             tooltip && (
               <div>
+                <Icon color="warning" icon={<IconWarningSquare />} />
                 Je probeert <strong>{tooltip}</strong> te plakken. Je kunt hier alleen cijfers
                 invullen.
               </div>

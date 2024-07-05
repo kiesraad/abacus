@@ -1,5 +1,7 @@
 import type { Story } from "@ladle/react";
 import { Tooltip } from "./Tooltip";
+import { Icon } from "../Icon/Icon";
+import { IconWarningSquare } from "@kiesraad/icon";
 
 type Props = {
   text: string;
@@ -13,9 +15,10 @@ export const DefaultTooltip: Story<Props> = ({ text }) => {
       <Tooltip
         content={
           text || (
-            <div>
-              Je probeert <strong>24,29</strong> te plakken. Je kunt hier alleen cijfers invullen.
-            </div>
+            <>
+              <Icon icon={<IconWarningSquare />} color="warning" />
+              hier alleen <strong>cijfers</strong> invullen.
+            </>
           )
         }
       >

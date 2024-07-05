@@ -143,3 +143,8 @@ export const IconWarning = () => (
     />
   </svg>
 );
+export const IconWarningSquare = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24">
+    <path d="M22,0H2C.9,0,0,.9,0,2v20c0,1.1.9,2,2,2h20c1.1,0,2-.9,2-2V2c0-1.1-.9-2-2-2ZM10.7,6.5h2.7v2.9l-.3,4.6h-2l-.3-4.6v-2.9ZM13.4,17.5h-2.8v-2.7h2.8v2.7Z" />
+  </svg>
+);

@@ -15,3 +15,4 @@ export * from "./Tooltip";
 export * from "./util/Util";
 export * from "./Feedback/Feedback";
 export * from "./FormField/FormField";
+export * from "./Icon/Icon";

@@ -4,19 +4,18 @@
 }
 
 .tooltip {
+  z-index: 10;
   position: absolute;
-  top: calc(100% + 14px);
+  top: calc(100% + 8px);
   left: 10px;
   border-radius: 4px;
   pointer-events: none;
+  min-width: 480px;
 
-  min-width: 500px;
-
-  aside {
-    position: absolute;
-    z-index: 2;
-    top: 7px;
-    left: 16px;
+  > span {
+    display: block;
+    margin-left: 16px;
+    margin-bottom: -5px;
     width: 10px;
     height: 10px;
     border-left: 1px solid var(--border-color-default);
@@ -26,20 +25,16 @@
   }
 
   article {
-    position: relative;
-    z-index: 1;
-    top: 0;
     border: 1px solid var(--border-color-default);
     background: var(--base-white);
     border-radius: 4px;
     padding: 8px;
-    display: flex;
-    align-items: center;
 
-    > p {
-      margin: 0;
-      font-size: var(--font-size-sm);
-      line-height: 1.2rem;
+    font-size: 14px;
+    line-height: 1.2rem;
+    svg {
+      vertical-align: middle;
+      margin-right: 10px;
     }
   }
 }

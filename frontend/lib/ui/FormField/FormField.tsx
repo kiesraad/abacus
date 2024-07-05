@@ -32,7 +32,7 @@ export function FormField({ children, error, warning, tooltip }: FormFieldProps)
       })}
     >
       <aside>{icon}</aside>
-      {tooltip ? <Tooltip content={tooltip}>{children}</Tooltip> : children}
+      <Tooltip content={tooltip}>{children}</Tooltip>
     </div>
   );
 }

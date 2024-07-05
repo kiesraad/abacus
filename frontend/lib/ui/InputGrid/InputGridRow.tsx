@@ -54,6 +54,7 @@ export function InputGridRow({
           }
         >
           <input
+            key={name}
             id={name}
             name={name}
             maxLength={11}

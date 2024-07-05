@@ -12,7 +12,7 @@ const hideEvent = new CustomEvent(EVENT_TOOLTIP_HIDE);
 
 export function Tooltip({ children, content, onClose }: TooltipProps): React.ReactNode {
   const [visible, setVisible] = React.useState(true);
-
+  const ref = React.useRef<HTMLDivElement>(null);
   const handleMouseAndKeyboardEvent = React.useCallback(() => {
     if (onClose) onClose();
     setVisible(false);
@@ -28,9 +28,19 @@ export function Tooltip({ children, content, onClose }: TooltipProps): React.Rea
     };
   }, [handleMouseAndKeyboardEvent]);
 
+  React.useEffect(() => {
+    if (ref.current) {
+      const firstChild = ref.current.firstElementChild as HTMLElement;
+      firstChild.focus();
+      if (firstChild instanceof HTMLInputElement) {
+        firstChild.select();
+      }
+    }
+  }, []);
+
   if (!visible) return children;
   return (
-    <div className={cls.container}>
+    <div className={cls.container} ref={ref}>
       {children}
       <div className={cls.tooltip} role="dialog">
         <aside></aside>

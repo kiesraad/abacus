@@ -27,14 +27,14 @@ export function Tooltip({ children, content, onClose }: TooltipProps): React.Rea
   }, [handleMouseAndKeyboardEvent]);
 
   React.useEffect(() => {
-    if (ref.current) {
+    if (ref.current && content) {
       const firstChild = ref.current.firstElementChild as HTMLElement;
       firstChild.focus();
       if (firstChild instanceof HTMLInputElement) {
         firstChild.select();
       }
     }
-  }, []);
+  }, [content]);
 
   return (
     <div className={cls.container} ref={ref}>

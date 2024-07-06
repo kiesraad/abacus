@@ -51,10 +51,12 @@ export function InputGridRow({
           warning={warnings}
           tooltip={
             tooltip && (
-              <div>
+              <div className="tooltip-content">
                 <Icon color="warning" icon={<IconWarningSquare />} />
-                Je probeert <strong>{ellipsis(tooltip)}</strong> te plakken. Je kunt hier alleen
-                cijfers invullen.
+                <div>
+                  Je probeert <strong>{ellipsis(tooltip)}</strong> te plakken. Je kunt hier alleen
+                  cijfers invullen.
+                </div>
               </div>
             )
           }

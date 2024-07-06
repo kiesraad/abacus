@@ -32,6 +32,12 @@
 
     font-size: 14px;
     line-height: 1.2rem;
+
+    :global(.tooltip-content) {
+      display: flex;
+      align-items: center;
+    }
+
     svg {
       vertical-align: middle;
       margin-right: 10px;

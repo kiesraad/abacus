@@ -5,7 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // ignore in prod
 import { startMockAPI } from "./msw-mock-api.ts";
 import { routes } from "./routes.tsx";
-import { ApiProvider } from "@kiesraad/api";
+import { ApiProvider, ElectionListProvider, ElectionProvider } from "@kiesraad/api";
 
 const rootDiv = document.getElementById("root");
 if (!rootDiv) throw new Error("Root div not found");
@@ -22,7 +22,11 @@ function render() {
   root.render(
     <StrictMode>
       <ApiProvider host={process.env.API_HOST || ""}>
-        <RouterProvider router={router} />
+        <ElectionListProvider>
+          <ElectionProvider>
+            <RouterProvider router={router} />
+          </ElectionProvider>
+        </ElectionListProvider>
       </ApiProvider>
     </StrictMode>,
   );

@@ -31,9 +31,11 @@ export function useApiGetRequest<DATA>(path: string): UseApiGetRequestReturn<DAT
       }
     };
 
-    doRequest(path).catch((e: unknown) => {
-      console.log("Error", e);
-    });
+    if (path !== "") {
+      doRequest(path).catch((e: unknown) => {
+        console.log("Error", e);
+      });
+    }
 
     return () => {
       isSubscribed = false;

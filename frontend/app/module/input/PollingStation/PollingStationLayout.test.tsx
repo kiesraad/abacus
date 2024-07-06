@@ -1,10 +1,10 @@
 import { render } from "app/test/unit";
 import { describe, expect, test } from "vitest";
-import { PollingStationPage } from "./PollingStationPage";
+import { PollingStationLayout } from "./PollingStationLayout";
 
-describe("PollingStationPage", () => {
+describe("PollingStationLayout", () => {
   test("Enter form field values", () => {
-    render(<PollingStationPage />);
+    render(<PollingStationLayout />);
     expect(true).toBe(true);
   });
 });

@@ -42,6 +42,7 @@ describe("Test VotersAndVotesForm", () => {
     render(<VotersAndVotesForm />);
 
     const pollCards = screen.getByTestId("pollCards");
+    expect(pollCards).toHaveFocus();
     await user.clear(pollCards);
     await user.type(pollCards, "12345");
     expect(pollCards).toHaveValue("12.345");

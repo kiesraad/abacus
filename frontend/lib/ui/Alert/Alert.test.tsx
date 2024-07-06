@@ -1,6 +1,6 @@
-import { fireEvent, render } from "app/test/unit";
 import { describe, expect, test, vi } from "vitest";
 
+import { fireEvent, render } from "app/test/unit";
 import { DefaultAlert, ClosableAlert } from "./Alert.stories";
 
 describe("UI component: Alert", () => {

@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
-import { render, screen } from "@testing-library/react";
+
+import { render, screen } from "app/test/unit";
 import { Badge } from "./Badge.tsx";
 
 test("The correction badge is visible", () => {

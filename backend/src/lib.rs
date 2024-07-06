@@ -1,6 +1,7 @@
 use std::error::Error;
 
 use axum::extract::rejection::JsonRejection;
+use axum::extract::FromRef;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
@@ -16,9 +17,16 @@ pub mod election;
 pub mod polling_station;
 pub mod validation;
 
+#[derive(FromRef, Clone)]
+pub struct AppState {
+    pool: SqlitePool,
+}
+
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
-    let app = Router::new()
+    let state = AppState { pool };
+
+    let app: Router = Router::new()
         .route("/api/elections/:id", get(election::election_details))
         .route("/api/elections", get(election::election_list))
         .nest(
@@ -30,7 +38,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
                     post(polling_station::polling_station_data_entry),
                 ),
         )
-        .with_state(pool);
+        .with_state(state);
 
     // Always create an OpenAPI Json spec, but only provide a swagger frontend in release builds
     #[cfg(feature = "openapi")]

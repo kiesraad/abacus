@@ -7,7 +7,7 @@ import {
   VotesCounts,
   VotersCounts,
 } from "@kiesraad/api";
-import { electionMockData } from "./ElectionMockData.ts";
+import { electionMockData, electionsMockData } from "./ElectionMockData.ts";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -137,6 +137,10 @@ export const pollingStationDataEntryHandler = http.post<
   }
 });
 
+export const ElectionListRequestHandler = http.get("/v1/api/elections", () => {
+  return HttpResponse.json(electionsMockData, { status: 200 });
+});
+
 export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/v1/api/elections/:id",
   () => {
@@ -147,6 +151,7 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
 export const handlers: HttpHandler[] = [
   pingHandler,
   pollingStationDataEntryHandler,
+  ElectionListRequestHandler,
   ElectionRequestHandler,
 ];
 

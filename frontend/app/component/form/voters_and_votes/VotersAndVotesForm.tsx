@@ -19,17 +19,6 @@ interface FormElements extends HTMLFormControlsCollection {
   total_votes_cast_count: HTMLInputElement;
 }
 
-const defaultValues = {
-  poll_card_count: 1,
-  proxy_certificate_count: 2,
-  voter_card_count: 3,
-  total_admitted_voters_count: 6,
-  votes_candidates_counts: 7,
-  blank_votes_count: 8,
-  invalid_votes_count: 9,
-  total_votes_cast_count: 24,
-};
-
 interface VotersAndVotesFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
@@ -170,7 +159,7 @@ export function VotersAndVotesForm() {
           </div>
         </Feedback>
       )}
-      <InputGrid>
+      <InputGrid key="numbers">
         <InputGrid.Header>
           <th>Veld</th>
           <th>Geteld aantal</th>
@@ -184,8 +173,8 @@ export function VotersAndVotesForm() {
             title="Stempassen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(defaultValues.poll_card_count)}
             format={format}
+            isFocused
           />
           <InputGridRow
             key="B"
@@ -194,7 +183,6 @@ export function VotersAndVotesForm() {
             title="Volmachtbewijzen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(defaultValues.proxy_certificate_count)}
             format={format}
           />
           <InputGridRow
@@ -204,22 +192,18 @@ export function VotersAndVotesForm() {
             title="Kiezerspassen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(defaultValues.voter_card_count)}
             format={format}
           />
-
           <InputGridRow
             field="D"
             name="total_admitted_voters_count"
             title="Totaal toegelaten kiezers"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(defaultValues.total_admitted_voters_count)}
             format={format}
             isTotal
+            addSeparator
           />
-
-          <InputGrid.Separator />
 
           <InputGridRow
             field="E"
@@ -227,37 +211,30 @@ export function VotersAndVotesForm() {
             title="Stemmen op kandidaten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(defaultValues.votes_candidates_counts)}
             format={format}
           />
-
           <InputGridRow
             field="F"
             name="blank_votes_count"
             title="Blanco stemmen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(defaultValues.blank_votes_count)}
             format={format}
           />
-
           <InputGridRow
             field="G"
             name="invalid_votes_count"
             title="Ongeldige stemmen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(defaultValues.invalid_votes_count)}
             format={format}
           />
-
           <InputGridRow
             field="H"
             name="total_votes_cast_count"
             title="Totaal uitgebrachte stemmen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
-            defaultValue={format(defaultValues.total_votes_cast_count)}
             format={format}
             isTotal
           />

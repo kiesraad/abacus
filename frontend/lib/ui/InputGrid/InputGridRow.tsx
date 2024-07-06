@@ -1,10 +1,12 @@
 import * as React from "react";
-import { InputGrid } from "./InputGrid";
-import { FormField } from "../FormField/FormField";
+
 import { ErrorsAndWarnings } from "@kiesraad/api";
-import { Icon } from "../Icon/Icon";
 import { IconWarningSquare } from "@kiesraad/icon";
 import { ellipsis, FormatFunc } from "@kiesraad/util";
+
+import { FormField } from "../FormField/FormField";
+import { Icon } from "../Icon/Icon";
+import { InputGrid } from "./InputGrid";
 
 export interface InputGridRowProps {
   field: string;
@@ -15,6 +17,8 @@ export interface InputGridRowProps {
   format: FormatFunc;
   defaultValue?: string;
   isTotal?: boolean;
+  isFocused?: boolean;
+  addSeparator?: boolean;
 }
 
 export function InputGridRow({
@@ -26,6 +30,8 @@ export function InputGridRow({
   defaultValue,
   inputProps,
   isTotal,
+  isFocused = false,
+  addSeparator,
 }: InputGridRowProps) {
   const errors = errorsAndWarnings.get(name)?.errors;
   const warnings = errorsAndWarnings
@@ -37,7 +43,7 @@ export function InputGridRow({
 
   const [value, setValue] = React.useState(defaultValue || "");
   return (
-    <InputGrid.Row isTotal={isTotal}>
+    <InputGrid.Row isTotal={isTotal} isFocused={isFocused} addSeparator={addSeparator}>
       <td>{field}</td>
       <td>
         <FormField
@@ -60,6 +66,8 @@ export function InputGridRow({
             maxLength={11}
             {...inputProps}
             value={value}
+            /* eslint-disable-next-line jsx-a11y/no-autofocus */
+            autoFocus={isFocused}
             onChange={(e) => {
               setValue(format(e.currentTarget.value));
             }}

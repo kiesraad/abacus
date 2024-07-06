@@ -2,15 +2,16 @@ use axum::extract::{FromRequest, Path, State};
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde::{Deserialize, Serialize};
-use sqlx::{query, query_as, SqlitePool};
 use utoipa::ToSchema;
 
-use crate::election::repository::get_election;
+use crate::election::repository::Elections;
 use crate::validation::ValidationResults;
 use crate::{APIError, JsonResponse};
 
+use self::repository::{PollingStationDataEntries, PollingStations};
 pub use self::structs::*;
 
+pub mod repository;
 pub mod structs;
 
 /// Request structure for data entry of polling station results
@@ -51,7 +52,8 @@ impl IntoResponse for DataEntryResponse {
         ),
     )]
 pub async fn polling_station_data_entry(
-    State(pool): State<SqlitePool>,
+    State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(elections): State<Elections>,
     Path((id, entry_number)): Path<(u32, u8)>,
     data_entry_request: DataEntryRequest,
 ) -> Result<DataEntryResponse, APIError> {
@@ -64,7 +66,7 @@ pub async fn polling_station_data_entry(
     // need to resolve election id from polling station once we have
     // polling stations in the database
     let election_id = 1;
-    let election = get_election(pool.clone(), election_id).await?;
+    let election = elections.get(election_id).await?;
 
     let mut validation_results = ValidationResults::default();
     data_entry_request
@@ -74,10 +76,8 @@ pub async fn polling_station_data_entry(
     let data = serde_json::to_string(&data_entry_request.data)?;
 
     // Save the data entry or update it if it already exists
-    query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data) VALUES (?, ?, ?)\
-              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET data = excluded.data",
-        id, entry_number, data)
-        .execute(&pool)
+    polling_station_data_entries
+        .upsert(id, entry_number, data)
         .await?;
 
     Ok(DataEntryResponse {
@@ -103,38 +103,18 @@ pub struct PollingStationListResponse {
     ),
 )]
 pub async fn polling_station_list(
-    State(pool): State<SqlitePool>,
+    State(polling_stations): State<PollingStations>,
     Path(election_id): Path<u32>,
 ) -> Result<JsonResponse<PollingStationListResponse>, APIError> {
-    let polling_stations = query_as!(
-        PollingStation,
-        r#"
-SELECT
-  id,
-  name,
-  number,
-  number_of_voters,
-  polling_station_type,
-  street,
-  house_number,
-  house_number_addition,
-  postal_code,
-  locality
-FROM polling_stations
-WHERE election_id = $1;
-"#,
-        election_id
-    )
-    .fetch_all(&pool)
-    .await?;
-
     Ok(JsonResponse(PollingStationListResponse {
-        polling_stations,
+        polling_stations: polling_stations.list(election_id).await?,
     }))
 }
 
 #[cfg(test)]
 mod tests {
+    use sqlx::{query, SqlitePool};
+
     use super::*;
 
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections")))]
@@ -164,10 +144,14 @@ mod tests {
             },
         };
 
-        let response =
-            polling_station_data_entry(State(pool.clone()), Path((1, 1)), request_body.clone())
-                .await
-                .into_response();
+        let response = polling_station_data_entry(
+            State(PollingStationDataEntries::new(pool.clone())),
+            State(Elections::new(pool.clone())),
+            Path((1, 1)),
+            request_body.clone(),
+        )
+        .await
+        .into_response();
         assert_eq!(response.status(), 200);
 
         // Check if a row was created
@@ -180,9 +164,14 @@ mod tests {
         // Test updating the same row
         let new_value = 10;
         request_body.data.voters_counts.poll_card_count = new_value;
-        let response = polling_station_data_entry(State(pool.clone()), Path((1, 1)), request_body)
-            .await
-            .into_response();
+        let response = polling_station_data_entry(
+            State(PollingStationDataEntries::new(pool.clone())),
+            State(Elections::new(pool.clone())),
+            Path((1, 1)),
+            request_body,
+        )
+        .await
+        .into_response();
         assert_eq!(response.status(), 200);
 
         // Check if there is still only one row

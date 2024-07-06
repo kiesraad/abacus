@@ -5,8 +5,6 @@ import { cn, domtoren } from "@kiesraad/util";
 
 export interface InputGridProps {
   zebra?: boolean;
-  focusIds?: string[];
-  currentFocusId?: string;
   children: React.ReactNode;
 }
 
@@ -90,7 +88,7 @@ export function InputGrid({ zebra, children }: InputGridProps) {
     }
   }, []);
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     const tableEl = ref.current;
     if (tableEl) {
       inputList.current = [];
@@ -128,15 +126,45 @@ InputGrid.Header = ({
 );
 
 InputGrid.Body = ({ children }: { children: React.ReactNode }) => <tbody>{children}</tbody>;
+
 InputGrid.Separator = () => (
-  <tr>
-    <td className="sep" colSpan={3}></td>
-  </tr>
+  // 2 trs are needed to make sure zebra styling is according to design
+  <>
+    <tr className="sep_row"></tr>
+    <tr className="sep_row">
+      <td className="sep" colSpan={3}></td>
+    </tr>
+  </>
 );
+
 InputGrid.Row = ({
   children,
   isTotal,
+  isFocused,
+  addSeparator,
 }: {
   children: [React.ReactElement, React.ReactElement, React.ReactElement];
   isTotal?: boolean;
-}) => <tr className={isTotal ? "is-total" : undefined}>{children}</tr>;
+  isFocused?: boolean;
+  addSeparator?: boolean;
+}) => (
+  <>
+    <tr className={(isTotal ? "is-total " : "") + (isFocused ? "focused" : "")}>{children}</tr>
+    {addSeparator && <InputGrid.Separator />}
+  </>
+);
+
+InputGrid.Total = ({
+  children,
+}: {
+  children: [React.ReactElement, React.ReactElement, React.ReactElement];
+}) => (
+  <>
+    <tr className="sep_total">
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr className="list_total is-total">{children}</tr>
+  </>
+);

@@ -1,11 +1,11 @@
 use axum::extract::{Path, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
 use crate::APIError;
 
+use self::repository::Elections;
 pub use self::structs::*;
 
 pub(crate) mod repository;
@@ -35,9 +35,9 @@ pub struct ElectionDetailsResponse {
         ),
     )]
 pub async fn election_list(
-    State(pool): State<SqlitePool>,
+    State(elections_repo): State<Elections>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
-    let elections = repository::get_elections(pool).await?;
+    let elections = elections_repo.list().await?;
     Ok(Json(ElectionListResponse { elections }))
 }
 
@@ -55,9 +55,9 @@ pub async fn election_list(
         ),
     )]
 pub async fn election_details(
-    State(pool): State<SqlitePool>,
+    State(elections_repo): State<Elections>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
-    let election = repository::get_election(pool, id).await?;
+    let election = elections_repo.get(id).await?;
     Ok(Json(ElectionDetailsResponse { election }))
 }

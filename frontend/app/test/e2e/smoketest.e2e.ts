@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("smoke test", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
   const appFrame = page.locator("css=#root .app-frame");
   await expect(appFrame).toContainText("Abacus");
 });

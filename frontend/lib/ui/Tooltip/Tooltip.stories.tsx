@@ -7,8 +7,6 @@ type Props = {
   text: string;
 };
 
-//TODO: tooltip renders correct in application but not in storybook
-
 export const DefaultTooltip: Story<Props> = ({ text }) => {
   return (
     <div>
@@ -17,7 +15,7 @@ export const DefaultTooltip: Story<Props> = ({ text }) => {
           text || (
             <>
               <Icon icon={<IconWarningSquare />} color="warning" />
-              hier alleen <strong>cijfers</strong> invullen.
+              Je probeert <strong>24,29</strong> te plakken. Je kunt hier alleen cijfers invullen.
             </>
           )
         }

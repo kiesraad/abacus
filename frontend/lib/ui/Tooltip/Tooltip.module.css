@@ -1,13 +1,21 @@
+.container {
+  position: relative;
+  display: inline-block;
+}
+
 .tooltip {
+  z-index: 10;
   position: absolute;
+  top: calc(100% + 8px);
+  left: 10px;
   border-radius: 4px;
   pointer-events: none;
+  min-width: 480px;
 
-  aside {
-    position: absolute;
-    z-index: 2;
-    top: 0;
-    left: 16px;
+  > span {
+    display: block;
+    margin-left: 16px;
+    margin-bottom: -5px;
     width: 10px;
     height: 10px;
     border-left: 1px solid var(--border-color-default);
@@ -17,35 +25,22 @@
   }
 
   article {
-    position: relative;
-    z-index: 1;
-    top: 5px;
     border: 1px solid var(--border-color-default);
     background: var(--base-white);
     border-radius: 4px;
     padding: 8px;
-    display: flex;
-    align-items: center;
 
-    > div {
-      min-width: 24px;
-      min-height: 24px;
-      border-radius: 2px;
-      background-color: var(--color-warning-darker);
-      color: var(--base-white);
-      font-weight: bold;
-      margin-right: 8px;
+    font-size: 14px;
+    line-height: 1.2rem;
 
-      /* To center ! in box, should not be needed using icons */
+    :global(.tooltip-content) {
       display: flex;
-      justify-content: space-around;
       align-items: center;
     }
 
-    > p {
-      margin: 0;
-      font-size: var(--font-size-sm);
-      line-height: 1.2rem;
+    svg {
+      vertical-align: middle;
+      margin-right: 10px;
     }
   }
 }

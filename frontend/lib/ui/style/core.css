@@ -1,3 +1,7 @@
+ul {
+  padding-left: 16px;
+}
+
 ul.link-list {
   padding: 0;
   margin: 0;
@@ -11,4 +15,8 @@ ul.link-list {
       padding-left: 10px;
     }
   }
+}
+
+.hidden {
+  display: none;
 }

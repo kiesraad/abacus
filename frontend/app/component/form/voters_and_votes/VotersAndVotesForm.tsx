@@ -1,18 +1,22 @@
 import * as React from "react";
 
-import { usePollingStationDataEntry } from "@kiesraad/api";
-import { BottomBar, Button, InputGrid, Tooltip } from "@kiesraad/ui";
-import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
+import { usePollingStationDataEntry, ValidationResult, ErrorsAndWarnings } from "@kiesraad/api";
+import { Button, InputGrid, Feedback, BottomBar, InputGridRow, useTooltip } from "@kiesraad/ui";
+import {
+  usePositiveNumberInputMask,
+  usePreventFormEnterSubmit,
+  fieldNameFromPath,
+} from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
-  pollCards: HTMLInputElement;
-  proxyCertificates: HTMLInputElement;
-  voterCards: HTMLInputElement;
-  totalAdmittedVoters: HTMLInputElement;
-  votesOnCandidates: HTMLInputElement;
-  blankVotes: HTMLInputElement;
-  invalidVotes: HTMLInputElement;
-  totalVotesCast: HTMLInputElement;
+  poll_card_count: HTMLInputElement;
+  proxy_certificate_count: HTMLInputElement;
+  voter_card_count: HTMLInputElement;
+  total_admitted_voters_count: HTMLInputElement;
+  votes_candidates_counts: HTMLInputElement;
+  blank_votes_count: HTMLInputElement;
+  invalid_votes_count: HTMLInputElement;
+  total_votes_cast_count: HTMLInputElement;
 }
 
 interface VotersAndVotesFormElement extends HTMLFormElement {
@@ -20,12 +24,22 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const { register, deformat, warnings } = usePositiveNumberInputMask();
+  const {
+    register,
+    format,
+    deformat,
+    warnings: inputMaskWarnings,
+    resetWarnings,
+  } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
   const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
     polling_station_id: 1,
     entry_number: 1,
+  });
+
+  useTooltip({
+    onDismiss: resetWarnings,
   });
 
   function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
@@ -35,29 +49,115 @@ export function VotersAndVotesForm() {
     doSubmit({
       data: {
         voters_counts: {
-          poll_card_count: deformat(elements.pollCards.value),
-          proxy_certificate_count: deformat(elements.proxyCertificates.value),
-          voter_card_count: deformat(elements.voterCards.value),
-          total_admitted_voters_count: deformat(elements.totalAdmittedVoters.value),
+          poll_card_count: deformat(elements.poll_card_count.value),
+          proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
+          voter_card_count: deformat(elements.voter_card_count.value),
+          total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
         },
         votes_counts: {
-          votes_candidates_counts: deformat(elements.votesOnCandidates.value),
-          blank_votes_count: deformat(elements.blankVotes.value),
-          invalid_votes_count: deformat(elements.invalidVotes.value),
-          total_votes_cast_count: deformat(elements.totalVotesCast.value),
+          votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
+          blank_votes_count: deformat(elements.blank_votes_count.value),
+          invalid_votes_count: deformat(elements.invalid_votes_count.value),
+          total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
         },
       },
     });
   }
 
+  const errorsAndWarnings: Map<string, ErrorsAndWarnings> = React.useMemo(() => {
+    const result = new Map<string, ErrorsAndWarnings>();
+
+    const process = (target: keyof ErrorsAndWarnings, arr: ValidationResult[]) => {
+      arr.forEach((v) => {
+        v.fields.forEach((f) => {
+          const fieldName = fieldNameFromPath(f);
+          if (!result.has(fieldName)) {
+            result.set(fieldName, { errors: [], warnings: [] });
+          }
+          const field = result.get(fieldName);
+          if (field) {
+            field[target].push({
+              code: v.code,
+              id: fieldName,
+            });
+          }
+        });
+      });
+    };
+
+    if (data && data.validation_results.errors.length > 0) {
+      process("errors", data.validation_results.errors);
+    }
+    if (data && data.validation_results.warnings.length > 0) {
+      process("warnings", data.validation_results.warnings);
+    }
+
+    inputMaskWarnings.forEach((warning) => {
+      if (!result.has(warning.id)) {
+        result.set(warning.id, { errors: [], warnings: [] });
+      }
+      const field = result.get(warning.id);
+      if (field) {
+        field.warnings.push(warning);
+      }
+    });
+
+    return result;
+  }, [data, inputMaskWarnings]);
+
+  React.useEffect(() => {
+    if (data) {
+      window.scrollTo(0, 0);
+    }
+  }, [data]);
+
+  const hasValidationError = data && data.validation_results.errors.length > 0;
+  const hasValidationWarning = data && data.validation_results.warnings.length > 0;
+
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
+      <div id="error-codes" className="hidden">
+        {data && data.validation_results.errors.map((r) => r.code).join(",")}
+      </div>
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
-      {data && <p id="result">Success</p>}
       {error && (
-        <p id="result">
-          Error {error.errorCode} {error.message || ""}
-        </p>
+        <Feedback type="error" title="Error">
+          <div>
+            <h2>Error</h2>
+            <p id="result">{error.message}</p>
+          </div>
+        </Feedback>
+      )}
+      {hasValidationError && (
+        <Feedback type="error" title="Controleer uitgebrachte stemmen">
+          <div>
+            <ul>
+              {data.validation_results.errors.map((error, n) => (
+                <li key={`${error.code}-${n}`}>{error.code}</li>
+              ))}
+            </ul>
+          </div>
+        </Feedback>
+      )}
+
+      {hasValidationWarning && (
+        <Feedback type="warning" title="Controleer uitgebrachte stemmen">
+          <div>
+            <ul>
+              {data.validation_results.warnings.map((warning, n) => (
+                <li key={`${warning.code}-${n}`}>{warning.code}</li>
+              ))}
+            </ul>
+          </div>
+        </Feedback>
+      )}
+
+      {data && !hasValidationError && (
+        <Feedback type="success" title="Success">
+          <div>
+            <h2 id="result">Success</h2>
+          </div>
+        </Feedback>
       )}
       <InputGrid key="numbers">
         <InputGrid.Header>
@@ -66,63 +166,78 @@ export function VotersAndVotesForm() {
           <th>Omschrijving</th>
         </InputGrid.Header>
         <InputGrid.Body>
-          <InputGrid.Row isFocused key="pollCards">
-            <td>A</td>
-            <td>
-              {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
-              <input id="pollCards" maxLength={11} {...register()} autoFocus />
-            </td>
-            <td>Stempassen</td>
-          </InputGrid.Row>
-          <InputGrid.Row key="proxyCertificates">
-            <td>B</td>
-            <td>
-              <input id="proxyCertificates" maxLength={11} {...register()} />
-            </td>
-            <td>Volmachtbewijzen</td>
-          </InputGrid.Row>
-          <InputGrid.Row key="voterCards">
-            <td>C</td>
-            <td>
-              <input id="voterCards" maxLength={11} {...register()} />
-            </td>
-            <td>Kiezerspassen</td>
-          </InputGrid.Row>
-          <InputGrid.Row key="totalAdmittedVoters" isTotal addSeparator>
-            <td>D</td>
-            <td>
-              <input id="totalAdmittedVoters" maxLength={11} {...register()} />
-            </td>
-            <td>Totaal toegelaten kiezers</td>
-          </InputGrid.Row>
-          <InputGrid.Row key="votesOnCandidates">
-            <td>E</td>
-            <td>
-              <input id="votesOnCandidates" maxLength={11} {...register()} />
-            </td>
-            <td>Stemmen op kandidaten</td>
-          </InputGrid.Row>
-          <InputGrid.Row key="blankVotes">
-            <td>F</td>
-            <td>
-              <input id="blankVotes" maxLength={11} {...register()} />
-            </td>
-            <td>Blanco stemmen</td>
-          </InputGrid.Row>
-          <InputGrid.Row key="invalidVotes">
-            <td>G</td>
-            <td>
-              <input id="invalidVotes" maxLength={11} {...register()} />
-            </td>
-            <td>Ongeldige stemmen</td>
-          </InputGrid.Row>
-          <InputGrid.Row key="totalVotesCast" isTotal>
-            <td>H</td>
-            <td>
-              <input id="totalVotesCast" maxLength={11} {...register()} />
-            </td>
-            <td>Totaal uitgebrachte stemmen</td>
-          </InputGrid.Row>
+          <InputGridRow
+            key="A"
+            field="A"
+            name="poll_card_count"
+            title="Stempassen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+            isFocused
+          />
+          <InputGridRow
+            key="B"
+            field="B"
+            name="proxy_certificate_count"
+            title="Volmachtbewijzen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+          />
+          <InputGridRow
+            key="C"
+            field="C"
+            name="voter_card_count"
+            title="Kiezerspassen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+          />
+          <InputGridRow
+            field="D"
+            name="total_admitted_voters_count"
+            title="Totaal toegelaten kiezers"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+            isTotal
+            addSeparator
+          />
+
+          <InputGridRow
+            field="E"
+            name="votes_candidates_counts"
+            title="Stemmen op kandidaten"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+          />
+          <InputGridRow
+            field="F"
+            name="blank_votes_count"
+            title="Blanco stemmen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+          />
+          <InputGridRow
+            field="G"
+            name="invalid_votes_count"
+            title="Ongeldige stemmen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+          />
+          <InputGridRow
+            field="H"
+            name="total_votes_cast_count"
+            title="Totaal uitgebrachte stemmen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+            isTotal
+          />
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="form">
@@ -131,18 +246,6 @@ export function VotersAndVotesForm() {
         </Button>
         <span className="button_hint">SHIFT + Enter</span>
       </BottomBar>
-      {warnings.map((warning) => {
-        const trimmedString =
-          warning.value.length > 20 ? warning.value.substring(0, 20) + "..." : warning.value;
-        return (
-          <Tooltip key={warning.anchor.id} anchor={warning.anchor} closeOnClickOrKeyboardEvent>
-            <p>
-              Je probeert <strong>{trimmedString}</strong> te plakken. Je kunt hier alleen cijfers
-              invullen.
-            </p>
-          </Tooltip>
-        );
-      })}
     </form>
   );
 }

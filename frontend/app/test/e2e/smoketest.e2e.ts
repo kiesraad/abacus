@@ -8,5 +8,5 @@ test("smoke test", async ({ page }) => {
 
 test("input form", async ({ page }) => {
   await page.goto("/input/030/numbers", { waitUntil: "domcontentloaded" });
-  await expect(page.getByTestId("pollCards")).toBeVisible();
+  await expect(page.getByTestId("poll_card_count")).toBeVisible();
 });

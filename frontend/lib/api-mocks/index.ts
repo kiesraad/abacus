@@ -88,6 +88,25 @@ export const pollingStationDataEntryHandler = http.post<
       }
     });
 
+    // A + B + C = D
+    if (
+      voters_counts.poll_card_count +
+        voters_counts.proxy_certificate_count +
+        voters_counts.voter_card_count !==
+      voters_counts.total_admitted_voters_count
+    ) {
+      response.validation_results.errors.push({
+        fields: [
+          "voters_counts.poll_card_count",
+          "voters_counts.proxy_certificate_count",
+          "voters_counts.voter_card_count",
+          "voters_counts.total_admitted_voters_count",
+        ],
+        code: "IncorrectTotal",
+      });
+    }
+
+    // E + F + G = H
     if (
       votes_counts.votes_candidates_counts +
         votes_counts.blank_votes_count +

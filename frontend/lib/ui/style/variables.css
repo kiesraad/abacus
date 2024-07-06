@@ -45,11 +45,15 @@
 
   --border-color-default: #d0d5dd;
 
-  --color-error: #d92d20;
+  --color-error: #f04438;
+  --color-error-border: #fda29b;
+  --color-error-darker: #d92d20;
+  --color-error-darkest: #b42318;
   --color-error-bg: #fee4e2;
   --color-error-hover: #fecdca;
 
   --color-warning: #f79009;
+  --color-warning-border: #fec84b;
   --color-warning-darker: #dc6803;
   --color-warning-bg: #fef0c7;
   --color-warning-hover: #fedf89;
@@ -95,7 +99,6 @@
   --menu-updates: #004eeb;
 
   --error-400: #f97066;
-  --error-600: #d92d20;
 
   --gray-200: #eaecf0;
   --menu-empty: #667085;

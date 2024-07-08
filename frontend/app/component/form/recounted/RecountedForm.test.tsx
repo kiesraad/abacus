@@ -1,9 +1,9 @@
 import { overrideOnce, render, screen } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
-import { RecountForm } from "./RecountForm";
+import { RecountedForm } from "./RecountedForm";
 
-describe("Test RecountForm", () => {
+describe("Test RecountedForm", () => {
   afterEach(() => {
     vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
   });
@@ -12,7 +12,7 @@ describe("Test RecountForm", () => {
     const spy = vi.spyOn(global, "fetch");
 
     const user = userEvent.setup();
-    render(<RecountForm />);
+    render(<RecountedForm />);
 
     const yes = screen.getByTestId("yes");
     await user.click(yes);
@@ -32,12 +32,20 @@ describe("Test RecountForm", () => {
 
     const user = userEvent.setup();
 
-    render(<RecountForm />);
+    render(<RecountedForm />);
 
     const yes = screen.getByTestId("yes");
     const no = screen.getByTestId("no");
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+
     expect(yes).not.toBeChecked();
     expect(no).not.toBeChecked();
+
+    await user.click(submitButton);
+
+    const validationError = screen.getByText("Controleer het papieren proces-verbaal");
+    expect(validationError).toBeVisible();
+
     await user.click(yes);
     expect(yes).toBeChecked();
     expect(no).not.toBeChecked();
@@ -45,7 +53,6 @@ describe("Test RecountForm", () => {
     expect(no).toBeChecked();
     expect(yes).not.toBeChecked();
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
     // const result = await screen.findByTestId("result");
@@ -54,15 +61,15 @@ describe("Test RecountForm", () => {
   });
 
   // TODO: Add tests once submit is added
-  describe("RecountForm Api call", () => {
-    test.skip("RecountForm request body is equal to the form data", async () => {
+  describe("RecountedForm Api call", () => {
+    test.skip("RecountedForm request body is equal to the form data", async () => {
       const spy = vi.spyOn(global, "fetch");
 
       const expectedRequest = {};
 
       const user = userEvent.setup();
 
-      render(<RecountForm />);
+      render(<RecountedForm />);
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -87,7 +94,7 @@ describe("Test RecountForm", () => {
 
     const user = userEvent.setup();
 
-    render(<RecountForm />);
+    render(<RecountedForm />);
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
@@ -103,7 +110,7 @@ describe("Test RecountForm", () => {
 
     const user = userEvent.setup();
 
-    render(<RecountForm />);
+    render(<RecountedForm />);
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);

@@ -32,7 +32,7 @@ h2 {
   font-size: 1.25rem;
   font-weight: bold;
   line-height: 1.875rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 h3 {
   font-size: 1.125em;
@@ -83,4 +83,5 @@ h2.form_title {
 
 p.form-paragraph {
   width: 37.5rem;
+  margin-top: 1rem;
 }

@@ -5,7 +5,7 @@ import {
   InputLayout,
   InputHomePage,
   PollingStationLayout,
-  RecountPage,
+  RecountedPage,
   VotersAndVotesPage,
 } from "./module/input";
 import { OverviewLayout, OverviewPage } from "./module/overview";
@@ -27,7 +27,7 @@ export const routes = createRoutesFromElements(
     <Route path=":electionId/input" element={<InputLayout />}>
       <Route index element={<InputHomePage />} />
       <Route path=":pollingStationId/" element={<PollingStationLayout />}>
-        <Route index path="recount" element={<RecountPage />} />
+        <Route index path="recounted" element={<RecountedPage />} />
         <Route path="numbers" element={<VotersAndVotesPage />} />
         <Route path="differences" element={<div>Placeholder Differences Page</div>} />
         <Route path="list/:listNumber" element={<CandidatesVotesPage />} />

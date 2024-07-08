@@ -53,8 +53,8 @@ export function PollingStationLayout() {
       <main>
         <nav>
           <ProgressList>
-            <ProgressList.Item key="recount" status="accept" active={targetForm === "recount"}>
-              <Link to={`/${electionId}/input/${pollingStationId}/recount`}>Is er herteld?</Link>
+            <ProgressList.Item key="recounted" status="accept" active={targetForm === "recounted"}>
+              <Link to={`/${electionId}/input/${pollingStationId}/recounted`}>Is er herteld?</Link>
             </ProgressList.Item>
             <ProgressList.Item key="numbers" status="idle" active={targetForm === "numbers"}>
               <Link to={`/${electionId}/input/${pollingStationId}/numbers`}>

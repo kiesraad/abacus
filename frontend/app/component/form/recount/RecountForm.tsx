@@ -30,11 +30,11 @@ export function RecountForm() {
       </p>
       <div className="radio-form">
         <label>
-          <input type="radio" name="recounted" value="yes" />
+          <input type="radio" name="recounted" id="yes" value="yes" />
           Ja, er was een hertelling
         </label>
         <label>
-          <input type="radio" name="recounted" value="no" />
+          <input type="radio" name="recounted" id="no" value="no" />
           Nee, er was geen hertelling
         </label>
       </div>

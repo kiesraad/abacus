@@ -13,11 +13,11 @@ interface PollingStationChoiceFormElement extends HTMLFormElement {
 export function PollingStationChoiceForm() {
   const navigate = useNavigate();
   const handleRowClick = () => {
-    navigate(`./030/numbers`);
+    navigate(`./030/recount`);
   };
   function handleSubmit(event: React.FormEvent<PollingStationChoiceFormElement>) {
     event.preventDefault();
-    navigate("./030/numbers");
+    navigate("./030/recount");
   }
 
   return (

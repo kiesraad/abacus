@@ -199,6 +199,16 @@
               }
             }
           },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "422": {
             "description": "JSON body parsing error (Unprocessable Content)",
             "content": {
@@ -303,11 +313,16 @@
         "type": "object",
         "description": "Request structure for data entry of polling station results",
         "required": [
+          "finalise",
           "data"
         ],
         "properties": {
           "data": {
             "$ref": "#/components/schemas/PollingStationResults"
+          },
+          "finalise": {
+            "type": "boolean",
+            "description": "Whether this data entry should be finalised"
           }
         }
       },
@@ -315,17 +330,9 @@
         "type": "object",
         "description": "Response structure for data entry of polling station results",
         "required": [
-          "saved",
-          "message",
           "validation_results"
         ],
         "properties": {
-          "message": {
-            "type": "string"
-          },
-          "saved": {
-            "type": "boolean"
-          },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
           }

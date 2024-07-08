@@ -1,7 +1,7 @@
-use crate::AppState;
-
 use axum::extract::FromRef;
-use sqlx::{query_as, SqlitePool};
+use sqlx::{query, query_as, SqlitePool};
+
+use crate::AppState;
 
 use super::PollingStation;
 
@@ -48,6 +48,29 @@ impl PollingStationDataEntries {
             id, entry_number, data)
             .execute(&self.0)
             .await?;
+
+        Ok(())
+    }
+
+    pub async fn finalise(&self, id: u32, data: String) -> Result<(), sqlx::Error> {
+        let mut tx = self.0.begin().await?;
+
+        query!(
+            "INSERT INTO polling_station_results (polling_station_id, data) VALUES (?, ?)",
+            id,
+            data
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        query!(
+            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ?",
+            id
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        tx.commit().await?;
 
         Ok(())
     }

@@ -15,7 +15,7 @@ export function HomePage() {
           <Link to={"/overview"}>Overzicht module</Link>
         </li>
         <li>
-          <Link to={`/input`}>Input module</Link>
+          <Link to={`1/input`}>Input module</Link>
         </li>
       </ul>
 

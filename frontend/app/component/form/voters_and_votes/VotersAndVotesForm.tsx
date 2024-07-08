@@ -240,7 +240,7 @@ export function VotersAndVotesForm() {
           />
         </InputGrid.Body>
       </InputGrid>
-      <BottomBar type="form">
+      <BottomBar type="inputgrid">
         <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>

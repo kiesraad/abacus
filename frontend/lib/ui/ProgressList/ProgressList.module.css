@@ -12,6 +12,7 @@
     align-items: center;
 
     aside {
+      display: flex;
       flex: 0 0 32px;
       svg {
         width: 24px;

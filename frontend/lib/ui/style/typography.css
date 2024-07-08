@@ -1,7 +1,7 @@
 body {
   font-family: var(--font-text), sans-serif;
-  font-size: 16px;
-  line-height: 1em;
+  font-size: var(--font-size-md);
+  line-height: 1.5em;
   color: var(--text-color-body);
 
   text-rendering: optimizeLegibility;
@@ -32,7 +32,7 @@ h2 {
   font-size: 1.25rem;
   font-weight: bold;
   line-height: 1.875rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 h3 {
   font-size: 1.125em;
@@ -62,6 +62,7 @@ p {
 p.md {
   font-size: var(--font-size-md);
   margin-bottom: 2rem;
+  line-height: 1.5rem;
 }
 
 a {
@@ -78,4 +79,9 @@ a {
 
 h2.form_title {
   margin-bottom: 2rem;
+}
+
+p.form-paragraph {
+  width: 37.5rem;
+  margin-top: 1rem;
 }

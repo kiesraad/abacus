@@ -1,4 +1,4 @@
-import { Badge, Button, InputField } from "@kiesraad/ui";
+import { Badge, BottomBar, Button, InputField } from "@kiesraad/ui";
 import { useNavigate } from "react-router-dom";
 import { IconChevronRight } from "@kiesraad/icon";
 
@@ -38,12 +38,12 @@ export function PollingStationChoiceForm() {
         <br />
         Dan kan je beginnen.
       </p>
-      <div>
+      <BottomBar type="form">
         <Button type="submit" size="lg">
           Beginnen
         </Button>
         <span className="button_hint">SHIFT + Enter</span>
-      </div>
+      </BottomBar>
       <details>
         <summary>
           <p>

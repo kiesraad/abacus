@@ -31,7 +31,7 @@ export function LoginForm() {
         hint="Eerder ingelogd? Vul het wachtwoord in dat je zelf hebt ingesteld. Nog niet eerder ingelogd? Gebruik het wachtwoord dat je van de coördinator hebt gekregen."
         type="password"
       />
-      <BottomBar type="full">
+      <BottomBar type="footer">
         <Button type="submit" size="lg">
           Inloggen
         </Button>

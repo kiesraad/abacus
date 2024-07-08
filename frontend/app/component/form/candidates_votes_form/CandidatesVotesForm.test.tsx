@@ -26,16 +26,11 @@ describe("Test CandidatesVotesForm", () => {
   });
 
   test("Form field entry and keybindings", async () => {
-    overrideOnce(
-      "post",
-      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
-      200,
-      {
-        message: "Data saved",
-        saved: true,
-        validation_results: { errors: [], warnings: [] },
-      },
-    );
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      message: "Data saved",
+      saved: true,
+      validation_results: { errors: [], warnings: [] },
+    });
 
     const user = userEvent.setup();
 
@@ -141,14 +136,9 @@ describe("Test CandidatesVotesForm", () => {
   });
 
   test.skip("422 response results in display of error message", async () => {
-    overrideOnce(
-      "post",
-      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
-      422,
-      {
-        message: "422 error from mock",
-      },
-    );
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+      message: "422 error from mock",
+    });
 
     const user = userEvent.setup();
 
@@ -161,15 +151,10 @@ describe("Test CandidatesVotesForm", () => {
   });
 
   test.skip("500 response results in display of error message", async () => {
-    overrideOnce(
-      "post",
-      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
-      500,
-      {
-        message: "500 error from mock",
-        errorCode: "500_ERROR",
-      },
-    );
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
+      message: "500 error from mock",
+      errorCode: "500_ERROR",
+    });
 
     const user = userEvent.setup();
 

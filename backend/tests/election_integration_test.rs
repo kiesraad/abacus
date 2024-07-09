@@ -4,8 +4,11 @@ use reqwest::StatusCode;
 use serde_json::json;
 use sqlx::SqlitePool;
 
-use backend::election::ElectionDetailsResponse;
-use backend::polling_station::{CandidateVotes, DataEntryResponse, PoliticalGroupVotes};
+use backend::election::{ElectionDetailsResponse, ElectionListResponse};
+use backend::polling_station::{
+    CandidateVotes, DataEntryRequest, DataEntryResponse, DifferencesCounts, PoliticalGroupVotes,
+    PollingStationResults, VotersCounts, VotesCounts,
+};
 use backend::validation::ValidationResultCode::IncorrectTotal;
 use backend::ErrorResponse;
 
@@ -17,21 +20,21 @@ mod utils;
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let request_body = backend::polling_station::DataEntryRequest {
-        data: backend::polling_station::PollingStationResults {
-            voters_counts: backend::polling_station::VotersCounts {
+    let request_body = DataEntryRequest {
+        data: PollingStationResults {
+            voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,
                 voter_card_count: 2,
                 total_admitted_voters_count: 104,
             },
-            votes_counts: backend::polling_station::VotesCounts {
+            votes_counts: VotesCounts {
                 votes_candidates_counts: 102,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 104,
             },
-            differences_counts: backend::polling_station::DifferencesCounts {
+            differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 0,
                 unreturned_ballots_count: 0,
@@ -214,7 +217,7 @@ async fn test_election_list_works(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     let status = response.status();
-    let body: backend::election::ElectionListResponse = response.json().await.unwrap();
+    let body: ElectionListResponse = response.json().await.unwrap();
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert_eq!(body.elections.len(), 2);

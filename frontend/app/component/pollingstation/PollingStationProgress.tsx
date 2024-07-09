@@ -43,7 +43,7 @@ export function PollingStationProgress() {
 }
 
 function currentSectionFromPath(pathname: string): string {
-  //3 deep;
+  //4 deep;
   const pathParts = pathname.split("/");
   if (pathParts.length >= 4) {
     return pathParts[4] || "";

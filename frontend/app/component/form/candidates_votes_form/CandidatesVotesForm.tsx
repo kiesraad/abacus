@@ -107,6 +107,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                   <input
                     id={`candidate-votes-${candidate.number}`}
                     name="candidatevotes[]"
+                    maxLength={11}
                     {...register()}
                     /* eslint-disable-next-line jsx-a11y/no-autofocus */
                     autoFocus={index === 0}

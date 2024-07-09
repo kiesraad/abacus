@@ -1,7 +1,7 @@
 import { render } from "app/test/unit";
 import { describe, expect, test } from "vitest";
-import { PollingStationLayout } from "./PollingStationLayout";
 import { ElectionListProvider, ElectionProvider } from "@kiesraad/api";
+import { PollingStationLayout } from "./PollingStationLayout";
 
 describe("PollingStationLayout", () => {
   test("Enter form field values", () => {

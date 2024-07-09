@@ -7,7 +7,7 @@ proces tijdens en na de verkiezingsdag zal ondersteunen wordt in huis gebouwd do
 Abacus ondersteunt het papieren proces, van het optellen van de stemmen tot en met de zetelverdeling, bij alle in
 Nederland gebruikelijke verkiezingsvormen. De naam van de software is "Abacus software voor verkiezingsuitslagen en zetelverdeling", kortweg "Abacus".
 
-De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonderwijs en in de handel wordt gebruikt. Het is de meest transparante en eenvoudige manier om grote berekeningen uit te voeren en sluit zo aan bij de waarden die we in het verkiezingsproces belangrijk vinden. Abacus is er ook als [https://unicode.org/emoji/charts/full-emoji-list.html#1f9ee](emoji: 🧮).
+De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonderwijs en in de handel wordt gebruikt. Het is de meest transparante en eenvoudige manier om grote berekeningen uit te voeren en sluit zo aan bij de waarden die we in het verkiezingsproces belangrijk vinden. Abacus is er ook als [emoji: 🧮](https://unicode.org/emoji/charts/full-emoji-list.html#1f9ee).
 
  ![Abacus software voor verkiezingsuitslagen en zetelverdeling](/documentatie/img/abacus.png)
 

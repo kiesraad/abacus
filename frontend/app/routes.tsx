@@ -2,6 +2,7 @@ import { createRoutesFromElements, Route } from "react-router-dom";
 import { HomePage } from "./module/HomePage";
 import {
   CandidatesVotesPage,
+  DifferencesPage,
   InputLayout,
   InputHomePage,
   PollingStationLayout,
@@ -29,7 +30,7 @@ export const routes = createRoutesFromElements(
       <Route path=":pollingStationId/" element={<PollingStationLayout />}>
         <Route index path="recounted" element={<RecountedPage />} />
         <Route path="numbers" element={<VotersAndVotesPage />} />
-        <Route path="differences" element={<div>Placeholder Differences Page</div>} />
+        <Route path="differences" element={<DifferencesPage />} />
         <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
         <Route path="save" element={<div>Placeholder Check and Save Page</div>} />
       </Route>

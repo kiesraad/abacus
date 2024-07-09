@@ -71,6 +71,10 @@
     &:global(.focused) {
       td {
         background-color: var(--bg-highlight);
+        color: var(--base-black);
+      }
+      td:first-of-type {
+        font-weight: bold;
       }
     }
 

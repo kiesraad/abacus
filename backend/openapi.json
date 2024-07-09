@@ -331,6 +331,63 @@
           }
         }
       },
+      "DifferencesCounts": {
+        "type": "object",
+        "description": "Voters counts, part of the polling station results.",
+        "required": [
+          "more_ballots_count",
+          "fewer_ballots_count",
+          "unreturned_ballots_count",
+          "too_few_ballots_handed_out_count",
+          "too_many_ballots_handed_out_count",
+          "other_explanation_count",
+          "no_explanation_count"
+        ],
+        "properties": {
+          "fewer_ballots_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of fewer counted ballots (\"Er zijn minder stembiljetten geteld. Noteer hoeveel stembiljetten er minder zijn geteld\")",
+            "minimum": 0
+          },
+          "more_ballots_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of more counted ballots (\"Er zijn méér stembiljetten geteld. Noteer hoeveel stembiljetten er meer zijn geteld\")",
+            "minimum": 0
+          },
+          "no_explanation_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of no explanations (\"Aantal keren dat er geen verklaring is voor het verschil\")",
+            "minimum": 0
+          },
+          "other_explanation_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of other explanations (\"Aantal keren dat er een andere verklaring is voor het verschil\")",
+            "minimum": 0
+          },
+          "too_few_ballots_handed_out_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of fewer ballots handed out (\"Aantal keren dat er een stembiljet te weinig is uitgereikt\")",
+            "minimum": 0
+          },
+          "too_many_ballots_handed_out_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of more ballots handed out (\"Aantal keren dat er een stembiljet teveel is uitgereikt\")",
+            "minimum": 0
+          },
+          "unreturned_ballots_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of unreturned ballots (\"Aantal keren dat een kiezer het stembiljet niet heeft ingeleverd\")",
+            "minimum": 0
+          }
+        }
+      },
       "Election": {
         "type": "object",
         "description": "Election, optionally with its political groups",
@@ -539,9 +596,13 @@
         "required": [
           "voters_counts",
           "votes_counts",
+          "differences_counts",
           "political_group_votes"
         ],
         "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts"
+          },
           "political_group_votes": {
             "type": "array",
             "items": {

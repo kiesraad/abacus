@@ -1,4 +1,4 @@
-# Abacus 🧮 software voor verkiezingsuitslagen en zetelverdeling
+# Abacus software voor verkiezingsuitslagen en zetelverdeling
 
 ## Wat is Abacus?
 
@@ -7,7 +7,9 @@ proces tijdens en na de verkiezingsdag zal ondersteunen wordt in huis gebouwd do
 Abacus ondersteunt het papieren proces, van het optellen van de stemmen tot en met de zetelverdeling, bij alle in
 Nederland gebruikelijke verkiezingsvormen. De naam van de software is "Abacus software voor verkiezingsuitslagen en zetelverdeling", kortweg "Abacus".
 
-De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonderwijs en in de handel wordt gebruikt. Het is de meest transparante en eenvoudige manier om grote berekeningen uit te voeren en sluit zo aan bij de waarden die we in het verkiezingsproces belangrijk vinden. 
+De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonderwijs en in de handel wordt gebruikt. Het is de meest transparante en eenvoudige manier om grote berekeningen uit te voeren en sluit zo aan bij de waarden die we in het verkiezingsproces belangrijk vinden. Abacus is er ook als [https://unicode.org/emoji/charts/full-emoji-list.html#1f9ee](emoji: 🧮).
+
+ ![Abacus software voor verkiezingsuitslagen en zetelverdeling](/documentatie/img/abacus.png)
 
 ## Aanpak
 
@@ -65,9 +67,7 @@ Lees voor meer informatie het bestand `README.md` in elke directory.
 
 ## Bijdragen
 
-We ontwikkelen Abacus open source, niet alleen omdat dit de transparantie bevordert, maar ook omdat we bijdragen vanuit de community verwelkomen. Als je iets wilt bijdragen of als je een vraag hebt, kun je een issue openen op GitHub. Ook kun je contact opnemen met het team via e-mail: [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). 
-
-De software wordt beschikbaar gesteld onder de EUPL v1.2-licentie. 
+We ontwikkelen Abacus open source, niet alleen omdat dit de transparantie bevordert, maar ook omdat we bijdragen vanuit de community verwelkomen. We zijn altijd nieuwsgierig naar nieuwe perspectieven of invalshoeken. Als je iets wilt bijdragen of als je een vraag hebt, neem dan vooral contact op via e-mail: [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). Het team werkt met een planning en epics zoals opgenomen in het projectboard.
 
 Om bij te kunnen dragen aan de software vragen we je om een [contributor licence agreement (CLA)](/CLA.md) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. Stuur de getekende CLA naar [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). Dank alvast!
 

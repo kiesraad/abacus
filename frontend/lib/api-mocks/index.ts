@@ -52,7 +52,7 @@ export const pollingStationDataEntryHandler = http.post<
       },
     };
 
-    const { voters_counts, votes_counts } = json.data;
+    const { voters_counts, votes_counts, political_group_votes } = json.data;
 
     const votesFields: (keyof VotesCounts)[] = [
       "blank_votes_count",
@@ -123,6 +123,33 @@ export const pollingStationDataEntryHandler = http.post<
         code: "IncorrectTotal",
       });
     }
+
+    //SECTION political_group_votes
+    political_group_votes.forEach((pg) => {
+      if (valueOutOfRange(pg.total)) {
+        response.validation_results.errors.push({
+          code: "OutOfRange",
+          fields: [`political_group_votes[${pg.number}].total`],
+        });
+      }
+
+      pg.candidate_votes.forEach((cv) => {
+        if (valueOutOfRange(cv.votes)) {
+          response.validation_results.errors.push({
+            code: "OutOfRange",
+            fields: [`political_group_votes[${pg.number}].candidate_votes[${cv.number}].votes`],
+          });
+        }
+      });
+
+      const sum = pg.candidate_votes.reduce((acc, cv) => acc + cv.votes, 0);
+      if (sum !== pg.total) {
+        response.validation_results.errors.push({
+          code: "IncorrectTotal",
+          fields: [`political_group_votes[${pg.number}].total`],
+        });
+      }
+    });
 
     //OPTION:  threshold checks
 

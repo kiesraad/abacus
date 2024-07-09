@@ -24,7 +24,7 @@ export function PollingStationLayout() {
     >
       <header>
         <section>
-          <PollingStationNumber>{id}</PollingStationNumber>
+          <PollingStationNumber>{pollingStationId}</PollingStationNumber>
           <h1>Fluisterbosdreef 8</h1>
           <Badge type="first_entry" />
         </section>

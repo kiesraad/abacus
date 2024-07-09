@@ -128,7 +128,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </InputGrid.Total>
         </InputGrid.Body>
       </InputGrid>
-      <BottomBar type="form">
+      <BottomBar type="inputgrid">
         <Button type="submit" size="lg">
           Volgende
         </Button>

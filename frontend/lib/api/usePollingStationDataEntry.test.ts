@@ -33,6 +33,13 @@ describe("usePollingStationDataEntry", () => {
           invalid_votes_count: 7,
           total_votes_cast_count: 8,
         },
+        political_group_votes: [
+          {
+            candidate_votes: [{ number: 1, votes: 0 }],
+            number: 1,
+            total: 0,
+          },
+        ],
       },
     });
 

@@ -11,7 +11,7 @@ import {
 export function OverviewPage() {
   const navigate = useNavigate();
   const handleRowClick = () => {
-    navigate(`/input`);
+    navigate(`/1/input`);
   };
 
   return (

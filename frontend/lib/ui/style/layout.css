@@ -67,7 +67,7 @@
     }
     > article {
       flex: 1 1 auto;
-      padding: 2rem 5rem 2rem 5rem;
+      padding: 2.5rem 5rem;
       background-color: var(--bg-gray);
       &.no_footer {
         padding-bottom: 0;

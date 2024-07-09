@@ -315,7 +315,7 @@ impl Validate for VotesCounts {
     }
 }
 
-/// Voters counts, part of the polling station results.
+/// Differences counts, part of the polling station results.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct DifferencesCounts {
     /// Number of more counted ballots ("Er zijn méér stembiljetten geteld. Noteer hoeveel stembiljetten er meer zijn geteld")

@@ -70,7 +70,7 @@ export interface DataEntryResponse {
 }
 
 /**
- * Voters counts, part of the polling station results.
+ * Differences counts, part of the polling station results.
  */
 export interface DifferencesCounts {
   fewer_ballots_count: number;

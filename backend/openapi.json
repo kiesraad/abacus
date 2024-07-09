@@ -333,7 +333,7 @@
       },
       "DifferencesCounts": {
         "type": "object",
-        "description": "Voters counts, part of the polling station results.",
+        "description": "Differences counts, part of the polling station results.",
         "required": [
           "more_ballots_count",
           "fewer_ballots_count",

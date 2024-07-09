@@ -237,6 +237,7 @@ describe("Test DifferencesForm", () => {
     expect(result).toHaveTextContent(/^500 error from mock$/);
   });
 
+  // TODO: Add validation once backend validation is implemented
   test.skip("Incorrect total is caught by validation", async () => {
     const { getByTestId } = render(<DifferencesForm />);
 

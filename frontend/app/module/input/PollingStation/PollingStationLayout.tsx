@@ -1,42 +1,27 @@
-import { useState, useEffect } from "react";
-import { Link, Outlet, useLocation, useParams } from "react-router-dom";
+import { useState } from "react";
+import { Outlet, useParams } from "react-router-dom";
 
-import { useElectionDataRequest } from "@kiesraad/api";
+import { PollingStationFormController, useElection } from "@kiesraad/api";
 import { IconCross } from "@kiesraad/icon";
-import {
-  Badge,
-  Button,
-  Modal,
-  PollingStationNumber,
-  ProgressList,
-  WorkStationNumber,
-} from "@kiesraad/ui";
+import { Badge, Button, Modal, PollingStationNumber, WorkStationNumber } from "@kiesraad/ui";
+import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 
 export function PollingStationLayout() {
-  const { id, listNumber } = useParams();
+  const { id } = useParams();
+  const { election } = useElection();
   const [openModal, setOpenModal] = useState(false);
-  const { data } = useElectionDataRequest({
-    election_id: parseInt(id || ""),
-  });
-  const [lists, setLists] = useState<string[]>([]);
-  const { pathname } = useLocation();
-
-  const targetForm = currentSectionFromPath(pathname);
-
-  useEffect(() => {
-    if (data) {
-      const parties: string[] = [];
-      data.political_groups?.forEach((group: { name: string }) => parties.push(group.name));
-      setLists(parties);
-    }
-  }, [data]);
 
   function changeDialog() {
     setOpenModal(!openModal);
   }
 
+  const pollingStationId = id ? parseInt(id) : 0;
   return (
-    <>
+    <PollingStationFormController
+      election={election}
+      pollingStationId={pollingStationId}
+      entryNumber={1}
+    >
       <header>
         <section>
           <PollingStationNumber>{id}</PollingStationNumber>
@@ -52,40 +37,7 @@ export function PollingStationLayout() {
       </header>
       <main>
         <nav>
-          <ProgressList>
-            <ProgressList.Item key="recount" status="accept" active={targetForm === "recount"}>
-              <Link to={`/input/${id}/recount`}>Is er herteld?</Link>
-            </ProgressList.Item>
-            <ProgressList.Item key="numbers" status="idle" active={targetForm === "numbers"}>
-              <Link to={`/input/${id}/numbers`}>Aantal kiezers en stemmen</Link>
-            </ProgressList.Item>
-            <ProgressList.Item
-              key="differences"
-              status="idle"
-              active={targetForm === "differences"}
-            >
-              <Link to={`/input/${id}/differences`}>Verschillen</Link>
-            </ProgressList.Item>
-            <ProgressList.Ruler key="ruler1" />
-            {lists.map((list, index) => {
-              const listId = `${index + 1}`;
-              return (
-                <ProgressList.Item
-                  key={`list${listId}`}
-                  status="idle"
-                  active={listNumber === listId}
-                >
-                  <Link to={`/input/${id}/list/${listId}`} state={data}>
-                    {list}
-                  </Link>
-                </ProgressList.Item>
-              );
-            })}
-            <ProgressList.Ruler key="ruler2" />
-            <ProgressList.Item key="save" status="idle" active={targetForm === "save"}>
-              <Link to={`/input/${id}/save`}>Controleren en opslaan</Link>
-            </ProgressList.Item>
-          </ProgressList>
+          <PollingStationProgress />
         </nav>
         <article>
           <Outlet />
@@ -109,15 +61,6 @@ export function PollingStationLayout() {
           </nav>
         </Modal>
       )}
-    </>
+    </PollingStationFormController>
   );
-}
-
-function currentSectionFromPath(pathname: string): string {
-  //3 deep;
-  const pathParts = pathname.split("/");
-  if (pathParts.length >= 3) {
-    return pathParts[3] || "";
-  }
-  return "";
 }

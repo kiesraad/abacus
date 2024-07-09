@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { usePollingStationDataEntry, ValidationResult, ErrorsAndWarnings } from "@kiesraad/api";
+import { ValidationResult, ErrorsAndWarnings, useVotersAndVotes } from "@kiesraad/api";
 import { Button, InputGrid, Feedback, BottomBar, InputGridRow, useTooltip } from "@kiesraad/ui";
 import {
   usePositiveNumberInputMask,
@@ -33,10 +33,9 @@ export function VotersAndVotesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-  const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
-    polling_station_id: 1,
-    entry_number: 1,
-  });
+
+  const { sectionValues, setSectionValues, loading, errors, warnings, serverError, isCalled } =
+    useVotersAndVotes();
 
   useTooltip({
     onDismiss: resetWarnings,
@@ -46,20 +45,18 @@ export function VotersAndVotesForm() {
     event.preventDefault();
     const elements = event.currentTarget.elements;
 
-    doSubmit({
-      data: {
-        voters_counts: {
-          poll_card_count: deformat(elements.poll_card_count.value),
-          proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
-          voter_card_count: deformat(elements.voter_card_count.value),
-          total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
-        },
-        votes_counts: {
-          votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
-          blank_votes_count: deformat(elements.blank_votes_count.value),
-          invalid_votes_count: deformat(elements.invalid_votes_count.value),
-          total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
-        },
+    setSectionValues({
+      voters_counts: {
+        poll_card_count: deformat(elements.poll_card_count.value),
+        proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
+        voter_card_count: deformat(elements.voter_card_count.value),
+        total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
+      },
+      votes_counts: {
+        votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
+        blank_votes_count: deformat(elements.blank_votes_count.value),
+        invalid_votes_count: deformat(elements.invalid_votes_count.value),
+        total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
       },
     });
   }
@@ -85,11 +82,11 @@ export function VotersAndVotesForm() {
       });
     };
 
-    if (data && data.validation_results.errors.length > 0) {
-      process("errors", data.validation_results.errors);
+    if (errors.length > 0) {
+      process("errors", errors);
     }
-    if (data && data.validation_results.warnings.length > 0) {
-      process("warnings", data.validation_results.warnings);
+    if (warnings.length > 0) {
+      process("warnings", warnings);
     }
 
     inputMaskWarnings.forEach((warning) => {
@@ -103,28 +100,29 @@ export function VotersAndVotesForm() {
     });
 
     return result;
-  }, [data, inputMaskWarnings]);
+  }, [errors, warnings, inputMaskWarnings]);
 
-  React.useEffect(() => {
-    if (data) {
-      window.scrollTo(0, 0);
-    }
-  }, [data]);
+  // TODO: implement a suiting trigger
+  // React.useEffect(() => {
+  //   if (data) {
+  //     window.scrollTo(0, 0);
+  //   }
+  // }, [data]);
 
-  const hasValidationError = data && data.validation_results.errors.length > 0;
-  const hasValidationWarning = data && data.validation_results.warnings.length > 0;
+  const hasValidationError = errors.length > 0;
+  const hasValidationWarning = warnings.length > 0;
 
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       <div id="error-codes" className="hidden">
-        {data && data.validation_results.errors.map((r) => r.code).join(",")}
+        {errors.map((r) => r.code).join(",")}
       </div>
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
-      {error && (
+      {serverError && (
         <Feedback type="error" title="Error">
           <div>
             <h2>Error</h2>
-            <p id="result">{error.message}</p>
+            <p id="result">{serverError.message}</p>
           </div>
         </Feedback>
       )}
@@ -132,7 +130,7 @@ export function VotersAndVotesForm() {
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div>
             <ul>
-              {data.validation_results.errors.map((error, n) => (
+              {errors.map((error, n) => (
                 <li key={`${error.code}-${n}`}>{error.code}</li>
               ))}
             </ul>
@@ -144,7 +142,7 @@ export function VotersAndVotesForm() {
         <Feedback type="warning" title="Controleer uitgebrachte stemmen">
           <div>
             <ul>
-              {data.validation_results.warnings.map((warning, n) => (
+              {warnings.map((warning, n) => (
                 <li key={`${warning.code}-${n}`}>{warning.code}</li>
               ))}
             </ul>
@@ -152,10 +150,11 @@ export function VotersAndVotesForm() {
         </Feedback>
       )}
 
-      {data && !hasValidationError && (
+      {isCalled && !hasValidationError && (
         <Feedback type="success" title="Success">
           <div>
             <h2 id="result">Success</h2>
+            <p>Tijdelijk, wordt navigatie naar volgende stap</p>
           </div>
         </Feedback>
       )}
@@ -174,6 +173,7 @@ export function VotersAndVotesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.voters_counts.poll_card_count}
             isFocused
           />
           <InputGridRow
@@ -183,6 +183,7 @@ export function VotersAndVotesForm() {
             title="Volmachtbewijzen"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
+            defaultValue={sectionValues.voters_counts.proxy_certificate_count}
             format={format}
           />
           <InputGridRow
@@ -193,6 +194,7 @@ export function VotersAndVotesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.voters_counts.poll_card_count}
           />
           <InputGridRow
             field="D"
@@ -201,6 +203,7 @@ export function VotersAndVotesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.voters_counts.total_admitted_voters_count}
             isTotal
             addSeparator
           />
@@ -212,6 +215,7 @@ export function VotersAndVotesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.votes_counts.votes_candidates_counts}
           />
           <InputGridRow
             field="F"
@@ -220,6 +224,7 @@ export function VotersAndVotesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.votes_counts.blank_votes_count}
           />
           <InputGridRow
             field="G"
@@ -228,6 +233,7 @@ export function VotersAndVotesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.votes_counts.invalid_votes_count}
           />
           <InputGridRow
             field="H"
@@ -236,6 +242,7 @@ export function VotersAndVotesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.votes_counts.total_votes_cast_count}
             isTotal
           />
         </InputGrid.Body>

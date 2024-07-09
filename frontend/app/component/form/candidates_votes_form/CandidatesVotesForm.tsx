@@ -1,12 +1,13 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 
-import { PoliticalGroup } from "@kiesraad/api";
-import { BottomBar, Button, InputGrid } from "@kiesraad/ui";
+import { PoliticalGroup, usePoliticalGroup } from "@kiesraad/api";
+import { BottomBar, Button, Feedback, InputGrid } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
-  list_total: HTMLInputElement;
+  listtotal: HTMLInputElement;
+  "candidatevotes[]": HTMLInputElement[];
 }
 
 interface CandidatesVotesFormElement extends HTMLFormElement {
@@ -18,26 +19,73 @@ export interface CandidatesVotesFormProps {
 }
 
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
-  const navigate = useNavigate();
-  const { register } = usePositiveNumberInputMask();
+  //const navigate = useNavigate();
+  const { register, format, deformat } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
+  const { sectionValues, errors, warnings, setSectionValues, serverError } = usePoliticalGroup(
+    group.number,
+  );
 
   usePreventFormEnterSubmit(formRef);
 
-  const candidates = React.useMemo(() => {
-    return group.candidates.map((candidate) => {
-      return `${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`;
-    });
-  }, [group]);
-
   function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
     event.preventDefault();
-    navigate(`../list/${group.number + 1}`);
+    const elements = event.currentTarget.elements;
+
+    const candidate_votes = [];
+    for (const el of elements["candidatevotes[]"]) {
+      candidate_votes.push({
+        number: candidateNumberFromElement(el),
+        votes: deformat(el.value),
+      });
+    }
+
+    setSectionValues({
+      number: group.number,
+      total: parseInt(elements.listtotal.value),
+      candidate_votes: candidate_votes,
+    });
+    //navigate(`../list/${group.number + 1}`);
   }
+
+  const hasValidationError = errors.length > 0;
+  const hasValidationWarning = warnings.length > 0;
 
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       <h2>{group.name}</h2>
+      {serverError && (
+        <Feedback type="error" title="Error">
+          <div>
+            <h2>Error</h2>
+            <p id="result">{serverError.message}</p>
+          </div>
+        </Feedback>
+      )}
+      {hasValidationError && (
+        <Feedback type="error" title="Controleer uitgebrachte stemmen">
+          <div>
+            <ul>
+              {errors.map((error, n) => (
+                <li key={`${error.code}-${n}`}>{error.code}</li>
+              ))}
+            </ul>
+          </div>
+        </Feedback>
+      )}
+
+      {hasValidationWarning && (
+        <Feedback type="warning" title="Controleer uitgebrachte stemmen">
+          <div>
+            <ul>
+              {warnings.map((warning, n) => (
+                <li key={`${warning.code}-${n}`}>{warning.code}</li>
+              ))}
+            </ul>
+          </div>
+        </Feedback>
+      )}
+
       <InputGrid key={`list${group.number}`} zebra>
         <InputGrid.Header>
           <th>Nummer</th>
@@ -45,8 +93,9 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           <th>Kandidaat</th>
         </InputGrid.Header>
         <InputGrid.Body>
-          {candidates.map((candidate, index) => {
+          {group.candidates.map((candidate, index) => {
             const addSeparator = (index + 1) % 25 == 0;
+            const defaultValue = sectionValues?.candidate_votes[index]?.votes || "";
             return (
               <InputGrid.Row
                 isFocused={index === 0}
@@ -56,21 +105,24 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 <td>{index + 1}</td>
                 <td>
                   <input
-                    id={`list${group.number}-candidate${index + 1}`}
-                    maxLength={11}
+                    id={`candidate-votes-${candidate.number}`}
+                    name="candidatevotes[]"
                     {...register()}
                     /* eslint-disable-next-line jsx-a11y/no-autofocus */
                     autoFocus={index === 0}
+                    defaultValue={format(defaultValue)}
                   />
                 </td>
-                <td>{candidate}</td>
+                <td>
+                  {candidate.last_name}, {candidate.initials} ({candidate.first_name})
+                </td>
               </InputGrid.Row>
             );
           })}
           <InputGrid.Total key={`list${group.number}-total`}>
             <td></td>
             <td>
-              <input id={`list${group.number}-total`} maxLength={11} {...register()} />
+              <input id={`list-total`} name="listtotal" maxLength={11} {...register()} />
             </td>
             <td>Totaal lijst {group.number}</td>
           </InputGrid.Total>
@@ -84,4 +136,14 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       </BottomBar>
     </form>
   );
+}
+
+function candidateNumberFromElement(el: HTMLInputElement) {
+  const id = el.id;
+  const bits = id.split("-");
+  const numberString = bits[bits.length - 1];
+  if (numberString) {
+    return parseInt(numberString);
+  }
+  return 0;
 }

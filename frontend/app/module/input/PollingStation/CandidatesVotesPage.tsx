@@ -11,7 +11,7 @@ export function CandidatesVotesPage() {
     return <div>Geen lijstnummer gevonden</div>;
   }
 
-  const group = election.political_groups?.find(
+  const group = election.political_groups.find(
     (group) => group.number === parseInt(listNumber, 10),
   );
 

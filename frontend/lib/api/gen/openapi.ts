@@ -12,6 +12,12 @@ export interface ELECTION_DETAILS_REQUEST_PARAMS {
 }
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
 
+// /api/polling_stations/{election_id}
+export interface POLLING_STATION_LIST_REQUEST_PARAMS {
+  election_id: number;
+}
+export type POLLING_STATION_LIST_REQUEST_PATH = `/api/polling_stations/${number}`;
+
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS {
   polling_station_id: number;
@@ -41,6 +47,11 @@ export interface Candidate {
  * Candidate gender
  */
 export type CandidateGender = "Male" | "Female" | "X";
+
+export interface CandidateVotes {
+  number: number;
+  votes: number;
+}
 
 /**
  * Request structure for data entry of polling station results
@@ -107,15 +118,50 @@ export interface PoliticalGroup {
   number: number;
 }
 
+export interface PoliticalGroupVotes {
+  candidate_votes: CandidateVotes[];
+  number: number;
+  total: number;
+}
+
+/**
+ * Polling station of a certain [Election]
+ */
+export interface PollingStation {
+  house_number: string;
+  house_number_addition?: string;
+  id: number;
+  locality: string;
+  name: string;
+  number: number;
+  number_of_voters?: number;
+  polling_station_type: PollingStationType;
+  postal_code: string;
+  street: string;
+}
+
+/**
+ * Polling station list response
+ */
+export interface PollingStationListResponse {
+  polling_stations: PollingStation[];
+}
+
 /**
  * PollingStationResults, following the fields in
 "Model N 10-1. Proces-verbaal van een stembureau"
 <https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1>
  */
 export interface PollingStationResults {
+  political_group_votes: PoliticalGroupVotes[];
   voters_counts: VotersCounts;
   votes_counts: VotesCounts;
 }
+
+/**
+ * Type of Polling station
+ */
+export type PollingStationType = "VasteLocatie" | "Bijzonder" | "Mobiel";
 
 export interface ValidationResult {
   code: ValidationResultCode;
@@ -126,7 +172,8 @@ export type ValidationResultCode =
   | "OutOfRange"
   | "IncorrectTotal"
   | "AboveThreshold"
-  | "EqualInput";
+  | "EqualInput"
+  | "IncorrectCandidatesList";
 
 export interface ValidationResults {
   errors: ValidationResult[];

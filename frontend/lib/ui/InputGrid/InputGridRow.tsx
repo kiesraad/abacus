@@ -15,7 +15,7 @@ export interface InputGridRowProps {
   errorsAndWarnings: Map<string, ErrorsAndWarnings>;
   inputProps: Partial<React.InputHTMLAttributes<HTMLInputElement>>;
   format: FormatFunc;
-  defaultValue?: string;
+  defaultValue?: string | number;
   isTotal?: boolean;
   isFocused?: boolean;
   addSeparator?: boolean;
@@ -41,7 +41,7 @@ export function InputGridRow({
     .get(name)
     ?.warnings.find((warning) => warning.code === "REFORMAT_WARNING")?.value;
 
-  const [value, setValue] = React.useState(defaultValue || "");
+  const [value, setValue] = React.useState(() => (defaultValue ? format(defaultValue) : ""));
   return (
     <InputGrid.Row isTotal={isTotal} isFocused={isFocused} addSeparator={addSeparator}>
       <td>{field}</td>

@@ -30,16 +30,7 @@ export function PollingStationChoiceForm() {
   return (
     <form onSubmit={handleSubmit}>
       <h2 className="form_title">Welk stembureau ga je invoeren?</h2>
-      <InputField
-        id="pollingStation"
-        name="number"
-        label="Voer het nummer in:"
-        fieldWidth="narrow"
-        margin={false}
-        pattern="\d+"
-        title="Alleen positieve nummers toegestaan"
-        maxLength={6}
-      />
+      <PollingStationSelector />      
       <p className="md">
         Klopt de naam van het stembureau met de naam op je papieren proces verbaal?
         <br />

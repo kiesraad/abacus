@@ -84,6 +84,9 @@ summary {
     text-decoration: underline;
     color: #1570ef;
   }
+  .pointer {
+    cursor: pointer;
+  }
 }
 
 h2.table_title {

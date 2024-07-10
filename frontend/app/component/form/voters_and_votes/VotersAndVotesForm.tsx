@@ -1,12 +1,18 @@
 import * as React from "react";
 
-import { ValidationResult, ErrorsAndWarnings, useVotersAndVotes } from "@kiesraad/api";
+import {
+  ValidationResult,
+  ErrorsAndWarnings,
+  useVotersAndVotes,
+  VotersAndVotesValues,
+} from "@kiesraad/api";
 import { Button, InputGrid, Feedback, BottomBar, InputGridRow, useTooltip } from "@kiesraad/ui";
 import {
   usePositiveNumberInputMask,
   usePreventFormEnterSubmit,
   fieldNameFromPath,
 } from "@kiesraad/util";
+import { useBlocker } from "react-router-dom";
 
 interface FormElements extends HTMLFormControlsCollection {
   poll_card_count: HTMLInputElement;
@@ -34,32 +40,58 @@ export function VotersAndVotesForm() {
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
 
-  const { sectionValues, setSectionValues, loading, errors, warnings, serverError, isCalled } =
-    useVotersAndVotes();
+  const {
+    sectionValues,
+    setSectionValues,
+    loading,
+    errors,
+    warnings,
+    serverError,
+    isCalled,
+    setTemporaryCache,
+  } = useVotersAndVotes();
 
   useTooltip({
     onDismiss: resetWarnings,
   });
 
+  const getValues = React.useCallback(
+    (elements: VotersAndVotesFormElement["elements"]): VotersAndVotesValues => {
+      return {
+        voters_counts: {
+          poll_card_count: deformat(elements.poll_card_count.value),
+          proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
+          voter_card_count: deformat(elements.voter_card_count.value),
+          total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
+        },
+        votes_counts: {
+          votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
+          blank_votes_count: deformat(elements.blank_votes_count.value),
+          invalid_votes_count: deformat(elements.invalid_votes_count.value),
+          total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
+        },
+      };
+    },
+    [deformat],
+  );
+
   function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
     event.preventDefault();
     const elements = event.currentTarget.elements;
-
-    setSectionValues({
-      voters_counts: {
-        poll_card_count: deformat(elements.poll_card_count.value),
-        proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
-        voter_card_count: deformat(elements.voter_card_count.value),
-        total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
-      },
-      votes_counts: {
-        votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
-        blank_votes_count: deformat(elements.blank_votes_count.value),
-        invalid_votes_count: deformat(elements.invalid_votes_count.value),
-        total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
-      },
-    });
+    setSectionValues(getValues(elements));
   }
+  //const blocker =  useBlocker() use const blocker to render confirmation UI.
+  useBlocker(() => {
+    if (formRef.current && !isCalled) {
+      const elements = formRef.current.elements as VotersAndVotesFormElement["elements"];
+      const values = getValues(elements);
+      setTemporaryCache({
+        key: "voters_and_votes",
+        data: values,
+      });
+    }
+    return false;
+  });
 
   const errorsAndWarnings: Map<string, ErrorsAndWarnings> = React.useMemo(() => {
     const result = new Map<string, ErrorsAndWarnings>();
@@ -102,12 +134,11 @@ export function VotersAndVotesForm() {
     return result;
   }, [errors, warnings, inputMaskWarnings]);
 
-  // TODO: implement a suiting trigger
-  // React.useEffect(() => {
-  //   if (data) {
-  //     window.scrollTo(0, 0);
-  //   }
-  // }, [data]);
+  React.useEffect(() => {
+    if (isCalled) {
+      window.scrollTo(0, 0);
+    }
+  }, [isCalled]);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;

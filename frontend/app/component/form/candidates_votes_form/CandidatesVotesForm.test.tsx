@@ -3,6 +3,14 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 import { politicalGroupMockData } from "../../../../lib/api-mocks/ElectionMockData.ts";
+import { PollingStationFormController } from "@kiesraad/api";
+import { electionMock } from "@kiesraad/api-mocks";
+
+const Component = (
+  <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
+    <CandidatesVotesForm group={politicalGroupMockData} />
+  </PollingStationFormController>
+);
 
 describe("Test CandidatesVotesForm", () => {
   afterEach(() => {
@@ -13,9 +21,9 @@ describe("Test CandidatesVotesForm", () => {
     const spy = vi.spyOn(global, "fetch");
 
     const user = userEvent.setup();
-    render(<CandidatesVotesForm group={politicalGroupMockData} />);
+    render(Component);
 
-    const candidate1 = screen.getByTestId("list1-candidate1");
+    const candidate1 = screen.getByTestId("candidate-votes-1");
     await user.clear(candidate1);
     await user.type(candidate1, "12345");
     expect(candidate1).toHaveValue("12.345");
@@ -34,9 +42,9 @@ describe("Test CandidatesVotesForm", () => {
 
     const user = userEvent.setup();
 
-    render(<CandidatesVotesForm group={politicalGroupMockData} />);
+    render(Component);
 
-    const candidate1 = screen.getByTestId("list1-candidate1");
+    const candidate1 = screen.getByTestId("candidate-votes-1");
     expect(candidate1).toHaveFocus();
     await user.clear(candidate1);
     await user.type(candidate1, "12345");
@@ -44,7 +52,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate2 = screen.getByTestId("list1-candidate2");
+    const candidate2 = screen.getByTestId("candidate-votes-2");
     expect(candidate2).toHaveFocus();
     await user.clear(candidate2);
     await user.type(candidate2, "6789");
@@ -52,7 +60,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate3 = screen.getByTestId("list1-candidate3");
+    const candidate3 = screen.getByTestId("candidate-votes-3");
     expect(candidate3).toHaveFocus();
     await user.clear(candidate3);
     await user.type(candidate3, "123");
@@ -60,7 +68,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate4 = screen.getByTestId("list1-candidate4");
+    const candidate4 = screen.getByTestId("candidate-votes-4");
     expect(candidate4).toHaveFocus();
     await user.clear(candidate4);
     await user.paste("4242");
@@ -68,7 +76,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate5 = screen.getByTestId("list1-candidate5");
+    const candidate5 = screen.getByTestId("candidate-votes-5");
     expect(candidate5).toHaveFocus();
     await user.clear(candidate5);
     await user.type(candidate5, "12");
@@ -76,7 +84,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate6 = screen.getByTestId("list1-candidate6");
+    const candidate6 = screen.getByTestId("candidate-votes-6");
     expect(candidate6).toHaveFocus();
     await user.clear(candidate6);
     // Test if maxLength on field works
@@ -85,7 +93,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate7 = screen.getByTestId("list1-candidate7");
+    const candidate7 = screen.getByTestId("candidate-votes-7");
     expect(candidate7).toHaveFocus();
     await user.clear(candidate7);
     await user.type(candidate7, "3");
@@ -93,7 +101,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const total = screen.getByTestId("list1-total");
+    const total = screen.getByTestId("list-total");
     await user.click(total);
     expect(total).toHaveFocus();
     await user.clear(total);
@@ -117,7 +125,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(<CandidatesVotesForm group={politicalGroupMockData} />);
+      render(Component);
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -142,7 +150,7 @@ describe("Test CandidatesVotesForm", () => {
 
     const user = userEvent.setup();
 
-    render(<CandidatesVotesForm group={politicalGroupMockData} />);
+    render(Component);
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
@@ -158,7 +166,7 @@ describe("Test CandidatesVotesForm", () => {
 
     const user = userEvent.setup();
 
-    render(<CandidatesVotesForm group={politicalGroupMockData} />);
+    render(Component);
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);

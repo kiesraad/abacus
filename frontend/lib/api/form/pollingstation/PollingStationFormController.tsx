@@ -16,7 +16,27 @@ export interface iPollingStationControllerContext {
   data: DataEntryResponse | null;
   values: PollingStationResults;
   setValues: React.Dispatch<React.SetStateAction<PollingStationResults>>;
+  setTemporaryCache: (cache: AnyCache | null) => boolean;
+  cache: AnyCache | null;
 }
+
+//store unvalidated data
+export type TemporaryCache<T> = {
+  key: string;
+  data: T;
+  id?: number;
+};
+
+export interface TemporaryCacheVotersAndVotes
+  extends TemporaryCache<Pick<PollingStationResults, "voters_counts" | "votes_counts">> {
+  key: "voters_and_votes";
+}
+
+export interface TemporaryCachePoliticalGroupVotes
+  extends TemporaryCache<PollingStationResults["political_group_votes"][0]> {
+  key: "political_group_votes";
+}
+export type AnyCache = TemporaryCacheVotersAndVotes | TemporaryCachePoliticalGroupVotes;
 
 export const PollingStationControllerContext = React.createContext<
   iPollingStationControllerContext | undefined
@@ -33,7 +53,9 @@ export function PollingStationFormController({
     entry_number: entryNumber,
   });
 
-  const [values, setValues] = React.useState<PollingStationResults>({
+  const temporaryCache = React.useRef<AnyCache | null>(null);
+
+  const [values, _setValues] = React.useState<PollingStationResults>(() => ({
     political_group_votes: election.political_groups.map((pg) => ({
       number: pg.number,
       total: 0,
@@ -54,20 +76,34 @@ export function PollingStationFormController({
       total_votes_cast_count: 0,
       votes_candidates_counts: 0,
     },
-  });
+  }));
 
-  // const setSectionValues = React.useCallback(
-  //   <K extends keyof PollingStationResults>(key:K, values:PollingStationResults[K]) => {
-  //     setValues(prev => ({
-  //       ...prev,
-  //       [key]: values
-  //     }))
-  //   }, []);
+  const _isCalled = React.useRef<boolean>(false);
+
+  const setValues = React.useCallback((values: React.SetStateAction<PollingStationResults>) => {
+    _isCalled.current = true;
+    _setValues((old) => {
+      const newValues = typeof values === "function" ? values(old) : values;
+      return {
+        ...old,
+        ...newValues,
+      };
+    });
+  }, []);
+
+  const setTemporaryCache = React.useCallback((cache: AnyCache | null) => {
+    console.log("Setting cache?", cache);
+    //OPTIONAL: allow only cache for unvalidated data
+    temporaryCache.current = cache;
+    return true;
+  }, []);
 
   React.useEffect(() => {
-    doRequest({
-      data: values,
-    });
+    if (_isCalled.current) {
+      doRequest({
+        data: values,
+      });
+    }
   }, [doRequest, values]);
 
   return (
@@ -78,6 +114,8 @@ export function PollingStationFormController({
         loading,
         error,
         data,
+        cache: temporaryCache.current,
+        setTemporaryCache,
       }}
     >
       {children}

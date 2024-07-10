@@ -6,6 +6,42 @@ import { overrideOnce, render, screen, fireEvent } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
+import {
+  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
+  PollingStationFormController,
+} from "@kiesraad/api";
+import { electionMock } from "@kiesraad/api-mocks";
+
+const Component = (
+  <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
+    <VotersAndVotesForm />
+  </PollingStationFormController>
+);
+
+const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
+  data: {
+    political_group_votes: electionMock.political_groups.map((group) => ({
+      number: group.number,
+      total: 0,
+      candidate_votes: group.candidates.map((candidate) => ({
+        number: candidate.number,
+        votes: 0,
+      })),
+    })),
+    voters_counts: {
+      poll_card_count: 0,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 0,
+    },
+    votes_counts: {
+      votes_candidates_counts: 0,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 0,
+    },
+  },
+};
 
 describe("Test VotersAndVotesForm", () => {
   afterEach(() => {
@@ -17,7 +53,7 @@ describe("Test VotersAndVotesForm", () => {
 
     const user = userEvent.setup();
 
-    render(<VotersAndVotesForm />);
+    render(Component);
 
     const pollCards = screen.getByTestId("poll_card_count");
     await user.clear(pollCards);
@@ -38,7 +74,7 @@ describe("Test VotersAndVotesForm", () => {
 
     const user = userEvent.setup();
 
-    render(<VotersAndVotesForm />);
+    render(Component);
 
     const pollCards = screen.getByTestId("poll_card_count");
     expect(pollCards).toHaveFocus();
@@ -117,6 +153,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const expectedRequest = {
         data: {
+          ...rootRequest.data,
           voters_counts: {
             poll_card_count: 1,
             proxy_certificate_count: 2,
@@ -134,7 +171,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      const { getByTestId } = render(<VotersAndVotesForm />);
+      const { getByTestId } = render(Component);
 
       const pollCards = getByTestId("poll_card_count");
       fireEvent.change(pollCards, {
@@ -201,7 +238,7 @@ describe("Test VotersAndVotesForm", () => {
 
     const user = userEvent.setup();
 
-    render(<VotersAndVotesForm />);
+    render(Component);
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
@@ -217,7 +254,7 @@ describe("Test VotersAndVotesForm", () => {
 
     const user = userEvent.setup();
 
-    render(<VotersAndVotesForm />);
+    render(Component);
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
@@ -226,7 +263,7 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   test("Incorrect total is caught by validation", async () => {
-    const { getByTestId } = render(<VotersAndVotesForm />);
+    const { getByTestId } = render(Component);
 
     const setValue = (id: string, value: string | number) => {
       const el = getByTestId(id);

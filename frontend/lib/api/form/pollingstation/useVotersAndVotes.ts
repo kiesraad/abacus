@@ -3,17 +3,23 @@ import * as React from "react";
 import { PollingStationResults, ValidationResult } from "../../gen/openapi";
 import { usePollingStationFormController } from "./usePollingStationFormController";
 
-type VotersAndVotesValues = Pick<PollingStationResults, "voters_counts" | "votes_counts">;
+export type VotersAndVotesValues = Pick<PollingStationResults, "voters_counts" | "votes_counts">;
 
 export function useVotersAndVotes() {
-  const { values, setValues, loading, error, data } = usePollingStationFormController();
+  const { values, setValues, loading, error, data, setTemporaryCache, cache } =
+    usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
+    if (cache && cache.key === "voters_and_votes") {
+      const data = cache.data as VotersAndVotesValues;
+      setTemporaryCache(null);
+      return data;
+    }
     return {
       voters_counts: values.voters_counts,
       votes_counts: values.votes_counts,
     };
-  }, [values]);
+  }, [values, setTemporaryCache, cache]);
 
   const errors = React.useMemo(() => {
     if (data) {
@@ -60,6 +66,7 @@ export function useVotersAndVotes() {
     warnings,
     serverError: error,
     isCalled,
+    setTemporaryCache,
   };
 }
 

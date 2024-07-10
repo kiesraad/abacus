@@ -4,6 +4,7 @@ import * as React from "react";
 import { PoliticalGroup, usePoliticalGroup } from "@kiesraad/api";
 import { BottomBar, Button, Feedback, InputGrid } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
+import { useBlocker } from "react-router-dom";
 
 interface FormElements extends HTMLFormControlsCollection {
   listtotal: HTMLInputElement;
@@ -21,30 +22,56 @@ export interface CandidatesVotesFormProps {
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   //const navigate = useNavigate();
   const { register, format, deformat } = usePositiveNumberInputMask();
-  const formRef = React.useRef<HTMLFormElement>(null);
-  const { sectionValues, errors, warnings, setSectionValues, serverError } = usePoliticalGroup(
-    group.number,
-  );
+  const formRef = React.useRef<CandidatesVotesFormElement>(null);
+  const {
+    sectionValues,
+    errors,
+    warnings,
+    setSectionValues,
+    serverError,
+    isCalled,
+    setTemporaryCache,
+  } = usePoliticalGroup(group.number);
 
   usePreventFormEnterSubmit(formRef);
+
+  const getValues = React.useCallback(
+    (elements: CandidatesVotesFormElement["elements"]) => {
+      const candidate_votes = [];
+      for (const el of elements["candidatevotes[]"]) {
+        candidate_votes.push({
+          number: candidateNumberFromElement(el),
+          votes: deformat(el.value),
+        });
+      }
+      return {
+        number: group.number,
+        total: parseInt(elements.listtotal.value),
+        candidate_votes: candidate_votes,
+      };
+    },
+    [deformat, group],
+  );
+
+  //const blocker =  useBlocker() use const blocker to render confirmation UI.
+  useBlocker(() => {
+    if (formRef.current && !isCalled) {
+      const elements = formRef.current.elements;
+      const values = getValues(elements);
+      setTemporaryCache({
+        key: "political_group_votes",
+        id: group.number,
+        data: values,
+      });
+    }
+    return false;
+  });
 
   function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
     event.preventDefault();
     const elements = event.currentTarget.elements;
 
-    const candidate_votes = [];
-    for (const el of elements["candidatevotes[]"]) {
-      candidate_votes.push({
-        number: candidateNumberFromElement(el),
-        votes: deformat(el.value),
-      });
-    }
-
-    setSectionValues({
-      number: group.number,
-      total: parseInt(elements.listtotal.value),
-      candidate_votes: candidate_votes,
-    });
+    setSectionValues(getValues(elements));
     //navigate(`../list/${group.number + 1}`);
   }
 

@@ -10,11 +10,18 @@ export function usePoliticalGroup(political_group_number: number) {
     data,
     loading,
     error: serverError,
+    setTemporaryCache,
+    cache,
   } = usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
+    if (cache && cache.key === "political_group_votes" && cache.id === political_group_number) {
+      const data = cache.data;
+      setTemporaryCache(null);
+      return data;
+    }
     return values.political_group_votes.find((pg) => pg.number === political_group_number);
-  }, [values, political_group_number]);
+  }, [values, political_group_number, setTemporaryCache, cache]);
 
   const errors = React.useMemo(() => {
     if (data) {
@@ -46,13 +53,22 @@ export function usePoliticalGroup(political_group_number: number) {
     }));
   };
 
+  const isCalled = React.useMemo(() => {
+    if (sectionValues && sectionValues.total) {
+      return true;
+    }
+    return false;
+  }, [sectionValues]);
+
   return {
     sectionValues,
     setSectionValues,
     errors,
     warnings,
     loading,
+    isCalled,
     serverError,
+    setTemporaryCache,
   };
 }
 

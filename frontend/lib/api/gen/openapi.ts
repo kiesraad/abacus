@@ -16,8 +16,7 @@ export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
 export interface POLLING_STATION_LIST_REQUEST_PARAMS {
   election_id: number;
 }
-export type POLLING_STATION_LIST_REQUEST_PATH =
-  `/api/polling_stations/${number}`;
+export type POLLING_STATION_LIST_REQUEST_PATH = `/api/polling_stations/${number}`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS {

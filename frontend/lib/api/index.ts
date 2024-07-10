@@ -3,6 +3,7 @@ export * from "./gen/openapi";
 export type * from "./api.d.ts";
 export * from "./ApiClient";
 export * from "./ApiProvider";
+export * from "./PollingStationProvider";
 export * from "./useApiGetRequest";
 export * from "./useApiPostRequest";
 export * from "./useElectionDataRequest";

@@ -18,6 +18,8 @@ export interface ElectionProviderProps {
 export function ElectionProvider({ children }: ElectionProviderProps) {
   const { electionList } = useElectionList();
 
+  console.log("TEST", electionList);
+
   const { data, loading } = useElectionDataRequest({
     election_id: electionList.length && electionList[0] ? electionList[0].id : 0,
   });
@@ -30,8 +32,10 @@ export function ElectionProvider({ children }: ElectionProviderProps) {
     return <div>Error no election data</div>;
   }
 
+  console.log("DATA", data);
+
   return (
-    <ElectionProviderContext.Provider value={{ election: data as Required<Election> }}>
+    <ElectionProviderContext.Provider value={{ election: data.election as Required<Election> }}>
       {children}
     </ElectionProviderContext.Provider>
   );

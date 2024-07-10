@@ -174,7 +174,7 @@ export const ElectionListRequestHandler = http.get("/v1/api/elections", () => {
 export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/v1/api/elections/:id",
   () => {
-    return HttpResponse.json(electionMockData, { status: 200 });
+    return HttpResponse.json({ election: electionMockData }, { status: 200 });
   },
 );
 

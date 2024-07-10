@@ -36,6 +36,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
                 .route(
                     "/:id/data_entries/:entry_number",
                     post(polling_station::polling_station_data_entry),
+                )
+                .route(
+                    "/:id/data_entries/:entry_number/finalise",
+                    post(polling_station::polling_station_data_entry_finalise),
                 ),
         )
         .with_state(state);
@@ -57,8 +61,9 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         paths(
             election::election_list,
             election::election_details,
-            polling_station::polling_station_data_entry,
             polling_station::polling_station_list,
+            polling_station::polling_station_data_entry,
+            polling_station::polling_station_data_entry_finalise,
         ),
         components(
             schemas(

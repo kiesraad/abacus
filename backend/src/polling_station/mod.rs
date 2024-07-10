@@ -18,8 +18,6 @@ pub mod structs;
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 pub struct DataEntryRequest {
-    /// Whether this data entry should be finalised
-    pub finalise: bool,
     /// Data entry for a polling station
     pub data: PollingStationResults,
 }
@@ -78,24 +76,67 @@ pub async fn polling_station_data_entry(
 
     let data = serde_json::to_string(&data_entry_request.data)?;
 
-    if data_entry_request.finalise {
-        if validation_results.has_errors() {
-            return Err(APIError::Conflict("Validation returned errors".to_string()));
-        }
+    // Save the data entry or update it if it already exists
+    polling_station_data_entries
+        .upsert(id, entry_number, data)
+        .await?;
 
-        // future: validate whether first and second data entries are equal, #129
+    Ok(DataEntryResponse { validation_results })
+}
 
-        polling_station_data_entries.finalise(id, data).await?;
-
-        Ok(DataEntryResponse { validation_results })
-    } else {
-        // Save the data entry or update it if it already exists
-        polling_station_data_entries
-            .upsert(id, entry_number, data)
-            .await?;
-
-        Ok(DataEntryResponse { validation_results })
+/// Finalise the data entry for a polling station
+#[utoipa::path(
+        post,
+        path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise",
+        request_body = DataEntryRequest,
+        responses(
+            (status = 200, description = "Data entry finalised successfully", body = DataEntryResponse),
+            (status = 404, description = "Not found", body = ErrorResponse),
+            (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+            (status = 422, description = "JSON body parsing error (Unprocessable Content)", body = ErrorResponse),
+            (status = 500, description = "Internal server error", body = ErrorResponse),
+        ),
+        params(
+            ("polling_station_id" = u32, description = "Polling station database id"),
+            ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
+        ),
+    )]
+pub async fn polling_station_data_entry_finalise(
+    State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(elections): State<Elections>,
+    Path((id, entry_number)): Path<(u32, u8)>,
+    data_entry_request: DataEntryRequest,
+) -> Result<DataEntryResponse, APIError> {
+    // only the first data entry is supported for now
+    if entry_number != 1 {
+        return Err(APIError::NotFound(
+            "Only the first data entry is supported".to_string(),
+        ));
     }
+
+    // future: need to resolve election id from polling station once we have
+    // polling stations in the database, #106
+    let election_id = 1;
+    let election = elections.get(election_id).await?;
+
+    let mut validation_results = ValidationResults::default();
+    data_entry_request
+        .data
+        .validate(&election, &mut validation_results, "data".to_string());
+
+    let data = serde_json::to_string(&data_entry_request.data)?;
+
+    if validation_results.has_errors() {
+        return Err(APIError::Conflict(
+            "Cannot finalise data entry with validation errors".to_string(),
+        ));
+    }
+
+    // future: validate whether first and second data entries are equal, #129
+
+    polling_station_data_entries.finalise(id, data).await?;
+
+    Ok(DataEntryResponse { validation_results })
 }
 
 /// Polling station list response
@@ -131,7 +172,6 @@ mod tests {
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections")))]
     async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
         let mut request_body = DataEntryRequest {
-            finalise: false,
             data: PollingStationResults {
                 voters_counts: VotersCounts {
                     poll_card_count: 100, // incorrect
@@ -162,7 +202,7 @@ mod tests {
             },
         };
 
-        async fn do_request(pool: SqlitePool, request_body: DataEntryRequest) -> Response {
+        async fn save(pool: SqlitePool, request_body: DataEntryRequest) -> Response {
             polling_station_data_entry(
                 State(PollingStationDataEntries::new(pool.clone())),
                 State(Elections::new(pool.clone())),
@@ -173,7 +213,18 @@ mod tests {
             .into_response()
         }
 
-        let response = do_request(pool.clone(), request_body.clone()).await;
+        async fn finalise(pool: SqlitePool, request_body: DataEntryRequest) -> Response {
+            polling_station_data_entry_finalise(
+                State(PollingStationDataEntries::new(pool.clone())),
+                State(Elections::new(pool.clone())),
+                Path((1, 1)),
+                request_body.clone(),
+            )
+            .await
+            .into_response()
+        }
+
+        let response = save(pool.clone(), request_body.clone()).await;
         assert_eq!(response.status(), 200);
 
         // Check if a row was created
@@ -184,15 +235,13 @@ mod tests {
         assert_eq!(row_count.count, 1);
 
         // Check that we cannot finalise with errors
-        request_body.finalise = true;
-        let response = do_request(pool.clone(), request_body.clone()).await;
+        let response = finalise(pool.clone(), request_body.clone()).await;
         assert_eq!(response.status(), 409);
 
         // Test updating the data entry
         let poll_card_count = 98;
-        request_body.finalise = false;
         request_body.data.voters_counts.poll_card_count = poll_card_count; // correct value
-        let response = do_request(pool.clone(), request_body.clone()).await;
+        let response = save(pool.clone(), request_body.clone()).await;
         assert_eq!(response.status(), 200);
 
         // Check if there is still only one row
@@ -211,8 +260,7 @@ mod tests {
         assert_eq!(data.voters_counts.poll_card_count, poll_card_count);
 
         // Finalise data entry after correcting the error
-        request_body.finalise = true;
-        let response = do_request(pool.clone(), request_body.clone()).await;
+        let response = finalise(pool.clone(), request_body.clone()).await;
         assert_eq!(response.status(), 200);
 
         // Check if the data entry was finalised:

@@ -38,7 +38,6 @@ async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let request_body = backend::polling_station::DataEntryRequest {
-        finalise: false,
         data: backend::polling_station::PollingStationResults {
             voters_counts: backend::polling_station::VotersCounts {
                 poll_card_count: 100,
@@ -118,7 +117,6 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let request_body = json!({
-      "finalise": false,
       "data": {
         "voters_counts": {
           "poll_card_count": 1,

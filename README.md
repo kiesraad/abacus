@@ -1,19 +1,22 @@
 # Abacus software voor verkiezingsuitslagen en zetelverdeling
 
 ## Wat is Abacus?
+De Kiesraad ontwikkelt een nieuw softwareprogramma voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Het programma telt uitslagen bij elkaar op en berekent de zetelverdeling. Abacus vervangt de module Uitslagvaststelling van het programma Ondersteunende Software Verkiezingen (OSV2020) dat sinds 2020 wordt gebruikt. Abacus zal ingezet worden bij alle verkiezingen in Nederland.
 
-De Kiesraad gaat de software Ondersteunende Software Verkiezingen (OSV2020) vervangen. Het deel van de software dat het
-proces tijdens en na de verkiezingsdag zal ondersteunen wordt in huis gebouwd door een eigen ontwikkelteam.
-Abacus ondersteunt het papieren proces, van het optellen van de stemmen tot en met de zetelverdeling, bij alle in
-Nederland gebruikelijke verkiezingsvormen. De naam van de software is "Abacus software voor verkiezingsuitslagen en zetelverdeling", kortweg "Abacus".
+## Papieren proces is leidend
+Na afloop van verkiezingen worden in de stembureaus de stembiljetten met de hand geteld en de uitkomsten vastgelegd in een proces-verbaal. Vervolgens tellen gemeentelijke stembureaus, hoofdstembureaus en het centraal stembureau de uitslagen van de stembureaus digitaal bij elkaar op. Hierbij zal Abacus worden gebruikt, met als doel een zorgvuldige invoer en correcte optelling. De optellingen en de zetelverdeling die met de programmatuur worden gegenereerd, worden handmatig gecontroleerd, aan de hand van controleprotocollen die de Kiesraad opstelt.
+
+## Abacus: symbool voor transparantie en eenvoud
 
 De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonderwijs en in de handel wordt gebruikt. Het is de meest transparante en eenvoudige manier om grote berekeningen uit te voeren en sluit zo aan bij de waarden die we in het verkiezingsproces belangrijk vinden. Abacus is er ook als [emoji: 🧮](https://unicode.org/emoji/charts/full-emoji-list.html#1f9ee).
 
  ![Abacus software voor verkiezingsuitslagen en zetelverdeling](/documentatie/img/abacus.png)
 
-## Aanpak
+## Ontwikkeling
 
-Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de GSB-U module van OSV2020 voor de uitslagvaststelling en zetelverdeling voor gemeenteraadsverkiezingen. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen.
+De software wordt ontworpen en gebouwd door de Kiesraad zelf, in nauwe samenspraak met gebruikers, met name mensen bij gemeenten, waterschappen en het openbaar lichaam op de eilanden. 
+
+Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de module van OSV2020 voor de uitslagvaststelling en zetelverdeling voor het Gemeentelijk stembureau bij gemeenteraadsverkiezingen. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen.
 
 De uitgangspunten bij het ontwerp en de bouw van Abacus zijn gebruiksvriendelijkheid en eenvoud, naast de waarden integriteit, transparantie en controleerbaarheid. De software dient voor het correct invoeren van de resultaten van de stembureaus volgens het vier-ogen principe, voor het maken van de optelling van alle ingevoerde stembureaus en het opstellen van het proces-verbaal met de resultaten. 
 
@@ -53,7 +56,7 @@ Daarnaast zijn voor de software, de ontwikkeling en het gebruik onder andere de 
 * Eenvoud als uitgangspunt: minimale functies, eenvoudige en overzichtelijke techniek
 * Veilige programmeertaal (Rust)
 * Ontwikkel- en releaseproces met reviews en beveiligingsonderzoek
-* Definitieve release: pentest en toets op wettelijke kaders
+* Definitieve release: openbare pentest en toets op wettelijke kaders
 * Lokale installatie zonder internet
 * Afzender- en bestandsverificatie (weten van wie een bestand komt en dat het compleet is)
 
@@ -74,6 +77,20 @@ Om bij te kunnen dragen aan de software vragen we je om een [contributor licence
 ## Meldingen en security issues
 
 Alle meldingen over onze software zijn welkom. Je kunt het team direct bereiken via [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl) of contact opnemen met onze CISO Fleur van Leusden via [security@kiesraad.nl](mailto:security@kiesraad.nl). 
+
+## Over de Kiesraad
+
+In Nederland mogen we al meer dan honderd jaar via verkiezingen bepalen wie onze volksvertegenwoordigers zijn. Voor onze democratie is het van groot belang om een betrouwbaar, transparant en controleerbaar verkiezingsproces in te richten en in stand te houden. Dat doen we met wetten en regels, maar vooral met mensen, die er samen voor zorgen dat verkiezingen eerlijk verlopen en dat iedere stem meetelt.
+
+De Kiesraad is de onafhankelijke autoriteit in Nederland op het gebied van verkiezingen. De missie van de Kiesraad is dat iedereen de uitslag van de verkiezingen kan vertrouwen. 
+
+De Kiesraad adviseert de regering en het parlement over verkiezingen en het kiesrecht. Dit doen we gevraagd en ongevraagd. We evalueren iedere verkiezing en adviseren de minister over mogelijke verbeteringen. 
+
+In het verkiezingsproces wordt digitalisering ingezet als hulpmiddel. De Kiesraad is verantwoordelijk voor de ontwikkeling en het beheer van de ondersteunende software die gebruikt wordt bij de kandidaatstelling en de vaststelling van de uitslagen van verkiezingen. 
+
+Als informatie- en expertisecentrum over verkiezingen beheert de Kiesraad een verkiezingsdatabank die de uitslagen van meer dan 700 verkiezingen omvat, teruggaand tot 1848. De Kiesraad is benaderbaar voor iedereen die uitleg wil over het verkiezingsproces.
+
+Meer informatie over de verkiezingen en de Kiesraad is te vinden op [www.kiesraad.nl](https://www.kiesraad.nl)
 
 ## Copyright en licenties
 

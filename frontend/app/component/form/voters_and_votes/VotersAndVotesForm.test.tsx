@@ -129,6 +129,22 @@ describe("Test VotersAndVotesForm", () => {
             invalid_votes_count: 6,
             total_votes_cast_count: 15,
           },
+          differences_counts: {
+            more_ballots_count: 0,
+            fewer_ballots_count: 0,
+            unreturned_ballots_count: 0,
+            too_few_ballots_handed_out_count: 0,
+            too_many_ballots_handed_out_count: 0,
+            other_explanation_count: 0,
+            no_explanation_count: 0,
+          },
+          political_group_votes: [
+            {
+              candidate_votes: [{ number: 1, votes: 0 }],
+              number: 1,
+              total: 0,
+            },
+          ],
         },
       };
 

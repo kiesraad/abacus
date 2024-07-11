@@ -88,7 +88,7 @@ export const pollingStationDataEntryHandler = http.post<
       if (valueOutOfRange(voters_counts[field])) {
         response.validation_results.errors.push({
           code: "OutOfRange",
-          fields: [`data.voters_counters.${field}`],
+          fields: [`data.voters_counts.${field}`],
         });
       }
     });

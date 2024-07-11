@@ -60,7 +60,7 @@ Daarnaast zijn voor de software, de ontwikkeling en het gebruik onder andere de 
 * Eenvoud als uitgangspunt: minimale functies, eenvoudige en overzichtelijke techniek
 * Veilige programmeertaal (Rust)
 * Ontwikkel- en releaseproces met reviews en beveiligingsonderzoek
-* Definitieve release: openbare pentest en toets op wettelijke kaders
+* Definitieve release: pentest en toets op wettelijke kaders, rapportages openbaar
 * Lokale installatie zonder internet
 * Afzender- en bestandsverificatie (weten van wie een bestand komt en dat het correct is)
 

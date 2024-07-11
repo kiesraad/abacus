@@ -1,12 +1,7 @@
 # Overwegingen ten aanzien van technische keuzes binnen dit project
 
-| Versie | Datum            | Wijzigingen | 
-| ------ | ---------------- | ----------- |
-| 0.1    | 15 december 2023 | Eerste versie |
-| 0.2    | 3 april 2024     | Toevoeging keuzes frontend, backend, tools |
-
 Bij het maken van technische keuzes binnen dit project zijn er een aantal uitgangspunten.
-De eisen aan de software zijn gesteld in besluiten en de kieswet.
+De eisen aan de software zijn gesteld in de Kieswet, Kiesbesluit en overige kaders zoals de BIO.
 Hier zal zonder uitzondering aan voldaan moeten worden.
 
 Een aantal van de eisen zijn zeer duidelijk en een aantal van de eisen is impliciet vanuit het beoogde gebruik.
@@ -70,14 +65,6 @@ We maken ook gebruik van TypeScript, een uitgebreidere versie van JavaScript. Di
 ### Library: React
 
 React is een van de meest gebruikte libraries voor het maken van gebruikersinterfaces. Deze library heeft een groot bereik onder developers en wordt goed onderhouden. Een andere overweging was Angular, maar React is stabieler. Ook hebben onze programmeurs hier ervaring mee. 
-
-### Ladle
-
-Deze tool wordt gebruikt om te ontwikkelen en testen met React. Deze optie werkt eenvoudiger dan het alternatief Storybook.
-
-### Playwright
-
-Playwright is uitermate geschikt als testframework voor de browser. Selenium is een automatiseringslibrary die een alternatief zou kunnen zijn voor Playwright, maar Playwright heeft meer functionaliteit. Bovendien zou je voor Selenium ook een test runner en een assertion library nodig hebben. Ook zou je convenience functions/methods moeten bouwen omdat Selenium best low-level control op de browser biedt. Playwright heeft deze vereisten niet, en daarom hebben we hiervoor gekozen. 
 
 ## Keuze backend: Rust
 

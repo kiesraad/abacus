@@ -272,6 +272,34 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   test("Incorrect total is caught by validation", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      message: "Data saved",
+      saved: true,
+      validation_results: {
+        errors: [
+          {
+            fields: [
+              "data.votes_counts.total_votes_cast_count",
+              "data.votes_counts.blank_votes_count",
+              "data.votes_counts.invalid_votes_count",
+              "data.votes_counts.votes_candidates_counts",
+            ],
+            code: "IncorrectTotal",
+          },
+          {
+            fields: [
+              "data.voters_counts.total_admitted_voters_count",
+              "data.voters_counts.poll_card_count",
+              "data.voters_counts.proxy_certificate_count",
+              "data.voters_counts.voter_card_count",
+            ],
+            code: "IncorrectTotal",
+          },
+        ],
+        warnings: [],
+      },
+    });
+
     const { getByTestId } = render(Component);
 
     const setValue = (id: string, value: string | number) => {

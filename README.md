@@ -47,9 +47,11 @@ Er zijn enkele zaken waar we nog over nadenken:
 
 ## Techniek
 
-Abacus wordt voor de gemeenteraadsverkiezingen gebouwd als een stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in Rust, de frontend in TypeScript/React. Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, Typescript en React](/documentatie/softwarearchitectuur/overwegingen talen en frameworks.md). 
+Abacus wordt voor de gemeenteraadsverkiezingen gebouwd als een stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in Rust, de frontend in TypeScript/React. 
 
-## Papier is leidend: beveiligingsmaatregelen
+Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, Typescript en React](/documentatie/softwarearchitectuur/overwegingen talen en frameworks.md). 
+
+## Beveiligingsmaatregelen
 
 Het uitgangspunt in Nederland is dat het papier leidend is bij het bepalen van de verkiezingsuitslag en dat de software hierbij ondersteunt. Hiervoor worden controles uitgevoerd, waarbij steeds teruggekeken wordt of de invoer, optelling en berekening van de software klopt met het papier.
 

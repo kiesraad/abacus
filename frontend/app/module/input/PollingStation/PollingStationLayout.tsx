@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 
 import { useElectionDataRequest } from "@kiesraad/api";
 import { IconCross } from "@kiesraad/icon";
@@ -11,17 +11,17 @@ import {
   ProgressList,
   WorkStationNumber,
 } from "@kiesraad/ui";
-import { VotersAndVotesForm } from "app/component/form/voters_and_votes/VotersAndVotesForm";
 
-export function PollingStationPage() {
-  const { id, section } = useParams();
-  // TODO: Set default targetForm correctly once all pages are implemented
-  const targetForm = section || "numbers";
+export function PollingStationLayout() {
+  const { electionId, pollingStationId, listNumber } = useParams();
   const [openModal, setOpenModal] = useState(false);
   const { data } = useElectionDataRequest({
-    election_id: parseInt(id || ""),
+    election_id: parseInt(electionId || ""),
   });
   const [lists, setLists] = useState<string[]>([]);
+  const { pathname } = useLocation();
+
+  const targetForm = currentSectionFromPath(pathname);
 
   useEffect(() => {
     if (data) {
@@ -39,7 +39,7 @@ export function PollingStationPage() {
     <>
       <header>
         <section>
-          <PollingStationNumber>{id}</PollingStationNumber>
+          <PollingStationNumber>{pollingStationId}</PollingStationNumber>
           <h1>Fluisterbosdreef 8</h1>
           <Badge type="first_entry" />
         </section>
@@ -53,36 +53,46 @@ export function PollingStationPage() {
       <main>
         <nav>
           <ProgressList>
-            <ProgressList.Item status="accept" active={targetForm === "recount"}>
-              <Link to={`/input/${id}/recount`}>Is er herteld?</Link>
+            <ProgressList.Item key="recounted" status="accept" active={targetForm === "recounted"}>
+              <Link to={`/${electionId}/input/${pollingStationId}/recounted`}>Is er herteld?</Link>
             </ProgressList.Item>
-            <ProgressList.Item status="idle" active={targetForm === "numbers"}>
-              <Link to={`/input/${id}/numbers`}>Aantal kiezers en stemmen</Link>
+            <ProgressList.Item key="numbers" status="idle" active={targetForm === "numbers"}>
+              <Link to={`/${electionId}/input/${pollingStationId}/numbers`}>
+                Aantal kiezers en stemmen
+              </Link>
             </ProgressList.Item>
-            <ProgressList.Item status="idle" active={targetForm === "differences"}>
-              <Link to={`/input/${id}/differences`}>Verschillen</Link>
+            <ProgressList.Item
+              key="differences"
+              status="idle"
+              active={targetForm === "differences"}
+            >
+              <Link to={`/${electionId}/input/${pollingStationId}/differences`}>Verschillen</Link>
             </ProgressList.Item>
-            <ProgressList.Ruler />
+            <ProgressList.Ruler key="ruler1" />
             {lists.map((list, index) => {
-              const listId = `list${(index + 1).toString()}`;
+              const listId = `${index + 1}`;
               return (
-                <ProgressList.Item key={listId} status="idle" active={targetForm === listId}>
-                  <Link to={`/input/${id}/${listId}`}>{list}</Link>
+                <ProgressList.Item
+                  key={`list${listId}`}
+                  status="idle"
+                  active={listNumber === listId}
+                >
+                  <Link to={`/${electionId}/input/${pollingStationId}/list/${listId}`} state={data}>
+                    {list}
+                  </Link>
                 </ProgressList.Item>
               );
             })}
-            <ProgressList.Ruler />
-            <ProgressList.Item status="idle" active={targetForm === "save"}>
-              <Link to={`/input/${id}/save`}>Controleren en opslaan</Link>
+            <ProgressList.Ruler key="ruler2" />
+            <ProgressList.Item key="save" status="idle" active={targetForm === "save"}>
+              <Link to={`/${electionId}/input/${pollingStationId}/save`}>
+                Controleren en opslaan
+              </Link>
             </ProgressList.Item>
           </ProgressList>
         </nav>
         <article>
-          {targetForm === "recount" && <div>Placeholder Recount Page</div>}
-          {targetForm === "numbers" && <VotersAndVotesForm />}
-          {targetForm === "differences" && <div>Placeholder Differences Page</div>}
-          {targetForm.startsWith("list") && <div>Placeholder List page</div>}
-          {targetForm === "save" && <div>Placeholder Check and Save Page</div>}
+          <Outlet />
         </article>
       </main>
       {openModal && (
@@ -105,4 +115,13 @@ export function PollingStationPage() {
       )}
     </>
   );
+}
+
+function currentSectionFromPath(pathname: string): string {
+  //3 deep;
+  const pathParts = pathname.split("/");
+  if (pathParts.length >= 4) {
+    return pathParts[4] || "";
+  }
+  return "";
 }

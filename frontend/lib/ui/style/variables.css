@@ -29,10 +29,11 @@
 
   --font-size-body: 1.125rem;
   /* TODO: pick a better font size scale */
-  --font-size-sm: 0.8em;
-  --font-size-md: 1em;
-  --font-size-lg: 1.8em;
-  --font-size-xl: 3.75em;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.8rem;
+  --font-size-xl: 3.75rem;
 
   /* SPACING and CORNERS */
   --rounded-default: 8px;
@@ -45,11 +46,15 @@
 
   --border-color-default: #d0d5dd;
 
-  --color-error: #d92d20;
+  --color-error: #f04438;
+  --color-error-border: #fda29b;
+  --color-error-darker: #d92d20;
+  --color-error-darkest: #b42318;
   --color-error-bg: #fee4e2;
   --color-error-hover: #fecdca;
 
   --color-warning: #f79009;
+  --color-warning-border: #fec84b;
   --color-warning-darker: #dc6803;
   --color-warning-bg: #fef0c7;
   --color-warning-hover: #fedf89;
@@ -71,6 +76,7 @@
   --bg-gray-darkest: #d0d5dd;
   --bg-highlight: #eff4ff;
 
+  --base-black: #000000;
   --base-brand-blue: #113051;
   --base-dark-blue: #00305b;
   --base-light-grey: #f0f0f0;
@@ -95,7 +101,6 @@
   --menu-updates: #004eeb;
 
   --error-400: #f97066;
-  --error-600: #d92d20;
 
   --gray-200: #eaecf0;
   --menu-empty: #667085;

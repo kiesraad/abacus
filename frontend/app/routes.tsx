@@ -1,9 +1,17 @@
 import { createRoutesFromElements, Route } from "react-router-dom";
-import { RootLayout } from "./module/RootLayout";
 import { HomePage } from "./module/HomePage";
-import { InputLayout, InputHomePage, PollingStationPage } from "./module/input";
-import { AccountSetupPage, LoginPage, LoginLayout, UserHomePage } from "./module/user";
+import {
+  CandidatesVotesPage,
+  DifferencesPage,
+  InputLayout,
+  InputHomePage,
+  PollingStationLayout,
+  RecountedPage,
+  VotersAndVotesPage,
+} from "./module/input";
 import { OverviewLayout, OverviewPage } from "./module/overview";
+import { RootLayout } from "./module/RootLayout";
+import { AccountSetupPage, LoginPage, LoginLayout, UserHomePage } from "./module/user";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />}>
@@ -17,9 +25,15 @@ export const routes = createRoutesFromElements(
     <Route path="overview" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />
     </Route>
-    <Route path="input" element={<InputLayout />}>
+    <Route path=":electionId/input" element={<InputLayout />}>
       <Route index element={<InputHomePage />} />
-      <Route path=":id/:section?" element={<PollingStationPage />} />
+      <Route path=":pollingStationId/" element={<PollingStationLayout />}>
+        <Route index path="recounted" element={<RecountedPage />} />
+        <Route path="numbers" element={<VotersAndVotesPage />} />
+        <Route path="differences" element={<DifferencesPage />} />
+        <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
+        <Route path="save" element={<div>Placeholder Check and Save Page</div>} />
+      </Route>
     </Route>
   </Route>,
 );

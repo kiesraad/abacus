@@ -1,3 +1,7 @@
+/**
+ * @vitest-environment jsdom
+ */
+
 import { overrideOnce, render, screen, fireEvent } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
@@ -15,7 +19,7 @@ describe("Test VotersAndVotesForm", () => {
 
     render(<VotersAndVotesForm />);
 
-    const pollCards = screen.getByTestId("pollCards");
+    const pollCards = screen.getByTestId("poll_card_count");
     await user.clear(pollCards);
     await user.type(pollCards, "12345");
     expect(pollCards).toHaveValue("12.345");
@@ -26,29 +30,25 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   test("Form field entry and keybindings", async () => {
-    overrideOnce(
-      "post",
-      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
-      200,
-      {
-        message: "Data saved",
-        saved: true,
-        validation_results: { errors: [], warnings: [] },
-      },
-    );
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      message: "Data saved",
+      saved: true,
+      validation_results: { errors: [], warnings: [] },
+    });
 
     const user = userEvent.setup();
 
     render(<VotersAndVotesForm />);
 
-    const pollCards = screen.getByTestId("pollCards");
+    const pollCards = screen.getByTestId("poll_card_count");
+    expect(pollCards).toHaveFocus();
     await user.clear(pollCards);
     await user.type(pollCards, "12345");
     expect(pollCards).toHaveValue("12.345");
 
     await user.keyboard("{enter}");
 
-    const proxyCertificates = screen.getByTestId("proxyCertificates");
+    const proxyCertificates = screen.getByTestId("proxy_certificate_count");
     expect(proxyCertificates).toHaveFocus();
     await user.clear(proxyCertificates);
     await user.paste("6789");
@@ -56,7 +56,7 @@ describe("Test VotersAndVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const voterCards = screen.getByTestId("voterCards");
+    const voterCards = screen.getByTestId("voter_card_count");
     expect(voterCards).toHaveFocus();
     await user.clear(voterCards);
     await user.type(voterCards, "123");
@@ -64,7 +64,7 @@ describe("Test VotersAndVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const totalAdmittedVoters = screen.getByTestId("totalAdmittedVoters");
+    const totalAdmittedVoters = screen.getByTestId("total_admitted_voters_count");
     expect(totalAdmittedVoters).toHaveFocus();
     await user.clear(totalAdmittedVoters);
     await user.paste("4242");
@@ -72,7 +72,7 @@ describe("Test VotersAndVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const votesOnCandidates = screen.getByTestId("votesOnCandidates");
+    const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
     expect(votesOnCandidates).toHaveFocus();
     await user.clear(votesOnCandidates);
     await user.type(votesOnCandidates, "12");
@@ -80,7 +80,7 @@ describe("Test VotersAndVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const blankVotes = screen.getByTestId("blankVotes");
+    const blankVotes = screen.getByTestId("blank_votes_count");
     expect(blankVotes).toHaveFocus();
     await user.clear(blankVotes);
     // Test if maxLength on field works
@@ -89,7 +89,7 @@ describe("Test VotersAndVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const invalidVotes = screen.getByTestId("invalidVotes");
+    const invalidVotes = screen.getByTestId("invalid_votes_count");
     expect(invalidVotes).toHaveFocus();
     await user.clear(invalidVotes);
     await user.type(invalidVotes, "3");
@@ -97,7 +97,7 @@ describe("Test VotersAndVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const totalVotesCast = screen.getByTestId("totalVotesCast");
+    const totalVotesCast = screen.getByTestId("total_votes_cast_count");
     expect(totalVotesCast).toHaveFocus();
     await user.clear(totalVotesCast);
     await user.type(totalVotesCast, "555");
@@ -129,6 +129,22 @@ describe("Test VotersAndVotesForm", () => {
             invalid_votes_count: 6,
             total_votes_cast_count: 15,
           },
+          differences_counts: {
+            more_ballots_count: 0,
+            fewer_ballots_count: 0,
+            unreturned_ballots_count: 0,
+            too_few_ballots_handed_out_count: 0,
+            too_many_ballots_handed_out_count: 0,
+            other_explanation_count: 0,
+            no_explanation_count: 0,
+          },
+          political_group_votes: [
+            {
+              candidate_votes: [{ number: 1, votes: 0 }],
+              number: 1,
+              total: 0,
+            },
+          ],
         },
       };
 
@@ -136,44 +152,44 @@ describe("Test VotersAndVotesForm", () => {
 
       const { getByTestId } = render(<VotersAndVotesForm />);
 
-      const pollCards = getByTestId("pollCards");
+      const pollCards = getByTestId("poll_card_count");
       fireEvent.change(pollCards, {
         target: { value: expectedRequest.data.voters_counts.poll_card_count.toString() },
       });
 
-      const proxyCertificates = getByTestId("proxyCertificates");
+      const proxyCertificates = getByTestId("proxy_certificate_count");
       fireEvent.change(proxyCertificates, {
         target: { value: expectedRequest.data.voters_counts.proxy_certificate_count.toString() },
       });
 
-      const voterCards = getByTestId("voterCards");
+      const voterCards = getByTestId("voter_card_count");
       fireEvent.change(voterCards, {
         target: { value: expectedRequest.data.voters_counts.voter_card_count.toString() },
       });
 
-      const totalAdmittedVoters = getByTestId("totalAdmittedVoters");
+      const totalAdmittedVoters = getByTestId("total_admitted_voters_count");
       fireEvent.change(totalAdmittedVoters, {
         target: {
           value: expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
         },
       });
 
-      const votesOnCandidates = getByTestId("votesOnCandidates");
+      const votesOnCandidates = getByTestId("votes_candidates_counts");
       fireEvent.change(votesOnCandidates, {
         target: { value: expectedRequest.data.votes_counts.votes_candidates_counts.toString() },
       });
 
-      const blankVotes = getByTestId("blankVotes");
+      const blankVotes = getByTestId("blank_votes_count");
       fireEvent.change(blankVotes, {
         target: { value: expectedRequest.data.votes_counts.blank_votes_count.toString() },
       });
 
-      const invalidVotes = getByTestId("invalidVotes");
+      const invalidVotes = getByTestId("invalid_votes_count");
       fireEvent.change(invalidVotes, {
         target: { value: expectedRequest.data.votes_counts.invalid_votes_count.toString() },
       });
 
-      const totalVotesCast = getByTestId("totalVotesCast");
+      const totalVotesCast = getByTestId("total_votes_cast_count");
       fireEvent.change(totalVotesCast, {
         target: { value: expectedRequest.data.votes_counts.total_votes_cast_count.toString() },
       });
@@ -195,14 +211,9 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   test("422 response results in display of error message", async () => {
-    overrideOnce(
-      "post",
-      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
-      422,
-      {
-        message: "422 error from mock",
-      },
-    );
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+      message: "422 error from mock",
+    });
 
     const user = userEvent.setup();
 
@@ -211,19 +222,14 @@ describe("Test VotersAndVotesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^Error 422 error from mock$/);
+    expect(result).toHaveTextContent(/^422 error from mock$/);
   });
 
   test("500 response results in display of error message", async () => {
-    overrideOnce(
-      "post",
-      "/v1/api/polling_stations/:polling_station_id/data_entries/:entry_number",
-      500,
-      {
-        message: "500 error from mock",
-        errorCode: "500_ERROR",
-      },
-    );
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
+      message: "500 error from mock",
+      errorCode: "500_ERROR",
+    });
 
     const user = userEvent.setup();
 
@@ -232,6 +238,34 @@ describe("Test VotersAndVotesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^Error 500_ERROR 500 error from mock$/);
+    expect(result).toHaveTextContent(/^500 error from mock$/);
+  });
+
+  test("Incorrect total is caught by validation", async () => {
+    const { getByTestId } = render(<VotersAndVotesForm />);
+
+    const setValue = (id: string, value: string | number) => {
+      const el = getByTestId(id);
+      fireEvent.change(el, {
+        target: { value: `${value}` },
+      });
+    };
+
+    setValue("poll_card_count", 1);
+    setValue("proxy_certificate_count", 1);
+    setValue("voter_card_count", 1);
+    setValue("total_admitted_voters_count", 4);
+
+    setValue("votes_candidates_counts", 1);
+    setValue("blank_votes_count", 1);
+    setValue("invalid_votes_count", 1);
+    setValue("total_votes_cast_count", 4);
+
+    const user = userEvent.setup();
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    const result = await screen.findByTestId("error-codes");
+    expect(result).toHaveTextContent(/^IncorrectTotal,IncorrectTotal$/);
   });
 });

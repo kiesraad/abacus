@@ -7,7 +7,7 @@ import {
   VotesCounts,
   VotersCounts,
 } from "@kiesraad/api";
-import { electionMockData } from "./ElectionMockData.ts";
+import { electionMockData, electionsMockData } from "./ElectionMockData.ts";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -88,6 +88,25 @@ export const pollingStationDataEntryHandler = http.post<
       }
     });
 
+    // A + B + C = D
+    if (
+      voters_counts.poll_card_count +
+        voters_counts.proxy_certificate_count +
+        voters_counts.voter_card_count !==
+      voters_counts.total_admitted_voters_count
+    ) {
+      response.validation_results.errors.push({
+        fields: [
+          "voters_counts.poll_card_count",
+          "voters_counts.proxy_certificate_count",
+          "voters_counts.voter_card_count",
+          "voters_counts.total_admitted_voters_count",
+        ],
+        code: "IncorrectTotal",
+      });
+    }
+
+    // E + F + G = H
     if (
       votes_counts.votes_candidates_counts +
         votes_counts.blank_votes_count +
@@ -118,6 +137,10 @@ export const pollingStationDataEntryHandler = http.post<
   }
 });
 
+export const ElectionListRequestHandler = http.get("/v1/api/elections", () => {
+  return HttpResponse.json(electionsMockData, { status: 200 });
+});
+
 export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/v1/api/elections/:id",
   () => {
@@ -128,6 +151,7 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
 export const handlers: HttpHandler[] = [
   pingHandler,
   pollingStationDataEntryHandler,
+  ElectionListRequestHandler,
   ElectionRequestHandler,
 ];
 

@@ -76,6 +76,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 polling_station::CandidateVotes,
                 polling_station::DataEntryRequest,
                 polling_station::DataEntryResponse,
+                polling_station::DifferencesCounts,
                 polling_station::PoliticalGroupVotes,
                 polling_station::PollingStationResults,
                 polling_station::PollingStationListResponse,

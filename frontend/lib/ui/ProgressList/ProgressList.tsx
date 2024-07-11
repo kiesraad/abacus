@@ -21,44 +21,38 @@ export function ProgressList({ children }: ProgressListProps) {
 ProgressList.Ruler = () => <li className="ruler">&nbsp;</li>;
 
 // active is not a status since we might want to show both concurrently.
-
-export type BaseProgressListItemProps = {
-  message?: string;
+export type ProgressListItemProps = {
   active?: boolean;
+  status: MenuStatus;
   children?: React.ReactNode;
 };
 
-export type ProgressListItemProps = BaseProgressListItemProps &
-  (
-    | {
-        status: "accept" | "updates" | "empty" | "idle";
-      }
-    | {
-        status: "warning";
-        message: string;
-      }
-  );
+ProgressList.Item = function ({ active, status, children }: ProgressListItemProps) {
+  let title = undefined;
+  let icon = <IconArrowNarrowRight />;
+  if (!active) {
+    [title, icon] = renderStatusIcon(status);
+  }
 
-ProgressList.Item = function ({ status, active, children }: ProgressListItemProps) {
   return (
-    <li className={cn(active ? "active" : "idle", status)}>
-      <aside>{active ? <IconArrowNarrowRight /> : renderStatusIcon(status)}</aside>
+    <li className={cn(active ? "active" : "idle", status)} aria-current={active ? "step" : false}>
+      <aside title={title || undefined}>{icon}</aside>
       <label>{children}</label>
     </li>
   );
 };
 
-function renderStatusIcon(status: MenuStatus) {
+function renderStatusIcon(status: MenuStatus): [string | undefined, React.JSX.Element] {
   switch (status) {
     case "accept":
-      return <IconCheckmark />;
+      return ["Ingevoerd", <IconCheckmark />];
     case "warning":
-      return <IconWarning />;
+      return ["Ingevoerd, met openstaande waarschuwingen", <IconWarning />];
     case "empty":
-      return <IconMinus />;
+      return ["Geen invoer gedaan", <IconMinus />];
     case "updates":
-      return <IconAsterisk />;
+      return ["Updates", <IconAsterisk />];
     default:
-      return null;
+      return [undefined, <></>];
   }
 }

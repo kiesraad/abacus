@@ -1,6 +1,6 @@
-import { render } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
+import { render } from "app/test/unit";
 import { DefaultIconButton, DisabledIconButton } from "./IconButton.stories";
 
 describe("UI component: IconButton", () => {

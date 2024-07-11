@@ -1,3 +1,7 @@
+ul {
+  padding-left: 16px;
+}
+
 ul.link-list {
   padding: 0;
   margin: 0;
@@ -11,4 +15,14 @@ ul.link-list {
       padding-left: 10px;
     }
   }
+}
+
+div.radio-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hidden {
+  display: none;
 }

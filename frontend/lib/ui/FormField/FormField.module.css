@@ -1,0 +1,33 @@
+.form-field {
+  position: relative;
+  aside {
+    position: absolute;
+    left: 24px;
+    z-index: 4;
+    top: 50%;
+    margin-top: -12px;
+    svg {
+      width: 24px;
+      fill: var(--color-error-darker);
+    }
+  }
+
+  &:global(.has-warning) {
+    aside {
+      svg {
+        fill: var(--color-warning-darker);
+      }
+    }
+  }
+
+  &:global(.has-error) {
+    input {
+      padding-left: 56px !important;
+    }
+    aside {
+      svg {
+        fill: var(--color-error-darker);
+      }
+    }
+  }
+}

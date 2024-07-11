@@ -6,9 +6,6 @@ on:
   merge_group:
     types: [checks_requested]
 
-env:
-  API_MODE: msw
-
 jobs:
   node:
     name: Node

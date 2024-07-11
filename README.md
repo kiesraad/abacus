@@ -69,6 +69,7 @@ Daarnaast zijn voor de software, de ontwikkeling en het gebruik onder andere de 
 - [Documentatie](/documentatie/)
 - [Backend codebase](/backend/)
 - [Frontend codebase](/frontend/)
+- [Ontwerp user interface (Figma)](https://www.figma.com/design/xHDfsv69Nhmk3IrWC0303B/Public---Kiesraad---Abacus-optelsoftware?node-id=3190-28385&t=VnghjibSJMqrQepm-1)
 
 Lees voor meer informatie het bestand `README.md` in elke directory.
 

@@ -1,0 +1,51 @@
+.icon {
+  display: inline-block;
+  fill: currentColor;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--button-color-primary);
+  }
+
+  &.warning {
+    svg {
+      fill: var(--color-warning);
+    }
+  }
+
+  &.xs {
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &.sm {
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &.md {
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  &.lg {
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  &.xl {
+    svg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+}

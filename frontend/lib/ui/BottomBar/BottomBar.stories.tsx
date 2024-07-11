@@ -5,7 +5,7 @@ import { Button } from "@kiesraad/ui";
 
 export const DefaultBottomBar: Story = () => {
   return (
-    <BottomBar type="full">
+    <BottomBar type="footer">
       <Button>Click me</Button>
     </BottomBar>
   );

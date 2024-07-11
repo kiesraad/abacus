@@ -4,7 +4,7 @@
   border-spacing: 0;
   th {
     border-bottom: 1px solid var(--bg-gray-darkest);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     text-align: right;
     padding: 0.75rem 1.5rem;
     color: var(--color-help-text);
@@ -14,8 +14,13 @@
   }
 
   &:global(.zebra) {
-    tr:nth-of-type(odd) {
+    tbody tr:nth-of-type(even) {
       background-color: var(--bg-gray-darker);
+    }
+    tbody tr:global(.sep_row),
+    tbody tr:global(.sep_total),
+    tbody tr:global(.list_total) {
+      background-color: var(--bg-gray);
     }
   }
 
@@ -66,6 +71,29 @@
     &:global(.focused) {
       td {
         background-color: var(--bg-highlight);
+        color: var(--base-black);
+      }
+      td:first-of-type {
+        font-weight: bold;
+      }
+    }
+
+    &:global(.list_total) {
+      td:first-of-type {
+        border-bottom: 0;
+      }
+      td:last-of-type {
+        border: 0;
+      }
+    }
+
+    &:global(.sep_total) {
+      td:first-of-type,
+      td:last-of-type {
+        border: 0;
+      }
+      td:nth-of-type(2) {
+        border-right: 0;
       }
     }
 

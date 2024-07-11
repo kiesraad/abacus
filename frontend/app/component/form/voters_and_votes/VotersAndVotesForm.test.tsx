@@ -251,8 +251,8 @@ describe("Test VotersAndVotesForm", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-    const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^422 error from mock$/);
+    const result = await screen.findByTestId("feedback-server-error");
+    expect(result).toHaveTextContent(/^Error422 error from mock$/);
   });
 
   test("500 response results in display of error message", async () => {
@@ -267,8 +267,8 @@ describe("Test VotersAndVotesForm", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-    const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^500 error from mock$/);
+    const result = await screen.findByTestId("feedback-server-error");
+    expect(result).toHaveTextContent(/^Error500 error from mock$/);
   });
 
   test("Incorrect total is caught by validation", async () => {
@@ -323,7 +323,7 @@ describe("Test VotersAndVotesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
-    const result = await screen.findByTestId("error-codes");
-    expect(result).toHaveTextContent(/^IncorrectTotal,IncorrectTotal$/);
+    const result = await screen.findByTestId("feedback-error");
+    expect(result).toHaveTextContent(/^IncorrectTotalIncorrectTotal$/);
   });
 });

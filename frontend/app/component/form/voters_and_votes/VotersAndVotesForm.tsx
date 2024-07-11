@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useBlocker, useNavigate } from "react-router-dom";
 
 import {
   ValidationResult,
@@ -13,6 +12,7 @@ import {
   usePreventFormEnterSubmit,
   fieldNameFromPath,
 } from "@kiesraad/util";
+import { useBlocker } from "react-router-dom";
 
 interface FormElements extends HTMLFormControlsCollection {
   poll_card_count: HTMLInputElement;
@@ -39,7 +39,7 @@ export function VotersAndVotesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-  const navigate = useNavigate();
+
   const {
     sectionValues,
     setSectionValues,
@@ -140,26 +140,17 @@ export function VotersAndVotesForm() {
     }
   }, [isCalled]);
 
-  React.useEffect(() => {
-    if (isCalled) {
-      if (errors.length === 0 && warnings.length === 0) {
-        navigate("../differences");
-      }
-    }
-  }, [errors, warnings, isCalled, navigate]);
-
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-
+  const success = isCalled && !hasValidationError && !hasValidationWarning && !loading;
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
-      <div id="error-codes" className="hidden">
-        {errors.map((r) => r.code).join(",")}
-      </div>
+      {/* Temporary while not navigating through form sections */}
+      {success && <div id="result">Success</div>}
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
       {serverError && (
         <Feedback type="error" title="Error">
-          <div>
+          <div id="feedback-server-error">
             <h2>Error</h2>
             <p id="result">{serverError.message}</p>
           </div>
@@ -167,7 +158,7 @@ export function VotersAndVotesForm() {
       )}
       {hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
-          <div>
+          <div id="feedback-error">
             <ul>
               {errors.map((error, n) => (
                 <li key={`${error.code}-${n}`}>{error.code}</li>
@@ -179,7 +170,7 @@ export function VotersAndVotesForm() {
 
       {hasValidationWarning && !hasValidationError && (
         <Feedback type="warning" title="Controleer uitgebrachte stemmen">
-          <div>
+          <div id="feedback-warning">
             <ul>
               {warnings.map((warning, n) => (
                 <li key={`${warning.code}-${n}`}>{warning.code}</li>

@@ -215,7 +215,7 @@ export function VotersAndVotesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.voters_counts.poll_card_count}
+            defaultValue={sectionValues.voters_counts.voter_card_count}
           />
           <InputGridRow
             key="D"

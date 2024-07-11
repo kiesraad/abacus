@@ -1,7 +1,10 @@
 import * as React from "react";
 
-import { PollingStationResults, ValidationResult } from "../../gen/openapi";
-import { usePollingStationFormController } from "./usePollingStationFormController";
+import {
+  PollingStationResults,
+  usePollingStationFormController,
+  ValidationResult,
+} from "@kiesraad/api";
 
 export type VotersAndVotesValues = Pick<PollingStationResults, "voters_counts" | "votes_counts">;
 

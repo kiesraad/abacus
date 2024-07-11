@@ -1,14 +1,13 @@
 import { overrideOnce, render, screen } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
-import { CandidatesVotesForm } from "./CandidatesVotesForm";
-import { politicalGroupMockData } from "../../../../lib/api-mocks/ElectionMockData.ts";
 import { PollingStationFormController } from "@kiesraad/api";
-import { electionMock } from "@kiesraad/api-mocks";
+import { electionMock, politicalGroupMock } from "@kiesraad/api-mocks";
+import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const Component = (
   <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
-    <CandidatesVotesForm group={politicalGroupMockData} />
+    <CandidatesVotesForm group={politicalGroupMock} />
   </PollingStationFormController>
 );
 

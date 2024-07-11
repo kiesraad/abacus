@@ -7,10 +7,12 @@ import {
   VotesCounts,
   VotersCounts,
   Election,
+  PoliticalGroup,
 } from "@kiesraad/api";
-import { electionMockData, electionsMockData } from "./ElectionMockData.ts";
+import { electionMockData, electionsMockData, politicalGroupMockData } from "./ElectionMockData.ts";
 
 export const electionMock = electionMockData as Required<Election>;
+export const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
 type ParamsToString<T> = {
   [P in keyof T]: string;

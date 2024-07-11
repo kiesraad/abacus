@@ -1,7 +1,11 @@
 import * as React from "react";
-import { DataEntryResponse, Election, PollingStationResults } from "../../gen/openapi";
-import { usePollingStationDataEntry } from "../../usePollingStationDataEntry";
-import { ApiResponseErrorData } from "../../ApiClient";
+import {
+  ApiResponseErrorData,
+  DataEntryResponse,
+  Election,
+  PollingStationResults,
+  usePollingStationDataEntry,
+} from "@kiesraad/api";
 
 export interface PollingStationFormControllerProps {
   election: Required<Election>;

@@ -1,7 +1,10 @@
 import * as React from "react";
 
-import { DifferencesCounts, ValidationResult } from "../../gen/openapi";
-import { usePollingStationFormController } from "./usePollingStationFormController";
+import {
+  DifferencesCounts,
+  usePollingStationFormController,
+  ValidationResult,
+} from "@kiesraad/api";
 
 export function useDifferences() {
   const { values, setValues, loading, error, data, setTemporaryCache, cache } =

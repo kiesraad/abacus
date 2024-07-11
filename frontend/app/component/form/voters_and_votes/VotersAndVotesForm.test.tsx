@@ -28,6 +28,15 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
         votes: 0,
       })),
     })),
+    differences_counts: {
+      more_ballots_count: 0,
+      fewer_ballots_count: 0,
+      unreturned_ballots_count: 0,
+      too_few_ballots_handed_out_count: 0,
+      too_many_ballots_handed_out_count: 0,
+      other_explanation_count: 0,
+      no_explanation_count: 0,
+    },
     voters_counts: {
       poll_card_count: 0,
       proxy_certificate_count: 0,

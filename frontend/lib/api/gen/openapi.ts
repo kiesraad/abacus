@@ -70,6 +70,19 @@ export interface DataEntryResponse {
 }
 
 /**
+ * Differences counts, part of the polling station results.
+ */
+export interface DifferencesCounts {
+  fewer_ballots_count: number;
+  more_ballots_count: number;
+  no_explanation_count: number;
+  other_explanation_count: number;
+  too_few_ballots_handed_out_count: number;
+  too_many_ballots_handed_out_count: number;
+  unreturned_ballots_count: number;
+}
+
+/**
  * Election, optionally with its political groups
  */
 export interface Election {
@@ -153,6 +166,7 @@ export interface PollingStationListResponse {
 <https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1>
  */
 export interface PollingStationResults {
+  differences_counts: DifferencesCounts;
   political_group_votes: PoliticalGroupVotes[];
   voters_counts: VotersCounts;
   votes_counts: VotesCounts;

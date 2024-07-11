@@ -59,6 +59,8 @@ pub struct PollingStationResults {
     pub voters_counts: VotersCounts,
     /// Votes counts ("4. Aantal uitgebrachte stemmen")
     pub votes_counts: VotesCounts,
+    /// Differences counts ("5. Verschil tussen het aantal toegelaten kiezers en het aantal uitgebrachte stemmen")
+    pub differences_counts: DifferencesCounts,
     /// Vote counts for each candidate in each political group ("Aantal stemmen per lijst en kandidaat")
     pub political_group_votes: Vec<PoliticalGroupVotes>,
 }
@@ -151,7 +153,7 @@ pub struct VotersCounts {
 }
 
 /// Check if all voters counts and votes counts are equal to zero.
-/// Used in validations where this is a edge case that needs to be handled.
+/// Used in validations where this is an edge case that needs to be handled.
 fn all_zero(voters: &VotersCounts, votes: &VotesCounts) -> bool {
     voters.poll_card_count == 0
         && voters.proxy_certificate_count == 0
@@ -313,6 +315,34 @@ impl Validate for VotesCounts {
     }
 }
 
+/// Differences counts, part of the polling station results.
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct DifferencesCounts {
+    /// Number of more counted ballots ("Er zijn méér stembiljetten geteld. Noteer hoeveel stembiljetten er meer zijn geteld")
+    #[schema(value_type = u32)]
+    pub more_ballots_count: Count,
+    /// Number of fewer counted ballots ("Er zijn minder stembiljetten geteld. Noteer hoeveel stembiljetten er minder zijn geteld")
+    #[schema(value_type = u32)]
+    pub fewer_ballots_count: Count,
+    /// Number of unreturned ballots ("Aantal keren dat een kiezer het stembiljet niet heeft ingeleverd")
+    #[schema(value_type = u32)]
+    pub unreturned_ballots_count: Count,
+    /// Number of fewer ballots handed out ("Aantal keren dat er een stembiljet te weinig is uitgereikt")
+    #[schema(value_type = u32)]
+    pub too_few_ballots_handed_out_count: Count,
+    /// Number of more ballots handed out ("Aantal keren dat er een stembiljet teveel is uitgereikt")
+    #[schema(value_type = u32)]
+    pub too_many_ballots_handed_out_count: Count,
+    /// Number of other explanations ("Aantal keren dat er een andere verklaring is voor het verschil")
+    #[schema(value_type = u32)]
+    pub other_explanation_count: Count,
+    /// Number of no explanations ("Aantal keren dat er geen verklaring is voor het verschil")
+    #[schema(value_type = u32)]
+    pub no_explanation_count: Count,
+}
+
+// TODO: impl Validate for DifferencesCounts
+
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PoliticalGroupVotes {
     pub number: u8,
@@ -456,6 +486,15 @@ mod tests {
                 invalid_votes_count: 7,
                 total_votes_cast_count: 20, // incorrect total
             },
+            differences_counts: DifferencesCounts {
+                more_ballots_count: 0,
+                fewer_ballots_count: 0,
+                unreturned_ballots_count: 0,
+                too_few_ballots_handed_out_count: 0,
+                too_many_ballots_handed_out_count: 0,
+                other_explanation_count: 0,
+                no_explanation_count: 0,
+            },
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,
                 total: 5,
@@ -491,6 +530,15 @@ mod tests {
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 1002,
+            },
+            differences_counts: DifferencesCounts {
+                more_ballots_count: 0,
+                fewer_ballots_count: 0,
+                unreturned_ballots_count: 0,
+                too_few_ballots_handed_out_count: 0,
+                too_many_ballots_handed_out_count: 0,
+                other_explanation_count: 0,
+                no_explanation_count: 0,
             },
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,

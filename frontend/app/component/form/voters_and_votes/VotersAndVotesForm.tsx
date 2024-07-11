@@ -228,6 +228,7 @@ export function VotersAndVotesForm() {
             defaultValue={sectionValues.voters_counts.poll_card_count}
           />
           <InputGridRow
+            key="D"
             field="D"
             name="total_admitted_voters_count"
             title="Totaal toegelaten kiezers"
@@ -240,6 +241,7 @@ export function VotersAndVotesForm() {
           />
 
           <InputGridRow
+            key="E"
             field="E"
             name="votes_candidates_counts"
             title="Stemmen op kandidaten"
@@ -249,6 +251,7 @@ export function VotersAndVotesForm() {
             defaultValue={sectionValues.votes_counts.votes_candidates_counts}
           />
           <InputGridRow
+            key="F"
             field="F"
             name="blank_votes_count"
             title="Blanco stemmen"
@@ -258,6 +261,7 @@ export function VotersAndVotesForm() {
             defaultValue={sectionValues.votes_counts.blank_votes_count}
           />
           <InputGridRow
+            key="G"
             field="G"
             name="invalid_votes_count"
             title="Ongeldige stemmen"
@@ -267,6 +271,7 @@ export function VotersAndVotesForm() {
             defaultValue={sectionValues.votes_counts.invalid_votes_count}
           />
           <InputGridRow
+            key="H"
             field="H"
             name="total_votes_cast_count"
             title="Totaal uitgebrachte stemmen"

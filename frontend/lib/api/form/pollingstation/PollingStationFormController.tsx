@@ -36,7 +36,16 @@ export interface TemporaryCachePoliticalGroupVotes
   extends TemporaryCache<PollingStationResults["political_group_votes"][0]> {
   key: "political_group_votes";
 }
-export type AnyCache = TemporaryCacheVotersAndVotes | TemporaryCachePoliticalGroupVotes;
+
+export interface TemporaryCacheDifferences
+  extends TemporaryCache<PollingStationResults["differences_counts"]> {
+  key: "differences";
+}
+
+export type AnyCache =
+  | TemporaryCacheVotersAndVotes
+  | TemporaryCachePoliticalGroupVotes
+  | TemporaryCacheDifferences;
 
 export const PollingStationControllerContext = React.createContext<
   iPollingStationControllerContext | undefined
@@ -64,6 +73,15 @@ export function PollingStationFormController({
         votes: 0,
       })),
     })),
+    differences_counts: {
+      more_ballots_count: 0,
+      fewer_ballots_count: 0,
+      unreturned_ballots_count: 0,
+      too_few_ballots_handed_out_count: 0,
+      too_many_ballots_handed_out_count: 0,
+      other_explanation_count: 0,
+      no_explanation_count: 0,
+    },
     voters_counts: {
       proxy_certificate_count: 0,
       total_admitted_voters_count: 0,

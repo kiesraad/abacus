@@ -49,7 +49,7 @@ export function PollingStationChoiceForm() {
           <p>
             Weet je het nummer niet?
             <br />
-            <span id="openPollingStationList" className="underlined">
+            <span id="openPollingStationList" className="underlined pointer">
               Bekijk de lijst met alle stembureaus
             </span>
           </p>

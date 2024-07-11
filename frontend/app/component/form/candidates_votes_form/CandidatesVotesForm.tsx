@@ -1,10 +1,14 @@
 import * as React from "react";
-//import { useNavigate } from "react-router-dom";
+import { useBlocker } from "react-router-dom";
 
-import { PoliticalGroup, usePoliticalGroup } from "@kiesraad/api";
+import {
+  CandidateVotes,
+  PoliticalGroup,
+  PoliticalGroupVotes,
+  usePoliticalGroup,
+} from "@kiesraad/api";
 import { BottomBar, Button, Feedback, InputGrid } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
-import { useBlocker } from "react-router-dom";
 
 interface FormElements extends HTMLFormControlsCollection {
   listtotal: HTMLInputElement;
@@ -20,7 +24,6 @@ export interface CandidatesVotesFormProps {
 }
 
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
-  //const navigate = useNavigate();
   const { register, format, deformat } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
   const {
@@ -28,6 +31,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     errors,
     warnings,
     setSectionValues,
+    loading,
     serverError,
     isCalled,
     setTemporaryCache,
@@ -36,8 +40,8 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   usePreventFormEnterSubmit(formRef);
 
   const getValues = React.useCallback(
-    (elements: CandidatesVotesFormElement["elements"]) => {
-      const candidate_votes = [];
+    (elements: CandidatesVotesFormElement["elements"]): PoliticalGroupVotes => {
+      const candidate_votes: CandidateVotes[] = [];
       for (const el of elements["candidatevotes[]"]) {
         candidate_votes.push({
           number: candidateNumberFromElement(el),
@@ -70,20 +74,20 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
     event.preventDefault();
     const elements = event.currentTarget.elements;
-
     setSectionValues(getValues(elements));
-    //navigate(`../list/${group.number + 1}`);
   }
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-
+  const success = isCalled && !hasValidationError && !hasValidationWarning && !loading;
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
+      {/* Temporary while not navigating through form sections */}
+      {success && <div id="result">Success</div>}
       <h2>{group.name}</h2>
       {serverError && (
         <Feedback type="error" title="Error">
-          <div>
+          <div id="feedback-server-error">
             <h2>Error</h2>
             <p id="result">{serverError.message}</p>
           </div>
@@ -91,7 +95,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       )}
       {hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
-          <div>
+          <div id="feedback-error">
             <ul>
               {errors.map((error, n) => (
                 <li key={`${error.code}-${n}`}>{error.code}</li>
@@ -103,7 +107,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
       {hasValidationWarning && (
         <Feedback type="warning" title="Controleer uitgebrachte stemmen">
-          <div>
+          <div id="feedback-warning">
             <ul>
               {warnings.map((warning, n) => (
                 <li key={`${warning.code}-${n}`}>{warning.code}</li>
@@ -112,7 +116,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </div>
         </Feedback>
       )}
-
       <InputGrid key={`list${group.number}`} zebra>
         <InputGrid.Header>
           <th>Nummer</th>
@@ -163,7 +166,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="inputgrid">
-        <Button type="submit" size="lg">
+        <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>
         <span className="button_hint">SHIFT + Enter</span>

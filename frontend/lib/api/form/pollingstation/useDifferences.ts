@@ -24,9 +24,7 @@ export function useDifferences() {
       setTemporaryCache(null);
       return data;
     }
-    return {
-      differences_counts: values.differences_counts,
-    };
+    return values.differences_counts;
   }, [values, setTemporaryCache, cache]);
 
   const errors = React.useMemo(() => {

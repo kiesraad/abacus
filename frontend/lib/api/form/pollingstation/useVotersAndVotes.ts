@@ -1,7 +1,10 @@
 import * as React from "react";
 
-import { PollingStationResults, ValidationResult } from "../../gen/openapi";
-import { usePollingStationFormController } from "./usePollingStationFormController";
+import {
+  PollingStationResults,
+  usePollingStationFormController,
+  ValidationResult,
+} from "@kiesraad/api";
 import { matchValidationResultWithFormSections } from "@kiesraad/util";
 
 export type VotersAndVotesValues = Pick<PollingStationResults, "voters_counts" | "votes_counts">;
@@ -53,10 +56,7 @@ export function useVotersAndVotes() {
   };
 
   const isCalled = React.useMemo(() => {
-    if (sectionValues.votes_counts.total_votes_cast_count > 0) {
-      return true;
-    }
-    return false;
+    return sectionValues.votes_counts.total_votes_cast_count > 0;
   }, [sectionValues]);
 
   return {

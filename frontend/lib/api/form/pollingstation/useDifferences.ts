@@ -5,10 +5,18 @@ import {
   usePollingStationFormController,
   ValidationResult,
 } from "@kiesraad/api";
+import { matchValidationResultWithFormSections } from "@kiesraad/util";
 
 export function useDifferences() {
-  const { values, setValues, loading, error, data, setTemporaryCache, cache } =
-    usePollingStationFormController();
+  const {
+    values,
+    setValues,
+    data,
+    loading,
+    error: serverError,
+    setTemporaryCache,
+    cache,
+  } = usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
     if (cache && cache.key === "differences") {
@@ -24,7 +32,7 @@ export function useDifferences() {
   const errors = React.useMemo(() => {
     if (data) {
       return data.validation_results.errors.filter((err) =>
-        isInSection(["differences_counts"], err.fields),
+        matchValidationResultWithFormSections(err.fields, ["differences_votes"]),
       );
     }
     return [] as ValidationResult[];
@@ -33,7 +41,7 @@ export function useDifferences() {
   const warnings = React.useMemo(() => {
     if (data) {
       return data.validation_results.warnings.filter((warning) =>
-        isInSection(["differences_counts"], warning.fields),
+        matchValidationResultWithFormSections(warning.fields, ["differences_votes"]),
       );
     }
     return [] as ValidationResult[];
@@ -62,21 +70,8 @@ export function useDifferences() {
     setSectionValues,
     errors,
     warnings,
-    serverError: error,
     isCalled,
+    serverError,
     setTemporaryCache,
   };
-}
-
-function isInSection(keys: string[], fields: string[]) {
-  for (let i = 0; i < fields.length; i++) {
-    const field = fields[i];
-    for (let j = 0; j < keys.length; j++) {
-      const key = keys[j];
-      if (field && key && field.startsWith(key)) {
-        return true;
-      }
-    }
-  }
-  return false;
 }

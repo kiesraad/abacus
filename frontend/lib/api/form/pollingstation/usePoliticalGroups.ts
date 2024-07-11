@@ -1,7 +1,10 @@
 import * as React from "react";
 
-import { usePollingStationFormController } from "./usePollingStationFormController";
-import { PoliticalGroupVotes, ValidationResult } from "../../gen/openapi";
+import {
+  PoliticalGroupVotes,
+  usePollingStationFormController,
+  ValidationResult,
+} from "@kiesraad/api";
 import { matchValidationResultWithFormSections } from "@kiesraad/util";
 
 export function usePoliticalGroup(political_group_number: number) {

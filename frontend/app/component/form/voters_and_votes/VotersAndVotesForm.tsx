@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useBlocker, useNavigate } from "react-router-dom";
 
 import {
   ValidationResult,
@@ -12,7 +13,6 @@ import {
   usePreventFormEnterSubmit,
   fieldNameFromPath,
 } from "@kiesraad/util";
-import { useBlocker, useNavigate } from "react-router-dom";
 
 interface FormElements extends HTMLFormControlsCollection {
   poll_card_count: HTMLInputElement;

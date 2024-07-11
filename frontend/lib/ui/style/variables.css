@@ -29,10 +29,11 @@
 
   --font-size-body: 1.125rem;
   /* TODO: pick a better font size scale */
-  --font-size-sm: 0.8em;
-  --font-size-md: 1em;
-  --font-size-lg: 1.8em;
-  --font-size-xl: 3.75em;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.8rem;
+  --font-size-xl: 3.75rem;
 
   /* SPACING and CORNERS */
   --rounded-default: 8px;
@@ -75,6 +76,7 @@
   --bg-gray-darkest: #d0d5dd;
   --bg-highlight: #eff4ff;
 
+  --base-black: #000000;
   --base-brand-blue: #113051;
   --base-dark-blue: #00305b;
   --base-light-grey: #f0f0f0;

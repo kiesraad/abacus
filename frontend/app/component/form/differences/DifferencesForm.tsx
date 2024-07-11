@@ -9,21 +9,20 @@ import {
 } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
-  poll_card_count: HTMLInputElement;
-  proxy_certificate_count: HTMLInputElement;
-  voter_card_count: HTMLInputElement;
-  total_admitted_voters_count: HTMLInputElement;
-  votes_candidates_counts: HTMLInputElement;
-  blank_votes_count: HTMLInputElement;
-  invalid_votes_count: HTMLInputElement;
-  total_votes_cast_count: HTMLInputElement;
+  more_ballots_count: HTMLInputElement;
+  fewer_ballots_count: HTMLInputElement;
+  unreturned_ballots_count: HTMLInputElement;
+  too_few_ballots_handed_out_count: HTMLInputElement;
+  too_many_ballots_handed_out_count: HTMLInputElement;
+  other_explanation_count: HTMLInputElement;
+  no_explanation_count: HTMLInputElement;
 }
 
-interface VotersAndVotesFormElement extends HTMLFormElement {
+interface DifferencesFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
-export function VotersAndVotesForm() {
+export function DifferencesForm() {
   const {
     register,
     format,
@@ -42,32 +41,36 @@ export function VotersAndVotesForm() {
     onDismiss: resetWarnings,
   });
 
-  function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
+  function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
     event.preventDefault();
     const elements = event.currentTarget.elements;
 
     doSubmit({
       data: {
         voters_counts: {
-          poll_card_count: deformat(elements.poll_card_count.value),
-          proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
-          voter_card_count: deformat(elements.voter_card_count.value),
-          total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
+          poll_card_count: 0,
+          proxy_certificate_count: 0,
+          voter_card_count: 0,
+          total_admitted_voters_count: 0,
         },
         votes_counts: {
-          votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
-          blank_votes_count: deformat(elements.blank_votes_count.value),
-          invalid_votes_count: deformat(elements.invalid_votes_count.value),
-          total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
+          votes_candidates_counts: 0,
+          blank_votes_count: 0,
+          invalid_votes_count: 0,
+          total_votes_cast_count: 0,
         },
         differences_counts: {
-          more_ballots_count: 0,
-          fewer_ballots_count: 0,
-          unreturned_ballots_count: 0,
-          too_few_ballots_handed_out_count: 0,
-          too_many_ballots_handed_out_count: 0,
-          other_explanation_count: 0,
-          no_explanation_count: 0,
+          more_ballots_count: deformat(elements.more_ballots_count.value),
+          fewer_ballots_count: deformat(elements.fewer_ballots_count.value),
+          unreturned_ballots_count: deformat(elements.unreturned_ballots_count.value),
+          too_few_ballots_handed_out_count: deformat(
+            elements.too_few_ballots_handed_out_count.value,
+          ),
+          too_many_ballots_handed_out_count: deformat(
+            elements.too_many_ballots_handed_out_count.value,
+          ),
+          other_explanation_count: deformat(elements.other_explanation_count.value),
+          no_explanation_count: deformat(elements.no_explanation_count.value),
         },
         political_group_votes: [
           {
@@ -135,7 +138,7 @@ export function VotersAndVotesForm() {
       <div id="error-codes" className="hidden">
         {data && data.validation_results.errors.map((r) => r.code).join(",")}
       </div>
-      <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
+      <h2>Verschil tussen aantal kiezers en getelde stemmen</h2>
       {error && (
         <Feedback type="error" title="Error">
           <div>
@@ -145,7 +148,7 @@ export function VotersAndVotesForm() {
         </Feedback>
       )}
       {hasValidationError && (
-        <Feedback type="error" title="Controleer uitgebrachte stemmen">
+        <Feedback type="error" title="Controleer ingevulde verschillen">
           <div>
             <ul>
               {data.validation_results.errors.map((error, n) => (
@@ -157,7 +160,7 @@ export function VotersAndVotesForm() {
       )}
 
       {hasValidationWarning && (
-        <Feedback type="warning" title="Controleer uitgebrachte stemmen">
+        <Feedback type="warning" title="Controleer ingevulde verschillen">
           <div>
             <ul>
               {data.validation_results.warnings.map((warning, n) => (
@@ -175,7 +178,7 @@ export function VotersAndVotesForm() {
           </div>
         </Feedback>
       )}
-      <InputGrid key="numbers">
+      <InputGrid key="differences">
         <InputGrid.Header>
           <th>Veld</th>
           <th>Geteld aantal</th>
@@ -183,81 +186,73 @@ export function VotersAndVotesForm() {
         </InputGrid.Header>
         <InputGrid.Body>
           <InputGridRow
-            key="A"
-            field="A"
-            name="poll_card_count"
-            title="Stempassen"
+            key="I"
+            field="I"
+            name="more_ballots_count"
+            title="Stembiljetten méér geteld"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
             isFocused
           />
           <InputGridRow
-            key="B"
-            field="B"
-            name="proxy_certificate_count"
-            title="Volmachtbewijzen"
+            key="J"
+            field="J"
+            name="fewer_ballots_count"
+            title="Stembiljetten minder geteld"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
-          />
-          <InputGridRow
-            key="C"
-            field="C"
-            name="voter_card_count"
-            title="Kiezerspassen"
-            errorsAndWarnings={errorsAndWarnings}
-            inputProps={register()}
-            format={format}
-          />
-          <InputGridRow
-            key="D"
-            field="D"
-            name="total_admitted_voters_count"
-            title="Totaal toegelaten kiezers"
-            errorsAndWarnings={errorsAndWarnings}
-            inputProps={register()}
-            format={format}
-            isTotal
             addSeparator
           />
 
           <InputGridRow
-            key="E"
-            field="E"
-            name="votes_candidates_counts"
-            title="Stemmen op kandidaten"
+            key="K"
+            field="K"
+            name="unreturned_ballots_count"
+            title="Niet ingeleverde stembiljetten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
           />
           <InputGridRow
-            key="F"
-            field="F"
-            name="blank_votes_count"
-            title="Blanco stemmen"
+            key="L"
+            field="L"
+            name="too_few_ballots_handed_out_count"
+            title="Te weinig uitgerekte stembiljetten"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+          />
+
+          <InputGridRow
+            key="M"
+            field="M"
+            name="too_many_ballots_handed_out_count"
+            title="Teveel uitgereikte stembiljetten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
           />
           <InputGridRow
-            key="G"
-            field="G"
-            name="invalid_votes_count"
-            title="Ongeldige stemmen"
+            key="N"
+            field="N"
+            name="other_explanation_count"
+            title="Andere verklaring voor het verschil"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            addSeparator
           />
+
           <InputGridRow
-            key="H"
-            field="H"
-            name="total_votes_cast_count"
-            title="Totaal uitgebrachte stemmen"
+            key="O"
+            field="O"
+            name="no_explanation_count"
+            title="Geen verklaring voor het verschil"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
-            isTotal
           />
         </InputGrid.Body>
       </InputGrid>

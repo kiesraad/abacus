@@ -2,9 +2,11 @@ import { createRoutesFromElements, Route } from "react-router-dom";
 import { HomePage } from "./module/HomePage";
 import {
   CandidatesVotesPage,
+  DifferencesPage,
   InputLayout,
   InputHomePage,
   PollingStationLayout,
+  RecountedPage,
   VotersAndVotesPage,
 } from "./module/input";
 import { OverviewLayout, OverviewPage } from "./module/overview";
@@ -23,12 +25,12 @@ export const routes = createRoutesFromElements(
     <Route path="overview" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />
     </Route>
-    <Route path="input" element={<InputLayout />}>
+    <Route path=":electionId/input" element={<InputLayout />}>
       <Route index element={<InputHomePage />} />
-      <Route path=":id/" element={<PollingStationLayout />}>
-        <Route index path="recount" element={<div>Placeholder Recount Page</div>} />
+      <Route path=":pollingStationId/" element={<PollingStationLayout />}>
+        <Route index path="recounted" element={<RecountedPage />} />
         <Route path="numbers" element={<VotersAndVotesPage />} />
-        <Route path="differences" element={<div>Placeholder Differences Page</div>} />
+        <Route path="differences" element={<DifferencesPage />} />
         <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
         <Route path="save" element={<div>Placeholder Check and Save Page</div>} />
       </Route>

@@ -3,7 +3,7 @@
 use reqwest::StatusCode;
 use sqlx::SqlitePool;
 
-use backend::election::ElectionDetailsResponse;
+use backend::election::{ElectionDetailsResponse, ElectionListResponse};
 
 use crate::utils::serve_api;
 
@@ -18,7 +18,7 @@ async fn test_election_list_works(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     let status = response.status();
-    let body: backend::election::ElectionListResponse = response.json().await.unwrap();
+    let body: ElectionListResponse = response.json().await.unwrap();
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert_eq!(body.elections.len(), 2);

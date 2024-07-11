@@ -17,6 +17,12 @@ ul.link-list {
   }
 }
 
+div.radio-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .hidden {
   display: none;
 }

@@ -3,7 +3,7 @@ import { cn } from "@kiesraad/util";
 import cls from "./BottomBar.module.css";
 
 export interface BottomBarProps {
-  type: "full" | "form";
+  type: "footer" | "form" | "inputgrid";
   children: React.ReactNode;
 }
 

@@ -5,7 +5,8 @@ use serde_json::json;
 use sqlx::SqlitePool;
 
 use backend::polling_station::{
-    CandidateVotes, DataEntryResponse, PoliticalGroupVotes, PollingStationListResponse,
+    CandidateVotes, DataEntryRequest, DataEntryResponse, DifferencesCounts, PoliticalGroupVotes,
+    PollingStationListResponse, PollingStationResults, VotersCounts, VotesCounts,
 };
 use backend::validation::ValidationResultCode::IncorrectTotal;
 use backend::ErrorResponse;
@@ -37,19 +38,28 @@ async fn test_polling_station_listing_works(pool: SqlitePool) {
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let request_body = backend::polling_station::DataEntryRequest {
-        data: backend::polling_station::PollingStationResults {
-            voters_counts: backend::polling_station::VotersCounts {
+    let request_body = DataEntryRequest {
+        data: PollingStationResults {
+            voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,
                 voter_card_count: 2,
                 total_admitted_voters_count: 104,
             },
-            votes_counts: backend::polling_station::VotesCounts {
+            votes_counts: VotesCounts {
                 votes_candidates_counts: 102,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 104,
+            },
+            differences_counts: DifferencesCounts {
+                more_ballots_count: 0,
+                fewer_ballots_count: 0,
+                unreturned_ballots_count: 0,
+                too_few_ballots_handed_out_count: 0,
+                too_many_ballots_handed_out_count: 0,
+                other_explanation_count: 0,
+                no_explanation_count: 0,
             },
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,
@@ -136,6 +146,15 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
           "blank_votes_count": 6,
           "invalid_votes_count": 7,
           "total_votes_cast_count": 8
+        },
+        "differences_counts": {
+          "more_ballots_count": 4,
+          "fewer_ballots_count": 0,
+          "unreturned_ballots_count": 0,
+          "too_few_ballots_handed_out_count": 0,
+          "too_many_ballots_handed_out_count": 2,
+          "other_explanation_count": 1,
+          "no_explanation_count": 1,
         },
         "political_group_votes": [
           {

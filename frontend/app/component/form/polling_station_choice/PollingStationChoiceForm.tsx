@@ -1,4 +1,4 @@
-import { Badge, Button, InputField } from "@kiesraad/ui";
+import { Badge, BottomBar, Button, InputField } from "@kiesraad/ui";
 import { useNavigate } from "react-router-dom";
 import { IconChevronRight } from "@kiesraad/icon";
 
@@ -13,11 +13,11 @@ interface PollingStationChoiceFormElement extends HTMLFormElement {
 export function PollingStationChoiceForm() {
   const navigate = useNavigate();
   const handleRowClick = () => {
-    navigate(`./030/numbers`);
+    navigate(`./030/recounted`);
   };
   function handleSubmit(event: React.FormEvent<PollingStationChoiceFormElement>) {
     event.preventDefault();
-    navigate("./030/numbers");
+    navigate("./030/recounted");
   }
 
   return (
@@ -38,18 +38,18 @@ export function PollingStationChoiceForm() {
         <br />
         Dan kan je beginnen.
       </p>
-      <div>
+      <BottomBar type="form">
         <Button type="submit" size="lg">
           Beginnen
         </Button>
         <span className="button_hint">SHIFT + Enter</span>
-      </div>
+      </BottomBar>
       <details>
         <summary>
           <p>
             Weet je het nummer niet?
             <br />
-            <span id="openPollingStationList" className="underlined">
+            <span id="openPollingStationList" className="underlined pointer">
               Bekijk de lijst met alle stembureaus
             </span>
           </p>

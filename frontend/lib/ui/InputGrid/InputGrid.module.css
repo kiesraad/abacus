@@ -4,7 +4,7 @@
   border-spacing: 0;
   th {
     border-bottom: 1px solid var(--bg-gray-darkest);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     text-align: right;
     padding: 0.75rem 1.5rem;
     color: var(--color-help-text);
@@ -71,6 +71,10 @@
     &:global(.focused) {
       td {
         background-color: var(--bg-highlight);
+        color: var(--base-black);
+      }
+      td:first-of-type {
+        font-weight: bold;
       }
     }
 

@@ -8,13 +8,13 @@
 
 ### Building
 
-Install JavaScript dependencies
+Install JavaScript dependencies:
 
 ```sh
 npm install
 ```
 
-Install Playwright dependencies
+Install Playwright dependencies:
 
 ```sh
 npx playwright install --with-deps
@@ -22,10 +22,16 @@ npx playwright install --with-deps
 
 ### Running
 
-This runs the client with a (client-side) mock API
+This runs the client with a (client-side) mock API:
 
 ```sh
 npm run dev
+```
+
+To run with the backend API server, first [start the API server](../backend/README.md#running) and use:
+
+```sh
+npm run dev:server
 ```
 
 ### Linting
@@ -42,24 +48,24 @@ Unit tests
 npm run test
 ```
 
-e2e tests
+Browser tests using Playwright:
 
 ```sh
 npm run e2e
 
-# with Playwright web ui
+# with Playwright UI:
 npm run e2eui
 ```
 
 ### UI Component development
 
-Develop and test UI components in isolation.
+Develop and test UI components in isolation:
 
 ```sh
 npm run ladle
 ```
 
-Open: http://localhost:61000/
+And open Ladle at http://localhost:61000/.
 
 ## Structure
 
@@ -90,20 +96,20 @@ The application uses the following dependencies:
 
 #### gen_openapi_types
 
-Generate Typescript types from `/backend/openapi.json`.
+Generate Typescript types from `/backend/openapi.json`:
 
 ```sh
 npm run gen:openapi
 ```
 
-This results in `/frontend/lib/api/gen/openapi.ts`
+This results in `/frontend/lib/api/gen/openapi.ts`.
 
 #### gen_icons
 
-Generate React components from icons located in `/frontend/lib/ui/svg`
+Generate React components from icons located in `/frontend/lib/ui/svg`:
 
 ```sh
 npm run gen:icons
 ```
 
-This results in `/frontend/lib/icon/gen.tsx`
+This results in `/frontend/lib/icon/gen.tsx`.

@@ -17,11 +17,11 @@ Use `cargo run --bin api` to run the API on port 8080 (http://localhost:8080).
 
 ### Linting
 
-Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the project. Warnings are treated as errors in the CI pipeline.
+Use `cargo clippy --all-targets --all-features -- -D warnings` to lint the project. Warnings are treated as errors in the GitHub Actions workflow.
 
 ### Testing
 
-Use `cargo test` to run the tests. The tests are also run in the CI pipeline.
+Use `cargo test` to run the tests. The tests are also run in a GitHub Actions workflow.
 
 ## Structure
 
@@ -34,6 +34,7 @@ The following dependencies (crates) are used:
 - `tokio`: runtime for writing asynchronous applications.
 - `tower`: library for building robust networking clients and servers.
 - `utoipa`: library for documenting REST APIs using OpenAPI.
+- `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `serde`: framework for serializing and deserializing data structures.
 - `serde_json`: JSON support for Serde.
 - `sqlx`: async SQL library featuring compile-time checked queries.
@@ -48,11 +49,20 @@ Additionally, the following development dependencies are used:
 SQLite is used as the database. An empty database is created as `db.sqlite` when the application is
 started. The database schema is created and updated using migrations managed by `sqlx`.
 
+When migrations are out of sync (e.g. `VersionError` occurs when starting the API server),
+the database can be reset using `sqlx database reset`.
+
+Example database fixtures can be loaded using the SQLite CLI:
+
+```shell
+sqlite3 db.sqlite < fixtures/elections.sql
+sqlite3 db.sqlite < fixtures/polling_stations.sql 
+```
+
 ### OpenAPI
 
-The [utoipa](https://github.com/juhaku/utoipa) crate is used to generate OpenAPI documentation for the REST API. In this
-proof of concept, all web UIs are also included. The OpenAPI JSON can be found
-at [/api-docs/openapi.json](http://localhost:8080/api-docs/openapi.json).
+The [utoipa](https://github.com/juhaku/utoipa) crate is used to generate OpenAPI documentation for the REST API. 
+The OpenAPI JSON specification is available in the repository at `openapi.json` and can be found at [/api-docs/openapi.json](http://localhost:8080/api-docs/openapi.json) when running the API server.
+The Swagger UI is available at [/api-docs](http://localhost:8080/api-docs).
 
-The OpenAPI docs are also written to the `openapi.json` file in the root of the project. To update the file, run the
-command `cargo run --bin gen-openapi`.
+To update `openapi.json` in the repository, run the command `cargo run --bin gen-openapi`.

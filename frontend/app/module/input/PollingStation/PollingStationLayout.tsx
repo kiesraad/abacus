@@ -7,7 +7,7 @@ import { Badge, Button, Modal, PollingStationNumber, WorkStationNumber } from "@
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 
 export function PollingStationLayout() {
-  const { id } = useParams();
+  const { pollingStationId } = useParams();
   const { election } = useElection();
   const [openModal, setOpenModal] = useState(false);
 
@@ -15,11 +15,10 @@ export function PollingStationLayout() {
     setOpenModal(!openModal);
   }
 
-  const pollingStationId = id ? parseInt(id) : 0;
   return (
     <PollingStationFormController
       election={election}
-      pollingStationId={pollingStationId}
+      pollingStationId={parseInt(pollingStationId || "0")}
       entryNumber={1}
     >
       <header>

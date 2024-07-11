@@ -12,7 +12,7 @@ import {
   usePreventFormEnterSubmit,
   fieldNameFromPath,
 } from "@kiesraad/util";
-import { useBlocker } from "react-router-dom";
+import { useBlocker, useNavigate } from "react-router-dom";
 
 interface FormElements extends HTMLFormControlsCollection {
   poll_card_count: HTMLInputElement;
@@ -39,7 +39,7 @@ export function VotersAndVotesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-
+  const navigate = useNavigate();
   const {
     sectionValues,
     setSectionValues,
@@ -140,6 +140,14 @@ export function VotersAndVotesForm() {
     }
   }, [isCalled]);
 
+  React.useEffect(() => {
+    if (isCalled) {
+      if (errors.length === 0 && warnings.length === 0) {
+        navigate("../differences");
+      }
+    }
+  }, [errors, warnings, isCalled, navigate]);
+
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
 
@@ -169,7 +177,7 @@ export function VotersAndVotesForm() {
         </Feedback>
       )}
 
-      {hasValidationWarning && (
+      {hasValidationWarning && !hasValidationError && (
         <Feedback type="warning" title="Controleer uitgebrachte stemmen">
           <div>
             <ul>
@@ -177,15 +185,6 @@ export function VotersAndVotesForm() {
                 <li key={`${warning.code}-${n}`}>{warning.code}</li>
               ))}
             </ul>
-          </div>
-        </Feedback>
-      )}
-
-      {isCalled && !hasValidationError && (
-        <Feedback type="success" title="Success">
-          <div>
-            <h2 id="result">Success</h2>
-            <p>Tijdelijk, wordt navigatie naar volgende stap</p>
           </div>
         </Feedback>
       )}

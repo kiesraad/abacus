@@ -1,10 +1,8 @@
 import * as React from "react";
 
-import {
-  PoliticalGroupVotes,
-  usePollingStationFormController,
-  ValidationResult,
-} from "@kiesraad/api";
+import { usePollingStationFormController } from "./usePollingStationFormController";
+import { PoliticalGroupVotes, ValidationResult } from "../../gen/openapi";
+import { matchValidationResultWithFormSections } from "@kiesraad/util";
 
 export function usePoliticalGroup(political_group_number: number) {
   const {
@@ -29,7 +27,7 @@ export function usePoliticalGroup(political_group_number: number) {
   const errors = React.useMemo(() => {
     if (data) {
       return data.validation_results.errors.filter((err) =>
-        isInSection(["political_group_votes"], err.fields),
+        matchValidationResultWithFormSections(err.fields, ["political_group_votes"]),
       );
     }
     return [] as ValidationResult[];
@@ -38,7 +36,7 @@ export function usePoliticalGroup(political_group_number: number) {
   const warnings = React.useMemo(() => {
     if (data) {
       return data.validation_results.warnings.filter((warning) =>
-        isInSection(["political_group_votes"], warning.fields),
+        matchValidationResultWithFormSections(warning.fields, ["political_group_votes"]),
       );
     }
     return [] as ValidationResult[];
@@ -73,17 +71,4 @@ export function usePoliticalGroup(political_group_number: number) {
     serverError,
     setTemporaryCache,
   };
-}
-
-function isInSection(keys: string[], fields: string[]) {
-  for (let i = 0; i < fields.length; i++) {
-    const field = fields[i];
-    for (let j = 0; j < keys.length; j++) {
-      const key = keys[j];
-      if (field && key && field.startsWith(key)) {
-        return true;
-      }
-    }
-  }
-  return false;
 }

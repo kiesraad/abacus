@@ -71,7 +71,7 @@ export const pollingStationDataEntryHandler = http.post<
         if (valueOutOfRange(votes_counts[field])) {
           response.validation_results.errors.push({
             code: "OutOfRange",
-            fields: [field],
+            fields: [`data.votes_counts.${field}`],
           });
         }
       }
@@ -88,7 +88,7 @@ export const pollingStationDataEntryHandler = http.post<
       if (valueOutOfRange(voters_counts[field])) {
         response.validation_results.errors.push({
           code: "OutOfRange",
-          fields: [field],
+          fields: [`data.voters_counters.${field}`],
         });
       }
     });
@@ -102,10 +102,10 @@ export const pollingStationDataEntryHandler = http.post<
     ) {
       response.validation_results.errors.push({
         fields: [
-          "voters_counts.poll_card_count",
-          "voters_counts.proxy_certificate_count",
-          "voters_counts.voter_card_count",
-          "voters_counts.total_admitted_voters_count",
+          "data.voters_counts.poll_card_count",
+          "data.voters_counts.proxy_certificate_count",
+          "data.voters_counts.voter_card_count",
+          "data.voters_counts.total_admitted_voters_count",
         ],
         code: "IncorrectTotal",
       });
@@ -120,10 +120,10 @@ export const pollingStationDataEntryHandler = http.post<
     ) {
       response.validation_results.errors.push({
         fields: [
-          "votes_counts.total_votes_cast_count",
-          "votes_counts.votes_candidates_counts",
-          "votes_counts.blank_votes_count",
-          "votes_counts.invalid_votes_count",
+          "data.votes_counts.total_votes_cast_count",
+          "data.votes_counts.votes_candidates_counts",
+          "data.votes_counts.blank_votes_count",
+          "data.votes_counts.invalid_votes_count",
         ],
         code: "IncorrectTotal",
       });
@@ -134,7 +134,7 @@ export const pollingStationDataEntryHandler = http.post<
       if (valueOutOfRange(pg.total)) {
         response.validation_results.errors.push({
           code: "OutOfRange",
-          fields: [`political_group_votes[${pg.number}].total`],
+          fields: [`data.political_group_votes[${pg.number}].total`],
         });
       }
 
@@ -142,7 +142,9 @@ export const pollingStationDataEntryHandler = http.post<
         if (valueOutOfRange(cv.votes)) {
           response.validation_results.errors.push({
             code: "OutOfRange",
-            fields: [`political_group_votes[${pg.number}].candidate_votes[${cv.number}].votes`],
+            fields: [
+              `data.political_group_votes[${pg.number}].candidate_votes[${cv.number}].votes`,
+            ],
           });
         }
       });
@@ -151,7 +153,7 @@ export const pollingStationDataEntryHandler = http.post<
       if (sum !== pg.total) {
         response.validation_results.errors.push({
           code: "IncorrectTotal",
-          fields: [`political_group_votes[${pg.number}].total`],
+          fields: [`data.political_group_votes[${pg.number}].total`],
         });
       }
     });

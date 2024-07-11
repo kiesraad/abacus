@@ -114,7 +114,6 @@ export function PollingStationFormController({
   }, []);
 
   const setTemporaryCache = React.useCallback((cache: AnyCache | null) => {
-    console.log("Setting cache?", cache);
     //OPTIONAL: allow only cache for unvalidated data
     temporaryCache.current = cache;
     return true;

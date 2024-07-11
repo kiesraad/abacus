@@ -1,10 +1,8 @@
 import * as React from "react";
 
-import {
-  PollingStationResults,
-  usePollingStationFormController,
-  ValidationResult,
-} from "@kiesraad/api";
+import { PollingStationResults, ValidationResult } from "../../gen/openapi";
+import { usePollingStationFormController } from "./usePollingStationFormController";
+import { matchValidationResultWithFormSections } from "@kiesraad/util";
 
 export type VotersAndVotesValues = Pick<PollingStationResults, "voters_counts" | "votes_counts">;
 
@@ -27,7 +25,7 @@ export function useVotersAndVotes() {
   const errors = React.useMemo(() => {
     if (data) {
       return data.validation_results.errors.filter((err) =>
-        isInSection(["voters_counts", "votes_counts"], err.fields),
+        matchValidationResultWithFormSections(err.fields, ["voters_counts", "votes_counts"]),
       );
     }
     return [] as ValidationResult[];
@@ -36,7 +34,7 @@ export function useVotersAndVotes() {
   const warnings = React.useMemo(() => {
     if (data) {
       return data.validation_results.warnings.filter((warning) =>
-        isInSection(["voters_counts", "votes_counts"], warning.fields),
+        matchValidationResultWithFormSections(warning.fields, ["voters_counts", "votes_counts"]),
       );
     }
     return [] as ValidationResult[];
@@ -71,17 +69,4 @@ export function useVotersAndVotes() {
     isCalled,
     setTemporaryCache,
   };
-}
-
-function isInSection(keys: string[], fields: string[]) {
-  for (let i = 0; i < fields.length; i++) {
-    const field = fields[i];
-    for (let j = 0; j < keys.length; j++) {
-      const key = keys[j];
-      if (field && key && field.startsWith(key)) {
-        return true;
-      }
-    }
-  }
-  return false;
 }

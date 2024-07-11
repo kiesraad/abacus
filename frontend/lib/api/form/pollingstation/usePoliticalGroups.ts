@@ -30,20 +30,24 @@ export function usePoliticalGroup(political_group_number: number) {
   const errors = React.useMemo(() => {
     if (data) {
       return data.validation_results.errors.filter((err) =>
-        matchValidationResultWithFormSections(err.fields, ["political_group_votes"]),
+        matchValidationResultWithFormSections(err.fields, [
+          `political_group_votes[${political_group_number}]`,
+        ]),
       );
     }
     return [] as ValidationResult[];
-  }, [data]);
+  }, [data, political_group_number]);
 
   const warnings = React.useMemo(() => {
     if (data) {
       return data.validation_results.warnings.filter((warning) =>
-        matchValidationResultWithFormSections(warning.fields, ["political_group_votes"]),
+        matchValidationResultWithFormSections(warning.fields, [
+          `political_group_votes[${political_group_number}]`,
+        ]),
       );
     }
     return [] as ValidationResult[];
-  }, [data]);
+  }, [data, political_group_number]);
 
   const setSectionValues = (values: PoliticalGroupVotes) => {
     setValues((old) => ({

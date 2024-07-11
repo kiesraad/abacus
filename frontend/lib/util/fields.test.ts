@@ -24,4 +24,9 @@ test("matchValidationResultWithFormSections", () => {
   sections = ["test1"];
 
   expect(matchValidationResultWithFormSections(fields, sections)).equals(false);
+
+  fields = ["data.political_group_votes[1].total"];
+  sections = ["political_group_votes[1]"];
+
+  expect(matchValidationResultWithFormSections(fields, sections)).equals(true);
 });

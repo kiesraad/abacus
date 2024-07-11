@@ -5,7 +5,53 @@
 import { overrideOnce, render, screen, fireEvent } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
+
+import {
+  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
+  PollingStationFormController,
+} from "@kiesraad/api";
+import { electionMock } from "@kiesraad/api-mocks";
 import { DifferencesForm } from "./DifferencesForm";
+
+const Component = (
+  <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
+    <DifferencesForm />
+  </PollingStationFormController>
+);
+
+const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
+  data: {
+    political_group_votes: electionMock.political_groups.map((group) => ({
+      number: group.number,
+      total: 0,
+      candidate_votes: group.candidates.map((candidate) => ({
+        number: candidate.number,
+        votes: 0,
+      })),
+    })),
+    differences_counts: {
+      more_ballots_count: 0,
+      fewer_ballots_count: 0,
+      unreturned_ballots_count: 0,
+      too_few_ballots_handed_out_count: 0,
+      too_many_ballots_handed_out_count: 0,
+      other_explanation_count: 0,
+      no_explanation_count: 0,
+    },
+    voters_counts: {
+      poll_card_count: 0,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 0,
+    },
+    votes_counts: {
+      votes_candidates_counts: 0,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 0,
+    },
+  },
+};
 
 describe("Test DifferencesForm", () => {
   afterEach(() => {
@@ -17,12 +63,12 @@ describe("Test DifferencesForm", () => {
 
     const user = userEvent.setup();
 
-    render(<DifferencesForm />);
+    render(Component);
 
-    const pollCards = screen.getByTestId("more_ballots_count");
-    await user.clear(pollCards);
-    await user.type(pollCards, "12345");
-    expect(pollCards).toHaveValue("12.345");
+    const moreBallotsCount = screen.getByTestId("more_ballots_count");
+    await user.clear(moreBallotsCount);
+    await user.type(moreBallotsCount, "12345");
+    expect(moreBallotsCount).toHaveValue("12.345");
 
     await user.keyboard("{enter}");
 
@@ -38,7 +84,7 @@ describe("Test DifferencesForm", () => {
 
     const user = userEvent.setup();
 
-    render(<DifferencesForm />);
+    render(Component);
 
     const moreBallotsCount = screen.getByTestId("more_ballots_count");
     expect(moreBallotsCount).toHaveFocus();
@@ -101,7 +147,6 @@ describe("Test DifferencesForm", () => {
     await user.click(submitButton);
 
     const result = await screen.findByTestId("result");
-
     expect(result).toHaveTextContent(/^Success$/);
   });
 
@@ -111,18 +156,7 @@ describe("Test DifferencesForm", () => {
 
       const expectedRequest = {
         data: {
-          voters_counts: {
-            poll_card_count: 0,
-            proxy_certificate_count: 0,
-            voter_card_count: 0,
-            total_admitted_voters_count: 0,
-          },
-          votes_counts: {
-            votes_candidates_counts: 0,
-            blank_votes_count: 0,
-            invalid_votes_count: 0,
-            total_votes_cast_count: 0,
-          },
+          ...rootRequest.data,
           differences_counts: {
             more_ballots_count: 2,
             fewer_ballots_count: 0,
@@ -132,19 +166,12 @@ describe("Test DifferencesForm", () => {
             other_explanation_count: 0,
             no_explanation_count: 1,
           },
-          political_group_votes: [
-            {
-              candidate_votes: [{ number: 1, votes: 0 }],
-              number: 1,
-              total: 0,
-            },
-          ],
         },
       };
 
       const user = userEvent.setup();
 
-      const { getByTestId } = render(<DifferencesForm />);
+      const { getByTestId } = render(Component);
 
       const moreBallotsCount = getByTestId("more_ballots_count");
       fireEvent.change(moreBallotsCount, {
@@ -214,12 +241,12 @@ describe("Test DifferencesForm", () => {
 
     const user = userEvent.setup();
 
-    render(<DifferencesForm />);
+    render(Component);
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-    const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^422 error from mock$/);
+    const result = await screen.findByTestId("feedback-server-error");
+    expect(result).toHaveTextContent(/^Error422 error from mock$/);
   });
 
   test("500 response results in display of error message", async () => {
@@ -229,17 +256,17 @@ describe("Test DifferencesForm", () => {
 
     const user = userEvent.setup();
 
-    render(<DifferencesForm />);
+    render(Component);
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-    const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^500 error from mock$/);
+    const result = await screen.findByTestId("feedback-server-error");
+    expect(result).toHaveTextContent(/^Error500 error from mock$/);
   });
 
-  // TODO: Add validation once backend validation is implemented
+  // TODO: Add validation test once backend validation is implemented
   test.skip("Incorrect total is caught by validation", async () => {
-    const { getByTestId } = render(<DifferencesForm />);
+    const { getByTestId } = render(Component);
 
     const setValue = (id: string, value: string | number) => {
       const el = getByTestId(id);
@@ -260,7 +287,7 @@ describe("Test DifferencesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
-    const result = await screen.findByTestId("error-codes");
+    const result = await screen.findByTestId("feedback-error");
     expect(result).toHaveTextContent(/^IncorrectTotal,IncorrectTotal$/);
   });
 });

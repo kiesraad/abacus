@@ -56,11 +56,8 @@ export function useDifferences() {
 
   const isCalled = React.useMemo(() => {
     // TODO: How to know if this is called, all values can be 0?
-    // if (sectionValues.differences_counts... > 0) {
-    //   return true;
-    // }
-    return false;
-  }, []);
+    return !!sectionValues.more_ballots_count;
+  }, [sectionValues]);
 
   return {
     loading,

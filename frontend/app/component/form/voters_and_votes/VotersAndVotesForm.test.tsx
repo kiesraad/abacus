@@ -5,12 +5,13 @@
 import { overrideOnce, render, screen, fireEvent } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
-import { VotersAndVotesForm } from "./VotersAndVotesForm";
+
 import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
 } from "@kiesraad/api";
 import { electionMock } from "@kiesraad/api-mocks";
+import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const Component = (
   <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
@@ -152,7 +153,6 @@ describe("Test VotersAndVotesForm", () => {
     await user.click(submitButton);
 
     const result = await screen.findByTestId("result");
-
     expect(result).toHaveTextContent(/^Success$/);
   });
 

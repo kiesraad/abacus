@@ -46,7 +46,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       }
       return {
         number: group.number,
-        total: parseInt(elements.listtotal.value),
+        total: deformat(elements.listtotal.value),
         candidate_votes: candidate_votes,
       };
     },

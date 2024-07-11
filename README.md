@@ -49,7 +49,7 @@ Er zijn enkele zaken waar we nog over nadenken:
 
 Abacus wordt voor de gemeenteraadsverkiezingen gebouwd als een stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in Rust, de frontend in TypeScript/React. 
 
-Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, Typescript en React](/documentatie/softwarearchitectuur/overwegingen talen en frameworks.md). 
+Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, Typescript en React](</documentatie/softwarearchitectuur/overwegingen talen en frameworks.md>). 
 
 ## Beveiligingsmaatregelen
 
@@ -61,6 +61,7 @@ Daarnaast zijn voor de software, de ontwikkeling en het gebruik onder andere de 
 * Veilige programmeertaal (Rust)
 * Ontwikkel- en releaseproces met reviews en beveiligingsonderzoek
 * Definitieve release: openbare pentest en toets op wettelijke kaders
+* Lokale installatie zonder internet
 * Afzender- en bestandsverificatie (weten van wie een bestand komt en dat het correct is)
 
 ## Projectstructuur

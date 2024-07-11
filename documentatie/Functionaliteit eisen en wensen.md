@@ -34,7 +34,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 *Deze wensen zullen alleen aan bod komen als er tijd genoeg is.*
 
 - Er is ondersteuning voor het invoeren van gemeenten met een decentrale stemopneming (DSO).
-- De frontend wordt geseved vanuit de backend, de applicatie kan als geheel gedraaid worden.
+- De frontend wordt is bereikbaar vanuit de backend: de applicatie kan als één geheel gedraaid worden.
 - Stembureaus kunnen worden aangemaakt.
 - Bezwaren en bijzonderheden kunnen per stembureau worden ingevoerd (bij CSO).
 - Bezwaren en bijzonderheden kunnen worden ingevuld tijdens het invoeren van de GSB-zitting.

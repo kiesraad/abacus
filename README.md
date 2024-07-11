@@ -1,7 +1,7 @@
 # Abacus software voor verkiezingsuitslagen en zetelverdeling
 
 ## Wat is Abacus?
-De Kiesraad ontwikkelt een nieuw softwareprogramma voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Het programma telt uitslagen bij elkaar op en berekent de zetelverdeling. Abacus vervangt de module Uitslagvaststelling van het programma Ondersteunende Software Verkiezingen (OSV2020) dat sinds 2020 wordt gebruikt. Abacus zal ingezet worden bij alle verkiezingen in Nederland.
+De Kiesraad ontwikkelt een nieuw softwareprogramma voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Het programma telt uitslagen bij elkaar op en berekent de zetelverdeling. Abacus vervangt de module Uitslagvaststelling van het programma Ondersteunende Software Verkiezingen (OSV2020) dat sinds 2020 wordt gebruikt. Abacus zal ingezet worden bij alle verkiezingen in Nederland. 
 
 <p align="center">
 <img src="/documentatie/img/abacus.svg" alt="Abacus software voor verkiezingsuitslagen en zetelverdeling" height="300px">
@@ -16,9 +16,9 @@ De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonder
 
 ## Ontwikkeling
 
-De software wordt ontworpen en gebouwd door de Kiesraad zelf, in nauwe samenspraak met gebruikers, met name mensen bij gemeenten, waterschappen en het openbaar lichaam op de eilanden. 
+De software wordt ontworpen en gebouwd door de Kiesraad zelf, in nauwe samenspraak met gebruikers, met name mensen bij gemeenten, waterschappen en het openbaar lichaam op de eilanden. Het team werkt in deze repository aan de software, dus wat je hier ziet is in ontwikkeling.
 
-Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De software is 'work in progress'. De eerste software die in productie wordt genomen vervangt de module van OSV2020 voor de uitslagvaststelling en zetelverdeling bij gemeenteraadsverkiezingen. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen.
+Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de module van OSV2020 voor de uitslagvaststelling en zetelverdeling bij gemeenteraadsverkiezingen. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen. De software wordt pas in productie genomen als deze aan alle eisen voldoet.
 
 De uitgangspunten bij het ontwerp en de bouw van Abacus zijn gebruiksvriendelijkheid en eenvoud, naast de waarden integriteit, transparantie en controleerbaarheid. De software dient voor het correct invoeren van de resultaten van de stembureaus volgens het vier-ogen principe, voor het maken van de optelling van alle ingevoerde stembureaus en het opstellen van het proces-verbaal met de resultaten. 
 
@@ -26,7 +26,7 @@ Meer informatie over het proces en de uitvoering van de verkiezingen in Nederlan
 
 ## Functies
 
-De eerste stap is het bouwen van de uitslagensoftware voor de gemeenteraadsverkiezingen. De software omvat de flow van invoeren en optellen van de getelde stemmen tot en met de zetelverdeling:
+De eerste stap is het bouwen van de uitslagensoftware voor de gemeenteraadsverkiezingen, hier wordt nu aan gewerkt. De software omvat de flow van invoeren en optellen van de getelde stemmen tot en met de zetelverdeling:
 
 - Invoer uitslagen en correcties
 - Optelling GSB
@@ -59,8 +59,7 @@ Daarnaast zijn voor de software, de ontwikkeling en het gebruik onder andere de 
 * Veilige programmeertaal (Rust)
 * Ontwikkel- en releaseproces met reviews en beveiligingsonderzoek
 * Definitieve release: openbare pentest en toets op wettelijke kaders
-* Lokale installatie zonder internet
-* Afzender- en bestandsverificatie (weten van wie een bestand komt en dat het compleet is)
+* Afzender- en bestandsverificatie (weten van wie een bestand komt en dat het correct is)
 
 ## Projectstructuur
 
@@ -72,7 +71,7 @@ Lees voor meer informatie het bestand `README.md` in elke directory.
 
 ## Bijdragen
 
-We ontwikkelen Abacus open source, niet alleen omdat dit de transparantie bevordert, maar ook omdat we bijdragen vanuit de community verwelkomen. We zijn altijd nieuwsgierig naar nieuwe perspectieven of invalshoeken. Als je iets wilt bijdragen aan de software of als je een vraag hebt, neem dan vooral contact op via e-mail: [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). Het team werkt met een planning en epics zoals opgenomen in het projectboard. 
+We ontwikkelen Abacus open source, niet alleen omdat dit de transparantie bevordert, maar ook omdat we bijdragen vanuit de community verwelkomen. We zijn altijd nieuwsgierig naar nieuwe perspectieven of invalshoeken. Als je iets wilt bijdragen aan de software, neem dan vooraf contact op via e-mail: [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). Het team werkt met een planning en epics zoals opgenomen in het projectboard.
 
 Als je een bijdrage aan de broncode wilt doen vragen we je om vooraf een [contributor licence agreement (CLA)](/CLA.md) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. Stuur de getekende CLA naar [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). Dank alvast!
 

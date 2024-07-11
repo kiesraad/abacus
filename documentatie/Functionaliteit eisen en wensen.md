@@ -13,7 +13,6 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 
 *Deze eisen (requirements) moeten in het eindresultaat terugkomen. Zonder deze eisen is de demo niet geslaagd.*
 
-- Alle vereisten (must-haves) zijn functioneel en kunnen worden gebruikt in de eerste demo.
 - De flow voor de eerste invoer van een stembureau in een gemeente met centrale stemopneming (CSO) is compleet.
 - Validatie en consistentiechecks worden waar mogelijk uitgevoerd op de uitslagen.
 - Er kunnen meerdere stembureaus worden ingevoerd.

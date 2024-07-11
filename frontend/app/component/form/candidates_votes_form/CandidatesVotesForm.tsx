@@ -150,7 +150,13 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           <InputGrid.Total key={`list${group.number}-total`}>
             <td></td>
             <td>
-              <input id={`list-total`} name="listtotal" maxLength={11} {...register()} />
+              <input
+                id={`list-total`}
+                name="listtotal"
+                maxLength={11}
+                {...register()}
+                defaultValue={format(sectionValues?.total || "")}
+              />
             </td>
             <td>Totaal lijst {group.number}</td>
           </InputGrid.Total>

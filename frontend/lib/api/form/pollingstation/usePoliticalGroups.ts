@@ -55,10 +55,7 @@ export function usePoliticalGroup(political_group_number: number) {
   };
 
   const isCalled = React.useMemo(() => {
-    if (sectionValues && sectionValues.total) {
-      return true;
-    }
-    return false;
+    return !!(sectionValues && sectionValues.total);
   }, [sectionValues]);
 
   return {

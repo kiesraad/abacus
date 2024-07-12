@@ -1,17 +1,17 @@
 # Testen en kwaliteit
 
 ## Uitgangspunten
-- kwaliteit is iets emergent
+- Kwaliteit is iets emergent
 	- gevolg van vele kleine dingen die goed gedaan worden ("many small things done right")
 	- kwaliteit moet makkelijk genoeg zijn, vanwege het ETTO-principe (Efficiency-Thoroughness Trade-Off principe)
-- kwaliteit en snelheid sluiten elkaar niet uit, maar gaan hand in hand
+- Kwaliteit en snelheid sluiten elkaar niet uit, maar gaan hand in hand
 	- interne kwaliteit faciliteert snelheid faciliteert feedback faciliteert externe kwaliteit
 	- interne kwaliteit: software als code; externe kwaliteit: software als product
-- testen is een proces van ontdekken en evalueren
+- Testen is een proces van ontdekken en evalueren
 	- ontdekken: wat doet het?
 	- evalueren: wat vinden we daarvan?
 	- dit levert inzicht op in waarde (voldoen aan verwachtingen) en in risico's (vervelende verrassingen)
-- testen gebeurt overal in het proces ("continuous testing") en beperkt zich niet tot de geschreven software
+- Testen gebeurt overal in het proces ("continuous testing") en beperkt zich niet tot de geschreven software
 	- dus in alle fases: procesanalyse, ontwerp, bouw, releases, uitrol, beheer
 	- dus door verschillende personen en rollen
 	- zo veel mogelijk vermijden: grote validatiestappen aan het eind, als in "we zijn klaar, we moeten alleen nog testen"
@@ -40,16 +40,14 @@
 
 ## Kwaliteitsattributen
 
-Uit een [lijst met kwaliteitsattributen](http://thetesteye.com/posters/TheTestEye_SoftwareQualityCharacteristics.pdf) zijn deze vijf gekozen als de meest belangrijke:
+We hebben kwaliteitscriteria gekozen om ons werk tegen te toetsen, aansluitend op de waarborgen uit het verkiezingsproces:
 
--   Reliability. Can you trust the product in many and difficult situations?
--   Usability. Is the product easy to use? (voor alle bedoelde gebruikers, dus ook installatie, controleerbaar door burger, etc)
--   Security. Does the product protect against unwanted usage?
--   Testability. Is it easy to check and test the product?
--   Maintainability. Can the product be maintained and extended at low
-    cost?
-
-IT-bility (Is the product easy to install, maintain and support?) overlapt met Usability, Testability en Maintainability, maar is belangrijk genoeg om ook expliciet te vermelden.
+-   Betrouwbaarheid. Kun je de software in de meeste situaties vertrouwen?
+-   Bruikbaarheid. Is de software makkelijk te gebruiken? (voor alle bedoelde gebruikers, dus ook installatie, controleerbaar door burger, etc)
+-   Beveiliging. Biedt de software voldoende bescherming tegen ongewenst gebruik?
+-   Testbaarheid. Is het eenvoudig om de software te testen en controleren?
+-   Onderhoudbaarheid. Kan de software eenvoudig worden onderhouden en aangepast?
+-   IT-bility (Is de software eenvoudig te installeren, onderhouden en ondersteunen?) overlapt met Bruikbaarheid, Testbaarheid en Onderhoudbaarheid en is belangrijk genoeg om ook expliciet te vermelden.
 
 
 ## Kwaliteits- en testprogramma

@@ -47,7 +47,7 @@ We hebben kwaliteitscriteria gekozen om ons werk tegen te toetsen, aansluitend o
 -   Beveiliging. Biedt de software voldoende bescherming tegen ongewenst gebruik?
 -   Testbaarheid. Is het eenvoudig om de software te testen en controleren?
 -   Onderhoudbaarheid. Kan de software eenvoudig worden onderhouden en aangepast?
--   IT-bility (Is de software eenvoudig te installeren, onderhouden en ondersteunen?) overlapt met Bruikbaarheid, Testbaarheid en Onderhoudbaarheid en is belangrijk genoeg om ook expliciet te vermelden.
+-   IT-bility. Is de software eenvoudig te installeren, onderhouden en ondersteunen? Dit criterium overlapt met Bruikbaarheid, Testbaarheid en Onderhoudbaarheid en is belangrijk genoeg om ook expliciet te vermelden.
 
 
 ## Kwaliteits- en testprogramma

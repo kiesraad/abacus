@@ -7,7 +7,7 @@ van feedback.
 
 Aan het begin van de releasecyclus bepalen we welke functionaliteit we willen implementeren. Dit doen we in overleg met
 het team tijdens een tweewekelijkse planningsmeeting. De prioriteit van de features bepalen we aan de hand van
-verschillende factoren. Wil je als externe contributor een bijdrage leveren aan de software, neem dan contact op via abacus@kiesraad.nl. 
+verschillende factoren. Wil je als externe contributor een bijdrage leveren aan de software, neem dan contact op via abacus[@]kiesraad.nl. 
 
 ## Stappen in het proces
 

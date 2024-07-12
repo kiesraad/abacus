@@ -16,7 +16,7 @@ De naam Abacus komt uit het Latijn. Het is een telraam dat veel in wiskundeonder
 
 ## Ontwikkeling
 
-De software wordt ontworpen en gebouwd door de Kiesraad zelf, in nauwe samenspraak met gebruikers, met name mensen bij gemeenten, waterschappen en het openbaar lichaam op de eilanden (Caribisch Nederland). Het team werkt in deze repository aan de software, dus wat je hier ziet is in ontwikkeling. De software staat letterlijk in de steigers, we werken er dagelijks aan.
+De software wordt ontworpen en gebouwd door de Kiesraad zelf, in nauwe samenspraak met gebruikers, met name mensen bij gemeenten, waterschappen en het openbaar lichaam op de eilanden (Caribisch Nederland). Het team werkt in deze repository aan de software, dus wat je hier ziet is in ontwikkeling. De software staat figuurlijk in de steigers, we werken er dagelijks aan.
 
 Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de module van OSV2020 voor de uitslagvaststelling en zetelverdeling bij gemeenteraadsverkiezingen. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen. De software wordt pas in productie genomen als deze aan alle eisen voldoet.
 

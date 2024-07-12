@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 
-import { overrideOnce, render, screen, fireEvent, getBodyObject } from "app/test/unit";
+import { overrideOnce, render, screen, fireEvent, getUrlMethodAndBody } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
 
@@ -227,17 +227,12 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      // expect(spy).toHaveBeenCalledWith("http://testhost/v1/api/polling_stations/1/data_entries/1", {
-      //   method: "POST",
-      //   body: JSON.stringify(expectedRequest),
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      // });
-
       expect(spy).toHaveBeenCalled();
-      const obj = getBodyObject(spy.mock.calls);
-      expect(obj).toEqual(expectedRequest);
+      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
+
+      expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
+      expect(method).toEqual("POST");
+      expect(body).toEqual(expectedRequest);
 
       const result = await screen.findByTestId("result");
       expect(result).toHaveTextContent(/^Success$/);

@@ -29,7 +29,7 @@ en refinement.
 Als het nodig is overleggen we geplande features ook met het hogere management en/of de leden van de Kiesraad.
 
 In de tweewekelijkse planningsmeeting wordt een duidelijk overzicht gemaakt van alle geplande taken. Alle taken en
-issues worden bijgehouden op het [GitHub Projects bord].
+issues worden bijgehouden op het GitHub Projects bord.
 De taken worden aan een _epic_ gekoppeld en de epics worden gerangschikt op prioriteit.
 
 Het UX design in Figma bevat ontwerpen voor alle features die een ontwerp vereisen.
@@ -37,7 +37,7 @@ Dit wordt ook in de context van het gehele design besproken met het team.
 
 Het aanmaken van een nieuw GitHub-issue voor een feature of change request gebeurt in overleg met het team.
 
-[GitHub Projects bord]: https://github.com/orgs/kiesraad/projects/1/views/2
+GitHub Projects bord: [Abacus project board](https://github.com/orgs/kiesraad/projects/1)
 
 ### Ontwikkeling
 
@@ -65,7 +65,7 @@ aantal wijzigingen tussen de getoetste en de definitieve versie minimaal blijft.
 Een release moet aan een aantal vereisten voldoen:
 
 - Alle issues en epics in de milestone voor de release zijn klaar.
-- Alle functionaliteit is voldoende getest, zie Testen en valideren (todo: toevoegen link naar document).
+- Alle functionaliteit is voldoende getest, zie [Testen en valideren](</documentatie/Testen en kwaliteit.md>).
 - De formele checks zijn geslaagd (pentest en [toets op de wettelijke kaders](https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage2))
 - Alle documentatie is bijgewerkt voor de wijzigingen in deze release.
 - De release is voorzien van release notes.

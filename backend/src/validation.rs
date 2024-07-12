@@ -14,6 +14,14 @@ impl ValidationResults {
         self.errors.append(&mut other.errors);
         self.warnings.append(&mut other.warnings);
     }
+
+    pub fn has_errors(&self) -> bool {
+        !self.errors.is_empty()
+    }
+
+    pub fn has_warnings(&self) -> bool {
+        !self.warnings.is_empty()
+    }
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]

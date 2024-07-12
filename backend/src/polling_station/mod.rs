@@ -2,6 +2,7 @@ use axum::extract::{FromRequest, Path, State};
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
 use crate::election::repository::Elections;
@@ -18,14 +19,13 @@ pub mod structs;
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 pub struct DataEntryRequest {
+    /// Data entry for a polling station
     pub data: PollingStationResults,
 }
 
 /// Response structure for data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct DataEntryResponse {
-    pub saved: bool,
-    pub message: String,
     pub validation_results: ValidationResults,
 }
 
@@ -43,6 +43,7 @@ impl IntoResponse for DataEntryResponse {
         responses(
             (status = 200, description = "Data entry saved successfully", body = DataEntryResponse),
             (status = 404, description = "Not found", body = ErrorResponse),
+            (status = 409, description = "Request cannot be completed", body = ErrorResponse),
             (status = 422, description = "JSON body parsing error (Unprocessable Content)", body = ErrorResponse),
             (status = 500, description = "Internal server error", body = ErrorResponse),
         ),
@@ -63,8 +64,9 @@ pub async fn polling_station_data_entry(
             "Only the first data entry is supported".to_string(),
         ));
     }
-    // need to resolve election id from polling station once we have
-    // polling stations in the database
+
+    // future: need to resolve election id from polling station once we have
+    // polling stations in the database, #106
     let election_id = 1;
     let election = elections.get(election_id).await?;
 
@@ -80,11 +82,59 @@ pub async fn polling_station_data_entry(
         .upsert(id, entry_number, data)
         .await?;
 
-    Ok(DataEntryResponse {
-        saved: true,
-        message: "Data entry saved successfully".to_string(),
-        validation_results,
-    })
+    Ok(DataEntryResponse { validation_results })
+}
+
+/// Finalise the data entry for a polling station
+#[utoipa::path(
+        post,
+        path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise",
+        responses(
+            (status = 200, description = "Data entry finalised successfully", body = DataEntryResponse),
+            (status = 404, description = "Not found", body = ErrorResponse),
+            (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+            (status = 422, description = "JSON body parsing error (Unprocessable Content)", body = ErrorResponse),
+            (status = 500, description = "Internal server error", body = ErrorResponse),
+        ),
+        params(
+            ("polling_station_id" = u32, description = "Polling station database id"),
+            ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
+        ),
+    )]
+pub async fn polling_station_data_entry_finalise(
+    State(pool): State<SqlitePool>,
+    State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(elections): State<Elections>,
+    Path((id, entry_number)): Path<(u32, u8)>,
+) -> Result<(), APIError> {
+    // future: need to resolve election id from polling station once we have
+    // polling stations in the database, #106
+    let election_id = 1;
+    let election = elections.get(election_id).await?;
+
+    let mut tx = pool.begin().await?;
+
+    // future: support for second data entry, #129 validate whether first and second data entries are equal, #129
+
+    let data = polling_station_data_entries
+        .get(&mut tx, id, entry_number)
+        .await?;
+    let results = serde_json::from_slice::<PollingStationResults>(&data)?;
+
+    let mut validation_results = ValidationResults::default();
+    results.validate(&election, &mut validation_results, "data".to_string());
+
+    if validation_results.has_errors() {
+        return Err(APIError::Conflict(
+            "Cannot finalise data entry with validation errors".to_string(),
+        ));
+    }
+
+    polling_station_data_entries.finalise(&mut tx, id).await?;
+
+    tx.commit().await?;
+
+    Ok(())
 }
 
 /// Polling station list response
@@ -122,16 +172,16 @@ mod tests {
         let mut request_body = DataEntryRequest {
             data: PollingStationResults {
                 voters_counts: VotersCounts {
-                    poll_card_count: 1,
-                    proxy_certificate_count: 2,
-                    voter_card_count: 3,
-                    total_admitted_voters_count: 4,
+                    poll_card_count: 100, // incorrect
+                    proxy_certificate_count: 1,
+                    voter_card_count: 1,
+                    total_admitted_voters_count: 100,
                 },
                 votes_counts: VotesCounts {
-                    votes_candidates_counts: 5,
-                    blank_votes_count: 6,
-                    invalid_votes_count: 7,
-                    total_votes_cast_count: 8,
+                    votes_candidates_counts: 96,
+                    blank_votes_count: 2,
+                    invalid_votes_count: 2,
+                    total_votes_cast_count: 100,
                 },
                 differences_counts: DifferencesCounts {
                     more_ballots_count: 0,
@@ -144,23 +194,44 @@ mod tests {
                 },
                 political_group_votes: vec![PoliticalGroupVotes {
                     number: 1,
-                    total: 9,
-                    candidate_votes: vec![CandidateVotes {
-                        number: 1,
-                        votes: 10,
-                    }],
+                    total: 96,
+                    candidate_votes: vec![
+                        CandidateVotes {
+                            number: 1,
+                            votes: 54,
+                        },
+                        CandidateVotes {
+                            number: 2,
+                            votes: 42,
+                        },
+                    ],
                 }],
             },
         };
 
-        let response = polling_station_data_entry(
-            State(PollingStationDataEntries::new(pool.clone())),
-            State(Elections::new(pool.clone())),
-            Path((1, 1)),
-            request_body.clone(),
-        )
-        .await
-        .into_response();
+        async fn save(pool: SqlitePool, request_body: DataEntryRequest) -> Response {
+            polling_station_data_entry(
+                State(PollingStationDataEntries::new(pool.clone())),
+                State(Elections::new(pool.clone())),
+                Path((1, 1)),
+                request_body.clone(),
+            )
+            .await
+            .into_response()
+        }
+
+        async fn finalise(pool: SqlitePool) -> Response {
+            polling_station_data_entry_finalise(
+                State(pool.clone()),
+                State(PollingStationDataEntries::new(pool.clone())),
+                State(Elections::new(pool.clone())),
+                Path((1, 1)),
+            )
+            .await
+            .into_response()
+        }
+
+        let response = save(pool.clone(), request_body.clone()).await;
         assert_eq!(response.status(), 200);
 
         // Check if a row was created
@@ -170,17 +241,16 @@ mod tests {
             .unwrap();
         assert_eq!(row_count.count, 1);
 
-        // Test updating the same row
-        let new_value = 10;
-        request_body.data.voters_counts.poll_card_count = new_value;
-        let response = polling_station_data_entry(
-            State(PollingStationDataEntries::new(pool.clone())),
-            State(Elections::new(pool.clone())),
-            Path((1, 1)),
-            request_body,
-        )
-        .await
-        .into_response();
+        // Check that we cannot finalise with errors
+        let response = save(pool.clone(), request_body.clone()).await;
+        assert_eq!(response.status(), 200);
+        let response = finalise(pool.clone()).await;
+        assert_eq!(response.status(), 409);
+
+        // Test updating the data entry
+        let poll_card_count = 98;
+        request_body.data.voters_counts.poll_card_count = poll_card_count; // correct value
+        let response = save(pool.clone(), request_body.clone()).await;
         assert_eq!(response.status(), 200);
 
         // Check if there is still only one row
@@ -196,7 +266,27 @@ mod tests {
             .await
             .expect("No data found");
         let data: PollingStationResults = serde_json::from_slice(&data.data.unwrap()).unwrap();
-        assert_eq!(data.voters_counts.poll_card_count, new_value);
+        assert_eq!(data.voters_counts.poll_card_count, poll_card_count);
+
+        // Finalise data entry after correcting the error
+        let response = save(pool.clone(), request_body.clone()).await;
+        assert_eq!(response.status(), 200);
+        let response = finalise(pool.clone()).await;
+        assert_eq!(response.status(), 200);
+
+        // Check if the data entry was finalised:
+        // removed from polling_station_data_entries...
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 0);
+        // ...and added to polling_station_results
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 1);
     }
 
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections")))]

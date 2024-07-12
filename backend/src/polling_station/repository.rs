@@ -1,7 +1,7 @@
-use crate::AppState;
-
 use axum::extract::FromRef;
-use sqlx::{query_as, SqlitePool};
+use sqlx::{query, query_as, Sqlite, SqlitePool, Transaction};
+
+use crate::AppState;
 
 use super::PollingStation;
 
@@ -48,6 +48,45 @@ impl PollingStationDataEntries {
             id, entry_number, data)
             .execute(&self.0)
             .await?;
+
+        Ok(())
+    }
+
+    pub async fn get(
+        &self,
+        tx: &mut Transaction<'_, Sqlite>,
+        id: u32,
+        entry_number: u8,
+    ) -> Result<Vec<u8>, sqlx::Error> {
+        let res = query!(
+            "SELECT data FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
+            id,
+            entry_number
+        )
+            .fetch_one(&mut **tx)
+        .await?;
+        res.data.ok_or_else(|| sqlx::Error::RowNotFound)
+    }
+
+    pub async fn finalise(
+        &self,
+        tx: &mut Transaction<'_, Sqlite>,
+        id: u32,
+    ) -> Result<(), sqlx::Error> {
+        // future: support second data entry
+        query!(
+            "INSERT INTO polling_station_results (polling_station_id, data) SELECT polling_station_id, data FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = 1",
+            id,
+        )
+        .execute(&mut **tx)
+        .await?;
+
+        query!(
+            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ?",
+            id
+        )
+        .execute(&mut **tx)
+        .await?;
 
         Ok(())
     }

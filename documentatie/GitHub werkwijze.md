@@ -8,7 +8,7 @@ Dit document beschrijft de werkwijze met Github. Er zijn meerdere manieren om de
       overleg dan met het team.
     - Bedenk of het issue duidelijk genoeg is om te implementeren.
       Zijn er architectuur-overwegingen die afgestemd moeten worden?
-      Bij twijfel, betrek het team voordat je code gaat schrijven.
+      Betrek bij twijfel het team voordat je code gaat schrijven.
 
 - Maak een nieuwe branch aan op basis van de main branch:
     - `git checkout -b <branch name>`

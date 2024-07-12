@@ -1,7 +1,7 @@
 # Overwegingen ten aanzien van technische keuzes binnen dit project
 
 Bij het maken van technische keuzes binnen dit project zijn er een aantal uitgangspunten.
-De eisen aan de software zijn gesteld in de Kieswet, Kiesbesluit en overige kaders zoals de BIO.
+De eisen aan de software zijn gesteld in de Kieswet, Kiesbesluit en normenkaders zoals de Baseline Informatiebeveiliging Overheid (BIO).
 Hier zal zonder uitzondering aan voldaan moeten worden.
 
 Een aantal van de eisen zijn zeer duidelijk en een aantal van de eisen is impliciet vanuit het beoogde gebruik.

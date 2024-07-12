@@ -40,8 +40,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     setTemporaryCache,
   } = usePoliticalGroup(group.number);
 
-  console.log(errors);
-
   usePreventFormEnterSubmit(formRef);
 
   const getValues = React.useCallback(
@@ -64,7 +62,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
-  console.log(errorsAndWarnings);
   //const blocker =  useBlocker() use const blocker to render confirmation UI.
   useBlocker(() => {
     if (formRef.current && !isCalled) {
@@ -146,6 +143,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 format={format}
                 addSeparator={addSeparator}
                 defaultValue={defaultValue}
+                isFocused={index === 0}
               />
             );
           })}

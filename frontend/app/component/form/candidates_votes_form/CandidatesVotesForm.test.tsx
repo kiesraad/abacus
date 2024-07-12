@@ -62,7 +62,7 @@ describe("Test CandidatesVotesForm", () => {
     const user = userEvent.setup();
     render(Component);
 
-    const candidate1 = screen.getByTestId("candidate-votes-1");
+    const candidate1 = screen.getByTestId("candidate_votes-1.votes");
     await user.clear(candidate1);
     await user.type(candidate1, "12345");
     expect(candidate1).toHaveValue("12.345");
@@ -83,7 +83,7 @@ describe("Test CandidatesVotesForm", () => {
 
     render(Component);
 
-    const candidate1 = screen.getByTestId("candidate-votes-1");
+    const candidate1 = screen.getByTestId("candidate_votes-1.votes");
     expect(candidate1).toHaveFocus();
     await user.clear(candidate1);
     await user.type(candidate1, "12345");
@@ -91,7 +91,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate2 = screen.getByTestId("candidate-votes-2");
+    const candidate2 = screen.getByTestId("candidate_votes-2.votes");
     expect(candidate2).toHaveFocus();
     await user.clear(candidate2);
     await user.type(candidate2, "6789");
@@ -99,7 +99,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate3 = screen.getByTestId("candidate-votes-3");
+    const candidate3 = screen.getByTestId("candidate_votes-3.votes");
     expect(candidate3).toHaveFocus();
     await user.clear(candidate3);
     await user.type(candidate3, "123");
@@ -107,7 +107,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate4 = screen.getByTestId("candidate-votes-4");
+    const candidate4 = screen.getByTestId("candidate_votes-4.votes");
     expect(candidate4).toHaveFocus();
     await user.clear(candidate4);
     await user.paste("4242");
@@ -115,7 +115,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate5 = screen.getByTestId("candidate-votes-5");
+    const candidate5 = screen.getByTestId("candidate_votes-5.votes");
     expect(candidate5).toHaveFocus();
     await user.clear(candidate5);
     await user.type(candidate5, "12");
@@ -123,7 +123,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate6 = screen.getByTestId("candidate-votes-6");
+    const candidate6 = screen.getByTestId("candidate_votes-6.votes");
     expect(candidate6).toHaveFocus();
     await user.clear(candidate6);
     // Test if maxLength on field works
@@ -132,7 +132,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const candidate7 = screen.getByTestId("candidate-votes-7");
+    const candidate7 = screen.getByTestId("candidate_votes-7.votes");
     expect(candidate7).toHaveFocus();
     await user.clear(candidate7);
     await user.type(candidate7, "3");
@@ -140,7 +140,7 @@ describe("Test CandidatesVotesForm", () => {
 
     await user.keyboard("{enter}");
 
-    const total = screen.getByTestId("list-total");
+    const total = screen.getByTestId("total");
     await user.click(total);
     expect(total).toHaveFocus();
     await user.clear(total);
@@ -260,21 +260,21 @@ describe("Test CandidatesVotesForm", () => {
 
       render(Component);
 
-      const candidateOne = screen.getByTestId("candidate-votes-1");
+      const candidateOne = screen.getByTestId("candidate_votes-1.votes");
       await user.clear(candidateOne);
       await user.type(
         candidateOne,
         expectedRequest.data.political_group_votes[0]?.candidate_votes[0]?.votes.toString() ?? "0",
       );
 
-      const candidateTwo = screen.getByTestId("candidate-votes-2");
+      const candidateTwo = screen.getByTestId("candidate_votes-2.votes");
       await user.clear(candidateTwo);
       await user.type(
         candidateTwo,
         expectedRequest.data.political_group_votes[0]?.candidate_votes[1]?.votes.toString() ?? "0",
       );
 
-      const listTotal = screen.getByTestId("list-total");
+      const listTotal = screen.getByTestId("total");
       await user.clear(listTotal);
       await user.type(
         listTotal,

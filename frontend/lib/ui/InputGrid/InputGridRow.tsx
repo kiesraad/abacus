@@ -20,6 +20,7 @@ export interface InputGridRowProps {
   isTotal?: boolean;
   isFocused?: boolean;
   addSeparator?: boolean;
+  autoFocus?: boolean;
 }
 
 export function InputGridRow({

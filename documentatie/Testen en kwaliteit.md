@@ -117,6 +117,7 @@ IT-bility (Is the product easy to install, maintain and support?) overlapt met U
 	- feedback ophalen van externe stakeholders, bijv gemeentes
 	- feedback ophalen van externe geïnteresseerden, bijv betrokken burgers maar ook community van experts (programmeren, testen)
 - faciliteren door:
+	- kleinschalige gebruikerstests
 	- organiseren sessies voor ophalen feedback
 	- code, builds en releases beschikbaar op GitHub
 

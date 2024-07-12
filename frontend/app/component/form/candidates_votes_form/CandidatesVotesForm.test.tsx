@@ -2,10 +2,13 @@ import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
 import {
+  Election,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
+  PoliticalGroup,
   PollingStationFormController,
 } from "@kiesraad/api";
 import { electionMock, politicalGroupMock } from "@kiesraad/api-mocks";
+
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const Component = (
@@ -155,23 +158,128 @@ describe("Test CandidatesVotesForm", () => {
     test("CandidateVotesForm request body is equal to the form data", async () => {
       const spy = vi.spyOn(global, "fetch");
 
+      const politicalGroupMockData: PoliticalGroup = {
+        number: 1,
+        name: "Lijst 1 - Vurige Vleugels Partij",
+        candidates: [
+          {
+            number: 1,
+            initials: "E.",
+            first_name: "Eldor",
+            last_name: "Zilverlicht",
+            locality: "Amsterdam",
+          },
+          {
+            number: 2,
+            initials: "G.",
+            first_name: "Grom",
+            last_name: "Donderbrul",
+            locality: "Rotterdam",
+          },
+        ],
+      };
+
+      const electionMockData: Election = {
+        id: 1,
+        name: "Municipal Election",
+        category: "Municipal",
+        election_date: "2024-11-30",
+        nomination_date: "2024-11-01",
+        political_groups: [
+          politicalGroupMockData,
+          {
+            number: 2,
+            name: "Lijst 2 - Wijzen van Water en Wind",
+            candidates: [
+              {
+                number: 1,
+                initials: "A.",
+                first_name: "Alice",
+                last_name: "Foo",
+                locality: "Amsterdam",
+                gender: "Female",
+              },
+              {
+                number: 2,
+                initials: "C.",
+                first_name: "Charlie",
+                last_name: "Doe",
+                locality: "Rotterdam",
+              },
+            ],
+          },
+        ],
+      };
+
+      const electionMock = electionMockData as Required<Election>;
+      const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
+
+      const Component = (
+        <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
+          <CandidatesVotesForm group={politicalGroupMock} />
+        </PollingStationFormController>
+      );
+
       const expectedRequest = {
         data: {
           ...rootRequest.data,
-          political_group_votes: electionMock.political_groups.map((group) => ({
-            number: group.number,
-            total: 100,
-            candidate_votes: group.candidates.map((candidate) => ({
-              number: candidate.number,
-              votes: 5,
-            })),
-          })),
+          political_group_votes: [
+            {
+              number: 1,
+              total: 10,
+              candidate_votes: [
+                {
+                  number: 1,
+                  votes: 5,
+                },
+                {
+                  number: 2,
+                  votes: 5,
+                },
+              ],
+            },
+            {
+              number: 2,
+              total: 0,
+              candidate_votes: [
+                {
+                  number: 1,
+                  votes: 0,
+                },
+                {
+                  number: 2,
+                  votes: 0,
+                },
+              ],
+            },
+          ],
         },
       };
 
       const user = userEvent.setup();
 
       render(Component);
+
+      const candidateOne = screen.getByTestId("candidate-votes-1");
+      await user.clear(candidateOne);
+      await user.type(
+        candidateOne,
+        expectedRequest.data.political_group_votes[0]?.candidate_votes[0]?.votes.toString() ?? "0",
+      );
+
+      const candidateTwo = screen.getByTestId("candidate-votes-2");
+      await user.clear(candidateTwo);
+      await user.type(
+        candidateTwo,
+        expectedRequest.data.political_group_votes[0]?.candidate_votes[1]?.votes.toString() ?? "0",
+      );
+
+      const listTotal = screen.getByTestId("list-total");
+      await user.clear(listTotal);
+      await user.type(
+        listTotal,
+        expectedRequest.data.political_group_votes[0]?.total.toString() ?? "0",
+      );
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);

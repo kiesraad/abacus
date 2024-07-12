@@ -32,7 +32,7 @@ In de tweewekelijkse planningsmeeting wordt een duidelijk overzicht gemaakt van 
 issues worden bijgehouden op het GitHub Projects bord.
 De taken worden aan een _epic_ gekoppeld en de epics worden gerangschikt op prioriteit.
 
-Het UX design in Figma bevat ontwerpen voor alle features die een ontwerp vereisen.
+Het [ontwerp van de gebruikersinterface (in Figma)](https://www.figma.com/design/xHDfsv69Nhmk3IrWC0303B/Public---Kiesraad---Abacus-Software-voor-verkiezingsuitslagen-en-zetelverdeling?node-id=3190-11434) bevat ontwerpen voor alle features die een ontwerp vereisen.
 Dit wordt ook in de context van het gehele design besproken met het team.
 
 Het aanmaken van een nieuw GitHub-issue voor een feature of change request gebeurt in overleg met het team.

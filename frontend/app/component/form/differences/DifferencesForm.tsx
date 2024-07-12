@@ -184,7 +184,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="I"
             field="I"
-            name="more_ballots_count"
+            id="more_ballots_count"
             title="Stembiljetten méér geteld"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
@@ -195,7 +195,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="J"
             field="J"
-            name="fewer_ballots_count"
+            id="fewer_ballots_count"
             title="Stembiljetten minder geteld"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
@@ -207,7 +207,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="K"
             field="K"
-            name="unreturned_ballots_count"
+            id="unreturned_ballots_count"
             title="Niet ingeleverde stembiljetten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
@@ -217,7 +217,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="L"
             field="L"
-            name="too_few_ballots_handed_out_count"
+            id="too_few_ballots_handed_out_count"
             title="Te weinig uitgerekte stembiljetten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
@@ -228,7 +228,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="M"
             field="M"
-            name="too_many_ballots_handed_out_count"
+            id="too_many_ballots_handed_out_count"
             title="Teveel uitgereikte stembiljetten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
@@ -238,7 +238,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="N"
             field="N"
-            name="other_explanation_count"
+            id="other_explanation_count"
             title="Andere verklaring voor het verschil"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
@@ -250,7 +250,7 @@ export function DifferencesForm() {
           <InputGridRow
             key="O"
             field="O"
-            name="no_explanation_count"
+            id="no_explanation_count"
             title="Geen verklaring voor het verschil"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}

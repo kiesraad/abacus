@@ -46,7 +46,7 @@ export function InputGridRow({
 
   const [value, setValue] = React.useState(() => (defaultValue ? format(defaultValue) : ""));
   return (
-    <InputGrid.Row isTotal={isTotal} isFocused={isFocused} addSeparator={addSeparator}>
+    <InputGrid.Row isTotal={isTotal} isFocused={isFocused} addSeparator={addSeparator} id={id}>
       <td>{field}</td>
       <td>
         <FormField

@@ -325,4 +325,43 @@ describe("Test VotersAndVotesForm", () => {
     const result = await screen.findByTestId("feedback-error");
     expect(result).toHaveTextContent(/^IncorrectTotalIncorrectTotal$/);
   });
+
+  describe("VotersAndVotesForm errors", () => {
+    test("IncorrectTotal Voters", async () => {
+      overrideOnce(
+        "post",
+        "/v1/api/polling_stations/1/data_entries/1",
+        200,
+        '{"saved":true,"message":"Data entry saved successfully","validation_results":{"errors":[{"fields":["data.voters_counts.total_admitted_voters_count","data.voters_counts.poll_card_count","data.voters_counts.proxy_certificate_count","data.voters_counts.voter_card_count"],"code":"IncorrectTotal"}],"warnings":[]}}',
+      );
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      const pollCards = screen.getByTestId("poll_card_count");
+      await user.clear(pollCards);
+      await user.type(pollCards, "1");
+
+      const proxyCertificates = screen.getByTestId("proxy_certificate_count");
+      await user.clear(proxyCertificates);
+      await user.type(proxyCertificates, "1");
+
+      const voterCards = screen.getByTestId("voter_card_count");
+      await user.clear(voterCards);
+      await user.type(voterCards, "1");
+
+      const totalAdmittedVoters = screen.getByTestId("total_admitted_voters_count");
+      await user.clear(totalAdmittedVoters);
+      await user.type(totalAdmittedVoters, "4");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const result = await screen.findByTestId("feedback-error");
+      expect(result).toHaveTextContent(/^IncorrectTotal$/);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+    });
+  });
 });

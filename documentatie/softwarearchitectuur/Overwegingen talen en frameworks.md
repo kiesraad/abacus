@@ -66,6 +66,14 @@ We maken ook gebruik van TypeScript, een uitgebreidere versie van JavaScript. Di
 
 React is een van de meest gebruikte libraries voor het maken van gebruikersinterfaces. Deze library heeft een groot bereik onder developers en wordt goed onderhouden. Een andere overweging was Angular, maar React is stabieler. Ook hebben onze programmeurs hier ervaring mee. 
 
+### Ladle
+
+Deze tool wordt gebruikt om te ontwikkelen en testen met React. Deze optie werkt eenvoudiger dan het alternatief Storybook.
+
+### Playwright
+
+Playwright is uitermate geschikt als testframework voor de browser. Selenium is een automatiseringslibrary die een alternatief zou kunnen zijn voor Playwright, maar Playwright heeft meer functionaliteit. Bovendien zou je voor Selenium ook een test runner en een assertion library nodig hebben. Ook zou je convenience functions/methods moeten bouwen omdat Selenium best low-level control op de browser biedt. Playwright heeft deze vereisten niet, en daarom hebben we hiervoor gekozen. 
+
 ## Keuze backend: Rust
 
 Qua programmeertaal voor de backend is elke courante taal een redelijke, waarbij enkele overwegingen moeten worden meegenomen. Ten eerste valt C af omdat deze taal te lage abstractie en dus minder efficiëntie biedt in het programmeren. Bovendien zijn er ook risico's op bugs vanwege de methoden voor geheugengebruik. Door deze overwegingen vallen ook veel andere standaard talen met zwakke en/of dynamische typesystemen af, zoals PHP en Python.

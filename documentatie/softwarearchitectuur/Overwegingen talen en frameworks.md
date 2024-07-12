@@ -147,4 +147,4 @@ GitHub is een platform waar ontwikkelaars code kunnen schrijven, beheren en dele
 
 ### Figma
 
-Figma een veelgebruikte tool voor het ontwerpen van gebruikersinterfaces voor digitale producten. Het bevat veel functionaliteit, goede opties voor samenwerking en is zeer populair onder designers.
+Figma is een veelgebruikte tool voor het ontwerpen van gebruikersinterfaces voor digitale producten. Het bevat veel functionaliteit, goede opties voor samenwerking en is zeer populair onder designers.

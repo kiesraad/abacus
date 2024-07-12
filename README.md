@@ -39,7 +39,7 @@ De eerste stap is het bouwen van de uitslagensoftware voor de gemeenteraadsverki
 
 ### Work in progress
 
-Er zijn enkele zaken waar we nog over nadenken:
+We denken nog na over de beste manier om de volgende functionaliteit in te bouwen: 
 
 - Afzender- en bestandsverificatie
 - Bestandsuitwisseling

@@ -105,7 +105,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         </Feedback>
       )}
 
-      {hasValidationWarning && (
+      {hasValidationWarning && !hasValidationError && (
         <Feedback type="warning" title="Controleer uitgebrachte stemmen">
           <div id="feedback-warning">
             <ul>

@@ -75,7 +75,7 @@ Lees voor meer informatie het bestand `README.md` in elke directory.
 
 ## Bijdragen
 
-We ontwikkelen Abacus open source, niet alleen omdat dit de transparantie bevordert, maar ook omdat we bijdragen vanuit de community verwelkomen. We zijn altijd nieuwsgierig naar nieuwe perspectieven of invalshoeken. Als je iets wilt bijdragen aan de software, neem dan vooraf contact op via e-mail: [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). Het team werkt met een planning en epics zoals opgenomen in het projectboard.
+We ontwikkelen Abacus open source, niet alleen omdat dit de transparantie bevordert, maar ook omdat we bijdragen vanuit de community verwelkomen. We zijn altijd nieuwsgierig naar nieuwe perspectieven of invalshoeken. Als je iets wilt bijdragen aan de software, neem dan vooraf contact op via e-mail: [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). Het team werkt met een planning en epics zoals opgenomen in het projectbord.
 
 Als je een bijdrage aan de broncode wilt doen vragen we je om vooraf een [contributor licence agreement (CLA)](/CLA.md) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. Stuur de getekende CLA naar [abacus@kiesraad.nl](mailto:abacus@kiesraad.nl). Dank alvast!
 

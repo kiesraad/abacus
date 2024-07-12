@@ -40,7 +40,7 @@
 
 ## Kwaliteitsattributen
 
-We hebben kwaliteitscriteria gekozen om ons werk tegen te toetsen, aansluitend op de waarborgen uit het verkiezingsproces:
+We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op de waarborgen uit het verkiezingsproces:
 
 -   Betrouwbaarheid. Kun je de software in de meeste situaties vertrouwen?
 -   Bruikbaarheid. Is de software makkelijk te gebruiken? (voor alle bedoelde gebruikers, dus ook installatie, controleerbaar door burger, etc)

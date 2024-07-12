@@ -328,12 +328,24 @@ describe("Test VotersAndVotesForm", () => {
 
   describe("VotersAndVotesForm errors", () => {
     test("IncorrectTotal Voters", async () => {
-      overrideOnce(
-        "post",
-        "/v1/api/polling_stations/1/data_entries/1",
-        200,
-        '{"saved":true,"message":"Data entry saved successfully","validation_results":{"errors":[{"fields":["data.voters_counts.total_admitted_voters_count","data.voters_counts.poll_card_count","data.voters_counts.proxy_certificate_count","data.voters_counts.voter_card_count"],"code":"IncorrectTotal"}],"warnings":[]}}',
-      );
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+        saved: true,
+        message: "Data entry saved successfully",
+        validation_results: {
+          errors: [
+            {
+              fields: [
+                "data.voters_counts.total_admitted_voters_count",
+                "data.voters_counts.poll_card_count",
+                "data.voters_counts.proxy_certificate_count",
+                "data.voters_counts.voter_card_count",
+              ],
+              code: "IncorrectTotal",
+            },
+          ],
+          warnings: [],
+        },
+      });
 
       const user = userEvent.setup();
 

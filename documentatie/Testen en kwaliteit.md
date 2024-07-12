@@ -20,20 +20,20 @@
 ## Kwaliteits- en testbeleid
 
 ### Zero bug policy
-- geldt zowel voor externe kwaliteit (product) als interne kwaliteit (code)
-- of het is goed genoeg, of we accepteren dat we het werk mogelijk nooit inplannen
+- Geldt zowel voor externe kwaliteit (product) als interne kwaliteit (code)
+- Of het is goed genoeg, of we accepteren dat we het werk mogelijk nooit inplannen
 	- niet onderhandelen over kwaliteit door bugs aan de backlog toe te voegen of door een kwetsbaarhedenregister bij te houden
 	- vermijden van "normalization of deviance": "dit kan voor één keer" wordt "dit kan wel eens een keer" wordt "dit kan wel"
 	- vermijden van "failure demand" (extra werk omdat het de eerste keer niet goed genoeg was): managen van je backlog/bevindingenregister kost uiteindelijk vrijwel altijd meer dan gelijk oplossen
 
 ### Vroege feedback en end-to-end feedback
-- vroege feedback
+- Vroege feedback
 	- feedback op waar je op dat moment mee bezig bent is beter dan feedback op wat je vorige week was aan het doen
 	- dus ontwikkelen in dunne "slices" (zo klein mogelijke scope)
-- end-to-end feedback
+- End-to-end feedback
 	- feedback op een feature is rijker dan feedback op een component
 	- dus ontwikkelen in verticale "slices" (feature over componenten heen), niet in horizontale "slices" (feature component per component bouwen)
-- gefaciliteerd door
+- Gefaciliteerd door
 	- iteratief en incrementeel ontwikkelen
 	- CI/CD (zie "Kwaliteits- en testprogramma")
 
@@ -63,7 +63,7 @@ We hebben kwaliteitscriteria gekozen om ons werk tegen te toetsen, aansluitend o
 ### Ontwikkelteam
 
 #### Vier-ogen principe
-- om te vermijden dat ongewenste functionaliteit (backdoors, manipuleren verkiezingsresultaten, lekken informatie) op de mainline komt, wordt elke code-wijziging hierop gereviewd vóórdat deze naar mainline gemerged wordt
+- Om te vermijden dat ongewenste functionaliteit (backdoors, manipuleren verkiezingsresultaten, lekken informatie) op de mainline komt, wordt elke code-wijziging hierop gereviewd vóórdat deze naar mainline gemerged wordt
 
 #### Permanente code reviews
 - kleine PRs, doel 1-3 dagen open
@@ -83,7 +83,7 @@ We hebben kwaliteitscriteria gekozen om ons werk tegen te toetsen, aansluitend o
 	- ideaal: elke developer intregreert eigen code minstens één keer per dag met gedeelde branch
 - CD: mitigeren risico opleveren installeerbaar product door het continu te doen
 	- pipeline resulteert in installeerbare en werkende applicatie
-- dus CI/CD pipeline nodig met quality gates (nog niet alle geïmplementeerd):
+- Dus CI/CD pipeline nodig met quality gates (nog niet alle geïmplementeerd):
 	- linting
 	- static code anlysis
 	- unit tests
@@ -92,46 +92,46 @@ We hebben kwaliteitscriteria gekozen om ons werk tegen te toetsen, aansluitend o
 	- security scan
 	- performance test
 	- installeerbaarheidstest
-- op zijn minst de volgende quality gates kunnen ook lokaal gedraaid worden: linting, unit tests, integration tests, e2e tests
-- feedback van de pipeline is snel genoeg, ambitie is binnen 5-10 minuten op zijn minst feedback te hebben van linting, static code analysis, unit tests,
+- Op zijn minst de volgende quality gates kunnen ook lokaal gedraaid worden: linting, unit tests, integration tests, e2e tests
+- Feedback van de pipeline is snel genoeg, ambitie is binnen 5-10 minuten op zijn minst feedback te hebben van linting, static code analysis, unit tests,
   integration tests, e2e tests, security scan
 
 ### Interne stakeholders
-- frequentie: regelmatig
-- doel:
+- Frequentie: regelmatig
+- Doel:
 	- feedback ophalen van interne stakeholders Kiesraad
-- scope:
+- Scope:
 	- juridische kaders
 	- hallway test
 	- ...
-- faciliteren door:
+- Faciliteren door:
 	- demos
 	- beschikbaar maken front-end met mock service
 	- code, builds en releases beschikbaar op GitHub
 
 ### Externe stakeholders
-- frequentie: te bepalen
-- doel:
+- Frequentie: te bepalen
+- Doel:
 	- feedback ophalen van externe stakeholders, bijv gemeentes
 	- feedback ophalen van externe geïnteresseerden, bijv betrokken burgers maar ook community van experts (programmeren, testen)
-- faciliteren door:
+- Faciliteren door:
 	- kleinschalige gebruikerstests
 	- organiseren sessies voor ophalen feedback
 	- code, builds en releases beschikbaar op GitHub
 
 ### Oefen-verkiezingsrelease
-- frequentie: elke half jaar
-- doel:
+- Frequentie: elke half jaar
+- Doel:
 	- vaker feedback dan alleen bij verkiezingen
 	- routine opbouwen in release-proces
-- scope:
+- Scope:
 	- externe code review
 	- externe pentests
 
 ### Verkiezingsrelease
-- frequentie: elke verkiezingen
-- doel: verkiezingen
-- scope:
+- Frequentie: elke verkiezingen
+- Doel: verkiezingen
+- Scope:
 	- externe code review
 	- externe pentests
 	- toetsing wettelijke kaders

@@ -37,7 +37,7 @@ Dit wordt ook in de context van het gehele design besproken met het team.
 
 Het aanmaken van een nieuw GitHub-issue voor een feature of change request gebeurt in overleg met het team.
 
-GitHub Projects bord: [Abacus project board](https://github.com/orgs/kiesraad/projects/1)
+GitHub Projects bord: [Abacus projectbord](https://github.com/orgs/kiesraad/projects/1)
 
 ### Ontwikkeling
 

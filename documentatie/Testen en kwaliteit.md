@@ -63,7 +63,7 @@ We hebben kwaliteitscriteria gekozen om ons werk tegen te toetsen, aansluitend o
 ### Ontwikkelteam
 
 #### Vier-ogen principe
-- Om te vermijden dat ongewenste functionaliteit (backdoors, manipuleren verkiezingsresultaten, lekken informatie) op de mainline komt, wordt elke code-wijziging hierop gereviewd vóórdat deze naar mainline gemerged wordt
+- Om te vermijden dat fouten of ongewenste functionaliteit (backdoors, manipuleren verkiezingsresultaten, lekken informatie) op de main branch komen, wordt elke code-wijziging hierop gereviewd vóórdat deze naar main gemerged wordt
 
 #### Permanente code reviews
 - kleine PRs, doel 1-3 dagen open

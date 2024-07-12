@@ -57,8 +57,8 @@ We hebben kwaliteitscriteria gekozen om ons werk tegen te toetsen, aansluitend o
 | ontwikkeling       | continu         | ontwikkelteam         | permanente reviews van code en documentatie, handmatig en automatisch testen, CI/CD |
 | ontwikkeling       | regelmatig      | stakeholders Kiesraad | feedback op applicatie en documentatie |
 | tussentijds        | te bepalen      | externe stakeholders, externe geïnteresseerden | feedback op code, applicatie en documentatie |
-| oefen-release      | elk half jaar   | externe partijen      | code review, pen test |
-| verkiezingsrelease | elke verkiezing | externe partijen      | code review, pen test, toetsing wettelijke kaders |
+| oefen-release      | elk half jaar   | externe partijen      | code review, pentest |
+| verkiezingsrelease | elke verkiezing | externe partijen      | code review, pentest, toetsing wettelijke kaders |
 
 ### Ontwikkelteam
 

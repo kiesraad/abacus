@@ -5,13 +5,14 @@ import {
   CandidateVotes,
   PoliticalGroup,
   PoliticalGroupVotes,
+  useErrorsAndWarnings,
   usePoliticalGroup,
 } from "@kiesraad/api";
-import { BottomBar, Button, Feedback, InputGrid } from "@kiesraad/ui";
+import { BottomBar, Button, Feedback, InputGrid, InputGridRow } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
-  listtotal: HTMLInputElement;
+  total: HTMLInputElement;
   "candidatevotes[]": HTMLInputElement[];
 }
 
@@ -23,8 +24,10 @@ export interface CandidatesVotesFormProps {
   group: PoliticalGroup;
 }
 
+//political_group_votes[1].candidate_votes[1].votes
+
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
-  const { register, format, deformat } = usePositiveNumberInputMask();
+  const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
   const {
     sectionValues,
@@ -36,6 +39,8 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     isCalled,
     setTemporaryCache,
   } = usePoliticalGroup(group.number);
+
+  console.log(errors);
 
   usePreventFormEnterSubmit(formRef);
 
@@ -50,13 +55,16 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       }
       return {
         number: group.number,
-        total: deformat(elements.listtotal.value),
+        total: deformat(elements.total.value),
         candidate_votes: candidate_votes,
       };
     },
     [deformat, group],
   );
 
+  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+
+  console.log(errorsAndWarnings);
   //const blocker =  useBlocker() use const blocker to render confirmation UI.
   useBlocker(() => {
     if (formRef.current && !isCalled) {
@@ -127,42 +135,32 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             const addSeparator = (index + 1) % 25 == 0;
             const defaultValue = sectionValues?.candidate_votes[index]?.votes || "";
             return (
-              <InputGrid.Row
-                isFocused={index === 0}
-                addSeparator={addSeparator}
+              <InputGridRow
                 key={`list${group.number}-candidate${index + 1}`}
-              >
-                <td>{index + 1}</td>
-                <td>
-                  <input
-                    id={`candidate-votes-${candidate.number}`}
-                    name="candidatevotes[]"
-                    maxLength={11}
-                    {...register()}
-                    /* eslint-disable-next-line jsx-a11y/no-autofocus */
-                    autoFocus={index === 0}
-                    defaultValue={format(defaultValue)}
-                  />
-                </td>
-                <td>
-                  {candidate.last_name}, {candidate.initials} ({candidate.first_name})
-                </td>
-              </InputGrid.Row>
+                field={`${index + 1}`}
+                name="candidatevotes[]"
+                id={`candidate_votes-${candidate.number}.votes`}
+                title={`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`}
+                errorsAndWarnings={errorsAndWarnings}
+                inputProps={register()}
+                format={format}
+                addSeparator={addSeparator}
+                defaultValue={defaultValue}
+              />
             );
           })}
-          <InputGrid.Total key={`list${group.number}-total`}>
-            <td></td>
-            <td>
-              <input
-                id={`list-total`}
-                name="listtotal"
-                maxLength={11}
-                {...register()}
-                defaultValue={format(sectionValues?.total || "")}
-              />
-            </td>
-            <td>Totaal lijst {group.number}</td>
-          </InputGrid.Total>
+          <InputGridRow
+            key={`list${group.number}-total`}
+            field={``}
+            name="total"
+            id={`total`}
+            title={`Totaal lijst ${group.number}`}
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+            defaultValue={format(sectionValues?.total || "")}
+            isTotal
+          />
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="inputgrid">

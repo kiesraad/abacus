@@ -9,12 +9,13 @@ import { Icon } from "../Icon/Icon";
 import { InputGrid } from "./InputGrid";
 
 export interface InputGridRowProps {
+  id: string;
   field: string;
-  name: string;
   title: string;
   errorsAndWarnings: Map<string, ErrorsAndWarnings>;
   inputProps: Partial<React.InputHTMLAttributes<HTMLInputElement>>;
   format: FormatFunc;
+  name?: string;
   defaultValue?: string | number;
   isTotal?: boolean;
   isFocused?: boolean;
@@ -30,15 +31,16 @@ export function InputGridRow({
   defaultValue,
   inputProps,
   isTotal,
+  id,
   isFocused = false,
   addSeparator,
 }: InputGridRowProps) {
-  const errors = errorsAndWarnings.get(name)?.errors;
+  const errors = errorsAndWarnings.get(id)?.errors;
   const warnings = errorsAndWarnings
-    .get(name)
+    .get(id)
     ?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING");
   const tooltip = errorsAndWarnings
-    .get(name)
+    .get(id)
     ?.warnings.find((warning) => warning.code === "REFORMAT_WARNING")?.value;
 
   const [value, setValue] = React.useState(() => (defaultValue ? format(defaultValue) : ""));
@@ -62,9 +64,9 @@ export function InputGridRow({
           }
         >
           <input
-            key={name}
-            id={name}
-            name={name}
+            key={id}
+            id={id}
+            name={name || id}
             maxLength={11}
             {...inputProps}
             value={value}

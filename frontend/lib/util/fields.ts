@@ -1,6 +1,16 @@
 export function fieldNameFromPath(path: string): string {
+  let result = "";
   const bits = path.split(".");
-  return bits[bits.length - 1] || path;
+  // flatten path at depth 4: data.political_group_votes[1].candidate_votes[1].votes
+  if (bits.length === 4) {
+    const [, , subsection, field] = bits;
+    // replace [1] with -1
+    const b = subsection?.replace(/\[(\d+)\]/, "-$1");
+    return `${b}.${field}`;
+  } else {
+    result = bits[bits.length - 1] || "";
+  }
+  return result || path;
 }
 
 /**

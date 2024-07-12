@@ -5,6 +5,7 @@ test.each([
   ["votes_counts.total_votes_cast_count", "total_votes_cast_count"],
   ["test", "test"],
   ["test1.test2.test3", "test3"],
+  ["data.policical_group_votes[1].candidate[1].votes", "candidate-1.votes"],
   ["", ""],
 ])("fieldName from path %s as %s", (input: string, expected: string) => {
   expect(fieldNameFromPath(input)).equals(expected);

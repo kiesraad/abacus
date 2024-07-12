@@ -1,10 +1,23 @@
 import { ReactElement } from "react";
 import { Providers } from "./Providers";
 
-import { render, RenderOptions } from "@testing-library/react";
+import { render, RenderOptions, RenderResult, fireEvent } from "@testing-library/react";
 
-const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
-  render(ui, { wrapper: Providers, ...options });
+const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) => {
+  const result: RenderResult = render(ui, { wrapper: Providers, ...options });
+
+  const fillFormValues = (values: Record<string, string | number>) => {
+    Object.keys(values).forEach((key) => {
+      const input = result.getByTestId(key);
+      fireEvent.change(input, { target: { value: values[key] } });
+    });
+  };
+
+  return {
+    ...result,
+    fillFormValues,
+  };
+};
 
 export * from "@testing-library/react";
 export { customRender as render };

@@ -22,7 +22,7 @@ Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijz
 
 De uitgangspunten bij het ontwerp en de bouw van Abacus zijn gebruiksvriendelijkheid en eenvoud, naast de waarden integriteit, transparantie en controleerbaarheid. De software dient voor het correct invoeren van de resultaten van de stembureaus volgens het vier-ogen principe, voor het maken van de optelling van alle ingevoerde stembureaus en het opstellen van het proces-verbaal met de resultaten. 
 
-Meer informatie over het proces en de uitvoering van de verkiezingen in Nederland is te vinden op de website van de Kiesraad onder 'verkiezingen': [https://www.kiesraad.nl/verkiezingen](https://www.kiesraad.nl/verkiezingen)
+Meer informatie over het proces en de uitvoering van de verkiezingen in Nederland is te vinden op de website van de Kiesraad onder 'verkiezingen': [kiesraad.nl/verkiezingen](https://www.kiesraad.nl/verkiezingen)
 
 ## Functies
 

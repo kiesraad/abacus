@@ -47,8 +47,8 @@ Voor de ontwikkeling via GitHub werken we met issues die zijn opgenomen in epics
 
 Er vinden twee soorten releases plaats: 
 
-- tussentijdse releases of builds
-- releases voor verkiezingen
+- Tussentijdse releases of builds
+- Releases voor verkiezingen
 
 #### Tussentijds
 

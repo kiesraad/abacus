@@ -1,4 +1,3 @@
-
 # GitHub werkwijze
 
 Dit document beschrijft de werkwijze met Github. Er zijn meerdere manieren om deze stappen te zetten. 

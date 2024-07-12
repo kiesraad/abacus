@@ -56,7 +56,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 
 ### Vereist (must have)
 
-*De onderstaande eisen (requirements) moeten in de eerste versie voor gemeenteraadsverkiezingen terugkomen. Zonder deze eisen is het product niet bruikbaar.*
+*Onderstaande eisen (requirements) moeten in de eerste versie voor gemeenteraadsverkiezingen terugkomen. Zonder deze eisen is het product niet bruikbaar.*
 
 - Gebruikers en rollen:
   - Gebruikers kunnen lokaal worden aangemaakt met eenvoudige authenticatie, dus alleen een gebruikersnaam en wachtwoord.

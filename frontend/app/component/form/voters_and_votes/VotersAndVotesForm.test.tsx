@@ -396,4 +396,57 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
   });
+
+  test("F.12 IncorrectTotal Votes", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      saved: true,
+      message: "Data entry saved successfully",
+      validation_results: {
+        errors: [
+          {
+            fields: [
+              "data.votes_counts.total_votes_cast_count",
+              "data.votes_counts.votes_candidates_counts",
+              "data.votes_counts.blank_votes_count",
+              "data.votes_counts.invalid_votes_count",
+            ],
+            code: "IncorrectTotal",
+          },
+          {
+            fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
+            code: "IncorrectTotal",
+          },
+        ],
+        warnings: [],
+      },
+    });
+
+    const user = userEvent.setup();
+
+    render(Component);
+
+    const pollCards = screen.getByTestId("votes_candidates_counts");
+    await user.clear(pollCards);
+    await user.type(pollCards, "1");
+
+    const proxyCertificates = screen.getByTestId("blank_votes_count");
+    await user.clear(proxyCertificates);
+    await user.type(proxyCertificates, "1");
+
+    const voterCards = screen.getByTestId("invalid_votes_count");
+    await user.clear(voterCards);
+    await user.type(voterCards, "1");
+
+    const totalAdmittedVoters = screen.getByTestId("total_votes_cast_count");
+    await user.clear(totalAdmittedVoters);
+    await user.type(totalAdmittedVoters, "4");
+
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    const result = await screen.findByTestId("feedback-error");
+    expect(result).toHaveTextContent(/^IncorrectTotal$/);
+    expect(screen.queryByTestId("feedback-warning")).toBeNull();
+    expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+  });
 });

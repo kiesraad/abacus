@@ -151,7 +151,7 @@ InputGrid.Row = ({
   id?: string;
 }) => (
   <>
-    <tr className={(isTotal ? "is-total " : "") + (isFocused ? "focused" : "")} id={id}>
+    <tr className={(isTotal ? "is-total " : "") + (isFocused ? "focused" : "")} id={`row-${id}`}>
       {children}
     </tr>
     {addSeparator && <InputGrid.Separator />}

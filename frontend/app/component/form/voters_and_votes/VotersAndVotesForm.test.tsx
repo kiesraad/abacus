@@ -425,21 +425,21 @@ describe("Test VotersAndVotesForm", () => {
 
       render(Component);
 
-      const pollCards = screen.getByTestId("votes_candidates_counts");
-      await user.clear(pollCards);
-      await user.type(pollCards, "1");
+      const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
+      await user.clear(votesOnCandidates);
+      await user.type(votesOnCandidates, "1");
 
-      const proxyCertificates = screen.getByTestId("blank_votes_count");
-      await user.clear(proxyCertificates);
-      await user.type(proxyCertificates, "1");
+      const blankVotes = screen.getByTestId("blank_votes_count");
+      await user.clear(blankVotes);
+      await user.type(blankVotes, "1");
 
-      const voterCards = screen.getByTestId("invalid_votes_count");
-      await user.clear(voterCards);
-      await user.type(voterCards, "1");
+      const invalidVotes = screen.getByTestId("invalid_votes_count");
+      await user.clear(invalidVotes);
+      await user.type(invalidVotes, "1");
 
-      const totalAdmittedVoters = screen.getByTestId("total_votes_cast_count");
-      await user.clear(totalAdmittedVoters);
-      await user.type(totalAdmittedVoters, "4");
+      const totalVotesCast = screen.getByTestId("total_votes_cast_count");
+      await user.clear(totalVotesCast);
+      await user.type(totalVotesCast, "4");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -474,27 +474,139 @@ describe("Test VotersAndVotesForm", () => {
 
       render(Component);
 
-      const pollCards = screen.getByTestId("votes_candidates_counts");
-      await user.clear(pollCards);
-      await user.type(pollCards, "0");
+      const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
+      await user.clear(votesOnCandidates);
+      await user.type(votesOnCandidates, "0");
 
-      const proxyCertificates = screen.getByTestId("blank_votes_count");
-      await user.clear(proxyCertificates);
-      await user.type(proxyCertificates, "1");
+      const blankVotes = screen.getByTestId("blank_votes_count");
+      await user.clear(blankVotes);
+      await user.type(blankVotes, "1");
 
-      const voterCards = screen.getByTestId("invalid_votes_count");
-      await user.clear(voterCards);
-      await user.type(voterCards, "0");
+      const invalidVotes = screen.getByTestId("invalid_votes_count");
+      await user.clear(invalidVotes);
+      await user.type(invalidVotes, "0");
 
-      const totalAdmittedVoters = screen.getByTestId("total_votes_cast_count");
-      await user.clear(totalAdmittedVoters);
-      await user.type(totalAdmittedVoters, "1");
+      const totalVotesCast = screen.getByTestId("total_votes_cast_count");
+      await user.clear(totalVotesCast);
+      await user.type(totalVotesCast, "1");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const result = await screen.findByTestId("feedback-warning");
       expect(result).toHaveTextContent(/^AboveThreshold$/);
+      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
+
+    test("W.22 AboveThreshold invalid votes", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+        saved: true,
+        message: "Data entry saved successfully",
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: [
+                "data.votes_counts.blank_votes_count",
+                "data.votes_counts.total_votes_cast_count",
+              ],
+              code: "AboveThreshold",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
+      await user.clear(votesOnCandidates);
+      await user.type(votesOnCandidates, "0");
+
+      const blankVotes = screen.getByTestId("blank_votes_count");
+      await user.clear(blankVotes);
+      await user.type(blankVotes, "0");
+
+      const invalidVotes = screen.getByTestId("invalid_votes_count");
+      await user.clear(invalidVotes);
+      await user.type(invalidVotes, "1");
+
+      const totalVotesCast = screen.getByTestId("total_votes_cast_count");
+      await user.clear(totalVotesCast);
+      await user.type(totalVotesCast, "1");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const result = await screen.findByTestId("feedback-warning");
+      expect(result).toHaveTextContent(/^AboveThreshold$/);
+      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
+
+    test("W.27 EqualInput voters and votes", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+        saved: true,
+        message: "Data entry saved successfully",
+        validation_results: {
+          errors: [
+            {
+              fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
+              code: "IncorrectTotal",
+            },
+          ],
+          warnings: [
+            {
+              fields: ["data.voters_counts", "data.votes_counts"],
+              code: "EqualInput",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      const pollCards = screen.getByTestId("poll_card_count");
+      await user.clear(pollCards);
+      await user.type(pollCards, "1");
+
+      const proxyCertificates = screen.getByTestId("proxy_certificate_count");
+      await user.clear(proxyCertificates);
+      await user.type(proxyCertificates, "0");
+
+      const voterCards = screen.getByTestId("voter_card_count");
+      await user.clear(voterCards);
+      await user.type(voterCards, "0");
+
+      const totalAdmittedVoters = screen.getByTestId("total_admitted_voters_count");
+      await user.clear(totalAdmittedVoters);
+      await user.type(totalAdmittedVoters, "1");
+
+      const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
+      await user.clear(votesOnCandidates);
+      await user.type(votesOnCandidates, "1");
+
+      const blankVotes = screen.getByTestId("blank_votes_count");
+      await user.clear(blankVotes);
+      await user.type(blankVotes, "0");
+
+      const invalidVotes = screen.getByTestId("invalid_votes_count");
+      await user.clear(invalidVotes);
+      await user.type(invalidVotes, "0");
+
+      const totalVotesCast = screen.getByTestId("total_votes_cast_count");
+      await user.clear(totalVotesCast);
+      await user.type(totalVotesCast, "1");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const result = await screen.findByTestId("feedback-warning");
+      expect(result).toHaveTextContent(/^EqualInput$/);
       expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });

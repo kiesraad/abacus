@@ -58,287 +58,207 @@ describe("Test VotersAndVotesForm", () => {
     vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
   });
 
-  test("hitting enter key does not result in api call", async () => {
-    const spy = vi.spyOn(global, "fetch");
+  describe("VotersAndVotesForm user interactions", () => {
+    test("hitting enter key does not result in api call", async () => {
+      const spy = vi.spyOn(global, "fetch");
 
-    const user = userEvent.setup();
+      const user = userEvent.setup();
 
-    render(Component);
+      render(Component);
 
-    const pollCards = screen.getByTestId("poll_card_count");
-    await user.type(pollCards, "12345");
-    expect(pollCards).toHaveValue("12.345");
+      const pollCards = screen.getByTestId("poll_card_count");
+      await user.type(pollCards, "12345");
+      expect(pollCards).toHaveValue("12.345");
 
-    await user.keyboard("{enter}");
+      await user.keyboard("{enter}");
 
-    expect(spy).not.toHaveBeenCalled();
-  });
-
-  test("Form field entry and keybindings", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
-      message: "Data saved",
-      saved: true,
-      validation_results: { errors: [], warnings: [] },
+      expect(spy).not.toHaveBeenCalled();
     });
 
-    const user = userEvent.setup();
+    test("Form field entry and keybindings", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+        message: "Data saved",
+        saved: true,
+        validation_results: { errors: [], warnings: [] },
+      });
 
-    render(Component);
+      const user = userEvent.setup();
 
-    const pollCards = screen.getByTestId("poll_card_count");
-    expect(pollCards).toHaveFocus();
-    await user.type(pollCards, "12345");
-    expect(pollCards).toHaveValue("12.345");
+      render(Component);
 
-    await user.keyboard("{enter}");
+      const pollCards = screen.getByTestId("poll_card_count");
+      expect(pollCards).toHaveFocus();
+      await user.type(pollCards, "12345");
+      expect(pollCards).toHaveValue("12.345");
 
-    const proxyCertificates = screen.getByTestId("proxy_certificate_count");
-    expect(proxyCertificates).toHaveFocus();
-    await user.paste("6789");
-    expect(proxyCertificates).toHaveValue("6.789");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const proxyCertificates = screen.getByTestId("proxy_certificate_count");
+      expect(proxyCertificates).toHaveFocus();
+      await user.paste("6789");
+      expect(proxyCertificates).toHaveValue("6.789");
 
-    const voterCards = screen.getByTestId("voter_card_count");
-    expect(voterCards).toHaveFocus();
-    await user.type(voterCards, "123");
-    expect(voterCards).toHaveValue("123");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const voterCards = screen.getByTestId("voter_card_count");
+      expect(voterCards).toHaveFocus();
+      await user.type(voterCards, "123");
+      expect(voterCards).toHaveValue("123");
 
-    const totalAdmittedVoters = screen.getByTestId("total_admitted_voters_count");
-    expect(totalAdmittedVoters).toHaveFocus();
-    await user.paste("4242");
-    expect(totalAdmittedVoters).toHaveValue("4.242");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const totalAdmittedVoters = screen.getByTestId("total_admitted_voters_count");
+      expect(totalAdmittedVoters).toHaveFocus();
+      await user.paste("4242");
+      expect(totalAdmittedVoters).toHaveValue("4.242");
 
-    const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
-    expect(votesOnCandidates).toHaveFocus();
-    await user.type(votesOnCandidates, "12");
-    expect(votesOnCandidates).toHaveValue("12");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
+      expect(votesOnCandidates).toHaveFocus();
+      await user.type(votesOnCandidates, "12");
+      expect(votesOnCandidates).toHaveValue("12");
 
-    const blankVotes = screen.getByTestId("blank_votes_count");
-    expect(blankVotes).toHaveFocus();
-    // Test if maxLength on field works
-    await user.type(blankVotes, "1000000000");
-    expect(blankVotes).toHaveValue("100.000.000");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const blankVotes = screen.getByTestId("blank_votes_count");
+      expect(blankVotes).toHaveFocus();
+      // Test if maxLength on field works
+      await user.type(blankVotes, "1000000000");
+      expect(blankVotes).toHaveValue("100.000.000");
 
-    const invalidVotes = screen.getByTestId("invalid_votes_count");
-    expect(invalidVotes).toHaveFocus();
-    await user.type(invalidVotes, "3");
-    expect(invalidVotes).toHaveValue("3");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const invalidVotes = screen.getByTestId("invalid_votes_count");
+      expect(invalidVotes).toHaveFocus();
+      await user.type(invalidVotes, "3");
+      expect(invalidVotes).toHaveValue("3");
 
-    const totalVotesCast = screen.getByTestId("total_votes_cast_count");
-    expect(totalVotesCast).toHaveFocus();
-    await user.type(totalVotesCast, "555");
-    expect(totalVotesCast).toHaveValue("555");
+      await user.keyboard("{enter}");
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
+      const totalVotesCast = screen.getByTestId("total_votes_cast_count");
+      expect(totalVotesCast).toHaveFocus();
+      await user.type(totalVotesCast, "555");
+      expect(totalVotesCast).toHaveValue("555");
 
-    const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^Success$/);
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const result = await screen.findByTestId("result");
+      expect(result).toHaveTextContent(/^Success$/);
+    });
   });
 
-  test("VotersAndVotesForm request body is equal to the form data", async () => {
-    const spy = vi.spyOn(global, "fetch");
+  describe("VotersAndVotesForm API request and response", () => {
+    test("VotersAndVotesForm request body is equal to the form data", async () => {
+      const spy = vi.spyOn(global, "fetch");
 
-    const expectedRequest = {
-      data: {
-        ...rootRequest.data,
-        voters_counts: {
-          poll_card_count: 1,
-          proxy_certificate_count: 2,
-          voter_card_count: 3,
-          total_admitted_voters_count: 6,
+      const expectedRequest = {
+        data: {
+          ...rootRequest.data,
+          voters_counts: {
+            poll_card_count: 1,
+            proxy_certificate_count: 2,
+            voter_card_count: 3,
+            total_admitted_voters_count: 6,
+          },
+          votes_counts: {
+            votes_candidates_counts: 4,
+            blank_votes_count: 5,
+            invalid_votes_count: 6,
+            total_votes_cast_count: 15,
+          },
         },
-        votes_counts: {
-          votes_candidates_counts: 4,
-          blank_votes_count: 5,
-          invalid_votes_count: 6,
-          total_votes_cast_count: 15,
-        },
-      },
-    };
+      };
 
-    const user = userEvent.setup();
+      const user = userEvent.setup();
 
-    render(Component);
+      render(Component);
 
-    await user.type(
-      screen.getByTestId("poll_card_count"),
-      expectedRequest.data.voters_counts.poll_card_count.toString(),
-    );
-    await user.type(
-      screen.getByTestId("proxy_certificate_count"),
-      expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
-    );
-    await user.type(
-      screen.getByTestId("voter_card_count"),
-      expectedRequest.data.voters_counts.voter_card_count.toString(),
-    );
-    await user.type(
-      screen.getByTestId("total_admitted_voters_count"),
-      expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
-    );
+      await user.type(
+        screen.getByTestId("poll_card_count"),
+        expectedRequest.data.voters_counts.poll_card_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("proxy_certificate_count"),
+        expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("voter_card_count"),
+        expectedRequest.data.voters_counts.voter_card_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("total_admitted_voters_count"),
+        expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
+      );
 
-    await user.type(
-      screen.getByTestId("votes_candidates_counts"),
-      expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
-    );
-    await user.type(
-      screen.getByTestId("blank_votes_count"),
-      expectedRequest.data.votes_counts.blank_votes_count.toString(),
-    );
-    await user.type(
-      screen.getByTestId("invalid_votes_count"),
-      expectedRequest.data.votes_counts.invalid_votes_count.toString(),
-    );
-    await user.type(
-      screen.getByTestId("total_votes_cast_count"),
-      expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
-    );
+      await user.type(
+        screen.getByTestId("votes_candidates_counts"),
+        expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
+      );
+      await user.type(
+        screen.getByTestId("blank_votes_count"),
+        expectedRequest.data.votes_counts.blank_votes_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("invalid_votes_count"),
+        expectedRequest.data.votes_counts.invalid_votes_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("total_votes_cast_count"),
+        expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
+      );
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
 
-    expect(spy).toHaveBeenCalled();
-    const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
+      expect(spy).toHaveBeenCalled();
+      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
 
-    expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
-    expect(method).toEqual("POST");
-    expect(body).toEqual(expectedRequest);
+      expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
+      expect(method).toEqual("POST");
+      expect(body).toEqual(expectedRequest);
 
-    const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^Success$/);
-  });
-
-  test("422 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
-      message: "422 error from mock",
+      const result = await screen.findByTestId("result");
+      expect(result).toHaveTextContent(/^Success$/);
     });
 
-    const user = userEvent.setup();
+    test("422 response results in display of error message", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+        message: "422 error from mock",
+      });
 
-    render(Component);
+      const user = userEvent.setup();
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-    const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
+      render(Component);
 
-    expect(screen.queryByTestId("result")).not.toBeNull();
-    expect(screen.queryByTestId("result")).toHaveTextContent(/^422 error from mock$/);
-  });
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+      const feedbackServerError = await screen.findByTestId("feedback-server-error");
+      expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
 
-  test("500 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
-      message: "500 error from mock",
-      errorCode: "500_ERROR",
+      expect(screen.queryByTestId("result")).not.toBeNull();
+      expect(screen.queryByTestId("result")).toHaveTextContent(/^422 error from mock$/);
     });
 
-    const user = userEvent.setup();
+    test("500 response results in display of error message", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
+        message: "500 error from mock",
+        errorCode: "500_ERROR",
+      });
 
-    render(Component);
+      const user = userEvent.setup();
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-    const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
+      render(Component);
 
-    expect(screen.queryByTestId("result")).not.toBeNull();
-    expect(screen.queryByTestId("result")).toHaveTextContent(/^500 error from mock$/);
-  });
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+      const feedbackServerError = await screen.findByTestId("feedback-server-error");
+      expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
 
-  test("Incorrect total is caught by validation", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
-      message: "Data saved",
-      saved: true,
-      validation_results: {
-        errors: [
-          {
-            fields: [
-              "data.votes_counts.total_votes_cast_count",
-              "data.votes_counts.blank_votes_count",
-              "data.votes_counts.invalid_votes_count",
-              "data.votes_counts.votes_candidates_counts",
-            ],
-            code: "IncorrectTotal",
-          },
-          {
-            fields: [
-              "data.voters_counts.total_admitted_voters_count",
-              "data.voters_counts.poll_card_count",
-              "data.voters_counts.proxy_certificate_count",
-              "data.voters_counts.voter_card_count",
-            ],
-            code: "IncorrectTotal",
-          },
-        ],
-        warnings: [],
-      },
+      expect(screen.queryByTestId("result")).not.toBeNull();
+      expect(screen.queryByTestId("result")).toHaveTextContent(/^500 error from mock$/);
     });
-
-    const user = userEvent.setup();
-
-    render(Component);
-
-    await user.type(screen.getByTestId("poll_card_count"), "1");
-    await user.type(screen.getByTestId("proxy_certificate_count"), "1");
-    await user.type(screen.getByTestId("voter_card_count"), "1");
-    await user.type(screen.getByTestId("total_admitted_voters_count"), "4");
-
-    await user.type(screen.getByTestId("votes_candidates_counts"), "1");
-    await user.type(screen.getByTestId("blank_votes_count"), "1");
-    await user.type(screen.getByTestId("invalid_votes_count"), "1");
-    await user.type(screen.getByTestId("total_votes_cast_count"), "4");
-
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-
-    const feedbackError = await screen.findByTestId("feedback-error");
-    expect(feedbackError).toHaveTextContent(/^IncorrectTotalIncorrectTotal$/);
-    expect(screen.queryByTestId("result")).toBeNull();
-  });
-
-  test("Error with non-existing fields is displayed", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
-      saved: true,
-      message: "Data entry saved successfully",
-      validation_results: {
-        errors: [
-          {
-            fields: [
-              "data.not_a_real_object.not_a_real_field",
-              "data.not_a_real_object.this_field_does_not_exist",
-            ],
-            code: "NotARealError",
-          },
-        ],
-        warnings: [],
-      },
-    });
-
-    const user = userEvent.setup();
-
-    render(Component);
-
-    // Since the component does not allow to input values for non-existing fields,
-    // not inputting any values and just clicking the submit button.
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-
-    expect(screen.queryByTestId("result")).toBeNull();
-    expect(screen.queryByTestId("feedback-error")).toBeNull();
-    expect(screen.queryByTestId("feedback-warning")).toBeNull();
-    expect(screen.queryByTestId("feedback-server-error")).toBeNull();
   });
 
   describe("VotersAndVotesForm errors", () => {
@@ -441,6 +361,39 @@ describe("Test VotersAndVotesForm", () => {
       expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+    });
+
+    test("Error with non-existing fields is not displayed", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+        saved: true,
+        message: "Data entry saved successfully",
+        validation_results: {
+          errors: [
+            {
+              fields: [
+                "data.not_a_real_object.not_a_real_field",
+                "data.not_a_real_object.this_field_does_not_exist",
+              ],
+              code: "NotARealError",
+            },
+          ],
+          warnings: [],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      // Since the component does not allow to input values for non-existing fields,
+      // not inputting any values and just clicking the submit button.
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(screen.queryByTestId("result")).toBeNull();
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
     });
   });
 

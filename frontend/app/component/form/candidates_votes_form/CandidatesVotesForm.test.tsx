@@ -55,258 +55,261 @@ describe("Test CandidatesVotesForm", () => {
   afterEach(() => {
     vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
   });
+  describe("CandidatesVotesForm user interactions", () => {
+    test("hitting enter key does not result in api call", async () => {
+      const spy = vi.spyOn(global, "fetch");
 
-  test("hitting enter key does not result in api call", async () => {
-    const spy = vi.spyOn(global, "fetch");
+      const user = userEvent.setup();
+      render(Component);
 
-    const user = userEvent.setup();
-    render(Component);
+      const candidate1 = screen.getByTestId("candidate_votes-0.votes");
+      await user.type(candidate1, "12345");
+      expect(candidate1).toHaveValue("12.345");
 
-    const candidate1 = screen.getByTestId("candidate_votes-0.votes");
-    await user.type(candidate1, "12345");
-    expect(candidate1).toHaveValue("12.345");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
-
-    expect(spy).not.toHaveBeenCalled();
-  });
-
-  test("Form field entry and keybindings", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
-      message: "Data saved",
-      saved: true,
-      validation_results: { errors: [], warnings: [] },
+      expect(spy).not.toHaveBeenCalled();
     });
 
-    const user = userEvent.setup();
+    test("Form field entry and keybindings", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+        message: "Data saved",
+        saved: true,
+        validation_results: { errors: [], warnings: [] },
+      });
 
-    render(Component);
+      const user = userEvent.setup();
 
-    const candidate1 = screen.getByTestId("candidate_votes-0.votes");
-    expect(candidate1).toHaveFocus();
-    await user.type(candidate1, "12345");
-    expect(candidate1).toHaveValue("12.345");
+      render(Component);
 
-    await user.keyboard("{enter}");
+      const candidate1 = screen.getByTestId("candidate_votes-0.votes");
+      expect(candidate1).toHaveFocus();
+      await user.type(candidate1, "12345");
+      expect(candidate1).toHaveValue("12.345");
 
-    const candidate2 = screen.getByTestId("candidate_votes-1.votes");
-    expect(candidate2).toHaveFocus();
-    await user.type(candidate2, "6789");
-    expect(candidate2).toHaveValue("6.789");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const candidate2 = screen.getByTestId("candidate_votes-1.votes");
+      expect(candidate2).toHaveFocus();
+      await user.type(candidate2, "6789");
+      expect(candidate2).toHaveValue("6.789");
 
-    const candidate3 = screen.getByTestId("candidate_votes-2.votes");
-    expect(candidate3).toHaveFocus();
-    await user.type(candidate3, "123");
-    expect(candidate3).toHaveValue("123");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const candidate3 = screen.getByTestId("candidate_votes-2.votes");
+      expect(candidate3).toHaveFocus();
+      await user.type(candidate3, "123");
+      expect(candidate3).toHaveValue("123");
 
-    const candidate4 = screen.getByTestId("candidate_votes-3.votes");
-    expect(candidate4).toHaveFocus();
-    await user.paste("4242");
-    expect(candidate4).toHaveValue("4.242");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const candidate4 = screen.getByTestId("candidate_votes-3.votes");
+      expect(candidate4).toHaveFocus();
+      await user.paste("4242");
+      expect(candidate4).toHaveValue("4.242");
 
-    const candidate5 = screen.getByTestId("candidate_votes-4.votes");
-    expect(candidate5).toHaveFocus();
-    await user.type(candidate5, "12");
-    expect(candidate5).toHaveValue("12");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const candidate5 = screen.getByTestId("candidate_votes-4.votes");
+      expect(candidate5).toHaveFocus();
+      await user.type(candidate5, "12");
+      expect(candidate5).toHaveValue("12");
 
-    const candidate6 = screen.getByTestId("candidate_votes-5.votes");
-    expect(candidate6).toHaveFocus();
-    // Test if maxLength on field works
-    await user.type(candidate6, "1000000000");
-    expect(candidate6).toHaveValue("100.000.000");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const candidate6 = screen.getByTestId("candidate_votes-5.votes");
+      expect(candidate6).toHaveFocus();
+      // Test if maxLength on field works
+      await user.type(candidate6, "1000000000");
+      expect(candidate6).toHaveValue("100.000.000");
 
-    const candidate7 = screen.getByTestId("candidate_votes-6.votes");
-    expect(candidate7).toHaveFocus();
-    await user.type(candidate7, "3");
-    expect(candidate7).toHaveValue("3");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const candidate7 = screen.getByTestId("candidate_votes-6.votes");
+      expect(candidate7).toHaveFocus();
+      await user.type(candidate7, "3");
+      expect(candidate7).toHaveValue("3");
 
-    const total = screen.getByTestId("total");
-    await user.click(total);
-    expect(total).toHaveFocus();
-    await user.type(total, "555");
-    expect(total).toHaveValue("555");
+      await user.keyboard("{enter}");
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
+      const total = screen.getByTestId("total");
+      await user.click(total);
+      expect(total).toHaveFocus();
+      await user.type(total, "555");
+      expect(total).toHaveValue("555");
 
-    const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^Success$/);
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const result = await screen.findByTestId("result");
+      expect(result).toHaveTextContent(/^Success$/);
+    });
   });
 
-  test("CandidateVotesForm request body is equal to the form data", async () => {
-    const spy = vi.spyOn(global, "fetch");
+  describe("CandidatesVotesForm API request and response", () => {
+    test("CandidateVotesForm request body is equal to the form data", async () => {
+      const spy = vi.spyOn(global, "fetch");
 
-    const politicalGroupMockData: PoliticalGroup = {
-      number: 1,
-      name: "Lijst 1 - Vurige Vleugels Partij",
-      candidates: [
-        {
-          number: 1,
-          initials: "E.",
-          first_name: "Eldor",
-          last_name: "Zilverlicht",
-          locality: "Amsterdam",
-        },
-        {
-          number: 2,
-          initials: "G.",
-          first_name: "Grom",
-          last_name: "Donderbrul",
-          locality: "Rotterdam",
-        },
-      ],
-    };
-
-    const electionMockData: Election = {
-      id: 1,
-      name: "Municipal Election",
-      category: "Municipal",
-      election_date: "2024-11-30",
-      nomination_date: "2024-11-01",
-      political_groups: [
-        politicalGroupMockData,
-        {
-          number: 2,
-          name: "Lijst 2 - Wijzen van Water en Wind",
-          candidates: [
-            {
-              number: 1,
-              initials: "A.",
-              first_name: "Alice",
-              last_name: "Foo",
-              locality: "Amsterdam",
-              gender: "Female",
-            },
-            {
-              number: 2,
-              initials: "C.",
-              first_name: "Charlie",
-              last_name: "Doe",
-              locality: "Rotterdam",
-            },
-          ],
-        },
-      ],
-    };
-
-    const electionMock = electionMockData as Required<Election>;
-    const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
-
-    const Component = (
-      <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
-        <CandidatesVotesForm group={politicalGroupMock} />
-      </PollingStationFormController>
-    );
-
-    const expectedRequest = {
-      data: {
-        ...rootRequest.data,
-        political_group_votes: [
+      const politicalGroupMockData: PoliticalGroup = {
+        number: 1,
+        name: "Lijst 1 - Vurige Vleugels Partij",
+        candidates: [
           {
             number: 1,
-            total: 10,
-            candidate_votes: [
-              {
-                number: 1,
-                votes: 5,
-              },
-              {
-                number: 2,
-                votes: 5,
-              },
-            ],
+            initials: "E.",
+            first_name: "Eldor",
+            last_name: "Zilverlicht",
+            locality: "Amsterdam",
           },
           {
             number: 2,
-            total: 0,
-            candidate_votes: [
+            initials: "G.",
+            first_name: "Grom",
+            last_name: "Donderbrul",
+            locality: "Rotterdam",
+          },
+        ],
+      };
+
+      const electionMockData: Election = {
+        id: 1,
+        name: "Municipal Election",
+        category: "Municipal",
+        election_date: "2024-11-30",
+        nomination_date: "2024-11-01",
+        political_groups: [
+          politicalGroupMockData,
+          {
+            number: 2,
+            name: "Lijst 2 - Wijzen van Water en Wind",
+            candidates: [
               {
                 number: 1,
-                votes: 0,
+                initials: "A.",
+                first_name: "Alice",
+                last_name: "Foo",
+                locality: "Amsterdam",
+                gender: "Female",
               },
               {
                 number: 2,
-                votes: 0,
+                initials: "C.",
+                first_name: "Charlie",
+                last_name: "Doe",
+                locality: "Rotterdam",
               },
             ],
           },
         ],
-      },
-    };
+      };
 
-    const user = userEvent.setup();
+      const electionMock = electionMockData as Required<Election>;
+      const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
-    render(Component);
+      const Component = (
+        <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
+          <CandidatesVotesForm group={politicalGroupMock} />
+        </PollingStationFormController>
+      );
 
-    await user.type(
-      screen.getByTestId("candidate_votes-0.votes"),
-      expectedRequest.data.political_group_votes[0]?.candidate_votes[0]?.votes.toString() ?? "0",
-    );
+      const expectedRequest = {
+        data: {
+          ...rootRequest.data,
+          political_group_votes: [
+            {
+              number: 1,
+              total: 10,
+              candidate_votes: [
+                {
+                  number: 1,
+                  votes: 5,
+                },
+                {
+                  number: 2,
+                  votes: 5,
+                },
+              ],
+            },
+            {
+              number: 2,
+              total: 0,
+              candidate_votes: [
+                {
+                  number: 1,
+                  votes: 0,
+                },
+                {
+                  number: 2,
+                  votes: 0,
+                },
+              ],
+            },
+          ],
+        },
+      };
 
-    await user.type(
-      screen.getByTestId("candidate_votes-1.votes"),
-      expectedRequest.data.political_group_votes[0]?.candidate_votes[1]?.votes.toString() ?? "0",
-    );
+      const user = userEvent.setup();
 
-    await user.type(
-      screen.getByTestId("total"),
-      expectedRequest.data.political_group_votes[0]?.total.toString() ?? "0",
-    );
+      render(Component);
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
+      await user.type(
+        screen.getByTestId("candidate_votes-0.votes"),
+        expectedRequest.data.political_group_votes[0]?.candidate_votes[0]?.votes.toString() ?? "0",
+      );
 
-    expect(spy).toHaveBeenCalled();
-    const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-    expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
-    expect(method).toEqual("POST");
-    expect(body).toEqual(expectedRequest);
+      await user.type(
+        screen.getByTestId("candidate_votes-1.votes"),
+        expectedRequest.data.political_group_votes[0]?.candidate_votes[1]?.votes.toString() ?? "0",
+      );
 
-    const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^Success$/);
-  });
+      await user.type(
+        screen.getByTestId("total"),
+        expectedRequest.data.political_group_votes[0]?.total.toString() ?? "0",
+      );
 
-  test("422 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
-      message: "422 error from mock",
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(spy).toHaveBeenCalled();
+      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
+      expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
+      expect(method).toEqual("POST");
+      expect(body).toEqual(expectedRequest);
+
+      const result = await screen.findByTestId("result");
+      expect(result).toHaveTextContent(/^Success$/);
     });
 
-    const user = userEvent.setup();
+    test("422 response results in display of error message", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+        message: "422 error from mock",
+      });
 
-    render(Component);
+      const user = userEvent.setup();
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-    const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
-  });
+      render(Component);
 
-  test("500 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
-      message: "500 error from mock",
-      errorCode: "500_ERROR",
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+      const feedbackServerError = await screen.findByTestId("feedback-server-error");
+      expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
     });
 
-    const user = userEvent.setup();
+    test("500 response results in display of error message", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
+        message: "500 error from mock",
+        errorCode: "500_ERROR",
+      });
 
-    render(Component);
+      const user = userEvent.setup();
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-    const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
+      render(Component);
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+      const feedbackServerError = await screen.findByTestId("feedback-server-error");
+      expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
+    });
   });
 
   describe("CandidatesVotesForm errors", () => {

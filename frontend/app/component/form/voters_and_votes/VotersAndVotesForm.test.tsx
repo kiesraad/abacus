@@ -348,7 +348,7 @@ describe("Test VotersAndVotesForm", () => {
 
     render(Component);
 
-    // Since the component does not allow to input invalid values such as -3,
+    // Since the component does not allow to input values for non-existing fields,
     // not inputting any values and just clicking the submit button.
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);

@@ -334,8 +334,8 @@ describe("Test VotersAndVotesForm", () => {
         errors: [
           {
             fields: [
-              "data.voters_counts.not_a_real_field",
-              "data.voters_counts.this_field_does_not_exist",
+              "data.not_a_real_object.not_a_real_field",
+              "data.not_a_real_object.this_field_does_not_exist",
             ],
             code: "NotARealError",
           },
@@ -353,8 +353,8 @@ describe("Test VotersAndVotesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
-    const result = await screen.findByTestId("feedback-error");
-    expect(result).toHaveTextContent(/^NotARealError$/);
+    expect(screen.queryByTestId("result")).toBeNull();
+    expect(screen.queryByTestId("feedback-error")).toBeNull();
     expect(screen.queryByTestId("feedback-warning")).toBeNull();
     expect(screen.queryByTestId("feedback-server-error")).toBeNull();
   });

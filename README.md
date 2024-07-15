@@ -101,4 +101,15 @@ Meer informatie over de verkiezingen en de Kiesraad is te vinden op [www.kiesraa
 
 ## Copyright en licenties
 
-Copyright © 2024 Kiesraad. Licensed under the EUPL-1.2 or later.
+Copyright © 2024 Kiesraad.
+Licensed under the EUPL-1.2 or later, except where indicated otherwise:
+
+- Fonts in `frontend/public/font` are licensed under
+  the SIL Open Font License version 1.1 (OFL v1.1).
+- The file `frontend/app/test/unit/server.ts` is licensed under
+  the Mozilla Public License v2.0 (MPL 2.0).
+- Dependencies from npm and Cargo are licensed under their respective licenses.
+
+Versions of the EUPL-1.2 in all official EU languages can be found at
+https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12.
+The English version is included verbatim in [LICENSE](LICENSE).

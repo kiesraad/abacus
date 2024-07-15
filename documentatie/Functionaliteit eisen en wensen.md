@@ -1,20 +1,20 @@
 # Functionaliteit van Abacus: eisen en wensen
 
-De nieuwe uitslagensoftware Abacus zal in meerdere stappen worden ontwikkeld. Eerst wordt de software ontwikkeld voor het GSB (gemeentelijk stembureau), en daarna wordt de functionaliteit uitgebreid naar het HSB (hoofdstembureau) en CSB (centraal stembureau).
-De allereerste stap is het maken van een bruikbare demoversie, die begin september 2024 wordt gepubliceerd.
+De nieuwe uitslagensoftware Abacus zal in meerdere stappen worden ontwikkeld. Eerst wordt de software ontwikkeld voor voor de gemeenteraadsverkiezingen, en daarna wordt de functionaliteit uitgebreid naar de andere verkiezingen. 
+
+De allereerste stap is het maken van een bruikbare demoversie.
 
 In dit document staan de eisen en wensen voor de demoversie en voor de volledige GSB-versie van Abacus.
 In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid. De specificaties voor de andere versies zullen op een later moment worden vastgesteld.
 
-## Functionaliteit voor demo Kiesraad begin september 2024
+## Functionaliteit voor eerste demo
 
 ### Vereist (must have)
 
 *Deze eisen (requirements) moeten in het eindresultaat terugkomen. Zonder deze eisen is de demo niet geslaagd.*
 
-- Alle vereisten (must-haves) zijn functioneel en kunnen worden gebruikt in een klikbare demoversie.
 - De flow voor de eerste invoer van een stembureau in een gemeente met centrale stemopneming (CSO) is compleet.
-- Validatie en consistentiechecks worden uitgevoerd op de uitslagen.
+- Validatie en consistentiechecks worden waar mogelijk uitgevoerd op de uitslagen.
 - Er kunnen meerdere stembureaus worden ingevoerd.
 - Er is een placeholder-pagina voor het afronden van de zitting.
 - De resultaten van de stembureaus worden bij elkaar opgeteld.
@@ -33,7 +33,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 *Deze wensen zullen alleen aan bod komen als er tijd genoeg is.*
 
 - Er is ondersteuning voor het invoeren van gemeenten met een decentrale stemopneming (DSO).
-- De frontend wordt aangestuurd vanuit de backend.
+- De frontend is bereikbaar vanuit de backend: de applicatie kan als één geheel gedraaid worden.
 - Stembureaus kunnen worden aangemaakt.
 - Bezwaren en bijzonderheden kunnen per stembureau worden ingevoerd (bij CSO).
 - Bezwaren en bijzonderheden kunnen worden ingevuld tijdens het invoeren van de GSB-zitting.
@@ -56,7 +56,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 
 ### Vereist (must have)
 
-*De onderstaande eisen (requirements) moeten in het eindresultaat dat gebruikt wordt bij de gemeenteraadverkiezingen in 2026 terugkomen. Zonder deze eisen is het product niet bruikbaar.*
+*Onderstaande eisen (requirements) moeten in de eerste versie voor gemeenteraadsverkiezingen terugkomen. Zonder deze eisen is het product niet bruikbaar.*
 
 - Gebruikers en rollen:
   - Gebruikers kunnen lokaal worden aangemaakt met eenvoudige authenticatie, dus alleen een gebruikersnaam en wachtwoord.

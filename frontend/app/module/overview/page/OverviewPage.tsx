@@ -37,7 +37,7 @@ export function OverviewPage() {
             </thead>
             <tbody>
               <tr onClick={handleRowClick}>
-                <td>Referendum uitbreiding stadshart 2026</td>
+                <td>Provinciale Statenverkiezingen 2026</td>
                 <td>GSB - Juinen (045)</td>
                 <td>
                   <div className="flex_overview">
@@ -52,8 +52,8 @@ export function OverviewPage() {
                 </td>
               </tr>
               <tr onClick={handleRowClick}>
-                <td>Wijkraad Grachtenkwartier 2026</td>
-                <td>Lokale verkiezing</td>
+                <td>Waterschap Zeegraslanden 2026</td>
+                <td></td>
                 <td>
                   <div className="flex_overview">
                     <IconClock />
@@ -67,7 +67,7 @@ export function OverviewPage() {
                 </td>
               </tr>
               <tr onClick={handleRowClick}>
-                <td>Europees Parlementsverkiezing 2024</td>
+                <td>Waterschap De Watervenen 2026</td>
                 <td></td>
                 <td>
                   <div className="flex_overview">
@@ -82,7 +82,7 @@ export function OverviewPage() {
                 </td>
               </tr>
               <tr onClick={handleRowClick}>
-                <td>Tweede Kamerverkiezing 2023</td>
+                <td>Gemeenteraadsverkiezing 2026</td>
                 <td></td>
                 <td>
                   <div className="flex_overview">

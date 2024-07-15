@@ -1,12 +1,7 @@
 # Overwegingen ten aanzien van technische keuzes binnen dit project
 
-| Versie | Datum            | Wijzigingen | 
-| ------ | ---------------- | ----------- |
-| 0.1    | 15 december 2023 | Eerste versie |
-| 0.2    | 3 april 2024     | Toevoeging keuzes frontend, backend, tools |
-
 Bij het maken van technische keuzes binnen dit project zijn er een aantal uitgangspunten.
-De eisen aan de software zijn gesteld in besluiten en de kieswet.
+De eisen aan de software zijn gesteld in de Kieswet, Kiesbesluit en normenkaders zoals de Baseline Informatiebeveiliging Overheid (BIO).
 Hier zal zonder uitzondering aan voldaan moeten worden.
 
 Een aantal van de eisen zijn zeer duidelijk en een aantal van de eisen is impliciet vanuit het beoogde gebruik.
@@ -152,4 +147,4 @@ GitHub is een platform waar ontwikkelaars code kunnen schrijven, beheren en dele
 
 ### Figma
 
-Figma is de meest gebruikte tool voor het ontwikkelen van designs. Het bevat veel functionaliteit, goede opties voor samenwerking en is zeer populair onder designers.
+Figma is een veelgebruikte tool voor het ontwerpen van gebruikersinterfaces voor digitale producten. Het bevat veel functionaliteit, goede opties voor samenwerking en is zeer populair onder designers.

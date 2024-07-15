@@ -325,7 +325,7 @@ export const electionMockData: Election = {
     },
     {
       number: 7,
-      name: "Lijst 7 - ABC",
+      name: "Lijst 7 - Harmonie van Hemel en Aarde",
       candidates: [
         {
           number: 1,
@@ -346,7 +346,7 @@ export const electionMockData: Election = {
     },
     {
       number: 8,
-      name: "Lijst 8 - Hele hele hele hele lange lange lange naam",
+      name: "Lijst 8 - Stralende Sterren Alliantie",
       candidates: [
         {
           number: 1,
@@ -367,7 +367,7 @@ export const electionMockData: Election = {
     },
     {
       number: 9,
-      name: "Lijst 9 - ABC",
+      name: "Lijst 9 - Tijdloze Toekomst Partij",
       candidates: [
         {
           number: 1,
@@ -388,7 +388,7 @@ export const electionMockData: Election = {
     },
     {
       number: 10,
-      name: "Lijst 10 - DEF",
+      name: "Lijst 10 - Kosmische Kracht Coalitie",
       candidates: [
         {
           number: 1,
@@ -409,7 +409,7 @@ export const electionMockData: Election = {
     },
     {
       number: 11,
-      name: "Lijst 11 - GHI",
+      name: "Lijst 11 - Magische Melodieën Beweging",
       candidates: [
         {
           number: 1,
@@ -430,7 +430,7 @@ export const electionMockData: Election = {
     },
     {
       number: 12,
-      name: "Lijst 12 - JKL",
+      name: "Lijst 12 - Zilveren Zonnestralen Partij",
       candidates: [
         {
           number: 1,
@@ -451,7 +451,7 @@ export const electionMockData: Election = {
     },
     {
       number: 13,
-      name: "Lijst 13 - MNO",
+      name: "Lijst 13 - Mystieke Maanlicht Liga",
       candidates: [
         {
           number: 1,
@@ -472,7 +472,7 @@ export const electionMockData: Election = {
     },
     {
       number: 14,
-      name: "Lijst 14 - PQR",
+      name: "Lijst 14 - GVR",
       candidates: [
         {
           number: 1,
@@ -493,7 +493,7 @@ export const electionMockData: Election = {
     },
     {
       number: 15,
-      name: "Lijst 15 - STU",
+      name: "Lijst 15 - Partij voor de ontwikkeling",
       candidates: [
         {
           number: 1,
@@ -514,7 +514,7 @@ export const electionMockData: Election = {
     },
     {
       number: 16,
-      name: "Lijst 16 - VW",
+      name: "Lijst 16 - Bond van de kiezers",
       candidates: [
         {
           number: 1,
@@ -535,7 +535,7 @@ export const electionMockData: Election = {
     },
     {
       number: 17,
-      name: "Lijst 17 - XYZ",
+      name: "Lijst 17 - Omega",
       candidates: [
         {
           number: 1,
@@ -556,7 +556,7 @@ export const electionMockData: Election = {
     },
     {
       number: 18,
-      name: "Lijst 18 - Nog steeds niet de laatste partij",
+      name: "Lijst 18 - Partij van de werkers",
       candidates: [
         {
           number: 1,
@@ -577,7 +577,7 @@ export const electionMockData: Election = {
     },
     {
       number: 19,
-      name: "Lijst 19 - De op een na laatste",
+      name: "Lijst 19 - Sterrenpartij",
       candidates: [
         {
           number: 1,
@@ -598,7 +598,7 @@ export const electionMockData: Election = {
     },
     {
       number: 20,
-      name: "Lijst 20 - De allerlaatste groep",
+      name: "Lijst 20 - Partij voor de zon",
       candidates: [
         {
           number: 1,
@@ -624,14 +624,14 @@ export const electionsMockData: ElectionListResponse = {
   elections: [
     {
       id: 1,
-      name: "Municipal Election",
+      name: "Gemeenteraadsverkiezingen 2026",
       category: "Municipal",
       election_date: "2024-11-30",
       nomination_date: "2024-11-01",
     },
     {
       id: 2,
-      name: "Municipal Election",
+      name: "Gemeenteraadsverkiezingen 2030",
       category: "Municipal",
       election_date: "2024-01-30",
       nomination_date: "2024-01-01",

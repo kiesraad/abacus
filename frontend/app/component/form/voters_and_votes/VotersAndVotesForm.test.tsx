@@ -327,7 +327,27 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   describe("VotersAndVotesForm errors", () => {
-    test("IncorrectTotal Voters", async () => {
+    test("F.01 Invalid value", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+        error:
+          "Failed to deserialize the JSON body into the target type: data.voters_counts.poll_card_count: invalid value: integer `-3`, expected u32 at line 1 column 525",
+      });
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      // Since the component does not allow to input invalid values such as -3,
+      // not inputting any values and just clicking the submit button.
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const result = await screen.findByTestId("feedback-server-error");
+      expect(result).toHaveTextContent(/^Error$/);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
+    test("F.11 IncorrectTotal Voters", async () => {
       overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
         saved: true,
         message: "Data entry saved successfully",

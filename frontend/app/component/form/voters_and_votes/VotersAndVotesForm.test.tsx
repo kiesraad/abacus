@@ -231,8 +231,11 @@ describe("Test VotersAndVotesForm", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-    const result = await screen.findByTestId("feedback-server-error");
-    expect(result).toHaveTextContent(/^Error422 error from mock$/);
+    const feedbackServerError = await screen.findByTestId("feedback-server-error");
+    expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
+
+    expect(screen.queryByTestId("result")).not.toBeNull();
+    expect(screen.queryByTestId("result")).toHaveTextContent(/^422 error from mock$/);
   });
 
   test("500 response results in display of error message", async () => {
@@ -247,8 +250,11 @@ describe("Test VotersAndVotesForm", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-    const result = await screen.findByTestId("feedback-server-error");
-    expect(result).toHaveTextContent(/^Error500 error from mock$/);
+    const feedbackServerError = await screen.findByTestId("feedback-server-error");
+    expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
+
+    expect(screen.queryByTestId("result")).not.toBeNull();
+    expect(screen.queryByTestId("result")).toHaveTextContent(/^500 error from mock$/);
   });
 
   test("Incorrect total is caught by validation", async () => {
@@ -297,8 +303,9 @@ describe("Test VotersAndVotesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
-    const result = await screen.findByTestId("feedback-error");
-    expect(result).toHaveTextContent(/^IncorrectTotalIncorrectTotal$/);
+    const feedbackError = await screen.findByTestId("feedback-error");
+    expect(feedbackError).toHaveTextContent(/^IncorrectTotalIncorrectTotal$/);
+    expect(screen.queryByTestId("result")).toBeNull();
   });
 
   test("Error with non-existing fields is displayed", async () => {
@@ -350,8 +357,8 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const result = await screen.findByTestId("feedback-server-error");
-      expect(result).toHaveTextContent(/^Error$/);
+      const feedbackServerError = await screen.findByTestId("feedback-server-error");
+      expect(feedbackServerError).toHaveTextContent(/^Error$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
@@ -388,8 +395,8 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const result = await screen.findByTestId("feedback-error");
-      expect(result).toHaveTextContent(/^IncorrectTotal$/);
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -430,8 +437,8 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const result = await screen.findByTestId("feedback-error");
-      expect(result).toHaveTextContent(/^IncorrectTotal$/);
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -468,8 +475,8 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const result = await screen.findByTestId("feedback-warning");
-      expect(result).toHaveTextContent(/^AboveThreshold$/);
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^AboveThreshold$/);
       expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
@@ -504,8 +511,8 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const result = await screen.findByTestId("feedback-warning");
-      expect(result).toHaveTextContent(/^AboveThreshold$/);
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^AboveThreshold$/);
       expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
@@ -547,8 +554,8 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const result = await screen.findByTestId("feedback-warning");
-      expect(result).toHaveTextContent(/^EqualInput$/);
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^EqualInput$/);
       expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });

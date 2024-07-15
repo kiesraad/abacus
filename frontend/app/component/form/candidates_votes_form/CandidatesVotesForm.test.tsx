@@ -289,8 +289,8 @@ describe("Test CandidatesVotesForm", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-    const result = await screen.findByTestId("feedback-server-error");
-    expect(result).toHaveTextContent(/^Error422 error from mock$/);
+    const feedbackServerError = await screen.findByTestId("feedback-server-error");
+    expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
   });
 
   test("500 response results in display of error message", async () => {
@@ -305,8 +305,8 @@ describe("Test CandidatesVotesForm", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-    const result = await screen.findByTestId("feedback-server-error");
-    expect(result).toHaveTextContent(/^Error500 error from mock$/);
+    const feedbackServerError = await screen.findByTestId("feedback-server-error");
+    expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
   });
 
   describe("CandidatesVotesForm errors", () => {
@@ -335,8 +335,8 @@ describe("Test CandidatesVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const result = await screen.findByTestId("feedback-error");
-      expect(result).toHaveTextContent(/^IncorrectTotal$/);
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });

@@ -217,8 +217,8 @@ describe("Test DifferencesForm", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-    const result = await screen.findByTestId("feedback-server-error");
-    expect(result).toHaveTextContent(/^Error422 error from mock$/);
+    const feedbackServerError = await screen.findByTestId("feedback-server-error");
+    expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
   });
 
   test("500 response results in display of error message", async () => {
@@ -232,8 +232,8 @@ describe("Test DifferencesForm", () => {
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-    const result = await screen.findByTestId("feedback-server-error");
-    expect(result).toHaveTextContent(/^Error500 error from mock$/);
+    const feedbackServerError = await screen.findByTestId("feedback-server-error");
+    expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
   });
 
   // TODO: Add validation test once backend validation is implemented
@@ -253,7 +253,7 @@ describe("Test DifferencesForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
-    const result = await screen.findByTestId("feedback-error");
-    expect(result).toHaveTextContent(/^IncorrectTotal,IncorrectTotal$/);
+    const feedbackError = await screen.findByTestId("feedback-error");
+    expect(feedbackError).toHaveTextContent(/^IncorrectTotal,IncorrectTotal$/);
   });
 });

@@ -326,6 +326,39 @@ describe("Test VotersAndVotesForm", () => {
     expect(result).toHaveTextContent(/^IncorrectTotalIncorrectTotal$/);
   });
 
+  test("Error with non-existing fields is displayed", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      saved: true,
+      message: "Data entry saved successfully",
+      validation_results: {
+        errors: [
+          {
+            fields: [
+              "data.voters_counts.not_a_real_field",
+              "data.voters_counts.this_field_does_not_exist",
+            ],
+            code: "NotARealError",
+          },
+        ],
+        warnings: [],
+      },
+    });
+
+    const user = userEvent.setup();
+
+    render(Component);
+
+    // Since the component does not allow to input invalid values such as -3,
+    // not inputting any values and just clicking the submit button.
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    const result = await screen.findByTestId("feedback-error");
+    expect(result).toHaveTextContent(/^NotARealError$/);
+    expect(screen.queryByTestId("feedback-warning")).toBeNull();
+    expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+  });
+
   describe("VotersAndVotesForm errors", () => {
     test("F.01 Invalid value", async () => {
       overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {

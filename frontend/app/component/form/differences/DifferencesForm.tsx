@@ -1,18 +1,9 @@
 import * as React from "react";
 import { useBlocker } from "react-router-dom";
 
-import {
-  ValidationResult,
-  ErrorsAndWarnings,
-  useDifferences,
-  DifferencesCounts,
-} from "@kiesraad/api";
+import { useDifferences, DifferencesCounts, useErrorsAndWarnings } from "@kiesraad/api";
 import { Button, InputGrid, Feedback, BottomBar, InputGridRow, useTooltip } from "@kiesraad/ui";
-import {
-  usePositiveNumberInputMask,
-  usePreventFormEnterSubmit,
-  fieldNameFromPath,
-} from "@kiesraad/util";
+import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
   more_ballots_count: HTMLInputElement;
@@ -88,46 +79,7 @@ export function DifferencesForm() {
     return false;
   });
 
-  const errorsAndWarnings: Map<string, ErrorsAndWarnings> = React.useMemo(() => {
-    const result = new Map<string, ErrorsAndWarnings>();
-
-    const process = (target: keyof ErrorsAndWarnings, arr: ValidationResult[]) => {
-      arr.forEach((v) => {
-        v.fields.forEach((f) => {
-          const fieldName = fieldNameFromPath(f);
-          if (!result.has(fieldName)) {
-            result.set(fieldName, { errors: [], warnings: [] });
-          }
-          const field = result.get(fieldName);
-          if (field) {
-            field[target].push({
-              code: v.code,
-              id: fieldName,
-            });
-          }
-        });
-      });
-    };
-
-    if (errors.length > 0) {
-      process("errors", errors);
-    }
-    if (warnings.length > 0) {
-      process("warnings", warnings);
-    }
-
-    inputMaskWarnings.forEach((warning) => {
-      if (!result.has(warning.id)) {
-        result.set(warning.id, { errors: [], warnings: [] });
-      }
-      const field = result.get(warning.id);
-      if (field) {
-        field.warnings.push(warning);
-      }
-    });
-
-    return result;
-  }, [errors, warnings, inputMaskWarnings]);
+  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
   React.useEffect(() => {
     if (isCalled) {

@@ -31,7 +31,7 @@ export function usePoliticalGroup(political_group_number: number) {
     if (data) {
       return data.validation_results.errors.filter((err) =>
         matchValidationResultWithFormSections(err.fields, [
-          `political_group_votes[${political_group_number}]`,
+          `political_group_votes[${political_group_number - 1}]`,
         ]),
       );
     }
@@ -42,7 +42,7 @@ export function usePoliticalGroup(political_group_number: number) {
     if (data) {
       return data.validation_results.warnings.filter((warning) =>
         matchValidationResultWithFormSections(warning.fields, [
-          `political_group_votes[${political_group_number}]`,
+          `political_group_votes[${political_group_number - 1}]`,
         ]),
       );
     }

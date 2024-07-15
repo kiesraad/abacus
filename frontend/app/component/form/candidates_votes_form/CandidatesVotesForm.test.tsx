@@ -310,19 +310,146 @@ describe("Test CandidatesVotesForm", () => {
     expect(result).toHaveTextContent(/^Error422 error from mock$/);
   });
 
-  test("500 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
-      message: "500 error from mock",
-      errorCode: "500_ERROR",
+  describe("CandidatesVotesForm errors", () => {
+    test("500 response results in display of error message", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
+        message: "500 error from mock",
+        errorCode: "500_ERROR",
+      });
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+      const result = await screen.findByTestId("feedback-server-error");
+      expect(result).toHaveTextContent(/^Error500 error from mock$/);
+    });
+  });
+
+  test("Incorrect total is caught by validation", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      saved: true,
+      message: "Data entry saved successfully",
+      validation_results: {
+        errors: [
+          {
+            fields: [
+              "data.political_group_votes[1].canidates[1].votes",
+              "data.political_group_votes[1].canidates[2].votes",
+              "data.political_group_votes[1].total",
+            ],
+            code: "IncorrectTotal",
+          },
+        ],
+        warnings: [],
+      },
+    });
+
+    render(Component);
+    const user = userEvent.setup();
+
+    const candidateOne = screen.getByTestId("candidate_votes-1.votes");
+    await user.clear(candidateOne);
+    await user.type(candidateOne, "1");
+
+    const candidateTwo = screen.getByTestId("candidate_votes-2.votes");
+    await user.clear(candidateTwo);
+    await user.type(candidateTwo, "2");
+
+    const totalInput = screen.getByTestId("total");
+    await user.clear(totalInput);
+    await user.type(totalInput, "10");
+
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    const result = await screen.findByTestId("feedback-error");
+    expect(result).toHaveTextContent(/^IncorrectTotal$/);
+    expect(screen.queryByTestId("feedback-warning")).toBeNull();
+    expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+  });
+});
+
+describe("CandidatesVotesForm warnings", () => {
+  test("W.21 AboveThreshold candidate votes", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      saved: true,
+      message: "Data entry saved successfully",
+      validation_results: {
+        errors: [],
+        warnings: [
+          {
+            fields: ["data.political_group_votes[1].candidates[1].votes"],
+            code: "AboveThreshold",
+          },
+        ],
+      },
     });
 
     const user = userEvent.setup();
 
     render(Component);
 
+    const candidateOne = screen.getByTestId("candidate_votes-1.votes");
+    await user.clear(candidateOne);
+    await user.type(candidateOne, "1");
+
+    const candidateTwo = screen.getByTestId("candidate_votes-2.votes");
+    await user.clear(candidateTwo);
+    await user.type(candidateTwo, "2");
+
+    const totalInput = screen.getByTestId("total");
+    await user.clear(totalInput);
+    await user.type(totalInput, "10");
+
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
-    const result = await screen.findByTestId("feedback-server-error");
-    expect(result).toHaveTextContent(/^Error500 error from mock$/);
+
+    const result = await screen.findByTestId("feedback-warning");
+    expect(result).toHaveTextContent(/^AboveThreshold$/);
+    expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+    expect(screen.queryByTestId("feedback-error")).toBeNull();
+  });
+
+  test("W.21 AboveThreshold political group total votes", async () => {
+    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      saved: true,
+      message: "Data entry saved successfully",
+      validation_results: {
+        errors: [],
+        warnings: [
+          {
+            fields: ["data.political_group_votes[1].total"],
+            code: "AboveThreshold",
+          },
+        ],
+      },
+    });
+
+    const user = userEvent.setup();
+
+    render(Component);
+
+    const candidateOne = screen.getByTestId("candidate_votes-1.votes");
+    await user.clear(candidateOne);
+    await user.type(candidateOne, "1");
+
+    const candidateTwo = screen.getByTestId("candidate_votes-2.votes");
+    await user.clear(candidateTwo);
+    await user.type(candidateTwo, "2");
+
+    const totalInput = screen.getByTestId("total");
+    await user.clear(totalInput);
+    await user.type(totalInput, "10");
+
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    const result = await screen.findByTestId("feedback-warning");
+    expect(result).toHaveTextContent(/^AboveThreshold$/);
+    expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+    expect(screen.queryByTestId("feedback-error")).toBeNull();
   });
 });

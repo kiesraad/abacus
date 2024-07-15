@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 
-import { overrideOnce, render, screen, fireEvent, getUrlMethodAndBody } from "app/test/unit";
+import { overrideOnce, render, screen, getUrlMethodAndBody } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
 
@@ -66,7 +66,6 @@ describe("Test VotersAndVotesForm", () => {
     render(Component);
 
     const pollCards = screen.getByTestId("poll_card_count");
-    await user.clear(pollCards);
     await user.type(pollCards, "12345");
     expect(pollCards).toHaveValue("12.345");
 
@@ -88,7 +87,6 @@ describe("Test VotersAndVotesForm", () => {
 
     const pollCards = screen.getByTestId("poll_card_count");
     expect(pollCards).toHaveFocus();
-    await user.clear(pollCards);
     await user.type(pollCards, "12345");
     expect(pollCards).toHaveValue("12.345");
 
@@ -96,7 +94,6 @@ describe("Test VotersAndVotesForm", () => {
 
     const proxyCertificates = screen.getByTestId("proxy_certificate_count");
     expect(proxyCertificates).toHaveFocus();
-    await user.clear(proxyCertificates);
     await user.paste("6789");
     expect(proxyCertificates).toHaveValue("6.789");
 
@@ -104,7 +101,6 @@ describe("Test VotersAndVotesForm", () => {
 
     const voterCards = screen.getByTestId("voter_card_count");
     expect(voterCards).toHaveFocus();
-    await user.clear(voterCards);
     await user.type(voterCards, "123");
     expect(voterCards).toHaveValue("123");
 
@@ -112,7 +108,6 @@ describe("Test VotersAndVotesForm", () => {
 
     const totalAdmittedVoters = screen.getByTestId("total_admitted_voters_count");
     expect(totalAdmittedVoters).toHaveFocus();
-    await user.clear(totalAdmittedVoters);
     await user.paste("4242");
     expect(totalAdmittedVoters).toHaveValue("4.242");
 
@@ -120,7 +115,6 @@ describe("Test VotersAndVotesForm", () => {
 
     const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
     expect(votesOnCandidates).toHaveFocus();
-    await user.clear(votesOnCandidates);
     await user.type(votesOnCandidates, "12");
     expect(votesOnCandidates).toHaveValue("12");
 
@@ -128,7 +122,6 @@ describe("Test VotersAndVotesForm", () => {
 
     const blankVotes = screen.getByTestId("blank_votes_count");
     expect(blankVotes).toHaveFocus();
-    await user.clear(blankVotes);
     // Test if maxLength on field works
     await user.type(blankVotes, "1000000000");
     expect(blankVotes).toHaveValue("100.000.000");
@@ -137,7 +130,6 @@ describe("Test VotersAndVotesForm", () => {
 
     const invalidVotes = screen.getByTestId("invalid_votes_count");
     expect(invalidVotes).toHaveFocus();
-    await user.clear(invalidVotes);
     await user.type(invalidVotes, "3");
     expect(invalidVotes).toHaveValue("3");
 
@@ -145,7 +137,6 @@ describe("Test VotersAndVotesForm", () => {
 
     const totalVotesCast = screen.getByTestId("total_votes_cast_count");
     expect(totalVotesCast).toHaveFocus();
-    await user.clear(totalVotesCast);
     await user.type(totalVotesCast, "555");
     expect(totalVotesCast).toHaveValue("555");
 
@@ -180,49 +171,41 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      const { getByTestId } = render(Component);
+      render(Component);
 
-      const pollCards = getByTestId("poll_card_count");
-      fireEvent.change(pollCards, {
-        target: { value: expectedRequest.data.voters_counts.poll_card_count.toString() },
-      });
+      await user.type(
+        screen.getByTestId("poll_card_count"),
+        expectedRequest.data.voters_counts.poll_card_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("proxy_certificate_count"),
+        expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("voter_card_count"),
+        expectedRequest.data.voters_counts.voter_card_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("total_admitted_voters_count"),
+        expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
+      );
 
-      const proxyCertificates = getByTestId("proxy_certificate_count");
-      fireEvent.change(proxyCertificates, {
-        target: { value: expectedRequest.data.voters_counts.proxy_certificate_count.toString() },
-      });
-
-      const voterCards = getByTestId("voter_card_count");
-      fireEvent.change(voterCards, {
-        target: { value: expectedRequest.data.voters_counts.voter_card_count.toString() },
-      });
-
-      const totalAdmittedVoters = getByTestId("total_admitted_voters_count");
-      fireEvent.change(totalAdmittedVoters, {
-        target: {
-          value: expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
-        },
-      });
-
-      const votesOnCandidates = getByTestId("votes_candidates_counts");
-      fireEvent.change(votesOnCandidates, {
-        target: { value: expectedRequest.data.votes_counts.votes_candidates_counts.toString() },
-      });
-
-      const blankVotes = getByTestId("blank_votes_count");
-      fireEvent.change(blankVotes, {
-        target: { value: expectedRequest.data.votes_counts.blank_votes_count.toString() },
-      });
-
-      const invalidVotes = getByTestId("invalid_votes_count");
-      fireEvent.change(invalidVotes, {
-        target: { value: expectedRequest.data.votes_counts.invalid_votes_count.toString() },
-      });
-
-      const totalVotesCast = getByTestId("total_votes_cast_count");
-      fireEvent.change(totalVotesCast, {
-        target: { value: expectedRequest.data.votes_counts.total_votes_cast_count.toString() },
-      });
+      await user.type(
+        screen.getByTestId("votes_candidates_counts"),
+        expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
+      );
+      await user.type(
+        screen.getByTestId("blank_votes_count"),
+        expectedRequest.data.votes_counts.blank_votes_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("invalid_votes_count"),
+        expectedRequest.data.votes_counts.invalid_votes_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("total_votes_cast_count"),
+        expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
+      );
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -299,26 +282,20 @@ describe("Test VotersAndVotesForm", () => {
       },
     });
 
-    const { getByTestId } = render(Component);
-
-    const setValue = (id: string, value: string | number) => {
-      const el = getByTestId(id);
-      fireEvent.change(el, {
-        target: { value: `${value}` },
-      });
-    };
-
-    setValue("poll_card_count", 1);
-    setValue("proxy_certificate_count", 1);
-    setValue("voter_card_count", 1);
-    setValue("total_admitted_voters_count", 4);
-
-    setValue("votes_candidates_counts", 1);
-    setValue("blank_votes_count", 1);
-    setValue("invalid_votes_count", 1);
-    setValue("total_votes_cast_count", 4);
-
     const user = userEvent.setup();
+
+    render(Component);
+
+    await user.type(screen.getByTestId("poll_card_count"), "1");
+    await user.type(screen.getByTestId("proxy_certificate_count"), "1");
+    await user.type(screen.getByTestId("voter_card_count"), "1");
+    await user.type(screen.getByTestId("total_admitted_voters_count"), "4");
+
+    await user.type(screen.getByTestId("votes_candidates_counts"), "1");
+    await user.type(screen.getByTestId("blank_votes_count"), "1");
+    await user.type(screen.getByTestId("invalid_votes_count"), "1");
+    await user.type(screen.getByTestId("total_votes_cast_count"), "4");
+
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 
@@ -405,21 +382,10 @@ describe("Test VotersAndVotesForm", () => {
 
       render(Component);
 
-      const pollCards = screen.getByTestId("poll_card_count");
-      await user.clear(pollCards);
-      await user.type(pollCards, "1");
-
-      const proxyCertificates = screen.getByTestId("proxy_certificate_count");
-      await user.clear(proxyCertificates);
-      await user.type(proxyCertificates, "1");
-
-      const voterCards = screen.getByTestId("voter_card_count");
-      await user.clear(voterCards);
-      await user.type(voterCards, "1");
-
-      const totalAdmittedVoters = screen.getByTestId("total_admitted_voters_count");
-      await user.clear(totalAdmittedVoters);
-      await user.type(totalAdmittedVoters, "4");
+      await user.type(screen.getByTestId("poll_card_count"), "1");
+      await user.type(screen.getByTestId("proxy_certificate_count"), "1");
+      await user.type(screen.getByTestId("voter_card_count"), "1");
+      await user.type(screen.getByTestId("total_admitted_voters_count"), "4");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -458,21 +424,10 @@ describe("Test VotersAndVotesForm", () => {
 
       render(Component);
 
-      const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
-      await user.clear(votesOnCandidates);
-      await user.type(votesOnCandidates, "1");
-
-      const blankVotes = screen.getByTestId("blank_votes_count");
-      await user.clear(blankVotes);
-      await user.type(blankVotes, "1");
-
-      const invalidVotes = screen.getByTestId("invalid_votes_count");
-      await user.clear(invalidVotes);
-      await user.type(invalidVotes, "1");
-
-      const totalVotesCast = screen.getByTestId("total_votes_cast_count");
-      await user.clear(totalVotesCast);
-      await user.type(totalVotesCast, "4");
+      await user.type(screen.getByTestId("votes_candidates_counts"), "1");
+      await user.type(screen.getByTestId("blank_votes_count"), "1");
+      await user.type(screen.getByTestId("invalid_votes_count"), "1");
+      await user.type(screen.getByTestId("total_votes_cast_count"), "4");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -507,21 +462,10 @@ describe("Test VotersAndVotesForm", () => {
 
       render(Component);
 
-      const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
-      await user.clear(votesOnCandidates);
-      await user.type(votesOnCandidates, "0");
-
-      const blankVotes = screen.getByTestId("blank_votes_count");
-      await user.clear(blankVotes);
-      await user.type(blankVotes, "1");
-
-      const invalidVotes = screen.getByTestId("invalid_votes_count");
-      await user.clear(invalidVotes);
-      await user.type(invalidVotes, "0");
-
-      const totalVotesCast = screen.getByTestId("total_votes_cast_count");
-      await user.clear(totalVotesCast);
-      await user.type(totalVotesCast, "1");
+      await user.type(screen.getByTestId("votes_candidates_counts"), "0");
+      await user.type(screen.getByTestId("blank_votes_count"), "1");
+      await user.type(screen.getByTestId("invalid_votes_count"), "0");
+      await user.type(screen.getByTestId("total_votes_cast_count"), "1");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -554,21 +498,10 @@ describe("Test VotersAndVotesForm", () => {
 
       render(Component);
 
-      const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
-      await user.clear(votesOnCandidates);
-      await user.type(votesOnCandidates, "0");
-
-      const blankVotes = screen.getByTestId("blank_votes_count");
-      await user.clear(blankVotes);
-      await user.type(blankVotes, "0");
-
-      const invalidVotes = screen.getByTestId("invalid_votes_count");
-      await user.clear(invalidVotes);
-      await user.type(invalidVotes, "1");
-
-      const totalVotesCast = screen.getByTestId("total_votes_cast_count");
-      await user.clear(totalVotesCast);
-      await user.type(totalVotesCast, "1");
+      await user.type(screen.getByTestId("votes_candidates_counts"), "0");
+      await user.type(screen.getByTestId("blank_votes_count"), "0");
+      await user.type(screen.getByTestId("invalid_votes_count"), "1");
+      await user.type(screen.getByTestId("total_votes_cast_count"), "1");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -603,37 +536,15 @@ describe("Test VotersAndVotesForm", () => {
 
       render(Component);
 
-      const pollCards = screen.getByTestId("poll_card_count");
-      await user.clear(pollCards);
-      await user.type(pollCards, "1");
+      await user.type(screen.getByTestId("poll_card_count"), "1");
+      await user.type(screen.getByTestId("proxy_certificate_count"), "0");
+      await user.type(screen.getByTestId("voter_card_count"), "0");
+      await user.type(screen.getByTestId("total_admitted_voters_count"), "1");
 
-      const proxyCertificates = screen.getByTestId("proxy_certificate_count");
-      await user.clear(proxyCertificates);
-      await user.type(proxyCertificates, "0");
-
-      const voterCards = screen.getByTestId("voter_card_count");
-      await user.clear(voterCards);
-      await user.type(voterCards, "0");
-
-      const totalAdmittedVoters = screen.getByTestId("total_admitted_voters_count");
-      await user.clear(totalAdmittedVoters);
-      await user.type(totalAdmittedVoters, "1");
-
-      const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
-      await user.clear(votesOnCandidates);
-      await user.type(votesOnCandidates, "1");
-
-      const blankVotes = screen.getByTestId("blank_votes_count");
-      await user.clear(blankVotes);
-      await user.type(blankVotes, "0");
-
-      const invalidVotes = screen.getByTestId("invalid_votes_count");
-      await user.clear(invalidVotes);
-      await user.type(invalidVotes, "0");
-
-      const totalVotesCast = screen.getByTestId("total_votes_cast_count");
-      await user.clear(totalVotesCast);
-      await user.type(totalVotesCast, "1");
+      await user.type(screen.getByTestId("votes_candidates_counts"), "1");
+      await user.type(screen.getByTestId("blank_votes_count"), "0");
+      await user.type(screen.getByTestId("invalid_votes_count"), "0");
+      await user.type(screen.getByTestId("total_votes_cast_count"), "1");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);

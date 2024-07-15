@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 
-import { overrideOnce, render, screen, fireEvent, getUrlMethodAndBody } from "app/test/unit";
+import { overrideOnce, render, screen, getUrlMethodAndBody } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
 
@@ -66,7 +66,6 @@ describe("Test DifferencesForm", () => {
     render(Component);
 
     const moreBallotsCount = screen.getByTestId("more_ballots_count");
-    await user.clear(moreBallotsCount);
     await user.type(moreBallotsCount, "12345");
     expect(moreBallotsCount).toHaveValue("12.345");
 
@@ -88,7 +87,6 @@ describe("Test DifferencesForm", () => {
 
     const moreBallotsCount = screen.getByTestId("more_ballots_count");
     expect(moreBallotsCount).toHaveFocus();
-    await user.clear(moreBallotsCount);
     await user.type(moreBallotsCount, "12345");
     expect(moreBallotsCount).toHaveValue("12.345");
 
@@ -96,7 +94,6 @@ describe("Test DifferencesForm", () => {
 
     const fewerBallotsCount = screen.getByTestId("fewer_ballots_count");
     expect(fewerBallotsCount).toHaveFocus();
-    await user.clear(fewerBallotsCount);
     await user.paste("6789");
     expect(fewerBallotsCount).toHaveValue("6.789");
 
@@ -104,7 +101,6 @@ describe("Test DifferencesForm", () => {
 
     const unreturnedBallotsCount = screen.getByTestId("unreturned_ballots_count");
     expect(unreturnedBallotsCount).toHaveFocus();
-    await user.clear(unreturnedBallotsCount);
     await user.type(unreturnedBallotsCount, "123");
     expect(unreturnedBallotsCount).toHaveValue("123");
 
@@ -112,7 +108,6 @@ describe("Test DifferencesForm", () => {
 
     const tooFewBallotsHandedOutCount = screen.getByTestId("too_few_ballots_handed_out_count");
     expect(tooFewBallotsHandedOutCount).toHaveFocus();
-    await user.clear(tooFewBallotsHandedOutCount);
     await user.paste("4242");
     expect(tooFewBallotsHandedOutCount).toHaveValue("4.242");
 
@@ -120,7 +115,6 @@ describe("Test DifferencesForm", () => {
 
     const tooManyBallotsHandedOutCount = screen.getByTestId("too_many_ballots_handed_out_count");
     expect(tooManyBallotsHandedOutCount).toHaveFocus();
-    await user.clear(tooManyBallotsHandedOutCount);
     await user.type(tooManyBallotsHandedOutCount, "12");
     expect(tooManyBallotsHandedOutCount).toHaveValue("12");
 
@@ -128,7 +122,6 @@ describe("Test DifferencesForm", () => {
 
     const otherExplanationCount = screen.getByTestId("other_explanation_count");
     expect(otherExplanationCount).toHaveFocus();
-    await user.clear(otherExplanationCount);
     // Test if maxLength on field works
     await user.type(otherExplanationCount, "1000000000");
     expect(otherExplanationCount).toHaveValue("100.000.000");
@@ -137,7 +130,6 @@ describe("Test DifferencesForm", () => {
 
     const noExplanationCount = screen.getByTestId("no_explanation_count");
     expect(noExplanationCount).toHaveFocus();
-    await user.clear(noExplanationCount);
     await user.type(noExplanationCount, "3");
     expect(noExplanationCount).toHaveValue("3");
 
@@ -171,52 +163,36 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      const { getByTestId } = render(Component);
+      render(Component);
 
-      const moreBallotsCount = getByTestId("more_ballots_count");
-      fireEvent.change(moreBallotsCount, {
-        target: { value: expectedRequest.data.differences_counts.more_ballots_count.toString() },
-      });
-
-      const fewerBallotsCount = getByTestId("fewer_ballots_count");
-      fireEvent.change(fewerBallotsCount, {
-        target: { value: expectedRequest.data.differences_counts.fewer_ballots_count.toString() },
-      });
-
-      const unreturnedBallotsCount = getByTestId("unreturned_ballots_count");
-      fireEvent.change(unreturnedBallotsCount, {
-        target: {
-          value: expectedRequest.data.differences_counts.unreturned_ballots_count.toString(),
-        },
-      });
-
-      const tooFewBallotsHandedOutCount = getByTestId("too_few_ballots_handed_out_count");
-      fireEvent.change(tooFewBallotsHandedOutCount, {
-        target: {
-          value:
-            expectedRequest.data.differences_counts.too_few_ballots_handed_out_count.toString(),
-        },
-      });
-
-      const tooManyBallotsHandedOutCount = getByTestId("too_many_ballots_handed_out_count");
-      fireEvent.change(tooManyBallotsHandedOutCount, {
-        target: {
-          value:
-            expectedRequest.data.differences_counts.too_many_ballots_handed_out_count.toString(),
-        },
-      });
-
-      const otherExplanationCount = getByTestId("other_explanation_count");
-      fireEvent.change(otherExplanationCount, {
-        target: {
-          value: expectedRequest.data.differences_counts.other_explanation_count.toString(),
-        },
-      });
-
-      const noExplanationCount = getByTestId("no_explanation_count");
-      fireEvent.change(noExplanationCount, {
-        target: { value: expectedRequest.data.differences_counts.no_explanation_count.toString() },
-      });
+      await user.type(
+        screen.getByTestId("more_ballots_count"),
+        expectedRequest.data.differences_counts.more_ballots_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("fewer_ballots_count"),
+        expectedRequest.data.differences_counts.fewer_ballots_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("unreturned_ballots_count"),
+        expectedRequest.data.differences_counts.unreturned_ballots_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("too_few_ballots_handed_out_count"),
+        expectedRequest.data.differences_counts.too_few_ballots_handed_out_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("too_many_ballots_handed_out_count"),
+        expectedRequest.data.differences_counts.too_many_ballots_handed_out_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("other_explanation_count"),
+        expectedRequest.data.differences_counts.other_explanation_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("no_explanation_count"),
+        expectedRequest.data.differences_counts.no_explanation_count.toString(),
+      );
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -264,24 +240,18 @@ describe("Test DifferencesForm", () => {
 
   // TODO: Add validation test once backend validation is implemented
   test.skip("Incorrect total is caught by validation", async () => {
-    const { getByTestId } = render(Component);
-
-    const setValue = (id: string, value: string | number) => {
-      const el = getByTestId(id);
-      fireEvent.change(el, {
-        target: { value: `${value}` },
-      });
-    };
-
-    setValue("more_ballots_count", 2);
-    setValue("fewer_ballots_count", 0);
-    setValue("unreturned_ballots_count", 0);
-    setValue("too_few_ballots_handed_out_count", 0);
-    setValue("too_many_ballots_handed_out_count", 1);
-    setValue("other_explanation_count", 0);
-    setValue("no_explanation_count", 1);
-
     const user = userEvent.setup();
+
+    render(Component);
+
+    await user.type(screen.getByTestId("more_ballots_count"), "2");
+    await user.type(screen.getByTestId("fewer_ballots_count"), "0");
+    await user.type(screen.getByTestId("unreturned_ballots_count"), "0");
+    await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "0");
+    await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "1");
+    await user.type(screen.getByTestId("other_explanation_count"), "0");
+    await user.type(screen.getByTestId("no_explanation_count"), "1");
+
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
 

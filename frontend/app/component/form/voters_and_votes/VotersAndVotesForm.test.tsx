@@ -147,79 +147,77 @@ describe("Test VotersAndVotesForm", () => {
     expect(result).toHaveTextContent(/^Success$/);
   });
 
-  describe("VotersAndVotesForm Api call", () => {
-    test("VotersAndVotesForm request body is equal to the form data", async () => {
-      const spy = vi.spyOn(global, "fetch");
+  test("VotersAndVotesForm request body is equal to the form data", async () => {
+    const spy = vi.spyOn(global, "fetch");
 
-      const expectedRequest = {
-        data: {
-          ...rootRequest.data,
-          voters_counts: {
-            poll_card_count: 1,
-            proxy_certificate_count: 2,
-            voter_card_count: 3,
-            total_admitted_voters_count: 6,
-          },
-          votes_counts: {
-            votes_candidates_counts: 4,
-            blank_votes_count: 5,
-            invalid_votes_count: 6,
-            total_votes_cast_count: 15,
-          },
+    const expectedRequest = {
+      data: {
+        ...rootRequest.data,
+        voters_counts: {
+          poll_card_count: 1,
+          proxy_certificate_count: 2,
+          voter_card_count: 3,
+          total_admitted_voters_count: 6,
         },
-      };
+        votes_counts: {
+          votes_candidates_counts: 4,
+          blank_votes_count: 5,
+          invalid_votes_count: 6,
+          total_votes_cast_count: 15,
+        },
+      },
+    };
 
-      const user = userEvent.setup();
+    const user = userEvent.setup();
 
-      render(Component);
+    render(Component);
 
-      await user.type(
-        screen.getByTestId("poll_card_count"),
-        expectedRequest.data.voters_counts.poll_card_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("proxy_certificate_count"),
-        expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("voter_card_count"),
-        expectedRequest.data.voters_counts.voter_card_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("total_admitted_voters_count"),
-        expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
-      );
+    await user.type(
+      screen.getByTestId("poll_card_count"),
+      expectedRequest.data.voters_counts.poll_card_count.toString(),
+    );
+    await user.type(
+      screen.getByTestId("proxy_certificate_count"),
+      expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
+    );
+    await user.type(
+      screen.getByTestId("voter_card_count"),
+      expectedRequest.data.voters_counts.voter_card_count.toString(),
+    );
+    await user.type(
+      screen.getByTestId("total_admitted_voters_count"),
+      expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
+    );
 
-      await user.type(
-        screen.getByTestId("votes_candidates_counts"),
-        expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
-      );
-      await user.type(
-        screen.getByTestId("blank_votes_count"),
-        expectedRequest.data.votes_counts.blank_votes_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("invalid_votes_count"),
-        expectedRequest.data.votes_counts.invalid_votes_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("total_votes_cast_count"),
-        expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
-      );
+    await user.type(
+      screen.getByTestId("votes_candidates_counts"),
+      expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
+    );
+    await user.type(
+      screen.getByTestId("blank_votes_count"),
+      expectedRequest.data.votes_counts.blank_votes_count.toString(),
+    );
+    await user.type(
+      screen.getByTestId("invalid_votes_count"),
+      expectedRequest.data.votes_counts.invalid_votes_count.toString(),
+    );
+    await user.type(
+      screen.getByTestId("total_votes_cast_count"),
+      expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
+    );
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
 
-      expect(spy).toHaveBeenCalled();
-      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
+    expect(spy).toHaveBeenCalled();
+    const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
 
-      expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
-      expect(method).toEqual("POST");
-      expect(body).toEqual(expectedRequest);
+    expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
+    expect(method).toEqual("POST");
+    expect(body).toEqual(expectedRequest);
 
-      const result = await screen.findByTestId("result");
-      expect(result).toHaveTextContent(/^Success$/);
-    });
+    const result = await screen.findByTestId("result");
+    expect(result).toHaveTextContent(/^Success$/);
   });
 
   test("422 response results in display of error message", async () => {

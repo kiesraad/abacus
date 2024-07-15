@@ -142,70 +142,68 @@ describe("Test DifferencesForm", () => {
     expect(result).toHaveTextContent(/^Success$/);
   });
 
-  describe("DifferencesForm Api call", () => {
-    test("DifferencesForm request body is equal to the form data", async () => {
-      const spy = vi.spyOn(global, "fetch");
+  test("DifferencesForm request body is equal to the form data", async () => {
+    const spy = vi.spyOn(global, "fetch");
 
-      const expectedRequest = {
-        data: {
-          ...rootRequest.data,
-          differences_counts: {
-            more_ballots_count: 2,
-            fewer_ballots_count: 0,
-            unreturned_ballots_count: 0,
-            too_few_ballots_handed_out_count: 0,
-            too_many_ballots_handed_out_count: 1,
-            other_explanation_count: 0,
-            no_explanation_count: 1,
-          },
+    const expectedRequest = {
+      data: {
+        ...rootRequest.data,
+        differences_counts: {
+          more_ballots_count: 2,
+          fewer_ballots_count: 0,
+          unreturned_ballots_count: 0,
+          too_few_ballots_handed_out_count: 0,
+          too_many_ballots_handed_out_count: 1,
+          other_explanation_count: 0,
+          no_explanation_count: 1,
         },
-      };
+      },
+    };
 
-      const user = userEvent.setup();
+    const user = userEvent.setup();
 
-      render(Component);
+    render(Component);
 
-      await user.type(
-        screen.getByTestId("more_ballots_count"),
-        expectedRequest.data.differences_counts.more_ballots_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("fewer_ballots_count"),
-        expectedRequest.data.differences_counts.fewer_ballots_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("unreturned_ballots_count"),
-        expectedRequest.data.differences_counts.unreturned_ballots_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("too_few_ballots_handed_out_count"),
-        expectedRequest.data.differences_counts.too_few_ballots_handed_out_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("too_many_ballots_handed_out_count"),
-        expectedRequest.data.differences_counts.too_many_ballots_handed_out_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("other_explanation_count"),
-        expectedRequest.data.differences_counts.other_explanation_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("no_explanation_count"),
-        expectedRequest.data.differences_counts.no_explanation_count.toString(),
-      );
+    await user.type(
+      screen.getByTestId("more_ballots_count"),
+      expectedRequest.data.differences_counts.more_ballots_count.toString(),
+    );
+    await user.type(
+      screen.getByTestId("fewer_ballots_count"),
+      expectedRequest.data.differences_counts.fewer_ballots_count.toString(),
+    );
+    await user.type(
+      screen.getByTestId("unreturned_ballots_count"),
+      expectedRequest.data.differences_counts.unreturned_ballots_count.toString(),
+    );
+    await user.type(
+      screen.getByTestId("too_few_ballots_handed_out_count"),
+      expectedRequest.data.differences_counts.too_few_ballots_handed_out_count.toString(),
+    );
+    await user.type(
+      screen.getByTestId("too_many_ballots_handed_out_count"),
+      expectedRequest.data.differences_counts.too_many_ballots_handed_out_count.toString(),
+    );
+    await user.type(
+      screen.getByTestId("other_explanation_count"),
+      expectedRequest.data.differences_counts.other_explanation_count.toString(),
+    );
+    await user.type(
+      screen.getByTestId("no_explanation_count"),
+      expectedRequest.data.differences_counts.no_explanation_count.toString(),
+    );
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
 
-      expect(spy).toHaveBeenCalled();
-      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-      expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
-      expect(method).toEqual("POST");
-      expect(body).toEqual(expectedRequest);
+    expect(spy).toHaveBeenCalled();
+    const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
+    expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
+    expect(method).toEqual("POST");
+    expect(body).toEqual(expectedRequest);
 
-      const result = await screen.findByTestId("result");
-      expect(result).toHaveTextContent(/^Success$/);
-    });
+    const result = await screen.findByTestId("result");
+    expect(result).toHaveTextContent(/^Success$/);
   });
 
   test("422 response results in display of error message", async () => {

@@ -22,7 +22,7 @@ describe("Test useElectionListRequest", () => {
         },
       ],
     };
-    overrideOnce("get", "/v1/api/elections", 200, elections);
+    overrideOnce("get", "/api/elections", 200, elections);
     const { result } = renderHook(() => useElectionListRequest(), { wrapper: Providers });
 
     expect(result.current.loading).toBe(true);

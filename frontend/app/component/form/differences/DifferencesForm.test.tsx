@@ -2,9 +2,9 @@
  * @vitest-environment jsdom
  */
 
-import { overrideOnce, render, screen, getUrlMethodAndBody } from "app/test/unit";
+import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi, afterEach } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
@@ -76,7 +76,7 @@ describe("Test DifferencesForm", () => {
     });
 
     test("Form field entry and keybindings", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         message: "Data saved",
         saved: true,
         validation_results: { errors: [], warnings: [] },
@@ -201,7 +201,7 @@ describe("Test DifferencesForm", () => {
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-      expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
+      expect(url).toEqual("http://testhost/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
 
@@ -210,7 +210,7 @@ describe("Test DifferencesForm", () => {
     });
 
     test("422 response results in display of error message", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
         message: "422 error from mock",
       });
 
@@ -225,7 +225,7 @@ describe("Test DifferencesForm", () => {
     });
 
     test("500 response results in display of error message", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
         message: "500 error from mock",
       });
 
@@ -266,7 +266,7 @@ describe("Test DifferencesForm", () => {
   describe("DifferencesForm warnings", () => {
     // TODO: Unskip test once validation is implemented in frontend and backend
     test.skip("Warnings can be displayed", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         saved: true,
         message: "Data entry saved successfully",
         validation_results: {

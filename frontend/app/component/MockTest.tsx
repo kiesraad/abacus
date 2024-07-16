@@ -5,7 +5,7 @@ export function MockTest() {
 
   React.useEffect(() => {
     const action = async () => {
-      const response = await fetch("/v1/ping", {
+      const response = await fetch("/ping", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

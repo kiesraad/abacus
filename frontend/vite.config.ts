@@ -47,10 +47,9 @@ export default defineConfig(() => ({
   server: {
     port: 3000,
     proxy: {
-      "/v1": {
+      "/api": {
         target: apiHost,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/v1/, ""),
       },
     },
   },

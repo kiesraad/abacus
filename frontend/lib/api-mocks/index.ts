@@ -1,13 +1,13 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 import {
   DataEntryResponse,
+  Election,
   ErrorResponse,
+  PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
-  VotesCounts,
   VotersCounts,
-  Election,
-  PoliticalGroup,
+  VotesCounts,
 } from "@kiesraad/api";
 import { electionMockData, electionsMockData, politicalGroupMockData } from "./ElectionMockData.ts";
 
@@ -27,7 +27,7 @@ type PingResponseBody = {
 };
 
 const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>(
-  "/v1/ping",
+  "/ping",
   async ({ request }) => {
     const data = await request.json();
 
@@ -43,7 +43,7 @@ export const pollingStationDataEntryHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   DataEntryResponse | ErrorResponse
->("/v1/api/polling_stations/:id/data_entries/:entry_number", async ({ request }) => {
+>("/api/polling_stations/:id/data_entries/:entry_number", async ({ request }) => {
   let json: POLLING_STATION_DATA_ENTRY_REQUEST_BODY;
 
   try {
@@ -171,12 +171,12 @@ export const pollingStationDataEntryHandler = http.post<
   }
 });
 
-export const ElectionListRequestHandler = http.get("/v1/api/elections", () => {
+export const ElectionListRequestHandler = http.get("/api/elections", () => {
   return HttpResponse.json(electionsMockData, { status: 200 });
 });
 
 export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
-  "/v1/api/elections/:id",
+  "/api/elections/:id",
   () => {
     return HttpResponse.json({ election: electionMockData }, { status: 200 });
   },

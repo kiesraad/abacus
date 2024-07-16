@@ -1,4 +1,5 @@
 import { ErrorResponse } from "@kiesraad/api";
+
 export interface ApiResponse<DATA = object> {
   status: string;
   code: number;
@@ -88,7 +89,7 @@ export class ApiClient {
   ): Promise<ApiResponseSuccess<SuccessResponse> | ApiResponse<ErrorResponse>> {
     const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
 
-    const response = await fetch(host + "/v1" + path, {
+    const response = await fetch(host + path, {
       method: "POST",
       body: JSON.stringify(requestBody),
       headers: {
@@ -104,7 +105,7 @@ export class ApiClient {
   ): Promise<ApiResponseSuccess<SuccessResponse> | ApiResponse<ErrorResponse>> {
     const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
 
-    const response = await fetch(host + "/v1" + path, {
+    const response = await fetch(host + path, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

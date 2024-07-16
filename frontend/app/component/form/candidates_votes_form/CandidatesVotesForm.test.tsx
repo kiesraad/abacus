@@ -313,6 +313,27 @@ describe("Test CandidatesVotesForm", () => {
   });
 
   describe("CandidatesVotesForm errors", () => {
+    test("F.01 Invalid value", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+        error:
+          "Failed to deserialize the JSON body into the target type: data.political_group_votes[0].total: invalid value: integer `-3`, expected u32 at line 1 column 61",
+      });
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      // Since the component does not allow to input invalid values such as -3,
+      // not inputting any values and just clicking the submit button.
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackServerError = await screen.findByTestId("feedback-server-error");
+      expect(feedbackServerError).toHaveTextContent(/^Error$/);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
+
     test("F.31 IncorrectTotal group total", async () => {
       overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
         saved: true,

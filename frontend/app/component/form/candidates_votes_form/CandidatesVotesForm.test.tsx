@@ -344,4 +344,36 @@ describe("Test CandidatesVotesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
   });
+
+  describe("CandidatesVotesForm warnings", () => {
+    test("Warnings can be displayed", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+        saved: true,
+        message: "Data entry saved successfully",
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: ["data.political_group_votes[0].total"],
+              code: "NotAnActualWarning",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      // Since no warnings exist for the fields on this page,
+      // not inputting any values and just clicking submit.
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
+      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
+  });
 });

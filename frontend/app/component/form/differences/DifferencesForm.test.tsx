@@ -2,127 +2,155 @@
  * @vitest-environment jsdom
  */
 
-import { overrideOnce, render, screen, fireEvent } from "app/test/unit";
+import { overrideOnce, render, screen, getUrlMethodAndBody } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi, afterEach } from "vitest";
+
+import {
+  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
+  PollingStationFormController,
+} from "@kiesraad/api";
+import { electionMock } from "@kiesraad/api-mocks";
 import { DifferencesForm } from "./DifferencesForm";
+
+const Component = (
+  <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
+    <DifferencesForm />
+  </PollingStationFormController>
+);
+
+const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
+  data: {
+    political_group_votes: electionMock.political_groups.map((group) => ({
+      number: group.number,
+      total: 0,
+      candidate_votes: group.candidates.map((candidate) => ({
+        number: candidate.number,
+        votes: 0,
+      })),
+    })),
+    differences_counts: {
+      more_ballots_count: 0,
+      fewer_ballots_count: 0,
+      unreturned_ballots_count: 0,
+      too_few_ballots_handed_out_count: 0,
+      too_many_ballots_handed_out_count: 0,
+      other_explanation_count: 0,
+      no_explanation_count: 0,
+    },
+    voters_counts: {
+      poll_card_count: 0,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 0,
+    },
+    votes_counts: {
+      votes_candidates_counts: 0,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 0,
+    },
+  },
+};
 
 describe("Test DifferencesForm", () => {
   afterEach(() => {
     vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
   });
 
-  test("hitting enter key does not result in api call", async () => {
-    const spy = vi.spyOn(global, "fetch");
+  describe("DifferencesForm user interactions", () => {
+    test("hitting enter key does not result in api call", async () => {
+      const spy = vi.spyOn(global, "fetch");
 
-    const user = userEvent.setup();
+      const user = userEvent.setup();
 
-    render(<DifferencesForm />);
+      render(Component);
 
-    const pollCards = screen.getByTestId("more_ballots_count");
-    await user.clear(pollCards);
-    await user.type(pollCards, "12345");
-    expect(pollCards).toHaveValue("12.345");
+      const moreBallotsCount = screen.getByTestId("more_ballots_count");
+      await user.type(moreBallotsCount, "12345");
+      expect(moreBallotsCount).toHaveValue("12.345");
 
-    await user.keyboard("{enter}");
+      await user.keyboard("{enter}");
 
-    expect(spy).not.toHaveBeenCalled();
-  });
-
-  test("Form field entry and keybindings", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
-      message: "Data saved",
-      saved: true,
-      validation_results: { errors: [], warnings: [] },
+      expect(spy).not.toHaveBeenCalled();
     });
 
-    const user = userEvent.setup();
+    test("Form field entry and keybindings", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+        message: "Data saved",
+        saved: true,
+        validation_results: { errors: [], warnings: [] },
+      });
 
-    render(<DifferencesForm />);
+      const user = userEvent.setup();
 
-    const moreBallotsCount = screen.getByTestId("more_ballots_count");
-    expect(moreBallotsCount).toHaveFocus();
-    await user.clear(moreBallotsCount);
-    await user.type(moreBallotsCount, "12345");
-    expect(moreBallotsCount).toHaveValue("12.345");
+      render(Component);
 
-    await user.keyboard("{enter}");
+      const moreBallotsCount = screen.getByTestId("more_ballots_count");
+      expect(moreBallotsCount).toHaveFocus();
+      await user.type(moreBallotsCount, "12345");
+      expect(moreBallotsCount).toHaveValue("12.345");
 
-    const fewerBallotsCount = screen.getByTestId("fewer_ballots_count");
-    expect(fewerBallotsCount).toHaveFocus();
-    await user.clear(fewerBallotsCount);
-    await user.paste("6789");
-    expect(fewerBallotsCount).toHaveValue("6.789");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const fewerBallotsCount = screen.getByTestId("fewer_ballots_count");
+      expect(fewerBallotsCount).toHaveFocus();
+      await user.paste("6789");
+      expect(fewerBallotsCount).toHaveValue("6.789");
 
-    const unreturnedBallotsCount = screen.getByTestId("unreturned_ballots_count");
-    expect(unreturnedBallotsCount).toHaveFocus();
-    await user.clear(unreturnedBallotsCount);
-    await user.type(unreturnedBallotsCount, "123");
-    expect(unreturnedBallotsCount).toHaveValue("123");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const unreturnedBallotsCount = screen.getByTestId("unreturned_ballots_count");
+      expect(unreturnedBallotsCount).toHaveFocus();
+      await user.type(unreturnedBallotsCount, "123");
+      expect(unreturnedBallotsCount).toHaveValue("123");
 
-    const tooFewBallotsHandedOutCount = screen.getByTestId("too_few_ballots_handed_out_count");
-    expect(tooFewBallotsHandedOutCount).toHaveFocus();
-    await user.clear(tooFewBallotsHandedOutCount);
-    await user.paste("4242");
-    expect(tooFewBallotsHandedOutCount).toHaveValue("4.242");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const tooFewBallotsHandedOutCount = screen.getByTestId("too_few_ballots_handed_out_count");
+      expect(tooFewBallotsHandedOutCount).toHaveFocus();
+      await user.paste("4242");
+      expect(tooFewBallotsHandedOutCount).toHaveValue("4.242");
 
-    const tooManyBallotsHandedOutCount = screen.getByTestId("too_many_ballots_handed_out_count");
-    expect(tooManyBallotsHandedOutCount).toHaveFocus();
-    await user.clear(tooManyBallotsHandedOutCount);
-    await user.type(tooManyBallotsHandedOutCount, "12");
-    expect(tooManyBallotsHandedOutCount).toHaveValue("12");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const tooManyBallotsHandedOutCount = screen.getByTestId("too_many_ballots_handed_out_count");
+      expect(tooManyBallotsHandedOutCount).toHaveFocus();
+      await user.type(tooManyBallotsHandedOutCount, "12");
+      expect(tooManyBallotsHandedOutCount).toHaveValue("12");
 
-    const otherExplanationCount = screen.getByTestId("other_explanation_count");
-    expect(otherExplanationCount).toHaveFocus();
-    await user.clear(otherExplanationCount);
-    // Test if maxLength on field works
-    await user.type(otherExplanationCount, "1000000000");
-    expect(otherExplanationCount).toHaveValue("100.000.000");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const otherExplanationCount = screen.getByTestId("other_explanation_count");
+      expect(otherExplanationCount).toHaveFocus();
+      // Test if maxLength on field works
+      await user.type(otherExplanationCount, "1000000000");
+      expect(otherExplanationCount).toHaveValue("100.000.000");
 
-    const noExplanationCount = screen.getByTestId("no_explanation_count");
-    expect(noExplanationCount).toHaveFocus();
-    await user.clear(noExplanationCount);
-    await user.type(noExplanationCount, "3");
-    expect(noExplanationCount).toHaveValue("3");
+      await user.keyboard("{enter}");
 
-    await user.keyboard("{enter}");
+      const noExplanationCount = screen.getByTestId("no_explanation_count");
+      expect(noExplanationCount).toHaveFocus();
+      await user.type(noExplanationCount, "3");
+      expect(noExplanationCount).toHaveValue("3");
 
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
+      await user.keyboard("{enter}");
 
-    const result = await screen.findByTestId("result");
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
 
-    expect(result).toHaveTextContent(/^Success$/);
+      const result = await screen.findByTestId("result");
+      expect(result).toHaveTextContent(/^Success$/);
+    });
   });
 
-  describe("DifferencesForm Api call", () => {
+  describe("DifferencesForm API request and response", () => {
     test("DifferencesForm request body is equal to the form data", async () => {
       const spy = vi.spyOn(global, "fetch");
 
       const expectedRequest = {
         data: {
-          voters_counts: {
-            poll_card_count: 0,
-            proxy_certificate_count: 0,
-            voter_card_count: 0,
-            total_admitted_voters_count: 0,
-          },
-          votes_counts: {
-            votes_candidates_counts: 0,
-            blank_votes_count: 0,
-            invalid_votes_count: 0,
-            total_votes_cast_count: 0,
-          },
+          ...rootRequest.data,
           differences_counts: {
             more_ballots_count: 2,
             fewer_ballots_count: 0,
@@ -132,135 +160,139 @@ describe("Test DifferencesForm", () => {
             other_explanation_count: 0,
             no_explanation_count: 1,
           },
-          political_group_votes: [
-            {
-              candidate_votes: [{ number: 1, votes: 0 }],
-              number: 1,
-              total: 0,
-            },
-          ],
         },
       };
 
       const user = userEvent.setup();
 
-      const { getByTestId } = render(<DifferencesForm />);
+      render(Component);
 
-      const moreBallotsCount = getByTestId("more_ballots_count");
-      fireEvent.change(moreBallotsCount, {
-        target: { value: expectedRequest.data.differences_counts.more_ballots_count.toString() },
-      });
-
-      const fewerBallotsCount = getByTestId("fewer_ballots_count");
-      fireEvent.change(fewerBallotsCount, {
-        target: { value: expectedRequest.data.differences_counts.fewer_ballots_count.toString() },
-      });
-
-      const unreturnedBallotsCount = getByTestId("unreturned_ballots_count");
-      fireEvent.change(unreturnedBallotsCount, {
-        target: {
-          value: expectedRequest.data.differences_counts.unreturned_ballots_count.toString(),
-        },
-      });
-
-      const tooFewBallotsHandedOutCount = getByTestId("too_few_ballots_handed_out_count");
-      fireEvent.change(tooFewBallotsHandedOutCount, {
-        target: {
-          value:
-            expectedRequest.data.differences_counts.too_few_ballots_handed_out_count.toString(),
-        },
-      });
-
-      const tooManyBallotsHandedOutCount = getByTestId("too_many_ballots_handed_out_count");
-      fireEvent.change(tooManyBallotsHandedOutCount, {
-        target: {
-          value:
-            expectedRequest.data.differences_counts.too_many_ballots_handed_out_count.toString(),
-        },
-      });
-
-      const otherExplanationCount = getByTestId("other_explanation_count");
-      fireEvent.change(otherExplanationCount, {
-        target: {
-          value: expectedRequest.data.differences_counts.other_explanation_count.toString(),
-        },
-      });
-
-      const noExplanationCount = getByTestId("no_explanation_count");
-      fireEvent.change(noExplanationCount, {
-        target: { value: expectedRequest.data.differences_counts.no_explanation_count.toString() },
-      });
+      await user.type(
+        screen.getByTestId("more_ballots_count"),
+        expectedRequest.data.differences_counts.more_ballots_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("fewer_ballots_count"),
+        expectedRequest.data.differences_counts.fewer_ballots_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("unreturned_ballots_count"),
+        expectedRequest.data.differences_counts.unreturned_ballots_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("too_few_ballots_handed_out_count"),
+        expectedRequest.data.differences_counts.too_few_ballots_handed_out_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("too_many_ballots_handed_out_count"),
+        expectedRequest.data.differences_counts.too_many_ballots_handed_out_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("other_explanation_count"),
+        expectedRequest.data.differences_counts.other_explanation_count.toString(),
+      );
+      await user.type(
+        screen.getByTestId("no_explanation_count"),
+        expectedRequest.data.differences_counts.no_explanation_count.toString(),
+      );
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      expect(spy).toHaveBeenCalledWith("http://testhost/v1/api/polling_stations/1/data_entries/1", {
-        method: "POST",
-        body: JSON.stringify(expectedRequest),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      expect(spy).toHaveBeenCalled();
+      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
+      expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
+      expect(method).toEqual("POST");
+      expect(body).toEqual(expectedRequest);
 
       const result = await screen.findByTestId("result");
       expect(result).toHaveTextContent(/^Success$/);
     });
-  });
 
-  test("422 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
-      message: "422 error from mock",
-    });
-
-    const user = userEvent.setup();
-
-    render(<DifferencesForm />);
-
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-    const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^422 error from mock$/);
-  });
-
-  test("500 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
-      message: "500 error from mock",
-    });
-
-    const user = userEvent.setup();
-
-    render(<DifferencesForm />);
-
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-    const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^500 error from mock$/);
-  });
-
-  // TODO: Add validation once backend validation is implemented
-  test.skip("Incorrect total is caught by validation", async () => {
-    const { getByTestId } = render(<DifferencesForm />);
-
-    const setValue = (id: string, value: string | number) => {
-      const el = getByTestId(id);
-      fireEvent.change(el, {
-        target: { value: `${value}` },
+    test("422 response results in display of error message", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+        message: "422 error from mock",
       });
-    };
 
-    setValue("more_ballots_count", 2);
-    setValue("fewer_ballots_count", 0);
-    setValue("unreturned_ballots_count", 0);
-    setValue("too_few_ballots_handed_out_count", 0);
-    setValue("too_many_ballots_handed_out_count", 1);
-    setValue("other_explanation_count", 0);
-    setValue("no_explanation_count", 1);
+      const user = userEvent.setup();
 
-    const user = userEvent.setup();
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
+      render(Component);
 
-    const result = await screen.findByTestId("error-codes");
-    expect(result).toHaveTextContent(/^IncorrectTotal,IncorrectTotal$/);
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+      const feedbackServerError = await screen.findByTestId("feedback-server-error");
+      expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
+    });
+
+    test("500 response results in display of error message", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
+        message: "500 error from mock",
+      });
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+      const feedbackServerError = await screen.findByTestId("feedback-server-error");
+      expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
+    });
+  });
+
+  describe("DifferencesForm errors", () => {
+    // TODO: Add validation test once backend validation is implemented
+    test.skip("Incorrect total is caught by validation", async () => {
+      const user = userEvent.setup();
+
+      render(Component);
+
+      await user.type(screen.getByTestId("more_ballots_count"), "2");
+      await user.type(screen.getByTestId("fewer_ballots_count"), "0");
+      await user.type(screen.getByTestId("unreturned_ballots_count"), "0");
+      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "0");
+      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "1");
+      await user.type(screen.getByTestId("other_explanation_count"), "0");
+      await user.type(screen.getByTestId("no_explanation_count"), "1");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(/^IncorrectTotal,IncorrectTotal$/);
+    });
+  });
+
+  describe("DifferencesForm warnings", () => {
+    // TODO: Unskip test once validation is implemented in frontend and backend
+    test.skip("Warnings can be displayed", async () => {
+      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+        saved: true,
+        message: "Data entry saved successfully",
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: ["data.differences_counts.more_ballots_count"],
+              code: "NotAnActualWarning",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      // Since no warnings exist for the fields on this page,
+      // not inputting any values and just clicking submit.
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
+      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
   });
 });

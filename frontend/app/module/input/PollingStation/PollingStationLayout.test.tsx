@@ -1,10 +1,17 @@
 import { render } from "app/test/unit";
 import { describe, expect, test } from "vitest";
+import { ElectionListProvider, ElectionProvider } from "@kiesraad/api";
 import { PollingStationLayout } from "./PollingStationLayout";
 
 describe("PollingStationLayout", () => {
   test("Enter form field values", () => {
-    render(<PollingStationLayout />);
+    render(
+      <ElectionListProvider>
+        <ElectionProvider>
+          <PollingStationLayout />
+        </ElectionProvider>
+      </ElectionListProvider>,
+    );
     expect(true).toBe(true);
   });
 });

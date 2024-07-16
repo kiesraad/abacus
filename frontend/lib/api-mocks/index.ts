@@ -6,8 +6,13 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
   VotesCounts,
   VotersCounts,
+  Election,
+  PoliticalGroup,
 } from "@kiesraad/api";
-import { electionMockData, electionsMockData } from "./ElectionMockData.ts";
+import { electionMockData, electionsMockData, politicalGroupMockData } from "./ElectionMockData.ts";
+
+export const electionMock = electionMockData as Required<Election>;
+export const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -52,7 +57,7 @@ export const pollingStationDataEntryHandler = http.post<
       },
     };
 
-    const { voters_counts, votes_counts } = json.data;
+    const { voters_counts, votes_counts, political_group_votes } = json.data;
 
     const votesFields: (keyof VotesCounts)[] = [
       "blank_votes_count",
@@ -66,7 +71,7 @@ export const pollingStationDataEntryHandler = http.post<
         if (valueOutOfRange(votes_counts[field])) {
           response.validation_results.errors.push({
             code: "OutOfRange",
-            fields: [field],
+            fields: [`data.votes_counts.${field}`],
           });
         }
       }
@@ -83,7 +88,7 @@ export const pollingStationDataEntryHandler = http.post<
       if (valueOutOfRange(voters_counts[field])) {
         response.validation_results.errors.push({
           code: "OutOfRange",
-          fields: [field],
+          fields: [`data.voters_counts.${field}`],
         });
       }
     });
@@ -97,10 +102,10 @@ export const pollingStationDataEntryHandler = http.post<
     ) {
       response.validation_results.errors.push({
         fields: [
-          "voters_counts.poll_card_count",
-          "voters_counts.proxy_certificate_count",
-          "voters_counts.voter_card_count",
-          "voters_counts.total_admitted_voters_count",
+          "data.voters_counts.poll_card_count",
+          "data.voters_counts.proxy_certificate_count",
+          "data.voters_counts.voter_card_count",
+          "data.voters_counts.total_admitted_voters_count",
         ],
         code: "IncorrectTotal",
       });
@@ -115,14 +120,43 @@ export const pollingStationDataEntryHandler = http.post<
     ) {
       response.validation_results.errors.push({
         fields: [
-          "votes_counts.total_votes_cast_count",
-          "votes_counts.votes_candidates_counts",
-          "votes_counts.blank_votes_count",
-          "votes_counts.invalid_votes_count",
+          "data.votes_counts.total_votes_cast_count",
+          "data.votes_counts.votes_candidates_counts",
+          "data.votes_counts.blank_votes_count",
+          "data.votes_counts.invalid_votes_count",
         ],
         code: "IncorrectTotal",
       });
     }
+
+    //SECTION political_group_votes
+    political_group_votes.forEach((pg) => {
+      if (valueOutOfRange(pg.total)) {
+        response.validation_results.errors.push({
+          code: "OutOfRange",
+          fields: [`data.political_group_votes[${pg.number - 1}].total`],
+        });
+      }
+
+      pg.candidate_votes.forEach((cv) => {
+        if (valueOutOfRange(cv.votes)) {
+          response.validation_results.errors.push({
+            code: "OutOfRange",
+            fields: [
+              `data.political_group_votes[${pg.number - 1}].candidate_votes[${cv.number - 1}].votes`,
+            ],
+          });
+        }
+      });
+
+      const sum = pg.candidate_votes.reduce((acc, cv) => acc + cv.votes, 0);
+      if (sum !== pg.total) {
+        response.validation_results.errors.push({
+          code: "IncorrectTotal",
+          fields: [`data.political_group_votes[${pg.number - 1}].total`],
+        });
+      }
+    });
 
     //OPTION:  threshold checks
 
@@ -144,7 +178,7 @@ export const ElectionListRequestHandler = http.get("/v1/api/elections", () => {
 export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/v1/api/elections/:id",
   () => {
-    return HttpResponse.json(electionMockData, { status: 200 });
+    return HttpResponse.json({ election: electionMockData }, { status: 200 });
   },
 );
 

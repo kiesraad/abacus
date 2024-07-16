@@ -4,7 +4,7 @@ import { useElectionDataRequest } from "../useElectionDataRequest";
 import { useElectionList } from "./useElectionList";
 
 export interface iElectionProviderContext {
-  election: Election;
+  election: Required<Election>;
 }
 
 export const ElectionProviderContext = React.createContext<iElectionProviderContext | undefined>(
@@ -31,7 +31,7 @@ export function ElectionProvider({ children }: ElectionProviderProps) {
   }
 
   return (
-    <ElectionProviderContext.Provider value={{ election: data }}>
+    <ElectionProviderContext.Provider value={{ election: data.election as Required<Election> }}>
       {children}
     </ElectionProviderContext.Provider>
   );

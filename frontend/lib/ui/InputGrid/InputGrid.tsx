@@ -142,14 +142,18 @@ InputGrid.Row = ({
   isTotal,
   isFocused,
   addSeparator,
+  id,
 }: {
   children: [React.ReactElement, React.ReactElement, React.ReactElement];
   isTotal?: boolean;
   isFocused?: boolean;
   addSeparator?: boolean;
+  id?: string;
 }) => (
   <>
-    <tr className={(isTotal ? "is-total " : "") + (isFocused ? "focused" : "")}>{children}</tr>
+    <tr className={(isTotal ? "is-total " : "") + (isFocused ? "focused" : "")} id={`row-${id}`}>
+      {children}
+    </tr>
     {addSeparator && <InputGrid.Separator />}
   </>
 );

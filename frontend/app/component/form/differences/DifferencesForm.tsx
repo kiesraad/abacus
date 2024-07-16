@@ -1,12 +1,9 @@
 import * as React from "react";
+import { useBlocker } from "react-router-dom";
 
-import { usePollingStationDataEntry, ValidationResult, ErrorsAndWarnings } from "@kiesraad/api";
+import { useDifferences, DifferencesCounts, useErrorsAndWarnings } from "@kiesraad/api";
 import { Button, InputGrid, Feedback, BottomBar, InputGridRow, useTooltip } from "@kiesraad/ui";
-import {
-  usePositiveNumberInputMask,
-  usePreventFormEnterSubmit,
-  fieldNameFromPath,
-} from "@kiesraad/util";
+import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
   more_ballots_count: HTMLInputElement;
@@ -32,126 +29,85 @@ export function DifferencesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-  const [doSubmit, { data, loading, error }] = usePollingStationDataEntry({
-    polling_station_id: 1,
-    entry_number: 1,
-  });
+  const {
+    sectionValues,
+    setSectionValues,
+    loading,
+    errors,
+    warnings,
+    serverError,
+    isCalled,
+    setTemporaryCache,
+  } = useDifferences();
 
   useTooltip({
     onDismiss: resetWarnings,
   });
 
+  const getValues = React.useCallback(
+    (elements: DifferencesFormElement["elements"]): DifferencesCounts => {
+      return {
+        more_ballots_count: deformat(elements.more_ballots_count.value),
+        fewer_ballots_count: deformat(elements.fewer_ballots_count.value),
+        unreturned_ballots_count: deformat(elements.unreturned_ballots_count.value),
+        too_few_ballots_handed_out_count: deformat(elements.too_few_ballots_handed_out_count.value),
+        too_many_ballots_handed_out_count: deformat(
+          elements.too_many_ballots_handed_out_count.value,
+        ),
+        other_explanation_count: deformat(elements.other_explanation_count.value),
+        no_explanation_count: deformat(elements.no_explanation_count.value),
+      };
+    },
+    [deformat],
+  );
+
   function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
     event.preventDefault();
     const elements = event.currentTarget.elements;
-
-    doSubmit({
-      data: {
-        voters_counts: {
-          poll_card_count: 0,
-          proxy_certificate_count: 0,
-          voter_card_count: 0,
-          total_admitted_voters_count: 0,
-        },
-        votes_counts: {
-          votes_candidates_counts: 0,
-          blank_votes_count: 0,
-          invalid_votes_count: 0,
-          total_votes_cast_count: 0,
-        },
-        differences_counts: {
-          more_ballots_count: deformat(elements.more_ballots_count.value),
-          fewer_ballots_count: deformat(elements.fewer_ballots_count.value),
-          unreturned_ballots_count: deformat(elements.unreturned_ballots_count.value),
-          too_few_ballots_handed_out_count: deformat(
-            elements.too_few_ballots_handed_out_count.value,
-          ),
-          too_many_ballots_handed_out_count: deformat(
-            elements.too_many_ballots_handed_out_count.value,
-          ),
-          other_explanation_count: deformat(elements.other_explanation_count.value),
-          no_explanation_count: deformat(elements.no_explanation_count.value),
-        },
-        political_group_votes: [
-          {
-            candidate_votes: [{ number: 1, votes: 0 }],
-            number: 1,
-            total: 0,
-          },
-        ],
-      },
-    });
+    setSectionValues(getValues(elements));
   }
-
-  const errorsAndWarnings: Map<string, ErrorsAndWarnings> = React.useMemo(() => {
-    const result = new Map<string, ErrorsAndWarnings>();
-
-    const process = (target: keyof ErrorsAndWarnings, arr: ValidationResult[]) => {
-      arr.forEach((v) => {
-        v.fields.forEach((f) => {
-          const fieldName = fieldNameFromPath(f);
-          if (!result.has(fieldName)) {
-            result.set(fieldName, { errors: [], warnings: [] });
-          }
-          const field = result.get(fieldName);
-          if (field) {
-            field[target].push({
-              code: v.code,
-              id: fieldName,
-            });
-          }
-        });
+  //const blocker =  useBlocker() use const blocker to render confirmation UI.
+  useBlocker(() => {
+    if (formRef.current && !isCalled) {
+      const elements = formRef.current.elements as DifferencesFormElement["elements"];
+      const values = getValues(elements);
+      setTemporaryCache({
+        key: "differences",
+        data: values,
       });
-    };
-
-    if (data && data.validation_results.errors.length > 0) {
-      process("errors", data.validation_results.errors);
     }
-    if (data && data.validation_results.warnings.length > 0) {
-      process("warnings", data.validation_results.warnings);
-    }
+    return false;
+  });
 
-    inputMaskWarnings.forEach((warning) => {
-      if (!result.has(warning.id)) {
-        result.set(warning.id, { errors: [], warnings: [] });
-      }
-      const field = result.get(warning.id);
-      if (field) {
-        field.warnings.push(warning);
-      }
-    });
-
-    return result;
-  }, [data, inputMaskWarnings]);
+  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
   React.useEffect(() => {
-    if (data) {
+    if (isCalled) {
       window.scrollTo(0, 0);
     }
-  }, [data]);
+  }, [isCalled]);
 
-  const hasValidationError = data && data.validation_results.errors.length > 0;
-  const hasValidationWarning = data && data.validation_results.warnings.length > 0;
-
+  const hasValidationError = errors.length > 0;
+  const hasValidationWarning = warnings.length > 0;
+  const success = isCalled && !hasValidationError && !hasValidationWarning && !loading;
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
-      <div id="error-codes" className="hidden">
-        {data && data.validation_results.errors.map((r) => r.code).join(",")}
-      </div>
+      {/* Temporary while not navigating through form sections */}
+      {success && <div id="result">Success</div>}
       <h2>Verschil tussen aantal kiezers en getelde stemmen</h2>
-      {error && (
+      {serverError && (
         <Feedback type="error" title="Error">
-          <div>
+          <div id="feedback-server-error">
             <h2>Error</h2>
-            <p id="result">{error.message}</p>
+            <p id="result">{serverError.message}</p>
           </div>
         </Feedback>
       )}
       {hasValidationError && (
         <Feedback type="error" title="Controleer ingevulde verschillen">
-          <div>
+          <div id="feedback-error">
             <ul>
-              {data.validation_results.errors.map((error, n) => (
+              {errors.map((error, n) => (
                 <li key={`${error.code}-${n}`}>{error.code}</li>
               ))}
             </ul>
@@ -159,22 +115,14 @@ export function DifferencesForm() {
         </Feedback>
       )}
 
-      {hasValidationWarning && (
+      {hasValidationWarning && !hasValidationError && (
         <Feedback type="warning" title="Controleer ingevulde verschillen">
-          <div>
+          <div id="feedback-warning">
             <ul>
-              {data.validation_results.warnings.map((warning, n) => (
+              {warnings.map((warning, n) => (
                 <li key={`${warning.code}-${n}`}>{warning.code}</li>
               ))}
             </ul>
-          </div>
-        </Feedback>
-      )}
-
-      {data && !hasValidationError && (
-        <Feedback type="success" title="Success">
-          <div>
-            <h2 id="result">Success</h2>
           </div>
         </Feedback>
       )}
@@ -188,71 +136,78 @@ export function DifferencesForm() {
           <InputGridRow
             key="I"
             field="I"
-            name="more_ballots_count"
+            id="more_ballots_count"
             title="Stembiljetten méér geteld"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.more_ballots_count}
             isFocused
           />
           <InputGridRow
             key="J"
             field="J"
-            name="fewer_ballots_count"
+            id="fewer_ballots_count"
             title="Stembiljetten minder geteld"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.fewer_ballots_count}
             addSeparator
           />
 
           <InputGridRow
             key="K"
             field="K"
-            name="unreturned_ballots_count"
+            id="unreturned_ballots_count"
             title="Niet ingeleverde stembiljetten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.unreturned_ballots_count}
           />
           <InputGridRow
             key="L"
             field="L"
-            name="too_few_ballots_handed_out_count"
+            id="too_few_ballots_handed_out_count"
             title="Te weinig uitgerekte stembiljetten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.too_few_ballots_handed_out_count}
           />
 
           <InputGridRow
             key="M"
             field="M"
-            name="too_many_ballots_handed_out_count"
+            id="too_many_ballots_handed_out_count"
             title="Teveel uitgereikte stembiljetten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.too_many_ballots_handed_out_count}
           />
           <InputGridRow
             key="N"
             field="N"
-            name="other_explanation_count"
+            id="other_explanation_count"
             title="Andere verklaring voor het verschil"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.other_explanation_count}
             addSeparator
           />
 
           <InputGridRow
             key="O"
             field="O"
-            name="no_explanation_count"
+            id="no_explanation_count"
             title="Geen verklaring voor het verschil"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
+            defaultValue={sectionValues.no_explanation_count}
           />
         </InputGrid.Body>
       </InputGrid>

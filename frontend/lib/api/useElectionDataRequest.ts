@@ -13,5 +13,5 @@ export function useElectionDataRequest(params: ELECTION_DETAILS_REQUEST_PARAMS) 
     path = "";
   }
 
-  return useApiGetRequest<Election>(path);
+  return useApiGetRequest<{ election: Election }>(path);
 }

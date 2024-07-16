@@ -19,7 +19,7 @@ Er zijn meerdere manieren om deze stappen te zetten.
 
 - Schrijf de code:
     - Implementeer de functionaliteit die wordt beschreven in het issue.
-    - Maak testen aan voor de functionaliteit en voer ze uit.
+    - Test de functionaliteit, schrijf zover zinvol tests (unit, integration etc).
     - Push ook tussentijdse commits naar GitHub.
 
 - Maak een pull request aan:

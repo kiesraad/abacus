@@ -24,8 +24,6 @@ export interface CandidatesVotesFormProps {
   group: PoliticalGroup;
 }
 
-//political_group_votes[1].candidate_votes[1].votes
-
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);

@@ -1,4 +1,4 @@
-import { Badge, BottomBar, Button } from "@kiesraad/ui";
+import { BottomBar, Button } from "@kiesraad/ui";
 import { useNavigate } from "react-router-dom";
 import { IconChevronRight } from "@kiesraad/icon";
 import { PollingStation, PollingStationsContext } from "@kiesraad/api";
@@ -72,7 +72,7 @@ export function PollingStationChoiceForm() {
                     </td>
                     <td>
                       <span>{pollingStation.name}</span>
-                      <Badge type="first_entry" />
+                      {/* TODO: <Badge type="first_entry" />*/}
                     </td>
                     <td width="5rem">
                       <div className="link">

@@ -1,10 +1,10 @@
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi, afterEach } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   Election,
-  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PoliticalGroup,
+  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
 } from "@kiesraad/api";
 import { electionMock, politicalGroupMock } from "@kiesraad/api-mocks";
@@ -72,7 +72,7 @@ describe("Test CandidatesVotesForm", () => {
     });
 
     test("Form field entry and keybindings", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         message: "Data saved",
         saved: true,
         validation_results: { errors: [], warnings: [] },
@@ -272,7 +272,7 @@ describe("Test CandidatesVotesForm", () => {
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-      expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
+      expect(url).toEqual("http://testhost/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
 
@@ -281,7 +281,7 @@ describe("Test CandidatesVotesForm", () => {
     });
 
     test("422 response results in display of error message", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
         message: "422 error from mock",
       });
 
@@ -296,7 +296,7 @@ describe("Test CandidatesVotesForm", () => {
     });
 
     test("500 response results in display of error message", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
         message: "500 error from mock",
         errorCode: "500_ERROR",
       });
@@ -314,7 +314,7 @@ describe("Test CandidatesVotesForm", () => {
 
   describe("CandidatesVotesForm errors", () => {
     test("F.01 Invalid value", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
         error:
           "Failed to deserialize the JSON body into the target type: data.political_group_votes[0].total: invalid value: integer `-3`, expected u32 at line 1 column 61",
       });
@@ -335,7 +335,7 @@ describe("Test CandidatesVotesForm", () => {
     });
 
     test("F.31 IncorrectTotal group total", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         saved: true,
         message: "Data entry saved successfully",
         validation_results: {
@@ -368,7 +368,7 @@ describe("Test CandidatesVotesForm", () => {
 
   describe("CandidatesVotesForm warnings", () => {
     test("Warnings can be displayed", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         saved: true,
         message: "Data entry saved successfully",
         validation_results: {

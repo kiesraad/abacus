@@ -2,9 +2,9 @@
  * @vitest-environment jsdom
  */
 
-import { overrideOnce, render, screen, getUrlMethodAndBody } from "app/test/unit";
+import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi, afterEach } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
@@ -76,7 +76,7 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("Form field entry and keybindings", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         message: "Data saved",
         saved: true,
         validation_results: { errors: [], warnings: [] },
@@ -215,7 +215,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
 
-      expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
+      expect(url).toEqual("http://testhost/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
 
@@ -224,7 +224,7 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("422 response results in display of error message", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
         message: "422 error from mock",
       });
 
@@ -242,7 +242,7 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("500 response results in display of error message", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
         message: "500 error from mock",
         errorCode: "500_ERROR",
       });
@@ -263,7 +263,7 @@ describe("Test VotersAndVotesForm", () => {
 
   describe("VotersAndVotesForm errors", () => {
     test("F.01 Invalid value", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
         error:
           "Failed to deserialize the JSON body into the target type: data.voters_counts.poll_card_count: invalid value: integer `-3`, expected u32 at line 1 column 525",
       });
@@ -284,7 +284,7 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("F.11 IncorrectTotal Voters", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         saved: true,
         message: "Data entry saved successfully",
         validation_results: {
@@ -322,7 +322,7 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("F.12 IncorrectTotal Votes", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         saved: true,
         message: "Data entry saved successfully",
         validation_results: {
@@ -364,7 +364,7 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("Error with non-existing fields is not displayed", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         saved: true,
         message: "Data entry saved successfully",
         validation_results: {
@@ -399,7 +399,7 @@ describe("Test VotersAndVotesForm", () => {
 
   describe("VotersAndVotesForm warnings", () => {
     test("W.21 AboveThreshold blank votes", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         saved: true,
         message: "Data entry saved successfully",
         validation_results: {
@@ -435,7 +435,7 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("W.22 AboveThreshold invalid votes", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         saved: true,
         message: "Data entry saved successfully",
         validation_results: {
@@ -471,7 +471,7 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("W.27 EqualInput voters and votes", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         saved: true,
         message: "Data entry saved successfully",
         validation_results: {

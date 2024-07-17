@@ -6,7 +6,7 @@ export async function startMockAPI() {
   const { http } = await import("msw");
   const { setupWorker } = await import("msw/browser");
 
-  const interceptAll = http.all("/v1/*", async () => {
+  const interceptAll = http.all("/*", async () => {
     await sleep(randInt(200, 400));
   });
 

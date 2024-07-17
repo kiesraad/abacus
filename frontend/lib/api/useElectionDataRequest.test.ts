@@ -76,7 +76,7 @@ describe("Test useElectionDataRequest", () => {
         },
       ],
     };
-    overrideOnce("get", "/v1/api/elections/1", 200, election);
+    overrideOnce("get", "/api/elections/1", 200, election);
     const { result } = renderHook(
       () =>
         useElectionDataRequest({

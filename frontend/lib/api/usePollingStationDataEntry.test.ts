@@ -1,11 +1,10 @@
-import { describe, expect, test, assert } from "vitest";
-import { renderHook, waitFor, Providers } from "app/test/unit";
+import { assert, describe, expect, test } from "vitest";
+import { overrideOnce, Providers, renderHook, waitFor } from "app/test/unit";
 import { usePollingStationDataEntry } from "./usePollingStationDataEntry";
-import { overrideOnce } from "app/test/unit";
 
 describe("usePollingStationDataEntry", () => {
   test("doSubmit parses ok response", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
       message: "should work",
     });
 

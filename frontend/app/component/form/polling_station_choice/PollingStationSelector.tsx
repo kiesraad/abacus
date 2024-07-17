@@ -2,16 +2,21 @@ import { PollingStation, PollingStationsContext } from "@kiesraad/api";
 import { InputField } from "@kiesraad/ui";
 import { useContext, useMemo, useState } from "react";
 
+const ERROR_MESSAGE: string = "Alleen positieve nummers toegestaan";
+
 export function PollingStationSelector() {
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const { pollingStations, pollingStationsLoading } = useContext(PollingStationsContext);
 
   const currentPollingStation = useMemo(() => {
     const parsedInt = parseInt(pollingStationNumber, 10);
-    if (Number.isNaN(parsedInt)) {
+    if (pollingStationNumber !== "" && Number.isNaN(parsedInt)) {
+      setError(ERROR_MESSAGE);
       return undefined;
     }
 
+    setError("");
     return pollingStations.find(
       (pollingStation: PollingStation) => pollingStation.number === parsedInt,
     );
@@ -27,7 +32,8 @@ export function PollingStationSelector() {
         fieldWidth="narrow"
         margin={false}
         pattern="\d+"
-        title="Alleen positieve nummers toegestaan"
+        title={ERROR_MESSAGE}
+        error={error}
         maxLength={6}
         onChange={(e) => {
           setPollingStationNumber(e.target.value);

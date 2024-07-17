@@ -626,6 +626,7 @@
         "description": "Polling station of a certain [Election]",
         "required": [
           "id",
+          "election_id",
           "name",
           "number",
           "polling_station_type",
@@ -635,6 +636,11 @@
           "locality"
         ],
         "properties": {
+          "election_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
           "house_number": {
             "type": "string"
           },
@@ -644,7 +650,8 @@
           },
           "id": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "locality": {
             "type": "string"

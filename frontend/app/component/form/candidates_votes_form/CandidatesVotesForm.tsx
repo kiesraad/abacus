@@ -149,13 +149,13 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             key={`list${group.number}-total`}
             field={``}
             name="total"
-            id={`total`}
+            id={`list${group.number}.total`}
             title={`Totaal lijst ${group.number}`}
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
             defaultValue={format(sectionValues?.total || "")}
-            isTotal
+            isListTotal
           />
         </InputGrid.Body>
       </InputGrid>

@@ -1,4 +1,4 @@
-import { BottomBar, Button } from "@kiesraad/ui";
+import { BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
 import { useNavigate } from "react-router-dom";
 import { IconChevronRight } from "@kiesraad/icon";
 import { PollingStation, PollingStationsContext } from "@kiesraad/api";
@@ -53,7 +53,10 @@ export function PollingStationChoiceForm() {
         </summary>
         <h2 className="form_title table_title">Kies het stembureau</h2>
         {pollingStationsLoading ? (
-          <div>aan het zoeken …</div>
+          <div className="flex">
+            <Icon icon={<Spinner size="lg" />} />
+            aan het zoeken …
+          </div>
         ) : (
           <table id="polling_station_list" className="overview_table">
             <thead>

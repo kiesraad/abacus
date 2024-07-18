@@ -61,6 +61,7 @@ export function PollingStationSelector() {
             return (
               <div className={cn(cls.result, cls.success)}>
                 <span className={"bold"}>{currentPollingStation.name}</span>
+                {/* TODO: <Badge type="first_entry" />*/}
               </div>
             );
           } else {

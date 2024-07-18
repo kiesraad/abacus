@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  align-items: center;
+}
+
+.result {
+  margin: 0 1em;
+  padding: 0 2em;
+  background-color: var(--bg-gray-darker);
+  height: 4em;
+  width: 100%;
+  align-content: center;
+  font-size: var(--font-size-body);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+}
+
+.loadingMessage {
+  margin-left: 1rem;
+}

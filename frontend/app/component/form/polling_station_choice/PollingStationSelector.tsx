@@ -1,6 +1,7 @@
 import { PollingStation, PollingStationsContext } from "@kiesraad/api";
-import { InputField } from "@kiesraad/ui";
+import { InputField, Spinner } from "@kiesraad/ui";
 import { useContext, useMemo, useState } from "react";
+import cls from "./PollingStationSelector.module.css";
 
 const ERROR_MESSAGE: string = "Alleen positieve nummers toegestaan";
 
@@ -23,7 +24,7 @@ export function PollingStationSelector() {
   }, [pollingStationNumber, pollingStations]);
 
   return (
-    <div>
+    <div className={cls.container}>
       <InputField
         id="pollingStation"
         name="number"
@@ -39,17 +40,24 @@ export function PollingStationSelector() {
           setPollingStationNumber(e.target.value);
         }}
       />
+      <div className={cls.result}>
       {(() => {
         if (pollingStationNumber.trim() === "") {
           return null;
         } else if (pollingStationsLoading) {
-          return <div>aan het zoeken …</div>;
+          return (
+            <div className={cls.loading}>
+              <Spinner size="lg" />
+              <p className={cls.loadingMessage}>aan het zoeken …</p>
+            </div>
+          );
         } else if (currentPollingStation) {
           return <div>{currentPollingStation.name}</div>;
         } else {
           return <div>Geen stembureau gevonden met nummer {pollingStationNumber}</div>;
         }
       })()}
+      </div>
     </div>
   );
 }

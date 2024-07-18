@@ -149,7 +149,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             key={`list${group.number}-total`}
             field={``}
             name="total"
-            id={`list${group.number}.total`}
+            id="total"
             title={`Totaal lijst ${group.number}`}
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}

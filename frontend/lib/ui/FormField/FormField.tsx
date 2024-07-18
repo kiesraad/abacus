@@ -1,9 +1,11 @@
-import { type FieldValidationResult } from "@kiesraad/api";
 import * as React from "react";
-import cls from "./FormField.module.css";
-import { cn } from "@kiesraad/util";
+
+import { type FieldValidationResult } from "@kiesraad/api";
 import { IconError, IconWarning } from "@kiesraad/icon";
+import { cn } from "@kiesraad/util";
+
 import { Tooltip } from "../Tooltip/Tooltip";
+import cls from "./FormField.module.css";
 
 export interface FormFieldProps {
   children: React.ReactNode;

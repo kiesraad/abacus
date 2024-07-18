@@ -1,5 +1,7 @@
 import { describe, expect, test } from "vitest";
+
 import { overrideOnce, Providers, renderHook, waitFor } from "app/test/unit";
+
 import { useElectionDataRequest } from "./useElectionDataRequest";
 
 describe("Test useElectionDataRequest", () => {

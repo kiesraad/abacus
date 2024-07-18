@@ -1,9 +1,9 @@
 import * as React from "react";
-
-import { useVotersAndVotes, VotersAndVotesValues, useErrorsAndWarnings } from "@kiesraad/api";
-import { Button, InputGrid, Feedback, BottomBar, InputGridRow, useTooltip } from "@kiesraad/ui";
-import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 import { useBlocker } from "react-router-dom";
+
+import { useErrorsAndWarnings, useVotersAndVotes, VotersAndVotesValues } from "@kiesraad/api";
+import { BottomBar, Button, Feedback, InputGrid, InputGridRow, useTooltip } from "@kiesraad/ui";
+import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
   poll_card_count: HTMLInputElement;

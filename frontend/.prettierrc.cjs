@@ -4,9 +4,9 @@ module.exports = {
   importOrder: [
     "^react.*$", // anything react
     "<THIRD_PARTY_MODULES>", // node_modules
-    "^@kiesraad/.*$", // lib
-    "^app/.*$", // app
     "^ladle/.*$", // ladle
+    "^app/.*$", // app
+    "^@kiesraad/.*$", // lib
     "^(\\.||\\.\\.)/.*$", // local imports
   ],
   importOrderSeparation: true, // ensures new line separation between sorted import declarations group

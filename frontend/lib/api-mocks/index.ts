@@ -1,4 +1,5 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
+
 import {
   DataEntryResponse,
   Election,
@@ -9,6 +10,7 @@ import {
   VotersCounts,
   VotesCounts,
 } from "@kiesraad/api";
+
 import { electionMockData, electionsMockData, politicalGroupMockData } from "./ElectionMockData.ts";
 
 export const electionMock = electionMockData as Required<Election>;

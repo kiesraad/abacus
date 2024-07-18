@@ -1,7 +1,8 @@
 import type { Story } from "@ladle/react";
 
-import { FormField } from "./FormField";
 import { ResultCode } from "@kiesraad/api";
+
+import { FormField } from "./FormField";
 
 type Props = {
   error?: ResultCode;

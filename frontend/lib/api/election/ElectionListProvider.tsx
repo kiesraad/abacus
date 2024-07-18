@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import { Election } from "../gen/openapi";
 import { useElectionListRequest } from "../useElectionListRequest";
 

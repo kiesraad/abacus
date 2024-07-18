@@ -1,6 +1,7 @@
-import { Badge, BottomBar, Button, InputField } from "@kiesraad/ui";
 import { useNavigate } from "react-router-dom";
+
 import { IconChevronRight } from "@kiesraad/icon";
+import { Badge, BottomBar, Button, InputField } from "@kiesraad/ui";
 
 interface FormElements extends HTMLFormControlsCollection {
   number: HTMLInputElement;

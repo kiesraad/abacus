@@ -1,17 +1,18 @@
 import { createRoutesFromElements, Route } from "react-router-dom";
+
 import { HomePage } from "./module/HomePage";
 import {
   CandidatesVotesPage,
   DifferencesPage,
-  InputLayout,
   InputHomePage,
+  InputLayout,
   PollingStationLayout,
   RecountedPage,
   VotersAndVotesPage,
 } from "./module/input";
 import { OverviewLayout, OverviewPage } from "./module/overview";
 import { RootLayout } from "./module/RootLayout";
-import { AccountSetupPage, LoginPage, LoginLayout, UserHomePage } from "./module/user";
+import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/user";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />}>

@@ -1,6 +1,8 @@
 import { describe, expect, test } from "vitest";
-import { ApiClient } from "./ApiClient";
+
 import { overrideOnce } from "app/test/unit";
+
+import { ApiClient } from "./ApiClient";
 
 describe("ApiClient", () => {
   test("200 response is parsed as success", async () => {

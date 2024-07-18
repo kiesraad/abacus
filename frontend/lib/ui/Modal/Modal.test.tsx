@@ -1,5 +1,7 @@
 import { describe, expect, test } from "vitest";
+
 import { getQueriesForElement, render } from "app/test/unit";
+
 import { Modal } from "./Modal";
 
 const component = (onClose: () => void) => (

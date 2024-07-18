@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useBlocker } from "react-router-dom";
 
-import { useDifferences, DifferencesCounts, useErrorsAndWarnings } from "@kiesraad/api";
-import { Button, InputGrid, Feedback, BottomBar, InputGridRow, useTooltip } from "@kiesraad/ui";
+import { DifferencesCounts, useDifferences, useErrorsAndWarnings } from "@kiesraad/api";
+import { BottomBar, Button, Feedback, InputGrid, InputGridRow, useTooltip } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {

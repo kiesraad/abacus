@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test("default button is visible", async ({ page }) => {
   await page.goto("http://localhost:61000/?story=button--default-button");

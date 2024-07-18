@@ -1,7 +1,7 @@
+import { Link, useLocation, useParams } from "react-router-dom";
+
 import { useElection } from "@kiesraad/api";
 import { ProgressList } from "@kiesraad/ui";
-
-import { Link, useLocation, useParams } from "react-router-dom";
 
 export function PollingStationProgress() {
   const { pollingStationId, listNumber } = useParams();

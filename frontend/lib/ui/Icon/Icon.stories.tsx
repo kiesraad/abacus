@@ -1,8 +1,9 @@
 import type { Story } from "@ladle/react";
 
-import { Icon } from "./Icon";
-import { Size } from "../ui.types";
 import { IconWarning } from "@kiesraad/icon";
+
+import { Size } from "../ui.types";
+import { Icon } from "./Icon";
 
 type Props = {
   color: "primary" | "warning";

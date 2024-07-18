@@ -49,8 +49,6 @@ export const pollingStationDataEntryHandler = http.post<
   try {
     json = await request.json();
     const response: DataEntryResponse = {
-      message: "Data saved",
-      saved: true,
       validation_results: {
         errors: [],
         warnings: [],

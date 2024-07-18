@@ -51,17 +51,23 @@ impl From<String> for PollingStationType {
 }
 
 /// PollingStationResults, following the fields in
-/// "Model N 10-1. Proces-verbaal van een stembureau"
-/// <https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1>
+/// "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar lichaam
+///  in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht"
+/// "Bijlage 2: uitkomsten per stembureau"
+///  <https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieNa31.2
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PollingStationResults {
-    /// Voters counts ("3. Aantal toegelaten kiezers")
+    /// Recounted ("Is er herteld? - See form for official long description of the checkbox")
+    pub recounted: bool,
+    /// Voters counts ("1. Aantal toegelaten kiezers")
     pub voters_counts: VotersCounts,
-    /// Votes counts ("4. Aantal uitgebrachte stemmen")
+    /// Votes counts ("2. Aantal getelde stembiljetten")
     pub votes_counts: VotesCounts,
-    /// Differences counts ("5. Verschil tussen het aantal toegelaten kiezers en het aantal uitgebrachte stemmen")
+    /// Voters recounts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
+    pub voters_recounts: Option<VotersRecounts>,
+    /// Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
     pub differences_counts: DifferencesCounts,
-    /// Vote counts for each candidate in each political group ("Aantal stemmen per lijst en kandidaat")
+    /// Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat")
     pub political_group_votes: Vec<PoliticalGroupVotes>,
 }
 
@@ -82,13 +88,30 @@ impl Validate for PollingStationResults {
             validation_results,
             format!("{field_name}.votes_counts"),
         );
+        if let Some(voters_recounts) = &self.voters_recounts {
+            voters_recounts.validate(
+                election,
+                validation_results,
+                format!("{field_name}.votes_recounts"),
+            );
+            if identical_voters_recounts_and_votes_counts(voters_recounts, &self.votes_counts) {
+                validation_results.warnings.push(ValidationResult {
+                    fields: vec![
+                        format!("{field_name}.voters_recounts"),
+                        format!("{field_name}.votes_counts"),
+                    ],
+                    code: ValidationResultCode::EqualInput,
+                });
+            }
+        };
+
         self.political_group_votes.validate(
             election,
             validation_results,
             format!("{field_name}.political_group_votes"),
         );
 
-        if identical_counts(&self.voters_counts, &self.votes_counts) {
+        if identical_voters_counts_and_votes_counts(&self.voters_counts, &self.votes_counts) {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![
                     format!("{field_name}.voters_counts"),
@@ -154,7 +177,7 @@ pub struct VotersCounts {
 
 /// Check if all voters counts and votes counts are equal to zero.
 /// Used in validations where this is an edge case that needs to be handled.
-fn all_zero(voters: &VotersCounts, votes: &VotesCounts) -> bool {
+fn all_zero_voters_counts_and_votes_counts(voters: &VotersCounts, votes: &VotesCounts) -> bool {
     voters.poll_card_count == 0
         && voters.proxy_certificate_count == 0
         && voters.voter_card_count == 0
@@ -165,13 +188,12 @@ fn all_zero(voters: &VotersCounts, votes: &VotesCounts) -> bool {
         && votes.total_votes_cast_count == 0
 }
 
-/// Check if the voters counts and votes counts are identical, which should
-/// result in a warning.
+/// Check if the voters counts and votes counts are identical, which should result in a warning.
 ///
 /// This is not implemented as Eq because there is no true equality relation
 /// between these two sets of numbers.
-fn identical_counts(voters: &VotersCounts, votes: &VotesCounts) -> bool {
-    !all_zero(voters, votes)
+fn identical_voters_counts_and_votes_counts(voters: &VotersCounts, votes: &VotesCounts) -> bool {
+    !all_zero_voters_counts_and_votes_counts(voters, votes)
         && voters.poll_card_count == votes.votes_candidates_counts
         && voters.proxy_certificate_count == votes.blank_votes_count
         && voters.voter_card_count == votes.invalid_votes_count
@@ -315,28 +337,122 @@ impl Validate for VotesCounts {
     }
 }
 
+/// Voters recounts, part of the polling station results.
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct VotersRecounts {
+    /// Number of valid poll cards ("Aantal geldige stempassen")
+    #[schema(value_type = u32)]
+    pub poll_card_recount: Count,
+    /// Number of valid proxy certificates ("Aantal geldige volmachtbewijzen")
+    #[schema(value_type = u32)]
+    pub proxy_certificate_recount: Count,
+    /// Number of valid voter cards ("Aantal geldige kiezerspassen")
+    #[schema(value_type = u32)]
+    pub voter_card_recount: Count,
+    /// Total number of admitted voters ("Totaal aantal toegelaten kiezers")
+    #[schema(value_type = u32)]
+    pub total_admitted_voters_recount: Count,
+}
+
+/// Check if all voters recounts and votes counts are equal to zero.
+/// Used in validations where this is an edge case that needs to be handled.
+fn all_zero_voters_recounts_and_votes_counts(
+    voters: &crate::polling_station::VotersRecounts,
+    votes: &VotesCounts,
+) -> bool {
+    voters.poll_card_recount == 0
+        && voters.proxy_certificate_recount == 0
+        && voters.voter_card_recount == 0
+        && voters.total_admitted_voters_recount == 0
+        && votes.votes_candidates_counts == 0
+        && votes.blank_votes_count == 0
+        && votes.invalid_votes_count == 0
+        && votes.total_votes_cast_count == 0
+}
+
+/// Check if the voters recounts and votes counts are identical, which should result in a warning.
+///
+/// This is not implemented as Eq because there is no true equality relation
+/// between these two sets of numbers.
+fn identical_voters_recounts_and_votes_counts(
+    voters: &VotersRecounts,
+    votes: &VotesCounts,
+) -> bool {
+    !all_zero_voters_recounts_and_votes_counts(voters, votes)
+        && voters.poll_card_recount == votes.votes_candidates_counts
+        && voters.proxy_certificate_recount == votes.blank_votes_count
+        && voters.voter_card_recount == votes.invalid_votes_count
+        && voters.total_admitted_voters_recount == votes.total_votes_cast_count
+}
+
+impl Validate for VotersRecounts {
+    fn validate(
+        &self,
+        election: &Election,
+        validation_results: &mut ValidationResults,
+        field_name: String,
+    ) {
+        // validate all counts
+        self.poll_card_recount.validate(
+            election,
+            validation_results,
+            format!("{field_name}.poll_card_recount"),
+        );
+        self.proxy_certificate_recount.validate(
+            election,
+            validation_results,
+            format!("{field_name}.proxy_certificate_recount"),
+        );
+        self.voter_card_recount.validate(
+            election,
+            validation_results,
+            format!("{field_name}.voter_card_recount"),
+        );
+        self.total_admitted_voters_recount.validate(
+            election,
+            validation_results,
+            format!("{field_name}.total_admitted_voters_recount"),
+        );
+
+        // validate that total_admitted_voters_recount == poll_card_recount + proxy_certificate_recount + voter_card_recount
+        if self.poll_card_recount + self.proxy_certificate_recount + self.voter_card_recount
+            != self.total_admitted_voters_recount
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    format!("{field_name}.total_admitted_voters_recount"),
+                    format!("{field_name}.poll_card_recount"),
+                    format!("{field_name}.proxy_certificate_recount"),
+                    format!("{field_name}.voter_card_recount"),
+                ],
+                code: ValidationResultCode::IncorrectTotal,
+            });
+        }
+    }
+}
+
 /// Differences counts, part of the polling station results.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct DifferencesCounts {
-    /// Number of more counted ballots ("Er zijn méér stembiljetten geteld. Noteer hoeveel stembiljetten er meer zijn geteld")
+    /// Number of more counted ballots ("Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?")
     #[schema(value_type = u32)]
     pub more_ballots_count: Count,
-    /// Number of fewer counted ballots ("Er zijn minder stembiljetten geteld. Noteer hoeveel stembiljetten er minder zijn geteld")
+    /// Number of fewer counted ballots ("Er zijn minder stembiljetten geteld. Hoeveel stembiljetten zijn er minder geteld")
     #[schema(value_type = u32)]
     pub fewer_ballots_count: Count,
-    /// Number of unreturned ballots ("Aantal keren dat een kiezer het stembiljet niet heeft ingeleverd")
+    /// Number of unreturned ballots ("Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?")
     #[schema(value_type = u32)]
     pub unreturned_ballots_count: Count,
-    /// Number of fewer ballots handed out ("Aantal keren dat er een stembiljet te weinig is uitgereikt")
+    /// Number of fewer ballots handed out ("Hoe vaak is er een stembiljet te weinig uitgereikt?")
     #[schema(value_type = u32)]
     pub too_few_ballots_handed_out_count: Count,
-    /// Number of more ballots handed out ("Aantal keren dat er een stembiljet teveel is uitgereikt")
+    /// Number of more ballots handed out ("Hoe vaak is er een stembiljet te veel uitgereikt?")
     #[schema(value_type = u32)]
     pub too_many_ballots_handed_out_count: Count,
-    /// Number of other explanations ("Aantal keren dat er een andere verklaring is voor het verschil")
+    /// Number of other explanations ("Hoe vaak is er een andere verklaring voor het verschil?")
     #[schema(value_type = u32)]
     pub other_explanation_count: Count,
-    /// Number of no explanations ("Aantal keren dat er geen verklaring is voor het verschil")
+    /// Number of no explanations ("Hoe vaak is er geen verklaring voor het verschil?")
     #[schema(value_type = u32)]
     pub no_explanation_count: Count,
 }
@@ -474,6 +590,7 @@ mod tests {
     fn test_polling_station_results_validation() {
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
+            recounted: false,
             voters_counts: VotersCounts {
                 poll_card_count: 1,
                 proxy_certificate_count: 2,
@@ -486,6 +603,7 @@ mod tests {
                 invalid_votes_count: 7,
                 total_votes_cast_count: 20, // incorrect total
             },
+            voters_recounts: None,
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 0,
@@ -518,6 +636,7 @@ mod tests {
     fn test_polling_station_identical_counts_validation() {
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
+            recounted: false,
             voters_counts: VotersCounts {
                 poll_card_count: 1000,
                 proxy_certificate_count: 1,
@@ -531,6 +650,7 @@ mod tests {
                 invalid_votes_count: 1,
                 total_votes_cast_count: 1002,
             },
+            voters_recounts: None,
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 0,
@@ -632,6 +752,25 @@ mod tests {
         );
         assert_eq!(validation_results.errors.len(), 0);
         assert_eq!(validation_results.warnings.len(), 1);
+    }
+
+    #[test]
+    fn test_voters_recounts_validation() {
+        let mut validation_results = ValidationResults::default();
+        let voters_recounts = VotersRecounts {
+            poll_card_recount: 1_000_000_001, // out of range
+            proxy_certificate_recount: 2,
+            voter_card_recount: 3,
+            total_admitted_voters_recount: 1_000_000_006, // correct but out of range
+        };
+        let election = election_fixture(&[]);
+        voters_recounts.validate(
+            &election,
+            &mut validation_results,
+            "voters_recounts".to_string(),
+        );
+        assert_eq!(validation_results.errors.len(), 2);
+        assert_eq!(validation_results.warnings.len(), 0);
     }
 
     #[test]

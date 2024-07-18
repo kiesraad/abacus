@@ -434,43 +434,43 @@
           "fewer_ballots_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of fewer counted ballots (\"Er zijn minder stembiljetten geteld. Noteer hoeveel stembiljetten er minder zijn geteld\")",
+            "description": "Number of fewer counted ballots (\"Er zijn minder stembiljetten geteld. Hoeveel stembiljetten zijn er minder geteld\")",
             "minimum": 0
           },
           "more_ballots_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of more counted ballots (\"Er zijn méér stembiljetten geteld. Noteer hoeveel stembiljetten er meer zijn geteld\")",
+            "description": "Number of more counted ballots (\"Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?\")",
             "minimum": 0
           },
           "no_explanation_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of no explanations (\"Aantal keren dat er geen verklaring is voor het verschil\")",
+            "description": "Number of no explanations (\"Hoe vaak is er geen verklaring voor het verschil?\")",
             "minimum": 0
           },
           "other_explanation_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of other explanations (\"Aantal keren dat er een andere verklaring is voor het verschil\")",
+            "description": "Number of other explanations (\"Hoe vaak is er een andere verklaring voor het verschil?\")",
             "minimum": 0
           },
           "too_few_ballots_handed_out_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of fewer ballots handed out (\"Aantal keren dat er een stembiljet te weinig is uitgereikt\")",
+            "description": "Number of fewer ballots handed out (\"Hoe vaak is er een stembiljet te weinig uitgereikt?\")",
             "minimum": 0
           },
           "too_many_ballots_handed_out_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of more ballots handed out (\"Aantal keren dat er een stembiljet teveel is uitgereikt\")",
+            "description": "Number of more ballots handed out (\"Hoe vaak is er een stembiljet te veel uitgereikt?\")",
             "minimum": 0
           },
           "unreturned_ballots_count": {
             "type": "integer",
             "format": "int32",
-            "description": "Number of unreturned ballots (\"Aantal keren dat een kiezer het stembiljet niet heeft ingeleverd\")",
+            "description": "Number of unreturned ballots (\"Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?\")",
             "minimum": 0
           }
         }
@@ -679,8 +679,9 @@
       },
       "PollingStationResults": {
         "type": "object",
-        "description": "PollingStationResults, following the fields in\n\"Model N 10-1. Proces-verbaal van een stembureau\"\n<https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1>",
+        "description": "PollingStationResults, following the fields in\n\"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar lichaam\nin een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht\"\n\"Bijlage 2: uitkomsten per stembureau\"\n<https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieNa31.2",
         "required": [
+          "recounted",
           "voters_counts",
           "votes_counts",
           "differences_counts",
@@ -695,10 +696,22 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroupVotes"
             },
-            "description": "Vote counts for each candidate in each political group (\"Aantal stemmen per lijst en kandidaat\")"
+            "description": "Vote counts per list and candidate (5. \"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "recounted": {
+            "type": "boolean",
+            "description": "Recounted (\"Is er herteld? - See form for official long description of the checkbox\")"
           },
           "voters_counts": {
             "$ref": "#/components/schemas/VotersCounts"
+          },
+          "voters_recounts": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VotersRecounts"
+              }
+            ],
+            "nullable": true
           },
           "votes_counts": {
             "$ref": "#/components/schemas/VotesCounts"
@@ -792,6 +805,42 @@
             "minimum": 0
           },
           "voter_card_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of valid voter cards (\"Aantal geldige kiezerspassen\")",
+            "minimum": 0
+          }
+        }
+      },
+      "VotersRecounts": {
+        "type": "object",
+        "description": "Voters recounts, part of the polling station results.",
+        "required": [
+          "poll_card_recount",
+          "proxy_certificate_recount",
+          "voter_card_recount",
+          "total_admitted_voters_recount"
+        ],
+        "properties": {
+          "poll_card_recount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of valid poll cards (\"Aantal geldige stempassen\")",
+            "minimum": 0
+          },
+          "proxy_certificate_recount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of valid proxy certificates (\"Aantal geldige volmachtbewijzen\")",
+            "minimum": 0
+          },
+          "total_admitted_voters_recount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total number of admitted voters (\"Totaal aantal toegelaten kiezers\")",
+            "minimum": 0
+          },
+          "voter_card_recount": {
             "type": "integer",
             "format": "int32",
             "description": "Number of valid voter cards (\"Aantal geldige kiezerspassen\")",

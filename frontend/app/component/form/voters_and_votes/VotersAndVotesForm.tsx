@@ -14,6 +14,10 @@ interface FormElements extends HTMLFormControlsCollection {
   blank_votes_count: HTMLInputElement;
   invalid_votes_count: HTMLInputElement;
   total_votes_cast_count: HTMLInputElement;
+  poll_card_recount: HTMLInputElement;
+  proxy_certificate_recount: HTMLInputElement;
+  voter_card_recount: HTMLInputElement;
+  total_admitted_voters_recount: HTMLInputElement;
 }
 
 interface VotersAndVotesFormElement extends HTMLFormElement {
@@ -60,6 +64,12 @@ export function VotersAndVotesForm() {
           blank_votes_count: deformat(elements.blank_votes_count.value),
           invalid_votes_count: deformat(elements.invalid_votes_count.value),
           total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
+        },
+        voters_recounts: {
+          poll_card_recount: deformat(elements.poll_card_recount.value),
+          proxy_certificate_recount: deformat(elements.proxy_certificate_recount.value),
+          voter_card_recount: deformat(elements.voter_card_recount.value),
+          total_admitted_voters_recount: deformat(elements.total_admitted_voters_recount.value),
         },
       };
     },
@@ -221,6 +231,49 @@ export function VotersAndVotesForm() {
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.votes_counts.total_votes_cast_count}
+            isTotal
+          />
+
+          <InputGridRow
+            key="A.2"
+            field="A.2"
+            id="poll_card_recount"
+            title="Stempassen (na hertelling door gemeentelijke stembureau)"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+            defaultValue={sectionValues.voters_recounts?.poll_card_recount}
+            isFocused
+          />
+          <InputGridRow
+            key="B.2"
+            field="B.2"
+            id="proxy_certificate_recount"
+            title="Volmachtbewijzen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            defaultValue={sectionValues.voters_recounts?.proxy_certificate_recount}
+            format={format}
+          />
+          <InputGridRow
+            key="C.2"
+            field="C.2"
+            id="voter_card_recount"
+            title="Kiezerspassen"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+            defaultValue={sectionValues.voters_recounts?.voter_card_recount}
+          />
+          <InputGridRow
+            key="D.2"
+            field="D.2"
+            id="total_admitted_voters_recount"
+            title="Totaal toegelaten kiezers"
+            errorsAndWarnings={errorsAndWarnings}
+            inputProps={register()}
+            format={format}
+            defaultValue={sectionValues.voters_recounts?.total_admitted_voters_recount}
             isTotal
           />
         </InputGrid.Body>

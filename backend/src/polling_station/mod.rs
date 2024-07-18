@@ -171,6 +171,7 @@ mod tests {
     async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
         let mut request_body = DataEntryRequest {
             data: PollingStationResults {
+                recounted: false,
                 voters_counts: VotersCounts {
                     poll_card_count: 100, // incorrect
                     proxy_certificate_count: 1,
@@ -183,6 +184,7 @@ mod tests {
                     invalid_votes_count: 2,
                     total_votes_cast_count: 100,
                 },
+                voters_recounts: None,
                 differences_counts: DifferencesCounts {
                     more_ballots_count: 0,
                     fewer_ballots_count: 0,

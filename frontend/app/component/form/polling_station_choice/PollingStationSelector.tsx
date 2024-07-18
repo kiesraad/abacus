@@ -29,7 +29,6 @@ export function PollingStationSelector() {
         label="Voer het nummer in:"
         fieldWidth="narrow"
         margin={false}
-        pattern="\d+"
         maxLength={6}
         onChange={(e) => {
           setPollingStationNumber(e.target.value);
@@ -46,14 +45,14 @@ export function PollingStationSelector() {
             );
           } else if (currentPollingStation) {
             return (
-              <div className={cn(cls.result, cls.success)}>
+              <div id="pollingStationSelectorFeedback" className={cn(cls.result, cls.success)}>
                 <span className={"bold"}>{currentPollingStation.name}</span>
                 {/* TODO: <Badge type="first_entry" />*/}
               </div>
             );
           } else {
             return (
-              <div className={cn(cls.result, cls.error)}>
+              <div id="pollingStationSelectorFeedback" className={cn(cls.result, cls.error)}>
                 <Icon icon={<IconError />} color="error" />
                 <span>Geen stembureau gevonden met nummer {pollingStationNumber}</span>
               </div>

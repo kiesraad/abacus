@@ -5,25 +5,63 @@ import { PollingStationChoiceForm } from "app/component/form/polling_station_cho
 import { PollingStationProvider } from "@kiesraad/api";
 
 describe("Test PollingStationChoiceForm", () => {
-  test("Form field entry and buttons", async () => {
+  test("Form field entry", async () => {
     const user = userEvent.setup();
 
-    render(<PollingStationChoiceForm />);
+    render(
+      <PollingStationProvider electionId={1}>
+        <PollingStationChoiceForm />
+      </PollingStationProvider>,
+    );
 
     const pollingStation = screen.getByTestId("pollingStation");
-    const submitButton = screen.getByRole("button", { name: "Beginnen" });
 
-    // Test if pattern on field works
+    // Test if the feedback field shows an error
     await user.type(pollingStation, "abc");
-    await user.click(submitButton);
-    expect(pollingStation).toBeInvalid();
+    const pollingStationFeedback = screen.getByTestId("pollingStationSelectorFeedback");
+    expect(
+      within(pollingStationFeedback).getByText("Geen stembureau gevonden met nummer abc"),
+    ).toBeVisible();
+
     await user.clear(pollingStation);
 
     // Test if maxLength on field works
     await user.type(pollingStation, "1234567");
     expect(pollingStation).toHaveValue("123456");
 
-    await user.click(submitButton);
+    await user.clear(pollingStation);
+  });
+
+  test("Selecting a valid polling station", async () => {
+    const user = userEvent.setup();
+    render(
+      <PollingStationProvider electionId={1}>
+        <PollingStationChoiceForm />
+      </PollingStationProvider>,
+    );
+    const pollingStation = screen.getByTestId("pollingStation");
+
+    // Test if the polling station name is shown
+    await user.type(pollingStation, "20");
+    const pollingStationFeedback = screen.getByTestId("pollingStationSelectorFeedback");
+    expect(within(pollingStationFeedback).getByText('Stembureau "Op Rolletjes"')).toBeVisible();
+  });
+
+  test("Selecting a non-existing polling station", async () => {
+    const user = userEvent.setup();
+    render(
+      <PollingStationProvider electionId={1}>
+        <PollingStationChoiceForm />
+      </PollingStationProvider>,
+    );
+    const pollingStation = screen.getByTestId("pollingStation");
+
+    // Test if the polling station name is shown
+    await user.type(pollingStation, "99");
+    const pollingStationFeedback = screen.getByTestId("pollingStationSelectorFeedback");
+    expect(
+      within(pollingStationFeedback).getByText("Geen stembureau gevonden met nummer 99"),
+    ).toBeVisible();
   });
 
   test("Polling station list", async () => {

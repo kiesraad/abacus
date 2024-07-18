@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { IconChevronRight } from "@kiesraad/icon";
 import { PollingStation, PollingStationsContext } from "@kiesraad/api";
 import { PollingStationSelector } from "./PollingStationSelector";
-import { useContext } from "react";
+import { FormEvent, useContext } from "react";
 
 interface FormElements extends HTMLFormControlsCollection {
   number: HTMLInputElement;
@@ -21,7 +21,7 @@ export function PollingStationChoiceForm() {
   const handleRowClick = (pollingStationNumber: number) => () => {
     navigate(`./${pollingStationNumber}/recounted`);
   };
-  function handleSubmit(event: React.FormEvent<PollingStationChoiceFormElement>) {
+  function handleSubmit(event: FormEvent<PollingStationChoiceFormElement>) {
     event.preventDefault();
     navigate("./030/recounted");
   }

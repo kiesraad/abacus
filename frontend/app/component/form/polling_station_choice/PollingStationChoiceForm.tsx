@@ -55,35 +55,33 @@ export function PollingStationChoiceForm() {
         {pollingStationsLoading ? (
           <div>aan het zoeken …</div>
         ) : (
-          <>
-            <table id="polling_station_list" className="overview_table">
-              <thead>
-                <tr>
-                  <th className="align-center">Nummer</th>
-                  <th>Stembureau</th>
-                  <th></th>
+          <table id="polling_station_list" className="overview_table">
+            <thead>
+              <tr>
+                <th className="align-center">Nummer</th>
+                <th>Stembureau</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {pollingStations.map((pollingStation: PollingStation) => (
+                <tr onClick={handleRowClick(pollingStation.number)} key={pollingStation.number}>
+                  <td width="6.5rem" className="number">
+                    {pollingStation.number}
+                  </td>
+                  <td>
+                    <span>{pollingStation.name}</span>
+                    {/* TODO: <Badge type="first_entry" />*/}
+                  </td>
+                  <td width="5rem">
+                    <div className="link">
+                      <IconChevronRight />
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {pollingStations.map((pollingStation: PollingStation) => (
-                  <tr onClick={handleRowClick(pollingStation.number)} key={pollingStation.number}>
-                    <td width="6.5rem" className="number">
-                      {pollingStation.number}
-                    </td>
-                    <td>
-                      <span>{pollingStation.name}</span>
-                      {/* TODO: <Badge type="first_entry" />*/}
-                    </td>
-                    <td width="5rem">
-                      <div className="link">
-                        <IconChevronRight />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
+              ))}
+            </tbody>
+          </table>
         )}
       </details>
     </form>

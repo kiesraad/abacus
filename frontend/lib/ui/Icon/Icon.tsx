@@ -8,7 +8,7 @@ import cls from "./Icon.module.css";
 export interface IconProps {
   icon: React.ReactNode;
   size?: Size;
-  color?: "primary" | "warning";
+  color?: "primary" | "warning" | "error";
   spacing?: number;
 }
 

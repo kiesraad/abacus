@@ -1,7 +1,9 @@
 import { PollingStation, PollingStationsContext } from "@kiesraad/api";
-import { InputField, Spinner } from "@kiesraad/ui";
+import { Icon, InputField, Spinner } from "@kiesraad/ui";
 import { useContext, useMemo, useState } from "react";
 import cls from "./PollingStationSelector.module.css";
+import { cn } from "@kiesraad/util";
+import { IconError } from "@kiesraad/icon";
 
 const ERROR_MESSAGE: string = "Alleen positieve nummers toegestaan";
 
@@ -34,30 +36,42 @@ export function PollingStationSelector() {
         margin={false}
         pattern="\d+"
         title={ERROR_MESSAGE}
-        error={error}
         maxLength={6}
         onChange={(e) => {
           setPollingStationNumber(e.target.value);
         }}
       />
-      <div className={cls.result}>
-      {(() => {
-        if (pollingStationNumber.trim() === "") {
-          return null;
-        } else if (pollingStationsLoading) {
-          return (
-            <div className={cls.loading}>
-              <Spinner size="lg" />
-              <p className={cls.loadingMessage}>aan het zoeken …</p>
-            </div>
-          );
-        } else if (currentPollingStation) {
-          return <div>{currentPollingStation.name}</div>;
-        } else {
-          return <div>Geen stembureau gevonden met nummer {pollingStationNumber}</div>;
-        }
-      })()}
-      </div>
+      {pollingStationNumber.trim() !== "" &&
+        (() => {
+          if (error) {
+            return (
+              <div className={cn(cls.result, cls.error)}>
+                <Icon icon={<IconError />} color="error" />
+                <span>{error}</span>
+              </div>
+            );
+          } else if (pollingStationsLoading) {
+            return (
+              <div className={cls.result}>
+                <Icon icon={<Spinner size="lg" />} />
+                <span>aan het zoeken …</span>
+              </div>
+            );
+          } else if (currentPollingStation) {
+            return (
+              <div className={cn(cls.result, cls.success)}>
+                <span className={"bold"}>{currentPollingStation.name}</span>
+              </div>
+            );
+          } else {
+            return (
+              <div className={cn(cls.result, cls.error)}>
+                <Icon icon={<IconError />} color="error" />
+                <span>Geen stembureau gevonden met nummer {pollingStationNumber}</span>
+              </div>
+            );
+          }
+        })()}
     </div>
   );
 }

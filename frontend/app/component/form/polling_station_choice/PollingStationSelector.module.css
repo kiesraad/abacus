@@ -11,13 +11,18 @@
   width: 100%;
   align-content: center;
   font-size: var(--font-size-body);
-}
-
-.loading {
   display: flex;
   align-items: center;
-}
 
-.loadingMessage {
-  margin-left: 1rem;
+  span {
+    margin-left: 1rem;
+  }
+
+  &.error {
+    background-color: var(--color-error-bg);
+  }
+
+  &.success {
+    background-color: var(--color-success-bg);
+  }
 }

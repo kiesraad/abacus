@@ -1,8 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
-
+import { render, screen, within } from "app/test/unit";
 import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
-import { render, screen } from "app/test/unit";
 import { PollingStationProvider } from "@kiesraad/api";
 
 describe("Test PollingStationChoiceForm", () => {
@@ -43,9 +42,10 @@ describe("Test PollingStationChoiceForm", () => {
     expect(screen.getByText("Kies het stembureau")).toBeVisible();
 
     // Check if the station number and name exist and are visible
-    expect(screen.getByText("20")).toBeVisible();
-    expect(screen.getByText('Stembureau "Op Rolletjes"')).toBeVisible();
-    expect(screen.getByText("21")).toBeVisible();
-    expect(screen.getByText("Testplek")).toBeVisible();
+    const pollingStationList = screen.getByTestId("polling_station_list");
+    expect(within(pollingStationList).getByText("20")).toBeVisible();
+    expect(within(pollingStationList).getByText('Stembureau "Op Rolletjes"')).toBeVisible();
+    expect(within(pollingStationList).getByText("21")).toBeVisible();
+    expect(within(pollingStationList).getByText("Testplek")).toBeVisible();
   });
 });

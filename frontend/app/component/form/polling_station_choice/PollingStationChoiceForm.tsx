@@ -19,7 +19,7 @@ export function PollingStationChoiceForm() {
   const { pollingStations, pollingStationsLoading } = useContext(PollingStationsContext);
 
   const handleRowClick = (pollingStationNumber: number) => () => {
-    navigate(`./${pollingStationNumber}`);
+    navigate(`./${pollingStationNumber}/recounted`);
   };
   function handleSubmit(event: React.FormEvent<PollingStationChoiceFormElement>) {
     event.preventDefault();

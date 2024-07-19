@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 
 import { render, screen } from "app/test/unit";
+
 import { DefaultBottomBar } from "./BottomBar.stories.tsx";
 
 test("The bottom bar is rendered with a button as child", () => {

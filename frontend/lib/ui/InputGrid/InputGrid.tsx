@@ -1,7 +1,8 @@
 import * as React from "react";
 
-import cls from "./InputGrid.module.css";
 import { cn, domtoren } from "@kiesraad/util";
+
+import cls from "./InputGrid.module.css";
 
 export interface InputGridProps {
   zebra?: boolean;

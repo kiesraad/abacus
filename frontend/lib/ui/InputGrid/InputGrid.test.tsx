@@ -2,6 +2,7 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
 import { render, screen } from "app/test/unit";
+
 import { InputGrid } from "./InputGrid";
 
 const component = (

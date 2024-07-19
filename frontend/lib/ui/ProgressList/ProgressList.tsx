@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import {
   IconArrowNarrowRight,
   IconAsterisk,
@@ -7,6 +8,7 @@ import {
   IconWarning,
 } from "@kiesraad/icon";
 import { cn } from "@kiesraad/util";
+
 import { MenuStatus } from "../ui.types";
 import cls from "./ProgressList.module.css";
 

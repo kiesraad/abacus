@@ -1,16 +1,17 @@
 /**
  * @vitest-environment jsdom
  */
-
-import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
+
+import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 
 import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
 } from "@kiesraad/api";
 import { electionMock } from "@kiesraad/api-mocks";
+
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const Component = (

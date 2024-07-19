@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useBlocker } from "react-router-dom";
 
-import { useRecounted, Recounted } from "@kiesraad/api";
+import { Recounted, useRecounted } from "@kiesraad/api";
 import { BottomBar, Button, Feedback } from "@kiesraad/ui";
 import { usePreventFormEnterSubmit } from "@kiesraad/util";
 

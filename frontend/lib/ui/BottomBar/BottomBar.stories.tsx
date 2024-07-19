@@ -1,7 +1,8 @@
 import type { Story } from "@ladle/react";
 
-import { BottomBar } from "./BottomBar";
 import { Button } from "@kiesraad/ui";
+
+import { BottomBar } from "./BottomBar";
 
 export const DefaultBottomBar: Story = () => {
   return (

@@ -1,6 +1,8 @@
-import { Alert, WorkStationNumber } from "@kiesraad/ui";
-import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
 import { useState } from "react";
+
+import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
+
+import { Alert, WorkStationNumber } from "@kiesraad/ui";
 
 export function InputHomePage() {
   const [showAlert, setShowAlert] = useState(true);

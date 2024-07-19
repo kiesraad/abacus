@@ -1,5 +1,6 @@
-import { AppFrame } from "@kiesraad/ui";
 import { Outlet } from "react-router-dom";
+
+import { AppFrame } from "@kiesraad/ui";
 
 export function RootLayout() {
   return (

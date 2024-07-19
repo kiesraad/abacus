@@ -58,11 +58,10 @@ export const pollingStationDataEntryHandler = http.post<
     };
 
     const {
-      recounted,
       voters_counts,
       votes_counts,
       voters_recounts,
-      differences_counts,
+      // differences_counts,
       political_group_votes,
     } = json.data;
 
@@ -134,6 +133,26 @@ export const pollingStationDataEntryHandler = http.post<
         ],
         code: "IncorrectTotal",
       });
+    }
+
+    if (voters_recounts) {
+      // A2 + B2 + C2 = D2
+      if (
+        voters_recounts.poll_card_recount +
+          voters_recounts.proxy_certificate_recount +
+          voters_recounts.voter_card_recount !==
+        voters_recounts.total_admitted_voters_recount
+      ) {
+        response.validation_results.errors.push({
+          fields: [
+            "data.voters_recounts.poll_card_recount",
+            "data.voters_recounts.proxy_certificate_recount",
+            "data.voters_recounts.voter_card_recount",
+            "data.voters_recounts.total_admitted_voters_recount",
+          ],
+          code: "IncorrectTotal",
+        });
+      }
     }
 
     //SECTION political_group_votes

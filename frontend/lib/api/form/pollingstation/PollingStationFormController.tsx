@@ -3,14 +3,28 @@ import * as React from "react";
 import {
   ApiResponseErrorData,
   DataEntryResponse,
+  DifferencesCounts,
   Election,
+  PoliticalGroupVotes,
   PollingStationResults,
   usePollingStationDataEntry,
+  VotersCounts,
+  VotersRecounts,
+  VotesCounts,
 } from "@kiesraad/api";
 
 export interface Recounted {
   yes: boolean;
   no: boolean;
+}
+
+export interface PollingStationValues {
+  differences_counts: DifferencesCounts;
+  political_group_votes: PoliticalGroupVotes[];
+  recounted?: boolean;
+  voters_counts: VotersCounts;
+  voters_recounts?: VotersRecounts;
+  votes_counts: VotesCounts;
 }
 
 export interface PollingStationFormControllerProps {
@@ -24,8 +38,8 @@ export interface iPollingStationControllerContext {
   loading: boolean;
   error: ApiResponseErrorData | null;
   data: DataEntryResponse | null;
-  values: PollingStationResults;
-  setValues: React.Dispatch<React.SetStateAction<PollingStationResults>>;
+  values: PollingStationValues;
+  setValues: React.Dispatch<React.SetStateAction<PollingStationValues>>;
   setTemporaryCache: (cache: AnyCache | null) => boolean;
   cache: AnyCache | null;
 }
@@ -42,17 +56,19 @@ export interface TemporaryCacheRecounted extends TemporaryCache<Recounted> {
 }
 
 export interface TemporaryCacheVotersAndVotes
-  extends TemporaryCache<Pick<PollingStationResults, "voters_counts" | "votes_counts">> {
+  extends TemporaryCache<
+    Pick<PollingStationValues, "voters_counts" | "votes_counts" | "voters_recounts">
+  > {
   key: "voters_and_votes";
 }
 
 export interface TemporaryCacheDifferences
-  extends TemporaryCache<PollingStationResults["differences_counts"]> {
+  extends TemporaryCache<PollingStationValues["differences_counts"]> {
   key: "differences";
 }
 
 export interface TemporaryCachePoliticalGroupVotes
-  extends TemporaryCache<PollingStationResults["political_group_votes"][0]> {
+  extends TemporaryCache<PollingStationValues["political_group_votes"][0]> {
   key: "political_group_votes";
 }
 
@@ -79,11 +95,7 @@ export function PollingStationFormController({
 
   const temporaryCache = React.useRef<AnyCache | null>(null);
 
-  const [values, _setValues] = React.useState<PollingStationResults>(() => ({
-    // TODO: I need the initial value of recounted to be undefined, but this means changing the backend
-    //  which should not happen, because it is a mandatory boolean field, any ideas how to fix this?
-    //  also 3 tests now fail because they are missing the recounted value in the data,
-    //  they do work when I add recounted: false as the default, but then the RecountForm breaks when selecting 'no'
+  const [values, _setValues] = React.useState<PollingStationValues>(() => ({
     recounted: undefined,
     voters_counts: {
       poll_card_count: 0,
@@ -119,7 +131,7 @@ export function PollingStationFormController({
 
   const _isCalled = React.useRef<boolean>(false);
 
-  const setValues = React.useCallback((values: React.SetStateAction<PollingStationResults>) => {
+  const setValues = React.useCallback((values: React.SetStateAction<PollingStationValues>) => {
     _isCalled.current = true;
     _setValues((old) => {
       const newValues = typeof values === "function" ? values(old) : values;
@@ -138,8 +150,12 @@ export function PollingStationFormController({
 
   React.useEffect(() => {
     if (_isCalled.current) {
+      const postValues: PollingStationResults = {
+        ...values,
+        recounted: values.recounted !== undefined ? values.recounted : false,
+      };
       doRequest({
-        data: values,
+        data: postValues,
       });
     }
   }, [doRequest, values]);

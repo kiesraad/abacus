@@ -197,7 +197,8 @@ export type ValidationResultCode =
   | "IncorrectTotal"
   | "AboveThreshold"
   | "EqualInput"
-  | "IncorrectCandidatesList";
+  | "IncorrectCandidatesList"
+  | "MissingRecounts";
 
 export interface ValidationResults {
   errors: ValidationResult[];

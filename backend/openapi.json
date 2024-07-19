@@ -752,7 +752,8 @@
           "IncorrectTotal",
           "AboveThreshold",
           "EqualInput",
-          "IncorrectCandidatesList"
+          "IncorrectCandidatesList",
+          "MissingRecounts"
         ]
       },
       "ValidationResults": {

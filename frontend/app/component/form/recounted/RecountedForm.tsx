@@ -34,18 +34,6 @@ export function RecountedForm() {
     return { yes: elements.yes.checked, no: elements.no.checked };
   }, []);
 
-  function handleSubmit(event: React.FormEvent<RecountedFormElement>) {
-    event.preventDefault();
-    const elements = event.currentTarget.elements;
-    setSectionValues(getValues(elements));
-
-    if (!elements.yes.checked && !elements.no.checked) {
-      setHasValidationError(true);
-    } else {
-      setHasValidationError(false);
-    }
-  }
-
   useBlocker(() => {
     if (formRef.current && !isCalled) {
       const elements = formRef.current.elements as RecountedFormElement["elements"];
@@ -57,6 +45,18 @@ export function RecountedForm() {
     }
     return false;
   });
+
+  function handleSubmit(event: React.FormEvent<RecountedFormElement>) {
+    event.preventDefault();
+    const elements = event.currentTarget.elements;
+    setSectionValues(getValues(elements));
+
+    if (!elements.yes.checked && !elements.no.checked) {
+      setHasValidationError(true);
+    } else {
+      setHasValidationError(false);
+    }
+  }
 
   React.useEffect(() => {
     if (isCalled) {

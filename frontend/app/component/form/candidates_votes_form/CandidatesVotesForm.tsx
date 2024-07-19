@@ -60,7 +60,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
-  //const blocker =  useBlocker() use const blocker to render confirmation UI.
+  //const blocker = useBlocker() use const blocker to render confirmation UI.
   useBlocker(() => {
     if (formRef.current && !isCalled) {
       const elements = formRef.current.elements;

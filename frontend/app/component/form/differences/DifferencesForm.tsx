@@ -61,12 +61,9 @@ export function DifferencesForm() {
     [deformat],
   );
 
-  function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
-    event.preventDefault();
-    const elements = event.currentTarget.elements;
-    setSectionValues(getValues(elements));
-  }
-  //const blocker =  useBlocker() use const blocker to render confirmation UI.
+  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+
+  //const blocker = useBlocker() use const blocker to render confirmation UI.
   useBlocker(() => {
     if (formRef.current && !isCalled) {
       const elements = formRef.current.elements as DifferencesFormElement["elements"];
@@ -79,7 +76,11 @@ export function DifferencesForm() {
     return false;
   });
 
-  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+  function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
+    event.preventDefault();
+    const elements = event.currentTarget.elements;
+    setSectionValues(getValues(elements));
+  }
 
   React.useEffect(() => {
     if (isCalled) {

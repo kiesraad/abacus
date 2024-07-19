@@ -78,17 +78,19 @@ impl Validate for PollingStationResults {
         validation_results: &mut ValidationResults,
         field_name: String,
     ) {
-        if self.recounted && self.voters_recounts.is_none() {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    format!("{field_name}.voters_recounts.poll_card_recount"),
-                    format!("{field_name}.voters_recounts.proxy_certificate_recount"),
-                    format!("{field_name}.voters_recounts.voter_card_recount"),
-                    format!("{field_name}.voters_recounts.total_admitted_voters_recount"),
-                ],
-                code: ValidationResultCode::MissingRecounts,
-            });
-        }
+        // TODO: This needs to be implemented differently, because once you submit empty fields this
+        //  error does not trigger, while it does trigger when you arrive at the empty Voters and Votes page
+        // if self.recounted && self.voters_recounts.is_none() {
+        //     validation_results.errors.push(ValidationResult {
+        //         fields: vec![
+        //             format!("{field_name}.voters_recounts.poll_card_recount"),
+        //             format!("{field_name}.voters_recounts.proxy_certificate_recount"),
+        //             format!("{field_name}.voters_recounts.voter_card_recount"),
+        //             format!("{field_name}.voters_recounts.total_admitted_voters_recount"),
+        //         ],
+        //         code: ValidationResultCode::MissingRecounts,
+        //     });
+        // }
 
         self.voters_counts.validate(
             election,

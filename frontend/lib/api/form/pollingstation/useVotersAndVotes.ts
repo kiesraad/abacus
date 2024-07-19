@@ -29,6 +29,10 @@ export function useVotersAndVotes() {
     };
   }, [values, setTemporaryCache, cache]);
 
+  const isCalled = React.useMemo(() => {
+    return sectionValues.votes_counts.total_votes_cast_count > 0;
+  }, [sectionValues]);
+
   const errors = React.useMemo(() => {
     if (data) {
       return data.validation_results.errors.filter((err) =>
@@ -71,10 +75,6 @@ export function useVotersAndVotes() {
         : undefined,
     }));
   };
-
-  const isCalled = React.useMemo(() => {
-    return sectionValues.votes_counts.total_votes_cast_count > 0;
-  }, [sectionValues]);
 
   return {
     loading,

@@ -8,6 +8,7 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
   VotersCounts,
+  VotersRecounts,
   VotesCounts,
 } from "@kiesraad/api";
 
@@ -58,6 +59,7 @@ export const pollingStationDataEntryHandler = http.post<
     };
 
     const {
+      // recounted,
       voters_counts,
       votes_counts,
       voters_recounts,
@@ -65,14 +67,14 @@ export const pollingStationDataEntryHandler = http.post<
       political_group_votes,
     } = json.data;
 
-    const votesFields: (keyof VotesCounts)[] = [
+    const votesCountsFields: (keyof VotesCounts)[] = [
       "blank_votes_count",
       "invalid_votes_count",
       "total_votes_cast_count",
       "votes_candidates_counts",
     ];
 
-    votesFields.forEach((field) => {
+    votesCountsFields.forEach((field) => {
       if (field in votes_counts) {
         if (valueOutOfRange(votes_counts[field])) {
           response.validation_results.errors.push({
@@ -83,14 +85,14 @@ export const pollingStationDataEntryHandler = http.post<
       }
     });
 
-    const votersFields: (keyof VotersCounts)[] = [
+    const votersCountsFields: (keyof VotersCounts)[] = [
       "poll_card_count",
       "proxy_certificate_count",
       "total_admitted_voters_count",
       "voter_card_count",
     ];
 
-    votersFields.forEach((field) => {
+    votersCountsFields.forEach((field) => {
       if (valueOutOfRange(voters_counts[field])) {
         response.validation_results.errors.push({
           code: "OutOfRange",
@@ -135,7 +137,34 @@ export const pollingStationDataEntryHandler = http.post<
       });
     }
 
+    const votersRecountsFields: (keyof VotersRecounts)[] = [
+      "poll_card_recount",
+      "proxy_certificate_recount",
+      "total_admitted_voters_recount",
+      "voter_card_recount",
+    ];
+
+    // TODO: This needs to be implemented differently, because once you submit empty fields this
+    //  error does not trigger, while it does trigger when you arrive at the empty Voters and Votes page
+    // if (recounted && voters_recounts === undefined) {
+    //   votersRecountsFields.forEach((field) => {
+    //     response.validation_results.errors.push({
+    //       code: "MissingRecounts",
+    //       fields: [`data.voters_recounts.${field}`],
+    //     });
+    //   });
+    // }
+
     if (voters_recounts) {
+      votersRecountsFields.forEach((field) => {
+        if (valueOutOfRange(voters_recounts[field])) {
+          response.validation_results.errors.push({
+            code: "OutOfRange",
+            fields: [`data.voters_recounts.${field}`],
+          });
+        }
+      });
+
       // A2 + B2 + C2 = D2
       if (
         voters_recounts.poll_card_recount +

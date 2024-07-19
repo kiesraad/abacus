@@ -81,12 +81,9 @@ export function VotersAndVotesForm() {
     [deformat, recounted],
   );
 
-  function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
-    event.preventDefault();
-    const elements = event.currentTarget.elements;
-    setSectionValues(getValues(elements));
-  }
-  //const blocker =  useBlocker() use const blocker to render confirmation UI.
+  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+
+  //const blocker = useBlocker() use const blocker to render confirmation UI.
   useBlocker(() => {
     if (formRef.current && !isCalled) {
       const elements = formRef.current.elements as VotersAndVotesFormElement["elements"];
@@ -99,7 +96,11 @@ export function VotersAndVotesForm() {
     return false;
   });
 
-  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+  function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
+    event.preventDefault();
+    const elements = event.currentTarget.elements;
+    setSectionValues(getValues(elements));
+  }
 
   React.useEffect(() => {
     if (isCalled) {

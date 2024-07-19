@@ -159,13 +159,15 @@ InputGrid.Row = ({
   </>
 );
 
-InputGrid.Total = ({
+InputGrid.ListTotal = ({
   children,
+  id,
 }: {
   children: [React.ReactElement, React.ReactElement, React.ReactElement];
+  id?: string;
 }) => (
   <>
-    <tr className="sep_total">
+    <tr className="sep_total" id={`row-${id}`}>
       <td></td>
       <td></td>
       <td></td>

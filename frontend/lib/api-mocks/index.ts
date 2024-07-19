@@ -55,7 +55,14 @@ export const pollingStationDataEntryHandler = http.post<
       },
     };
 
-    const { voters_counts, votes_counts, political_group_votes } = json.data;
+    const {
+      recounted,
+      voters_counts,
+      votes_counts,
+      voters_recounts,
+      differences_counts,
+      political_group_votes,
+    } = json.data;
 
     const votesFields: (keyof VotesCounts)[] = [
       "blank_votes_count",

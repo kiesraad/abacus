@@ -37,6 +37,7 @@ pub enum ValidationResultCode {
     AboveThreshold,
     EqualInput,
     IncorrectCandidatesList,
+    MissingRecounts,
 }
 
 impl fmt::Display for ValidationResultCode {
@@ -47,6 +48,7 @@ impl fmt::Display for ValidationResultCode {
             ValidationResultCode::AboveThreshold => write!(f, "Above threshold"),
             ValidationResultCode::EqualInput => write!(f, "Equal input"),
             ValidationResultCode::IncorrectCandidatesList => write!(f, "Incorrect candidates list"),
+            ValidationResultCode::MissingRecounts => write!(f, "Missing recounts"),
         }
     }
 }

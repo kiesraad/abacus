@@ -85,5 +85,6 @@ export function useVotersAndVotes() {
     serverError: error,
     isCalled,
     setTemporaryCache,
+    recounted: values.recounted,
   };
 }

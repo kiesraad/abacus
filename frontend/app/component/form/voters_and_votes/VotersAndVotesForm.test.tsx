@@ -21,6 +21,7 @@ const Component = (
 
 const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
   data: {
+    recounted: false,
     political_group_votes: electionMock.political_groups.map((group) => ({
       number: group.number,
       total: 0,

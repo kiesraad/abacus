@@ -1,8 +1,9 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { useBlocker } from "react-router-dom";
 
+import { useRecounted, Recounted } from "@kiesraad/api";
 import { BottomBar, Button, Feedback } from "@kiesraad/ui";
-import { useState } from "react";
+import { usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
   yes: HTMLInputElement;
@@ -14,25 +15,62 @@ interface RecountedFormElement extends HTMLFormElement {
 }
 
 export function RecountedForm() {
-  const navigate = useNavigate();
-  const [hasValidationError, setHasValidationError] = useState(false);
+  const [hasValidationError, setHasValidationError] = React.useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
+  usePreventFormEnterSubmit(formRef);
+
+  const { sectionValues, setSectionValues, loading, serverError, isCalled, setTemporaryCache } =
+    useRecounted();
+
+  const getValues = React.useCallback((elements: RecountedFormElement["elements"]): Recounted => {
+    return { yes: elements.yes.checked, no: elements.no.checked };
+  }, []);
 
   function handleSubmit(event: React.FormEvent<RecountedFormElement>) {
     event.preventDefault();
     const elements = event.currentTarget.elements;
+    setSectionValues(getValues(elements));
 
     if (!elements.yes.checked && !elements.no.checked) {
       setHasValidationError(true);
     } else {
       setHasValidationError(false);
-      navigate("../numbers");
     }
   }
 
+  useBlocker(() => {
+    if (formRef.current && !isCalled) {
+      const elements = formRef.current.elements as RecountedFormElement["elements"];
+      const values = getValues(elements);
+      setTemporaryCache({
+        key: "recounted",
+        data: values,
+      });
+    }
+    return false;
+  });
+
+  React.useEffect(() => {
+    if (isCalled) {
+      window.scrollTo(0, 0);
+    }
+  }, [isCalled]);
+
+  const success = isCalled && !hasValidationError && !loading;
+
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
+      {/* Temporary while not navigating through form sections */}
+      {success && <div id="result">Success</div>}
       <h2>Is er herteld?</h2>
+      {serverError && (
+        <Feedback type="error" title="Error">
+          <div id="feedback-server-error">
+            <h2>Error</h2>
+            <p id="result">{serverError.message}</p>
+          </div>
+        </Feedback>
+      )}
       {hasValidationError && (
         <Feedback type="error" title="Controleer het papieren proces-verbaal">
           <div>
@@ -51,11 +89,11 @@ export function RecountedForm() {
       </p>
       <div className="radio-form">
         <label>
-          <input type="radio" name="recounted" id="yes" value="yes" />
+          <input type="radio" name="recounted" id="yes" defaultChecked={sectionValues.yes} />
           Ja, er was een hertelling
         </label>
         <label>
-          <input type="radio" name="recounted" id="no" value="no" />
+          <input type="radio" name="recounted" id="no" defaultChecked={sectionValues.no} />
           Nee, er was geen hertelling
         </label>
       </div>

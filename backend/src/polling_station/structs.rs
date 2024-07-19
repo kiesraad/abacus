@@ -78,6 +78,18 @@ impl Validate for PollingStationResults {
         validation_results: &mut ValidationResults,
         field_name: String,
     ) {
+        if self.recounted && self.voters_recounts.is_none() {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    format!("{field_name}.voters_recounts.poll_card_recount"),
+                    format!("{field_name}.voters_recounts.proxy_certificate_recount"),
+                    format!("{field_name}.voters_recounts.voter_card_recount"),
+                    format!("{field_name}.voters_recounts.total_admitted_voters_recount"),
+                ],
+                code: ValidationResultCode::MissingRecounts,
+            });
+        }
+
         self.voters_counts.validate(
             election,
             validation_results,
@@ -356,10 +368,7 @@ pub struct VotersRecounts {
 
 /// Check if all voters recounts and votes counts are equal to zero.
 /// Used in validations where this is an edge case that needs to be handled.
-fn all_zero_voters_recounts_and_votes_counts(
-    voters: &crate::polling_station::VotersRecounts,
-    votes: &VotesCounts,
-) -> bool {
+fn all_zero_voters_recounts_and_votes_counts(voters: &VotersRecounts, votes: &VotesCounts) -> bool {
     voters.poll_card_recount == 0
         && voters.proxy_certificate_recount == 0
         && voters.voter_card_recount == 0

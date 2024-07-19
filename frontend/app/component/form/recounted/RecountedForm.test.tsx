@@ -1,7 +1,53 @@
 import { overrideOnce, render, screen } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import {
+  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
+  PollingStationFormController,
+} from "@kiesraad/api";
+import { electionMock } from "@kiesraad/api-mocks";
 import { RecountedForm } from "./RecountedForm";
+
+const Component = (
+  <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
+    <RecountedForm />
+  </PollingStationFormController>
+);
+
+const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
+  data: {
+    recounted: false,
+    political_group_votes: electionMock.political_groups.map((group) => ({
+      number: group.number,
+      total: 0,
+      candidate_votes: group.candidates.map((candidate) => ({
+        number: candidate.number,
+        votes: 0,
+      })),
+    })),
+    differences_counts: {
+      more_ballots_count: 0,
+      fewer_ballots_count: 0,
+      unreturned_ballots_count: 0,
+      too_few_ballots_handed_out_count: 0,
+      too_many_ballots_handed_out_count: 0,
+      other_explanation_count: 0,
+      no_explanation_count: 0,
+    },
+    voters_counts: {
+      poll_card_count: 0,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 0,
+    },
+    votes_counts: {
+      votes_candidates_counts: 0,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 0,
+    },
+  },
+};
 
 describe("Test RecountedForm", () => {
   afterEach(() => {
@@ -12,7 +58,7 @@ describe("Test RecountedForm", () => {
     const spy = vi.spyOn(global, "fetch");
 
     const user = userEvent.setup();
-    render(<RecountedForm />);
+    render(Component);
 
     const yes = screen.getByTestId("yes");
     await user.click(yes);
@@ -32,7 +78,7 @@ describe("Test RecountedForm", () => {
 
     const user = userEvent.setup();
 
-    render(<RecountedForm />);
+    render(Component);
 
     const yes = screen.getByTestId("yes");
     const no = screen.getByTestId("no");
@@ -55,21 +101,24 @@ describe("Test RecountedForm", () => {
 
     await user.click(submitButton);
 
-    // const result = await screen.findByTestId("result");
-    //
-    // expect(result).toHaveTextContent(/^Success$/);
+    const result = await screen.findByTestId("result");
+    expect(result).toHaveTextContent(/^Success$/);
   });
 
-  // TODO: Add tests once submit is added
   describe("RecountedForm Api call", () => {
-    test.skip("RecountedForm request body is equal to the form data", async () => {
+    test("RecountedForm request body is equal to the form data", async () => {
       const spy = vi.spyOn(global, "fetch");
 
-      const expectedRequest = {};
+      const expectedRequest = {
+        data: {
+          ...rootRequest.data,
+          recounted: false,
+        },
+      };
 
       const user = userEvent.setup();
 
-      render(<RecountedForm />);
+      render(Component);
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -87,22 +136,22 @@ describe("Test RecountedForm", () => {
     });
   });
 
-  test.skip("422 response results in display of error message", async () => {
+  test("422 response results in display of error message", async () => {
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
       message: "422 error from mock",
     });
 
     const user = userEvent.setup();
 
-    render(<RecountedForm />);
+    render(Component);
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^Error 422 error from mock$/);
+    expect(result).toHaveTextContent(/^422 error from mock$/);
   });
 
-  test.skip("500 response results in display of error message", async () => {
+  test("500 response results in display of error message", async () => {
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
       message: "500 error from mock",
       errorCode: "500_ERROR",
@@ -110,11 +159,11 @@ describe("Test RecountedForm", () => {
 
     const user = userEvent.setup();
 
-    render(<RecountedForm />);
+    render(Component);
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const result = await screen.findByTestId("result");
-    expect(result).toHaveTextContent(/^Error 500_ERROR 500 error from mock$/);
+    expect(result).toHaveTextContent(/^500 error from mock$/);
   });
 });

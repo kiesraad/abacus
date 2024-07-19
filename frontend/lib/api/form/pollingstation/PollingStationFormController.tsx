@@ -7,6 +7,11 @@ import {
   usePollingStationDataEntry,
 } from "@kiesraad/api";
 
+export interface Recounted {
+  yes: boolean;
+  no: boolean;
+}
+
 export interface PollingStationFormControllerProps {
   election: Required<Election>;
   pollingStationId: number;
@@ -31,14 +36,13 @@ export type TemporaryCache<T> = {
   id?: number;
 };
 
+export interface TemporaryCacheRecounted extends TemporaryCache<Recounted> {
+  key: "recounted";
+}
+
 export interface TemporaryCacheVotersAndVotes
   extends TemporaryCache<Pick<PollingStationResults, "voters_counts" | "votes_counts">> {
   key: "voters_and_votes";
-}
-
-export interface TemporaryCachePoliticalGroupVotes
-  extends TemporaryCache<PollingStationResults["political_group_votes"][0]> {
-  key: "political_group_votes";
 }
 
 export interface TemporaryCacheDifferences
@@ -46,10 +50,16 @@ export interface TemporaryCacheDifferences
   key: "differences";
 }
 
+export interface TemporaryCachePoliticalGroupVotes
+  extends TemporaryCache<PollingStationResults["political_group_votes"][0]> {
+  key: "political_group_votes";
+}
+
 export type AnyCache =
+  | TemporaryCacheRecounted
   | TemporaryCacheVotersAndVotes
-  | TemporaryCachePoliticalGroupVotes
-  | TemporaryCacheDifferences;
+  | TemporaryCacheDifferences
+  | TemporaryCachePoliticalGroupVotes;
 
 export const PollingStationControllerContext = React.createContext<
   iPollingStationControllerContext | undefined
@@ -69,14 +79,21 @@ export function PollingStationFormController({
   const temporaryCache = React.useRef<AnyCache | null>(null);
 
   const [values, _setValues] = React.useState<PollingStationResults>(() => ({
-    political_group_votes: election.political_groups.map((pg) => ({
-      number: pg.number,
-      total: 0,
-      candidate_votes: pg.candidates.map((c) => ({
-        number: c.number,
-        votes: 0,
-      })),
-    })),
+    // TODO: I need the initial value of recounted to be undefined, but this means changing the backend
+    //  which should not happen, because it is a mandatory field, any ideas how to fix this?
+    recounted: undefined,
+    voters_counts: {
+      poll_card_count: 0,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 0,
+    },
+    votes_counts: {
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 0,
+      votes_candidates_counts: 0,
+    },
     differences_counts: {
       more_ballots_count: 0,
       fewer_ballots_count: 0,
@@ -86,18 +103,14 @@ export function PollingStationFormController({
       other_explanation_count: 0,
       no_explanation_count: 0,
     },
-    voters_counts: {
-      proxy_certificate_count: 0,
-      total_admitted_voters_count: 0,
-      voter_card_count: 0,
-      poll_card_count: 0,
-    },
-    votes_counts: {
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-      votes_candidates_counts: 0,
-    },
+    political_group_votes: election.political_groups.map((pg) => ({
+      number: pg.number,
+      total: 0,
+      candidate_votes: pg.candidates.map((c) => ({
+        number: c.number,
+        votes: 0,
+      })),
+    })),
   }));
 
   const _isCalled = React.useRef<boolean>(false);

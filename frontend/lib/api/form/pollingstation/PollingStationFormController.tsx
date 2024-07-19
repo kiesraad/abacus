@@ -84,7 +84,7 @@ export function PollingStationFormController({
     //  which should not happen, because it is a mandatory boolean field, any ideas how to fix this?
     //  also 3 tests now fail because they are missing the recounted value in the data,
     //  they do work when I add recounted: false as the default, but then the RecountForm breaks when selecting 'no'
-    recounted: false,
+    recounted: undefined,
     voters_counts: {
       poll_card_count: 0,
       proxy_certificate_count: 0,

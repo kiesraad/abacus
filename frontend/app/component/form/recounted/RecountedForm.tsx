@@ -19,8 +19,16 @@ export function RecountedForm() {
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
 
-  const { sectionValues, setSectionValues, loading, serverError, isCalled, setTemporaryCache } =
-    useRecounted();
+  const {
+    sectionValues,
+    setSectionValues,
+    loading,
+    errors,
+    warnings,
+    serverError,
+    isCalled,
+    setTemporaryCache,
+  } = useRecounted();
 
   const getValues = React.useCallback((elements: RecountedFormElement["elements"]): Recounted => {
     return { yes: elements.yes.checked, no: elements.no.checked };
@@ -56,14 +64,11 @@ export function RecountedForm() {
     }
   }, [isCalled]);
 
-  const success = isCalled && !hasValidationError && !loading;
-
-  console.log("++++++++++++++++++++");
-  console.log(isCalled);
-  console.log(hasValidationError);
-  console.log(loading);
-  console.log(success);
-  console.log("====================");
+  if (errors.length > 0) {
+    setHasValidationError(true);
+  }
+  const hasValidationWarning = warnings.length > 0;
+  const success = isCalled && !hasValidationError && !hasValidationWarning && !loading;
 
   return (
     <form onSubmit={handleSubmit} ref={formRef}>

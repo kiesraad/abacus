@@ -18,10 +18,8 @@ export function useRecounted() {
     if (cache && cache.key === "recounted") {
       const data = cache.data;
       setTemporaryCache(null);
-      console.log(data);
       return data;
     }
-    console.log(values.recounted);
     return {
       yes: values.recounted !== undefined ? values.recounted : false,
       no: values.recounted !== undefined ? !values.recounted : false,
@@ -56,11 +54,6 @@ export function useRecounted() {
   const isCalled = React.useMemo(() => {
     return sectionValues.yes || sectionValues.no;
   }, [sectionValues]);
-
-  console.log("sectionValues");
-  console.log(sectionValues);
-  console.log("isCalled");
-  console.log(isCalled);
 
   return {
     loading,

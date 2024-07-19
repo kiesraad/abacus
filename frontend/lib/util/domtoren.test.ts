@@ -1,4 +1,5 @@
-import { expect, test, assert } from "vitest";
+import { assert, expect, test } from "vitest";
+
 import { domtoren } from "./domtoren";
 
 const div = document.createElement("div");

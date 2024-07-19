@@ -1,7 +1,9 @@
 import * as React from "react";
+
+import { fieldNameFromPath } from "@kiesraad/util";
+
 import { ErrorsAndWarnings, FieldValidationResult } from "../api";
 import { ValidationResult } from "../gen/openapi";
-import { fieldNameFromPath } from "@kiesraad/util";
 
 export function useErrorsAndWarnings(
   errors: ValidationResult[],

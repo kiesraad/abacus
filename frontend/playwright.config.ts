@@ -1,4 +1,4 @@
-import { devices, type PlaywrightTestConfig, defineConfig } from "@playwright/test";
+import { defineConfig, devices, type PlaywrightTestConfig } from "@playwright/test";
 
 /**
  * See https://playwright.dev/docs/test-configuration.

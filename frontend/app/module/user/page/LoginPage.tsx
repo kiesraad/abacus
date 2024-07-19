@@ -1,5 +1,6 @@
-import { WorkStationNumber } from "@kiesraad/ui";
 import { LoginForm } from "app/component/form/login/LoginForm";
+
+import { WorkStationNumber } from "@kiesraad/ui";
 
 export function LoginPage() {
   return (

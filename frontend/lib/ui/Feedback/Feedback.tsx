@@ -1,8 +1,10 @@
 import * as React from "react";
-import cls from "./Feedback.module.css";
-import { AlertType } from "../ui.types";
+
 import { cn } from "@kiesraad/util";
+
+import { AlertType } from "../ui.types";
 import { renderIconForType } from "../util/Util";
+import cls from "./Feedback.module.css";
 
 export interface FeedbackProps {
   type: AlertType;

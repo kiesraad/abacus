@@ -1,4 +1,5 @@
-import { IconError, IconThumbsUp, IconWarning, IconInfo } from "@kiesraad/icon";
+import { IconError, IconInfo, IconThumbsUp, IconWarning } from "@kiesraad/icon";
+
 import { AlertType } from "../ui.types";
 
 export function renderIconForType(type: AlertType) {

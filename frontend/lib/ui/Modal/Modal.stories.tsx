@@ -1,6 +1,7 @@
 import type { Story } from "@ladle/react";
 
 import { Button } from "@kiesraad/ui";
+
 import { Modal } from "./Modal";
 
 export const DefaultModal: Story = () => (

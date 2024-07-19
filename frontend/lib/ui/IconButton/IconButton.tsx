@@ -1,7 +1,9 @@
 import * as React from "react";
-import cls from "./IconButton.module.css";
+
 import { cn } from "@kiesraad/util";
+
 import { Size, Variant } from "../ui.types";
+import cls from "./IconButton.module.css";
 
 export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: React.ReactNode;

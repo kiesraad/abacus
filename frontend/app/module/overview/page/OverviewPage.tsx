@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { WorkStationNumber } from "@kiesraad/ui";
+
 import {
   IconCheckHeart,
   IconCheckVerified,
@@ -7,6 +7,7 @@ import {
   IconClock,
   IconHourglass,
 } from "@kiesraad/icon";
+import { WorkStationNumber } from "@kiesraad/ui";
 
 export function OverviewPage() {
   const navigate = useNavigate();

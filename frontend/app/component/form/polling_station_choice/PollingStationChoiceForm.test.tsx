@@ -1,7 +1,8 @@
-import { describe, expect, test } from "vitest";
 import { userEvent } from "@testing-library/user-event";
-import { render, screen } from "app/test/unit";
+import { describe, expect, test } from "vitest";
+
 import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
+import { render, screen } from "app/test/unit";
 
 describe("Test PollingStationChoiceForm", () => {
   test("Form field entry and buttons", async () => {

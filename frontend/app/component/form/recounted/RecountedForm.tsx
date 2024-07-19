@@ -1,8 +1,8 @@
 import * as React from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { BottomBar, Button, Feedback } from "@kiesraad/ui";
-import { useState } from "react";
 
 interface FormElements extends HTMLFormControlsCollection {
   yes: HTMLInputElement;

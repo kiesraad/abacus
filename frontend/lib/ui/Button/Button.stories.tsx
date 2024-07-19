@@ -1,7 +1,7 @@
 import type { Story } from "@ladle/react";
 
-import { Button } from "./Button";
 import { Size, Variant } from "../ui.types";
+import { Button } from "./Button";
 
 type Props = {
   label: string;

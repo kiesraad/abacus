@@ -1,7 +1,8 @@
 import { expect, test } from "vitest";
 
 import { render, screen } from "app/test/unit";
-import { DefaultButton, EnabledButton, DisabledButton } from "./Button.stories";
+
+import { DefaultButton, DisabledButton, EnabledButton } from "./Button.stories";
 
 test("The default button is enabled", () => {
   render(

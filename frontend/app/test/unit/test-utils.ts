@@ -1,7 +1,8 @@
 import { ReactElement } from "react";
-import { Providers } from "./Providers";
 
 import { render, RenderOptions } from "@testing-library/react";
+
+import { Providers } from "./Providers";
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
   render(ui, { wrapper: Providers, ...options });

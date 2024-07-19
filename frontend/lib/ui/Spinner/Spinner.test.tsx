@@ -1,5 +1,7 @@
 import { describe, expect, test } from "vitest";
+
 import { render } from "app/test/unit";
+
 import { DefaultSpinner } from "./Spinner.stories";
 
 describe("UI component: Spinner", () => {

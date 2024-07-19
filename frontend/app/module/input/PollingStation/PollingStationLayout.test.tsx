@@ -1,6 +1,9 @@
-import { render } from "app/test/unit";
 import { describe, expect, test } from "vitest";
+
+import { render } from "app/test/unit";
+
 import { ElectionListProvider, ElectionProvider } from "@kiesraad/api";
+
 import { PollingStationLayout } from "./PollingStationLayout";
 
 describe("PollingStationLayout", () => {

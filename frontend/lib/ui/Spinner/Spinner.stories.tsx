@@ -1,7 +1,7 @@
 import type { Story } from "@ladle/react";
 
-import { Spinner } from "./Spinner";
 import { Size } from "../ui.types";
+import { Spinner } from "./Spinner";
 
 type Props = {
   size: Size;

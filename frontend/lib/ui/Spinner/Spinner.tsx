@@ -1,7 +1,9 @@
 import * as React from "react";
+
+import { cn } from "@kiesraad/util";
+
 import { Size } from "../ui.types";
 import cls from "./Spinner.module.css";
-import { cn } from "@kiesraad/util";
 
 export interface SpinnerProps {
   size?: Size;

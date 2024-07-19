@@ -1,5 +1,7 @@
 import { describe, expect, test } from "vitest";
+
 import { renderHook } from "app/test/unit";
+
 import { usePositiveNumberInputMask } from "@kiesraad/util";
 
 describe("useInputMask", () => {

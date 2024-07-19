@@ -58,6 +58,13 @@ export function RecountedForm() {
 
   const success = isCalled && !hasValidationError && !loading;
 
+  console.log("++++++++++++++++++++");
+  console.log(isCalled);
+  console.log(hasValidationError);
+  console.log(loading);
+  console.log(success);
+  console.log("====================");
+
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       {/* Temporary while not navigating through form sections */}

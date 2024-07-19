@@ -7,7 +7,10 @@ import { usePollingStationDataEntry } from "./usePollingStationDataEntry";
 describe("usePollingStationDataEntry", () => {
   test("doSubmit parses ok response", async () => {
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-      message: "should work",
+      validation_results: {
+        errors: [],
+        warnings: [],
+      },
     });
 
     const { result } = renderHook(
@@ -22,6 +25,7 @@ describe("usePollingStationDataEntry", () => {
     const [doSubmit] = result.current;
     doSubmit({
       data: {
+        recounted: false,
         voters_counts: {
           poll_card_count: 1,
           proxy_certificate_count: 2,
@@ -60,6 +64,7 @@ describe("usePollingStationDataEntry", () => {
 
     const [, { data }] = result.current;
     assert(data !== null, "data is not null");
-    expect(data.message).toBe("should work");
+    expect(data.validation_results.errors).toStrictEqual([]);
+    expect(data.validation_results.warnings).toStrictEqual([]);
   });
 });

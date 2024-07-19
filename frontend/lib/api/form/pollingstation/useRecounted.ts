@@ -18,11 +18,13 @@ export function useRecounted() {
     if (cache && cache.key === "recounted") {
       const data = cache.data;
       setTemporaryCache(null);
+      console.log(data);
       return data;
     }
+    console.log(values.recounted);
     return {
-      yes: values.recounted ? values.recounted : false,
-      no: values.recounted ? !values.recounted : false,
+      yes: values.recounted !== undefined ? values.recounted : false,
+      no: values.recounted !== undefined ? !values.recounted : false,
     };
   }, [values, setTemporaryCache, cache]);
 
@@ -47,13 +49,18 @@ export function useRecounted() {
   const setSectionValues = (values: Recounted) => {
     setValues((old) => ({
       ...old,
-      recounted: values.yes,
+      recounted: values.yes || !values.no,
     }));
   };
 
   const isCalled = React.useMemo(() => {
     return sectionValues.yes || sectionValues.no;
   }, [sectionValues]);
+
+  console.log("sectionValues");
+  console.log(sectionValues);
+  console.log("isCalled");
+  console.log(isCalled);
 
   return {
     loading,

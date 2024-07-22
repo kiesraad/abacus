@@ -1,8 +1,11 @@
 name: Frontend Preview
 
 on:
-  push:
   workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -39,7 +42,7 @@ jobs:
         with:
           apiToken: ${{ secrets.API_TOKEN }}
           accountId: ${{ secrets.ACCOUNT_ID }}
-          command: pages deploy dist --project-name=${{ vars.PROJECT_NAME }}
+          command: pages deploy dist --project-name=${{ vars.PROJECT_NAME }} --branch ${{ github.head_ref || github.ref }} --commit-hash ${GITHUB_SHA}
           workingDirectory: frontend
       - name: Upload artifact
         uses: actions/upload-artifact@v4

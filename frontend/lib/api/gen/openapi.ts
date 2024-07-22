@@ -198,7 +198,10 @@ export type ValidationResultCode =
   | "AboveThreshold"
   | "EqualInput"
   | "IncorrectCandidatesList"
-  | "MissingRecounts";
+  | "MissingRecounts"
+  | "IncorrectDifference"
+  | "WrongDifferences"
+  | "NoDifference";
 
 export interface ValidationResults {
   errors: ValidationResult[];

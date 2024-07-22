@@ -753,7 +753,10 @@
           "AboveThreshold",
           "EqualInput",
           "IncorrectCandidatesList",
-          "MissingRecounts"
+          "MissingRecounts",
+          "IncorrectDifference",
+          "WrongDifferences",
+          "NoDifference"
         ]
       },
       "ValidationResults": {

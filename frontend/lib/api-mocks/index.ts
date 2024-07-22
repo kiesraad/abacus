@@ -144,17 +144,6 @@ export const pollingStationDataEntryHandler = http.post<
       "voter_card_recount",
     ];
 
-    // TODO: This needs to be implemented differently, because once you submit empty fields this
-    //  error does not trigger, while it does trigger when you arrive at the empty Voters and Votes page
-    // if (recounted && voters_recounts === undefined) {
-    //   votersRecountsFields.forEach((field) => {
-    //     response.validation_results.errors.push({
-    //       code: "MissingRecounts",
-    //       fields: [`data.voters_recounts.${field}`],
-    //     });
-    //   });
-    // }
-
     if (voters_recounts) {
       votersRecountsFields.forEach((field) => {
         if (valueOutOfRange(voters_recounts[field])) {

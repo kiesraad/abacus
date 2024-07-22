@@ -182,7 +182,7 @@ export function DifferencesForm() {
             key="M"
             field="M"
             id="too_many_ballots_handed_out_count"
-            title="Teveel uitgereikte stembiljetten"
+            title="Te veel uitgereikte stembiljetten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}

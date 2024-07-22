@@ -23,23 +23,6 @@ const Component = (
 const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
   data: {
     recounted: false,
-    political_group_votes: electionMock.political_groups.map((group) => ({
-      number: group.number,
-      total: 0,
-      candidate_votes: group.candidates.map((candidate) => ({
-        number: candidate.number,
-        votes: 0,
-      })),
-    })),
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
     voters_counts: {
       poll_card_count: 0,
       proxy_certificate_count: 0,
@@ -52,6 +35,24 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
       invalid_votes_count: 0,
       total_votes_cast_count: 0,
     },
+    voters_recounts: undefined,
+    differences_counts: {
+      more_ballots_count: 0,
+      fewer_ballots_count: 0,
+      unreturned_ballots_count: 0,
+      too_few_ballots_handed_out_count: 0,
+      too_many_ballots_handed_out_count: 0,
+      other_explanation_count: 0,
+      no_explanation_count: 0,
+    },
+    political_group_votes: electionMock.political_groups.map((group) => ({
+      number: group.number,
+      total: 0,
+      candidate_votes: group.candidates.map((candidate) => ({
+        number: candidate.number,
+        votes: 0,
+      })),
+    })),
   },
 };
 
@@ -79,8 +80,6 @@ describe("Test VotersAndVotesForm", () => {
 
     test("Form field entry and keybindings", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        message: "Data saved",
-        saved: true,
         validation_results: { errors: [], warnings: [] },
       });
 
@@ -287,8 +286,6 @@ describe("Test VotersAndVotesForm", () => {
 
     test("F.11 IncorrectTotal Voters", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [
             {
@@ -325,8 +322,6 @@ describe("Test VotersAndVotesForm", () => {
 
     test("F.12 IncorrectTotal Votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [
             {
@@ -367,8 +362,6 @@ describe("Test VotersAndVotesForm", () => {
 
     test("Error with non-existing fields is not displayed", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [
             {
@@ -402,8 +395,6 @@ describe("Test VotersAndVotesForm", () => {
   describe("VotersAndVotesForm warnings", () => {
     test("W.21 AboveThreshold blank votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [],
           warnings: [
@@ -438,8 +429,6 @@ describe("Test VotersAndVotesForm", () => {
 
     test("W.22 AboveThreshold invalid votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [],
           warnings: [
@@ -474,8 +463,6 @@ describe("Test VotersAndVotesForm", () => {
 
     test("W.27 EqualInput voters and votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [
             {

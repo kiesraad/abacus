@@ -124,6 +124,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
           "invalid_votes_count": 7,
           "total_votes_cast_count": 8
         },
+        "voters_recounts": null,
         "differences_counts": {
           "more_ballots_count": 4,
           "fewer_ballots_count": 0,

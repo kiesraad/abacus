@@ -135,7 +135,7 @@ impl Validate for PollingStationResults {
             });
         }
 
-        // validate that the total number of valid votes is equal to the sum of all political group totals
+        // F.13 validate that the total number of valid votes is equal to the sum of all political group totals
         if self.votes_counts.votes_candidates_counts as u64
             != self
                 .political_group_votes
@@ -221,7 +221,7 @@ impl Validate for VotersCounts {
         validation_results: &mut ValidationResults,
         field_name: String,
     ) {
-        // validate all counts
+        // F.01 validate all counts
         self.poll_card_count.validate(
             election,
             validation_results,
@@ -243,7 +243,7 @@ impl Validate for VotersCounts {
             format!("{field_name}.total_admitted_voters_count"),
         );
 
-        // validate that total_admitted_voters_count == poll_card_count + proxy_certificate_count + voter_card_count
+        // F.11 validate that total_admitted_voters_count == poll_card_count + proxy_certificate_count + voter_card_count
         if self.poll_card_count + self.proxy_certificate_count + self.voter_card_count
             != self.total_admitted_voters_count
         {
@@ -285,7 +285,7 @@ impl Validate for VotesCounts {
         validation_results: &mut ValidationResults,
         field_name: String,
     ) {
-        // validate all counts
+        // F.01 validate all counts
         self.votes_candidates_counts.validate(
             election,
             validation_results,
@@ -307,7 +307,7 @@ impl Validate for VotesCounts {
             format!("{field_name}.total_votes_cast_count"),
         );
 
-        // validate that total_votes_cast_count == votes_candidates_counts + blank_votes_count + invalid_votes_count
+        // F.12 validate that total_votes_cast_count == votes_candidates_counts + blank_votes_count + invalid_votes_count
         if self.votes_candidates_counts + self.blank_votes_count + self.invalid_votes_count
             != self.total_votes_cast_count
         {
@@ -403,7 +403,7 @@ impl Validate for VotersRecounts {
         validation_results: &mut ValidationResults,
         field_name: String,
     ) {
-        // validate all counts
+        // F.01 validate all counts
         self.poll_card_recount.validate(
             election,
             validation_results,
@@ -551,11 +551,11 @@ impl Validate for PoliticalGroupVotes {
             );
         });
 
-        // validate the total number of votes
+        // F.01 validate the total number of votes
         self.total
             .validate(election, validation_results, format!("{field_name}.total"));
 
-        // validate whether if the total number of votes matches the sum of all candidate votes,
+        // F.31 validate whether if the total number of votes matches the sum of all candidate votes,
         // cast to u64 to avoid overflow
         if self.total as u64
             != self
@@ -586,6 +586,7 @@ impl Validate for CandidateVotes {
         validation_results: &mut ValidationResults,
         field_name: String,
     ) {
+        // F.01
         self.votes
             .validate(election, validation_results, format!("{field_name}.votes"));
     }

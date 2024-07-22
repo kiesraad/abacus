@@ -2,23 +2,34 @@ import { PollingStation, PollingStationsContext } from "@kiesraad/api";
 import { Icon, InputField, Spinner } from "@kiesraad/ui";
 import { useContext, useMemo, useState } from "react";
 import cls from "./PollingStationSelector.module.css";
-import { cn } from "@kiesraad/util";
+import { cn, useDebouncedCallback } from "@kiesraad/util";
 import { IconError } from "@kiesraad/icon";
 
 export function PollingStationSelector() {
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(
+    undefined,
+  );
+
   const { pollingStations, pollingStationsLoading } = useContext(PollingStationsContext);
 
-  const currentPollingStation = useMemo(() => {
+  const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
+    setLoading(false);
+    setCurrentPollingStation(pollingStation);
+  }, 200);
+
+  useMemo(() => {
     const parsedInt = parseInt(pollingStationNumber, 10);
     if (pollingStationNumber !== "" && Number.isNaN(parsedInt)) {
       return undefined;
     }
 
-    return pollingStations.find(
-      (pollingStation: PollingStation) => pollingStation.number === parsedInt,
+    setLoading(true);
+    debouncedCallback(
+      pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt),
     );
-  }, [pollingStationNumber, pollingStations]);
+  }, [pollingStationNumber, pollingStations, debouncedCallback]);
 
   return (
     <div className={cls.container}>
@@ -36,7 +47,7 @@ export function PollingStationSelector() {
       />
       {pollingStationNumber.trim() !== "" &&
         (() => {
-          if (pollingStationsLoading) {
+          if (pollingStationsLoading || loading) {
             return (
               <div className={cls.result}>
                 <Icon icon={<Spinner size="lg" />} />

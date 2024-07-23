@@ -84,15 +84,20 @@ impl Validate for PollingStationResults {
             validation_results,
             format!("{field_name}.votes_counts"),
         );
-        let mut total_voters_counts = self.voters_counts.total_admitted_voters_count;
+
+        let total_votes_counts = self.votes_counts.total_votes_cast_count;
+        let total_voters_counts: Count;
+
+        // if recounted = true
         if let Some(voters_recounts) = &self.voters_recounts {
+            total_voters_counts = voters_recounts.total_admitted_voters_recount;
             voters_recounts.validate(
                 election,
                 validation_results,
                 format!("{field_name}.votes_recounts"),
             );
-            total_voters_counts = voters_recounts.total_admitted_voters_recount;
-            // W.27 with recounted = true
+
+            // W.30 validate that the numbers in voters_recounts and votes_counts are not the same
             if identical_voters_recounts_and_votes_counts(voters_recounts, &self.votes_counts) {
                 validation_results.warnings.push(ValidationResult {
                     fields: vec![
@@ -102,13 +107,16 @@ impl Validate for PollingStationResults {
                     code: ValidationResultCode::EqualInput,
                 });
             }
+        // if recounted = false
         } else {
+            total_voters_counts = self.voters_counts.total_admitted_voters_count;
             self.voters_counts.validate(
                 election,
                 validation_results,
                 format!("{field_name}.voters_counts"),
             );
-            // W.27 with recounted = false
+
+            // W.29 validate that the numbers in voters_counts and votes_counts are not the same
             if identical_voters_counts_and_votes_counts(&self.voters_counts, &self.votes_counts) {
                 validation_results.warnings.push(ValidationResult {
                     fields: vec![
@@ -120,8 +128,8 @@ impl Validate for PollingStationResults {
             }
         }
 
-        let total_votes_counts = self.votes_counts.total_votes_cast_count;
-        // F.21 validate that the difference for more ballots counted is correct
+        // F.21 (recounted = false) or F.22 (recounted = true)
+        // validate that the difference for more ballots counted is correct
         if total_voters_counts < total_votes_counts
             && (total_votes_counts - total_voters_counts
                 != self.differences_counts.more_ballots_count)
@@ -131,7 +139,9 @@ impl Validate for PollingStationResults {
                 code: ValidationResultCode::IncorrectDifference,
             });
         }
-        // F.22 validate that the difference for fewer ballots counted is correct
+
+        // F.23 (recounted = false) or F.24 (recounted = true)
+        // validate that the difference for fewer ballots counted is correct
         if total_voters_counts > total_votes_counts
             && (total_voters_counts - total_votes_counts
                 != self.differences_counts.fewer_ballots_count)
@@ -141,7 +151,8 @@ impl Validate for PollingStationResults {
                 code: ValidationResultCode::IncorrectDifference,
             });
         }
-        // F.23 validate that only more or fewer ballots counted is filled in when there is a difference in the totals
+
+        // F.25 validate that only more or fewer ballots counted is filled in when there is a difference in the totals
         if total_voters_counts != total_votes_counts
             && (self.differences_counts.more_ballots_count != 0
                 && self.differences_counts.fewer_ballots_count != 0)
@@ -154,7 +165,9 @@ impl Validate for PollingStationResults {
                 code: ValidationResultCode::WrongDifferences,
             });
         }
-        // W.28 validate that no difference should be filled in when there is no difference in the totals
+
+        // W.31 (recounted = false) or W.32 (recounted = true)
+        // validate that no difference should be filled in when there is no difference in the totals
         if total_voters_counts == total_votes_counts
             && (self.differences_counts.more_ballots_count != 0
                 || self.differences_counts.fewer_ballots_count != 0)
@@ -563,7 +576,7 @@ impl Validate for DifferencesCounts {
             format!("{field_name}.no_explanation_count"),
         );
 
-        // F.24 validate that more_ballots_count == too_many_ballots_handed_out_count + other_explanation_count + no_explanation_count
+        // F.26 validate that more_ballots_count == too_many_ballots_handed_out_count + other_explanation_count + no_explanation_count
         if self.more_ballots_count != 0
             && (self.too_many_ballots_handed_out_count
                 + self.other_explanation_count
@@ -580,7 +593,7 @@ impl Validate for DifferencesCounts {
                 code: ValidationResultCode::IncorrectTotal,
             });
         }
-        // F.25 validate that fewer_ballots_count == unreturned_ballots_count + too_few_ballots_handed_out_count + other_explanation_count + no_explanation_count
+        // F.27 validate that fewer_ballots_count == unreturned_ballots_count + too_few_ballots_handed_out_count + other_explanation_count + no_explanation_count
         if self.fewer_ballots_count != 0
             && (self.unreturned_ballots_count
                 + self.too_few_ballots_handed_out_count
@@ -687,7 +700,7 @@ impl Validate for PoliticalGroupVotes {
         self.total
             .validate(election, validation_results, format!("{field_name}.total"));
 
-        // F.31 validate whether if the total number of votes matches the sum of all candidate votes,
+        // F.31 validate whether the total number of votes matches the sum of all candidate votes,
         // cast to u64 to avoid overflow
         if self.total as u64
             != self
@@ -895,7 +908,7 @@ mod tests {
 
     #[test]
     fn test_polling_station_results_wrong_and_no_difference_validation() {
-        // test F.23 wrong difference
+        // test F.25 wrong differences
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: false,
@@ -913,8 +926,8 @@ mod tests {
             },
             voters_recounts: None,
             differences_counts: DifferencesCounts {
-                more_ballots_count: 4,  // F.23 wrong differences
-                fewer_ballots_count: 4, // F.23 wrong differences
+                more_ballots_count: 4,  // F.25 wrong differences
+                fewer_ballots_count: 4, // F.25 wrong differences
                 unreturned_ballots_count: 1,
                 too_few_ballots_handed_out_count: 1,
                 too_many_ballots_handed_out_count: 2,
@@ -950,7 +963,7 @@ mod tests {
             ]
         );
 
-        // test W.28 incorrect difference and F.14 incorrect total
+        // test W.32 no difference and F.14 incorrect total
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: true,
@@ -974,7 +987,7 @@ mod tests {
             }),
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
-                fewer_ballots_count: 4, // W.28 no difference
+                fewer_ballots_count: 4, // W.32 no difference
                 unreturned_ballots_count: 1,
                 too_few_ballots_handed_out_count: 1,
                 too_many_ballots_handed_out_count: 0,
@@ -1022,18 +1035,18 @@ mod tests {
     #[test]
     fn test_polling_station_identical_counts_validation() {
         let mut validation_results = ValidationResults::default();
-        // test W.27 equal input
+        // test W.29 equal input
         let mut polling_station_results = PollingStationResults {
             recounted: false,
             voters_counts: VotersCounts {
-                // W.27 equal input
+                // W.29 equal input
                 poll_card_count: 1000,
                 proxy_certificate_count: 1,
                 voter_card_count: 1,
                 total_admitted_voters_count: 1002,
             },
             votes_counts: VotesCounts {
-                // W.27 equal input
+                // W.29 equal input
                 votes_candidates_counts: 1000,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
@@ -1078,7 +1091,7 @@ mod tests {
             ]
         );
 
-        // test W.28 equal input
+        // test W.30 equal input
         validation_results = ValidationResults::default();
         polling_station_results.recounted = true;
         // voters_counts is not equal to votes_counts
@@ -1088,7 +1101,7 @@ mod tests {
             voter_card_count: 1,
             total_admitted_voters_count: 1000,
         };
-        // voters_recounts is now equal to votes_counts: W.28 equal input
+        // voters_recounts is now equal to votes_counts: W.30 equal input
         polling_station_results.voters_recounts = Some(VotersRecounts {
             poll_card_recount: 1000,
             proxy_certificate_recount: 1,
@@ -1118,7 +1131,6 @@ mod tests {
     #[test]
     fn test_voters_counts_validation() {
         let mut validation_results = ValidationResults::default();
-
         // test F.01 out of range
         let mut voters_counts = VotersCounts {
             poll_card_count: 1_000_000_001, // F.01 out of range
@@ -1405,10 +1417,10 @@ mod tests {
             vec!["differences_counts.no_explanation_count"]
         );
 
-        // test F.24 incorrect total
+        // test F.26 incorrect total
         validation_results = ValidationResults::default();
         differences_counts = DifferencesCounts {
-            more_ballots_count: 5, // F.24 incorrect total
+            more_ballots_count: 5, // F.26 incorrect total
             fewer_ballots_count: 0,
             unreturned_ballots_count: 0,
             too_few_ballots_handed_out_count: 0,
@@ -1438,11 +1450,11 @@ mod tests {
             ]
         );
 
-        // test F.25 incorrect total
+        // test F.27 incorrect total
         validation_results = ValidationResults::default();
         differences_counts = DifferencesCounts {
             more_ballots_count: 0,
-            fewer_ballots_count: 5, // F.25 incorrect total
+            fewer_ballots_count: 5, // F.27 incorrect total
             unreturned_ballots_count: 1,
             too_few_ballots_handed_out_count: 1,
             too_many_ballots_handed_out_count: 0,

@@ -84,12 +84,12 @@ export function RecountedForm() {
         </Feedback>
       )}
       {hasValidationError && (
-        <Feedback type="error" title="Controleer het papieren proces-verbaal">
+        <Feedback type="error" title="Controleer het papieren proces-verbaal" code="F.02">
           <div>
             Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?
             <ul>
-              <li>Controleer of rubriek 6 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
-              <li>Wel een vinkje, maar rubriek 6 niet ingevuld? Overleg met de coördinator</li>
+              <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
+              <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
               <li>Geen vinkje? Kies dan 'nee'.</li>
             </ul>
           </div>

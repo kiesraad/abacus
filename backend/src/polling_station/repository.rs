@@ -8,27 +8,58 @@ use super::PollingStation;
 pub struct PollingStations(SqlitePool);
 
 impl PollingStations {
+    #[cfg(test)]
+    pub fn new(pool: SqlitePool) -> Self {
+        Self(pool)
+    }
+
     pub async fn list(&self, election_id: u32) -> Result<Vec<PollingStation>, sqlx::Error> {
         query_as!(
             PollingStation,
             r#"
-SELECT
-  id,
-  name,
-  number,
-  number_of_voters,
-  polling_station_type,
-  street,
-  house_number,
-  house_number_addition,
-  postal_code,
-  locality
-FROM polling_stations
-WHERE election_id = $1;
-"#,
+            SELECT
+                id AS "id: u32",
+                election_id AS "election_id: u32",
+                name,
+                number,
+                number_of_voters,
+                polling_station_type,
+                street,
+                house_number,
+                house_number_addition,
+                postal_code,
+                locality
+            FROM polling_stations
+            WHERE election_id = $1
+        "#,
             election_id
         )
         .fetch_all(&self.0)
+        .await
+    }
+
+    pub async fn get(&self, id: u32) -> Result<PollingStation, sqlx::Error> {
+        query_as!(
+            PollingStation,
+            r#"
+            SELECT
+                id AS "id: u32",
+                election_id AS "election_id: u32",
+                name,
+                number,
+                number_of_voters,
+                polling_station_type,
+                street,
+                house_number,
+                house_number_addition,
+                postal_code,
+                locality
+            FROM polling_stations
+            WHERE id = $1
+        "#,
+            id
+        )
+        .fetch_one(&self.0)
         .await
     }
 }

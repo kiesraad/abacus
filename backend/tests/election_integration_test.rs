@@ -15,7 +15,7 @@ use backend::ErrorResponse;
 
 mod utils;
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -105,7 +105,7 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
     );
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

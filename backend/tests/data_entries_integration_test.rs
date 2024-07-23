@@ -223,6 +223,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
 
     let request_body = DataEntryRequest {
         data: PollingStationResults {
+            recounted: false,
             voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,
@@ -235,6 +236,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
                 invalid_votes_count: 1,
                 total_votes_cast_count: 104,
             },
+            voters_recounts: None,
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 0,

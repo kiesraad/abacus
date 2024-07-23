@@ -162,7 +162,7 @@ impl Validate for PollingStationResults {
                     format!("{field_name}.more_ballots_count"),
                     format!("{field_name}.fewer_ballots_count"),
                 ],
-                code: ValidationResultCode::WrongDifferences,
+                code: ValidationResultCode::ConflictingDifferences,
             });
         }
 
@@ -175,13 +175,13 @@ impl Validate for PollingStationResults {
             if self.differences_counts.more_ballots_count != 0 {
                 validation_results.warnings.push(ValidationResult {
                     fields: vec![format!("{field_name}.more_ballots_count")],
-                    code: ValidationResultCode::NoDifference,
+                    code: ValidationResultCode::NoDifferenceExpected,
                 });
             }
             if self.differences_counts.fewer_ballots_count != 0 {
                 validation_results.warnings.push(ValidationResult {
                     fields: vec![format!("{field_name}.fewer_ballots_count")],
-                    code: ValidationResultCode::NoDifference,
+                    code: ValidationResultCode::NoDifferenceExpected,
                 });
             }
         }
@@ -908,7 +908,7 @@ mod tests {
 
     #[test]
     fn test_polling_station_results_wrong_and_no_difference_validation() {
-        // test F.25 wrong differences
+        // test F.25 conflicting differences
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: false,
@@ -926,8 +926,8 @@ mod tests {
             },
             voters_recounts: None,
             differences_counts: DifferencesCounts {
-                more_ballots_count: 4,  // F.25 wrong differences
-                fewer_ballots_count: 4, // F.25 wrong differences
+                more_ballots_count: 4,  // F.25 conflicting differences
+                fewer_ballots_count: 4, // F.25 conflicting differences
                 unreturned_ballots_count: 1,
                 too_few_ballots_handed_out_count: 1,
                 too_many_ballots_handed_out_count: 2,
@@ -953,7 +953,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 0);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::WrongDifferences
+            ValidationResultCode::ConflictingDifferences
         );
         assert_eq!(
             validation_results.errors[0].fields,
@@ -963,7 +963,7 @@ mod tests {
             ]
         );
 
-        // test W.32 no difference and F.14 incorrect total
+        // test W.32 no difference expected and F.14 incorrect total
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: true,
@@ -987,7 +987,7 @@ mod tests {
             }),
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
-                fewer_ballots_count: 4, // W.32 no difference
+                fewer_ballots_count: 4, // W.32 no difference expected
                 unreturned_ballots_count: 1,
                 too_few_ballots_handed_out_count: 1,
                 too_many_ballots_handed_out_count: 0,
@@ -1024,7 +1024,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::NoDifference
+            ValidationResultCode::NoDifferenceExpected
         );
         assert_eq!(
             validation_results.warnings[0].fields,

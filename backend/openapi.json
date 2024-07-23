@@ -772,8 +772,8 @@
           "IncorrectCandidatesList",
           "MissingRecounts",
           "IncorrectDifference",
-          "WrongDifferences",
-          "NoDifference"
+          "ConflictingDifferences",
+          "NoDifferenceExpected"
         ]
       },
       "ValidationResults": {

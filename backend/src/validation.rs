@@ -39,8 +39,8 @@ pub enum ValidationResultCode {
     IncorrectCandidatesList,
     MissingRecounts,
     IncorrectDifference,
-    WrongDifferences,
-    NoDifference,
+    ConflictingDifferences,
+    NoDifferenceExpected,
 }
 
 impl fmt::Display for ValidationResultCode {
@@ -53,8 +53,8 @@ impl fmt::Display for ValidationResultCode {
             ValidationResultCode::IncorrectCandidatesList => write!(f, "Incorrect candidates list"),
             ValidationResultCode::MissingRecounts => write!(f, "Missing recounts"),
             ValidationResultCode::IncorrectDifference => write!(f, "Incorrect difference"),
-            ValidationResultCode::WrongDifferences => write!(f, "Wrong differences"),
-            ValidationResultCode::NoDifference => write!(f, "No difference"),
+            ValidationResultCode::ConflictingDifferences => write!(f, "Conflicting differences"),
+            ValidationResultCode::NoDifferenceExpected => write!(f, "No difference expected"),
         }
     }
 }

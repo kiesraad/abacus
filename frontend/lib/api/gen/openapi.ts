@@ -147,6 +147,7 @@ export interface PoliticalGroupVotes {
  * Polling station of a certain [Election]
  */
 export interface PollingStation {
+  election_id: number;
   house_number: string;
   house_number_addition?: string;
   id: number;
@@ -200,8 +201,8 @@ export type ValidationResultCode =
   | "IncorrectCandidatesList"
   | "MissingRecounts"
   | "IncorrectDifference"
-  | "WrongDifferences"
-  | "NoDifference";
+  | "ConflictingDifferences"
+  | "NoDifferenceExpected";
 
 export interface ValidationResults {
   errors: ValidationResult[];

@@ -78,11 +78,6 @@ impl Validate for PollingStationResults {
         validation_results: &mut ValidationResults,
         field_name: String,
     ) {
-        self.voters_counts.validate(
-            election,
-            validation_results,
-            format!("{field_name}.voters_counts"),
-        );
         self.votes_counts.validate(
             election,
             validation_results,
@@ -107,6 +102,11 @@ impl Validate for PollingStationResults {
                 });
             }
         } else {
+            self.voters_counts.validate(
+                election,
+                validation_results,
+                format!("{field_name}.voters_counts"),
+            );
             // W.27 with recounted = false
             if identical_voters_counts_and_votes_counts(&self.voters_counts, &self.votes_counts) {
                 validation_results.warnings.push(ValidationResult {
@@ -778,12 +778,34 @@ mod tests {
             ValidationResultCode::IncorrectTotal
         );
         assert_eq!(
+            validation_results.errors[0].fields,
+            vec![
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.votes_counts.votes_candidates_counts",
+                "polling_station_results.votes_counts.blank_votes_count",
+                "polling_station_results.votes_counts.invalid_votes_count"
+            ]
+        );
+        assert_eq!(
             validation_results.errors[1].code,
             ValidationResultCode::IncorrectTotal
         );
         assert_eq!(
+            validation_results.errors[1].fields,
+            vec![
+                "polling_station_results.voters_counts.total_admitted_voters_count",
+                "polling_station_results.voters_counts.poll_card_count",
+                "polling_station_results.voters_counts.proxy_certificate_count",
+                "polling_station_results.voters_counts.voter_card_count"
+            ]
+        );
+        assert_eq!(
             validation_results.errors[2].code,
             ValidationResultCode::IncorrectDifference
+        );
+        assert_eq!(
+            validation_results.errors[2].fields,
+            vec!["polling_station_results.more_ballots_count"]
         );
 
         // test F.11 incorrect total, F.12 incorrect total, F.13 incorrect total and F.22 incorrect difference
@@ -832,24 +854,41 @@ mod tests {
             &mut validation_results,
             "polling_station_results".to_string(),
         );
-        assert_eq!(validation_results.errors.len(), 4);
+        assert_eq!(validation_results.errors.len(), 3);
         assert_eq!(validation_results.warnings.len(), 0);
-        // TODO: Is showing F.11 Incorrect Total still wanted if there was a recount?
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::IncorrectTotal
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec![
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.votes_counts.votes_candidates_counts",
+                "polling_station_results.votes_counts.blank_votes_count",
+                "polling_station_results.votes_counts.invalid_votes_count"
+            ]
         );
         assert_eq!(
             validation_results.errors[1].code,
             ValidationResultCode::IncorrectTotal
         );
         assert_eq!(
-            validation_results.errors[2].code,
-            ValidationResultCode::IncorrectTotal
+            validation_results.errors[1].fields,
+            vec![
+                "polling_station_results.votes_recounts.total_admitted_voters_recount",
+                "polling_station_results.votes_recounts.poll_card_recount",
+                "polling_station_results.votes_recounts.proxy_certificate_recount",
+                "polling_station_results.votes_recounts.voter_card_recount"
+            ]
         );
         assert_eq!(
-            validation_results.errors[3].code,
+            validation_results.errors[2].code,
             ValidationResultCode::IncorrectDifference
+        );
+        assert_eq!(
+            validation_results.errors[2].fields,
+            vec!["polling_station_results.fewer_ballots_count"]
         );
     }
 
@@ -901,6 +940,13 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::WrongDifferences
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec![
+                "polling_station_results.more_ballots_count",
+                "polling_station_results.fewer_ballots_count"
+            ]
         );
 
         // test W.28 incorrect difference and F.14 incorrect total
@@ -956,8 +1002,19 @@ mod tests {
             ValidationResultCode::IncorrectTotal
         );
         assert_eq!(
+            validation_results.errors[0].fields,
+            vec![
+                "polling_station_results.votes_counts.votes_candidates_counts",
+                "polling_station_results.political_group_votes"
+            ]
+        );
+        assert_eq!(
             validation_results.warnings[0].code,
             ValidationResultCode::NoDifference
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec!["polling_station_results.fewer_ballots_count"]
         );
     }
 
@@ -1012,6 +1069,13 @@ mod tests {
             validation_results.warnings[0].code,
             ValidationResultCode::EqualInput
         );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "polling_station_results.voters_counts",
+                "polling_station_results.votes_counts"
+            ]
+        );
 
         // test W.28 equal input
         validation_results = ValidationResults::default();
@@ -1041,6 +1105,13 @@ mod tests {
             validation_results.warnings[0].code,
             ValidationResultCode::EqualInput
         );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "polling_station_results.voters_recounts",
+                "polling_station_results.votes_counts"
+            ]
+        );
     }
 
     #[test]
@@ -1067,8 +1138,16 @@ mod tests {
             ValidationResultCode::OutOfRange
         );
         assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["voters_counts.poll_card_count"]
+        );
+        assert_eq!(
             validation_results.errors[1].code,
             ValidationResultCode::OutOfRange
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
+            vec!["voters_counts.total_admitted_voters_count"]
         );
 
         // test F.11 incorrect total
@@ -1090,6 +1169,15 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::IncorrectTotal
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec![
+                "voters_counts.total_admitted_voters_count",
+                "voters_counts.poll_card_count",
+                "voters_counts.proxy_certificate_count",
+                "voters_counts.voter_card_count"
+            ]
         );
     }
 
@@ -1116,8 +1204,16 @@ mod tests {
             ValidationResultCode::OutOfRange
         );
         assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["votes_counts.votes_candidates_counts"]
+        );
+        assert_eq!(
             validation_results.errors[1].code,
             ValidationResultCode::OutOfRange
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
+            vec!["votes_counts.total_votes_cast_count"]
         );
 
         // test F.12 incorrect total
@@ -1139,6 +1235,15 @@ mod tests {
             validation_results.errors[0].code,
             ValidationResultCode::IncorrectTotal
         );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec![
+                "votes_counts.total_votes_cast_count",
+                "votes_counts.votes_candidates_counts",
+                "votes_counts.blank_votes_count",
+                "votes_counts.invalid_votes_count"
+            ]
+        );
 
         // test W.21 high number of blank votes
         validation_results = ValidationResults::default();
@@ -1159,6 +1264,13 @@ mod tests {
             validation_results.warnings[0].code,
             ValidationResultCode::AboveThreshold
         );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "votes_counts.blank_votes_count",
+                "votes_counts.total_votes_cast_count"
+            ]
+        );
 
         // test W.22 high number of invalid votes
         validation_results = ValidationResults::default();
@@ -1178,6 +1290,13 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].code,
             ValidationResultCode::AboveThreshold
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "votes_counts.invalid_votes_count",
+                "votes_counts.total_votes_cast_count"
+            ]
         );
     }
 
@@ -1204,8 +1323,16 @@ mod tests {
             ValidationResultCode::OutOfRange
         );
         assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["voters_recounts.poll_card_recount"]
+        );
+        assert_eq!(
             validation_results.errors[1].code,
             ValidationResultCode::OutOfRange
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
+            vec!["voters_recounts.total_admitted_voters_recount"]
         );
 
         // test F.13 incorrect total
@@ -1227,6 +1354,15 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::IncorrectTotal
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec![
+                "voters_recounts.total_admitted_voters_recount",
+                "voters_recounts.poll_card_recount",
+                "voters_recounts.proxy_certificate_recount",
+                "voters_recounts.voter_card_recount"
+            ]
         );
     }
 
@@ -1256,8 +1392,16 @@ mod tests {
             ValidationResultCode::OutOfRange
         );
         assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["differences_counts.more_ballots_count"]
+        );
+        assert_eq!(
             validation_results.errors[1].code,
             ValidationResultCode::OutOfRange
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
+            vec!["differences_counts.no_explanation_count"]
         );
 
         // test F.24 incorrect total
@@ -1283,6 +1427,15 @@ mod tests {
             validation_results.errors[0].code,
             ValidationResultCode::IncorrectTotal
         );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec![
+                "differences_counts.more_ballots_count",
+                "differences_counts.too_many_ballots_handed_out_count",
+                "differences_counts.other_explanation_count",
+                "differences_counts.no_explanation_count"
+            ]
+        );
 
         // test F.25 incorrect total
         validation_results = ValidationResults::default();
@@ -1306,6 +1459,16 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::IncorrectTotal
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec![
+                "differences_counts.fewer_ballots_count",
+                "differences_counts.unreturned_ballots_count",
+                "differences_counts.too_few_ballots_handed_out_count",
+                "differences_counts.other_explanation_count",
+                "differences_counts.no_explanation_count"
+            ]
         );
     }
 
@@ -1368,6 +1531,10 @@ mod tests {
             validation_results.errors[0].code,
             ValidationResultCode::IncorrectTotal
         );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["political_group_votes[0].total"]
+        );
 
         // validate with incorrect number of candidates for the first political group
         validation_results = ValidationResults::default();
@@ -1384,6 +1551,10 @@ mod tests {
             validation_results.errors[0].code,
             ValidationResultCode::IncorrectCandidatesList
         );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["political_group_votes[0].candidate_votes"]
+        );
 
         // validate with incorrect number of political groups
         validation_results = ValidationResults::default();
@@ -1398,6 +1569,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::IncorrectCandidatesList
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["political_group_votes"]
         );
 
         // validate with correct number of political groups but mixed up numbers
@@ -1414,6 +1589,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::IncorrectCandidatesList
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["political_group_votes[0].number"]
         );
     }
 }

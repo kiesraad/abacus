@@ -149,13 +149,18 @@ pub struct PollingStationListResponse {
     path = "/api/polling_stations/{election_id}",
     responses(
         (status = 200, description = "Polling station listing successful", body = PollingStationListResponse),
+        (status = 404, description = "Election not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 pub async fn polling_station_list(
     State(polling_stations): State<PollingStations>,
+    State(elections): State<Elections>,
     Path(election_id): Path<u32>,
 ) -> Result<JsonResponse<PollingStationListResponse>, APIError> {
+    // Check if the election exists, will respond with NOT_FOUND otherwise
+    elections.get(election_id).await?;
+
     Ok(JsonResponse(PollingStationListResponse {
         polling_stations: polling_stations.list(election_id).await?,
     }))

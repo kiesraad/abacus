@@ -54,6 +54,7 @@ impl IntoResponse for DataEntryResponse {
     )]
 pub async fn polling_station_data_entry(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(polling_stations_repo): State<PollingStations>,
     State(elections): State<Elections>,
     Path((id, entry_number)): Path<(u32, u8)>,
     data_entry_request: DataEntryRequest,
@@ -65,10 +66,8 @@ pub async fn polling_station_data_entry(
         ));
     }
 
-    // future: need to resolve election id from polling station once we have
-    // polling stations in the database, #106
-    let election_id = 1;
-    let election = elections.get(election_id).await?;
+    let polling_station = polling_stations_repo.get(id).await?;
+    let election = elections.get(polling_station.election_id).await?;
 
     let mut validation_results = ValidationResults::default();
     data_entry_request
@@ -104,13 +103,12 @@ pub async fn polling_station_data_entry(
 pub async fn polling_station_data_entry_finalise(
     State(pool): State<SqlitePool>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(polling_stations_repo): State<PollingStations>,
     State(elections): State<Elections>,
     Path((id, entry_number)): Path<(u32, u8)>,
 ) -> Result<(), APIError> {
-    // future: need to resolve election id from polling station once we have
-    // polling stations in the database, #106
-    let election_id = 1;
-    let election = elections.get(election_id).await?;
+    let polling_station = polling_stations_repo.get(id).await?;
+    let election = elections.get(polling_station.election_id).await?;
 
     let mut tx = pool.begin().await?;
 
@@ -172,7 +170,7 @@ mod tests {
 
     use super::*;
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
     async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
         let mut request_body = DataEntryRequest {
             data: PollingStationResults {
@@ -219,6 +217,7 @@ mod tests {
         async fn save(pool: SqlitePool, request_body: DataEntryRequest) -> Response {
             polling_station_data_entry(
                 State(PollingStationDataEntries::new(pool.clone())),
+                State(PollingStations::new(pool.clone())),
                 State(Elections::new(pool.clone())),
                 Path((1, 1)),
                 request_body.clone(),
@@ -231,6 +230,7 @@ mod tests {
             polling_station_data_entry_finalise(
                 State(pool.clone()),
                 State(PollingStationDataEntries::new(pool.clone())),
+                State(PollingStations::new(pool.clone())),
                 State(Elections::new(pool.clone())),
                 Path((1, 1)),
             )

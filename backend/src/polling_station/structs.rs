@@ -19,7 +19,8 @@ pub trait Validate {
 /// Polling station of a certain [Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
 pub struct PollingStation {
-    pub id: i64,
+    pub id: u32,
+    pub election_id: u32,
     pub name: String,
     pub number: i64,
     pub number_of_voters: Option<i64>,

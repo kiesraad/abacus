@@ -23,10 +23,14 @@ export function PollingStationChoiceForm() {
   const handleRowClick = (pollingStationNumber: number) => () => {
     navigate(`./${pollingStationNumber}/recounted`);
   };
-  function handleSubmit(event: FormEvent<PollingStationChoiceFormElement>) {
+
+  const handleSubmit = (event: FormEvent<PollingStationChoiceFormElement>) => {
+    const pollingStationNumber = parseInt(event.currentTarget.elements.number.value, 10);
     event.preventDefault();
-    navigate("./030/recounted");
-  }
+    if (pollingStations.some((ps) => ps.number === pollingStationNumber)) {
+      navigate(`./${pollingStationNumber}/recounted`);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit}>

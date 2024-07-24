@@ -1,48 +1,51 @@
-import { FormEvent, useContext } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { PollingStation, PollingStationsContext } from "@kiesraad/api";
-import { IconChevronRight } from "@kiesraad/icon";
+import { PollingStationsContext } from "@kiesraad/api";
 import { BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
 
 import { PollingStationSelector } from "./PollingStationSelector";
-
-interface FormElements extends HTMLFormControlsCollection {
-  number: HTMLInputElement;
-}
-
-interface PollingStationChoiceFormElement extends HTMLFormElement {
-  readonly elements: FormElements;
-}
+import { PollingStationsList } from "./PollingStationsList";
 
 export function PollingStationChoiceForm() {
   const navigate = useNavigate();
 
   const { pollingStations, pollingStationsLoading } = useContext(PollingStationsContext);
+  const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
 
-  const handleRowClick = (pollingStationNumber: number) => () => {
-    navigate(`./${pollingStationNumber}/recounted`);
-  };
-
-  const handleSubmit = (event: FormEvent<PollingStationChoiceFormElement>) => {
-    const pollingStationNumber = parseInt(event.currentTarget.elements.number.value, 10);
-    event.preventDefault();
-    if (pollingStations.some((ps) => ps.number === pollingStationNumber)) {
+  const handleSubmit = () => {
+    const parsedStationNumber = parseInt(pollingStationNumber, 10);
+    if (pollingStations.some((ps) => ps.number === parsedStationNumber)) {
       navigate(`./${pollingStationNumber}/recounted`);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        return;
+      }}
+    >
       <h2 className="form_title">Welk stembureau ga je invoeren?</h2>
-      <PollingStationSelector />
+      <PollingStationSelector
+        pollingStationNumber={pollingStationNumber}
+        setPollingStationNumber={setPollingStationNumber}
+        handleSubmit={handleSubmit}
+      />
       <p className="md">
         Klopt de naam van het stembureau met de naam op je papieren proces verbaal?
         <br />
         Dan kan je beginnen.
       </p>
       <BottomBar type="form">
-        <Button type="submit" size="lg">
+        <Button
+          type="button"
+          size="lg"
+          onClick={() => {
+            handleSubmit();
+          }}
+        >
           Beginnen
         </Button>
         <span className="button_hint">SHIFT + Enter</span>
@@ -64,33 +67,7 @@ export function PollingStationChoiceForm() {
             aan het zoeken …
           </div>
         ) : (
-          <table id="polling_station_list" className="overview_table">
-            <thead>
-              <tr>
-                <th className="align-center">Nummer</th>
-                <th>Stembureau</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {pollingStations.map((pollingStation: PollingStation) => (
-                <tr onClick={handleRowClick(pollingStation.number)} key={pollingStation.number}>
-                  <td width="6.5rem" className="number">
-                    {pollingStation.number}
-                  </td>
-                  <td>
-                    <span>{pollingStation.name}</span>
-                    {/* TODO: <Badge type="first_entry" />*/}
-                  </td>
-                  <td width="5rem">
-                    <div className="link">
-                      <IconChevronRight />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <PollingStationsList pollingStations={pollingStations} />
         )}
       </details>
     </form>

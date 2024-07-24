@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useMemo, useState } from "react";
 
 import { PollingStation, PollingStationsContext } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
@@ -7,8 +7,17 @@ import { cn, useDebouncedCallback } from "@kiesraad/util";
 
 import cls from "./PollingStationSelector.module.css";
 
-export function PollingStationSelector() {
-  const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
+export interface PollingStationSelectorProps {
+  pollingStationNumber: string;
+  setPollingStationNumber: Dispatch<SetStateAction<string>>;
+  handleSubmit: () => void;
+}
+
+export function PollingStationSelector({
+  pollingStationNumber,
+  setPollingStationNumber,
+  handleSubmit,
+}: PollingStationSelectorProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(
     undefined,
@@ -45,6 +54,11 @@ export function PollingStationSelector() {
         maxLength={6}
         onChange={(e) => {
           setPollingStationNumber(e.target.value);
+        }}
+        onKeyDown={(e) => {
+          if (e.shiftKey && e.key === "Enter") {
+            handleSubmit();
+          }
         }}
       />
       {pollingStationNumber.trim() !== "" &&

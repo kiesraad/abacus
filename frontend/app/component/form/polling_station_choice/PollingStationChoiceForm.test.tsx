@@ -4,7 +4,7 @@ import { describe, expect, test } from "vitest";
 import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
 import { render, screen, within } from "app/test/unit";
 
-import { PollingStationProvider } from "@kiesraad/api";
+import { PollingStationProvider, PollingStationsContext } from "@kiesraad/api";
 
 describe("Test PollingStationChoiceForm", () => {
   test("Form field entry", async () => {
@@ -87,5 +87,27 @@ describe("Test PollingStationChoiceForm", () => {
     expect(within(pollingStationList).getByText('Stembureau "Op Rolletjes"')).toBeVisible();
     expect(within(pollingStationList).getByText("21")).toBeVisible();
     expect(within(pollingStationList).getByText("Testplek")).toBeVisible();
+  });
+
+  test("Polling station list no stations", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PollingStationsContext.Provider
+        value={{
+          pollingStationsLoading: false,
+          pollingStations: [],
+        }}
+      >
+        <PollingStationChoiceForm />
+      </PollingStationsContext.Provider>,
+    );
+
+    const openPollingStationList = screen.getByTestId("openPollingStationList");
+    await user.click(openPollingStationList);
+    expect(screen.getByText("Kies het stembureau")).toBeVisible();
+
+    // Check if the error message is visible
+    expect(screen.getByText("Geen stembureaus gevonden")).toBeVisible();
   });
 });

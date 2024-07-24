@@ -70,7 +70,7 @@ export function PollingStationChoiceForm() {
               </div>
             );
           } else if (pollingStations.length === 0) {
-            return <Alert type={"error"}>geen stembureaus gevonden.</Alert>;
+            return <Alert type={"error"}>Geen stembureaus gevonden</Alert>;
           } else {
             return <PollingStationsList pollingStations={pollingStations} />;
           }

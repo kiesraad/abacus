@@ -51,10 +51,11 @@ npm run test
 Browser tests using Playwright:
 
 ```sh
-npm run e2e
+# tests for ui components using ladle:
+npm run e2e:lib-ui
 
-# with Playwright UI:
-npm run e2eui
+# tests for frontend with msw:
+npm run e2e:app
 ```
 
 ### UI Component development

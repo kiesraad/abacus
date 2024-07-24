@@ -1,4 +1,4 @@
-name: Backend
+name: Build, lint & test
 
 on:
   workflow_dispatch:
@@ -10,8 +10,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  rust:
-    name: Rust
+  backend:
+    name: Backend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -45,3 +45,46 @@ jobs:
         run: cargo clippy --all-targets --all-features -- -D warnings
       - name: Run tests
         run: cargo test --verbose
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Check formatting
+        run: npx prettier --check .
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test
+      - name: Build
+        run: npm run build
+  playwright:
+    name: Playwright
+    needs: frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: e2e test install
+        run: npx playwright install --with-deps
+      - name: e2e test - lib
+        run: npm run e2e -- lib
+      - name: e2e test - app
+        run: npm run e2e -- app

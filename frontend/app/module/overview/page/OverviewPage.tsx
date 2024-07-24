@@ -1,19 +1,17 @@
 import { useNavigate } from "react-router-dom";
 
-import {
-  IconCheckHeart,
-  IconCheckVerified,
-  IconChevronRight,
-  IconClock,
-  IconHourglass,
-} from "@kiesraad/icon";
+import { Election, useElectionList } from "@kiesraad/api";
+import { IconCheckHeart, IconChevronRight } from "@kiesraad/icon";
 import { WorkStationNumber } from "@kiesraad/ui";
 
 export function OverviewPage() {
   const navigate = useNavigate();
-  const handleRowClick = () => {
-    navigate(`/1/input`);
+  const handleRowClick = (election: Election) => {
+    return () => {
+      navigate(`/${election.id}/input`);
+    };
   };
+  const { electionList } = useElectionList();
 
   return (
     <>
@@ -37,66 +35,29 @@ export function OverviewPage() {
               </tr>
             </thead>
             <tbody>
-              <tr onClick={handleRowClick}>
-                <td>Provinciale Statenverkiezingen 2026</td>
-                <td>GSB - Juinen (045)</td>
-                <td>
-                  <div className="flex_overview">
-                    <IconHourglass />
-                    <span>Invoer opgeschort</span>
-                  </div>
-                </td>
-                <td className="link">
-                  <div className="link">
-                    <IconChevronRight />
-                  </div>
-                </td>
-              </tr>
-              <tr onClick={handleRowClick}>
-                <td>Waterschap Zeegraslanden 2026</td>
-                <td></td>
-                <td>
-                  <div className="flex_overview">
-                    <IconClock />
-                    <span>Wachten op coördinator</span>
-                  </div>
-                </td>
-                <td className="link">
-                  <div className="link">
-                    <IconChevronRight />
-                  </div>
-                </td>
-              </tr>
-              <tr onClick={handleRowClick}>
-                <td>Waterschap De Watervenen 2026</td>
-                <td></td>
-                <td>
-                  <div className="flex_overview">
-                    <IconCheckHeart />
-                    <span>Invoerders bezig</span>
-                  </div>
-                </td>
-                <td className="link">
-                  <div className="link">
-                    <IconChevronRight />
-                  </div>
-                </td>
-              </tr>
-              <tr onClick={handleRowClick}>
-                <td>Gemeenteraadsverkiezing 2026</td>
-                <td></td>
-                <td>
-                  <div className="flex_overview">
-                    <IconCheckVerified />
-                    <span>Steminvoer voltooid</span>
-                  </div>
-                </td>
-                <td className="link">
-                  <div className="link">
-                    <IconChevronRight />
-                  </div>
-                </td>
-              </tr>
+              {electionList.map((election) => (
+                <tr onClick={handleRowClick(election)} key={election.id}>
+                  <td>{election.name}</td>
+                  <td></td>
+                  <td>
+                    <div className="flex_overview">
+                      <IconCheckHeart />
+                      <span>Invoerders bezig</span>
+                      {/* TODO <IconHourglass />
+                      <span>Invoer opgeschort</span>
+                      <IconClock />
+                      <span>Wachten op coördinator</span>
+                      <IconCheckVerified />
+                      <span>Steminvoer voltooid</span> */}
+                    </div>
+                  </td>
+                  <td className="link">
+                    <div className="link">
+                      <IconChevronRight />
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </article>

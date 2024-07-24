@@ -30,8 +30,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let app = router(pool)?;
 
     let app = if let Some(fd) = args.frontend_dist {
-        app.route_service("/", ServeFile::new(fd.join("index.html")))
-            .fallback_service(ServeDir::new(fd))
+        app.fallback_service(
+            ServeDir::new(fd.clone()).not_found_service(ServeFile::new(fd.join("index.html"))),
+        )
     } else {
         app
     };

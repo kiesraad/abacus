@@ -1,7 +1,9 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
-import { render, screen, within } from "app/test/unit";
+
 import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
+import { render, screen, within } from "app/test/unit";
+
 import { PollingStationProvider } from "@kiesraad/api";
 
 describe("Test PollingStationChoiceForm", () => {

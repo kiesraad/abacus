@@ -1,6 +1,8 @@
-import { Footer } from "app/component/footer/Footer";
-import { PollingStationProvider } from "@kiesraad/api";
 import { Outlet, useParams } from "react-router-dom";
+
+import { Footer } from "app/component/footer/Footer";
+
+import { PollingStationProvider } from "@kiesraad/api";
 
 export function InputLayout() {
   const { electionId } = useParams();

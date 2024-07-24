@@ -1,9 +1,11 @@
-import { BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
-import { useNavigate } from "react-router-dom";
-import { IconChevronRight } from "@kiesraad/icon";
-import { PollingStation, PollingStationsContext } from "@kiesraad/api";
-import { PollingStationSelector } from "./PollingStationSelector";
 import { FormEvent, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { PollingStation, PollingStationsContext } from "@kiesraad/api";
+import { IconChevronRight } from "@kiesraad/icon";
+import { BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
+
+import { PollingStationSelector } from "./PollingStationSelector";
 
 interface FormElements extends HTMLFormControlsCollection {
   number: HTMLInputElement;

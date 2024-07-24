@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import { PollingStation } from "./gen/openapi";
 import { usePollingStationListRequest } from "./usePollingStation";
 

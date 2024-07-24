@@ -1,9 +1,11 @@
-import { PollingStation, PollingStationsContext } from "@kiesraad/api";
-import { Icon, InputField, Spinner } from "@kiesraad/ui";
 import { useContext, useMemo, useState } from "react";
-import cls from "./PollingStationSelector.module.css";
-import { cn, useDebouncedCallback } from "@kiesraad/util";
+
+import { PollingStation, PollingStationsContext } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
+import { Icon, InputField, Spinner } from "@kiesraad/ui";
+import { cn, useDebouncedCallback } from "@kiesraad/util";
+
+import cls from "./PollingStationSelector.module.css";
 
 export function PollingStationSelector() {
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");

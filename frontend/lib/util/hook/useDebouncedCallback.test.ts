@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
 import { renderHook } from "app/test/unit";
+
 import { useDebouncedCallback } from "./useDebouncedCallback";
 
 describe("useDebouncedCallback", () => {

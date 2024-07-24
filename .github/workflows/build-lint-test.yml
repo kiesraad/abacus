@@ -10,8 +10,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  rust:
-    name: Rust
+  backend:
+    name: Backend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -45,8 +45,8 @@ jobs:
         run: cargo clippy --all-targets --all-features -- -D warnings
       - name: Run tests
         run: cargo test --verbose
-  node:
-    name: Node
+  frontend:
+    name: Frontend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -69,7 +69,7 @@ jobs:
         run: npm run build
   playwright:
     name: Playwright
-    needs: node
+    needs: frontend
     runs-on: ubuntu-latest
     defaults:
       run:

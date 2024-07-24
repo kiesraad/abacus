@@ -50,7 +50,9 @@ export function PollingStationSelector() {
           if (pollingStationsLoading || loading) {
             return (
               <div className={cls.result}>
-                <Icon icon={<Spinner size="lg" />} />
+                <span className={cls.icon}>
+                  <Icon icon={<Spinner size="md" />} />
+                </span>
                 <span>aan het zoeken …</span>
               </div>
             );
@@ -64,7 +66,9 @@ export function PollingStationSelector() {
           } else {
             return (
               <div id="pollingStationSelectorFeedback" className={cn(cls.result, cls.error)}>
-                <Icon icon={<IconError />} color="error" />
+                <span className={cls.icon}>
+                  <Icon icon={<IconError />} color="error" />
+                </span>
                 <span>Geen stembureau gevonden met nummer {pollingStationNumber}</span>
               </div>
             );

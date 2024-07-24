@@ -10,7 +10,7 @@ describe("PollingStationLayout", () => {
   test("Enter form field values", () => {
     render(
       <ElectionListProvider>
-        <ElectionProvider>
+        <ElectionProvider electionId={1}>
           <PollingStationLayout />
         </ElectionProvider>
       </ElectionListProvider>,

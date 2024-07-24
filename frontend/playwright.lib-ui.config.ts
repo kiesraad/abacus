@@ -4,7 +4,7 @@ import { defineConfig, devices, type PlaywrightTestConfig } from "@playwright/te
  * See https://playwright.dev/docs/test-configuration.
  */
 const config: PlaywrightTestConfig = defineConfig({
-  testDir: "./",
+  testDir: "./lib/ui",
   testMatch: /\.e2e\.ts/,
   // Fail the build on CI if you accidentally left test.only in the source code
   forbidOnly: !!process.env.CI,
@@ -38,12 +38,7 @@ const config: PlaywrightTestConfig = defineConfig({
       use: { ...devices["Desktop Safari"] },
     },
   ],
-  // use different port, so it doesn't conflict with local dev server
   webServer: [
-    {
-      command: "npm run start:msw -- --port 4009",
-      port: 4009,
-    },
     {
       command: "npm run ladle",
       port: 61000,

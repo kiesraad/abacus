@@ -84,7 +84,7 @@ jobs:
         run: npm ci
       - name: e2e test install
         run: npx playwright install --with-deps
-      - name: e2e test - lib
-        run: npm run e2e -- lib
+      - name: e2e test - lib ui
+        run: npm run e2e:lib-ui
       - name: e2e test - app
-        run: npm run e2e -- app
+        run: npm run e2e:app

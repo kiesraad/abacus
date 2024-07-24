@@ -31,7 +31,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let app = if let Some(fd) = args.frontend_dist {
         app.fallback_service(
-            ServeDir::new(fd.clone()).not_found_service(ServeFile::new(fd.join("index.html"))),
+            ServeDir::new(fd.clone()).fallback(ServeFile::new(fd.join("index.html"))),
         )
     } else {
         app

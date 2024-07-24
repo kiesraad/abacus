@@ -4,7 +4,9 @@ export function useDebouncedCallback<T extends (...args: never[]) => unknown>(
   callback: T,
   delay: number,
 ) {
+  const callbackRef = useRef(callback);
   const debounceTimerRef = useRef(0);
+
   useEffect(() => {
     return () => {
       window.clearTimeout(debounceTimerRef.current);
@@ -14,9 +16,8 @@ export function useDebouncedCallback<T extends (...args: never[]) => unknown>(
   return useCallback(
     (...args: Parameters<T>) => {
       window.clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = window.setTimeout(() => callback(...args), delay);
+      debounceTimerRef.current = window.setTimeout(() => callbackRef.current(...args), delay);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [delay],
   );
 }

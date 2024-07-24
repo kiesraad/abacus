@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { PollingStationsContext } from "@kiesraad/api";
-import { BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
+import { Alert, BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
 
 import { PollingStationSelector } from "./PollingStationSelector";
 import { PollingStationsList } from "./PollingStationsList";
@@ -61,14 +61,20 @@ export function PollingStationChoiceForm() {
           </p>
         </summary>
         <h2 className="form_title table_title">Kies het stembureau</h2>
-        {pollingStationsLoading ? (
-          <div className="flex">
-            <Icon icon={<Spinner size="lg" />} />
-            aan het zoeken …
-          </div>
-        ) : (
-          <PollingStationsList pollingStations={pollingStations} />
-        )}
+        {(() => {
+          if (pollingStationsLoading) {
+            return (
+              <div className="flex">
+                <Icon icon={<Spinner size="lg" />} />
+                aan het zoeken …
+              </div>
+            );
+          } else if (pollingStations.length === 0) {
+            return <Alert type={"error"}>geen stembureaus gevonden.</Alert>;
+          } else {
+            return <PollingStationsList pollingStations={pollingStations} />;
+          }
+        })()}
       </details>
     </form>
   );

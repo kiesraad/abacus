@@ -147,6 +147,9 @@ describe("Test RecountedForm", () => {
 
     render(Component);
 
+    const no = screen.getByTestId("no");
+    await user.click(no);
+
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const feedbackServerError = await screen.findByTestId("feedback-server-error");
@@ -165,6 +168,9 @@ describe("Test RecountedForm", () => {
     const user = userEvent.setup();
 
     render(Component);
+
+    const no = screen.getByTestId("no");
+    await user.click(no);
 
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);

@@ -49,12 +49,12 @@ export function RecountedForm() {
   function handleSubmit(event: React.FormEvent<RecountedFormElement>) {
     event.preventDefault();
     const elements = event.currentTarget.elements;
-    setSectionValues(getValues(elements));
 
     if (!elements.yes.checked && !elements.no.checked) {
       setHasValidationError(true);
     } else {
       setHasValidationError(false);
+      setSectionValues(getValues(elements));
     }
   }
 
@@ -68,8 +68,8 @@ export function RecountedForm() {
     setHasValidationError(true);
   }
   const hasValidationWarning = warnings.length > 0;
-  const success = isCalled && !hasValidationError && !hasValidationWarning && !loading;
-
+  const success =
+    isCalled && !serverError && !hasValidationError && !hasValidationWarning && !loading;
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       {/* Temporary while not navigating through form sections */}

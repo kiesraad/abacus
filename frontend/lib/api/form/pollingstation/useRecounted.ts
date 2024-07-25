@@ -4,15 +4,8 @@ import { Recounted, usePollingStationFormController, ValidationResult } from "@k
 import { matchValidationResultWithFormSections } from "@kiesraad/util";
 
 export function useRecounted() {
-  const {
-    values,
-    setValues,
-    data,
-    loading,
-    error: serverError,
-    setTemporaryCache,
-    cache,
-  } = usePollingStationFormController();
+  const { values, setValues, data, loading, error, setTemporaryCache, cache } =
+    usePollingStationFormController();
 
   const sectionValues: Recounted = React.useMemo(() => {
     if (cache && cache.key === "recounted") {
@@ -62,7 +55,7 @@ export function useRecounted() {
     errors,
     warnings,
     isCalled,
-    serverError,
+    serverError: error,
     setTemporaryCache,
   };
 }

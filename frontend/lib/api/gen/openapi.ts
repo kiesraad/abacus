@@ -168,6 +168,29 @@ export interface PollingStationListResponse {
 }
 
 /**
+ * Polling station of a certain [Election]
+ */
+export interface PollingStation {
+  house_number: string;
+  house_number_addition?: string;
+  id: number;
+  locality: string;
+  name: string;
+  number: number;
+  number_of_voters?: number;
+  polling_station_type: PollingStationType;
+  postal_code: string;
+  street: string;
+}
+
+/**
+ * Polling station list response
+ */
+export interface PollingStationListResponse {
+  polling_stations: PollingStation[];
+}
+
+/**
  * PollingStationResults, following the fields in
 "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar lichaam
 in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht"

@@ -13,6 +13,7 @@ import {
 } from "@kiesraad/api";
 
 import { electionMockData, electionsMockData, politicalGroupMockData } from "./ElectionMockData.ts";
+import { pollingStationMockData } from "./PollingStationMockData.ts";
 
 export const electionMock = electionMockData as Required<Election>;
 export const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
@@ -226,9 +227,17 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
   },
 );
 
+export const PollingStationListRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
+  "/api/polling_stations/:id",
+  () => {
+    return HttpResponse.json(pollingStationMockData, { status: 200 });
+  },
+);
+
 export const handlers: HttpHandler[] = [
   pingHandler,
   pollingStationDataEntryHandler,
+  PollingStationListRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
 ];

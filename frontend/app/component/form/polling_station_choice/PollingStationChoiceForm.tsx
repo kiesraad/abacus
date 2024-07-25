@@ -1,38 +1,37 @@
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { IconChevronRight } from "@kiesraad/icon";
-import { Badge, BottomBar, Button, InputField } from "@kiesraad/ui";
+import { PollingStationsContext } from "@kiesraad/api";
+import { Alert, BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
 
-interface FormElements extends HTMLFormControlsCollection {
-  number: HTMLInputElement;
-}
-
-interface PollingStationChoiceFormElement extends HTMLFormElement {
-  readonly elements: FormElements;
-}
+import { PollingStationSelector } from "./PollingStationSelector";
+import { PollingStationsList } from "./PollingStationsList";
 
 export function PollingStationChoiceForm() {
   const navigate = useNavigate();
-  const handleRowClick = () => {
-    navigate(`./030/recounted`);
+
+  const { pollingStations, pollingStationsLoading } = useContext(PollingStationsContext);
+  const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
+
+  const handleSubmit = () => {
+    const parsedStationNumber = parseInt(pollingStationNumber, 10);
+    if (pollingStations.some((ps) => ps.number === parsedStationNumber)) {
+      navigate(`./${pollingStationNumber}/recounted`);
+    }
   };
-  function handleSubmit(event: React.FormEvent<PollingStationChoiceFormElement>) {
-    event.preventDefault();
-    navigate("./030/recounted");
-  }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        return;
+      }}
+    >
       <h2 className="form_title">Welk stembureau ga je invoeren?</h2>
-      <InputField
-        id="pollingStation"
-        name="number"
-        label="Voer het nummer in:"
-        fieldWidth="narrow"
-        margin={false}
-        pattern="\d+"
-        title="Alleen positieve nummers toegestaan"
-        maxLength={6}
+      <PollingStationSelector
+        pollingStationNumber={pollingStationNumber}
+        setPollingStationNumber={setPollingStationNumber}
+        handleSubmit={handleSubmit}
       />
       <p className="md">
         Klopt de naam van het stembureau met de naam op je papieren proces verbaal?
@@ -40,7 +39,13 @@ export function PollingStationChoiceForm() {
         Dan kan je beginnen.
       </p>
       <BottomBar type="form">
-        <Button type="submit" size="lg">
+        <Button
+          type="button"
+          size="lg"
+          onClick={() => {
+            handleSubmit();
+          }}
+        >
           Beginnen
         </Button>
         <span className="button_hint">SHIFT + Enter</span>
@@ -56,115 +61,20 @@ export function PollingStationChoiceForm() {
           </p>
         </summary>
         <h2 className="form_title table_title">Kies het stembureau</h2>
-        <table id="polling_station_list" className="overview_table">
-          <thead>
-            <tr>
-              <th className="align-center">Nummer</th>
-              <th>Stembureau</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="number">
-                1
-              </td>
-              <td>
-                <span>Nachthemelstraat 21</span>
-                <Badge type="first_entry" />
-              </td>
-              <td width="5rem">
-                <div className="link">
-                  <IconChevronRight />
-                </div>
-              </td>
-            </tr>
-            <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="number">
-                2
-              </td>
-              <td>
-                <span>Schoolstraat 78</span>
-                <Badge type="second_entry" />
-              </td>
-              <td width="5rem">
-                <div className="link">
-                  <IconChevronRight />
-                </div>
-              </td>
-            </tr>
-            <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="number">
-                3
-              </td>
-              <td>
-                <span>Fluisterbosdreef 8</span>
-                <Badge type="extra_entry" />
-              </td>
-              <td width="5rem">
-                <div className="link">
-                  <IconChevronRight />
-                </div>
-              </td>
-            </tr>
-            <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="number">
-                4
-              </td>
-              <td>
-                <span>Wilhelminastraat 21</span>
-                <Badge type="objections" />
-              </td>
-              <td width="5rem">
-                <div className="link">
-                  <IconChevronRight />
-                </div>
-              </td>
-            </tr>
-            <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="number">
-                5
-              </td>
-              <td>
-                <span>Tuinstraat 2</span>
-                <Badge type="difference" />
-              </td>
-              <td width="5rem">
-                <div className="link">
-                  <IconChevronRight />
-                </div>
-              </td>
-            </tr>
-            <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="number">
-                6
-              </td>
-              <td>
-                <span>Rietland 31</span>
-                <Badge type="correction" />
-              </td>
-              <td width="5rem">
-                <div className="link">
-                  <IconChevronRight />
-                </div>
-              </td>
-            </tr>
-            <tr onClick={handleRowClick}>
-              <td width="6.5rem" className="number">
-                7
-              </td>
-              <td>
-                <span>Grote Markt 1</span>
-                <Badge type="definitive" />
-              </td>
-              <td width="5rem">
-                <div className="link">
-                  <IconChevronRight />
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        {(() => {
+          if (pollingStationsLoading) {
+            return (
+              <div className="flex">
+                <Icon icon={<Spinner size="lg" />} />
+                aan het zoeken …
+              </div>
+            );
+          } else if (pollingStations.length === 0) {
+            return <Alert type={"error"}>Geen stembureaus gevonden</Alert>;
+          } else {
+            return <PollingStationsList pollingStations={pollingStations} />;
+          }
+        })()}
       </details>
     </form>
   );

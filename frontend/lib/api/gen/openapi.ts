@@ -161,6 +161,29 @@ export interface PollingStationListResponse {
 }
 
 /**
+ * Polling station of a certain [Election]
+ */
+export interface PollingStation {
+  house_number: string;
+  house_number_addition?: string;
+  id: number;
+  locality: string;
+  name: string;
+  number: number;
+  number_of_voters?: number;
+  polling_station_type: PollingStationType;
+  postal_code: string;
+  street: string;
+}
+
+/**
+ * Polling station list response
+ */
+export interface PollingStationListResponse {
+  polling_stations: PollingStation[];
+}
+
+/**
  * PollingStationResults, following the fields in
 "Model N 10-1. Proces-verbaal van een stembureau"
 <https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1>

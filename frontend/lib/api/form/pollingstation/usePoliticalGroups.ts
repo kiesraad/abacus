@@ -1,21 +1,20 @@
 import * as React from "react";
 
-import {
-  PoliticalGroupVotes,
-  usePollingStationFormController,
-  ValidationResult,
-} from "@kiesraad/api";
-import { matchValidationResultWithFormSections } from "@kiesraad/util";
+import { PoliticalGroupVotes, usePollingStationFormController } from "@kiesraad/api";
 
-export function usePoliticalGroup(political_group_number: number) {
+export function usePoliticalGroup(
+  political_group_number: number,
+  getValues: () => PoliticalGroupVotes,
+) {
   const {
     values,
-    setValues,
-    data,
+    formState,
     loading,
     error: serverError,
     setTemporaryCache,
     cache,
+    registerCurrentForm,
+    submitCurrentForm,
   } = usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
@@ -27,52 +26,55 @@ export function usePoliticalGroup(political_group_number: number) {
     return values.political_group_votes.find((pg) => pg.number === political_group_number);
   }, [values, political_group_number, setTemporaryCache, cache]);
 
+  // const setSectionValues = (values: PoliticalGroupVotes) => {
+  //   setValues((old) => ({
+  //     ...old,
+  //     political_group_votes: old.political_group_votes.map((pg) => {
+  //       if (pg.number === political_group_number) {
+  //         return values;
+  //       }
+  //       return pg;
+  //     }),
+  //   }));
+  // };
+
+  // //TODO: this does not what I want.
+  // const _getValues = React.useCallback(() => {
+  //   const newValues = getValues();
+  //   return {
+  //     political_group_votes: values.political_group_votes.map((pg) => {
+  //       if (pg.number === political_group_number) {
+  //         return newValues;
+  //       }
+  //       return pg;
+  //     }),
+  //   };
+  // }, [values, political_group_number, getValues]);
+
   const errors = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.errors.filter((err) =>
-        matchValidationResultWithFormSections(err.fields, [
-          `political_group_votes[${political_group_number - 1}]`,
-        ]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data, political_group_number]);
+    return formState.sections[`political_group_votes_${political_group_number}`]?.errors || [];
+  }, [formState, political_group_number]);
 
   const warnings = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.warnings.filter((warning) =>
-        matchValidationResultWithFormSections(warning.fields, [
-          `political_group_votes[${political_group_number - 1}]`,
-        ]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data, political_group_number]);
+    return formState.sections[`political_group_votes_${political_group_number}`]?.warnings || [];
+  }, [formState, political_group_number]);
 
-  const setSectionValues = (values: PoliticalGroupVotes) => {
-    setValues((old) => ({
-      ...old,
-      political_group_votes: old.political_group_votes.map((pg) => {
-        if (pg.number === political_group_number) {
-          return values;
-        }
-        return pg;
-      }),
-    }));
-  };
-
-  const isCalled = React.useMemo(() => {
-    return !!(sectionValues && sectionValues.total);
-  }, [sectionValues]);
+  registerCurrentForm({
+    type: "political_group_votes",
+    id: `political_group_votes_${political_group_number}`,
+    number: political_group_number,
+    getValues,
+  });
 
   return {
     sectionValues,
-    setSectionValues,
     errors,
     warnings,
     loading,
-    isCalled,
+    isCalled:
+      formState.sections[`political_group_votes_${political_group_number}`]?.isCalled || false,
     serverError,
     setTemporaryCache,
+    submit: submitCurrentForm,
   };
 }

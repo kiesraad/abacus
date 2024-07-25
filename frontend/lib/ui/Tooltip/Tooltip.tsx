@@ -13,9 +13,11 @@ const hideEvent = new CustomEvent(EVENT_TOOLTIP_HIDE);
 export function Tooltip({ children, content, onClose }: TooltipProps): React.ReactNode {
   const ref = React.useRef<HTMLDivElement>(null);
   const handleMouseAndKeyboardEvent = React.useCallback(() => {
-    if (onClose) onClose();
-    window.dispatchEvent(hideEvent);
-  }, [onClose]);
+    if (content) {
+      if (onClose) onClose();
+      window.dispatchEvent(hideEvent);
+    }
+  }, [onClose, content]);
 
   React.useEffect(() => {
     document.addEventListener("mousedown", handleMouseAndKeyboardEvent);

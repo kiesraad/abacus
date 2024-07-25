@@ -86,17 +86,17 @@ export function usePositiveNumberInputMask(): UsePositiveNumberInputMaskReturn {
     [validate],
   );
 
-  const register = () => {
+  const register = React.useCallback(() => {
     return {
       onChange,
       onLoad,
       onPaste,
     };
-  };
+  }, [onChange, onLoad, onPaste]);
 
-  const resetWarnings = () => {
+  const resetWarnings = React.useCallback(() => {
     setWarnings([]);
-  };
+  }, []);
 
   return {
     format,

@@ -1,17 +1,19 @@
 import * as React from "react";
 
-import {
-  PollingStationResults,
-  usePollingStationFormController,
-  ValidationResult,
-} from "@kiesraad/api";
-import { matchValidationResultWithFormSections } from "@kiesraad/util";
+import { PollingStationResults, usePollingStationFormController } from "@kiesraad/api";
 
 export type VotersAndVotesValues = Pick<PollingStationResults, "voters_counts" | "votes_counts">;
 
-export function useVotersAndVotes() {
-  const { values, setValues, loading, error, data, setTemporaryCache, cache } =
-    usePollingStationFormController();
+export function useVotersAndVotes(getValues: () => VotersAndVotesValues) {
+  const {
+    values,
+    loading,
+    formState,
+    setTemporaryCache,
+    cache,
+    registerCurrentForm,
+    submitCurrentForm,
+  } = usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
     if (cache && cache.key === "voters_and_votes") {
@@ -25,48 +27,38 @@ export function useVotersAndVotes() {
     };
   }, [values, setTemporaryCache, cache]);
 
+  // const setSectionValues = (values: VotersAndVotesValues) => {
+  //   setValues((old) => ({
+  //     ...old,
+  //     voters_counts: {
+  //       ...values.voters_counts,
+  //     },
+  //     votes_counts: {
+  //       ...values.votes_counts,
+  //     },
+  //   }));
+  // };
+
+  registerCurrentForm({
+    id: "voters_votes_counts",
+    type: "voters_and_votes",
+    getValues,
+  });
+
   const errors = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.errors.filter((err) =>
-        matchValidationResultWithFormSections(err.fields, ["voters_counts", "votes_counts"]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data]);
+    return formState.sections.voters_votes_counts.errors;
+  }, [formState]);
 
   const warnings = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.warnings.filter((warning) =>
-        matchValidationResultWithFormSections(warning.fields, ["voters_counts", "votes_counts"]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data]);
-
-  const setSectionValues = (values: VotersAndVotesValues) => {
-    setValues((old) => ({
-      ...old,
-      voters_counts: {
-        ...values.voters_counts,
-      },
-      votes_counts: {
-        ...values.votes_counts,
-      },
-    }));
-  };
-
-  const isCalled = React.useMemo(() => {
-    return sectionValues.votes_counts.total_votes_cast_count > 0;
-  }, [sectionValues]);
+    return formState.sections.voters_votes_counts.warnings;
+  }, [formState]);
 
   return {
     loading,
     sectionValues,
-    setSectionValues,
     errors,
     warnings,
-    serverError: error,
-    isCalled,
-    setTemporaryCache,
+    isCalled: formState.sections.voters_votes_counts.isCalled,
+    submit: submitCurrentForm,
   };
 }

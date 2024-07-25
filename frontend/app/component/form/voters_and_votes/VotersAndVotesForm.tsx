@@ -1,9 +1,8 @@
 import * as React from "react";
 
-import { useVotersAndVotes, VotersAndVotesValues, useErrorsAndWarnings } from "@kiesraad/api";
+import { useVotersAndVotes, getErrorsAndWarnings } from "@kiesraad/api";
 import { Button, InputGrid, Feedback, BottomBar, InputGridRow, useTooltip } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
-import { useBlocker } from "react-router-dom";
 
 interface FormElements extends HTMLFormControlsCollection {
   poll_card_count: HTMLInputElement;
@@ -30,61 +29,49 @@ export function VotersAndVotesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-
-  const {
-    sectionValues,
-    setSectionValues,
-    loading,
-    errors,
-    warnings,
-    serverError,
-    isCalled,
-    setTemporaryCache,
-  } = useVotersAndVotes();
+  const { sectionValues, loading, errors, warnings, isCalled, submit } = useVotersAndVotes(() => {
+    if (!formRef.current)
+      return {
+        voters_counts: {
+          poll_card_count: 0,
+          proxy_certificate_count: 0,
+          voter_card_count: 0,
+          total_admitted_voters_count: 0,
+        },
+        votes_counts: {
+          votes_candidates_counts: 0,
+          blank_votes_count: 0,
+          invalid_votes_count: 0,
+          total_votes_cast_count: 0,
+        },
+      };
+    const elements = formRef.current.elements as VotersAndVotesFormElement["elements"];
+    return {
+      voters_counts: {
+        poll_card_count: deformat(elements.poll_card_count.value),
+        proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
+        voter_card_count: deformat(elements.voter_card_count.value),
+        total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
+      },
+      votes_counts: {
+        votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
+        blank_votes_count: deformat(elements.blank_votes_count.value),
+        invalid_votes_count: deformat(elements.invalid_votes_count.value),
+        total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
+      },
+    };
+  });
 
   useTooltip({
     onDismiss: resetWarnings,
   });
 
-  const getValues = React.useCallback(
-    (elements: VotersAndVotesFormElement["elements"]): VotersAndVotesValues => {
-      return {
-        voters_counts: {
-          poll_card_count: deformat(elements.poll_card_count.value),
-          proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
-          voter_card_count: deformat(elements.voter_card_count.value),
-          total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
-        },
-        votes_counts: {
-          votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
-          blank_votes_count: deformat(elements.blank_votes_count.value),
-          invalid_votes_count: deformat(elements.invalid_votes_count.value),
-          total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
-        },
-      };
-    },
-    [deformat],
-  );
-
   function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
     event.preventDefault();
-    const elements = event.currentTarget.elements;
-    setSectionValues(getValues(elements));
+    submit();
   }
-  //const blocker =  useBlocker() use const blocker to render confirmation UI.
-  useBlocker(() => {
-    if (formRef.current && !isCalled) {
-      const elements = formRef.current.elements as VotersAndVotesFormElement["elements"];
-      const values = getValues(elements);
-      setTemporaryCache({
-        key: "voters_and_votes",
-        data: values,
-      });
-    }
-    return false;
-  });
 
-  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
   React.useEffect(() => {
     if (isCalled) {
@@ -100,14 +87,7 @@ export function VotersAndVotesForm() {
       {/* Temporary while not navigating through form sections */}
       {success && <div id="result">Success</div>}
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
-      {serverError && (
-        <Feedback type="error" title="Error">
-          <div id="feedback-server-error">
-            <h2>Error</h2>
-            <p id="result">{serverError.message}</p>
-          </div>
-        </Feedback>
-      )}
+
       {hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div id="feedback-error">

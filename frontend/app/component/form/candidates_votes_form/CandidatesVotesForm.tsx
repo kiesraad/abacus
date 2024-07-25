@@ -1,11 +1,9 @@
 import * as React from "react";
-import { useBlocker } from "react-router-dom";
 
 import {
   CandidateVotes,
+  getErrorsAndWarnings,
   PoliticalGroup,
-  PoliticalGroupVotes,
-  useErrorsAndWarnings,
   usePoliticalGroup,
 } from "@kiesraad/api";
 import { BottomBar, Button, Feedback, InputGrid, InputGridRow } from "@kiesraad/ui";
@@ -27,57 +25,39 @@ export interface CandidatesVotesFormProps {
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
-  const {
-    sectionValues,
-    errors,
-    warnings,
-    setSectionValues,
-    loading,
-    serverError,
-    isCalled,
-    setTemporaryCache,
-  } = usePoliticalGroup(group.number);
-
-  usePreventFormEnterSubmit(formRef);
-
-  const getValues = React.useCallback(
-    (elements: CandidatesVotesFormElement["elements"]): PoliticalGroupVotes => {
-      const candidate_votes: CandidateVotes[] = [];
-      for (const el of elements["candidatevotes[]"]) {
-        candidate_votes.push({
-          number: candidateNumberFromElement(el),
-          votes: deformat(el.value),
-        });
+  const { sectionValues, errors, warnings, loading, isCalled, submit } = usePoliticalGroup(
+    group.number,
+    () => {
+      if (formRef.current) {
+        const elements = formRef.current.elements;
+        const candidate_votes: CandidateVotes[] = [];
+        for (const el of elements["candidatevotes[]"]) {
+          candidate_votes.push({
+            number: candidateNumberFromElement(el),
+            votes: deformat(el.value),
+          });
+        }
+        return {
+          number: group.number,
+          total: deformat(elements.total.value),
+          candidate_votes: candidate_votes,
+        };
       }
       return {
         number: group.number,
-        total: deformat(elements.total.value),
-        candidate_votes: candidate_votes,
+        total: 0,
+        candidate_votes: [],
       };
     },
-    [deformat, group],
   );
 
-  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+  usePreventFormEnterSubmit(formRef);
 
-  //const blocker =  useBlocker() use const blocker to render confirmation UI.
-  useBlocker(() => {
-    if (formRef.current && !isCalled) {
-      const elements = formRef.current.elements;
-      const values = getValues(elements);
-      setTemporaryCache({
-        key: "political_group_votes",
-        id: group.number,
-        data: values,
-      });
-    }
-    return false;
-  });
+  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
   function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
     event.preventDefault();
-    const elements = event.currentTarget.elements;
-    setSectionValues(getValues(elements));
+    submit();
   }
 
   const hasValidationError = errors.length > 0;
@@ -88,14 +68,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       {/* Temporary while not navigating through form sections */}
       {success && <div id="result">Success</div>}
       <h2>{group.name}</h2>
-      {serverError && (
-        <Feedback type="error" title="Error">
-          <div id="feedback-server-error">
-            <h2>Error</h2>
-            <p id="result">{serverError.message}</p>
-          </div>
-        </Feedback>
-      )}
       {hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div id="feedback-error">

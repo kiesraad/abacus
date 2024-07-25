@@ -24,16 +24,5 @@ export const pollingStationMockData: PollingStationListResponse = {
       postal_code: "1234 QY",
       street: "Teststraat",
     },
-    {
-      election_id: 1,
-      id: 3,
-      number: 35,
-      name: "Testgebouw",
-      house_number: "3",
-      locality: "Teststad",
-      polling_station_type: "VasteLocatie",
-      postal_code: "1234 QA",
-      street: "Testweg",
-    },
   ],
 };

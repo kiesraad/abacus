@@ -44,7 +44,7 @@ describe("Test PollingStationChoiceForm", () => {
     const pollingStation = screen.getByTestId("pollingStation");
 
     // Test if the polling station name is shown
-    await user.type(pollingStation, "20");
+    await user.type(pollingStation, "33");
     const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
     expect(within(pollingStationFeedback).getByText('Stembureau "Op Rolletjes"')).toBeVisible();
   });
@@ -83,9 +83,9 @@ describe("Test PollingStationChoiceForm", () => {
 
     // Check if the station number and name exist and are visible
     const pollingStationList = screen.getByTestId("polling_station_list");
-    expect(within(pollingStationList).getByText("20")).toBeVisible();
+    expect(within(pollingStationList).getByText("33")).toBeVisible();
     expect(within(pollingStationList).getByText('Stembureau "Op Rolletjes"')).toBeVisible();
-    expect(within(pollingStationList).getByText("21")).toBeVisible();
+    expect(within(pollingStationList).getByText("34")).toBeVisible();
     expect(within(pollingStationList).getByText("Testplek")).toBeVisible();
   });
 

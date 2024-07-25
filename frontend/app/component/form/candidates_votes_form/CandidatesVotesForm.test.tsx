@@ -64,7 +64,7 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
       render(Component);
 
-      const candidate1 = screen.getByTestId("candidate_votes-0.votes");
+      const candidate1 = screen.getByTestId("candidate_votes[0].votes");
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12.345");
 
@@ -75,8 +75,6 @@ describe("Test CandidatesVotesForm", () => {
 
     test("Form field entry and keybindings", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        message: "Data saved",
-        saved: true,
         validation_results: { errors: [], warnings: [] },
       });
 
@@ -84,42 +82,42 @@ describe("Test CandidatesVotesForm", () => {
 
       render(Component);
 
-      const candidate1 = screen.getByTestId("candidate_votes-0.votes");
+      const candidate1 = screen.getByTestId("candidate_votes[0].votes");
       expect(candidate1).toHaveFocus();
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12.345");
 
       await user.keyboard("{enter}");
 
-      const candidate2 = screen.getByTestId("candidate_votes-1.votes");
+      const candidate2 = screen.getByTestId("candidate_votes[1].votes");
       expect(candidate2).toHaveFocus();
       await user.type(candidate2, "6789");
       expect(candidate2).toHaveValue("6.789");
 
       await user.keyboard("{enter}");
 
-      const candidate3 = screen.getByTestId("candidate_votes-2.votes");
+      const candidate3 = screen.getByTestId("candidate_votes[2].votes");
       expect(candidate3).toHaveFocus();
       await user.type(candidate3, "123");
       expect(candidate3).toHaveValue("123");
 
       await user.keyboard("{enter}");
 
-      const candidate4 = screen.getByTestId("candidate_votes-3.votes");
+      const candidate4 = screen.getByTestId("candidate_votes[3].votes");
       expect(candidate4).toHaveFocus();
       await user.paste("4242");
       expect(candidate4).toHaveValue("4.242");
 
       await user.keyboard("{enter}");
 
-      const candidate5 = screen.getByTestId("candidate_votes-4.votes");
+      const candidate5 = screen.getByTestId("candidate_votes[4].votes");
       expect(candidate5).toHaveFocus();
       await user.type(candidate5, "12");
       expect(candidate5).toHaveValue("12");
 
       await user.keyboard("{enter}");
 
-      const candidate6 = screen.getByTestId("candidate_votes-5.votes");
+      const candidate6 = screen.getByTestId("candidate_votes[5].votes");
       expect(candidate6).toHaveFocus();
       // Test if maxLength on field works
       await user.type(candidate6, "1000000000");
@@ -127,7 +125,7 @@ describe("Test CandidatesVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const candidate7 = screen.getByTestId("candidate_votes-6.votes");
+      const candidate7 = screen.getByTestId("candidate_votes[6].votes");
       expect(candidate7).toHaveFocus();
       await user.type(candidate7, "3");
       expect(candidate7).toHaveValue("3");
@@ -255,12 +253,12 @@ describe("Test CandidatesVotesForm", () => {
       render(Component);
 
       await user.type(
-        screen.getByTestId("candidate_votes-0.votes"),
+        screen.getByTestId("candidate_votes[0].votes"),
         expectedRequest.data.political_group_votes[0]?.candidate_votes[0]?.votes.toString() ?? "0",
       );
 
       await user.type(
-        screen.getByTestId("candidate_votes-1.votes"),
+        screen.getByTestId("candidate_votes[1].votes"),
         expectedRequest.data.political_group_votes[0]?.candidate_votes[1]?.votes.toString() ?? "0",
       );
 
@@ -316,9 +314,16 @@ describe("Test CandidatesVotesForm", () => {
 
   describe("CandidatesVotesForm errors", () => {
     test("F.01 Invalid value", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
-        error:
-          "Failed to deserialize the JSON body into the target type: data.political_group_votes[0].total: invalid value: integer `-3`, expected u32 at line 1 column 61",
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: ["data.political_group_votes[0].candidate_votes[0].votes"],
+              code: "OutOfRange",
+            },
+          ],
+          warnings: [],
+        },
       });
 
       const user = userEvent.setup();
@@ -330,16 +335,14 @@ describe("Test CandidatesVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error$/);
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(/^OutOfRange$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
     test("F.31 IncorrectTotal group total", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [
             {
@@ -354,8 +357,8 @@ describe("Test CandidatesVotesForm", () => {
       render(Component);
       const user = userEvent.setup();
 
-      await user.type(screen.getByTestId("candidate_votes-0.votes"), "1");
-      await user.type(screen.getByTestId("candidate_votes-1.votes"), "2");
+      await user.type(screen.getByTestId("candidate_votes[0].votes"), "1");
+      await user.type(screen.getByTestId("candidate_votes[1].votes"), "2");
       await user.type(screen.getByTestId("total"), "10");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
@@ -371,8 +374,6 @@ describe("Test CandidatesVotesForm", () => {
   describe("CandidatesVotesForm warnings", () => {
     test("Warnings can be displayed", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [],
           warnings: [

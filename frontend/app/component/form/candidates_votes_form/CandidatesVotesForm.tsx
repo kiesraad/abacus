@@ -134,7 +134,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 key={`list${group.number}-candidate${index + 1}`}
                 field={`${index + 1}`}
                 name="candidatevotes[]"
-                id={`candidate_votes-${candidate.number - 1}.votes`}
+                id={`candidate_votes[${candidate.number - 1}].votes`}
                 title={`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`}
                 errorsAndWarnings={errorsAndWarnings}
                 inputProps={register()}
@@ -171,7 +171,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
 function candidateNumberFromElement(el: HTMLInputElement) {
   const id = el.id;
-  const bits = id.split("-");
+  const bits = id.split("[");
   const numberString = bits[bits.length - 1];
   if (numberString) {
     return parseInt(numberString) + 1;

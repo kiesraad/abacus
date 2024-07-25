@@ -27,13 +27,13 @@ pub struct ElectionDetailsResponse {
 
 /// Get a list of all elections, without their candidate lists
 #[utoipa::path(
-        get,
-        path = "/api/elections",
-        responses(
-            (status = 200, description = "Election list", body = ElectionListResponse),
-            (status = 500, description = "Internal server error", body = ErrorResponse),
-        ),
-    )]
+    get,
+    path = "/api/elections",
+    responses(
+        (status = 200, description = "Election list", body = ElectionListResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
 pub async fn election_list(
     State(elections_repo): State<Elections>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
@@ -43,17 +43,17 @@ pub async fn election_list(
 
 /// Get election details including its candidate list
 #[utoipa::path(
-        get,
-        path = "/api/elections/{election_id}",
-        responses(
-            (status = 200, description = "Election", body = ElectionDetailsResponse),
-            (status = 404, description = "Not found", body = ErrorResponse),
-            (status = 500, description = "Internal server error", body = ErrorResponse),
-        ),
-        params(
-            ("election_id" = u32, description = "Election database id"),
-        ),
-    )]
+    get,
+    path = "/api/elections/{election_id}",
+    responses(
+        (status = 200, description = "Election", body = ElectionDetailsResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
+)]
 pub async fn election_details(
     State(elections_repo): State<Elections>,
     Path(id): Path<u32>,

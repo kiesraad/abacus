@@ -15,9 +15,11 @@ export function PollingStationChoiceForm() {
 
   const handleSubmit = () => {
     const parsedStationNumber = parseInt(pollingStationNumber, 10);
-    if (pollingStations.some((ps) => ps.number === parsedStationNumber)) {
-      navigate(`./${pollingStationNumber}/recounted`);
-    }
+    pollingStations.forEach((pollingStation) => {
+      if (pollingStation.number === parsedStationNumber) {
+        navigate(`./${pollingStation.id}/recounted`);
+      }
+    });
   };
 
   return (

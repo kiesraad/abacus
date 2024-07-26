@@ -10,8 +10,8 @@ export interface PollingStationsListProps {
 export function PollingStationsList({ pollingStations }: PollingStationsListProps) {
   const navigate = useNavigate();
 
-  const handleRowClick = (pollingStationNumber: number) => () => {
-    navigate(`./${pollingStationNumber}/recounted`);
+  const handleRowClick = (pollingStationId: number) => () => {
+    navigate(`./${pollingStationId}/recounted`);
   };
 
   return (
@@ -25,7 +25,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
       </thead>
       <tbody>
         {pollingStations.map((pollingStation: PollingStation) => (
-          <tr onClick={handleRowClick(pollingStation.number)} key={pollingStation.number}>
+          <tr onClick={handleRowClick(pollingStation.id)} key={pollingStation.number}>
             <td width="6.5rem" className="number">
               {pollingStation.number}
             </td>

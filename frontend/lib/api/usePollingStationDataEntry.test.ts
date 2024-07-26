@@ -7,10 +7,7 @@ import { usePollingStationDataEntry } from "./usePollingStationDataEntry";
 describe("usePollingStationDataEntry", () => {
   test("doSubmit parses ok response", async () => {
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-      validation_results: {
-        errors: [],
-        warnings: [],
-      },
+      validation_results: { errors: [], warnings: [] },
     });
 
     const { result } = renderHook(

@@ -9,7 +9,11 @@ import {
   usePoliticalGroup,
 } from "@kiesraad/api";
 import { BottomBar, Button, Feedback, InputGrid, InputGridRow } from "@kiesraad/ui";
-import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
+import {
+  candidateNumberFromId,
+  usePositiveNumberInputMask,
+  usePreventFormEnterSubmit,
+} from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
   total: HTMLInputElement;
@@ -45,7 +49,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       const candidate_votes: CandidateVotes[] = [];
       for (const el of elements["candidatevotes[]"]) {
         candidate_votes.push({
-          number: candidateNumberFromElement(el),
+          number: candidateNumberFromId(el.id),
           votes: deformat(el.value),
         });
       }
@@ -135,7 +139,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 key={`list${group.number}-candidate${index + 1}`}
                 field={`${index + 1}`}
                 name="candidatevotes[]"
-                id={`candidate_votes-${candidate.number - 1}.votes`}
+                id={`candidate_votes[${candidate.number - 1}].votes`}
                 title={`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`}
                 errorsAndWarnings={errorsAndWarnings}
                 inputProps={register()}
@@ -168,14 +172,4 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       </BottomBar>
     </form>
   );
-}
-
-function candidateNumberFromElement(el: HTMLInputElement) {
-  const id = el.id;
-  const bits = id.split("-");
-  const numberString = bits[bits.length - 1];
-  if (numberString) {
-    return parseInt(numberString) + 1;
-  }
-  return 0;
 }

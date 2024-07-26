@@ -26,22 +26,27 @@ pub struct AppState {
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let state = AppState { pool };
 
-    let app: Router = Router::new()
-        .route("/api/elections/:id", get(election::election_details))
-        .route("/api/elections", get(election::election_list))
-        .nest(
-            "/api/polling_stations",
-            Router::new()
-                .route("/:election_id", get(polling_station::polling_station_list))
-                .route(
-                    "/:id/data_entries/:entry_number",
-                    post(polling_station::polling_station_data_entry),
-                )
-                .route(
-                    "/:id/data_entries/:entry_number/finalise",
-                    post(polling_station::polling_station_data_entry_finalise),
-                ),
+    let polling_station_routes = Router::new()
+        .route(
+            "/:polling_station_id/data_entries/:entry_number",
+            post(polling_station::polling_station_data_entry),
         )
+        .route(
+            "/:polling_station_id/data_entries/:entry_number/finalise",
+            post(polling_station::polling_station_data_entry_finalise),
+        );
+
+    let election_routes = Router::new()
+        .route("/", get(election::election_list))
+        .route("/:election_id", get(election::election_details))
+        .route(
+            "/:election_id/polling_stations",
+            get(polling_station::polling_station_list),
+        );
+
+    let app: Router = Router::new()
+        .nest("/api/elections", election_routes)
+        .nest("/api/polling_stations", polling_station_routes)
         .with_state(state);
 
     // Always create an OpenAPI Json spec, but only provide a swagger frontend in release builds

@@ -94,17 +94,18 @@
         }
       }
     },
-    "/api/polling_stations/{election_id}": {
+    "/api/elections/{election_id}/polling_stations": {
       "get": {
         "tags": [
           "polling_station"
         ],
-        "summary": "List all polling stations",
+        "summary": "List all polling stations of an election",
         "operationId": "polling_station_list",
         "parameters": [
           {
             "name": "election_id",
             "in": "path",
+            "description": "Election database id",
             "required": true,
             "schema": {
               "type": "integer",

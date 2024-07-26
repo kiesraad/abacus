@@ -20,6 +20,10 @@ pre-commit:
       root: "frontend/"
       run: npx prettier --ignore-unknown --write {staged_files}
       stage_fixed: true
+    frontend-typescript:
+      root: "frontend/"
+      glob: "*.{ts,tsx}"
+      run: npx tsc
     frontend-linter:
       root: "frontend/"
       glob: "*.{ts,tsx}"

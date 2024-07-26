@@ -37,21 +37,21 @@ impl IntoResponse for DataEntryResponse {
 
 /// Save or update the data entry for a polling station
 #[utoipa::path(
-        post,
-        path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
-        request_body = DataEntryRequest,
-        responses(
-            (status = 200, description = "Data entry saved successfully", body = DataEntryResponse),
-            (status = 404, description = "Not found", body = ErrorResponse),
-            (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-            (status = 422, description = "JSON body parsing error (Unprocessable Content)", body = ErrorResponse),
-            (status = 500, description = "Internal server error", body = ErrorResponse),
-        ),
-        params(
-            ("polling_station_id" = u32, description = "Polling station database id"),
-            ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
-        ),
-    )]
+    post,
+    path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
+    request_body = DataEntryRequest,
+    responses(
+        (status = 200, description = "Data entry saved successfully", body = DataEntryResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 422, description = "JSON body parsing error (Unprocessable Content)", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
+    ),
+)]
 pub async fn polling_station_data_entry(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
@@ -86,20 +86,20 @@ pub async fn polling_station_data_entry(
 
 /// Finalise the data entry for a polling station
 #[utoipa::path(
-        post,
-        path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise",
-        responses(
-            (status = 200, description = "Data entry finalised successfully", body = DataEntryResponse),
-            (status = 404, description = "Not found", body = ErrorResponse),
-            (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-            (status = 422, description = "JSON body parsing error (Unprocessable Content)", body = ErrorResponse),
-            (status = 500, description = "Internal server error", body = ErrorResponse),
-        ),
-        params(
-            ("polling_station_id" = u32, description = "Polling station database id"),
-            ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
-        ),
-    )]
+    post,
+    path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise",
+    responses(
+        (status = 200, description = "Data entry finalised successfully", body = DataEntryResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 422, description = "JSON body parsing error (Unprocessable Content)", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
+    ),
+)]
 pub async fn polling_station_data_entry_finalise(
     State(pool): State<SqlitePool>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
@@ -141,14 +141,17 @@ pub struct PollingStationListResponse {
     pub polling_stations: Vec<PollingStation>,
 }
 
-/// List all polling stations
+/// List all polling stations of an election
 #[utoipa::path(
     get,
-    path = "/api/polling_stations/{election_id}",
+    path = "/api/elections/{election_id}/polling_stations",
     responses(
         (status = 200, description = "Polling station listing successful", body = PollingStationListResponse),
         (status = 404, description = "Election not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
     ),
 )]
 pub async fn polling_station_list(

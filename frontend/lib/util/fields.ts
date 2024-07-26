@@ -4,13 +4,20 @@ export function fieldNameFromPath(path: string): string {
   // flatten path at depth 4: data.political_group_votes[1].candidate_votes[1].votes
   if (bits.length === 4) {
     const [, , subsection, field] = bits;
-    // replace [1] with -1
-    const b = subsection?.replace(/\[(\d+)\]/, "-$1");
-    return `${b}.${field}`;
+    return `${subsection}.${field}`;
   } else {
     result = bits[bits.length - 1] || "";
   }
   return result || path;
+}
+
+export function candidateNumberFromId(id: string) {
+  // example of id is candidate_votes[1].votes
+  const regexMatchArray = id.match(/\d+/);
+  if (regexMatchArray) {
+    return parseInt(regexMatchArray[0]) + 1;
+  }
+  return 0;
 }
 
 /**

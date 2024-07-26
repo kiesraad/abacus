@@ -13,7 +13,7 @@ mod utils;
 async fn test_polling_station_listing_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/polling_stations/1");
+    let url = format!("http://{addr}/api/elections/1/polling_stations");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
     // Ensure the response is what we expect
@@ -32,7 +32,7 @@ async fn test_polling_station_listing_works(pool: SqlitePool) {
 async fn test_polling_station_list_invalid_election(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     // election ID 1234 does not exist
-    let url = format!("http://{addr}/api/polling_stations/1234");
+    let url = format!("http://{addr}/api/elections/1234/polling_stations");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
     let status = response.status();

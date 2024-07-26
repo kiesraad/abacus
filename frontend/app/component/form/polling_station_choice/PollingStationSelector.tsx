@@ -32,10 +32,6 @@ export function PollingStationSelector({
 
   useMemo(() => {
     const parsedInt = parseInt(pollingStationNumber, 10);
-    if (pollingStationNumber !== "" && Number.isNaN(parsedInt)) {
-      return undefined;
-    }
-
     setLoading(true);
     debouncedCallback(
       pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt),

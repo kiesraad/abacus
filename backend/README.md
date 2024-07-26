@@ -63,7 +63,7 @@ Additionally, the following development dependencies are used:
 SQLite is used as the database. An empty database is created as `db.sqlite` when the application is
 started. The database schema is created and updated using migrations managed by `sqlx`.
 
-When migrations are out of sync (e.g. `VersionError` occurs when starting the API server),
+When migrations are out of sync (e.g. `VersionMismatch` occurs when starting the API server),
 the database can be reset using `sqlx database reset`.
 
 Example database fixtures can be loaded using the SQLite CLI:

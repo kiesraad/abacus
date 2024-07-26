@@ -46,14 +46,12 @@ export const pollingStationDataEntryHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   DataEntryResponse | ErrorResponse
->("/api/polling_stations/:id/data_entries/:entry_number", async ({ request }) => {
+>("/api/polling_stations/:polling_station_id/data_entries/:entry_number", async ({ request }) => {
   let json: POLLING_STATION_DATA_ENTRY_REQUEST_BODY;
 
   try {
     json = await request.json();
     const response: DataEntryResponse = {
-      message: "Data saved",
-      saved: true,
       validation_results: {
         errors: [],
         warnings: [],
@@ -179,14 +177,14 @@ export const ElectionListRequestHandler = http.get("/api/elections", () => {
 });
 
 export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
-  "/api/elections/:id",
+  "/api/elections/:election_id",
   () => {
     return HttpResponse.json({ election: electionMockData }, { status: 200 });
   },
 );
 
 export const PollingStationListRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
-  "/api/polling_stations/:id",
+  "/api/elections/:election_id/polling_stations",
   () => {
     return HttpResponse.json(pollingStationMockData, { status: 200 });
   },

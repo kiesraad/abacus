@@ -27,8 +27,6 @@ describe("Test RecountedForm", () => {
 
   test("Form field entry and keybindings", async () => {
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-      message: "Data saved",
-      saved: true,
       validation_results: { errors: [], warnings: [] },
     });
 

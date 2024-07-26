@@ -78,8 +78,6 @@ describe("Test DifferencesForm", () => {
 
     test("Form field entry and keybindings", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        message: "Data saved",
-        saved: true,
         validation_results: { errors: [], warnings: [] },
       });
 
@@ -268,8 +266,6 @@ describe("Test DifferencesForm", () => {
     // TODO: Unskip test once validation is implemented in frontend and backend
     test.skip("Warnings can be displayed", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [],
           warnings: [

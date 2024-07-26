@@ -78,8 +78,6 @@ describe("Test VotersAndVotesForm", () => {
 
     test("Form field entry and keybindings", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        message: "Data saved",
-        saved: true,
         validation_results: { errors: [], warnings: [] },
       });
 
@@ -235,9 +233,16 @@ describe("Test VotersAndVotesForm", () => {
 
   describe("VotersAndVotesForm errors", () => {
     test("F.01 Invalid value", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
-        error:
-          "Failed to deserialize the JSON body into the target type: data.voters_counts.poll_card_count: invalid value: integer `-3`, expected u32 at line 1 column 525",
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: ["data.voters_counts.poll_card_count"],
+              code: "OutOfRange",
+            },
+          ],
+          warnings: [],
+        },
       });
 
       const user = userEvent.setup();
@@ -249,16 +254,14 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error$/);
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(/^OutOfRange$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
     test("F.11 IncorrectTotal Voters", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [
             {
@@ -295,8 +298,6 @@ describe("Test VotersAndVotesForm", () => {
 
     test("F.12 IncorrectTotal Votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [
             {
@@ -337,8 +338,6 @@ describe("Test VotersAndVotesForm", () => {
 
     test("Error with non-existing fields is not displayed", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [
             {
@@ -372,8 +371,6 @@ describe("Test VotersAndVotesForm", () => {
   describe("VotersAndVotesForm warnings", () => {
     test("W.21 AboveThreshold blank votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [],
           warnings: [
@@ -408,8 +405,6 @@ describe("Test VotersAndVotesForm", () => {
 
     test("W.22 AboveThreshold invalid votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [],
           warnings: [
@@ -444,8 +439,6 @@ describe("Test VotersAndVotesForm", () => {
 
     test("W.27 EqualInput voters and votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
         validation_results: {
           errors: [
             {

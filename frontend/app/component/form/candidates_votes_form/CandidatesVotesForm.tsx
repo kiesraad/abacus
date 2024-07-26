@@ -9,7 +9,11 @@ import {
   usePoliticalGroup,
 } from "@kiesraad/api";
 import { BottomBar, Button, Feedback, InputGrid, InputGridRow } from "@kiesraad/ui";
-import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
+import {
+  candidateNumberFromId,
+  usePositiveNumberInputMask,
+  usePreventFormEnterSubmit,
+} from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
   total: HTMLInputElement;
@@ -45,7 +49,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       const candidate_votes: CandidateVotes[] = [];
       for (const el of elements["candidatevotes[]"]) {
         candidate_votes.push({
-          number: candidateNumberFromElement(el),
+          number: candidateNumberFromId(el.id),
           votes: deformat(el.value),
         });
       }
@@ -167,13 +171,4 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       </BottomBar>
     </form>
   );
-}
-
-function candidateNumberFromElement(el: HTMLInputElement) {
-  const id = el.id;
-  const regexMatchArray = id.match(/[(\d+)]/g);
-  if (regexMatchArray) {
-    return parseInt(regexMatchArray[0]) + 1;
-  }
-  return 0;
 }

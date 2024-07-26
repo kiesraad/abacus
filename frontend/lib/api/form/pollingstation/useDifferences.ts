@@ -30,7 +30,7 @@ export function useDifferences() {
   const errors = React.useMemo(() => {
     if (data) {
       return data.validation_results.errors.filter((err) =>
-        matchValidationResultWithFormSections(err.fields, ["differences_votes"]),
+        matchValidationResultWithFormSections(err.fields, ["differences_counts"]),
       );
     }
     return [] as ValidationResult[];
@@ -39,7 +39,7 @@ export function useDifferences() {
   const warnings = React.useMemo(() => {
     if (data) {
       return data.validation_results.warnings.filter((warning) =>
-        matchValidationResultWithFormSections(warning.fields, ["differences_votes"]),
+        matchValidationResultWithFormSections(warning.fields, ["differences_counts"]),
       );
     }
     return [] as ValidationResult[];
@@ -56,7 +56,7 @@ export function useDifferences() {
 
   const isCalled = React.useMemo(() => {
     // TODO: How to know if this is called, all values can be 0?
-    return !!sectionValues.more_ballots_count;
+    return !!sectionValues.more_ballots_count || !!sectionValues.fewer_ballots_count;
   }, [sectionValues]);
 
   return {

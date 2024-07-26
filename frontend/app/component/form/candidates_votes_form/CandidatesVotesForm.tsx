@@ -171,10 +171,9 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
 function candidateNumberFromElement(el: HTMLInputElement) {
   const id = el.id;
-  const bits = id.split("[");
-  const numberString = bits[bits.length - 1]?.split("]")[0];
-  if (numberString) {
-    return parseInt(numberString) + 1;
+  const regexMatchArray = id.match(/[(\d*)]/g);
+  if (regexMatchArray) {
+    return parseInt(regexMatchArray[0]) + 1;
   }
   return 0;
 }

@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import { ApiProvider, ElectionListProvider } from "@kiesraad/api";
+import { ApiProvider } from "@kiesraad/api";
 
 // ignore in prod
 import { startMockAPI } from "./msw-mock-api.ts";
@@ -23,9 +23,7 @@ function render() {
   root.render(
     <StrictMode>
       <ApiProvider host={process.env.API_HOST || ""}>
-        <ElectionListProvider>
-          <RouterProvider router={router} />
-        </ElectionListProvider>
+        <RouterProvider router={router} />
       </ApiProvider>
     </StrictMode>,
   );

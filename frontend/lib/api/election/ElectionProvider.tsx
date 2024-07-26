@@ -17,7 +17,7 @@ export interface ElectionProviderProps {
 }
 
 export function ElectionProvider({ children, electionId }: ElectionProviderProps) {
-  const { data, loading } = useElectionDataRequest({
+  const { data, loading, error } = useElectionDataRequest({
     election_id: electionId,
   });
 
@@ -25,8 +25,8 @@ export function ElectionProvider({ children, electionId }: ElectionProviderProps
     return <div>Loading...</div>;
   }
 
-  if (!data) {
-    return <div>Error no election data</div>;
+  if (!data || error) {
+    throw new Error();
   }
 
   return (

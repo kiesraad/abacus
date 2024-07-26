@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useMemo, useState } from "react";
 
 export interface iNotFoundContext {
   notFound: boolean;
@@ -26,16 +26,4 @@ export const NotFoundProvider = (props: object) => {
   );
 
   return <NotFoundContext.Provider value={value} {...props} />;
-};
-
-export const NotFound = () => {
-  const { notFound, setNotFound } = useContext(NotFoundContext);
-
-  useEffect(() => {
-    if (!notFound) {
-      setNotFound(true);
-    }
-  }, [notFound, setNotFound]);
-
-  return <></>;
 };

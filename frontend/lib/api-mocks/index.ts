@@ -196,6 +196,7 @@ export const PollingStationListRequestHandler = http.get<ParamsToString<{ electi
   },
 );
 
+// Used for testing 404 responses in e2e tests
 export const ElectionNotFoundHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/-1",
   () => {

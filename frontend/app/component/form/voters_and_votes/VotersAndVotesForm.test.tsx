@@ -4,7 +4,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
-import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
+import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
 
 import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
@@ -176,39 +176,10 @@ describe("Test VotersAndVotesForm", () => {
 
       render(Component);
 
-      await user.type(
-        screen.getByTestId("poll_card_count"),
-        expectedRequest.data.voters_counts.poll_card_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("proxy_certificate_count"),
-        expectedRequest.data.voters_counts.proxy_certificate_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("voter_card_count"),
-        expectedRequest.data.voters_counts.voter_card_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("total_admitted_voters_count"),
-        expectedRequest.data.voters_counts.total_admitted_voters_count.toString(),
-      );
-
-      await user.type(
-        screen.getByTestId("votes_candidates_counts"),
-        expectedRequest.data.votes_counts.votes_candidates_counts.toString(),
-      );
-      await user.type(
-        screen.getByTestId("blank_votes_count"),
-        expectedRequest.data.votes_counts.blank_votes_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("invalid_votes_count"),
-        expectedRequest.data.votes_counts.invalid_votes_count.toString(),
-      );
-      await user.type(
-        screen.getByTestId("total_votes_cast_count"),
-        expectedRequest.data.votes_counts.total_votes_cast_count.toString(),
-      );
+      await userTypeInputs(user, {
+        ...expectedRequest.data.voters_counts,
+        ...expectedRequest.data.votes_counts,
+      });
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);

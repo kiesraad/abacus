@@ -171,7 +171,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
 function candidateNumberFromElement(el: HTMLInputElement) {
   const id = el.id;
-  const regexMatchArray = id.match(/[(\d*)]/g);
+  const regexMatchArray = id.match(/[(\d+)]/g);
   if (regexMatchArray) {
     return parseInt(regexMatchArray[0]) + 1;
   }

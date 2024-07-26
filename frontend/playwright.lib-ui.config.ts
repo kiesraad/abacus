@@ -5,6 +5,7 @@ import { defineConfig, devices, type PlaywrightTestConfig } from "@playwright/te
  */
 const config: PlaywrightTestConfig = defineConfig({
   testDir: "./lib/ui",
+  outputDir: "./test-results/lib-ui",
   testMatch: /\.e2e\.ts/,
   // Fail the build on CI if you accidentally left test.only in the source code
   forbidOnly: !!process.env.CI,
@@ -16,7 +17,7 @@ const config: PlaywrightTestConfig = defineConfig({
   fullyParallel: true,
   use: {
     trace: "retain-on-failure",
-    baseURL: "http://localhost:4009",
+    baseURL: "http://localhost:61000",
     testIdAttribute: "id",
   },
   projects: [

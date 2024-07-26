@@ -95,7 +95,7 @@ describe("Test PollingStationChoiceForm", () => {
   });
 
   test("Polling station list no stations", async () => {
-    overrideOnce("get", "/api/polling_stations/1", 200, {
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, {
       polling_stations: [],
     });
     const user = userEvent.setup();

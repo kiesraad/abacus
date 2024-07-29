@@ -244,7 +244,9 @@ export function VotersAndVotesForm() {
       </InputGrid>
       {recounted && (
         <>
-          <h2 id="recounted_title">Toegelaten kiezers en uitgebrachte stemmen</h2>
+          <h2 id="recounted_title">
+            Toegelaten kiezers na hertelling door gemeentelijk stembureau
+          </h2>
           <InputGrid key="recounted">
             <InputGrid.Header>
               <th>Veld</th>

@@ -135,7 +135,9 @@ impl Validate for PollingStationResults {
                 != self.differences_counts.more_ballots_count)
         {
             validation_results.errors.push(ValidationResult {
-                fields: vec![format!("{field_name}.more_ballots_count")],
+                fields: vec![format!(
+                    "{field_name}.differences_counts.more_ballots_count"
+                )],
                 code: ValidationResultCode::IncorrectDifference,
             });
         }
@@ -147,7 +149,9 @@ impl Validate for PollingStationResults {
                 != self.differences_counts.fewer_ballots_count)
         {
             validation_results.errors.push(ValidationResult {
-                fields: vec![format!("{field_name}.fewer_ballots_count")],
+                fields: vec![format!(
+                    "{field_name}.differences_counts.fewer_ballots_count"
+                )],
                 code: ValidationResultCode::IncorrectDifference,
             });
         }
@@ -159,8 +163,8 @@ impl Validate for PollingStationResults {
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![
-                    format!("{field_name}.more_ballots_count"),
-                    format!("{field_name}.fewer_ballots_count"),
+                    format!("{field_name}.differences_counts.more_ballots_count"),
+                    format!("{field_name}.differences_counts.fewer_ballots_count"),
                 ],
                 code: ValidationResultCode::ConflictingDifferences,
             });
@@ -174,13 +178,17 @@ impl Validate for PollingStationResults {
         {
             if self.differences_counts.more_ballots_count != 0 {
                 validation_results.warnings.push(ValidationResult {
-                    fields: vec![format!("{field_name}.more_ballots_count")],
+                    fields: vec![format!(
+                        "{field_name}.differences_counts.more_ballots_count"
+                    )],
                     code: ValidationResultCode::NoDifferenceExpected,
                 });
             }
             if self.differences_counts.fewer_ballots_count != 0 {
                 validation_results.warnings.push(ValidationResult {
-                    fields: vec![format!("{field_name}.fewer_ballots_count")],
+                    fields: vec![format!(
+                        "{field_name}.differences_counts.fewer_ballots_count"
+                    )],
                     code: ValidationResultCode::NoDifferenceExpected,
                 });
             }
@@ -819,7 +827,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.errors[2].fields,
-            vec!["polling_station_results.more_ballots_count"]
+            vec!["polling_station_results.differences_counts.more_ballots_count"]
         );
 
         // test F.11 incorrect total, F.12 incorrect total, F.13 incorrect total and F.22 incorrect difference
@@ -902,7 +910,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.errors[2].fields,
-            vec!["polling_station_results.fewer_ballots_count"]
+            vec!["polling_station_results.differences_counts.fewer_ballots_count"]
         );
     }
 
@@ -958,8 +966,8 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "polling_station_results.more_ballots_count",
-                "polling_station_results.fewer_ballots_count"
+                "polling_station_results.differences_counts.more_ballots_count",
+                "polling_station_results.differences_counts.fewer_ballots_count"
             ]
         );
 
@@ -1028,7 +1036,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.warnings[0].fields,
-            vec!["polling_station_results.fewer_ballots_count"]
+            vec!["polling_station_results.differences_counts.fewer_ballots_count"]
         );
     }
 

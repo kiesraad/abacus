@@ -17,7 +17,7 @@ const config: PlaywrightTestConfig = defineConfig({
   fullyParallel: true,
   use: {
     trace: "retain-on-failure",
-    baseURL: "http://localhost:8080",
+    baseURL: "http://localhost:8081",
     testIdAttribute: "id",
   },
   projects: [
@@ -41,8 +41,9 @@ const config: PlaywrightTestConfig = defineConfig({
   ],
   webServer: [
     {
-      command: "cd ../backend && cargo run --bin api -- --frontend-dist ../frontend/dist",
-      port: 8080,
+      command:
+        "cd ../backend && cargo run --bin api -- --frontend-dist ../frontend/dist --port 8081",
+      port: 8081,
     },
   ],
 });

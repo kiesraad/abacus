@@ -239,10 +239,19 @@ export function VotersAndVotesForm() {
             format={format}
             defaultValue={sectionValues.votes_counts.total_votes_cast_count}
             isTotal
-            addSeparator={recounted}
           />
-          {recounted && (
-            <>
+        </InputGrid.Body>
+      </InputGrid>
+      {recounted && (
+        <>
+          <h2 id="recounted_title">Toegelaten kiezers en uitgebrachte stemmen</h2>
+          <InputGrid key="recounted">
+            <InputGrid.Header>
+              <th>Veld</th>
+              <th>Geteld aantal</th>
+              <th>Omschrijving</th>
+            </InputGrid.Header>
+            <InputGrid.Body>
               <InputGridRow
                 key="A.2"
                 field="A.2"
@@ -284,10 +293,10 @@ export function VotersAndVotesForm() {
                 defaultValue={sectionValues.voters_recounts?.total_admitted_voters_recount}
                 isTotal
               />
-            </>
-          )}
-        </InputGrid.Body>
-      </InputGrid>
+            </InputGrid.Body>
+          </InputGrid>
+        </>
+      )}
       <BottomBar type="inputgrid">
         <Button type="submit" size="lg" disabled={loading}>
           Volgende

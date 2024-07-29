@@ -5,18 +5,25 @@ import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit
 
 import {
   Election,
+  ElectionProvider,
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
 } from "@kiesraad/api";
-import { electionMock, politicalGroupMock } from "@kiesraad/api-mocks";
+import { electionMock, politicalGroupMock, pollingStationMock } from "@kiesraad/api-mocks";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const Component = (
-  <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
-    <CandidatesVotesForm group={politicalGroupMock} />
-  </PollingStationFormController>
+  <ElectionProvider electionId={1}>
+    <PollingStationFormController
+      pollingStationId={pollingStationMock.id}
+      entryNumber={1}
+      election={electionMock}
+    >
+      <CandidatesVotesForm group={politicalGroupMock} />
+    </PollingStationFormController>
+  </ElectionProvider>
 );
 
 const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
@@ -59,12 +66,12 @@ describe("Test CandidatesVotesForm", () => {
   });
   describe("CandidatesVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
-      const spy = vi.spyOn(global, "fetch");
-
       const user = userEvent.setup();
       render(Component);
 
-      const candidate1 = screen.getByTestId("candidate_votes[0].votes");
+      const spy = vi.spyOn(global, "fetch");
+
+      const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12.345");
 
@@ -82,7 +89,7 @@ describe("Test CandidatesVotesForm", () => {
 
       render(Component);
 
-      const candidate1 = screen.getByTestId("candidate_votes[0].votes");
+      const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
       expect(candidate1).toHaveFocus();
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12.345");
@@ -148,8 +155,6 @@ describe("Test CandidatesVotesForm", () => {
 
   describe("CandidatesVotesForm API request and response", () => {
     test("CandidateVotesForm request body is equal to the form data", async () => {
-      const spy = vi.spyOn(global, "fetch");
-
       const politicalGroupMockData: PoliticalGroup = {
         number: 1,
         name: "Lijst 1 - Vurige Vleugels Partij",
@@ -171,7 +176,7 @@ describe("Test CandidatesVotesForm", () => {
         ],
       };
 
-      const electionMockData: Election = {
+      const electionMockData: Required<Election> = {
         id: 1,
         name: "Gemeenteraadsverkiezingen 2026",
         category: "Municipal",
@@ -203,13 +208,18 @@ describe("Test CandidatesVotesForm", () => {
         ],
       };
 
-      const electionMock = electionMockData as Required<Election>;
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
-          <CandidatesVotesForm group={politicalGroupMock} />
-        </PollingStationFormController>
+        <ElectionProvider electionId={1}>
+          <PollingStationFormController
+            pollingStationId={pollingStationMock.id}
+            entryNumber={1}
+            election={electionMockData}
+          >
+            <CandidatesVotesForm group={politicalGroupMock} />
+          </PollingStationFormController>
+        </ElectionProvider>
       );
 
       const expectedRequest = {
@@ -249,11 +259,12 @@ describe("Test CandidatesVotesForm", () => {
       };
 
       const user = userEvent.setup();
-
       render(Component);
 
+      const spy = vi.spyOn(global, "fetch");
+
       await user.type(
-        screen.getByTestId("candidate_votes[0].votes"),
+        await screen.findByTestId("candidate_votes[0].votes"),
         expectedRequest.data.political_group_votes[0]?.candidate_votes[0]?.votes.toString() ?? "0",
       );
 
@@ -289,7 +300,7 @@ describe("Test CandidatesVotesForm", () => {
 
       render(Component);
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
       expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
@@ -305,7 +316,7 @@ describe("Test CandidatesVotesForm", () => {
 
       render(Component);
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
       expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
@@ -332,7 +343,7 @@ describe("Test CandidatesVotesForm", () => {
 
       // Since the component does not allow to input invalid values such as -3,
       // not inputting any values and just clicking the submit button.
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
@@ -357,7 +368,7 @@ describe("Test CandidatesVotesForm", () => {
       render(Component);
       const user = userEvent.setup();
 
-      await user.type(screen.getByTestId("candidate_votes[0].votes"), "1");
+      await user.type(await screen.findByTestId("candidate_votes[0].votes"), "1");
       await user.type(screen.getByTestId("candidate_votes[1].votes"), "2");
       await user.type(screen.getByTestId("total"), "10");
 
@@ -391,7 +402,7 @@ describe("Test CandidatesVotesForm", () => {
 
       // Since no warnings exist for the fields on this page,
       // not inputting any values and just clicking submit.
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");

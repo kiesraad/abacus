@@ -3,6 +3,7 @@ import { http, type HttpHandler, HttpResponse } from "msw";
 import {
   DataEntryResponse,
   Election,
+  ElectionDetailsResponse,
   ErrorResponse,
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
@@ -19,17 +20,15 @@ import {
   electionMockData,
   politicalGroupMockData,
 } from "./ElectionMockData";
-import {
-  pollingStationDetailsMockResponse,
-  pollingStationListMockResponse,
-  pollingStationMockData,
-} from "./PollingStationMockData";
+import { pollingStationListMockResponse, pollingStationMockData } from "./PollingStationMockData";
 
 export const electionMock = electionMockData as Required<Election>;
 export const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 export const pollingStationMock = pollingStationMockData as Required<PollingStation>;
 export const pollingStationsMockResponse =
   pollingStationListMockResponse as Required<PollingStationListResponse>;
+export const electionMockResponse =
+  electionDetailsMockResponse as Required<ElectionDetailsResponse>;
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -204,19 +203,12 @@ export const PollingStationListRequestHandler = http.get<ParamsToString<{ electi
   },
 );
 
-export const PollingStationRequestHandler = http.get<
-  ParamsToString<{ polling_station_id: number }>
->("/api/polling_stations/:polling_station_id", () => {
-  return HttpResponse.json(pollingStationDetailsMockResponse, { status: 200 });
-});
-
 export const handlers: HttpHandler[] = [
   pingHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   pollingStationDataEntryHandler,
   PollingStationListRequestHandler,
-  PollingStationRequestHandler,
 ];
 
 function valueOutOfRange(v: number): boolean {

@@ -4,11 +4,10 @@ import { ElectionLayout } from "./module/ElectionLayout";
 import { HomePage } from "./module/HomePage";
 import {
   CandidatesVotesPage,
-  DataEntryIndexPage,
-  DataEntryLayout,
   DifferencesPage,
   InputHomePage,
   InputLayout,
+  PollingStationHomePage,
   PollingStationLayout,
   RecountedPage,
   VotersAndVotesPage,
@@ -33,14 +32,12 @@ export const routes = createRoutesFromElements(
       <Route path="input" element={<InputLayout />}>
         <Route index element={<InputHomePage />} />
         <Route path=":pollingStationId" element={<PollingStationLayout />}>
-          <Route element={<DataEntryLayout />}>
-            <Route index element={<DataEntryIndexPage />} />
-            <Route path="recounted" element={<RecountedPage />} />
-            <Route path="numbers" element={<VotersAndVotesPage />} />
-            <Route path="differences" element={<DifferencesPage />} />
-            <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-            <Route path="save" element={<div>Placeholder Check and Save Page</div>} />
-          </Route>
+          <Route index element={<PollingStationHomePage />} />
+          <Route path="recounted" element={<RecountedPage />} />
+          <Route path="numbers" element={<VotersAndVotesPage />} />
+          <Route path="differences" element={<DifferencesPage />} />
+          <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
+          <Route path="save" element={<div>Placeholder Check and Save Page</div>} />
         </Route>
       </Route>
     </Route>

@@ -148,60 +148,6 @@
         }
       }
     },
-    "/api/polling_stations/{polling_station_id}": {
-      "get": {
-        "tags": [
-          "polling_station"
-        ],
-        "summary": "Get election details including its candidate list",
-        "operationId": "polling_station_details",
-        "parameters": [
-          {
-            "name": "polling_station_id",
-            "in": "path",
-            "description": "PollingStation database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "PollingStation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PollingStationDetailsResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
         "tags": [
@@ -731,18 +677,6 @@
           },
           "street": {
             "type": "string"
-          }
-        }
-      },
-      "PollingStationDetailsResponse": {
-        "type": "object",
-        "description": "Polling station details response",
-        "required": [
-          "polling_station"
-        ],
-        "properties": {
-          "polling_station": {
-            "$ref": "#/components/schemas/PollingStation"
           }
         }
       },

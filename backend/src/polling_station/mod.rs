@@ -167,35 +167,6 @@ pub async fn polling_station_list(
     }))
 }
 
-/// Polling station details response
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct PollingStationDetailsResponse {
-    pub polling_station: PollingStation,
-}
-
-/// Get election details including its candidate list
-#[utoipa::path(
-    get,
-    path = "/api/polling_stations/{polling_station_id}",
-    responses(
-        (status = 200, description = "PollingStation", body = PollingStationDetailsResponse),
-        (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("polling_station_id" = u32, description = "PollingStation database id"),
-    ),
-)]
-pub async fn polling_station_details(
-    State(polling_stations): State<PollingStations>,
-    Path(id): Path<u32>,
-) -> Result<JsonResponse<PollingStationDetailsResponse>, APIError> {
-    let polling_station = polling_stations.get(id).await?;
-    Ok(JsonResponse(PollingStationDetailsResponse {
-        polling_station,
-    }))
-}
-
 #[cfg(test)]
 mod tests {
     use sqlx::{query, SqlitePool};

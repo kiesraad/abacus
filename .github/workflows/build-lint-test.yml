@@ -37,14 +37,14 @@ jobs:
         run: cargo install sqlx-cli --no-default-features --features sqlite
       - name: Create database and run migrations
         run: sqlx database setup
-      - name: Build
-        run: cargo build --verbose
       - name: Check rustfmt
-        run: cargo fmt --all -- --check
+        run: cargo --verbose --locked fmt --all -- --check
       - name: Check clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo --verbose --locked clippy --all-targets --all-features -- -D warnings
       - name: Run tests
-        run: cargo test --verbose
+        run: cargo --verbose --locked test
+      - name: Build
+        run: cargo --verbose --locked build
   frontend:
     name: Frontend
     runs-on: ubuntu-latest

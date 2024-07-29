@@ -11,10 +11,14 @@ import {
   VotesCounts,
 } from "@kiesraad/api";
 
-import { electionMockData, electionsMockData, politicalGroupMockData } from "./ElectionMockData.ts";
+import {
+  electionDetailMockData,
+  electionListMockData,
+  politicalGroupMockData,
+} from "./ElectionMockData.ts";
 import { pollingStationMockData } from "./PollingStationMockData.ts";
 
-export const electionMock = electionMockData as Required<Election>;
+export const electionDetailMock = electionDetailMockData as Required<Election>;
 export const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
 type ParamsToString<T> = {
@@ -173,13 +177,13 @@ export const pollingStationDataEntryHandler = http.post<
 });
 
 export const ElectionListRequestHandler = http.get("/api/elections", () => {
-  return HttpResponse.json(electionsMockData, { status: 200 });
+  return HttpResponse.json(electionListMockData, { status: 200 });
 });
 
 export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id",
   () => {
-    return HttpResponse.json({ election: electionMockData }, { status: 200 });
+    return HttpResponse.json({ election: electionDetailMock }, { status: 200 });
   },
 );
 

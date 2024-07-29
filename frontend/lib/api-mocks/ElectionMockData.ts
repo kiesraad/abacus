@@ -210,7 +210,7 @@ export const politicalGroupMockData: PoliticalGroup = {
   ],
 };
 
-export const electionMockData: Election = {
+export const electionDetailMockData: Election = {
   id: 1,
   name: "Municipal Election",
   category: "Municipal",
@@ -620,7 +620,7 @@ export const electionMockData: Election = {
   ],
 };
 
-export const electionsMockData: ElectionListResponse = {
+export const electionListMockData: ElectionListResponse = {
   elections: [
     {
       id: 1,

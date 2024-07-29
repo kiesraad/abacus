@@ -9,7 +9,7 @@ import { pollingStationMock } from "@kiesraad/api-mocks";
 
 describe("Test PollingStationChoiceForm", () => {
   test("Form field entry", async () => {
-    overrideOnce("get", "/api/polling_stations/1", 200, pollingStationMock);
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
     const user = userEvent.setup();
 
     render(
@@ -37,7 +37,7 @@ describe("Test PollingStationChoiceForm", () => {
   });
 
   test("Selecting a valid polling station", async () => {
-    overrideOnce("get", "/api/polling_stations/1", 200, pollingStationMock);
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
     const user = userEvent.setup();
     render(
       <PollingStationProvider electionId={1}>
@@ -53,7 +53,7 @@ describe("Test PollingStationChoiceForm", () => {
   });
 
   test("Selecting a non-existing polling station", async () => {
-    overrideOnce("get", "/api/polling_stations/1", 200, pollingStationMock);
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
     const user = userEvent.setup();
     render(
       <PollingStationProvider electionId={1}>
@@ -71,7 +71,7 @@ describe("Test PollingStationChoiceForm", () => {
   });
 
   test("Polling station list", async () => {
-    overrideOnce("get", "/api/polling_stations/1", 200, pollingStationMock);
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
     const user = userEvent.setup();
 
     render(

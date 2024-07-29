@@ -16,6 +16,6 @@ describe("InputHomePage", () => {
       </ElectionProvider>,
     );
 
-    expect(await screen.findByText("Municipal Election")).toBeVisible();
+    expect(await screen.findByText(electionDetailMock.name)).toBeVisible();
   });
 });

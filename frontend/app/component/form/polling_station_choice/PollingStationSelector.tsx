@@ -13,6 +13,8 @@ export interface PollingStationSelectorProps {
   handleSubmit: () => void;
 }
 
+const USER_INPUT_DEBOUNCE: number = 500; // ms
+
 export function PollingStationSelector({
   pollingStationNumber,
   setPollingStationNumber,
@@ -28,7 +30,7 @@ export function PollingStationSelector({
   const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
     setLoading(false);
     setCurrentPollingStation(pollingStation);
-  }, 200);
+  }, USER_INPUT_DEBOUNCE);
 
   useMemo(() => {
     const parsedInt = parseInt(pollingStationNumber, 10);

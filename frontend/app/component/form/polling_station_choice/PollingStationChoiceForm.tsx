@@ -1,7 +1,7 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { PollingStationsContext } from "@kiesraad/api";
+import { usePollingStationList } from "@kiesraad/api";
 import { Alert, BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
 
 import { PollingStationSelector } from "./PollingStationSelector";
@@ -10,7 +10,7 @@ import { PollingStationsList } from "./PollingStationsList";
 export function PollingStationChoiceForm() {
   const navigate = useNavigate();
 
-  const { pollingStations, pollingStationsLoading } = useContext(PollingStationsContext);
+  const { pollingStations, pollingStationsLoading } = usePollingStationList();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
 
   const handleSubmit = () => {
@@ -39,7 +39,7 @@ export function PollingStationChoiceForm() {
       <p className="md">
         Klopt de naam van het stembureau met de naam op je papieren proces verbaal?
         <br />
-        Dan kan je beginnen.
+        Dan kan je beginnen. Klopt de naam niet? Overleg met de coördinator.
       </p>
       <BottomBar type="form">
         <Button

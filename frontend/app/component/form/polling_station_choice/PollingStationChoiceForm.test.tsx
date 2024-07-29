@@ -1,21 +1,21 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
+import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm";
 import { overrideOnce, render, screen, within } from "app/test/unit";
 
-import { PollingStationProvider } from "@kiesraad/api";
-import { pollingStationMock } from "@kiesraad/api-mocks";
+import { PollingStationListProvider } from "@kiesraad/api";
+import { pollingStationsMockResponse } from "@kiesraad/api-mocks";
 
 describe("Test PollingStationChoiceForm", () => {
   test("Form field entry", async () => {
-    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
     const user = userEvent.setup();
 
     render(
-      <PollingStationProvider electionId={1}>
+      <PollingStationListProvider electionId={1}>
         <PollingStationChoiceForm />
-      </PollingStationProvider>,
+      </PollingStationListProvider>,
     );
 
     const pollingStation = screen.getByTestId("pollingStation");
@@ -37,12 +37,12 @@ describe("Test PollingStationChoiceForm", () => {
   });
 
   test("Selecting a valid polling station", async () => {
-    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
     const user = userEvent.setup();
     render(
-      <PollingStationProvider electionId={1}>
+      <PollingStationListProvider electionId={1}>
         <PollingStationChoiceForm />
-      </PollingStationProvider>,
+      </PollingStationListProvider>,
     );
     const pollingStation = screen.getByTestId("pollingStation");
 
@@ -53,12 +53,12 @@ describe("Test PollingStationChoiceForm", () => {
   });
 
   test("Selecting a non-existing polling station", async () => {
-    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
     const user = userEvent.setup();
     render(
-      <PollingStationProvider electionId={1}>
+      <PollingStationListProvider electionId={1}>
         <PollingStationChoiceForm />
-      </PollingStationProvider>,
+      </PollingStationListProvider>,
     );
     const pollingStation = screen.getByTestId("pollingStation");
 
@@ -71,13 +71,13 @@ describe("Test PollingStationChoiceForm", () => {
   });
 
   test("Polling station list", async () => {
-    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
     const user = userEvent.setup();
 
     render(
-      <PollingStationProvider electionId={1}>
+      <PollingStationListProvider electionId={1}>
         <PollingStationChoiceForm />
-      </PollingStationProvider>,
+      </PollingStationListProvider>,
     );
 
     expect(screen.getByText("Kies het stembureau")).not.toBeVisible();
@@ -101,9 +101,9 @@ describe("Test PollingStationChoiceForm", () => {
     const user = userEvent.setup();
 
     render(
-      <PollingStationProvider electionId={1}>
+      <PollingStationListProvider electionId={1}>
         <PollingStationChoiceForm />
-      </PollingStationProvider>,
+      </PollingStationListProvider>,
     );
 
     const openPollingStationList = screen.getByTestId("openPollingStationList");
@@ -121,9 +121,9 @@ describe("Test PollingStationChoiceForm", () => {
     const user = userEvent.setup();
 
     render(
-      <PollingStationProvider electionId={1}>
+      <PollingStationListProvider electionId={1}>
         <PollingStationChoiceForm />
-      </PollingStationProvider>,
+      </PollingStationListProvider>,
     );
 
     const openPollingStationList = screen.getByTestId("openPollingStationList");

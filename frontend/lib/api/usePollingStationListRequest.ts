@@ -1,5 +1,8 @@
-import { POLLING_STATION_LIST_REQUEST_PARAMS, PollingStationListResponse } from "./gen/openapi";
-import { useApiGetRequest } from "./useApiGetRequest";
+import {
+  POLLING_STATION_LIST_REQUEST_PARAMS,
+  PollingStationListResponse,
+  useApiGetRequest,
+} from "@kiesraad/api";
 
 export function usePollingStationListRequest(params: POLLING_STATION_LIST_REQUEST_PARAMS) {
   return useApiGetRequest<PollingStationListResponse>(

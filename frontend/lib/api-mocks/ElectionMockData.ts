@@ -1,4 +1,9 @@
-import { Election, ElectionListResponse, PoliticalGroup } from "@kiesraad/api";
+import {
+  Election,
+  ElectionDetailsResponse,
+  ElectionListResponse,
+  PoliticalGroup,
+} from "@kiesraad/api";
 
 export const politicalGroupMockData: PoliticalGroup = {
   number: 1,
@@ -620,7 +625,11 @@ export const electionMockData: Election = {
   ],
 };
 
-export const electionsMockData: ElectionListResponse = {
+export const electionDetailsMockResponse: ElectionDetailsResponse = {
+  election: electionMockData,
+};
+
+export const electionListMockResponse: ElectionListResponse = {
   elections: [
     {
       id: 1,

@@ -18,6 +18,12 @@ export interface POLLING_STATION_LIST_REQUEST_PARAMS {
 }
 export type POLLING_STATION_LIST_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
 
+// /api/polling_stations/{polling_station_id}
+export interface POLLING_STATION_DETAILS_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_DETAILS_REQUEST_PATH = `/api/polling_stations/${number}`;
+
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS {
   polling_station_id: number;
@@ -158,6 +164,13 @@ export interface PollingStation {
   polling_station_type: PollingStationType;
   postal_code: string;
   street: string;
+}
+
+/**
+ * Polling station details response
+ */
+export interface PollingStationDetailsResponse {
+  polling_station: PollingStation;
 }
 
 /**

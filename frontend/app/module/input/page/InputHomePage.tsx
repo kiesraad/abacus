@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
+import { Footer } from "app/component/footer/Footer";
+import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm";
 
 import { useElection } from "@kiesraad/api";
 import { Alert, WorkStationNumber } from "@kiesraad/ui";
@@ -15,6 +16,7 @@ export function InputHomePage() {
 
   return (
     <>
+      <nav>{election.name}</nav> {/* TODO: Add Role in front of election name */}
       <header>
         <section>
           <h1>{election.name}</h1>
@@ -40,6 +42,7 @@ export function InputHomePage() {
           {/* TODO: Add Progress bars */}
         </nav>
       </main>
+      <Footer />
     </>
   );
 }

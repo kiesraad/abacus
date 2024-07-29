@@ -1,7 +1,6 @@
 import * as React from "react";
 
-import { Election } from "../gen/openapi";
-import { useElectionListRequest } from "../useElectionListRequest";
+import { Election, useElectionListRequest } from "@kiesraad/api";
 
 export interface iElectionListProviderContext {
   electionList: Election[];

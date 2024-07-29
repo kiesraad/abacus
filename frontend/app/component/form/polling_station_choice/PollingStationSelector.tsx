@@ -1,6 +1,6 @@
-import { Dispatch, SetStateAction, useContext, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 
-import { PollingStation, PollingStationsContext } from "@kiesraad/api";
+import { PollingStation, usePollingStationList } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
 import { Icon, InputField, Spinner } from "@kiesraad/ui";
 import { cn, useDebouncedCallback } from "@kiesraad/util";
@@ -25,7 +25,7 @@ export function PollingStationSelector({
     undefined,
   );
 
-  const { pollingStations, pollingStationsLoading } = useContext(PollingStationsContext);
+  const { pollingStations, pollingStationsLoading } = usePollingStationList();
 
   const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
     setLoading(false);

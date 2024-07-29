@@ -1,18 +1,22 @@
 import { expect, test } from "@playwright/test";
 
-import { InputPage } from "./page-objects/input/InputPage";
-import { RecountedPage } from "./page-objects/input/RecountedPage";
-import { VotersVotesPage } from "./page-objects/input/VotersVotesPage";
+import { InputPage } from "../page-objects/input/InputPage";
+import { RecountedPage } from "../page-objects/input/RecountedPage";
+import { VotersVotesPage } from "../page-objects/input/VotersVotesPage";
 
 test.describe("Data entry", () => {
   test("no recount flow", async ({ page }) => {
     await page.goto("/1/input");
 
     const inputPage = new InputPage(page);
-    await inputPage.selectPollingStationThroughInputField("33", 'Stembureau "Op Rolletjes"');
+    await inputPage.pollingStation.fill("33");
+    await expect(inputPage.pollingStationFeedback).toHaveText('Stembureau "Op Rolletjes"');
+    await inputPage.clickBeginnen();
 
     const recountedPage = new RecountedPage(page);
-    await recountedPage.submitNotRecounted();
+    await recountedPage.no.check();
+    await expect(recountedPage.no).toBeChecked();
+    await recountedPage.volgende.click();
 
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {

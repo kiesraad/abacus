@@ -212,7 +212,7 @@ export const politicalGroupMockData: PoliticalGroup = {
 
 export const electionDetailMockData: Election = {
   id: 1,
-  name: "Municipal Election",
+  name: "Gemeenteraadsverkiezingen 2026",
   category: "Municipal",
   election_date: "2024-11-30",
   nomination_date: "2024-11-01",

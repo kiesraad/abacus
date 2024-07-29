@@ -2,12 +2,14 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
 import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
-import { render, screen, within } from "app/test/unit";
+import { overrideOnce, render, screen, within } from "app/test/unit";
 
-import { PollingStationProvider, PollingStationsContext } from "@kiesraad/api";
+import { PollingStationProvider } from "@kiesraad/api";
+import { pollingStationMock } from "@kiesraad/api-mocks";
 
 describe("Test PollingStationChoiceForm", () => {
   test("Form field entry", async () => {
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
     const user = userEvent.setup();
 
     render(
@@ -35,6 +37,7 @@ describe("Test PollingStationChoiceForm", () => {
   });
 
   test("Selecting a valid polling station", async () => {
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
     const user = userEvent.setup();
     render(
       <PollingStationProvider electionId={1}>
@@ -50,6 +53,7 @@ describe("Test PollingStationChoiceForm", () => {
   });
 
   test("Selecting a non-existing polling station", async () => {
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
     const user = userEvent.setup();
     render(
       <PollingStationProvider electionId={1}>
@@ -67,6 +71,7 @@ describe("Test PollingStationChoiceForm", () => {
   });
 
   test("Polling station list", async () => {
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationMock);
     const user = userEvent.setup();
 
     render(
@@ -90,17 +95,35 @@ describe("Test PollingStationChoiceForm", () => {
   });
 
   test("Polling station list no stations", async () => {
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, {
+      polling_stations: [],
+    });
     const user = userEvent.setup();
 
     render(
-      <PollingStationsContext.Provider
-        value={{
-          pollingStationsLoading: false,
-          pollingStations: [],
-        }}
-      >
+      <PollingStationProvider electionId={1}>
         <PollingStationChoiceForm />
-      </PollingStationsContext.Provider>,
+      </PollingStationProvider>,
+    );
+
+    const openPollingStationList = screen.getByTestId("openPollingStationList");
+    await user.click(openPollingStationList);
+    expect(screen.getByText("Kies het stembureau")).toBeVisible();
+
+    // Check if the error message is visible
+    expect(screen.getByText("Geen stembureaus gevonden")).toBeVisible();
+  });
+
+  test("Polling station request returns 404", async () => {
+    overrideOnce("get", "/api/elections/1/polling_stations", 404, {
+      error: "Resource not found",
+    });
+    const user = userEvent.setup();
+
+    render(
+      <PollingStationProvider electionId={1}>
+        <PollingStationChoiceForm />
+      </PollingStationProvider>,
     );
 
     const openPollingStationList = screen.getByTestId("openPollingStationList");

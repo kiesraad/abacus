@@ -113,4 +113,24 @@ describe("Test PollingStationChoiceForm", () => {
     // Check if the error message is visible
     expect(screen.getByText("Geen stembureaus gevonden")).toBeVisible();
   });
+
+  test("Polling station request returns 404", async () => {
+    overrideOnce("get", "/api/elections/1/polling_stations", 404, {
+      error: "Resource not found",
+    });
+    const user = userEvent.setup();
+
+    render(
+      <PollingStationProvider electionId={1}>
+        <PollingStationChoiceForm />
+      </PollingStationProvider>,
+    );
+
+    const openPollingStationList = screen.getByTestId("openPollingStationList");
+    await user.click(openPollingStationList);
+    expect(screen.getByText("Kies het stembureau")).toBeVisible();
+
+    // Check if the error message is visible
+    expect(screen.getByText("Geen stembureaus gevonden")).toBeVisible();
+  });
 });

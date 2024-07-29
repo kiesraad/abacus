@@ -7,6 +7,7 @@ import {
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
+  PollingStationListResponse,
   VotersCounts,
   VotesCounts,
 } from "@kiesraad/api";
@@ -16,6 +17,7 @@ import { pollingStationMockData } from "./PollingStationMockData.ts";
 
 export const electionMock = electionMockData as Required<Election>;
 export const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
+export const pollingStationMock = pollingStationMockData as Required<PollingStationListResponse>;
 
 type ParamsToString<T> = {
   [P in keyof T]: string;

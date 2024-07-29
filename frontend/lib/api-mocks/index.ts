@@ -4,6 +4,7 @@ import {
   DataEntryResponse,
   Election,
   ElectionDetailsResponse,
+  ElectionListResponse,
   ErrorResponse,
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
@@ -29,6 +30,7 @@ export const pollingStationsMockResponse =
   pollingStationListMockResponse as Required<PollingStationListResponse>;
 export const electionMockResponse =
   electionDetailsMockResponse as Required<ElectionDetailsResponse>;
+export const electionsMockResponse = electionListMockResponse as Required<ElectionListResponse>;
 
 type ParamsToString<T> = {
   [P in keyof T]: string;

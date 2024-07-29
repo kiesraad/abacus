@@ -2,37 +2,13 @@ import { describe, expect, test } from "vitest";
 
 import { overrideOnce, Providers, renderHook, waitFor } from "app/test/unit";
 
+import { pollingStationsMockResponse } from "@kiesraad/api-mocks";
+
 import { usePollingStationListRequest } from "./usePollingStationListRequest";
 
 describe("Test usePollingStationListRequest", () => {
   test("doRequest returns expected data", async () => {
-    const polling_stations = {
-      polling_stations: [
-        {
-          election_id: 1,
-          id: 1,
-          number: 33,
-          name: 'Stembureau "Op Rolletjes"',
-          house_number: "1",
-          locality: "Den Haag",
-          polling_station_type: "Mobiel",
-          postal_code: "1234 YQ",
-          street: "Rijksweg A12",
-        },
-        {
-          election_id: 1,
-          id: 2,
-          number: 34,
-          name: "Testplek",
-          house_number: "2",
-          locality: "Testdorp",
-          polling_station_type: "Bijzonder",
-          postal_code: "1234 QY",
-          street: "Teststraat",
-        },
-      ],
-    };
-    overrideOnce("get", "/api/elections/1/polling_stations", 200, polling_stations);
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
     const { result } = renderHook(() => usePollingStationListRequest({ election_id: 1 }), {
       wrapper: Providers,
     });
@@ -42,6 +18,6 @@ describe("Test usePollingStationListRequest", () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.data).toEqual(polling_stations);
+    expect(result.current.data).toEqual(pollingStationsMockResponse);
   });
 });

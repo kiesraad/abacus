@@ -262,7 +262,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.11 IncorrectTotal Voters", async () => {
+    test("F.11 IncorrectTotal Voters counts", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -298,7 +298,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.12 IncorrectTotal Votes", async () => {
+    test("F.12 IncorrectTotal Votes counts", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -309,10 +309,6 @@ describe("Test VotersAndVotesForm", () => {
                 "data.votes_counts.blank_votes_count",
                 "data.votes_counts.invalid_votes_count",
               ],
-              code: "IncorrectTotal",
-            },
-            {
-              fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
               code: "IncorrectTotal",
             },
           ],
@@ -328,6 +324,45 @@ describe("Test VotersAndVotesForm", () => {
       await user.type(screen.getByTestId("blank_votes_count"), "1");
       await user.type(screen.getByTestId("invalid_votes_count"), "1");
       await user.type(screen.getByTestId("total_votes_cast_count"), "4");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+    });
+
+    test("F.13 IncorrectTotal Voters recounts", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: [
+                "data.voters_recounts.total_admitted_voters_recount",
+                "data.voters_recounts.poll_card_recount",
+                "data.voters_recounts.proxy_certificate_recount",
+                "data.voters_recounts.voter_card_recount",
+              ],
+              code: "IncorrectTotal",
+            },
+          ],
+          warnings: [],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      // TODO: These fields don't render because recounted is by default undefined
+      //  this value is coming from useState, any idea how to either refactor the code
+      //  or mock useState to be able to test this error?
+      await user.type(screen.getByTestId("poll_card_recount"), "1");
+      await user.type(screen.getByTestId("proxy_certificate_recount"), "1");
+      await user.type(screen.getByTestId("voter_card_recount"), "1");
+      await user.type(screen.getByTestId("total_admitted_voters_recount"), "4");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -439,15 +474,10 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
-    test("W.27 EqualInput voters and votes", async () => {
+    test("W.29 EqualInput voters counts and votes counts", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
-              code: "IncorrectTotal",
-            },
-          ],
+          errors: [],
           warnings: [
             {
               fields: ["data.voters_counts", "data.votes_counts"],
@@ -479,5 +509,44 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
+  });
+
+  test("W.30 EqualInput voters recounts and votes counts", async () => {
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      validation_results: {
+        errors: [],
+        warnings: [
+          {
+            fields: ["data.voters_recounts", "data.votes_counts"],
+            code: "EqualInput",
+          },
+        ],
+      },
+    });
+
+    const user = userEvent.setup();
+
+    render(Component);
+
+    await user.type(screen.getByTestId("votes_candidates_counts"), "1");
+    await user.type(screen.getByTestId("blank_votes_count"), "0");
+    await user.type(screen.getByTestId("invalid_votes_count"), "0");
+    await user.type(screen.getByTestId("total_votes_cast_count"), "1");
+
+    // TODO: These fields don't render because recounted is by default undefined
+    //  this value is coming from useState, any idea how to either refactor the code
+    //  or mock useState to be able to test this error?
+    await user.type(screen.getByTestId("poll_card_recount"), "1");
+    await user.type(screen.getByTestId("proxy_certificate_recount"), "0");
+    await user.type(screen.getByTestId("voter_card_recount"), "0");
+    await user.type(screen.getByTestId("total_admitted_voters_recount"), "1");
+
+    const submitButton = screen.getByRole("button", { name: "Volgende" });
+    await user.click(submitButton);
+
+    const feedbackWarning = await screen.findByTestId("feedback-warning");
+    expect(feedbackWarning).toHaveTextContent(/^EqualInput$/);
+    expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+    expect(screen.queryByTestId("feedback-error")).toBeNull();
   });
 });

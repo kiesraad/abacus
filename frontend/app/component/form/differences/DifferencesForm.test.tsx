@@ -333,6 +333,23 @@ describe("Test DifferencesForm", () => {
     });
 
     test("F.26 Incorrect total", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: [
+                "data.differences_counts.more_ballots_count",
+                "data.differences_counts.too_many_ballots_handed_out_count",
+                "data.differences_counts.other_explanation_count",
+                "data.differences_counts.no_explanation_count",
+              ],
+              code: "IncorrectTotal",
+            },
+          ],
+          warnings: [],
+        },
+      });
+
       const user = userEvent.setup();
 
       render(Component);
@@ -355,6 +372,24 @@ describe("Test DifferencesForm", () => {
     });
 
     test("F.27 Incorrect total", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: [
+                "data.differences_counts.fewer_ballots_count",
+                "data.differences_counts.unreturned_ballots_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.other_explanation_count",
+                "data.differences_counts.no_explanation_count",
+              ],
+              code: "IncorrectTotal",
+            },
+          ],
+          warnings: [],
+        },
+      });
+
       const user = userEvent.setup();
 
       render(Component);

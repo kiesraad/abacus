@@ -182,7 +182,7 @@ describe("Test RecountedForm", () => {
   });
 
   describe("RecountedForm errors", () => {
-    test("No radio selected", async () => {
+    test("F.02 No radio selected", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [] },
       });

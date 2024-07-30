@@ -439,7 +439,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
-    test("W.27 EqualInput voters and votes", async () => {
+    test("W.29 EqualInput voters and votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [

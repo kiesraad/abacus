@@ -9,16 +9,24 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } fro
 import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
+  PollingStationValues,
 } from "@kiesraad/api";
 import { electionDetailMock } from "@kiesraad/api-mocks";
 
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
-const Component = (
-  <PollingStationFormController election={electionDetailMock} pollingStationId={1} entryNumber={1}>
-    <VotersAndVotesForm />
-  </PollingStationFormController>
-);
+function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
+  return render(
+    <PollingStationFormController
+      election={electionDetailMock}
+      pollingStationId={1}
+      entryNumber={1}
+      defaultValues={defaultValues}
+    >
+      <VotersAndVotesForm />
+    </PollingStationFormController>,
+  );
+}
 
 const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
   data: {
@@ -67,7 +75,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       const pollCards = screen.getByTestId("poll_card_count");
       await user.type(pollCards, "12345");
@@ -85,7 +93,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       const pollCards = screen.getByTestId("poll_card_count");
       expect(pollCards).toHaveFocus();
@@ -174,7 +182,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       await userTypeInputs(user, {
         ...expectedRequest.data.voters_counts,
@@ -202,7 +210,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -221,7 +229,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -249,7 +257,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       // Since the component does not allow to input invalid values such as -3,
       // not inputting any values and just clicking the submit button.
@@ -282,7 +290,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       await user.type(screen.getByTestId("poll_card_count"), "1");
       await user.type(screen.getByTestId("proxy_certificate_count"), "1");
@@ -318,7 +326,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       await user.type(screen.getByTestId("votes_candidates_counts"), "1");
       await user.type(screen.getByTestId("blank_votes_count"), "1");
@@ -354,11 +362,8 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm({ recounted: true });
 
-      // TODO: These fields don't render because recounted is by default undefined
-      //  this value is coming from useState, any idea how to either refactor the code
-      //  or mock useState to be able to test this error?
       await user.type(screen.getByTestId("poll_card_recount"), "1");
       await user.type(screen.getByTestId("proxy_certificate_recount"), "1");
       await user.type(screen.getByTestId("voter_card_recount"), "1");
@@ -391,7 +396,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       // Since the component does not allow to input values for non-existing fields,
       // not inputting any values and just clicking the submit button.
@@ -424,7 +429,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       await user.type(screen.getByTestId("votes_candidates_counts"), "0");
       await user.type(screen.getByTestId("blank_votes_count"), "1");
@@ -458,7 +463,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       await user.type(screen.getByTestId("votes_candidates_counts"), "0");
       await user.type(screen.getByTestId("blank_votes_count"), "0");
@@ -489,7 +494,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       await user.type(screen.getByTestId("poll_card_count"), "1");
       await user.type(screen.getByTestId("proxy_certificate_count"), "0");
@@ -509,44 +514,41 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
-  });
 
-  test("W.30 EqualInput voters recounts and votes counts", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-      validation_results: {
-        errors: [],
-        warnings: [
-          {
-            fields: ["data.voters_recounts", "data.votes_counts"],
-            code: "EqualInput",
-          },
-        ],
-      },
+    test("W.30 EqualInput voters recounts and votes counts", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: ["data.voters_recounts", "data.votes_counts"],
+              code: "EqualInput",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      await user.type(screen.getByTestId("votes_candidates_counts"), "1");
+      await user.type(screen.getByTestId("blank_votes_count"), "0");
+      await user.type(screen.getByTestId("invalid_votes_count"), "0");
+      await user.type(screen.getByTestId("total_votes_cast_count"), "1");
+
+      await user.type(screen.getByTestId("poll_card_recount"), "1");
+      await user.type(screen.getByTestId("proxy_certificate_recount"), "0");
+      await user.type(screen.getByTestId("voter_card_recount"), "0");
+      await user.type(screen.getByTestId("total_admitted_voters_recount"), "1");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^EqualInput$/);
+      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
-
-    const user = userEvent.setup();
-
-    render(Component);
-
-    await user.type(screen.getByTestId("votes_candidates_counts"), "1");
-    await user.type(screen.getByTestId("blank_votes_count"), "0");
-    await user.type(screen.getByTestId("invalid_votes_count"), "0");
-    await user.type(screen.getByTestId("total_votes_cast_count"), "1");
-
-    // TODO: These fields don't render because recounted is by default undefined
-    //  this value is coming from useState, any idea how to either refactor the code
-    //  or mock useState to be able to test this error?
-    await user.type(screen.getByTestId("poll_card_recount"), "1");
-    await user.type(screen.getByTestId("proxy_certificate_recount"), "0");
-    await user.type(screen.getByTestId("voter_card_recount"), "0");
-    await user.type(screen.getByTestId("total_admitted_voters_recount"), "1");
-
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-
-    const feedbackWarning = await screen.findByTestId("feedback-warning");
-    expect(feedbackWarning).toHaveTextContent(/^EqualInput$/);
-    expect(screen.queryByTestId("feedback-server-error")).toBeNull();
-    expect(screen.queryByTestId("feedback-error")).toBeNull();
   });
 });

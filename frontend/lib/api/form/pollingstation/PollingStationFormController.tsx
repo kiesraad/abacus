@@ -32,6 +32,7 @@ export interface PollingStationFormControllerProps {
   pollingStationId: number;
   entryNumber: number;
   children: React.ReactNode;
+  defaultValues?: Partial<PollingStationValues>;
 }
 
 export interface iPollingStationControllerContext {
@@ -87,6 +88,7 @@ export function PollingStationFormController({
   pollingStationId,
   entryNumber,
   children,
+  defaultValues = {},
 }: PollingStationFormControllerProps) {
   const [doRequest, { data, loading, error }] = usePollingStationDataEntry({
     polling_station_id: pollingStationId,
@@ -127,6 +129,7 @@ export function PollingStationFormController({
         votes: 0,
       })),
     })),
+    ...defaultValues,
   }));
 
   const _isCalled = React.useRef<boolean>(false);

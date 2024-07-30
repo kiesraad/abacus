@@ -1,13 +1,17 @@
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
-import { PollingStationListProvider } from "@kiesraad/api";
+import { Footer } from "app/component/footer/Footer.tsx";
+
+import { PollingStationListProvider, useElection } from "@kiesraad/api";
 
 export function InputLayout() {
-  const { electionId } = useParams();
+  const { election } = useElection();
   return (
-    <PollingStationListProvider electionId={parseInt(electionId ?? "", 10)}>
+    <PollingStationListProvider electionId={election.id}>
       <div className="app-layout">
+        <nav>{election.name}</nav> {/* TODO: Add Role in front of election name */}
         <Outlet />
+        <Footer />
       </div>
     </PollingStationListProvider>
   );

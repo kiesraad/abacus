@@ -16,6 +16,6 @@ describe("InputHomePage", () => {
       </ElectionProvider>,
     );
 
-    expect(await screen.findAllByText(electionMock.name)).length(2);
+    expect(await screen.findByText(electionMock.name));
   });
 });

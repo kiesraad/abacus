@@ -1,12 +1,13 @@
-import { describe, expect, test, assert } from "vitest";
-import { renderHook, waitFor, Providers } from "app/test/unit";
+import { assert, describe, expect, test } from "vitest";
+
+import { overrideOnce, Providers, renderHook, waitFor } from "app/test/unit";
+
 import { usePollingStationDataEntry } from "./usePollingStationDataEntry";
-import { overrideOnce } from "app/test/unit";
 
 describe("usePollingStationDataEntry", () => {
   test("doSubmit parses ok response", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
-      message: "should work",
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      validation_results: { errors: [], warnings: [] },
     });
 
     const { result } = renderHook(
@@ -59,6 +60,7 @@ describe("usePollingStationDataEntry", () => {
 
     const [, { data }] = result.current;
     assert(data !== null, "data is not null");
-    expect(data.message).toBe("should work");
+    expect(data.validation_results.errors).toStrictEqual([]);
+    expect(data.validation_results.warnings).toStrictEqual([]);
   });
 });

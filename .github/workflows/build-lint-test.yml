@@ -1,0 +1,90 @@
+name: Build, lint & test
+
+on:
+  workflow_dispatch:
+  pull_request:
+  merge_group:
+    types: [checks_requested]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        run: rustup update stable && rustup default stable
+      - name: Cargo cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+      - name: Install sqlx-cli
+        run: cargo install sqlx-cli --no-default-features --features sqlite
+      - name: Create database and run migrations
+        run: sqlx database setup
+      - name: Check rustfmt
+        run: cargo --verbose --locked fmt --all -- --check
+      - name: Check clippy
+        run: cargo --verbose --locked clippy --all-targets --all-features -- -D warnings
+      - name: Run tests
+        run: cargo --verbose --locked test
+      - name: Build
+        run: cargo --verbose --locked build
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Check formatting
+        run: npx prettier --check .
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test
+      - name: Build
+        run: npm run build
+  playwright:
+    name: Playwright
+    needs: frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: e2e test install
+        run: npx playwright install --with-deps
+      - name: e2e test - lib ui
+        run: npm run e2e:lib-ui
+      - name: e2e test - app
+        run: npm run e2e:app

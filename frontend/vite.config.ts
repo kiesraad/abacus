@@ -1,8 +1,9 @@
+import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
-import tsConfig from "./tsconfig.json";
+
 import pkgjson from "./package.json";
+import tsConfig from "./tsconfig.json";
 
 const apiMode = process.env.API_MODE || "mock";
 const apiHost = process.env.API_HOST || apiMode === "mock" ? "" : "http://localhost:8080";
@@ -47,10 +48,9 @@ export default defineConfig(() => ({
   server: {
     port: 3000,
     proxy: {
-      "/v1": {
+      "/api": {
         target: apiHost,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/v1/, ""),
       },
     },
   },

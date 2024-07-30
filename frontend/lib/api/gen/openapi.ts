@@ -12,11 +12,11 @@ export interface ELECTION_DETAILS_REQUEST_PARAMS {
 }
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
 
-// /api/polling_stations/{election_id}
+// /api/elections/{election_id}/polling_stations
 export interface POLLING_STATION_LIST_REQUEST_PARAMS {
   election_id: number;
 }
-export type POLLING_STATION_LIST_REQUEST_PATH = `/api/polling_stations/${number}`;
+export type POLLING_STATION_LIST_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS {
@@ -26,6 +26,14 @@ export interface POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS {
 export type POLLING_STATION_DATA_ENTRY_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}`;
 export type POLLING_STATION_DATA_ENTRY_REQUEST_BODY = DataEntryRequest;
+
+// /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
+export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
+  polling_station_id: number;
+  entry_number: number;
+}
+export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
+  `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
 /** TYPES **/
 
@@ -64,8 +72,6 @@ export interface DataEntryRequest {
  * Response structure for data entry of polling station results
  */
 export interface DataEntryResponse {
-  message: string;
-  saved: boolean;
   validation_results: ValidationResults;
 }
 
@@ -141,6 +147,7 @@ export interface PoliticalGroupVotes {
  * Polling station of a certain [Election]
  */
 export interface PollingStation {
+  election_id: number;
   house_number: string;
   house_number_addition?: string;
   id: number;

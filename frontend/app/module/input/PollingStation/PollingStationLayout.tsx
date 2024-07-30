@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
+import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
+import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
+
 import { PollingStationFormController, useElection } from "@kiesraad/api";
 import { IconCross } from "@kiesraad/icon";
 import { Badge, Button, Modal, PollingStationNumber, WorkStationNumber } from "@kiesraad/ui";
-import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
-import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 
 export function PollingStationLayout() {
   const { pollingStationId } = useParams();

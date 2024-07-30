@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test("default small wide input field is visible", async ({ page }) => {
   await page.goto("http://localhost:61000/?story=input-field--wide-input-field");

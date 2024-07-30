@@ -1,6 +1,8 @@
-import { Alert, WorkStationNumber } from "@kiesraad/ui";
-import { AccountSetupForm } from "app/component/form/account_setup/AccountSetupForm";
 import { useState } from "react";
+
+import { AccountSetupForm } from "app/component/form/account_setup/AccountSetupForm";
+
+import { Alert, WorkStationNumber } from "@kiesraad/ui";
 
 export function AccountSetupPage() {
   const [showAlert, setShowAlert] = useState(true);

@@ -1,21 +1,41 @@
 use std::error::Error;
 use std::net::{Ipv4Addr, SocketAddr};
+use std::path::PathBuf;
 use std::str::FromStr;
 
+use clap::Parser;
 use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::SqlitePool;
 use tokio::net::TcpListener;
+use tower_http::services::{ServeDir, ServeFile};
 
 use backend::router;
 
 const DB_URL: &str = "sqlite://db.sqlite";
 
+/// Abacus API server
+#[derive(Parser, Debug)]
+struct Args {
+    /// Path to the frontend dist directory to serve through the API server
+    #[arg(short, long)]
+    frontend_dist: Option<PathBuf>,
+}
+
 /// Main entry point for the application, sets up the database and starts the
 /// API server on port 8080.
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    let args = Args::parse();
     let pool = create_sqlite_pool().await?;
     let app = router(pool)?;
+
+    let app = if let Some(fd) = args.frontend_dist {
+        app.fallback_service(
+            ServeDir::new(fd.clone()).fallback(ServeFile::new(fd.join("index.html"))),
+        )
+    } else {
+        app
+    };
 
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
     let listener = TcpListener::bind(&address).await?;

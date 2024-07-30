@@ -1,7 +1,8 @@
 import * as React from "react";
 
-import cls from "./InputGrid.module.css";
 import { cn, domtoren } from "@kiesraad/util";
+
+import cls from "./InputGrid.module.css";
 
 export interface InputGridProps {
   zebra?: boolean;
@@ -158,13 +159,15 @@ InputGrid.Row = ({
   </>
 );
 
-InputGrid.Total = ({
+InputGrid.ListTotal = ({
   children,
+  id,
 }: {
   children: [React.ReactElement, React.ReactElement, React.ReactElement];
+  id?: string;
 }) => (
   <>
-    <tr className="sep_total">
+    <tr className="sep_total" id={`row-${id}`}>
       <td></td>
       <td></td>
       <td></td>

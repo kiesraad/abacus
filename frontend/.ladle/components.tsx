@@ -1,5 +1,6 @@
-import type { GlobalProvider } from "@ladle/react";
 import { StaticRouter } from "react-router-dom/server";
+
+import type { GlobalProvider } from "@ladle/react";
 
 import "../lib/ui/style/index.css";
 import "./override.css";

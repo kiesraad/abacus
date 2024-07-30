@@ -64,6 +64,7 @@ export function usePoliticalGroup(
     id: `political_group_votes_${political_group_number}`,
     number: political_group_number,
     getValues,
+    ignoreWarnings: () => false,
   });
 
   return {

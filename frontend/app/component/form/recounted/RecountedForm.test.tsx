@@ -1,6 +1,8 @@
-import { overrideOnce, render, screen } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi, afterEach } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
+
+import { overrideOnce, render, screen } from "app/test/unit";
+
 import { RecountedForm } from "./RecountedForm";
 
 describe("Test RecountedForm", () => {
@@ -24,9 +26,7 @@ describe("Test RecountedForm", () => {
   });
 
   test("Form field entry and keybindings", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
-      message: "Data saved",
-      saved: true,
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
       validation_results: { errors: [], warnings: [] },
     });
 
@@ -74,7 +74,7 @@ describe("Test RecountedForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      expect(spy).toHaveBeenCalledWith("http://testhost/v1/api/polling_stations/1/data_entries/1", {
+      expect(spy).toHaveBeenCalledWith("http://testhost/api/polling_stations/1/data_entries/1", {
         method: "POST",
         body: JSON.stringify(expectedRequest),
         headers: {
@@ -88,7 +88,7 @@ describe("Test RecountedForm", () => {
   });
 
   test.skip("422 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
       message: "422 error from mock",
     });
 
@@ -103,7 +103,7 @@ describe("Test RecountedForm", () => {
   });
 
   test.skip("500 response results in display of error message", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
       message: "500 error from mock",
       errorCode: "500_ERROR",
     });

@@ -1,12 +1,14 @@
 import * as React from "react";
+
+import { cn } from "@kiesraad/util";
+
 import { Size } from "../ui.types";
 import cls from "./Icon.module.css";
-import { cn } from "@kiesraad/util";
 
 export interface IconProps {
   icon: React.ReactNode;
   size?: Size;
-  color?: "primary" | "warning";
+  color?: "primary" | "warning" | "error";
   spacing?: number;
 }
 

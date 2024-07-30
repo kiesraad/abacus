@@ -1,4 +1,4 @@
-import { Locator, test as base, expect } from "@playwright/test";
+import { test as base, expect, Locator } from "@playwright/test";
 
 const test = base.extend<{ gridPage: Locator }>({
   gridPage: async ({ page }, use) => {

@@ -1,11 +1,12 @@
-import ReactDOM from "react-dom/client";
 import { StrictMode } from "react";
+import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import { ApiProvider, ElectionListProvider } from "@kiesraad/api";
 
 // ignore in prod
 import { startMockAPI } from "./msw-mock-api.ts";
 import { routes } from "./routes.tsx";
-import { ApiProvider, ElectionListProvider, ElectionProvider } from "@kiesraad/api";
 
 const rootDiv = document.getElementById("root");
 if (!rootDiv) throw new Error("Root div not found");
@@ -23,9 +24,7 @@ function render() {
     <StrictMode>
       <ApiProvider host={process.env.API_HOST || ""}>
         <ElectionListProvider>
-          <ElectionProvider>
-            <RouterProvider router={router} />
-          </ElectionProvider>
+          <RouterProvider router={router} />
         </ElectionListProvider>
       </ApiProvider>
     </StrictMode>,

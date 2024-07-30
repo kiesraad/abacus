@@ -1,10 +1,12 @@
 import { describe, expect, test } from "vitest";
-import { ApiClient } from "./ApiClient";
+
 import { overrideOnce } from "app/test/unit";
+
+import { ApiClient } from "./ApiClient";
 
 describe("ApiClient", () => {
   test("200 response is parsed as success", async () => {
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, { fizz: "buzz" });
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, { fizz: "buzz" });
 
     const client = new ApiClient("testhost");
     const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
@@ -16,7 +18,7 @@ describe("ApiClient", () => {
 
   test("422 response is parsed as client error", async () => {
     const responseBody = { fizz: "buzz" };
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, responseBody);
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, responseBody);
 
     const client = new ApiClient("testhost");
     const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
@@ -28,7 +30,7 @@ describe("ApiClient", () => {
 
   test("500 response is parsed as server error", async () => {
     const responseBody = { fizz: "buzz" };
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, responseBody);
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, responseBody);
 
     const client = new ApiClient("testhost");
     const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
@@ -40,7 +42,7 @@ describe("ApiClient", () => {
 
   test("318 response throws an error", async () => {
     const responseStatus = 318;
-    overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", responseStatus, "");
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", responseStatus, "");
 
     const client = new ApiClient("testhost");
 
@@ -50,7 +52,7 @@ describe("ApiClient", () => {
   });
 
   test("Get request returns expected data", async () => {
-    overrideOnce("get", "/v1/api/test/1", 200, { fizz: "buzz" });
+    overrideOnce("get", "/api/test/1", 200, { fizz: "buzz" });
 
     const client = new ApiClient("testhost");
     const parsedResponse = await client.getRequest("/api/test/1");
@@ -59,7 +61,7 @@ describe("ApiClient", () => {
   });
 
   test("Invalid server response throws an error", async () => {
-    overrideOnce("get", "/v1/api/test/1", 200, "invalid json");
+    overrideOnce("get", "/api/test/1", 200, "invalid json");
 
     const client = new ApiClient("testhost");
 
@@ -69,7 +71,7 @@ describe("ApiClient", () => {
   });
 
   test("Unexpected status code throws an error", async () => {
-    overrideOnce("get", "/v1/api/test/1", 201, { fizz: "buzz" });
+    overrideOnce("get", "/api/test/1", 201, { fizz: "buzz" });
 
     const client = new ApiClient("testhost");
 

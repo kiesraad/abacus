@@ -1,7 +1,8 @@
 import assert from "assert";
 import fs from "fs";
 import prettier from "prettier";
-import { OpenAPIV3, ReferenceObject, SchemaObject, PathsObject, OperationObject } from "./openapi";
+
+import { OpenAPIV3, OperationObject, PathsObject, ReferenceObject, SchemaObject } from "./openapi";
 
 const TARGET_PATH = "./lib/api/gen";
 const FILE_NAME = "openapi.ts";

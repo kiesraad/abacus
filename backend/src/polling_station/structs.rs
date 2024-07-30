@@ -19,7 +19,8 @@ pub trait Validate {
 /// Polling station of a certain [Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
 pub struct PollingStation {
-    pub id: i64,
+    pub id: u32,
+    pub election_id: u32,
     pub name: String,
     pub number: i64,
     pub number_of_voters: Option<i64>,
@@ -126,7 +127,7 @@ impl Validate for Count {
         validation_results: &mut ValidationResults,
         field_name: String,
     ) {
-        if self > &1_000_000_000 {
+        if self > &999_999_999 {
             validation_results.errors.push(ValidationResult {
                 fields: vec![field_name],
                 code: ValidationResultCode::OutOfRange,
@@ -654,7 +655,7 @@ mod tests {
             },
             PoliticalGroupVotes {
                 number: 2,
-                total: 20,
+                total: 1_000_000_000, // F.01 out of range
                 candidate_votes: vec![
                     CandidateVotes {
                         number: 1,
@@ -662,24 +663,42 @@ mod tests {
                     },
                     CandidateVotes {
                         number: 2,
-                        votes: 20,
+                        votes: 1_000_000_000, // F.01 out of range
                     },
                 ],
             },
         ];
         let election = election_fixture(&[2, 2]);
 
-        // validate with correct totals and correct number of candidates
+        // validate out of range number of candidates
         let mut validation_results = ValidationResults::default();
         political_group_votes.validate(
             &election,
             &mut validation_results,
             "political_group_votes".to_string(),
         );
-        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.errors.len(), 2);
         assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(
+            validation_results.errors[0].code,
+            ValidationResultCode::OutOfRange
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["political_group_votes[1].candidate_votes[1].votes"]
+        );
+        assert_eq!(
+            validation_results.errors[1].code,
+            ValidationResultCode::OutOfRange
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
+            vec!["political_group_votes[1].total"]
+        );
 
-        // validate with incorrect totals
+        // validate with correct in range votes for second political group but incorrect total for first political group
+        political_group_votes[1].candidate_votes[1].votes = 20;
+        political_group_votes[1].total = 20;
         political_group_votes[0].total = 20;
         let mut validation_results = ValidationResults::default();
         political_group_votes.validate(

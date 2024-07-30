@@ -1,7 +1,9 @@
 import type { Story } from "@ladle/react";
-import { Tooltip } from "./Tooltip";
-import { Icon } from "../Icon/Icon";
+
 import { IconWarningSquare } from "@kiesraad/icon";
+
+import { Icon } from "../Icon/Icon";
+import { Tooltip } from "./Tooltip";
 
 type Props = {
   text: string;

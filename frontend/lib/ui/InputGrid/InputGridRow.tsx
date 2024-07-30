@@ -18,6 +18,7 @@ export interface InputGridRowProps {
   name?: string;
   defaultValue?: string | number;
   isTotal?: boolean;
+  isListTotal?: boolean;
   isFocused?: boolean;
   addSeparator?: boolean;
   autoFocus?: boolean;
@@ -32,6 +33,7 @@ export function InputGridRow({
   defaultValue,
   inputProps,
   isTotal,
+  isListTotal,
   id,
   isFocused = false,
   addSeparator,
@@ -45,7 +47,43 @@ export function InputGridRow({
     ?.warnings.find((warning) => warning.code === "REFORMAT_WARNING")?.value;
 
   const [value, setValue] = React.useState(() => (defaultValue ? format(defaultValue) : ""));
-  return (
+  return isListTotal ? (
+    <InputGrid.ListTotal id={id}>
+      <td>{field}</td>
+      <td>
+        <FormField
+          error={errors}
+          warning={warnings}
+          tooltip={
+            tooltip && (
+              <div className="tooltip-content">
+                <Icon color="warning" icon={<IconWarningSquare />} />
+                <div>
+                  Je probeert <strong>{ellipsis(tooltip)}</strong> te plakken. Je kunt hier alleen
+                  cijfers invullen.
+                </div>
+              </div>
+            )
+          }
+        >
+          <input
+            key={id}
+            id={id}
+            name={name || id}
+            maxLength={11}
+            {...inputProps}
+            value={value}
+            /* eslint-disable-next-line jsx-a11y/no-autofocus */
+            autoFocus={isFocused}
+            onChange={(e) => {
+              setValue(format(e.currentTarget.value));
+            }}
+          />
+        </FormField>
+      </td>
+      <td>{title}</td>
+    </InputGrid.ListTotal>
+  ) : (
     <InputGrid.Row isTotal={isTotal} isFocused={isFocused} addSeparator={addSeparator} id={id}>
       <td>{field}</td>
       <td>

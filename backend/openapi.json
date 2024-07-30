@@ -94,17 +94,18 @@
         }
       }
     },
-    "/api/polling_stations/{election_id}": {
+    "/api/elections/{election_id}/polling_stations": {
       "get": {
         "tags": [
           "polling_station"
         ],
-        "summary": "List all polling stations",
+        "summary": "List all polling stations of an election",
         "operationId": "polling_station_list",
         "parameters": [
           {
             "name": "election_id",
             "in": "path",
+            "description": "Election database id",
             "required": true,
             "schema": {
               "type": "integer",
@@ -120,6 +121,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PollingStationListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -616,6 +627,7 @@
         "description": "Polling station of a certain [Election]",
         "required": [
           "id",
+          "election_id",
           "name",
           "number",
           "polling_station_type",
@@ -625,6 +637,11 @@
           "locality"
         ],
         "properties": {
+          "election_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
           "house_number": {
             "type": "string"
           },
@@ -634,7 +651,8 @@
           },
           "id": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "locality": {
             "type": "string"

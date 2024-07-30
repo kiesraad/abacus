@@ -1,5 +1,6 @@
-import { BottomBar, Button, InputField } from "@kiesraad/ui";
 import { useNavigate } from "react-router-dom";
+
+import { BottomBar, Button, InputField } from "@kiesraad/ui";
 
 interface FormElements extends HTMLFormControlsCollection {
   username: HTMLInputElement;

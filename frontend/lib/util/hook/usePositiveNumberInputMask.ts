@@ -1,5 +1,6 @@
-import { FieldValidationResult } from "@kiesraad/api";
 import * as React from "react";
+
+import { FieldValidationResult } from "@kiesraad/api";
 
 export type FormatFunc = (s: string | number | null | undefined) => string;
 export type DeformatFunc = (s: string) => number;

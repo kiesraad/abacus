@@ -1,5 +1,6 @@
-import { Footer } from "app/component/footer/Footer";
 import { Outlet } from "react-router-dom";
+
+import { Footer } from "app/component/footer/Footer";
 
 export function OverviewLayout() {
   return (

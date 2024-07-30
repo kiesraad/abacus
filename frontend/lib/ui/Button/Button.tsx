@@ -1,6 +1,7 @@
 import * as React from "react";
-import cls from "./Button.module.css";
+
 import { Size, Variant } from "../ui.types";
+import cls from "./Button.module.css";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isDisabled?: boolean;

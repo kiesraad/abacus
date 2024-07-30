@@ -1,6 +1,7 @@
 import type { Story } from "@ladle/react";
-import { Feedback } from "./Feedback";
+
 import { AlertType } from "../ui.types";
+import { Feedback } from "./Feedback";
 
 type Props = {
   title: string;

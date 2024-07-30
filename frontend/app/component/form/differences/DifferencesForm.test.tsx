@@ -1,27 +1,28 @@
 /**
  * @vitest-environment jsdom
  */
-
-import { overrideOnce, render, screen, getUrlMethodAndBody } from "app/test/unit";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi, afterEach } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
+
+import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 
 import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
 } from "@kiesraad/api";
-import { electionMock } from "@kiesraad/api-mocks";
+import { electionDetailMock } from "@kiesraad/api-mocks";
+
 import { DifferencesForm } from "./DifferencesForm";
 
 const Component = (
-  <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
+  <PollingStationFormController election={electionDetailMock} pollingStationId={1} entryNumber={1}>
     <DifferencesForm />
   </PollingStationFormController>
 );
 
 const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
   data: {
-    political_group_votes: electionMock.political_groups.map((group) => ({
+    political_group_votes: electionDetailMock.political_groups.map((group) => ({
       number: group.number,
       total: 0,
       candidate_votes: group.candidates.map((candidate) => ({
@@ -76,9 +77,7 @@ describe("Test DifferencesForm", () => {
     });
 
     test("Form field entry and keybindings", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
-        message: "Data saved",
-        saved: true,
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [] },
       });
 
@@ -201,7 +200,7 @@ describe("Test DifferencesForm", () => {
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-      expect(url).toEqual("http://testhost/v1/api/polling_stations/1/data_entries/1");
+      expect(url).toEqual("http://testhost/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
 
@@ -210,7 +209,7 @@ describe("Test DifferencesForm", () => {
     });
 
     test("422 response results in display of error message", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 422, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
         message: "422 error from mock",
       });
 
@@ -225,7 +224,7 @@ describe("Test DifferencesForm", () => {
     });
 
     test("500 response results in display of error message", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 500, {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
         message: "500 error from mock",
       });
 
@@ -266,9 +265,7 @@ describe("Test DifferencesForm", () => {
   describe("DifferencesForm warnings", () => {
     // TODO: Unskip test once validation is implemented in frontend and backend
     test.skip("Warnings can be displayed", async () => {
-      overrideOnce("post", "/v1/api/polling_stations/1/data_entries/1", 200, {
-        saved: true,
-        message: "Data entry saved successfully",
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
           warnings: [

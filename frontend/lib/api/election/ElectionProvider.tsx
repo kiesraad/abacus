@@ -1,7 +1,7 @@
 import * as React from "react";
+
 import { Election } from "../gen/openapi";
 import { useElectionDataRequest } from "../useElectionDataRequest";
-import { useElectionList } from "./useElectionList";
 
 export interface iElectionProviderContext {
   election: Required<Election>;
@@ -13,13 +13,12 @@ export const ElectionProviderContext = React.createContext<iElectionProviderCont
 
 export interface ElectionProviderProps {
   children: React.ReactNode;
+  electionId: number;
 }
 
-export function ElectionProvider({ children }: ElectionProviderProps) {
-  const { electionList } = useElectionList();
-
+export function ElectionProvider({ children, electionId }: ElectionProviderProps) {
   const { data, loading } = useElectionDataRequest({
-    election_id: electionList.length && electionList[0] ? electionList[0].id : 0,
+    election_id: electionId,
   });
 
   if (loading) {

@@ -1,5 +1,7 @@
 import { describe, expect, test } from "vitest";
+
 import { overrideOnce, Providers, renderHook, waitFor } from "app/test/unit";
+
 import { useElectionListRequest } from "./useElectionListRequest";
 
 describe("Test useElectionListRequest", () => {
@@ -22,7 +24,7 @@ describe("Test useElectionListRequest", () => {
         },
       ],
     };
-    overrideOnce("get", "/v1/api/elections", 200, elections);
+    overrideOnce("get", "/api/elections", 200, elections);
     const { result } = renderHook(() => useElectionListRequest(), { wrapper: Providers });
 
     expect(result.current.loading).toBe(true);

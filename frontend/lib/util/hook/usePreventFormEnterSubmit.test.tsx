@@ -1,8 +1,10 @@
 import * as React from "react";
+
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { render } from "app/test/unit";
+
 import { usePreventFormEnterSubmit } from "@kiesraad/util";
 
 const TestComponent = ({ cb }: { cb: (event: React.FormEvent) => void }) => {

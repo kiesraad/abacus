@@ -1,7 +1,10 @@
 import { ReactElement } from "react";
-import { Providers } from "./Providers";
 
-import { render, RenderOptions } from "@testing-library/react";
+import { render, RenderOptions, screen } from "@testing-library/react";
+import { UserEvent } from "@testing-library/user-event";
+import { expect } from "vitest";
+
+import { Providers } from "./Providers";
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
   render(ui, { wrapper: Providers, ...options });
@@ -33,4 +36,12 @@ export function getUrlMethodAndBody(
     }
   }
   return { url, method, body };
+}
+
+export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: string | number }) {
+  for (const [key, value] of Object.entries(inputs)) {
+    const input = screen.getByTestId(key);
+    await user.type(input, value.toString());
+    expect(input).toHaveValue(value.toString());
+  }
 }

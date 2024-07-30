@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+
 import { classnames, cn } from "./classnames";
 
 test("classnames result", () => {

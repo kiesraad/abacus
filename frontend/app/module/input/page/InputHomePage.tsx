@@ -1,8 +1,12 @@
-import { Alert, WorkStationNumber } from "@kiesraad/ui";
-import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
 import { useState } from "react";
 
+import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
+
+import { useElection } from "@kiesraad/api";
+import { Alert, WorkStationNumber } from "@kiesraad/ui";
+
 export function InputHomePage() {
+  const { election } = useElection();
   const [showAlert, setShowAlert] = useState(true);
 
   function hideAlert() {
@@ -13,7 +17,7 @@ export function InputHomePage() {
     <>
       <header>
         <section>
-          <h1>Verkiezingsnaam</h1>
+          <h1>{election.name}</h1>
         </section>
         <section>
           <WorkStationNumber>16</WorkStationNumber>

@@ -9,14 +9,14 @@
   "scripts": {
     "dev": "cross-env API_MODE=mock vite",
     "dev:server": "cross-env API_MODE=local vite",
-    "build": "tsc && vite build",
+    "build": "tsc && cross-env API_MODE=local vite build",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettier": "prettier --ignore-unknown --write .",
     "preview": "vite preview",
     "test": "vitest",
-    "e2e": "playwright test",
-    "e2eui": "playwright test --ui",
+    "e2e:lib-ui": "playwright test -c playwright.lib-ui.config.ts",
+    "e2e:app": "playwright test -c playwright.app.config.ts",
     "ladle": "ladle serve",
     "start:msw": "cross-env API_MODE=mock vite",
     "gen:icons": "node scripts/gen_icons.js",
@@ -35,6 +35,7 @@
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -75,8 +76,5 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx,json}": "eslint --cache --fix"
-  },
-  "prettier": {
-    "printWidth": 100
   }
 }

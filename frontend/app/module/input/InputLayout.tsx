@@ -1,14 +1,20 @@
+import { Outlet, useParams } from "react-router-dom";
+
 import { Footer } from "app/component/footer/Footer";
-import { Outlet } from "react-router-dom";
+
+import { PollingStationProvider } from "@kiesraad/api";
 
 export function InputLayout() {
+  const { electionId } = useParams();
   return (
-    <div className="app-layout">
-      <nav>Hello world</nav>
+    <PollingStationProvider electionId={parseInt(electionId ?? "", 10)}>
+      <div className="app-layout">
+        <nav>Hello world</nav>
 
-      <Outlet />
+        <Outlet />
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </PollingStationProvider>
   );
 }

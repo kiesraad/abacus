@@ -1,7 +1,9 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { IconButton } from "@kiesraad/ui";
+
 import { IconCross } from "@kiesraad/icon";
+import { IconButton } from "@kiesraad/ui";
+
 import cls from "./Modal.module.css";
 
 export interface ModalProps {

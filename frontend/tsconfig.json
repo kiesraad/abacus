@@ -34,7 +34,8 @@
     "app/**/*",
     "lib/**/*",
     "scripts/**/*",
-    "playwright.config.ts",
+    "playwright.app.config.ts",
+    "playwright.lib-ui.config.ts",
     "vite.config.ts"
   ]
 }

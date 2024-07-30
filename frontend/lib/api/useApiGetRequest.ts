@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { useApi } from "./useApi";
 import { ApiResponseErrorData } from "./ApiClient";
+import { useApi } from "./useApi";
 
 export type UseApiGetRequestReturn<DATA> = {
   loading: boolean;

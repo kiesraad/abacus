@@ -9,11 +9,23 @@
 
 ### Building
 
-First run `sqlx database setup` to create the SQLite database. Then use `cargo build` to build the project.
+First run `sqlx database setup` to create the SQLite database.
+Then use `cargo build` to build the project.
+
+To make a release build, use `cargo build --release`.
+The built binary will be located in `target/release/`.
 
 ### Running
 
 Use `cargo run --bin api` to run the API on port 8080 (http://localhost:8080).
+
+To let the API server serve the frontend, first compile the frontend using
+`npm run build` in the `frontend` directory. The run the API server with the
+`--frontend-dist` flag pointing to the frontend build directory, e.g.:
+
+```shell
+cargo run --bin api -- --frontend-dist ../frontend/dist
+```
 
 ### Linting
 
@@ -33,12 +45,14 @@ The following dependencies (crates) are used:
 - `hyper`: fast and correct HTTP implementation.
 - `tokio`: runtime for writing asynchronous applications.
 - `tower`: library for building robust networking clients and servers.
+- `tower-http`: Tower middleware and utilities for HTTP clients and servers.
 - `utoipa`: library for documenting REST APIs using OpenAPI.
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `serde`: framework for serializing and deserializing data structures.
 - `serde_json`: JSON support for Serde.
 - `sqlx`: async SQL library featuring compile-time checked queries.
 - `chrono`: date and time library.
+- `clap`: library for command-line argument parsing.
 
 Additionally, the following development dependencies are used:
 
@@ -49,7 +63,7 @@ Additionally, the following development dependencies are used:
 SQLite is used as the database. An empty database is created as `db.sqlite` when the application is
 started. The database schema is created and updated using migrations managed by `sqlx`.
 
-When migrations are out of sync (e.g. `VersionError` occurs when starting the API server),
+When migrations are out of sync (e.g. `VersionMismatch` occurs when starting the API server),
 the database can be reset using `sqlx database reset`.
 
 Example database fixtures can be loaded using the SQLite CLI:

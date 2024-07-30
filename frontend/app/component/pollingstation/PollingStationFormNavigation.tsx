@@ -1,8 +1,8 @@
 import * as React from "react";
+import { BlockerFunction, useBlocker, useNavigate, useParams } from "react-router-dom";
 
+import { FormSectionID, useElection, usePollingStationFormController } from "@kiesraad/api";
 import { Button, Modal } from "@kiesraad/ui";
-import { usePollingStationFormController, FormSectionID, useElection } from "@kiesraad/api";
-import { useNavigate, useParams, useBlocker, BlockerFunction } from "react-router-dom";
 
 export function PollingStationFormNavigation() {
   const _lastKnownSection = React.useRef<FormSectionID | null>(null);

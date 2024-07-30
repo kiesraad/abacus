@@ -94,7 +94,7 @@ impl Validate for PollingStationResults {
             voters_recounts.validate(
                 election,
                 validation_results,
-                format!("{field_name}.votes_recounts"),
+                format!("{field_name}.voters_recounts"),
             );
 
             // W.30 validate that the numbers in voters_recounts and votes_counts are not the same
@@ -898,10 +898,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[1].fields,
             vec![
-                "polling_station_results.votes_recounts.total_admitted_voters_recount",
-                "polling_station_results.votes_recounts.poll_card_recount",
-                "polling_station_results.votes_recounts.proxy_certificate_recount",
-                "polling_station_results.votes_recounts.voter_card_recount"
+                "polling_station_results.voters_recounts.total_admitted_voters_recount",
+                "polling_station_results.voters_recounts.poll_card_recount",
+                "polling_station_results.voters_recounts.proxy_certificate_recount",
+                "polling_station_results.voters_recounts.voter_card_recount"
             ]
         );
         assert_eq!(

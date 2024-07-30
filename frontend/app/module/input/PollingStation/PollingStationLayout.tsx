@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
-import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress.tsx";
+import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 
 import {
   PollingStation,

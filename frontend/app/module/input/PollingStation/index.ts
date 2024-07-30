@@ -1,5 +1,5 @@
 export * from "./CandidatesVotesPage";
-export * from "./PollingStationHomePage.tsx";
+export * from "./PollingStationHomePage";
 export * from "./DifferencesPage";
 export * from "./PollingStationLayout";
 export * from "./RecountedPage";

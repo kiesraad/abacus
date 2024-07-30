@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-import { Footer } from "app/component/footer/Footer.tsx";
+import { Footer } from "app/component/footer/Footer";
 
 import { PollingStationListProvider, useElection } from "@kiesraad/api";
 

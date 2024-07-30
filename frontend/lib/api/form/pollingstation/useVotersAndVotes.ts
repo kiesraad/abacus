@@ -43,6 +43,7 @@ export function useVotersAndVotes(getValues: () => VotersAndVotesValues) {
     id: "voters_votes_counts",
     type: "voters_and_votes",
     getValues,
+    ignoreWarnings: () => false,
   });
 
   const errors = React.useMemo(() => {

@@ -17,6 +17,7 @@ export function PollingStationFormNavigation() {
 
   const shouldBlock = React.useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
+      //TODO: share logic with modal displaying.
       if (currentLocation.pathname === nextLocation.pathname) {
         console.log("Path same");
         return false;
@@ -25,19 +26,19 @@ export function PollingStationFormNavigation() {
         return false;
       }
 
-      console.log("HUH", currentForm.id);
       const formSection = formState.sections[currentForm.id];
       if (formSection) {
-        console.log("BLA", formState.active, formState.current, formSection.id);
         if (formSection.errors.length > 0) {
+          console.log("BLOCKED: has errors");
           return true;
-        } else {
-          if (formState.active !== formState.current) {
-            console.log("Cache this section", formState.current);
-            return false;
-          }
+        }
+        if (formSection.warnings.length > 0 && !currentForm.ignoreWarnings()) {
+          console.log("BLOCKED: has warnings without ignore");
+          return true;
         }
       }
+
+      //check if values have changed
 
       return false;
     },
@@ -47,8 +48,13 @@ export function PollingStationFormNavigation() {
   const blocker = useBlocker(shouldBlock);
 
   React.useEffect(() => {
+    if (_lastKnownSection.current === null) {
+      console.log("Setting last known section to", formState.active);
+      _lastKnownSection.current = formState.active;
+    }
     if (formState.active !== _lastKnownSection.current) {
       console.log("Navigating to", formState.active);
+      _lastKnownSection.current = formState.active;
       let url: string = "";
       if (formState.active.startsWith("political_group_votes_")) {
         url = `${baseUrl}/list/${formState.active.replace("political_group_votes_", "")}`;

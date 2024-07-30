@@ -21,6 +21,7 @@ export interface FormReference<T> {
   type: string;
   id: FormSectionID;
   getValues: () => T;
+  ignoreWarnings: () => boolean;
 }
 
 export interface FormReferenceVotersAndVotes
@@ -123,7 +124,10 @@ export function PollingStationFormController({
   });
 
   const temporaryCache = React.useRef<AnyCache | null>(null);
-  const [currentForm, setCurrentForm] = React.useState<AnyFormReference | null>(null);
+  const currentForm = React.useRef<AnyFormReference | null>(null);
+
+  // consumable flag to ignore warnings for the active form section;
+  const ignoreWarnings = React.useRef<FormSectionID | null>(null);
 
   const [formState, setFormState] = React.useState<FormState>(() => {
     const result: FormState = {
@@ -217,57 +221,74 @@ export function PollingStationFormController({
       //Form state changes based of validation results in data.
       setFormState((old) => {
         const newFormState = { ...old };
-        //set all errors and warnings to empty arrays, the server validates the entire request each time.
+        //reset all errors/warnings, the server validates the entire request each time.
         resetErrorsAndWarnings(newFormState);
+        //distribute errors to sections
         addValidationResultToFormState(newFormState, data.validation_results.errors, "errors");
+        //distribute warnings to sections
         addValidationResultToFormState(newFormState, data.validation_results.warnings, "warnings");
 
+        //what form section is active
         const activeFormSection = newFormState.sections[newFormState.active];
         if (activeFormSection) {
-          //flag isCalled since we can't determine on values
+          //store that this section has been sent to the server
           activeFormSection.isCalled = true;
 
-          // if (activeFormSection.errors.length === 0) {
-          //   //TODO: add opt out of warnings
-          //   if (activeFormSection.warnings.length === 0) {
-          //     //The next section is either current if a previous section was activated or the next section after current;
-          //     const nextSectionID =
-          //       newFormState.active !== newFormState.current
-          //         ? newFormState.current
-          //         : getNextSection(newFormState, activeFormSection.id);
-          //     if (nextSectionID) {
-          //       newFormState.active = nextSectionID;
-          //       newFormState.current = nextSectionID;
-          //     } else {
-          //       console.log("End of form?");
-          //     }
-          //   }
-          // }
-        }
+          //is this section finished?
+          if (activeFormSection.errors.length === 0) {
+            if (
+              activeFormSection.warnings.length === 0 ||
+              ignoreWarnings.current === activeFormSection.id
+            ) {
+              if (ignoreWarnings.current === activeFormSection.id) {
+                // goto next section
 
-        //determine current section
-        Object.values(newFormState.sections).forEach((section) => {
-          if (section.isCalled && section.errors.length === 0) {
-            newFormState.current = section.id;
+                if (newFormState.active !== newFormState.current) {
+                  newFormState.active = newFormState.current;
+                } else {
+                  const nextSectionID = getNextSection(newFormState, activeFormSection.id);
+                  if (nextSectionID) {
+                    newFormState.active = newFormState.current = nextSectionID;
+                  } else {
+                    console.log("FORM FINISHED?");
+                  }
+                }
+              }
+            }
           }
-        });
+        }
         return newFormState;
       });
+      //clean up
+      ignoreWarnings.current = null; //consume value
     }
   }, [data]);
 
   const registerCurrentForm = React.useCallback(
     (form: AnyFormReference) => {
-      if (currentForm !== null && form.id !== currentForm.id) {
-        setCurrentForm(form);
+      if (currentForm.current === null || form.id !== currentForm.current.id) {
+        currentForm.current = form;
+        if (form.id !== formState.active) {
+          setFormState((old) => {
+            const newFormState = { ...old };
+            newFormState.active = form.id;
+            return newFormState;
+          });
+        }
       }
     },
-    [currentForm],
+    [currentForm, formState],
   );
 
   const submitCurrentForm = React.useCallback(() => {
-    if (currentForm) {
-      const ref: AnyFormReference = currentForm;
+    if (currentForm.current) {
+      const ref: AnyFormReference = currentForm.current;
+
+      if (ref.ignoreWarnings()) {
+        ignoreWarnings.current = ref.id;
+      }
+
+      console.log("ref. type");
       switch (ref.type) {
         case "political_group_votes":
           setValues((old) => ({
@@ -283,6 +304,8 @@ export function PollingStationFormController({
         case "voters_and_votes":
         case "differences":
         default:
+          console.log("Setting values for", ref.id);
+          console.log(ref.getValues());
           setValues((old) => ({
             ...old,
             ...ref.getValues(),
@@ -311,7 +334,7 @@ export function PollingStationFormController({
         data,
         cache: temporaryCache.current,
         setTemporaryCache,
-        currentForm,
+        currentForm: currentForm.current,
         registerCurrentForm,
         submitCurrentForm,
       }}
@@ -350,6 +373,17 @@ function addValidationResultToFormState(
         break;
     }
   });
+}
+
+function getNextSection(formState: FormState, currentSection: FormSectionID): FormSectionID | null {
+  const keys = Object.keys(formState.sections);
+  const currentIndex = keys.indexOf(currentSection);
+  if (currentIndex !== -1) {
+    if (currentIndex + 1 < keys.length) {
+      return keys[currentIndex + 1] as FormSectionID;
+    }
+  }
+  return null;
 }
 
 function resetErrorsAndWarnings(formState: FormState) {

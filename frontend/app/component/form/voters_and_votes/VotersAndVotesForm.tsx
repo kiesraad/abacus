@@ -29,23 +29,10 @@ export function VotersAndVotesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-  const { sectionValues, loading, errors, warnings, isCalled, submit } = useVotersAndVotes(() => {
-    if (!formRef.current)
-      return {
-        voters_counts: {
-          poll_card_count: 0,
-          proxy_certificate_count: 0,
-          voter_card_count: 0,
-          total_admitted_voters_count: 0,
-        },
-        votes_counts: {
-          votes_candidates_counts: 0,
-          blank_votes_count: 0,
-          invalid_votes_count: 0,
-          total_votes_cast_count: 0,
-        },
-      };
-    const elements = formRef.current.elements as VotersAndVotesFormElement["elements"];
+
+  const getValues = React.useCallback(() => {
+    const form = document.getElementById("voters_and_votes_form") as HTMLFormElement;
+    const elements = form.elements as VotersAndVotesFormElement["elements"];
     return {
       voters_counts: {
         poll_card_count: deformat(elements.poll_card_count.value),
@@ -60,7 +47,10 @@ export function VotersAndVotesForm() {
         total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
       },
     };
-  });
+  }, [deformat]);
+
+  const { sectionValues, loading, errors, warnings, isCalled, submit } =
+    useVotersAndVotes(getValues);
 
   useTooltip({
     onDismiss: resetWarnings,
@@ -81,11 +71,8 @@ export function VotersAndVotesForm() {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-  const success = isCalled && !hasValidationError && !hasValidationWarning && !loading;
   return (
-    <form onSubmit={handleSubmit} ref={formRef}>
-      {/* Temporary while not navigating through form sections */}
-      {success && <div id="result">Success</div>}
+    <form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form">
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
 
       {hasValidationError && (

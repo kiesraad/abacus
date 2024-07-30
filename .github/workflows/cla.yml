@@ -1,0 +1,33 @@
+name: CLA Assistant
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+
+permissions:
+  pull-requests: write
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - id: check
+        uses: kiesraad/cla-bot@main
+
+      - if: failure() && steps.check.outputs.missing
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            Hi ${{steps.check.outputs.missing}}!
+
+            Thank you for contributing to Abacus! Before we consider your pull request, we ask that you sign [our Contributor Licence Agreement (CLA)](https://github.com/kiesraad/abacus/blob/main/CLA.md). This is only required for your first pull request.
+
+            Please [review the CLA](https://github.com/kiesraad/abacus/blob/main/CLA.md), and send your signed copy to abacus[@]kiesraad.nl. Thanks!
+
+      - if: success()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          delete: true

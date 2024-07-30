@@ -1,4 +1,6 @@
-import { describe, expect, test } from "vitest";
+import Router from "react-router";
+
+import { describe, expect, test, vi } from "vitest";
 
 import { PollingStationLayout } from "app/module/input";
 import { overrideOnce, render, screen } from "app/test/unit";
@@ -19,14 +21,18 @@ import {
 describe("PollingStationLayout", () => {
   overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
   overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
+  vi.spyOn(Router, "useParams").mockReturnValue({
+    electionId: electionMock.id.toString(),
+    pollingStationId: pollingStationMock.id.toString(),
+  });
   test("Render", async () => {
     render(
       <ElectionListProvider>
-        <ElectionProvider electionId={1}>
-          <PollingStationListProvider electionId={1}>
+        <ElectionProvider electionId={electionMock.id}>
+          <PollingStationListProvider electionId={electionMock.id}>
             <PollingStationFormController
               election={electionMock}
-              pollingStationId={1}
+              pollingStationId={pollingStationMock.id}
               entryNumber={1}
             >
               <PollingStationLayout />

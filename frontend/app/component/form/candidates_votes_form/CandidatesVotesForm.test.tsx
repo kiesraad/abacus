@@ -9,12 +9,12 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
 } from "@kiesraad/api";
-import { electionDetailMock, politicalGroupMock } from "@kiesraad/api-mocks";
+import { electionMock, politicalGroupMock } from "@kiesraad/api-mocks";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const Component = (
-  <PollingStationFormController election={electionDetailMock} pollingStationId={1} entryNumber={1}>
+  <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
     <CandidatesVotesForm group={politicalGroupMock} />
   </PollingStationFormController>
 );
@@ -44,7 +44,7 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
       other_explanation_count: 0,
       no_explanation_count: 0,
     },
-    political_group_votes: electionDetailMock.political_groups.map((group) => ({
+    political_group_votes: electionMock.political_groups.map((group) => ({
       number: group.number,
       total: 0,
       candidate_votes: group.candidates.map((candidate) => ({
@@ -175,7 +175,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const electionMockData: Election = {
         id: 1,
-        name: "Municipal Election",
+        name: "Gemeenteraadsverkiezingen 2026",
         category: "Municipal",
         election_date: "2024-11-30",
         nomination_date: "2024-11-01",

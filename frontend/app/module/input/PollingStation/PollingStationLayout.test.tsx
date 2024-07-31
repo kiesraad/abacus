@@ -1,20 +1,47 @@
-import { describe, expect, test } from "vitest";
+import Router from "react-router";
 
-import { render } from "app/test/unit";
+import { describe, expect, test, vi } from "vitest";
 
-import { ElectionListProvider, ElectionProvider } from "@kiesraad/api";
+import { PollingStationLayout } from "app/module/input";
+import { overrideOnce, render, screen } from "app/test/unit";
 
-import { PollingStationLayout } from "./PollingStationLayout";
+import {
+  ElectionListProvider,
+  ElectionProvider,
+  PollingStationFormController,
+  PollingStationListProvider,
+} from "@kiesraad/api";
+import {
+  electionMock,
+  electionMockResponse,
+  pollingStationMock,
+  pollingStationsMockResponse,
+} from "@kiesraad/api-mocks";
 
 describe("PollingStationLayout", () => {
-  test("Enter form field values", () => {
+  overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
+  overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
+  vi.spyOn(Router, "useParams").mockReturnValue({
+    electionId: electionMock.id.toString(),
+    pollingStationId: pollingStationMock.id.toString(),
+  });
+  test("Render", async () => {
     render(
       <ElectionListProvider>
-        <ElectionProvider electionId={1}>
-          <PollingStationLayout />
+        <ElectionProvider electionId={electionMock.id}>
+          <PollingStationListProvider electionId={electionMock.id}>
+            <PollingStationFormController
+              election={electionMock}
+              pollingStationId={pollingStationMock.id}
+              entryNumber={1}
+            >
+              <PollingStationLayout />
+            </PollingStationFormController>
+          </PollingStationListProvider>
         </ElectionProvider>
       </ElectionListProvider>,
     );
-    expect(true).toBe(true);
+    expect(await screen.findByText(pollingStationMock.name));
+    expect(await screen.findByText(pollingStationMock.number));
   });
 });

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm.tsx";
+import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm";
 
 import { useElection } from "@kiesraad/api";
 import { Alert, WorkStationNumber } from "@kiesraad/ui";

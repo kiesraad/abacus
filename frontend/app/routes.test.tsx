@@ -3,7 +3,7 @@ import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { overrideOnce, screen } from "app/test/unit";
+import { screen } from "app/test/unit";
 
 import { ApiProvider } from "@kiesraad/api";
 
@@ -64,7 +64,6 @@ describe("routes", () => {
   });
 
   test("Non existing election id results in not found page", async () => {
-    overrideOnce("get", "/api/elections/9876", 404, {});
     const router = setupTestRouter();
 
     // Navigate to a non-existing page

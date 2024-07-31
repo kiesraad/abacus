@@ -3,25 +3,34 @@ import { http, type HttpHandler, HttpResponse } from "msw";
 import {
   DataEntryResponse,
   Election,
+  ElectionDetailsResponse,
+  ElectionListResponse,
   ErrorResponse,
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
+  PollingStation,
   PollingStationListResponse,
   VotersCounts,
   VotesCounts,
 } from "@kiesraad/api";
 
 import {
-  electionDetailMockData,
-  electionListMockData,
+  electionDetailsMockResponse,
+  electionListMockResponse,
+  electionMockData,
   politicalGroupMockData,
-} from "./ElectionMockData.ts";
-import { pollingStationMockData } from "./PollingStationMockData.ts";
+} from "./ElectionMockData";
+import { pollingStationListMockResponse, pollingStationMockData } from "./PollingStationMockData";
 
-export const electionDetailMock = electionDetailMockData as Required<Election>;
+export const electionMock = electionMockData as Required<Election>;
 export const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
-export const pollingStationMock = pollingStationMockData as Required<PollingStationListResponse>;
+export const pollingStationMock = pollingStationMockData as Required<PollingStation>;
+export const pollingStationsMockResponse =
+  pollingStationListMockResponse as Required<PollingStationListResponse>;
+export const electionMockResponse =
+  electionDetailsMockResponse as Required<ElectionDetailsResponse>;
+export const electionsMockResponse = electionListMockResponse as Required<ElectionListResponse>;
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -45,6 +54,17 @@ const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>(
     return HttpResponse.json({
       pong,
     });
+  },
+);
+
+export const ElectionListRequestHandler = http.get("/api/elections", () => {
+  return HttpResponse.json(electionListMockResponse, { status: 200 });
+});
+
+export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
+  "/api/elections/:election_id",
+  () => {
+    return HttpResponse.json(electionDetailsMockResponse, { status: 200 });
   },
 );
 
@@ -178,30 +198,19 @@ export const pollingStationDataEntryHandler = http.post<
   }
 });
 
-export const ElectionListRequestHandler = http.get("/api/elections", () => {
-  return HttpResponse.json(electionListMockData, { status: 200 });
-});
-
-export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
-  "/api/elections/:election_id",
-  () => {
-    return HttpResponse.json({ election: electionDetailMock }, { status: 200 });
-  },
-);
-
 export const PollingStationListRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id/polling_stations",
   () => {
-    return HttpResponse.json(pollingStationMockData, { status: 200 });
+    return HttpResponse.json(pollingStationListMockResponse, { status: 200 });
   },
 );
 
 export const handlers: HttpHandler[] = [
   pingHandler,
-  pollingStationDataEntryHandler,
-  PollingStationListRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
+  pollingStationDataEntryHandler,
+  PollingStationListRequestHandler,
 ];
 
 function valueOutOfRange(v: number): boolean {

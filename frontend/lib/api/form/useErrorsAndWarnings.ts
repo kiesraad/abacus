@@ -1,16 +1,14 @@
 import * as React from "react";
 
+import { ErrorsAndWarnings, FieldValidationResult, ValidationResult } from "@kiesraad/api";
 import { fieldNameFromPath } from "@kiesraad/util";
-
-import { ErrorsAndWarnings, FieldValidationResult } from "../api";
-import { ValidationResult } from "../gen/openapi";
 
 export function useErrorsAndWarnings(
   errors: ValidationResult[],
   warnings: ValidationResult[],
   clientWarnings: FieldValidationResult[],
 ) {
-  const errorsAndWarnings: Map<string, ErrorsAndWarnings> = React.useMemo(() => {
+  return React.useMemo(() => {
     const result = new Map<string, ErrorsAndWarnings>();
 
     const process = (target: keyof ErrorsAndWarnings, arr: ValidationResult[]) => {
@@ -50,6 +48,4 @@ export function useErrorsAndWarnings(
 
     return result;
   }, [errors, warnings, clientWarnings]);
-
-  return errorsAndWarnings;
 }

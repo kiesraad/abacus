@@ -1,7 +1,6 @@
 import * as React from "react";
 
-import { Election } from "../gen/openapi";
-import { useElectionDataRequest } from "../useElectionDataRequest";
+import { Election, useElectionDataRequest } from "@kiesraad/api";
 
 export interface iElectionProviderContext {
   election: Required<Election>;

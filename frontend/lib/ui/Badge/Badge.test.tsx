@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 
 import { render, screen } from "app/test/unit";
 
-import { Badge } from "./Badge.tsx";
+import { Badge } from "./Badge";
 
 test("The correction badge is visible", () => {
   render(<Badge type="correction" />);

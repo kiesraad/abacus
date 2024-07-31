@@ -156,6 +156,7 @@ export function PollingStationFormController({
       const postValues: PollingStationResults = {
         ...values,
         recounted: values.recounted !== undefined ? values.recounted : false,
+        voters_recounts: values.recounted ? values.voters_recounts : undefined,
       };
       doRequest({
         data: postValues,

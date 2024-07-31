@@ -1,6 +1,6 @@
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
-import { render } from "@testing-library/react";
+import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { screen } from "app/test/unit";
@@ -32,7 +32,7 @@ describe("routes", () => {
 
     // NOTE: We're not using the wrapped render function here,
     // since we want control over our own memory router.
-    render(
+    rtlRender(
       <ApiProvider host="http://testhost">
         <RouterProvider router={router} />
       </ApiProvider>,

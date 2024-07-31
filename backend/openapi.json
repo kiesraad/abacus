@@ -337,7 +337,6 @@
         "required": [
           "number",
           "initials",
-          "first_name",
           "last_name",
           "locality"
         ],
@@ -347,7 +346,8 @@
             "nullable": true
           },
           "first_name": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "gender": {
             "allOf": [

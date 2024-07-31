@@ -9,7 +9,7 @@ export function CandidatesVotesPage() {
   const { election } = useElection();
 
   if (!listNumber) {
-    return <div>Geen lijstnummer gevonden</div>;
+    throw Error("Missing 'listNumber' parameter");
   }
 
   const group = election.political_groups.find(

@@ -68,7 +68,7 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
       (e: Election) => e.id.toString() === params.election_id,
     );
     if (election) {
-      return HttpResponse.json(election, { status: 200 });
+      return HttpResponse.json({ election }, { status: 200 });
     } else {
       return HttpResponse.json({}, { status: 404 });
     }

@@ -258,7 +258,7 @@ export function VotersAndVotesForm() {
                 key="A.2"
                 field="A.2"
                 id="poll_card_recount"
-                title="Stempassen (na hertelling door gemeentelijke stembureau)"
+                title="Stempassen"
                 errorsAndWarnings={errorsAndWarnings}
                 inputProps={register()}
                 format={format}
@@ -268,7 +268,7 @@ export function VotersAndVotesForm() {
                 key="B.2"
                 field="B.2"
                 id="proxy_certificate_recount"
-                title="Volmachtbewijzen (na hertelling door gemeentelijke stembureau)"
+                title="Volmachtbewijzen"
                 errorsAndWarnings={errorsAndWarnings}
                 inputProps={register()}
                 defaultValue={sectionValues.voters_recounts?.proxy_certificate_recount}
@@ -278,7 +278,7 @@ export function VotersAndVotesForm() {
                 key="C.2"
                 field="C.2"
                 id="voter_card_recount"
-                title="Kiezerspassen (na hertelling door gemeentelijke stembureau)"
+                title="Kiezerspassen"
                 errorsAndWarnings={errorsAndWarnings}
                 inputProps={register()}
                 format={format}
@@ -288,7 +288,7 @@ export function VotersAndVotesForm() {
                 key="D.2"
                 field="D.2"
                 id="total_admitted_voters_recount"
-                title="Totaal toegelaten (na hertelling door gemeentelijke stembureau)"
+                title="Totaal toegelaten"
                 errorsAndWarnings={errorsAndWarnings}
                 inputProps={register()}
                 format={format}

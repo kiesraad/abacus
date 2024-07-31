@@ -1,3 +1,3 @@
-export * from "./LoginPage.tsx";
-export * from "./AccountSetupPage.tsx";
-export * from "./UserHomePage.tsx";
+export * from "./LoginPage";
+export * from "./AccountSetupPage";
+export * from "./UserHomePage";

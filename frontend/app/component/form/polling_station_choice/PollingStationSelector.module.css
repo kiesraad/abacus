@@ -3,6 +3,10 @@
   align-items: center;
 }
 
+.input {
+  text-align: right;
+}
+
 .result {
   margin: 0 1em;
   padding: 0 2em;

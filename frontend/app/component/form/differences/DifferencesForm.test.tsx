@@ -10,19 +10,19 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
 } from "@kiesraad/api";
-import { electionDetailMock } from "@kiesraad/api-mocks";
+import { electionMock } from "@kiesraad/api-mocks";
 
 import { DifferencesForm } from "./DifferencesForm";
 
 const Component = (
-  <PollingStationFormController election={electionDetailMock} pollingStationId={1} entryNumber={1}>
+  <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
     <DifferencesForm />
   </PollingStationFormController>
 );
 
 const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
   data: {
-    political_group_votes: electionDetailMock.political_groups.map((group) => ({
+    political_group_votes: electionMock.political_groups.map((group) => ({
       number: group.number,
       total: 0,
       candidate_votes: group.candidates.map((candidate) => ({

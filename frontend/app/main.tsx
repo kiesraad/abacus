@@ -5,8 +5,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ApiProvider } from "@kiesraad/api";
 
 // ignore in prod
-import { startMockAPI } from "./msw-mock-api.ts";
-import { routes } from "./routes.tsx";
+import { startMockAPI } from "./msw-mock-api";
+import { routes } from "./routes";
 
 const rootDiv = document.getElementById("root");
 if (!rootDiv) throw new Error("Root div not found");

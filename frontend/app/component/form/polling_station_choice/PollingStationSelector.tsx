@@ -44,6 +44,7 @@ export function PollingStationSelector({
     <div className={cls.container}>
       <InputField
         id="pollingStation"
+        className={cls.input}
         name="number"
         value={pollingStationNumber}
         label="Voer het nummer in:"

@@ -8,7 +8,12 @@ export class InputPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.pollingStation = page.getByTestId("pollingStation");
+    // this.pollingStation = page.getByRole("textbox", { name: "stembureaunummer"})
+
+    // works without the exact, probably because of the sibling with class label containing "nummer"
+    // this.pollingStation = page.getByRole("textbox", { name: "nummer", exact: true})
+    this.pollingStation = page.getByLabel("Voer het nummer in: ");
+
     this.pollingStationFeedback = page.getByTestId("pollingStationSelectorFeedback");
     this.beginnen = page.getByRole("button", { name: "Beginnen" });
   }

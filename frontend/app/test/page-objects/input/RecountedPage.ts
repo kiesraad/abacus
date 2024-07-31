@@ -7,7 +7,8 @@ export class RecountedPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.no = page.getByTestId("no");
+    // this.no = page.getByRole("radio", { name: "not-recounted"})
+    this.no = page.getByLabel("Nee, er was geen hertelling");
     this.volgende = page.getByRole("button", { name: "Volgende" });
   }
 }

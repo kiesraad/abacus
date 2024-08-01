@@ -27,24 +27,13 @@ export function useVotersAndVotes(getValues: () => VotersAndVotesValues) {
     };
   }, [values, setTemporaryCache, cache]);
 
-  // const setSectionValues = (values: VotersAndVotesValues) => {
-  //   setValues((old) => ({
-  //     ...old,
-  //     voters_counts: {
-  //       ...values.voters_counts,
-  //     },
-  //     votes_counts: {
-  //       ...values.votes_counts,
-  //     },
-  //   }));
-  // };
-
-  registerCurrentForm({
-    id: "voters_votes_counts",
-    type: "voters_and_votes",
-    getValues,
-    ignoreWarnings: () => false,
-  });
+  React.useEffect(() => {
+    registerCurrentForm({
+      id: "voters_votes_counts",
+      type: "voters_and_votes",
+      getValues,
+    });
+  }, [registerCurrentForm, getValues]);
 
   const errors = React.useMemo(() => {
     return formState.sections.voters_votes_counts.errors;
@@ -59,7 +48,7 @@ export function useVotersAndVotes(getValues: () => VotersAndVotesValues) {
     sectionValues,
     errors,
     warnings,
-    isCalled: formState.sections.voters_votes_counts.isCalled,
+    isSaved: formState.sections.voters_votes_counts.isSaved,
     submit: submitCurrentForm,
   };
 }

@@ -1,20 +1,15 @@
 import * as React from "react";
 
-import {
-  DifferencesCounts,
-  usePollingStationFormController,
-  ValidationResult,
-} from "@kiesraad/api";
-import { matchValidationResultWithFormSections } from "@kiesraad/util";
+import { DifferencesCounts, usePollingStationFormController } from "@kiesraad/api";
 
-export function useDifferences() {
+export function useDifferences(getValues: () => DifferencesCounts) {
   const {
     values,
-    setValues,
-    data,
+    formState,
     loading,
-    error: serverError,
+    submitCurrentForm,
     setTemporaryCache,
+    registerCurrentForm,
     cache,
   } = usePollingStationFormController();
 
@@ -28,45 +23,27 @@ export function useDifferences() {
   }, [values, setTemporaryCache, cache]);
 
   const errors = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.errors.filter((err) =>
-        matchValidationResultWithFormSections(err.fields, ["differences_votes"]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data]);
+    return formState.sections.differences_counts.errors;
+  }, [formState]);
 
   const warnings = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.warnings.filter((warning) =>
-        matchValidationResultWithFormSections(warning.fields, ["differences_votes"]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data]);
+    return formState.sections.differences_counts.warnings;
+  }, [formState]);
 
-  const setSectionValues = (values: DifferencesCounts) => {
-    setValues((old) => ({
-      ...old,
-      differences_counts: {
-        ...values,
-      },
-    }));
-  };
-
-  const isCalled = React.useMemo(() => {
-    // TODO: How to know if this is called, all values can be 0?
-    return !!sectionValues.more_ballots_count;
-  }, [sectionValues]);
+  React.useEffect(() => {
+    registerCurrentForm({
+      id: "differences_counts",
+      type: "differences",
+      getValues,
+    });
+  }, [registerCurrentForm, getValues]);
 
   return {
     loading,
     sectionValues,
-    setSectionValues,
     errors,
     warnings,
-    isCalled,
-    serverError,
-    setTemporaryCache,
+    isSaved: formState.sections.differences_counts.isSaved,
+    submit: submitCurrentForm,
   };
 }

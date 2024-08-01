@@ -10,7 +10,6 @@ export function usePoliticalGroup(
     values,
     formState,
     loading,
-    error: serverError,
     setTemporaryCache,
     cache,
     registerCurrentForm,
@@ -26,31 +25,6 @@ export function usePoliticalGroup(
     return values.political_group_votes.find((pg) => pg.number === political_group_number);
   }, [values, political_group_number, setTemporaryCache, cache]);
 
-  // const setSectionValues = (values: PoliticalGroupVotes) => {
-  //   setValues((old) => ({
-  //     ...old,
-  //     political_group_votes: old.political_group_votes.map((pg) => {
-  //       if (pg.number === political_group_number) {
-  //         return values;
-  //       }
-  //       return pg;
-  //     }),
-  //   }));
-  // };
-
-  // //TODO: this does not what I want.
-  // const _getValues = React.useCallback(() => {
-  //   const newValues = getValues();
-  //   return {
-  //     political_group_votes: values.political_group_votes.map((pg) => {
-  //       if (pg.number === political_group_number) {
-  //         return newValues;
-  //       }
-  //       return pg;
-  //     }),
-  //   };
-  // }, [values, political_group_number, getValues]);
-
   const errors = React.useMemo(() => {
     return formState.sections[`political_group_votes_${political_group_number}`]?.errors || [];
   }, [formState, political_group_number]);
@@ -59,22 +33,23 @@ export function usePoliticalGroup(
     return formState.sections[`political_group_votes_${political_group_number}`]?.warnings || [];
   }, [formState, political_group_number]);
 
-  registerCurrentForm({
-    type: "political_group_votes",
-    id: `political_group_votes_${political_group_number}`,
-    number: political_group_number,
-    getValues,
-    ignoreWarnings: () => false,
-  });
+  //Once form is rendered, register the form
+  React.useEffect(() => {
+    registerCurrentForm({
+      type: "political_group_votes",
+      id: `political_group_votes_${political_group_number}`,
+      number: political_group_number,
+      getValues,
+    });
+  }, [registerCurrentForm, getValues, political_group_number]);
 
   return {
     sectionValues,
     errors,
     warnings,
     loading,
-    isCalled:
-      formState.sections[`political_group_votes_${political_group_number}`]?.isCalled || false,
-    serverError,
+    isSaved:
+      formState.sections[`political_group_votes_${political_group_number}`]?.isSaved || false,
     setTemporaryCache,
     submit: submitCurrentForm,
   };

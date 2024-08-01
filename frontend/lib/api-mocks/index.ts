@@ -100,6 +100,14 @@ export const pollingStationDataEntryHandler = http.post<
       }
     });
 
+    //introduce a warning trigger
+    if (voters_counts.poll_card_count === 1337) {
+      response.validation_results.warnings.push({
+        code: "IncorrectCandidatesList",
+        fields: ["data.voters_counts.poll_card_count"],
+      });
+    }
+
     // A + B + C = D
     if (
       voters_counts.poll_card_count +

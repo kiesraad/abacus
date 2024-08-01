@@ -49,7 +49,7 @@ export function VotersAndVotesForm() {
     };
   }, [deformat]);
 
-  const { sectionValues, loading, errors, warnings, isCalled, submit } =
+  const { sectionValues, loading, errors, warnings, isSaved, submit } =
     useVotersAndVotes(getValues);
 
   useTooltip({
@@ -58,16 +58,19 @@ export function VotersAndVotesForm() {
 
   function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
     event.preventDefault();
-    submit();
+    const ignoreWarnings = (
+      document.getElementById("voters_and_votes_form_ignore_warnings") as HTMLInputElement
+    ).checked;
+    submit(ignoreWarnings);
   }
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
   React.useEffect(() => {
-    if (isCalled) {
+    if (isSaved) {
       window.scrollTo(0, 0);
     }
-  }, [isCalled]);
+  }, [isSaved]);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
@@ -193,11 +196,40 @@ export function VotersAndVotesForm() {
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="inputgrid">
+        <IngoreWarningsCheckbox
+          id="voters_and_votes_form_ignore_warnings"
+          defaultChecked={false}
+          hidden={warnings.length === 0}
+        >
+          Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
+        </IngoreWarningsCheckbox>
+
         <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>
         <span className="button_hint">SHIFT + Enter</span>
       </BottomBar>
     </form>
+  );
+}
+
+interface IngoreWarningsCheckboxProps {
+  id: string;
+  children: React.ReactNode;
+  defaultChecked?: boolean;
+  hidden?: boolean;
+}
+
+function IngoreWarningsCheckbox({
+  id,
+  children,
+  defaultChecked,
+  hidden,
+}: IngoreWarningsCheckboxProps) {
+  return (
+    <div style={{ display: hidden ? "none" : "block" }}>
+      <input type="checkbox" id={id} defaultChecked={defaultChecked} />
+      <label htmlFor="voters_and_votes_form_ignore_warnings">{children}</label>
+    </div>
   );
 }

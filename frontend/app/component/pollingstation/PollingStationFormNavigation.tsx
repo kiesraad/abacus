@@ -6,7 +6,7 @@ import { Button, Modal } from "@kiesraad/ui";
 
 export function PollingStationFormNavigation() {
   const _lastKnownSection = React.useRef<FormSectionID | null>(null);
-  const { formState, error, currentForm } = usePollingStationFormController();
+  const { formState, error, currentForm, targetFormSection } = usePollingStationFormController();
   const { pollingStationId } = useParams();
   const { election } = useElection();
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export function PollingStationFormNavigation() {
           console.log("BLOCKED: has errors");
           return true;
         }
-        if (formSection.warnings.length > 0 && !currentForm.ignoreWarnings()) {
+        if (formSection.warnings.length > 0 && !formSection.ignoreWarnings) {
           console.log("BLOCKED: has warnings without ignore");
           return true;
         }
@@ -47,19 +47,17 @@ export function PollingStationFormNavigation() {
 
   const blocker = useBlocker(shouldBlock);
 
+  //check if the targetFormSection has changed and navigate to the correct url
   React.useEffect(() => {
-    if (_lastKnownSection.current === null) {
-      console.log("Setting last known section to", formState.active);
-      _lastKnownSection.current = formState.active;
-    }
-    if (formState.active !== _lastKnownSection.current) {
-      console.log("Navigating to", formState.active);
-      _lastKnownSection.current = formState.active;
+    if (targetFormSection !== _lastKnownSection.current) {
+      console.log("Navigating to", targetFormSection);
+      _lastKnownSection.current = targetFormSection;
+
       let url: string = "";
-      if (formState.active.startsWith("political_group_votes_")) {
-        url = `${baseUrl}/list/${formState.active.replace("political_group_votes_", "")}`;
+      if (targetFormSection.startsWith("political_group_votes_")) {
+        url = `${baseUrl}/list/${targetFormSection.replace("political_group_votes_", "")}`;
       } else {
-        switch (formState.active) {
+        switch (targetFormSection) {
           case "differences_counts":
             url = `${baseUrl}/differences`;
             break;
@@ -70,7 +68,7 @@ export function PollingStationFormNavigation() {
       }
       navigate(url);
     }
-  }, [formState, baseUrl, navigate]);
+  }, [targetFormSection, baseUrl, navigate]);
 
   //TODO: handle server error
 

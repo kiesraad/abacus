@@ -29,35 +29,40 @@ export interface CandidatesVotesFormProps {
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
-  const { sectionValues, errors, warnings, loading, isCalled, submit } = usePoliticalGroup(
+
+  const getValues = React.useCallback(() => {
+    const form = document.getElementById(
+      `candidates_form_${group.number}`,
+    ) as CandidatesVotesFormElement;
+    const elements = form.elements;
+    const candidate_votes: CandidateVotes[] = [];
+    for (const el of elements["candidatevotes[]"]) {
+      candidate_votes.push({
+        number: candidateNumberFromId(el.id),
+        votes: deformat(el.value),
+      });
+    }
+    return {
+      number: group.number,
+      total: deformat(elements.total.value),
+      candidate_votes: candidate_votes,
+    };
+  }, [deformat, group]);
+
+  const { sectionValues, errors, warnings, loading, isSaved, submit } = usePoliticalGroup(
     group.number,
-    () => {
-      if (formRef.current) {
-        const elements = formRef.current.elements;
-        const candidate_votes: CandidateVotes[] = [];
-        for (const el of elements["candidatevotes[]"]) {
-          candidate_votes.push({
-            number: candidateNumberFromId(el.id),
-            votes: deformat(el.value),
-          });
-        }
-        return {
-          number: group.number,
-          total: deformat(elements.total.value),
-          candidate_votes: candidate_votes,
-        };
-      }
-      return {
-        number: group.number,
-        total: 0,
-        candidate_votes: [],
-      };
-    },
+    getValues,
   );
 
   usePreventFormEnterSubmit(formRef);
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+
+  React.useEffect(() => {
+    if (isSaved) {
+      window.scrollTo(0, 0);
+    }
+  }, [isSaved]);
 
   function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
     event.preventDefault();
@@ -66,11 +71,10 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-  const success = isCalled && !hasValidationError && !hasValidationWarning && !loading;
+
   return (
-    <form onSubmit={handleSubmit} ref={formRef}>
+    <form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
       {/* Temporary while not navigating through form sections */}
-      {success && <div id="result">Success</div>}
       <h2>{group.name}</h2>
       {hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">

@@ -1,17 +1,6 @@
-import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-import { NotFoundContext } from "./NotFoundProvider";
-
 export function NotFound() {
-  const { notFound, setNotFound } = useContext(NotFoundContext);
-
-  useEffect(() => {
-    if (!notFound) {
-      setNotFound(true);
-    }
-  }, [notFound, setNotFound]);
-
   return (
     <div className="app-layout">
       <nav>

@@ -81,4 +81,23 @@ describe("routes", () => {
     // Test that we get the Not Found page
     await expectNotFound();
   });
+
+  test("Non existing polling station id results in not found page", async () => {
+    const router = setupTestRouter();
+
+    // Navigate to a non-existing page
+    await router.navigate("/1/input/9876");
+    expect(router.state.location.pathname).toEqual("/1/input/9876");
+
+    // NOTE: We're not using the wrapped render function here,
+    // since we want control over our own memory router.
+    rtlRender(
+      <ApiProvider host="http://testhost">
+        <RouterProvider router={router} />
+      </ApiProvider>,
+    );
+
+    // Test that we get the Not Found page
+    await expectNotFound();
+  });
 });

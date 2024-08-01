@@ -68,3 +68,48 @@ test.describe("Data entry", () => {
     // TODO: Controleren en opslaan
   });
 });
+
+test.describe("errors and warnings", () => {
+  test("display error on voters and votes page", async ({ page }) => {
+    await page.goto("/1/input/1/numbers");
+
+    const votersVotesPage = new VotersVotesPage(page);
+    const voters = {
+      poll_card_count: "1",
+      proxy_certificate_count: "0",
+      voter_card_count: "0",
+      total_admitted_voters_count: "100",
+    };
+    await votersVotesPage.inputVoters(voters);
+
+    await votersVotesPage.volgende.click();
+
+    await expect(votersVotesPage.error).toBeVisible();
+    await expect(votersVotesPage.warning).toBeHidden();
+  });
+
+  test("display warning on voters and votes page", async ({ page }) => {
+    await page.goto("/1/input/1/numbers");
+
+    const votersVotesPage = new VotersVotesPage(page);
+    const voters = {
+      poll_card_count: "100",
+      proxy_certificate_count: "0",
+      voter_card_count: "0",
+      total_admitted_voters_count: "100",
+    };
+    const votes = {
+      votes_candidates_counts: "100",
+      blank_votes_count: "0",
+      invalid_votes_count: "0",
+      total_votes_cast_count: "100",
+    };
+    await votersVotesPage.inputVoters(voters);
+    await votersVotesPage.inputVotes(votes);
+
+    await votersVotesPage.volgende.click();
+
+    await expect(votersVotesPage.error).toBeHidden();
+    await expect(votersVotesPage.warning).toBeVisible();
+  });
+});

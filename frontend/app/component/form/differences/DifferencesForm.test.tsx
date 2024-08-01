@@ -217,7 +217,7 @@ describe("Test DifferencesForm", () => {
   });
 
   describe("DifferencesForm errors", () => {
-    test("F.01 Invalid value", async () => {
+    test("F.001 Invalid value", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -245,7 +245,7 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.21/22 IncorrectDifference", async () => {
+    test("F.301/22 IncorrectDifference", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -273,7 +273,7 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.23/24 IncorrectDifference", async () => {
+    test("F.303/24 IncorrectDifference", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -301,7 +301,7 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.25 ConflictingDifferences", async () => {
+    test("W.301 ConflictingDifferences", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -332,21 +332,23 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.26 Incorrect total", async () => {
+    test("W.302 Incorrect total", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
+          errors: [],
+          warnings: [
             {
               fields: [
                 "data.differences_counts.more_ballots_count",
                 "data.differences_counts.too_many_ballots_handed_out_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.unreturned_ballots",
                 "data.differences_counts.other_explanation_count",
                 "data.differences_counts.no_explanation_count",
               ],
               code: "IncorrectTotal",
             },
           ],
-          warnings: [],
         },
       });
 
@@ -365,20 +367,22 @@ describe("Test DifferencesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
-      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^IncorrectTotal$/);
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.27 Incorrect total", async () => {
+    test("W.303 Incorrect total", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
+          errors: [],
+          warnings: [
             {
               fields: [
                 "data.differences_counts.fewer_ballots_count",
                 "data.differences_counts.unreturned_ballots_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
                 "data.differences_counts.too_few_ballots_handed_out_count",
                 "data.differences_counts.other_explanation_count",
                 "data.differences_counts.no_explanation_count",
@@ -386,7 +390,6 @@ describe("Test DifferencesForm", () => {
               code: "IncorrectTotal",
             },
           ],
-          warnings: [],
         },
       });
 
@@ -405,9 +408,9 @@ describe("Test DifferencesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
-      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^IncorrectTotal$/);
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
   });

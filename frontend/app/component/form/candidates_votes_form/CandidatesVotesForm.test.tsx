@@ -315,7 +315,7 @@ describe("Test CandidatesVotesForm", () => {
   });
 
   describe("CandidatesVotesForm errors", () => {
-    test("F.01 Invalid value", async () => {
+    test("F.001 Invalid value", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -343,7 +343,7 @@ describe("Test CandidatesVotesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.31 IncorrectTotal group total", async () => {
+    test("F.401 IncorrectTotal group total", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [

@@ -242,7 +242,7 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   describe("VotersAndVotesForm errors", () => {
-    test("F.01 Invalid value", async () => {
+    test("F.001 Invalid value", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -270,7 +270,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.11 IncorrectTotal Voters counts", async () => {
+    test("F.201 IncorrectTotal Voters counts", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -306,7 +306,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.12 IncorrectTotal Votes counts", async () => {
+    test("F.202 IncorrectTotal Votes counts", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -342,7 +342,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.13 IncorrectTotal Voters recounts", async () => {
+    test("F.203 IncorrectTotal Voters recounts", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -411,7 +411,7 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   describe("VotersAndVotesForm warnings", () => {
-    test("W.21 AboveThreshold blank votes", async () => {
+    test("W.201 AboveThreshold blank votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -445,7 +445,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
-    test("W.22 AboveThreshold invalid votes", async () => {
+    test("W.202 AboveThreshold invalid votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -479,7 +479,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
-    test("W.29 EqualInput voters counts and votes counts", async () => {
+    test("W.209 EqualInput voters counts and votes counts", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -515,7 +515,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
-    test("W.30 EqualInput voters recounts and votes counts", async () => {
+    test("W.210 EqualInput voters recounts and votes counts", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],

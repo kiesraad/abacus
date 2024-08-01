@@ -20,7 +20,8 @@ test.describe("Data entry", () => {
     await expect(recountedPage.no).toBeChecked();
     await recountedPage.volgende.click();
 
-    // TODO: check for errors and warnings
+    await expect(recountedPage.error).toBeHidden();
+    await expect(recountedPage.warning).toBeHidden();
 
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
@@ -42,14 +43,16 @@ test.describe("Data entry", () => {
 
     await votersVotesPage.volgende.click();
 
-    // TODO: check for errors and warnings
+    await expect(votersVotesPage.error).toBeHidden();
+    await expect(votersVotesPage.warning).toBeHidden();
 
     await votersVotesPage.verschillen.click(); // TODO: remove once naviation works
 
     const differencesPage = new DifferencesPage(page);
     await differencesPage.volgende.click();
 
-    // TODO: check for errors and warnings
+    await expect(differencesPage.error).toBeHidden();
+    await expect(differencesPage.warning).toBeHidden();
 
     await differencesPage.politicalGroupA.click(); // TODO: remove once naviation works
 
@@ -58,5 +61,10 @@ test.describe("Data entry", () => {
     await candidatesListPage_1.fillCandidate(1, 22);
     await candidatesListPage_1.total.fill("122");
     await candidatesListPage_1.volgende.click();
+
+    await expect(differencesPage.error).toBeHidden();
+    await expect(differencesPage.warning).toBeHidden();
+
+    // TODO: Controleren en opslaan
   });
 });

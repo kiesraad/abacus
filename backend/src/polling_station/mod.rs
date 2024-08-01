@@ -173,7 +173,7 @@ mod tests {
 
     use super::*;
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
+    #[sqlx::test(fixtures("../../fixtures/elections.sql", "../../fixtures/polling_stations.sql"))]
     async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
         let mut request_body = DataEntryRequest {
             data: PollingStationResults {
@@ -297,7 +297,7 @@ mod tests {
         assert_eq!(row_count.count, 1);
     }
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections")))]
+    #[sqlx::test(fixtures("../../fixtures/elections.sql"))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
         // Insert two unique polling stations
         let _ = query!(r#"

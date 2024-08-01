@@ -21,7 +21,7 @@ export function ElectionProvider({ children, electionId }: ElectionProviderProps
   });
 
   if (loading) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   if (!data || error) {

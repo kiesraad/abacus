@@ -84,7 +84,7 @@ export function RecountedForm() {
         </Feedback>
       )}
       {hasValidationError && (
-        <Feedback type="error" title="Controleer het papieren proces-verbaal" code="F.102">
+        <Feedback type="error" title="Controleer het papieren proces-verbaal" code="F.101">
           <div>
             Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?
             <ul>

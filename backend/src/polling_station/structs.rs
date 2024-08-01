@@ -194,6 +194,26 @@ impl Validate for PollingStationResults {
             }
         }
 
+        // W.306 validate that no difference specifics should be filled in when there is no difference in the totals
+        if total_voters_counts == total_votes_counts
+            && (self.differences_counts.unreturned_ballots_count != 0
+                || self.differences_counts.too_few_ballots_handed_out_count != 0
+                || self.differences_counts.too_many_ballots_handed_out_count != 0
+                || self.differences_counts.other_explanation_count != 0
+                || self.differences_counts.no_explanation_count != 0)
+        {
+            validation_results.warnings.push(ValidationResult {
+                fields: vec![
+                    format!("{field_name}.differences_counts.unreturned_ballots_count"),
+                    format!("{field_name}.differences_counts.too_few_ballots_handed_out_count"),
+                    format!("{field_name}.differences_counts.too_many_ballots_handed_out_count"),
+                    format!("{field_name}.differences_counts.other_explanation_count"),
+                    format!("{field_name}.differences_counts.no_explanation_count"),
+                ],
+                code: ValidationResultCode::NoDifferenceExpected,
+            });
+        }
+
         self.differences_counts.validate(
             election,
             validation_results,

@@ -245,7 +245,7 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.301/22 IncorrectDifference", async () => {
+    test("F.301/F.302 IncorrectDifference", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -273,7 +273,7 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.303/24 IncorrectDifference", async () => {
+    test("F.303/F.304 IncorrectDifference", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [

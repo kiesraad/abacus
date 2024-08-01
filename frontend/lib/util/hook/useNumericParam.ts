@@ -9,8 +9,8 @@ export function useNumericParam(p: string): number {
     throw Error(`Parameter ${p} does not exist`);
   }
 
-  // Matches only if the whole word is numeric.
-  if (!/\b\d+\b/.test(param)) {
+  // Matches only if the whole string is numeric
+  if (!/^\d+$/.test(param)) {
     throw Error(`Parameter ${p} is not numeric`);
   }
 

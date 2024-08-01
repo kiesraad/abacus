@@ -9,7 +9,7 @@ use crate::utils::serve_api;
 
 mod utils;
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections")))]
+#[sqlx::test(fixtures("../fixtures/elections.sql"))]
 async fn test_election_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -24,7 +24,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body.elections.len(), 2);
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections")))]
+#[sqlx::test(fixtures("../fixtures/elections.sql"))]
 async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

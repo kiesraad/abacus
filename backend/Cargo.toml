@@ -19,9 +19,9 @@ utoipa = { version = "4.2", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "7.1.0", features = ["axum"], optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-sqlx = { version = "0.7", features = ["runtime-tokio", "sqlite", "chrono"] }
+sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "chrono"] }
 chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
-clap = { version = "4.0", default-features = false, features = ["derive", "std"] }
+clap = { version = "4.5", default-features = false, features = ["derive", "std"] }
 
 [dev-dependencies]
 reqwest = { version = "0.12", default-features = false, features = ["json"] }

@@ -7,7 +7,6 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
 
 import {
-  ElectionProvider,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
 } from "@kiesraad/api";
@@ -16,15 +15,13 @@ import { electionMock, pollingStationMock } from "@kiesraad/api-mocks";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const Component = (
-  <ElectionProvider electionId={1}>
-    <PollingStationFormController
-      pollingStationId={pollingStationMock.id}
-      entryNumber={1}
-      election={electionMock}
-    >
-      <VotersAndVotesForm />
-    </PollingStationFormController>
-  </ElectionProvider>
+  <PollingStationFormController
+    pollingStationId={pollingStationMock.id}
+    entryNumber={1}
+    election={electionMock}
+  >
+    <VotersAndVotesForm />
+  </PollingStationFormController>
 );
 
 const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {

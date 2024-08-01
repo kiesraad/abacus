@@ -5,7 +5,6 @@ import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit
 
 import {
   Election,
-  ElectionProvider,
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
@@ -15,15 +14,13 @@ import { electionMock, politicalGroupMock, pollingStationMock } from "@kiesraad/
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const Component = (
-  <ElectionProvider electionId={1}>
-    <PollingStationFormController
-      pollingStationId={pollingStationMock.id}
-      entryNumber={1}
-      election={electionMock}
-    >
-      <CandidatesVotesForm group={politicalGroupMock} />
-    </PollingStationFormController>
-  </ElectionProvider>
+  <PollingStationFormController
+    pollingStationId={pollingStationMock.id}
+    entryNumber={1}
+    election={electionMock}
+  >
+    <CandidatesVotesForm group={politicalGroupMock} />
+  </PollingStationFormController>
 );
 
 const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
@@ -211,15 +208,13 @@ describe("Test CandidatesVotesForm", () => {
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <ElectionProvider electionId={1}>
-          <PollingStationFormController
-            pollingStationId={pollingStationMock.id}
-            entryNumber={1}
-            election={electionMockData}
-          >
-            <CandidatesVotesForm group={politicalGroupMock} />
-          </PollingStationFormController>
-        </ElectionProvider>
+        <PollingStationFormController
+          pollingStationId={pollingStationMock.id}
+          entryNumber={1}
+          election={electionMockData}
+        >
+          <CandidatesVotesForm group={politicalGroupMock} />
+        </PollingStationFormController>
       );
 
       const expectedRequest = {

@@ -1,5 +1,7 @@
 import { type Locator, type Page } from "@playwright/test";
 
+import { InputBasePage } from "./InputBasePage";
+
 interface VotersCounts {
   poll_card_count: string;
   proxy_certificate_count: string;
@@ -14,8 +16,7 @@ interface VotesCounts {
   total_votes_cast_count: string;
 }
 
-export class VotersVotesPage {
-  protected readonly page: Page;
+export class VotersVotesPage extends InputBasePage {
   readonly pollCardCount: Locator;
   readonly proxyCertificateCount: Locator;
   readonly voterCardCount: Locator;
@@ -24,9 +25,11 @@ export class VotersVotesPage {
   readonly blankVotesCount: Locator;
   readonly invalidVotesCount: Locator;
   readonly totalVotesCastCount: Locator;
+  readonly volgende: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
+
     // this.pollCardCount = page.getByLabel("Stempassen")
     // this.pollCardCount = page.getByRole("textbox", {name: "poll_card_count"});
     this.pollCardCount = page.getByTestId("poll_card_count");
@@ -37,6 +40,8 @@ export class VotersVotesPage {
     this.blankVotesCount = page.getByTestId("blank_votes_count");
     this.invalidVotesCount = page.getByTestId("invalid_votes_count");
     this.totalVotesCastCount = page.getByTestId("total_votes_cast_count");
+
+    this.volgende = page.getByRole("button", { name: "Volgende" });
   }
 
   async inputVoters(votersCounts: VotersCounts) {

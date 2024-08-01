@@ -1,11 +1,13 @@
 import { expect, test } from "@playwright/test";
 
+import { CandidatesListPage } from "../page-objects/input/CanidatesListPage";
+import { DifferencesPage } from "../page-objects/input/DifferencesPage";
 import { InputPage } from "../page-objects/input/InputPage";
 import { RecountedPage } from "../page-objects/input/RecountedPage";
 import { VotersVotesPage } from "../page-objects/input/VotersVotesPage";
 
 test.describe("Data entry", () => {
-  test("no recount flow", async ({ page }) => {
+  test("no recount, no differences flow", async ({ page }) => {
     await page.goto("/1/input");
 
     const inputPage = new InputPage(page);
@@ -17,6 +19,8 @@ test.describe("Data entry", () => {
     await recountedPage.no.check();
     await expect(recountedPage.no).toBeChecked();
     await recountedPage.volgende.click();
+
+    // TODO: check for errors and warnings
 
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
@@ -35,5 +39,24 @@ test.describe("Data entry", () => {
     await votersVotesPage.inputVotes(votes);
 
     await expect(page.getByTestId("poll_card_count")).toHaveValue(voters.poll_card_count);
+
+    await votersVotesPage.volgende.click();
+
+    // TODO: check for errors and warnings
+
+    await votersVotesPage.verschillen.click(); // TODO: remove once naviation works
+
+    const differencesPage = new DifferencesPage(page);
+    await differencesPage.volgende.click();
+
+    // TODO: check for errors and warnings
+
+    await differencesPage.politicalGroupA.click(); // TODO: remove once naviation works
+
+    const candidatesListPage_1 = new CandidatesListPage(page);
+    await candidatesListPage_1.fillCandidate(0, 100);
+    await candidatesListPage_1.fillCandidate(1, 22);
+    await candidatesListPage_1.total.fill("122");
+    await candidatesListPage_1.volgende.click();
   });
 });

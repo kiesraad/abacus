@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { usePollingStationList } from "@kiesraad/api";
 import { Alert, BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
+import { parseIntStrict } from "@kiesraad/util";
 
 import { PollingStationSelector } from "./PollingStationSelector";
 import { PollingStationsList } from "./PollingStationsList";
@@ -14,7 +15,7 @@ export function PollingStationChoiceForm() {
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
 
   const handleSubmit = () => {
-    const parsedStationNumber = parseInt(pollingStationNumber, 10);
+    const parsedStationNumber = parseIntStrict(pollingStationNumber);
     const pollingStation = pollingStations.find(
       (pollingStation) => pollingStation.number === parsedStationNumber,
     );

@@ -84,10 +84,7 @@ export function PollingStationSelector({
             );
           } else {
             return (
-              <div
-                id="pollingStationSelectorFeedback"
-                className={cn(cls.message, cls.error, cls.w100)}
-              >
+              <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.error)}>
                 <span className={cls.icon}>
                   <Icon icon={<IconError />} color="error" />
                 </span>

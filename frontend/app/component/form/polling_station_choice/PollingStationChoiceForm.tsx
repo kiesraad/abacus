@@ -57,7 +57,7 @@ export function PollingStationChoiceForm() {
         Dan kan je beginnen. Klopt de naam niet? Overleg met de coördinator.
       </p>
       {showAlert && (
-        <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.error, cls.border)}>
+        <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
           <span className={cls.icon}>
             <Icon icon={<IconError />} color="error" />
           </span>

@@ -28,7 +28,7 @@ export function PollingStationLayout() {
   return (
     <PollingStationFormController
       election={election}
-      pollingStationId={parseInt(pollingStationId || "0")}
+      pollingStationId={pollingStation.id}
       entryNumber={1}
     >
       <header>

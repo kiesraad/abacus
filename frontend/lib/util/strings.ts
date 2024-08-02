@@ -5,3 +5,9 @@ export function ellipsis(text: string, maxLength: number = 20): string {
 
   return text.substring(0, maxLength - 3) + "...";
 }
+
+// Checks if the _whole_ string is numeric, returning it as a number
+// returns undefined when non-numeric characters are encountered
+export function parseIntStrict(text: string): number | undefined {
+  return /^\d+$/.test(text) ? parseInt(text, 10) : undefined;
+}

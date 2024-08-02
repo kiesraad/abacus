@@ -9,17 +9,20 @@
 }
 
 .message {
-  padding: 0 2em;
+  padding: 1rem 1.5rem;
   background-color: var(--bg-gray-darker);
   height: 4em;
-  width: 100%;
   align-content: center;
   font-size: var(--font-size-body);
-  display: flex;
+  display: inline-flex;
   align-items: center;
 
   &.error {
     background-color: var(--color-error-bg);
+  }
+
+  &.w100 {
+    width: 100%;
   }
 
   &.success {
@@ -28,7 +31,7 @@
 
   .icon {
     padding-top: 6px;
-    padding-right: 1em;
+    padding-right: 1rem;
   }
 
   &.border {

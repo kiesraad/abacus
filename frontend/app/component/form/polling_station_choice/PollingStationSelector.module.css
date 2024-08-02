@@ -1,14 +1,14 @@
 .container {
   display: flex;
   align-items: center;
+  gap: 1em;
 }
 
 .input {
   text-align: right;
 }
 
-.result {
-  margin: 0 1em;
+.message {
   padding: 0 2em;
   background-color: var(--bg-gray-darker);
   height: 4em;
@@ -29,5 +29,13 @@
   .icon {
     padding-top: 6px;
     padding-right: 1em;
+  }
+
+  &.border {
+    border-left: 4px solid var(--color-error);
+  }
+
+  &.errorcolor {
+    color: var(--color-error);
   }
 }

@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { usePollingStationList } from "@kiesraad/api";
+import { PollingStation, usePollingStationList } from "@kiesraad/api";
+import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
+import { cn } from "@kiesraad/util";
 
 import { PollingStationSelector } from "./PollingStationSelector";
+import cls from "./PollingStationSelector.module.css";
 import { PollingStationsList } from "./PollingStationsList";
 
 export function PollingStationChoiceForm() {
@@ -12,8 +15,17 @@ export function PollingStationChoiceForm() {
 
   const { pollingStations, pollingStationsLoading } = usePollingStationList();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(
+    undefined,
+  );
 
   const handleSubmit = () => {
+    if (!currentPollingStation || pollingStationNumber === "") {
+      setShowAlert(true);
+      return;
+    }
+
     const parsedStationNumber = parseInt(pollingStationNumber, 10);
     const pollingStation = pollingStations.find(
       (pollingStation) => pollingStation.number === parsedStationNumber,
@@ -34,6 +46,9 @@ export function PollingStationChoiceForm() {
       <PollingStationSelector
         pollingStationNumber={pollingStationNumber}
         setPollingStationNumber={setPollingStationNumber}
+        currentPollingStation={currentPollingStation}
+        setCurrentPollingStation={setCurrentPollingStation}
+        setShowAlert={setShowAlert}
         handleSubmit={handleSubmit}
       />
       <p className="md">
@@ -41,6 +56,17 @@ export function PollingStationChoiceForm() {
         <br />
         Dan kan je beginnen. Klopt de naam niet? Overleg met de coördinator.
       </p>
+      {showAlert && (
+        <div
+          id="pollingStationSubmitFeedback"
+          className={cn(cls.message, cls.error, cls.border, cls.errorcolor)}
+        >
+          <span className={cls.icon}>
+            <Icon icon={<IconError />} color="error" />
+          </span>
+          <span>Voer een geldig nummer van een stembureau in om te beginnen</span>
+        </div>
+      )}
       <BottomBar type="form">
         <Button
           type="button"

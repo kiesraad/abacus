@@ -10,6 +10,9 @@ import cls from "./PollingStationSelector.module.css";
 export interface PollingStationSelectorProps {
   pollingStationNumber: string;
   setPollingStationNumber: Dispatch<SetStateAction<string>>;
+  currentPollingStation: PollingStation | undefined;
+  setCurrentPollingStation: Dispatch<SetStateAction<PollingStation | undefined>>;
+  setShowAlert: Dispatch<SetStateAction<boolean>>;
   handleSubmit: () => void;
 }
 
@@ -18,12 +21,12 @@ const USER_INPUT_DEBOUNCE: number = 500; // ms
 export function PollingStationSelector({
   pollingStationNumber,
   setPollingStationNumber,
+  currentPollingStation,
+  setCurrentPollingStation,
+  setShowAlert,
   handleSubmit,
 }: PollingStationSelectorProps) {
   const [loading, setLoading] = useState<boolean>(false);
-  const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(
-    undefined,
-  );
 
   const { pollingStations, pollingStationsLoading } = usePollingStationList();
 
@@ -52,6 +55,7 @@ export function PollingStationSelector({
         margin={false}
         maxLength={6}
         onChange={(e) => {
+          setShowAlert(false);
           setPollingStationNumber(e.target.value);
         }}
         onKeyDown={(e) => {
@@ -64,7 +68,7 @@ export function PollingStationSelector({
         (() => {
           if (pollingStationsLoading || loading) {
             return (
-              <div className={cls.result}>
+              <div className={cls.message}>
                 <span className={cls.icon}>
                   <Icon icon={<Spinner size="md" />} />
                 </span>
@@ -73,14 +77,14 @@ export function PollingStationSelector({
             );
           } else if (currentPollingStation) {
             return (
-              <div id="pollingStationSelectorFeedback" className={cn(cls.result, cls.success)}>
-                <span className={"bold"}>{currentPollingStation.name}</span>
+              <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.success)}>
+                <span className="bold">{currentPollingStation.name}</span>
                 {/* TODO: <Badge type="first_entry" />*/}
               </div>
             );
           } else {
             return (
-              <div id="pollingStationSelectorFeedback" className={cn(cls.result, cls.error)}>
+              <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.error)}>
                 <span className={cls.icon}>
                   <Icon icon={<IconError />} color="error" />
                 </span>

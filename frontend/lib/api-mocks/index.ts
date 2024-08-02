@@ -315,6 +315,47 @@ export const pollingStationDataEntryHandler = http.post<
       });
     }
 
+    // W.304 (recounted = false) or W.305 (recounted = true)
+    // validate that no difference should be filled in when there is no difference in the totals
+    if (
+      total_voters_counts == total_votes_counts &&
+      (differences_counts.more_ballots_count != 0 || differences_counts.fewer_ballots_count != 0)
+    ) {
+      if (differences_counts.more_ballots_count != 0) {
+        response.validation_results.warnings.push({
+          fields: ["data.differences_counts.more_ballots_count"],
+          code: "NoDifferenceExpected",
+        });
+      }
+      if (differences_counts.fewer_ballots_count != 0) {
+        response.validation_results.warnings.push({
+          fields: ["data.differences_counts.fewer_ballots_count"],
+          code: "NoDifferenceExpected",
+        });
+      }
+    }
+
+    // W.306 validate that no difference specifics should be filled in when there is no difference in the totals
+    if (
+      total_voters_counts == total_votes_counts &&
+      (differences_counts.unreturned_ballots_count != 0 ||
+        differences_counts.too_few_ballots_handed_out_count != 0 ||
+        differences_counts.too_many_ballots_handed_out_count != 0 ||
+        differences_counts.other_explanation_count != 0 ||
+        differences_counts.no_explanation_count != 0)
+    ) {
+      response.validation_results.warnings.push({
+        fields: [
+          "data.differences_counts.unreturned_ballots_count",
+          "data.differences_counts.too_few_ballots_handed_out_count",
+          "data.differences_counts.too_many_ballots_handed_out_count",
+          "data.differences_counts.other_explanation_count",
+          "data.differences_counts.no_explanation_count",
+        ],
+        code: "NoDifferenceExpected",
+      });
+    }
+
     //SECTION political_group_votes
     let candidateVotesSum = 0;
     political_group_votes.forEach((pg) => {
@@ -371,7 +412,7 @@ export const pollingStationDataEntryHandler = http.post<
 export const PollingStationListRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id/polling_stations",
   () => {
-    return HttpResponse.json(pollingStationListMockResponse, { status: 200 });
+    return HttpResponse.json(pollingStationsMockResponse, { status: 200 });
   },
 );
 

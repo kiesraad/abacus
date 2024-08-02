@@ -9,16 +9,24 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } fro
 import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
+  PollingStationValues,
 } from "@kiesraad/api";
 import { electionMock } from "@kiesraad/api-mocks";
 
 import { DifferencesForm } from "./DifferencesForm";
 
-const Component = (
-  <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
-    <DifferencesForm />
-  </PollingStationFormController>
-);
+function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
+  return render(
+    <PollingStationFormController
+      election={electionMock}
+      pollingStationId={1}
+      entryNumber={1}
+      defaultValues={defaultValues}
+    >
+      <DifferencesForm />
+    </PollingStationFormController>,
+  );
+}
 
 const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
   data: {
@@ -67,7 +75,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       const moreBallotsCount = screen.getByTestId("more_ballots_count");
       await user.type(moreBallotsCount, "12345");
@@ -85,7 +93,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       const moreBallotsCount = screen.getByTestId("more_ballots_count");
       expect(moreBallotsCount).toHaveFocus();
@@ -149,9 +157,25 @@ describe("Test DifferencesForm", () => {
     test("DifferencesForm request body is equal to the form data", async () => {
       const spy = vi.spyOn(global, "fetch");
 
+      const votersAndVotesValues = {
+        voters_counts: {
+          poll_card_count: 50,
+          proxy_certificate_count: 1,
+          voter_card_count: 2,
+          total_admitted_voters_count: 53,
+        },
+        votes_counts: {
+          votes_candidates_counts: 52,
+          blank_votes_count: 1,
+          invalid_votes_count: 2,
+          total_votes_cast_count: 55,
+        },
+      };
+
       const expectedRequest = {
         data: {
           ...rootRequest.data,
+          ...votersAndVotesValues,
           differences_counts: {
             more_ballots_count: 2,
             fewer_ballots_count: 0,
@@ -166,7 +190,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm({ ...votersAndVotesValues });
 
       await userTypeInputs(user, {
         ...expectedRequest.data.differences_counts,
@@ -192,7 +216,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -207,7 +231,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -232,7 +256,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       // Since the component does not allow to input invalid values such as -3,
       // not inputting any values and just clicking the submit button.
@@ -245,7 +269,7 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.301/F.302 IncorrectDifference", async () => {
+    test("F.301 IncorrectDifference", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -260,7 +284,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm({ recounted: false });
 
       // Since the component does not allow to change values in other components,
       // not inputting any values and just clicking the submit button.
@@ -273,7 +297,35 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.303/F.304 IncorrectDifference", async () => {
+    test("F.302 IncorrectDifference", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: ["data.differences_counts.more_ballots_count"],
+              code: "IncorrectDifference",
+            },
+          ],
+          warnings: [],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      // Since the component does not allow to change values in other components,
+      // not inputting any values and just clicking the submit button.
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(/^IncorrectDifference$/);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+    });
+
+    test("F.303 IncorrectDifference", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -288,7 +340,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm({ recounted: false });
 
       // Since the component does not allow to change values in other components,
       // not inputting any values and just clicking the submit button.
@@ -301,6 +353,36 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
+    test("F.304 IncorrectDifference", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: ["data.differences_counts.fewer_ballots_count"],
+              code: "IncorrectDifference",
+            },
+          ],
+          warnings: [],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      // Since the component does not allow to change values in other components,
+      // not inputting any values and just clicking the submit button.
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(/^IncorrectDifference$/);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+    });
+  });
+
+  describe("DifferencesForm warnings", () => {
     test("W.301 ConflictingDifferences", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
@@ -319,7 +401,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       // Since the component does not allow to change values in other components,
       // not inputting any values and just clicking the submit button.
@@ -354,7 +436,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       await user.type(screen.getByTestId("more_ballots_count"), "3");
       await user.type(screen.getByTestId("fewer_ballots_count"), "0");
@@ -395,7 +477,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm();
 
       await user.type(screen.getByTestId("more_ballots_count"), "0");
       await user.type(screen.getByTestId("fewer_ballots_count"), "4");
@@ -413,17 +495,25 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
-  });
 
-  describe("DifferencesForm warnings", () => {
-    test("Warnings can be displayed", async () => {
+    test("W.304 and W.306 No difference expected", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
           warnings: [
             {
-              fields: ["data.differences_counts.more_ballots_count"],
-              code: "NotAnActualWarning",
+              fields: ["data.differences_counts.fewer_ballots_count"],
+              code: "NoDifferenceExpected",
+            },
+            {
+              fields: [
+                "data.differences_counts.unreturned_ballots_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.other_explanation_count",
+                "data.differences_counts.no_explanation_count",
+              ],
+              code: "NoDifferenceExpected",
             },
           ],
         },
@@ -431,17 +521,67 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm({ recounted: false });
 
-      // Since no warnings exist for the fields on this page,
-      // not inputting any values and just clicking submit.
+      await user.type(screen.getByTestId("more_ballots_count"), "0");
+      await user.type(screen.getByTestId("fewer_ballots_count"), "4");
+      await user.type(screen.getByTestId("unreturned_ballots_count"), "1");
+      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "1");
+      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "0");
+      await user.type(screen.getByTestId("other_explanation_count"), "1");
+      await user.type(screen.getByTestId("no_explanation_count"), "1");
+
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
-      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+      expect(feedbackWarning).toHaveTextContent(/^NoDifferenceExpectedNoDifferenceExpected$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
+      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+    });
+
+    test("W.305 and W.306 No difference expected", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: ["data.differences_counts.more_ballots_count"],
+              code: "NoDifferenceExpected",
+            },
+            {
+              fields: [
+                "data.differences_counts.unreturned_ballots_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.other_explanation_count",
+                "data.differences_counts.no_explanation_count",
+              ],
+              code: "NoDifferenceExpected",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      await user.type(screen.getByTestId("more_ballots_count"), "4");
+      await user.type(screen.getByTestId("fewer_ballots_count"), "0");
+      await user.type(screen.getByTestId("unreturned_ballots_count"), "0");
+      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "0");
+      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "2");
+      await user.type(screen.getByTestId("other_explanation_count"), "1");
+      await user.type(screen.getByTestId("no_explanation_count"), "1");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^NoDifferenceExpectedNoDifferenceExpected$/);
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
   });
 });

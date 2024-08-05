@@ -4,7 +4,7 @@ import { defineConfig, devices, type PlaywrightTestConfig } from "@playwright/te
  * See https://playwright.dev/docs/test-configuration.
  */
 const config: PlaywrightTestConfig = defineConfig({
-  testDir: "./app/test/e2e",
+  testDir: "./e2e-tests/app-tests",
   outputDir: "./test-results/app",
   testMatch: /\.e2e\.ts/,
   // Fail the build on CI if you accidentally left test.only in the source code

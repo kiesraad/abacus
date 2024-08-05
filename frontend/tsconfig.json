@@ -37,6 +37,7 @@
     "playwright.app.config.ts",
     "playwright.d2d.config.ts",
     "playwright.lib-ui.config.ts",
-    "vite.config.ts"
+    "vite.config.ts",
+    "e2e-tests/**/*"
   ]
 }

@@ -4,7 +4,7 @@ import { defineConfig, devices, type PlaywrightTestConfig } from "@playwright/te
  * See https://playwright.dev/docs/test-configuration.
  */
 const config: PlaywrightTestConfig = defineConfig({
-  testDir: "./app/test/dom-to-db-tests",
+  testDir: "./e2e-tests/dom-to-db-tests",
   outputDir: "./test-results/dom-to-db",
   testMatch: /\.e2e\.ts/,
   // Fail the build on CI if you accidentally left test.only in the source code
@@ -42,6 +42,7 @@ const config: PlaywrightTestConfig = defineConfig({
   webServer: [
     {
       command:
+        // TODO: change as part of #218 (run in pipeline) after #154 (simpler loading of fixtures)
         "cd ../backend && cargo run --bin api -- --frontend-dist ../frontend/dist --port 8081",
       port: 8081,
     },

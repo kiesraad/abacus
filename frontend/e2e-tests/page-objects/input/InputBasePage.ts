@@ -5,7 +5,6 @@ export class InputBasePage {
   readonly error: Locator;
   readonly warning: Locator;
   readonly verschillen: Locator;
-  readonly politicalGroupA: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -13,6 +12,9 @@ export class InputBasePage {
     this.warning = page.getByTestId("feedback-warning");
 
     this.verschillen = page.getByText("Verschillen");
-    this.politicalGroupA = page.getByText("Political Group A");
+  }
+
+  async clickPoliticalGroup(politicalGroup: string) {
+    await this.page.getByText(politicalGroup).click();
   }
 }

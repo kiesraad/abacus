@@ -13,13 +13,13 @@ test.describe("Data entry", () => {
 
     const inputPage = new InputPage(page);
     const pollingStation = pollingStation33;
-    await inputPage.pollingStation.fill(pollingStation.number.toString());
+    await inputPage.stembureauNummmer.fill(pollingStation.number.toString());
     await expect(inputPage.pollingStationFeedback).toHaveText(pollingStation.name);
     await inputPage.clickBeginnen();
 
     const recountedPage = new RecountedPage(page);
-    await recountedPage.no.check();
-    await expect(recountedPage.no).toBeChecked();
+    await recountedPage.nee.check();
+    await expect(recountedPage.nee).toBeChecked();
     await recountedPage.volgende.click();
 
     await expect(recountedPage.error).toBeHidden();
@@ -56,7 +56,7 @@ test.describe("Data entry", () => {
     await expect(differencesPage.error).toBeHidden();
     await expect(differencesPage.warning).toBeHidden();
 
-    await differencesPage.politicalGroupA.click(); // TODO: remove once naviation works
+    await differencesPage.clickPoliticalGroup("Political Group A"); // TODO: remove once naviation works
 
     const candidatesListPage_1 = new CandidatesListPage(page);
     await candidatesListPage_1.fillCandidate(0, 100);

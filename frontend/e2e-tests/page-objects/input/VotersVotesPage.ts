@@ -30,8 +30,6 @@ export class VotersVotesPage extends InputBasePage {
   constructor(page: Page) {
     super(page);
 
-    // this.pollCardCount = page.getByLabel("Stempassen")
-    // this.pollCardCount = page.getByRole("textbox", {name: "poll_card_count"});
     this.pollCardCount = page.getByTestId("poll_card_count");
     this.proxyCertificateCount = page.getByTestId("proxy_certificate_count");
     this.voterCardCount = page.getByTestId("voter_card_count");

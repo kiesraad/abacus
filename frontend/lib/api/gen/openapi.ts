@@ -18,6 +18,12 @@ export interface POLLING_STATION_LIST_REQUEST_PARAMS {
 }
 export type POLLING_STATION_LIST_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
 
+// /api/elections/{election_id}/status
+export interface ELECTION_STATUS_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
+
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS {
   polling_station_id: number;
@@ -122,6 +128,13 @@ export interface ElectionListResponse {
 }
 
 /**
+ * Election status response
+ */
+export interface ElectionStatusResponse {
+  statusses: PollingStationStatusEntry[];
+}
+
+/**
  * Response structure for errors
  */
 export interface ErrorResponse {
@@ -177,6 +190,13 @@ export interface PollingStationResults {
   political_group_votes: PoliticalGroupVotes[];
   voters_counts: VotersCounts;
   votes_counts: VotesCounts;
+}
+
+export type PollingStationStatus = "Incomplete" | "Complete";
+
+export interface PollingStationStatusEntry {
+  id: number;
+  status: PollingStationStatus;
 }
 
 /**

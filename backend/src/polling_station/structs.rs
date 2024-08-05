@@ -118,13 +118,13 @@ impl Validate for PollingStationResults {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct PollingStationStatusEntry {
     pub id: u32,
     pub status: PollingStationStatus,
 }
 
-#[derive(Debug, Serialize, Deserialize, sqlx::Type)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type)]
 pub enum PollingStationStatus {
     Incomplete,
     Complete,

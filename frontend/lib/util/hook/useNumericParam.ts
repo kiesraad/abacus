@@ -1,5 +1,7 @@
 import { useParams } from "react-router-dom";
 
+import { parseIntStrict } from "../strings";
+
 // Takes a parameter key, then tries to find it in the URL params.
 // When it is found, it tries to validate it as a number and returns it.
 // Throws an error when the paramater key is not found or not an integer
@@ -12,9 +14,10 @@ export function useNumericParam(parameterKey: string): number {
   }
 
   // Matches only if the whole string is numeric
-  if (!/^\d+$/.test(param)) {
+  const parsedParam = parseIntStrict(param);
+  if (!parsedParam) {
     throw Error(`Parameter ${parameterKey} is not numeric`);
   }
 
-  return parseInt(param, 10);
+  return parsedParam;
 }

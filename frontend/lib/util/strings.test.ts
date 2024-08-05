@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { ellipsis } from "./strings";
+import { ellipsis, parseIntStrict } from "./strings";
 
 describe("Strings util", () => {
   test.each([
@@ -10,5 +10,21 @@ describe("Strings util", () => {
     ["", "", 20],
   ])("ellipsis %s as %s", (input: string, expected: string, maxLength: number) => {
     expect(ellipsis(input, maxLength)).equals(expected);
+  });
+
+  test.each([
+    ["123", 123],
+    ["00123"],
+    ["123a"],
+    ["a123"],
+    ["123 456"],
+    [" 123456 "],
+    ["/123/456"],
+    ["'123456'"],
+    ["six"],
+  ])("parseIntStrict %s", (input: string, expected: number | undefined = undefined) => {
+    expected
+      ? expect(parseIntStrict(input)).toBe(expected)
+      : expect(parseIntStrict(input)).toBeUndefined;
   });
 });

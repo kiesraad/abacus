@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { PollingStation, usePollingStationList } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
 import { Icon, InputField, Spinner } from "@kiesraad/ui";
-import { cn, useDebouncedCallback } from "@kiesraad/util";
+import { cn, parseIntStrict, useDebouncedCallback } from "@kiesraad/util";
 
 import cls from "./PollingStationSelector.module.css";
 
@@ -36,7 +36,7 @@ export function PollingStationSelector({
   }, USER_INPUT_DEBOUNCE);
 
   useMemo(() => {
-    const parsedInt = parseInt(pollingStationNumber, 10);
+    const parsedInt = parseIntStrict(pollingStationNumber);
     setLoading(true);
     debouncedCallback(
       pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt),

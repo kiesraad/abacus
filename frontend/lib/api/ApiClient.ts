@@ -19,7 +19,7 @@ export interface ApiResponseServerError<DATA = object> extends ApiResponse<DATA>
 }
 
 export interface ApiResponseErrorData {
-  errorCode: string;
+  errorCode: number;
   message: string;
 }
 

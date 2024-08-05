@@ -288,7 +288,7 @@ export function VotersAndVotesForm() {
                 key="D.2"
                 field="D.2"
                 id="total_admitted_voters_recount"
-                title="Totaal toegelaten"
+                title="Totaal toegelaten kiezers"
                 errorsAndWarnings={errorsAndWarnings}
                 inputProps={register()}
                 format={format}

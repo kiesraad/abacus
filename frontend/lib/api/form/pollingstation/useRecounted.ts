@@ -41,6 +41,12 @@ export function useRecounted() {
     setValues((old) => ({
       ...old,
       recounted: values.yes || !values.no,
+      voters_recounts:
+        values.yes && old.voters_recounts
+          ? {
+              ...old.voters_recounts,
+            }
+          : undefined,
     }));
   };
 

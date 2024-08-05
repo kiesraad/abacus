@@ -42,7 +42,7 @@ export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
  */
 export interface Candidate {
   country_code?: string;
-  first_name: string;
+  first_name?: string;
   gender?: CandidateGender;
   initials: string;
   last_name: string;

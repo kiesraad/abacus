@@ -16,7 +16,7 @@
 
   &.error {
     svg {
-      fill: var(--color-error);
+      fill: var(--color-error-darkest);
     }
   }
 

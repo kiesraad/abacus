@@ -9,7 +9,7 @@ use crate::utils::serve_api;
 
 mod utils;
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures("../fixtures/elections.sql", "../fixtures/polling_stations.sql"))]
 async fn test_polling_station_listing_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -28,7 +28,7 @@ async fn test_polling_station_listing_works(pool: SqlitePool) {
         .any(|ps| ps.name == "Stembureau \"Op Rolletjes\""));
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures("../fixtures/elections.sql", "../fixtures/polling_stations.sql"))]
 async fn test_polling_station_list_invalid_election(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     // election ID 1234 does not exist

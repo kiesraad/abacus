@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { ApiResponseErrorData } from "./ApiClient";
+import { ErrorResponse } from "./gen/openapi";
 import { useApi } from "./useApi";
 
 export type UseApiGetRequestReturn<DATA> = {
@@ -26,7 +27,10 @@ export function useApiGetRequest<DATA>(path: string): UseApiGetRequestReturn<DAT
         if (response.status === "success") {
           setData(response.data as DATA);
         } else {
-          setError(response.data as ApiResponseErrorData);
+          setError({
+            message: (response.data as ErrorResponse).error,
+            errorCode: response.code,
+          });
         }
       }
     };

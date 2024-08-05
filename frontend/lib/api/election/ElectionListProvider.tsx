@@ -18,7 +18,7 @@ export function ElectionListProvider({ children }: ElectionListProviderProps) {
   const { data, loading } = useElectionListRequest();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   if (!data || !data.elections.length) {

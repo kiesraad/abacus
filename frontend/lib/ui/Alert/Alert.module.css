@@ -28,7 +28,7 @@
   }
 
   &.error {
-    border-color: var(--color-error);
+    border-color: var(--color-error-darkest);
     background-color: var(--color-error-bg);
     button:hover {
       background: var(--color-error-hover);
@@ -38,7 +38,7 @@
     }
   }
   &.warning {
-    border-color: var(--color-warning);
+    border-color: var(--color-warning-darker);
     background-color: var(--color-warning-bg);
     button:hover {
       background: var(--color-warning-hover);

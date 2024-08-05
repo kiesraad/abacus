@@ -5,14 +5,16 @@ import { DifferencesPage } from "../page-objects/input/DifferencesPage";
 import { InputPage } from "../page-objects/input/InputPage";
 import { RecountedPage } from "../page-objects/input/RecountedPage";
 import { VotersVotesPage } from "../page-objects/input/VotersVotesPage";
+import { pollingStation33 } from "./test-data/PollingStationTestData";
 
 test.describe("Data entry", () => {
   test("no recount, no differences flow", async ({ page }) => {
     await page.goto("/1/input");
 
     const inputPage = new InputPage(page);
-    await inputPage.pollingStation.fill("33");
-    await expect(inputPage.pollingStationFeedback).toHaveText('Stembureau "Op Rolletjes"');
+    const pollingStation = pollingStation33;
+    await inputPage.pollingStation.fill(pollingStation.number.toString());
+    await expect(inputPage.pollingStationFeedback).toHaveText(pollingStation.name);
     await inputPage.clickBeginnen();
 
     const recountedPage = new RecountedPage(page);

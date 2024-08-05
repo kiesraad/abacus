@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { CandidatesListPage } from "e2e-tests/page-objects/input/CanidatesListPage";
+import { DifferencesPage } from "e2e-tests/page-objects/input/DifferencesPage";
+import { InputPage } from "e2e-tests/page-objects/input/InputPage";
+import { RecountedPage } from "e2e-tests/page-objects/input/RecountedPage";
+import { VotersVotesPage } from "e2e-tests/page-objects/input/VotersVotesPage";
 
-import { CandidatesListPage } from "../page-objects/input/CanidatesListPage";
-import { DifferencesPage } from "../page-objects/input/DifferencesPage";
-import { InputPage } from "../page-objects/input/InputPage";
-import { RecountedPage } from "../page-objects/input/RecountedPage";
-import { VotersVotesPage } from "../page-objects/input/VotersVotesPage";
 import { pollingStation33 } from "./test-data/PollingStationTestData";
 
 test.describe("Data entry", () => {

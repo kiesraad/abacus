@@ -131,7 +131,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         </InputGrid.Header>
         <InputGrid.Body>
           {group.candidates.map((candidate, index) => {
-            const addSeparator = (index + 1) % 25 == 0;
+            const addSeparator = (index + 1) % 25 == 0 && index + 1 !== group.candidates.length;
             const defaultValue = sectionValues?.candidate_votes[index]?.votes || "";
             return (
               <InputGridRow

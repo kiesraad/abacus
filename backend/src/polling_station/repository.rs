@@ -3,7 +3,7 @@ use sqlx::{query, query_as, Sqlite, SqlitePool, Transaction};
 
 use crate::AppState;
 
-use super::PollingStation;
+use super::{PollingStation, PollingStationStatusEntry};
 
 pub struct PollingStations(SqlitePool);
 
@@ -60,6 +60,25 @@ impl PollingStations {
             id
         )
         .fetch_one(&self.0)
+        .await
+    }
+
+    pub async fn status(
+        &self,
+        election_id: u32,
+    ) -> Result<Vec<PollingStationStatusEntry>, sqlx::Error> {
+        query_as!(
+            PollingStationStatusEntry,
+            r#"
+SELECT p.id AS "id: u32",
+CASE WHEN e.polling_station_id IS NULL THEN 'Incomplete' ELSE 'Complete' END AS "status!: _"
+FROM polling_stations AS p
+LEFT JOIN polling_station_data_entries AS e ON e.polling_station_id = p.id
+WHERE election_id = $1
+"#,
+            election_id
+        )
+        .fetch_all(&self.0)
         .await
     }
 }

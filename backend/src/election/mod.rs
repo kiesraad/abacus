@@ -3,6 +3,8 @@ use axum::Json;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
+use crate::polling_station::repository::PollingStations;
+use crate::polling_station::PollingStationStatusEntry;
 use crate::APIError;
 
 use self::repository::Elections;
@@ -23,6 +25,12 @@ pub struct ElectionListResponse {
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionDetailsResponse {
     pub election: Election,
+}
+
+/// Election status response
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct ElectionStatusResponse {
+    pub statusses: Vec<PollingStationStatusEntry>,
 }
 
 /// Get a list of all elections, without their candidate lists
@@ -60,4 +68,25 @@ pub async fn election_details(
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let election = elections_repo.get(id).await?;
     Ok(Json(ElectionDetailsResponse { election }))
+}
+
+/// Get election data entry status
+#[utoipa::path(
+    get,
+    path = "/api/elections/{election_id}/status",
+    responses(
+        (status = 200, description = "Election", body = ElectionStatusResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
+)]
+pub async fn election_status(
+    State(polling_station_repo): State<PollingStations>,
+    Path(id): Path<u32>,
+) -> Result<Json<ElectionStatusResponse>, APIError> {
+    let statusses = polling_station_repo.status(id).await?;
+    Ok(Json(ElectionStatusResponse { statusses }))
 }

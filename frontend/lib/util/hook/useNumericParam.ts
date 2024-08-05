@@ -15,7 +15,7 @@ export function useNumericParam(parameterKey: string): number {
 
   // Matches only if the whole string is numeric
   const parsedParam = parseIntStrict(param);
-  if (!parsedParam) {
+  if (parsedParam === undefined) {
     throw Error(`Parameter ${parameterKey} is not numeric`);
   }
 

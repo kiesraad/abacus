@@ -7,7 +7,7 @@ export function usePollingStation(pollingStationId: string | undefined) {
   const { pollingStations, pollingStationsLoading } = usePollingStationList();
 
   const pollingStation = useMemo(() => {
-    const parsedStationId = parseIntStrict(pollingStationId || "0");
+    const parsedStationId = parseIntStrict(pollingStationId ?? "0");
     return pollingStations.find((ps) => ps.id === parsedStationId);
   }, [pollingStationId, pollingStations]);
 

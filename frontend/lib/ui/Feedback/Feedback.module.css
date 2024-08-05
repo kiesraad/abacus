@@ -1,17 +1,12 @@
 .feedback {
   border: 2px solid #ccc;
   border-radius: var(--rounded-default);
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  padding: 24px;
 
   header {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
     align-items: center;
-
     svg {
       flex: 0 0 24px;
       width: 24px;
@@ -29,8 +24,8 @@
     }
   }
 
-  div > ul {
-    margin-bottom: 0;
+  p {
+    font-size: var(--font-size-md);
   }
 
   &.error {

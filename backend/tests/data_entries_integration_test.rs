@@ -21,7 +21,6 @@ async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
 
     let request_body = DataEntryRequest {
         data: PollingStationResults {
-            recounted: false,
             voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,
@@ -34,7 +33,6 @@ async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
                 invalid_votes_count: 1,
                 total_votes_cast_count: 104,
             },
-            voters_recounts: None,
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 0,
@@ -93,7 +91,6 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
 
     let request_body = json!({
       "data": {
-        "recounted": false,
         "voters_counts": {
           "poll_card_count": 1,
           "proxy_certificate_count": 2,
@@ -106,7 +103,6 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
           "invalid_votes_count": 7,
           "total_votes_cast_count": 8
         },
-        "voters_recounts": null,
         "differences_counts": {
           "more_ballots_count": 4,
           "fewer_ballots_count": 0,
@@ -157,10 +153,10 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(
         errors[0].fields,
         vec![
-            "data.votes_counts.total_votes_cast_count",
-            "data.votes_counts.votes_candidates_counts",
-            "data.votes_counts.blank_votes_count",
-            "data.votes_counts.invalid_votes_count"
+            "data.voters_counts.total_admitted_voters_count",
+            "data.voters_counts.poll_card_count",
+            "data.voters_counts.proxy_certificate_count",
+            "data.voters_counts.voter_card_count"
         ]
     );
     // error 2
@@ -168,10 +164,10 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(
         errors[1].fields,
         vec![
-            "data.voters_counts.total_admitted_voters_count",
-            "data.voters_counts.poll_card_count",
-            "data.voters_counts.proxy_certificate_count",
-            "data.voters_counts.voter_card_count"
+            "data.votes_counts.total_votes_cast_count",
+            "data.votes_counts.votes_candidates_counts",
+            "data.votes_counts.blank_votes_count",
+            "data.votes_counts.invalid_votes_count"
         ]
     );
     // error 3
@@ -223,7 +219,6 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
 
     let request_body = DataEntryRequest {
         data: PollingStationResults {
-            recounted: false,
             voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,
@@ -236,7 +231,6 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
                 invalid_votes_count: 1,
                 total_votes_cast_count: 104,
             },
-            voters_recounts: None,
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
                 fewer_ballots_count: 0,

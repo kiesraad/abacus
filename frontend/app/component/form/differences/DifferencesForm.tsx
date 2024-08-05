@@ -61,9 +61,12 @@ export function DifferencesForm() {
     [deformat],
   );
 
-  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
-
-  //const blocker = useBlocker() use const blocker to render confirmation UI.
+  function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
+    event.preventDefault();
+    const elements = event.currentTarget.elements;
+    setSectionValues(getValues(elements));
+  }
+  //const blocker =  useBlocker() use const blocker to render confirmation UI.
   useBlocker(() => {
     if (formRef.current && !isCalled) {
       const elements = formRef.current.elements as DifferencesFormElement["elements"];
@@ -76,11 +79,7 @@ export function DifferencesForm() {
     return false;
   });
 
-  function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
-    event.preventDefault();
-    const elements = event.currentTarget.elements;
-    setSectionValues(getValues(elements));
-  }
+  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
   React.useEffect(() => {
     if (isCalled) {
@@ -90,8 +89,7 @@ export function DifferencesForm() {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-  const success =
-    isCalled && !serverError && !hasValidationError && !hasValidationWarning && !loading;
+  const success = isCalled && !hasValidationError && !hasValidationWarning && !loading;
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       {/* Temporary while not navigating through form sections */}
@@ -183,7 +181,7 @@ export function DifferencesForm() {
             key="M"
             field="M"
             id="too_many_ballots_handed_out_count"
-            title="Te veel uitgereikte stembiljetten"
+            title="Teveel uitgereikte stembiljetten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}

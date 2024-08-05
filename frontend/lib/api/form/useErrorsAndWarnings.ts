@@ -31,7 +31,8 @@ export function useErrorsAndWarnings(
 
     if (errors.length > 0) {
       process("errors", errors);
-    } else if (warnings.length > 0) {
+    }
+    if (warnings.length > 0) {
       process("warnings", warnings);
     }
 

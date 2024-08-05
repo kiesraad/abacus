@@ -169,17 +169,13 @@ export interface PollingStationListResponse {
 
 /**
  * PollingStationResults, following the fields in
-"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar lichaam
-in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht"
-"Bijlage 2: uitkomsten per stembureau"
-<https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieNa31.2
+"Model N 10-1. Proces-verbaal van een stembureau"
+<https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1>
  */
 export interface PollingStationResults {
   differences_counts: DifferencesCounts;
   political_group_votes: PoliticalGroupVotes[];
-  recounted: boolean;
   voters_counts: VotersCounts;
-  voters_recounts?: VotersRecounts;
   votes_counts: VotesCounts;
 }
 
@@ -198,11 +194,7 @@ export type ValidationResultCode =
   | "IncorrectTotal"
   | "AboveThreshold"
   | "EqualInput"
-  | "IncorrectCandidatesList"
-  | "MissingRecounts"
-  | "IncorrectDifference"
-  | "ConflictingDifferences"
-  | "NoDifferenceExpected";
+  | "IncorrectCandidatesList";
 
 export interface ValidationResults {
   errors: ValidationResult[];
@@ -217,16 +209,6 @@ export interface VotersCounts {
   proxy_certificate_count: number;
   total_admitted_voters_count: number;
   voter_card_count: number;
-}
-
-/**
- * Voters recounts, part of the polling station results.
- */
-export interface VotersRecounts {
-  poll_card_recount: number;
-  proxy_certificate_recount: number;
-  total_admitted_voters_recount: number;
-  voter_card_recount: number;
 }
 
 /**

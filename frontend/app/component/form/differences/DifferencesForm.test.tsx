@@ -11,7 +11,7 @@ import {
   PollingStationFormController,
   PollingStationValues,
 } from "@kiesraad/api";
-import { electionMock } from "@kiesraad/api-mocks";
+import { electionMock, pollingStationMock } from "@kiesraad/api-mocks";
 
 import { DifferencesForm } from "./DifferencesForm";
 
@@ -19,7 +19,7 @@ function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   return render(
     <PollingStationFormController
       election={electionMock}
-      pollingStationId={1}
+      pollingStationId={pollingStationMock.id}
       entryNumber={1}
       defaultValues={defaultValues}
     >
@@ -71,13 +71,12 @@ describe("Test DifferencesForm", () => {
 
   describe("DifferencesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
-      const spy = vi.spyOn(global, "fetch");
-
       const user = userEvent.setup();
 
       renderForm();
+      const spy = vi.spyOn(global, "fetch");
 
-      const moreBallotsCount = screen.getByTestId("more_ballots_count");
+      const moreBallotsCount = await screen.findByTestId("more_ballots_count");
       await user.type(moreBallotsCount, "12345");
       expect(moreBallotsCount).toHaveValue("12.345");
 
@@ -95,7 +94,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm();
 
-      const moreBallotsCount = screen.getByTestId("more_ballots_count");
+      const moreBallotsCount = await screen.findByTestId("more_ballots_count");
       expect(moreBallotsCount).toHaveFocus();
       await user.type(moreBallotsCount, "12345");
       expect(moreBallotsCount).toHaveValue("12.345");
@@ -155,8 +154,6 @@ describe("Test DifferencesForm", () => {
 
   describe("DifferencesForm API request and response", () => {
     test("DifferencesForm request body is equal to the form data", async () => {
-      const spy = vi.spyOn(global, "fetch");
-
       const votersAndVotesValues = {
         voters_counts: {
           poll_card_count: 50,
@@ -191,6 +188,7 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       renderForm({ ...votersAndVotesValues });
+      const spy = vi.spyOn(global, "fetch");
 
       await userTypeInputs(user, {
         ...expectedRequest.data.differences_counts,
@@ -218,7 +216,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm();
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
       expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
@@ -233,7 +231,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm();
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
       expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);

@@ -133,4 +133,41 @@ describe("Test PollingStationChoiceForm", () => {
     // Check if the error message is visible
     expect(screen.getByText("Geen stembureaus gevonden")).toBeVisible();
   });
+
+  test("Submitting an empty or invalid polling station shows alert", async () => {
+    const user = userEvent.setup();
+    render(
+      <PollingStationListProvider electionId={1}>
+        <PollingStationChoiceForm />
+      </PollingStationListProvider>,
+    );
+
+    const pollingStation = screen.getByTestId("pollingStation");
+    const submitButton = screen.getByRole("button", { name: "Beginnen" });
+
+    await user.click(submitButton);
+
+    // Test that an alert is visible
+    const pollingStationSubmitFeedback = await screen.findByTestId("pollingStationSubmitFeedback");
+    expect(
+      within(pollingStationSubmitFeedback).getByText(
+        "Voer een geldig nummer van een stembureau in om te beginnen",
+      ),
+    ).toBeVisible();
+
+    // Now start typing an invalid polling station number
+    await user.type(pollingStation, "abc");
+
+    // Test that the alert disappeared
+    expect(pollingStationSubmitFeedback).toBeUndefined;
+
+    // Click submit again and see that the alert appeared again
+    await user.click(submitButton);
+
+    expect(
+      within(screen.getByTestId("pollingStationSubmitFeedback")).getByText(
+        "Voer een geldig nummer van een stembureau in om te beginnen",
+      ),
+    ).toBeVisible();
+  });
 });

@@ -11,7 +11,7 @@ import {
   PollingStationFormController,
   PollingStationValues,
 } from "@kiesraad/api";
-import { electionMock } from "@kiesraad/api-mocks";
+import { electionMock, pollingStationMock } from "@kiesraad/api-mocks";
 
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
@@ -19,7 +19,7 @@ function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   return render(
     <PollingStationFormController
       election={electionMock}
-      pollingStationId={1}
+      pollingStationId={pollingStationMock.id}
       entryNumber={1}
       defaultValues={defaultValues}
     >
@@ -71,13 +71,12 @@ describe("Test VotersAndVotesForm", () => {
 
   describe("VotersAndVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
-      const spy = vi.spyOn(global, "fetch");
-
       const user = userEvent.setup();
 
       renderForm();
+      const spy = vi.spyOn(global, "fetch");
 
-      const pollCards = screen.getByTestId("poll_card_count");
+      const pollCards = await screen.findByTestId("poll_card_count");
       await user.type(pollCards, "12345");
       expect(pollCards).toHaveValue("12.345");
 
@@ -95,7 +94,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      const pollCards = screen.getByTestId("poll_card_count");
+      const pollCards = await screen.findByTestId("poll_card_count");
       expect(pollCards).toHaveFocus();
       await user.type(pollCards, "12345");
       expect(pollCards).toHaveValue("12.345");
@@ -160,8 +159,6 @@ describe("Test VotersAndVotesForm", () => {
 
   describe("VotersAndVotesForm API request and response", () => {
     test("VotersAndVotesForm request body is equal to the form data", async () => {
-      const spy = vi.spyOn(global, "fetch");
-
       const expectedRequest = {
         data: {
           ...rootRequest.data,
@@ -183,6 +180,7 @@ describe("Test VotersAndVotesForm", () => {
       const user = userEvent.setup();
 
       renderForm();
+      const spy = vi.spyOn(global, "fetch");
 
       await userTypeInputs(user, {
         ...expectedRequest.data.voters_counts,
@@ -212,7 +210,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
       expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
@@ -231,7 +229,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
       expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
@@ -261,7 +259,7 @@ describe("Test VotersAndVotesForm", () => {
 
       // Since the component does not allow to input invalid values such as -3,
       // not inputting any values and just clicking the submit button.
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
@@ -292,7 +290,8 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await user.type(screen.getByTestId("poll_card_count"), "1");
+      // We await the first element to appear, so we know the page is loaded
+      await user.type(await screen.findByTestId("poll_card_count"), "1");
       await user.type(screen.getByTestId("proxy_certificate_count"), "1");
       await user.type(screen.getByTestId("voter_card_count"), "1");
       await user.type(screen.getByTestId("total_admitted_voters_count"), "4");
@@ -328,7 +327,8 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await user.type(screen.getByTestId("votes_candidates_counts"), "1");
+      // We await the first element to appear, so we know the page is loaded
+      await user.type(await screen.findByTestId("votes_candidates_counts"), "1");
       await user.type(screen.getByTestId("blank_votes_count"), "1");
       await user.type(screen.getByTestId("invalid_votes_count"), "1");
       await user.type(screen.getByTestId("total_votes_cast_count"), "4");
@@ -400,7 +400,7 @@ describe("Test VotersAndVotesForm", () => {
 
       // Since the component does not allow to input values for non-existing fields,
       // not inputting any values and just clicking the submit button.
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       expect(screen.queryByTestId("result")).toBeNull();
@@ -431,7 +431,8 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await user.type(screen.getByTestId("votes_candidates_counts"), "0");
+      // We await the first element to appear, so we know the page is loaded
+      await user.type(await screen.findByTestId("votes_candidates_counts"), "0");
       await user.type(screen.getByTestId("blank_votes_count"), "1");
       await user.type(screen.getByTestId("invalid_votes_count"), "0");
       await user.type(screen.getByTestId("total_votes_cast_count"), "1");
@@ -465,7 +466,8 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await user.type(screen.getByTestId("votes_candidates_counts"), "0");
+      // We await the first element to appear, so we know the page is loaded
+      await user.type(await screen.findByTestId("votes_candidates_counts"), "0");
       await user.type(screen.getByTestId("blank_votes_count"), "0");
       await user.type(screen.getByTestId("invalid_votes_count"), "1");
       await user.type(screen.getByTestId("total_votes_cast_count"), "1");
@@ -496,7 +498,8 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm();
 
-      await user.type(screen.getByTestId("poll_card_count"), "1");
+      // We await the first element to appear, so we know the page is loaded
+      await user.type(await screen.findByTestId("poll_card_count"), "1");
       await user.type(screen.getByTestId("proxy_certificate_count"), "0");
       await user.type(screen.getByTestId("voter_card_count"), "0");
       await user.type(screen.getByTestId("total_admitted_voters_count"), "1");

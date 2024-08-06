@@ -48,7 +48,7 @@ test.describe("Data entry", () => {
     await expect(votersVotesPage.error).toBeHidden();
     await expect(votersVotesPage.warning).toBeHidden();
 
-    await votersVotesPage.differences.click(); // TODO: remove once naviation works
+    await votersVotesPage.differences.click(); // TODO: remove once navigation works (#133)
 
     const differencesPage = new DifferencesPage(page);
     await differencesPage.next.click();

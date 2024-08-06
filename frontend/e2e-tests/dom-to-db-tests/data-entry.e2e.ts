@@ -56,7 +56,7 @@ test.describe("Data entry", () => {
     await expect(differencesPage.error).toBeHidden();
     await expect(differencesPage.warning).toBeHidden();
 
-    await differencesPage.clickPoliticalGroup("Political Group A"); // TODO: remove once naviation works
+    await differencesPage.clickPoliticalGroup("Political Group A"); // TODO: remove once navigation works (#133)
 
     const candidatesListPage_1 = new CandidatesListPage(page);
     await candidatesListPage_1.fillCandidate(0, 100);

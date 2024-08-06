@@ -8,6 +8,7 @@ export class InputPage {
 
   constructor(page: Page) {
     this.page = page;
+
     this.pollingstationNumber = page.getByRole("textbox", { name: "Voer het nummer in: " });
     this.pollingStationFeedback = page.getByTestId("pollingStationSelectorFeedback");
     this.start = page.getByRole("button", { name: "Beginnen" });

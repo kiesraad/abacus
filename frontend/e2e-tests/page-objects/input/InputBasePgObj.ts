@@ -8,6 +8,7 @@ export class InputBasePage {
 
   constructor(page: Page) {
     this.page = page;
+
     this.error = page.getByTestId("feedback-error");
     this.warning = page.getByTestId("feedback-warning");
 

@@ -8,6 +8,7 @@ export class RecountedPage extends InputBasePage {
 
   constructor(page: Page) {
     super(page);
+
     this.no = page.getByRole("radio", { name: "Nee, er was geen hertelling" });
     this.next = page.getByRole("button", { name: "Volgende" });
   }

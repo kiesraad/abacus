@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { overrideOnce } from "app/test/unit";
 
@@ -65,8 +65,16 @@ describe("ApiClient", () => {
 
     const client = new ApiClient("testhost");
 
+    // error is expected
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
     await expect(async () => client.getRequest("/api/test/1")).rejects.toThrowError(
       "Server response parse error: 200",
+    );
+
+    expect(console.error).toHaveBeenCalledWith(
+      "Server response parse error:",
+      expect.any(SyntaxError),
     );
   });
 

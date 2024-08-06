@@ -61,8 +61,8 @@ function addPath(path: string, v: PathsObject | undefined) {
     let id: string = request.operationId;
     id = id.toUpperCase();
 
-    result.push(`export interface ${id}_REQUEST_PARAMS {`);
     if (request.parameters) {
+      result.push(`export interface ${id}_REQUEST_PARAMS {`);
       request.parameters.forEach((p) => {
         if ("$ref" in p) {
           result.push(`// ${p.$ref.substring(p.$ref.lastIndexOf("/") + 1)}`);
@@ -72,8 +72,12 @@ function addPath(path: string, v: PathsObject | undefined) {
           result.push(`${p.name}: ${paramType};`);
         }
       });
+      result.push("}");
+    } else {
+      // From ESLint: An empty interface declaration allows any non-nullish value, including literals like `0` and `""`.
+      // More information: https://www.totaltypescript.com/the-empty-object-type-in-typescript
+      result.push(`export type ${id}_REQUEST_PARAMS = Record<string, never>;`);
     }
-    result.push("}");
     result.push(`export type ${id}_REQUEST_PATH = \`${requestPath}\`;`);
 
     if (request.requestBody) {

@@ -196,12 +196,22 @@ export const pollingStationDataEntryHandler = http.post<
 
     return HttpResponse.json(response, { status: 200 });
   } catch (e) {
-    return HttpResponse.json(
-      {
-        error: "invalid json",
-      },
-      { status: 422 },
-    );
+    if (e instanceof SyntaxError) {
+      return HttpResponse.json(
+        {
+          error: "Invalid JSON",
+        },
+        { status: 422 },
+      );
+    } else {
+      console.error("Mock request error:", e);
+      return HttpResponse.json(
+        {
+          error: "Internal Server Error",
+        },
+        { status: 500 },
+      );
+    }
   }
 });
 

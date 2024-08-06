@@ -65,8 +65,15 @@ export const ElectionListRequestHandler = http.get("/api/elections", () => {
 
 export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id",
-  () => {
-    return HttpResponse.json(electionDetailsMockResponse, { status: 200 });
+  ({ params }) => {
+    const election = electionListMockResponse.elections.find(
+      (e: Election) => e.id.toString() === params.election_id,
+    );
+    if (election) {
+      return HttpResponse.json({ election }, { status: 200 });
+    } else {
+      return HttpResponse.json({}, { status: 404 });
+    }
   },
 );
 

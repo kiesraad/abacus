@@ -1,11 +1,13 @@
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import { ElectionProvider } from "@kiesraad/api";
+import { useNumericParam } from "@kiesraad/util";
 
 export function ElectionLayout() {
-  const { electionId } = useParams();
+  const electionId = useNumericParam("electionId");
+
   return (
-    <ElectionProvider electionId={parseInt(electionId ?? "", 10)}>
+    <ElectionProvider electionId={electionId}>
       <Outlet />
     </ElectionProvider>
   );

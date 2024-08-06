@@ -41,7 +41,7 @@ test.describe("Data entry", () => {
     await votersVotesPage.inputVoters(voters);
     await votersVotesPage.inputVotes(votes);
 
-    await expect(page.getByTestId("poll_card_count")).toHaveValue(voters.poll_card_count);
+    await expect(votersVotesPage.pollCardCount).toHaveValue(voters.poll_card_count);
 
     await votersVotesPage.next.click();
 

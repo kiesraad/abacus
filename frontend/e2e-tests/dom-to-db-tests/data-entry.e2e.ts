@@ -64,8 +64,8 @@ test.describe("Data entry", () => {
     await candidatesListPage_1.total.fill("122");
     await candidatesListPage_1.next.click();
 
-    await expect(differencesPage.error).toBeHidden();
-    await expect(differencesPage.warning).toBeHidden();
+    await expect(candidatesListPage_1.error).toBeHidden();
+    await expect(candidatesListPage_1.warning).toBeHidden();
 
     // TODO: Controleren en opslaan
   });

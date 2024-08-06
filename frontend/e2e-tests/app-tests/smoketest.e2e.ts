@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { VotersVotesPage } from "e2e-tests/page-objects/input/VotersVotesPage";
+import { VotersVotesPage } from "e2e-tests/page-objects/input/VotersVotesPgObj";
 
 test("smoke test", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });

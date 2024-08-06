@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-import { InputBasePage } from "./InputBasePage";
+import { InputBasePage } from "./InputBasePgObj";
 
 interface VotersCounts {
   poll_card_count: string;
@@ -25,7 +25,7 @@ export class VotersVotesPage extends InputBasePage {
   readonly blankVotesCount: Locator;
   readonly invalidVotesCount: Locator;
   readonly totalVotesCastCount: Locator;
-  readonly volgende: Locator;
+  readonly next: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -39,7 +39,7 @@ export class VotersVotesPage extends InputBasePage {
     this.invalidVotesCount = page.getByTestId("invalid_votes_count");
     this.totalVotesCastCount = page.getByTestId("total_votes_cast_count");
 
-    this.volgende = page.getByRole("button", { name: "Volgende" });
+    this.next = page.getByRole("button", { name: "Volgende" });
   }
 
   async inputVoters(votersCounts: VotersCounts) {

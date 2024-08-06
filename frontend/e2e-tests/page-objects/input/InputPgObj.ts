@@ -2,18 +2,18 @@ import { type Locator, type Page } from "@playwright/test";
 
 export class InputPage {
   protected readonly page: Page;
-  readonly stembureauNummmer: Locator;
+  readonly pollingstationNumber: Locator;
   readonly pollingStationFeedback: Locator;
-  protected readonly beginnen: Locator; // use clickBeginnen() instead
+  protected readonly start: Locator; // use clickStart() instead
 
   constructor(page: Page) {
     this.page = page;
-    this.stembureauNummmer = page.getByRole("textbox", { name: "Voer het nummer in: " });
+    this.pollingstationNumber = page.getByRole("textbox", { name: "Voer het nummer in: " });
     this.pollingStationFeedback = page.getByTestId("pollingStationSelectorFeedback");
-    this.beginnen = page.getByRole("button", { name: "Beginnen" });
+    this.start = page.getByRole("button", { name: "Beginnen" });
   }
 
-  async clickBeginnen() {
+  async clickStart() {
     const button = this.page.getByRole("button", { name: "Beginnen" });
     // click() fails on Safari because element is visible and enabled, but not stable
     // so added timeout to make it fail fast

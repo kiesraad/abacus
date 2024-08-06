@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-import { InputBasePage } from "./InputBasePage";
+import { InputBasePage } from "./InputBasePgObj";
 
 export class DifferencesPage extends InputBasePage {
   readonly moreBallotsCount: Locator;
@@ -8,7 +8,7 @@ export class DifferencesPage extends InputBasePage {
   readonly unreturnedBallotsCount: Locator;
   readonly tooFewBallotsHandedOutCount: Locator;
   readonly otherExplanationCount: Locator;
-  readonly volgende: Locator;
+  readonly next: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -21,6 +21,6 @@ export class DifferencesPage extends InputBasePage {
     this.otherExplanationCount = page.getByTestId("other_explanation_count");
     this.otherExplanationCount = page.getByTestId("no_explanation_count");
 
-    this.volgende = page.getByRole("button", { name: "Volgende" });
+    this.next = page.getByRole("button", { name: "Volgende" });
   }
 }

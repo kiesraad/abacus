@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
-import { CandidatesListPage } from "e2e-tests/page-objects/input/CanidatesListPage";
-import { DifferencesPage } from "e2e-tests/page-objects/input/DifferencesPage";
-import { InputPage } from "e2e-tests/page-objects/input/InputPage";
-import { RecountedPage } from "e2e-tests/page-objects/input/RecountedPage";
-import { VotersVotesPage } from "e2e-tests/page-objects/input/VotersVotesPage";
+import { CandidatesListPage } from "e2e-tests/page-objects/input/CandidatesListPgObj";
+import { DifferencesPage } from "e2e-tests/page-objects/input/DifferencesPgObj";
+import { InputPage } from "e2e-tests/page-objects/input/InputPgObj";
+import { RecountedPage } from "e2e-tests/page-objects/input/RecountedPgObj";
+import { VotersVotesPage } from "e2e-tests/page-objects/input/VotersVotesPgObj";
 
 import { pollingStation33 } from "./test-data/PollingStationTestData";
 
@@ -13,14 +13,14 @@ test.describe("Data entry", () => {
 
     const inputPage = new InputPage(page);
     const pollingStation = pollingStation33;
-    await inputPage.stembureauNummmer.fill(pollingStation.number.toString());
+    await inputPage.pollingstationNumber.fill(pollingStation.number.toString());
     await expect(inputPage.pollingStationFeedback).toHaveText(pollingStation.name);
-    await inputPage.clickBeginnen();
+    await inputPage.clickStart();
 
     const recountedPage = new RecountedPage(page);
-    await recountedPage.nee.check();
-    await expect(recountedPage.nee).toBeChecked();
-    await recountedPage.volgende.click();
+    await recountedPage.no.check();
+    await expect(recountedPage.no).toBeChecked();
+    await recountedPage.next.click();
 
     await expect(recountedPage.error).toBeHidden();
     await expect(recountedPage.warning).toBeHidden();
@@ -43,15 +43,15 @@ test.describe("Data entry", () => {
 
     await expect(page.getByTestId("poll_card_count")).toHaveValue(voters.poll_card_count);
 
-    await votersVotesPage.volgende.click();
+    await votersVotesPage.next.click();
 
     await expect(votersVotesPage.error).toBeHidden();
     await expect(votersVotesPage.warning).toBeHidden();
 
-    await votersVotesPage.verschillen.click(); // TODO: remove once naviation works
+    await votersVotesPage.differences.click(); // TODO: remove once naviation works
 
     const differencesPage = new DifferencesPage(page);
-    await differencesPage.volgende.click();
+    await differencesPage.next.click();
 
     await expect(differencesPage.error).toBeHidden();
     await expect(differencesPage.warning).toBeHidden();
@@ -62,7 +62,7 @@ test.describe("Data entry", () => {
     await candidatesListPage_1.fillCandidate(0, 100);
     await candidatesListPage_1.fillCandidate(1, 22);
     await candidatesListPage_1.total.fill("122");
-    await candidatesListPage_1.volgende.click();
+    await candidatesListPage_1.next.click();
 
     await expect(differencesPage.error).toBeHidden();
     await expect(differencesPage.warning).toBeHidden();
@@ -84,7 +84,7 @@ test.describe("errors and warnings", () => {
     };
     await votersVotesPage.inputVoters(voters);
 
-    await votersVotesPage.volgende.click();
+    await votersVotesPage.next.click();
 
     await expect(votersVotesPage.error).toBeVisible();
     await expect(votersVotesPage.warning).toBeHidden();
@@ -109,7 +109,7 @@ test.describe("errors and warnings", () => {
     await votersVotesPage.inputVoters(voters);
     await votersVotesPage.inputVotes(votes);
 
-    await votersVotesPage.volgende.click();
+    await votersVotesPage.next.click();
 
     await expect(votersVotesPage.error).toBeHidden();
     await expect(votersVotesPage.warning).toBeVisible();

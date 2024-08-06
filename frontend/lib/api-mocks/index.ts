@@ -11,8 +11,6 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
   PollingStation,
   PollingStationListResponse,
-  VotersCounts,
-  VotesCounts,
 } from "@kiesraad/api";
 
 import {
@@ -93,40 +91,6 @@ export const pollingStationDataEntryHandler = http.post<
 
     const { voters_counts, votes_counts, political_group_votes } = json.data;
 
-    const votesFields: (keyof VotesCounts)[] = [
-      "blank_votes_count",
-      "invalid_votes_count",
-      "total_votes_cast_count",
-      "votes_candidates_counts",
-    ];
-
-    votesFields.forEach((field) => {
-      if (field in votes_counts) {
-        if (valueOutOfRange(votes_counts[field])) {
-          response.validation_results.errors.push({
-            code: "OutOfRange",
-            fields: [`data.votes_counts.${field}`],
-          });
-        }
-      }
-    });
-
-    const votersFields: (keyof VotersCounts)[] = [
-      "poll_card_count",
-      "proxy_certificate_count",
-      "total_admitted_voters_count",
-      "voter_card_count",
-    ];
-
-    votersFields.forEach((field) => {
-      if (valueOutOfRange(voters_counts[field])) {
-        response.validation_results.errors.push({
-          code: "OutOfRange",
-          fields: [`data.voters_counts.${field}`],
-        });
-      }
-    });
-
     // A + B + C = D
     if (
       voters_counts.poll_card_count +
@@ -165,24 +129,6 @@ export const pollingStationDataEntryHandler = http.post<
 
     //SECTION political_group_votes
     political_group_votes.forEach((pg) => {
-      if (valueOutOfRange(pg.total)) {
-        response.validation_results.errors.push({
-          code: "OutOfRange",
-          fields: [`data.political_group_votes[${pg.number - 1}].total`],
-        });
-      }
-
-      pg.candidate_votes.forEach((cv) => {
-        if (valueOutOfRange(cv.votes)) {
-          response.validation_results.errors.push({
-            code: "OutOfRange",
-            fields: [
-              `data.political_group_votes[${pg.number - 1}].candidate_votes[${cv.number - 1}].votes`,
-            ],
-          });
-        }
-      });
-
       const sum = pg.candidate_votes.reduce((acc, cv) => acc + cv.votes, 0);
       if (sum !== pg.total) {
         response.validation_results.errors.push({
@@ -229,7 +175,3 @@ export const handlers: HttpHandler[] = [
   pollingStationDataEntryHandler,
   PollingStationListRequestHandler,
 ];
-
-function valueOutOfRange(v: number): boolean {
-  return v < 0 || v > 999999999;
-}

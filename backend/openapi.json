@@ -753,11 +753,9 @@
       "ValidationResultCode": {
         "type": "string",
         "enum": [
-          "OutOfRange",
           "IncorrectTotal",
           "AboveThreshold",
-          "EqualInput",
-          "IncorrectCandidatesList"
+          "EqualInput"
         ]
       },
       "ValidationResults": {

@@ -122,6 +122,7 @@ impl IntoResponse for ErrorResponse {
 pub enum APIError {
     NotFound(String),
     Conflict(String),
+    InvalidData(String),
     JsonRejection(JsonRejection),
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
@@ -136,6 +137,7 @@ impl IntoResponse for APIError {
         let (status, response) = match self {
             APIError::NotFound(message) => (StatusCode::NOT_FOUND, to_error(message)),
             APIError::Conflict(message) => (StatusCode::CONFLICT, to_error(message)),
+            APIError::InvalidData(message) => (StatusCode::UNPROCESSABLE_ENTITY, to_error(message)),
             APIError::JsonRejection(rejection) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 to_error(rejection.body_text()),

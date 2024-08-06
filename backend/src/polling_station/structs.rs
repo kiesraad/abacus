@@ -1,11 +1,11 @@
-use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, Type};
-use utoipa::ToSchema;
-
 use crate::election::Election;
 use crate::validation::{
     above_percentage_threshold, ValidationResult, ValidationResultCode, ValidationResults,
 };
+use crate::APIError;
+use serde::{Deserialize, Serialize};
+use sqlx::{FromRow, Type};
+use utoipa::ToSchema;
 
 pub trait Validate {
     fn validate(
@@ -13,7 +13,7 @@ pub trait Validate {
         election: &Election,
         validation_results: &mut ValidationResults,
         field_name: String,
-    );
+    ) -> Result<Ok, APIError>;
 }
 
 /// Polling station of a certain [Election]
@@ -124,15 +124,15 @@ impl Validate for Count {
     fn validate(
         &self,
         _election: &Election,
-        validation_results: &mut ValidationResults,
-        field_name: String,
-    ) {
+        _validation_results: &mut ValidationResults,
+        _field_name: String,
+    ) -> Result<(), APIError> {
         if self > &999_999_999 {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![field_name],
-                code: ValidationResultCode::OutOfRange,
-            });
+            return Err(APIError::InvalidData(
+                "Cannot validate tampered invalid data".to_string(),
+            ));
         }
+        return Ok(());
     }
 }
 
@@ -185,7 +185,7 @@ impl Validate for VotersCounts {
         election: &Election,
         validation_results: &mut ValidationResults,
         field_name: String,
-    ) {
+    ) -> Result<(), APIError> {
         // validate all counts
         self.poll_card_count.validate(
             election,
@@ -222,6 +222,7 @@ impl Validate for VotersCounts {
                 code: ValidationResultCode::IncorrectTotal,
             });
         }
+        return Ok(());
     }
 }
 
@@ -249,7 +250,7 @@ impl Validate for VotesCounts {
         election: &Election,
         validation_results: &mut ValidationResults,
         field_name: String,
-    ) {
+    ) -> Result<(), APIError> {
         // validate all counts
         self.votes_candidates_counts.validate(
             election,
@@ -289,7 +290,7 @@ impl Validate for VotesCounts {
 
         // stop validation for warnings if there are errors
         if !validation_results.errors.is_empty() {
-            return;
+            return Ok(());
         }
 
         // validate that number of blank votes is no more than 3%
@@ -313,6 +314,7 @@ impl Validate for VotesCounts {
                 code: ValidationResultCode::AboveThreshold,
             });
         }
+        return Ok(());
     }
 }
 
@@ -358,29 +360,26 @@ impl Validate for Vec<PoliticalGroupVotes> {
         election: &Election,
         validation_results: &mut ValidationResults,
         field_name: String,
-    ) {
+    ) -> Result<(), APIError> {
         // check if the list of political groups has the correct length
         let pg = election.political_groups.as_ref();
         if pg.is_none() || pg.expect("candidate list should not be None").len() != self.len() {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![field_name],
-                code: ValidationResultCode::IncorrectCandidatesList,
-            });
-            return;
+            return Err(APIError::InvalidData(
+                "Cannot validate tampered invalid data".to_string(),
+            ));
         }
 
         // check each political group
         self.iter().enumerate().for_each(|(i, pgv)| {
             let number = pgv.number;
             if number as usize != i + 1 {
-                validation_results.errors.push(ValidationResult {
-                    fields: vec![format!("{field_name}[{i}].number")],
-                    code: ValidationResultCode::IncorrectCandidatesList,
-                });
-                return;
+                return Err(APIError::InvalidData(
+                    "Cannot validate tampered invalid data".to_string(),
+                ));
             }
             pgv.validate(election, validation_results, format!("{field_name}[{i}]"));
         });
+        return Ok(());
     }
 }
 
@@ -390,7 +389,7 @@ impl Validate for PoliticalGroupVotes {
         election: &Election,
         validation_results: &mut ValidationResults,
         field_name: String,
-    ) {
+    ) -> Result<(), APIError> {
         // check if the list of candidates has the correct length
         let pg = election
             .political_groups
@@ -401,22 +400,18 @@ impl Validate for PoliticalGroupVotes {
 
         // check if the number of candidates is correct
         if pg.candidates.len() != self.candidate_votes.len() {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![format!("{field_name}.candidate_votes")],
-                code: ValidationResultCode::IncorrectCandidatesList,
-            });
-            return;
+            return Err(APIError::InvalidData(
+                "Cannot validate tampered invalid data".to_string(),
+            ));
         }
 
         // validate all candidates
         self.candidate_votes.iter().enumerate().for_each(|(i, cv)| {
             let number = cv.number;
             if number as usize != i + 1 {
-                validation_results.errors.push(ValidationResult {
-                    fields: vec![format!("{field_name}.candidate_votes[{i}].number")],
-                    code: ValidationResultCode::IncorrectCandidatesList,
-                });
-                return;
+                return Err(APIError::InvalidData(
+                    "Cannot validate tampered invalid data".to_string(),
+                ));
             }
             cv.validate(
                 election,
@@ -427,7 +422,7 @@ impl Validate for PoliticalGroupVotes {
 
         // validate the total number of votes
         self.total
-            .validate(election, validation_results, format!("{field_name}.total"));
+            .validate(election, validation_results, format!("{field_name}.total"))?;
 
         // validate whether if the total number of votes matches the sum of all candidate votes,
         // cast to u64 to avoid overflow
@@ -443,6 +438,7 @@ impl Validate for PoliticalGroupVotes {
                 code: ValidationResultCode::IncorrectTotal,
             });
         }
+        return Ok(());
     }
 }
 
@@ -459,8 +455,9 @@ impl Validate for CandidateVotes {
         election: &Election,
         validation_results: &mut ValidationResults,
         field_name: String,
-    ) {
-        self.votes
+    ) -> Result<(), APIError> {
+        return self
+            .votes
             .validate(election, validation_results, format!("{field_name}.votes"));
     }
 }

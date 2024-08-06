@@ -1,12 +1,21 @@
 import * as React from "react";
 import { BlockerFunction, useBlocker, useNavigate, useParams } from "react-router-dom";
 
-import { FormSectionID, useElection, usePollingStationFormController } from "@kiesraad/api";
+import {
+  AnyFormReference,
+  currentFormHasChanges,
+  FormSectionID,
+  FormState,
+  PollingStationValues,
+  useElection,
+  usePollingStationFormController,
+} from "@kiesraad/api";
 import { Button, Modal } from "@kiesraad/ui";
 
 export function PollingStationFormNavigation() {
   const _lastKnownSection = React.useRef<FormSectionID | null>(null);
-  const { formState, error, currentForm, targetFormSection } = usePollingStationFormController();
+  const { formState, error, currentForm, targetFormSection, values, setTemporaryCache } =
+    usePollingStationFormController();
   const { pollingStationId } = useParams();
   const { election } = useElection();
   const navigate = useNavigate();
@@ -23,34 +32,39 @@ export function PollingStationFormNavigation() {
         return false;
       }
       if (!currentForm) {
+        console.log("NO current form?");
         return false;
       }
 
-      const formSection = formState.sections[currentForm.id];
-      if (formSection) {
-        if (formSection.errors.length > 0) {
-          console.log("BLOCKED: has errors");
-          return true;
+      const reason = reasonBlocked(formState, currentForm, values);
+      if (reason !== null) {
+        if (reason === "changes" && formState.active === formState.current) {
+          console.log("caching: ", currentForm.id);
+          setTemporaryCache({
+            key: currentForm.id,
+            data: currentForm.getValues(),
+          });
+          return false;
         }
-        if (formSection.warnings.length > 0 && !formSection.ignoreWarnings) {
-          console.log("BLOCKED: has warnings without ignore");
-          return true;
-        }
+        return true;
       }
-
-      //check if values have changed
 
       return false;
     },
-    [formState, currentForm],
+    [formState, currentForm, setTemporaryCache, values],
   );
 
   const blocker = useBlocker(shouldBlock);
 
+  React.useEffect(() => {
+    console.log("Setting current", formState.active);
+    _lastKnownSection.current = formState.active;
+  }, [formState.active]);
+
   //check if the targetFormSection has changed and navigate to the correct url
   React.useEffect(() => {
+    if (!targetFormSection) return;
     if (targetFormSection !== _lastKnownSection.current) {
-      console.log("Navigating to", targetFormSection);
       _lastKnownSection.current = targetFormSection;
 
       let url: string = "";
@@ -58,6 +72,9 @@ export function PollingStationFormNavigation() {
         url = `${baseUrl}/list/${targetFormSection.replace("political_group_votes_", "")}`;
       } else {
         switch (targetFormSection) {
+          case "recounted":
+            url = `${baseUrl}/recounted`;
+            break;
           case "differences_counts":
             url = `${baseUrl}/differences`;
             break;
@@ -77,6 +94,7 @@ export function PollingStationFormNavigation() {
       {blocker.state === "blocked" && (
         <Modal onClose={() => {}}>
           <h2>Wat wil je doen met je invoer?</h2>
+          <p>TEMP: {currentForm && reasonBlocked(formState, currentForm, values)}</p>
           <p>
             Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de
             invoer die je al hebt gedaan bewaren.
@@ -85,8 +103,21 @@ export function PollingStationFormNavigation() {
             Twijfel je? Overleg dan met de coördinator.
           </p>
           <nav>
-            <Button size="lg">Invoer bewaren</Button>
-            <Button size="lg" variant="secondary">
+            <Button
+              size="lg"
+              onClick={() => {
+                blocker.reset();
+              }}
+            >
+              Invoer bewaren
+            </Button>
+            <Button
+              size="lg"
+              variant="secondary"
+              onClick={() => {
+                blocker.proceed();
+              }}
+            >
               Niet bewaren
             </Button>
           </nav>
@@ -95,4 +126,31 @@ export function PollingStationFormNavigation() {
       {error && <div>Error: {error.message}</div>}
     </>
   );
+}
+
+type BlockReason = "errors" | "warnings" | "changes";
+
+function reasonBlocked(
+  formState: FormState,
+  currentForm: AnyFormReference,
+  values: PollingStationValues,
+): BlockReason | null {
+  const formSection = formState.sections[currentForm.id];
+  if (formSection) {
+    if (formSection.errors.length > 0) {
+      console.log("BLOCKED: has errors");
+      return "errors";
+    }
+    if (formSection.warnings.length > 0 && !formSection.ignoreWarnings) {
+      console.log("BLOCKED: has warnings without ignore");
+      return "warnings";
+    }
+    console.log("Checking changes!!!");
+    if (!formSection.isSubmitted && currentFormHasChanges(currentForm, values)) {
+      console.log("BLOCKED: has changes");
+      return "changes";
+    }
+  }
+
+  return null;
 }

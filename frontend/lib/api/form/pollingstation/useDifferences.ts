@@ -13,9 +13,9 @@ export function useDifferences(getValues: () => DifferencesCounts) {
     cache,
   } = usePollingStationFormController();
 
-  const sectionValues = React.useMemo(() => {
-    if (cache && cache.key === "differences") {
-      const data = cache.data;
+  const sectionValues: DifferencesCounts = React.useMemo(() => {
+    if (cache && cache.key === "differences_counts") {
+      const data = cache.data as DifferencesCounts;
       setTemporaryCache(null);
       return data;
     }

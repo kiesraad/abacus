@@ -4,6 +4,7 @@ import {
   IconArrowNarrowRight,
   IconAsterisk,
   IconCheckmark,
+  IconDot,
   IconMinus,
   IconWarning,
 } from "@kiesraad/icon";
@@ -28,10 +29,11 @@ ProgressList.Ruler = () => <li className="ruler">&nbsp;</li>;
 export type ProgressListItemProps = {
   active?: boolean;
   status: MenuStatus;
+  disabled?: boolean;
   children?: React.ReactNode;
 };
 
-ProgressList.Item = function ({ active, status, children }: ProgressListItemProps) {
+ProgressList.Item = function ({ active, status, disabled, children }: ProgressListItemProps) {
   let title = undefined;
   let icon = <IconArrowNarrowRight />;
   if (!active) {
@@ -39,7 +41,10 @@ ProgressList.Item = function ({ active, status, children }: ProgressListItemProp
   }
 
   return (
-    <li className={cn(active ? "active" : "idle", status)} aria-current={active ? "step" : false}>
+    <li
+      className={cn(active ? "active" : "idle", status, { disabled: !!disabled })}
+      aria-current={active ? "step" : false}
+    >
       <aside title={title || undefined}>{icon}</aside>
       <label>{children}</label>
     </li>
@@ -56,6 +61,8 @@ function renderStatusIcon(status: MenuStatus): [string | undefined, React.JSX.El
       return ["Geen invoer gedaan", <IconMinus />];
     case "updates":
       return ["Updates", <IconAsterisk />];
+    case "current":
+      return ["Huidige invoer", <IconDot />];
     default:
       return [undefined, <></>];
   }

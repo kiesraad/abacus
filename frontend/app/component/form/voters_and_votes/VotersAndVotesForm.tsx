@@ -49,7 +49,7 @@ export function VotersAndVotesForm() {
     };
   }, [deformat]);
 
-  const { sectionValues, loading, errors, warnings, isSaved, submit } =
+  const { sectionValues, loading, errors, warnings, isSaved, ignoreWarnings, submit } =
     useVotersAndVotes(getValues);
 
   useTooltip({
@@ -198,7 +198,7 @@ export function VotersAndVotesForm() {
       <BottomBar type="inputgrid">
         <IngoreWarningsCheckbox
           id="voters_and_votes_form_ignore_warnings"
-          defaultChecked={false}
+          defaultChecked={ignoreWarnings}
           hidden={warnings.length === 0}
         >
           Ik heb de aantallen gecontroleerd met papier en correct overgenomen.

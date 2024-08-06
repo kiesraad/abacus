@@ -8,7 +8,13 @@ import {
   usePollingStationDataEntry,
   ValidationResult,
 } from "@kiesraad/api";
-import { rootFieldSection } from "@kiesraad/util";
+
+import {
+  addValidationResultToFormState,
+  formSectionComplete,
+  getNextSection,
+  resetFormSectionState,
+} from "./pollingStationUtils";
 
 export interface PollingStationFormControllerProps {
   election: Required<Election>;
@@ -22,6 +28,10 @@ export interface FormReference<T> {
   type: string;
   id: FormSectionID;
   getValues: () => T;
+}
+
+export interface FormReferenceRecounted extends FormReference<{ recounted: boolean }> {
+  type: "recounted";
 }
 
 export interface FormReferenceVotersAndVotes
@@ -41,6 +51,7 @@ export interface FormReferencePoliticalGroupVotes
 }
 
 export type AnyFormReference =
+  | FormReferenceRecounted
   | FormReferenceVotersAndVotes
   | FormReferenceDifferences
   | FormReferencePoliticalGroupVotes;
@@ -50,24 +61,27 @@ export interface iPollingStationControllerContext {
   error: ApiResponseErrorData | null;
   data: DataEntryResponse | null;
   formState: FormState;
-  targetFormSection: FormSectionID;
-  values: PollingStationResults;
+  targetFormSection: FormSectionID | null;
+  values: PollingStationValues;
   setValues: React.Dispatch<React.SetStateAction<PollingStationResults>>;
-  setTemporaryCache: (cache: AnyCache | null) => boolean;
-  cache: AnyCache | null;
+  setTemporaryCache: (cache: TemporaryCache | null) => boolean;
+  cache: TemporaryCache | null;
   currentForm: AnyFormReference | null;
   submitCurrentForm: (ignoreWarnings?: boolean) => void;
   registerCurrentForm: (form: AnyFormReference) => void;
 }
 
 export type FormSectionID =
+  | "recounted"
   | "voters_votes_counts"
   | "differences_counts"
   | `political_group_votes_${number}`;
 
 export type FormSection = {
+  index: number; //fixate the order of filling in sections
   id: FormSectionID;
-  isSaved: boolean;
+  isSaved: boolean; //has this section been sent to the server
+  isSubmitted?: boolean; //has this section been submitted in the latest request
   ignoreWarnings: boolean;
   errors: ValidationResult[];
   warnings: ValidationResult[];
@@ -84,35 +98,20 @@ export interface FormState {
 }
 
 //store unvalidated data
-export type TemporaryCache<T> = {
-  key: string;
-  data: T;
-  id?: number;
+export type TemporaryCache = {
+  key: FormSectionID;
+  data: unknown;
 };
-
-export interface TemporaryCacheVotersAndVotes
-  extends TemporaryCache<Pick<PollingStationResults, "voters_counts" | "votes_counts">> {
-  key: "voters_and_votes";
-}
-
-export interface TemporaryCachePoliticalGroupVotes
-  extends TemporaryCache<PollingStationResults["political_group_votes"][0]> {
-  key: "political_group_votes";
-}
-
-export interface TemporaryCacheDifferences
-  extends TemporaryCache<PollingStationResults["differences_counts"]> {
-  key: "differences";
-}
-
-export type AnyCache =
-  | TemporaryCacheVotersAndVotes
-  | TemporaryCachePoliticalGroupVotes
-  | TemporaryCacheDifferences;
 
 export const PollingStationControllerContext = React.createContext<
   iPollingStationControllerContext | undefined
 >(undefined);
+
+export interface PollingStationValues extends PollingStationResults {
+  recounted: boolean;
+}
+
+const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
 
 export function PollingStationFormController({
   election,
@@ -125,7 +124,7 @@ export function PollingStationFormController({
     entry_number: entryNumber,
   });
 
-  const temporaryCache = React.useRef<AnyCache | null>(null);
+  const temporaryCache = React.useRef<TemporaryCache | null>(null);
 
   //reference to the current form on screen
   const currentForm = React.useRef<AnyFormReference | null>(null);
@@ -134,15 +133,25 @@ export function PollingStationFormController({
   const _ignoreWarnings = React.useRef<FormSectionID | null>(null);
 
   //where to navigate to next
-  const [targetFormSection, setTargetFormSection] =
-    React.useState<FormSectionID>("voters_votes_counts");
+  const [targetFormSection, setTargetFormSection] = React.useState<FormSectionID | null>(
+    INITIAL_FORM_SECTION_ID,
+  );
 
   const [formState, setFormState] = React.useState<FormState>(() => {
     const result: FormState = {
-      active: "voters_votes_counts",
-      current: "voters_votes_counts",
+      active: INITIAL_FORM_SECTION_ID,
+      current: INITIAL_FORM_SECTION_ID,
       sections: {
+        recounted: {
+          index: 0,
+          id: "recounted",
+          isSaved: false,
+          ignoreWarnings: false,
+          errors: [],
+          warnings: [],
+        },
         voters_votes_counts: {
+          index: 1,
           id: "voters_votes_counts",
           isSaved: false,
           ignoreWarnings: false,
@@ -150,6 +159,7 @@ export function PollingStationFormController({
           warnings: [],
         },
         differences_counts: {
+          index: 2,
           id: "differences_counts",
           isSaved: false,
           ignoreWarnings: false,
@@ -163,8 +173,9 @@ export function PollingStationFormController({
       },
     };
 
-    election.political_groups.forEach((pg) => {
+    election.political_groups.forEach((pg, n) => {
       result.sections[`political_group_votes_${pg.number}`] = {
+        index: n + 3,
         id: `political_group_votes_${pg.number}`,
         isSaved: false,
         ignoreWarnings: false,
@@ -176,7 +187,8 @@ export function PollingStationFormController({
     return result;
   });
 
-  const [values, _setValues] = React.useState<PollingStationResults>(() => ({
+  const [values, _setValues] = React.useState<PollingStationValues>(() => ({
+    recounted: false,
     political_group_votes: election.political_groups.map((pg) => ({
       number: pg.number,
       total: 0,
@@ -221,7 +233,7 @@ export function PollingStationFormController({
     });
   }, []);
 
-  const setTemporaryCache = React.useCallback((cache: AnyCache | null) => {
+  const setTemporaryCache = React.useCallback((cache: TemporaryCache | null) => {
     //OPTIONAL: allow only cache for unvalidated data
     temporaryCache.current = cache;
     return true;
@@ -232,8 +244,8 @@ export function PollingStationFormController({
       //Form state changes based of validation results in data.
       setFormState((old) => {
         const newFormState = { ...old };
-        //reset all errors/warnings, the server validates the entire request each time.
-        resetErrorsAndWarnings(newFormState);
+        //reset all errors/warnings, and submitted, the server validates the entire request each time.
+        resetFormSectionState(newFormState);
         //distribute errors to sections
         addValidationResultToFormState(newFormState, data.validation_results.errors, "errors");
         //distribute warnings to sections
@@ -244,7 +256,7 @@ export function PollingStationFormController({
         if (activeFormSection) {
           //store that this section has been sent to the server
           activeFormSection.isSaved = true;
-
+          activeFormSection.isSubmitted = true;
           //flag ignore warnings
           activeFormSection.ignoreWarnings = _ignoreWarnings.current === activeFormSection.id;
 
@@ -252,7 +264,7 @@ export function PollingStationFormController({
           if (newFormState.current === activeFormSection.id) {
             if (activeFormSection.errors.length === 0) {
               if (activeFormSection.warnings.length === 0 || activeFormSection.ignoreWarnings) {
-                const nextSectionID = getNextSection(newFormState, activeFormSection.id);
+                const nextSectionID = getNextSection(newFormState, activeFormSection);
                 if (nextSectionID) {
                   newFormState.current = nextSectionID;
                 } else {
@@ -272,8 +284,10 @@ export function PollingStationFormController({
   React.useEffect(() => {
     const activeSection = formState.sections[formState.active];
     if (activeSection) {
-      if (formSectionComplete(activeSection)) {
-        setTargetFormSection(formState.current);
+      if (activeSection.isSubmitted) {
+        if (formSectionComplete(activeSection)) {
+          setTargetFormSection(formState.current);
+        }
       }
     }
   }, [formState]);
@@ -285,9 +299,14 @@ export function PollingStationFormController({
         if (form.id !== formState.active) {
           setFormState((old) => {
             const newFormState = { ...old };
+            const oldActive = old.sections[old.active];
+            if (oldActive) {
+              oldActive.isSubmitted = false;
+            }
             newFormState.active = form.id;
             return newFormState;
           });
+          setTargetFormSection(null);
         }
       }
     },
@@ -316,6 +335,7 @@ export function PollingStationFormController({
             break;
           case "voters_and_votes":
           case "differences":
+          case "recounted":
           default:
             setValues((old) => ({
               ...old,
@@ -356,66 +376,4 @@ export function PollingStationFormController({
       {children}
     </PollingStationControllerContext.Provider>
   );
-}
-
-function addValidationResultToFormState(
-  formState: FormState,
-  arr: ValidationResult[],
-  target: "errors" | "warnings",
-) {
-  arr.forEach((validationResult) => {
-    const { name: rootSection, index } = rootFieldSection(validationResult.fields[0]);
-    switch (rootSection) {
-      case "votes_counts":
-      case "voters_counts":
-        formState.sections.voters_votes_counts[target].push(validationResult);
-        break;
-      case "differences_counts":
-        formState.sections.differences_counts[target].push(validationResult);
-        break;
-      case "political_group_votes":
-        if (index !== undefined) {
-          const sectionKey = `political_group_votes_${index}` as FormSectionID;
-          const section = formState.sections[sectionKey];
-          if (section) {
-            section[target].push(validationResult);
-          }
-        }
-        break;
-      default:
-        formState.unknown[target].push(validationResult);
-        break;
-    }
-  });
-}
-
-function formSectionComplete(section: FormSection): boolean {
-  if (section.isSaved) {
-    if (section.errors.length === 0) {
-      if (section.warnings.length === 0 || section.ignoreWarnings) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-function getNextSection(formState: FormState, currentSection: FormSectionID): FormSectionID | null {
-  const keys = Object.keys(formState.sections);
-  const currentIndex = keys.indexOf(currentSection);
-  if (currentIndex !== -1) {
-    if (currentIndex + 1 < keys.length) {
-      return keys[currentIndex + 1] as FormSectionID;
-    }
-  }
-  return null;
-}
-
-function resetErrorsAndWarnings(formState: FormState) {
-  Object.values(formState.sections).forEach((section) => {
-    section.errors = [];
-    section.warnings = [];
-  });
-  formState.unknown.errors = [];
-  formState.unknown.warnings = [];
 }

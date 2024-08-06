@@ -17,10 +17,10 @@ export function usePoliticalGroup(
   } = usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
-    if (cache && cache.key === "political_group_votes" && cache.id === political_group_number) {
+    if (cache && cache.key === `political_group_votes_${political_group_number}`) {
       const data = cache.data;
       setTemporaryCache(null);
-      return data;
+      return data as PoliticalGroupVotes;
     }
     return values.political_group_votes.find((pg) => pg.number === political_group_number);
   }, [values, political_group_number, setTemporaryCache, cache]);

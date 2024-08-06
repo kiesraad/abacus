@@ -63,6 +63,24 @@
         }
       }
     }
+
+    &:global(.current) {
+      aside {
+        svg {
+          fill: var(--color-notify);
+        }
+      }
+    }
+
+    &:global(.disabled) {
+      opacity: 0.5;
+
+      a {
+        pointer-events: none;
+        cursor: default;
+      }
+    }
+
     a {
       color: inherit;
       width: 100%;

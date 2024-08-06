@@ -128,7 +128,7 @@ export interface ParameterObject extends ParameterBaseObject {
   in: string;
 }
 
-export interface HeaderObject extends ParameterBaseObject {}
+export type HeaderObject = ParameterBaseObject;
 
 export interface ParameterBaseObject {
   description?: string;

@@ -6,8 +6,13 @@ license = "EUPL-1.2"
 rust-version = "1.75"
 
 [features]
-default = ["openapi"]
+default = ["openapi", "dev-database"]
 openapi = ["dep:utoipa-swagger-ui"]
+dev-database = []
+
+[[bin]]
+name = "gen-openapi"
+required-features = ["openapi"]
 
 [dependencies]
 axum = { version = "0.7", features = ["macros"] }

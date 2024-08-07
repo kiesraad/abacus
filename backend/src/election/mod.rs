@@ -30,7 +30,7 @@ pub struct ElectionDetailsResponse {
 /// Election status response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionStatusResponse {
-    pub statusses: Vec<PollingStationStatusEntry>,
+    pub statuses: Vec<PollingStationStatusEntry>,
 }
 
 /// Get a list of all elections, without their candidate lists

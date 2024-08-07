@@ -7,40 +7,69 @@
 
 Render happens based on last received API response
 
+ToDo:
+- different icon for accepted warnings?
+
 ```mermaid
 flowchart TD
 
     %% elements
-    %% render-errors
-    %% render-warnings
-    %% fill-cached-data
     flow-start([start])
     flow-end([end])
+    illegal-state{{illegal state}}
 
-    fill-cached-data
     show-error
+    error-icon-next-page
+    %% error-icon-prev-page is illegal state
+    error-icon-cur-page
 
-    errors{errors?}
+    show-warning
+    warning-icon-next-page
+    warning-icon-prev-page
+    warning-icon-cur-page
+
+    error-next-page{error-next-page?}
+    error-prev-page{error-prev-page?}
     error-cur-page{error-cur-page?}
+
+    warning-next-page{warning-next-page?}
+    warning-prev-page{warning-prev-page?}
+    warning-cur-page{warning-cur-page?}
 
     cur-page-submitted{cur-page-submitted?}
 
-    warnings{warnings?}
+    fill-cached-data
 
     %% flow
-    flow-start --> errors
+    flow-start --> error-prev-page
 
-    errors -- yes --> error-cur-page
+    error-prev-page -- yes --> illegal-state
+    error-prev-page -- no --> error-next-page
+
+    error-next-page -- yes --> error-icon-next-page
+    error-icon-next-page --> error-cur-page
+    error-next-page -- no --> error-cur-page
+
     error-cur-page -- yes --> cur-page-submitted
-    cur-page-submitted -- yes --> show-error
-    cur-page-submitted -- no --> warnings
+    cur-page-submitted -- yes --> error-icon-cur-page
+    error-icon-cur-page --> show-error
+    cur-page-submitted -- no --> warning-prev-page
+    error-cur-page -- no --> warning-prev-page
 
+    warning-prev-page -- no --> warning-next-page
+    warning-prev-page -- yes --> warning-icon-prev-page
+    warning-icon-prev-page --> warning-next-page
 
-    errors -- no --> warnings
+    warning-next-page -- no --> warning-cur-page
+    warning-next-page -- yes --> warning-icon-next-page
+    warning-icon-next-page --> warning-cur-page
 
-    warnings -- no --> fill-cached-data
+    warning-cur-page -- no --> fill-cached-data
+    warning-cur-page -- yes --> warning-icon-cur-page
+    warning-icon-cur-page --> show-warning
 
     show-error --> fill-cached-data
+    show-warning --> fill-cached-data
 
     fill-cached-data --> flow-end
 
@@ -51,6 +80,9 @@ flowchart TD
 
 
 ## Click "Volgende" and call API
+
+ToDo:
+- accept warnings dialog
 
 ```mermaid
 flowchart TD

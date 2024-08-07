@@ -112,10 +112,11 @@ flowchart TD
 ```
 
 
-## Click "Volgende" and call API
+## Click "Volgende"
 
 ```mermaid
 flowchart TD
+
     %% elements
     flow-start([start])
     flow-end([end])
@@ -128,11 +129,9 @@ flowchart TD
 
     error-any-prev-page{error-any-prev-page?}
     error-cur-page{error-cur-page?}
-    error-any-next-page{error-any-next-page?}
-    warnings{warnings?}
+    warning-cur-page{warning-cur-page?}
 
     %% flow
-
     flow-start --> click-next
     click-next --> call-api
     call-api --> error-any-prev-page
@@ -142,13 +141,10 @@ flowchart TD
     error-any-prev-page -- no --> error-cur-page
 
     error-cur-page -- yes --> render-cur-page
-    error-cur-page -- no --> error-any-next-page
+    error-cur-page -- no --> warning-cur-page
 
-    error-any-next-page -- yes --> warnings
-    error-any-next-page -- no --> warnings
-
-    warnings -- no --> go-to-next-page
-    warnings -- yes --> render-cur-page
+    warning-cur-page -- yes --> render-cur-page
+    warning-cur-page -- no --> go-to-next-page
     
     go-to-next-page --> flow-end
     render-cur-page --> flow-end

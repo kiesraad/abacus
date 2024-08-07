@@ -159,7 +159,7 @@ describe("Test PollingStationChoiceForm", () => {
     await user.type(pollingStation, "abc");
 
     // Test that the alert disappeared
-    expect(pollingStationSubmitFeedback).toBeUndefined();
+    expect(screen.queryByTestId("pollingStationSubmitFeedback")).toBeNull();
 
     // Click submit again and see that the alert appeared again
     await user.click(submitButton);

@@ -1,14 +1,13 @@
 # Data Entry Navigation
 
 ## Questions
-- Where does "cache input" happen in the basic happy path flow?
+- Where does "cache input" happen in these flows?
+- Is there a different warning icon for accepted versus not-accepted warnings? Or is it not possible to leave a page without accepting the warning? Also, accepting warnings is not yet included in any of the flows.
+
 
 ## Render page
 
-Render happens based on last received API response
-
-ToDo:
-- different icon for accepted warnings?
+Render happens based on last received API response.
 
 ```mermaid
 flowchart TD
@@ -38,7 +37,7 @@ flowchart TD
 
     cur-page-submitted{cur-page-submitted?}
 
-    fill-cached-data
+    fill-cached-input
 
     %% flow
     flow-start --> error-prev-page
@@ -68,21 +67,15 @@ flowchart TD
     warning-cur-page -- yes --> warning-icon-cur-page
     warning-icon-cur-page --> show-warning
 
-    show-error --> fill-cached-data
-    show-warning --> fill-cached-data
+    show-error --> fill-cached-input
+    show-warning --> fill-cached-input
 
-    fill-cached-data --> flow-end
+    fill-cached-input --> flow-end
 
 ```
 
----
-
-
 
 ## Click "Volgende" and call API
-
-ToDo:
-- accept warnings dialog
 
 ```mermaid
 flowchart TD
@@ -126,23 +119,31 @@ flowchart TD
 ```
 
 
----
-
-
-
 ## Click nav item
 
 ```mermaid
 flowchart TD
     %% elements
+    flow-start([start])
+    flow-end([end])
+
     click-nav-item
     save-changes{save-changes?}
     go-to-page
-    cache-input
+    remain-on-page
+    api-call
+
+    errors-or-warnings-cur-page{errors-or-warnings-cur-page?}
 
     %% flow
+    flow-start --> click-nav-item
     click-nav-item --> save-changes
     save-changes -- no --> go-to-page
-    save-changes -- yes --> cache-input
-    cache-input --> go-to-page
+    save-changes -- yes --> api-call
+    api-call --> errors-or-warnings-cur-page
+    errors-or-warnings-cur-page -- no --> go-to-page
+    errors-or-warnings-cur-page -- yes --> remain-on-page
+
+    go-to-page --> flow-end
+    remain-on-page --> flow-end
 ```

@@ -63,7 +63,7 @@ flowchart TD
     warning-next-page -- yes --> warning-icon-next-page
     warning-icon-next-page --> warning-cur-page
 
-    warning-cur-page -- no --> fill-cached-data
+    warning-cur-page -- no --> fill-cached-input
     warning-cur-page -- yes --> warning-icon-cur-page
     warning-icon-cur-page --> show-warning
 

@@ -142,7 +142,7 @@ pub struct PollingStationStatusEntry {
     pub status: PollingStationStatus,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq)]
 pub enum PollingStationStatus {
     Incomplete,
     Complete,

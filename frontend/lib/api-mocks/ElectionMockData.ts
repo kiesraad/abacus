@@ -362,7 +362,7 @@ export const electionDetailsMockResponse: ElectionDetailsResponse = {
 };
 
 export const electionStatusMockResponse: ElectionStatusResponse = {
-  statusses: [
+  statuses: [
     {
       id: 1,
       status: "Incomplete",

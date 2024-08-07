@@ -39,7 +39,7 @@ describe("InputHomePage", () => {
 
   test("Finish input visible when finished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
-      statusses: [
+      statuses: [
         { id: 1, status: "Complete" },
         { id: 2, status: "Complete" },
       ],

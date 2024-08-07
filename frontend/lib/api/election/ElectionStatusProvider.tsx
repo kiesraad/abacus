@@ -3,7 +3,7 @@ import * as React from "react";
 import { PollingStationStatusEntry, useElectionStatusRequest } from "@kiesraad/api";
 
 export interface iElectionStatusProviderContext {
-  statusses: Required<PollingStationStatusEntry[]>;
+  statuses: Required<PollingStationStatusEntry[]>;
 }
 
 export const ElectionStatusProviderContext = React.createContext<
@@ -29,7 +29,7 @@ export function ElectionStatusProvider({ children, electionId }: ElectionStatusP
   }
 
   return (
-    <ElectionStatusProviderContext.Provider value={{ statusses: data.statusses }}>
+    <ElectionStatusProviderContext.Provider value={{ statuses: data.statuses }}>
       {children}
     </ElectionStatusProviderContext.Provider>
   );

@@ -617,10 +617,10 @@
         "type": "object",
         "description": "Election status response",
         "required": [
-          "statusses"
+          "statuses"
         ],
         "properties": {
-          "statusses": {
+          "statuses": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PollingStationStatusEntry"

@@ -9,7 +9,7 @@ import { Alert, Button, WorkStationNumber } from "@kiesraad/ui";
 export function InputHomePage() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { statusses } = useElectionStatus();
+  const { statuses } = useElectionStatus();
   const [showAlert, setShowAlert] = useState(true);
 
   function hideAlert() {
@@ -31,7 +31,7 @@ export function InputHomePage() {
         </section>
       </header>
       {/* For demo purposes we just check if _any_ polling station is completed */}
-      {statusses.every((s) => s.status === "Complete") && (
+      {statuses.every((s) => s.status === "Complete") && (
         <Alert type="success" onClose={hideAlert}>
           <h2>Alle stembureaus zijn twee keer ingevoerd</h2>
           <p>

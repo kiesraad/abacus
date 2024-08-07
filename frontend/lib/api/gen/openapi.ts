@@ -131,7 +131,7 @@ export interface ElectionListResponse {
  * Election status response
  */
 export interface ElectionStatusResponse {
-  statusses: PollingStationStatusEntry[];
+  statuses: PollingStationStatusEntry[];
 }
 
 /**

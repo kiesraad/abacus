@@ -240,34 +240,6 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   describe("VotersAndVotesForm errors", () => {
-    test("F.001 Invalid value", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [
-            {
-              fields: ["data.voters_counts.poll_card_count"],
-              code: "OutOfRange",
-            },
-          ],
-          warnings: [],
-        },
-      });
-
-      const user = userEvent.setup();
-
-      renderForm();
-
-      // Since the component does not allow to input invalid values such as -3,
-      // not inputting any values and just clicking the submit button.
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^OutOfRange$/);
-      expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
-    });
-
     test("F.201 IncorrectTotal Voters counts", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {

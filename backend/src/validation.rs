@@ -32,11 +32,9 @@ pub struct ValidationResult {
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq)]
 pub enum ValidationResultCode {
-    OutOfRange,
     IncorrectTotal,
     AboveThreshold,
     EqualInput,
-    IncorrectCandidatesList,
     MissingRecounts,
     IncorrectDifference,
     ConflictingDifferences,
@@ -46,11 +44,9 @@ pub enum ValidationResultCode {
 impl fmt::Display for ValidationResultCode {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            ValidationResultCode::OutOfRange => write!(f, "Out of range"),
             ValidationResultCode::IncorrectTotal => write!(f, "Incorrect sum"),
             ValidationResultCode::AboveThreshold => write!(f, "Above threshold"),
             ValidationResultCode::EqualInput => write!(f, "Equal input"),
-            ValidationResultCode::IncorrectCandidatesList => write!(f, "Incorrect candidates list"),
             ValidationResultCode::MissingRecounts => write!(f, "Missing recounts"),
             ValidationResultCode::IncorrectDifference => write!(f, "Incorrect difference"),
             ValidationResultCode::ConflictingDifferences => write!(f, "Conflicting differences"),
@@ -81,7 +77,7 @@ mod tests {
         let mut result1 = ValidationResults {
             errors: vec![ValidationResult {
                 fields: vec!["field1".to_string()],
-                code: ValidationResultCode::OutOfRange,
+                code: ValidationResultCode::IncorrectTotal,
             }],
             warnings: vec![],
         };
@@ -89,7 +85,7 @@ mod tests {
         let mut result2 = ValidationResults {
             errors: vec![ValidationResult {
                 fields: vec!["field2".to_string()],
-                code: ValidationResultCode::OutOfRange,
+                code: ValidationResultCode::IncorrectTotal,
             }],
             warnings: vec![],
         };

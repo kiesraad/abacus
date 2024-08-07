@@ -194,11 +194,9 @@ export interface ValidationResult {
 }
 
 export type ValidationResultCode =
-  | "OutOfRange"
   | "IncorrectTotal"
   | "AboveThreshold"
   | "EqualInput"
-  | "IncorrectCandidatesList"
   | "MissingRecounts"
   | "IncorrectDifference"
   | "ConflictingDifferences"

@@ -2,7 +2,6 @@ import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
   DataEntryResponse,
-  DifferencesCounts,
   Election,
   ElectionDetailsResponse,
   ElectionListResponse,
@@ -12,9 +11,6 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
   PollingStation,
   PollingStationListResponse,
-  VotersCounts,
-  VotersRecounts,
-  VotesCounts,
 } from "@kiesraad/api";
 
 import {
@@ -109,20 +105,6 @@ export const pollingStationDataEntryHandler = http.post<
     if (voters_recounts) {
       //SECTION voters_recounts
       total_voters_counts = voters_recounts.total_admitted_voters_recount;
-      const votersRecountsFields: (keyof VotersRecounts)[] = [
-        "poll_card_recount",
-        "proxy_certificate_recount",
-        "total_admitted_voters_recount",
-        "voter_card_recount",
-      ];
-      votersRecountsFields.forEach((field) => {
-        if (valueOutOfRange(voters_recounts[field])) {
-          response.validation_results.errors.push({
-            fields: [`data.voters_recounts.${field}`],
-            code: "OutOfRange",
-          });
-        }
-      });
 
       // F.203 A.2 + B.2 + C.2 = D.2
       if (
@@ -145,21 +127,6 @@ export const pollingStationDataEntryHandler = http.post<
     } else {
       //SECTION voters_counts
       total_voters_counts = voters_counts.total_admitted_voters_count;
-      const votersCountsFields: (keyof VotersCounts)[] = [
-        "poll_card_count",
-        "proxy_certificate_count",
-        "total_admitted_voters_count",
-        "voter_card_count",
-      ];
-
-      votersCountsFields.forEach((field) => {
-        if (valueOutOfRange(voters_counts[field])) {
-          response.validation_results.errors.push({
-            fields: [`data.voters_counts.${field}`],
-            code: "OutOfRange",
-          });
-        }
-      });
 
       // F.201 A + B + C = D
       if (
@@ -181,24 +148,6 @@ export const pollingStationDataEntryHandler = http.post<
     }
 
     //SECTION votes_counts
-    const votesCountsFields: (keyof VotesCounts)[] = [
-      "blank_votes_count",
-      "invalid_votes_count",
-      "total_votes_cast_count",
-      "votes_candidates_counts",
-    ];
-
-    votesCountsFields.forEach((field) => {
-      if (field in votes_counts) {
-        if (valueOutOfRange(votes_counts[field])) {
-          response.validation_results.errors.push({
-            fields: [`data.votes_counts.${field}`],
-            code: "OutOfRange",
-          });
-        }
-      }
-    });
-
     // F.202 E + F + G = H
     if (
       votes_counts.votes_candidates_counts +
@@ -256,25 +205,6 @@ export const pollingStationDataEntryHandler = http.post<
         code: "ConflictingDifferences",
       });
     }
-
-    const differencesCountsFields: (keyof DifferencesCounts)[] = [
-      "more_ballots_count",
-      "fewer_ballots_count",
-      "unreturned_ballots_count",
-      "too_few_ballots_handed_out_count",
-      "too_many_ballots_handed_out_count",
-      "other_explanation_count",
-      "no_explanation_count",
-    ];
-
-    differencesCountsFields.forEach((field) => {
-      if (valueOutOfRange(differences_counts[field])) {
-        response.validation_results.errors.push({
-          fields: [`data.differences_counts.${field}`],
-          code: "OutOfRange",
-        });
-      }
-    });
 
     // W.302 if I: M + N + O - K - L = I
     if (
@@ -366,24 +296,6 @@ export const pollingStationDataEntryHandler = http.post<
     //SECTION political_group_votes
     let candidateVotesSum = 0;
     political_group_votes.forEach((pg) => {
-      if (valueOutOfRange(pg.total)) {
-        response.validation_results.errors.push({
-          fields: [`data.political_group_votes[${pg.number - 1}].total`],
-          code: "OutOfRange",
-        });
-      }
-
-      pg.candidate_votes.forEach((cv) => {
-        if (valueOutOfRange(cv.votes)) {
-          response.validation_results.errors.push({
-            fields: [
-              `data.political_group_votes[${pg.number - 1}].candidate_votes[${cv.number - 1}].votes`,
-            ],
-            code: "OutOfRange",
-          });
-        }
-      });
-
       // F.401
       const sum = pg.candidate_votes.reduce((acc, cv) => acc + cv.votes, 0);
       candidateVotesSum += sum;
@@ -440,7 +352,3 @@ export const handlers: HttpHandler[] = [
   pollingStationDataEntryHandler,
   PollingStationListRequestHandler,
 ];
-
-function valueOutOfRange(v: number): boolean {
-  return v < 0 || v > 999999999;
-}

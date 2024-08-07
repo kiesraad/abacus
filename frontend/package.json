@@ -17,6 +17,7 @@
     "test": "vitest",
     "e2e:lib-ui": "playwright test -c playwright.lib-ui.config.ts",
     "e2e:app": "playwright test -c playwright.app.config.ts",
+    "e2e:d2d": "playwright test -c playwright.d2d.config.ts",
     "ladle": "ladle serve",
     "start:msw": "cross-env API_MODE=mock vite",
     "gen:icons": "node scripts/gen_icons.js",

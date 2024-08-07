@@ -1,5 +1,6 @@
 use axum::extract::{Path, State};
 use axum::Json;
+use hyper::{header, HeaderMap};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -60,4 +61,37 @@ pub async fn election_details(
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let election = elections_repo.get(id).await?;
     Ok(Json(ElectionDetailsResponse { election }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/api/elections/{election_id}/pv",
+    responses(
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
+)]
+pub async fn election_generate_pv(
+    State(elections_repo): State<Elections>,
+    Path(id): Path<u32>,
+) -> Result<(), APIError> {
+    let _election = elections_repo.get(id).await?;
+
+    let filename = "file.name";
+    let disposition_header = format!("attachment; filename=\"{}\"", filename);
+
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        header::CONTENT_TYPE,
+        "text/pdf; charset=utf-8".parse().expect("couldn't parse"),
+    );
+    headers.insert(
+        header::CONTENT_DISPOSITION,
+        disposition_header.parse().expect("coudn't parse filename"),
+    );
+
+    todo!();
 }

@@ -40,6 +40,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let election_routes = Router::new()
         .route("/", get(election::election_list))
         .route("/:election_id", get(election::election_details))
+        .route("/:election_id/pv", get(election::election_generate_pv))
         .route(
             "/:election_id/polling_stations",
             get(polling_station::polling_station_list),

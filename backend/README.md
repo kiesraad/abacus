@@ -17,14 +17,14 @@ The built binary will be located in `target/release/`.
 
 ### Running
 
-Use `cargo run --bin api` to run the API on port 8080 (http://localhost:8080).
+Use `cargo run` to run the API on port 8080 (http://localhost:8080).
 
 To let the API server serve the frontend, first compile the frontend using
 `npm run build` in the `frontend` directory. The run the API server with the
 `--frontend-dist` flag pointing to the frontend build directory, e.g.:
 
 ```shell
-cargo run --bin api -- --frontend-dist ../frontend/dist
+cargo run -- --frontend-dist ../frontend/dist
 ```
 
 ### Linting
@@ -64,18 +64,20 @@ SQLite is used as the database. An empty database is created as `db.sqlite` when
 started. The database schema is created and updated using migrations managed by `sqlx`.
 
 When migrations are out of sync (e.g. `VersionMismatch` occurs when starting the API server),
-the database can be reset using `sqlx database reset`.
+the database can be reset using `sqlx database reset` or by running the API server with the
+`--reset-database` flag.
 
-Example database fixtures can be loaded using the SQLite CLI:
+Example database fixtures can be loaded during startup by adding the `--seed-data` command line
+flag. This can be combined with the `--reset-database` flag to always start from a clean database,
+e.g.:
 
 ```shell
-sqlite3 db.sqlite < fixtures/elections.sql
-sqlite3 db.sqlite < fixtures/polling_stations.sql 
+cargo run -- --reset-database --seed-data
 ```
 
 ### OpenAPI
 
-The [utoipa](https://github.com/juhaku/utoipa) crate is used to generate OpenAPI documentation for the REST API. 
+The [utoipa](https://github.com/juhaku/utoipa) crate is used to generate OpenAPI documentation for the REST API.
 The OpenAPI JSON specification is available in the repository at `openapi.json` and can be found at [/api-docs/openapi.json](http://localhost:8080/api-docs/openapi.json) when running the API server.
 The Swagger UI is available at [/api-docs](http://localhost:8080/api-docs).
 

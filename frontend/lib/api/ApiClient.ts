@@ -78,6 +78,7 @@ export class ApiClient {
         } as ApiResponseServerError<ErrorResponse>;
       }
     } catch (err: unknown) {
+      console.error("Server response parse error:", err);
       throw new Error(`Server response parse error: ${res.status}`);
     }
     throw new Error(`Unexpected response status: ${res.status}`);

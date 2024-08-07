@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { VotersVotesPage } from "e2e-tests/page-objects/input/VotersVotesPgObj";
 
 test("smoke test", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -8,5 +9,6 @@ test("smoke test", async ({ page }) => {
 
 test("input form", async ({ page }) => {
   await page.goto("/1/input/1/numbers", { waitUntil: "domcontentloaded" });
-  await expect(page.getByTestId("poll_card_count")).toBeVisible();
+  const votersVotesPage = new VotersVotesPage(page);
+  await expect(votersVotesPage.pollCardCount).toBeVisible();
 });

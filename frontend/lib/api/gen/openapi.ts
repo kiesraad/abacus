@@ -3,7 +3,7 @@
 /** PATHS **/
 
 // /api/elections
-export interface ELECTION_LIST_REQUEST_PARAMS {}
+export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
 
 // /api/elections/{election_id}
@@ -209,12 +209,7 @@ export interface ValidationResult {
   fields: string[];
 }
 
-export type ValidationResultCode =
-  | "OutOfRange"
-  | "IncorrectTotal"
-  | "AboveThreshold"
-  | "EqualInput"
-  | "IncorrectCandidatesList";
+export type ValidationResultCode = "IncorrectTotal" | "AboveThreshold" | "EqualInput";
 
 export interface ValidationResults {
   errors: ValidationResult[];

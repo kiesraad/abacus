@@ -275,7 +275,7 @@
             }
           },
           "422": {
-            "description": "JSON body parsing error (Unprocessable Content)",
+            "description": "JSON error or invalid data (Unprocessable Content)",
             "content": {
               "application/json": {
                 "schema": {
@@ -360,7 +360,7 @@
             }
           },
           "422": {
-            "description": "JSON body parsing error (Unprocessable Content)",
+            "description": "JSON error or invalid data (Unprocessable Content)",
             "content": {
               "application/json": {
                 "schema": {
@@ -846,11 +846,9 @@
       "ValidationResultCode": {
         "type": "string",
         "enum": [
-          "OutOfRange",
           "IncorrectTotal",
           "AboveThreshold",
-          "EqualInput",
-          "IncorrectCandidatesList"
+          "EqualInput"
         ]
       },
       "ValidationResults": {

@@ -56,6 +56,10 @@ npm run e2e:lib-ui
 
 # tests for frontend with msw:
 npm run e2e:app
+
+# tests for frontend with backend and database
+# important: run `npm run build` first
+npm run e2e:d2d
 ```
 
 ### UI Component development

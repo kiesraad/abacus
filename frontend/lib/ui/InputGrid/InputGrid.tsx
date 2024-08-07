@@ -129,13 +129,9 @@ InputGrid.Header = ({
 InputGrid.Body = ({ children }: { children: React.ReactNode }) => <tbody>{children}</tbody>;
 
 InputGrid.Separator = () => (
-  // 2 trs are needed to make sure zebra styling is according to design
-  <>
-    <tr className="sep_row"></tr>
-    <tr className="sep_row">
-      <td className="sep" colSpan={3}></td>
-    </tr>
-  </>
+  <tr className="sep_row">
+    <td className="sep" colSpan={3}></td>
+  </tr>
 );
 
 InputGrid.Row = ({

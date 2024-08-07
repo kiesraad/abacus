@@ -23,8 +23,10 @@ describe("Strings util", () => {
     ["'123456'"],
     ["six"],
   ])("parseIntStrict %s", (input: string, expected: number | undefined = undefined) => {
-    expected
-      ? expect(parseIntStrict(input)).toBe(expected)
-      : expect(parseIntStrict(input)).toBeUndefined();
+    if (expected) {
+      expect(parseIntStrict(input)).toBe(expected);
+    } else {
+      expect(parseIntStrict(input)).toBeUndefined();
+    }
   });
 });

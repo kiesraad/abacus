@@ -34,7 +34,7 @@ describe("InputHomePage", () => {
     await screen.findByText("Gemeenteraadsverkiezingen 2026");
 
     // Test that the message doesn't exist
-    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).toBeUndefined;
+    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).toBeUndefined();
   });
 
   test("Finish input visible when finished", async () => {

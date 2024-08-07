@@ -25,6 +25,6 @@ describe("Strings util", () => {
   ])("parseIntStrict %s", (input: string, expected: number | undefined = undefined) => {
     expected
       ? expect(parseIntStrict(input)).toBe(expected)
-      : expect(parseIntStrict(input)).toBeUndefined;
+      : expect(parseIntStrict(input)).toBeUndefined();
   });
 });

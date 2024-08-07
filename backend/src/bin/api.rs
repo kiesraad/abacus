@@ -19,6 +19,9 @@ struct Args {
     /// Path to the frontend dist directory to serve through the API server
     #[arg(short, long)]
     frontend_dist: Option<PathBuf>,
+    // Server port, optional
+    #[arg(short, long, default_value_t = 8080)]
+    port: u16,
 }
 
 /// Main entry point for the application, sets up the database and starts the
@@ -37,7 +40,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         app
     };
 
-    let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8080));
+    let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(&address).await?;
     println!("Starting API server on http://{}", listener.local_addr()?);
     axum::serve(listener, app.into_make_service()).await?;

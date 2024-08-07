@@ -30,7 +30,7 @@
   &.error {
     border-color: var(--color-error);
     background-color: var(--color-error-bg);
-    button:hover {
+    > button:hover {
       background: var(--color-error-hover);
     }
     svg {
@@ -40,7 +40,7 @@
   &.warning {
     border-color: var(--color-warning);
     background-color: var(--color-warning-bg);
-    button:hover {
+    > button:hover {
       background: var(--color-warning-hover);
     }
     svg {
@@ -50,7 +50,7 @@
   &.notify {
     border-color: var(--color-notify);
     background-color: var(--color-notify-bg);
-    button:hover {
+    > button:hover {
       background: var(--color-notify-hover);
     }
     svg {
@@ -60,7 +60,7 @@
   &.success {
     border-color: var(--color-success);
     background-color: var(--color-success-bg);
-    button:hover {
+    > button:hover {
       background: var(--color-success-hover);
     }
     svg {

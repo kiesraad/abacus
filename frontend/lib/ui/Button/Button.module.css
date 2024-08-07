@@ -17,9 +17,14 @@
   gap: 12px;
   cursor: pointer;
 
+  &:hover {
+    background-color: var(--button-color-primary-hover);
+  }
+
   &:focus {
     outline: none;
     box-shadow: 0 0 4px 4px rgba(66, 210, 243, 0.4);
+    background-color: var(--button-color-primary-focus);
   }
 
   &:disabled {

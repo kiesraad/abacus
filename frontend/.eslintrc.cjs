@@ -4,8 +4,10 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/strict-type-checked",
-    "plugin:react-hooks/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
     "plugin:jsx-a11y/recommended",
+    "plugin:react-hooks/recommended",
     "prettier",
   ],
   ignorePatterns: ["dist", ".eslintrc.cjs", "!.ladle/"],

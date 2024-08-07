@@ -30,7 +30,6 @@ export function InputHomePage() {
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
-      {/* For demo purposes we just check if _any_ polling station is completed */}
       {statuses.every((s) => s.status === "Complete") && (
         <Alert type="success" onClose={hideAlert}>
           <h2>Alle stembureaus zijn twee keer ingevoerd</h2>

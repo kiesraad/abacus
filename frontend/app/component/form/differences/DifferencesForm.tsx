@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useBlocker } from "react-router-dom";
 
 import { DifferencesCounts, useDifferences, useErrorsAndWarnings } from "@kiesraad/api";
 import { BottomBar, Button, Feedback, InputGrid, InputGridRow, useTooltip } from "@kiesraad/ui";
@@ -29,80 +28,48 @@ export function DifferencesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-  const {
-    sectionValues,
-    setSectionValues,
-    loading,
-    errors,
-    warnings,
-    serverError,
-    isCalled,
-    setTemporaryCache,
-  } = useDifferences();
+
+  const getValues = React.useCallback((): DifferencesCounts => {
+    const form = document.getElementById("differences_form") as DifferencesFormElement;
+    const elements = form.elements;
+
+    return {
+      more_ballots_count: deformat(elements.more_ballots_count.value),
+      fewer_ballots_count: deformat(elements.fewer_ballots_count.value),
+      unreturned_ballots_count: deformat(elements.unreturned_ballots_count.value),
+      too_few_ballots_handed_out_count: deformat(elements.too_few_ballots_handed_out_count.value),
+      too_many_ballots_handed_out_count: deformat(elements.too_many_ballots_handed_out_count.value),
+      other_explanation_count: deformat(elements.other_explanation_count.value),
+      no_explanation_count: deformat(elements.no_explanation_count.value),
+    };
+  }, [deformat]);
+
+  const { sectionValues, loading, errors, warnings, isSaved, submit } = useDifferences(getValues);
 
   useTooltip({
     onDismiss: resetWarnings,
   });
 
-  const getValues = React.useCallback(
-    (elements: DifferencesFormElement["elements"]): DifferencesCounts => {
-      return {
-        more_ballots_count: deformat(elements.more_ballots_count.value),
-        fewer_ballots_count: deformat(elements.fewer_ballots_count.value),
-        unreturned_ballots_count: deformat(elements.unreturned_ballots_count.value),
-        too_few_ballots_handed_out_count: deformat(elements.too_few_ballots_handed_out_count.value),
-        too_many_ballots_handed_out_count: deformat(
-          elements.too_many_ballots_handed_out_count.value,
-        ),
-        other_explanation_count: deformat(elements.other_explanation_count.value),
-        no_explanation_count: deformat(elements.no_explanation_count.value),
-      };
-    },
-    [deformat],
-  );
-
   function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
     event.preventDefault();
-    const elements = event.currentTarget.elements;
-    setSectionValues(getValues(elements));
+    submit();
   }
-  //const blocker =  useBlocker() use const blocker to render confirmation UI.
-  useBlocker(() => {
-    if (formRef.current && !isCalled) {
-      const elements = formRef.current.elements as DifferencesFormElement["elements"];
-      const values = getValues(elements);
-      setTemporaryCache({
-        key: "differences",
-        data: values,
-      });
-    }
-    return false;
-  });
 
   const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
   React.useEffect(() => {
-    if (isCalled) {
+    if (isSaved) {
       window.scrollTo(0, 0);
     }
-  }, [isCalled]);
+  }, [isSaved]);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-  const success = isCalled && !hasValidationError && !hasValidationWarning && !loading;
+
   return (
-    <form onSubmit={handleSubmit} ref={formRef}>
-      {/* Temporary while not navigating through form sections */}
-      {success && <div id="result">Success</div>}
+    <form onSubmit={handleSubmit} ref={formRef} id="differences_form">
       <h2>Verschil tussen aantal kiezers en getelde stemmen</h2>
-      {serverError && (
-        <Feedback type="error" title="Error">
-          <div id="feedback-server-error">
-            <h2>Error</h2>
-            <p id="result">{serverError.message}</p>
-          </div>
-        </Feedback>
-      )}
+
       {hasValidationError && (
         <Feedback type="error" title="Controleer ingevulde verschillen">
           <div id="feedback-error">

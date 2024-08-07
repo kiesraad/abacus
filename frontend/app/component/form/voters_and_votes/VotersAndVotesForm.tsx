@@ -1,7 +1,6 @@
 import * as React from "react";
-import { useBlocker } from "react-router-dom";
 
-import { useErrorsAndWarnings, useVotersAndVotes, VotersAndVotesValues } from "@kiesraad/api";
+import { getErrorsAndWarnings, useVotersAndVotes } from "@kiesraad/api";
 import { BottomBar, Button, Feedback, InputGrid, InputGridRow, useTooltip } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
@@ -31,83 +30,54 @@ export function VotersAndVotesForm() {
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
 
-  const {
-    sectionValues,
-    setSectionValues,
-    loading,
-    errors,
-    warnings,
-    serverError,
-    isCalled,
-    setTemporaryCache,
-  } = useVotersAndVotes();
+  const getValues = React.useCallback(() => {
+    const form = document.getElementById("voters_and_votes_form") as HTMLFormElement;
+    const elements = form.elements as VotersAndVotesFormElement["elements"];
+    return {
+      voters_counts: {
+        poll_card_count: deformat(elements.poll_card_count.value),
+        proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
+        voter_card_count: deformat(elements.voter_card_count.value),
+        total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
+      },
+      votes_counts: {
+        votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
+        blank_votes_count: deformat(elements.blank_votes_count.value),
+        invalid_votes_count: deformat(elements.invalid_votes_count.value),
+        total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
+      },
+    };
+  }, [deformat]);
+
+  const { sectionValues, loading, errors, warnings, isSaved, ignoreWarnings, submit } =
+    useVotersAndVotes(getValues);
 
   useTooltip({
     onDismiss: resetWarnings,
   });
 
-  const getValues = React.useCallback(
-    (elements: VotersAndVotesFormElement["elements"]): VotersAndVotesValues => {
-      return {
-        voters_counts: {
-          poll_card_count: deformat(elements.poll_card_count.value),
-          proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
-          voter_card_count: deformat(elements.voter_card_count.value),
-          total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
-        },
-        votes_counts: {
-          votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
-          blank_votes_count: deformat(elements.blank_votes_count.value),
-          invalid_votes_count: deformat(elements.invalid_votes_count.value),
-          total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
-        },
-      };
-    },
-    [deformat],
-  );
-
   function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
     event.preventDefault();
-    const elements = event.currentTarget.elements;
-    setSectionValues(getValues(elements));
+    const ignoreWarnings = (
+      document.getElementById("voters_and_votes_form_ignore_warnings") as HTMLInputElement
+    ).checked;
+    submit(ignoreWarnings);
   }
-  //const blocker =  useBlocker() use const blocker to render confirmation UI.
-  useBlocker(() => {
-    if (formRef.current && !isCalled) {
-      const elements = formRef.current.elements as VotersAndVotesFormElement["elements"];
-      const values = getValues(elements);
-      setTemporaryCache({
-        key: "voters_and_votes",
-        data: values,
-      });
-    }
-    return false;
-  });
 
-  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
   React.useEffect(() => {
-    if (isCalled) {
+    if (isSaved) {
       window.scrollTo(0, 0);
     }
-  }, [isCalled]);
+  }, [isSaved]);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-  const success = isCalled && !hasValidationError && !hasValidationWarning && !loading;
   return (
-    <form onSubmit={handleSubmit} ref={formRef}>
-      {/* Temporary while not navigating through form sections */}
-      {success && <div id="result">Success</div>}
+    <form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form">
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
-      {serverError && (
-        <Feedback type="error" title="Error">
-          <div id="feedback-server-error">
-            <h2>Error</h2>
-            <p id="result">{serverError.message}</p>
-          </div>
-        </Feedback>
-      )}
+
       {hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div id="feedback-error">
@@ -226,11 +196,40 @@ export function VotersAndVotesForm() {
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="inputgrid">
+        <IngoreWarningsCheckbox
+          id="voters_and_votes_form_ignore_warnings"
+          defaultChecked={ignoreWarnings}
+          hidden={warnings.length === 0}
+        >
+          Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
+        </IngoreWarningsCheckbox>
+
         <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>
         <span className="button_hint">SHIFT + Enter</span>
       </BottomBar>
     </form>
+  );
+}
+
+interface IngoreWarningsCheckboxProps {
+  id: string;
+  children: React.ReactNode;
+  defaultChecked?: boolean;
+  hidden?: boolean;
+}
+
+function IngoreWarningsCheckbox({
+  id,
+  children,
+  defaultChecked,
+  hidden,
+}: IngoreWarningsCheckboxProps) {
+  return (
+    <div style={{ display: hidden ? "none" : "block" }}>
+      <input type="checkbox" id={id} defaultChecked={defaultChecked} />
+      <label htmlFor="voters_and_votes_form_ignore_warnings">{children}</label>
+    </div>
   );
 }

@@ -3,7 +3,16 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { overrideOnce, render, screen } from "app/test/unit";
 
+import { PollingStationFormController } from "@kiesraad/api";
+import { electionDetailMock } from "@kiesraad/api-mocks";
+
 import { RecountedForm } from "./RecountedForm";
+
+const Component = (
+  <PollingStationFormController election={electionDetailMock} pollingStationId={1} entryNumber={1}>
+    <RecountedForm />
+  </PollingStationFormController>
+);
 
 describe("Test RecountedForm", () => {
   afterEach(() => {
@@ -14,7 +23,7 @@ describe("Test RecountedForm", () => {
     const spy = vi.spyOn(global, "fetch");
 
     const user = userEvent.setup();
-    render(<RecountedForm />);
+    render(Component);
 
     const yes = screen.getByTestId("yes");
     await user.click(yes);

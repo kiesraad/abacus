@@ -1,8 +1,7 @@
 import * as React from "react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
-import { BottomBar, Button, Feedback } from "@kiesraad/ui";
+import { usePollingStationFormController } from "@kiesraad/api";
+import { BottomBar, Button } from "@kiesraad/ui";
 
 interface FormElements extends HTMLFormControlsCollection {
   yes: HTMLInputElement;
@@ -14,26 +13,36 @@ interface RecountedFormElement extends HTMLFormElement {
 }
 
 export function RecountedForm() {
-  const navigate = useNavigate();
-  const [hasValidationError, setHasValidationError] = useState(false);
+  const { values, submitCurrentForm, registerCurrentForm } = usePollingStationFormController();
+
+  const getValues = React.useCallback(() => {
+    const form = document.getElementById("recounted_form") as RecountedFormElement;
+    const elements = form.elements;
+    return {
+      recounted: elements.yes.checked ? true : false,
+    };
+  }, []);
+
+  React.useEffect(() => {
+    registerCurrentForm({
+      id: "recounted",
+      type: "recounted",
+      getValues,
+    });
+  }, [getValues, registerCurrentForm]);
+
+  //  const [hasValidationError, setHasValidationError] = useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
 
   function handleSubmit(event: React.FormEvent<RecountedFormElement>) {
     event.preventDefault();
-    const elements = event.currentTarget.elements;
-
-    if (!elements.yes.checked && !elements.no.checked) {
-      setHasValidationError(true);
-    } else {
-      setHasValidationError(false);
-      navigate("../numbers");
-    }
+    submitCurrentForm();
   }
 
   return (
-    <form onSubmit={handleSubmit} ref={formRef}>
+    <form onSubmit={handleSubmit} ref={formRef} id="recounted_form">
       <h2>Is er herteld?</h2>
-      {hasValidationError && (
+      {/* {hasValidationError && (
         <Feedback type="error" title="Controleer het papieren proces-verbaal">
           <div>
             Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?
@@ -44,14 +53,20 @@ export function RecountedForm() {
             </ul>
           </div>
         </Feedback>
-      )}
+      )} */}
       <p className="form-paragraph md">
         Was er een onverklaard verschil tussen het aantal toegelaten kiezers en het aantal
         uitgebrachte stemmen? Is er op basis daarvan herteld door het gemeentelijk stembureau?
       </p>
       <div className="radio-form">
         <label>
-          <input type="radio" name="recounted" id="yes" value="yes" />
+          <input
+            type="radio"
+            name="recounted"
+            id="yes"
+            value="yes"
+            defaultChecked={values.recounted}
+          />
           Ja, er was een hertelling
         </label>
         <label>

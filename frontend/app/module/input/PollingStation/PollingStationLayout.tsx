@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
+import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 
 import { PollingStationFormController, useElection, usePollingStation } from "@kiesraad/api";
@@ -70,6 +71,7 @@ export function PollingStationLayout() {
           </nav>
         </Modal>
       )}
+      <PollingStationFormNavigation />
     </PollingStationFormController>
   );
 }

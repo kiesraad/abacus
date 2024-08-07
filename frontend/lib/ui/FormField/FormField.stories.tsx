@@ -32,8 +32,8 @@ export default {
   },
   argTypes: {
     error: {
-      options: [undefined, "OutOfRange", "IncorrectTotal", "AboveThreshold"],
-      defaultValue: "OutOfRange",
+      options: [undefined, "IncorrectTotal", "AboveThreshold", "EqualInput"],
+      defaultValue: "IncorrectTotal",
       control: { type: "radio" },
     },
   },

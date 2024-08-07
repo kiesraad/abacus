@@ -189,12 +189,7 @@ export interface ValidationResult {
   fields: string[];
 }
 
-export type ValidationResultCode =
-  | "OutOfRange"
-  | "IncorrectTotal"
-  | "AboveThreshold"
-  | "EqualInput"
-  | "IncorrectCandidatesList";
+export type ValidationResultCode = "IncorrectTotal" | "AboveThreshold" | "EqualInput";
 
 export interface ValidationResults {
   errors: ValidationResult[];

@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { AccountSetupForm } from "app/component/form/account_setup/AccountSetupForm";
 
-import { Alert, WorkStationNumber } from "@kiesraad/ui";
+import { Alert, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
 export function AccountSetupPage() {
   const [showAlert, setShowAlert] = useState(true);
@@ -13,6 +13,7 @@ export function AccountSetupPage() {
 
   return (
     <>
+      <PageTitle title="Account instellen - Abacus" />
       <header>
         <section>
           <h1>Account instellen</h1>

@@ -13,55 +13,36 @@
 
 Render happens based on last received API response.
 
+### Description
+Evaluate these top to bottom. The first one that evaluates to true is the state of the menu item
+
+1. index of menu-item > furthest page user has seen: `disabled` (no icon, no link)
+1. index of menu-item == current: `current` (arrow icon, bold, no link)
+1. index of menu-item == furthest: `unsubmitted` (blue dot)
+1. page contains errors: error: `error` icon
+1. page contains warnings and warnings have been accepted: `warning` (warning icon)
+1. submitted data was empty `empty` (dash icon)
+1. submitted data was not empty `valid` (green check icon)
+
+### Diagram
+
 ```mermaid
 flowchart TD
-
-    %% elements
     flow-start([start])
-    flow-end([end])
-    illegal-state{{illegal state}}
 
-    current-icon-cur-page
-
-    error-icon-next-page
-    %% error-icon-prev-page is illegal state
-
-    warning-icon-next-page
-    warning-icon-prev-page
-
-    error-any-next-page{error-any-next-page?}
-    error-any-prev-page{error-any-prev-page?}
-
-    warning-any-next-page{warning-any-next-page?}
-    warning-any-prev-page{warning-any-prev-page?}
-
-    already-has-error-icon{already-has-error-icon?}
-
-    fill-cached-input
-
-    %% flow
-    flow-start --> current-icon-cur-page
-    
-    current-icon-cur-page --> error-any-prev-page
-
-    error-any-prev-page -- yes --> illegal-state
-    error-any-prev-page -- no --> error-any-next-page
-
-    error-any-next-page -- yes --> error-icon-next-page
-    error-icon-next-page --> warning-any-prev-page
-    error-any-next-page -- no --> warning-any-prev-page
-
-    warning-any-prev-page -- no --> warning-any-next-page
-    warning-any-prev-page -- yes --> already-has-error-icon
-    already-has-error-icon -- yes --> warning-any-next-page
-    already-has-error-icon -- no --> warning-icon-prev-page
-    warning-icon-prev-page --> warning-any-next-page
-
-    warning-any-next-page -- no --> fill-cached-input
-    warning-any-next-page -- yes --> warning-icon-next-page
-    warning-icon-next-page --> fill-cached-input
-
-    fill-cached-input --> flow-end
+    flow-start --> page-visited{page-visited?}
+    page-visited -- no --> disabled-styling
+    page-visited -- yes --> current-page{current-page?}
+    current-page{current-page?} -- yes --> current-styling
+    current-page -- no --> submitted{submitted?}
+    submitted -- no --> unsubmitted-styling
+    submitted -- yes --> errors{errors?}
+    errors -- yes --> error-styling
+    errors -- no --> warnings{warnings?}
+    warnings -- yes --> warning-styling
+    warnings -- no --> empty{empty? }
+    empty -- yes --> empty-styling
+    empty -- no --> green-check-styling
 
 ```
 

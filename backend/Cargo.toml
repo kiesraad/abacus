@@ -5,9 +5,16 @@ edition = "2021"
 license = "EUPL-1.2"
 rust-version = "1.75"
 
+default-run = "api"
+
 [features]
-default = ["openapi"]
+default = ["openapi", "dev-database"]
 openapi = ["dep:utoipa-swagger-ui"]
+dev-database = []
+
+[[bin]]
+name = "gen-openapi"
+required-features = ["openapi"]
 
 [dependencies]
 axum = { version = "0.7", features = ["macros"] }
@@ -21,7 +28,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "chrono"] }
 chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
-clap = { version = "4.5", default-features = false, features = ["derive", "std"] }
+clap = { version = "4.5", default-features = false, features = ["derive", "std", "help"] }
 
 [dev-dependencies]
 reqwest = { version = "0.12", default-features = false, features = ["json"] }

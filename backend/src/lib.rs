@@ -10,7 +10,7 @@ use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
-use utoipa::{OpenApi, ToSchema};
+use utoipa::ToSchema;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -63,6 +63,8 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
 
 #[cfg(feature = "openapi")]
 pub fn create_openapi() -> utoipa::openapi::OpenApi {
+    use utoipa::OpenApi;
+
     #[derive(OpenApi)]
     #[openapi(
         paths(

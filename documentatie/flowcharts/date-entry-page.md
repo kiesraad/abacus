@@ -141,27 +141,36 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    %% elements
+    %% start and end
     flow-start([start])
-    flow-end([end])
 
+    go-to-page([go-to-page])
+    remain-on-page([remain-on-page])
+
+    %% steps
     click-nav-item
+    on-furthest-page{on-furthest-page?}
+    user-made-changes{user-made-changes?}
     save-changes{save-changes?}
-    go-to-page
-    remain-on-page
     api-call
-
-    errors-or-warnings-cur-page{errors-or-warnings-cur-page?}
+    cache-input
+    reset-changes
+    errors-or-warnings{errors-or-warnings?}
 
     %% flow
     flow-start --> click-nav-item
-    click-nav-item --> save-changes
-    save-changes -- no --> go-to-page
-    save-changes -- yes --> api-call
-    api-call --> errors-or-warnings-cur-page
-    errors-or-warnings-cur-page -- no --> go-to-page
-    errors-or-warnings-cur-page -- yes --> remain-on-page
+    click-nav-item --> on-furthest-page
+    on-furthest-page -- yes --> cache-input
+    cache-input --> go-to-page
 
-    go-to-page --> flow-end
-    remain-on-page --> flow-end
+    on-furthest-page -- no --> user-made-changes
+    user-made-changes -- no --> go-to-page
+    user-made-changes -- yes --> save-changes
+    save-changes -- no --> reset-changes
+    reset-changes --> go-to-page
+    save-changes -- yes --> api-call
+    api-call --> errors-or-warnings
+    errors-or-warnings -- no --> go-to-page
+    errors-or-warnings -- yes --> remain-on-page
+
 ```

@@ -30,7 +30,9 @@ export function PollingStationProgress() {
         const listId = `${index + 1}`;
         return (
           <ProgressList.Item key={`list${listId}`} status="idle" active={listNumber === listId}>
-            <Link to={`/${election.id}/input/${pollingStationId}/list/${listId}`}>{list.name}</Link>
+            <Link to={`/${election.id}/input/${pollingStationId}/list/${listId}`}>
+              Lijst {list.number} - {list.name}
+            </Link>
           </ProgressList.Item>
         );
       })}

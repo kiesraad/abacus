@@ -1,4 +1,4 @@
-.progresslist {
+.progress-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -6,7 +6,7 @@
 
   li {
     padding: 0.625rem 0.75rem;
-    min-height: 2.75rem;
+    height: 2.75rem;
     border-radius: 0.5rem;
     display: flex;
     align-items: center;
@@ -30,6 +30,9 @@
     &:global(.active) {
       background-color: var(--color-hover);
       font-weight: 500;
+      a {
+        cursor: auto;
+      }
     }
 
     &:global(.updates) {
@@ -65,7 +68,10 @@
     }
     a {
       color: inherit;
+      display: inline-block;
       width: 100%;
+      height: 100%;
+      vertical-align: middle;
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;

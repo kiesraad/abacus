@@ -624,12 +624,12 @@ impl Validate for DifferencesCounts {
 
         // W.302 validate that more_ballots_count == too_many_ballots_handed_out_count + other_explanation_count + no_explanation_count - unreturned_ballots_count - too_few_ballots_handed_out_count
         if self.more_ballots_count != 0
-            && (self.too_many_ballots_handed_out_count
-                + self.other_explanation_count
-                + self.no_explanation_count
-                - self.unreturned_ballots_count
-                - self.too_few_ballots_handed_out_count
-                != self.more_ballots_count)
+            && (i64::from(self.too_many_ballots_handed_out_count)
+                + i64::from(self.other_explanation_count)
+                + i64::from(self.no_explanation_count)
+                - i64::from(self.unreturned_ballots_count)
+                - i64::from(self.too_few_ballots_handed_out_count)
+                != i64::from(self.more_ballots_count))
         {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![
@@ -645,12 +645,12 @@ impl Validate for DifferencesCounts {
         }
         // W.303 validate that fewer_ballots_count == unreturned_ballots_count + too_few_ballots_handed_out_count + other_explanation_count + no_explanation_count
         if self.fewer_ballots_count != 0
-            && (self.unreturned_ballots_count
-                + self.too_few_ballots_handed_out_count
-                + self.other_explanation_count
-                + self.no_explanation_count
-                - self.too_many_ballots_handed_out_count
-                != self.fewer_ballots_count)
+            && (i64::from(self.unreturned_ballots_count)
+                + i64::from(self.too_few_ballots_handed_out_count)
+                + i64::from(self.other_explanation_count)
+                + i64::from(self.no_explanation_count)
+                - i64::from(self.too_many_ballots_handed_out_count)
+                != i64::from(self.fewer_ballots_count))
         {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![
@@ -1268,12 +1268,12 @@ mod tests {
     #[test]
     fn test_voters_counts_validation() {
         let mut validation_results = ValidationResults::default();
-        // test F.001 out of range
+        // test out of range
         let mut voters_counts = VotersCounts {
-            poll_card_count: 1_000_000_001, // F.001 out of range
+            poll_card_count: 1_000_000_001, // out of range
             proxy_certificate_count: 2,
             voter_card_count: 3,
-            total_admitted_voters_count: 1_000_000_006, // correct but F.001 out of range
+            total_admitted_voters_count: 1_000_000_006, // correct but out of range
         };
         let election = election_fixture(&[]);
         let res = voters_counts.validate(
@@ -1319,12 +1319,12 @@ mod tests {
     #[test]
     fn test_votes_counts_validation() {
         let mut validation_results = ValidationResults::default();
-        // test F.001 out of range
+        // test out of range
         let mut votes_counts = VotesCounts {
-            votes_candidates_counts: 1_000_000_001, // F.001 out of range
+            votes_candidates_counts: 1_000_000_001, // out of range
             blank_votes_count: 2,
             invalid_votes_count: 3,
-            total_votes_cast_count: 1_000_000_006, // correct but F.001 out of range
+            total_votes_cast_count: 1_000_000_006, // correct but out of range
         };
         let election = election_fixture(&[]);
         let res = votes_counts.validate(
@@ -1428,7 +1428,7 @@ mod tests {
     #[test]
     fn test_voters_recounts_validation() {
         let mut validation_results = ValidationResults::default();
-        // test F.001 out of range
+        // test out of range
         let mut voters_recounts = VotersRecounts {
             poll_card_recount: 1_000_000_001, // out of range
             proxy_certificate_recount: 2,
@@ -1479,7 +1479,7 @@ mod tests {
     #[test]
     fn test_differences_counts_validation() {
         let mut validation_results = ValidationResults::default();
-        // test F.001 out of range
+        // test out of range
         let mut differences_counts = DifferencesCounts {
             more_ballots_count: 1_000_000_002, // correct but out of range
             fewer_ballots_count: 0,
@@ -1496,6 +1496,43 @@ mod tests {
             "differences_counts".to_string(),
         );
         assert!(res.is_err());
+
+        // test calculation for more_ballots_count does not add up and becomes minus
+        validation_results = ValidationResults::default();
+        differences_counts = DifferencesCounts {
+            more_ballots_count: 1,
+            fewer_ballots_count: 0,
+            unreturned_ballots_count: 2,
+            too_few_ballots_handed_out_count: 0,
+            too_many_ballots_handed_out_count: 1,
+            other_explanation_count: 0,
+            no_explanation_count: 0,
+        };
+        let election = election_fixture(&[]);
+        differences_counts
+            .validate(
+                &election,
+                &mut validation_results,
+                "differences_counts".to_string(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::IncorrectTotal
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "differences_counts.more_ballots_count",
+                "differences_counts.too_many_ballots_handed_out_count",
+                "differences_counts.other_explanation_count",
+                "differences_counts.no_explanation_count",
+                "differences_counts.unreturned_ballots_count",
+                "differences_counts.too_few_ballots_handed_out_count"
+            ]
+        );
 
         // test W.302 incorrect total
         validation_results = ValidationResults::default();
@@ -1531,6 +1568,43 @@ mod tests {
                 "differences_counts.no_explanation_count",
                 "differences_counts.unreturned_ballots_count",
                 "differences_counts.too_few_ballots_handed_out_count"
+            ]
+        );
+
+        // test calculation for fewer_ballots_count does not add up and becomes minus
+        validation_results = ValidationResults::default();
+        differences_counts = DifferencesCounts {
+            more_ballots_count: 0,
+            fewer_ballots_count: 1,
+            unreturned_ballots_count: 1,
+            too_few_ballots_handed_out_count: 0,
+            too_many_ballots_handed_out_count: 2,
+            other_explanation_count: 0,
+            no_explanation_count: 0,
+        };
+        let election = election_fixture(&[]);
+        differences_counts
+            .validate(
+                &election,
+                &mut validation_results,
+                "differences_counts".to_string(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::IncorrectTotal
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "differences_counts.fewer_ballots_count",
+                "differences_counts.unreturned_ballots_count",
+                "differences_counts.too_few_ballots_handed_out_count",
+                "differences_counts.too_many_ballots_handed_out_count",
+                "differences_counts.other_explanation_count",
+                "differences_counts.no_explanation_count"
             ]
         );
 
@@ -1593,7 +1667,7 @@ mod tests {
             },
             PoliticalGroupVotes {
                 number: 2,
-                total: 1_000_000_000, // F.001 out of range
+                total: 1_000_000_000, // out of range
                 candidate_votes: vec![
                     CandidateVotes {
                         number: 1,
@@ -1601,7 +1675,7 @@ mod tests {
                     },
                     CandidateVotes {
                         number: 2,
-                        votes: 1_000_000_000, // F.001 out of range
+                        votes: 1_000_000_000, // out of range
                     },
                 ],
             },

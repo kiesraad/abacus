@@ -73,7 +73,7 @@ impl PollingStations {
 SELECT p.id AS "id: u32",
 CASE WHEN e.polling_station_id IS NULL THEN 'Incomplete' ELSE 'Complete' END AS "status!: _"
 FROM polling_stations AS p
-LEFT JOIN polling_station_data_entries AS e ON e.polling_station_id = p.id
+LEFT JOIN polling_station_results AS e ON e.polling_station_id = p.id
 WHERE election_id = $1
 "#,
             election_id

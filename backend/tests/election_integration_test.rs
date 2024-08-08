@@ -78,12 +78,17 @@ async fn test_election_details_status(pool: SqlitePool) {
     let status = response.status();
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
-    // Ensure the response is what we expect
+    // Ensure the response is what we expect:
+    // polling station 1 is now complete, polling station 2 is still incomplete
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
         PollingStationStatus::Complete
+    );
+    assert_eq!(
+        body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,
+        PollingStationStatus::Incomplete
     );
 }

@@ -1,6 +1,6 @@
 #![cfg(test)]
 
-use reqwest::StatusCode;
+use hyper::StatusCode;
 use sqlx::SqlitePool;
 
 use backend::{
@@ -10,6 +10,7 @@ use backend::{
 
 use crate::utils::serve_api;
 
+mod shared;
 mod utils;
 
 #[sqlx::test(fixtures("../fixtures/elections.sql"))]
@@ -68,4 +69,19 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
     assert_eq!(body.statuses[0].status, PollingStationStatus::Incomplete);
+    assert_eq!(body.statuses[1].status, PollingStationStatus::Incomplete);
+
+    shared::create_and_finalise_data_entry(&addr).await;
+
+    let url = format!("http://{addr}/api/elections/1/status");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
+    // Ensure the response is what we expect
+    println!("response body: {:?}", &body);
+    assert_eq!(status, StatusCode::OK);
+    assert!(!body.statuses.is_empty());
+    assert_eq!(body.statuses[0].status, PollingStationStatus::Complete);
+    assert_eq!(body.statuses[1].status, PollingStationStatus::Incomplete);
 }

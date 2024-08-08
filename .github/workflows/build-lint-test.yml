@@ -39,8 +39,10 @@ jobs:
         run: sqlx database setup
       - name: Check rustfmt
         run: cargo --verbose --locked fmt --all -- --check
-      - name: Check clippy
+      - name: Check Clippy with all features
         run: cargo --verbose --locked clippy --all-targets --all-features -- -D warnings
+      - name: Check Clippy without default features
+        run: cargo --verbose --locked clippy --all-targets --no-default-features -- -D warnings
       - name: Run tests
         run: cargo --verbose --locked test
       - name: Build

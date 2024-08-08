@@ -30,9 +30,6 @@
     &:global(.active) {
       background-color: var(--color-hover);
       font-weight: 500;
-      a {
-        cursor: auto;
-      }
     }
 
     &:global(.updates) {

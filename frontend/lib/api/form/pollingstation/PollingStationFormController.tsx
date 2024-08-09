@@ -373,7 +373,6 @@ export function PollingStationFormController({
         recounted: values.recounted !== undefined ? values.recounted : false,
         voters_recounts: values.recounted ? values.voters_recounts : undefined,
       };
-      console.log(postValues);
       doRequest({
         data: postValues,
       });

@@ -210,9 +210,6 @@ describe("Test VotersAndVotesForm", () => {
     //   await user.click(submitButton);
     //   const feedbackServerError = await screen.findByTestId("feedback-server-error");
     //   expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
-
-    //   expect(screen.queryByTestId("result")).not.toBeNull();
-    //   expect(screen.queryByTestId("result")).toHaveTextContent(/^422 error from mock$/);
     // });
 
     //Server errors are no longer rendered inside the form
@@ -231,10 +228,6 @@ describe("Test VotersAndVotesForm", () => {
     //  await user.click(submitButton);
     //  const feedbackServerError = await screen.findByTestId("feedback-server-error");
     //  expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
-
-    // TODO: server errors moved out of the form
-    //  expect(screen.queryByTestId("result")).not.toBeNull();
-    //  expect(screen.queryByTestId("result")).toHaveTextContent(/^500 error from mock$/);
     //});
   });
 
@@ -452,6 +445,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^AboveThreshold$/);
+      //TODO: server errors moved out of the form
       //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
@@ -526,6 +520,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^EqualInput$/);
+      //TODO: server errors moved out of the form
       //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });

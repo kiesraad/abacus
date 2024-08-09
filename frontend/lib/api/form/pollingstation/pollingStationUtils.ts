@@ -8,6 +8,8 @@ import {
   FormState,
   PollingStationValues,
 } from "./PollingStationFormController";
+import { DifferencesValues } from "./useDifferences.ts";
+import { RecountedValue } from "./useRecounted.ts";
 import { VotersAndVotesValues } from "./useVotersAndVotes";
 
 export function addValidationResultToFormState(
@@ -20,6 +22,7 @@ export function addValidationResultToFormState(
     switch (rootSection) {
       case "votes_counts":
       case "voters_counts":
+      case "voters_recounts":
         formState.sections.voters_votes_counts[target].push(validationResult);
         break;
       case "differences_counts":
@@ -80,10 +83,17 @@ export function currentFormHasChanges(
   currentForm: AnyFormReference,
   values: PollingStationValues,
 ): boolean {
+  if (currentForm.type === "recounted") {
+    const valA: RecountedValue = { recounted: values.recounted };
+    const valB = currentForm.getValues();
+    return !deepEqual(valA, valB);
+  }
+
   if (currentForm.type === "voters_and_votes") {
     const valA: VotersAndVotesValues = {
       voters_counts: values.voters_counts,
       votes_counts: values.votes_counts,
+      voters_recounts: values.voters_recounts,
     };
     const valB = currentForm.getValues();
     console.log("A", valA);
@@ -92,13 +102,9 @@ export function currentFormHasChanges(
   }
 
   if (currentForm.type === "differences") {
-    const valA = values.differences_counts;
-    const valB = currentForm.getValues();
-    return !deepEqual(valA, valB);
-  }
-
-  if (currentForm.type === "recounted") {
-    const valA = { recounted: values.recounted };
+    const valA: DifferencesValues = {
+      differences_counts: values.differences_counts,
+    };
     const valB = currentForm.getValues();
     return !deepEqual(valA, valB);
   }

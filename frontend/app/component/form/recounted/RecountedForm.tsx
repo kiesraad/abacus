@@ -49,7 +49,7 @@ export function RecountedForm() {
     <form onSubmit={handleSubmit} ref={formRef} id="recounted_form">
       <h2>Is er herteld?</h2>
       {hasValidationError && (
-        <Feedback type="error" title="Controleer het papieren proces-verbaal">
+        <Feedback type="error" title="Controleer het papieren proces-verbaal" code="F.101">
           <div>
             Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?
             <ul>

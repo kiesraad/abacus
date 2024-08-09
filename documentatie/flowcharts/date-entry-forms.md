@@ -66,31 +66,44 @@ flowchart TD
 
     render-empty-fields([render with empty fields])
     render-cached-data([render with cached data])
+    flow-end([end])
+
     render-submitted-data([render with submitted data])
 
-    show-error(show error)
-    show-warning(show warning)
+    show-error([show error])
+    show-warning([show warning])
+    show-checked-accepted(["show checked checkbox
+        warnings accepted"])
+    show-unchecked-accepted(["show unchecked checkbox
+        warnings accepted"])
 
-    cur-page-submitted{current page submitted}
+    page-submitted{page submitted?}
     error-cur-page{error for current page?}
     warning-cur-page{warning for current page?}
     cached-input-available{cached input available?}
+    warning-accepted{"warning(s) accepted?"}
 
     %% flow
-    flow-start --> cur-page-submitted
+    flow-start --> page-submitted
 
-    cur-page-submitted -- no --> cached-input-available
+    page-submitted -- no --> cached-input-available
     cached-input-available -- yes --> render-cached-data
     cached-input-available -- no --> render-empty-fields
-    cur-page-submitted -- yes --> error-cur-page
+    page-submitted -- yes --> render-submitted-data
+    
+    render-submitted-data --> error-cur-page
 
     error-cur-page -- yes --> show-error
-    show-error --> render-submitted-data
+    show-error --> flow-end
     error-cur-page -- no --> warning-cur-page
 
     warning-cur-page -- yes --> show-warning
-    show-warning --> render-submitted-data
-    warning-cur-page -- no --> render-submitted-data
+    show-warning --> warning-accepted
+    warning-accepted -- yes --> show-checked-accepted
+    warning-accepted -- no --> show-unchecked-accepted
+    show-checked-accepted --> flow-end
+    show-unchecked-accepted --> flow-end
+    warning-cur-page -- no --> flow-end
 ```
 
 

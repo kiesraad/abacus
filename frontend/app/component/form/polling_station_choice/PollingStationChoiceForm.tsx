@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { PollingStation, usePollingStationList } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
-import { parseIntStrict } from "@kiesraad/util";
-import { cn } from "@kiesraad/util";
+import { cn, parseIntStrict } from "@kiesraad/util";
 
 import { PollingStationSelector } from "./PollingStationSelector";
 import cls from "./PollingStationSelector.module.css";

@@ -1,4 +1,4 @@
-import Router from "react-router";
+import * as Router from "react-router";
 
 import { describe, expect, test, vi } from "vitest";
 

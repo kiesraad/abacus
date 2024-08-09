@@ -10,7 +10,6 @@ An important thing to keep in mind when reading these diagrams is that a user ca
 
 ## Questions
 - Where does "cache input" happen in these flows?
-- Is there a different warning icon for accepted versus not-accepted warnings? Or is it not possible to leave a page without accepting the warning? Also, accepting warnings is not yet included in any of the flows.
 
 
 ## Render navigation menu
@@ -109,6 +108,7 @@ flowchart TD
 
 ## Click "Volgende"
 
+
 ```mermaid
 flowchart TD
 
@@ -116,7 +116,11 @@ flowchart TD
     flow-start([start])
     go-to-prev-page([go-to-prev-page])
     go-to-next-page([go-to-next-page])
-    render-cur-page([render-cur-page])
+
+    abort-input([abort-input])
+    
+    render-error-cur-page
+    render-warning-cur-page
 
     click-next
     call-api
@@ -125,18 +129,34 @@ flowchart TD
     error-cur-page{error-cur-page?}
     warning-cur-page{warning-cur-page?}
 
+    address-error{handle-error}
+
+    address-warning{handle-warning}
+
     %% flow
     flow-start --> click-next
     click-next --> call-api
     call-api --> error-any-prev-page
+
     error-any-prev-page -- yes --> go-to-prev-page
 
     error-any-prev-page -- no --> error-cur-page
 
-    error-cur-page -- yes --> render-cur-page
-    error-cur-page -- no --> warning-cur-page
+    error-cur-page -- yes --> render-error-cur-page
+    render-error-cur-page --> address-error
+    
+    address-error -- abort --> abort-input
+    address-error -- resolve --> change-input
+    change-input --> click-next
 
-    warning-cur-page -- yes --> render-cur-page
+    error-cur-page -- no --> warning-cur-page
+    warning-cur-page -- yes --> render-warning-cur-page
+    render-warning-cur-page --> address-warning
+    address-warning -- resolve --> change-input
+    address-warning -- accept --> accept-warning
+    accept-warning --> go-to-next-page
+    address-warning -- abort --> abort-input
+
     warning-cur-page -- no --> go-to-next-page
 
 ```

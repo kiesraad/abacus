@@ -109,7 +109,6 @@ flowchart TD
 
 ## Click "Volgende"
 
-
 ```mermaid
 flowchart TD
 
@@ -140,8 +139,6 @@ flowchart TD
 
     go-to-next-page([go to next page])
 
-
-
     %% flow
     flow-start --> click-next
     click-next --> call-api
@@ -171,6 +168,8 @@ flowchart TD
     warning-cur-page -- no --> go-to-next-page
 
 ```
+
+Note that if there is a warning and the user changes the input, they should no longer have the option to accept the warning. They need to click "Next" first, to validate the changed input.
 
 
 ## Click navigation item

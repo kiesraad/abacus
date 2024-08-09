@@ -1,6 +1,12 @@
 import * as React from "react";
 import { BlockerFunction, useBlocker, useNavigate, useParams } from "react-router-dom";
 
+/* TODO:
+- make form submit from modal
+- browser navigation redirect if after current
+- close X button does nothing
+- hide ignore warnings key up if asd.
+**/
 import {
   AnyFormReference,
   currentFormHasChanges,
@@ -10,7 +16,7 @@ import {
   useElection,
   usePollingStationFormController,
 } from "@kiesraad/api";
-import { Button, Modal } from "@kiesraad/ui";
+import { Button, Feedback, Modal } from "@kiesraad/ui";
 
 export function PollingStationFormNavigation() {
   const _lastKnownSection = React.useRef<FormSectionID | null>(null);
@@ -122,6 +128,14 @@ export function PollingStationFormNavigation() {
             </Button>
           </nav>
         </Modal>
+      )}
+
+      {error && (
+        <Feedback type="error" title="Controleer uitgebrachte stemmen">
+          <div id="feedback-server-error">
+            {error.errorCode}: {error.message}
+          </div>
+        </Feedback>
       )}
       {error && <div>Error: {error.message}</div>}
     </>

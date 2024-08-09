@@ -350,8 +350,10 @@ export function PollingStationFormController({
 
   React.useEffect(() => {
     if (_isCalled.current) {
+      //eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { recounted: _recounted, ...serverValues } = values;
       doRequest({
-        data: values,
+        data: serverValues,
       });
     }
   }, [doRequest, values]);

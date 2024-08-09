@@ -29,7 +29,7 @@ export function VotersAndVotesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-
+  const [hideIgnoreWarnings, setHideIgnoreWarnings] = React.useState(false);
   const getValues = React.useCallback(() => {
     const form = document.getElementById("voters_and_votes_form") as HTMLFormElement;
     const elements = form.elements as VotersAndVotesFormElement["elements"];
@@ -65,6 +65,18 @@ export function VotersAndVotesForm() {
   }
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+
+  React.useEffect(() => {
+    const onKeyUp = () => {
+      setHideIgnoreWarnings(true);
+      document.removeEventListener("keyup", onKeyUp);
+    };
+
+    document.addEventListener("keyup", onKeyUp);
+    return () => {
+      document.removeEventListener("keyup", onKeyUp);
+    };
+  });
 
   React.useEffect(() => {
     if (isSaved) {
@@ -199,7 +211,7 @@ export function VotersAndVotesForm() {
         <IngoreWarningsCheckbox
           id="voters_and_votes_form_ignore_warnings"
           defaultChecked={ignoreWarnings}
-          hidden={warnings.length === 0}
+          hidden={hideIgnoreWarnings || warnings.length === 0}
         >
           Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
         </IngoreWarningsCheckbox>

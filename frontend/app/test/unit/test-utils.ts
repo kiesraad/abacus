@@ -11,6 +11,7 @@ const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">
 
 export * from "@testing-library/react";
 export { customRender as render };
+export { router } from "./router";
 
 export function getUrlMethodAndBody(
   call: [input: string | URL | Request, init?: RequestInit | undefined][],

@@ -1,10 +1,12 @@
 import * as React from "react";
-import { createMemoryRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 
 import { ApiProvider } from "@kiesraad/api";
 
+import { getRouter } from "./router";
+
 export const Providers = ({ children }: { children: React.ReactNode }) => {
-  const router = createMemoryRouter([{ path: "*", element: children }]);
+  const router = getRouter(children);
   return (
     <ApiProvider host="http://testhost">
       <RouterProvider router={router} />

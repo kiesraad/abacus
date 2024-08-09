@@ -4,7 +4,6 @@ import { Outlet, useParams } from "react-router-dom";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 
 import { PollingStationFormController, useElection, usePollingStation } from "@kiesraad/api";
-import { IconCross } from "@kiesraad/icon";
 import {
   Badge,
   Button,
@@ -46,7 +45,7 @@ export function PollingStationLayout() {
           <Badge type="first_entry" />
         </section>
         <section>
-          <Button variant="secondary" size="sm" onClick={changeDialog} rightIcon={<IconCross />}>
+          <Button variant="secondary" size="sm" onClick={changeDialog}>
             Invoer afbreken
           </Button>
           <WorkStationNumber>16</WorkStationNumber>

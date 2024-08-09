@@ -73,7 +73,8 @@
 
   &.sm {
     font-size: 14px;
-    padding: 8px 12px;
+    line-height: normal;
+    padding: 8px 14px;
   }
 
   &.lg {

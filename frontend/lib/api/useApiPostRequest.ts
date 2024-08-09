@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { ApiResponseErrorData } from "./ApiClient";
+import { ApiResponseErrorData, ApiResponseStatus } from "./ApiClient";
 import { useApi } from "./useApi";
 
 export type UseApiPostRequestReturn<REQUEST_BODY, DATA> = [
@@ -29,7 +29,7 @@ export function useApiPostRequest<REQUEST_BODY, DATA>({
     const doRequest = async (b: REQUEST_BODY) => {
       const response = await client.postRequest<DATA>(path, b as object);
       if (isSubscribed) {
-        if (response.status === "success") {
+        if (response.status === ApiResponseStatus.Success) {
           setData(response.data as DATA);
         } else {
           setError(response.data as ApiResponseErrorData);

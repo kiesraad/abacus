@@ -1,21 +1,7 @@
-import { ErrorResponse } from "@kiesraad/api";
-
-export interface ApiResponse<DATA = object> {
-  status: string;
+export interface ApiResponse<DataType> {
+  status: ApiResponseStatus;
   code: number;
-  data?: DATA;
-}
-
-export interface ApiResponseSuccess<DATA = object> extends ApiResponse<DATA> {
-  status: "success";
-}
-
-export interface ApiResponseClientError<DATA = object> extends ApiResponse<DATA> {
-  status: "client_error";
-}
-
-export interface ApiResponseServerError<DATA = object> extends ApiResponse<DATA> {
-  status: "server_error";
+  data?: DataType;
 }
 
 export interface ApiResponseErrorData {
@@ -23,27 +9,11 @@ export interface ApiResponseErrorData {
   message: string;
 }
 
-export type ApiServerResponse<SuccessResponse> =
-  | (Omit<Response, "json"> & {
-      status: 200;
-      json: () => SuccessResponse | PromiseLike<SuccessResponse>;
-    })
-  | (Omit<Response, "json"> & {
-      status: 422;
-      json: () => ErrorResponse | PromiseLike<ErrorResponse>;
-    })
-  | (Omit<Response, "json"> & {
-      status: 404;
-      json: () => ErrorResponse | PromiseLike<ErrorResponse>;
-    })
-  | (Omit<Response, "json"> & {
-      status: 500;
-      json: () => ErrorResponse | PromiseLike<ErrorResponse>;
-    })
-  | (Omit<Response, "json"> & {
-      status: number;
-      json: () => never;
-    });
+export enum ApiResponseStatus {
+  Success,
+  ClientError,
+  ServerError,
+}
 
 export class ApiClient {
   host: string;
@@ -52,42 +22,45 @@ export class ApiClient {
     this.host = host;
   }
 
-  async responseHandler<SuccessResponse>(response: Response) {
-    const res = response as ApiServerResponse<SuccessResponse>;
-    try {
-      if (res.status === 200) {
-        const data = await res.json();
-        return {
-          status: "success",
-          code: 200,
-          data,
-        } as ApiResponseSuccess<SuccessResponse>;
-      } else if (res.status >= 400 && res.status <= 499) {
-        const data = await res.json();
-        return {
-          status: "client_error",
-          code: res.status,
-          data,
-        } as ApiResponseClientError<ErrorResponse>;
-      } else if (res.status >= 500 && res.status <= 599) {
-        const data = await res.json();
-        return {
-          status: "server_error",
-          code: res.status,
-          data,
-        } as ApiResponseServerError<ErrorResponse>;
+  async responseHandler<SuccessResponseType>(response: Response) {
+    let data;
+    if (response.headers.get("Content-Type") === "application/json") {
+      try {
+        data = (await response.json()) as SuccessResponseType;
+      } catch (err: unknown) {
+        console.error("Server response parse error:", err);
+        throw new Error(`Server response parse error: ${response.status}`);
       }
-    } catch (err: unknown) {
-      console.error("Server response parse error:", err);
-      throw new Error(`Server response parse error: ${res.status}`);
+    } else {
+      data = await response.text();
+      if (data.length > 0) {
+        console.error("Unexpected data from server:", data);
+        throw new Error(`Unexpected data from server: ${data}`);
+      }
     }
-    throw new Error(`Unexpected response status: ${res.status}`);
+
+    let status;
+    if (response.status >= 200 && response.status <= 299) {
+      status = ApiResponseStatus.Success;
+    } else if (response.status >= 400 && response.status <= 499) {
+      status = ApiResponseStatus.ClientError;
+    } else if (response.status >= 500 && response.status <= 599) {
+      status = ApiResponseStatus.ServerError;
+    } else {
+      throw new Error(`Unexpected response status: ${response.status}`);
+    }
+
+    return {
+      status: status,
+      code: response.status,
+      data,
+    } as ApiResponse<SuccessResponseType>;
   }
 
-  async postRequest<SuccessResponse>(
+  async postRequest<SuccessResponseType>(
     path: string,
     requestBody: object,
-  ): Promise<ApiResponseSuccess<SuccessResponse> | ApiResponse<ErrorResponse>> {
+  ): Promise<ApiResponse<SuccessResponseType>> {
     const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
 
     const response = await fetch(host + path, {
@@ -98,12 +71,10 @@ export class ApiClient {
       },
     });
 
-    return this.responseHandler<SuccessResponse>(response);
+    return this.responseHandler<SuccessResponseType>(response);
   }
 
-  async getRequest<SuccessResponse>(
-    path: string,
-  ): Promise<ApiResponseSuccess<SuccessResponse> | ApiResponse<ErrorResponse>> {
+  async getRequest<SuccessResponseType>(path: string): Promise<ApiResponse<SuccessResponseType>> {
     const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
 
     const response = await fetch(host + path, {
@@ -113,6 +84,14 @@ export class ApiClient {
       },
     });
 
-    return this.responseHandler<SuccessResponse>(response);
+    return this.responseHandler<SuccessResponseType>(response);
+  }
+
+  async deleteRequest<SuccessResponseType>(
+    path: string,
+  ): Promise<ApiResponse<SuccessResponseType>> {
+    const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
+    const response = await fetch(host + path, { method: "DELETE" });
+    return this.responseHandler<SuccessResponseType>(response);
   }
 }

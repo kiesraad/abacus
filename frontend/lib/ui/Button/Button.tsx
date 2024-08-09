@@ -28,7 +28,7 @@ export function Button({
       {...htmlButtonProps}
     >
       {children}
-      {rightIcon && rightIcon}
+      {rightIcon}
     </button>
   );
 }

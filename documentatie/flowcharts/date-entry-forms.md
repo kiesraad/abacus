@@ -1,12 +1,8 @@
-# Data Entry Page
+# Data Entry Forms
 
 This page describes the navigation and rendering logic of the data entry forms.
 
 An important thing to keep in mind when reading these diagrams is that a user can only move on to the next form after resolving all errors (if any) and accepting all warnings (if any). So it should not be possible that any form previous to the current one has any errors or unaccepted warnings.
-
-
-## ToDo
-- update document title and file name to "data entry forms" before un-drafting the PR
 
 
 ## Questions

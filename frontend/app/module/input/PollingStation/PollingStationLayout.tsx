@@ -5,7 +5,14 @@ import { PollingStationProgress } from "app/component/pollingstation/PollingStat
 
 import { PollingStationFormController, useElection, usePollingStation } from "@kiesraad/api";
 import { IconCross } from "@kiesraad/icon";
-import { Badge, Button, Modal, PollingStationNumber, WorkStationNumber } from "@kiesraad/ui";
+import {
+  Badge,
+  Button,
+  Modal,
+  PageTitle,
+  PollingStationNumber,
+  WorkStationNumber,
+} from "@kiesraad/ui";
 
 export function PollingStationLayout() {
   const { election } = useElection();
@@ -31,6 +38,7 @@ export function PollingStationLayout() {
       pollingStationId={pollingStation.id}
       entryNumber={1}
     >
+      <PageTitle title={`Invoeren ${pollingStation.number} ${pollingStation.name} - Abacus`} />
       <header>
         <section>
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>

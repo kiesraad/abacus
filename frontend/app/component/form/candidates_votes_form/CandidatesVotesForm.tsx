@@ -92,7 +92,9 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     <form onSubmit={handleSubmit} ref={formRef}>
       {/* Temporary while not navigating through form sections */}
       {success && <div id="result">Success</div>}
-      <h2>{group.name}</h2>
+      <h2>
+        Lijst {group.number} - {group.name}
+      </h2>
       {serverError && (
         <Feedback type="error" title="Error">
           <div id="feedback-server-error">

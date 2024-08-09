@@ -64,7 +64,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
-  //const blocker =  useBlocker() use const blocker to render confirmation UI.
+  //const blocker = useBlocker() use const blocker to render confirmation UI.
   useBlocker(() => {
     if (formRef.current && !isCalled) {
       const elements = formRef.current.elements;
@@ -86,12 +86,15 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-  const success = isCalled && !hasValidationError && !hasValidationWarning && !loading;
+  const success =
+    isCalled && !serverError && !hasValidationError && !hasValidationWarning && !loading;
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       {/* Temporary while not navigating through form sections */}
       {success && <div id="result">Success</div>}
-      <h2>{group.name}</h2>
+      <h2>
+        Lijst {group.number} - {group.name}
+      </h2>
       {serverError && (
         <Feedback type="error" title="Error">
           <div id="feedback-server-error">

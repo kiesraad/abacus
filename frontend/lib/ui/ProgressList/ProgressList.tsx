@@ -17,7 +17,7 @@ export interface ProgressListProps {
 }
 
 export function ProgressList({ children }: ProgressListProps) {
-  return <ul className={cls.progresslist}>{children}</ul>;
+  return <ul className={cls["progress-list"]}>{children}</ul>;
 }
 
 ProgressList.Ruler = () => <li className="ruler">&nbsp;</li>;

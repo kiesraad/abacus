@@ -2,9 +2,7 @@ import * as React from "react";
 import { BlockerFunction, useBlocker, useNavigate, useParams } from "react-router-dom";
 
 /* TODO:
-- make form submit from modal
 - browser navigation redirect if after current
-- close X button does nothing
 - hide ignore warnings key up if asd.
 **/
 import {
@@ -20,8 +18,15 @@ import { Button, Feedback, Modal } from "@kiesraad/ui";
 
 export function PollingStationFormNavigation() {
   const _lastKnownSection = React.useRef<FormSectionID | null>(null);
-  const { formState, error, currentForm, targetFormSection, values, setTemporaryCache } =
-    usePollingStationFormController();
+  const {
+    formState,
+    error,
+    currentForm,
+    targetFormSection,
+    values,
+    setTemporaryCache,
+    submitCurrentForm,
+  } = usePollingStationFormController();
   const { pollingStationId } = useParams();
   const { election } = useElection();
   const navigate = useNavigate();
@@ -32,15 +37,14 @@ export function PollingStationFormNavigation() {
 
   const shouldBlock = React.useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
-      //TODO: share logic with modal displaying.
       if (currentLocation.pathname === nextLocation.pathname) {
-        console.log("Path same");
         return false;
       }
       if (!currentForm) {
-        console.log("NO current form?");
         return false;
       }
+
+      //check if currentForm is before or same as current;
 
       const reason = reasonBlocked(formState, currentForm, values);
       if (reason !== null) {
@@ -98,7 +102,11 @@ export function PollingStationFormNavigation() {
   return (
     <>
       {blocker.state === "blocked" && (
-        <Modal onClose={() => {}}>
+        <Modal
+          onClose={() => {
+            blocker.proceed();
+          }}
+        >
           <h2>Wat wil je doen met je invoer?</h2>
           <p>TEMP: {currentForm && reasonBlocked(formState, currentForm, values)}</p>
           <p>
@@ -113,6 +121,7 @@ export function PollingStationFormNavigation() {
               size="lg"
               onClick={() => {
                 blocker.reset();
+                submitCurrentForm();
               }}
             >
               Invoer bewaren

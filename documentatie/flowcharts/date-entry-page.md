@@ -1,8 +1,12 @@
 # Data Entry Page
 
-## TODO
-- add dash icon in "Render navigation menu" for forms with all fields filled with `0`
-- add blue circle icon in "Render navigation menu" for forms that some field(s) filled in, but nothing submitted
+This page describes the navigation and rendering logic of the data entry forms.
+
+An important thing to keep in mind when reading these diagrams is that a user can only move on to the next form after resolving all errors (if any) and accepting all warnings (if any). So it should not be possible that any form previous to the current one has any errors or unaccepted warnings.
+
+
+## ToDo
+- update document title and file name to "data entry forms" before un-drafting the PR
 
 ## Questions
 - Where does "cache input" happen in these flows?
@@ -28,19 +32,37 @@ Evaluate these top to bottom. The first one that evaluates to true is the state 
 
 ```mermaid
 flowchart TD
+    %% elements
     flow-start([start])
 
-    flow-start --> page-visited{page-visited?}
+    disabled-styling([disabled-styling])
+    current-styling([current-styling])
+    unsubmitted-styling([unsubmitted-styling])
+    error-styling([error-styling])
+    warning-styling([warning-styling])
+    empty-styling([empty-styling])
+    green-check-styling([green-check-styling])
+
+    page-visited{page-visited?}
+    current-page{current-page?}
+    submitted{submitted?}
+
+    errors{errros?}
+    warnings{warnings?}
+    empty{empty?}
+
+    %% flow
+    flow-start --> page-visited
     page-visited -- no --> disabled-styling
-    page-visited -- yes --> current-page{current-page?}
-    current-page{current-page?} -- yes --> current-styling
-    current-page -- no --> submitted{submitted?}
+    page-visited -- yes --> current-page
+    current-page -- yes --> current-styling
+    current-page -- no --> submitted
     submitted -- no --> unsubmitted-styling
-    submitted -- yes --> errors{errors?}
+    submitted -- yes --> errors
     errors -- yes --> error-styling
-    errors -- no --> warnings{warnings?}
+    errors -- no --> warnings
     warnings -- yes --> warning-styling
-    warnings -- no --> empty{empty? }
+    warnings -- no --> empty
     empty -- yes --> empty-styling
     empty -- no --> green-check-styling
 
@@ -56,44 +78,32 @@ flowchart TD
 
     %% elements
     flow-start([start])
-    flow-end([end])
-    illegal-state{{illegal state}}
+
+    render-cached-data([render-cached-data])
+    render-submitted-data([render-submitted-data])
 
     show-error
     show-warning
 
-    error-any-prev-page{error-any-prev-page?}
     error-cur-page{error-cur-page?}
 
     warning-cur-page{warning-cur-page?}
 
-    cur-page-submitted-error{cur-page-submitted?}
-    cur-page-submitted-warning{cur-page-submitted?}
-
-    fill-cached-input
+    cur-page-submitted{cur-page-submitted?}
 
     %% flow
-    flow-start --> error-any-prev-page
+    flow-start --> cur-page-submitted
 
-    error-any-prev-page -- yes --> illegal-state
-    error-any-prev-page -- no -->  error-cur-page
+    cur-page-submitted -- no --> render-cached-data
+    cur-page-submitted -- yes --> error-cur-page
 
-    error-cur-page -- yes --> cur-page-submitted-error
-    cur-page-submitted-error -- yes --> show-error
-    cur-page-submitted-error -- no --> warning-cur-page
+    error-cur-page -- yes --> show-error
+    show-error --> render-submitted-data
     error-cur-page -- no --> warning-cur-page
 
-    warning-cur-page -- no --> fill-cached-input
-    warning-cur-page -- yes --> cur-page-submitted-warning
-    
-    cur-page-submitted-warning -- yes --> show-warning
-    cur-page-submitted-warning -- no --> fill-cached-input
-
-    show-error --> fill-cached-input
-    show-warning --> fill-cached-input
-
-    fill-cached-input --> flow-end
-
+    warning-cur-page -- yes --> show-warning
+    show-warning --> render-submitted-data
+    warning-cur-page -- no --> render-submitted-data
 ```
 
 
@@ -104,13 +114,12 @@ flowchart TD
 
     %% elements
     flow-start([start])
-    flow-end([end])
+    go-to-prev-page([go-to-prev-page])
+    go-to-next-page([go-to-next-page])
+    render-cur-page([render-cur-page])
 
     click-next
     call-api
-    go-to-prev-page
-    go-to-next-page
-    render-cur-page
 
     error-any-prev-page{error-any-prev-page?}
     error-cur-page{error-cur-page?}
@@ -121,7 +130,6 @@ flowchart TD
     click-next --> call-api
     call-api --> error-any-prev-page
     error-any-prev-page -- yes --> go-to-prev-page
-    go-to-prev-page --> flow-end
 
     error-any-prev-page -- no --> error-cur-page
 
@@ -130,9 +138,6 @@ flowchart TD
 
     warning-cur-page -- yes --> render-cur-page
     warning-cur-page -- no --> go-to-next-page
-    
-    go-to-next-page --> flow-end
-    render-cur-page --> flow-end
 
 ```
 

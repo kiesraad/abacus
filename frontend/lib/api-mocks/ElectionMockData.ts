@@ -3,6 +3,7 @@ import {
   Election,
   ElectionDetailsResponse,
   ElectionListResponse,
+  ElectionStatusResponse,
   PoliticalGroup,
 } from "@kiesraad/api";
 
@@ -358,4 +359,17 @@ export { electionMockData };
 
 export const electionDetailsMockResponse: ElectionDetailsResponse = {
   election: electionMockData,
+};
+
+export const electionStatusMockResponse: ElectionStatusResponse = {
+  statuses: [
+    {
+      id: 1,
+      status: "Incomplete",
+    },
+    {
+      id: 2,
+      status: "Complete",
+    },
+  ],
 };

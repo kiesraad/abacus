@@ -9,5 +9,6 @@ export * from "./useApiGetRequest";
 export * from "./useApiPostRequest";
 export * from "./useElectionDataRequest";
 export * from "./useElectionListRequest";
+export * from "./useElectionStatusRequest";
 export * from "./usePollingStationDataEntry";
 export * from "./usePollingStationListRequest";

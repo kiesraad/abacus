@@ -4,10 +4,18 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/strict-type-checked",
-    "plugin:react-hooks/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
     "plugin:jsx-a11y/recommended",
+    "plugin:react-hooks/recommended",
     "prettier",
   ],
+  settings: {
+    "import/resolver": {
+      typescript: true,
+      node: true,
+    },
+  },
   ignorePatterns: ["dist", ".eslintrc.cjs", "!.ladle/"],
   parser: "@typescript-eslint/parser",
   plugins: ["react-refresh", "jsx-a11y", "prettier", "@typescript-eslint"],
@@ -22,7 +30,7 @@ module.exports = {
     ],
   },
   parserOptions: {
-    project: "./tsconfig.json",
+    project: "**/tsconfig.json",
   },
   overrides: [
     {

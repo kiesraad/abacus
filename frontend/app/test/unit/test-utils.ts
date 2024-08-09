@@ -9,8 +9,11 @@ import { Providers } from "./Providers";
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
   render(ui, { wrapper: Providers, ...options });
 
+/* eslint-disable import/export */
+// Re-export everything in RTL but shadow the original `render` with our custom implementation.
 export * from "@testing-library/react";
 export { customRender as render };
+/* eslint-enable import/export */
 
 export function getUrlMethodAndBody(
   call: [input: string | URL | Request, init?: RequestInit | undefined][],

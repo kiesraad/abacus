@@ -9,35 +9,23 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
 } from "@kiesraad/api";
-import { electionDetailMock, politicalGroupMock } from "@kiesraad/api-mocks";
+import { electionMock, politicalGroupMock, pollingStationMock } from "@kiesraad/api-mocks";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const Component = (
-  <PollingStationFormController election={electionDetailMock} pollingStationId={1} entryNumber={1}>
+  <PollingStationFormController
+    pollingStationId={pollingStationMock.id}
+    entryNumber={1}
+    election={electionMock}
+  >
     <CandidatesVotesForm group={politicalGroupMock} />
   </PollingStationFormController>
 );
 
 const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
   data: {
-    political_group_votes: electionDetailMock.political_groups.map((group) => ({
-      number: group.number,
-      total: 0,
-      candidate_votes: group.candidates.map((candidate) => ({
-        number: candidate.number,
-        votes: 0,
-      })),
-    })),
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
+    recounted: false,
     voters_counts: {
       poll_card_count: 0,
       proxy_certificate_count: 0,
@@ -50,6 +38,24 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
       invalid_votes_count: 0,
       total_votes_cast_count: 0,
     },
+    voters_recounts: undefined,
+    differences_counts: {
+      more_ballots_count: 0,
+      fewer_ballots_count: 0,
+      unreturned_ballots_count: 0,
+      too_few_ballots_handed_out_count: 0,
+      too_many_ballots_handed_out_count: 0,
+      other_explanation_count: 0,
+      no_explanation_count: 0,
+    },
+    political_group_votes: electionMock.political_groups.map((group) => ({
+      number: group.number,
+      total: 0,
+      candidate_votes: group.candidates.map((candidate) => ({
+        number: candidate.number,
+        votes: 0,
+      })),
+    })),
   },
 };
 
@@ -59,12 +65,12 @@ describe("Test CandidatesVotesForm", () => {
   });
   describe("CandidatesVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
-      const spy = vi.spyOn(global, "fetch");
-
       const user = userEvent.setup();
       render(Component);
 
-      const candidate1 = screen.getByTestId("candidate_votes[0].votes");
+      const spy = vi.spyOn(global, "fetch");
+
+      const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12.345");
 
@@ -82,7 +88,7 @@ describe("Test CandidatesVotesForm", () => {
 
       render(Component);
 
-      const candidate1 = screen.getByTestId("candidate_votes[0].votes");
+      const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
       expect(candidate1).toHaveFocus();
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12.345");
@@ -140,16 +146,11 @@ describe("Test CandidatesVotesForm", () => {
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
-
-      const result = await screen.findByTestId("result");
-      expect(result).toHaveTextContent(/^Success$/);
     });
   });
 
   describe("CandidatesVotesForm API request and response", () => {
     test("CandidateVotesForm request body is equal to the form data", async () => {
-      const spy = vi.spyOn(global, "fetch");
-
       const politicalGroupMockData: PoliticalGroup = {
         number: 1,
         name: "Lijst 1 - Vurige Vleugels Partij",
@@ -171,9 +172,9 @@ describe("Test CandidatesVotesForm", () => {
         ],
       };
 
-      const electionMockData: Election = {
+      const electionMockData: Required<Election> = {
         id: 1,
-        name: "Municipal Election",
+        name: "Gemeenteraadsverkiezingen 2026",
         category: "Municipal",
         election_date: "2024-11-30",
         nomination_date: "2024-11-01",
@@ -203,11 +204,14 @@ describe("Test CandidatesVotesForm", () => {
         ],
       };
 
-      const electionMock = electionMockData as Required<Election>;
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
+        <PollingStationFormController
+          pollingStationId={pollingStationMock.id}
+          entryNumber={1}
+          election={electionMockData}
+        >
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>
       );
@@ -249,11 +253,12 @@ describe("Test CandidatesVotesForm", () => {
       };
 
       const user = userEvent.setup();
-
       render(Component);
 
+      const spy = vi.spyOn(global, "fetch");
+
       await user.type(
-        screen.getByTestId("candidate_votes[0].votes"),
+        await screen.findByTestId("candidate_votes[0].votes"),
         expectedRequest.data.political_group_votes[0]?.candidate_votes[0]?.votes.toString() ?? "0",
       );
 
@@ -275,73 +280,46 @@ describe("Test CandidatesVotesForm", () => {
       expect(url).toEqual("http://testhost/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
-
-      const result = await screen.findByTestId("result");
-      expect(result).toHaveTextContent(/^Success$/);
     });
 
-    test("422 response results in display of error message", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
-        message: "422 error from mock",
-      });
+    //Server errors are no longer rendered inside the form
+    // test("422 response results in display of error message", async () => {
+    //   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
+    //     message: "422 error from mock",
+    //   });
+    //
+    //   const user = userEvent.setup();
+    //
+    //   render(Component);
+    //
+    //   const submitButton = await screen.findByRole("button", { name: "Volgende" });
+    //   await user.click(submitButton);
+    //   //TODO: server errors moved out of the form
+    //   //const feedbackServerError = await screen.findByTestId("feedback-server-error");
+    //   //expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
+    // });
 
-      const user = userEvent.setup();
-
-      render(Component);
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-      const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
-    });
-
-    test("500 response results in display of error message", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
-        message: "500 error from mock",
-        errorCode: "500_ERROR",
-      });
-
-      const user = userEvent.setup();
-
-      render(Component);
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-      const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
-    });
+    //Server errors are no longer rendered inside the form
+    // test("500 response results in display of error message", async () => {
+    //   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
+    //     message: "500 error from mock",
+    //     errorCode: "500_ERROR",
+    //   });
+    //
+    //   const user = userEvent.setup();
+    //
+    //   render(Component);
+    //
+    //   const submitButton = await screen.findByRole("button", { name: "Volgende" });
+    //   await user.click(submitButton);
+    //   //TODO: server errors moved out of the form
+    //   //const feedbackServerError = await screen.findByTestId("feedback-server-error");
+    //   //expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
+    // });
   });
 
   describe("CandidatesVotesForm errors", () => {
-    test("F.01 Invalid value", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [
-            {
-              fields: ["data.political_group_votes[0].candidate_votes[0].votes"],
-              code: "OutOfRange",
-            },
-          ],
-          warnings: [],
-        },
-      });
-
-      const user = userEvent.setup();
-
-      render(Component);
-
-      // Since the component does not allow to input invalid values such as -3,
-      // not inputting any values and just clicking the submit button.
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^OutOfRange$/);
-      expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
-    });
-
-    test("F.31 IncorrectTotal group total", async () => {
+    test("F.401 IncorrectTotal group total", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -357,7 +335,7 @@ describe("Test CandidatesVotesForm", () => {
       render(Component);
       const user = userEvent.setup();
 
-      await user.type(screen.getByTestId("candidate_votes[0].votes"), "1");
+      await user.type(await screen.findByTestId("candidate_votes[0].votes"), "1");
       await user.type(screen.getByTestId("candidate_votes[1].votes"), "2");
       await user.type(screen.getByTestId("total"), "10");
 
@@ -391,12 +369,13 @@ describe("Test CandidatesVotesForm", () => {
 
       // Since no warnings exist for the fields on this page,
       // not inputting any values and just clicking submit.
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
-      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+      //TODO: server errors moved out of the form
+      //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
   });

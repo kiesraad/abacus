@@ -75,7 +75,9 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   return (
     <form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
       {/* Temporary while not navigating through form sections */}
-      <h2>{group.name}</h2>
+      <h2>
+        Lijst {group.number} - {group.name}
+      </h2>
       {hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div id="feedback-error">
@@ -107,7 +109,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         </InputGrid.Header>
         <InputGrid.Body>
           {group.candidates.map((candidate, index) => {
-            const addSeparator = (index + 1) % 25 == 0;
+            const addSeparator = (index + 1) % 25 == 0 && index + 1 !== group.candidates.length;
             const defaultValue = sectionValues?.candidate_votes[index]?.votes || "";
             return (
               <InputGridRow

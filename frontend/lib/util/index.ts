@@ -6,3 +6,4 @@ export * from "./compare";
 export * from "./hook/usePositiveNumberInputMask";
 export * from "./hook/usePreventFormEnterSubmit";
 export * from "./hook/useDebouncedCallback";
+export * from "./hook/useNumericParam";

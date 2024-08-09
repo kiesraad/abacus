@@ -16,11 +16,16 @@ import {
   resetFormSectionState,
 } from "./pollingStationUtils";
 
+export interface PollingStationValues extends Omit<PollingStationResults, "recounted"> {
+  recounted: boolean | undefined;
+}
+
 export interface PollingStationFormControllerProps {
   election: Required<Election>;
   pollingStationId: number;
   entryNumber: number;
   children: React.ReactNode;
+  defaultValues?: Partial<PollingStationValues>;
 }
 
 //TODO: change getValues so it also works for political_group_votes, getValues should only return the form for the specific list to use in caching.
@@ -30,17 +35,20 @@ export interface FormReference<T> {
   getValues: () => T;
 }
 
-export interface FormReferenceRecounted extends FormReference<{ recounted: boolean }> {
+export interface FormReferenceRecounted
+  extends FormReference<Pick<PollingStationValues, "recounted">> {
   type: "recounted";
 }
 
 export interface FormReferenceVotersAndVotes
-  extends FormReference<Pick<PollingStationResults, "voters_counts" | "votes_counts">> {
+  extends FormReference<
+    Pick<PollingStationResults, "voters_counts" | "votes_counts" | "voters_recounts">
+  > {
   type: "voters_and_votes";
 }
 
 export interface FormReferenceDifferences
-  extends FormReference<PollingStationResults["differences_counts"]> {
+  extends FormReference<Pick<PollingStationResults, "differences_counts">> {
   type: "differences";
 }
 
@@ -63,7 +71,7 @@ export interface iPollingStationControllerContext {
   formState: FormState;
   targetFormSection: FormSectionID | null;
   values: PollingStationValues;
-  setValues: React.Dispatch<React.SetStateAction<PollingStationResults>>;
+  setValues: React.Dispatch<React.SetStateAction<PollingStationValues>>;
   setTemporaryCache: (cache: TemporaryCache | null) => boolean;
   cache: TemporaryCache | null;
   currentForm: AnyFormReference | null;
@@ -107,10 +115,6 @@ export const PollingStationControllerContext = React.createContext<
   iPollingStationControllerContext | undefined
 >(undefined);
 
-export interface PollingStationValues extends PollingStationResults {
-  recounted: boolean;
-}
-
 const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
 
 export function PollingStationFormController({
@@ -118,6 +122,7 @@ export function PollingStationFormController({
   pollingStationId,
   entryNumber,
   children,
+  defaultValues = {},
 }: PollingStationFormControllerProps) {
   const [doRequest, { data, loading, error }] = usePollingStationDataEntry({
     polling_station_id: pollingStationId,
@@ -188,15 +193,20 @@ export function PollingStationFormController({
   });
 
   const [values, _setValues] = React.useState<PollingStationValues>(() => ({
-    recounted: false,
-    political_group_votes: election.political_groups.map((pg) => ({
-      number: pg.number,
-      total: 0,
-      candidate_votes: pg.candidates.map((c) => ({
-        number: c.number,
-        votes: 0,
-      })),
-    })),
+    recounted: undefined,
+    voters_counts: {
+      poll_card_count: 0,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 0,
+    },
+    votes_counts: {
+      votes_candidates_counts: 0,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 0,
+    },
+    voters_recounts: undefined,
     differences_counts: {
       more_ballots_count: 0,
       fewer_ballots_count: 0,
@@ -206,23 +216,20 @@ export function PollingStationFormController({
       other_explanation_count: 0,
       no_explanation_count: 0,
     },
-    voters_counts: {
-      proxy_certificate_count: 0,
-      total_admitted_voters_count: 0,
-      voter_card_count: 0,
-      poll_card_count: 0,
-    },
-    votes_counts: {
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-      votes_candidates_counts: 0,
-    },
+    political_group_votes: election.political_groups.map((pg) => ({
+      number: pg.number,
+      total: 0,
+      candidate_votes: pg.candidates.map((c) => ({
+        number: c.number,
+        votes: 0,
+      })),
+    })),
+    ...defaultValues,
   }));
 
   const _isCalled = React.useRef<boolean>(false);
 
-  const setValues = React.useCallback((values: React.SetStateAction<PollingStationResults>) => {
+  const setValues = React.useCallback((values: React.SetStateAction<PollingStationValues>) => {
     _isCalled.current = true;
     _setValues((old) => {
       const newValues = typeof values === "function" ? values(old) : values;
@@ -333,9 +340,20 @@ export function PollingStationFormController({
               }),
             }));
             break;
+          case "recounted": {
+            const newValues = ref.getValues();
+            setValues((old) => ({
+              ...old,
+              ...newValues,
+              voters_recounts:
+                newValues.recounted && old.voters_recounts !== undefined
+                  ? { ...old.voters_recounts }
+                  : undefined,
+            }));
+            break;
+          }
           case "voters_and_votes":
           case "differences":
-          case "recounted":
           default:
             setValues((old) => ({
               ...old,
@@ -350,10 +368,14 @@ export function PollingStationFormController({
 
   React.useEffect(() => {
     if (_isCalled.current) {
-      //eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { recounted: _recounted, ...serverValues } = values;
+      const postValues: PollingStationResults = {
+        ...values,
+        recounted: values.recounted !== undefined ? values.recounted : false,
+        voters_recounts: values.recounted ? values.voters_recounts : undefined,
+      };
+      console.log(postValues);
       doRequest({
-        data: serverValues,
+        data: postValues,
       });
     }
   }, [doRequest, values]);

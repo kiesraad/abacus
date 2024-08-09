@@ -3,7 +3,7 @@ import { expect, test } from "vitest";
 
 import { render, screen } from "app/test/unit";
 
-import { NarrowInputField, TextAreaInputField, WideInputField } from "./InputField.stories.tsx";
+import { NarrowInputField, TextAreaInputField, WideInputField } from "./InputField.stories";
 
 test("The wide input fields are rendered", () => {
   render(<WideInputField />);

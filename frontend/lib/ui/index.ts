@@ -15,4 +15,4 @@ export * from "./Modal/Modal";
 export * from "./ProgressList/ProgressList";
 export * from "./Spinner/Spinner";
 export * from "./Tooltip";
-export * from "./util/Util";
+export * from "./util";

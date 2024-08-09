@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { DifferencesCounts, useDifferences, useErrorsAndWarnings } from "@kiesraad/api";
+import { getErrorsAndWarnings, useDifferences } from "@kiesraad/api";
 import { BottomBar, Button, Feedback, InputGrid, InputGridRow, useTooltip } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
@@ -29,18 +29,21 @@ export function DifferencesForm() {
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
 
-  const getValues = React.useCallback((): DifferencesCounts => {
+  const getValues = React.useCallback(() => {
     const form = document.getElementById("differences_form") as DifferencesFormElement;
     const elements = form.elements;
-
     return {
-      more_ballots_count: deformat(elements.more_ballots_count.value),
-      fewer_ballots_count: deformat(elements.fewer_ballots_count.value),
-      unreturned_ballots_count: deformat(elements.unreturned_ballots_count.value),
-      too_few_ballots_handed_out_count: deformat(elements.too_few_ballots_handed_out_count.value),
-      too_many_ballots_handed_out_count: deformat(elements.too_many_ballots_handed_out_count.value),
-      other_explanation_count: deformat(elements.other_explanation_count.value),
-      no_explanation_count: deformat(elements.no_explanation_count.value),
+      differences_counts: {
+        more_ballots_count: deformat(elements.more_ballots_count.value),
+        fewer_ballots_count: deformat(elements.fewer_ballots_count.value),
+        unreturned_ballots_count: deformat(elements.unreturned_ballots_count.value),
+        too_few_ballots_handed_out_count: deformat(elements.too_few_ballots_handed_out_count.value),
+        too_many_ballots_handed_out_count: deformat(
+          elements.too_many_ballots_handed_out_count.value,
+        ),
+        other_explanation_count: deformat(elements.other_explanation_count.value),
+        no_explanation_count: deformat(elements.no_explanation_count.value),
+      },
     };
   }, [deformat]);
 
@@ -55,7 +58,7 @@ export function DifferencesForm() {
     submit();
   }
 
-  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
   React.useEffect(() => {
     if (isSaved) {
@@ -108,7 +111,7 @@ export function DifferencesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.more_ballots_count}
+            defaultValue={sectionValues.differences_counts.more_ballots_count}
             isFocused
           />
           <InputGridRow
@@ -119,7 +122,7 @@ export function DifferencesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.fewer_ballots_count}
+            defaultValue={sectionValues.differences_counts.fewer_ballots_count}
             addSeparator
           />
 
@@ -131,7 +134,7 @@ export function DifferencesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.unreturned_ballots_count}
+            defaultValue={sectionValues.differences_counts.unreturned_ballots_count}
           />
           <InputGridRow
             key="L"
@@ -141,18 +144,18 @@ export function DifferencesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.too_few_ballots_handed_out_count}
+            defaultValue={sectionValues.differences_counts.too_few_ballots_handed_out_count}
           />
 
           <InputGridRow
             key="M"
             field="M"
             id="too_many_ballots_handed_out_count"
-            title="Teveel uitgereikte stembiljetten"
+            title="Te veel uitgereikte stembiljetten"
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.too_many_ballots_handed_out_count}
+            defaultValue={sectionValues.differences_counts.too_many_ballots_handed_out_count}
           />
           <InputGridRow
             key="N"
@@ -162,7 +165,7 @@ export function DifferencesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.other_explanation_count}
+            defaultValue={sectionValues.differences_counts.other_explanation_count}
             addSeparator
           />
 
@@ -174,7 +177,7 @@ export function DifferencesForm() {
             errorsAndWarnings={errorsAndWarnings}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.no_explanation_count}
+            defaultValue={sectionValues.differences_counts.no_explanation_count}
           />
         </InputGrid.Body>
       </InputGrid>

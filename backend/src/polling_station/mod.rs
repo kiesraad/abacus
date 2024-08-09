@@ -44,7 +44,7 @@ impl IntoResponse for DataEntryResponse {
         (status = 200, description = "Data entry saved successfully", body = DataEntryResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 422, description = "JSON body parsing error (Unprocessable Content)", body = ErrorResponse),
+        (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -72,7 +72,7 @@ pub async fn polling_station_data_entry(
     let mut validation_results = ValidationResults::default();
     data_entry_request
         .data
-        .validate(&election, &mut validation_results, "data".to_string());
+        .validate(&election, &mut validation_results, "data".to_string())?;
 
     let data = serde_json::to_string(&data_entry_request.data)?;
 
@@ -92,7 +92,7 @@ pub async fn polling_station_data_entry(
         (status = 200, description = "Data entry finalised successfully", body = DataEntryResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 422, description = "JSON body parsing error (Unprocessable Content)", body = ErrorResponse),
+        (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -120,7 +120,7 @@ pub async fn polling_station_data_entry_finalise(
     let results = serde_json::from_slice::<PollingStationResults>(&data)?;
 
     let mut validation_results = ValidationResults::default();
-    results.validate(&election, &mut validation_results, "data".to_string());
+    results.validate(&election, &mut validation_results, "data".to_string())?;
 
     if validation_results.has_errors() {
         return Err(APIError::Conflict(
@@ -173,10 +173,11 @@ mod tests {
 
     use super::*;
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
+    #[sqlx::test(fixtures("../../fixtures/elections.sql", "../../fixtures/polling_stations.sql"))]
     async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
         let mut request_body = DataEntryRequest {
             data: PollingStationResults {
+                recounted: false,
                 voters_counts: VotersCounts {
                     poll_card_count: 100, // incorrect
                     proxy_certificate_count: 1,
@@ -189,6 +190,7 @@ mod tests {
                     invalid_votes_count: 2,
                     total_votes_cast_count: 100,
                 },
+                voters_recounts: None,
                 differences_counts: DifferencesCounts {
                     more_ballots_count: 0,
                     fewer_ballots_count: 0,
@@ -297,7 +299,7 @@ mod tests {
         assert_eq!(row_count.count, 1);
     }
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections")))]
+    #[sqlx::test(fixtures("../../fixtures/elections.sql"))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
         // Insert two unique polling stations
         let _ = query!(r#"

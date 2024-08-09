@@ -1,5 +1,6 @@
 use std::error::Error;
 
+use crate::polling_station::DataError;
 use axum::extract::rejection::JsonRejection;
 use axum::extract::FromRef;
 use axum::http::StatusCode;
@@ -9,7 +10,7 @@ use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
-use utoipa::{OpenApi, ToSchema};
+use utoipa::ToSchema;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -61,6 +62,8 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
 
 #[cfg(feature = "openapi")]
 pub fn create_openapi() -> utoipa::openapi::OpenApi {
+    use utoipa::OpenApi;
+
     #[derive(OpenApi)]
     #[openapi(
         paths(
@@ -93,6 +96,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 polling_station::PollingStationType,
                 polling_station::PollingStation,
                 polling_station::VotersCounts,
+                polling_station::VotersRecounts,
                 polling_station::VotesCounts,
             ),
         ),
@@ -119,9 +123,11 @@ impl IntoResponse for ErrorResponse {
 
 /// Generic error type, converted to an ErrorResponse by the IntoResponse
 /// trait implementation
+#[derive(Debug)]
 pub enum APIError {
     NotFound(String),
     Conflict(String),
+    InvalidData(DataError),
     JsonRejection(JsonRejection),
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
@@ -136,6 +142,13 @@ impl IntoResponse for APIError {
         let (status, response) = match self {
             APIError::NotFound(message) => (StatusCode::NOT_FOUND, to_error(message)),
             APIError::Conflict(message) => (StatusCode::CONFLICT, to_error(message)),
+            APIError::InvalidData(err) => {
+                println!("Invalid data error: {}", err);
+                (
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                    to_error("Invalid data".to_string()),
+                )
+            }
             APIError::JsonRejection(rejection) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 to_error(rejection.body_text()),
@@ -179,6 +192,12 @@ impl From<serde_json::Error> for APIError {
 impl From<sqlx::Error> for APIError {
     fn from(err: sqlx::Error) -> Self {
         APIError::SqlxError(err)
+    }
+}
+
+impl From<DataError> for APIError {
+    fn from(err: DataError) -> Self {
+        APIError::InvalidData(err)
     }
 }
 

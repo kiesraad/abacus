@@ -22,6 +22,7 @@ describe("usePollingStationDataEntry", () => {
     const [doSubmit] = result.current;
     doSubmit({
       data: {
+        recounted: false,
         voters_counts: {
           poll_card_count: 1,
           proxy_certificate_count: 2,

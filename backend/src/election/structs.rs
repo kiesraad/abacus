@@ -37,7 +37,8 @@ pub struct PoliticalGroup {
 pub struct Candidate {
     pub number: u8,
     pub initials: String,
-    pub first_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_name_prefix: Option<String>,
     pub last_name: String,
@@ -79,7 +80,7 @@ pub(crate) mod tests {
                     .map(|j| Candidate {
                         number: j + 1,
                         initials: "A.B.".to_string(),
-                        first_name: "John".to_string(),
+                        first_name: Some("John".to_string()),
                         last_name_prefix: Some("van".to_string()),
                         last_name: "Doe".to_string(),
                         locality: "Juinen".to_string(),

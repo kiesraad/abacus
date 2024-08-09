@@ -1,8 +1,14 @@
-import { Election, ElectionListResponse, PoliticalGroup } from "@kiesraad/api";
+import {
+  Candidate,
+  Election,
+  ElectionDetailsResponse,
+  ElectionListResponse,
+  PoliticalGroup,
+} from "@kiesraad/api";
 
 export const politicalGroupMockData: PoliticalGroup = {
   number: 1,
-  name: "Lijst 1 - Vurige Vleugels Partij",
+  name: "Vurige Vleugels Partij",
   candidates: [
     {
       number: 1,
@@ -210,417 +216,124 @@ export const politicalGroupMockData: PoliticalGroup = {
   ],
 };
 
-export const electionDetailMockData: Election = {
-  id: 1,
-  name: "Gemeenteraadsverkiezingen 2026",
-  category: "Municipal",
-  election_date: "2024-11-30",
-  nomination_date: "2024-11-01",
-  political_groups: [
-    politicalGroupMockData,
-    {
-      number: 2,
-      name: "Lijst 2 - Wijzen van Water en Wind",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 3,
-      name: "Lijst 3 - Eeuwenoude Aarde Unie",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 4,
-      name: "Lijst 4 - Verbond van Licht en Leven",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 5,
-      name: "Lijst 5 - Nieuwe Horizon Beweging",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 6,
-      name: "Lijst 6 - VRG",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 7,
-      name: "Lijst 7 - Harmonie van Hemel en Aarde",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 8,
-      name: "Lijst 8 - Stralende Sterren Alliantie",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 9,
-      name: "Lijst 9 - Tijdloze Toekomst Partij",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 10,
-      name: "Lijst 10 - Kosmische Kracht Coalitie",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 11,
-      name: "Lijst 11 - Magische Melodieën Beweging",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 12,
-      name: "Lijst 12 - Zilveren Zonnestralen Partij",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 13,
-      name: "Lijst 13 - Mystieke Maanlicht Liga",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 14,
-      name: "Lijst 14 - GVR",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 15,
-      name: "Lijst 15 - Partij voor de ontwikkeling",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 16,
-      name: "Lijst 16 - Bond van de kiezers",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 17,
-      name: "Lijst 17 - Omega",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 18,
-      name: "Lijst 18 - Partij van de werkers",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 19,
-      name: "Lijst 19 - Sterrenpartij",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-    {
-      number: 20,
-      name: "Lijst 20 - Partij voor de zon",
-      candidates: [
-        {
-          number: 1,
-          initials: "A.",
-          first_name: "Alice",
-          last_name: "Foo",
-          locality: "Amsterdam",
-          gender: "Female",
-        },
-        {
-          number: 2,
-          initials: "C.",
-          first_name: "Charlie",
-          last_name: "Doe",
-          locality: "Rotterdam",
-        },
-      ],
-    },
-  ],
-};
+const candidates: Candidate[] = [
+  {
+    number: 1,
+    initials: "A.",
+    first_name: "Alice",
+    last_name: "Foo",
+    locality: "Amsterdam",
+    gender: "Female",
+  },
+  {
+    number: 2,
+    initials: "C.",
+    first_name: "Charlie",
+    last_name: "Doe",
+    locality: "Rotterdam",
+  },
+];
 
-export const electionListMockData: ElectionListResponse = {
+const politicalGroupsMockData: PoliticalGroup[] = [
+  politicalGroupMockData,
+  {
+    number: 2,
+    name: "Wijzen van Water en Wind",
+    candidates: candidates,
+  },
+  {
+    number: 3,
+    name: "Eeuwenoude Aarde Unie",
+    candidates: candidates,
+  },
+  {
+    number: 4,
+    name: "Verbond van Licht en Leven",
+    candidates: candidates,
+  },
+  {
+    number: 5,
+    name: "Nieuwe Horizon Beweging",
+    candidates: candidates,
+  },
+  {
+    number: 6,
+    name: "VRG",
+    candidates: candidates,
+  },
+  {
+    number: 7,
+    name: "Harmonie van Hemel en Aarde",
+    candidates: candidates,
+  },
+  {
+    number: 8,
+    name: "Stralende Sterren Alliantie",
+    candidates: candidates,
+  },
+  {
+    number: 9,
+    name: "Tijdloze Toekomst Partij",
+    candidates: candidates,
+  },
+  {
+    number: 10,
+    name: "Kosmische Kracht Coalitie",
+    candidates: candidates,
+  },
+  {
+    number: 11,
+    name: "Magische Melodieën Beweging",
+    candidates: candidates,
+  },
+  {
+    number: 12,
+    name: "Zilveren Zonnestralen Partij",
+    candidates: candidates,
+  },
+  {
+    number: 13,
+    name: "Mystieke Maanlicht Liga",
+    candidates: candidates,
+  },
+  {
+    number: 14,
+    name: "GVR",
+    candidates: candidates,
+  },
+  {
+    number: 15,
+    name: "Partij voor de ontwikkeling",
+    candidates: candidates,
+  },
+  {
+    number: 16,
+    name: "Bond van de kiezers",
+    candidates: candidates,
+  },
+  {
+    number: 17,
+    name: "Omega",
+    candidates: candidates,
+  },
+  {
+    number: 18,
+    name: "Partij van de werkers",
+    candidates: candidates,
+  },
+  {
+    number: 19,
+    name: "Sterrenpartij",
+    candidates: candidates,
+  },
+  {
+    number: 20,
+    name: "Partij voor de zon",
+    candidates: candidates,
+  },
+];
+
+export const electionListMockResponse: ElectionListResponse = {
   elections: [
     {
       id: 1,
@@ -637,4 +350,12 @@ export const electionListMockData: ElectionListResponse = {
       nomination_date: "2024-01-01",
     },
   ],
+};
+
+const electionMockData = electionListMockResponse.elections[0] as Election;
+electionMockData.political_groups = politicalGroupsMockData;
+export { electionMockData };
+
+export const electionDetailsMockResponse: ElectionDetailsResponse = {
+  election: electionMockData,
 };

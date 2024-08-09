@@ -3,7 +3,7 @@
 /** PATHS **/
 
 // /api/elections
-export interface ELECTION_LIST_REQUEST_PARAMS {}
+export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
 
 // /api/elections/{election_id}
@@ -42,7 +42,7 @@ export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
  */
 export interface Candidate {
   country_code?: string;
-  first_name: string;
+  first_name?: string;
   gender?: CandidateGender;
   initials: string;
   last_name: string;
@@ -169,13 +169,17 @@ export interface PollingStationListResponse {
 
 /**
  * PollingStationResults, following the fields in
-"Model N 10-1. Proces-verbaal van een stembureau"
-<https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieN10.1>
+"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar lichaam
+in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht"
+"Bijlage 2: uitkomsten per stembureau"
+<https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieNa31.2
  */
 export interface PollingStationResults {
   differences_counts: DifferencesCounts;
   political_group_votes: PoliticalGroupVotes[];
+  recounted: boolean;
   voters_counts: VotersCounts;
+  voters_recounts?: VotersRecounts;
   votes_counts: VotesCounts;
 }
 
@@ -190,11 +194,13 @@ export interface ValidationResult {
 }
 
 export type ValidationResultCode =
-  | "OutOfRange"
   | "IncorrectTotal"
   | "AboveThreshold"
   | "EqualInput"
-  | "IncorrectCandidatesList";
+  | "MissingRecounts"
+  | "IncorrectDifference"
+  | "ConflictingDifferences"
+  | "NoDifferenceExpected";
 
 export interface ValidationResults {
   errors: ValidationResult[];
@@ -209,6 +215,16 @@ export interface VotersCounts {
   proxy_certificate_count: number;
   total_admitted_voters_count: number;
   voter_card_count: number;
+}
+
+/**
+ * Voters recounts, part of the polling station results.
+ */
+export interface VotersRecounts {
+  poll_card_recount: number;
+  proxy_certificate_recount: number;
+  total_admitted_voters_recount: number;
+  voter_card_recount: number;
 }
 
 /**

@@ -4,19 +4,16 @@ import { describe, expect, test } from "vitest";
 
 import { renderHook, waitFor } from "app/test/unit";
 
-import { electionDetailMock } from "@kiesraad/api-mocks";
-
-import { ApiProvider } from "../../ApiProvider";
-import { PollingStationFormController } from "./PollingStationFormController";
-import { usePollingStationFormController } from "./usePollingStationFormController";
+import {
+  ApiProvider,
+  PollingStationFormController,
+  usePollingStationFormController,
+} from "@kiesraad/api";
+import { electionMock } from "@kiesraad/api-mocks";
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <ApiProvider host="http://testhost">
-    <PollingStationFormController
-      election={electionDetailMock}
-      pollingStationId={1}
-      entryNumber={1}
-    >
+    <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
       {children}
     </PollingStationFormController>
   </ApiProvider>
@@ -38,7 +35,7 @@ describe("PollingStationFormController", () => {
       },
     });
 
-    expect(result.current.values.recounted).toEqual(false);
+    expect(result.current.values.recounted).toEqual(undefined);
 
     rerender();
 
@@ -68,6 +65,7 @@ describe("PollingStationFormController", () => {
             total_votes_cast_count: 0,
             votes_candidates_counts: 0,
           },
+          voters_recounts: undefined,
         };
       },
     });

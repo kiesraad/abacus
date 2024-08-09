@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { getErrorsAndWarnings, useVotersAndVotes } from "@kiesraad/api";
+import { getErrorsAndWarnings, useVotersAndVotes, VotersAndVotesValues } from "@kiesraad/api";
 import { BottomBar, Button, Feedback, InputGrid, InputGridRow, useTooltip } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
@@ -13,6 +13,10 @@ interface FormElements extends HTMLFormControlsCollection {
   blank_votes_count: HTMLInputElement;
   invalid_votes_count: HTMLInputElement;
   total_votes_cast_count: HTMLInputElement;
+  poll_card_recount: HTMLInputElement;
+  proxy_certificate_recount: HTMLInputElement;
+  voter_card_recount: HTMLInputElement;
+  total_admitted_voters_recount: HTMLInputElement;
 }
 
 interface VotersAndVotesFormElement extends HTMLFormElement {
@@ -33,7 +37,7 @@ export function VotersAndVotesForm() {
   const getValues = React.useCallback(() => {
     const form = document.getElementById("voters_and_votes_form") as HTMLFormElement;
     const elements = form.elements as VotersAndVotesFormElement["elements"];
-    return {
+    const values: VotersAndVotesValues = {
       voters_counts: {
         poll_card_count: deformat(elements.poll_card_count.value),
         proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
@@ -46,10 +50,21 @@ export function VotersAndVotesForm() {
         invalid_votes_count: deformat(elements.invalid_votes_count.value),
         total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
       },
+      voters_recounts: undefined,
     };
+    const recountForm = document.getElementById("voters_and_votes_recount_section");
+    if (recountForm) {
+      values.voters_recounts = {
+        poll_card_recount: deformat(elements.poll_card_recount.value),
+        proxy_certificate_recount: deformat(elements.proxy_certificate_recount.value),
+        voter_card_recount: deformat(elements.voter_card_recount.value),
+        total_admitted_voters_recount: deformat(elements.total_admitted_voters_recount.value),
+      };
+    }
+    return values;
   }, [deformat]);
 
-  const { sectionValues, loading, errors, warnings, isSaved, ignoreWarnings, submit } =
+  const { sectionValues, loading, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
     useVotersAndVotes(getValues);
 
   useTooltip({
@@ -89,7 +104,6 @@ export function VotersAndVotesForm() {
   return (
     <form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form">
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
-
       {hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div id="feedback-error">
@@ -101,7 +115,6 @@ export function VotersAndVotesForm() {
           </div>
         </Feedback>
       )}
-
       {hasValidationWarning && !hasValidationError && (
         <Feedback type="warning" title="Controleer uitgebrachte stemmen">
           <div id="feedback-warning">
@@ -207,14 +220,71 @@ export function VotersAndVotesForm() {
           />
         </InputGrid.Body>
       </InputGrid>
+      {recounted && (
+        <div id="voters_and_votes_recount_section">
+          <h2 id="recounted_title">
+            Toegelaten kiezers na hertelling door gemeentelijk stembureau
+          </h2>
+          <InputGrid key="recounted">
+            <InputGrid.Header>
+              <th>Veld</th>
+              <th>Geteld aantal</th>
+              <th>Omschrijving</th>
+            </InputGrid.Header>
+            <InputGrid.Body>
+              <InputGridRow
+                key="A.2"
+                field="A.2"
+                id="poll_card_recount"
+                title="Stempassen"
+                errorsAndWarnings={errorsAndWarnings}
+                inputProps={register()}
+                format={format}
+                defaultValue={sectionValues.voters_recounts?.poll_card_recount}
+              />
+              <InputGridRow
+                key="B.2"
+                field="B.2"
+                id="proxy_certificate_recount"
+                title="Volmachtbewijzen"
+                errorsAndWarnings={errorsAndWarnings}
+                inputProps={register()}
+                defaultValue={sectionValues.voters_recounts?.proxy_certificate_recount}
+                format={format}
+              />
+              <InputGridRow
+                key="C.2"
+                field="C.2"
+                id="voter_card_recount"
+                title="Kiezerspassen"
+                errorsAndWarnings={errorsAndWarnings}
+                inputProps={register()}
+                format={format}
+                defaultValue={sectionValues.voters_recounts?.voter_card_recount}
+              />
+              <InputGridRow
+                key="D.2"
+                field="D.2"
+                id="total_admitted_voters_recount"
+                title="Totaal toegelaten kiezers"
+                errorsAndWarnings={errorsAndWarnings}
+                inputProps={register()}
+                format={format}
+                defaultValue={sectionValues.voters_recounts?.total_admitted_voters_recount}
+                isTotal
+              />
+            </InputGrid.Body>
+          </InputGrid>
+        </div>
+      )}
       <BottomBar type="inputgrid">
-        <IngoreWarningsCheckbox
+        <IgnoreWarningsCheckbox
           id="voters_and_votes_form_ignore_warnings"
           defaultChecked={ignoreWarnings}
           hidden={hideIgnoreWarnings || warnings.length === 0}
         >
           Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
-        </IngoreWarningsCheckbox>
+        </IgnoreWarningsCheckbox>
 
         <Button type="submit" size="lg" disabled={loading}>
           Volgende
@@ -225,19 +295,19 @@ export function VotersAndVotesForm() {
   );
 }
 
-interface IngoreWarningsCheckboxProps {
+interface IgnoreWarningsCheckboxProps {
   id: string;
   children: React.ReactNode;
   defaultChecked?: boolean;
   hidden?: boolean;
 }
 
-function IngoreWarningsCheckbox({
+function IgnoreWarningsCheckbox({
   id,
   children,
   defaultChecked,
   hidden,
-}: IngoreWarningsCheckboxProps) {
+}: IgnoreWarningsCheckboxProps) {
   return (
     <div style={{ display: hidden ? "none" : "block" }}>
       <input type="checkbox" id={id} defaultChecked={defaultChecked} />

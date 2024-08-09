@@ -4,29 +4,46 @@ import { Outlet, useParams } from "react-router-dom";
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 
-import { PollingStationFormController, useElection } from "@kiesraad/api";
+import { PollingStationFormController, useElection, usePollingStation } from "@kiesraad/api";
 import { IconCross } from "@kiesraad/icon";
-import { Badge, Button, Modal, PollingStationNumber, WorkStationNumber } from "@kiesraad/ui";
+import {
+  Badge,
+  Button,
+  Modal,
+  PageTitle,
+  PollingStationNumber,
+  WorkStationNumber,
+} from "@kiesraad/ui";
 
 export function PollingStationLayout() {
-  const { pollingStationId } = useParams();
   const { election } = useElection();
+  const { pollingStationId } = useParams();
+  const { pollingStation, loading } = usePollingStation(pollingStationId);
   const [openModal, setOpenModal] = useState(false);
 
   function changeDialog() {
     setOpenModal(!openModal);
   }
 
+  if (loading) {
+    return null;
+  }
+
+  if (!pollingStation) {
+    throw Error("Polling station not found");
+  }
+
   return (
     <PollingStationFormController
       election={election}
-      pollingStationId={parseInt(pollingStationId || "0")}
+      pollingStationId={pollingStation.id}
       entryNumber={1}
     >
+      <PageTitle title={`Invoeren ${pollingStation.number} ${pollingStation.name} - Abacus`} />
       <header>
         <section>
-          <PollingStationNumber>{pollingStationId}</PollingStationNumber>
-          <h1>Fluisterbosdreef 8</h1>
+          <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
+          <h1>{pollingStation.name}</h1>
           <Badge type="first_entry" />
         </section>
         <section>

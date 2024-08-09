@@ -1,7 +1,8 @@
 import * as React from "react";
 
-import { usePollingStationFormController } from "@kiesraad/api";
-import { BottomBar, Button } from "@kiesraad/ui";
+import { useRecounted } from "@kiesraad/api";
+import { BottomBar, Button, Feedback } from "@kiesraad/ui";
+import { usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
   yes: HTMLInputElement;
@@ -13,47 +14,52 @@ interface RecountedFormElement extends HTMLFormElement {
 }
 
 export function RecountedForm() {
-  const { values, submitCurrentForm, registerCurrentForm } = usePollingStationFormController();
+  const [hasValidationError, setHasValidationError] = React.useState(false);
 
   const getValues = React.useCallback(() => {
     const form = document.getElementById("recounted_form") as RecountedFormElement;
     const elements = form.elements;
-    return {
-      recounted: elements.yes.checked ? true : false,
-    };
+    return { recounted: elements.yes.checked ? true : elements.no.checked ? false : undefined };
   }, []);
 
-  React.useEffect(() => {
-    registerCurrentForm({
-      id: "recounted",
-      type: "recounted",
-      getValues,
-    });
-  }, [getValues, registerCurrentForm]);
+  const { sectionValues, loading, isSaved, submit } = useRecounted(getValues);
 
-  //  const [hasValidationError, setHasValidationError] = useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
+  usePreventFormEnterSubmit(formRef);
 
   function handleSubmit(event: React.FormEvent<RecountedFormElement>) {
     event.preventDefault();
-    submitCurrentForm();
+    const elements = event.currentTarget.elements;
+
+    if (!elements.yes.checked && !elements.no.checked) {
+      setHasValidationError(true);
+    } else {
+      setHasValidationError(false);
+      submit();
+    }
   }
+
+  React.useEffect(() => {
+    if (isSaved) {
+      window.scrollTo(0, 0);
+    }
+  }, [isSaved]);
 
   return (
     <form onSubmit={handleSubmit} ref={formRef} id="recounted_form">
       <h2>Is er herteld?</h2>
-      {/* {hasValidationError && (
+      {hasValidationError && (
         <Feedback type="error" title="Controleer het papieren proces-verbaal">
           <div>
             Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?
             <ul>
-              <li>Controleer of rubriek 6 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
-              <li>Wel een vinkje, maar rubriek 6 niet ingevuld? Overleg met de coördinator</li>
+              <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
+              <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
               <li>Geen vinkje? Kies dan 'nee'.</li>
             </ul>
           </div>
         </Feedback>
-      )} */}
+      )}
       <p className="form-paragraph md">
         Was er een onverklaard verschil tussen het aantal toegelaten kiezers en het aantal
         uitgebrachte stemmen? Is er op basis daarvan herteld door het gemeentelijk stembureau?
@@ -64,18 +70,22 @@ export function RecountedForm() {
             type="radio"
             name="recounted"
             id="yes"
-            value="yes"
-            defaultChecked={values.recounted}
+            defaultChecked={sectionValues.recounted === true}
           />
           Ja, er was een hertelling
         </label>
         <label>
-          <input type="radio" name="recounted" id="no" value="no" />
+          <input
+            type="radio"
+            name="recounted"
+            id="no"
+            defaultChecked={sectionValues.recounted === false}
+          />
           Nee, er was geen hertelling
         </label>
       </div>
       <BottomBar type="form">
-        <Button type="submit" size="lg">
+        <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>
         <span className="button_hint">SHIFT + Enter</span>

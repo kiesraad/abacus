@@ -1,7 +1,6 @@
 import * as React from "react";
 
-import { Election } from "../gen/openapi";
-import { useElectionListRequest } from "../useElectionListRequest";
+import { Election, useElectionListRequest } from "@kiesraad/api";
 
 export interface iElectionListProviderContext {
   electionList: Election[];
@@ -19,7 +18,7 @@ export function ElectionListProvider({ children }: ElectionListProviderProps) {
   const { data, loading } = useElectionListRequest();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   if (!data || !data.elections.length) {

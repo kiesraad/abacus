@@ -1,8 +1,10 @@
 import * as React from "react";
 
-import { DifferencesCounts, usePollingStationFormController } from "@kiesraad/api";
+import { PollingStationResults, usePollingStationFormController } from "@kiesraad/api";
 
-export function useDifferences(getValues: () => DifferencesCounts) {
+export type DifferencesValues = Pick<PollingStationResults, "differences_counts">;
+
+export function useDifferences(getValues: () => DifferencesValues) {
   const {
     values,
     formState,
@@ -13,13 +15,16 @@ export function useDifferences(getValues: () => DifferencesCounts) {
     cache,
   } = usePollingStationFormController();
 
-  const sectionValues: DifferencesCounts = React.useMemo(() => {
+  const sectionValues = React.useMemo(() => {
     if (cache && cache.key === "differences_counts") {
-      const data = cache.data as DifferencesCounts;
+      const data = cache.data as DifferencesValues;
       setTemporaryCache(null);
       return data;
     }
-    return values.differences_counts;
+
+    return {
+      differences_counts: values.differences_counts,
+    };
   }, [values, setTemporaryCache, cache]);
 
   const errors = React.useMemo(() => {

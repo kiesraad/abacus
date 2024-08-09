@@ -81,6 +81,10 @@ h2.form_title {
   margin-bottom: 2rem;
 }
 
+h2#recounted_title {
+  margin-top: 2rem;
+}
+
 p.form-paragraph {
   width: 37.5rem;
   margin-top: 1rem;

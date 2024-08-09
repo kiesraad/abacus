@@ -1,3 +1,7 @@
+// TODO: You should apparently never import from "react-router" directly, but from "react-router-dom"
+//  (https://github.com/remix-run/react-router/tree/main/packages/react-router#react-router)
+//  but this seems to be the only way to make the test work, but eslint says:
+//  5:8  error  No default export found in imported module "react-router"  import/default
 import Router from "react-router";
 
 import { describe, expect, test, vi } from "vitest";

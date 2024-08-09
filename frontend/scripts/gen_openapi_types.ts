@@ -1,6 +1,6 @@
 import assert from "assert";
 import fs from "fs";
-import prettier from "prettier";
+import { format } from "prettier";
 
 import { OpenAPIV3, OperationObject, PathsObject, ReferenceObject, SchemaObject } from "./openapi";
 
@@ -42,7 +42,7 @@ async function run() {
   result.push(types.join("\n\n"));
 
   let s = result.join("\n");
-  s = await prettier.format(s, { parser: "typescript" });
+  s = await format(s, { parser: "typescript" });
   fs.writeFileSync(`${TARGET_PATH}/${FILE_NAME}`, s);
 }
 

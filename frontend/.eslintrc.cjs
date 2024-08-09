@@ -10,6 +10,12 @@ module.exports = {
     "plugin:react-hooks/recommended",
     "prettier",
   ],
+  settings: {
+    "import/resolver": {
+      typescript: true,
+      node: true,
+    },
+  },
   ignorePatterns: ["dist", ".eslintrc.cjs", "!.ladle/"],
   parser: "@typescript-eslint/parser",
   plugins: ["react-refresh", "jsx-a11y", "prettier", "@typescript-eslint"],
@@ -24,7 +30,7 @@ module.exports = {
     ],
   },
   parserOptions: {
-    project: "./tsconfig.json",
+    project: "**/tsconfig.json",
   },
   overrides: [
     {

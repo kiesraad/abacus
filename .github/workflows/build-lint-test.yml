@@ -79,7 +79,9 @@ jobs:
           path: frontend/dist
   playwright:
     name: Playwright
-    needs: frontend
+    needs:
+        - backend
+        - frontend
     runs-on: ubuntu-latest
     defaults:
       run:

@@ -4,6 +4,7 @@ export class InputBasePage {
   protected readonly page: Page;
   readonly error: Locator;
   readonly warning: Locator;
+  readonly votersAndVotes: Locator;
   readonly differences: Locator;
 
   constructor(page: Page) {
@@ -12,6 +13,7 @@ export class InputBasePage {
     this.error = page.getByTestId("feedback-error");
     this.warning = page.getByTestId("feedback-warning");
 
+    this.votersAndVotes = page.getByText("Aantal kiezers en stemmen");
     this.differences = page.getByText("Verschillen");
   }
 

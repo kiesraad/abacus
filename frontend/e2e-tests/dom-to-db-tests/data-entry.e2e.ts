@@ -25,6 +25,8 @@ test.describe("Data entry", () => {
     await expect(recountedPage.error).toBeHidden();
     await expect(recountedPage.warning).toBeHidden();
 
+    await recountedPage.votersAndVotes.click();
+
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
       poll_card_count: "100",

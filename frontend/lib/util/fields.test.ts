@@ -57,7 +57,7 @@ describe("Field utils", () => {
       "data.political_group_votes[1].candidate_votes[1].votes",
       [
         { name: "political_group_votes", index: 1 },
-        { name: "candidate", index: 1 },
+        { name: "candidate_votes", index: 1 },
         { name: "votes" },
       ],
     ],

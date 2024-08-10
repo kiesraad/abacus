@@ -73,7 +73,7 @@ describe("Test DifferencesForm", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
       const spy = vi.spyOn(global, "fetch");
 
       const moreBallotsCount = await screen.findByTestId("more_ballots_count");
@@ -92,7 +92,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       const moreBallotsCount = await screen.findByTestId("more_ballots_count");
       expect(moreBallotsCount).toHaveFocus();
@@ -369,7 +369,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // Since the component does not allow to change values in other components,
       // not inputting any values and just clicking the submit button.
@@ -404,7 +404,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       await user.type(screen.getByTestId("more_ballots_count"), "3");
       await user.type(screen.getByTestId("fewer_ballots_count"), "0");
@@ -445,7 +445,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       await user.type(screen.getByTestId("more_ballots_count"), "0");
       await user.type(screen.getByTestId("fewer_ballots_count"), "4");

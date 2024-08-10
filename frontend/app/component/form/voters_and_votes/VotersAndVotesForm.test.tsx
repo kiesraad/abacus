@@ -73,7 +73,7 @@ describe("Test VotersAndVotesForm", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
       const spy = vi.spyOn(global, "fetch");
 
       const pollCards = await screen.findByTestId("poll_card_count");
@@ -92,7 +92,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       const pollCards = await screen.findByTestId("poll_card_count");
       expect(pollCards).toHaveFocus();
@@ -176,7 +176,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
       const spy = vi.spyOn(global, "fetch");
 
       await userTypeInputs(user, {
@@ -252,7 +252,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // We await the first element to appear, so we know the page is loaded
       await user.type(await screen.findByTestId("poll_card_count"), "1");
@@ -291,7 +291,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // We await the first element to appear, so we know the page is loaded
       await user.type(await screen.findByTestId("votes_candidates_counts"), "1");
@@ -339,7 +339,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^IncorrectTotalIncorrectTotal$/);
+      expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       //TODO: server errors moved out of the form
       //expect(screen.queryByTestId("server-feedback-error")).toBeNull();
@@ -363,7 +363,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // Since the component does not allow to input values for non-existing fields,
       // not inputting any values and just clicking the submit button.
@@ -396,7 +396,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // We await the first element to appear, so we know the page is loaded
       await user.type(await screen.findByTestId("votes_candidates_counts"), "0");
@@ -432,7 +432,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // We await the first element to appear, so we know the page is loaded
       await user.type(await screen.findByTestId("votes_candidates_counts"), "0");
@@ -465,7 +465,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // We await the first element to appear, so we know the page is loaded
       await user.type(await screen.findByTestId("poll_card_count"), "1");

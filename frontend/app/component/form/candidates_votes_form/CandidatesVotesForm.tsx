@@ -74,7 +74,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   return (
     <form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
-      {/* Temporary while not navigating through form sections */}
       <h2>
         Lijst {group.number} - {group.name}
       </h2>

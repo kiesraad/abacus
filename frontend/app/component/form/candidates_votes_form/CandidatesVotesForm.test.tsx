@@ -8,20 +8,24 @@ import {
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
+  PollingStationValues,
 } from "@kiesraad/api";
 import { electionMock, politicalGroupMock, pollingStationMock } from "@kiesraad/api-mocks";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
-const Component = (
-  <PollingStationFormController
-    pollingStationId={pollingStationMock.id}
-    entryNumber={1}
-    election={electionMock}
-  >
-    <CandidatesVotesForm group={politicalGroupMock} />
-  </PollingStationFormController>
-);
+function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
+  return render(
+    <PollingStationFormController
+      election={electionMock}
+      pollingStationId={pollingStationMock.id}
+      entryNumber={1}
+      defaultValues={defaultValues}
+    >
+      <CandidatesVotesForm group={politicalGroupMock} />
+    </PollingStationFormController>,
+  );
+}
 
 const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
   data: {
@@ -66,8 +70,8 @@ describe("Test CandidatesVotesForm", () => {
   describe("CandidatesVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
-      render(Component);
 
+      renderForm({ recounted: false });
       const spy = vi.spyOn(global, "fetch");
 
       const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
@@ -86,7 +90,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm({ recounted: false });
 
       const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
       expect(candidate1).toHaveFocus();
@@ -253,6 +257,7 @@ describe("Test CandidatesVotesForm", () => {
       };
 
       const user = userEvent.setup();
+
       render(Component);
 
       const spy = vi.spyOn(global, "fetch");
@@ -332,8 +337,9 @@ describe("Test CandidatesVotesForm", () => {
         },
       });
 
-      render(Component);
       const user = userEvent.setup();
+
+      renderForm({ recounted: false });
 
       await user.type(await screen.findByTestId("candidate_votes[0].votes"), "1");
       await user.type(screen.getByTestId("candidate_votes[1].votes"), "2");
@@ -365,7 +371,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const user = userEvent.setup();
 
-      render(Component);
+      renderForm({ recounted: false });
 
       // Since no warnings exist for the fields on this page,
       // not inputting any values and just clicking submit.

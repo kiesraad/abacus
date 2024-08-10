@@ -77,8 +77,8 @@ export function getErrorsAndWarnings(
 
   if (errors.length > 0) {
     process("errors", errors);
-  }
-  if (warnings.length > 0) {
+  } else if (warnings.length > 0) {
+    // only process warnings if there are no errors
     process("warnings", warnings);
   }
 

@@ -39,12 +39,9 @@ export function InputGridRow({
   addSeparator,
 }: InputGridRowProps) {
   const errors = errorsAndWarnings?.get(id)?.errors;
-  const warnings =
-    errors?.length === 0
-      ? errorsAndWarnings
-          ?.get(id)
-          ?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING")
-      : undefined;
+  const warnings = errorsAndWarnings
+    ?.get(id)
+    ?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING");
   const tooltip = errorsAndWarnings
     ?.get(id)
     ?.warnings.find((warning) => warning.code === "REFORMAT_WARNING")?.value;

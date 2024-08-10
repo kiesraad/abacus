@@ -58,7 +58,10 @@ npm run e2e:lib-ui
 npm run e2e:app
 
 # tests for frontend with backend and database
-# important: run `npm run build` first
+# important: to run these locally, you first need to:
+# - in ./frontend: npm run build (build frontend)
+# - in ./backend: cargo build (build backend)
+# - in ./backend/target/debug: ./api --reset-database --seed-data (reset database and seed data)
 npm run e2e:d2d
 ```
 

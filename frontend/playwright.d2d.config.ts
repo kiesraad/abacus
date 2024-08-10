@@ -13,9 +13,9 @@ const config: PlaywrightTestConfig = defineConfig({
   },
   webServer: [
     {
-      // TODO: change as part of #218 (run in pipeline) after #154 (simpler loading of fixtures)
-      command:
-        "cd ../backend && cargo run --bin api -- --frontend-dist ../frontend/dist --port 8081",
+      command: process.env.CI
+        ? "cd ../builds/backend && ./api --reset-database --seed-data --frontend-dist ../frontend --port 8081"
+        : "cd ../backend/target/debug && ./api --frontend-dist ../../../frontend/dist --port 8081",
       port: 8081,
     },
   ],

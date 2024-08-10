@@ -23,6 +23,27 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
+interface IgnoreWarningsCheckboxProps {
+  id: string;
+  children: React.ReactNode;
+  defaultChecked?: boolean;
+  hidden?: boolean;
+}
+
+function IgnoreWarningsCheckbox({
+  id,
+  children,
+  defaultChecked,
+  hidden,
+}: IgnoreWarningsCheckboxProps) {
+  return (
+    <div style={{ display: hidden ? "none" : "block" }}>
+      <input type="checkbox" id={id} defaultChecked={defaultChecked} />
+      <label htmlFor="voters_and_votes_form_ignore_warnings">{children}</label>
+    </div>
+  );
+}
+
 export function VotersAndVotesForm() {
   const {
     register,
@@ -104,7 +125,7 @@ export function VotersAndVotesForm() {
   return (
     <form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form">
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
-      {hasValidationError && (
+      {isSaved && hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div id="feedback-error">
             <ul>
@@ -115,7 +136,7 @@ export function VotersAndVotesForm() {
           </div>
         </Feedback>
       )}
-      {hasValidationWarning && !hasValidationError && (
+      {isSaved && hasValidationWarning && !hasValidationError && (
         <Feedback type="warning" title="Controleer uitgebrachte stemmen">
           <div id="feedback-warning">
             <ul>
@@ -138,7 +159,7 @@ export function VotersAndVotesForm() {
             field="A"
             id="poll_card_count"
             title="Stempassen"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.voters_counts.poll_card_count}
@@ -149,7 +170,7 @@ export function VotersAndVotesForm() {
             field="B"
             id="proxy_certificate_count"
             title="Volmachtbewijzen"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             defaultValue={sectionValues.voters_counts.proxy_certificate_count}
             format={format}
@@ -159,7 +180,7 @@ export function VotersAndVotesForm() {
             field="C"
             id="voter_card_count"
             title="Kiezerspassen"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.voters_counts.voter_card_count}
@@ -169,7 +190,7 @@ export function VotersAndVotesForm() {
             field="D"
             id="total_admitted_voters_count"
             title="Totaal toegelaten kiezers"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.voters_counts.total_admitted_voters_count}
@@ -182,7 +203,7 @@ export function VotersAndVotesForm() {
             field="E"
             id="votes_candidates_counts"
             title="Stemmen op kandidaten"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.votes_counts.votes_candidates_counts}
@@ -192,7 +213,7 @@ export function VotersAndVotesForm() {
             field="F"
             id="blank_votes_count"
             title="Blanco stemmen"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.votes_counts.blank_votes_count}
@@ -202,7 +223,7 @@ export function VotersAndVotesForm() {
             field="G"
             id="invalid_votes_count"
             title="Ongeldige stemmen"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.votes_counts.invalid_votes_count}
@@ -212,7 +233,7 @@ export function VotersAndVotesForm() {
             field="H"
             id="total_votes_cast_count"
             title="Totaal uitgebrachte stemmen"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.votes_counts.total_votes_cast_count}
@@ -237,7 +258,7 @@ export function VotersAndVotesForm() {
                 field="A.2"
                 id="poll_card_recount"
                 title="Stempassen"
-                errorsAndWarnings={errorsAndWarnings}
+                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
                 inputProps={register()}
                 format={format}
                 defaultValue={sectionValues.voters_recounts?.poll_card_recount}
@@ -247,7 +268,7 @@ export function VotersAndVotesForm() {
                 field="B.2"
                 id="proxy_certificate_recount"
                 title="Volmachtbewijzen"
-                errorsAndWarnings={errorsAndWarnings}
+                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
                 inputProps={register()}
                 defaultValue={sectionValues.voters_recounts?.proxy_certificate_recount}
                 format={format}
@@ -257,7 +278,7 @@ export function VotersAndVotesForm() {
                 field="C.2"
                 id="voter_card_recount"
                 title="Kiezerspassen"
-                errorsAndWarnings={errorsAndWarnings}
+                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
                 inputProps={register()}
                 format={format}
                 defaultValue={sectionValues.voters_recounts?.voter_card_recount}
@@ -267,7 +288,7 @@ export function VotersAndVotesForm() {
                 field="D.2"
                 id="total_admitted_voters_recount"
                 title="Totaal toegelaten kiezers"
-                errorsAndWarnings={errorsAndWarnings}
+                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
                 inputProps={register()}
                 format={format}
                 defaultValue={sectionValues.voters_recounts?.total_admitted_voters_recount}
@@ -285,33 +306,11 @@ export function VotersAndVotesForm() {
         >
           Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
         </IgnoreWarningsCheckbox>
-
         <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>
         <span className="button_hint">SHIFT + Enter</span>
       </BottomBar>
     </form>
-  );
-}
-
-interface IgnoreWarningsCheckboxProps {
-  id: string;
-  children: React.ReactNode;
-  defaultChecked?: boolean;
-  hidden?: boolean;
-}
-
-function IgnoreWarningsCheckbox({
-  id,
-  children,
-  defaultChecked,
-  hidden,
-}: IgnoreWarningsCheckboxProps) {
-  return (
-    <div style={{ display: hidden ? "none" : "block" }}>
-      <input type="checkbox" id={id} defaultChecked={defaultChecked} />
-      <label htmlFor="voters_and_votes_form_ignore_warnings">{children}</label>
-    </div>
   );
 }

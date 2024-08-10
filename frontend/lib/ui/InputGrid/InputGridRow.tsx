@@ -12,7 +12,7 @@ export interface InputGridRowProps {
   id: string;
   field: string;
   title: string;
-  errorsAndWarnings: Map<string, ErrorsAndWarnings>;
+  errorsAndWarnings?: Map<string, ErrorsAndWarnings>;
   inputProps: Partial<React.InputHTMLAttributes<HTMLInputElement>>;
   format: FormatFunc;
   name?: string;
@@ -38,12 +38,15 @@ export function InputGridRow({
   isFocused = false,
   addSeparator,
 }: InputGridRowProps) {
-  const errors = errorsAndWarnings.get(id)?.errors;
-  const warnings = errorsAndWarnings
-    .get(id)
-    ?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING");
+  const errors = errorsAndWarnings?.get(id)?.errors;
+  const warnings =
+    errors?.length === 0
+      ? errorsAndWarnings
+          ?.get(id)
+          ?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING")
+      : undefined;
   const tooltip = errorsAndWarnings
-    .get(id)
+    ?.get(id)
     ?.warnings.find((warning) => warning.code === "REFORMAT_WARNING")?.value;
 
   const [value, setValue] = React.useState(() => (defaultValue ? format(defaultValue) : ""));

@@ -78,7 +78,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       <h2>
         Lijst {group.number} - {group.name}
       </h2>
-      {hasValidationError && (
+      {isSaved && hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div id="feedback-error">
             <ul>
@@ -89,8 +89,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </div>
         </Feedback>
       )}
-
-      {hasValidationWarning && !hasValidationError && (
+      {isSaved && hasValidationWarning && !hasValidationError && (
         <Feedback type="warning" title="Controleer uitgebrachte stemmen">
           <div id="feedback-warning">
             <ul>
@@ -118,7 +117,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 name="candidatevotes[]"
                 id={`candidate_votes[${candidate.number - 1}].votes`}
                 title={`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`}
-                errorsAndWarnings={errorsAndWarnings}
+                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
                 inputProps={register()}
                 format={format}
                 addSeparator={addSeparator}
@@ -133,7 +132,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             name="total"
             id="total"
             title={`Totaal lijst ${group.number}`}
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={format(sectionValues?.total || "")}

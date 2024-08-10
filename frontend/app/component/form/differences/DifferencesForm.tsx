@@ -72,8 +72,7 @@ export function DifferencesForm() {
   return (
     <form onSubmit={handleSubmit} ref={formRef} id="differences_form">
       <h2>Verschil tussen aantal kiezers en getelde stemmen</h2>
-
-      {hasValidationError && (
+      {isSaved && hasValidationError && (
         <Feedback type="error" title="Controleer ingevulde verschillen">
           <div id="feedback-error">
             <ul>
@@ -84,8 +83,7 @@ export function DifferencesForm() {
           </div>
         </Feedback>
       )}
-
-      {hasValidationWarning && !hasValidationError && (
+      {isSaved && hasValidationWarning && !hasValidationError && (
         <Feedback type="warning" title="Controleer ingevulde verschillen">
           <div id="feedback-warning">
             <ul>
@@ -108,7 +106,7 @@ export function DifferencesForm() {
             field="I"
             id="more_ballots_count"
             title="Stembiljetten méér geteld"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.more_ballots_count}
@@ -119,7 +117,7 @@ export function DifferencesForm() {
             field="J"
             id="fewer_ballots_count"
             title="Stembiljetten minder geteld"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.fewer_ballots_count}
@@ -131,7 +129,7 @@ export function DifferencesForm() {
             field="K"
             id="unreturned_ballots_count"
             title="Niet ingeleverde stembiljetten"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.unreturned_ballots_count}
@@ -141,18 +139,17 @@ export function DifferencesForm() {
             field="L"
             id="too_few_ballots_handed_out_count"
             title="Te weinig uitgerekte stembiljetten"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.too_few_ballots_handed_out_count}
           />
-
           <InputGridRow
             key="M"
             field="M"
             id="too_many_ballots_handed_out_count"
             title="Te veel uitgereikte stembiljetten"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.too_many_ballots_handed_out_count}
@@ -162,7 +159,7 @@ export function DifferencesForm() {
             field="N"
             id="other_explanation_count"
             title="Andere verklaring voor het verschil"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.other_explanation_count}
@@ -174,7 +171,7 @@ export function DifferencesForm() {
             field="O"
             id="no_explanation_count"
             title="Geen verklaring voor het verschil"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.no_explanation_count}

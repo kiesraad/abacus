@@ -19,6 +19,9 @@
       flex: 0 0 32px;
       padding: 0.625rem 0 0.625rem 0.75rem;
       width: 1.5rem;
+      svg {
+        z-index: 1;
+      }
     }
 
     label {
@@ -27,6 +30,7 @@
       overflow: hidden;
       white-space: nowrap;
       line-height: 1.5rem;
+      margin-left: -2.5rem;
     }
 
     &:global(.active) {
@@ -84,7 +88,7 @@
       display: inline-block;
       width: 100%;
       height: 100%;
-      padding: 0.625rem 0.75rem 0.625rem 0;
+      padding: 0.625rem 0.75rem 0.625rem 2.5rem;
       vertical-align: middle;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -95,7 +99,7 @@
       }
     }
     span {
-      padding: 0.625rem 0.75rem 0.625rem 0;
+      padding: 0.625rem 0.75rem 0.625rem 2.5rem;
     }
   }
 

@@ -207,7 +207,7 @@
         "tags": [
           "polling_station"
         ],
-        "summary": "Save or update the data entry for a polling station",
+        "summary": "Save or update a data entry for a polling station",
         "operationId": "polling_station_data_entry",
         "parameters": [
           {
@@ -276,6 +276,62 @@
           },
           "422": {
             "description": "JSON error or invalid data (Unprocessable Content)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "polling_station"
+        ],
+        "summary": "Delete an in-progress data entry for a polling station",
+        "operationId": "polling_station_data_entry_delete",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "entry_number",
+            "in": "path",
+            "description": "Data entry number (first or second data entry)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Data entry deleted successfully"
+          },
+          "404": {
+            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {

@@ -1,4 +1,5 @@
 use axum::extract::{FromRequest, Path, State};
+use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde::{Deserialize, Serialize};
@@ -35,7 +36,7 @@ impl IntoResponse for DataEntryResponse {
     }
 }
 
-/// Save or update the data entry for a polling station
+/// Save or update a data entry for a polling station
 #[utoipa::path(
     post,
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
@@ -82,6 +83,38 @@ pub async fn polling_station_data_entry(
         .await?;
 
     Ok(DataEntryResponse { validation_results })
+}
+
+/// Delete an in-progress data entry for a polling station
+#[utoipa::path(
+    delete,
+    path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
+    responses(
+        (status = 204, description = "Data entry deleted successfully"),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
+    ),
+)]
+pub async fn polling_station_data_entry_delete(
+    State(polling_station_data_entries): State<PollingStationDataEntries>,
+    Path((id, entry_number)): Path<(u32, u8)>,
+) -> Result<StatusCode, APIError> {
+    // only the first data entry is supported for now
+    if entry_number != 1 {
+        return Err(APIError::NotFound(
+            "Only the first data entry is supported".to_string(),
+        ));
+    }
+
+    polling_station_data_entries
+        .delete(id, entry_number)
+        .await?;
+
+    Ok(StatusCode::NO_CONTENT)
 }
 
 /// Finalise the data entry for a polling station
@@ -169,13 +202,13 @@ pub async fn polling_station_list(
 
 #[cfg(test)]
 mod tests {
+    use axum::http::StatusCode;
     use sqlx::{query, SqlitePool};
 
     use super::*;
 
-    #[sqlx::test(fixtures("../../fixtures/elections.sql", "../../fixtures/polling_stations.sql"))]
-    async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
-        let mut request_body = DataEntryRequest {
+    fn example_data_entry() -> DataEntryRequest {
+        DataEntryRequest {
             data: PollingStationResults {
                 recounted: false,
                 voters_counts: VotersCounts {
@@ -215,7 +248,12 @@ mod tests {
                     ],
                 }],
             },
-        };
+        }
+    }
+
+    #[sqlx::test(fixtures("../../fixtures/elections.sql", "../../fixtures/polling_stations.sql"))]
+    async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
+        let mut request_body = example_data_entry();
 
         async fn save(pool: SqlitePool, request_body: DataEntryRequest) -> Response {
             polling_station_data_entry(
@@ -242,7 +280,7 @@ mod tests {
         }
 
         let response = save(pool.clone(), request_body.clone()).await;
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
 
         // Check if a row was created
         let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
@@ -253,15 +291,15 @@ mod tests {
 
         // Check that we cannot finalise with errors
         let response = save(pool.clone(), request_body.clone()).await;
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone()).await;
-        assert_eq!(response.status(), 409);
+        assert_eq!(response.status(), StatusCode::CONFLICT);
 
         // Test updating the data entry
         let poll_card_count = 98;
         request_body.data.voters_counts.poll_card_count = poll_card_count; // correct value
         let response = save(pool.clone(), request_body.clone()).await;
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
 
         // Check if there is still only one row
         let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
@@ -280,9 +318,9 @@ mod tests {
 
         // Finalise data entry after correcting the error
         let response = save(pool.clone(), request_body.clone()).await;
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone()).await;
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
 
         // Check if the data entry was finalised:
         // removed from polling_station_data_entries...
@@ -297,6 +335,46 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(row_count.count, 1);
+    }
+
+    #[sqlx::test(fixtures("../../fixtures/elections.sql", "../../fixtures/polling_stations.sql"))]
+    async fn test_polling_station_data_entry_delete(pool: SqlitePool) {
+        // create data entry
+        let response = polling_station_data_entry(
+            State(PollingStationDataEntries::new(pool.clone())),
+            State(PollingStations::new(pool.clone())),
+            State(Elections::new(pool.clone())),
+            Path((1, 1)),
+            example_data_entry(),
+        )
+        .await
+        .into_response();
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // delete data entry
+        let response = polling_station_data_entry_delete(
+            State(PollingStationDataEntries::new(pool.clone())),
+            Path((1, 1)),
+        )
+        .await
+        .into_response();
+        assert_eq!(response.status(), StatusCode::NO_CONTENT);
+
+        // check if data entry was deleted
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 0);
+
+        // check that deleting a non-existing data entry returns 404
+        let response = polling_station_data_entry_delete(
+            State(PollingStationDataEntries::new(pool.clone())),
+            Path((1, 1)),
+        )
+        .await
+        .into_response();
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
     }
 
     #[sqlx::test(fixtures("../../fixtures/elections.sql"))]

@@ -31,31 +31,31 @@ export type ProgressListItemProps = {
 };
 
 ProgressList.Item = function ({ active, status, children }: ProgressListItemProps) {
-  const [title, icon] = renderStatusIcon(status);
+  const icon = renderStatusIcon(active ? "active" : status);
 
   return (
     <li className={cn(active ? "active" : "idle", status)} aria-current={active ? "step" : false}>
-      <aside title={title}>{icon}</aside>
+      <aside>{icon}</aside>
       <label>{children}</label>
     </li>
   );
 };
 
-function renderStatusIcon(status: MenuStatus): [string, React.JSX.Element] {
+function renderStatusIcon(status: MenuStatus): React.JSX.Element {
   switch (status) {
     case "active":
-      return ["Actief", <IconArrowNarrowRight />];
+      return <IconArrowNarrowRight />; // "Actief"
     case "accept":
-      return ["Ingevoerd", <IconCheckmark />];
+      return <IconCheckmark />; // "Ingevoerd"
     case "warning":
-      return ["Ingevoerd, met openstaande waarschuwingen", <IconWarning />];
+      return <IconWarning />; // "Ingevoerd, met openstaande waarschuwingen"
     case "empty":
-      return ["Geen invoer gedaan", <IconMinus />];
+      return <IconMinus />; // "Geen invoer gedaan"
     case "updates":
-      return ["Updates", <IconAsterisk />];
+      return <IconAsterisk />; // "Updates"
     case "unsaved":
-      return ["Niet opgeslagen wijzigingen", <IconPencil />];
+      return <IconPencil />; // "Niet opgeslagen wijzigingen"
     default:
-      return ["", <></>];
+      return <></>;
   }
 }

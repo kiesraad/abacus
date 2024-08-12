@@ -1,10 +1,6 @@
 import * as React from "react";
 import { BlockerFunction, useBlocker, useNavigate, useParams } from "react-router-dom";
 
-/* TODO:
-- browser navigation redirect if after current
-- hide ignore warnings key up if asd.
-**/
 import {
   AnyFormReference,
   currentFormHasChanges,
@@ -31,9 +27,30 @@ export function PollingStationFormNavigation() {
   const { election } = useElection();
   const navigate = useNavigate();
 
-  const baseUrl = React.useMemo(() => {
-    return `/${election.id}/input/${pollingStationId}`;
-  }, [election, pollingStationId]);
+  const getUrlForFormSection = React.useCallback(
+    (id: FormSectionID) => {
+      const baseUrl = `/${election.id}/input/${pollingStationId}`;
+      let url: string = "";
+      if (id.startsWith("political_group_votes_")) {
+        url = `${baseUrl}/list/${id.replace("political_group_votes_", "")}`;
+      } else {
+        switch (id) {
+          case "recounted":
+            url = `${baseUrl}/recounted`;
+            break;
+          case "differences_counts":
+            url = `${baseUrl}/differences`;
+            break;
+          case "voters_votes_counts":
+            url = `${baseUrl}/numbers`;
+            break;
+        }
+      }
+
+      return url;
+    },
+    [election, pollingStationId],
+  );
 
   const shouldBlock = React.useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
@@ -68,8 +85,16 @@ export function PollingStationFormNavigation() {
 
   React.useEffect(() => {
     console.log("Setting current", formState.active);
+    const activeSection = formState.sections[formState.active];
+    const currentSection = formState.sections[formState.current];
+    if (activeSection && currentSection) {
+      if (activeSection.index > currentSection.index) {
+        const url = getUrlForFormSection(currentSection.id);
+        navigate(url);
+      }
+    }
     _lastKnownSection.current = formState.active;
-  }, [formState.active]);
+  }, [formState, navigate, getUrlForFormSection]);
 
   //check if the targetFormSection has changed and navigate to the correct url
   React.useEffect(() => {
@@ -77,25 +102,10 @@ export function PollingStationFormNavigation() {
     if (targetFormSection !== _lastKnownSection.current) {
       _lastKnownSection.current = targetFormSection;
 
-      let url: string = "";
-      if (targetFormSection.startsWith("political_group_votes_")) {
-        url = `${baseUrl}/list/${targetFormSection.replace("political_group_votes_", "")}`;
-      } else {
-        switch (targetFormSection) {
-          case "recounted":
-            url = `${baseUrl}/recounted`;
-            break;
-          case "differences_counts":
-            url = `${baseUrl}/differences`;
-            break;
-          case "voters_votes_counts":
-            url = `${baseUrl}/numbers`;
-            break;
-        }
-      }
+      const url = getUrlForFormSection(targetFormSection);
       navigate(url);
     }
-  }, [targetFormSection, baseUrl, navigate]);
+  }, [targetFormSection, getUrlForFormSection, navigate]);
 
   //TODO: handle server error
 

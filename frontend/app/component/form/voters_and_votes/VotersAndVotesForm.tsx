@@ -97,22 +97,28 @@ export function VotersAndVotesForm() {
     const ignoreWarnings = (
       document.getElementById("voters_and_votes_form_ignore_warnings") as HTMLInputElement
     ).checked;
+
+    //this can never be the case after submit
+    setHideIgnoreWarnings(false);
     submit(ignoreWarnings);
   }
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
+  // if this form has been saved and there are warnings that were ignored, reset the ignoreWarnings checkbox if changes are made.
   React.useEffect(() => {
-    const onKeyUp = () => {
-      setHideIgnoreWarnings(true);
-      document.removeEventListener("keyup", onKeyUp);
-    };
+    if (isSaved && warnings.length > 0) {
+      const onKeyUp = () => {
+        setHideIgnoreWarnings(true);
+        document.removeEventListener("keyup", onKeyUp);
+      };
 
-    document.addEventListener("keyup", onKeyUp);
-    return () => {
-      document.removeEventListener("keyup", onKeyUp);
-    };
-  });
+      document.addEventListener("keyup", onKeyUp);
+      return () => {
+        document.removeEventListener("keyup", onKeyUp);
+      };
+    }
+  }, [isSaved, warnings]);
 
   React.useEffect(() => {
     if (isSaved) {

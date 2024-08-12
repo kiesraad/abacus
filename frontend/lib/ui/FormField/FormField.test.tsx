@@ -6,7 +6,7 @@ import { DefaultFormField } from "./FormField.stories";
 
 describe("UI component: FormField", () => {
   test("FormField has expected children", () => {
-    const { getByTestId } = render(<DefaultFormField error="IncorrectTotal" />);
+    const { getByTestId } = render(<DefaultFormField error="F201" />);
 
     expect(getByTestId("test-input")).toBeInTheDocument();
   });

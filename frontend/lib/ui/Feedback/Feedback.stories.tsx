@@ -28,7 +28,7 @@ export const DefaultFeedback: Story<Props> = ({ title, type, code }) => (
 export default {
   args: {
     title: "Controleer pagina 1 van het proces verbaal",
-    code: "F.3",
+    code: "F.201",
   },
   argTypes: {
     type: {

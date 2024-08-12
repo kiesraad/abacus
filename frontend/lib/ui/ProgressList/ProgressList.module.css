@@ -10,6 +10,10 @@
     border-radius: 0.5rem;
     display: flex;
     align-items: center;
+    &:global(:hover) {
+      background-color: var(--color-hover);
+      cursor: pointer;
+    }
 
     aside {
       display: flex;
@@ -29,7 +33,12 @@
 
     &:global(.active) {
       background-color: var(--color-hover);
-      font-weight: 500;
+      font-weight: bold;
+      aside {
+        svg {
+          fill: var(--menu-active);
+        }
+      }
     }
 
     &:global(.updates) {
@@ -63,6 +72,15 @@
         }
       }
     }
+
+    &:global(.unsaved) {
+      aside {
+        svg {
+          fill: var(--menu-unsaved);
+        }
+      }
+    }
+
     a {
       color: inherit;
       display: inline-block;

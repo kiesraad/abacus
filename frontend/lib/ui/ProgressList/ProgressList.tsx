@@ -5,6 +5,7 @@ import {
   IconAsterisk,
   IconCheckmark,
   IconMinus,
+  IconPencil,
   IconWarning,
 } from "@kiesraad/icon";
 import { cn } from "@kiesraad/util";
@@ -54,6 +55,8 @@ function renderStatusIcon(status: MenuStatus): [string | undefined, React.JSX.El
       return ["Geen invoer gedaan", <IconMinus />];
     case "updates":
       return ["Updates", <IconAsterisk />];
+    case "unsaved":
+      return ["Niet opgeslagen wijzigingen", <IconPencil />];
     default:
       return [undefined, <></>];
   }

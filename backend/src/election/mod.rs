@@ -73,7 +73,7 @@ pub async fn election_details(
 
 #[utoipa::path(
     get,
-    path = "/api/elections/{election_id}/pv",
+    path = "/api/elections/{election_id}/download-pdf",
     responses(
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -106,15 +106,18 @@ pub async fn election_status(
 pub async fn election_generate_pv(
     State(elections_repo): State<Elections>,
     Path(id): Path<u32>,
-) -> Result<(), APIError> {
+) -> Result<(HeaderMap, Vec<u8>), APIError> {
     let _election = elections_repo.get(id).await?;
 
-    let filename = "file.name";
+    // TODO: Replace this with the generated PDF
+    let filename = "proces-verbaal.pdf";
+    let content = &[];
+
     let disposition_header = format!("attachment; filename=\"{}\"", filename);
 
     let mut headers = HeaderMap::new();
     headers.insert(header::CONTENT_TYPE, "text/pdf; charset=utf-8".parse()?);
     headers.insert(header::CONTENT_DISPOSITION, disposition_header.parse()?);
 
-    todo!();
+    Ok((headers, content.to_vec()))
 }

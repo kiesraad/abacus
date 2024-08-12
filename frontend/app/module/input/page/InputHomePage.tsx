@@ -1,16 +1,23 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm";
 
-import { useElection } from "@kiesraad/api";
-import { Alert, PageTitle, WorkStationNumber } from "@kiesraad/ui";
+import { useElection, useElectionStatus } from "@kiesraad/api";
+import { Alert, Button, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
 export function InputHomePage() {
+  const navigate = useNavigate();
   const { election } = useElection();
+  const { statuses } = useElectionStatus();
   const [showAlert, setShowAlert] = useState(true);
 
   function hideAlert() {
     setShowAlert(!showAlert);
+  }
+
+  function finishInput() {
+    navigate("/");
   }
 
   return (
@@ -24,6 +31,17 @@ export function InputHomePage() {
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
+      {statuses.every((s) => s.status === "Complete") && (
+        <Alert type="success" onClose={hideAlert}>
+          <h2>Alle stembureaus zijn twee keer ingevoerd</h2>
+          <p>
+            De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de
+            uitslag nu definitief maken en het proces verbaal opmaken. Doe dit alleen als er vandaag
+            niks meer herteld hoeft te worden.
+          </p>
+          <Button onClick={finishInput}>Invoer afronden</Button>
+        </Alert>
+      )}
       {showAlert && (
         <Alert type="success" onClose={hideAlert}>
           <h2>Je account is ingesteld</h2>

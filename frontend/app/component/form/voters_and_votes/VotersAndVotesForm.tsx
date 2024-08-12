@@ -241,18 +241,16 @@ export function VotersAndVotesForm() {
             isTotal
           />
         </InputGrid.Body>
-      </InputGrid>
-      {recounted && (
-        <>
-          <h2 id="recounted_title">
-            Toegelaten kiezers na hertelling door gemeentelijk stembureau
-          </h2>
-          <InputGrid key="recounted">
-            <InputGrid.Header>
+        {recounted && (
+          <>
+            <InputGrid.SectionTitle>
+              <h2 id="recounted_title">
+                Toegelaten kiezers na hertelling door gemeentelijk stembureau
+              </h2>
               <th>Veld</th>
               <th>Geteld aantal</th>
               <th>Omschrijving</th>
-            </InputGrid.Header>
+            </InputGrid.SectionTitle>
             <InputGrid.Body>
               <InputGridRow
                 key="A.2"
@@ -296,9 +294,10 @@ export function VotersAndVotesForm() {
                 isTotal
               />
             </InputGrid.Body>
-          </InputGrid>
-        </>
-      )}
+          </>
+        )}
+      </InputGrid>
+
       <BottomBar type="inputgrid">
         <Button type="submit" size="lg" disabled={loading}>
           Volgende

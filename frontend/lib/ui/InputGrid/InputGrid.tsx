@@ -116,6 +116,25 @@ export function InputGrid({ zebra, children }: InputGridProps) {
   );
 }
 
+InputGrid.SectionTitle = ({
+  children,
+}: {
+  children: [React.ReactNode, React.ReactElement, React.ReactElement, React.ReactElement];
+}) => (
+  <thead>
+    <tr>
+      <th className={cn(cls.section_title)} colSpan={3}>
+        {children[0]}
+      </th>
+    </tr>
+    <tr>
+      {children[1]}
+      {children[2]}
+      {children[3]}
+    </tr>
+  </thead>
+);
+
 InputGrid.Header = ({
   children,
 }: {

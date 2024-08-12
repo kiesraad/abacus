@@ -14,8 +14,10 @@ const config: PlaywrightTestConfig = defineConfig({
   webServer: [
     {
       command: process.env.CI
-        ? "cd ../builds/backend && ./api --reset-database --seed-data --frontend-dist ../frontend --port 8081"
-        : "cd ../backend/target/debug && ./api --frontend-dist ../../../frontend/dist --port 8081",
+        ? // CI: use frontend build and backend build, reset and seed database
+          "cd ../builds/backend && ./api --reset-database --seed-data --frontend-dist ../frontend --port 8081"
+        : // local: build and run backend, expect frontend build and database setup/seeding to have been done
+          "cd ../backend && cargo run -- --frontend-dist ../frontend/dist --port 8081",
       port: 8081,
     },
   ],

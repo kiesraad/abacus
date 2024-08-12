@@ -18,9 +18,7 @@
       display: flex;
       flex: 0 0 32px;
       padding: 0.625rem 0 0.625rem 0.75rem;
-      svg {
-        width: 24px;
-      }
+      width: 1.5rem;
     }
 
     label {

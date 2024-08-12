@@ -2,11 +2,13 @@ import * as React from "react";
 
 import {
   ApiResponseErrorData,
+  ApiResponseStatus,
   DataEntryResponse,
   DifferencesCounts,
   Election,
   PoliticalGroupVotes,
   PollingStationResults,
+  useApi,
   usePollingStationDataEntry,
   VotersCounts,
   VotersRecounts,
@@ -43,6 +45,7 @@ export interface iPollingStationControllerContext {
   setValues: React.Dispatch<React.SetStateAction<PollingStationValues>>;
   setTemporaryCache: (cache: AnyCache | null) => boolean;
   cache: AnyCache | null;
+  deleteDataEntry: () => Promise<void>;
 }
 
 //store unvalidated data
@@ -94,6 +97,8 @@ export function PollingStationFormController({
     polling_station_id: pollingStationId,
     entry_number: entryNumber,
   });
+
+  const { client } = useApi();
 
   const temporaryCache = React.useRef<AnyCache | null>(null);
 
@@ -164,6 +169,15 @@ export function PollingStationFormController({
     }
   }, [doRequest, values]);
 
+  const deleteDataEntry = async () => {
+    const path = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+    const response = await client.deleteRequest(path);
+    if (response.status !== ApiResponseStatus.Success && response.code !== 404) {
+      console.error("Failed to delete data entry", response);
+      throw new Error("Failed to delete data entry");
+    }
+  };
+
   return (
     <PollingStationControllerContext.Provider
       value={{
@@ -174,6 +188,7 @@ export function PollingStationFormController({
         data,
         cache: temporaryCache.current,
         setTemporaryCache,
+        deleteDataEntry,
       }}
     >
       {children}

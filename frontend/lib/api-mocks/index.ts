@@ -17,6 +17,7 @@ import {
   electionDetailsMockResponse,
   electionListMockResponse,
   electionMockData,
+  electionStatusMockResponse,
   politicalGroupMockData,
 } from "./ElectionMockData";
 import { pollingStationListMockResponse, pollingStationMockData } from "./PollingStationMockData";
@@ -67,6 +68,20 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
     );
     if (election) {
       return HttpResponse.json({ election }, { status: 200 });
+    } else {
+      return HttpResponse.json({}, { status: 404 });
+    }
+  },
+);
+
+export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
+  "/api/elections/:election_id/status",
+  ({ params }) => {
+    const election = electionListMockResponse.elections.find(
+      (e: Election) => e.id.toString() === params.election_id,
+    );
+    if (election) {
+      return HttpResponse.json(electionStatusMockResponse, { status: 200 });
     } else {
       return HttpResponse.json({}, { status: 404 });
     }
@@ -349,6 +364,7 @@ export const handlers: HttpHandler[] = [
   pingHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
+  ElectionStatusRequestHandler,
   pollingStationDataEntryHandler,
   PollingStationListRequestHandler,
 ];

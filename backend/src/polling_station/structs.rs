@@ -263,6 +263,18 @@ impl Validate for PollingStationResults {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct PollingStationStatusEntry {
+    pub id: u32,
+    pub status: PollingStationStatus,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq)]
+pub enum PollingStationStatus {
+    Incomplete,
+    Complete,
+}
+
 type Count = u32;
 
 impl Validate for Count {

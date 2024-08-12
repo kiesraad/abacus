@@ -113,14 +113,8 @@ pub async fn election_generate_pv(
     let disposition_header = format!("attachment; filename=\"{}\"", filename);
 
     let mut headers = HeaderMap::new();
-    headers.insert(
-        header::CONTENT_TYPE,
-        "text/pdf; charset=utf-8".parse().expect("couldn't parse"),
-    );
-    headers.insert(
-        header::CONTENT_DISPOSITION,
-        disposition_header.parse().expect("coudn't parse filename"),
-    );
+    headers.insert(header::CONTENT_TYPE, "text/pdf; charset=utf-8".parse()?);
+    headers.insert(header::CONTENT_DISPOSITION, disposition_header.parse()?);
 
     todo!();
 }

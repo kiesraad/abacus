@@ -7,6 +7,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
+use hyper::header::InvalidHeaderValue;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
@@ -137,6 +138,7 @@ pub enum APIError {
     JsonRejection(JsonRejection),
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
+    InvalidHeaderValue,
 }
 
 impl IntoResponse for APIError {
@@ -177,6 +179,10 @@ impl IntoResponse for APIError {
                     to_error("Internal server error".to_string()),
                 )
             }
+            APIError::InvalidHeaderValue => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                to_error("Internal server error".to_string()),
+            ),
         };
 
         (status, response).into_response()
@@ -204,6 +210,12 @@ impl From<sqlx::Error> for APIError {
 impl From<DataError> for APIError {
     fn from(err: DataError) -> Self {
         APIError::InvalidData(err)
+    }
+}
+
+impl From<InvalidHeaderValue> for APIError {
+    fn from(_: InvalidHeaderValue) -> Self {
+        APIError::InvalidHeaderValue
     }
 }
 

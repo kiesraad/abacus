@@ -43,7 +43,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/:election_id", get(election::election_details))
         .route(
             "/:election_id/download-pdf",
-            get(election::election_generate_pv),
+            get(election::election_download_pdf),
         )
         .route(
             "/:election_id/polling_stations",
@@ -76,6 +76,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             election::election_list,
             election::election_details,
             election::election_status,
+            election::election_download_pdf,
             polling_station::polling_station_list,
             polling_station::polling_station_data_entry,
             polling_station::polling_station_data_entry_finalise,

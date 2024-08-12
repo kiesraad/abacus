@@ -71,10 +71,12 @@ pub async fn election_details(
     Ok(Json(ElectionDetailsResponse { election }))
 }
 
+/// Get election data entry status
 #[utoipa::path(
     get,
-    path = "/api/elections/{election_id}/download-pdf",
+    path = "/api/elections/{election_id}/status",
     responses(
+        (status = 200, description = "Election", body = ElectionStatusResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -90,12 +92,20 @@ pub async fn election_status(
     Ok(Json(ElectionStatusResponse { statuses }))
 }
 
-/// Get election data entry status
+/// Download a generated PDF
 #[utoipa::path(
     get,
-    path = "/api/elections/{election_id}/status",
+    path = "/api/elections/{election_id}/download-pdf",
     responses(
-        (status = 200, description = "Election", body = ElectionStatusResponse),
+        (
+            status = 200,
+            description = "PDF",
+            content_type="text/pdf; charset=utf-8",
+            headers(
+                ("Content-Type", description = "text/pdf; charset=utf-8"),
+                ("Content-Disposition", description = "attachment; filename=\"filename.pdf\"")
+            )
+        ),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -103,7 +113,7 @@ pub async fn election_status(
         ("election_id" = u32, description = "Election database id"),
     ),
 )]
-pub async fn election_generate_pv(
+pub async fn election_download_pdf(
     State(elections_repo): State<Elections>,
     Path(id): Path<u32>,
 ) -> Result<(HeaderMap, Vec<u8>), APIError> {

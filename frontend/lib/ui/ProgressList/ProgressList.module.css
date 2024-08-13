@@ -19,6 +19,9 @@
       flex: 0 0 32px;
       padding: 0.625rem 0 0.625rem 0.75rem;
       width: 1.5rem;
+      svg {
+        width: 24px; /* needed for Safari to show the svg */
+      }
     }
 
     label {

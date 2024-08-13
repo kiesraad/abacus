@@ -1,6 +1,7 @@
-.inputgrid {
+.input-grid {
   margin-top: 1rem;
   width: 100%;
+  border-spacing: 0;
   th {
     border-bottom: 1px solid var(--bg-gray-darkest);
     font-size: var(--font-size-xs);

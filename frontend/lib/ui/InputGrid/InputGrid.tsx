@@ -110,7 +110,7 @@ export function InputGrid({ zebra, children }: InputGridProps) {
   }, [handleBlur, handleFocus]);
 
   return (
-    <table ref={ref} className={cn(cls.inputgrid, { zebra: zebra })}>
+    <table ref={ref} className={cn(cls["input-grid"], { zebra: zebra })}>
       {children}
     </table>
   );

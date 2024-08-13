@@ -10,7 +10,7 @@ export function NotFound() {
       <main>
         <article>
           <section>
-            Er ging iet mis. De link die je hebt gebruikt is niet (meer) geldig. Ga naar het{" "}
+            Er ging iets mis. De link die je hebt gebruikt is niet (meer) geldig. Ga naar het{" "}
             <Link to="/overview">overzicht met verkiezingen</Link>.
           </section>
         </article>

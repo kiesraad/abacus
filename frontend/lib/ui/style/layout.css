@@ -17,7 +17,7 @@
 
   > nav {
     flex: 0 0 44px;
-    gap: 8px;
+    gap: 0.5rem;
     padding: 0 5rem;
     background-color: var(--base-brand-blue);
     color: var(--base-white);
@@ -41,7 +41,7 @@
       border-bottom: 4px solid var(--accent-orange);
     }
     svg {
-      width: 24px;
+      width: 1.5rem;
       color: var(--base-white);
     }
   }

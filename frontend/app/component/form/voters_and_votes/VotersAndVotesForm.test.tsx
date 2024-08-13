@@ -389,10 +389,7 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.blank_votes_count",
-                "data.votes_counts.total_votes_cast_count",
-              ],
+              fields: ["data.votes_counts.blank_votes_count"],
               code: "W201",
             },
           ],
@@ -424,10 +421,7 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.blank_votes_count",
-                "data.votes_counts.total_votes_cast_count",
-              ],
+              fields: ["data.votes_counts.blank_votes_count"],
               code: "W202",
             },
           ],

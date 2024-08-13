@@ -13,8 +13,6 @@ An important thing to keep in mind when reading these diagrams is that a user ca
 
 Render happens based on last received API response.
 
-### Diagram
-
 ```mermaid
 flowchart TD
     %% elements
@@ -71,6 +69,8 @@ flowchart TD
     render-submitted-data([render with submitted data])
 
     show-error([show error])
+    hide-checkbox-accepted(["hide checkbox
+        warnings accepted"])
     show-warning([show warning])
     show-checked-accepted(["show checked checkbox
         warnings accepted"])
@@ -81,6 +81,8 @@ flowchart TD
     error-cur-page{error for current page?}
     warning-cur-page{warning for current page?}
     cached-input-available{cached input available?}
+    input-changed{"input changed
+        since submit?"}
     warning-accepted{"warning(s) accepted?"}
 
     %% flow
@@ -98,7 +100,10 @@ flowchart TD
     error-cur-page -- no --> warning-cur-page
 
     warning-cur-page -- yes --> show-warning
-    show-warning --> warning-accepted
+    show-warning --> input-changed
+    input-changed -- yes --> hide-checkbox-accepted
+    hide-checkbox-accepted --> flow-end
+    input-changed -- no --> warning-accepted
     warning-accepted -- yes --> show-checked-accepted
     warning-accepted -- no --> show-unchecked-accepted
     show-checked-accepted --> flow-end
@@ -128,10 +133,6 @@ flowchart TD
 
     user-addresses-warning{user addresses warning}
 
-    
-    render-error(render error)
-    render-warning(render warning)
-
     click-next(click next)
     call-api(call api)
     change-input(change input)
@@ -148,16 +149,14 @@ flowchart TD
 
     error-any-prev-page -- no --> error-cur-page
 
-    error-cur-page -- yes --> render-error
-    render-error --> user-addresses-error
+    error-cur-page -- yes --> user-addresses-error
     
     user-addresses-error -- abort --> abort-input
     user-addresses-error -- resolve --> change-input
     change-input --> click-next
 
     error-cur-page -- no --> warning-cur-page
-    warning-cur-page -- yes --> render-warning
-    render-warning --> warnings-accepted
+    warning-cur-page -- yes --> warnings-accepted
     warnings-accepted -- no --> user-addresses-warning
     warnings-accepted -- yes --> go-to-next-page
     user-addresses-warning -- resolve --> change-input

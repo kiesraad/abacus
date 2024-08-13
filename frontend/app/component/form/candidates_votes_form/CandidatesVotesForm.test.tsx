@@ -327,7 +327,7 @@ describe("Test CandidatesVotesForm", () => {
           errors: [
             {
               fields: ["data.political_group_votes[0].total"],
-              code: "IncorrectTotal",
+              code: "F401",
             },
           ],
           warnings: [],
@@ -345,7 +345,7 @@ describe("Test CandidatesVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
+      expect(feedbackError).toHaveTextContent(/^F401$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });

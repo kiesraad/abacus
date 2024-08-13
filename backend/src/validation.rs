@@ -1,5 +1,3 @@
-use std::fmt;
-
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -57,38 +55,6 @@ pub enum ValidationResultCode {
     W304,
     W305,
     W306,
-}
-
-impl fmt::Display for ValidationResultCode {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            ValidationResultCode::F201 => write!(f, "F.201"),
-            ValidationResultCode::F202 => write!(f, "F.202"),
-            ValidationResultCode::F203 => write!(f, "F.203"),
-            ValidationResultCode::F204 => write!(f, "F.204"),
-            ValidationResultCode::F301 => write!(f, "F.301"),
-            ValidationResultCode::F302 => write!(f, "F.302"),
-            ValidationResultCode::F303 => write!(f, "F.303"),
-            ValidationResultCode::F304 => write!(f, "F.304"),
-            ValidationResultCode::F401 => write!(f, "F.401"),
-            ValidationResultCode::W201 => write!(f, "W.201"),
-            ValidationResultCode::W202 => write!(f, "W.202"),
-            ValidationResultCode::W203 => write!(f, "W.203"),
-            ValidationResultCode::W204 => write!(f, "W.204"),
-            ValidationResultCode::W205 => write!(f, "W.205"),
-            ValidationResultCode::W206 => write!(f, "W.206"),
-            ValidationResultCode::W207 => write!(f, "W.207"),
-            ValidationResultCode::W208 => write!(f, "W.208"),
-            ValidationResultCode::W209 => write!(f, "W.209"),
-            ValidationResultCode::W210 => write!(f, "W.210"),
-            ValidationResultCode::W301 => write!(f, "W.301"),
-            ValidationResultCode::W302 => write!(f, "W.302"),
-            ValidationResultCode::W303 => write!(f, "W.303"),
-            ValidationResultCode::W304 => write!(f, "W.304"),
-            ValidationResultCode::W305 => write!(f, "W.305"),
-            ValidationResultCode::W306 => write!(f, "W.306"),
-        }
-    }
 }
 
 /// Validate that a value is equal to or above a certain percentage threshold of the total,

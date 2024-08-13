@@ -72,9 +72,9 @@
   }
 
   &.sm {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     line-height: normal;
-    padding: 8px 14px;
+    padding: 0.5rem 0.875rem;
   }
 
   &.lg {

@@ -150,13 +150,12 @@ export function PollingStationFormNavigation() {
       )}
 
       {error && (
-        <Feedback type="error" title="Controleer uitgebrachte stemmen">
+        <Feedback type="error" title="Server error">
           <div id="feedback-server-error">
             {error.errorCode}: {error.message}
           </div>
         </Feedback>
       )}
-      {error && <div>Error: {error.message}</div>}
     </>
   );
 }

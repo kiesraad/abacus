@@ -26,6 +26,7 @@ export interface PollingStationFormControllerProps {
   entryNumber: number;
   children: React.ReactNode;
   defaultValues?: Partial<PollingStationValues>;
+  defaultFormState?: Partial<FormState>;
 }
 
 //TODO: change getValues so it also works for political_group_votes, getValues should only return the form for the specific list to use in caching.
@@ -95,13 +96,17 @@ export type FormSection = {
   warnings: ValidationResult[];
 };
 
+export interface ClientValidationResult extends ValidationResult {
+  isGlobal?: boolean;
+}
+
 export interface FormState {
   current: FormSectionID; //the current step that needs completion
   active: FormSectionID; //the form that is currently active
   sections: Record<FormSectionID, FormSection>;
   unknown: {
-    errors: ValidationResult[];
-    warnings: ValidationResult[];
+    errors: ClientValidationResult[];
+    warnings: ClientValidationResult[];
   };
 }
 
@@ -123,6 +128,7 @@ export function PollingStationFormController({
   entryNumber,
   children,
   defaultValues = {},
+  defaultFormState = {},
 }: PollingStationFormControllerProps) {
   const [doRequest, { data, loading, error }] = usePollingStationDataEntry({
     polling_station_id: pollingStationId,
@@ -189,7 +195,7 @@ export function PollingStationFormController({
       };
     });
 
-    return result;
+    return { ...result, ...defaultFormState };
   });
 
   const [values, _setValues] = React.useState<PollingStationValues>(() => ({

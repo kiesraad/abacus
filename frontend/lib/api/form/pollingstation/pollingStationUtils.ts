@@ -3,6 +3,7 @@ import { deepEqual, rootFieldSection } from "@kiesraad/util";
 import { ValidationResult } from "../../gen/openapi";
 import {
   AnyFormReference,
+  ClientValidationResult,
   FormSection,
   FormSectionID,
   FormState,
@@ -19,26 +20,27 @@ export function addValidationResultToFormState(
 ) {
   arr.forEach((validationResult) => {
     const { name: rootSection, index } = rootFieldSection(validationResult.fields[0]);
+    const clientValidationResult = toClientValidationResult(validationResult);
     switch (rootSection) {
       case "votes_counts":
       case "voters_counts":
       case "voters_recounts":
-        formState.sections.voters_votes_counts[target].push(validationResult);
+        formState.sections.voters_votes_counts[target].push(clientValidationResult);
         break;
       case "differences_counts":
-        formState.sections.differences_counts[target].push(validationResult);
+        formState.sections.differences_counts[target].push(clientValidationResult);
         break;
       case "political_group_votes":
         if (index !== undefined) {
           const sectionKey = `political_group_votes_${index}` as FormSectionID;
           const section = formState.sections[sectionKey];
           if (section) {
-            section[target].push(validationResult);
+            section[target].push(clientValidationResult);
           }
         }
         break;
       default:
-        formState.unknown[target].push(validationResult);
+        formState.unknown[target].push(clientValidationResult);
         break;
     }
   });
@@ -117,4 +119,18 @@ export function currentFormHasChanges(
   }
 
   return false;
+}
+
+export function toClientValidationResult(
+  validationResult: ValidationResult,
+): ClientValidationResult {
+  const result: ClientValidationResult = { ...validationResult };
+  switch (validationResult.code) {
+    case "IncorrectTotal":
+      result.isGlobal = true;
+      break;
+    default:
+      result.isGlobal = false;
+  }
+  return result;
 }

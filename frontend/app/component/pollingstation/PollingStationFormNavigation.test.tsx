@@ -5,16 +5,20 @@ import { describe, test } from "vitest";
 import { overrideOnce, render } from "app/test/unit";
 
 import { ApiProvider, PollingStationFormController } from "@kiesraad/api";
-import { electionDetailMock } from "@kiesraad/api-mocks";
+import { electionMock } from "@kiesraad/api-mocks";
 
 import { PollingStationFormNavigation } from "./PollingStationFormNavigation";
 
 //TODO: where should this logic live?
 
-//vi.mock("../../../../lib/api/form/pollingstation/usePollingStationFormController", ())
+// vi.mock("../../../../lib/api/form/pollingstation/usePollingStationFormController", () => {
+//   return {
+//     formState: { bla }
+//   }
+// })
 
 const Children = () => (
-  <PollingStationFormController election={electionDetailMock} pollingStationId={1} entryNumber={1}>
+  <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
     <PollingStationFormNavigation />
   </PollingStationFormController>
 );

@@ -13,18 +13,17 @@ export function MockTest() {
         body: JSON.stringify({ ping: "ping" }),
       });
 
-      const data = (await response.json()) as object;
-      setMessage(`Response: ${JSON.stringify(data)}`);
+      const data = (await response.json()) as { pong: string };
+      if (data.pong === "ping") {
+        setMessage("✅");
+      } else {
+        setMessage(`⚠️: ${JSON.stringify(data)}`);
+      }
     };
 
     action().catch((err: unknown) => {
-      setMessage(`Error: ${err instanceof Error ? err.message : String(err)}`);
+      setMessage(`❌: ${err instanceof Error ? err.message : String(err)}`);
     });
   }, []);
-  return (
-    <div>
-      <h4>Testing mockserver</h4>
-      {message && <p>{message}</p>}
-    </div>
-  );
+  return <p>Mock Service Worker: {message}</p>;
 }

@@ -1,4 +1,4 @@
-.inputgrid {
+.input-grid {
   margin-top: 1rem;
   width: 100%;
   border-spacing: 0;
@@ -8,9 +8,14 @@
     text-align: right;
     padding: 0.75rem 1.5rem;
     color: var(--color-help-text);
-    &:nth-of-type(3) {
+    &:nth-of-type(3),
+    &.section_title {
       text-align: left;
     }
+  }
+  th.section_title {
+    padding: 0;
+    border: none;
   }
 
   &:global(.zebra) {

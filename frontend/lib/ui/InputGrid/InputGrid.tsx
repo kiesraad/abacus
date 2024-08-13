@@ -110,11 +110,26 @@ export function InputGrid({ zebra, children }: InputGridProps) {
   }, [handleBlur, handleFocus]);
 
   return (
-    <table ref={ref} className={cn(cls.inputgrid, { zebra: zebra })}>
+    <table ref={ref} className={cn(cls["input-grid"], { zebra: zebra })}>
       {children}
     </table>
   );
 }
+
+InputGrid.SectionTitleHeader = ({
+  children,
+}: {
+  children: [React.ReactNode, React.ReactElement, React.ReactElement, React.ReactElement];
+}) => (
+  <thead>
+    <tr>
+      <th className={cn(cls.section_title)} colSpan={3}>
+        {children[0]}
+      </th>
+    </tr>
+    <tr>{children.slice(1)}</tr>
+  </thead>
+);
 
 InputGrid.Header = ({
   children,

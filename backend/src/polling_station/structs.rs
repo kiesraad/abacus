@@ -450,10 +450,7 @@ impl Validate for VotesCounts {
         // W.201 validate that number of blank votes is no more than 3%
         if above_percentage_threshold(self.blank_votes_count, self.total_votes_cast_count, 3) {
             validation_results.warnings.push(ValidationResult {
-                fields: vec![
-                    format!("{field_name}.blank_votes_count"),
-                    format!("{field_name}.total_votes_cast_count"),
-                ],
+                fields: vec![format!("{field_name}.blank_votes_count")],
                 code: ValidationResultCode::AboveThreshold,
             });
         }
@@ -461,10 +458,7 @@ impl Validate for VotesCounts {
         // W.202 validate that number of invalid votes is no more than 3%
         if above_percentage_threshold(self.invalid_votes_count, self.total_votes_cast_count, 3) {
             validation_results.warnings.push(ValidationResult {
-                fields: vec![
-                    format!("{field_name}.invalid_votes_count"),
-                    format!("{field_name}.total_votes_cast_count"),
-                ],
+                fields: vec![format!("{field_name}.invalid_votes_count")],
                 code: ValidationResultCode::AboveThreshold,
             });
         }
@@ -1401,10 +1395,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.warnings[0].fields,
-            vec![
-                "votes_counts.blank_votes_count",
-                "votes_counts.total_votes_cast_count"
-            ]
+            vec!["votes_counts.blank_votes_count",]
         );
 
         // test W.202 high number of invalid votes
@@ -1430,10 +1421,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.warnings[0].fields,
-            vec![
-                "votes_counts.invalid_votes_count",
-                "votes_counts.total_votes_cast_count"
-            ]
+            vec!["votes_counts.invalid_votes_count",]
         );
     }
 

@@ -58,10 +58,11 @@ npm run e2e:lib-ui
 npm run e2e:app
 
 # tests for frontend with backend and database
-# important: to run these locally, you first need to:
-# - in ./frontend: npm run build (build frontend)
-# - in ./backend: cargo run --reset-database --seed-data (reset database and seed data)
+# tests use database at backend/target/debug/playwright.sqlite
+# build frontend, build backend, setup fresh seeded database:
 npm run e2e:d2d
+# run tests, expect builds and database to be available:
+npm run e2e:d2d-dev
 ```
 
 ### UI Component development

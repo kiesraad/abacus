@@ -17,12 +17,17 @@
 
   > nav {
     flex: 0 0 44px;
+    gap: 8px;
     padding: 0 5rem;
     background-color: var(--base-brand-blue);
     color: var(--base-white);
     height: 3rem;
     display: flex;
     align-items: center;
+
+    a {
+      color: inherit;
+    }
 
     span {
       display: flex;
@@ -34,6 +39,10 @@
     }
     span.active {
       border-bottom: 4px solid var(--accent-orange);
+    }
+    svg {
+      width: 24px;
+      color: var(--base-white);
     }
   }
 

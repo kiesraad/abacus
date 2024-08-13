@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Outlet, useParams } from "react-router-dom";
+import { Link, Outlet, useParams } from "react-router-dom";
 
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 
 import { PollingStationFormController, useElection, usePollingStation } from "@kiesraad/api";
-import { IconCross } from "@kiesraad/icon";
+import { IconChevronRight, IconCross } from "@kiesraad/icon";
 import {
   Badge,
   Button,
@@ -39,6 +39,13 @@ export function PollingStationLayout() {
       entryNumber={1}
     >
       <PageTitle title={`Invoeren ${pollingStation.number} ${pollingStation.name} - Abacus`} />
+      <nav>
+        <Link to={"/overview"}>Overzicht</Link>
+        <IconChevronRight />
+        <Link to={`/${election.id}/input`}>{election.name}</Link>
+        <IconChevronRight />
+        {pollingStation.name}
+      </nav>{" "}
       <header>
         <section>
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>

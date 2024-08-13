@@ -41,7 +41,7 @@ describe("PollingStationLayout", () => {
         </ElectionProvider>
       </ElectionListProvider>,
     );
-    expect(await screen.findByText(pollingStationMock.name));
+    expect(await screen.findAllByText(pollingStationMock.name));
     expect(await screen.findByText(pollingStationMock.number));
   });
 });

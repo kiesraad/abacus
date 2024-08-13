@@ -18,7 +18,7 @@ describe("InputHomePage", () => {
       </ElectionProvider>,
     );
 
-    expect(await screen.findByText(electionMock.name));
+    expect(await screen.findAllByText(electionMock.name));
   });
 
   test("Finish input not visible when not finished", async () => {
@@ -31,7 +31,7 @@ describe("InputHomePage", () => {
     );
 
     // Wait for the page to be loaded
-    await screen.findByText("Gemeenteraadsverkiezingen 2026");
+    await screen.findAllByText("Gemeenteraadsverkiezingen 2026");
 
     // Test that the message doesn't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).toBeNull();

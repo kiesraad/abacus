@@ -2,7 +2,7 @@ table.overview_table {
   width: 100%;
   line-height: 1.5rem;
   border-spacing: unset;
-  color: var(--gray-600);
+  color: var(--color-help-text);
   tbody tr {
     cursor: pointer;
     &:hover {

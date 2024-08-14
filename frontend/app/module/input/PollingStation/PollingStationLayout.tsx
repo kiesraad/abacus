@@ -43,9 +43,7 @@ export function PollingStationLayout() {
         <Link to={"/overview"}>Overzicht</Link>
         <IconChevronRight />
         <Link to={`/${election.id}/input`}>{election.name}</Link>
-        <IconChevronRight />
-        {pollingStation.name}
-      </nav>{" "}
+      </nav>
       <header>
         <section>
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>

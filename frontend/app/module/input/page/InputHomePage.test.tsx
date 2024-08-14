@@ -1,6 +1,6 @@
-import { describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
-import { overrideOnce, render, screen } from "app/test/unit";
+import { overrideOnce, render, screen, server, within } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 import { electionMock, electionMockResponse } from "@kiesraad/api-mocks";
@@ -8,8 +8,8 @@ import { electionMock, electionMockResponse } from "@kiesraad/api-mocks";
 import { InputHomePage } from "./InputHomePage";
 
 describe("InputHomePage", () => {
-  overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
-  test("Election name", async () => {
+  beforeEach(() => {
+    overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
     render(
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
@@ -17,21 +17,26 @@ describe("InputHomePage", () => {
         </ElectionStatusProvider>
       </ElectionProvider>,
     );
+  });
 
-    expect(await screen.findAllByText(electionMock.name));
+  afterEach(() => {
+    server.restoreHandlers();
+  });
+
+  test("Election name", async () => {
+    expect(await screen.findByRole("heading", { level: 1, name: electionMock.name }));
+
+    // Check if the navigation bar displays the correct information
+    const nav = await screen.findByRole("navigation", { name: /primary-navigation/i });
+    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute(
+      "href",
+      "/overview",
+    );
   });
 
   test("Finish input not visible when not finished", async () => {
-    render(
-      <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <InputHomePage />
-        </ElectionStatusProvider>
-      </ElectionProvider>,
-    );
-
     // Wait for the page to be loaded
-    await screen.findAllByText("Gemeenteraadsverkiezingen 2026");
+    expect(await screen.findByRole("heading", { level: 1, name: electionMock.name }));
 
     // Test that the message doesn't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).toBeNull();
@@ -44,14 +49,6 @@ describe("InputHomePage", () => {
         { id: 2, status: "Complete" },
       ],
     });
-
-    render(
-      <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <InputHomePage />
-        </ElectionStatusProvider>
-      </ElectionProvider>,
-    );
 
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
   });

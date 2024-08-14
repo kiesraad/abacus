@@ -23,7 +23,7 @@ export function InputHomePage() {
   return (
     <>
       <PageTitle title="Kies een stembureau - Abacus" />
-      <nav>
+      <nav aria-label="primary-navigation">
         <Link to={"/overview"}>Overzicht</Link>
       </nav>
       <header>

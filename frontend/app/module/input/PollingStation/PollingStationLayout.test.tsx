@@ -1,9 +1,9 @@
 import * as Router from "react-router";
 
-import { describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { PollingStationLayout } from "app/module/input";
-import { overrideOnce, render, screen } from "app/test/unit";
+import { overrideOnce, render, screen, server, within } from "app/test/unit";
 
 import {
   ElectionListProvider,
@@ -19,12 +19,20 @@ import {
 } from "@kiesraad/api-mocks";
 
 describe("PollingStationLayout", () => {
-  overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
-  overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
-  vi.spyOn(Router, "useParams").mockReturnValue({
-    electionId: electionMock.id.toString(),
-    pollingStationId: pollingStationMock.id.toString(),
+  beforeEach(() => {
+    overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
+    vi.spyOn(Router, "useParams").mockReturnValue({
+      electionId: electionMock.id.toString(),
+      pollingStationId: pollingStationMock.id.toString(),
+    });
   });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+    server.restoreHandlers();
+  });
+
   test("Render", async () => {
     render(
       <ElectionListProvider>
@@ -41,7 +49,20 @@ describe("PollingStationLayout", () => {
         </ElectionProvider>
       </ElectionListProvider>,
     );
-    expect(await screen.findAllByText(pollingStationMock.name));
+
+    // Wait for the page to be loaded and check if the polling station information is displayed
+    expect(await screen.findByRole("heading", { level: 1, name: pollingStationMock.name }));
     expect(await screen.findByText(pollingStationMock.number));
+
+    // Check if the navigation bar displays the correct information
+    const nav = await screen.findByRole("navigation", { name: /primary-navigation/i });
+    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute(
+      "href",
+      "/overview",
+    );
+    expect(within(nav).getByRole("link", { name: electionMock.name })).toHaveAttribute(
+      "href",
+      `/${electionMock.id}/input`,
+    );
   });
 });

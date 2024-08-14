@@ -9,7 +9,7 @@ export function OverviewLayout() {
   return (
     <div className="app-layout">
       <PageTitle title="Overzicht verkiezingen - Abacus" />
-      <nav>
+      <nav aria-label="primary-navigation">
         <span className="active">Overzicht</span>
       </nav>
       <ElectionListProvider>

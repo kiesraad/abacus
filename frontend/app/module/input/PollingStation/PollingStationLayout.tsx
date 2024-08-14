@@ -39,7 +39,7 @@ export function PollingStationLayout() {
       entryNumber={1}
     >
       <PageTitle title={`Invoeren ${pollingStation.number} ${pollingStation.name} - Abacus`} />
-      <nav>
+      <nav aria-label="primary-navigation">
         <Link to={"/overview"}>Overzicht</Link>
         <IconChevronRight />
         <Link to={`/${election.id}/input`}>{election.name}</Link>

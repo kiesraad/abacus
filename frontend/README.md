@@ -58,8 +58,11 @@ npm run e2e:lib-ui
 npm run e2e:app
 
 # tests for frontend with backend and database
-# important: run `npm run build` first
+# tests use database at backend/target/debug/playwright.sqlite
+# build frontend, build backend, setup fresh seeded database:
 npm run e2e:d2d
+# run tests, expect builds and database to be available:
+npm run e2e:d2d-dev
 ```
 
 ### UI Component development

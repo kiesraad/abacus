@@ -3,7 +3,7 @@ import * as router from "react-router";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { overrideOnce, render, screen, server, waitFor } from "app/test/unit";
+import { overrideOnce, render, screen, server } from "app/test/unit";
 
 import { ElectionProvider, PollingStationFormController } from "@kiesraad/api";
 import { electionMock, electionMockResponse, pollingStationMock } from "@kiesraad/api-mocks";
@@ -64,7 +64,7 @@ describe("Test AbortDataEntryControl", () => {
     await user.click(screen.getByRole("button", { name: "Invoer bewaren" }));
 
     // check that the user is navigated back to the input page
-    expect(mockNavigate).toHaveBeenCalledWith(expect.stringMatching(/\/input$/));
+    expect(mockNavigate).toHaveBeenCalledWith("/1/input");
   });
 
   test("deletes the data entry and navigates on delete", async () => {
@@ -88,12 +88,8 @@ describe("Test AbortDataEntryControl", () => {
     // click the delete button in the modal
     await user.click(screen.getByRole("button", { name: "Niet bewaren" }));
 
-    // check that the delete request was made
+    // check that the delete request was made and the user is navigated back to the input page
     expect(deleteRequestMade).toBe(true);
-
-    // check that the user is navigated back to the input page
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(expect.stringMatching("/input$"));
-    });
+    expect(mockNavigate).toHaveBeenCalledWith("/1/input");
   });
 });

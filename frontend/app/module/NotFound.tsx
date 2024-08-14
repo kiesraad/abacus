@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 export function NotFound() {
   return (
     <div className="app-layout">
-      <nav>
-        <span></span>
+      <nav aria-label="primary-navigation">
+        <span>
+          <Link to={"/overview"}>Overzicht</Link>
+        </span>
       </nav>
 
       <main>

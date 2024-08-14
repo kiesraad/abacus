@@ -85,7 +85,7 @@ pub async fn polling_station_data_entry(
     Ok(DataEntryResponse { validation_results })
 }
 
-/// Delete an in-progress data entry for a polling station
+/// Delete an in-progress (not finalised) data entry for a polling station
 #[utoipa::path(
     delete,
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",

@@ -300,7 +300,7 @@
         "tags": [
           "polling_station"
         ],
-        "summary": "Delete an in-progress data entry for a polling station",
+        "summary": "Delete an in-progress (not finalised) data entry for a polling station",
         "operationId": "polling_station_data_entry_delete",
         "parameters": [
           {

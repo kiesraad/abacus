@@ -286,103 +286,68 @@ describe("Test CandidatesVotesForm", () => {
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
     });
-
-    //Server errors are no longer rendered inside the form
-    // test("422 response results in display of error message", async () => {
-    //   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
-    //     message: "422 error from mock",
-    //   });
-    //
-    //   const user = userEvent.setup();
-    //
-    //   render(Component);
-    //
-    //   const submitButton = await screen.findByRole("button", { name: "Volgende" });
-    //   await user.click(submitButton);
-    //   //TODO: server errors moved out of the form
-    //   //const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    //   //expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
-    // });
-
-    //Server errors are no longer rendered inside the form
-    // test("500 response results in display of error message", async () => {
-    //   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
-    //     message: "500 error from mock",
-    //     errorCode: "500_ERROR",
-    //   });
-    //
-    //   const user = userEvent.setup();
-    //
-    //   render(Component);
-    //
-    //   const submitButton = await screen.findByRole("button", { name: "Volgende" });
-    //   await user.click(submitButton);
-    //   //TODO: server errors moved out of the form
-    //   //const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    //   //expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
-    // });
   });
 
-  // describe("CandidatesVotesForm errors", () => {
-  //   test("F.401 IncorrectTotal group total", async () => {
-  //     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-  //       validation_results: {
-  //         errors: [
-  //           {
-  //             fields: ["data.political_group_votes[0].total"],
-  //             code: "F401",
-  //           },
-  //         ],
-  //         warnings: [],
-  //       },
-  //     });
-  //
-  //     const user = userEvent.setup();
-  //
-  //     renderForm({ recounted: false });
-  //
-  //     await user.type(await screen.findByTestId("candidate_votes[0].votes"), "1");
-  //     await user.type(screen.getByTestId("candidate_votes[1].votes"), "2");
-  //     await user.type(screen.getByTestId("total"), "10");
-  //
-  //     const submitButton = screen.getByRole("button", { name: "Volgende" });
-  //     await user.click(submitButton);
-  //
-  //     const feedbackError = await screen.findByTestId("feedback-error");
-  //     expect(feedbackError).toHaveTextContent(/^F401$/);
-  //     expect(screen.queryByTestId("feedback-warning")).toBeNull();
-  //     expect(screen.queryByTestId("server-feedback-error")).toBeNull();
-  //   });
-  // });
+  describe("CandidatesVotesForm errors", () => {
+    test("F.401 IncorrectTotal group total", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [
+            {
+              fields: ["data.political_group_votes[0].total"],
+              code: "W304",
+            },
+          ],
+          warnings: [],
+        },
+      });
 
-  // describe("CandidatesVotesForm warnings", () => {
-  //   test("Warnings can be displayed", async () => {
-  //     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-  //       validation_results: {
-  //         errors: [],
-  //         warnings: [
-  //           {
-  //             fields: ["data.political_group_votes[0].total"],
-  //             code: "NotAnActualWarning",
-  //           },
-  //         ],
-  //       },
-  //     });
-  //
-  //     const user = userEvent.setup();
-  //
-  //     renderForm({ recounted: false });
-  //
-  //     // Since no warnings exist for the fields on this page,
-  //     // not inputting any values and just clicking submit.
-  //     const submitButton = await screen.findByRole("button", { name: "Volgende" });
-  //     await user.click(submitButton);
-  //
-  //     const feedbackWarning = await screen.findByTestId("feedback-warning");
-  //     expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
-  //     //TODO: server errors moved out of the form
-  //     //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
-  //     expect(screen.queryByTestId("feedback-error")).toBeNull();
-  //   });
-  // });
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await user.type(await screen.findByTestId("candidate_votes[0].votes"), "1");
+      await user.type(screen.getByTestId("candidate_votes[1].votes"), "2");
+      await user.type(screen.getByTestId("total"), "10");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(/^W304$/);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+    });
+  });
+
+  describe("CandidatesVotesForm warnings", () => {
+    test("Warnings can be displayed", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: ["data.political_group_votes[0].total"],
+              code: "NotAnActualWarning",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      // Since no warnings exist for the fields on this page,
+      // not inputting any values and just clicking submit.
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
+      //TODO: server errors moved out of the form
+      //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
+  });
 });

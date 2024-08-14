@@ -13,6 +13,7 @@ import {
   addValidationResultToFormState,
   formSectionComplete,
   getNextSection,
+  isGlobalValidationResult,
   resetFormSectionState,
 } from "./pollingStationUtils";
 
@@ -27,6 +28,7 @@ export interface PollingStationFormControllerProps {
   children: React.ReactNode;
   defaultValues?: Partial<PollingStationValues>;
   defaultFormState?: Partial<FormState>;
+  defaultCurrentForm?: AnyFormReference | null;
 }
 
 //TODO: change getValues so it also works for political_group_votes, getValues should only return the form for the specific list to use in caching.
@@ -108,6 +110,7 @@ export interface FormState {
     errors: ClientValidationResult[];
     warnings: ClientValidationResult[];
   };
+  isCompleted: boolean;
 }
 
 //store unvalidated data
@@ -129,6 +132,7 @@ export function PollingStationFormController({
   children,
   defaultValues = {},
   defaultFormState = {},
+  defaultCurrentForm = null,
 }: PollingStationFormControllerProps) {
   const [doRequest, { data, loading, error }] = usePollingStationDataEntry({
     polling_station_id: pollingStationId,
@@ -138,7 +142,7 @@ export function PollingStationFormController({
   const temporaryCache = React.useRef<TemporaryCache | null>(null);
 
   //reference to the current form on screen
-  const currentForm = React.useRef<AnyFormReference | null>(null);
+  const currentForm = React.useRef<AnyFormReference | null>(defaultCurrentForm);
 
   // consumable flag to ignore warnings for the active form section;
   const _ignoreWarnings = React.useRef<FormSectionID | null>(null);
@@ -182,6 +186,7 @@ export function PollingStationFormController({
         errors: [],
         warnings: [],
       },
+      isCompleted: false,
     };
 
     election.political_groups.forEach((pg, n) => {
@@ -275,18 +280,28 @@ export function PollingStationFormController({
 
           //determine new current if applicable
           if (newFormState.current === activeFormSection.id) {
-            if (activeFormSection.errors.length === 0) {
+            if (
+              activeFormSection.errors.length === 0 ||
+              activeFormSection.errors.every((vr) => isGlobalValidationResult(vr))
+            ) {
               if (activeFormSection.warnings.length === 0 || activeFormSection.ignoreWarnings) {
                 const nextSectionID = getNextSection(newFormState, activeFormSection);
                 if (nextSectionID) {
                   newFormState.current = nextSectionID;
+
+                  //if not completed, remove global errors
+                  Object.values(newFormState.sections).forEach((section) => {
+                    section.errors = section.errors.filter((err) => !isGlobalValidationResult(err));
+                  });
                 } else {
-                  console.log("FORM FINISHED?");
+                  newFormState.isCompleted = true;
                 }
               }
             }
           }
         }
+
+        console.log("FormState", newFormState);
         return newFormState;
       });
       //clean up

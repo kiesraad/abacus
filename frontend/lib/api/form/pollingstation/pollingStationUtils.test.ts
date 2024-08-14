@@ -2,14 +2,20 @@ import { describe, expect, test } from "vitest";
 
 import { ValidationResult } from "@kiesraad/api";
 
-import { AnyFormReference, FormState, PollingStationValues } from "./PollingStationFormController";
+import {
+  AnyFormReference,
+  ClientValidationResult,
+  FormState,
+  PollingStationValues,
+} from "./PollingStationFormController";
 import {
   addValidationResultToFormState,
   currentFormHasChanges,
   formSectionComplete,
   getNextSection,
+  hasOnlyGlobalValidationResults,
+  isGlobalValidationResult,
   resetFormSectionState,
-  toClientValidationResult,
 } from "./pollingStationUtils";
 
 const defaultFormState: FormState = {
@@ -61,6 +67,7 @@ const defaultFormState: FormState = {
     errors: [],
     warnings: [],
   },
+  isCompleted: false,
 };
 
 const defaultValues: PollingStationValues = {
@@ -118,7 +125,7 @@ describe("PollingStationUtils", () => {
     const validationResults: ValidationResult[] = [
       {
         fields: ["data.votes_counts.blank_votes_count"],
-        code: "F202",
+        code: "F401",
       },
     ];
 
@@ -209,7 +216,7 @@ describe("PollingStationUtils", () => {
     };
     formState.sections.voters_votes_counts.errors = [
       {
-        code: "F202",
+        code: "W203",
         fields: ["data.votes_counts.blank_votes_count"],
       },
     ];
@@ -219,12 +226,73 @@ describe("PollingStationUtils", () => {
     expect(formState.sections.voters_votes_counts.errors.length).toBe(0);
   });
 
-  test("toClientValidationResult", () => {
-    const clientValidationResult = toClientValidationResult({
-      code: "F202",
-      fields: ["data.votes_counts.blank_votes_count"],
-    });
+  test("isGlobalValidationResult", () => {
+    expect(
+      isGlobalValidationResult({
+        code: "F204",
+        fields: ["data.votes_counts.blank_votes_count"],
+      }),
+    ).toBe(true);
 
-    expect(clientValidationResult.isGlobal).toBe(true);
+    expect(
+      isGlobalValidationResult({
+        code: "F401",
+        fields: ["data.votes_counts.blank_votes_count"],
+      }),
+    ).toBe(true);
+
+    expect(
+      isGlobalValidationResult({
+        code: "W304",
+        fields: ["data.votes_counts.blank_votes_count"],
+      }),
+    ).toBe(false);
+  });
+
+  test("hasOnlyGlobalValidationResults", () => {
+    const onlyGlobalResults: ClientValidationResult[] = [
+      {
+        code: "F204",
+        fields: ["data.votes_counts.blank_votes_count"],
+        isGlobal: true,
+      },
+      {
+        code: "F401",
+        fields: ["data.votes_counts.blank_votes_count"],
+        isGlobal: true,
+      },
+    ];
+
+    expect(hasOnlyGlobalValidationResults(onlyGlobalResults)).toBe(true);
+
+    const onlyLocalResults: ClientValidationResult[] = [
+      {
+        code: "W203",
+        fields: ["data.votes_counts.blank_votes_count"],
+        isGlobal: false,
+      },
+      {
+        code: "W203",
+        fields: ["data.votes_counts.blank_votes_count"],
+        isGlobal: false,
+      },
+    ];
+
+    expect(hasOnlyGlobalValidationResults(onlyLocalResults)).toBe(false);
+
+    const mixedResults: ClientValidationResult[] = [
+      {
+        code: "F204",
+        fields: ["data.votes_counts.blank_votes_count"],
+        isGlobal: true,
+      },
+      {
+        code: "W203",
+        fields: ["data.votes_counts.blank_votes_count"],
+        isGlobal: false,
+      },
+    ];
+
+    expect(hasOnlyGlobalValidationResults(mixedResults)).toBe(false);
   });
 });

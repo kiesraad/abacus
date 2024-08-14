@@ -1,18 +1,26 @@
 import * as React from "react";
-import { BlockerFunction, useBlocker, useNavigate, useParams } from "react-router-dom";
+import { BlockerFunction, useBlocker, useNavigate } from "react-router-dom";
 
 import {
   AnyFormReference,
   currentFormHasChanges,
+  Election,
   FormSectionID,
   FormState,
   PollingStationValues,
-  useElection,
   usePollingStationFormController,
 } from "@kiesraad/api";
 import { Button, Feedback, Modal } from "@kiesraad/ui";
 
-export function PollingStationFormNavigation() {
+export interface PollingStationFormNavigationProps {
+  pollingStationId: number;
+  election: Required<Election>;
+}
+
+export function PollingStationFormNavigation({
+  pollingStationId,
+  election,
+}: PollingStationFormNavigationProps) {
   const _lastKnownSection = React.useRef<FormSectionID | null>(null);
   const {
     formState,
@@ -23,8 +31,7 @@ export function PollingStationFormNavigation() {
     setTemporaryCache,
     submitCurrentForm,
   } = usePollingStationFormController();
-  const { pollingStationId } = useParams();
-  const { election } = useElection();
+
   const navigate = useNavigate();
 
   const getUrlForFormSection = React.useCallback(
@@ -55,15 +62,18 @@ export function PollingStationFormNavigation() {
   const shouldBlock = React.useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
       if (currentLocation.pathname === nextLocation.pathname) {
+        console.log("Same pathname");
         return false;
       }
       if (!currentForm) {
+        console.log("No current form");
         return false;
       }
 
       //check if currentForm is before or same as current;
 
       const reason = reasonBlocked(formState, currentForm, values);
+      console.log("REASON: ", reason);
       if (reason !== null) {
         if (reason === "changes" && formState.active === formState.current) {
           console.log("caching: ", currentForm.id);
@@ -101,7 +111,7 @@ export function PollingStationFormNavigation() {
     if (!targetFormSection) return;
     if (targetFormSection !== _lastKnownSection.current) {
       _lastKnownSection.current = targetFormSection;
-
+      console.log("calling navigate?", targetFormSection);
       const url = getUrlForFormSection(targetFormSection);
       navigate(url);
     }
@@ -117,7 +127,7 @@ export function PollingStationFormNavigation() {
             blocker.proceed();
           }}
         >
-          <h2>Wat wil je doen met je invoer?</h2>
+          <h2 id="modal-blocker-title">Wat wil je doen met je invoer?</h2>
           <p>TEMP: {currentForm && reasonBlocked(formState, currentForm, values)}</p>
           <p>
             Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de
@@ -168,6 +178,7 @@ function reasonBlocked(
   values: PollingStationValues,
 ): BlockReason | null {
   const formSection = formState.sections[currentForm.id];
+  console.log("Checking reasonBlocked", formSection?.id, currentForm.id);
   if (formSection) {
     if (formSection.errors.length > 0) {
       console.log("BLOCKED: has errors");

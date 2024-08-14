@@ -20,27 +20,28 @@ export function addValidationResultToFormState(
 ) {
   arr.forEach((validationResult) => {
     const { name: rootSection, index } = rootFieldSection(validationResult.fields[0]);
-    const clientValidationResult = toClientValidationResult(validationResult);
+
     switch (rootSection) {
       case "votes_counts":
       case "voters_counts":
       case "voters_recounts":
-        formState.sections.voters_votes_counts[target].push(clientValidationResult);
+        formState.sections.voters_votes_counts[target].push(validationResult);
         break;
       case "differences_counts":
-        formState.sections.differences_counts[target].push(clientValidationResult);
+        formState.sections.differences_counts[target].push(validationResult);
         break;
       case "political_group_votes":
         if (index !== undefined) {
+          //TODO: check this index vs number thing, it's very confusing/error prone
           const sectionKey = `political_group_votes_${index + 1}` as FormSectionID;
           const section = formState.sections[sectionKey];
           if (section) {
-            section[target].push(clientValidationResult);
+            section[target].push(validationResult);
           }
         }
         break;
       default:
-        formState.unknown[target].push(clientValidationResult);
+        formState.unknown[target].push(validationResult);
         break;
     }
   });
@@ -48,13 +49,17 @@ export function addValidationResultToFormState(
 
 export function formSectionComplete(section: FormSection): boolean {
   if (section.isSaved) {
-    if (section.errors.length === 0) {
+    if (section.errors.length === 0 || hasOnlyGlobalValidationResults(section.errors)) {
       if (section.warnings.length === 0 || section.ignoreWarnings) {
         return true;
       }
     }
   }
   return false;
+}
+
+export function hasOnlyGlobalValidationResults(arr: ClientValidationResult[]): boolean {
+  return arr.every((result) => isGlobalValidationResult(result));
 }
 
 //get the next section in the form based on index
@@ -121,16 +126,12 @@ export function currentFormHasChanges(
   return false;
 }
 
-export function toClientValidationResult(
-  validationResult: ValidationResult,
-): ClientValidationResult {
-  const result: ClientValidationResult = { ...validationResult };
+export function isGlobalValidationResult(validationResult: ValidationResult): boolean {
   switch (validationResult.code) {
     case "F401":
-      result.isGlobal = true;
-      break;
+    case "F204":
+      return true;
     default:
-      result.isGlobal = false;
+      return false;
   }
-  return result;
 }

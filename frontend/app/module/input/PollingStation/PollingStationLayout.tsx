@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
@@ -14,11 +14,12 @@ import {
   PollingStationNumber,
   WorkStationNumber,
 } from "@kiesraad/ui";
+import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationLayout() {
   const { election } = useElection();
-  const { pollingStationId } = useParams();
-  const { pollingStation, loading } = usePollingStation(pollingStationId);
+  const pollingStationId = useNumericParam("pollingStationId");
+  const { pollingStation, loading } = usePollingStation(`${pollingStationId}`);
   const [openModal, setOpenModal] = useState(false);
 
   function changeDialog() {
@@ -79,7 +80,7 @@ export function PollingStationLayout() {
           </nav>
         </Modal>
       )}
-      <PollingStationFormNavigation />
+      <PollingStationFormNavigation pollingStationId={pollingStationId} election={election} />
     </PollingStationFormController>
   );
 }

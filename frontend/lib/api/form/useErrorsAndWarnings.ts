@@ -1,6 +1,11 @@
 import * as React from "react";
 
-import { ErrorsAndWarnings, FieldValidationResult, ValidationResult } from "@kiesraad/api";
+import {
+  ClientValidationResult,
+  ErrorsAndWarnings,
+  FieldValidationResult,
+  ValidationResult,
+} from "@kiesraad/api";
 import { fieldNameFromPath } from "@kiesraad/util";
 
 export function useErrorsAndWarnings(
@@ -51,13 +56,13 @@ export function useErrorsAndWarnings(
 
 //TODO: intermediate step for testing, might scrap code above.
 export function getErrorsAndWarnings(
-  errors: ValidationResult[],
-  warnings: ValidationResult[],
+  errors: ClientValidationResult[],
+  warnings: ClientValidationResult[],
   clientWarnings: FieldValidationResult[],
 ): Map<string, ErrorsAndWarnings> {
   const result = new Map<string, ErrorsAndWarnings>();
 
-  const process = (target: keyof ErrorsAndWarnings, arr: ValidationResult[]) => {
+  const process = (target: keyof ErrorsAndWarnings, arr: ClientValidationResult[]) => {
     arr.forEach((v) => {
       v.fields.forEach((f) => {
         const fieldName = fieldNameFromPath(f);

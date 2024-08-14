@@ -63,5 +63,6 @@ export function useVotersAndVotes(getValues: () => VotersAndVotesValues) {
     ignoreWarnings: formState.sections.voters_votes_counts.ignoreWarnings,
     submit: submitCurrentForm,
     recounted: values.recounted,
+    isCompleted: formState.isCompleted,
   };
 }

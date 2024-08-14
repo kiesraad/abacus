@@ -50,5 +50,6 @@ export function useDifferences(getValues: () => DifferencesValues) {
     warnings,
     isSaved: formState.sections.differences_counts.isSaved,
     submit: submitCurrentForm,
+    isCompleted: formState.isCompleted,
   };
 }

@@ -3,7 +3,7 @@ import * as router from "react-router";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { fireEvent, overrideOnce, render, screen, server, waitFor } from "app/test/unit";
+import { overrideOnce, render, screen, server, waitFor } from "app/test/unit";
 
 import { ElectionProvider, PollingStationFormController } from "@kiesraad/api";
 import { electionMock, electionMockResponse, pollingStationMock } from "@kiesraad/api-mocks";
@@ -61,10 +61,10 @@ describe("Test AbortDataEntryControl", () => {
     await user.click(abortButton);
 
     // click the save button in the modal
-    fireEvent.click(screen.getByText("Invoer bewaren"));
+    await user.click(screen.getByRole("button", { name: "Invoer bewaren" }));
 
     // check that the user is navigated back to the input page
-    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining("/input"));
+    expect(mockNavigate).toHaveBeenCalledWith(expect.stringMatching(/\/input$/));
   });
 
   test("deletes the data entry and navigates on delete", async () => {
@@ -80,23 +80,20 @@ describe("Test AbortDataEntryControl", () => {
     let deleteRequestMade = false;
     overrideOnce("delete", "/api/polling_stations/1/data_entries/1", 204, null);
     server.events.on("request:start", ({ request }) => {
-      if (
-        request.method === "DELETE" &&
-        request.url === "http://testhost/api/polling_stations/1/data_entries/1"
-      ) {
-        deleteRequestMade = true;
-      }
+      expect(request.method).toBe("DELETE");
+      expect(request.url).toBe("http://testhost/api/polling_stations/1/data_entries/1");
+      deleteRequestMade = true;
     });
 
     // click the delete button in the modal
-    fireEvent.click(screen.getByText("Niet bewaren"));
+    await user.click(screen.getByRole("button", { name: "Niet bewaren" }));
 
     // check that the delete request was made
     expect(deleteRequestMade).toBe(true);
 
     // check that the user is navigated back to the input page
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining("/input"));
+      expect(mockNavigate).toHaveBeenCalledWith(expect.stringMatching("/input$"));
     });
   });
 });

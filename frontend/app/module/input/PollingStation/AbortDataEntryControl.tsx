@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useElection, usePollingStationFormController } from "@kiesraad/api";
 import { Button, Modal } from "@kiesraad/ui";
 
-export function AbortDataEntry() {
+export function AbortDataEntryControl() {
   const navigate = useNavigate();
   const { election } = useElection();
 

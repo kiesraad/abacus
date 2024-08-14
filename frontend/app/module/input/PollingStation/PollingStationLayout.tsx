@@ -1,7 +1,7 @@
 import { Outlet, useParams } from "react-router-dom";
 
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
-import { AbortDataEntry } from "app/module/input/PollingStation/AbortDataEntry.tsx";
+import { AbortDataEntryControl } from "app/module/input/PollingStation/AbortDataEntryControl.tsx";
 
 import { PollingStationFormController, useElection, usePollingStation } from "@kiesraad/api";
 import { Badge, PageTitle, PollingStationNumber, WorkStationNumber } from "@kiesraad/ui";
@@ -33,7 +33,7 @@ export function PollingStationLayout() {
           <Badge type="first_entry" />
         </section>
         <section>
-          <AbortDataEntry />
+          <AbortDataEntryControl />
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>

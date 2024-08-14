@@ -7,11 +7,11 @@ import { fireEvent, overrideOnce, render, screen, server, waitFor } from "app/te
 import { ElectionProvider, PollingStationFormController } from "@kiesraad/api";
 import { electionMock, electionMockResponse, pollingStationMock } from "@kiesraad/api-mocks";
 
-import { AbortDataEntry } from "./AbortDataEntry.tsx";
+import { AbortDataEntryControl } from "./AbortDataEntryControl.tsx";
 
 const mockNavigate = vi.fn();
 
-const renderAbortDataEntry = () => {
+const renderAbortDataEntryControl = () => {
   render(
     <ElectionProvider electionId={1}>
       <PollingStationFormController
@@ -19,19 +19,19 @@ const renderAbortDataEntry = () => {
         pollingStationId={pollingStationMock.id}
         entryNumber={1}
       >
-        <AbortDataEntry />
+        <AbortDataEntryControl />
       </PollingStationFormController>
     </ElectionProvider>,
   );
 };
 
-describe("Test AbortDataEntry", () => {
+describe("Test AbortDataEntryControl", () => {
   beforeEach(async () => {
     overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
     vi.spyOn(router, "useNavigate").mockImplementation(() => mockNavigate);
 
     // render the abort button, then click it to open the modal
-    renderAbortDataEntry();
+    renderAbortDataEntryControl();
     const abortButton = await screen.findByText("Invoer afbreken");
     fireEvent.click(abortButton);
   });

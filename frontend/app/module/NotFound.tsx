@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 
+import { NavBar } from "app/component/navbar/NavBar.tsx";
+
 export function NotFound() {
   return (
     <div className="app-layout">
-      <nav aria-label="primary-navigation">
+      <NavBar>
         <span>
           <Link to={"/overview"}>Overzicht</Link>
         </span>
-      </nav>
+      </NavBar>
 
       <main>
         <article>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, Outlet, useParams } from "react-router-dom";
 
+import { NavBar } from "app/component/navbar/NavBar.tsx";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 
 import { PollingStationFormController, useElection, usePollingStation } from "@kiesraad/api";
@@ -39,11 +40,11 @@ export function PollingStationLayout() {
       entryNumber={1}
     >
       <PageTitle title={`Invoeren ${pollingStation.number} ${pollingStation.name} - Abacus`} />
-      <nav aria-label="primary-navigation">
+      <NavBar>
         <Link to={"/overview"}>Overzicht</Link>
         <IconChevronRight />
         <Link to={`/${election.id}/input`}>{election.name}</Link>
-      </nav>
+      </NavBar>
       <header>
         <section>
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>

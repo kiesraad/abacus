@@ -1,5 +1,6 @@
 import * as router from "react-router";
 
+import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { fireEvent, overrideOnce, render, screen, server, waitFor } from "app/test/unit";
@@ -26,14 +27,9 @@ const renderAbortDataEntryControl = () => {
 };
 
 describe("Test AbortDataEntryControl", () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
     vi.spyOn(router, "useNavigate").mockImplementation(() => mockNavigate);
-
-    // render the abort button, then click it to open the modal
-    renderAbortDataEntryControl();
-    const abortButton = await screen.findByText("Invoer afbreken");
-    fireEvent.click(abortButton);
   });
 
   afterEach(() => {
@@ -42,16 +38,45 @@ describe("Test AbortDataEntryControl", () => {
     server.events.removeAllListeners();
   });
 
-  test("renders and toggles the modal", () => {
+  test("renders and toggles the modal", async () => {
+    // render the abort button, then click it to open the modal
+    renderAbortDataEntryControl();
+    const user = userEvent.setup();
+
+    // click the abort button to open the modal
+    const abortButton = await screen.findByRole("button", { name: "Invoer afbreken" });
+    await user.click(abortButton);
+
+    // check that the modal is open
     expect(screen.getByText("Wat wil je doen met je invoer?")).toBeInTheDocument();
   });
 
-  test("saves the form state and navigates on save", () => {
+  test("saves the form state and navigates on save", async () => {
+    // render the abort button
+    renderAbortDataEntryControl();
+    const user = userEvent.setup();
+
+    // click the abort button to open the modal
+    const abortButton = await screen.findByRole("button", { name: "Invoer afbreken" });
+    await user.click(abortButton);
+
+    // click the save button in the modal
     fireEvent.click(screen.getByText("Invoer bewaren"));
+
+    // check that the user is navigated back to the input page
     expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining("/input"));
   });
 
   test("deletes the data entry and navigates on delete", async () => {
+    // render the abort button, then click it to open the modal
+    renderAbortDataEntryControl();
+    const user = userEvent.setup();
+
+    // click the abort button to open the modal
+    const abortButton = await screen.findByRole("button", { name: "Invoer afbreken" });
+    await user.click(abortButton);
+
+    // set up a listener to check if the delete request is made
     let deleteRequestMade = false;
     overrideOnce("delete", "/api/polling_stations/1/data_entries/1", 204, null);
     server.events.on("request:start", ({ request }) => {
@@ -63,9 +88,13 @@ describe("Test AbortDataEntryControl", () => {
       }
     });
 
+    // click the delete button in the modal
     fireEvent.click(screen.getByText("Niet bewaren"));
+
+    // check that the delete request was made
     expect(deleteRequestMade).toBe(true);
 
+    // check that the user is navigated back to the input page
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining("/input"));
     });

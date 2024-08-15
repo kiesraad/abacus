@@ -94,7 +94,7 @@
         }
       }
     },
-    "/api/elections/{election_id}/download-pdf": {
+    "/api/elections/{election_id}/download_pdf": {
       "get": {
         "tags": [
           "election"
@@ -128,7 +128,7 @@
                 "schema": {
                   "type": "string"
                 },
-                "description": "text/pdf; charset=utf-8"
+                "description": "application/pdf"
               }
             }
           },

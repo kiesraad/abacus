@@ -295,7 +295,7 @@ async fn test_election_details_status(pool: SqlitePool) {
 async fn test_election_pdf_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/1/download-pdf");
+    let url = format!("http://{addr}/api/elections/1/download_pdf");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let content_disposition = response.headers().get("Content-Disposition");
@@ -303,7 +303,7 @@ async fn test_election_pdf_download(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(content_type.unwrap(), "text/pdf; charset=utf-8");
+    assert_eq!(content_type.unwrap(), "application/pdf");
 
     // Check if the first 21 characters compare
     let content_disposition_string = content_disposition

@@ -95,14 +95,14 @@ pub async fn election_status(
 /// Download a generated PDF
 #[utoipa::path(
     get,
-    path = "/api/elections/{election_id}/download-pdf",
+    path = "/api/elections/{election_id}/download_pdf",
     responses(
         (
             status = 200,
             description = "PDF",
-            content_type="text/pdf; charset=utf-8",
+            content_type="application/pdf",
             headers(
-                ("Content-Type", description = "text/pdf; charset=utf-8"),
+                ("Content-Type", description = "application/pdf"),
                 ("Content-Disposition", description = "attachment; filename=\"filename.pdf\"")
             )
         ),
@@ -126,7 +126,7 @@ pub async fn election_download_pdf(
     let disposition_header = format!("attachment; filename=\"{}\"", filename);
 
     let mut headers = HeaderMap::new();
-    headers.insert(header::CONTENT_TYPE, "text/pdf; charset=utf-8".parse()?);
+    headers.insert(header::CONTENT_TYPE, "application/pdf".parse()?);
     headers.insert(header::CONTENT_DISPOSITION, disposition_header.parse()?);
 
     Ok((headers, content.to_vec()))

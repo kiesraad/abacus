@@ -295,7 +295,7 @@ async fn test_election_details_status(pool: SqlitePool) {
 async fn test_election_pdf_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/1/download_pdf");
+    let url = format!("http://{addr}/api/elections/1/download_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let content_disposition = response.headers().get("Content-Disposition");

@@ -94,13 +94,13 @@
         }
       }
     },
-    "/api/elections/{election_id}/download_pdf": {
+    "/api/elections/{election_id}/download_results": {
       "get": {
         "tags": [
           "election"
         ],
         "summary": "Download a generated PDF",
-        "operationId": "election_download_pdf",
+        "operationId": "election_download_results",
         "parameters": [
           {
             "name": "election_id",

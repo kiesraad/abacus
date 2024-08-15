@@ -95,7 +95,7 @@ pub async fn election_status(
 /// Download a generated PDF
 #[utoipa::path(
     get,
-    path = "/api/elections/{election_id}/download_pdf",
+    path = "/api/elections/{election_id}/download_results",
     responses(
         (
             status = 200,
@@ -113,7 +113,7 @@ pub async fn election_status(
         ("election_id" = u32, description = "Election database id"),
     ),
 )]
-pub async fn election_download_pdf(
+pub async fn election_download_results(
     State(elections_repo): State<Elections>,
     Path(id): Path<u32>,
 ) -> Result<(HeaderMap, Vec<u8>), APIError> {

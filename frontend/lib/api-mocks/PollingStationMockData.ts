@@ -12,19 +12,26 @@ export const pollingStationMockData: PollingStation = {
   street: "Rijksweg A12",
 };
 
-export const pollingStationListMockResponse: PollingStationListResponse = {
-  polling_stations: [
-    pollingStationMockData,
-    {
-      election_id: 1,
-      id: 2,
-      number: 34,
-      name: "Testplek",
-      house_number: "2",
-      locality: "Testdorp",
-      polling_station_type: "Bijzonder",
-      postal_code: "1234 QY",
-      street: "Teststraat",
-    },
-  ],
+export const getPollingStationListMockResponse = (
+  election_id: number,
+): PollingStationListResponse => {
+  return {
+    polling_stations: [
+      { ...pollingStationMockData, election_id },
+      {
+        election_id,
+        id: 2,
+        number: 34,
+        name: "Testplek",
+        house_number: "2",
+        locality: "Testdorp",
+        polling_station_type: "Bijzonder",
+        postal_code: "1234 QY",
+        street: "Teststraat",
+      },
+    ],
+  };
 };
+
+export const pollingStationsMockResponse: PollingStationListResponse =
+  getPollingStationListMockResponse(1);

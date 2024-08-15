@@ -6,33 +6,34 @@ import { PollingStationLayout } from "app/module/input";
 import { overrideOnce, render, screen } from "app/test/unit";
 
 import {
+  Election,
   ElectionListProvider,
   ElectionProvider,
   PollingStationFormController,
   PollingStationListProvider,
 } from "@kiesraad/api";
 import {
-  electionMock,
-  electionMockResponse,
-  pollingStationMock,
+  electionDetailsMockResponse,
+  pollingStationMockData,
   pollingStationsMockResponse,
 } from "@kiesraad/api-mocks";
 
 describe("PollingStationLayout", () => {
-  overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
+  overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
   overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
+  const election = electionDetailsMockResponse.election as Required<Election>;
   vi.spyOn(Router, "useParams").mockReturnValue({
-    electionId: electionMock.id.toString(),
-    pollingStationId: pollingStationMock.id.toString(),
+    electionId: election.id.toString(),
+    pollingStationId: pollingStationMockData.id.toString(),
   });
   test("Render", async () => {
     render(
       <ElectionListProvider>
-        <ElectionProvider electionId={electionMock.id}>
-          <PollingStationListProvider electionId={electionMock.id}>
+        <ElectionProvider electionId={election.id}>
+          <PollingStationListProvider electionId={election.id}>
             <PollingStationFormController
-              election={electionMock}
-              pollingStationId={pollingStationMock.id}
+              election={election}
+              pollingStationId={pollingStationMockData.id}
               entryNumber={1}
             >
               <PollingStationLayout />
@@ -41,7 +42,7 @@ describe("PollingStationLayout", () => {
         </ElectionProvider>
       </ElectionListProvider>,
     );
-    expect(await screen.findByText(pollingStationMock.name));
-    expect(await screen.findByText(pollingStationMock.number));
+    expect(await screen.findByText(pollingStationMockData.name));
+    expect(await screen.findByText(pollingStationMockData.number));
   });
 });

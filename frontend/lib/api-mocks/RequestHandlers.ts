@@ -2,34 +2,17 @@ import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
   DataEntryResponse,
-  Election,
-  ElectionDetailsResponse,
-  ElectionListResponse,
   ErrorResponse,
-  PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
-  PollingStation,
-  PollingStationListResponse,
 } from "@kiesraad/api";
 
 import {
-  electionDetailsMockResponse,
   electionListMockResponse,
-  electionMockData,
   electionStatusMockResponse,
-  politicalGroupMockData,
+  getElectionMockData,
 } from "./ElectionMockData";
-import { pollingStationListMockResponse, pollingStationMockData } from "./PollingStationMockData";
-
-export const electionMock = electionMockData as Required<Election>;
-export const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
-export const pollingStationMock = pollingStationMockData as Required<PollingStation>;
-export const pollingStationsMockResponse =
-  pollingStationListMockResponse as Required<PollingStationListResponse>;
-export const electionMockResponse =
-  electionDetailsMockResponse as Required<ElectionDetailsResponse>;
-export const electionsMockResponse = electionListMockResponse as Required<ElectionListResponse>;
+import { getPollingStationListMockResponse } from "./PollingStationMockData";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -63,12 +46,10 @@ export const ElectionListRequestHandler = http.get("/api/elections", () => {
 export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id",
   ({ params }) => {
-    const election = electionListMockResponse.elections.find(
-      (e: Election) => e.id.toString() === params.election_id,
-    );
-    if (election) {
-      return HttpResponse.json({ election }, { status: 200 });
-    } else {
+    try {
+      const election = getElectionMockData(Number(params.election_id));
+      return HttpResponse.json(election, { status: 200 });
+    } catch {
       return HttpResponse.json({}, { status: 404 });
     }
   },
@@ -77,12 +58,10 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
 export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id/status",
   ({ params }) => {
-    const election = electionListMockResponse.elections.find(
-      (e: Election) => e.id.toString() === params.election_id,
-    );
-    if (election) {
+    try {
+      getElectionMockData(Number(params.election_id));
       return HttpResponse.json(electionStatusMockResponse, { status: 200 });
-    } else {
+    } catch {
       return HttpResponse.json({}, { status: 404 });
     }
   },
@@ -355,8 +334,10 @@ export const pollingStationDataEntryHandler = http.post<
 
 export const PollingStationListRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id/polling_stations",
-  () => {
-    return HttpResponse.json(pollingStationsMockResponse, { status: 200 });
+  ({ params }) => {
+    return HttpResponse.json(getPollingStationListMockResponse(Number(params.election_id)), {
+      status: 200,
+    });
   },
 );
 

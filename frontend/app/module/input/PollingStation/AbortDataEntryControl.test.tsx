@@ -77,19 +77,19 @@ describe("Test AbortDataEntryControl", () => {
     await user.click(abortButton);
 
     // set up a listener to check if the delete request is made
-    let deleteRequestMade = false;
+    let request_method, request_url;
     overrideOnce("delete", "/api/polling_stations/1/data_entries/1", 204, null);
     server.events.on("request:start", ({ request }) => {
-      expect(request.method).toBe("DELETE");
-      expect(request.url).toBe("http://testhost/api/polling_stations/1/data_entries/1");
-      deleteRequestMade = true;
+      request_method = request.method;
+      request_url = request.url;
     });
 
     // click the delete button in the modal
     await user.click(screen.getByRole("button", { name: "Niet bewaren" }));
 
     // check that the delete request was made and the user is navigated back to the input page
-    expect(deleteRequestMade).toBe(true);
+    expect(request_method).toBe("DELETE");
+    expect(request_url).toBe("http://testhost/api/polling_stations/1/data_entries/1");
     expect(mockNavigate).toHaveBeenCalledWith("/1/input");
   });
 });

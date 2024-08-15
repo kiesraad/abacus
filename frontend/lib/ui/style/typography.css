@@ -20,7 +20,7 @@ h6 {
   color: var(--text-color-header);
   font-size: 1rem;
   font-style: normal;
-  font-weight: 400;
+  font-weight: normal;
   letter-spacing: -0.72px;
 }
 
@@ -37,7 +37,7 @@ h2 {
 h3 {
   font-size: 1.125em;
   margin-bottom: 0.4rem;
-  font-weight: 600;
+  font-weight: bold;
 }
 h4 {
   font-size: 1.25rem;

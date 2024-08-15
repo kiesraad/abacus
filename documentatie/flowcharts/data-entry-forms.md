@@ -171,7 +171,7 @@ flowchart TD
 Note that if there is a warning and the user changes the input, they should no longer have the option to accept the warning. They need to click "Next" first, to validate the changed input.
 
 
-## Click navigation item
+## Click navigation item or browser back/forward buttons
 
 ```mermaid
 flowchart TD
@@ -183,6 +183,10 @@ flowchart TD
 
     %% steps
     click-nav-item(click navigation item)
+    click-browser-back("click browser
+        back button")
+    click-browser-forward("click browser
+        forward button")
     on-furthest-page{on furthest page?}
     user-made-changes{user made changes?}
     save-changes{save changes?}
@@ -193,6 +197,11 @@ flowchart TD
 
     %% flow
     flow-start --> click-nav-item
+    flow-start --> click-browser-back
+    flow-start --> click-browser-forward
+    click-browser-back --> on-furthest-page
+    %% if you can click the browser forward button, you by definition are not on the furthest page
+    click-browser-forward --> user-made-changes
     click-nav-item --> on-furthest-page
     on-furthest-page -- yes --> cache-input
     cache-input --> go-to-page

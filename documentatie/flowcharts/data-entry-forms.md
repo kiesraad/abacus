@@ -18,13 +18,13 @@ flowchart TD
     %% elements
     flow-start([start])
 
-    disabled-styling([disabled styling])
-    current-styling([current styling])
-    unsubmitted-styling([unsubmitted styling])
-    error-styling([error styling])
-    warning-styling([warning styling])
-    empty-styling([empty styling])
-    green-check-styling([valid styling])
+    styling-disabled([styling: disabled])
+    styling-current([styling: current])
+    styling-unsubmitted([styling: unsubmitted])
+    styling-error([styling: error])
+    styling-warning([styling: warning])
+    styling-empty([styling: empty])
+    styling-valid([styling: valid])
 
     page-visited{page visited before?}
     current-page{current page?}
@@ -36,18 +36,18 @@ flowchart TD
 
     %% flow
     flow-start --> page-visited
-    page-visited -- no --> disabled-styling
+    page-visited -- no --> styling-disabled
     page-visited -- yes --> current-page
-    current-page -- yes --> current-styling
+    current-page -- yes --> styling-current
     current-page -- no --> submitted
-    submitted -- no --> unsubmitted-styling
+    submitted -- no --> styling-unsubmitted
     submitted -- yes --> errors
-    errors -- yes --> error-styling
+    errors -- yes --> styling-error
     errors -- no --> warnings
-    warnings -- yes --> warning-styling
+    warnings -- yes --> styling-warning
     warnings -- no --> empty
-    empty -- yes --> empty-styling
-    empty -- no --> green-check-styling
+    empty -- yes --> styling-empty
+    empty -- no --> styling-valid
 
 ```
 

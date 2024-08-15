@@ -18,6 +18,7 @@ test.describe("Data entry", () => {
     await inputPage.clickStart();
 
     const recountedPage = new RecountedPage(page);
+    await expect(recountedPage.heading).toHaveText("Is er herteld?");
     await recountedPage.no.check();
     await expect(recountedPage.no).toBeChecked();
     await recountedPage.next.click();
@@ -25,9 +26,9 @@ test.describe("Data entry", () => {
     await expect(recountedPage.error).toBeHidden();
     await expect(recountedPage.warning).toBeHidden();
 
-    await recountedPage.votersAndVotes.click();
-
     const votersVotesPage = new VotersVotesPage(page);
+    await expect(votersVotesPage.heading).toHaveText("Toegelaten kiezers en uitgebrachte stemmen");
+
     const voters = {
       poll_card_count: "100",
       proxy_certificate_count: "10",
@@ -50,17 +51,18 @@ test.describe("Data entry", () => {
     await expect(votersVotesPage.error).toBeHidden();
     await expect(votersVotesPage.warning).toBeHidden();
 
-    await votersVotesPage.differences.click(); // TODO: remove once navigation works (#133)
-
     const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toHaveText(
+      "Verschil tussen aantal kiezers en getelde stemmen",
+    );
     await differencesPage.next.click();
 
     await expect(differencesPage.error).toBeHidden();
     await expect(differencesPage.warning).toBeHidden();
 
-    await differencesPage.clickPoliticalGroup("Political Group A"); // TODO: remove once navigation works (#133)
-
     const candidatesListPage_1 = new CandidatesListPage(page);
+    await expect(candidatesListPage_1.heading).toHaveText("Lijst 1 - Political Group A");
+
     await candidatesListPage_1.fillCandidate(0, 100);
     await candidatesListPage_1.fillCandidate(1, 22);
     await candidatesListPage_1.total.fill("122");

@@ -16,6 +16,7 @@ use utoipa::ToSchema;
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod election;
+pub mod pdf_gen;
 pub mod polling_station;
 pub mod validation;
 
@@ -148,6 +149,7 @@ pub enum APIError {
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
     InvalidHeaderValue,
+    PdfGenError(String),
 }
 
 impl IntoResponse for APIError {
@@ -192,6 +194,13 @@ impl IntoResponse for APIError {
                 StatusCode::INTERNAL_SERVER_ERROR,
                 to_error("Internal server error".to_string()),
             ),
+            APIError::PdfGenError(err) => {
+                println!("PDF generation error: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error("Internal server error".to_string()),
+                )
+            }
         };
 
         (status, response).into_response()

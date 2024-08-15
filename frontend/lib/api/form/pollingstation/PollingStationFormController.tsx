@@ -288,14 +288,6 @@ export function PollingStationFormController({
                 const nextSectionID = getNextSection(newFormState, activeFormSection);
                 if (nextSectionID) {
                   newFormState.current = nextSectionID;
-
-                  //if not completed, remove global errors
-                  Object.values(newFormState.sections).forEach((section) => {
-                    section.errors = section.errors.filter((err) => !isGlobalValidationResult(err));
-                    section.warnings = section.warnings.filter(
-                      (err) => !isGlobalValidationResult(err),
-                    );
-                  });
                 } else {
                   newFormState.isCompleted = true;
                 }
@@ -304,6 +296,13 @@ export function PollingStationFormController({
           }
         }
 
+        //if the entire form is not completed yet, filter out global validation results since they dont have meaning yet.
+        if (!newFormState.isCompleted) {
+          Object.values(newFormState.sections).forEach((section) => {
+            section.errors = section.errors.filter((err) => !isGlobalValidationResult(err));
+            section.warnings = section.warnings.filter((err) => !isGlobalValidationResult(err));
+          });
+        }
         console.log("FormState", newFormState);
         return newFormState;
       });

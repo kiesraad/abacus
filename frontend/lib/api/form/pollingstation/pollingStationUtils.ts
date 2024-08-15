@@ -103,8 +103,6 @@ export function currentFormHasChanges(
       voters_recounts: values.voters_recounts,
     };
     const valB = currentForm.getValues();
-    console.log("A", valA);
-    console.log("B", valB);
     return !deepEqual(valA, valB);
   }
 

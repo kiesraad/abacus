@@ -292,6 +292,9 @@ export function PollingStationFormController({
                   //if not completed, remove global errors
                   Object.values(newFormState.sections).forEach((section) => {
                     section.errors = section.errors.filter((err) => !isGlobalValidationResult(err));
+                    section.warnings = section.warnings.filter(
+                      (err) => !isGlobalValidationResult(err),
+                    );
                   });
                 } else {
                   newFormState.isCompleted = true;

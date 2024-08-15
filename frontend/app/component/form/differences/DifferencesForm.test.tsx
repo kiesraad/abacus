@@ -267,12 +267,12 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.302 IncorrectDifference", async () => {
+    test("F.302 Should be empty", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
             {
-              fields: ["data.differences_counts.more_ballots_count"],
+              fields: ["data.differences_counts.fewer_ballots_count"],
               code: "F302",
             },
           ],
@@ -323,12 +323,12 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("F.304 IncorrectDifference", async () => {
+    test("F.304 Should be empty", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
             {
-              fields: ["data.differences_counts.fewer_ballots_count"],
+              fields: ["data.differences_counts.more_ballots_count"],
               code: "F304",
             },
           ],
@@ -350,19 +350,21 @@ describe("Test DifferencesForm", () => {
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
-  });
 
-  describe("DifferencesForm warnings", () => {
-    test("W.301 ConflictingDifferences", async () => {
+    test("F.305 No difference expected", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
             {
               fields: [
-                "data.differences_counts.more_ballots_count",
                 "data.differences_counts.fewer_ballots_count",
+                "data.differences_counts.unreturned_ballots_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.other_explanation_count",
+                "data.differences_counts.no_explanation_count",
               ],
-              code: "W301",
+              code: "F305",
             },
           ],
           warnings: [],
@@ -371,20 +373,28 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
-      // Since the component does not allow to change values in other components,
-      // not inputting any values and just clicking the submit button.
+      await user.type(screen.getByTestId("more_ballots_count"), "0");
+      await user.type(screen.getByTestId("fewer_ballots_count"), "4");
+      await user.type(screen.getByTestId("unreturned_ballots_count"), "1");
+      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "1");
+      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "0");
+      await user.type(screen.getByTestId("other_explanation_count"), "1");
+      await user.type(screen.getByTestId("no_explanation_count"), "1");
+
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^W301$/);
+      const feedbackWarning = await screen.findByTestId("feedback-error");
+      expect(feedbackWarning).toHaveTextContent(/^F305$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
+  });
 
-    test("W.302 Incorrect total", async () => {
+  describe("DifferencesForm warnings", () => {
+    test("W.301 Incorrect total", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -398,7 +408,7 @@ describe("Test DifferencesForm", () => {
                 "data.differences_counts.other_explanation_count",
                 "data.differences_counts.no_explanation_count",
               ],
-              code: "W302",
+              code: "W301",
             },
           ],
         },
@@ -420,12 +430,12 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W302$/);
+      expect(feedbackWarning).toHaveTextContent(/^W301$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
-    test("W.303 Incorrect total", async () => {
+    test("W.302 Incorrect total", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -439,7 +449,7 @@ describe("Test DifferencesForm", () => {
                 "data.differences_counts.other_explanation_count",
                 "data.differences_counts.no_explanation_count",
               ],
-              code: "W303",
+              code: "W302",
             },
           ],
         },
@@ -461,95 +471,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W303$/);
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
-    });
-
-    test("W.304 and W.306 No difference expected", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [],
-          warnings: [
-            {
-              fields: ["data.differences_counts.fewer_ballots_count"],
-              code: "W304",
-            },
-            {
-              fields: [
-                "data.differences_counts.unreturned_ballots_count",
-                "data.differences_counts.too_few_ballots_handed_out_count",
-                "data.differences_counts.too_few_ballots_handed_out_count",
-                "data.differences_counts.other_explanation_count",
-                "data.differences_counts.no_explanation_count",
-              ],
-              code: "W306",
-            },
-          ],
-        },
-      });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
-
-      await user.type(screen.getByTestId("more_ballots_count"), "0");
-      await user.type(screen.getByTestId("fewer_ballots_count"), "4");
-      await user.type(screen.getByTestId("unreturned_ballots_count"), "1");
-      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "1");
-      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "0");
-      await user.type(screen.getByTestId("other_explanation_count"), "1");
-      await user.type(screen.getByTestId("no_explanation_count"), "1");
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W304W306$/);
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
-    });
-
-    test("W.305 and W.306 No difference expected", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [],
-          warnings: [
-            {
-              fields: ["data.differences_counts.more_ballots_count"],
-              code: "W305",
-            },
-            {
-              fields: [
-                "data.differences_counts.unreturned_ballots_count",
-                "data.differences_counts.too_few_ballots_handed_out_count",
-                "data.differences_counts.too_few_ballots_handed_out_count",
-                "data.differences_counts.other_explanation_count",
-                "data.differences_counts.no_explanation_count",
-              ],
-              code: "W306",
-            },
-          ],
-        },
-      });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: true });
-
-      await user.type(screen.getByTestId("more_ballots_count"), "4");
-      await user.type(screen.getByTestId("fewer_ballots_count"), "0");
-      await user.type(screen.getByTestId("unreturned_ballots_count"), "0");
-      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "0");
-      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "2");
-      await user.type(screen.getByTestId("other_explanation_count"), "1");
-      await user.type(screen.getByTestId("no_explanation_count"), "1");
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W305W306$/);
+      expect(feedbackWarning).toHaveTextContent(/^W302$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });

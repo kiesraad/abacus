@@ -326,7 +326,7 @@ describe("Test CandidatesVotesForm", () => {
         validation_results: {
           errors: [
             {
-              fields: ["data.political_group_votes[0].total"],
+              fields: ["data.political_group_votes[0]"],
               code: "F401",
             },
           ],

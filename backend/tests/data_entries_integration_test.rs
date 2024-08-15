@@ -111,10 +111,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     );
     // error 3
     assert_eq!(errors[2].code, ValidationResultCode::F401);
-    assert_eq!(
-        errors[2].fields,
-        vec!["data.political_group_votes[0].total"]
-    );
+    assert_eq!(errors[2].fields, vec!["data.political_group_votes[0]"]);
     // error 4
     assert_eq!(errors[3].code, ValidationResultCode::F204);
     assert_eq!(

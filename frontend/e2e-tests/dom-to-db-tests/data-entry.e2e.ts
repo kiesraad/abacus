@@ -75,7 +75,11 @@ test.describe("Data entry", () => {
 
 test.describe("errors and warnings", () => {
   test("display error on voters and votes page", async ({ page }) => {
-    await page.goto("/1/input/1/numbers");
+    await page.goto("/1/input/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.no.click();
+    await recountedPage.next.click();
 
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
@@ -93,7 +97,11 @@ test.describe("errors and warnings", () => {
   });
 
   test("display warning on voters and votes page", async ({ page }) => {
-    await page.goto("/1/input/1/numbers");
+    await page.goto("/1/input/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.no.click();
+    await recountedPage.next.click();
 
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
@@ -113,7 +121,7 @@ test.describe("errors and warnings", () => {
 
     await votersVotesPage.next.click();
 
-    await expect(votersVotesPage.error).toBeHidden();
     await expect(votersVotesPage.warning).toBeVisible();
+    await expect(votersVotesPage.error).toBeHidden();
   });
 });

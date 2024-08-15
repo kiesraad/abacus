@@ -308,7 +308,7 @@ export function VotersAndVotesForm() {
         <IgnoreWarningsCheckbox
           id="voters_and_votes_form_ignore_warnings"
           defaultChecked={ignoreWarnings}
-          hidden={hideIgnoreWarnings || warnings.length === 0}
+          hidden={errors.length > 0 || hideIgnoreWarnings || warnings.length === 0}
         >
           Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
         </IgnoreWarningsCheckbox>

@@ -7,6 +7,7 @@ import {
   DifferencesCounts,
   Election,
   PoliticalGroupVotes,
+  POLLING_STATION_DATA_ENTRY_REQUEST_PATH,
   PollingStationResults,
   useApi,
   usePollingStationDataEntry,
@@ -170,7 +171,7 @@ export function PollingStationFormController({
   }, [doRequest, values]);
 
   const deleteDataEntry = async () => {
-    const path = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+    const path: POLLING_STATION_DATA_ENTRY_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
     const response = await client.deleteRequest(path);
     if (response.status !== ApiResponseStatus.Success && response.code !== 404) {
       console.error("Failed to delete data entry", response);

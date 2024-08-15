@@ -118,7 +118,7 @@ describe("PollingStationUtils", () => {
     const validationResults: ValidationResult[] = [
       {
         fields: ["data.votes_counts.blank_votes_count"],
-        code: "IncorrectTotal",
+        code: "F202",
       },
     ];
 
@@ -209,7 +209,7 @@ describe("PollingStationUtils", () => {
     };
     formState.sections.voters_votes_counts.errors = [
       {
-        code: "IncorrectTotal",
+        code: "F202",
         fields: ["data.votes_counts.blank_votes_count"],
       },
     ];
@@ -221,7 +221,7 @@ describe("PollingStationUtils", () => {
 
   test("toClientValidationResult", () => {
     const clientValidationResult = toClientValidationResult({
-      code: "IncorrectTotal",
+      code: "F202",
       fields: ["data.votes_counts.blank_votes_count"],
     });
 

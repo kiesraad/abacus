@@ -43,7 +43,8 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route(
             "/:election_id/polling_stations",
             get(polling_station::polling_station_list),
-        );
+        )
+        .route("/:election_id/status", get(election::election_status));
 
     let app: Router = Router::new()
         .nest("/api/elections", election_routes)
@@ -69,6 +70,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         paths(
             election::election_list,
             election::election_details,
+            election::election_status,
             polling_station::polling_station_list,
             polling_station::polling_station_data_entry,
             polling_station::polling_station_data_entry_finalise,
@@ -86,6 +88,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 election::CandidateGender,
                 election::ElectionListResponse,
                 election::ElectionDetailsResponse,
+                election::ElectionStatusResponse,
                 polling_station::CandidateVotes,
                 polling_station::DataEntryRequest,
                 polling_station::DataEntryResponse,
@@ -94,6 +97,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 polling_station::PollingStationResults,
                 polling_station::PollingStationListResponse,
                 polling_station::PollingStationType,
+                polling_station::PollingStationStatusEntry,
+                polling_station::PollingStationStatus,
                 polling_station::PollingStation,
                 polling_station::VotersCounts,
                 polling_station::VotersRecounts,

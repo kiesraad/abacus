@@ -121,7 +121,7 @@ impl Validate for PollingStationResults {
                         format!("{field_name}.voters_recounts"),
                         format!("{field_name}.votes_counts"),
                     ],
-                    code: ValidationResultCode::EqualInput,
+                    code: ValidationResultCode::W210,
                 });
             }
         // if recounted = false
@@ -140,7 +140,7 @@ impl Validate for PollingStationResults {
                         format!("{field_name}.voters_counts"),
                         format!("{field_name}.votes_counts"),
                     ],
-                    code: ValidationResultCode::EqualInput,
+                    code: ValidationResultCode::W209,
                 });
             }
         }
@@ -155,7 +155,11 @@ impl Validate for PollingStationResults {
                 fields: vec![format!(
                     "{field_name}.differences_counts.more_ballots_count"
                 )],
-                code: ValidationResultCode::IncorrectDifference,
+                code: if self.recounted {
+                    ValidationResultCode::F302
+                } else {
+                    ValidationResultCode::F301
+                },
             });
         }
 
@@ -169,7 +173,11 @@ impl Validate for PollingStationResults {
                 fields: vec![format!(
                     "{field_name}.differences_counts.fewer_ballots_count"
                 )],
-                code: ValidationResultCode::IncorrectDifference,
+                code: if self.recounted {
+                    ValidationResultCode::F304
+                } else {
+                    ValidationResultCode::F303
+                },
             });
         }
 
@@ -183,7 +191,7 @@ impl Validate for PollingStationResults {
                     format!("{field_name}.differences_counts.more_ballots_count"),
                     format!("{field_name}.differences_counts.fewer_ballots_count"),
                 ],
-                code: ValidationResultCode::ConflictingDifferences,
+                code: ValidationResultCode::W301,
             });
         }
 
@@ -198,7 +206,11 @@ impl Validate for PollingStationResults {
                     fields: vec![format!(
                         "{field_name}.differences_counts.more_ballots_count"
                     )],
-                    code: ValidationResultCode::NoDifferenceExpected,
+                    code: if self.recounted {
+                        ValidationResultCode::W305
+                    } else {
+                        ValidationResultCode::W304
+                    },
                 });
             }
             if self.differences_counts.fewer_ballots_count != 0 {
@@ -206,7 +218,11 @@ impl Validate for PollingStationResults {
                     fields: vec![format!(
                         "{field_name}.differences_counts.fewer_ballots_count"
                     )],
-                    code: ValidationResultCode::NoDifferenceExpected,
+                    code: if self.recounted {
+                        ValidationResultCode::W305
+                    } else {
+                        ValidationResultCode::W304
+                    },
                 });
             }
         }
@@ -227,7 +243,7 @@ impl Validate for PollingStationResults {
                     format!("{field_name}.differences_counts.other_explanation_count"),
                     format!("{field_name}.differences_counts.no_explanation_count"),
                 ],
-                code: ValidationResultCode::NoDifferenceExpected,
+                code: ValidationResultCode::W306,
             });
         }
 
@@ -256,11 +272,23 @@ impl Validate for PollingStationResults {
                     format!("{field_name}.votes_counts.votes_candidates_counts"),
                     format!("{field_name}.political_group_votes"),
                 ],
-                code: ValidationResultCode::IncorrectTotal,
+                code: ValidationResultCode::F204,
             });
         }
         Ok(())
     }
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct PollingStationStatusEntry {
+    pub id: u32,
+    pub status: PollingStationStatus,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq)]
+pub enum PollingStationStatus {
+    Incomplete,
+    Complete,
 }
 
 type Count = u32;
@@ -361,7 +389,7 @@ impl Validate for VotersCounts {
                     format!("{field_name}.proxy_certificate_count"),
                     format!("{field_name}.voter_card_count"),
                 ],
-                code: ValidationResultCode::IncorrectTotal,
+                code: ValidationResultCode::F201,
             });
         }
         Ok(())
@@ -426,7 +454,7 @@ impl Validate for VotesCounts {
                     format!("{field_name}.blank_votes_count"),
                     format!("{field_name}.invalid_votes_count"),
                 ],
-                code: ValidationResultCode::IncorrectTotal,
+                code: ValidationResultCode::F202,
             });
         }
 
@@ -438,22 +466,16 @@ impl Validate for VotesCounts {
         // W.201 validate that number of blank votes is no more than 3%
         if above_percentage_threshold(self.blank_votes_count, self.total_votes_cast_count, 3) {
             validation_results.warnings.push(ValidationResult {
-                fields: vec![
-                    format!("{field_name}.blank_votes_count"),
-                    format!("{field_name}.total_votes_cast_count"),
-                ],
-                code: ValidationResultCode::AboveThreshold,
+                fields: vec![format!("{field_name}.blank_votes_count")],
+                code: ValidationResultCode::W201,
             });
         }
 
         // W.202 validate that number of invalid votes is no more than 3%
         if above_percentage_threshold(self.invalid_votes_count, self.total_votes_cast_count, 3) {
             validation_results.warnings.push(ValidationResult {
-                fields: vec![
-                    format!("{field_name}.invalid_votes_count"),
-                    format!("{field_name}.total_votes_cast_count"),
-                ],
-                code: ValidationResultCode::AboveThreshold,
+                fields: vec![format!("{field_name}.invalid_votes_count")],
+                code: ValidationResultCode::W202,
             });
         }
         Ok(())
@@ -545,7 +567,7 @@ impl Validate for VotersRecounts {
                     format!("{field_name}.proxy_certificate_recount"),
                     format!("{field_name}.voter_card_recount"),
                 ],
-                code: ValidationResultCode::IncorrectTotal,
+                code: ValidationResultCode::F203,
             });
         }
         Ok(())
@@ -640,7 +662,7 @@ impl Validate for DifferencesCounts {
                     format!("{field_name}.unreturned_ballots_count"),
                     format!("{field_name}.too_few_ballots_handed_out_count"),
                 ],
-                code: ValidationResultCode::IncorrectTotal,
+                code: ValidationResultCode::W302,
             });
         }
         // W.303 validate that fewer_ballots_count == unreturned_ballots_count + too_few_ballots_handed_out_count + other_explanation_count + no_explanation_count
@@ -661,7 +683,7 @@ impl Validate for DifferencesCounts {
                     format!("{field_name}.other_explanation_count"),
                     format!("{field_name}.no_explanation_count"),
                 ],
-                code: ValidationResultCode::IncorrectTotal,
+                code: ValidationResultCode::W303,
             });
         }
         Ok(())
@@ -753,7 +775,7 @@ impl Validate for PoliticalGroupVotes {
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![format!("{field_name}.total")],
-                code: ValidationResultCode::IncorrectTotal,
+                code: ValidationResultCode::F401,
             });
         }
         Ok(())
@@ -834,7 +856,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 0);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::F202
         );
         assert_eq!(
             validation_results.errors[0].fields,
@@ -847,7 +869,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.errors[1].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::F201
         );
         assert_eq!(
             validation_results.errors[1].fields,
@@ -860,7 +882,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.errors[2].code,
-            ValidationResultCode::IncorrectDifference
+            ValidationResultCode::F301
         );
         assert_eq!(
             validation_results.errors[2].fields,
@@ -919,7 +941,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 0);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::F202
         );
         assert_eq!(
             validation_results.errors[0].fields,
@@ -932,7 +954,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.errors[1].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::F203
         );
         assert_eq!(
             validation_results.errors[1].fields,
@@ -945,7 +967,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.errors[2].code,
-            ValidationResultCode::IncorrectDifference
+            ValidationResultCode::F304
         );
         assert_eq!(
             validation_results.errors[2].fields,
@@ -1002,7 +1024,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::ConflictingDifferences
+            ValidationResultCode::W301
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1059,7 +1081,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 2);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::NoDifferenceExpected
+            ValidationResultCode::W304
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1067,7 +1089,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.warnings[1].code,
-            ValidationResultCode::NoDifferenceExpected
+            ValidationResultCode::W306
         );
         assert_eq!(
             validation_results.warnings[1].fields,
@@ -1132,7 +1154,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 2);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::F204
         );
         assert_eq!(
             validation_results.errors[0].fields,
@@ -1143,7 +1165,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::NoDifferenceExpected
+            ValidationResultCode::W305
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1151,7 +1173,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.warnings[1].code,
-            ValidationResultCode::NoDifferenceExpected
+            ValidationResultCode::W306
         );
         assert_eq!(
             validation_results.warnings[1].fields,
@@ -1216,7 +1238,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::EqualInput
+            ValidationResultCode::W209
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1254,7 +1276,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::EqualInput
+            ValidationResultCode::W210
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1303,7 +1325,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 0);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::F201
         );
         assert_eq!(
             validation_results.errors[0].fields,
@@ -1354,7 +1376,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 0);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::F202
         );
         assert_eq!(
             validation_results.errors[0].fields,
@@ -1385,14 +1407,11 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::AboveThreshold
+            ValidationResultCode::W201
         );
         assert_eq!(
             validation_results.warnings[0].fields,
-            vec![
-                "votes_counts.blank_votes_count",
-                "votes_counts.total_votes_cast_count"
-            ]
+            vec!["votes_counts.blank_votes_count",]
         );
 
         // test W.202 high number of invalid votes
@@ -1414,14 +1433,11 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::AboveThreshold
+            ValidationResultCode::W202
         );
         assert_eq!(
             validation_results.warnings[0].fields,
-            vec![
-                "votes_counts.invalid_votes_count",
-                "votes_counts.total_votes_cast_count"
-            ]
+            vec!["votes_counts.invalid_votes_count",]
         );
     }
 
@@ -1463,7 +1479,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 0);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::F203
         );
         assert_eq!(
             validation_results.errors[0].fields,
@@ -1520,7 +1536,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::W302
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1557,7 +1573,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::W302
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1594,7 +1610,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::W303
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1631,7 +1647,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::W303
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1706,7 +1722,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 0);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::IncorrectTotal
+            ValidationResultCode::F401
         );
         assert_eq!(
             validation_results.errors[0].fields,

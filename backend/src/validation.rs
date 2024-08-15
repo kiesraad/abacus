@@ -1,5 +1,3 @@
-use std::fmt;
-
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -32,27 +30,31 @@ pub struct ValidationResult {
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq)]
 pub enum ValidationResultCode {
-    IncorrectTotal,
-    AboveThreshold,
-    EqualInput,
-    MissingRecounts,
-    IncorrectDifference,
-    ConflictingDifferences,
-    NoDifferenceExpected,
-}
-
-impl fmt::Display for ValidationResultCode {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            ValidationResultCode::IncorrectTotal => write!(f, "Incorrect sum"),
-            ValidationResultCode::AboveThreshold => write!(f, "Above threshold"),
-            ValidationResultCode::EqualInput => write!(f, "Equal input"),
-            ValidationResultCode::MissingRecounts => write!(f, "Missing recounts"),
-            ValidationResultCode::IncorrectDifference => write!(f, "Incorrect difference"),
-            ValidationResultCode::ConflictingDifferences => write!(f, "Conflicting differences"),
-            ValidationResultCode::NoDifferenceExpected => write!(f, "No difference expected"),
-        }
-    }
+    F201,
+    F202,
+    F203,
+    F204,
+    F301,
+    F302,
+    F303,
+    F304,
+    F401,
+    W201,
+    W202,
+    W203,
+    W204,
+    W205,
+    W206,
+    W207,
+    W208,
+    W209,
+    W210,
+    W301,
+    W302,
+    W303,
+    W304,
+    W305,
+    W306,
 }
 
 /// Validate that a value is equal to or above a certain percentage threshold of the total,
@@ -77,7 +79,7 @@ mod tests {
         let mut result1 = ValidationResults {
             errors: vec![ValidationResult {
                 fields: vec!["field1".to_string()],
-                code: ValidationResultCode::IncorrectTotal,
+                code: ValidationResultCode::F201,
             }],
             warnings: vec![],
         };
@@ -85,7 +87,7 @@ mod tests {
         let mut result2 = ValidationResults {
             errors: vec![ValidationResult {
                 fields: vec!["field2".to_string()],
-                code: ValidationResultCode::IncorrectTotal,
+                code: ValidationResultCode::F202,
             }],
             warnings: vec![],
         };

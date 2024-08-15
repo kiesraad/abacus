@@ -1,18 +1,19 @@
 #![cfg(test)]
 
-use reqwest::StatusCode;
+use hyper::StatusCode;
 use serde_json::json;
 use sqlx::SqlitePool;
 
 use crate::utils::serve_api;
-use backend::election::{ElectionDetailsResponse, ElectionListResponse};
+use backend::election::{ElectionDetailsResponse, ElectionListResponse, ElectionStatusResponse};
 use backend::polling_station::{
     CandidateVotes, DataEntryRequest, DataEntryResponse, DifferencesCounts, PoliticalGroupVotes,
-    PollingStationResults, VotersCounts, VotesCounts,
+    PollingStationResults, PollingStationStatus, VotersCounts, VotesCounts,
 };
-use backend::validation::ValidationResultCode::IncorrectTotal;
+use backend::validation::ValidationResultCode;
 use backend::ErrorResponse;
 
+mod shared;
 mod utils;
 
 #[sqlx::test(fixtures("../fixtures/elections.sql", "../fixtures/polling_stations.sql"))]
@@ -171,7 +172,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let errors = body.validation_results.errors;
     assert_eq!(errors.len(), 4);
     // error 1
-    assert_eq!(errors[0].code, IncorrectTotal);
+    assert_eq!(errors[0].code, ValidationResultCode::F202);
     assert_eq!(
         errors[0].fields,
         vec![
@@ -182,7 +183,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         ]
     );
     // error 2
-    assert_eq!(errors[1].code, IncorrectTotal);
+    assert_eq!(errors[1].code, ValidationResultCode::F201);
     assert_eq!(
         errors[1].fields,
         vec![
@@ -193,13 +194,13 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         ]
     );
     // error 3
-    assert_eq!(errors[2].code, IncorrectTotal);
+    assert_eq!(errors[2].code, ValidationResultCode::F401);
     assert_eq!(
         errors[2].fields,
         vec!["data.political_group_votes[0].total"]
     );
     // error 4
-    assert_eq!(errors[3].code, IncorrectTotal);
+    assert_eq!(errors[3].code, ValidationResultCode::F204);
     assert_eq!(
         errors[3].fields,
         vec![
@@ -250,4 +251,42 @@ async fn test_election_details_not_found(pool: SqlitePool) {
     // Ensure the response is what we expect
     let status = response.status();
     assert_eq!(status, StatusCode::NOT_FOUND);
+}
+
+#[sqlx::test(fixtures("../fixtures/elections.sql", "../fixtures/polling_stations.sql"))]
+async fn test_election_details_status(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/1/status");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
+    // Ensure the response is what we expect
+    println!("response body: {:?}", &body);
+    assert_eq!(status, StatusCode::OK);
+    assert!(!body.statuses.is_empty());
+    assert_eq!(body.statuses[0].status, PollingStationStatus::Incomplete);
+    assert_eq!(body.statuses[1].status, PollingStationStatus::Incomplete);
+
+    shared::create_and_finalise_data_entry(&addr).await;
+
+    let url = format!("http://{addr}/api/elections/1/status");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
+    // Ensure the response is what we expect:
+    // polling station 1 is now complete, polling station 2 is still incomplete
+    println!("response body: {:?}", &body);
+    assert_eq!(status, StatusCode::OK);
+    assert!(!body.statuses.is_empty());
+    assert_eq!(
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
+        PollingStationStatus::Complete
+    );
+    assert_eq!(
+        body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,
+        PollingStationStatus::Incomplete
+    );
 }

@@ -6,6 +6,7 @@ import {
   IconCheckmark,
   IconDot,
   IconMinus,
+  IconPencil,
   IconWarning,
 } from "@kiesraad/icon";
 import { cn } from "@kiesraad/util";
@@ -34,36 +35,36 @@ export type ProgressListItemProps = {
 };
 
 ProgressList.Item = function ({ active, status, disabled, children }: ProgressListItemProps) {
-  let title = undefined;
-  let icon = <IconArrowNarrowRight />;
-  if (!active) {
-    [title, icon] = renderStatusIcon(status);
-  }
+  const icon = renderStatusIcon(active ? "active" : status);
 
   return (
     <li
       className={cn(active ? "active" : "idle", status, { disabled: !!disabled })}
       aria-current={active ? "step" : false}
     >
-      <aside title={title || undefined}>{icon}</aside>
+      <aside>{icon}</aside>
       <label>{children}</label>
     </li>
   );
 };
 
-function renderStatusIcon(status: MenuStatus): [string | undefined, React.JSX.Element] {
+function renderStatusIcon(status: MenuStatus): React.JSX.Element {
   switch (status) {
+    case "active":
+      return <IconArrowNarrowRight />; // "Actief"
     case "accept":
-      return ["Ingevoerd", <IconCheckmark />];
+      return <IconCheckmark />; // "Ingevoerd"
     case "warning":
-      return ["Ingevoerd, met openstaande waarschuwingen", <IconWarning />];
+      return <IconWarning />; // "Ingevoerd, met openstaande waarschuwingen"
     case "empty":
-      return ["Geen invoer gedaan", <IconMinus />];
+      return <IconMinus />; // "Geen invoer gedaan"
     case "updates":
-      return ["Updates", <IconAsterisk />];
+      return <IconAsterisk />; // "Updates"
     case "current":
-      return ["Huidige invoer", <IconDot />];
+      return <IconDot />; // "Huidige invoer"
+    case "unsaved":
+      return <IconPencil />; // "Niet opgeslagen wijzigingen"
     default:
-      return [undefined, <></>];
+      return <></>;
   }
 }

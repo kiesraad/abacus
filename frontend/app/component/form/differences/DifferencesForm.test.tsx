@@ -243,7 +243,7 @@ describe("Test DifferencesForm", () => {
           errors: [
             {
               fields: ["data.differences_counts.more_ballots_count"],
-              code: "IncorrectDifference",
+              code: "F301",
             },
           ],
           warnings: [],
@@ -260,7 +260,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^IncorrectDifference$/);
+      expect(feedbackError).toHaveTextContent(/^F301$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -271,7 +271,7 @@ describe("Test DifferencesForm", () => {
           errors: [
             {
               fields: ["data.differences_counts.more_ballots_count"],
-              code: "IncorrectDifference",
+              code: "F302",
             },
           ],
           warnings: [],
@@ -288,7 +288,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^IncorrectDifference$/);
+      expect(feedbackError).toHaveTextContent(/^F302$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -299,7 +299,7 @@ describe("Test DifferencesForm", () => {
           errors: [
             {
               fields: ["data.differences_counts.fewer_ballots_count"],
-              code: "IncorrectDifference",
+              code: "F303",
             },
           ],
           warnings: [],
@@ -316,7 +316,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^IncorrectDifference$/);
+      expect(feedbackError).toHaveTextContent(/^F303$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -327,7 +327,7 @@ describe("Test DifferencesForm", () => {
           errors: [
             {
               fields: ["data.differences_counts.fewer_ballots_count"],
-              code: "IncorrectDifference",
+              code: "F304",
             },
           ],
           warnings: [],
@@ -344,7 +344,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^IncorrectDifference$/);
+      expect(feedbackError).toHaveTextContent(/^F304$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -360,7 +360,7 @@ describe("Test DifferencesForm", () => {
                 "data.differences_counts.more_ballots_count",
                 "data.differences_counts.fewer_ballots_count",
               ],
-              code: "ConflictingDifferences",
+              code: "W301",
             },
           ],
           warnings: [],
@@ -377,7 +377,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^ConflictingDifferences$/);
+      expect(feedbackError).toHaveTextContent(/^W301$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -396,7 +396,7 @@ describe("Test DifferencesForm", () => {
                 "data.differences_counts.other_explanation_count",
                 "data.differences_counts.no_explanation_count",
               ],
-              code: "IncorrectTotal",
+              code: "W302",
             },
           ],
         },
@@ -418,7 +418,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^IncorrectTotal$/);
+      expect(feedbackWarning).toHaveTextContent(/^W302$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -437,7 +437,7 @@ describe("Test DifferencesForm", () => {
                 "data.differences_counts.other_explanation_count",
                 "data.differences_counts.no_explanation_count",
               ],
-              code: "IncorrectTotal",
+              code: "W303",
             },
           ],
         },
@@ -459,7 +459,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^IncorrectTotal$/);
+      expect(feedbackWarning).toHaveTextContent(/^W303$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -471,7 +471,7 @@ describe("Test DifferencesForm", () => {
           warnings: [
             {
               fields: ["data.differences_counts.fewer_ballots_count"],
-              code: "NoDifferenceExpected",
+              code: "W304",
             },
             {
               fields: [
@@ -481,7 +481,7 @@ describe("Test DifferencesForm", () => {
                 "data.differences_counts.other_explanation_count",
                 "data.differences_counts.no_explanation_count",
               ],
-              code: "NoDifferenceExpected",
+              code: "W306",
             },
           ],
         },
@@ -503,7 +503,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^NoDifferenceExpectedNoDifferenceExpected$/);
+      expect(feedbackWarning).toHaveTextContent(/^W304W306$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -515,7 +515,7 @@ describe("Test DifferencesForm", () => {
           warnings: [
             {
               fields: ["data.differences_counts.more_ballots_count"],
-              code: "NoDifferenceExpected",
+              code: "W305",
             },
             {
               fields: [
@@ -525,7 +525,7 @@ describe("Test DifferencesForm", () => {
                 "data.differences_counts.other_explanation_count",
                 "data.differences_counts.no_explanation_count",
               ],
-              code: "NoDifferenceExpected",
+              code: "W306",
             },
           ],
         },
@@ -547,7 +547,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^NoDifferenceExpectedNoDifferenceExpected$/);
+      expect(feedbackWarning).toHaveTextContent(/^W305W306$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });

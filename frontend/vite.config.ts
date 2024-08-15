@@ -5,8 +5,9 @@ import { defineConfig } from "vite";
 import pkgjson from "./package.json";
 import tsConfig from "./tsconfig.json";
 
-const apiMode = process.env.API_MODE || "mock";
-const apiHost = process.env.API_HOST || apiMode === "mock" ? "" : "http://localhost:8080";
+const apiMode = process.env.API_MODE ?? "mock";
+const apiHost = process.env.API_HOST ?? (apiMode === "mock" ? "" : "http://localhost:8080");
+const viteHost = process.env.VITE_HOST ?? undefined;
 
 // https://vitejs.dev/config/
 export default defineConfig(() => ({
@@ -47,6 +48,7 @@ export default defineConfig(() => ({
   },
   server: {
     port: 3000,
+    host: viteHost,
     proxy: {
       "/api": {
         target: apiHost,

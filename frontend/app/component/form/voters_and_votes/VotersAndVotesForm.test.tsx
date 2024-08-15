@@ -243,7 +243,7 @@ describe("Test VotersAndVotesForm", () => {
                 "data.voters_counts.proxy_certificate_count",
                 "data.voters_counts.voter_card_count",
               ],
-              code: "IncorrectTotal",
+              code: "F201",
             },
           ],
           warnings: [],
@@ -264,7 +264,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
+      expect(feedbackError).toHaveTextContent(/^F201$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
 
       //TODO: server errors moved out of the form
@@ -282,7 +282,7 @@ describe("Test VotersAndVotesForm", () => {
                 "data.votes_counts.blank_votes_count",
                 "data.votes_counts.invalid_votes_count",
               ],
-              code: "IncorrectTotal",
+              code: "F202",
             },
           ],
           warnings: [],
@@ -303,7 +303,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
+      expect(feedbackError).toHaveTextContent(/^F202$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -319,7 +319,7 @@ describe("Test VotersAndVotesForm", () => {
                 "data.voters_recounts.proxy_certificate_recount",
                 "data.voters_recounts.voter_card_recount",
               ],
-              code: "IncorrectTotal",
+              code: "F203",
             },
           ],
           warnings: [],
@@ -339,7 +339,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^IncorrectTotal$/);
+      expect(feedbackError).toHaveTextContent(/^F203$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       //TODO: server errors moved out of the form
       //expect(screen.queryByTestId("server-feedback-error")).toBeNull();
@@ -384,11 +384,8 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.blank_votes_count",
-                "data.votes_counts.total_votes_cast_count",
-              ],
-              code: "AboveThreshold",
+              fields: ["data.votes_counts.blank_votes_count"],
+              code: "W201",
             },
           ],
         },
@@ -408,7 +405,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^AboveThreshold$/);
+      expect(feedbackWarning).toHaveTextContent(/^W201$/);
       //TODO: server errors moved out of the form
       //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
@@ -420,11 +417,8 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.blank_votes_count",
-                "data.votes_counts.total_votes_cast_count",
-              ],
-              code: "AboveThreshold",
+              fields: ["data.votes_counts.blank_votes_count"],
+              code: "W202",
             },
           ],
         },
@@ -444,7 +438,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^AboveThreshold$/);
+      expect(feedbackWarning).toHaveTextContent(/^W202$/);
       //TODO: server errors moved out of the form
       //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
@@ -457,7 +451,7 @@ describe("Test VotersAndVotesForm", () => {
           warnings: [
             {
               fields: ["data.voters_counts", "data.votes_counts"],
-              code: "EqualInput",
+              code: "W209",
             },
           ],
         },
@@ -482,7 +476,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^EqualInput$/);
+      expect(feedbackWarning).toHaveTextContent(/^W209$/);
       //TODO: server errors moved out of the form
       //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
@@ -495,7 +489,7 @@ describe("Test VotersAndVotesForm", () => {
           warnings: [
             {
               fields: ["data.voters_recounts", "data.votes_counts"],
-              code: "EqualInput",
+              code: "W210",
             },
           ],
         },
@@ -519,7 +513,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^EqualInput$/);
+      expect(feedbackWarning).toHaveTextContent(/^W210$/);
       //TODO: server errors moved out of the form
       //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();

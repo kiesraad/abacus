@@ -73,7 +73,7 @@ export function VotersAndVotesForm() {
       },
       voters_recounts: undefined,
     };
-    const recountForm = document.getElementById("voters_and_votes_recount_section");
+    const recountForm = document.getElementById("recounted_title");
     if (recountForm) {
       values.voters_recounts = {
         poll_card_recount: deformat(elements.poll_card_recount.value),
@@ -246,18 +246,16 @@ export function VotersAndVotesForm() {
             isTotal
           />
         </InputGrid.Body>
-      </InputGrid>
-      {recounted && (
-        <div id="voters_and_votes_recount_section">
-          <h2 id="recounted_title">
-            Toegelaten kiezers na hertelling door gemeentelijk stembureau
-          </h2>
-          <InputGrid key="recounted">
-            <InputGrid.Header>
+        {recounted && (
+          <>
+            <InputGrid.SectionTitleHeader>
+              <h2 id="recounted_title">
+                Toegelaten kiezers na hertelling door gemeentelijk stembureau
+              </h2>
               <th>Veld</th>
               <th>Geteld aantal</th>
               <th>Omschrijving</th>
-            </InputGrid.Header>
+            </InputGrid.SectionTitleHeader>
             <InputGrid.Body>
               <InputGridRow
                 key="A.2"
@@ -301,9 +299,10 @@ export function VotersAndVotesForm() {
                 isTotal
               />
             </InputGrid.Body>
-          </InputGrid>
-        </div>
-      )}
+          </>
+        )}
+      </InputGrid>
+
       <BottomBar type="inputgrid">
         <IgnoreWarningsCheckbox
           id="voters_and_votes_form_ignore_warnings"

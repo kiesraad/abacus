@@ -100,6 +100,10 @@
   }
 }
 
+article#polling-station-choice-form {
+  padding-right: 0;
+}
+
 nav#progress {
   width: 26.5rem;
   padding: 2.5rem 5rem;

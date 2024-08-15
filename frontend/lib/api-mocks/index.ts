@@ -17,6 +17,7 @@ import {
   electionDetailsMockResponse,
   electionListMockResponse,
   electionMockData,
+  electionStatusMockResponse,
   politicalGroupMockData,
 } from "./ElectionMockData";
 import { pollingStationListMockResponse, pollingStationMockData } from "./PollingStationMockData";
@@ -73,6 +74,20 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
   },
 );
 
+export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
+  "/api/elections/:election_id/status",
+  ({ params }) => {
+    const election = electionListMockResponse.elections.find(
+      (e: Election) => e.id.toString() === params.election_id,
+    );
+    if (election) {
+      return HttpResponse.json(electionStatusMockResponse, { status: 200 });
+    } else {
+      return HttpResponse.json({}, { status: 404 });
+    }
+  },
+);
+
 export const pollingStationDataEntryHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
@@ -90,7 +105,7 @@ export const pollingStationDataEntryHandler = http.post<
     };
 
     const {
-      // recounted,
+      recounted,
       voters_counts,
       votes_counts,
       voters_recounts,
@@ -120,7 +135,7 @@ export const pollingStationDataEntryHandler = http.post<
             "data.voters_recounts.voter_card_recount",
             "data.voters_recounts.total_admitted_voters_recount",
           ],
-          code: "IncorrectTotal",
+          code: "F203",
         });
       }
       // if recounted = false
@@ -142,7 +157,7 @@ export const pollingStationDataEntryHandler = http.post<
             "data.voters_counts.voter_card_count",
             "data.voters_counts.total_admitted_voters_count",
           ],
-          code: "IncorrectTotal",
+          code: "F201",
         });
       }
     }
@@ -162,7 +177,7 @@ export const pollingStationDataEntryHandler = http.post<
           "data.votes_counts.blank_votes_count",
           "data.votes_counts.invalid_votes_count",
         ],
-        code: "IncorrectTotal",
+        code: "F202",
       });
     }
 
@@ -175,7 +190,7 @@ export const pollingStationDataEntryHandler = http.post<
     ) {
       response.validation_results.errors.push({
         fields: ["data.differences_counts.more_ballots_count"],
-        code: "IncorrectDifference",
+        code: recounted ? "F302" : "F301",
       });
     }
 
@@ -187,7 +202,7 @@ export const pollingStationDataEntryHandler = http.post<
     ) {
       response.validation_results.errors.push({
         fields: ["data.differences_counts.fewer_ballots_count"],
-        code: "IncorrectDifference",
+        code: recounted ? "F304" : "F303",
       });
     }
 
@@ -202,7 +217,7 @@ export const pollingStationDataEntryHandler = http.post<
           "data.differences_counts.more_ballots_count",
           "data.differences_counts.fewer_ballots_count",
         ],
-        code: "ConflictingDifferences",
+        code: "W301",
       });
     }
 
@@ -225,7 +240,7 @@ export const pollingStationDataEntryHandler = http.post<
           "data.differences_counts.other_explanation_count",
           "data.differences_counts.no_explanation_count",
         ],
-        code: "IncorrectTotal",
+        code: "W302",
       });
     }
 
@@ -248,7 +263,7 @@ export const pollingStationDataEntryHandler = http.post<
           "data.differences_counts.other_explanation_count",
           "data.differences_counts.no_explanation_count",
         ],
-        code: "IncorrectTotal",
+        code: "W303",
       });
     }
 
@@ -261,13 +276,13 @@ export const pollingStationDataEntryHandler = http.post<
       if (differences_counts.more_ballots_count != 0) {
         response.validation_results.warnings.push({
           fields: ["data.differences_counts.more_ballots_count"],
-          code: "NoDifferenceExpected",
+          code: recounted ? "W305" : "W304",
         });
       }
       if (differences_counts.fewer_ballots_count != 0) {
         response.validation_results.warnings.push({
           fields: ["data.differences_counts.fewer_ballots_count"],
-          code: "NoDifferenceExpected",
+          code: recounted ? "W305" : "W304",
         });
       }
     }
@@ -289,7 +304,7 @@ export const pollingStationDataEntryHandler = http.post<
           "data.differences_counts.other_explanation_count",
           "data.differences_counts.no_explanation_count",
         ],
-        code: "NoDifferenceExpected",
+        code: "W306",
       });
     }
 
@@ -302,7 +317,7 @@ export const pollingStationDataEntryHandler = http.post<
       if (sum !== pg.total) {
         response.validation_results.errors.push({
           fields: [`data.political_group_votes[${pg.number - 1}].total`],
-          code: "IncorrectTotal",
+          code: "F401",
         });
       }
     });
@@ -311,7 +326,7 @@ export const pollingStationDataEntryHandler = http.post<
     if (votes_counts.votes_candidates_counts !== candidateVotesSum) {
       response.validation_results.errors.push({
         fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
-        code: "IncorrectTotal",
+        code: "F204",
       });
     }
 
@@ -349,6 +364,7 @@ export const handlers: HttpHandler[] = [
   pingHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
+  ElectionStatusRequestHandler,
   pollingStationDataEntryHandler,
   PollingStationListRequestHandler,
 ];

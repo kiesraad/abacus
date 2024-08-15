@@ -32,7 +32,7 @@ export function addValidationResultToFormState(
         break;
       case "political_group_votes":
         if (index !== undefined) {
-          const sectionKey = `political_group_votes_${index}` as FormSectionID;
+          const sectionKey = `political_group_votes_${index + 1}` as FormSectionID;
           const section = formState.sections[sectionKey];
           if (section) {
             section[target].push(clientValidationResult);
@@ -126,7 +126,7 @@ export function toClientValidationResult(
 ): ClientValidationResult {
   const result: ClientValidationResult = { ...validationResult };
   switch (validationResult.code) {
-    case "IncorrectTotal":
+    case "F401":
       result.isGlobal = true;
       break;
     default:

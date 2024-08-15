@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 
 import { MockTest } from "app/component/MockTest";
+import { NavBar } from "app/component/navbar/NavBar.tsx";
 
 export function DevHomePage() {
   return (
     <div className="app-layout">
-      <nav></nav>
+      <NavBar />
       <div style={{ padding: "32px" }}>
         <h1>Abacus 🧮</h1>
 

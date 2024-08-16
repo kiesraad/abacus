@@ -55,7 +55,7 @@ export function InputHomePage() {
         </Alert>
       )}
       <main>
-        <article>
+        <article id="polling-station-choice-form">
           <PollingStationChoiceForm />
         </article>
         <nav id="progress">

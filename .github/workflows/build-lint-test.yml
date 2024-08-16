@@ -47,6 +47,10 @@ jobs:
         run: cargo --verbose --locked test
       - name: Build
         run: cargo --verbose --locked build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-build
+          path: backend/target/debug/api
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
@@ -69,9 +73,15 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
   playwright:
     name: Playwright
-    needs: frontend
+    needs:
+        - backend
+        - frontend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -90,3 +100,17 @@ jobs:
         run: npm run e2e:lib-ui
       - name: e2e test - app
         run: npm run e2e:app
+      - name: Download frontend-build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: builds/frontend
+      - name: Download backend-build
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-build
+          path: builds/backend
+      - name: make backend build executable
+        run: chmod a+x ../builds/backend/api
+      - name: e2e test - d2d
+        run: npm run e2e:d2d

@@ -25,9 +25,7 @@
     section {
       display: flex;
       align-items: center;
-      > *:not(:last-child) {
-        margin-right: 1rem;
-      }
+      gap: 2rem;
     }
   }
 
@@ -76,6 +74,10 @@
     font-size: 0.875rem;
     line-height: 1.25rem;
   }
+}
+
+article#polling-station-choice-form {
+  padding-right: 0;
 }
 
 nav#progress {

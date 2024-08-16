@@ -10,7 +10,7 @@ use backend::polling_station::{
     CandidateVotes, DataEntryRequest, DataEntryResponse, DifferencesCounts, PoliticalGroupVotes,
     PollingStationResults, PollingStationStatus, VotersCounts, VotesCounts,
 };
-use backend::validation::ValidationResultCode::IncorrectTotal;
+use backend::validation::ValidationResultCode;
 use backend::ErrorResponse;
 
 mod shared;
@@ -172,7 +172,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let errors = body.validation_results.errors;
     assert_eq!(errors.len(), 4);
     // error 1
-    assert_eq!(errors[0].code, IncorrectTotal);
+    assert_eq!(errors[0].code, ValidationResultCode::F202);
     assert_eq!(
         errors[0].fields,
         vec![
@@ -183,7 +183,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         ]
     );
     // error 2
-    assert_eq!(errors[1].code, IncorrectTotal);
+    assert_eq!(errors[1].code, ValidationResultCode::F201);
     assert_eq!(
         errors[1].fields,
         vec![
@@ -194,13 +194,13 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         ]
     );
     // error 3
-    assert_eq!(errors[2].code, IncorrectTotal);
+    assert_eq!(errors[2].code, ValidationResultCode::F401);
     assert_eq!(
         errors[2].fields,
         vec!["data.political_group_votes[0].total"]
     );
     // error 4
-    assert_eq!(errors[3].code, IncorrectTotal);
+    assert_eq!(errors[3].code, ValidationResultCode::F204);
     assert_eq!(
         errors[3].fields,
         vec![

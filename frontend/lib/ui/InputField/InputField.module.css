@@ -23,7 +23,7 @@
     font-style: normal;
     line-height: 1.5rem;
     &:global(.label) {
-      color: var(--gray-900);
+      color: var(--text-color-header);
       font-weight: bold;
     }
     &:global(.subtext) {

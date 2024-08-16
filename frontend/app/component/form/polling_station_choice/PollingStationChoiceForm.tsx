@@ -78,13 +78,11 @@ export function PollingStationChoiceForm() {
       </BottomBar>
       <details>
         <summary>
-          <p>
-            Weet je het nummer niet?
-            <br />
-            <span id="openPollingStationList" className="underlined pointer">
-              Bekijk de lijst met alle stembureaus
-            </span>
-          </p>
+          Weet je het nummer niet?
+          <br />
+          <span id="openPollingStationList" className="underlined pointer">
+            Bekijk de lijst met alle stembureaus
+          </span>
         </summary>
         <h2 className="form_title table_title">Kies het stembureau</h2>
         {(() => {

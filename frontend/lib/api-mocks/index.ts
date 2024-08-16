@@ -353,6 +353,13 @@ export const pollingStationDataEntryHandler = http.post<
   }
 });
 
+// delete data entry handler
+export const pollingStationDataEntryDeleteHandler = http.delete<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>
+>("/api/polling_stations/:polling_station_id/data_entries/:entry_number", () => {
+  return HttpResponse.text(null, { status: 204 });
+});
+
 export const PollingStationListRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id/polling_stations",
   () => {
@@ -367,4 +374,5 @@ export const handlers: HttpHandler[] = [
   ElectionStatusRequestHandler,
   pollingStationDataEntryHandler,
   PollingStationListRequestHandler,
+  pollingStationDataEntryDeleteHandler,
 ];

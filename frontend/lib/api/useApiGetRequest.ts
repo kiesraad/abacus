@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { ApiResponseErrorData } from "./ApiClient";
+import { ApiResponseErrorData, ApiResponseStatus } from "./ApiClient";
 import { ErrorResponse } from "./gen/openapi";
 import { useApi } from "./useApi";
 
@@ -24,7 +24,7 @@ export function useApiGetRequest<DATA>(path: string): UseApiGetRequestReturn<DAT
     const doRequest = async (path: string) => {
       if (isSubscribed) {
         const response = await client.getRequest<DATA>(path);
-        if (response.status === "success") {
+        if (response.status === ApiResponseStatus.Success) {
           setData(response.data as DATA);
         } else {
           setError({

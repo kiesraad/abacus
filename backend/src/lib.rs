@@ -5,7 +5,7 @@ use axum::extract::rejection::JsonRejection;
 use axum::extract::FromRef;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post};
+use axum::routing::{delete, get, post};
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
@@ -31,6 +31,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route(
             "/:polling_station_id/data_entries/:entry_number",
             post(polling_station::polling_station_data_entry),
+        )
+        .route(
+            "/:polling_station_id/data_entries/:entry_number",
+            delete(polling_station::polling_station_data_entry_delete),
         )
         .route(
             "/:polling_station_id/data_entries/:entry_number/finalise",
@@ -73,6 +77,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             election::election_status,
             polling_station::polling_station_list,
             polling_station::polling_station_data_entry,
+            polling_station::polling_station_data_entry_delete,
             polling_station::polling_station_data_entry_finalise,
         ),
         components(

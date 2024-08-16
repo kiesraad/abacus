@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from "vitest";
 
 import { overrideOnce } from "app/test/unit";
 
-import { ApiClient } from "./ApiClient";
+import { ApiClient, ApiResponseStatus } from "./ApiClient";
 
 describe("ApiClient", () => {
   test("200 response is parsed as success", async () => {
@@ -13,7 +13,11 @@ describe("ApiClient", () => {
       data: null,
     });
 
-    expect(parsedResponse).toStrictEqual({ status: "success", code: 200, data: { fizz: "buzz" } });
+    expect(parsedResponse).toStrictEqual({
+      status: ApiResponseStatus.Success,
+      code: 200,
+      data: { fizz: "buzz" },
+    });
   });
 
   test("422 response is parsed as client error", async () => {
@@ -25,7 +29,11 @@ describe("ApiClient", () => {
       data: null,
     });
 
-    expect(parsedResponse).toStrictEqual({ status: "client_error", code: 422, data: responseBody });
+    expect(parsedResponse).toStrictEqual({
+      status: ApiResponseStatus.ClientError,
+      code: 422,
+      data: responseBody,
+    });
   });
 
   test("500 response is parsed as server error", async () => {
@@ -37,7 +45,11 @@ describe("ApiClient", () => {
       data: null,
     });
 
-    expect(parsedResponse).toStrictEqual({ status: "server_error", code: 500, data: responseBody });
+    expect(parsedResponse).toStrictEqual({
+      status: ApiResponseStatus.ServerError,
+      code: 500,
+      data: responseBody,
+    });
   });
 
   test("318 response throws an error", async () => {
@@ -57,11 +69,15 @@ describe("ApiClient", () => {
     const client = new ApiClient("testhost");
     const parsedResponse = await client.getRequest("/api/test/1");
 
-    expect(parsedResponse).toStrictEqual({ status: "success", code: 200, data: { fizz: "buzz" } });
+    expect(parsedResponse).toStrictEqual({
+      status: ApiResponseStatus.Success,
+      code: 200,
+      data: { fizz: "buzz" },
+    });
   });
 
   test("Invalid server response throws an error", async () => {
-    overrideOnce("get", "/api/test/1", 200, "invalid json");
+    overrideOnce("get", "/api/test/1", 200, "invalid");
 
     const client = new ApiClient("testhost");
 
@@ -69,22 +85,19 @@ describe("ApiClient", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     await expect(async () => client.getRequest("/api/test/1")).rejects.toThrowError(
-      "Server response parse error: 200",
+      "Unexpected data from server: invalid",
     );
 
-    expect(console.error).toHaveBeenCalledWith(
-      "Server response parse error:",
-      expect.any(SyntaxError),
-    );
+    expect(console.error).toHaveBeenCalledWith("Unexpected data from server:", expect.any(String));
   });
 
   test("Unexpected status code throws an error", async () => {
-    overrideOnce("get", "/api/test/1", 201, { fizz: "buzz" });
+    overrideOnce("get", "/api/test/1", 301, { fizz: "buzz" });
 
     const client = new ApiClient("testhost");
 
     await expect(async () => client.getRequest("/api/test/1")).rejects.toThrowError(
-      "Unexpected response status: 201",
+      "Unexpected response status: 301",
     );
   });
 });

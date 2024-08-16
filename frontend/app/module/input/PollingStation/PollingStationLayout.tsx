@@ -1,28 +1,15 @@
-import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
+import { AbortDataEntryControl } from "app/module/input/PollingStation/AbortDataEntryControl.tsx";
 
 import { PollingStationFormController, useElection, usePollingStation } from "@kiesraad/api";
-import { IconCross } from "@kiesraad/icon";
-import {
-  Badge,
-  Button,
-  Modal,
-  PageTitle,
-  PollingStationNumber,
-  WorkStationNumber,
-} from "@kiesraad/ui";
+import { Badge, PageTitle, PollingStationNumber, WorkStationNumber } from "@kiesraad/ui";
 
 export function PollingStationLayout() {
   const { election } = useElection();
   const { pollingStationId } = useParams();
   const { pollingStation, loading } = usePollingStation(pollingStationId);
-  const [openModal, setOpenModal] = useState(false);
-
-  function changeDialog() {
-    setOpenModal(!openModal);
-  }
 
   if (loading) {
     return null;
@@ -46,9 +33,7 @@ export function PollingStationLayout() {
           <Badge type="first_entry" />
         </section>
         <section>
-          <Button variant="secondary" size="sm" onClick={changeDialog} rightIcon={<IconCross />}>
-            Invoer afbreken
-          </Button>
+          <AbortDataEntryControl />
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
@@ -60,24 +45,6 @@ export function PollingStationLayout() {
           <Outlet />
         </article>
       </main>
-      {openModal && (
-        <Modal onClose={changeDialog}>
-          <h2>Wat wil je doen met je invoer?</h2>
-          <p>
-            Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de
-            invoer die je al hebt gedaan bewaren.
-            <br />
-            <br />
-            Twijfel je? Overleg dan met de coördinator.
-          </p>
-          <nav>
-            <Button size="lg">Invoer bewaren</Button>
-            <Button size="lg" variant="secondary">
-              Niet bewaren
-            </Button>
-          </nav>
-        </Modal>
-      )}
     </PollingStationFormController>
   );
 }

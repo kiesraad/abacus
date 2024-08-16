@@ -10,11 +10,11 @@ export function OverviewLayout() {
   return (
     <div className="app-layout">
       <PageTitle title="Overzicht verkiezingen - Abacus" />
-      <NavBar />
       <ElectionListProvider>
+        <NavBar />
         <Outlet />
+        <Footer />
       </ElectionListProvider>
-      <Footer />
     </div>
   );
 }

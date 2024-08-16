@@ -353,13 +353,18 @@ export const electionListMockResponse: ElectionListResponse = {
   ],
 };
 
-const electionMockData = electionListMockResponse.elections[0] as Election;
-electionMockData.political_groups = politicalGroupsMockData;
-export { electionMockData };
-
-export const electionDetailsMockResponse: ElectionDetailsResponse = {
-  election: electionMockData,
+export const getElectionMockData = (election_id: number): Required<ElectionDetailsResponse> => {
+  const election = electionListMockResponse.elections.find((e) => e.id === election_id);
+  if (!election) {
+    throw new Error(`Election with id ${election_id} not found`);
+  }
+  election.political_groups = politicalGroupsMockData;
+  return { election: election };
 };
+
+export const electionDetailsMockResponse: Required<ElectionDetailsResponse> =
+  getElectionMockData(1);
+export const electionMockData = electionDetailsMockResponse.election as Required<Election>;
 
 export const electionStatusMockResponse: ElectionStatusResponse = {
   statuses: [

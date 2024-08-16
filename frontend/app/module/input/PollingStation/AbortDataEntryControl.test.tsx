@@ -6,7 +6,11 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { overrideOnce, render, screen, server } from "app/test/unit";
 
 import { ElectionProvider, PollingStationFormController } from "@kiesraad/api";
-import { electionMock, electionMockResponse, pollingStationMock } from "@kiesraad/api-mocks";
+import {
+  electionDetailsMockResponse,
+  electionMockData,
+  pollingStationMockData,
+} from "@kiesraad/api-mocks";
 
 import { AbortDataEntryControl } from "./AbortDataEntryControl.tsx";
 
@@ -16,8 +20,8 @@ const renderAbortDataEntryControl = () => {
   render(
     <ElectionProvider electionId={1}>
       <PollingStationFormController
-        election={electionMock}
-        pollingStationId={pollingStationMock.id}
+        election={electionMockData}
+        pollingStationId={pollingStationMockData.id}
         entryNumber={1}
       >
         <AbortDataEntryControl />
@@ -28,7 +32,7 @@ const renderAbortDataEntryControl = () => {
 
 describe("Test AbortDataEntryControl", () => {
   beforeEach(() => {
-    overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
+    overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
     vi.spyOn(router, "useNavigate").mockImplementation(() => mockNavigate);
   });
 

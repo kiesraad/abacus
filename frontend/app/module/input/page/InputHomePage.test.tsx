@@ -3,13 +3,13 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { overrideOnce, render, screen, server, within } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
-import { electionMock, electionMockResponse } from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
 
 import { InputHomePage } from "./InputHomePage";
 
 describe("InputHomePage", () => {
   beforeEach(() => {
-    overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
+    overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
     render(
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
@@ -24,7 +24,12 @@ describe("InputHomePage", () => {
   });
 
   test("Election name", async () => {
-    expect(await screen.findByRole("heading", { level: 1, name: electionMock.name }));
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: electionDetailsMockResponse.election.name,
+      }),
+    );
 
     // Check if the navigation bar displays the correct information
     const nav = await screen.findByRole("navigation", { name: /primary-navigation/i });
@@ -36,7 +41,12 @@ describe("InputHomePage", () => {
 
   test("Finish input not visible when not finished", async () => {
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: electionMock.name }));
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: electionDetailsMockResponse.election.name,
+      }),
+    );
 
     // Test that the message doesn't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).toBeNull();

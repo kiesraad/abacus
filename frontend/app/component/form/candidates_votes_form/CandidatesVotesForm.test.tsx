@@ -9,17 +9,21 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
 } from "@kiesraad/api";
-import { electionMock, politicalGroupMock, pollingStationMock } from "@kiesraad/api-mocks";
+import {
+  electionMockData,
+  politicalGroupMockData,
+  pollingStationMockData,
+} from "@kiesraad/api-mocks";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 const Component = (
   <PollingStationFormController
-    pollingStationId={pollingStationMock.id}
+    election={electionMockData}
+    pollingStationId={pollingStationMockData.id}
     entryNumber={1}
-    election={electionMock}
   >
-    <CandidatesVotesForm group={politicalGroupMock} />
+    <CandidatesVotesForm group={politicalGroupMockData} />
   </PollingStationFormController>
 );
 
@@ -48,7 +52,7 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
       other_explanation_count: 0,
       no_explanation_count: 0,
     },
-    political_group_votes: electionMock.political_groups.map((group) => ({
+    political_group_votes: electionMockData.political_groups.map((group) => ({
       number: group.number,
       total: 0,
       candidate_votes: group.candidates.map((candidate) => ({
@@ -211,9 +215,9 @@ describe("Test CandidatesVotesForm", () => {
 
       const Component = (
         <PollingStationFormController
-          pollingStationId={pollingStationMock.id}
-          entryNumber={1}
           election={electionMockData}
+          pollingStationId={pollingStationMockData.id}
+          entryNumber={1}
         >
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>

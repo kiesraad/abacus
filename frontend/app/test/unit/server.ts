@@ -5,7 +5,7 @@
  *
  * Copyright Oxide Computer Company
  */
-import { http, HttpResponse } from "msw";
+import { http, HttpResponse, JsonBodyType } from "msw";
 import { setupServer } from "msw/node";
 
 import { handlers } from "@kiesraad/api-mocks";
@@ -23,7 +23,7 @@ export function overrideOnce(
   method: keyof typeof http,
   path: string,
   status: number,
-  body: string | null | Record<string, unknown>,
+  body: string | null | JsonBodyType,
 ) {
   server.use(
     http[method](

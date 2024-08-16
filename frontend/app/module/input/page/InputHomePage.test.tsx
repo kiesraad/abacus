@@ -3,12 +3,12 @@ import { describe, expect, test } from "vitest";
 import { overrideOnce, render, screen } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
-import { electionMock, electionMockResponse } from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
 
 import { InputHomePage } from "./InputHomePage";
 
 describe("InputHomePage", () => {
-  overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
+  overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
   test("Election name", async () => {
     render(
       <ElectionProvider electionId={1}>
@@ -18,7 +18,7 @@ describe("InputHomePage", () => {
       </ElectionProvider>,
     );
 
-    expect(await screen.findByText(electionMock.name));
+    expect(await screen.findByText(electionDetailsMockResponse.election.name)).toBeVisible();
   });
 
   test("Finish input not visible when not finished", async () => {

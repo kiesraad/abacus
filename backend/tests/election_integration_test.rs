@@ -290,3 +290,28 @@ async fn test_election_details_status(pool: SqlitePool) {
         PollingStationStatus::Incomplete
     );
 }
+
+#[sqlx::test(fixtures("../fixtures/elections.sql"))]
+async fn test_election_pdf_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/1/download_results");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let content_disposition = response.headers().get("Content-Disposition");
+    let content_type = response.headers().get("Content-Type");
+
+    // Ensure the response is what we expect
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "application/pdf");
+
+    // Check if the first 21 characters compare
+    let content_disposition_string = content_disposition
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_lowercase();
+    assert_eq!(&content_disposition_string[..21], "attachment; filename=");
+    // But the header should also contain ".pdf"
+    assert!(content_disposition_string.contains(".pdf"));
+}

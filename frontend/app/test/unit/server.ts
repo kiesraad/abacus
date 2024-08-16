@@ -23,16 +23,18 @@ export function overrideOnce(
   method: keyof typeof http,
   path: string,
   status: number,
-  body: string | JsonBodyType,
+  body: string | null | JsonBodyType,
 ) {
   server.use(
     http[method](
       `http://testhost${path}`,
       () => {
         // https://mswjs.io/docs/api/response/once
-        return typeof body === "string"
-          ? new HttpResponse(body, { status })
-          : HttpResponse.json(body, { status });
+        if (typeof body === "string" || body === null) {
+          return new HttpResponse(body, { status });
+        } else {
+          return HttpResponse.json(body, { status });
+        }
       },
       { once: true },
     ),

@@ -118,6 +118,21 @@ impl PollingStationDataEntries {
         res.data.ok_or_else(|| sqlx::Error::RowNotFound)
     }
 
+    pub async fn delete(&self, id: u32, entry_number: u8) -> Result<(), sqlx::Error> {
+        let res = query!(
+            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
+            id,
+            entry_number
+        )
+        .execute(&self.0)
+        .await?;
+        if res.rows_affected() == 0 {
+            Err(sqlx::Error::RowNotFound)
+        } else {
+            Ok(())
+        }
+    }
+
     pub async fn finalise(
         &self,
         tx: &mut Transaction<'_, Sqlite>,

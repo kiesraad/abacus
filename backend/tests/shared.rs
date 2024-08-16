@@ -8,8 +8,8 @@ use backend::polling_station::{
 };
 use hyper::StatusCode;
 
-pub async fn create_and_finalise_data_entry(addr: &SocketAddr) {
-    let request_body = DataEntryRequest {
+pub fn example_data_entry() -> DataEntryRequest {
+    DataEntryRequest {
         data: PollingStationResults {
             recounted: false,
             voters_counts: VotersCounts {
@@ -49,7 +49,11 @@ pub async fn create_and_finalise_data_entry(addr: &SocketAddr) {
                 ],
             }],
         },
-    };
+    }
+}
+
+pub async fn create_and_finalise_data_entry(addr: &SocketAddr) {
+    let request_body = example_data_entry();
 
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
     let response = reqwest::Client::new()

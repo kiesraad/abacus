@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm";
@@ -11,11 +10,6 @@ export function InputHomePage() {
   const navigate = useNavigate();
   const { election } = useElection();
   const { statuses } = useElectionStatus();
-  const [showAlert, setShowAlert] = useState(true);
-
-  function hideAlert() {
-    setShowAlert(!showAlert);
-  }
 
   function finishInput() {
     navigate("/");
@@ -36,22 +30,16 @@ export function InputHomePage() {
         </section>
       </header>
       {statuses.every((s) => s.status === "Complete") && (
-        <Alert type="success" onClose={hideAlert}>
+        <Alert type="success">
           <h2>Alle stembureaus zijn twee keer ingevoerd</h2>
           <p>
             De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de
             uitslag nu definitief maken en het proces verbaal opmaken. Doe dit alleen als er vandaag
             niks meer herteld hoeft te worden.
           </p>
-          <Button onClick={finishInput}>Invoer afronden</Button>
-        </Alert>
-      )}
-      {showAlert && (
-        <Alert type="success" onClose={hideAlert}>
-          <h2>Je account is ingesteld</h2>
-          <p>
-            Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.
-          </p>
+          <Button onClick={finishInput} size="md">
+            Invoer afronden
+          </Button>
         </Alert>
       )}
       <main>

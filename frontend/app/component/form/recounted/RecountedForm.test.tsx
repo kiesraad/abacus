@@ -153,10 +153,7 @@ describe("Test RecountedForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
-
-    expect(screen.queryByTestId("result")).not.toBeNull();
-    expect(screen.queryByTestId("result")).toHaveTextContent(/^422 error from mock$/);
+    expect(feedbackServerError).toHaveTextContent(`Server error: 422 error from mock`);
   });
 
   test("500 response results in display of error message", async () => {
@@ -175,10 +172,7 @@ describe("Test RecountedForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
-
-    expect(screen.queryByTestId("result")).not.toBeNull();
-    expect(screen.queryByTestId("result")).toHaveTextContent(/^500 error from mock$/);
+    expect(feedbackServerError).toHaveTextContent(`Server error500_ERROR: 500 error from mock`);
   });
 
   describe("RecountedForm errors", () => {
@@ -200,8 +194,12 @@ describe("Test RecountedForm", () => {
 
       await user.click(submitButton);
 
-      const validationError = screen.getByText("Controleer het papieren proces-verbaal");
-      expect(validationError).toBeVisible();
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(
+        `Controleer het papieren proces-verbaalF.101Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinatorGeen vinkje? Kies dan 'nee'.`,
+      );
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
   });
 });

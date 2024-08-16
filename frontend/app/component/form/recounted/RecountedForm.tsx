@@ -75,24 +75,14 @@ export function RecountedForm() {
       {/* Temporary while not navigating through form sections */}
       {success && <div id="result">Success</div>}
       <h2>Is er herteld?</h2>
-      {serverError && (
-        <Feedback type="error" title="Error">
-          <div id="feedback-server-error">
-            <h2>Error</h2>
-            <p id="result">{serverError.message}</p>
-          </div>
-        </Feedback>
-      )}
+      {serverError && <Feedback id="feedback-server-error" type="error" data={serverError} />}
       {hasValidationError && (
-        <Feedback type="error" title="Controleer het papieren proces-verbaal" code="F.101">
-          <div>
-            Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?
-            <ul>
-              <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
-              <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
-              <li>Geen vinkje? Kies dan 'nee'.</li>
-            </ul>
-          </div>
+        <Feedback id="feedback-error" type="error" data={["F101"]}>
+          <ul>
+            <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
+            <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
+            <li>Geen vinkje? Kies dan 'nee'.</li>
+          </ul>
         </Feedback>
       )}
       <p className="form-paragraph md">

@@ -219,7 +219,7 @@ describe("Test DifferencesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
+      expect(feedbackServerError).toHaveTextContent(`Server error: 422 error from mock`);
     });
 
     test("500 response results in display of error message", async () => {
@@ -234,7 +234,7 @@ describe("Test DifferencesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
+      expect(feedbackServerError).toHaveTextContent(`Server error: 500 error from mock`);
     });
   });
 
@@ -262,7 +262,9 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F301$/);
+      expect(feedbackError).toHaveTextContent(
+        `Controleer I (stembiljetten meer geteld)F.301Je hebt bij Aantal kiezers en stemmers ingevuld dat er meer stemmen dan kiezers waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het aantal meer getelde stembiljetten.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -290,7 +292,9 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F302$/);
+      expect(feedbackError).toHaveTextContent(
+        `Controleer J (stembiljetten minder geteld)F.302Je hebt bij Aantal kiezers en stemmers ingevuld dat er meer stemmen dan kiezers waren. Daarom mag J niet ingevuld zijn.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -318,7 +322,9 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F303$/);
+      expect(feedbackError).toHaveTextContent(
+        `Controleer J (stembiljetten minder geteld)F.303Je hebt bij Aantal kiezers en stemmers ingevuld dat er minder stemmen dan kiezers waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het aantal minder getelde stembiljetten.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -346,7 +352,9 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F304$/);
+      expect(feedbackError).toHaveTextContent(
+        `Controleer I (stembiljetten meer geteld)F.304Je hebt bij Aantal kiezers en stemmers ingevuld dat er minder stemmen dan kiezers waren. Daarom mag I niet ingevuld zijn.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -387,7 +395,9 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-error");
-      expect(feedbackWarning).toHaveTextContent(/^F305$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer ingevulde verschillenF.305Je hebt bij Aantal kiezers en stemmers ingevuld dat er evenveel stemmen als kiezers waren. Maar je hebt wel verschillen ingevuld.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -430,7 +440,9 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W301$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer ingevulde verschillenW.301De invoer bij I, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -471,7 +483,9 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W302$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer ingevulde verschillenW.302De invoer bij J, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });

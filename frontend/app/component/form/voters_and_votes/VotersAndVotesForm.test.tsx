@@ -213,10 +213,7 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
-
-      expect(screen.queryByTestId("result")).not.toBeNull();
-      expect(screen.queryByTestId("result")).toHaveTextContent(/^422 error from mock$/);
+      expect(feedbackServerError).toHaveTextContent(`Server error: 422 error from mock`);
     });
 
     test("500 response results in display of error message", async () => {
@@ -232,10 +229,7 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
-
-      expect(screen.queryByTestId("result")).not.toBeNull();
-      expect(screen.queryByTestId("result")).toHaveTextContent(/^500 error from mock$/);
+      expect(feedbackServerError).toHaveTextContent(`Server error500_ERROR: 500 error from mock`);
     });
   });
 
@@ -272,7 +266,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F201$/);
+      expect(feedbackError).toHaveTextContent(
+        `Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -309,7 +305,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F202$/);
+      expect(feedbackError).toHaveTextContent(
+        `Controleer uitgebrachte stemmenF.202De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -345,7 +343,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F203$/);
+      expect(feedbackError).toHaveTextContent(
+        `Controleer hertelde toegelaten kiezersF.203De invoer bij A.2, B.2, C.2 of D.2 klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -410,7 +410,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W201$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
@@ -442,7 +444,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W202$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
@@ -479,7 +483,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W209$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer E t/m H en A t/m DW.209De getallen bij E t/m H zijn precies hetzelfde als A t/m D.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
@@ -515,7 +521,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W210$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer E t/m H en A.2 t/m D.2W.210De getallen bij E t/m H zijn precies hetzelfde als A.2 t/m D.2.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });

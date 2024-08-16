@@ -1,40 +1,70 @@
 import type { Story } from "@ladle/react";
 
-import { AlertType } from "../ui.types";
+import { ClientValidationResultCode } from "@kiesraad/ui";
+
+import { AlertType, FeedbackId } from "../ui.types";
 import { Feedback } from "./Feedback";
 
 type Props = {
-  title: string;
+  id: FeedbackId;
   type: AlertType;
-  code?: string;
+  data: ClientValidationResultCode[];
 };
 
-export const DefaultFeedback: Story<Props> = ({ title, type, code }) => (
-  <Feedback title={title} type={type} code={code}>
-    <p>
-      De invoer bij E, F, G of H lijkt niet te kloppen. Check of je het papieren proces verbaal goed
-      hebt overgenomen.
-    </p>
-    <ul>
-      <li>Heb je iets niet goed overgenomen? Herstel de fout en ga verder.</li>
-      <li>
-        Heb je alles gecontroleerd en komt je invoer overeen met het papier? Overleg dan met de
-        coördinator.
-      </li>
-    </ul>
-  </Feedback>
+export const SingleError: Story = () => {
+  return <Feedback id="feedback-error" type="error" data={["F202"]} />;
+};
+
+export const SingleErrorWithCustomAction: Story = () => {
+  return (
+    <Feedback id="feedback-error" type="error" data={["F101"]}>
+      <ul>
+        <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
+        <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
+        <li>Geen vinkje? Kies dan 'nee'.</li>
+      </ul>
+    </Feedback>
+  );
+};
+
+export const MultipleErrors: Story = () => {
+  return <Feedback id="feedback-error" type="error" data={["F201", "F202"]} />;
+};
+
+export const SingleWarning: Story = () => {
+  return <Feedback id="feedback-warning" type="warning" data={["W202"]} />;
+};
+
+export const MultipleWarnings: Story = () => {
+  return <Feedback id="feedback-warning" type="warning" data={["W201", "W202"]} />;
+};
+
+export const SingleServerError: Story = () => {
+  return (
+    <Feedback
+      id="feedback-server-error"
+      type="error"
+      data={{ errorCode: 500, message: "Internal Server Error" }}
+    />
+  );
+};
+
+export const CustomizableFeedback: Story<Props> = ({ id, type, data }) => (
+  <Feedback id={id} type={type} data={data} />
 );
 
-export default {
-  args: {
-    title: "Controleer pagina 1 van het proces verbaal",
-    code: "F.201",
+CustomizableFeedback.args = {
+  data: ["F101", "F201", "F202"],
+};
+CustomizableFeedback.argTypes = {
+  id: {
+    options: ["feedback-error", "feedback-warning", "feedback-server-error"],
+    control: { type: "radio" },
+    defaultValue: "feedback-error",
   },
-  argTypes: {
-    type: {
-      options: ["error", "warning"],
-      control: { type: "radio" },
-      defaultValue: "error",
-    },
+  type: {
+    options: ["error", "warning"],
+    control: { type: "inline-radio" },
+    defaultValue: "error",
   },
 };

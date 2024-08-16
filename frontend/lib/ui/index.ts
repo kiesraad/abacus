@@ -4,7 +4,7 @@ export * from "./Alert/Alert";
 export * from "./Badge";
 export * from "./BottomBar/BottomBar";
 export * from "./Button/Button";
-export * from "./Feedback/Feedback";
+export * from "./Feedback";
 export * from "./FormField/FormField";
 export * from "./Frame/AppFrame";
 export * from "./Icon/Icon";

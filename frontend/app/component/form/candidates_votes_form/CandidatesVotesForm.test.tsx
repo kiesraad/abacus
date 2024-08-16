@@ -300,7 +300,7 @@ describe("Test CandidatesVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
+      expect(feedbackServerError).toHaveTextContent(`Server error: 422 error from mock`);
     });
 
     test("500 response results in display of error message", async () => {
@@ -316,7 +316,7 @@ describe("Test CandidatesVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
       const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
+      expect(feedbackServerError).toHaveTextContent(`Server error500_ERROR: 500 error from mock`);
     });
   });
 
@@ -345,39 +345,11 @@ describe("Test CandidatesVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F401$/);
+      expect(feedbackError).toHaveTextContent(
+        `Controleer ingevoerde aantallenF.401De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
-    });
-  });
-
-  describe("CandidatesVotesForm warnings", () => {
-    test("Warnings can be displayed", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [],
-          warnings: [
-            {
-              fields: ["data.political_group_votes[0].total"],
-              code: "NotAnActualWarning",
-            },
-          ],
-        },
-      });
-
-      const user = userEvent.setup();
-
-      render(Component);
-
-      // Since no warnings exist for the fields on this page,
-      // not inputting any values and just clicking submit.
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
-      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
   });
 });

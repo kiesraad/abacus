@@ -1,7 +1,7 @@
 import { Outlet, useParams } from "react-router-dom";
 
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
-import { AbortDataEntryControl } from "app/module/input/PollingStation/AbortDataEntryControl.tsx";
+import { AbortDataEntryControl } from "app/module/input/PollingStation/AbortDataEntryControl";
 
 import { PollingStationFormController, useElection, usePollingStation } from "@kiesraad/api";
 import { Badge, PageTitle, PollingStationNumber, WorkStationNumber } from "@kiesraad/ui";

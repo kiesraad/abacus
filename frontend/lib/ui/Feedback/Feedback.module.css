@@ -4,7 +4,13 @@
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1.5rem;
+
+  div:global(.feedback) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
   header {
     display: flex;
@@ -29,8 +35,10 @@
     }
   }
 
-  div > ul {
-    margin-bottom: 0;
+  div:global(.action) {
+    ul {
+      margin: 0;
+    }
   }
 
   &.error {

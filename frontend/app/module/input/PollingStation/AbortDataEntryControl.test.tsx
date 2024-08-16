@@ -8,7 +8,7 @@ import { overrideOnce, render, screen, server } from "app/test/unit";
 import { ElectionProvider, PollingStationFormController } from "@kiesraad/api";
 import { electionMock, electionMockResponse, pollingStationMock } from "@kiesraad/api-mocks";
 
-import { AbortDataEntryControl } from "./AbortDataEntryControl.tsx";
+import { AbortDataEntryControl } from "./AbortDataEntryControl";
 
 const mockNavigate = vi.fn();
 

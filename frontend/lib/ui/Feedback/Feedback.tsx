@@ -66,10 +66,17 @@ export function Feedback({ id, type, data, children }: FeedbackProps) {
               )}
               <ul>
                 <li>Heb je iets niet goed overgenomen? Herstel de fout en ga verder.</li>
-                <li>
-                  Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan
-                  verder.
-                </li>
+                {type === "error" ? (
+                  <li>
+                    Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder.
+                    Overleg met de coördinator.
+                  </li>
+                ) : (
+                  <li>
+                    Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan
+                    verder.
+                  </li>
+                )}
               </ul>
             </>
           )}

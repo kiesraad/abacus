@@ -140,7 +140,8 @@ describe("Test RecountedForm", () => {
 
   test("422 response results in display of error message", async () => {
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
-      message: "422 error from mock",
+      message: "Error from mock",
+      errorCode: 422,
     });
 
     const user = userEvent.setup();
@@ -153,13 +154,13 @@ describe("Test RecountedForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(`Server error: 422 error from mock`);
+    expect(feedbackServerError).toHaveTextContent(`Server error422: Error from mock`);
   });
 
   test("500 response results in display of error message", async () => {
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
-      message: "500 error from mock",
-      errorCode: "500_ERROR",
+      message: "Error from mock",
+      errorCode: 500,
     });
 
     const user = userEvent.setup();
@@ -172,7 +173,7 @@ describe("Test RecountedForm", () => {
     const submitButton = screen.getByRole("button", { name: "Volgende" });
     await user.click(submitButton);
     const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(`Server error500_ERROR: 500 error from mock`);
+    expect(feedbackServerError).toHaveTextContent(`Server error500: Error from mock`);
   });
 
   describe("RecountedForm errors", () => {

@@ -85,10 +85,12 @@ export function RecountedForm() {
         </label>
       </div>
       <BottomBar type="form">
-        <Button type="submit" size="lg" disabled={loading}>
-          Volgende
-        </Button>
-        <span className="button_hint">SHIFT + Enter</span>
+        <BottomBar.Row>
+          <Button type="submit" size="lg" disabled={loading}>
+            Volgende
+          </Button>
+          <span className="button_hint">SHIFT + Enter</span>
+        </BottomBar.Row>
       </BottomBar>
     </form>
   );

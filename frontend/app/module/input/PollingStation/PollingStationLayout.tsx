@@ -1,6 +1,7 @@
 import { Link, Outlet, useParams } from "react-router-dom";
 
 import { NavBar } from "app/component/navbar/NavBar.tsx";
+import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 import { AbortDataEntryControl } from "app/module/input/PollingStation/AbortDataEntryControl.tsx";
 
@@ -49,6 +50,7 @@ export function PollingStationLayout() {
           <PollingStationProgress />
         </nav>
         <article>
+          <PollingStationFormNavigation pollingStationId={pollingStation.id} election={election} />
           <Outlet />
         </article>
       </main>

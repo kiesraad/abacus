@@ -111,8 +111,6 @@ export function PollingStationFormNavigation({
     }
   }, [targetFormSection, getUrlForFormSection, navigate]);
 
-  //TODO: handle server error
-
   return (
     <>
       {blocker.state === "blocked" && (

@@ -10,7 +10,6 @@ export function InputLayout() {
     <PollingStationListProvider electionId={election.id}>
       <ElectionStatusProvider electionId={election.id}>
         <div className="app-layout">
-          <nav>{election.name}</nav> {/* TODO: Add Role in front of election name */}
           <Outlet />
           <Footer />
         </div>

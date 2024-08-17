@@ -1,7 +1,7 @@
-import { createRoutesFromElements, Route } from "react-router-dom";
+import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
+import { DevHomePage } from "./module/DevHomePage.tsx";
 import { ElectionLayout } from "./module/ElectionLayout";
-import { HomePage } from "./module/HomePage";
 import {
   CandidatesVotesPage,
   DifferencesPage,
@@ -19,14 +19,15 @@ import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />}>
+    <Route index path="/" element={<Navigate to="/overview" replace />} />
     <Route path="*" element={<NotFound />} />
-    <Route index path="/" element={<HomePage />} />
+    <Route path="/dev" element={<DevHomePage />} />
     <Route path="user" element={<LoginLayout />}>
       <Route index element={<UserHomePage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="account/setup" element={<AccountSetupPage />} />
     </Route>
-    <Route path="overview" element={<OverviewLayout />} errorElement={<NotFound />}>
+    <Route path="/overview" element={<OverviewLayout />} errorElement={<NotFound />}>
       <Route index element={<OverviewPage />} />
     </Route>
     <Route path=":electionId" element={<ElectionLayout />} errorElement={<NotFound />}>

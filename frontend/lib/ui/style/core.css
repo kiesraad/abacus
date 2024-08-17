@@ -2,21 +2,6 @@ ul {
   padding-left: 16px;
 }
 
-ul.link-list {
-  padding: 0;
-  margin: 0;
-  list-style: none inside none;
-
-  li {
-    margin: 0;
-    list-style-type: "\1F44D";
-    a {
-      display: inline-block;
-      padding-left: 10px;
-    }
-  }
-}
-
 div.radio-form {
   display: flex;
   flex-direction: column;

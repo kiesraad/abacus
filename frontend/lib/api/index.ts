@@ -5,6 +5,7 @@ export * from "./polling_station";
 export type * from "./api.d";
 export * from "./ApiClient";
 export * from "./ApiProvider";
+export * from "./useApi";
 export * from "./useApiGetRequest";
 export * from "./useApiPostRequest";
 export * from "./useElectionDataRequest";

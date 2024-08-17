@@ -12,6 +12,12 @@ export interface ELECTION_DETAILS_REQUEST_PARAMS {
 }
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
 
+// /api/elections/{election_id}/download_results
+export interface ELECTION_DOWNLOAD_RESULTS_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_DOWNLOAD_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_results`;
+
 // /api/elections/{election_id}/polling_stations
 export interface POLLING_STATION_LIST_REQUEST_PARAMS {
   election_id: number;

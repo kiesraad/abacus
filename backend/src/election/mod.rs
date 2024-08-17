@@ -1,5 +1,6 @@
 use axum::extract::{Path, State};
 use axum::Json;
+use hyper::{header, HeaderMap};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -89,4 +90,44 @@ pub async fn election_status(
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
     let statuses = polling_station_repo.status(id).await?;
     Ok(Json(ElectionStatusResponse { statuses }))
+}
+
+/// Download a generated PDF
+#[utoipa::path(
+    get,
+    path = "/api/elections/{election_id}/download_results",
+    responses(
+        (
+            status = 200,
+            description = "PDF",
+            content_type="application/pdf",
+            headers(
+                ("Content-Type", description = "application/pdf"),
+                ("Content-Disposition", description = "attachment; filename=\"filename.pdf\"")
+            )
+        ),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
+)]
+pub async fn election_download_results(
+    State(elections_repo): State<Elections>,
+    Path(id): Path<u32>,
+) -> Result<(HeaderMap, Vec<u8>), APIError> {
+    let _election = elections_repo.get(id).await?;
+
+    // TODO: Replace this with the generated PDF
+    let filename = "proces-verbaal.pdf";
+    let content = &[];
+
+    let disposition_header = format!("attachment; filename=\"{}\"", filename);
+
+    let mut headers = HeaderMap::new();
+    headers.insert(header::CONTENT_TYPE, "application/pdf".parse()?);
+    headers.insert(header::CONTENT_DISPOSITION, disposition_header.parse()?);
+
+    Ok((headers, content.to_vec()))
 }

@@ -2,13 +2,13 @@ import { describe, expect, test } from "vitest";
 
 import { overrideOnce, Providers, renderHook, waitFor } from "app/test/unit";
 
-import { electionMockResponse } from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
 
 import { useElectionDataRequest } from "./useElectionDataRequest";
 
 describe("Test useElectionDataRequest", () => {
   test("doRequest returns expected data", async () => {
-    overrideOnce("get", "/api/elections/1", 200, electionMockResponse);
+    overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
     const { result } = renderHook(
       () =>
         useElectionDataRequest({
@@ -22,6 +22,6 @@ describe("Test useElectionDataRequest", () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.data).toEqual(electionMockResponse);
+    expect(result.current.data).toEqual(electionDetailsMockResponse);
   });
 });

@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, Mock, test, vi } from "vitest";
 
 import { usePollingStationFormController } from "@kiesraad/api";
-import { electionMock } from "@kiesraad/api-mocks";
+import { electionMockData } from "@kiesraad/api-mocks";
 
 import { PollingStationFormNavigation } from "./PollingStationFormNavigation";
 
@@ -77,7 +77,7 @@ describe("PollingStationFormNavigation", () => {
   test("It Navigates to targetFormSection", () => {
     (usePollingStationFormController as Mock).mockReturnValueOnce(mockController);
 
-    render(<PollingStationFormNavigation pollingStationId={1} election={electionMock} />);
+    render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
     expect(mockNavigate).toHaveBeenCalledWith("/1/input/1/numbers");
   });
@@ -101,7 +101,7 @@ describe("PollingStationFormNavigation", () => {
         recounted: true,
       },
     });
-    render(<PollingStationFormNavigation pollingStationId={1} election={electionMock} />);
+    render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
     const shouldBlock = (useBlocker as Mock).mock.lastCall;
     if (Array.isArray(shouldBlock)) {
@@ -152,7 +152,7 @@ describe("PollingStationFormNavigation", () => {
       state: "blocked",
     });
 
-    render(<PollingStationFormNavigation pollingStationId={1} election={electionMock} />);
+    render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
     const shouldBlock = (useBlocker as Mock).mock.lastCall;
     if (Array.isArray(shouldBlock)) {

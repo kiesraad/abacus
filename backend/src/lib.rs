@@ -5,8 +5,9 @@ use axum::extract::rejection::JsonRejection;
 use axum::extract::FromRef;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post};
+use axum::routing::{delete, get, post};
 use axum::{Json, Router};
+use hyper::header::InvalidHeaderValue;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
@@ -33,6 +34,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             post(polling_station::polling_station_data_entry),
         )
         .route(
+            "/:polling_station_id/data_entries/:entry_number",
+            delete(polling_station::polling_station_data_entry_delete),
+        )
+        .route(
             "/:polling_station_id/data_entries/:entry_number/finalise",
             post(polling_station::polling_station_data_entry_finalise),
         );
@@ -40,6 +45,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let election_routes = Router::new()
         .route("/", get(election::election_list))
         .route("/:election_id", get(election::election_details))
+        .route(
+            "/:election_id/download_results",
+            get(election::election_download_results),
+        )
         .route(
             "/:election_id/polling_stations",
             get(polling_station::polling_station_list),
@@ -71,8 +80,10 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             election::election_list,
             election::election_details,
             election::election_status,
+            election::election_download_results,
             polling_station::polling_station_list,
             polling_station::polling_station_data_entry,
+            polling_station::polling_station_data_entry_delete,
             polling_station::polling_station_data_entry_finalise,
         ),
         components(
@@ -136,6 +147,7 @@ pub enum APIError {
     JsonRejection(JsonRejection),
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
+    InvalidHeaderValue,
 }
 
 impl IntoResponse for APIError {
@@ -176,6 +188,10 @@ impl IntoResponse for APIError {
                     to_error("Internal server error".to_string()),
                 )
             }
+            APIError::InvalidHeaderValue => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                to_error("Internal server error".to_string()),
+            ),
         };
 
         (status, response).into_response()
@@ -203,6 +219,12 @@ impl From<sqlx::Error> for APIError {
 impl From<DataError> for APIError {
     fn from(err: DataError) -> Self {
         APIError::InvalidData(err)
+    }
+}
+
+impl From<InvalidHeaderValue> for APIError {
+    fn from(_: InvalidHeaderValue) -> Self {
+        APIError::InvalidHeaderValue
     }
 }
 

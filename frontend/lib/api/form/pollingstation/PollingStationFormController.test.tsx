@@ -9,11 +9,11 @@ import {
   PollingStationFormController,
   usePollingStationFormController,
 } from "@kiesraad/api";
-import { electionMock } from "@kiesraad/api-mocks";
+import { electionMockData } from "@kiesraad/api-mocks";
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <ApiProvider host="http://testhost">
-    <PollingStationFormController election={electionMock} pollingStationId={1} entryNumber={1}>
+    <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
       {children}
     </PollingStationFormController>
   </ApiProvider>

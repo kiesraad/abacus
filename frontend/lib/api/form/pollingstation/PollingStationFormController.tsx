@@ -2,9 +2,12 @@ import * as React from "react";
 
 import {
   ApiResponseErrorData,
+  ApiResponseStatus,
   DataEntryResponse,
   Election,
+  POLLING_STATION_DATA_ENTRY_REQUEST_PATH,
   PollingStationResults,
+  useApi,
   usePollingStationDataEntry,
   ValidationResult,
 } from "@kiesraad/api";
@@ -80,6 +83,7 @@ export interface iPollingStationControllerContext {
   currentForm: AnyFormReference | null;
   submitCurrentForm: (ignoreWarnings?: boolean) => void;
   registerCurrentForm: (form: AnyFormReference) => void;
+  deleteDataEntry: () => Promise<void>;
 }
 
 export type FormSectionID =
@@ -202,6 +206,7 @@ export function PollingStationFormController({
 
     return { ...result, ...defaultFormState };
   });
+  const { client } = useApi();
 
   const [values, _setValues] = React.useState<PollingStationValues>(() => ({
     recounted: undefined,
@@ -401,6 +406,15 @@ export function PollingStationFormController({
     }
   }, [doRequest, values]);
 
+  const deleteDataEntry = async () => {
+    const path: POLLING_STATION_DATA_ENTRY_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+    const response = await client.deleteRequest(path);
+    if (response.status !== ApiResponseStatus.Success && response.code !== 404) {
+      console.error("Failed to delete data entry", response);
+      throw new Error("Failed to delete data entry");
+    }
+  };
+
   return (
     <PollingStationControllerContext.Provider
       value={{
@@ -416,6 +430,7 @@ export function PollingStationFormController({
         registerCurrentForm,
         submitCurrentForm,
         targetFormSection,
+        deleteDataEntry,
       }}
     >
       {children}

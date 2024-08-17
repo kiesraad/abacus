@@ -10,19 +10,26 @@ import {
   PollingStationFormController,
   PollingStationValues,
 } from "@kiesraad/api";
-import { electionMock, politicalGroupMock, pollingStationMock } from "@kiesraad/api-mocks";
+import {
+  electionMockData as _electionMockData,
+  politicalGroupMockData as _politicalGroupMockData,
+  pollingStationMockData as _pollingStationMockData,
+} from "@kiesraad/api-mocks";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
+const electionMockData = _electionMockData as unknown as Required<Election>;
+const politicalGroupMockData = _politicalGroupMockData as unknown as PoliticalGroup;
+const pollingStationMockData = _pollingStationMockData as unknown as { id: number };
 function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   return render(
     <PollingStationFormController
-      election={electionMock}
-      pollingStationId={pollingStationMock.id}
+      election={electionMockData}
+      pollingStationId={1}
       entryNumber={1}
       defaultValues={defaultValues}
     >
-      <CandidatesVotesForm group={politicalGroupMock} />
+      <CandidatesVotesForm group={politicalGroupMockData} />
     </PollingStationFormController>,
   );
 }
@@ -52,7 +59,7 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
       other_explanation_count: 0,
       no_explanation_count: 0,
     },
-    political_group_votes: electionMock.political_groups.map((group) => ({
+    political_group_votes: electionMockData.political_groups.map((group) => ({
       number: group.number,
       total: 0,
       candidate_votes: group.candidates.map((candidate) => ({
@@ -212,9 +219,9 @@ describe("Test CandidatesVotesForm", () => {
 
       const Component = (
         <PollingStationFormController
-          pollingStationId={pollingStationMock.id}
-          entryNumber={1}
           election={electionMockData}
+          pollingStationId={pollingStationMockData.id}
+          entryNumber={1}
         >
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>

@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { describe, expect, test } from "vitest";
 
-import { renderHook, waitFor } from "app/test/unit";
+import { overrideOnce, renderHook, waitFor } from "app/test/unit";
 
 import {
   ApiProvider,
@@ -77,5 +77,57 @@ describe("PollingStationFormController", () => {
     });
 
     expect(result.current.values.voters_counts.proxy_certificate_count).toEqual(1);
+  });
+
+  test("It filters out global errors", async () => {
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      validation_results: {
+        errors: [
+          {
+            fields: [
+              "data.voters_counts.total_admitted_voters_count",
+              "data.voters_counts.poll_card_count",
+              "data.voters_counts.proxy_certificate_count",
+              "data.voters_counts.voter_card_count",
+            ],
+            code: "F204",
+          },
+        ],
+        warnings: [],
+      },
+    });
+
+    const { result } = renderHook(() => usePollingStationFormController(), {
+      wrapper: Wrapper,
+    });
+
+    result.current.registerCurrentForm({
+      id: "voters_votes_counts",
+      type: "voters_and_votes",
+      getValues: () => {
+        return {
+          voters_counts: {
+            proxy_certificate_count: 1,
+            voter_card_count: 1,
+            poll_card_count: 1,
+            total_admitted_voters_count: 3,
+          },
+          votes_counts: {
+            blank_votes_count: 1,
+            invalid_votes_count: 1,
+            total_votes_cast_count: 1,
+            votes_candidates_counts: 3,
+          },
+          voters_recounts: undefined,
+        };
+      },
+    });
+
+    result.current.submitCurrentForm();
+
+    await waitFor(() => {
+      expect(result.current.formState.sections.voters_votes_counts.isSaved).toBe(true);
+    });
+    expect(result.current.formState.sections.voters_votes_counts.errors.length).toBe(0);
   });
 });

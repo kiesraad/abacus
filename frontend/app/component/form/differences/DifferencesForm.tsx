@@ -1,7 +1,15 @@
 import * as React from "react";
 
 import { getErrorsAndWarnings, useDifferences } from "@kiesraad/api";
-import { BottomBar, Button, Feedback, InputGrid, InputGridRow, useTooltip } from "@kiesraad/ui";
+import {
+  BottomBar,
+  Button,
+  Checkbox,
+  Feedback,
+  InputGrid,
+  InputGridRow,
+  useTooltip,
+} from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -28,7 +36,7 @@ export function DifferencesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-
+  const [hideIgnoreWarnings, setHideIgnoreWarnings] = React.useState(false);
   const getValues = React.useCallback(() => {
     const form = document.getElementById("differences_form") as DifferencesFormElement;
     const elements = form.elements;
@@ -47,7 +55,8 @@ export function DifferencesForm() {
     };
   }, [deformat]);
 
-  const { sectionValues, loading, errors, warnings, isSaved, submit } = useDifferences(getValues);
+  const { sectionValues, loading, errors, warnings, isSaved, submit, ignoreWarnings } =
+    useDifferences(getValues);
 
   useTooltip({
     onDismiss: resetWarnings,
@@ -59,6 +68,20 @@ export function DifferencesForm() {
   }
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+
+  React.useEffect(() => {
+    if (isSaved && warnings.length > 0) {
+      const onKeyUp = () => {
+        setHideIgnoreWarnings(true);
+        document.removeEventListener("keyup", onKeyUp);
+      };
+
+      document.addEventListener("keyup", onKeyUp);
+      return () => {
+        document.removeEventListener("keyup", onKeyUp);
+      };
+    }
+  }, [isSaved, warnings]);
 
   React.useEffect(() => {
     if (isSaved) {
@@ -179,10 +202,17 @@ export function DifferencesForm() {
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="inputgrid">
-        <Button type="submit" size="lg" disabled={loading}>
-          Volgende
-        </Button>
-        <span className="button_hint">SHIFT + Enter</span>
+        <BottomBar.Row hidden={errors.length > 0 || hideIgnoreWarnings || warnings.length === 0}>
+          <Checkbox id="voters_and_votes_form_ignore_warnings" defaultChecked={ignoreWarnings}>
+            Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
+          </Checkbox>
+        </BottomBar.Row>
+        <BottomBar.Row>
+          <Button type="submit" size="lg" disabled={loading}>
+            Volgende
+          </Button>
+          <span className="button_hint">SHIFT + Enter</span>
+        </BottomBar.Row>
       </BottomBar>
     </form>
   );

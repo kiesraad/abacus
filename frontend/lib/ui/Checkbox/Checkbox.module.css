@@ -1,0 +1,12 @@
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+
+  input {
+    margin-right: 8px;
+  }
+
+  &:global(.hidden) {
+    display: none;
+  }
+}

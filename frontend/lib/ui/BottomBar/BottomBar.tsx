@@ -12,3 +12,13 @@ export interface BottomBarProps {
 export function BottomBar({ type, children }: BottomBarProps) {
   return <div className={cn(cls["bottombar"], cls[type])}>{children}</div>;
 }
+
+BottomBar.Row = function BottomBarRow({
+  children,
+  hidden,
+}: {
+  children: React.ReactNode;
+  hidden?: boolean;
+}) {
+  return <section className={cn("row", { hidden: !!hidden })}>{children}</section>;
+};

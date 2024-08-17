@@ -1,7 +1,15 @@
 import * as React from "react";
 
 import { getErrorsAndWarnings, useVotersAndVotes, VotersAndVotesValues } from "@kiesraad/api";
-import { BottomBar, Button, Feedback, InputGrid, InputGridRow, useTooltip } from "@kiesraad/ui";
+import {
+  BottomBar,
+  Button,
+  Checkbox,
+  Feedback,
+  InputGrid,
+  InputGridRow,
+  useTooltip,
+} from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -21,27 +29,6 @@ interface FormElements extends HTMLFormControlsCollection {
 
 interface VotersAndVotesFormElement extends HTMLFormElement {
   readonly elements: FormElements;
-}
-
-interface IgnoreWarningsCheckboxProps {
-  id: string;
-  children: React.ReactNode;
-  defaultChecked?: boolean;
-  hidden?: boolean;
-}
-
-function IgnoreWarningsCheckbox({
-  id,
-  children,
-  defaultChecked,
-  hidden,
-}: IgnoreWarningsCheckboxProps) {
-  return (
-    <div style={{ display: hidden ? "none" : "block" }}>
-      <input type="checkbox" id={id} defaultChecked={defaultChecked} />
-      <label htmlFor="voters_and_votes_form_ignore_warnings">{children}</label>
-    </div>
-  );
 }
 
 export function VotersAndVotesForm() {
@@ -305,17 +292,17 @@ export function VotersAndVotesForm() {
       </InputGrid>
 
       <BottomBar type="inputgrid">
-        <IgnoreWarningsCheckbox
-          id="voters_and_votes_form_ignore_warnings"
-          defaultChecked={ignoreWarnings}
-          hidden={errors.length > 0 || hideIgnoreWarnings || warnings.length === 0}
-        >
-          Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
-        </IgnoreWarningsCheckbox>
-        <Button type="submit" size="lg" disabled={loading}>
-          Volgende
-        </Button>
-        <span className="button_hint">SHIFT + Enter</span>
+        <BottomBar.Row hidden={errors.length > 0 || hideIgnoreWarnings || warnings.length === 0}>
+          <Checkbox id="voters_and_votes_form_ignore_warnings" defaultChecked={ignoreWarnings}>
+            Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
+          </Checkbox>
+        </BottomBar.Row>
+        <BottomBar.Row>
+          <Button type="submit" size="lg" disabled={loading}>
+            Volgende
+          </Button>
+          <span className="button_hint">SHIFT + Enter</span>
+        </BottomBar.Row>
       </BottomBar>
     </form>
   );

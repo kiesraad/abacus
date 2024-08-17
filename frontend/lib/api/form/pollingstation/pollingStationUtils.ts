@@ -1,4 +1,4 @@
-import { deepEqual, rootFieldSection } from "@kiesraad/util";
+import { deepEqual, FieldSection, rootFieldSection } from "@kiesraad/util";
 
 import { ValidationResult } from "../../gen/openapi";
 import {
@@ -19,32 +19,50 @@ export function addValidationResultToFormState(
   target: "errors" | "warnings",
 ) {
   arr.forEach((validationResult) => {
-    const { name: rootSection, index } = rootFieldSection(validationResult.fields[0]);
+    const uniqueRootSections = uniqueFieldSections(validationResult.fields);
 
-    switch (rootSection) {
-      case "votes_counts":
-      case "voters_counts":
-      case "voters_recounts":
-        formState.sections.voters_votes_counts[target].push(validationResult);
-        break;
-      case "differences_counts":
-        formState.sections.differences_counts[target].push(validationResult);
-        break;
-      case "political_group_votes":
-        if (index !== undefined) {
-          //TODO: check this index vs number thing, it's very confusing/error prone
-          const sectionKey = `political_group_votes_${index + 1}` as FormSectionID;
-          const section = formState.sections[sectionKey];
-          if (section) {
-            section[target].push(validationResult);
+    uniqueRootSections.forEach((fieldSection) => {
+      const { name: rootSection, index } = fieldSection;
+      switch (rootSection) {
+        case "votes_counts":
+        case "voters_counts":
+        case "voters_recounts":
+          formState.sections.voters_votes_counts[target].push(validationResult);
+          break;
+        case "differences_counts":
+          formState.sections.differences_counts[target].push(validationResult);
+          break;
+        case "political_group_votes":
+          if (index !== undefined) {
+            //TODO: check this index vs number thing, it's very confusing/error prone
+            const sectionKey = `political_group_votes_${index + 1}` as FormSectionID;
+            const section = formState.sections[sectionKey];
+            if (section) {
+              section[target].push(validationResult);
+            }
           }
-        }
-        break;
-      default:
-        formState.unknown[target].push(validationResult);
-        break;
+          break;
+        default:
+          formState.unknown[target].push(validationResult);
+          break;
+      }
+    });
+  });
+}
+
+export function uniqueFieldSections(fields: string[]): FieldSection[] {
+  const result: FieldSection[] = [];
+
+  fields.forEach((field) => {
+    const rootSection = rootFieldSection(field);
+    if (
+      result.findIndex((s) => s.name === rootSection.name && s.index === rootSection.index) === -1
+    ) {
+      result.push(rootSection);
     }
   });
+
+  return result;
 }
 
 export function formSectionComplete(section: FormSection): boolean {
@@ -126,7 +144,6 @@ export function currentFormHasChanges(
 
 export function isGlobalValidationResult(validationResult: ValidationResult): boolean {
   switch (validationResult.code) {
-    case "F401":
     case "F204":
       return true;
     default:

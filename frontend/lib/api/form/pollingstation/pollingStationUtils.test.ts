@@ -119,8 +119,8 @@ const defaultValues: PollingStationValues = {
 };
 
 describe("PollingStationUtils", () => {
-  test("addValidationResultToFormState", () => {
-    const formState = { ...defaultFormState };
+  test("addValidationResultToFormState adds result to correct section", () => {
+    const formState = structuredClone(defaultFormState);
 
     const validationResults: ValidationResult[] = [
       {
@@ -132,6 +132,23 @@ describe("PollingStationUtils", () => {
     addValidationResultToFormState(formState, validationResults, "errors");
 
     expect(formState.sections.voters_votes_counts.errors.length).toBe(1);
+  });
+
+  test("addValidationResultToFormState adds result to multiple sections", () => {
+    const formState = structuredClone(defaultFormState);
+
+    const validationResults: ValidationResult[] = [
+      {
+        fields: ["data.votes_counts.invalid_votes_count", "data.political_group_votes[0]"],
+        code: "F401",
+      },
+    ];
+
+    addValidationResultToFormState(formState, validationResults, "errors");
+
+    console.log(formState.sections.voters_votes_counts.errors);
+    expect(formState.sections.voters_votes_counts.errors.length).toBe(1);
+    expect(formState.sections.political_group_votes_1?.errors.length).toBe(1);
   });
 
   test("formSectionComplete", () => {
@@ -159,7 +176,7 @@ describe("PollingStationUtils", () => {
   });
 
   test("getNextSection", () => {
-    const formState = { ...defaultFormState };
+    const formState = structuredClone(defaultFormState);
 
     const nextSection = getNextSection(formState, {
       index: 0,
@@ -239,7 +256,7 @@ describe("PollingStationUtils", () => {
         code: "F401",
         fields: ["data.votes_counts.blank_votes_count"],
       }),
-    ).toBe(true);
+    ).toBe(false);
 
     expect(
       isGlobalValidationResult({
@@ -254,12 +271,6 @@ describe("PollingStationUtils", () => {
       {
         code: "F204",
         fields: ["data.votes_counts.blank_votes_count"],
-        isGlobal: true,
-      },
-      {
-        code: "F401",
-        fields: ["data.votes_counts.blank_votes_count"],
-        isGlobal: true,
       },
     ];
 

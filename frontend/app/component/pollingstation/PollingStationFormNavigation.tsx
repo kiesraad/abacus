@@ -62,21 +62,17 @@ export function PollingStationFormNavigation({
   const shouldBlock = React.useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
       if (currentLocation.pathname === nextLocation.pathname) {
-        console.log("Same pathname");
         return false;
       }
       if (!currentForm) {
-        console.log("No current form");
         return false;
       }
 
       //check if currentForm is before or same as current;
 
       const reason = reasonBlocked(formState, currentForm, values);
-      console.log("REASON: ", reason);
       if (reason !== null) {
         if (reason === "changes" && formState.active === formState.current) {
-          console.log("caching: ", currentForm.id);
           setTemporaryCache({
             key: currentForm.id,
             data: currentForm.getValues(),
@@ -94,7 +90,6 @@ export function PollingStationFormNavigation({
   const blocker = useBlocker(shouldBlock);
 
   React.useEffect(() => {
-    console.log("Setting current", formState.active);
     const activeSection = formState.sections[formState.active];
     const currentSection = formState.sections[formState.current];
     if (activeSection && currentSection) {
@@ -111,7 +106,6 @@ export function PollingStationFormNavigation({
     if (!targetFormSection) return;
     if (targetFormSection !== _lastKnownSection.current) {
       _lastKnownSection.current = targetFormSection;
-      console.log("calling navigate?", targetFormSection);
       const url = getUrlForFormSection(targetFormSection);
       navigate(url);
     }
@@ -178,19 +172,15 @@ function reasonBlocked(
   values: PollingStationValues,
 ): BlockReason | null {
   const formSection = formState.sections[currentForm.id];
-  console.log("Checking reasonBlocked", formSection?.id, currentForm.id);
   if (formSection) {
     if (formSection.errors.length > 0) {
-      console.log("BLOCKED: has errors");
       return "errors";
     }
     if (formSection.warnings.length > 0 && !formSection.ignoreWarnings) {
-      console.log("BLOCKED: has warnings without ignore");
       return "warnings";
     }
     console.log("Checking changes!!!");
     if (!formSection.isSubmitted && currentFormHasChanges(currentForm, values)) {
-      console.log("BLOCKED: has changes");
       return "changes";
     }
   }

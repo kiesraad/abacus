@@ -20,7 +20,7 @@ required-features = ["openapi"]
 axum = { version = "0.7", features = ["macros"] }
 hyper = { version = "1", features = ["full"] }
 tokio = { version = "1", features = ["full"] }
-tower = "0.4"
+tower = "0.5"
 tower-http = { version = "0.5.0", features = ["fs"] }
 utoipa = { version = "4.2", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "7.1.0", features = ["axum"], optional = true }

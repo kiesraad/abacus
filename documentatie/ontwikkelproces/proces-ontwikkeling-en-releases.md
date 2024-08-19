@@ -1,13 +1,13 @@
 # Proces voor ontwikkeling en releases
 
 Abacus wordt open source, in eigen huis en onder eigen regie ontwikkeld, voor meer flexibiliteit en controle.
-We werken Agile, gericht op samenwerking en flexibiliteit. De ontwikkeling van functionaliteit delen we op in 
+We werken Agile, gericht op samenwerking en flexibiliteit. De ontwikkeling van functionaliteit delen we op in
 kleine stukken, zodat we efficiënt kunnen opleveren en ons werk voortdurend kunnen verbeteren op basis
 van feedback.
 
 Aan het begin van de releasecyclus bepalen we welke functionaliteit we willen implementeren. Dit doen we in overleg met
 het team tijdens een tweewekelijkse planningsmeeting. De prioriteit van de features bepalen we aan de hand van
-verschillende factoren. Wil je als externe contributor een bijdrage leveren aan de software, neem dan contact op via abacus[@]kiesraad.nl. 
+verschillende factoren. Wil je als externe contributor een bijdrage leveren aan de software, neem dan contact op via abacus[@]kiesraad.nl.
 
 ## Stappen in het proces
 
@@ -39,11 +39,11 @@ Het aanmaken van een nieuw GitHub-issue voor een feature of change request gebeu
 
 ### Ontwikkeling
 
-Voor de ontwikkeling via GitHub werken we met issues die zijn opgenomen in epics. Aan issues in de 'Current' kolom van het bord kan worden gewerkt. Maak een nieuwe branch aan op basis van de main branch en schrijf de code die je wilt maken. Test je functionaliteit door zover zinvol tests te schrijven. Denk hierbij aan unittests, integration tests enzovoorts. Als je code en de tests klaar zijn en geschikt zijn voor review, maak dan een pull request aan. Wijs reviewers aan. Na review en approval kan de code worden gemerged. Een uitgebreidere beschrijving is te vinden in het document over [de werkwijze op GitHub](</documentatie/GitHub werkwijze.md>). 
+Voor de ontwikkeling via GitHub werken we met issues die zijn opgenomen in epics. Aan issues in de 'Current' kolom van het bord kan worden gewerkt. Maak een nieuwe branch aan op basis van de main branch en schrijf de code die je wilt maken. Test je functionaliteit door zover zinvol tests te schrijven. Denk hierbij aan unittests, integration tests enzovoorts. Als je code en de tests klaar zijn en geschikt zijn voor review, maak dan een pull request aan. Wijs reviewers aan. Na review en approval kan de code worden gemerged. Een uitgebreidere beschrijving is te vinden in het document over [de werkwijze op GitHub](</documentatie/GitHub werkwijze.md>).
 
 ### Releases
 
-Er vinden twee soorten releases plaats: 
+Er vinden twee soorten releases plaats:
 
 - Tussentijdse releases of builds
 - Releases voor verkiezingen
@@ -73,4 +73,3 @@ Een release moet aan een aantal vereisten voldoen:
 Na de release evalueren we hoe het is verlopen en hoe de release wordt ontvangen. Het verloop van het ontwikkelproces
 wordt besproken in onze planningsmeeting en met enige regelmaat in een retro. Ook feedback van buitenaf nemen we hierin
 mee.
-

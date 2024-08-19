@@ -51,9 +51,7 @@ Als er voor de gebruikersinterface gebruik gemaakt wordt van een webbrowser, kan
 
 Het zelf ontwikkelen van een GUI is voor het beoogde doel vermoedelijk niet productief en levert geen toegevoegde waarde, omdat alle specifieke interfacing met OS en netwerk al wordt opgelost en bijgehouden door browsers op een niveau dat niet te halen is met een klein team.
 
-# Keuzes naar aanleiding van de afweging
-
-## Keuzes frontend
+## Gemaakte keuzes frontend
 
 Voor de frontend wordt de keuze beperkt door de browser. Daarom maken we gebruik van HTML, CSS en TypeScript.
 Hierbinnen zijn vele frameworks te kiezen, en daarbij tellen de afwegingen wat betreft zelfgeschreven software mee. Het is belangrijk dat een framework met minder afhankelijkheden gekozen wordt.
@@ -64,7 +62,7 @@ We maken ook gebruik van TypeScript, een uitgebreidere versie van JavaScript. Di
 
 ### Library: React
 
-React is een van de meest gebruikte libraries voor het maken van gebruikersinterfaces. Deze library heeft een groot bereik onder developers en wordt goed onderhouden. Een andere overweging was Angular, maar React is stabieler. Ook hebben onze programmeurs hier ervaring mee. 
+React is een van de meest gebruikte libraries voor het maken van gebruikersinterfaces. Deze library heeft een groot bereik onder developers en wordt goed onderhouden. Een andere overweging was Angular, maar React is stabieler. Ook hebben onze programmeurs hier ervaring mee.
 
 ### Ladle
 
@@ -72,9 +70,9 @@ Deze tool wordt gebruikt om te ontwikkelen en testen met React. Deze optie werkt
 
 ### Playwright
 
-Playwright is uitermate geschikt als testframework voor de browser. Selenium is een automatiseringslibrary die een alternatief zou kunnen zijn voor Playwright, maar Playwright heeft meer functionaliteit. Bovendien zou je voor Selenium ook een test runner en een assertion library nodig hebben. Ook zou je convenience functions/methods moeten bouwen omdat Selenium best low-level control op de browser biedt. Playwright heeft deze vereisten niet, en daarom hebben we hiervoor gekozen. 
+Playwright is uitermate geschikt als testframework voor de browser. Selenium is een automatiseringslibrary die een alternatief zou kunnen zijn voor Playwright, maar Playwright heeft meer functionaliteit. Bovendien zou je voor Selenium ook een test runner en een assertion library nodig hebben. Ook zou je convenience functions/methods moeten bouwen omdat Selenium best low-level control op de browser biedt. Playwright heeft deze vereisten niet, en daarom hebben we hiervoor gekozen.
 
-## Keuze backend: Rust
+## Gemaakte keuze backend: Rust
 
 Qua programmeertaal voor de backend is elke courante taal een redelijke, waarbij enkele overwegingen moeten worden meegenomen. Ten eerste valt C af omdat deze taal te lage abstractie en dus minder efficiëntie biedt in het programmeren. Bovendien zijn er ook risico's op bugs vanwege de methoden voor geheugengebruik. Door deze overwegingen vallen ook veel andere standaard talen met zwakke en/of dynamische typesystemen af, zoals PHP en Python.
 
@@ -87,41 +85,53 @@ Na een inventarisatie van beschikbare programmeurs, mogelijke talen en de voor- 
 ### Voordelen van Rust
 
 #### Geheugenveiligheid zonder *garbage collector*
+
 Rust is ontworpen met een focus op geheugenveiligheid. Het unieke eigendomssysteem van Rust zorgt ervoor dat geheugenfouten zoals *dangling pointers* of *data races* worden voorkomen zonder gebruik te maken van een *garbage collector*. Dit verhoogt de prestaties en betrouwbaarheid, vooral in systemen waar geheugenbeheer cruciaal is.
 
 #### Concurrentie zonder *data races*
+
 Rust maakt gelijktijdige programmering veel veiliger en eenvoudiger door te garanderen dat programma's vrij zijn van *data races*. Dit wordt bereikt door middel van strikte eigendoms- en levensduurregels, wat betekent dat je veiligere multithreaded code kunt schrijven zonder je zorgen te maken over complexe bugs die vaak in andere talen voorkomen.
 
 #### Modern *type system* en *type inference*
+
 Rust heeft een modern *type system* dat helpt bij het vangen van fouten tijdens de compilatiefase. *Type inference* maakt de code bovendien beknopt en leesbaar, terwijl het toch de strikte typecontroles behoudt die nodig zijn voor betrouwbaarheid.
 
 #### Prestaties vergelijkbaar met C/C++
+
 Rust is ontworpen om prestaties te leveren die vergelijkbaar zijn met C en C++. Dit maakt het een uitstekende keuze voor prestatiegevoelige toepassingen zoals besturingssystemen en embedded systemen.
 
 #### Uitstekend tooling-ecosysteem
+
 Rust wordt geleverd met Cargo, een uitstekend pakketbeheersysteem en een build-tool. Cargo vereenvoudigt veel aspecten van de Rust-programmeerervaring, inclusief afhankelijkheidsbeheer, het compileren van code, het uitvoeren van tests en het genereren van documentatie.
 
 #### Immutability en functioneel programmeren
+
 Rust moedigt onveranderlijke data aan en biedt ondersteuning voor functionele programmeerpatronen. Dit kan leiden tot een duidelijkere codestructuur, eenvoudiger debuggen en onderhoud, en minder bugs.
 
 #### Uitgebreide community en groeiende populariteit
+
 De Rust-gemeenschap is actief en groeiend, met een sterke nadruk op inclusiviteit en toegankelijkheid. Dit betekent dat er veel middelen beschikbaar zijn voor nieuwe Rust-programmeurs, en de taal blijft zich ontwikkelen in reactie op de behoeften van haar gebruikers.
 
 #### Cross-platform ondersteuning
+
 Rust ondersteunt diverse platforms, van krachtige serveromgevingen tot embedded systemen. Dit maakt het een veelzijdige keuze voor projecten die op verschillende soorten hardware moeten draaien. Dit is ook een vereiste gezien de pluriformiteit in systemen van verschillende gemeenten.
 
 #### *Zero-cost abstractions*
+
 Rust’s ontwerp maakt het mogelijk om abstracties te maken zonder prestatiekosten. Dit betekent dat je code kunt schrijven die een hoog niveau heeft en efficiënt is, zodat je niet hoeft over te schakelen op talen met een lager niveau om de prestaties te verbeteren.
 
 ### Relevante nadelen van Rust
 
 #### Minder automatisch geheugenbeheer
+
 Terwijl het eigendomssysteem van Rust helpt bij het voorkomen van veelvoorkomende geheugenfouten, vereist het ook dat programmeurs meer handmatig nadenken over geheugenbeheer. Dit staat in contrast met talen zoals Java of Python, waar *garbage collection* veel van dit werk automatisch doet.
 
 #### Asynchrone programmering kan complex zijn
+
 Asynchroon programmeren in Rust kan complex en lastig zijn. Dit is overigens geen specifiek probleem bij Rust. De taal heeft wel asynchrone functies en *await*-syntax, maar deze kunnen lastig te begrijpen en te gebruiken zijn in vergelijking met andere talen.
 
 #### Jonge taal
+
 Rust is relatief jong in vergelijking met talen zoals C, C++, of Java. Dit betekent dat het nog steeds in ontwikkeling is en soms veranderingen ondergaat die invloed kunnen hebben op de stabiliteit en voorspelbaarheid voor lange-termijnprojecten.
 
 ### Conclusie keuze backend-taal
@@ -133,7 +143,9 @@ Daarmee is de keuze voor Rust op basis van alle redelijke inschattingen en overw
 ## Andere keuzes backend
 
 ### Libraries
+
 We hebben gekozen voor de volgende libraries:
+
 - De library [SQLite](https://www.sqlite.org/) die een SQL database engine implementeert. Dit is zeer populair, lichtgewicht en makkelijk in gebruik. Je hoeft bovendien niets te installeren. Het is handiger dan PostgreSQL, dat je zou moeten installeren op de computer of zou moeten meeleveren in de installer.
 - De web library [axum](https://github.com/tokio-rs/axum). Deze library wordt veel gebruikt en goed ondersteund.
 - De database library [sqlx](https://github.com/launchbadge/sqlx) voor SQL.

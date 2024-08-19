@@ -69,12 +69,15 @@ describe("PollingStationFormController", () => {
         };
       },
     });
-
+    rerender();
     result.current.submitCurrentForm();
+    rerender();
 
     await waitFor(() => {
       expect(result.current.formState.sections.voters_votes_counts.errors.length).toBe(1);
     });
+
+    console.log(result.current.formState.sections.voters_votes_counts);
 
     expect(result.current.values.voters_counts.proxy_certificate_count).toEqual(1);
   });

@@ -267,6 +267,17 @@ export function PollingStationFormController({
       //Form state changes based of validation results in data.
       setFormState((old) => {
         const newFormState = { ...old };
+
+        const activeFormSection = newFormState.sections[newFormState.active];
+
+        if (activeFormSection) {
+          //store that this section has been sent to the server
+          activeFormSection.isSaved = true;
+          //store that this section has been submitted, this resets on each request
+          activeFormSection.isSubmitted = true;
+          //flag ignore warnings
+          activeFormSection.ignoreWarnings = _ignoreWarnings.current === activeFormSection.id;
+        }
         //reset all errors/warnings, and submitted, the server validates the entire request each time.
         resetFormSectionState(newFormState);
         //distribute errors to sections
@@ -275,15 +286,8 @@ export function PollingStationFormController({
         addValidationResultToFormState(newFormState, data.validation_results.warnings, "warnings");
 
         //what form section is active
-        const activeFormSection = newFormState.sections[newFormState.active];
-        if (activeFormSection) {
-          //store that this section has been sent to the server
-          activeFormSection.isSaved = true;
-          //store that this section has been submitted, this resets on each request
-          activeFormSection.isSubmitted = true;
-          //flag ignore warnings
-          activeFormSection.ignoreWarnings = _ignoreWarnings.current === activeFormSection.id;
 
+        if (activeFormSection) {
           //determine new current if applicable
           if (newFormState.current === activeFormSection.id) {
             if (
@@ -309,9 +313,6 @@ export function PollingStationFormController({
             section.warnings = section.warnings.filter((err) => !isGlobalValidationResult(err));
           });
         }
-
-        console.log(newFormState);
-
         return newFormState;
       });
       //clean up

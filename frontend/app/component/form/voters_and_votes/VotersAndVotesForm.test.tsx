@@ -7,6 +7,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
 
 import {
+  FormState,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
   PollingStationValues,
@@ -15,6 +16,42 @@ import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
+const defaultFormState: FormState = {
+  active: "recounted",
+  current: "recounted",
+  sections: {
+    recounted: {
+      index: 0,
+      id: "recounted",
+      isSaved: true,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+    voters_votes_counts: {
+      index: 1,
+      id: "voters_votes_counts",
+      isSaved: true,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+    differences_counts: {
+      index: 2,
+      id: "differences_counts",
+      isSaved: true,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+  },
+  unknown: {
+    errors: [],
+    warnings: [],
+  },
+  isCompleted: false,
+};
+
 function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   return render(
     <PollingStationFormController
@@ -22,6 +59,7 @@ function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
       pollingStationId={pollingStationMockData.id}
       entryNumber={1}
       defaultValues={defaultValues}
+      defaultFormState={defaultFormState}
     >
       <VotersAndVotesForm />
     </PollingStationFormController>,

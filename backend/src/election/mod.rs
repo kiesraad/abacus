@@ -121,14 +121,15 @@ pub async fn election_download_results(
 ) -> Result<(HeaderMap, Vec<u8>), APIError> {
     let election = elections_repo.get(id).await?;
 
-    let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
+    let model = PdfModel::ModelNa31_2(ModelNa31_2Input {
         aanduiding_verkiezing: election.name,
         datum: election.election_date.format("%d-%m-%Y").to_string(),
         plek: "Gemeente Zilverhaven".to_string(),
-    }))?;
+    });
+    let filename = model.as_filename();
+    let content = generate_pdf(model)?;
 
     // TODO: Replace this with the generated PDF
-    let filename = "proces-verbaal.pdf";
 
     let disposition_header = format!("attachment; filename=\"{}\"", filename);
 

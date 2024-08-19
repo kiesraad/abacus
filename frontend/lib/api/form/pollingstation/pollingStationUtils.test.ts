@@ -146,7 +146,6 @@ describe("PollingStationUtils", () => {
 
     addValidationResultToFormState(formState, validationResults, "errors");
 
-    console.log(formState.sections.voters_votes_counts.errors);
     expect(formState.sections.voters_votes_counts.errors.length).toBe(1);
     expect(formState.sections.political_group_votes_1?.errors.length).toBe(1);
   });

@@ -177,7 +177,6 @@ function reasonBlocked(
     if (formSection.warnings.length > 0 && !formSection.ignoreWarnings) {
       return "warnings";
     }
-    console.log("Checking changes!!!");
     if (!formSection.isSubmitted && currentFormHasChanges(currentForm, values)) {
       return "changes";
     }

@@ -309,7 +309,6 @@ export function PollingStationFormController({
           });
         }
 
-        console.log("new form state", newFormState);
         return newFormState;
       });
       //clean up

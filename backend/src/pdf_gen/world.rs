@@ -129,17 +129,7 @@ impl World for PdfWorld {
 /// done at compile time.
 macro_rules! include_filedata {
     ($path:literal) => {{
-        #[cfg(debug_assertions)]
-        fn filedata_init() -> &'static [u8] {
-            Box::leak(std::fs::read($path).unwrap().into_boxed_slice())
-        }
-
-        #[cfg(not(debug_assertions))]
-        fn filedata_init() -> &'static [u8] {
-            include_bytes!(concat!("../", $path)) as &'static [u8]
-        }
-
-        filedata_init()
+        include_bytes!(concat!("../../templates/", $path)) as &'static [u8]
     }};
 }
 
@@ -148,17 +138,7 @@ macro_rules! include_filedata {
 /// done at compile time.
 macro_rules! include_strdata {
     ($path:literal) => {{
-        #[cfg(debug_assertions)]
-        fn strdata_init() -> &'static str {
-            Box::leak(std::fs::read_to_string($path).unwrap().into_boxed_str())
-        }
-
-        #[cfg(not(debug_assertions))]
-        fn strdata_init() -> &'static str {
-            include_str!(concat!("../", $path)) as &'static str
-        }
-
-        strdata_init()
+        include_str!(concat!("../../templates/", $path)) as &'static str
     }};
 }
 
@@ -179,9 +159,9 @@ fn load_sources() -> Vec<Source> {
     // read them at runtime on initialization to allow more rapid development on the
     // typst files.
     vec![
-        include_source!("../templates/common/style.typ"),
-        include_source!("../templates/common/scripts.typ"),
-        include_source!("../templates/model-p-22-1.typ"),
+        include_source!("common/style.typ"),
+        include_source!("common/scripts.typ"),
+        include_source!("model-p-22-1.typ"),
     ]
 }
 
@@ -202,10 +182,11 @@ fn load_fonts() -> (Vec<Font>, FontBook) {
     // We include each file individually to make sure that all expected files are available.
     // Note that these font files are only read at font index 0 (i.e. font files with multiple
     // fonts are not supported, split them up in separate files instead)
-    include_font!("fonts/bitstream-vera/Vera.ttf");
-    include_font!("fonts/bitstream-vera/VeraBd.ttf");
-    include_font!("fonts/bitstream-vera/VeraBI.ttf");
-    include_font!("fonts/bitstream-vera/VeraIt.ttf");
+    include_font!("fonts/DM_Sans/DMSans-VariableFont_opsz,wght.ttf");
+    include_font!("fonts/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf");
+    include_font!("fonts/Geist_Mono/GeistMono-Regular.otf");
+    include_font!("fonts/Geist_Mono/GeistMonoVF.ttf");
+    include_font!("fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf");
 
     (fonts, fontbook)
 }

@@ -59,10 +59,7 @@ fn generate<'a>(model: PdfModel) -> Result<PdfGenResult<'a>, APIError> {
 }
 
 /// Defines the available models and what their input parameters are.
-#[derive(Serialize, Deserialize)]
-#[serde(tag = "model", content = "input")]
 pub enum PdfModel {
-    #[serde(rename = "model-p-22-1")]
     ModelP22_1(ModelP22_1Input),
 }
 

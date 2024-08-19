@@ -198,7 +198,7 @@ impl IntoResponse for APIError {
                 println!("PDF generation error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".to_string()),
+                    to_error("Internal server error".into()),
                 )
             }
         };

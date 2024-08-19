@@ -91,6 +91,11 @@ export const pollingStationDataEntryHandler = http.post<
       political_group_votes,
     } = json.data;
 
+    // Rules and checks implemented in this mock api:
+    // F.201-204, F.301-305, F.401, W.301-302
+    // Rules and checks not implemented in this mock api:
+    // W.201-210
+
     const total_votes_counts = votes_counts.total_votes_cast_count;
     let total_voters_counts;
 
@@ -312,8 +317,6 @@ export const pollingStationDataEntryHandler = http.post<
         code: "F204",
       });
     }
-
-    //OPTION: threshold checks
 
     return HttpResponse.json(response, { status: 200 });
   } catch (e) {

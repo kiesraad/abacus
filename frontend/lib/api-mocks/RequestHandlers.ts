@@ -94,11 +94,30 @@ export const pollingStationDataEntryHandler = http.post<
     const total_votes_counts = votes_counts.total_votes_cast_count;
     let total_voters_counts;
 
-    // if recounted = true
     if (voters_recounts) {
-      //SECTION voters_recounts
+      // if recounted = true
       total_voters_counts = voters_recounts.total_admitted_voters_recount;
 
+      //SECTION votes_counts
+      // F.202 E + F + G = H
+      if (
+        votes_counts.votes_candidates_counts +
+          votes_counts.blank_votes_count +
+          votes_counts.invalid_votes_count !==
+        votes_counts.total_votes_cast_count
+      ) {
+        response.validation_results.errors.push({
+          fields: [
+            "data.votes_counts.total_votes_cast_count",
+            "data.votes_counts.votes_candidates_counts",
+            "data.votes_counts.blank_votes_count",
+            "data.votes_counts.invalid_votes_count",
+          ],
+          code: "F202",
+        });
+      }
+
+      //SECTION voters_recounts
       // F.203 A.2 + B.2 + C.2 = D.2
       if (
         voters_recounts.poll_card_recount +
@@ -116,11 +135,11 @@ export const pollingStationDataEntryHandler = http.post<
           code: "F203",
         });
       }
-      // if recounted = false
     } else {
-      //SECTION voters_counts
+      // if recounted = false
       total_voters_counts = voters_counts.total_admitted_voters_count;
 
+      //SECTION voters_counts
       // F.201 A + B + C = D
       if (
         voters_counts.poll_card_count +
@@ -138,25 +157,25 @@ export const pollingStationDataEntryHandler = http.post<
           code: "F201",
         });
       }
-    }
 
-    //SECTION votes_counts
-    // F.202 E + F + G = H
-    if (
-      votes_counts.votes_candidates_counts +
-        votes_counts.blank_votes_count +
-        votes_counts.invalid_votes_count !==
-      votes_counts.total_votes_cast_count
-    ) {
-      response.validation_results.errors.push({
-        fields: [
-          "data.votes_counts.total_votes_cast_count",
-          "data.votes_counts.votes_candidates_counts",
-          "data.votes_counts.blank_votes_count",
-          "data.votes_counts.invalid_votes_count",
-        ],
-        code: "F202",
-      });
+      //SECTION votes_counts
+      // F.202 E + F + G = H
+      if (
+        votes_counts.votes_candidates_counts +
+          votes_counts.blank_votes_count +
+          votes_counts.invalid_votes_count !==
+        votes_counts.total_votes_cast_count
+      ) {
+        response.validation_results.errors.push({
+          fields: [
+            "data.votes_counts.total_votes_cast_count",
+            "data.votes_counts.votes_candidates_counts",
+            "data.votes_counts.blank_votes_count",
+            "data.votes_counts.invalid_votes_count",
+          ],
+          code: "F202",
+        });
+      }
     }
 
     //SECTION differences_counts

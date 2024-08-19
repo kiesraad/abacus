@@ -96,18 +96,17 @@ impl Validate for PollingStationResults {
         validation_results: &mut ValidationResults,
         field_name: String,
     ) -> Result<(), DataError> {
-        self.votes_counts.validate(
-            election,
-            validation_results,
-            format!("{field_name}.votes_counts"),
-        )?;
-
         let total_votes_counts = self.votes_counts.total_votes_cast_count;
         let total_voters_counts: Count;
 
-        // if recounted = true
         if let Some(voters_recounts) = &self.voters_recounts {
+            // if recounted = true
             total_voters_counts = voters_recounts.total_admitted_voters_recount;
+            self.votes_counts.validate(
+                election,
+                validation_results,
+                format!("{field_name}.votes_counts"),
+            )?;
             voters_recounts.validate(
                 election,
                 validation_results,
@@ -124,13 +123,18 @@ impl Validate for PollingStationResults {
                     code: ValidationResultCode::W210,
                 });
             }
-        // if recounted = false
         } else {
+            // if recounted = false
             total_voters_counts = self.voters_counts.total_admitted_voters_count;
             self.voters_counts.validate(
                 election,
                 validation_results,
                 format!("{field_name}.voters_counts"),
+            )?;
+            self.votes_counts.validate(
+                election,
+                validation_results,
+                format!("{field_name}.votes_counts"),
             )?;
 
             // W.209 validate that the numbers in voters_counts and votes_counts are not the same

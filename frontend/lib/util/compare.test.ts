@@ -33,5 +33,9 @@ describe("Compare util", () => {
     const obj4A = { foo: 0 };
     const obj4B = { foo: 0 };
     expect(deepEqual(obj4A, obj4B)).equals(true);
+
+    const obj5A = { foo: 0 };
+    const obj5B = { foo: "" };
+    expect(deepEqual(obj5A, obj5B, true)).equals(true);
   });
 });

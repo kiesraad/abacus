@@ -121,7 +121,7 @@ const defaultValues: PollingStationValues = {
 describe("PollingStationUtils", () => {
   test("addValidationResultToFormState adds result to correct section", () => {
     const formState = structuredClone(defaultFormState);
-
+    formState.sections.voters_votes_counts.isSaved = true;
     const validationResults: ValidationResult[] = [
       {
         fields: ["data.votes_counts.blank_votes_count"],
@@ -137,6 +137,10 @@ describe("PollingStationUtils", () => {
   test("addValidationResultToFormState adds result to multiple sections", () => {
     const formState = structuredClone(defaultFormState);
 
+    formState.sections.voters_votes_counts.isSaved = true;
+    if (formState.sections.political_group_votes_1)
+      formState.sections.political_group_votes_1.isSaved = true;
+
     const validationResults: ValidationResult[] = [
       {
         fields: ["data.votes_counts.invalid_votes_count", "data.political_group_votes[0]"],
@@ -148,6 +152,22 @@ describe("PollingStationUtils", () => {
 
     expect(formState.sections.voters_votes_counts.errors.length).toBe(1);
     expect(formState.sections.political_group_votes_1?.errors.length).toBe(1);
+  });
+
+  test("addValidationResultToFormState doesnt add errors to unsaved sections", () => {
+    const formState = structuredClone(defaultFormState);
+
+    const validationResults: ValidationResult[] = [
+      {
+        fields: ["data.votes_counts.invalid_votes_count", "data.political_group_votes[0]"],
+        code: "F401",
+      },
+    ];
+
+    addValidationResultToFormState(formState, validationResults, "errors");
+
+    expect(formState.sections.voters_votes_counts.errors.length).toBe(0);
+    expect(formState.sections.political_group_votes_1?.errors.length).toBe(0);
   });
 
   test("formSectionComplete", () => {
@@ -208,7 +228,8 @@ describe("PollingStationUtils", () => {
       type: "differences",
       getValues: () => ({
         differences_counts: {
-          more_ballots_count: 0,
+          //@ts-expect-error-next-line
+          more_ballots_count: "",
           fewer_ballots_count: 0,
           unreturned_ballots_count: 0,
           too_few_ballots_handed_out_count: 0,

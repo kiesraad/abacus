@@ -279,6 +279,7 @@ export function PollingStationFormController({
         if (activeFormSection) {
           //store that this section has been sent to the server
           activeFormSection.isSaved = true;
+          //store that this section has been submitted, this resets on each request
           activeFormSection.isSubmitted = true;
           //flag ignore warnings
           activeFormSection.ignoreWarnings = _ignoreWarnings.current === activeFormSection.id;
@@ -308,6 +309,8 @@ export function PollingStationFormController({
             section.warnings = section.warnings.filter((err) => !isGlobalValidationResult(err));
           });
         }
+
+        console.log(newFormState);
 
         return newFormState;
       });

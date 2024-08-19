@@ -27,18 +27,26 @@ export function addValidationResultToFormState(
         case "votes_counts":
         case "voters_counts":
         case "voters_recounts":
-          formState.sections.voters_votes_counts[target].push(validationResult);
+          //dont add errors and warnings to the form state if the section is not saved
+          if (formState.sections.voters_votes_counts.isSaved) {
+            formState.sections.voters_votes_counts[target].push(validationResult);
+          }
           break;
         case "differences_counts":
-          formState.sections.differences_counts[target].push(validationResult);
+          //dont add errors and warnings to the form state if the section is not saved
+          if (formState.sections.differences_counts.isSaved) {
+            formState.sections.differences_counts[target].push(validationResult);
+          }
           break;
         case "political_group_votes":
           if (index !== undefined) {
-            //TODO: check this index vs number thing, it's very confusing/error prone
             const sectionKey = `political_group_votes_${index + 1}` as FormSectionID;
             const section = formState.sections[sectionKey];
             if (section) {
-              section[target].push(validationResult);
+              //dont add errors and warnings to the form state if the section is not saved
+              if (section.isSaved) {
+                section[target].push(validationResult);
+              }
             }
           }
           break;
@@ -121,7 +129,7 @@ export function currentFormHasChanges(
       voters_recounts: values.voters_recounts,
     };
     const valB = currentForm.getValues();
-    return !deepEqual(valA, valB);
+    return !deepEqual(valA, valB, true);
   }
 
   if (currentForm.type === "differences") {
@@ -129,14 +137,14 @@ export function currentFormHasChanges(
       differences_counts: values.differences_counts,
     };
     const valB = currentForm.getValues();
-    return !deepEqual(valA, valB);
+    return !deepEqual(valA, valB, true);
   }
 
   //political_group_votes
   const valA = values.political_group_votes.find((pg) => pg.number === currentForm.number);
   if (valA) {
     const valB = currentForm.getValues();
-    return !deepEqual(valA, valB);
+    return !deepEqual(valA, valB, true);
   }
 
   return false;

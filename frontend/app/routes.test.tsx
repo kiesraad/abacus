@@ -14,7 +14,7 @@ const setupTestRouter = () => {
 };
 
 const expectNotFound = async () => {
-  expect(await screen.findByText(/Er ging iet mis./)).toBeVisible();
+  expect(await screen.findByText(/Er ging iets mis./)).toBeVisible();
 };
 
 describe("routes", () => {

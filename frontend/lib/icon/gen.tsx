@@ -64,7 +64,7 @@ export const IconChevronRight = () => (
   <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M7.5 15L12.5 10L7.5 5"
-      stroke="#475467"
+      stroke="currentColor"
       strokeWidth="1.66667"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -148,6 +148,17 @@ export const IconPencil = () => (
 export const IconThumbsUp = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M17.4,23H4c-1.7,0-3-1.3-3-3v-7c0-1.7,1.3-3,3-3h2.4l3.5-7.9c.3-.7.9-1.1,1.7-1.1,1.9,0,3.5,1.6,3.5,3.5v3.5h3.5c1.2,0,2.3.5,3,1.4s1.1,2.1.9,3.2l-1.1,7c-.3,2-2,3.4-4,3.4ZM8,21h9.4c1,0,1.8-.7,2-1.7l1.1-7c0-.6,0-1.2-.5-1.6-.4-.4-.9-.7-1.5-.7h-3.5c-1.1,0-2-.9-2-2v-3.5c0-.8-.6-1.4-1.4-1.5l-3.5,7.8c0,.1-.1.2-.2.3v9.9ZM4,12c-.6,0-1,.4-1,1v7c0,.6.4,1,1,1h2v-9h-2Z" />
+  </svg>
+);
+export const IconUser = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M20 21C20 19.6044 20 18.9067 19.8278 18.3389C19.44 17.0605 18.4395 16.06 17.1611 15.6722C16.5933 15.5 15.8956 15.5 14.5 15.5H9.5C8.10444 15.5 7.40665 15.5 6.83886 15.6722C5.56045 16.06 4.56004 17.0605 4.17224 18.3389C4 18.9067 4 19.6044 4 21M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 export const IconWarning = () => (

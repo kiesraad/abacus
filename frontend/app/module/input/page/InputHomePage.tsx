@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm";
+import { NavBar } from "app/component/navbar/NavBar.tsx";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { Alert, Button, PageTitle, WorkStationNumber } from "@kiesraad/ui";
@@ -23,6 +24,9 @@ export function InputHomePage() {
   return (
     <>
       <PageTitle title="Kies een stembureau - Abacus" />
+      <NavBar>
+        <Link to={"/overview"}>Overzicht</Link>
+      </NavBar>
       <header>
         <section>
           <h1>{election.name}</h1>

@@ -472,6 +472,14 @@ impl Validate for VotesCounts {
                 code: ValidationResultCode::W202,
             });
         }
+
+        // W.205 validate that total number of votes cast is not 0
+        if self.total_votes_cast_count == 0 {
+            validation_results.warnings.push(ValidationResult {
+                fields: vec![format!("{field_name}.total_votes_cast_count")],
+                code: ValidationResultCode::W205,
+            });
+        }
         Ok(())
     }
 }
@@ -1546,6 +1554,32 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec!["votes_counts.invalid_votes_count",]
+        );
+
+        // test W.205 total votes cast should not be zero
+        validation_results = ValidationResults::default();
+        votes_counts = VotesCounts {
+            votes_candidates_counts: 0,
+            blank_votes_count: 0,
+            invalid_votes_count: 0,
+            total_votes_cast_count: 0, // W.205 should not be zero
+        };
+        votes_counts
+            .validate(
+                &election,
+                &mut validation_results,
+                "votes_counts".to_string(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W205
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec!["votes_counts.total_votes_cast_count",]
         );
     }
 

@@ -126,4 +126,41 @@ test.describe("errors and warnings", () => {
     await expect(votersVotesPage.warning).toBeVisible();
     await expect(votersVotesPage.error).toBeHidden();
   });
+
+  test("accept warning on voters and votes page", async ({ page }) => {
+    await page.goto("/1/input/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.no.check();
+    await recountedPage.next.click();
+
+    const votersVotesPage = new VotersVotesPage(page);
+    const voters = {
+      poll_card_count: "100",
+      proxy_certificate_count: "0",
+      voter_card_count: "0",
+      total_admitted_voters_count: "100",
+    };
+    const votes = {
+      votes_candidates_counts: "100",
+      blank_votes_count: "0",
+      invalid_votes_count: "0",
+      total_votes_cast_count: "100",
+    };
+    await votersVotesPage.inputVoters(voters);
+    await votersVotesPage.inputVotes(votes);
+
+    await votersVotesPage.next.click();
+
+    await votersVotesPage.acceptWarnings.check();
+
+    await votersVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toHaveText(
+      "Verschil tussen aantal kiezers en getelde stemmen",
+    );
+
+    await expect(differencesPage.navVotersAndVotes).toHaveClass("idle warning");
+  });
 });

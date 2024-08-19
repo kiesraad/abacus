@@ -25,6 +25,7 @@ export class VotersVotesPage extends InputBasePage {
   readonly blankVotesCount: Locator;
   readonly invalidVotesCount: Locator;
   readonly totalVotesCastCount: Locator;
+  readonly acceptWarnings: Locator;
   readonly next: Locator;
 
   constructor(page: Page) {
@@ -38,6 +39,10 @@ export class VotersVotesPage extends InputBasePage {
     this.blankVotesCount = page.getByTestId("blank_votes_count");
     this.invalidVotesCount = page.getByTestId("invalid_votes_count");
     this.totalVotesCastCount = page.getByTestId("total_votes_cast_count");
+
+    this.acceptWarnings = page.getByLabel(
+      "Ik heb de aantallen gecontroleerd met papier en correct overgenomen.",
+    );
 
     this.next = page.getByRole("button", { name: "Volgende" });
   }

@@ -6,6 +6,8 @@ export class InputBasePage {
   readonly error: Locator;
   readonly warning: Locator;
 
+  readonly navVotersAndVotes: Locator;
+
   constructor(page: Page) {
     this.page = page;
 
@@ -13,5 +15,7 @@ export class InputBasePage {
 
     this.error = page.getByTestId("feedback-error");
     this.warning = page.getByTestId("feedback-warning");
+
+    this.navVotersAndVotes = page.locator("li").filter({ hasText: "Aantal kiezers en stemmen" });
   }
 }

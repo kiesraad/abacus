@@ -15,7 +15,7 @@ export function AccountSetupForm() {
   const navigate = useNavigate();
   function handleSubmit(event: React.FormEvent<AccountSetupFormElement>) {
     event.preventDefault();
-    navigate("/overview");
+    navigate("/overview#new_account");
   }
 
   return (

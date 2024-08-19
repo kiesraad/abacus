@@ -172,4 +172,33 @@ describe("PollingStationFormNavigation", () => {
       expect(title).toBeInTheDocument();
     }
   });
+
+  test("500 response results in display of error message", async () => {
+    (usePollingStationFormController as Mock).mockReturnValueOnce({
+      formState: {
+        ...mockFormState,
+      },
+      error: {
+        errorCode: 500,
+        message: "Internal server error",
+      },
+      currentForm: {
+        id: "recounted",
+        type: "recounted",
+        getValues: () => ({
+          recounted: true,
+        }),
+      },
+      setTemporaryCache: vi.fn(),
+      targetFormSection: "recounted",
+      values: {
+        recounted: true,
+      },
+    });
+
+    render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
+
+    const feedbackServerError = await screen.findByTestId("feedback-server-error");
+    expect(feedbackServerError).toHaveTextContent(/^500: Internal server error$/);
+  });
 });

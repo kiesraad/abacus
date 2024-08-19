@@ -200,40 +200,6 @@ describe("Test DifferencesForm", () => {
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
     });
-
-    //Server errors are no longer rendered inside the form
-    // test("422 response results in display of error message", async () => {
-    //   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
-    //     message: "422 error from mock",
-    //   });
-    //
-    //   const user = userEvent.setup();
-    //
-    //   renderForm();
-    //
-    //   const submitButton = await screen.findByRole("button", { name: "Volgende" });
-    //   await user.click(submitButton);
-    //   //TODO: server errors moved out of the form
-    //   //const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    //   //expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
-    // });
-
-    //Server errors are no longer rendered inside the form
-    // test("500 response results in display of error message", async () => {
-    //   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
-    //     message: "500 error from mock",
-    //   });
-    //
-    //   const user = userEvent.setup();
-    //
-    //   renderForm();
-    //
-    //   const submitButton = await screen.findByRole("button", { name: "Volgende" });
-    //   await user.click(submitButton);
-    //   //TODO: server errors moved out of the form
-    //   //const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    //   //expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
-    // });
   });
 
   describe("DifferencesForm errors", () => {

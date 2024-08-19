@@ -29,7 +29,7 @@ export interface CandidatesVotesFormProps {
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
-  const [hideIgnoreWarnings, setHideIgnoreWarnings] = React.useState(false);
+
   const getValues = React.useCallback(() => {
     const form = document.getElementById(
       `candidates_form_${group.number}`,
@@ -55,21 +55,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   usePreventFormEnterSubmit(formRef);
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
-
-  // if this form has been saved and there are warnings that were ignored, reset the ignoreWarnings checkbox if changes are made.
-  React.useEffect(() => {
-    if (isSaved && warnings.length > 0) {
-      const onKeyUp = () => {
-        setHideIgnoreWarnings(true);
-        document.removeEventListener("keyup", onKeyUp);
-      };
-
-      document.addEventListener("keyup", onKeyUp);
-      return () => {
-        document.removeEventListener("keyup", onKeyUp);
-      };
-    }
-  }, [isSaved, warnings]);
 
   React.useEffect(() => {
     if (isSaved) {
@@ -153,7 +138,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="inputgrid">
-        <BottomBar.Row hidden={errors.length > 0 || hideIgnoreWarnings || warnings.length === 0}>
+        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0}>
           <Checkbox id="voters_and_votes_form_ignore_warnings" defaultChecked={ignoreWarnings}>
             Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
           </Checkbox>

@@ -36,7 +36,7 @@ export function DifferencesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<HTMLFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-  const [hideIgnoreWarnings, setHideIgnoreWarnings] = React.useState(false);
+
   const getValues = React.useCallback(() => {
     const form = document.getElementById("differences_form") as DifferencesFormElement;
     const elements = form.elements;
@@ -68,20 +68,6 @@ export function DifferencesForm() {
   }
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
-
-  React.useEffect(() => {
-    if (isSaved && warnings.length > 0) {
-      const onKeyUp = () => {
-        setHideIgnoreWarnings(true);
-        document.removeEventListener("keyup", onKeyUp);
-      };
-
-      document.addEventListener("keyup", onKeyUp);
-      return () => {
-        document.removeEventListener("keyup", onKeyUp);
-      };
-    }
-  }, [isSaved, warnings]);
 
   React.useEffect(() => {
     if (isSaved) {
@@ -202,7 +188,7 @@ export function DifferencesForm() {
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="inputgrid">
-        <BottomBar.Row hidden={errors.length > 0 || hideIgnoreWarnings || warnings.length === 0}>
+        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0}>
           <Checkbox id="voters_and_votes_form_ignore_warnings" defaultChecked={ignoreWarnings}>
             Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
           </Checkbox>

@@ -119,7 +119,16 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
             "data.political_group_votes"
         ]
     );
-    assert_eq!(body.validation_results.warnings.len(), 0);
+    let warnings = body.validation_results.warnings;
+    assert_eq!(warnings.len(), 1);
+    assert_eq!(warnings[0].code, ValidationResultCode::W203);
+    assert_eq!(
+        warnings[0].fields,
+        vec![
+            "data.voters_counts.total_admitted_voters_count",
+            "data.votes_counts.total_votes_cast_count"
+        ]
+    );
 }
 
 #[sqlx::test]

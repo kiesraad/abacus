@@ -69,6 +69,18 @@ impl From<String> for PollingStationType {
     }
 }
 
+/// Check if the difference between the total admitted voters count and the total votes cast count
+/// is above the threshold, meaning 2% or more or 15 or more, which should result in a warning.
+fn difference_admitted_voters_count_and_votes_cast_count_above_threshold(
+    admitted_voters: u32,
+    votes_cast: u32,
+) -> bool {
+    let float_admitted_voters: f64 = f64::from(admitted_voters);
+    let float_votes_cast: f64 = f64::from(votes_cast);
+    f64::abs(float_admitted_voters - float_votes_cast) / float_votes_cast >= 0.02
+        || f64::abs(float_admitted_voters - float_votes_cast) >= 15.0
+}
+
 /// PollingStationResults, following the fields in
 /// "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar lichaam
 ///  in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht"
@@ -117,12 +129,26 @@ impl Validate for PollingStationResults {
                 format!("{field_name}.voters_recounts"),
             )?;
 
+            // W.204 validate that the difference between total votes cast count and total admitted voters recount is not above threshold
+            if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
+                voters_recounts.total_admitted_voters_recount,
+                self.votes_counts.total_votes_cast_count,
+            ) {
+                validation_results.warnings.push(ValidationResult {
+                    fields: vec![
+                        format!("{field_name}.votes_counts.total_votes_cast_count"),
+                        format!("{field_name}.voters_recounts.total_admitted_voters_recount"),
+                    ],
+                    code: ValidationResultCode::W204,
+                });
+            }
+
             // W.210 validate that the numbers in voters_recounts and votes_counts are not the same
             if identical_voters_recounts_and_votes_counts(voters_recounts, &self.votes_counts) {
                 validation_results.warnings.push(ValidationResult {
                     fields: vec![
-                        format!("{field_name}.voters_recounts"),
                         format!("{field_name}.votes_counts"),
+                        format!("{field_name}.voters_recounts"),
                     ],
                     code: ValidationResultCode::W210,
                 });
@@ -142,6 +168,20 @@ impl Validate for PollingStationResults {
                 validation_results,
                 format!("{field_name}.votes_counts"),
             )?;
+
+            // W.203 validate that the difference between total votes cast count and total admitted voters recount is not above threshold
+            if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
+                self.voters_counts.total_admitted_voters_count,
+                self.votes_counts.total_votes_cast_count,
+            ) {
+                validation_results.warnings.push(ValidationResult {
+                    fields: vec![
+                        format!("{field_name}.voters_counts.total_admitted_voters_count"),
+                        format!("{field_name}.votes_counts.total_votes_cast_count"),
+                    ],
+                    code: ValidationResultCode::W203,
+                });
+            }
 
             // W.209 validate that the numbers in voters_counts and votes_counts are not the same
             if identical_voters_counts_and_votes_counts(&self.voters_counts, &self.votes_counts) {
@@ -909,21 +949,21 @@ mod tests {
 
     #[test]
     fn test_polling_station_results_incorrect_total_and_difference_validation() {
-        // test F.201 incorrect total, F.202 incorrect total and F.301 incorrect difference
+        // test F.201 incorrect total, F.202 incorrect total, F.301 incorrect difference & W.203 above threshold in absolute numbers
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: false,
             voters_counts: VotersCounts {
-                poll_card_count: 1,
+                poll_card_count: 29,
                 proxy_certificate_count: 2,
                 voter_card_count: 3,
-                total_admitted_voters_count: 5, // F.201 incorrect total
+                total_admitted_voters_count: 35, // F.201 incorrect total & W.203 above threshold in absolute numbers
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 2,
+                votes_candidates_counts: 44,
                 blank_votes_count: 1,
                 invalid_votes_count: 4,
-                total_votes_cast_count: 8, // F.202 incorrect total
+                total_votes_cast_count: 50, // F.202 incorrect total & W.203 above threshold in absolute numbers
             },
             voters_recounts: None,
             differences_counts: DifferencesCounts {
@@ -937,10 +977,10 @@ mod tests {
             },
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,
-                total: 2,
+                total: 44,
                 candidate_votes: vec![CandidateVotes {
                     number: 1,
-                    votes: 2,
+                    votes: 44,
                 }],
             }],
         };
@@ -955,7 +995,7 @@ mod tests {
             )
             .unwrap();
         assert_eq!(validation_results.errors.len(), 3);
-        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F201
@@ -990,8 +1030,19 @@ mod tests {
             validation_results.errors[2].fields,
             vec!["polling_station_results.differences_counts.more_ballots_count"]
         );
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W203
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "polling_station_results.voters_counts.total_admitted_voters_count",
+                "polling_station_results.votes_counts.total_votes_cast_count"
+            ]
+        );
 
-        // test F.303 incorrect difference and F.304 should be empty
+        // test F.303 incorrect difference & F.304 should be empty
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: false,
@@ -1053,7 +1104,7 @@ mod tests {
             vec!["polling_station_results.differences_counts.more_ballots_count"]
         );
 
-        // test F.201 incorrect total, F.202 incorrect total, F.203 incorrect total, F.301 incorrect difference and F.302 should be empty
+        // test F.201 incorrect total, F.202 incorrect total, F.203 incorrect total, F.301 incorrect difference, F.302 should be empty & W.204 above threshold in percentage
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: true,
@@ -1061,13 +1112,13 @@ mod tests {
                 poll_card_count: 1,
                 proxy_certificate_count: 2,
                 voter_card_count: 3,
-                total_admitted_voters_count: 5, // F.201 incorrect total
+                total_admitted_voters_count: 5, // F.201 incorrect total & W.204 above threshold in percentage
             },
             votes_counts: VotesCounts {
                 votes_candidates_counts: 3,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
-                total_votes_cast_count: 6, // F.202 incorrect total
+                total_votes_cast_count: 6, // F.202 incorrect total & W.204 above threshold in percentage
             },
             voters_recounts: Some(VotersRecounts {
                 poll_card_recount: 1,
@@ -1102,7 +1153,7 @@ mod tests {
             )
             .unwrap();
         assert_eq!(validation_results.errors.len(), 4);
-        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F202
@@ -1145,8 +1196,19 @@ mod tests {
             validation_results.errors[3].fields,
             vec!["polling_station_results.differences_counts.fewer_ballots_count"]
         );
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W204
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.voters_recounts.total_admitted_voters_recount"
+            ]
+        );
 
-        // test F.303 incorrect difference and F.304 should be empty
+        // test F.303 incorrect difference, F.304 should be empty & W.204 above threshold in absolute numbers
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: true,
@@ -1157,32 +1219,32 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 100,
+                votes_candidates_counts: 101,
                 blank_votes_count: 2,
                 invalid_votes_count: 2,
-                total_votes_cast_count: 104,
+                total_votes_cast_count: 105, // W.204 above threshold in absolute numbers
             },
             voters_recounts: Some(VotersRecounts {
-                poll_card_recount: 100,
+                poll_card_recount: 115,
                 proxy_certificate_recount: 2,
                 voter_card_recount: 3,
-                total_admitted_voters_recount: 105,
+                total_admitted_voters_recount: 120, // W.204 above threshold in absolute numbers
             }),
             differences_counts: DifferencesCounts {
-                more_ballots_count: 2,  // F.304 should be empty
+                more_ballots_count: 15, // F.304 should be empty
                 fewer_ballots_count: 0, // F.303 incorrect difference
                 unreturned_ballots_count: 0,
                 too_few_ballots_handed_out_count: 0,
                 too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 0,
-                no_explanation_count: 2,
+                other_explanation_count: 8,
+                no_explanation_count: 7,
             },
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,
-                total: 100,
+                total: 101,
                 candidate_votes: vec![CandidateVotes {
                     number: 1,
-                    votes: 100,
+                    votes: 101,
                 }],
             }],
         };
@@ -1195,7 +1257,7 @@ mod tests {
             )
             .unwrap();
         assert_eq!(validation_results.errors.len(), 2);
-        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F303
@@ -1212,11 +1274,22 @@ mod tests {
             validation_results.errors[1].fields,
             vec!["polling_station_results.differences_counts.more_ballots_count",]
         );
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W204
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.voters_recounts.total_admitted_voters_recount"
+            ]
+        );
     }
 
     #[test]
     fn test_polling_station_results_wrong_and_no_difference_validation() {
-        // test F.304 should be empty
+        // test F.304 should be empty & W.203 above threshold in percentage
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: false,
@@ -1224,13 +1297,13 @@ mod tests {
                 poll_card_count: 50,
                 proxy_certificate_count: 2,
                 voter_card_count: 4,
-                total_admitted_voters_count: 56,
+                total_admitted_voters_count: 56, // W.203 above threshold in percentage
             },
             votes_counts: VotesCounts {
                 votes_candidates_counts: 50,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
-                total_votes_cast_count: 52,
+                total_votes_cast_count: 52, // W.203 above threshold in percentage
             },
             voters_recounts: None,
             differences_counts: DifferencesCounts {
@@ -1262,7 +1335,7 @@ mod tests {
             )
             .unwrap();
         assert_eq!(validation_results.errors.len(), 1);
-        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F304
@@ -1270,6 +1343,17 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec!["polling_station_results.differences_counts.more_ballots_count",]
+        );
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W203
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "polling_station_results.voters_counts.total_admitted_voters_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
+            ]
         );
 
         // test F.305 no difference expected
@@ -1330,7 +1414,7 @@ mod tests {
             ]
         );
 
-        // test F.305 no difference expected and F.204 incorrect total
+        // test F.305 no difference expected & F.204 incorrect total
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: true,
@@ -1504,8 +1588,8 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
+                "polling_station_results.votes_counts",
                 "polling_station_results.voters_recounts",
-                "polling_station_results.votes_counts"
             ]
         );
     }

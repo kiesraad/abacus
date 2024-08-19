@@ -9,7 +9,7 @@ use typst::{
     Library, World,
 };
 
-use super::PdfModel;
+use super::models::PdfModel;
 
 /// Contains the context for rendering PDFs.
 pub struct PdfWorld {
@@ -161,7 +161,7 @@ fn load_sources() -> Vec<Source> {
     vec![
         include_source!("common/style.typ"),
         include_source!("common/scripts.typ"),
-        include_source!("model-p-22-1.typ"),
+        include_source!("model-na-31-2.typ"),
     ]
 }
 

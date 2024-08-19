@@ -4,6 +4,8 @@ use hyper::{header, HeaderMap};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
+use crate::pdf_gen::generate_pdf;
+use crate::pdf_gen::models::{ModelNa31_2Input, PdfModel};
 use crate::polling_station::repository::PollingStations;
 use crate::polling_station::PollingStationStatusEntry;
 use crate::APIError;
@@ -117,11 +119,16 @@ pub async fn election_download_results(
     State(elections_repo): State<Elections>,
     Path(id): Path<u32>,
 ) -> Result<(HeaderMap, Vec<u8>), APIError> {
-    let _election = elections_repo.get(id).await?;
+    let election = elections_repo.get(id).await?;
+
+    let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
+        aanduiding_verkiezing: election.name,
+        datum: election.election_date.format("%d-%m-%Y").to_string(),
+        plek: "Gemeente Zilverhaven".to_string(),
+    }))?;
 
     // TODO: Replace this with the generated PDF
     let filename = "proces-verbaal.pdf";
-    let content = &[];
 
     let disposition_header = format!("attachment; filename=\"{}\"", filename);
 
@@ -129,5 +136,5 @@ pub async fn election_download_results(
     headers.insert(header::CONTENT_TYPE, "application/pdf".parse()?);
     headers.insert(header::CONTENT_DISPOSITION, disposition_header.parse()?);
 
-    Ok((headers, content.to_vec()))
+    Ok((headers, content.buffer))
 }

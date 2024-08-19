@@ -21,7 +21,7 @@ export function PollingStationChoiceForm() {
   );
 
   const handleSubmit = () => {
-    if (!currentPollingStation || pollingStationNumber === "") {
+    if (pollingStationNumber === "") {
       setShowAlert(true);
       return;
     }
@@ -30,8 +30,11 @@ export function PollingStationChoiceForm() {
     const pollingStation = pollingStations.find(
       (pollingStation) => pollingStation.number === parsedStationNumber,
     );
+
     if (pollingStation) {
       navigate(`./${pollingStation.id}/recounted`);
+    } else {
+      setShowAlert(true);
     }
   };
 

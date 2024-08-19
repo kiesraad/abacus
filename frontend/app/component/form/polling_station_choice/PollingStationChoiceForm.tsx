@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { PollingStation, usePollingStationList } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
-import { cn, parseIntStrict } from "@kiesraad/util";
+import { cn, parseIntStrict, useDebouncedCallback } from "@kiesraad/util";
 
 import { PollingStationSelector } from "./PollingStationSelector";
 import cls from "./PollingStationSelector.module.css";
 import { PollingStationsList } from "./PollingStationsList";
+
+const USER_INPUT_DEBOUNCE: number = 500; // ms
 
 export function PollingStationChoiceForm() {
   const navigate = useNavigate();
@@ -16,9 +18,23 @@ export function PollingStationChoiceForm() {
   const { pollingStations, pollingStationsLoading } = usePollingStationList();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(
     undefined,
   );
+
+  const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
+    setLoading(false);
+    setCurrentPollingStation(pollingStation);
+  }, USER_INPUT_DEBOUNCE);
+
+  useMemo(() => {
+    const parsedInt = parseIntStrict(pollingStationNumber);
+    setLoading(true);
+    debouncedCallback(
+      pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt),
+    );
+  }, [pollingStationNumber, pollingStations, debouncedCallback]);
 
   const handleSubmit = () => {
     if (pollingStationNumber === "") {
@@ -35,6 +51,8 @@ export function PollingStationChoiceForm() {
       navigate(`./${pollingStation.id}/recounted`);
     } else {
       setShowAlert(true);
+      setLoading(false);
+      return;
     }
   };
 
@@ -49,6 +67,8 @@ export function PollingStationChoiceForm() {
       <PollingStationSelector
         pollingStationNumber={pollingStationNumber}
         setPollingStationNumber={setPollingStationNumber}
+        loading={loading}
+        setLoading={setLoading}
         currentPollingStation={currentPollingStation}
         setCurrentPollingStation={setCurrentPollingStation}
         setShowAlert={setShowAlert}

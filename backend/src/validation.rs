@@ -28,7 +28,7 @@ pub struct ValidationResult {
     pub code: ValidationResultCode,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ValidationResultCode {
     F201,
     F202,

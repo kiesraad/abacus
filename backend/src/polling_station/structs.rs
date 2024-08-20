@@ -113,15 +113,16 @@ impl Validate for PollingStationResults {
         let total_votes_counts = self.votes_counts.total_votes_cast_count;
         let total_voters_counts: Count;
 
+        self.votes_counts.validate(
+            election,
+            polling_station,
+            validation_results,
+            format!("{field_name}.votes_counts"),
+        )?;
+
         if let Some(voters_recounts) = &self.voters_recounts {
             // if recounted = true
             total_voters_counts = voters_recounts.total_admitted_voters_recount;
-            self.votes_counts.validate(
-                election,
-                polling_station,
-                validation_results,
-                format!("{field_name}.votes_counts"),
-            )?;
             voters_recounts.validate(
                 election,
                 polling_station,
@@ -161,12 +162,6 @@ impl Validate for PollingStationResults {
                 polling_station,
                 validation_results,
                 format!("{field_name}.voters_counts"),
-            )?;
-            self.votes_counts.validate(
-                election,
-                polling_station,
-                validation_results,
-                format!("{field_name}.votes_counts"),
             )?;
 
             // W.203 validate that the difference between total votes cast count and total admitted voters recount is not above threshold
@@ -998,28 +993,28 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::F201
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec![
-                "polling_station_results.voters_counts.total_admitted_voters_count",
-                "polling_station_results.voters_counts.poll_card_count",
-                "polling_station_results.voters_counts.proxy_certificate_count",
-                "polling_station_results.voters_counts.voter_card_count"
-            ]
-        );
-        assert_eq!(
-            validation_results.errors[1].code,
             ValidationResultCode::F202
         );
         assert_eq!(
-            validation_results.errors[1].fields,
+            validation_results.errors[0].fields,
             vec![
                 "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.votes_counts.votes_candidates_counts",
                 "polling_station_results.votes_counts.blank_votes_count",
                 "polling_station_results.votes_counts.invalid_votes_count"
+            ]
+        );
+        assert_eq!(
+            validation_results.errors[1].code,
+            ValidationResultCode::F201
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
+            vec![
+                "polling_station_results.voters_counts.total_admitted_voters_count",
+                "polling_station_results.voters_counts.poll_card_count",
+                "polling_station_results.voters_counts.proxy_certificate_count",
+                "polling_station_results.voters_counts.voter_card_count"
             ]
         );
         assert_eq!(

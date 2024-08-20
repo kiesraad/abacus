@@ -77,7 +77,12 @@ pub async fn polling_station_data_entry(
         &mut validation_results,
         "data".to_string(),
     )?;
-
+    validation_results
+        .errors
+        .sort_by(|a, b| a.code.cmp(&b.code));
+    validation_results
+        .warnings
+        .sort_by(|a, b| a.code.cmp(&b.code));
     let data = serde_json::to_string(&data_entry_request.data)?;
 
     // Save the data entry or update it if it already exists

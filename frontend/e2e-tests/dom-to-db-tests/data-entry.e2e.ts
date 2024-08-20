@@ -88,7 +88,9 @@ test.describe("errors and warnings", () => {
 
     await votersVotesPage.next.click();
 
-    await expect(votersVotesPage.error).toBeVisible();
+    await expect(votersVotesPage.error).toContainText(
+      "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
+    );
     await expect(votersVotesPage.warning).toBeHidden();
   });
 
@@ -114,6 +116,8 @@ test.describe("errors and warnings", () => {
     await votersVotesPage.next.click();
 
     await expect(votersVotesPage.error).toBeHidden();
-    await expect(votersVotesPage.warning).toBeVisible();
+    await expect(votersVotesPage.warning).toContainText(
+      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+    );
   });
 });

@@ -190,7 +190,7 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "W.205",
     content: (
       <div>
-        Het totaal aantal uitgebrachte stemmen (H) is 0.
+        Het totaal aantal uitgebrachte stemmen (H) is nul.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>

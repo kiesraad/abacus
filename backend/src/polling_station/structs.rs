@@ -148,8 +148,14 @@ impl Validate for PollingStationResults {
             if identical_voters_recounts_and_votes_counts(voters_recounts, &self.votes_counts) {
                 validation_results.warnings.push(ValidationResult {
                     fields: vec![
-                        format!("{field_name}.votes_counts"),
-                        format!("{field_name}.voters_recounts"),
+                        format!("{field_name}.votes_counts.votes_candidates_counts"),
+                        format!("{field_name}.votes_counts.blank_votes_count"),
+                        format!("{field_name}.votes_counts.invalid_votes_count"),
+                        format!("{field_name}.votes_counts.total_votes_cast_count"),
+                        format!("{field_name}.voters_recounts.poll_card_recount"),
+                        format!("{field_name}.voters_recounts.proxy_certificate_recount"),
+                        format!("{field_name}.voters_recounts.voter_card_recount"),
+                        format!("{field_name}.voters_recounts.total_admitted_voters_recount"),
                     ],
                     code: ValidationResultCode::W210,
                 });
@@ -427,10 +433,10 @@ impl Validate for VotersCounts {
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![
-                    format!("{field_name}.total_admitted_voters_count"),
                     format!("{field_name}.poll_card_count"),
                     format!("{field_name}.proxy_certificate_count"),
                     format!("{field_name}.voter_card_count"),
+                    format!("{field_name}.total_admitted_voters_count"),
                 ],
                 code: ValidationResultCode::F201,
             });
@@ -507,10 +513,10 @@ impl Validate for VotesCounts {
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![
-                    format!("{field_name}.total_votes_cast_count"),
                     format!("{field_name}.votes_candidates_counts"),
                     format!("{field_name}.blank_votes_count"),
                     format!("{field_name}.invalid_votes_count"),
+                    format!("{field_name}.total_votes_cast_count"),
                 ],
                 code: ValidationResultCode::F202,
             });
@@ -643,10 +649,10 @@ impl Validate for VotersRecounts {
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![
-                    format!("{field_name}.total_admitted_voters_recount"),
                     format!("{field_name}.poll_card_recount"),
                     format!("{field_name}.proxy_certificate_recount"),
                     format!("{field_name}.voter_card_recount"),
+                    format!("{field_name}.total_admitted_voters_recount"),
                 ],
                 code: ValidationResultCode::F203,
             });
@@ -996,10 +1002,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.votes_counts.votes_candidates_counts",
                 "polling_station_results.votes_counts.blank_votes_count",
-                "polling_station_results.votes_counts.invalid_votes_count"
+                "polling_station_results.votes_counts.invalid_votes_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
             ]
         );
         assert_eq!(
@@ -1009,10 +1015,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[1].fields,
             vec![
-                "polling_station_results.voters_counts.total_admitted_voters_count",
                 "polling_station_results.voters_counts.poll_card_count",
                 "polling_station_results.voters_counts.proxy_certificate_count",
-                "polling_station_results.voters_counts.voter_card_count"
+                "polling_station_results.voters_counts.voter_card_count",
+                "polling_station_results.voters_counts.total_admitted_voters_count",
             ]
         );
         assert_eq!(
@@ -1154,10 +1160,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.votes_counts.votes_candidates_counts",
                 "polling_station_results.votes_counts.blank_votes_count",
-                "polling_station_results.votes_counts.invalid_votes_count"
+                "polling_station_results.votes_counts.invalid_votes_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
             ]
         );
         assert_eq!(
@@ -1167,10 +1173,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[1].fields,
             vec![
-                "polling_station_results.voters_recounts.total_admitted_voters_recount",
                 "polling_station_results.voters_recounts.poll_card_recount",
                 "polling_station_results.voters_recounts.proxy_certificate_recount",
-                "polling_station_results.voters_recounts.voter_card_recount"
+                "polling_station_results.voters_recounts.voter_card_recount",
+                "polling_station_results.voters_recounts.total_admitted_voters_recount",
             ]
         );
         assert_eq!(
@@ -1581,8 +1587,14 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
-                "polling_station_results.votes_counts",
-                "polling_station_results.voters_recounts",
+                "polling_station_results.votes_counts.votes_candidates_counts",
+                "polling_station_results.votes_counts.blank_votes_count",
+                "polling_station_results.votes_counts.invalid_votes_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.voters_recounts.poll_card_recount",
+                "polling_station_results.voters_recounts.proxy_certificate_recount",
+                "polling_station_results.voters_recounts.voter_card_recount",
+                "polling_station_results.voters_recounts.total_admitted_voters_recount"
             ]
         );
     }
@@ -1632,10 +1644,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "voters_counts.total_admitted_voters_count",
                 "voters_counts.poll_card_count",
                 "voters_counts.proxy_certificate_count",
-                "voters_counts.voter_card_count"
+                "voters_counts.voter_card_count",
+                "voters_counts.total_admitted_voters_count",
             ]
         );
 
@@ -1713,10 +1725,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "votes_counts.total_votes_cast_count",
                 "votes_counts.votes_candidates_counts",
                 "votes_counts.blank_votes_count",
-                "votes_counts.invalid_votes_count"
+                "votes_counts.invalid_votes_count",
+                "votes_counts.total_votes_cast_count",
             ]
         );
 
@@ -1875,10 +1887,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "voters_recounts.total_admitted_voters_recount",
                 "voters_recounts.poll_card_recount",
                 "voters_recounts.proxy_certificate_recount",
-                "voters_recounts.voter_card_recount"
+                "voters_recounts.voter_card_recount",
+                "voters_recounts.total_admitted_voters_recount",
             ]
         );
 

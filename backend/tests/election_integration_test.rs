@@ -176,10 +176,10 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(
         errors[0].fields,
         vec![
-            "data.voters_counts.total_admitted_voters_count",
             "data.voters_counts.poll_card_count",
             "data.voters_counts.proxy_certificate_count",
-            "data.voters_counts.voter_card_count"
+            "data.voters_counts.voter_card_count",
+            "data.voters_counts.total_admitted_voters_count",
         ]
     );
     // error 2
@@ -187,10 +187,10 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(
         errors[1].fields,
         vec![
-            "data.votes_counts.total_votes_cast_count",
             "data.votes_counts.votes_candidates_counts",
             "data.votes_counts.blank_votes_count",
-            "data.votes_counts.invalid_votes_count"
+            "data.votes_counts.invalid_votes_count",
+            "data.votes_counts.total_votes_cast_count",
         ]
     );
     // error 3

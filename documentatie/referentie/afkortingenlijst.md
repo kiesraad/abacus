@@ -2,7 +2,7 @@
 
 | Afkorting | Hele term en definitie |
 |-----------|------------------------|
-| SB | Stembureau. De plek waar burgers hun stem uitbrengen. Let op: de fysieke locatie heet een _stemlokaal_. In één stemlokaal kunnen meerdere _stembureaus_ gevestigd zijn. In het stembureau wordt de eerste telling van het aantal kiezers en de stemmen gedaan. Soms worden alleen de kiezer+stemmen op partijen geteld (Centrale Stemopneming, CSO), soms ook op kandidaten (Decentrale Stemopneming, DSO) |
+| SB | Stembureau. De plek waar burgers hun stem uitbrengen. Let op: de fysieke locatie heet een _stemlokaal_. In één stemlokaal kunnen meerdere _stembureaus_ gevestigd zijn. In het stembureau wordt de eerste telling van het aantal kiezers en de stemmen gedaan. Soms worden alleen het aantal kiezers en stemmen op partijen geteld (Centrale Stemopneming, CSO), soms ook het aantal stemmen op kandidaten (Decentrale Stemopneming, DSO) |
 | GSB | Gemeentelijk Stembureau. De plek waar de tellingen van alle stembureaus samenkomen. In geval van centrale stemopneming worden op het gemeentelijk stembureau de stemmen op kandidaatniveau geteld. De totalen per partij worden dan vergeleken met de tellingen die eerder op het stembureau zijn gedaan. Op het gemeentelijk stembureau worden de stemmen ingevoerd in de uitslagensoftware. |
 | HSB | Hoofdstembureau. Hier worden de resultaten van alle gemeenten bij elkaar opgeteld om tot een resultaat per Kieskring te komen. |
 | (N)BSB | (Nationaal) Briefstembureau. Stembureau waar alle stemmen die via de post zijn binnengekomen worden geteld.

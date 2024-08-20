@@ -267,6 +267,8 @@ export function PollingStationFormController({
       //Form state changes based of validation results in data.
       setFormState((old) => {
         const newFormState = { ...old };
+        //reset all errors/warnings, and submitted, the server validates the entire request each time.
+        resetFormSectionState(newFormState);
 
         const activeFormSection = newFormState.sections[newFormState.active];
 
@@ -278,8 +280,7 @@ export function PollingStationFormController({
           //flag ignore warnings
           activeFormSection.ignoreWarnings = _ignoreWarnings.current === activeFormSection.id;
         }
-        //reset all errors/warnings, and submitted, the server validates the entire request each time.
-        resetFormSectionState(newFormState);
+
         //distribute errors to sections
         addValidationResultToFormState(newFormState, data.validation_results.errors, "errors");
         //distribute warnings to sections
@@ -313,6 +314,7 @@ export function PollingStationFormController({
             section.warnings = section.warnings.filter((err) => !isGlobalValidationResult(err));
           });
         }
+
         return newFormState;
       });
       //clean up

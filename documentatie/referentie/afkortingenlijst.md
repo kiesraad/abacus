@@ -14,7 +14,7 @@
 | OSV | Ondersteunende Software Verkiezingen. De 'oude' software die we in dit project vervangen. |
 | OSV2020 | De eigenlijke naam van het softwarepakket. |
 | PP, OSV-PP | Module voor Kandidaatstelling door politieke partijen van OSV. Andere namen: VAPP-PP, Aanmaken kandidatenlijsten. Dit is de applicatie waarmee politieke partijen en groeperingen hun kandidatenlijst maken. |
-| KS, OSV-KS | Module voor Onderzoek en vaststellen kandidatenlijsten van OSV. Andere namen: VAPP-KS, KS, Kandidaatstelling. Dit is een OSV-module waarmee partijen hun kandidaatstelling beheren. Output is een EML die in OSV-U kan worden ingelezen (de kandidatenlijst). |
+| KS, OSV-KS | Module voor Onderzoek en vaststellen kandidatenlijsten van OSV. Andere namen: VAPP-KS, Kandidaatstelling. Dit is een OSV-module waarmee partijen hun kandidaatstelling beheren. Output is een EML die in OSV-U kan worden ingelezen (de kandidatenlijst). |
 | OSV-U | Module voor Uitslagvaststelling van OSV. Andere namen: VAPP-U, U, Uitslagvaststelling. |
 | DHV | Digitaal Hulpmiddel Verkiezingen. Naam van (gestopt) ontwikkelproces van software ter vervanging van OSV. |
 | PV, PVB | Proces Verbaal. Een officieel document met daarop tellingen van een stembureau, gemeentelijke stembureau, hoofdstembureau, etc. In sommige gevallen staan de tellingen van de stemmen op het proces verbaal. In andere gevallen heeft het proces verbaal een (aantal) bijlagen met daarop de tellingen. |

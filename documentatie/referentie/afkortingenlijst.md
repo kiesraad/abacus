@@ -7,7 +7,7 @@
 | HSB | Hoofdstembureau. Hier worden de resultaten van alle gemeenten bij elkaar opgeteld om tot een resultaat per Kieskring te komen. |
 | (N)BSB | (Nationaal) Briefstembureau. Stembureau waar alle stemmen die via de post zijn binnengekomen worden geteld.
 | (N)BSB-C | (Nationaal) Briefstembureau voor corrigenda |
-| CSB | Centraal Stembureau. Hier worden de resultaten van alle kieskringen bij elkaar opgeteld op tot een landelijk resultaat te komen. |
+| CSB | Centraal Stembureau. Hier worden de resultaten van alle kieskringen bij elkaar opgeteld om tot een landelijk resultaat te komen. |
 | SOL | Stembureau Openbaar Lichaam (op de eilanden). Equivalent van GSB en/of HSB in Nederland. |
 | CSO | Centrale Stemopneming. Proces waarbij op de verkiezingsdag op het stembureau alleen op lijst/partij niveau wordt geteld. Op de dag na de verkiezingen worden de op lijst gesorteerde stembiljetten op het _gemeentelijk_ stembureau vervolgens per kandidaat geteld. |
 | DSO | Decentrale Stemopneming. Hierbij wordt al op het stembureau tot op de kandidaat geteld. |

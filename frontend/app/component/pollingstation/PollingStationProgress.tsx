@@ -14,7 +14,7 @@ export function PollingStationProgress() {
   const { election } = useElection();
   const { pathname } = useLocation();
 
-  const { formState } = usePollingStationFormController();
+  const { formState, cache } = usePollingStationFormController();
 
   const menuStatusForFormSection = React.useCallback(
     (formSection?: FormSection): MenuStatus => {
@@ -24,6 +24,11 @@ export function PollingStationProgress() {
       }
 
       if (formSection.id === formState.current) {
+        if (formState.active !== formSection.id) {
+          if (cache?.key === formSection.id) {
+            return "unsaved";
+          }
+        }
         return "current";
       }
 
@@ -33,7 +38,7 @@ export function PollingStationProgress() {
 
       return "idle";
     },
-    [formState],
+    [formState, cache],
   );
 
   const targetForm = currentSectionFromPath(pathname);

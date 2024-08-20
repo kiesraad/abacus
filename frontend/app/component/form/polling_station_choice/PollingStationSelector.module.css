@@ -6,6 +6,10 @@
 
 .input {
   text-align: right;
+  font-family: var(--font-number);
+  font-size: var(--font-size-body);
+  font-style: normal;
+  font-feature-settings: "ss09" on;
 }
 
 .message {

@@ -1,47 +1,32 @@
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 import { PollingStation, usePollingStationList } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
 import { Icon, InputField, Spinner } from "@kiesraad/ui";
-import { cn, parseIntStrict, useDebouncedCallback } from "@kiesraad/util";
+import { cn } from "@kiesraad/util";
 
 import cls from "./PollingStationSelector.module.css";
 
 export interface PollingStationSelectorProps {
   pollingStationNumber: string;
   setPollingStationNumber: Dispatch<SetStateAction<string>>;
+  loading: boolean;
+  setLoading: Dispatch<SetStateAction<boolean>>;
   currentPollingStation: PollingStation | undefined;
   setCurrentPollingStation: Dispatch<SetStateAction<PollingStation | undefined>>;
   setShowAlert: Dispatch<SetStateAction<boolean>>;
   handleSubmit: () => void;
 }
 
-const USER_INPUT_DEBOUNCE: number = 500; // ms
-
 export function PollingStationSelector({
   pollingStationNumber,
   setPollingStationNumber,
+  loading,
   currentPollingStation,
-  setCurrentPollingStation,
   setShowAlert,
   handleSubmit,
 }: PollingStationSelectorProps) {
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const { pollingStations, pollingStationsLoading } = usePollingStationList();
-
-  const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
-    setLoading(false);
-    setCurrentPollingStation(pollingStation);
-  }, USER_INPUT_DEBOUNCE);
-
-  useMemo(() => {
-    const parsedInt = parseIntStrict(pollingStationNumber);
-    setLoading(true);
-    debouncedCallback(
-      pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt),
-    );
-  }, [pollingStationNumber, pollingStations, debouncedCallback]);
+  const { pollingStationsLoading } = usePollingStationList();
 
   return (
     <div className={cls.container}>

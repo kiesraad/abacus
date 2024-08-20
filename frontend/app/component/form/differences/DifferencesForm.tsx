@@ -147,7 +147,7 @@ export function DifferencesForm() {
             key="L"
             field="L"
             id="too_few_ballots_handed_out_count"
-            title="Te weinig uitgerekte stembiljetten"
+            title="Te weinig uitgereikte stembiljetten"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}

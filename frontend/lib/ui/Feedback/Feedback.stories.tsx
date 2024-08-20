@@ -32,7 +32,7 @@ export const MultipleErrors: Story = () => {
 };
 
 export const SingleWarning: Story = () => {
-  return <Feedback id="feedback-warning" type="warning" data={["W202"]} />;
+  return <Feedback id="feedback-warning" type="warning" data={["W203"]} />;
 };
 
 export const MultipleWarnings: Story = () => {

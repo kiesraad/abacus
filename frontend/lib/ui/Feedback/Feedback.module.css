@@ -16,7 +16,6 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
 
     svg {
       flex: 0 0 24px;
@@ -32,6 +31,7 @@
     span {
       flex: 0 0 32px;
       font-weight: bold;
+      padding-left: 1.5rem;
     }
   }
 

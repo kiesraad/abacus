@@ -923,9 +923,7 @@ mod tests {
 
     use super::*;
 
-    /// Create a test election with some political groups.
-    /// The number of political groups is the length of the `political_groups_candidates` slice.
-    /// The number of candidates in each political group is equal to the value in the slice at that index.
+    /// Create a test polling station.
     pub fn polling_station_fixture(number_of_voters: Option<i64>) -> PollingStation {
         PollingStation {
             id: 1,

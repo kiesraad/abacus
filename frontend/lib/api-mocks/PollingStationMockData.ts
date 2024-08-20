@@ -25,7 +25,7 @@ export const getPollingStationListMockResponse = (
         election_id,
         name: "Testplek",
         number: 34,
-        number_of_voters: 50,
+        number_of_voters: 1000,
         polling_station_type: "Bijzonder",
         street: "Teststraat",
         house_number: "2",

@@ -11,7 +11,7 @@
 | SOL | Stembureau Openbaar Lichaam (op de eilanden). Equivalent van GSB en/of HSB in Nederland. |
 | CSO | Centrale Stemopneming. Proces waarbij op de verkiezingsdag op het stembureau alleen op lijst/partij niveau wordt geteld. Op de dag na de verkiezingen worden de op lijst gesorteerde stembiljetten op het _gemeentelijk_ stembureau vervolgens per kandidaat geteld. |
 | DSO | Decentrale Stemopneming. Hierbij wordt al op het stembureau tot op de kandidaat geteld. |
-| OSV | Ondersteunende Software Verkiezingen. De 'oude' software die we in dit project vervangen. |
+| OSV | Ondersteunende Software Verkiezingen. De 'oude' software die we met dit project vervangen. |
 | OSV2020 | De eigenlijke naam van het 'oude' softwarepakket. |
 | PP, OSV-PP | Module voor Kandidaatstelling door politieke partijen van OSV. Andere namen: VAPP-PP, Aanmaken kandidatenlijsten. Dit is de applicatie waarmee politieke partijen en groeperingen hun kandidatenlijst maken. |
 | KS, OSV-KS | Module voor Onderzoek en vaststellen kandidatenlijsten van OSV. Andere namen: VAPP-KS, Kandidaatstelling. Dit is een OSV-module waarmee partijen hun kandidaatstelling beheren. Output is een EML die in OSV-U kan worden ingelezen (de kandidatenlijst). |

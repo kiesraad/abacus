@@ -89,7 +89,7 @@ Overleden kandidaten worden buiten beschouwing gelaten. (art P19a)
 
 ### 3. Rangschikking van de kandidaten op de kandidatenlijsten (art P 19)
 
-- Met het oog op het vervullen van vacatures: volgorde lijst wijzigen obv voorkeurstemmen
+- Met het oog op het vervullen van vacatures: volgorde lijst wijzigen o.b.v. voorkeurstemmen
 - Lijsten die in aanmerking komen voor rangschikking:
   - \>= 13 raadszetels: lijsten met minstens één zetel
   - < 13 raadszetels: alle lijsten

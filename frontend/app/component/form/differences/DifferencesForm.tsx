@@ -96,7 +96,7 @@ export function DifferencesForm() {
     <form onSubmit={handleSubmit} ref={formRef}>
       {/* Temporary while not navigating through form sections */}
       {success && <div id="result">Success</div>}
-      <h2>Verschil tussen aantal kiezers en getelde stemmen</h2>
+      <h2>Verschillen tussen toegelaten kiezers en uitgebrachte stemmen</h2>
       {serverError && <Feedback id="feedback-server-error" type="error" data={serverError} />}
       {hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />

@@ -166,20 +166,20 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "W.203",
     content: (
       <div>
-        Er is een onverwacht verschil tussen het aantal kiezers (A t/m D) en het aantal getelde
-        stemmen (E t/m H).
+        Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal
+        uitgebrachte stemmen (E t/m H).
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
     ),
   },
   W204: {
-    title: "Controleer herteld aantal toegelaten kiezers en aantal uitgebrachte stemmen",
+    title: "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezers",
     code: "W.204",
     content: (
       <div>
-        Er is een onverwacht verschil tussen het herteld aantal kiezers (A.2 t/m D.2) en het aantal
-        getelde stemmen (E t/m H).
+        Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het
+        herteld aantal toegelaten kiezers (A.2 t/m D.2).
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -197,52 +197,43 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     ),
   },
   W206: {
-    title: "Controleer aantal uitgebrachte stemmen",
+    title: "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
     code: "W.206",
     content: (
       <div>
-        Het totaal aantal uitgebrachte stemmen (H) is onverwacht hoog.
+        Het totaal aantal toegelaten kiezers (D) en/of het totaal aantal uitgebrachte stemmen (H) is
+        hoger dan het aantal kiesgerechtigden voor dit stembureau.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
     ),
   },
   W207: {
-    title: "Controleer aantal toegelaten kiezers",
+    title: "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezers",
     code: "W.207",
     content: (
       <div>
-        Het totaal aantal toegelaten kiezers (D) is onverwacht hoog.
+        Het totaal aantal uitgebrachte stemmen (H) en/of het herteld totaal aantal toegelaten
+        kiezers (D.2) is hoger dan het aantal kiesgerechtigden voor dit stembureau.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
     ),
   },
   W208: {
-    title: "Controleer herteld aantal toegelaten kiezers",
+    title: "Controleer A t/m D en E t/m H",
     code: "W.208",
     content: (
       <div>
-        Het herteld totaal aantal toegelaten kiezers (D.2) is onverwacht hoog.
+        De getallen bij A t/m D zijn precies hetzelfde als E t/m H.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
     ),
   },
   W209: {
-    title: "Controleer E t/m H en A t/m D",
-    code: "W.209",
-    content: (
-      <div>
-        De getallen bij E t/m H zijn precies hetzelfde als A t/m D.
-        <br />
-        Check of je het papieren proces-verbaal goed hebt overgenomen.
-      </div>
-    ),
-  },
-  W210: {
     title: "Controleer E t/m H en A.2 t/m D.2",
-    code: "W.210",
+    code: "W.209",
     content: (
       <div>
         De getallen bij E t/m H zijn precies hetzelfde als A.2 t/m D.2.

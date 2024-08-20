@@ -49,7 +49,6 @@ pub enum ValidationResultCode {
     W207,
     W208,
     W209,
-    W210,
     W301,
     W302,
 }

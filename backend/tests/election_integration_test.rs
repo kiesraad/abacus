@@ -213,8 +213,8 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(
         warnings[0].fields,
         vec![
+            "data.votes_counts.total_votes_cast_count",
             "data.voters_counts.total_admitted_voters_count",
-            "data.votes_counts.total_votes_cast_count"
         ]
     );
 }

@@ -73,7 +73,7 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 - één ticket/taak mag in meerdere PR's gebouwd worden.
 - Pair/ensemble programming telt als review.
 - Vraag vroeg feedback op je design wanneer nodig: [editing over proof-reading](https://buttondown.email/hillelwayne/archive/code-review-vs-code-proofreading/) (Hillel Wayne)
-- Zoveel mogelijk afvangen dmv linting en static code analysis, zodat menselijke code review kan focusen op design e.d.
+- Zoveel mogelijk afvangen d.m.v. linting en static code analysis, zodat menselijke code review kan focussen op design e.d.
 
 #### Handmatige tests en automatische tests
 

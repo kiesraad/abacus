@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { ValidationResult } from "@kiesraad/api";
+import { FieldValidationResult, ValidationResult } from "@kiesraad/api";
 
 import {
   AnyFormReference,
@@ -12,6 +12,7 @@ import {
   addValidationResultToFormState,
   currentFormHasChanges,
   formSectionComplete,
+  getErrorsAndWarnings,
   getNextSection,
   hasOnlyGlobalValidationResults,
   isGlobalValidationResult,
@@ -325,5 +326,60 @@ describe("PollingStationUtils", () => {
     ];
 
     expect(hasOnlyGlobalValidationResults(mixedResults)).toBe(false);
+  });
+
+  test("getErrorsAndWarnings errors and clientWarnings", () => {
+    const errors: ValidationResult[] = [
+      {
+        code: "W304",
+        fields: ["data.votes_counts.blank_votes_count"],
+      },
+      {
+        code: "W302",
+        fields: ["data.votes_counts.invalid_votes_count"],
+      },
+    ];
+
+    const warnings: ValidationResult[] = [
+      {
+        code: "W203",
+        fields: ["data.votes_counts.blank_votes_count"],
+      },
+    ];
+
+    const clientWarnings: FieldValidationResult[] = [
+      {
+        code: "W201",
+        id: "blank_votes_count",
+      },
+    ];
+
+    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, clientWarnings);
+    expect(errorsAndWarnings.get("blank_votes_count")).toBeDefined();
+    expect(errorsAndWarnings.get("blank_votes_count")?.errors.length).toBe(1);
+    //warnings should not be added if errors.
+    expect(errorsAndWarnings.get("blank_votes_count")?.warnings.length).toBe(1);
+  });
+  test("getErrorsAndWarnings warnings and clientWarnings", () => {
+    const errors: ValidationResult[] = [];
+
+    const warnings: ValidationResult[] = [
+      {
+        code: "W203",
+        fields: ["data.votes_counts.blank_votes_count"],
+      },
+    ];
+
+    const clientWarnings: FieldValidationResult[] = [
+      {
+        code: "W201",
+        id: "blank_votes_count",
+      },
+    ];
+
+    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, clientWarnings);
+    expect(errorsAndWarnings.get("blank_votes_count")).toBeDefined();
+    expect(errorsAndWarnings.get("blank_votes_count")?.errors.length).toBe(0);
+    expect(errorsAndWarnings.get("blank_votes_count")?.warnings.length).toBe(2);
   });
 });

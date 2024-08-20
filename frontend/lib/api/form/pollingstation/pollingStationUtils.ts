@@ -1,4 +1,6 @@
-import { deepEqual, FieldSection, rootFieldSection } from "@kiesraad/util";
+import { ErrorsAndWarnings, FieldValidationResult } from "lib/api/api";
+
+import { deepEqual, fieldNameFromPath, FieldSection, rootFieldSection } from "@kiesraad/util";
 
 import { ValidationResult } from "../../gen/openapi";
 import {
@@ -157,4 +159,50 @@ export function isGlobalValidationResult(validationResult: ValidationResult): bo
     default:
       return false;
   }
+}
+
+//transform a formsection's errors and warnings into a map of field id's and their errors and warnings
+export function getErrorsAndWarnings(
+  errors: ValidationResult[],
+  warnings: ValidationResult[],
+  clientWarnings: FieldValidationResult[],
+): Map<string, ErrorsAndWarnings> {
+  const result = new Map<string, ErrorsAndWarnings>();
+
+  const process = (target: keyof ErrorsAndWarnings, arr: ValidationResult[]) => {
+    arr.forEach((v) => {
+      v.fields.forEach((f) => {
+        const fieldName = fieldNameFromPath(f);
+        if (!result.has(fieldName)) {
+          result.set(fieldName, { errors: [], warnings: [] });
+        }
+        const field = result.get(fieldName);
+        if (field) {
+          field[target].push({
+            code: v.code,
+            id: fieldName,
+          });
+        }
+      });
+    });
+  };
+
+  if (errors.length > 0) {
+    process("errors", errors);
+  } else if (warnings.length > 0) {
+    // only process warnings if there are no errors
+    process("warnings", warnings);
+  }
+
+  clientWarnings.forEach((warning) => {
+    if (!result.has(warning.id)) {
+      result.set(warning.id, { errors: [], warnings: [] });
+    }
+    const field = result.get(warning.id);
+    if (field) {
+      field.warnings.push(warning);
+    }
+  });
+
+  return result;
 }

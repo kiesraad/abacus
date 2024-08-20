@@ -25,7 +25,7 @@
 - Of het is goed genoeg, of we accepteren dat we het werk mogelijk nooit inplannen, dus:
   - Niet onderhandelen over kwaliteit door bugs aan de backlog toe te voegen of door een kwetsbaarhedenregister bij te houden
   - Vermijden van "normalization of deviance": "dit kan voor één keer" wordt "dit kan wel eens een keer" en vervolgens "dit kan wel"
-  - Vermijden van "failure demand" (extra werk omdat het de eerste keer niet goed genoeg was): managen van je backlog/bevindingenregister kost uiteindelijk vrijwel altijd meer dan gelijk oplossen
+  - Vermijden van "failure demand" (extra werk omdat het de eerste keer niet goed genoeg was): managen van je backlog/bevindingenregister kost uiteindelijk vrijwel altijd meer tijd en energie dan gelijk oplossen
 
 ### Vroege feedback en end-to-end feedback
 

@@ -32,5 +32,5 @@
 | JKA | Team Juridische Zaken, Kennis en Advies (JKA) een afdeling van het bureau van de Kiesraad. Verantwoordelijk voor alle juridische taken van de Kiesraad. |
 | RKV |  Team Regie en Kwaliteit Verkiezingsketen (RKV), een afdeling van het bureau van de Kiesraad. Bewaakt de kwaliteit van het verkiezingsproces. |
 | CIE-U | Commissie Uitvoering, overleggroepje van de leden van de Kiesraad. |
-CIE-A | Commissie Advies, overleggroepje van de leden van de Kiesraad. |
+| CIE-A | Commissie Advies, overleggroepje van de leden van de Kiesraad. |
 | WPV | Wet programmatuur verkiezingsuitslagen |

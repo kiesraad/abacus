@@ -349,8 +349,6 @@ describe("Test CandidatesVotesForm", () => {
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
-      //TODO: server errors moved out of the form
-      //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
   });

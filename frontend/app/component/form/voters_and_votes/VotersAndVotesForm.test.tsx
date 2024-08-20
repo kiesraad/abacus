@@ -269,9 +269,6 @@ describe("Test VotersAndVotesForm", () => {
       const feedbackError = await screen.findByTestId("feedback-error");
       expect(feedbackError).toHaveTextContent(/^F201/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-
-      //TODO: server errors moved out of the form
-      //expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
     test("F.202 IncorrectTotal Votes counts", async () => {
@@ -344,8 +341,6 @@ describe("Test VotersAndVotesForm", () => {
       const feedbackError = await screen.findByTestId("feedback-error");
       expect(feedbackError).toHaveTextContent(/^F203/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      //TODO: server errors moved out of the form
-      //expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
     test("Error with non-existing fields is not displayed", async () => {
@@ -375,8 +370,6 @@ describe("Test VotersAndVotesForm", () => {
 
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      //TODO: server errors moved out of the form
-      //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
     });
   });
 
@@ -409,8 +402,6 @@ describe("Test VotersAndVotesForm", () => {
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^W201$/);
-      //TODO: server errors moved out of the form
-      //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
@@ -442,8 +433,6 @@ describe("Test VotersAndVotesForm", () => {
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^W202$/);
-      //TODO: server errors moved out of the form
-      //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
@@ -480,8 +469,6 @@ describe("Test VotersAndVotesForm", () => {
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^W209/);
-      //TODO: server errors moved out of the form
-      //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
@@ -517,8 +504,6 @@ describe("Test VotersAndVotesForm", () => {
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^W210/);
-      //TODO: server errors moved out of the form
-      //expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
   });

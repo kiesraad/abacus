@@ -25,7 +25,7 @@
   --font-header: "SpaceGrotesk";
   --font-header-body: "DMSans";
   --font-text: "DMSans";
-  --font-number: "GeistMono";
+  --font-number: "GeistMono", monospace, monospace;
 
   --font-size-body: 1.125rem;
   /* TODO: pick a better font size scale */

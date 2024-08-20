@@ -3,6 +3,7 @@
   background-color: var(--base-white);
   padding: 2rem 2rem 2rem 5rem;
   position: relative;
+  display: flex;
 
   > button {
     position: absolute;
@@ -10,7 +11,6 @@
     top: 2rem;
   }
 
-  display: flex;
   aside {
     padding-top: 2px;
     flex: 0 0 40px;
@@ -18,13 +18,9 @@
       width: 24px;
     }
   }
+
   section {
-    flex: 1 1 auto;
     max-width: 38rem;
-    p {
-      padding-bottom: 0;
-      margin-bottom: 0;
-    }
   }
 
   &.error {

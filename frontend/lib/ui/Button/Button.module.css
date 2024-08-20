@@ -77,6 +77,12 @@
     padding: 0.5rem 0.875rem;
   }
 
+  &.md {
+    font-size: var(--font-size-md);
+    line-height: 1.25rem;
+    padding: 0.625rem 1rem;
+  }
+
   &.lg {
     min-width: 13rem;
     font-weight: bold;

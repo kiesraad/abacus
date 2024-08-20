@@ -11,16 +11,13 @@ import {
   PollingStationValues,
 } from "@kiesraad/api";
 import {
-  electionMockData as _electionMockData,
-  politicalGroupMockData as _politicalGroupMockData,
-  pollingStationMockData as _pollingStationMockData,
+  electionMockData,
+  politicalGroupMockData,
+  pollingStationMockData,
 } from "@kiesraad/api-mocks";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
-const electionMockData = _electionMockData as unknown as Required<Election>;
-const politicalGroupMockData = _politicalGroupMockData as unknown as PoliticalGroup;
-const pollingStationMockData = _pollingStationMockData as unknown as { id: number };
 function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   return render(
     <PollingStationFormController

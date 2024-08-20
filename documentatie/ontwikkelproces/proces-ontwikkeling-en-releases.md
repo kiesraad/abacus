@@ -63,7 +63,7 @@ aantal wijzigingen tussen de getoetste en de definitieve versie minimaal blijft.
 Een release moet aan een aantal vereisten voldoen:
 
 - Alle issues en epics in de milestone voor de release zijn klaar.
-- Alle functionaliteit is voldoende getest, zie [Testen en valideren](</documentatie/Testen en kwaliteit.md>).
+- Alle functionaliteit is voldoende getest, zie [Testen en valideren](</documentatie/ontwikkelproces/testen-en-kwaliteit.md>).
 - De formele checks zijn geslaagd (pentest en [toets op de wettelijke kaders](https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage2))
 - Alle documentatie is bijgewerkt voor de wijzigingen in deze release.
 - De release is voorzien van release notes.

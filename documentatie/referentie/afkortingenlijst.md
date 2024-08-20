@@ -25,7 +25,7 @@
 | NVVB | Nederlandse Vereniging voor Burgerzaken. De NVVB behartigt sinds 1994 met succes de belangen van haar (gemeentelijke) leden op het gebied van persoonsinformatiemanagement, identiteitsmanagement, verkiezingen en dienstverlening en innovatie. |
 | VNG | Vereniging van Nederlandse Gemeenten, de belangenorganisatie en het kennisplatform voor alle Nederlandse gemeenten. |
 | NPVV | Nieuwe procedure vaststellen verkiezingsuitslagen. Voorheen werden stemmen maar 1 keer geteld. Nu kan een stembureau dat 'hoger' in de keten ligt een hertelling vragen aan een onderliggend stembureau. Zo'n hertelling leidt tot een corrigendum. |
-| TK | Tweede kamerverkiezing. Meestal geschreven in combinatie met het jaartal van de specifieke editie: TK2023 |
+| TK | Tweede Kamerverkiezing. Meestal geschreven in combinatie met het jaartal van de specifieke editie: TK2023 |
 | EP | Europees Parlementsverkiezing. |
 | PSW / PS/WS | Provinciale Staten- en Waterschapsverkiezingen |
 | D&T | Team Data en Technologie (D&T), een afdeling van het bureau van de Kiesraad. Het IT-team van de Kiesraad |

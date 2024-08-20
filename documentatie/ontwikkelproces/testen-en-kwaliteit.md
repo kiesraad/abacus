@@ -30,7 +30,7 @@
 ### Vroege feedback en end-to-end feedback
 
 - Vroege feedback:
-  - Feedback op waar je op dat moment mee bezig bent is beter dan feedback op wat je vorige week was aan het doen
+  - Feedback op waar je op dat moment mee bezig bent is beter dan feedback op wat je vorige week aan het doen was
   - Dus ontwikkelen in dunne "slices" (zo klein mogelijke scope)
 - End-to-end feedback:
   - Feedback op een feature is rijker dan feedback op een component

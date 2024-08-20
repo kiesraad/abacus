@@ -48,6 +48,8 @@ describe("PollingStationFormController", () => {
       expect(result.current.formState.current).toBe("voters_votes_counts");
     });
 
+    expect(result.current.targetFormSection).toBe("voters_votes_counts");
+
     result.current.registerCurrentForm({
       id: "voters_votes_counts",
       type: "voters_and_votes",

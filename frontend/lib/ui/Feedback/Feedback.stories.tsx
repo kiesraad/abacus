@@ -49,22 +49,54 @@ export const SingleServerError: Story = () => {
   );
 };
 
-export const CustomizableFeedback: Story<Props> = ({ id, type, data }) => (
-  <Feedback id={id} type={type} data={data} />
-);
+export const CustomizableErrors: Story<Props> = ({
+  id = "feedback-error",
+  type = "error",
+  data,
+}) => <Feedback id={id} type={type} data={data} />;
 
-CustomizableFeedback.args = {
-  data: ["F101", "F201", "F202"],
-};
-CustomizableFeedback.argTypes = {
-  id: {
-    options: ["feedback-error", "feedback-warning", "feedback-server-error"],
-    control: { type: "radio" },
-    defaultValue: "feedback-error",
+CustomizableErrors.argTypes = {
+  data: {
+    options: [
+      "F101",
+      "F201",
+      "F202",
+      "F203",
+      "F204",
+      "F301",
+      "F302",
+      "F303",
+      "F304",
+      "F305",
+      "F401",
+    ],
+    control: { type: "multi-select" },
+    defaultValue: ["F101"],
   },
-  type: {
-    options: ["error", "warning"],
-    control: { type: "inline-radio" },
-    defaultValue: "error",
+};
+
+export const CustomizableWarnings: Story<Props> = ({
+  id = "feedback-warning",
+  type = "warning",
+  data,
+}) => <Feedback id={id} type={type} data={data} />;
+
+CustomizableWarnings.argTypes = {
+  data: {
+    options: [
+      "W201",
+      "W202",
+      "W203",
+      "W204",
+      "W205",
+      "W206",
+      "W207",
+      "W208",
+      "W209",
+      "W301",
+      "W302",
+    ],
+    control: { type: "multi-select" },
+    defaultValue: ["W201"],
   },
 };

@@ -525,7 +525,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.type(screen.getByTestId("invalid_votes_count"), "0");
       await user.type(screen.getByTestId("total_votes_cast_count"), "20");
 
-      await user.type(await screen.findByTestId("poll_card_recount"), "5");
+      await user.type(screen.getByTestId("poll_card_recount"), "5");
       await user.type(screen.getByTestId("proxy_certificate_recount"), "0");
       await user.type(screen.getByTestId("voter_card_recount"), "0");
       await user.type(screen.getByTestId("total_admitted_voters_recount"), "5");

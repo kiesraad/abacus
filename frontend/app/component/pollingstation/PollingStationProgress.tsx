@@ -4,6 +4,7 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import {
   FormSection,
   FormSectionID,
+  isFormSectionEmpty,
   useElection,
   usePollingStationFormController,
 } from "@kiesraad/api";
@@ -14,7 +15,7 @@ export function PollingStationProgress() {
   const { election } = useElection();
   const { pathname } = useLocation();
 
-  const { formState, cache } = usePollingStationFormController();
+  const { formState, cache, values } = usePollingStationFormController();
 
   const menuStatusForFormSection = React.useCallback(
     (formSection?: FormSection): MenuStatus => {
@@ -31,6 +32,15 @@ export function PollingStationProgress() {
         }
         return "current";
       }
+      const currentSection = formState.sections[formState.current];
+      if (currentSection) {
+        //check if section has been left empty
+        if (formSection.index < currentSection.index) {
+          if (isFormSectionEmpty(formSection, values)) {
+            return "empty";
+          }
+        }
+      }
 
       if (formSection.errors.length === 0 && formSection.isSaved) {
         return "accept";
@@ -38,7 +48,7 @@ export function PollingStationProgress() {
 
       return "idle";
     },
-    [formState, cache],
+    [formState, cache, values],
   );
 
   const targetForm = currentSectionFromPath(pathname);

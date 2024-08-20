@@ -1,6 +1,12 @@
 import { ErrorsAndWarnings, FieldValidationResult } from "lib/api/api";
 
-import { deepEqual, fieldNameFromPath, FieldSection, rootFieldSection } from "@kiesraad/util";
+import {
+  deepEqual,
+  fieldNameFromPath,
+  FieldSection,
+  objectHasOnlyEmptyValues,
+  rootFieldSection,
+} from "@kiesraad/util";
 
 import { ValidationResult } from "../../gen/openapi";
 import {
@@ -205,4 +211,31 @@ export function getErrorsAndWarnings(
   });
 
   return result;
+}
+
+export function isFormSectionEmpty(section: FormSection, values: PollingStationValues): boolean {
+  if (section.id.startsWith("political_group_votes_")) {
+    const index = parseInt(section.id.replace("political_group_votes_", "")) - 1;
+    const g = values.political_group_votes[index];
+    if (g) {
+      if (g.total !== 0) return false;
+      for (let i = 0, n = g.candidate_votes.length; i < n; i++) {
+        if (g.candidate_votes[i]?.votes !== 0) return false;
+      }
+    }
+  }
+
+  switch (section.id) {
+    case "voters_votes_counts":
+      return (
+        objectHasOnlyEmptyValues({ ...values.votes_counts }) &&
+        objectHasOnlyEmptyValues({ ...values.voters_counts })
+      );
+    case "differences_counts":
+      return objectHasOnlyEmptyValues({ ...values.differences_counts });
+    case "recounted":
+      return values.recounted === undefined;
+    default:
+      return true;
+  }
 }

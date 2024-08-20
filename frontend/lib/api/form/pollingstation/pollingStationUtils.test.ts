@@ -5,6 +5,7 @@ import { FieldValidationResult, ValidationResult } from "@kiesraad/api";
 import {
   AnyFormReference,
   ClientValidationResult,
+  FormSection,
   FormState,
   PollingStationValues,
 } from "./PollingStationFormController";
@@ -15,6 +16,7 @@ import {
   getErrorsAndWarnings,
   getNextSection,
   hasOnlyGlobalValidationResults,
+  isFormSectionEmpty,
   isGlobalValidationResult,
   resetFormSectionState,
 } from "./pollingStationUtils";
@@ -381,5 +383,21 @@ describe("PollingStationUtils", () => {
     expect(errorsAndWarnings.get("blank_votes_count")).toBeDefined();
     expect(errorsAndWarnings.get("blank_votes_count")?.errors.length).toBe(0);
     expect(errorsAndWarnings.get("blank_votes_count")?.warnings.length).toBe(2);
+  });
+
+  test("isFormSectionEmpty", () => {
+    const formSection: FormSection = {
+      index: 0,
+      id: "voters_votes_counts",
+      isSaved: false,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    };
+    const values = structuredClone(defaultValues);
+    expect(isFormSectionEmpty(formSection, values)).toBe(true);
+
+    values.voters_counts.poll_card_count = 1;
+    expect(isFormSectionEmpty(formSection, values)).toBe(false);
   });
 });

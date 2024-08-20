@@ -38,3 +38,12 @@ export function deepEqual(
 
   return true;
 }
+
+export function objectHasOnlyEmptyValues(obj: Record<string, "" | number>): boolean {
+  for (const key in obj) {
+    if (obj[key] !== "" && obj[key] !== 0) {
+      return false;
+    }
+  }
+  return true;
+}

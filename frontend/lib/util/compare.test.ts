@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { deepEqual, isPrimitive } from "./compare";
+import { deepEqual, isPrimitive, objectHasOnlyEmptyValues } from "./compare";
 
 describe("Compare util", () => {
   test.each([
@@ -37,5 +37,12 @@ describe("Compare util", () => {
     const obj5A = { foo: 0 };
     const obj5B = { foo: "" };
     expect(deepEqual(obj5A, obj5B, true)).equals(true);
+  });
+
+  test("objectHasOnlyEmptyValues", () => {
+    expect(objectHasOnlyEmptyValues({ foo: "" })).equals(true);
+    expect(objectHasOnlyEmptyValues({ foo: 0 })).equals(true);
+    expect(objectHasOnlyEmptyValues({ foo: 1 })).equals(false);
+    expect(objectHasOnlyEmptyValues({ foo: 1, bar: "", baz: "" })).equals(false);
   });
 });

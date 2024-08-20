@@ -7,7 +7,7 @@ Hier vind je de documentatie over Abacus. De documentatie wordt telkens aangevul
 - Functionaliteit:
   - [Eisen en wensen voor functionaliteit](/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md)
 - Ontwikkelproces:
-  - [werkwijze voor GitHub](/documentatie/ontwikkelproces/GitHub-werkwijze.md)
+  - [Werkwijze voor GitHub](/documentatie/ontwikkelproces/GitHub-werkwijze.md)
   - [Proces voor ontwikkeling en releases](/documentatie/ontwikkelproces/proces-ontwikkeling-en-releases.md)
   - [Uitgangspunten voor testen en kwaliteit](/documentatie/ontwikkelproces/testen-en-kwaliteit.md)
 - Referentie:

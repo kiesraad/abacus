@@ -39,7 +39,7 @@ Het aanmaken van een nieuw GitHub-issue voor een feature of change request gebeu
 
 ### Ontwikkeling
 
-Voor de ontwikkeling via GitHub werken we met issues die zijn opgenomen in epics. Aan issues in de 'Current' kolom van het bord kan worden gewerkt. Maak een nieuwe branch aan op basis van de main branch en schrijf de code die je wilt maken. Test je functionaliteit door zover zinvol tests te schrijven. Denk hierbij aan unittests, integration tests enzovoorts. Als je code en de tests klaar zijn en geschikt zijn voor review, maak dan een pull request aan. Wijs reviewers aan. Na review en approval kan de code worden gemerged. Een uitgebreidere beschrijving is te vinden in het document over [de werkwijze op GitHub](</documentatie/GitHub werkwijze.md>).
+Voor de ontwikkeling via GitHub werken we met issues die zijn opgenomen in epics. Aan issues in de 'Current' kolom van het bord kan worden gewerkt. Maak een nieuwe branch aan op basis van de main branch en schrijf de code die je wilt maken. Test je functionaliteit door zover zinvol tests te schrijven. Denk hierbij aan unittests, integration tests enzovoorts. Als je code en de tests klaar zijn en geschikt zijn voor review, maak dan een pull request aan. Wijs reviewers aan. Na review en approval kan de code worden gemerged. Een uitgebreidere beschrijving is te vinden in het document over [de werkwijze op GitHub](</documentatie/ontwikkelproces/GitHub-werkwijze.md>).
 
 ### Releases
 

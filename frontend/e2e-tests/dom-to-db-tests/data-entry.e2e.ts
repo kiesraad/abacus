@@ -164,3 +164,73 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.navVotersAndVotes).toHaveClass("idle warning");
   });
 });
+
+test.describe("abort input modal", () => {
+  test("abort input on Recounted paged without saving", async ({ page }) => {
+    await page.goto("/1/input/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.no.click();
+    await recountedPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toHaveText("Toegelaten kiezers en uitgebrachte stemmen");
+    await expect(differencesPage.navRecounted).toHaveClass("idle accept");
+    await expect(differencesPage.navVotersAndVotes).toHaveClass("active current");
+    await differencesPage.navRecounted.click();
+
+    await expect(recountedPage.heading).toHaveText("Is er herteld?");
+    await expect(recountedPage.navRecounted).toHaveClass("active accept");
+    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
+    await recountedPage.yes.click();
+    await recountedPage.navVotersAndVotes.click();
+
+    await expect(recountedPage.modalHeading).toHaveText("Wat wil je doen met je invoer?");
+    await recountedPage.discardInput.click();
+
+    await expect(differencesPage.heading).toHaveText("Toegelaten kiezers en uitgebrachte stemmen");
+    await expect(differencesPage.navRecounted).toHaveClass("idle accept");
+    await expect(differencesPage.navVotersAndVotes).toHaveClass("active current");
+    await differencesPage.navRecounted.click();
+
+    await expect(recountedPage.heading).toHaveText("Is er herteld?");
+    await expect(recountedPage.navRecounted).toHaveClass("active accept");
+    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
+    await expect(recountedPage.no).toBeChecked();
+  });
+
+  test("abort input on Recounted paged with saving", async ({ page }) => {
+    await page.goto("/1/input/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.no.click();
+    await recountedPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toHaveText("Toegelaten kiezers en uitgebrachte stemmen");
+    await expect(differencesPage.navRecounted).toHaveClass("idle accept");
+    await expect(differencesPage.navVotersAndVotes).toHaveClass("active current");
+    await differencesPage.navRecounted.click();
+
+    await expect(recountedPage.heading).toHaveText("Is er herteld?");
+    await expect(recountedPage.navRecounted).toHaveClass("active accept");
+    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
+    await recountedPage.yes.click();
+    await recountedPage.navVotersAndVotes.click();
+
+    await expect(recountedPage.modalHeading).toHaveText("Wat wil je doen met je invoer?");
+    await recountedPage.saveInput.click();
+
+    await expect(
+      differencesPage.heading.filter({ hasText: "Toegelaten kiezers en uitgebrachte stemmen" }),
+    ).toBeVisible();
+    await expect(recountedPage.navRecounted).toHaveClass("idle accept");
+    await expect(recountedPage.navVotersAndVotes).toHaveClass("active current");
+    await differencesPage.navRecounted.click();
+
+    await expect(recountedPage.heading).toHaveText("Is er herteld?");
+    await expect(recountedPage.navRecounted).toHaveClass("active accept");
+    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
+    await expect(recountedPage.yes).toBeChecked();
+  });
+});

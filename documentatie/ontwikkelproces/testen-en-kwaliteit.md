@@ -64,7 +64,7 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 
 #### Vierogenprincipe
 
-- Om te vermijden dat fouten of ongewenste functionaliteit (backdoors, manipuleren verkiezingsresultaten, lekken informatie) op de main branch komen, wordt elke codewijziging hierop gereviewd vóórdat deze naar main gemerged wordt.
+- Om te vermijden dat fouten of ongewenste functionaliteit (backdoors, manipuleren verkiezingsresultaten, lekken informatie) op de main branch komen, wordt elke codewijziging hierop gereviewd door twee verschillende personen vóórdat deze naar main gemerged wordt.
 
 #### Permanente code reviews
 

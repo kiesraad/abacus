@@ -50,6 +50,6 @@ describe("FinaliseInputPage", () => {
       </ElectionProvider>,
     );
 
-    expect(await screen.findByText("Invoer afronden")).toBeVisible();
+    expect(await screen.findByText("Download resultaten")).toBeVisible();
   });
 });

@@ -172,12 +172,12 @@ test.describe("abort input modal", () => {
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
     await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
-    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
+    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active unsaved");
     await votersVotesPage.navRecounted.click();
 
     await recountedPage.heading.waitFor();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
-    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
+    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle unsaved");
     await recountedPage.yes.click();
     await recountedPage.navVotersAndVotes.click();
 
@@ -187,12 +187,12 @@ test.describe("abort input modal", () => {
 
     await votersVotesPage.heading.waitFor();
     await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
-    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
+    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active unsaved");
     await votersVotesPage.navRecounted.click();
 
     await recountedPage.heading.waitFor();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
-    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
+    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle unsaved");
     await expect(recountedPage.no).toBeChecked();
   });
 
@@ -206,12 +206,12 @@ test.describe("abort input modal", () => {
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
     await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
-    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
+    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active unsaved");
     await votersVotesPage.navRecounted.click();
 
     await recountedPage.heading.waitFor();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
-    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
+    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle unsaved");
     await recountedPage.yes.click();
     await recountedPage.navVotersAndVotes.click();
 
@@ -220,13 +220,12 @@ test.describe("abort input modal", () => {
 
     await votersVotesPage.heading.waitFor();
     await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
-    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
+    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active unsaved");
     await votersVotesPage.navRecounted.click();
 
     await recountedPage.heading.waitFor();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
-    // TODO: uncomment once class has been fixed, should be same as in test 'abort input on Recounted paged without saving'
-    // await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
+    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle unsaved");
     await expect(recountedPage.yes).toBeChecked();
   });
 });

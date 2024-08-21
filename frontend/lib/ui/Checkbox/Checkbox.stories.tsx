@@ -14,6 +14,6 @@ export const DefaultCheckbox: Story<Props> = ({ label }) => (
 
 export default {
   args: {
-    label: "Ik heb de aantallen gecontroleerd met papier en correct overgenomen.",
+    label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
   },
 };

@@ -140,7 +140,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       <BottomBar type="inputgrid">
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0}>
           <Checkbox id="voters_and_votes_form_ignore_warnings" defaultChecked={ignoreWarnings}>
-            Ik heb de aantallen gecontroleerd met papier en correct overgenomen.
+            Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>

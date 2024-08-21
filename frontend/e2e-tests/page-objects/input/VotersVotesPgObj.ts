@@ -41,7 +41,7 @@ export class VotersVotesPage extends InputBasePage {
     this.totalVotesCastCount = page.getByTestId("total_votes_cast_count");
 
     this.acceptWarnings = page.getByLabel(
-      "Ik heb de aantallen gecontroleerd met papier en correct overgenomen.",
+      "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
     );
 
     this.next = page.getByRole("button", { name: "Volgende" });

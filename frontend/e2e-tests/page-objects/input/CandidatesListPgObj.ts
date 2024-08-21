@@ -17,10 +17,6 @@ export class CandidatesListPage extends InputBasePage {
     this.next = page.getByRole("button", { name: "Volgende" });
   }
 
-  async waitForPageHeading() {
-    await this.heading.waitFor();
-  }
-
   async fillCandidate(index: number, count: number) {
     await this.page.getByTestId(`candidate_votes[${index}].votes`).fill(count.toString());
   }

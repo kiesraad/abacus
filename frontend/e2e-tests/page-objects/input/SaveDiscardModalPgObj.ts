@@ -19,8 +19,4 @@ export class SaveDiscardInputModal {
     this.saveInput = this.modal.getByRole("button", { name: "Invoer bewaren" });
     this.discardInput = this.modal.getByRole("button", { name: "Niet bewaren" });
   }
-
-  async waitForHeading() {
-    await this.heading.waitFor();
-  }
 }

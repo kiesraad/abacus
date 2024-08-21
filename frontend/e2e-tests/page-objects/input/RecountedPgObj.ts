@@ -18,8 +18,4 @@ export class RecountedPage extends InputBasePage {
     this.no = page.getByRole("radio", { name: "Nee, er was geen hertelling" });
     this.next = page.getByRole("button", { name: "Volgende" });
   }
-
-  async waitForPageHeading() {
-    await this.heading.waitFor();
-  }
 }

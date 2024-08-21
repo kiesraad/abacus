@@ -16,8 +16,4 @@ export class DifferencesPage extends InputBasePage {
 
     this.next = page.getByRole("button", { name: "Volgende" });
   }
-
-  async waitForPageHeading() {
-    await this.heading.waitFor();
-  }
 }

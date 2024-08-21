@@ -53,10 +53,6 @@ export class VotersVotesPage extends InputBasePage {
     this.next = page.getByRole("button", { name: "Volgende" });
   }
 
-  async waitForPageHeading() {
-    await this.heading.waitFor();
-  }
-
   async inputVoters(votersCounts: VotersCounts) {
     await this.pollCardCount.fill(votersCounts.poll_card_count);
     await this.proxyCertificateCount.fill(votersCounts.proxy_certificate_count);

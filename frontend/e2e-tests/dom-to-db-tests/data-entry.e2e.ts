@@ -18,7 +18,7 @@ test.describe("Data entry", () => {
     await inputPage.clickStart();
 
     const recountedPage = new RecountedPage(page);
-    await recountedPage.waitForPageHeading();
+    await recountedPage.heading.waitFor();
     await recountedPage.no.check();
     await expect(recountedPage.no).toBeChecked();
     await recountedPage.next.click();
@@ -27,7 +27,7 @@ test.describe("Data entry", () => {
     await expect(recountedPage.warning).toBeHidden();
 
     const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.waitForPageHeading();
+    await votersVotesPage.heading.waitFor();
 
     const voters = {
       poll_card_count: "100",
@@ -52,14 +52,14 @@ test.describe("Data entry", () => {
     await expect(votersVotesPage.warning).toBeHidden();
 
     const differencesPage = new DifferencesPage(page);
-    await differencesPage.waitForPageHeading();
+    await differencesPage.heading.waitFor();
     await differencesPage.next.click();
 
     await expect(differencesPage.error).toBeHidden();
     await expect(differencesPage.warning).toBeHidden();
 
     const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
-    await candidatesListPage_1.waitForPageHeading();
+    await candidatesListPage_1.heading.waitFor();
 
     await candidatesListPage_1.fillCandidate(0, 100);
     await candidatesListPage_1.fillCandidate(1, 22);
@@ -155,7 +155,7 @@ test.describe("errors and warnings", () => {
     await votersVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
-    await differencesPage.waitForPageHeading();
+    await differencesPage.heading.waitFor();
 
     await expect(differencesPage.navVotersAndVotes).toHaveClass("idle warning");
   });
@@ -170,27 +170,27 @@ test.describe("abort input modal", () => {
     await recountedPage.next.click();
 
     const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.waitForPageHeading();
+    await votersVotesPage.heading.waitFor();
     await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
     await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
     await votersVotesPage.navRecounted.click();
 
-    await recountedPage.waitForPageHeading();
+    await recountedPage.heading.waitFor();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
     await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
     await recountedPage.yes.click();
     await recountedPage.navVotersAndVotes.click();
 
-    await recountedPage.saveDiscardModal.waitForHeading();
+    await recountedPage.saveDiscardModal.heading.waitFor();
 
     await recountedPage.saveDiscardModal.discardInput.click();
 
-    await votersVotesPage.waitForPageHeading();
+    await votersVotesPage.heading.waitFor();
     await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
     await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
     await votersVotesPage.navRecounted.click();
 
-    await recountedPage.waitForPageHeading();
+    await recountedPage.heading.waitFor();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
     await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
     await expect(recountedPage.no).toBeChecked();
@@ -204,26 +204,26 @@ test.describe("abort input modal", () => {
     await recountedPage.next.click();
 
     const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.waitForPageHeading();
+    await votersVotesPage.heading.waitFor();
     await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
     await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
     await votersVotesPage.navRecounted.click();
 
-    await recountedPage.waitForPageHeading();
+    await recountedPage.heading.waitFor();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
     await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
     await recountedPage.yes.click();
     await recountedPage.navVotersAndVotes.click();
 
-    await recountedPage.saveDiscardModal.waitForHeading();
+    await recountedPage.saveDiscardModal.heading.waitFor();
     await recountedPage.saveDiscardModal.saveInput.click();
 
-    await votersVotesPage.waitForPageHeading();
+    await votersVotesPage.heading.waitFor();
     await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
     await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
     await votersVotesPage.navRecounted.click();
 
-    await recountedPage.waitForPageHeading();
+    await recountedPage.heading.waitFor();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
     // TODO: uncomment once class has been fixed, should be same as in test 'abort input on Recounted paged without saving'
     // await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");

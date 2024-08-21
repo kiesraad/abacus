@@ -12,7 +12,7 @@ export function InputHomePage() {
   const { statuses } = useElectionStatus();
 
   function finishInput() {
-    navigate("/");
+    navigate("finalise");
   }
 
   return (

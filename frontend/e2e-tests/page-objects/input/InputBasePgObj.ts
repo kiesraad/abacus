@@ -2,7 +2,6 @@ import { type Locator, type Page } from "@playwright/test";
 
 export class InputBasePage {
   protected readonly page: Page;
-  readonly heading: Locator;
 
   readonly error: Locator;
   readonly warning: Locator;
@@ -17,8 +16,6 @@ export class InputBasePage {
 
   constructor(page: Page) {
     this.page = page;
-
-    this.heading = page.getByRole("heading", { level: 2 });
 
     this.error = page.getByTestId("feedback-error");
     this.warning = page.getByTestId("feedback-warning");

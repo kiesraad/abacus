@@ -18,7 +18,7 @@ test.describe("Data entry", () => {
     await inputPage.clickStart();
 
     const recountedPage = new RecountedPage(page);
-    await expect(recountedPage.heading).toHaveText("Is er herteld?");
+    await recountedPage.waitForPageHeading();
     await recountedPage.no.check();
     await expect(recountedPage.no).toBeChecked();
     await recountedPage.next.click();
@@ -27,7 +27,7 @@ test.describe("Data entry", () => {
     await expect(recountedPage.warning).toBeHidden();
 
     const votersVotesPage = new VotersVotesPage(page);
-    await expect(votersVotesPage.heading).toHaveText("Toegelaten kiezers en uitgebrachte stemmen");
+    await votersVotesPage.waitForPageHeading();
 
     const voters = {
       poll_card_count: "100",
@@ -52,16 +52,14 @@ test.describe("Data entry", () => {
     await expect(votersVotesPage.warning).toBeHidden();
 
     const differencesPage = new DifferencesPage(page);
-    await expect(differencesPage.heading).toHaveText(
-      "Verschil tussen aantal kiezers en getelde stemmen",
-    );
+    await differencesPage.waitForPageHeading();
     await differencesPage.next.click();
 
     await expect(differencesPage.error).toBeHidden();
     await expect(differencesPage.warning).toBeHidden();
 
-    const candidatesListPage_1 = new CandidatesListPage(page);
-    await expect(candidatesListPage_1.heading).toHaveText("Lijst 1 - Political Group A");
+    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    await candidatesListPage_1.waitForPageHeading();
 
     await candidatesListPage_1.fillCandidate(0, 100);
     await candidatesListPage_1.fillCandidate(1, 22);
@@ -157,9 +155,7 @@ test.describe("errors and warnings", () => {
     await votersVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
-    await expect(differencesPage.heading).toHaveText(
-      "Verschil tussen aantal kiezers en getelde stemmen",
-    );
+    await differencesPage.waitForPageHeading();
 
     await expect(differencesPage.navVotersAndVotes).toHaveClass("idle warning");
   });
@@ -173,27 +169,27 @@ test.describe("abort input modal", () => {
     await recountedPage.no.click();
     await recountedPage.next.click();
 
-    const differencesPage = new DifferencesPage(page);
-    await expect(differencesPage.heading).toHaveText("Toegelaten kiezers en uitgebrachte stemmen");
-    await expect(differencesPage.navRecounted).toHaveClass("idle accept");
-    await expect(differencesPage.navVotersAndVotes).toHaveClass("active current");
-    await differencesPage.navRecounted.click();
+    const votersVotesPage = new VotersVotesPage(page);
+    await votersVotesPage.waitForPageHeading();
+    await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
+    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
+    await votersVotesPage.navRecounted.click();
 
-    await expect(recountedPage.heading).toHaveText("Is er herteld?");
+    await recountedPage.waitForPageHeading();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
     await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
     await recountedPage.yes.click();
     await recountedPage.navVotersAndVotes.click();
 
-    await expect(recountedPage.modalHeading).toHaveText("Wat wil je doen met je invoer?");
+    await recountedPage.waitForPageHeading();
     await recountedPage.discardInput.click();
 
-    await expect(differencesPage.heading).toHaveText("Toegelaten kiezers en uitgebrachte stemmen");
-    await expect(differencesPage.navRecounted).toHaveClass("idle accept");
-    await expect(differencesPage.navVotersAndVotes).toHaveClass("active current");
-    await differencesPage.navRecounted.click();
+    await votersVotesPage.waitForPageHeading();
+    await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
+    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
+    await votersVotesPage.navRecounted.click();
 
-    await expect(recountedPage.heading).toHaveText("Is er herteld?");
+    await recountedPage.waitForPageHeading();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
     await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
     await expect(recountedPage.no).toBeChecked();
@@ -206,13 +202,13 @@ test.describe("abort input modal", () => {
     await recountedPage.no.click();
     await recountedPage.next.click();
 
-    const differencesPage = new DifferencesPage(page);
-    await expect(differencesPage.heading).toHaveText("Toegelaten kiezers en uitgebrachte stemmen");
-    await expect(differencesPage.navRecounted).toHaveClass("idle accept");
-    await expect(differencesPage.navVotersAndVotes).toHaveClass("active current");
-    await differencesPage.navRecounted.click();
+    const votersVotesPage = new VotersVotesPage(page);
+    await votersVotesPage.waitForPageHeading();
+    await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
+    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
+    await votersVotesPage.navRecounted.click();
 
-    await expect(recountedPage.heading).toHaveText("Is er herteld?");
+    await recountedPage.waitForPageHeading();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
     await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
     await recountedPage.yes.click();
@@ -221,14 +217,12 @@ test.describe("abort input modal", () => {
     await expect(recountedPage.modalHeading).toHaveText("Wat wil je doen met je invoer?");
     await recountedPage.saveInput.click();
 
-    await expect(
-      differencesPage.heading.filter({ hasText: "Toegelaten kiezers en uitgebrachte stemmen" }),
-    ).toBeVisible();
-    await expect(recountedPage.navRecounted).toHaveClass("idle accept");
-    await expect(recountedPage.navVotersAndVotes).toHaveClass("active current");
-    await differencesPage.navRecounted.click();
+    await votersVotesPage.waitForPageHeading();
+    await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
+    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active current");
+    await votersVotesPage.navRecounted.click();
 
-    await expect(recountedPage.heading).toHaveText("Is er herteld?");
+    await recountedPage.waitForPageHeading();
     await expect(recountedPage.navRecounted).toHaveClass("active accept");
     await expect(recountedPage.navVotersAndVotes).toHaveClass("idle current");
     await expect(recountedPage.yes).toBeChecked();

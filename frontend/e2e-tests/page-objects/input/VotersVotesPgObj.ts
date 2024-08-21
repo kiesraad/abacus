@@ -17,6 +17,7 @@ interface VotesCounts {
 }
 
 export class VotersVotesPage extends InputBasePage {
+  readonly heading: Locator;
   readonly pollCardCount: Locator;
   readonly proxyCertificateCount: Locator;
   readonly voterCardCount: Locator;
@@ -30,6 +31,11 @@ export class VotersVotesPage extends InputBasePage {
 
   constructor(page: Page) {
     super(page);
+
+    this.heading = page.getByRole("heading", {
+      level: 2,
+      name: "Toegelaten kiezers en uitgebrachte stemmen",
+    });
 
     this.pollCardCount = page.getByTestId("poll_card_count");
     this.proxyCertificateCount = page.getByTestId("proxy_certificate_count");
@@ -45,6 +51,10 @@ export class VotersVotesPage extends InputBasePage {
     );
 
     this.next = page.getByRole("button", { name: "Volgende" });
+  }
+
+  async waitForPageHeading() {
+    await this.heading.waitFor();
   }
 
   async inputVoters(votersCounts: VotersCounts) {

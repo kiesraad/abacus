@@ -12,8 +12,11 @@ async function run() {
     // replace kebab-case with camelCase in attribute names
     // regex captures two or more alphanumeric groups seperated by dashes, if followed by an equal sign
     content = content.replace(/[A-Za-z]+(-[A-Za-z]+)+(?==)/g, kebabToCamelCase);
+    content = content.replace(/^<svg /, "<svg {...props} ");
 
-    result.push(`export const Icon${ucfirst(file.replace(".svg", ""))} = () => (${content});`);
+    result.push(
+      `export const Icon${ucfirst(file.replace(".svg", ""))} = (props:React.SVGAttributes<SVGElement>) => (${content});\n`,
+    );
   });
 
   let s = result.join("\n");

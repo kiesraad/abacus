@@ -51,19 +51,19 @@ ProgressList.Item = function ({ active, status, disabled, children }: ProgressLi
 function renderStatusIcon(status: MenuStatus): React.JSX.Element {
   switch (status) {
     case "active":
-      return <IconArrowNarrowRight />; // "Actief"
+      return <IconArrowNarrowRight aria-label={"je bent hier"} />; // "Actief"
     case "accept":
-      return <IconCheckmark />; // "Ingevoerd"
+      return <IconCheckmark aria-label={"opgeslagen"} />; // "Ingevoerd"
     case "warning":
-      return <IconWarning />; // "Ingevoerd, met openstaande waarschuwingen"
+      return <IconWarning aria-label={"bevat een waarschuwing"} />; // "Ingevoerd, met openstaande waarschuwingen"
     case "empty":
-      return <IconMinus />; // "Geen invoer gedaan"
+      return <IconMinus aria-label={"leeg"} />; // "Geen invoer gedaan"
     case "updates":
       return <IconAsterisk />; // "Updates"
     case "current":
       return <IconDot />; // "Huidige invoer"
     case "unsaved":
-      return <IconPencil />; // "Niet opgeslagen wijzigingen"
+      return <IconPencil aria-label={"nog niet afgerond"} />; // "Niet opgeslagen wijzigingen"
     default:
       return <></>;
   }

@@ -157,7 +157,9 @@ test.describe("errors and warnings", () => {
     const differencesPage = new DifferencesPage(page);
     await differencesPage.heading.waitFor();
 
-    await expect(differencesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("waarschuwing");
+    await expect(differencesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
+      "bevat een waarschuwing",
+    );
   });
 });
 
@@ -171,15 +173,15 @@ test.describe("abort input modal", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("vinkje");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
-      "pijl naar rechts",
-    );
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("opgeslagen");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("je bent hier");
     await votersVotesPage.navPanel.Recounted.click();
 
     await recountedPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("pijl naar rechts");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("potlood");
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("je bent hier");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
+      "nog niet afgerond",
+    );
     await recountedPage.yes.click();
     await recountedPage.navPanel.VotersAndVotes.click();
 
@@ -188,15 +190,15 @@ test.describe("abort input modal", () => {
     await recountedPage.saveDiscardModal.discardInput.click();
 
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("vinkje");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
-      "pijl naar rechts",
-    );
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("opgeslagen");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("je bent hier");
     await votersVotesPage.navPanel.Recounted.click();
 
     await recountedPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("pijl naar rechts");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("potlood");
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("je bent hier");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
+      "nog niet afgerond",
+    );
     await expect(recountedPage.no).toBeChecked();
   });
 
@@ -209,15 +211,15 @@ test.describe("abort input modal", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("vinkje");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
-      "pijl naar rechts",
-    );
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("opgeslagen");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("je bent hier");
     await votersVotesPage.navPanel.Recounted.click();
 
     await recountedPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("pijl naar rechts");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("potlood");
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("je bent hier");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
+      "nog niet afgerond",
+    );
     await recountedPage.yes.click();
     await recountedPage.navPanel.VotersAndVotes.click();
 
@@ -225,15 +227,15 @@ test.describe("abort input modal", () => {
     await recountedPage.saveDiscardModal.saveInput.click();
 
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("vinkje");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
-      "pijl naar rechts",
-    );
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("opgeslagen");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("je bent hier");
     await votersVotesPage.navPanel.Recounted.click();
 
     await recountedPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("pijl naar rechts");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("potlood");
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("je bent hier");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
+      "nog niet afgerond",
+    );
     await expect(recountedPage.yes).toBeChecked();
   });
 });

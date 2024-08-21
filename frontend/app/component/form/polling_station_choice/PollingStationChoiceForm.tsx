@@ -48,7 +48,7 @@ export function PollingStationChoiceForm() {
     );
 
     if (pollingStation) {
-      navigate(`./${pollingStation.id}/recounted`);
+      navigate(`./${pollingStation.id}`);
     } else {
       setShowAlert(true);
       setLoading(false);

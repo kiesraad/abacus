@@ -21,13 +21,12 @@ describe("Polling Station data entry integration tests", () => {
 
     const user = userEvent.setup();
     await router.navigate("/1/input/1");
-
     expect(router.state.location.pathname).toEqual("/1/input/1");
-    await waitFor(() => {
-      expect(screen.getByTestId("begin")).toHaveTextContent("Klik");
-    });
 
-    screen.getByTestId("begin-button").click();
+    // this automatically redirects to /1/input/1/recounted
+    await waitFor(() => {
+      expect(router.state.location.pathname).toEqual("/1/input/1/recounted");
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId("recounted_form")).toBeInTheDocument();

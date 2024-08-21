@@ -64,7 +64,10 @@ export function DifferencesForm() {
 
   function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
     event.preventDefault();
-    submit();
+    const ignoreWarnings = (
+      document.getElementById("differences_form_ignore_warnings") as HTMLInputElement
+    ).checked;
+    submit(ignoreWarnings);
   }
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
@@ -189,7 +192,7 @@ export function DifferencesForm() {
       </InputGrid>
       <BottomBar type="inputgrid">
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0}>
-          <Checkbox id="voters_and_votes_form_ignore_warnings" defaultChecked={ignoreWarnings}>
+          <Checkbox id="differences_form_ignore_warnings" defaultChecked={ignoreWarnings}>
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

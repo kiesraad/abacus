@@ -64,7 +64,13 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
     event.preventDefault();
-    submit();
+
+    const ignoreWarnings = (
+      document.getElementById(
+        `candidates_votes_form_ignore_warnings_${group.number}`,
+      ) as HTMLInputElement
+    ).checked;
+    submit(ignoreWarnings);
   }
 
   const hasValidationError = errors.length > 0;
@@ -139,7 +145,10 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       </InputGrid>
       <BottomBar type="inputgrid">
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0}>
-          <Checkbox id="voters_and_votes_form_ignore_warnings" defaultChecked={ignoreWarnings}>
+          <Checkbox
+            id={`candidates_votes_form_ignore_warnings_${group.number}`}
+            defaultChecked={ignoreWarnings}
+          >
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

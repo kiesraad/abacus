@@ -1,49 +1,11 @@
-import {
-  createMemoryRouter,
-  createRoutesFromElements,
-  Route,
-  RouterProvider,
-} from "react-router-dom";
+import { createMemoryRouter } from "react-router-dom";
 
-import { render, screen, waitFor } from "@testing-library/react";
+import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { userTypeInputs } from "app/test/unit";
-
-import { ApiProvider } from "@kiesraad/api";
-
-import { InputHomePage, InputLayout } from "../";
-import { ElectionLayout } from "../../ElectionLayout";
-import { NotFound } from "../../NotFound";
-import { RootLayout } from "../../RootLayout";
-import {
-  CandidatesVotesPage,
-  DifferencesPage,
-  PollingStationHomePage,
-  PollingStationLayout,
-  RecountedPage,
-  VotersAndVotesPage,
-} from "./";
-
-export const routes = createRoutesFromElements(
-  <Route element={<RootLayout />}>
-    <Route path="/" element={<div>Home</div>} />
-    <Route path=":electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
-      <Route path="input" element={<InputLayout />}>
-        <Route index element={<InputHomePage />} />
-        <Route path=":pollingStationId" element={<PollingStationLayout />}>
-          <Route index element={<PollingStationHomePage />} />
-          <Route path="recounted" element={<RecountedPage />} />
-          <Route path="numbers" element={<VotersAndVotesPage />} />
-          <Route path="differences" element={<DifferencesPage />} />
-          <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-          <Route path="save" element={<div>Placeholder Check and Save Page</div>} />
-        </Route>
-      </Route>
-    </Route>
-  </Route>,
-);
+import { routes } from "app/routes.tsx";
+import { Providers, screen, userTypeInputs, waitFor } from "app/test/unit";
 
 const router = createMemoryRouter(routes, {
   future: {
@@ -51,15 +13,11 @@ const router = createMemoryRouter(routes, {
   },
 });
 
-const Component = (
-  <ApiProvider host={process.env.API_HOST || ""}>
-    <RouterProvider router={router} />
-  </ApiProvider>
-);
+const render = () => rtlRender(<Providers router={router} />);
 
-describe("PollingStation integration tests", () => {
+describe("Polling Station data entry integration tests", () => {
   test("It renders", async () => {
-    render(Component);
+    render();
 
     const user = userEvent.setup();
     await router.navigate("/1/input/1");

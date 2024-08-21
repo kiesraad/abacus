@@ -7,9 +7,9 @@ import { expectNotFound, overrideOnce, render, setupTestRouter } from "app/test/
 
 import { ApiProvider, ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 
-import { FinaliseInputPage } from "./FinaliseInputPage";
+import { FinaliseElectionPage } from "./FinaliseElectionPage";
 
-describe("FinaliseInputPage", () => {
+describe("FinaliseElectionPage", () => {
   test("Error when election is not ready", async () => {
     // Since we test what happens after an error, we want vitest to ignore them
     vi.spyOn(console, "error").mockImplementation(() => {
@@ -31,7 +31,7 @@ describe("FinaliseInputPage", () => {
   });
 });
 
-describe("FinaliseInputPage", () => {
+describe("FinaliseElectionPage", () => {
   test("Shows button", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
@@ -43,7 +43,7 @@ describe("FinaliseInputPage", () => {
     render(
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <FinaliseInputPage />
+          <FinaliseElectionPage />
         </ElectionStatusProvider>
       </ElectionProvider>,
     );

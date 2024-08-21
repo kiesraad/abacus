@@ -6,7 +6,7 @@ import { useElection, useElectionStatus } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
 import { Button, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
-export function FinaliseInputPage() {
+export function FinaliseElectionPage() {
   const { election } = useElection();
   const { statuses } = useElectionStatus();
 

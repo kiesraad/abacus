@@ -48,6 +48,6 @@ describe("FinaliseInputPage", () => {
       </ElectionProvider>,
     );
 
-    expect(await screen.findByText("Download resultaten")).toBeVisible();
+    expect(await screen.findByText("Download proces-verbaal")).toBeVisible();
   });
 });

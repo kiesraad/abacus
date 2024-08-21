@@ -36,7 +36,7 @@ export function FinaliseInputPage() {
 
   return (
     <>
-      <PageTitle title="Invoer afronden - Abacus" />
+      <PageTitle title="Invoerfase afronden - Abacus" />
       <NavBar>
         <Link to={"/overview"}>Overzicht</Link>
         <IconChevronRight />
@@ -53,7 +53,7 @@ export function FinaliseInputPage() {
 
       <main>
         <article>
-          <Button onClick={downloadResults}>Download resultaten</Button>
+          <Button onClick={downloadResults}>Download proces-verbaal</Button>
         </article>
       </main>
     </>

@@ -205,14 +205,16 @@ impl Validate for PollingStationResults {
                     format!("{field_name}.voters_counts.total_admitted_voters_count")
                 }])
             }
-            validation_results.warnings.push(ValidationResult {
-                fields,
-                code: if self.recounted {
-                    ValidationResultCode::W207
-                } else {
-                    ValidationResultCode::W206
-                },
-            });
+            if !fields.is_empty() {
+                validation_results.warnings.push(ValidationResult {
+                    fields,
+                    code: if self.recounted {
+                        ValidationResultCode::W207
+                    } else {
+                        ValidationResultCode::W206
+                    },
+                });
+            }
         }
 
         if total_voters_count < total_votes_count {

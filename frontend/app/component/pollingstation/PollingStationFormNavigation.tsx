@@ -114,11 +114,7 @@ export function PollingStationFormNavigation({
   return (
     <>
       {blocker.state === "blocked" && (
-        <Modal
-          onClose={() => {
-            blocker.proceed();
-          }}
-        >
+        <Modal>
           <h2 id="modal-blocker-title">Wat wil je doen met je invoer?</h2>
           <p>TEMP: {currentForm && reasonBlocked(formState, currentForm, values)}</p>
           <p>

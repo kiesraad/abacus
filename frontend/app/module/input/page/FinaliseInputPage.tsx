@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { NavBar } from "app/component/navbar/NavBar.tsx";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
+import { IconChevronRight } from "@kiesraad/icon";
 import { Button, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
 export function FinaliseInputPage() {
@@ -38,6 +39,8 @@ export function FinaliseInputPage() {
       <PageTitle title="Invoer afronden - Abacus" />
       <NavBar>
         <Link to={"/overview"}>Overzicht</Link>
+        <IconChevronRight />
+        <Link to={`/${election.id}/input`}>{election.name}</Link>
       </NavBar>
       <header>
         <section>

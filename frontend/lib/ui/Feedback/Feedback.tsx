@@ -41,17 +41,17 @@ export function Feedback({ id, type, data, children }: FeedbackProps) {
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>
       {feedbackList.map((feedback, index) => (
-        <div key={`feedback-${index}`} className="feedback">
+        <div key={`feedback-${index}`} className="feedback-item">
           <header>
             {renderIconForType(type)}
             <h3>{feedback.title}</h3>
             {feedback.code && <span>{feedback.code}</span>}
           </header>
-          {feedback.content}
+          <div className="content">{feedback.content}</div>
         </div>
       ))}
       {id !== "feedback-server-error" && (
-        <div className="action">
+        <div className="feedback-action">
           {children ? (
             children
           ) : (

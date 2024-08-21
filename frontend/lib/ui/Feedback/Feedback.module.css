@@ -6,36 +6,40 @@
   flex-direction: column;
   gap: 1.5rem;
 
-  div:global(.feedback) {
+  div:global(.feedback-item) {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+
+    header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      svg {
+        flex: 0 0 24px;
+        width: 24px;
+        margin-right: 8px;
+      }
+
+      h3 {
+        margin-bottom: 0;
+        flex: 1 1 auto;
+      }
+
+      span {
+        flex: 0 0 32px;
+        font-weight: bold;
+        padding-left: 1.5rem;
+      }
+    }
+
+    div:global(.content) {
+      max-width: 42.5rem;
+    }
   }
 
-  header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
-    svg {
-      flex: 0 0 24px;
-      width: 24px;
-      margin-right: 8px;
-    }
-
-    h3 {
-      margin-bottom: 0;
-      flex: 1 1 auto;
-    }
-
-    span {
-      flex: 0 0 32px;
-      font-weight: bold;
-      padding-left: 1.5rem;
-    }
-  }
-
-  div:global(.action) {
+  div:global(.feedback-action) {
     ul {
       margin: 0;
     }

@@ -40,8 +40,6 @@ describe("FinaliseInputPage", () => {
       ],
     });
 
-    // NOTE: We're not using the wrapped render function here,
-    // since we want control over our own memory router.
     render(
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>

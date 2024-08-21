@@ -157,7 +157,7 @@ test.describe("errors and warnings", () => {
     const differencesPage = new DifferencesPage(page);
     await differencesPage.heading.waitFor();
 
-    await expect(differencesPage.navVotersAndVotes).toHaveClass("idle warning");
+    await expect(differencesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("waarschuwing");
   });
 });
 
@@ -171,28 +171,32 @@ test.describe("abort input modal", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
-    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active unsaved");
-    await votersVotesPage.navRecounted.click();
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("vinkje");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
+      "pijl naar rechts",
+    );
+    await votersVotesPage.navPanel.Recounted.click();
 
     await recountedPage.heading.waitFor();
-    await expect(recountedPage.navRecounted).toHaveClass("active accept");
-    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle unsaved");
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("pijl naar rechts");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("potlood");
     await recountedPage.yes.click();
-    await recountedPage.navVotersAndVotes.click();
+    await recountedPage.navPanel.VotersAndVotes.click();
 
     await recountedPage.saveDiscardModal.heading.waitFor();
 
     await recountedPage.saveDiscardModal.discardInput.click();
 
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
-    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active unsaved");
-    await votersVotesPage.navRecounted.click();
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("vinkje");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
+      "pijl naar rechts",
+    );
+    await votersVotesPage.navPanel.Recounted.click();
 
     await recountedPage.heading.waitFor();
-    await expect(recountedPage.navRecounted).toHaveClass("active accept");
-    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle unsaved");
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("pijl naar rechts");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("potlood");
     await expect(recountedPage.no).toBeChecked();
   });
 
@@ -205,27 +209,31 @@ test.describe("abort input modal", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
-    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active unsaved");
-    await votersVotesPage.navRecounted.click();
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("vinkje");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
+      "pijl naar rechts",
+    );
+    await votersVotesPage.navPanel.Recounted.click();
 
     await recountedPage.heading.waitFor();
-    await expect(recountedPage.navRecounted).toHaveClass("active accept");
-    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle unsaved");
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("pijl naar rechts");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("potlood");
     await recountedPage.yes.click();
-    await recountedPage.navVotersAndVotes.click();
+    await recountedPage.navPanel.VotersAndVotes.click();
 
     await recountedPage.saveDiscardModal.heading.waitFor();
     await recountedPage.saveDiscardModal.saveInput.click();
 
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
-    await expect(votersVotesPage.navVotersAndVotes).toHaveClass("active unsaved");
-    await votersVotesPage.navRecounted.click();
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("vinkje");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
+      "pijl naar rechts",
+    );
+    await votersVotesPage.navPanel.Recounted.click();
 
     await recountedPage.heading.waitFor();
-    await expect(recountedPage.navRecounted).toHaveClass("active accept");
-    await expect(recountedPage.navVotersAndVotes).toHaveClass("idle unsaved");
+    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("pijl naar rechts");
+    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("potlood");
     await expect(recountedPage.yes).toBeChecked();
   });
 });

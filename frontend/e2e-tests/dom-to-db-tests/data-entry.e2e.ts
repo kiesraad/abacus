@@ -181,8 +181,9 @@ test.describe("abort input modal", () => {
     await recountedPage.yes.click();
     await recountedPage.navVotersAndVotes.click();
 
-    await expect(recountedPage.modalHeading).toHaveText("Wat wil je doen met je invoer?");
-    await recountedPage.discardInput.click();
+    await recountedPage.saveDiscardModal.waitForHeading();
+
+    await recountedPage.saveDiscardModal.discardInput.click();
 
     await votersVotesPage.waitForPageHeading();
     await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");
@@ -214,8 +215,8 @@ test.describe("abort input modal", () => {
     await recountedPage.yes.click();
     await recountedPage.navVotersAndVotes.click();
 
-    await expect(recountedPage.modalHeading).toHaveText("Wat wil je doen met je invoer?");
-    await recountedPage.saveInput.click();
+    await recountedPage.saveDiscardModal.waitForHeading();
+    await recountedPage.saveDiscardModal.saveInput.click();
 
     await votersVotesPage.waitForPageHeading();
     await expect(votersVotesPage.navRecounted).toHaveClass("idle accept");

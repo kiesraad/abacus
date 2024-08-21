@@ -1,0 +1,26 @@
+import { type Locator, type Page } from "@playwright/test";
+
+export class SaveDiscardInputModal {
+  protected readonly page: Page;
+
+  readonly modal: Locator;
+  readonly heading: Locator;
+  readonly saveInput: Locator;
+  readonly discardInput: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+
+    this.modal = page.getByRole("dialog");
+    this.heading = this.modal.getByRole("heading", {
+      level: 2,
+      name: "Wat wil je doen met je invoer?",
+    });
+    this.saveInput = this.modal.getByRole("button", { name: "Invoer bewaren" });
+    this.discardInput = this.modal.getByRole("button", { name: "Niet bewaren" });
+  }
+
+  async waitForHeading() {
+    await this.heading.waitFor();
+  }
+}

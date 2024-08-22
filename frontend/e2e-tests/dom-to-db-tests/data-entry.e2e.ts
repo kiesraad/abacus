@@ -74,13 +74,14 @@ test.describe("Data entry", () => {
 });
 
 test.describe("errors and warnings", () => {
-  test("display error on voters and votes page", async ({ page }) => {
+  test("correct error on voters and votes page", async ({ page }) => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.no.click();
     await recountedPage.next.click();
 
+    // fill form with data that results in an error
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
       poll_card_count: "1",
@@ -89,25 +90,17 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: "100",
     };
     await votersVotesPage.inputVoters(voters);
-
     await votersVotesPage.next.click();
 
+    await expect(votersVotesPage.heading).toBeVisible();
     await expect(votersVotesPage.error).toBeVisible();
     await expect(votersVotesPage.warning).toBeHidden();
-  });
 
-  test("display warning on voters and votes page", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
-
-    const recountedPage = new RecountedPage(page);
-    await recountedPage.no.click();
-    await recountedPage.next.click();
-
-    const votersVotesPage = new VotersVotesPage(page);
-    const voters = {
-      poll_card_count: "100",
-      proxy_certificate_count: "0",
-      voter_card_count: "0",
+    // fill form with corrected data (no errors, no warnings)
+    const votersCorrected = {
+      poll_card_count: "98",
+      proxy_certificate_count: "1",
+      voter_card_count: "1",
       total_admitted_voters_count: "100",
     };
     const votes = {
@@ -116,13 +109,14 @@ test.describe("errors and warnings", () => {
       invalid_votes_count: "0",
       total_votes_cast_count: "100",
     };
-    await votersVotesPage.inputVoters(voters);
+    await votersVotesPage.inputVoters(votersCorrected);
     await votersVotesPage.inputVotes(votes);
-
     await votersVotesPage.next.click();
 
-    await expect(votersVotesPage.warning).toBeVisible();
-    await expect(votersVotesPage.error).toBeHidden();
+    const differencesPage = new DifferencesPage(page);
+    await differencesPage.heading.waitFor();
+
+    await expect(differencesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
   test("accept warning on voters and votes page", async ({ page }) => {
@@ -132,6 +126,7 @@ test.describe("errors and warnings", () => {
     await recountedPage.no.check();
     await recountedPage.next.click();
 
+    // fill form with data that results in a warning
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
       poll_card_count: "100",
@@ -147,11 +142,14 @@ test.describe("errors and warnings", () => {
     };
     await votersVotesPage.inputVoters(voters);
     await votersVotesPage.inputVotes(votes);
-
     await votersVotesPage.next.click();
 
-    await votersVotesPage.acceptWarnings.check();
+    await expect(votersVotesPage.heading).toBeVisible();
+    await expect(votersVotesPage.warning).toBeVisible();
+    await expect(votersVotesPage.error).toBeHidden();
 
+    // accept the warning
+    await votersVotesPage.acceptWarnings.check();
     await votersVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);

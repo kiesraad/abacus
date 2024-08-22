@@ -1,6 +1,6 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
-import { DevHomePage } from "./module/DevHomePage.tsx";
+import { DevHomePage } from "./module/DevHomePage";
 import { ElectionLayout } from "./module/ElectionLayout";
 import {
   CandidatesVotesPage,

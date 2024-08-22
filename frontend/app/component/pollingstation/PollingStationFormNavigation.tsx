@@ -116,7 +116,6 @@ export function PollingStationFormNavigation({
       {blocker.state === "blocked" && (
         <Modal>
           <h2 id="modal-blocker-title">Wat wil je doen met je invoer?</h2>
-          <p>TEMP: {currentForm && reasonBlocked(formState, currentForm, values)}</p>
           <p>
             Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de
             invoer die je al hebt gedaan bewaren.

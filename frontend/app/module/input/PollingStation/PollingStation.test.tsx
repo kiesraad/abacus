@@ -4,7 +4,7 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { routes } from "app/routes.tsx";
+import { routes } from "app/routes";
 import { Providers, screen, userTypeInputs, waitFor } from "app/test/unit";
 
 import { electionMockData } from "@kiesraad/api-mocks";

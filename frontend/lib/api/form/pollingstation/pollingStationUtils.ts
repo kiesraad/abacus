@@ -17,8 +17,8 @@ import {
   FormState,
   PollingStationValues,
 } from "./PollingStationFormController";
-import { DifferencesValues } from "./useDifferences.ts";
-import { RecountedValue } from "./useRecounted.ts";
+import { DifferencesValues } from "./useDifferences";
+import { RecountedValue } from "./useRecounted";
 import { VotersAndVotesValues } from "./useVotersAndVotes";
 
 export function addValidationResultToFormState(
@@ -35,13 +35,15 @@ export function addValidationResultToFormState(
         case "votes_counts":
         case "voters_counts":
         case "voters_recounts":
-          //dont add errors and warnings to the form state if the section is not saved
+          //don't add errors and warnings to the form state if the section is not saved
           if (formState.sections.voters_votes_counts.isSaved) {
-            formState.sections.voters_votes_counts[target].push(validationResult);
+            if (!formState.sections.voters_votes_counts[target].includes(validationResult)) {
+              formState.sections.voters_votes_counts[target].push(validationResult);
+            }
           }
           break;
         case "differences_counts":
-          //dont add errors and warnings to the form state if the section is not saved
+          //don't add errors and warnings to the form state if the section is not saved
           if (formState.sections.differences_counts.isSaved) {
             formState.sections.differences_counts[target].push(validationResult);
           }
@@ -51,7 +53,7 @@ export function addValidationResultToFormState(
             const sectionKey = `political_group_votes_${index + 1}` as FormSectionID;
             const section = formState.sections[sectionKey];
             if (section) {
-              //dont add errors and warnings to the form state if the section is not saved
+              //don't add errors and warnings to the form state if the section is not saved
               if (section.isSaved) {
                 section[target].push(validationResult);
               }
@@ -167,7 +169,7 @@ export function isGlobalValidationResult(validationResult: ValidationResult): bo
   }
 }
 
-//transform a formsection's errors and warnings into a map of field id's and their errors and warnings
+//transform a form sections errors and warnings into a map of field ids and their errors and warnings
 export function getErrorsAndWarnings(
   errors: ValidationResult[],
   warnings: ValidationResult[],

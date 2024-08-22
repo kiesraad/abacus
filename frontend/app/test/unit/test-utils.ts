@@ -1,8 +1,11 @@
 import { ReactElement } from "react";
+import { createMemoryRouter } from "react-router-dom";
 
 import { render, RenderOptions, screen } from "@testing-library/react";
 import { UserEvent } from "@testing-library/user-event";
 import { expect } from "vitest";
+
+import { routes } from "app/routes";
 
 import { Providers } from "./Providers";
 
@@ -48,3 +51,11 @@ export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: s
     expect(input).toHaveValue(value.toString());
   }
 }
+
+export const setupTestRouter = () => {
+  return createMemoryRouter(routes);
+};
+
+export const expectNotFound = async () => {
+  expect(await screen.findByText(/Er ging iets mis./)).toBeVisible();
+};

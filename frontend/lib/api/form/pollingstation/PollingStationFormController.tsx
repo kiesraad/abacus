@@ -328,7 +328,8 @@ export function PollingStationFormController({
     if (activeSection) {
       if (activeSection.isSubmitted) {
         if (formSectionComplete(activeSection)) {
-          setTargetFormSection(formState.current);
+          const nextSectionID = getNextSection(formState, activeSection);
+          setTargetFormSection(nextSectionID);
         }
       }
     }

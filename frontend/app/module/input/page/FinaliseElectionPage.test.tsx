@@ -48,6 +48,6 @@ describe("FinaliseElectionPage", () => {
       </ElectionProvider>,
     );
 
-    expect(await screen.findByText("Download proces-verbaal")).toBeVisible();
+    expect(await screen.findByRole('button', {name: "Download proces-verbaal"})).toBeVisible();
   });
 });

@@ -53,7 +53,7 @@ export function PollingStationSelector({
         (() => {
           if (pollingStationsLoading || loading) {
             return (
-              <div id="pollingStationSelectorLoading" className={cls.message}>
+              <div id="pollingStationSelectorFeedback" className={cls.message}>
                 <span className={cls.icon}>
                   <Icon icon={<Spinner size="md" />} />
                 </span>

@@ -25,7 +25,7 @@ describe("Test PollingStationChoiceForm", () => {
       await user.type(pollingStation, "abc");
       const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
       expect(
-        within(pollingStationFeedback).getByText("Geen stembureau gevonden met nummer abc"),
+        await within(pollingStationFeedback).findByText("Geen stembureau gevonden met nummer abc"),
       ).toBeVisible();
 
       await user.clear(pollingStation);
@@ -50,7 +50,9 @@ describe("Test PollingStationChoiceForm", () => {
       // Test if the polling station name is shown
       await user.type(pollingStation, "33");
       const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
-      expect(within(pollingStationFeedback).getByText('Stembureau "Op Rolletjes"')).toBeVisible();
+      expect(
+        await within(pollingStationFeedback).findByText('Stembureau "Op Rolletjes"'),
+      ).toBeVisible();
     });
 
     test("Selecting a non-existing polling station", async () => {
@@ -67,7 +69,7 @@ describe("Test PollingStationChoiceForm", () => {
       await user.type(pollingStation, "99");
       const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
       expect(
-        within(pollingStationFeedback).getByText("Geen stembureau gevonden met nummer 99"),
+        await within(pollingStationFeedback).findByText("Geen stembureau gevonden met nummer 99"),
       ).toBeVisible();
     });
 
@@ -127,7 +129,7 @@ describe("Test PollingStationChoiceForm", () => {
       const pollingStation = screen.getByTestId("pollingStation");
 
       await user.type(pollingStation, "33");
-      const pollingStationSearching = await screen.findByTestId("pollingStationSelectorLoading");
+      const pollingStationSearching = await screen.findByTestId("pollingStationSelectorFeedback");
       expect(within(pollingStationSearching).getByText("aan het zoeken …")).toBeVisible();
     });
   });

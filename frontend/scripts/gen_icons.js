@@ -10,7 +10,7 @@ async function run() {
     if (!file.endsWith(".svg")) return;
     let content = fs.readFileSync(`./lib/icon/svg/${file}`, "utf8");
     // replace kebab-case with camelCase in attribute names
-    // regex captures two or more alphanumeric groups seperated by dashes, if followed by an equal sign
+    // regex captures two or more groups of letters seperated by dashes, if followed by an equal sign
     content = content.replace(/[A-Za-z]+(-[A-Za-z]+)+(?==)/g, kebabToCamelCase);
     content = content.replace(/^<svg /, "<svg {...props} ");
 

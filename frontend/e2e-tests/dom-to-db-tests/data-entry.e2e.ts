@@ -159,6 +159,47 @@ test.describe("errors and warnings", () => {
       "bevat een waarschuwing",
     );
   });
+
+  test("remove option to accept warning on voters and votes page after input change", async ({
+    page,
+  }) => {
+    await page.goto("/1/input/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.no.check();
+    await recountedPage.next.click();
+
+    // fill form with data that results in a warning
+    const votersVotesPage = new VotersVotesPage(page);
+    const voters = {
+      poll_card_count: "100",
+      proxy_certificate_count: "0",
+      voter_card_count: "0",
+      total_admitted_voters_count: "100",
+    };
+    const votes = {
+      votes_candidates_counts: "100",
+      blank_votes_count: "0",
+      invalid_votes_count: "0",
+      total_votes_cast_count: "100",
+    };
+    await votersVotesPage.inputVoters(voters);
+    await votersVotesPage.inputVotes(votes);
+    await votersVotesPage.next.click();
+
+    await expect(votersVotesPage.heading).toBeVisible();
+    await expect(votersVotesPage.warning).toBeVisible();
+
+    await expect(votersVotesPage.acceptWarnings).toBeVisible();
+
+    // change input
+    await votersVotesPage.proxyCertificateCount.fill("7");
+    await expect(votersVotesPage.heading).toBeVisible();
+    await expect(votersVotesPage.warning).toBeVisible();
+
+    // TODO: uncomment next line when implemented as part of issue #133
+    // await expect(votersVotesPage.acceptWarnings).toBeHidden();
+  });
 });
 
 test.describe("abort input modal", () => {

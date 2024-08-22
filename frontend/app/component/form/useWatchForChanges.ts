@@ -23,7 +23,6 @@ export function useWatchForChanges<T>(active: boolean, oldValues: T, getNewValue
 
   React.useEffect(() => {
     //if old values changes, activate the listener again
-    console.log("oldValues", oldValues);
     setHasChanges(false);
   }, [oldValues]);
 

@@ -148,7 +148,7 @@ export function PollingStationFormController({
   //reference to the current form on screen
   const currentForm = React.useRef<AnyFormReference | null>(defaultCurrentForm);
 
-  // consumable flag to ignore warnings for the active form section;
+  //consumable flag to ignore warnings for the active form section;
   const _ignoreWarnings = React.useRef<FormSectionID | null>(null);
 
   //where to navigate to next
@@ -264,7 +264,7 @@ export function PollingStationFormController({
 
   React.useEffect(() => {
     if (data) {
-      //Form state changes based of validation results in data.
+      //form state changes based of validation results in data.
       setFormState((old) => {
         const newFormState = { ...old };
         //reset all errors/warnings, and submitted, the server validates the entire request each time.
@@ -287,7 +287,6 @@ export function PollingStationFormController({
         addValidationResultToFormState(newFormState, data.validation_results.warnings, "warnings");
 
         //what form section is active
-
         if (activeFormSection) {
           //determine new current if applicable
           if (newFormState.current === activeFormSection.id) {

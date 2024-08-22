@@ -1,5 +1,6 @@
 import { ErrorsAndWarnings, FieldValidationResult } from "lib/api/api";
 
+import { ValidationResult } from "@kiesraad/api";
 import {
   deepEqual,
   fieldNameFromPath,
@@ -8,7 +9,6 @@ import {
   rootFieldSection,
 } from "@kiesraad/util";
 
-import { ValidationResult } from "../../gen/openapi";
 import {
   AnyFormReference,
   ClientValidationResult,
@@ -37,6 +37,7 @@ export function addValidationResultToFormState(
         case "voters_recounts":
           //don't add errors and warnings to the form state if the section is not saved
           if (formState.sections.voters_votes_counts.isSaved) {
+            //don't add a duplicate validation result to the form state
             if (!formState.sections.voters_votes_counts[target].includes(validationResult)) {
               formState.sections.voters_votes_counts[target].push(validationResult);
             }

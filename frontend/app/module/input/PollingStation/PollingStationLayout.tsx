@@ -1,9 +1,9 @@
 import { Link, Outlet, useParams } from "react-router-dom";
 
-import { NavBar } from "app/component/navbar/NavBar.tsx";
+import { NavBar } from "app/component/navbar/NavBar";
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
-import { AbortDataEntryControl } from "app/module/input/PollingStation/AbortDataEntryControl.tsx";
+import { AbortDataEntryControl } from "app/module/input/PollingStation/AbortDataEntryControl";
 
 import { PollingStationFormController, useElection, usePollingStation } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";

@@ -1,7 +1,8 @@
 import * as React from "react";
 
+import { ErrorResponse } from "@kiesraad/api";
+
 import { ApiResponseErrorData, ApiResponseStatus } from "./ApiClient";
-import { ErrorResponse } from "./gen/openapi";
 import { useApi } from "./useApi";
 
 export type UseApiPostRequestReturn<REQUEST_BODY, DATA> = [

@@ -12,7 +12,7 @@ import {
   pollingStationMockData,
 } from "@kiesraad/api-mocks";
 
-import { AbortDataEntryControl } from "./AbortDataEntryControl.tsx";
+import { AbortDataEntryControl } from "./AbortDataEntryControl";
 
 const mockNavigate = vi.fn();
 

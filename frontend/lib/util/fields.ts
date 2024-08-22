@@ -80,7 +80,6 @@ export function pathToFieldSections(path: string): FieldSection[] {
       : { name };
   });
   // skip "data"
-
   return result[0]?.name === "data" ? result.slice(1) : result;
 }
 

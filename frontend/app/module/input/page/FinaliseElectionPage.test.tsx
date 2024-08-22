@@ -17,6 +17,13 @@ describe("FinaliseElectionPage", () => {
     });
     const router = setupTestRouter();
 
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [
+        { id: 1, status: "Incomplete" },
+        { id: 2, status: "Complete" },
+      ],
+    });
+
     await router.navigate("/1/input/finalise");
 
     // NOTE: We're not using the wrapped render function here,

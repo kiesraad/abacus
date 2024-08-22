@@ -5,7 +5,7 @@
  *
  * Copyright Oxide Computer Company
  */
-import { http, HttpResponse, JsonBodyType } from "msw";
+import { delay, http, HttpResponse, JsonBodyType } from "msw";
 import { setupServer } from "msw/node";
 
 import { handlers } from "@kiesraad/api-mocks";
@@ -24,11 +24,15 @@ export function overrideOnce(
   path: string,
   status: number,
   body: string | null | JsonBodyType,
+  delayResponse?: "infinite" | number,
 ) {
   server.use(
     http[method](
       `http://testhost${path}`,
-      () => {
+      async () => {
+        if (delayResponse) {
+          await delay(delayResponse);
+        }
         // https://mswjs.io/docs/api/response/once
         if (typeof body === "string" || body === null) {
           return new HttpResponse(body, { status });

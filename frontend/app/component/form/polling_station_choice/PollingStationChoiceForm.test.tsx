@@ -70,6 +70,28 @@ describe("Test PollingStationChoiceForm", () => {
     ).toBeVisible();
   });
 
+  test("Form displays message when searching", async () => {
+    overrideOnce(
+      "get",
+      "/api/elections/1/polling_stations",
+      200,
+      pollingStationsMockResponse,
+      "infinite",
+    );
+    const user = userEvent.setup();
+    render(
+      <PollingStationListProvider electionId={1}>
+        <PollingStationChoiceForm />
+      </PollingStationListProvider>,
+    );
+    const pollingStation = screen.getByTestId("pollingStation");
+
+    // Test if the polling station name is shown
+    await user.type(pollingStation, "33");
+    const pollingStationSearching = await screen.findByTestId("pollingStationSelectorLoading");
+    expect(within(pollingStationSearching).getByText("aan het zoeken …")).toBeVisible();
+  });
+
   test("Polling station list", async () => {
     overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
     const user = userEvent.setup();
@@ -169,5 +191,31 @@ describe("Test PollingStationChoiceForm", () => {
         "Voer een geldig nummer van een stembureau in om te beginnen",
       ),
     ).toBeVisible();
+  });
+
+  test("Polling station list shows message while loading", async () => {
+    overrideOnce(
+      "get",
+      "/api/elections/1/polling_stations",
+      200,
+      {
+        polling_stations: [],
+      },
+      "infinite",
+    );
+    const user = userEvent.setup();
+
+    render(
+      <PollingStationListProvider electionId={1}>
+        <PollingStationChoiceForm />
+      </PollingStationListProvider>,
+    );
+
+    const openPollingStationList = screen.getByTestId("openPollingStationList");
+    await user.click(openPollingStationList);
+    expect(screen.getByText("Kies het stembureau")).toBeVisible();
+
+    // check if the loading message is visible
+    expect(screen.getByText("aan het laden …")).toBeVisible();
   });
 });

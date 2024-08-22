@@ -114,7 +114,11 @@ export function PollingStationFormNavigation({
   return (
     <>
       {blocker.state === "blocked" && (
-        <Modal>
+        <Modal
+          onClose={() => {
+            blocker.reset();
+          }}
+        >
           <h2 id="modal-blocker-title">Wat wil je doen met je invoer?</h2>
           <p>
             Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de

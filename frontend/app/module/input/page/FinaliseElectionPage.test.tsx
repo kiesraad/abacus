@@ -29,9 +29,7 @@ describe("FinaliseElectionPage", () => {
 
     await expectNotFound();
   });
-});
 
-describe("FinaliseElectionPage", () => {
   test("Shows button", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
@@ -48,6 +46,6 @@ describe("FinaliseElectionPage", () => {
       </ElectionProvider>,
     );
 
-    expect(await screen.findByRole('button', {name: "Download proces-verbaal"})).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Download proces-verbaal" })).toBeVisible();
   });
 });

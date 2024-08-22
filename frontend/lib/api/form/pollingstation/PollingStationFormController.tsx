@@ -307,7 +307,7 @@ export function PollingStationFormController({
           }
         }
 
-        //if the entire form is not completed yet, filter out global validation results since they dont have meaning yet.
+        //if the entire form is not completed yet, filter out global validation results since they don't have meaning yet.
         if (!newFormState.isCompleted) {
           Object.values(newFormState.sections).forEach((section) => {
             section.errors = section.errors.filter((err) => !isGlobalValidationResult(err));

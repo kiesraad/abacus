@@ -59,7 +59,7 @@ const defaultFormState: FormState = {
     },
     political_group_votes_2: {
       index: 4,
-      id: "political_group_votes_1",
+      id: "political_group_votes_2",
       isSaved: false,
       ignoreWarnings: false,
       errors: [],
@@ -124,19 +124,20 @@ const defaultValues: PollingStationValues = {
 describe("PollingStationUtils", () => {
   test("addValidationResultToFormState adds result to correct section", () => {
     const formState = structuredClone(defaultFormState);
-    formState.sections.voters_votes_counts.isSaved = true;
+    formState.sections.differences_counts.isSaved = true;
     const validationResults: ValidationResult[] = [
       {
-        fields: ["data.votes_counts.blank_votes_count"],
-        code: "F401",
+        fields: ["data.differences_counts.fewer_ballots_count"],
+        code: "F303",
       },
     ];
 
     addValidationResultToFormState(formState, validationResults, "errors");
 
-    expect(formState.sections.voters_votes_counts.errors.length).toBe(1);
+    expect(formState.sections.differences_counts.errors.length).toBe(1);
   });
 
+  // FIXME: F.204 is a global error, so is this test relevant?
   test("addValidationResultToFormState adds result to multiple sections", () => {
     const formState = structuredClone(defaultFormState);
 
@@ -146,31 +147,29 @@ describe("PollingStationUtils", () => {
 
     const validationResults: ValidationResult[] = [
       {
-        fields: ["data.votes_counts.invalid_votes_count", "data.political_group_votes[0]"],
-        code: "F401",
+        fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
+        code: "F204",
       },
     ];
 
     addValidationResultToFormState(formState, validationResults, "errors");
 
     expect(formState.sections.voters_votes_counts.errors.length).toBe(1);
-    expect(formState.sections.political_group_votes_1?.errors.length).toBe(1);
   });
 
   test("addValidationResultToFormState doesnt add errors to unsaved sections", () => {
     const formState = structuredClone(defaultFormState);
-
+    formState.sections.differences_counts.isSaved = false;
     const validationResults: ValidationResult[] = [
       {
-        fields: ["data.votes_counts.invalid_votes_count", "data.political_group_votes[0]"],
-        code: "F401",
+        fields: ["data.differences_counts.fewer_ballots_count"],
+        code: "F303",
       },
     ];
 
     addValidationResultToFormState(formState, validationResults, "errors");
 
-    expect(formState.sections.voters_votes_counts.errors.length).toBe(0);
-    expect(formState.sections.political_group_votes_1?.errors.length).toBe(0);
+    expect(formState.sections.differences_counts.errors.length).toBe(0);
   });
 
   test("formSectionComplete", () => {
@@ -256,7 +255,7 @@ describe("PollingStationUtils", () => {
     };
     formState.sections.voters_votes_counts.errors = [
       {
-        code: "W203",
+        code: "W201",
         fields: ["data.votes_counts.blank_votes_count"],
       },
     ];
@@ -270,20 +269,20 @@ describe("PollingStationUtils", () => {
     expect(
       isGlobalValidationResult({
         code: "F204",
-        fields: ["data.votes_counts.blank_votes_count"],
+        fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
       }),
     ).toBe(true);
 
     expect(
       isGlobalValidationResult({
-        code: "F401",
-        fields: ["data.votes_counts.blank_votes_count"],
+        code: "F303",
+        fields: ["data.differences_counts.fewer_ballots_count"],
       }),
     ).toBe(false);
 
     expect(
       isGlobalValidationResult({
-        code: "W304",
+        code: "W301",
         fields: ["data.votes_counts.blank_votes_count"],
       }),
     ).toBe(false);

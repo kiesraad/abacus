@@ -87,12 +87,7 @@ describe("PollingStationFormController", () => {
       validation_results: {
         errors: [
           {
-            fields: [
-              "data.voters_counts.total_admitted_voters_count",
-              "data.voters_counts.poll_card_count",
-              "data.voters_counts.proxy_certificate_count",
-              "data.voters_counts.voter_card_count",
-            ],
+            fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
             code: "F204",
           },
         ],

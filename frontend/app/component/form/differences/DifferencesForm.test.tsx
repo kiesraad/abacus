@@ -343,7 +343,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^W301/);
+      expect(feedbackError).toHaveTextContent(/^W301$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
     });
 
@@ -383,7 +383,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W302/);
+      expect(feedbackWarning).toHaveTextContent(/^W302$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -424,7 +424,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W303/);
+      expect(feedbackWarning).toHaveTextContent(/^W303$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -468,7 +468,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W304/);
+      expect(feedbackWarning).toHaveTextContent(/^W304W306$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -512,7 +512,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W305/);
+      expect(feedbackWarning).toHaveTextContent(/^W305W306$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });

@@ -299,7 +299,7 @@ describe("Test CandidatesVotesForm", () => {
           errors: [
             {
               fields: ["data.political_group_votes[0].total"],
-              code: "W304",
+              code: "F401",
             },
           ],
           warnings: [],
@@ -318,7 +318,7 @@ describe("Test CandidatesVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^W304$/);
+      expect(feedbackError).toHaveTextContent(/^F401$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });

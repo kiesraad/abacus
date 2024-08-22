@@ -267,7 +267,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F201/);
+      expect(feedbackError).toHaveTextContent(/^F201$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
     });
 
@@ -303,7 +303,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F202/);
+      expect(feedbackError).toHaveTextContent(/^F202$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -339,7 +339,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F203/);
+      expect(feedbackError).toHaveTextContent(/^F203$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
     });
 
@@ -468,7 +468,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W209/);
+      expect(feedbackWarning).toHaveTextContent(/^W209$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
@@ -503,7 +503,7 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W210/);
+      expect(feedbackWarning).toHaveTextContent(/^W210$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
   });

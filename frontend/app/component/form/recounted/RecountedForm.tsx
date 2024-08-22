@@ -50,7 +50,7 @@ export function RecountedForm() {
       <h2>Is er herteld?</h2>
       {hasValidationError && (
         <Feedback type="error" title="Controleer het papieren proces-verbaal" code="F.101">
-          <div>
+          <div id="feedback-error">
             Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?
             <ul>
               <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>

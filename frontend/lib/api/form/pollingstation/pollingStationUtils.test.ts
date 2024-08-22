@@ -1,25 +1,23 @@
 import { describe, expect, test } from "vitest";
 
-import { FieldValidationResult, ValidationResult } from "@kiesraad/api";
-
-import {
-  AnyFormReference,
-  ClientValidationResult,
-  FormSection,
-  FormState,
-  PollingStationValues,
-} from "./PollingStationFormController";
 import {
   addValidationResultToFormState,
+  AnyFormReference,
+  ClientValidationResult,
   currentFormHasChanges,
+  FieldValidationResult,
+  FormSection,
   formSectionComplete,
+  FormState,
   getErrorsAndWarnings,
   getNextSection,
   hasOnlyGlobalValidationResults,
   isFormSectionEmpty,
   isGlobalValidationResult,
+  PollingStationValues,
   resetFormSectionState,
-} from "./pollingStationUtils";
+  ValidationResult,
+} from "@kiesraad/api";
 
 const defaultFormState: FormState = {
   active: "recounted",
@@ -292,7 +290,7 @@ describe("PollingStationUtils", () => {
     const onlyGlobalResults: ClientValidationResult[] = [
       {
         code: "F204",
-        fields: ["data.votes_counts.blank_votes_count"],
+        fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
       },
     ];
 
@@ -300,13 +298,13 @@ describe("PollingStationUtils", () => {
 
     const onlyLocalResults: ClientValidationResult[] = [
       {
-        code: "W203",
+        code: "W201",
         fields: ["data.votes_counts.blank_votes_count"],
         isGlobal: false,
       },
       {
-        code: "W203",
-        fields: ["data.votes_counts.blank_votes_count"],
+        code: "W202",
+        fields: ["data.votes_counts.invalid_votes_count"],
         isGlobal: false,
       },
     ];
@@ -316,11 +314,11 @@ describe("PollingStationUtils", () => {
     const mixedResults: ClientValidationResult[] = [
       {
         code: "F204",
-        fields: ["data.votes_counts.blank_votes_count"],
+        fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
         isGlobal: true,
       },
       {
-        code: "W203",
+        code: "W201",
         fields: ["data.votes_counts.blank_votes_count"],
         isGlobal: false,
       },
@@ -332,18 +330,28 @@ describe("PollingStationUtils", () => {
   test("getErrorsAndWarnings errors and clientWarnings", () => {
     const errors: ValidationResult[] = [
       {
-        code: "W304",
-        fields: ["data.votes_counts.blank_votes_count"],
+        code: "F201",
+        fields: [
+          "data.voters_counts.total_admitted_voters_count",
+          "data.voters_counts.poll_card_count",
+          "data.voters_counts.proxy_certificate_count",
+          "data.voters_counts.voter_card_count",
+        ],
       },
       {
-        code: "W302",
-        fields: ["data.votes_counts.invalid_votes_count"],
+        code: "F202",
+        fields: [
+          "data.votes_counts.total_votes_cast_count",
+          "data.votes_counts.votes_candidates_counts",
+          "data.votes_counts.blank_votes_count",
+          "data.votes_counts.invalid_votes_count",
+        ],
       },
     ];
 
     const warnings: ValidationResult[] = [
       {
-        code: "W203",
+        code: "W201",
         fields: ["data.votes_counts.blank_votes_count"],
       },
     ];
@@ -366,7 +374,7 @@ describe("PollingStationUtils", () => {
 
     const warnings: ValidationResult[] = [
       {
-        code: "W203",
+        code: "W201",
         fields: ["data.votes_counts.blank_votes_count"],
       },
     ];

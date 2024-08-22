@@ -1,6 +1,6 @@
 # Functionaliteit van Abacus: eisen en wensen
 
-De nieuwe uitslagensoftware Abacus zal in meerdere stappen worden ontwikkeld. Eerst wordt de software ontwikkeld voor voor de gemeenteraadsverkiezingen, en daarna wordt de functionaliteit uitgebreid naar de andere verkiezingen. 
+De nieuwe uitslagensoftware Abacus zal in meerdere stappen worden ontwikkeld. Eerst wordt de software ontwikkeld voor voor de gemeenteraadsverkiezingen, en daarna wordt de functionaliteit uitgebreid naar de andere verkiezingen.
 
 De allereerste stap is het maken van een bruikbare demoversie.
 
@@ -9,7 +9,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 
 ## Functionaliteit voor eerste demo
 
-### Vereist (must have)
+### Eerste demo: vereist (must have)
 
 *Deze eisen (requirements) moeten in het eindresultaat terugkomen. Zonder deze eisen is de demo niet geslaagd.*
 
@@ -20,7 +20,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 - De resultaten van de stembureaus worden bij elkaar opgeteld.
 - Het proces-verbaal kan worden geëxporteerd als PDF.
 
-### Zeer gewenst (should have)
+### Eerste demo: zeer gewenst (should have)
 
 *Deze punten zijn zeer gewenst, maar zonder is de demo wel geslaagd.*
 
@@ -28,7 +28,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 - Er is een statuspagina met daarop de voortgang van de invoer van stembureaus.
 - Verschillen tussen de eerste en tweede invoer worden weergegeven en kunnen worden opgelost.
 
-### Gewenst (could have)
+### Eerste demo: gewenst (could have)
 
 *Deze wensen zullen alleen aan bod komen als er tijd genoeg is.*
 
@@ -38,7 +38,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 - Bezwaren en bijzonderheden kunnen per stembureau worden ingevoerd (bij CSO).
 - Bezwaren en bijzonderheden kunnen worden ingevuld tijdens het invoeren van de GSB-zitting.
 
-### Niet binnen scope (won't have)
+### Eerste demo: niet binnen scope (won't have)
 
 *Deze eisen zullen in deze iteratie niet aan bod komen.*
 
@@ -54,7 +54,7 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 
 ## Functionaliteit voor GSB-versie 1.0
 
-### Vereist (must have)
+### Versie 1.0: vereist (must have)
 
 *Onderstaande eisen (requirements) moeten in de eerste versie voor gemeenteraadsverkiezingen terugkomen. Zonder deze eisen is het product niet bruikbaar.*
 
@@ -75,22 +75,21 @@ In de loop van de ontwikkeltijd zal dit document worden gewijzigd en uitgebreid.
 - Er is ondersteuning voor het gebruik van Abacus op meerdere werkstations.
 - Zetelverdeling Gemeenteraad
 
-
-### Zeer gewenst (should have)
+### Versie 1.0: zeer gewenst (should have)
 
 *Deze punten zijn zeer gewenst en worden geïmplementeerd als het kan, maar zonder is de software ook bruikbaar.*
 
 - De uitslag van een stembureau/GSB kan na de eerste uitslagvaststelling worden gecorrigeerd in de vorm van een corrigendum.
 - De uitslag GSB wordt voorzien van een cryptografische handtekening.
 
-### Gewenst (could have)
+### Versie 1.0: gewenst (could have)
 
 *Deze eisen zullen alleen aan bod komen als er tijd genoeg is.*
 
 - De software biedt ondersteuning voor meerdere verkiezingen tegelijkertijd. Dit is een vereiste die we sowieso zullen uitwerken na de GSB-fase, maar hier kan al in deze fase al een aanzet toe worden gedaan.
 - De interface is beschikbaar in meerdere talen: Nederlands, Engels, Fries en Papiaments.
 
-### Niet binnen scope (won't have)
+### Versie 1.0: niet binnen scope (won't have)
 
 *Deze functionaliteit zal in deze iteratie niet aan bod komen, maar kan in de toekomst interessant zijn.*
 

@@ -12,7 +12,7 @@ export function InputHomePage() {
   const { statuses } = useElectionStatus();
 
   function finishInput() {
-    navigate("/");
+    navigate("finalise");
   }
 
   return (
@@ -38,7 +38,7 @@ export function InputHomePage() {
             niks meer herteld hoeft te worden.
           </p>
           <Button onClick={finishInput} size="md">
-            Invoer afronden
+            Invoerfase afronden
           </Button>
         </Alert>
       )}

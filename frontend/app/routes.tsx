@@ -12,6 +12,7 @@ import {
   RecountedPage,
   VotersAndVotesPage,
 } from "./module/input";
+import { FinaliseElectionPage } from "./module/input/page/FinaliseElectionPage";
 import { NotFound } from "./module/NotFound";
 import { OverviewLayout, OverviewPage } from "./module/overview";
 import { RootLayout } from "./module/RootLayout";
@@ -41,6 +42,7 @@ export const routes = createRoutesFromElements(
           <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
           <Route path="save" element={<div>Placeholder Check and Save Page</div>} />
         </Route>
+        <Route path="finalise" element={<FinaliseElectionPage />} />
       </Route>
     </Route>
   </Route>,

@@ -113,7 +113,7 @@ export function PollingStationChoiceForm() {
             return (
               <div className="flex">
                 <Icon icon={<Spinner size="lg" />} />
-                aan het zoeken …
+                aan het laden …
               </div>
             );
           } else if (pollingStations.length === 0) {

@@ -51,6 +51,9 @@ export function PollingStationFormNavigation({
           case "voters_votes_counts":
             url = `${baseUrl}/numbers`;
             break;
+          case "save":
+            url = `${baseUrl}/save`;
+            break;
         }
       }
 

@@ -89,7 +89,8 @@ export type FormSectionID =
   | "recounted"
   | "voters_votes_counts"
   | "differences_counts"
-  | `political_group_votes_${number}`;
+  | `political_group_votes_${number}`
+  | "save";
 
 export type FormSection = {
   index: number; //fixate the order of filling in sections
@@ -183,6 +184,15 @@ export function PollingStationFormController({
           index: 2,
           id: "differences_counts",
           title: "Verschillen",
+          isSaved: false,
+          ignoreWarnings: false,
+          errors: [],
+          warnings: [],
+        },
+        save: {
+          index: election.political_groups.length + 3,
+          id: "save",
+          title: "Controleren en opslaan",
           isSaved: false,
           ignoreWarnings: false,
           errors: [],
@@ -302,7 +312,9 @@ export function PollingStationFormController({
                 const nextSectionID = getNextSection(newFormState, activeFormSection);
                 if (nextSectionID) {
                   newFormState.current = nextSectionID;
-                } else {
+                }
+                if (nextSectionID === "save") {
+                  newFormState.active = "save";
                   newFormState.isCompleted = true;
                 }
               }

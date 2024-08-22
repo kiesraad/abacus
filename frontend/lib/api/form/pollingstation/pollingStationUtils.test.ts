@@ -63,6 +63,14 @@ const defaultFormState: FormState = {
       errors: [],
       warnings: [],
     },
+    save: {
+      index: 5,
+      id: "save",
+      isSaved: false,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
   },
   unknown: {
     errors: [],

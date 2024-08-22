@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-export class SaveDiscardInputModal {
+export class UnsavedChangesModal {
   protected readonly page: Page;
 
   readonly modal: Locator;

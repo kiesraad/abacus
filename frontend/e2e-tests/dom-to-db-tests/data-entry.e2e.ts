@@ -224,9 +224,9 @@ test.describe("abort input modal", () => {
     await recountedPage.yes.click();
     await recountedPage.navPanel.VotersAndVotes.click();
 
-    await recountedPage.saveDiscardModal.heading.waitFor();
+    await recountedPage.unsavedChangesModal.heading.waitFor();
 
-    await recountedPage.saveDiscardModal.discardInput.click();
+    await recountedPage.unsavedChangesModal.discardInput.click();
 
     await votersVotesPage.heading.waitFor();
     await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("opgeslagen");
@@ -262,8 +262,8 @@ test.describe("abort input modal", () => {
     await recountedPage.yes.click();
     await recountedPage.navPanel.VotersAndVotes.click();
 
-    await recountedPage.saveDiscardModal.heading.waitFor();
-    await recountedPage.saveDiscardModal.saveInput.click();
+    await recountedPage.unsavedChangesModal.heading.waitFor();
+    await recountedPage.unsavedChangesModal.saveInput.click();
 
     await votersVotesPage.heading.waitFor();
     await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("opgeslagen");

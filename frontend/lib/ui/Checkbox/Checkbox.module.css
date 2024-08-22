@@ -9,4 +9,10 @@
   &:global(.hidden) {
     display: none;
   }
+
+  &:global(.has-error) {
+    input {
+      outline: 1px solid var(--color-error);
+    }
+  }
 }

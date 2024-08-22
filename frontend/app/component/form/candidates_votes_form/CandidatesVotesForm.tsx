@@ -6,12 +6,22 @@ import {
   PoliticalGroup,
   usePoliticalGroup,
 } from "@kiesraad/api";
-import { BottomBar, Button, Checkbox, Feedback, InputGrid, InputGridRow } from "@kiesraad/ui";
+import {
+  Alert,
+  BottomBar,
+  Button,
+  Checkbox,
+  Feedback,
+  InputGrid,
+  InputGridRow,
+} from "@kiesraad/ui";
 import {
   candidateNumberFromId,
   usePositiveNumberInputMask,
   usePreventFormEnterSubmit,
 } from "@kiesraad/util";
+
+import { useWatchForChanges } from "../useWatchForChanges";
 
 interface FormElements extends HTMLFormControlsCollection {
   total: HTMLInputElement;
@@ -29,6 +39,8 @@ export interface CandidatesVotesFormProps {
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
+
+  const _IGNORE_WARNINGS_ID = `candidates_votes_form_ignore_warnings_${group.number}`;
 
   const getValues = React.useCallback(() => {
     const form = document.getElementById(
@@ -49,10 +61,21 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     };
   }, [deformat, group]);
 
+  usePreventFormEnterSubmit(formRef);
+
   const { sectionValues, errors, warnings, loading, isSaved, submit, ignoreWarnings } =
     usePoliticalGroup(group.number, getValues);
 
-  usePreventFormEnterSubmit(formRef);
+  const shouldWatch = warnings.length > 0 && isSaved;
+  const { hasChanges } = useWatchForChanges(shouldWatch, sectionValues, getValues);
+
+  React.useEffect(() => {
+    if (hasChanges) {
+      const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
+      checkbox.checked = false;
+      setWarningsWarning(false);
+    }
+  }, [hasChanges, _IGNORE_WARNINGS_ID]);
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
@@ -62,6 +85,8 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     }
   }, [isSaved]);
 
+  const [warningsWarning, setWarningsWarning] = React.useState(false);
+
   function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
     event.preventDefault();
 
@@ -70,7 +95,12 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         `candidates_votes_form_ignore_warnings_${group.number}`,
       ) as HTMLInputElement
     ).checked;
-    submit(ignoreWarnings);
+
+    if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
+      setWarningsWarning(true);
+    } else {
+      submit(ignoreWarnings);
+    }
   }
 
   const hasValidationError = errors.length > 0;
@@ -144,11 +174,15 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="inputgrid">
-        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0}>
-          <Checkbox
-            id={`candidates_votes_form_ignore_warnings_${group.number}`}
-            defaultChecked={ignoreWarnings}
-          >
+        {warningsWarning && (
+          <BottomBar.Row>
+            <Alert type="error" variant="small">
+              <p>Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.</p>
+            </Alert>
+          </BottomBar.Row>
+        )}
+        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
+          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings}>
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

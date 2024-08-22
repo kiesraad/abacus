@@ -63,4 +63,14 @@
       fill: var(--color-success);
     }
   }
+
+  &:global(.small) {
+    padding: 1rem 1rem 1rem 1.4rem;
+    align-items: center;
+    p {
+      padding: 0;
+      margin: 0;
+      color: var(--color-error-darkest);
+    }
+  }
 }

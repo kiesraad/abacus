@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { getErrorsAndWarnings, useDifferences } from "@kiesraad/api";
 import {
+  Alert,
   BottomBar,
   Button,
   Checkbox,
@@ -11,6 +12,10 @@ import {
   useTooltip,
 } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
+
+import { useWatchForChanges } from "../useWatchForChanges";
+
+const _IGNORE_WARNINGS_ID = "differences_form_ignore_warnings";
 
 interface FormElements extends HTMLFormControlsCollection {
   more_ballots_count: HTMLInputElement;
@@ -58,16 +63,33 @@ export function DifferencesForm() {
   const { sectionValues, loading, errors, warnings, isSaved, submit, ignoreWarnings } =
     useDifferences(getValues);
 
+  const shouldWatch = warnings.length > 0 && isSaved;
+  const { hasChanges } = useWatchForChanges(shouldWatch, sectionValues, getValues);
+
+  React.useEffect(() => {
+    if (hasChanges) {
+      const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
+      checkbox.checked = false;
+      setWarningsWarning(false);
+    }
+  }, [hasChanges]);
+
   useTooltip({
     onDismiss: resetWarnings,
   });
 
+  const [warningsWarning, setWarningsWarning] = React.useState(false);
+
   function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
     event.preventDefault();
-    const ignoreWarnings = (
-      document.getElementById("differences_form_ignore_warnings") as HTMLInputElement
-    ).checked;
-    submit(ignoreWarnings);
+    const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
+      .checked;
+
+    if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
+      setWarningsWarning(true);
+    } else {
+      submit(ignoreWarnings);
+    }
   }
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
@@ -76,7 +98,7 @@ export function DifferencesForm() {
     if (isSaved) {
       window.scrollTo(0, 0);
     }
-  }, [isSaved]);
+  }, [isSaved, errors, warnings]);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
@@ -191,8 +213,19 @@ export function DifferencesForm() {
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="inputgrid">
-        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0}>
-          <Checkbox id="differences_form_ignore_warnings" defaultChecked={ignoreWarnings}>
+        {warningsWarning && (
+          <BottomBar.Row>
+            <Alert type="error" variant="small">
+              <p>Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.</p>
+            </Alert>
+          </BottomBar.Row>
+        )}
+        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
+          <Checkbox
+            id={_IGNORE_WARNINGS_ID}
+            defaultChecked={ignoreWarnings}
+            hasError={warningsWarning}
+          >
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>
@@ -206,3 +239,53 @@ export function DifferencesForm() {
     </form>
   );
 }
+
+// interface PollingStationBottomBarWarningsControlProps<T> {
+//   warningsActive: boolean;
+//   warningsWarning: boolean;
+//   setWarningsWarning: React.Dispatch<React.SetStateAction<boolean>>;
+//   ignoreWarningsCheckboxId: string;
+//   oldValues: T;
+//   getNewValues: () => T;
+//   defaultIgnoreWarnings?: boolean;
+// }
+
+// function PollingStationBottomBarWarningsControl<T>({
+//   warningsActive,
+//   warningsWarning,
+//   setWarningsWarning,
+//   ignoreWarningsCheckboxId,
+//   oldValues,
+//   getNewValues,
+//   defaultIgnoreWarnings,
+// }: PollingStationBottomBarWarningsControlProps<T>) {
+//   const { hasChanges } = useWatchForChanges(warningsActive, oldValues, getNewValues);
+
+//   React.useEffect(() => {
+//     if (hasChanges) {
+//       const checkbox = document.getElementById(ignoreWarningsCheckboxId) as HTMLInputElement;
+//       checkbox.checked = false;
+//       setWarningsWarning(false);
+//     }
+//   }, [hasChanges, ignoreWarningsCheckboxId, setWarningsWarning]);
+//   return (
+//     <>
+//       {warningsWarning && (
+//         <BottomBar.Row>
+//           <Alert type="error" variant="small">
+//             <p>Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.</p>
+//           </Alert>
+//         </BottomBar.Row>
+//       )}
+//       <BottomBar.Row hidden={!warningsActive || hasChanges}>
+//         <Checkbox
+//           id={ignoreWarningsCheckboxId}
+//           defaultChecked={defaultIgnoreWarnings}
+//           hasError={warningsWarning}
+//         >
+//           Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
+//         </Checkbox>
+//       </BottomBar.Row>
+//     </>
+//   );
+// }

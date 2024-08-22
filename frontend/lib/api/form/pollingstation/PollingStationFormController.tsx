@@ -315,7 +315,6 @@ export function PollingStationFormController({
         }
         return newFormState;
       });
-      //clean up
     }
   }, [data]);
 

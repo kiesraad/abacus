@@ -4,6 +4,8 @@
  * file, you can obtain one at https://mozilla.org/MPL/2.0/.
  *
  * Copyright Oxide Computer Company
+ *
+ * https://github.com/oxidecomputer/console/blob/8dcddcef62b8d10dfcd3adb470439212b23b3d5e/test/unit/server.ts
  */
 import { http, HttpResponse, JsonBodyType } from "msw";
 import { setupServer } from "msw/node";

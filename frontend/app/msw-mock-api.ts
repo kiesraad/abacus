@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, you can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright Oxide Computer Company
+ *
+ * https://github.com/oxidecomputer/console/blob/8dcddcef62b8d10dfcd3adb470439212b23b3d5e/app/msw-mock-api.ts
+ */
 const sleep = async (ms: number) => new Promise((res) => setTimeout(res, ms));
 const randInt = (min: number, max: number) => min + Math.floor(Math.random() * (max - min));
 

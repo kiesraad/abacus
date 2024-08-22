@@ -71,8 +71,9 @@ export function PollingStationFormNavigation({
       //check if currentForm is before or same as current;
 
       const reason = reasonBlocked(formState, currentForm, values);
-      if (reason !== null) {
-        if (reason === "changes" && formState.active === formState.current) {
+      //currently only block on changes
+      if (reason !== null && reason === "changes") {
+        if (formState.active === formState.current) {
           setTemporaryCache({
             key: currentForm.id,
             data: currentForm.getValues(),
@@ -119,14 +120,15 @@ export function PollingStationFormNavigation({
             blocker.reset();
           }}
         >
-          <h2 id="modal-blocker-title">Wat wil je doen met je invoer?</h2>
+          <h2 id="modal-blocker-title">Let op: niet opgeslagen wijzigingen</h2>
           <p>
-            Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de
-            invoer die je al hebt gedaan bewaren.
-            <br />
-            <br />
-            Twijfel je? Overleg dan met de coördinator.
+            Je hebt in{" "}
+            <strong>
+              {formState.sections[formState.active]?.title || "het huidige formulier"}
+            </strong>{" "}
+            wijzigingen gemaakt die nog niet zijn opgeslagen.
           </p>
+          <p>Wil je deze wijzigingen bewaren?</p>
           <nav>
             <Button
               size="lg"
@@ -135,7 +137,7 @@ export function PollingStationFormNavigation({
                 submitCurrentForm();
               }}
             >
-              Invoer bewaren
+              Wijzigingen opslaan
             </Button>
             <Button
               size="lg"

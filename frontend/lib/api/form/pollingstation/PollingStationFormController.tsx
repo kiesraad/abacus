@@ -34,7 +34,6 @@ export interface PollingStationFormControllerProps {
   defaultCurrentForm?: AnyFormReference | null;
 }
 
-//TODO: change getValues so it also works for political_group_votes, getValues should only return the form for the specific list to use in caching.
 export interface FormReference<T> {
   type: string;
   id: FormSectionID;
@@ -95,6 +94,7 @@ export type FormSectionID =
 export type FormSection = {
   index: number; //fixate the order of filling in sections
   id: FormSectionID;
+  title?: string;
   isSaved: boolean; //has this section been sent to the server
   isSubmitted?: boolean; //has this section been submitted in the latest request
   ignoreWarnings: boolean;
@@ -164,6 +164,7 @@ export function PollingStationFormController({
         recounted: {
           index: 0,
           id: "recounted",
+          title: "Is er herteld?",
           isSaved: false,
           ignoreWarnings: false,
           errors: [],
@@ -172,6 +173,7 @@ export function PollingStationFormController({
         voters_votes_counts: {
           index: 1,
           id: "voters_votes_counts",
+          title: "Toegelaten kiezers en uitgebrachte stemmen",
           isSaved: false,
           ignoreWarnings: false,
           errors: [],
@@ -180,6 +182,7 @@ export function PollingStationFormController({
         differences_counts: {
           index: 2,
           id: "differences_counts",
+          title: "Verschillen",
           isSaved: false,
           ignoreWarnings: false,
           errors: [],
@@ -197,6 +200,7 @@ export function PollingStationFormController({
       result.sections[`political_group_votes_${pg.number}`] = {
         index: n + 3,
         id: `political_group_votes_${pg.number}`,
+        title: pg.name,
         isSaved: false,
         ignoreWarnings: false,
         errors: [],

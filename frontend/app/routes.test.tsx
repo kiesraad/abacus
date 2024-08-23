@@ -1,21 +1,11 @@
-import { createMemoryRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { screen } from "app/test/unit";
+import { expectNotFound, setupTestRouter } from "app/test/unit";
 
 import { ApiProvider } from "@kiesraad/api";
-
-import { routes } from "./routes";
-
-const setupTestRouter = () => {
-  return createMemoryRouter(routes);
-};
-
-const expectNotFound = async () => {
-  expect(await screen.findByText(/Er ging iets mis./)).toBeVisible();
-};
 
 describe("routes", () => {
   beforeEach(() => {

@@ -28,6 +28,8 @@ module.exports = {
         allowBoolean: true,
       },
     ],
+    "no-console":
+      process.env.ESLINT_ENV === "production" ? ["error", { allow: ["warn", "error"] }] : "off",
   },
   parserOptions: {
     project: "**/tsconfig.json",

@@ -44,12 +44,29 @@ export function VotersAndVotesForm() {
     warnings: inputMaskWarnings,
     resetWarnings,
   } = usePositiveNumberInputMask();
-  const formRef = React.useRef<HTMLFormElement>(null);
+  const formRef = React.useRef<VotersAndVotesFormElement>(null);
   usePreventFormEnterSubmit(formRef);
 
   const getValues = React.useCallback(() => {
-    const form = document.getElementById("voters_and_votes_form") as HTMLFormElement;
-    const elements = form.elements as VotersAndVotesFormElement["elements"];
+    const form = formRef.current;
+    if (!form) {
+      return {
+        voters_counts: {
+          poll_card_count: 0,
+          proxy_certificate_count: 0,
+          voter_card_count: 0,
+          total_admitted_voters_count: 0,
+        },
+        votes_counts: {
+          votes_candidates_counts: 0,
+          blank_votes_count: 0,
+          invalid_votes_count: 0,
+          total_votes_cast_count: 0,
+        },
+        voters_recounts: undefined,
+      };
+    }
+    const elements = form.elements;
 
     const values: VotersAndVotesValues = {
       voters_counts: {

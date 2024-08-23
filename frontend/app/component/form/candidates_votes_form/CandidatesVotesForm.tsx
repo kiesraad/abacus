@@ -43,9 +43,15 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const _IGNORE_WARNINGS_ID = `candidates_votes_form_ignore_warnings_${group.number}`;
 
   const getValues = React.useCallback(() => {
-    const form = document.getElementById(
-      `candidates_form_${group.number}`,
-    ) as CandidatesVotesFormElement;
+    const form = formRef.current;
+    if (!form) {
+      return {
+        number: group.number,
+        total: 0,
+        candidate_votes: [],
+      };
+    }
+
     const elements = form.elements;
     const candidate_votes: CandidateVotes[] = [];
     for (const el of elements["candidatevotes[]"]) {

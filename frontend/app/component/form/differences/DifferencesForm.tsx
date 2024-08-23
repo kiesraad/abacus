@@ -39,11 +39,24 @@ export function DifferencesForm() {
     warnings: inputMaskWarnings,
     resetWarnings,
   } = usePositiveNumberInputMask();
-  const formRef = React.useRef<HTMLFormElement>(null);
+  const formRef = React.useRef<DifferencesFormElement>(null);
   usePreventFormEnterSubmit(formRef);
 
   const getValues = React.useCallback(() => {
-    const form = document.getElementById("differences_form") as DifferencesFormElement;
+    const form = formRef.current;
+    if (!form) {
+      return {
+        differences_counts: {
+          more_ballots_count: 0,
+          fewer_ballots_count: 0,
+          unreturned_ballots_count: 0,
+          too_few_ballots_handed_out_count: 0,
+          too_many_ballots_handed_out_count: 0,
+          other_explanation_count: 0,
+          no_explanation_count: 0,
+        },
+      };
+    }
     const elements = form.elements;
     return {
       differences_counts: {
@@ -58,7 +71,7 @@ export function DifferencesForm() {
         no_explanation_count: deformat(elements.no_explanation_count.value),
       },
     };
-  }, [deformat]);
+  }, [formRef, deformat]);
 
   const { sectionValues, loading, errors, warnings, isSaved, submit, ignoreWarnings } =
     useDifferences(getValues);

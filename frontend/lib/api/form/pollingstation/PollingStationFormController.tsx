@@ -333,7 +333,7 @@ export function PollingStationFormController({
             section.warnings = section.warnings.filter((err) => !isGlobalValidationResult(err));
           });
         }
-        console.log(newFormState);
+
         return newFormState;
       });
     }

@@ -3,17 +3,21 @@ import { type Locator, type Page } from "@playwright/test";
 export class NavigationPanel {
   protected readonly page: Page;
 
-  readonly Recounted: Locator;
-  readonly RecountedIcon: Locator;
-  readonly VotersAndVotes: Locator;
-  readonly VotersAndVotesIcon: Locator;
+  readonly recounted: Locator;
+  readonly recountedIcon: Locator;
+  readonly votersAndVotes: Locator;
+  readonly votersAndVotesIcon: Locator;
+  readonly differences: Locator;
+  readonly differencesIcon: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.Recounted = page.locator("li").filter({ hasText: "Is er herteld?" });
-    this.RecountedIcon = this.Recounted.getByRole("img");
-    this.VotersAndVotes = page.locator("li").filter({ hasText: "Aantal kiezers en stemmen" });
-    this.VotersAndVotesIcon = this.VotersAndVotes.getByRole("img");
+    this.recounted = page.locator("li").filter({ hasText: "Is er herteld?" });
+    this.recountedIcon = this.recounted.getByRole("img");
+    this.votersAndVotes = page.locator("li").filter({ hasText: "Aantal kiezers en stemmen" });
+    this.votersAndVotesIcon = this.votersAndVotes.getByRole("img");
+    this.differences = page.locator("li").filter({ hasText: "Verschillen" });
+    this.differencesIcon = this.differences.getByRole("img");
   }
 }

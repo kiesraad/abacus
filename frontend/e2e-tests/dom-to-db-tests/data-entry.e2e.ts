@@ -7,7 +7,7 @@ import { VotersVotesPage } from "e2e-tests/page-objects/input/VotersVotesPgObj";
 
 import { pollingStation33 } from "./test-data/PollingStationTestData";
 
-test.describe("Data entry", () => {
+test.describe("data entry", () => {
   test("no recount, no differences flow", async ({ page }) => {
     await page.goto("/1/input");
 
@@ -115,7 +115,7 @@ test.describe("errors and warnings", () => {
     const differencesPage = new DifferencesPage(page);
     await differencesPage.heading.waitFor();
 
-    await expect(differencesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+    await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
   test("accept warning on voters and votes page", async ({ page }) => {
@@ -151,7 +151,7 @@ test.describe("errors and warnings", () => {
     const differencesPage = new DifferencesPage(page);
     await differencesPage.heading.waitFor();
 
-    await expect(differencesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
+    await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName(
       "bevat een waarschuwing",
     );
   });
@@ -196,7 +196,7 @@ test.describe("errors and warnings", () => {
   });
 });
 
-test.describe("navigate with unsubmitted changes", () => {
+test.describe("navigation", () => {
   test("navigate away from Recounted page without saving", async ({ page }) => {
     await page.goto("/1/input/1/recounted");
 
@@ -205,33 +205,22 @@ test.describe("navigate with unsubmitted changes", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("opgeslagen");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("je bent hier");
-    await votersVotesPage.navPanel.Recounted.click();
+    await votersVotesPage.navPanel.recounted.click();
 
     await recountedPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("je bent hier");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
-      "nog niet afgerond",
-    );
     await recountedPage.yes.click();
-    await recountedPage.navPanel.VotersAndVotes.click();
+    // navigate away with unsubmitted change
+    await recountedPage.navPanel.votersAndVotes.click();
 
-    await recountedPage.unsavedChangesModal.heading.waitFor();
+    await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
     await expect(recountedPage.unsavedChangesModal.modal).toContainText("Is er herteld?");
-
     await recountedPage.unsavedChangesModal.discardInput.click();
 
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("opgeslagen");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("je bent hier");
-    await votersVotesPage.navPanel.Recounted.click();
-
+    await expect(votersVotesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
+    // return to Recounted page and verify change is not cached
+    await votersVotesPage.navPanel.recounted.click();
     await recountedPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("je bent hier");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
-      "nog niet afgerond",
-    );
     await expect(recountedPage.no).toBeChecked();
   });
 
@@ -243,32 +232,82 @@ test.describe("navigate with unsubmitted changes", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("opgeslagen");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("je bent hier");
-    await votersVotesPage.navPanel.Recounted.click();
+    await votersVotesPage.navPanel.recounted.click();
 
     await recountedPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("je bent hier");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
-      "nog niet afgerond",
-    );
     await recountedPage.yes.click();
-    await recountedPage.navPanel.VotersAndVotes.click();
+    // navigate away with unsubmitted change
+    await recountedPage.navPanel.votersAndVotes.click();
 
-    await recountedPage.unsavedChangesModal.heading.waitFor();
+    await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
     await expect(recountedPage.unsavedChangesModal.modal).toContainText("Is er herteld?");
     await recountedPage.unsavedChangesModal.saveInput.click();
 
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("opgeslagen");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName("je bent hier");
-    await votersVotesPage.navPanel.Recounted.click();
-
+    await expect(votersVotesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
+    // return to Recounted page and verify change is cached
+    await votersVotesPage.navPanel.recounted.click();
     await recountedPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.RecountedIcon).toHaveAccessibleName("je bent hier");
-    await expect(votersVotesPage.navPanel.VotersAndVotesIcon).toHaveAccessibleName(
-      "nog niet afgerond",
-    );
     await expect(recountedPage.yes).toBeChecked();
+  });
+
+  test.describe("navigation panel icons", () => {
+    test("check icons for active, accept, warning, empty, unsaved statuses", async ({ page }) => {
+      await page.goto("/1/input/1/recounted");
+
+      const recountedPage = new RecountedPage(page);
+      await expect(recountedPage.navPanel.recountedIcon).toHaveAccessibleName("je bent hier");
+      await recountedPage.checkNoAndClickNext();
+
+      const votersVotesPage = new VotersVotesPage(page);
+      await votersVotesPage.heading.waitFor();
+      await expect(votersVotesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
+      await expect(votersVotesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName(
+        "je bent hier",
+      );
+
+      const voters = {
+        poll_card_count: "100",
+        proxy_certificate_count: "0",
+        voter_card_count: "0",
+        total_admitted_voters_count: "100",
+      };
+      const votes = {
+        votes_candidates_counts: "100",
+        blank_votes_count: "0",
+        invalid_votes_count: "0",
+        total_votes_cast_count: "100",
+      };
+      await votersVotesPage.fillInPageAndClickNext(voters, votes);
+      await votersVotesPage.acceptWarnings.click();
+      await votersVotesPage.next.click();
+
+      const differencesPage = new DifferencesPage(page);
+      await differencesPage.heading.waitFor();
+      await expect(differencesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
+      await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName(
+        "bevat een waarschuwing",
+      );
+      await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
+      await differencesPage.navPanel.votersAndVotes.click();
+
+      await votersVotesPage.heading.waitFor();
+      await expect(votersVotesPage.navPanel.differencesIcon).toHaveAccessibleName(
+        "nog niet afgerond",
+      );
+      await votersVotesPage.navPanel.differences.click();
+
+      await differencesPage.heading.waitFor();
+      await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
+      await differencesPage.next.click();
+
+      const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+      await candidatesListPage_1.heading.waitFor();
+      await expect(candidatesListPage_1.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
+      await expect(candidatesListPage_1.navPanel.votersAndVotesIcon).toHaveAccessibleName(
+        "bevat een waarschuwing",
+      );
+      await expect(candidatesListPage_1.navPanel.differencesIcon).toHaveAccessibleName("leeg");
+    });
   });
 });

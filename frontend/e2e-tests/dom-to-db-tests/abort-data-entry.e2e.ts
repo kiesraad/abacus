@@ -10,8 +10,7 @@ test.describe("Abort data entry", () => {
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.heading.waitFor();
-    await recountedPage.no.check();
-    await recountedPage.next.click();
+    await recountedPage.checkNoAndClickNext();
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
@@ -31,8 +30,7 @@ test.describe("Abort data entry", () => {
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.heading.waitFor();
-    await recountedPage.no.check();
-    await recountedPage.next.click();
+    await recountedPage.checkNoAndClickNext();
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
@@ -46,7 +44,7 @@ test.describe("Abort data entry", () => {
     await abortInputModal.heading.waitFor();
     await abortInputModal.saveInput.click();
 
-    // TODO: uncomment once user is navigated back to input page
+    // TODO: uncomment once issue 212 implements the expected behavior
     // const inputPage = new InputPage(page);
     // await expect(inputPage.heading).toBeVisible();
   });
@@ -56,8 +54,7 @@ test.describe("Abort data entry", () => {
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.heading.waitFor();
-    await recountedPage.no.check();
-    await recountedPage.next.click();
+    await recountedPage.checkNoAndClickNext();
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
@@ -69,13 +66,11 @@ test.describe("Abort data entry", () => {
     };
     const votes = {
       votes_candidates_counts: "50",
-      blank_votes_count: "50",
+      blank_votes_count: "50", // exceeds threshold
       invalid_votes_count: "0",
       total_votes_cast_count: "100",
     };
-    await votersVotesPage.inputVoters(voters);
-    await votersVotesPage.inputVotes(votes);
-    await votersVotesPage.next.click();
+    await votersVotesPage.fillInPageAndClickNext(voters, votes);
     await expect(votersVotesPage.warning).toBeVisible();
 
     await votersVotesPage.abortInput.click();
@@ -84,7 +79,7 @@ test.describe("Abort data entry", () => {
     await abortInputModal.heading.waitFor();
     await abortInputModal.saveInput.click();
 
-    // TODO: uncomment once user is navigated back to input page
+    // TODO: uncomment once issue 212 implements the expected behavior
     // const inputPage = new InputPage(page);
     // await expect(inputPage.heading).toBeVisible();
   });

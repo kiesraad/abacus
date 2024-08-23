@@ -66,4 +66,10 @@ export class VotersVotesPage extends InputBasePage {
     await this.invalidVotesCount.fill(votesCounts.invalid_votes_count);
     await this.totalVotesCastCount.fill(votesCounts.total_votes_cast_count);
   }
+
+  async fillInPageAndClickNext(votersCounts: VotersCounts, votesCounts: VotesCounts) {
+    await this.inputVoters(votersCounts);
+    await this.inputVotes(votesCounts);
+    await this.next.click();
+  }
 }

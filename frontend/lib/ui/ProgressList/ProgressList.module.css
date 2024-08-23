@@ -91,6 +91,14 @@
       }
     }
 
+    &:global(.error) {
+      aside {
+        svg {
+          fill: var(--color-error-darkest);
+        }
+      }
+    }
+
     &:global(.disabled) {
       opacity: 0.5;
 

@@ -1,8 +1,13 @@
 # Data Entry Forms
 
-This page describes the navigation and rendering logic of the data entry forms.
+This page describes the navigation and rendering logic of the data entry forms through the following flow charts:
 
-An important thing to keep in mind when reading these diagrams is that a user can only move on to the next form after resolving all errors (if any) and accepting all warnings (if any). So it should not be possible that any form previous to the current one has any errors or unaccepted warnings.
+- __Render navigation menu__: styling of the different items in the left-hand navigation menu
+- __Render form__: rendering of the different forms for data entry
+- __Click "Volgende"__: what should happen when the user clicks the "Volgende" ("Next") button
+- __Navigate away from page__: what should happen when the user navigates away from the page in any other way than clicking the "Volgende" button
+
+An important thing to keep in mind when reading these diagrams is that a user can only proceed to the next form by clicking "Volgende" after they have resolved all errors (if any) and accepted all warnings (if any).
 
 
 ## Questions
@@ -171,7 +176,7 @@ flowchart TD
 Note that if there is a warning and the user changes the input, they should no longer have the option to accept the warning. They need to click "Next" first, to validate the changed input.
 
 
-## Click navigation item or browser back/forward buttons
+## Navigate away from page
 
 ```mermaid
 flowchart TD
@@ -185,6 +190,8 @@ flowchart TD
     click-nav-item(click navigation item)
     click-browser-back("click browser
         back button")
+    click-link-in-error-or-warning("click link
+        in error or warning")
     click-browser-forward("click browser
         forward button")
     on-furthest-page{on furthest page?}
@@ -199,10 +206,12 @@ flowchart TD
     flow-start --> click-nav-item
     flow-start --> click-browser-back
     flow-start --> click-browser-forward
-    click-browser-back --> on-furthest-page
+    flow-start --> click-link-in-error-or-warning
     %% if you can click the browser forward button, you by definition are not on the furthest page
     click-browser-forward --> user-made-changes
     click-nav-item --> on-furthest-page
+    click-link-in-error-or-warning --> on-furthest-page
+    click-browser-back --> on-furthest-page
     on-furthest-page -- yes --> cache-input
     cache-input --> go-to-page
 

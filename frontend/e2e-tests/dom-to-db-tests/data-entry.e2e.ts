@@ -202,8 +202,8 @@ test.describe("errors and warnings", () => {
   });
 });
 
-test.describe("abort input modal", () => {
-  test("abort input on Recounted paged without saving", async ({ page }) => {
+test.describe("navigate with unsubmitted changes", () => {
+  test("navigate away from Recounted page without saving", async ({ page }) => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
@@ -242,7 +242,7 @@ test.describe("abort input modal", () => {
     await expect(recountedPage.no).toBeChecked();
   });
 
-  test("abort input on Recounted paged with saving", async ({ page }) => {
+  test("navigate away from Recounted page with saving", async ({ page }) => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);

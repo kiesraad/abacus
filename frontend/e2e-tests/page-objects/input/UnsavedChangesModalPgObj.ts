@@ -14,9 +14,9 @@ export class UnsavedChangesModal {
     this.modal = page.getByRole("dialog");
     this.heading = this.modal.getByRole("heading", {
       level: 2,
-      name: "Wat wil je doen met je invoer?",
+      name: "Let op: niet opgeslagen wijzigingen",
     });
-    this.saveInput = this.modal.getByRole("button", { name: "Invoer bewaren" });
+    this.saveInput = this.modal.getByRole("button", { name: "Wijzigingen opslaan" });
     this.discardInput = this.modal.getByRole("button", { name: "Niet bewaren" });
   }
 }

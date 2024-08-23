@@ -225,6 +225,7 @@ test.describe("abort input modal", () => {
     await recountedPage.navPanel.VotersAndVotes.click();
 
     await recountedPage.unsavedChangesModal.heading.waitFor();
+    await expect(recountedPage.unsavedChangesModal.modal).toContainText("Is er herteld?");
 
     await recountedPage.unsavedChangesModal.discardInput.click();
 
@@ -263,6 +264,7 @@ test.describe("abort input modal", () => {
     await recountedPage.navPanel.VotersAndVotes.click();
 
     await recountedPage.unsavedChangesModal.heading.waitFor();
+    await expect(recountedPage.unsavedChangesModal.modal).toContainText("Is er herteld?");
     await recountedPage.unsavedChangesModal.saveInput.click();
 
     await votersVotesPage.heading.waitFor();

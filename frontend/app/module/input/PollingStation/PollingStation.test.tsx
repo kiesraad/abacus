@@ -17,81 +17,185 @@ const router = createMemoryRouter(routes, {
 
 const render = () => rtlRender(<Providers router={router} />);
 
+const user = userEvent.setup();
+
+async function submit() {
+  await user.click(screen.getByRole("button", { name: "Volgende" }));
+}
+
+const startPollingStationInput = async () => {
+  await router.navigate("/1/input/1");
+  expect(router.state.location.pathname).toEqual("/1/input/1");
+};
+
+const expectRecountedForm = async () => {
+  await waitFor(() => {
+    expect(screen.getByTestId("recounted_form")).toBeInTheDocument();
+  });
+};
+
+const fillRecountedForm = async () => {
+  await user.click(screen.getByLabelText("Nee, er was geen hertelling"));
+};
+
+const expectVotersAndVotesForm = async () => {
+  await waitFor(() => {
+    expect(screen.getByTestId("voters_and_votes_form")).toBeInTheDocument();
+  });
+};
+
+const fillVotersAndVotesForm = async () => {
+  const total_votes = electionMockData.political_groups.length * 10;
+  await userTypeInputs(user, {
+    poll_card_count: total_votes,
+    proxy_certificate_count: 0,
+    voter_card_count: 0,
+    total_admitted_voters_count: total_votes,
+    votes_candidates_counts: total_votes,
+    blank_votes_count: 0,
+    invalid_votes_count: 0,
+    total_votes_cast_count: total_votes,
+  });
+};
+
+const expectDifferencesForm = async () => {
+  await waitFor(() => {
+    expect(screen.getByTestId("differences_form")).toBeInTheDocument();
+  });
+};
+
+const fillDifferencesForm = async () => {
+  await userTypeInputs(user, {
+    more_ballots_count: 0,
+    fewer_ballots_count: 0,
+    unreturned_ballots_count: 0,
+    too_few_ballots_handed_out_count: 0,
+    too_many_ballots_handed_out_count: 0,
+    other_explanation_count: 0,
+    no_explanation_count: 0,
+  });
+};
+
+const expectPoliticalGroupCandidatesForm = async (pgNumber: number) => {
+  await waitFor(() => {
+    expect(screen.getByTestId(`candidates_form_${pgNumber}`)).toBeInTheDocument();
+  });
+};
+
+const fillPoliticalGroupCandidatesVotesForm = async () => {
+  await userTypeInputs(user, {
+    "candidate_votes[0].votes": 5,
+    "candidate_votes[1].votes": 5,
+    total: 10,
+  });
+};
+
+// FIXME: the last political group page doesn't navigate to the Check and Save page
+// const expectCheckAndSavePage = async () => {
+//   await waitFor(() => {
+//     expect(router.state.location.pathname).toEqual("/1/input/1/save");
+//   });
+// };
+
 describe("Polling Station data entry integration tests", () => {
-  test("Can navigate through form", async () => {
+  test("Navigate through complete form", async () => {
     render();
 
-    const user = userEvent.setup();
-    await router.navigate("/1/input/1");
-    expect(router.state.location.pathname).toEqual("/1/input/1");
+    const formFillingSteps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedForm,
+      submit,
+      expectVotersAndVotesForm,
+      fillVotersAndVotesForm,
+      submit,
+      expectDifferencesForm,
+      fillDifferencesForm,
+      submit,
+      ...electionMockData.political_groups.flatMap((pg) => [
+        () => expectPoliticalGroupCandidatesForm(pg.number),
+        fillPoliticalGroupCandidatesVotesForm,
+        submit,
+      ]),
+      // expectCheckAndSavePage,
+    ];
 
-    // this automatically redirects to /1/input/1/recounted
-    // → Recounted form ("Is er herteld?")
-    await waitFor(() => {
-      expect(router.state.location.pathname).toEqual("/1/input/1/recounted");
-    });
-
-    expect(screen.getByTestId("recounted_form")).toBeInTheDocument();
-    screen.getByTestId("no").click();
-    expect(screen.getByTestId("no")).toBeChecked();
-
-    await user.click(screen.getByRole("button", { name: "Volgende" }));
-
-    // → Voters and votes form ("Aantal kiezers en stemmen" / "Toegelaten kiezers en uitgebrachte stemmen")
-    await waitFor(() => {
-      expect(screen.getByTestId("voters_and_votes_form")).toBeInTheDocument();
-    });
-
-    const total_votes = electionMockData.political_groups.length * 10;
-    await userTypeInputs(user, {
-      poll_card_count: total_votes,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: total_votes,
-      votes_candidates_counts: total_votes,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: total_votes,
-    });
-
-    await user.click(screen.getByRole("button", { name: "Volgende" }));
-
-    // → Differences form ("Verschillen" / "Verschil tussen aantal kiezers en getelde stemmen")
-    await waitFor(() => {
-      expect(screen.getByTestId("differences_form")).toBeInTheDocument();
-    });
-
-    await userTypeInputs(user, {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    });
-
-    await user.click(screen.getByRole("button", { name: "Volgende" }));
-
-    // → Political group candidates votes form (stemmen op kandidaten per politieke groepering)
-    for (const pg of electionMockData.political_groups) {
-      await waitFor(() => {
-        expect(screen.getByTestId(`candidates_form_${pg.number}`)).toBeInTheDocument();
-      });
-
-      await userTypeInputs(user, {
-        "candidate_votes[0].votes": 5,
-        "candidate_votes[1].votes": 5,
-        total: 10,
-      });
-
-      await user.click(screen.getByRole("button", { name: "Volgende" }));
+    for (const step of formFillingSteps) {
+      await step();
     }
+  });
 
-    // → Check and Save Page ("Controleren en opslaan")
-    // FIXME: the last political group page doesn't navigate to the Check and Save page
-    // await waitFor(() => {
-    //   expect(router.state.location.pathname).toEqual("/1/input/1/save");
-    // });
+  test("Navigate back", async () => {
+    render();
+
+    const steps = [
+      // fill up to and including the differences form
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedForm,
+      submit,
+      expectVotersAndVotesForm,
+      fillVotersAndVotesForm,
+      submit,
+      expectDifferencesForm,
+      fillDifferencesForm,
+      submit,
+      // navigate back to the 'voters and votes' form
+      () => userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
+      expectVotersAndVotesForm,
+    ];
+
+    for (const step of steps) {
+      await step();
+    }
+  });
+
+  test("Navigate back with dirty state", async () => {
+    render();
+
+    const steps = [
+      // fill up to and including the voters and votes form
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedForm,
+      submit,
+      expectVotersAndVotesForm,
+      fillVotersAndVotesForm,
+      // don't submit, and navigate back to the 'recounted' form
+      () => userEvent.click(screen.getByRole("link", { name: "Is er herteld?" })),
+      expectRecountedForm,
+    ];
+
+    for (const step of steps) {
+      await step();
+    }
+  });
+
+  test("Navigate to correct page after navigating back and submitting", async () => {
+    render();
+
+    const steps = [
+      // fill up to and including the differences form
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedForm,
+      submit,
+      expectVotersAndVotesForm,
+      fillVotersAndVotesForm,
+      submit,
+      expectDifferencesForm,
+      fillDifferencesForm,
+      submit,
+      // navigate back to the 'voters and votes' form and submit
+      () => userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
+      expectVotersAndVotesForm,
+      submit,
+      // expect to be on the 'differences' form
+      expectDifferencesForm,
+    ];
+
+    for (const step of steps) {
+      await step();
+    }
   });
 });

@@ -90,12 +90,11 @@ const fillPoliticalGroupCandidatesVotesForm = async () => {
   });
 };
 
-// FIXME: the last political group page doesn't navigate to the Check and Save page
-// const expectCheckAndSavePage = async () => {
-//   await waitFor(() => {
-//     expect(router.state.location.pathname).toEqual("/1/input/1/save");
-//   });
-// };
+const expectCheckAndSavePage = async () => {
+  await waitFor(() => {
+    expect(router.state.location.pathname).toEqual("/1/input/1/save");
+  });
+};
 
 describe("Polling Station data entry integration tests", () => {
   test("Navigate through complete form", async () => {
@@ -117,7 +116,7 @@ describe("Polling Station data entry integration tests", () => {
         fillPoliticalGroupCandidatesVotesForm,
         submit,
       ]),
-      // expectCheckAndSavePage,
+      expectCheckAndSavePage,
     ];
 
     for (const step of formFillingSteps) {

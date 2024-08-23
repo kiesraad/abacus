@@ -230,13 +230,12 @@ describe("PollingStationUtils", () => {
         no_explanation_count: 0,
       },
     };
-
+    //@ts-expect-error more_ballots count is a string for testing purposes
     const currentForm: AnyFormReference = {
       id: "differences_counts",
       type: "differences",
       getValues: () => ({
         differences_counts: {
-          //@ts-expect-error-next-line
           more_ballots_count: "",
           fewer_ballots_count: 0,
           unreturned_ballots_count: 0,

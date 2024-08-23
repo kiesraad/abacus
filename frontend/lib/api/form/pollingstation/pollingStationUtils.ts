@@ -151,6 +151,10 @@ export function currentFormHasChanges(
     return !deepEqual(valA, valB, true);
   }
 
+  if (currentForm.type === "save") {
+    return false;
+  }
+
   //political_group_votes
   const valA = values.political_group_votes.find((pg) => pg.number === currentForm.number);
   if (valA) {

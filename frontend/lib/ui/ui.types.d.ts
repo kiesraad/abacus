@@ -9,4 +9,5 @@ export type MenuStatus =
   | "idle"
   | "updates"
   | "unsaved"
+  | "error"
   | "warning";

@@ -358,7 +358,11 @@ export const getElectionMockData = (election_id: number): Required<ElectionDetai
   if (!election) {
     throw new Error(`Election with id ${election_id} not found`);
   }
-  election.political_groups = politicalGroupsMockData;
+  if (election_id === 2) {
+    election.political_groups = politicalGroupsMockData.slice(0, 2);
+  } else {
+    election.political_groups = politicalGroupsMockData;
+  }
   return { election: election };
 };
 

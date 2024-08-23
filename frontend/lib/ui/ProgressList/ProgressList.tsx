@@ -5,6 +5,7 @@ import {
   IconAsterisk,
   IconCheckmark,
   IconDot,
+  IconError,
   IconMinus,
   IconPencil,
   IconWarning,
@@ -64,6 +65,8 @@ function renderStatusIcon(status: MenuStatus): React.JSX.Element {
       return <IconDot />; // "Huidige invoer"
     case "unsaved":
       return <IconPencil aria-label={"nog niet afgerond"} />; // "Niet opgeslagen wijzigingen"
+    case "error":
+      return <IconError aria-label={"bevat een fout"} />; // "Ingevoerd, met openstaande fouten"
     default:
       return <></>;
   }

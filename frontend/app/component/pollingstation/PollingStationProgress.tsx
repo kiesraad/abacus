@@ -20,6 +20,10 @@ export function PollingStationProgress() {
   const menuStatusForFormSection = React.useCallback(
     (formSection?: FormSection): MenuStatus => {
       if (!formSection) return "idle";
+
+      if (formSection.errors.length > 0) {
+        return "error";
+      }
       if (formSection.warnings.length > 0) {
         return "warning";
       }

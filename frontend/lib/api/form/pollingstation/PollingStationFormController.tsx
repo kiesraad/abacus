@@ -63,11 +63,16 @@ export interface FormReferencePoliticalGroupVotes
   number: number;
 }
 
+export interface FormReferenceSave extends FormReference<object> {
+  type: "save";
+}
+
 export type AnyFormReference =
   | FormReferenceRecounted
   | FormReferenceVotersAndVotes
   | FormReferenceDifferences
-  | FormReferencePoliticalGroupVotes;
+  | FormReferencePoliticalGroupVotes
+  | FormReferenceSave;
 
 export interface iPollingStationControllerContext {
   loading: boolean;
@@ -314,7 +319,6 @@ export function PollingStationFormController({
                   newFormState.current = nextSectionID;
                 }
                 if (nextSectionID === "save") {
-                  newFormState.active = "save";
                   newFormState.isCompleted = true;
                 }
               }
@@ -329,6 +333,7 @@ export function PollingStationFormController({
             section.warnings = section.warnings.filter((err) => !isGlobalValidationResult(err));
           });
         }
+        console.log(newFormState);
         return newFormState;
       });
     }

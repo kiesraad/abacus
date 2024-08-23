@@ -78,8 +78,7 @@ test.describe("errors and warnings", () => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
-    await recountedPage.no.click();
-    await recountedPage.next.click();
+    await recountedPage.checkNoAndClickNext();
 
     // fill form with data that results in an error
     const votersVotesPage = new VotersVotesPage(page);
@@ -123,8 +122,7 @@ test.describe("errors and warnings", () => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
-    await recountedPage.no.check();
-    await recountedPage.next.click();
+    await recountedPage.checkNoAndClickNext();
 
     // fill form with data that results in a warning
     const votersVotesPage = new VotersVotesPage(page);
@@ -140,9 +138,7 @@ test.describe("errors and warnings", () => {
       invalid_votes_count: "0",
       total_votes_cast_count: "100",
     };
-    await votersVotesPage.inputVoters(voters);
-    await votersVotesPage.inputVotes(votes);
-    await votersVotesPage.next.click();
+    await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
     await expect(votersVotesPage.heading).toBeVisible();
     await expect(votersVotesPage.warning).toBeVisible();
@@ -166,8 +162,7 @@ test.describe("errors and warnings", () => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
-    await recountedPage.no.check();
-    await recountedPage.next.click();
+    await recountedPage.checkNoAndClickNext();
 
     // fill form with data that results in a warning
     const votersVotesPage = new VotersVotesPage(page);
@@ -183,9 +178,7 @@ test.describe("errors and warnings", () => {
       invalid_votes_count: "0",
       total_votes_cast_count: "100",
     };
-    await votersVotesPage.inputVoters(voters);
-    await votersVotesPage.inputVotes(votes);
-    await votersVotesPage.next.click();
+    await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
     await expect(votersVotesPage.heading).toBeVisible();
     await expect(votersVotesPage.warning).toBeVisible();
@@ -208,8 +201,7 @@ test.describe("navigate with unsubmitted changes", () => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
-    await recountedPage.no.click();
-    await recountedPage.next.click();
+    await recountedPage.checkNoAndClickNext();
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
@@ -247,8 +239,7 @@ test.describe("navigate with unsubmitted changes", () => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
-    await recountedPage.no.click();
-    await recountedPage.next.click();
+    await recountedPage.checkNoAndClickNext();
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();

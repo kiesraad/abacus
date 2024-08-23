@@ -2,9 +2,7 @@ import * as React from "react";
 
 import {
   IconArrowNarrowRight,
-  IconAsterisk,
   IconCheckmark,
-  IconDot,
   IconError,
   IconMinus,
   IconPencil,
@@ -59,10 +57,6 @@ function renderStatusIcon(status: MenuStatus): React.JSX.Element {
       return <IconWarning aria-label={"bevat een waarschuwing"} />; // "Ingevoerd, met openstaande waarschuwingen"
     case "empty":
       return <IconMinus aria-label={"leeg"} />; // "Geen invoer gedaan"
-    case "updates":
-      return <IconAsterisk />; // "Updates"
-    case "current":
-      return <IconDot />; // "Huidige invoer"
     case "unsaved":
       return <IconPencil aria-label={"nog niet afgerond"} />; // "Niet opgeslagen wijzigingen"
     case "error":

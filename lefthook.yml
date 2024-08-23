@@ -27,4 +27,4 @@ pre-commit:
     frontend-linter:
       root: "frontend/"
       glob: "*.{ts,tsx}"
-      run: npm run lint {staged_files}
+      run: export ESLINT_ENV=production && npm run lint {staged_files}

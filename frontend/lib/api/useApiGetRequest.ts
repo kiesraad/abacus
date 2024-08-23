@@ -37,7 +37,7 @@ export function useApiGetRequest<DATA>(path: string): UseApiGetRequestReturn<DAT
 
     if (path !== "") {
       doRequest(path).catch((e: unknown) => {
-        console.log("Error", e);
+        console.error("Error", e);
       });
     }
 

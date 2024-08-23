@@ -194,11 +194,12 @@ test.describe("errors and warnings", () => {
 
     // change input
     await votersVotesPage.proxyCertificateCount.fill("7");
+    // Tab press needed for page to register change after Playwright's fill()
+    await votersVotesPage.proxyCertificateCount.press("Tab");
     await expect(votersVotesPage.heading).toBeVisible();
     await expect(votersVotesPage.warning).toBeVisible();
 
-    // TODO: uncomment next line when implemented as part of issue #133
-    // await expect(votersVotesPage.acceptWarnings).toBeHidden();
+    await expect(votersVotesPage.acceptWarnings).toBeHidden();
   });
 });
 

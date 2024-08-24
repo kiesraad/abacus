@@ -287,7 +287,8 @@ export function PollingStationFormController({
       setFormState((old) => {
         const newFormState = { ...old };
         //reset all errors/warnings, and submitted, the server validates the entire request each time.
-        resetFormSectionState(newFormState);
+        //a reset is done before submitting the form to the server.
+        //resetFormSectionState(newFormState);
 
         const activeFormSection = newFormState.sections[newFormState.active];
 
@@ -414,6 +415,12 @@ export function PollingStationFormController({
             }));
             break;
         }
+        //when submitting, all previous errors and warnings are invalid
+        setFormState((old) => {
+          const newFormState = { ...old };
+          resetFormSectionState(newFormState);
+          return newFormState;
+        });
       }
     },
     [setValues, currentForm],

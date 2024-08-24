@@ -105,6 +105,9 @@ export function getNextSection(
   currentSection: FormSection,
 ): FormSectionID | null {
   for (const section of Object.values(formState.sections)) {
+    if (formState.isCompleted && section.errors.length > 0) {
+      return section.id;
+    }
     if (section.index === currentSection.index + 1) {
       return section.id;
     }

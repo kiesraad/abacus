@@ -88,16 +88,18 @@ export function PollingStationChoiceForm() {
         </div>
       )}
       <BottomBar type="form">
-        <Button
-          type="button"
-          size="lg"
-          onClick={() => {
-            handleSubmit();
-          }}
-        >
-          Beginnen
-        </Button>
-        <span className="button_hint">SHIFT + Enter</span>
+        <BottomBar.Row>
+          <Button
+            type="button"
+            size="lg"
+            onClick={() => {
+              handleSubmit();
+            }}
+          >
+            Beginnen
+          </Button>
+          <span className="button_hint">SHIFT + Enter</span>
+        </BottomBar.Row>
       </BottomBar>
       <details>
         <summary>

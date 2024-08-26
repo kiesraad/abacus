@@ -186,6 +186,7 @@ flowchart TD
     cache-input(cache input)
     reset-changes(reset changes)
     errors-or-warnings{errors or warnings?}
+    modal-fix-or-ignore{fix or ignore?}
 
     %% flow
     flow-start --> nav-item
@@ -207,5 +208,7 @@ flowchart TD
     save-changes -- yes --> call-api
     call-api --> errors-or-warnings
     errors-or-warnings -- no --> go-to-page
-    errors-or-warnings -- yes --> remain-on-page
+    errors-or-warnings -- yes --> modal-fix-or-ignore
+    modal-fix-or-ignore -- fix --> remain-on-page
+    modal-fix-or-ignore -- ignore --> go-to-page
 ```

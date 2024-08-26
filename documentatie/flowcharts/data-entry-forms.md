@@ -66,10 +66,10 @@ flowchart TD
 
     %% elements
     flow-start([start])
+    flow-done([done])
 
     render-empty-fields([render with empty fields])
     render-cached-data([render with cached data])
-    flow-end([end])
 
     render-submitted-data([render with submitted data])
 
@@ -101,19 +101,19 @@ flowchart TD
     render-submitted-data --> error-cur-page
 
     error-cur-page -- yes --> show-error
-    show-error --> flow-end
+    show-error --> flow-done
     error-cur-page -- no --> warning-cur-page
 
     warning-cur-page -- yes --> show-warning
     show-warning --> input-changed
     input-changed -- yes --> hide-checkbox-accepted
-    hide-checkbox-accepted --> flow-end
+    hide-checkbox-accepted --> flow-done
     input-changed -- no --> warning-accepted
     warning-accepted -- yes --> show-checked-accepted
     warning-accepted -- no --> show-unchecked-accepted
-    show-checked-accepted --> flow-end
-    show-unchecked-accepted --> flow-end
-    warning-cur-page -- no --> flow-end
+    show-checked-accepted --> flow-done
+    show-unchecked-accepted --> flow-done
+    warning-cur-page -- no --> flow-done
 ```
 
 

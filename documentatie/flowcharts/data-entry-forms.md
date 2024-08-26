@@ -166,20 +166,23 @@ Note that if there is a warning and the user changes the input, they should no l
 
 ## Navigate away from page
 
+Navigating away from a page can happen in several ways:
+- Clicking an item in the left navigation menu
+- Clicking a link in an error or warning message
+- Clicking a link in the top navigation bar
+- Clicking the browser back/forward button
+
+The next page can be either within the form or outside it. The action flow depends on this.
+
 ```mermaid
 flowchart TD
     %% start and end
-    flow-start([start])
-
+    flow-start([navigate action])
     go-to-page([go to selected page])
     remain-on-page([remain on current page])
 
     %% steps
-    nav-item(click navigation item)
-    browser-back("click browser back button")
-    link-in-error-or-warning("click link in error or warning")
-    browser-forward("click browser forward button")
-    navigate-outside-form("navigate outside form")
+    inside-outside{navigating inside form?}
     on-furthest-page{on furthest page?}
     user-made-changes{user made changes?}
     save-changes{save changes?}
@@ -192,19 +195,12 @@ flowchart TD
     save-or-delete{"save or delete?"}
 
     %% flow
-    flow-start --> navigate-outside-form
-    flow-start --> nav-item
-    flow-start --> browser-back
-    flow-start --> browser-forward
-    flow-start --> link-in-error-or-warning
-    nav-item --> on-furthest-page
-    link-in-error-or-warning --> on-furthest-page
-    browser-forward --> on-furthest-page
-    browser-back --> on-furthest-page
+    flow-start --> inside-outside
+    inside-outside -- outside --> save-or-delete
+    inside-outside -- inside --> on-furthest-page
     on-furthest-page -- yes --> cache-input
     cache-input --> go-to-page
     
-    navigate-outside-form --> save-or-delete
     save-or-delete -- save --> call-save-api
     save-or-delete -- delete --> call-delete-api
     call-delete-api --> go-to-page

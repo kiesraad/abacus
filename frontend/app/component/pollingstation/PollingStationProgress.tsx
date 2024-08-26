@@ -115,7 +115,12 @@ export function PollingStationProgress() {
         );
       })}
       <ProgressList.Ruler key="ruler2" />
-      <ProgressList.Item key="save" status="idle" active={targetForm === "save"}>
+      <ProgressList.Item
+        key="save"
+        status="idle"
+        active={targetForm === "save"}
+        disabled={!formState.isCompleted}
+      >
         {formState.active !== "save" && formState.isCompleted ? (
           <Link to={`/${election.id}/input/${pollingStationId}/save`}>Controleren en opslaan</Link>
         ) : (

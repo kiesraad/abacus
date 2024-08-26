@@ -10,7 +10,8 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    &:global(:hover) {
+
+    &:hover {
       background-color: var(--color-hover);
     }
 
@@ -105,6 +106,10 @@
       a {
         pointer-events: none;
         cursor: default;
+      }
+
+      &:hover {
+        background-color: transparent;
       }
     }
 

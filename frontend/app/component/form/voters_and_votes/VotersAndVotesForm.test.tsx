@@ -1,6 +1,51 @@
 /**
  * @vitest-environment jsdom
  */
+
+/**
+ * TEST PLAN:
+  Variables in form
+
+  voters_counts: {
+    A poll_card_count: number
+    B proxy_certificate_count: number
+    C voter_card_count: number
+    D total_admitted_voters_count: number
+  },
+  votes_counts: {
+    E votes_candidates_counts: number
+    F blank_votes_count: number
+    G invalid_votes_count: number
+    H total_votes_cast_count: number
+  },
+  voters_recounts: {
+    A.2 poll_card_recount: number
+    B.2 proxy_certificate_recount: number
+    C.2 voter_card_recount: number
+    D.2 total_admitted_voters_recount: number 
+  }
+
+  Possible local errors:
+  F.201 
+  F.202 
+  F.203 
+
+  Possible local warnings:
+  W.201 
+  W.202 
+  W.203 
+  W.204 
+  W.205 
+  W.206 
+  W.207 
+  w.208
+  W.209
+
+  Possible global errors:
+  Global errors should only be displayed when all form sections are saved and the form is completed.
+
+  F.204 
+*/
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 

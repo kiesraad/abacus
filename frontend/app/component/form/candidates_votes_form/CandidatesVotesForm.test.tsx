@@ -1,3 +1,20 @@
+/** 
+ * Test Plan
+ 
+  variables:
+  political_group_votes: (n) {
+    number: number
+    total: number,
+    candidate_votes: (n) {
+      number: number
+      votes: number
+    }
+  }
+
+  Possible local errors:
+  F.401
+  
+ */
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 

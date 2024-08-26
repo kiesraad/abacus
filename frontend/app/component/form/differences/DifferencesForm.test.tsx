@@ -1,6 +1,30 @@
 /**
  * @vitest-environment jsdom
  */
+
+/** Test Plan
+  variables:
+  differences_counts: {
+    I: more_ballots_count: number
+    J: fewer_ballots_count: number
+    K: unreturned_ballots_count: number
+    L: too_few_ballots_handed_out_count: number
+    M: too_many_ballots_handed_out_count: number
+    N: other_explanation_count: number
+    O: no_explanation_count: number
+  }
+
+  Possible local errors
+  F.301
+  F.302
+  F.303
+  F.304
+  F.305
+
+  Possible local warnings
+  W.301
+  W.302
+ */
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 

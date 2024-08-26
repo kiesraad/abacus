@@ -179,16 +179,20 @@ flowchart TD
     browser-back("click browser back button")
     link-in-error-or-warning("click link in error or warning")
     browser-forward("click browser forward button")
+    navigate-outside-form("navigate outside form")
     on-furthest-page{on furthest page?}
     user-made-changes{user made changes?}
     save-changes{save changes?}
-    call-api(call api)
+    call-save-api(call save api)
+    call-delete-api(call delete api)
     cache-input(cache input)
     reset-changes(reset changes)
     errors-or-warnings{errors or warnings?}
     modal-fix-or-ignore{fix or ignore?}
+    save-or-delete{"save or delete?"}
 
     %% flow
+    flow-start --> navigate-outside-form
     flow-start --> nav-item
     flow-start --> browser-back
     flow-start --> browser-forward
@@ -199,14 +203,19 @@ flowchart TD
     browser-back --> on-furthest-page
     on-furthest-page -- yes --> cache-input
     cache-input --> go-to-page
+    
+    navigate-outside-form --> save-or-delete
+    save-or-delete -- save --> call-save-api
+    save-or-delete -- delete --> call-delete-api
+    call-delete-api --> go-to-page
 
     on-furthest-page -- no --> user-made-changes
     user-made-changes -- no --> go-to-page
     user-made-changes -- yes --> save-changes
     save-changes -- no --> reset-changes
     reset-changes --> go-to-page
-    save-changes -- yes --> call-api
-    call-api --> errors-or-warnings
+    save-changes -- yes --> call-save-api
+    call-save-api --> errors-or-warnings
     errors-or-warnings -- no --> go-to-page
     errors-or-warnings -- yes --> modal-fix-or-ignore
     modal-fix-or-ignore -- fix --> remain-on-page

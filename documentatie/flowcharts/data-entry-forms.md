@@ -192,10 +192,9 @@ flowchart TD
     flow-start --> browser-back
     flow-start --> browser-forward
     flow-start --> link-in-error-or-warning
-    %% if you can click the browser forward button, you by definition are not on the furthest page
-    browser-forward --> user-made-changes
     nav-item --> on-furthest-page
     link-in-error-or-warning --> on-furthest-page
+    browser-forward --> on-furthest-page
     browser-back --> on-furthest-page
     on-furthest-page -- yes --> cache-input
     cache-input --> go-to-page

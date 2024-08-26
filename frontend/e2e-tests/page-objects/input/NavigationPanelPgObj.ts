@@ -24,4 +24,8 @@ export class NavigationPanel {
   list(listNumber: number) {
     return this.page.locator("li").filter({ hasText: `Lijst ${listNumber} - ` });
   }
+
+  listIcon(listNumber: number) {
+    return this.list(listNumber).getByRole("img");
+  }
 }

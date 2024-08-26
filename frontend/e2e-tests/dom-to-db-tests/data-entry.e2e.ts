@@ -297,7 +297,9 @@ test.describe("navigation", () => {
   });
 
   test.describe("navigation panel icons", () => {
-    test("check icons for active, accept, warning, empty, unsaved statuses", async ({ page }) => {
+    test("check icons for accept, active, empty, error, warning, unsaved statuses", async ({
+      page,
+    }) => {
       await page.goto("/1/input/1/recounted");
 
       const recountedPage = new RecountedPage(page);
@@ -353,6 +355,18 @@ test.describe("navigation", () => {
         "bevat een waarschuwing",
       );
       await expect(candidatesListPage_1.navPanel.differencesIcon).toHaveAccessibleName("leeg");
+
+      await candidatesListPage_1.fillCandidatesAndTotal([1, 1], 100);
+      await candidatesListPage_1.next.click();
+      await candidatesListPage_1.navPanel.differences.click();
+
+      await differencesPage.heading.waitFor();
+      await expect(differencesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
+      await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName(
+        "bevat een waarschuwing",
+      );
+      await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
+      await expect(differencesPage.navPanel.listIcon(1)).toHaveAccessibleName("bevat een fout");
     });
   });
 });

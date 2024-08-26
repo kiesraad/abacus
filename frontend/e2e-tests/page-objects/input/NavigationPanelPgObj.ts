@@ -20,4 +20,8 @@ export class NavigationPanel {
     this.differences = page.locator("li").filter({ hasText: "Verschillen" });
     this.differencesIcon = this.differences.getByRole("img");
   }
+
+  list(listNumber: number) {
+    return this.page.locator("li").filter({ hasText: `Lijst ${listNumber} - ` });
+  }
 }

@@ -20,4 +20,12 @@ export class CandidatesListPage extends InputBasePage {
   async fillCandidate(index: number, count: number) {
     await this.page.getByTestId(`candidate_votes[${index}].votes`).fill(count.toString());
   }
+
+  async fillCandidatesAndTotal(votes: number[], total: number) {
+    for (const [index, count] of votes.entries()) {
+      await this.fillCandidate(index, count);
+    }
+
+    await this.total.fill(total.toString());
+  }
 }

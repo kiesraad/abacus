@@ -53,9 +53,7 @@ flowchart TD
     warnings -- no --> empty
     empty -- yes --> styling-empty
     empty -- no --> styling-valid
-
 ```
-
 
 ## Render form
 
@@ -74,20 +72,16 @@ flowchart TD
     render-submitted-data([render with submitted data])
 
     show-error([show error])
-    hide-checkbox-accepted(["hide checkbox
-        warnings accepted"])
+    hide-checkbox-accepted(["hide checkbox warnings accepted"])
     show-warning([show warning])
-    show-checked-accepted(["show checked checkbox
-        warnings accepted"])
-    show-unchecked-accepted(["show unchecked checkbox
-        warnings accepted"])
+    show-checked-accepted(["show checked checkbox warnings accepted"])
+    show-unchecked-accepted(["show unchecked checkbox warnings accepted"])
 
     page-submitted{page submitted?}
     error-cur-page{error for current page?}
     warning-cur-page{warning for current page?}
     cached-input-available{cached input available?}
-    input-changed{"input changed
-        since submit?"}
+    input-changed{"input changed since submit?"}
     warning-accepted{"warning(s) accepted?"}
 
     %% flow
@@ -116,7 +110,6 @@ flowchart TD
     warning-cur-page -- no --> flow-done
 ```
 
-
 ## Click "Volgende"
 
 ```mermaid
@@ -127,18 +120,15 @@ flowchart TD
     go-to-prev-page([go to previous page])
     abort-input([abort input])
 
-    error-any-prev-page{"error for any
-        previous page?"}
-    error-cur-page{"error for 
-        current page?"}
-    warning-cur-page{"warning for
-        current page?"}
+    error-any-prev-page{"error for any previous page?"}
+    error-cur-page{"error for current page?"}
+    warning-cur-page{"warning for current page?"}
     warnings-accepted{"warning(s) accepted?"}
     user-addresses-error{user addresses error}
 
     user-addresses-warning{user addresses warning}
 
-    click-next(click next)
+    next-button(next button)
     call-api(call api)
     change-input(change input)
     accept-warning(accept warning)
@@ -146,8 +136,8 @@ flowchart TD
     go-to-next-page([go to next page])
 
     %% flow
-    flow-start --> click-next
-    click-next --> call-api
+    flow-start --> next-button
+    next-button --> call-api
     call-api --> error-any-prev-page
 
     error-any-prev-page -- yes --> go-to-prev-page
@@ -158,7 +148,7 @@ flowchart TD
     
     user-addresses-error -- abort --> abort-input
     user-addresses-error -- resolve --> change-input
-    change-input --> click-next
+    change-input --> next-button
 
     error-cur-page -- no --> warning-cur-page
     warning-cur-page -- yes --> warnings-accepted
@@ -166,15 +156,13 @@ flowchart TD
     warnings-accepted -- yes --> go-to-next-page
     user-addresses-warning -- resolve --> change-input
     user-addresses-warning -- accept --> accept-warning
-    accept-warning --> click-next
+    accept-warning --> next-button
     user-addresses-warning -- abort --> abort-input
 
     warning-cur-page -- no --> go-to-next-page
-
 ```
 
 Note that if there is a warning and the user changes the input, they should no longer have the option to accept the warning. They need to click "Next" first, to validate the changed input.
-
 
 ## Navigate away from page
 
@@ -187,13 +175,10 @@ flowchart TD
     remain-on-page([remain on current page])
 
     %% steps
-    click-nav-item(click navigation item)
-    click-browser-back("click browser
-        back button")
-    click-link-in-error-or-warning("click link
-        in error or warning")
-    click-browser-forward("click browser
-        forward button")
+    nav-item(click navigation item)
+    browser-back("click browser back button")
+    link-in-error-or-warning("click link in error or warning")
+    browser-forward("click browser forward button")
     on-furthest-page{on furthest page?}
     user-made-changes{user made changes?}
     save-changes{save changes?}
@@ -203,15 +188,15 @@ flowchart TD
     errors-or-warnings{errors or warnings?}
 
     %% flow
-    flow-start --> click-nav-item
-    flow-start --> click-browser-back
-    flow-start --> click-browser-forward
-    flow-start --> click-link-in-error-or-warning
+    flow-start --> nav-item
+    flow-start --> browser-back
+    flow-start --> browser-forward
+    flow-start --> link-in-error-or-warning
     %% if you can click the browser forward button, you by definition are not on the furthest page
-    click-browser-forward --> user-made-changes
-    click-nav-item --> on-furthest-page
-    click-link-in-error-or-warning --> on-furthest-page
-    click-browser-back --> on-furthest-page
+    browser-forward --> user-made-changes
+    nav-item --> on-furthest-page
+    link-in-error-or-warning --> on-furthest-page
+    browser-back --> on-furthest-page
     on-furthest-page -- yes --> cache-input
     cache-input --> go-to-page
 
@@ -224,5 +209,4 @@ flowchart TD
     call-api --> errors-or-warnings
     errors-or-warnings -- no --> go-to-page
     errors-or-warnings -- yes --> remain-on-page
-
 ```

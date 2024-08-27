@@ -19,7 +19,7 @@ export function RecountedForm() {
   usePreventFormEnterSubmit(formRef);
 
   const getValues = React.useCallback(() => {
-    const form = formRef.current;
+    const form = document.getElementById("recounted_form") as RecountedFormElement | null;
     if (!form) {
       return { recounted: undefined };
     }

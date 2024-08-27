@@ -71,11 +71,9 @@ export function PollingStationFormNavigation({
         return false;
       }
 
-      //check if currentForm is before or same as current;
-
-      const reason = reasonBlocked(formState, currentForm, values);
+      const reasons = reasonsBlocked(formState, currentForm, values);
       //currently only block on changes
-      if (reason !== null && reason === "changes") {
+      if (reasons.includes("changes")) {
         if (formState.active === formState.current) {
           setTemporaryCache({
             key: currentForm.id,
@@ -168,28 +166,31 @@ export function PollingStationFormNavigation({
 
 type BlockReason = "errors" | "warnings" | "changes";
 
-function reasonBlocked(
+function reasonsBlocked(
   formState: FormState,
   currentForm: AnyFormReference,
   values: PollingStationValues,
-): BlockReason | null {
+): BlockReason[] {
+  const result: BlockReason[] = [];
+
   const formSection = formState.sections[currentForm.id];
   if (formSection) {
     if (formSection.errors.length > 0) {
-      return "errors";
+      result.push("errors");
     }
     if (formSection.warnings.length > 0 && !formSection.ignoreWarnings) {
-      return "warnings";
+      result.push("warnings");
     }
-    if (!formSection.isSubmitted) {
-      if (formSection.ignoreWarnings !== currentForm.getIgnoreWarnings?.()) {
-        return "changes";
-      }
-      if (currentFormHasChanges(currentForm, values)) {
-        return "changes";
-      }
+    //if (!formSection.isSubmitted) {
+    if (
+      (currentForm.getIgnoreWarnings &&
+        formSection.ignoreWarnings !== currentForm.getIgnoreWarnings()) ||
+      currentFormHasChanges(currentForm, values)
+    ) {
+      result.push("changes");
     }
+    //}
   }
 
-  return null;
+  return result;
 }

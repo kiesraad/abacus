@@ -2,7 +2,7 @@ import * as React from "react";
 import { useBlocker } from "react-router-dom";
 
 import { Recounted, useRecounted } from "@kiesraad/api";
-import { BottomBar, Button, Feedback } from "@kiesraad/ui";
+import { BottomBar, Button, Enter, Feedback, Shift } from "@kiesraad/ui";
 import { usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -113,7 +113,10 @@ export function RecountedForm() {
         <Button type="submit" size="lg">
           Volgende
         </Button>
-        <span className="button_hint">SHIFT + Enter</span>
+        <span className="button_hint">
+          <Shift />
+          <Enter />
+        </span>
       </BottomBar>
     </form>
   );

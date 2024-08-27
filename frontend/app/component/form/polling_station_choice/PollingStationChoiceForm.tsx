@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { PollingStation, usePollingStationList } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
-import { Alert, BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
+import { Alert, BottomBar, Button, Enter, Icon, Shift, Spinner } from "@kiesraad/ui";
 import { cn, parseIntStrict, useDebouncedCallback } from "@kiesraad/util";
 
 import { PollingStationSelector } from "./PollingStationSelector";
@@ -97,7 +97,10 @@ export function PollingStationChoiceForm() {
         >
           Beginnen
         </Button>
-        <span className="button_hint">SHIFT + Enter</span>
+        <span className="button_hint">
+          <Shift />
+          <Enter />
+        </span>
       </BottomBar>
       <details>
         <summary>

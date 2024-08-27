@@ -8,7 +8,7 @@ import {
   useErrorsAndWarnings,
   usePoliticalGroup,
 } from "@kiesraad/api";
-import { BottomBar, Button, Feedback, InputGrid, InputGridRow } from "@kiesraad/ui";
+import { BottomBar, Button, Enter, Feedback, InputGrid, InputGridRow, Shift } from "@kiesraad/ui";
 import {
   candidateNumberFromId,
   usePositiveNumberInputMask,
@@ -166,11 +166,14 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           />
         </InputGrid.Body>
       </InputGrid>
-      <BottomBar type="inputgrid">
+      <BottomBar type="input-grid">
         <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>
-        <span className="button_hint">SHIFT + Enter</span>
+        <span className="button_hint">
+          <Shift />
+          <Enter />
+        </span>
       </BottomBar>
     </form>
   );

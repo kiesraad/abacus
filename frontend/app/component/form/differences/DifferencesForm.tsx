@@ -2,7 +2,16 @@ import * as React from "react";
 import { useBlocker } from "react-router-dom";
 
 import { DifferencesCounts, useDifferences, useErrorsAndWarnings } from "@kiesraad/api";
-import { BottomBar, Button, Feedback, InputGrid, InputGridRow, useTooltip } from "@kiesraad/ui";
+import {
+  BottomBar,
+  Button,
+  Enter,
+  Feedback,
+  InputGrid,
+  InputGridRow,
+  Shift,
+  useTooltip,
+} from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -213,11 +222,14 @@ export function DifferencesForm() {
           />
         </InputGrid.Body>
       </InputGrid>
-      <BottomBar type="inputgrid">
+      <BottomBar type="input-grid">
         <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>
-        <span className="button_hint">SHIFT + Enter</span>
+        <span className="button_hint">
+          <Shift />
+          <Enter />
+        </span>
       </BottomBar>
     </form>
   );

@@ -72,9 +72,13 @@ export function DifferencesForm() {
       },
     };
   }, [formRef, deformat]);
+
   const getIgnoreWarnings = React.useCallback(() => {
-    const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
-    return checkbox.checked;
+    const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement | null;
+    if (checkbox) {
+      return checkbox.checked;
+    }
+    return false;
   }, []);
 
   const { sectionValues, loading, errors, warnings, isSaved, submit, ignoreWarnings } =

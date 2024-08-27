@@ -7,9 +7,7 @@ import { BottomBarFooter, BottomBarForm, BottomBarInputGrid } from "./BottomBar.
 test("The footer bottom bar is rendered with a button as child", () => {
   render(<BottomBarFooter></BottomBarFooter>);
 
-  const buttonElement = screen.getByRole("button", {
-    name: "Click me",
-  });
+  const buttonElement = screen.getByRole("button", { name: "Click me" });
 
   buttonElement.click();
   expect(buttonElement).toBeEnabled();
@@ -18,9 +16,7 @@ test("The footer bottom bar is rendered with a button as child", () => {
 test("The form bottom bar is rendered with a button and button hint as child", () => {
   render(<BottomBarForm></BottomBarForm>);
 
-  const buttonElement = screen.getByRole("button", {
-    name: "Click me",
-  });
+  const buttonElement = screen.getByRole("button", { name: "Click me" });
   const shiftElement = screen.getByText("Shift");
   const enterElement = screen.getByText("Enter");
 
@@ -34,9 +30,7 @@ test("The form bottom bar is rendered with a button and button hint as child", (
 test("The input grid bottom bar is rendered with a button and button hint as child", () => {
   render(<BottomBarInputGrid></BottomBarInputGrid>);
 
-  const buttonElement = screen.getByRole("button", {
-    name: "Click me",
-  });
+  const buttonElement = screen.getByRole("button", { name: "Click me" });
   const shiftElement = screen.getByText("Shift");
   const enterElement = screen.getByText("Enter");
 

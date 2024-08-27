@@ -162,7 +162,8 @@ flowchart TD
     warning-cur-page -- no --> go-to-next-page
 ```
 
-Note that if there is a warning and the user changes the input, they should no longer have the option to accept the warning. They need to click "Next" first, to validate the changed input.
+- If there is a warning and the user changes the input, they should no longer have the option to accept the warning. They need to click "Next" first, to validate the changed input.
+- Currently, only error F.204 can trigger on a previous page such that the user is redirected to that page.
 
 ## Navigate away from page
 

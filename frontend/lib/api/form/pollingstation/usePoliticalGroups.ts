@@ -5,6 +5,7 @@ import { PoliticalGroupVotes, usePollingStationFormController } from "@kiesraad/
 export function usePoliticalGroup(
   political_group_number: number,
   getValues: () => PoliticalGroupVotes,
+  getIgnoreWarnings?: () => boolean,
 ) {
   const {
     values,
@@ -40,8 +41,9 @@ export function usePoliticalGroup(
       id: `political_group_votes_${political_group_number}`,
       number: political_group_number,
       getValues,
+      getIgnoreWarnings,
     });
-  }, [registerCurrentForm, getValues, political_group_number]);
+  }, [registerCurrentForm, getValues, political_group_number, getIgnoreWarnings]);
 
   return {
     sectionValues,

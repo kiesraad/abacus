@@ -181,8 +181,13 @@ function reasonBlocked(
     if (formSection.warnings.length > 0 && !formSection.ignoreWarnings) {
       return "warnings";
     }
-    if (!formSection.isSubmitted && currentFormHasChanges(currentForm, values)) {
-      return "changes";
+    if (!formSection.isSubmitted) {
+      if (formSection.ignoreWarnings !== currentForm.getIgnoreWarnings?.()) {
+        return "changes";
+      }
+      if (currentFormHasChanges(currentForm, values)) {
+        return "changes";
+      }
     }
   }
 

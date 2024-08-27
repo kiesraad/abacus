@@ -7,7 +7,10 @@ export type VotersAndVotesValues = Pick<
   "voters_counts" | "votes_counts" | "voters_recounts"
 >;
 
-export function useVotersAndVotes(getValues: () => VotersAndVotesValues) {
+export function useVotersAndVotes(
+  getValues: () => VotersAndVotesValues,
+  getIgnoreWarnings?: () => boolean,
+) {
   const {
     values,
     loading,
@@ -43,8 +46,9 @@ export function useVotersAndVotes(getValues: () => VotersAndVotesValues) {
       id: "voters_votes_counts",
       type: "voters_and_votes",
       getValues,
+      getIgnoreWarnings,
     });
-  }, [registerCurrentForm, getValues]);
+  }, [registerCurrentForm, getValues, getIgnoreWarnings]);
 
   const errors = React.useMemo(() => {
     return formState.sections.voters_votes_counts.errors;

@@ -4,7 +4,10 @@ import { PollingStationResults, usePollingStationFormController } from "@kiesraa
 
 export type DifferencesValues = Pick<PollingStationResults, "differences_counts">;
 
-export function useDifferences(getValues: () => DifferencesValues) {
+export function useDifferences(
+  getValues: () => DifferencesValues,
+  getIgnoreWarnings?: () => boolean,
+) {
   const {
     values,
     formState,
@@ -40,8 +43,9 @@ export function useDifferences(getValues: () => DifferencesValues) {
       id: "differences_counts",
       type: "differences",
       getValues,
+      getIgnoreWarnings,
     });
-  }, [registerCurrentForm, getValues]);
+  }, [registerCurrentForm, getValues, getIgnoreWarnings]);
 
   return {
     loading,

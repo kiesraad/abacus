@@ -72,9 +72,13 @@ export function DifferencesForm() {
       },
     };
   }, [formRef, deformat]);
+  const getIgnoreWarnings = React.useCallback(() => {
+    const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
+    return checkbox.checked;
+  }, []);
 
   const { sectionValues, loading, errors, warnings, isSaved, submit, ignoreWarnings } =
-    useDifferences(getValues);
+    useDifferences(getValues, getIgnoreWarnings);
 
   const shouldWatch = warnings.length > 0 && isSaved;
   const { hasChanges } = useWatchForChanges(shouldWatch, sectionValues, getValues);

@@ -95,8 +95,13 @@ export function VotersAndVotesForm() {
     return values;
   }, [deformat]);
 
+  const getIgnoreWarnings = React.useCallback(() => {
+    const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
+    return checkbox.checked;
+  }, []);
+
   const { sectionValues, loading, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
-    useVotersAndVotes(getValues);
+    useVotersAndVotes(getValues, getIgnoreWarnings);
 
   useTooltip({
     onDismiss: resetWarnings,

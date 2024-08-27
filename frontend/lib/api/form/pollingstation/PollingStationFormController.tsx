@@ -38,6 +38,7 @@ export interface FormReference<T> {
   type: string;
   id: FormSectionID;
   getValues: () => T;
+  getIgnoreWarnings?: () => boolean;
 }
 
 export interface FormReferenceRecounted

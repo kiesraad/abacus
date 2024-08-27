@@ -26,25 +26,25 @@
   }
 
   Possible local errors:
-  F.201 
-  F.202 
-  F.203 
+  F.201 A B C D
+  F.202 E F G H
+  F.203 A.2 B.2 C.2 D.2
 
   Possible local warnings:
-  W.201 
-  W.202 
-  W.203 
-  W.204 
-  W.205 
-  W.206 
-  W.207 
-  w.208
-  W.209
+  W.201 F
+  W.202 G
+  W.203 D H
+  W.204 H D.2
+  W.205 H
+  W.206 D H
+  W.207 H D.2
+  w.208 none
+  W.209 E F G H A.2 B.2 C.2 D.2
 
   Possible global errors:
   Global errors should only be displayed when all form sections are saved and the form is completed.
 
-  F.204 
+  F.204 E
 */
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";

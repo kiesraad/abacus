@@ -67,10 +67,15 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     };
   }, [deformat, group]);
 
+  const getIgnoreWarnings = React.useCallback(() => {
+    const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
+    return checkbox.checked;
+  }, [_IGNORE_WARNINGS_ID]);
+
   usePreventFormEnterSubmit(formRef);
 
   const { sectionValues, errors, warnings, loading, isSaved, submit, ignoreWarnings } =
-    usePoliticalGroup(group.number, getValues);
+    usePoliticalGroup(group.number, getValues, getIgnoreWarnings);
 
   const shouldWatch = warnings.length > 0 && isSaved;
   const { hasChanges } = useWatchForChanges(shouldWatch, sectionValues, getValues);

@@ -126,7 +126,36 @@ const expectBlockerModal = async () => {
 const expectElementContainsIcon = (id: string, ariaLabel: string) => {
   const el = screen.getByTestId(id);
   expect(el).toBeInTheDocument();
+  //expect(within(el).getByRole("img")).toHaveAccessibleName(ariaLabel);
   expect(el).toContainHTML(`aria-label="${ariaLabel}"`);
+};
+
+type FormIdentifier = "recounted" | "voters_and_votes" | "differences" | `candidates_${number}`;
+
+const gotoForm = async (id: FormIdentifier) => {
+  if (id.startsWith("candidates_")) {
+    const bits = id.split("_");
+    if (bits.length === 2 && bits[1]) {
+      const pgNumber = parseInt(bits[1]);
+      await userEvent.click(screen.getByRole("link", { name: `Lijst ${pgNumber}` }));
+      await expectPoliticalGroupCandidatesForm(pgNumber);
+      return;
+    }
+  }
+  switch (id) {
+    case "recounted":
+      await userEvent.click(screen.getByRole("link", { name: "Is er herteld?" }));
+      await expectRecountedForm();
+      break;
+    case "voters_and_votes":
+      await userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
+      await expectVotersAndVotesForm();
+      break;
+    case "differences":
+      await userEvent.click(screen.getByRole("link", { name: "Verschillen" }));
+      await expectDifferencesForm();
+      break;
+  }
 };
 
 describe("Polling Station data entry integration tests", () => {
@@ -244,8 +273,7 @@ describe("Polling Station data entry integration tests", () => {
     await submit();
 
     await expectDifferencesForm();
-
-    await userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
+    await gotoForm("voters_and_votes");
 
     await expectVotersAndVotesForm();
 
@@ -301,9 +329,9 @@ describe("Polling Station data entry integration tests", () => {
     expectElementContainsIcon("list-item-recounted", "opgeslagen");
     expectElementContainsIcon("list-item-differences", "leeg");
 
-    await userEvent.click(screen.getByRole("link", { name: "Verschillen" }));
+    await gotoForm("differences");
 
-    await expectDifferencesForm();
+    expectElementContainsIcon("list-item-differences", "je bent hier");
 
     await userTypeInputs(user, {
       more_ballots_count: 1,
@@ -319,7 +347,18 @@ describe("Polling Station data entry integration tests", () => {
     await submit();
 
     await expectPoliticalGroupCandidatesForm(1);
-
     expectElementContainsIcon("list-item-differences", "bevat een waarschuwing");
+
+    await gotoForm("voters_and_votes");
+
+    await userTypeInputs(user, {
+      total_admitted_voters_count: 1,
+    });
+
+    await submit();
+    await expectVotersAndVotesForm();
+
+    await gotoForm("differences");
+    expectElementContainsIcon("list-item-numbers", "bevat een fout");
   });
 });

@@ -295,7 +295,7 @@ test.describe("errors and warnings", () => {
 });
 
 test.describe("navigation", () => {
-  test("navigate away from Recounted page without saving", async ({ page }) => {
+  test("navigate away from Differences page without saving", async ({ page }) => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
@@ -303,26 +303,55 @@ test.describe("navigation", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    await votersVotesPage.navPanel.recounted.click();
+    const voters = {
+      poll_card_count: "99",
+      proxy_certificate_count: "1",
+      voter_card_count: "0",
+      total_admitted_voters_count: "100",
+    };
+    const votes = {
+      votes_candidates_counts: "100",
+      blank_votes_count: "0",
+      invalid_votes_count: "0",
+      total_votes_cast_count: "100",
+    };
+    await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
-    await recountedPage.heading.waitFor();
-    await recountedPage.yes.click();
-    // navigate away with unsubmitted change
-    await recountedPage.navPanel.votersAndVotes.click();
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toBeVisible();
 
-    await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
-    await expect(recountedPage.unsavedChangesModal.modal).toContainText("Is er herteld?");
-    await recountedPage.unsavedChangesModal.discardInput.click();
-
+    await differencesPage.navPanel.votersAndVotes.click();
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
-    // return to Recounted page and verify change is not cached
+
+    const votersUpdates = {
+      poll_card_count: "90",
+      proxy_certificate_count: "5",
+      voter_card_count: "5",
+      total_admitted_voters_count: "100",
+    };
+    await votersVotesPage.inputVoters(votersUpdates);
+    // Tab press needed for page to register change after Playwright's fill()
+    await votersVotesPage.totalAdmittedVotersCount.press("Tab");
+
+    // navigate to previous page with unsaved changes
     await votersVotesPage.navPanel.recounted.click();
-    await recountedPage.heading.waitFor();
-    await expect(recountedPage.no).toBeChecked();
+    await expect(votersVotesPage.unsavedChangesModal.heading).toBeVisible();
+    await expect(votersVotesPage.unsavedChangesModal.modal).toContainText(
+      "Toegelaten kiezers en uitgebrachte stemmen",
+    );
+    // do not save changes
+    await votersVotesPage.unsavedChangesModal.discardInput.click();
+
+    await expect(recountedPage.heading).toBeVisible();
+    await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+
+    // return to VotersAndVotes page and verify change is not saved
+    await recountedPage.navPanel.votersAndVotes.click();
+    await votersVotesPage.heading.waitFor();
+    await expect(votersVotesPage.pollCardCount).toHaveValue("99");
   });
 
-  test("navigate away from Recounted page with saving", async ({ page }) => {
+  test("navigate away from Differences page with saving", async ({ page }) => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
@@ -330,23 +359,52 @@ test.describe("navigation", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    await votersVotesPage.navPanel.recounted.click();
+    const voters = {
+      poll_card_count: "99",
+      proxy_certificate_count: "1",
+      voter_card_count: "0",
+      total_admitted_voters_count: "100",
+    };
+    const votes = {
+      votes_candidates_counts: "100",
+      blank_votes_count: "0",
+      invalid_votes_count: "0",
+      total_votes_cast_count: "100",
+    };
+    await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
-    await recountedPage.heading.waitFor();
-    await recountedPage.yes.click();
-    // navigate away with unsubmitted change
-    await recountedPage.navPanel.votersAndVotes.click();
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toBeVisible();
 
-    await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
-    await expect(recountedPage.unsavedChangesModal.modal).toContainText("Is er herteld?");
-    await recountedPage.unsavedChangesModal.saveInput.click();
-
+    await differencesPage.navPanel.votersAndVotes.click();
     await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
-    // return to Recounted page and verify change is cached
+
+    const votersUpdates = {
+      poll_card_count: "90",
+      proxy_certificate_count: "5",
+      voter_card_count: "5",
+      total_admitted_voters_count: "100",
+    };
+    await votersVotesPage.inputVoters(votersUpdates);
+    // Tab press needed for page to register change after Playwright's fill()
+    await votersVotesPage.totalAdmittedVotersCount.press("Tab");
+
+    // navigate to previous page with unsaved changes
     await votersVotesPage.navPanel.recounted.click();
-    await recountedPage.heading.waitFor();
-    await expect(recountedPage.yes).toBeChecked();
+    await expect(votersVotesPage.unsavedChangesModal.heading).toBeVisible();
+    await expect(votersVotesPage.unsavedChangesModal.modal).toContainText(
+      "Toegelaten kiezers en uitgebrachte stemmen",
+    );
+    // save changes
+    await votersVotesPage.unsavedChangesModal.saveInput.click();
+
+    await expect(recountedPage.heading).toBeVisible(); // fails here because navigated to next page, i.e. Differences
+    await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+
+    // return to VotersAndVotes page and verify change is saved
+    await recountedPage.navPanel.votersAndVotes.click();
+    await votersVotesPage.heading.waitFor();
+    await expect(votersVotesPage.pollCardCount).toHaveValue("90");
   });
 
   test.describe("navigation panel icons", () => {

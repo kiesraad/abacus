@@ -33,6 +33,8 @@ export function PollingStationFormNavigation({
   } = usePollingStationFormController();
 
   const navigate = useNavigate();
+  //one time flag to prioritize user navigation over controller navigation
+  const overrideControllerNavigation = React.useRef<string | null>(null);
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionID) => {
@@ -91,6 +93,7 @@ export function PollingStationFormNavigation({
 
   const blocker = useBlocker(shouldBlock);
 
+  //prevent navigating to sections that are not yet active
   React.useEffect(() => {
     const activeSection = formState.sections[formState.active];
     const currentSection = formState.sections[formState.current];
@@ -106,6 +109,12 @@ export function PollingStationFormNavigation({
   //check if the targetFormSection has changed and navigate to the correct url
   React.useEffect(() => {
     if (!targetFormSection) return;
+    if (overrideControllerNavigation.current) {
+      const url = overrideControllerNavigation.current;
+      overrideControllerNavigation.current = null;
+      navigate(url);
+      return;
+    }
     if (targetFormSection !== _lastKnownSection.current) {
       _lastKnownSection.current = targetFormSection;
       const url = getUrlForFormSection(targetFormSection);
@@ -134,8 +143,9 @@ export function PollingStationFormNavigation({
             <Button
               size="lg"
               onClick={() => {
-                blocker.reset();
+                overrideControllerNavigation.current = blocker.location.pathname;
                 submitCurrentForm();
+                blocker.reset();
               }}
             >
               Wijzigingen opslaan

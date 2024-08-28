@@ -20,7 +20,7 @@ describe("InputHomePage", () => {
   });
 
   afterEach(() => {
-    server.restoreHandlers();
+    server.resetHandlers();
   });
 
   test("Election name", async () => {

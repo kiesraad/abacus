@@ -38,7 +38,7 @@ describe("Test AbortDataEntryControl", () => {
 
   afterEach(() => {
     vi.clearAllMocks();
-    server.restoreHandlers();
+    server.resetHandlers();
     server.events.removeAllListeners();
   });
 

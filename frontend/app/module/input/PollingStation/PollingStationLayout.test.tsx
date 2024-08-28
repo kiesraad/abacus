@@ -33,7 +33,7 @@ describe("PollingStationLayout", () => {
 
   afterEach(() => {
     vi.clearAllMocks();
-    server.restoreHandlers();
+    server.resetHandlers();
   });
 
   test("Render", async () => {

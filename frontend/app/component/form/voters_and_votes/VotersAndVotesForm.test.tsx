@@ -436,8 +436,6 @@ describe("Test VotersAndVotesForm", () => {
 
   describe("VotersAndVotesForm warnings", () => {
     test("clicking next without accepting warning results in alert shown", async () => {
-      // TODO: Fix that this test fails if it runs after a test that clicks the accept warnings checkbox,
-      // because the checked state of the checkbox persists into this test.
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],

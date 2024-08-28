@@ -224,7 +224,7 @@ export function PollingStationFormController({
       };
     });
 
-    return { ...result, ...defaultFormState };
+    return structuredClone({ ...result, ...defaultFormState });
   });
   const { client } = useApi();
 

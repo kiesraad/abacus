@@ -55,6 +55,22 @@ describe("Test PollingStationChoiceForm", () => {
       ).toBeVisible();
     });
 
+    test("Selecting a valid polling station with leading zeros", async () => {
+      overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
+      const user = userEvent.setup();
+      render(
+        <PollingStationListProvider electionId={1}>
+          <PollingStationChoiceForm />
+        </PollingStationListProvider>,
+      );
+      const pollingStation = screen.getByTestId("pollingStation");
+
+      // Test if the polling station name is shown
+      await user.type(pollingStation, "0034");
+      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      expect(await within(pollingStationFeedback).findByText("Testplek")).toBeVisible();
+    });
+
     test("Selecting a non-existing polling station", async () => {
       overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
       const user = userEvent.setup();

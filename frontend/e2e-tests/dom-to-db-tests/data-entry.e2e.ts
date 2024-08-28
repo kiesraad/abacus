@@ -121,6 +121,50 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
+  test("correct error F204", async ({ page }) => {
+    await page.goto("/1/input/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkNoAndClickNext();
+
+    const votersVotesPage = new VotersVotesPage(page);
+    const voters = {
+      poll_card_count: "99",
+      proxy_certificate_count: "1",
+      voter_card_count: "0",
+      total_admitted_voters_count: "100",
+    };
+    const votes = {
+      votes_candidates_counts: "100",
+      blank_votes_count: "0",
+      invalid_votes_count: "0",
+      total_votes_cast_count: "100",
+    };
+    await votersVotesPage.fillInPageAndClickNext(voters, votes);
+
+    const differencesPage = new DifferencesPage(page);
+    await differencesPage.heading.waitFor();
+    await differencesPage.next.click();
+
+    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    // fill counts of List 1 with data that doet not match the total votes on candidates
+    await candidatesListPage_1.fillCandidatesAndTotal([2, 1], 3);
+    await candidatesListPage_1.next.click();
+
+    await expect(votersVotesPage.heading).toBeVisible();
+    await expect(votersVotesPage.error).toBeVisible();
+    await expect(votersVotesPage.warning).toBeHidden();
+
+    await votersVotesPage.navPanel.list(1).click();
+    await expect(candidatesListPage_1.heading).toBeVisible();
+    // fill counts of List 1 with data that doet match the total votes on candidates
+    await candidatesListPage_1.fillCandidatesAndTotal([70, 30], 100);
+    await candidatesListPage_1.next.click();
+
+    const saveFormPage = new SaveFormPage(page);
+    await expect(saveFormPage.heading).toBeVisible();
+  });
+
   test("accept warning on voters and votes page", async ({ page }) => {
     await page.goto("/1/input/1/recounted");
 
@@ -208,50 +252,6 @@ test.describe("errors and warnings", () => {
     await differencesPage.heading.waitFor();
 
     await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
-  });
-
-  test("correct error F204", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
-
-    const recountedPage = new RecountedPage(page);
-    await recountedPage.checkNoAndClickNext();
-
-    const votersVotesPage = new VotersVotesPage(page);
-    const voters = {
-      poll_card_count: "99",
-      proxy_certificate_count: "1",
-      voter_card_count: "0",
-      total_admitted_voters_count: "100",
-    };
-    const votes = {
-      votes_candidates_counts: "100",
-      blank_votes_count: "0",
-      invalid_votes_count: "0",
-      total_votes_cast_count: "100",
-    };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
-
-    const differencesPage = new DifferencesPage(page);
-    await differencesPage.heading.waitFor();
-    await differencesPage.next.click();
-
-    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
-    // fill counts of List 1 with data that doet not match the total votes on candidates
-    await candidatesListPage_1.fillCandidatesAndTotal([2, 1], 3);
-    await candidatesListPage_1.next.click();
-
-    await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.error).toBeVisible();
-    await expect(votersVotesPage.warning).toBeHidden();
-
-    await votersVotesPage.navPanel.list(1).click();
-    await expect(candidatesListPage_1.heading).toBeVisible();
-    // fill counts of List 1 with data that doet match the total votes on candidates
-    await candidatesListPage_1.fillCandidatesAndTotal([70, 30], 100);
-    await candidatesListPage_1.next.click();
-
-    const saveFormPage = new SaveFormPage(page);
-    await expect(saveFormPage.heading).toBeVisible();
   });
 
   test("remove option to accept warning on voters and votes page after input change", async ({

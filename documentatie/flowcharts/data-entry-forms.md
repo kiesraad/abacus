@@ -173,7 +173,10 @@ Navigating away from a page can happen in several ways:
 - Clicking a link in the top navigation bar
 - Clicking the browser back/forward button
 
+
 The next page can be either within the form or outside it. The action flow depends on this.
+
+The abort button ("Invoer afbreken") is a special case covered in the next section. The rules in this flowchart do not apply to the abort button.
 
 ```mermaid
 flowchart TD
@@ -186,35 +189,50 @@ flowchart TD
     inside-outside{navigating inside form?}
     on-furthest-page{on furthest page?}
     user-made-changes{user made changes?}
-    save-changes{save changes?}
+    save-changes{"modal: \n save changes?"}
     call-save-api(call save api)
-    call-delete-api(call delete api)
     cache-input(cache input)
     reset-changes(reset changes)
-    errors-or-warnings{errors or warnings?}
-    modal-fix-or-ignore{fix or ignore?}
-    save-or-delete{"save or delete?"}
 
     %% flow
     flow-start --> inside-outside
-    inside-outside -- outside --> save-or-delete
+    inside-outside -- outside --> user-made-changes
     inside-outside -- inside --> on-furthest-page
     on-furthest-page -- yes --> cache-input
     cache-input --> go-to-page
     
-    save-or-delete -- save --> call-save-api
-    save-or-delete -- delete --> call-delete-api
-    call-delete-api --> go-to-page
 
     on-furthest-page -- no --> user-made-changes
     user-made-changes -- no --> go-to-page
     user-made-changes -- yes --> save-changes
-    save-changes -- no --> reset-changes
-    reset-changes --> go-to-page
     save-changes -- yes --> call-save-api
-    call-save-api --> errors-or-warnings
-    errors-or-warnings -- no --> go-to-page
-    errors-or-warnings -- yes --> modal-fix-or-ignore
-    modal-fix-or-ignore -- fix --> remain-on-page
-    modal-fix-or-ignore -- ignore --> go-to-page
+    save-changes -- no --> reset-changes
+    save-changes -- close × --> remain-on-page
+    reset-changes --> go-to-page
+    call-save-api --> go-to-page
+```
+
+# Abort data entry ("Invoer afbreken")
+
+```mermaid
+flowchart TD
+    %% start
+    flow-start([abort data entry])
+    
+    %% end
+    go-to-page([go to polling station selection])
+    remain-on-page([remain on current page])
+
+    %% steps
+    modal{"modal: \n save or delete?"}
+    call-save-api(call save api)
+    call-delete-api(call delete api)
+
+    %% flow
+    flow-start --> modal
+    modal -- save --> call-save-api
+    modal -- delete --> call-delete-api
+    modal -- close × --> remain-on-page
+    call-save-api --> go-to-page
+    call-delete-api --> go-to-page
 ```

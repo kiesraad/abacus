@@ -333,6 +333,56 @@ describe("Test DifferencesForm", () => {
   });
 
   describe("DifferencesForm warnings", () => {
+    test("clicking next without accepting warning results in alert shown", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: [
+                "data.differences_counts.more_ballots_count",
+                "data.differences_counts.too_many_ballots_handed_out_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.unreturned_ballots",
+                "data.differences_counts.other_explanation_count",
+                "data.differences_counts.no_explanation_count",
+              ],
+              code: "W301",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm();
+
+      await user.type(screen.getByTestId("more_ballots_count"), "3");
+      await user.type(screen.getByTestId("fewer_ballots_count"), "0");
+      await user.type(screen.getByTestId("unreturned_ballots_count"), "0");
+      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "0");
+      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "1");
+      await user.type(screen.getByTestId("other_explanation_count"), "0");
+      await user.type(screen.getByTestId("no_explanation_count"), "1");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/W301/);
+
+      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptFeedbackCheckbox).not.toBeChecked(); // fails if run after a test that clicks the checkbox
+
+      await user.click(submitButton);
+      const alertText = screen.getByRole("alert");
+      expect(alertText).toHaveTextContent(
+        /^Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.$/,
+      );
+    });
+
     test("W.301 ConflictingDifferences", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {

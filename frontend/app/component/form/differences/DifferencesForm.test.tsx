@@ -374,7 +374,7 @@ describe("Test DifferencesForm", () => {
       const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
         name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
       });
-      expect(acceptFeedbackCheckbox).not.toBeChecked(); // fails if run after a test that clicks the checkbox
+      expect(acceptFeedbackCheckbox).not.toBeChecked();
 
       await user.click(submitButton);
       const alertText = screen.getByRole("alert");

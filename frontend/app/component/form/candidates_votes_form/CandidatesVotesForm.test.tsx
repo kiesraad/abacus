@@ -365,5 +365,42 @@ describe("Test CandidatesVotesForm", () => {
       expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
+
+    test("clicking next without accepting warning results in alert shown", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: ["data.political_group_votes[0].total"],
+              code: "NotAnActualWarning",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      // Since no warnings exist for the fields on this page,
+      // not inputting any values and just clicking submit.
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
+
+      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptFeedbackCheckbox).not.toBeChecked();
+
+      await user.click(submitButton);
+      const alertText = screen.getByRole("alert");
+      expect(alertText).toHaveTextContent(
+        /^Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.$/,
+      );
+    });
   });
 });

@@ -1,7 +1,3 @@
-/**
- * @vitest-environment jsdom
- */
-
 /** Test Plan
   variables:
   differences_counts: {
@@ -26,7 +22,7 @@
   W.302
  */
 import { userEvent } from "@testing-library/user-event";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
 
@@ -89,10 +85,6 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
 };
 
 describe("Test DifferencesForm", () => {
-  afterEach(() => {
-    vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
-  });
-
   describe("DifferencesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();

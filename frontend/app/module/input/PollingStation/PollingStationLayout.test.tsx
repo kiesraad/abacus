@@ -1,9 +1,9 @@
 import * as Router from "react-router";
 
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { PollingStationLayout } from "app/module/input";
-import { overrideOnce, render, screen, server, within } from "app/test/unit";
+import { overrideOnce, render, screen, within } from "app/test/unit";
 
 import {
   Election,
@@ -29,11 +29,6 @@ describe("PollingStationLayout", () => {
       electionId: election.id.toString(),
       pollingStationId: pollingStationMockData.id.toString(),
     });
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-    server.resetHandlers();
   });
 
   test("Render", async () => {

@@ -1,8 +1,4 @@
 /**
- * @vitest-environment jsdom
- */
-
-/**
  * TEST PLAN:
   Variables in form
 
@@ -47,16 +43,9 @@
   F.204 E
 */
 import { userEvent } from "@testing-library/user-event";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
-import {
-  getUrlMethodAndBody,
-  overrideOnce,
-  render,
-  screen,
-  server,
-  userTypeInputs,
-} from "app/test/unit";
+import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
 
 import {
   FormState,
@@ -163,11 +152,6 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
 };
 
 describe("Test VotersAndVotesForm", () => {
-  afterEach(() => {
-    vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
-    server.resetHandlers();
-  });
-
   describe("VotersAndVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();

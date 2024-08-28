@@ -113,6 +113,8 @@ test.describe("errors and warnings", () => {
     await votersVotesPage.inputVotes(votes);
     await votersVotesPage.next.click();
 
+    await expect(votersVotesPage.error).toBeHidden();
+
     const differencesPage = new DifferencesPage(page);
     await differencesPage.heading.waitFor();
 
@@ -155,6 +157,57 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName(
       "bevat een waarschuwing",
     );
+  });
+
+  test("correct warning on voters and votes page", async ({ page }) => {
+    await page.goto("/1/input/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkNoAndClickNext();
+
+    // fill form with data that results in a warning
+    const votersVotesPage = new VotersVotesPage(page);
+    const voters = {
+      poll_card_count: "100",
+      proxy_certificate_count: "0",
+      voter_card_count: "0",
+      total_admitted_voters_count: "100",
+    };
+    const votes = {
+      votes_candidates_counts: "100",
+      blank_votes_count: "0",
+      invalid_votes_count: "0",
+      total_votes_cast_count: "100",
+    };
+    await votersVotesPage.fillInPageAndClickNext(voters, votes);
+
+    await expect(votersVotesPage.proxyCertificateCount).toHaveValue("0");
+
+    await expect(votersVotesPage.heading).toBeVisible();
+    await expect(votersVotesPage.warning).toBeVisible();
+    await expect(votersVotesPage.error).toBeHidden();
+    await expect(votersVotesPage.acceptWarnings).toBeVisible();
+
+    // correct the warning
+    const votersCorrected = {
+      poll_card_count: "98",
+      proxy_certificate_count: "1",
+      voter_card_count: "1",
+      total_admitted_voters_count: "100",
+    };
+
+    await votersVotesPage.inputVoters(votersCorrected);
+    // Tab press needed for page to register change after Playwright's fill()
+    await votersVotesPage.totalAdmittedVotersCount.press("Tab");
+    await votersVotesPage.next.click();
+
+    await expect(votersVotesPage.warning).toBeHidden();
+    await expect(votersVotesPage.acceptWarnings).toBeHidden();
+
+    const differencesPage = new DifferencesPage(page);
+    await differencesPage.heading.waitFor();
+
+    await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
   test("correct error F204", async ({ page }) => {

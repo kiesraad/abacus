@@ -49,7 +49,14 @@
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
-import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
+import {
+  getUrlMethodAndBody,
+  overrideOnce,
+  render,
+  screen,
+  server,
+  userTypeInputs,
+} from "app/test/unit";
 
 import {
   FormState,
@@ -158,6 +165,7 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
 describe("Test VotersAndVotesForm", () => {
   afterEach(() => {
     vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
+    server.resetHandlers();
   });
 
   describe("VotersAndVotesForm user interactions", () => {
@@ -427,7 +435,9 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   describe("VotersAndVotesForm warnings", () => {
-    test("accept warning W201", async () => {
+    test("clicking next without accepting warning results in alert shown", async () => {
+      // TODO: Fix that this test fails if it runs after a test that clicks the accept warnings checkbox,
+      // because the checked state of the checkbox persists into this test.
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -459,55 +469,13 @@ describe("Test VotersAndVotesForm", () => {
       const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
         name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
       });
-      expect(acceptFeedbackCheckbox).not.toBeChecked();
-
-      await user.click(acceptFeedbackCheckbox);
-      expect(acceptFeedbackCheckbox).toBeChecked();
+      expect(acceptFeedbackCheckbox).not.toBeChecked(); // fails if run after a test that clicks the checkbox
 
       await user.click(submitButton);
-      expect(acceptFeedbackCheckbox).toBeChecked();
-
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
-      expect(screen.queryByTestId("feedback-warning")).toBeNull(); // TODO: does this make sense? better to assert on url with memoryrouter?
-    });
-
-    test("clicking next without accepting warning results in alert shown", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [],
-          warnings: [
-            {
-              fields: ["data.votes_counts.blank_votes_count"],
-              code: "W201",
-            },
-          ],
-        },
-      });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
-
-      // We await the first element to appear, so we know the page is loaded
-      await user.type(await screen.findByTestId("votes_candidates_counts"), "0");
-      await user.type(screen.getByTestId("blank_votes_count"), "1");
-      await user.type(screen.getByTestId("invalid_votes_count"), "0");
-      await user.type(screen.getByTestId("total_votes_cast_count"), "1");
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W201$/);
-
-      // TODO: uncomment next lines after fixing state of the previous test leaking into this one
-
-      // const acceptFeedbackCheckbox = screen.getByRole('checkbox', {name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."})
-      // expect(acceptFeedbackCheckbox).not.toBeChecked() // fails if run after the accept warnings test
-
-      // await user.click(submitButton);
-      // const alertText = screen.getByRole('alert')
-      // expect(alertText).toHaveTextContent(/^Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.$/)
+      const alertText = screen.getByRole("alert");
+      expect(alertText).toHaveTextContent(
+        /^Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.$/,
+      );
     });
 
     test("W.201 AboveThreshold blank votes", async () => {

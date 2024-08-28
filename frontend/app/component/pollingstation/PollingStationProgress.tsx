@@ -57,7 +57,12 @@ export function PollingStationProgress() {
 
   return (
     <ProgressList>
-      <ProgressList.Item key="recounted" status="accept" active={formState.active === "recounted"}>
+      <ProgressList.Item
+        id="list-item-recounted"
+        key="recounted"
+        status="accept"
+        active={formState.active === "recounted"}
+      >
         {formState.active !== "recounted" ? (
           <Link to={`/${election.id}/input/${pollingStationId}/recounted`}>Is er herteld?</Link>
         ) : (
@@ -66,6 +71,7 @@ export function PollingStationProgress() {
       </ProgressList.Item>
       <ProgressList.Item
         key="numbers"
+        id="list-item-numbers"
         status={menuStatusForFormSection(formState.sections.voters_votes_counts)}
         disabled={formState.sections.voters_votes_counts.index > currentIndex}
         active={formState.active === "voters_votes_counts"}
@@ -80,6 +86,7 @@ export function PollingStationProgress() {
       </ProgressList.Item>
       <ProgressList.Item
         key="differences"
+        id="list-item-differences"
         disabled={formState.sections.differences_counts.index > currentIndex}
         status={menuStatusForFormSection(formState.sections.differences_counts)}
         active={formState.active === "differences_counts"}
@@ -98,6 +105,7 @@ export function PollingStationProgress() {
         return (
           <ProgressList.Item
             key={`list${listId}`}
+            id={`list-item-pg-${listId}`}
             disabled={formSection.index > currentIndex}
             status={menuStatusForFormSection(formSection)}
             active={formState.active === formSection.id}
@@ -117,6 +125,7 @@ export function PollingStationProgress() {
       <ProgressList.Ruler key="ruler2" />
       <ProgressList.Item
         key="save"
+        id="list-item-save"
         status="idle"
         active={targetForm === "save"}
         disabled={!formState.isCompleted}

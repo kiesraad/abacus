@@ -27,17 +27,19 @@ ProgressList.Ruler = () => <li className="ruler">&nbsp;</li>;
 
 // active is not a status since we might want to show both concurrently.
 export type ProgressListItemProps = {
-  active?: boolean;
   status: MenuStatus;
+  active?: boolean;
   disabled?: boolean;
   children?: React.ReactNode;
+  id?: string;
 };
 
-ProgressList.Item = function ({ active, status, disabled, children }: ProgressListItemProps) {
+ProgressList.Item = function ({ active, status, disabled, children, id }: ProgressListItemProps) {
   const icon = renderStatusIcon(active ? "active" : status);
 
   return (
     <li
+      id={id}
       className={cn(active ? "active" : "idle", status, { disabled: !!disabled })}
       aria-current={active ? "step" : false}
     >

@@ -44,9 +44,10 @@ const expectVotersAndVotesForm = async () => {
   });
 };
 
-const fillVotersAndVotesForm = async () => {
+const fillVotersAndVotesForm = async (values?: Record<string, number>) => {
   const total_votes = electionMockData.political_groups.length * 10;
-  await userTypeInputs(user, {
+
+  const userValues = values ?? {
     poll_card_count: total_votes,
     proxy_certificate_count: 0,
     voter_card_count: 0,
@@ -55,7 +56,9 @@ const fillVotersAndVotesForm = async () => {
     blank_votes_count: 0,
     invalid_votes_count: 0,
     total_votes_cast_count: total_votes,
-  });
+  };
+
+  await userTypeInputs(user, userValues);
 };
 
 const expectDifferencesForm = async () => {
@@ -94,6 +97,36 @@ const expectCheckAndSavePage = async () => {
   await waitFor(() => {
     expect(router.state.location.pathname).toEqual("/1/input/1/save");
   });
+};
+
+const expectFeedbackError = async (code?: string) => {
+  await waitFor(() => {
+    expect(screen.getByTestId("feedback-error")).toBeInTheDocument();
+  });
+  if (code) {
+    expect(screen.getByText(code)).toBeInTheDocument();
+  }
+};
+
+const expectFeedbackWarning = async (code?: string) => {
+  await waitFor(() => {
+    expect(screen.getByTestId("feedback-warning")).toBeInTheDocument();
+  });
+  if (code) {
+    expect(screen.getByText(code)).toBeInTheDocument();
+  }
+};
+
+const expectBlockerModal = async () => {
+  await waitFor(() => {
+    expect(screen.getByTestId("modal-blocker-title")).toBeInTheDocument();
+  });
+};
+
+const expectElementContainsIcon = (id: string, ariaLabel: string) => {
+  const el = screen.getByTestId(id);
+  expect(el).toBeInTheDocument();
+  expect(el).toContainHTML(`aria-label="${ariaLabel}"`);
 };
 
 describe("Polling Station data entry integration tests", () => {
@@ -196,5 +229,97 @@ describe("Polling Station data entry integration tests", () => {
     for (const step of steps) {
       await step();
     }
+  });
+
+  test("Navigate triggers changes modal", async () => {
+    render();
+    await startPollingStationInput();
+    await expectRecountedForm();
+    await fillRecountedForm();
+    await submit();
+
+    await expectVotersAndVotesForm();
+
+    await fillVotersAndVotesForm();
+    await submit();
+
+    await expectDifferencesForm();
+
+    await userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
+
+    await expectVotersAndVotesForm();
+
+    await fillVotersAndVotesForm({
+      poll_card_count: 1,
+      proxy_certificate_count: 1,
+      voter_card_count: 1,
+      total_admitted_voters_count: 2,
+      votes_candidates_counts: 1,
+      blank_votes_count: 1,
+      invalid_votes_count: 1,
+      total_votes_cast_count: 3,
+    });
+
+    await submit();
+    await expectFeedbackError();
+
+    await fillVotersAndVotesForm({
+      total_admitted_voters_count: 3,
+    });
+
+    await userEvent.click(screen.getByRole("link", { name: "Verschillen" }));
+
+    await expectBlockerModal();
+  });
+
+  test("Progress list shows correct icons", async () => {
+    render();
+
+    const formFillingSteps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedForm,
+      submit,
+      expectVotersAndVotesForm,
+      fillVotersAndVotesForm,
+      submit,
+      expectDifferencesForm,
+      fillDifferencesForm,
+      submit,
+      ...electionMockData.political_groups.flatMap((pg) => [
+        () => expectPoliticalGroupCandidatesForm(pg.number),
+        fillPoliticalGroupCandidatesVotesForm,
+        submit,
+      ]),
+      expectCheckAndSavePage,
+    ];
+
+    for (const step of formFillingSteps) {
+      await step();
+    }
+
+    expectElementContainsIcon("list-item-recounted", "opgeslagen");
+    expectElementContainsIcon("list-item-differences", "leeg");
+
+    await userEvent.click(screen.getByRole("link", { name: "Verschillen" }));
+
+    await expectDifferencesForm();
+
+    await userTypeInputs(user, {
+      more_ballots_count: 1,
+      fewer_ballots_count: 1,
+    });
+
+    await submit();
+    await expectFeedbackWarning();
+
+    await user.click(screen.getByTestId("differences_form_ignore_warnings"));
+    expect(screen.getByTestId("differences_form_ignore_warnings")).toBeChecked();
+
+    await submit();
+
+    await expectPoliticalGroupCandidatesForm(1);
+
+    expectElementContainsIcon("list-item-differences", "bevat een waarschuwing");
   });
 });

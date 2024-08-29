@@ -44,9 +44,9 @@ const expectVotersAndVotesForm = async () => {
   });
 };
 
-const fillVotersAndVotesForm = async (values?: Record<string, number>) => {
-  const total_votes = electionMockData.political_groups.length * 10;
+const total_votes = electionMockData.political_groups.length * 10;
 
+const fillVotersAndVotesForm = async (values?: Record<string, number>) => {
   const userValues = values ?? {
     poll_card_count: total_votes,
     proxy_certificate_count: 0,
@@ -123,8 +123,8 @@ const expectBlockerModal = async () => {
   });
 };
 
-const expectElementContainsIcon = (id: string, ariaLabel: string) => {
-  const el = screen.getByTestId(id);
+const expectElementContainsIcon = async (id: string, ariaLabel: string) => {
+  const el = await screen.findByTestId(id);
   expect(el).toBeInTheDocument();
   //expect(within(el).getByRole("img")).toHaveAccessibleName(ariaLabel);
   expect(el).toContainHTML(`aria-label="${ariaLabel}"`);
@@ -326,12 +326,12 @@ describe("Polling Station data entry integration tests", () => {
       await step();
     }
 
-    expectElementContainsIcon("list-item-recounted", "opgeslagen");
-    expectElementContainsIcon("list-item-differences", "leeg");
+    await expectElementContainsIcon("list-item-recounted", "opgeslagen");
+    await expectElementContainsIcon("list-item-differences", "leeg");
 
     await gotoForm("differences");
 
-    expectElementContainsIcon("list-item-differences", "je bent hier");
+    await expectElementContainsIcon("list-item-differences", "je bent hier");
 
     await userTypeInputs(user, {
       more_ballots_count: 1,
@@ -347,7 +347,7 @@ describe("Polling Station data entry integration tests", () => {
     await submit();
 
     await expectPoliticalGroupCandidatesForm(1);
-    expectElementContainsIcon("list-item-differences", "bevat een waarschuwing");
+    await expectElementContainsIcon("list-item-differences", "bevat een waarschuwing");
 
     await gotoForm("voters_and_votes");
 
@@ -359,6 +359,54 @@ describe("Polling Station data entry integration tests", () => {
     await expectVotersAndVotesForm();
 
     await gotoForm("differences");
-    expectElementContainsIcon("list-item-numbers", "bevat een fout");
+    await expectElementContainsIcon("list-item-numbers", "bevat een fout");
+  });
+
+  test("Navigating with changes goes to correct form", async () => {
+    render();
+
+    const formFillingSteps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedForm,
+      submit,
+      expectVotersAndVotesForm,
+      fillVotersAndVotesForm,
+      submit,
+      expectDifferencesForm,
+      fillDifferencesForm,
+      submit,
+      ...electionMockData.political_groups.flatMap((pg) => [
+        () => expectPoliticalGroupCandidatesForm(pg.number),
+        fillPoliticalGroupCandidatesVotesForm,
+        submit,
+      ]),
+      expectCheckAndSavePage,
+    ];
+
+    for (const step of formFillingSteps) {
+      await step();
+    }
+
+    await gotoForm("voters_and_votes");
+    await userTypeInputs(user, {
+      total_admitted_voters_count: 1,
+    });
+    await submit();
+
+    await expectFeedbackError();
+
+    await userTypeInputs(user, {
+      total_admitted_voters_count: total_votes,
+    });
+
+    await userEvent.click(screen.getByRole("link", { name: "Is er herteld?" }));
+
+    const modalTitle = await screen.findByTestId("modal-blocker-title");
+    expect(modalTitle).toHaveTextContent("Let op: niet opgeslagen wijzigingen");
+
+    await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
+
+    await expectRecountedForm();
   });
 });

@@ -18,8 +18,4 @@
     padding: 1.5rem 6.5rem;
     border-radius: 1rem;
   }
-  :global(.button_hint) {
-    display: flex;
-    gap: 0.25rem;
-  }
 }

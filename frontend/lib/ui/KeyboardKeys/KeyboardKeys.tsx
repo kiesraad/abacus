@@ -11,17 +11,21 @@ export interface KeyboardKeysProps {
   keys: KeyboardKey[];
 }
 
-function renderKey(key: KeyboardKey): React.JSX.Element {
-  switch (key) {
+function renderKey(keyboardKey: KeyboardKey, index: number): React.JSX.Element {
+  switch (keyboardKey) {
     case "enter":
-      return <Enter />;
+      return <Enter key={index} />;
     case "shift":
-      return <Shift />;
+      return <Shift key={index} />;
     default:
       return <></>;
   }
 }
 
 export function KeyboardKeys({ keys }: KeyboardKeysProps) {
-  return <div className={cn(cls["keyboard-keys"])}>{keys.map((key) => renderKey(key))}</div>;
+  return (
+    <div className={cn(cls["keyboard-keys"])}>
+      {keys.map((keyboardKey, index) => renderKey(keyboardKey, index))}
+    </div>
+  );
 }

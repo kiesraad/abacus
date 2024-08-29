@@ -1,9 +1,9 @@
 import * as React from "react";
 
 import { IconArrowBlockUp, IconCornerDownLeft } from "@kiesraad/icon";
+import { KeyboardKey } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
-import { KeyboardKey } from "../ui.types";
 import cls from "./KeyboardKeys.module.css";
 
 export interface KeyboardKeysProps {
@@ -12,14 +12,14 @@ export interface KeyboardKeysProps {
 
 function renderKey(keyboardKey: KeyboardKey, index: number): React.JSX.Element {
   switch (keyboardKey) {
-    case "enter":
+    case KeyboardKey.Enter:
       return (
         <kbd key={index}>
           <span>Enter</span>
           <IconCornerDownLeft />
         </kbd>
       );
-    case "shift":
+    case KeyboardKey.Shift:
       return (
         <kbd key={index}>
           <IconArrowBlockUp />

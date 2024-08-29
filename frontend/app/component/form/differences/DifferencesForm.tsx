@@ -8,6 +8,7 @@ import {
   Feedback,
   InputGrid,
   InputGridRow,
+  KeyboardKey,
   KeyboardKeys,
   useTooltip,
 } from "@kiesraad/ui";
@@ -225,7 +226,7 @@ export function DifferencesForm() {
         <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>
-        <KeyboardKeys keys={["shift", "enter"]} />
+        <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
       </BottomBar>
     </form>
   );

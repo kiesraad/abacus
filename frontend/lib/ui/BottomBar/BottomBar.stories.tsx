@@ -1,6 +1,6 @@
 import type { Story } from "@ladle/react";
 
-import { Button, KeyboardKeys } from "@kiesraad/ui";
+import { Button, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 
 import { BottomBar } from "./BottomBar";
 
@@ -16,7 +16,7 @@ export const BottomBarForm: Story = () => {
   return (
     <BottomBar type="form">
       <Button>Click me</Button>
-      <KeyboardKeys keys={["shift", "enter"]} />
+      <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
     </BottomBar>
   );
 };
@@ -25,7 +25,7 @@ export const BottomBarInputGrid: Story = () => {
   return (
     <BottomBar type="input-grid">
       <Button>Click me</Button>
-      <KeyboardKeys keys={["shift", "enter"]} />
+      <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
     </BottomBar>
   );
 };

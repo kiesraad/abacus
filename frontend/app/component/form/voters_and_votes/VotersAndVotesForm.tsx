@@ -5,11 +5,10 @@ import { useErrorsAndWarnings, useVotersAndVotes, VotersAndVotesValues } from "@
 import {
   BottomBar,
   Button,
-  Enter,
   Feedback,
   InputGrid,
   InputGridRow,
-  Shift,
+  KeyboardKeys,
   useTooltip,
 } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
@@ -311,10 +310,7 @@ export function VotersAndVotesForm() {
         <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>
-        <span className="button_hint">
-          <Shift />
-          <Enter />
-        </span>
+        <KeyboardKeys keys={["shift", "enter"]} />
       </BottomBar>
     </form>
   );

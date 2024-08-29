@@ -11,7 +11,7 @@ export * from "./Icon/Icon";
 export * from "./IconButton/IconButton";
 export * from "./InputField/InputField";
 export * from "./InputGrid";
-export * from "./KeyboardKey";
+export * from "./KeyboardKeys/KeyboardKeys";
 export * from "./Modal/Modal";
 export * from "./ProgressList/ProgressList";
 export * from "./Spinner/Spinner";

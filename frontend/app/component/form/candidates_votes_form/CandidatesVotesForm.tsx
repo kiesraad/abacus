@@ -8,7 +8,7 @@ import {
   useErrorsAndWarnings,
   usePoliticalGroup,
 } from "@kiesraad/api";
-import { BottomBar, Button, Enter, Feedback, InputGrid, InputGridRow, Shift } from "@kiesraad/ui";
+import { BottomBar, Button, Feedback, InputGrid, InputGridRow, KeyboardKeys } from "@kiesraad/ui";
 import {
   candidateNumberFromId,
   usePositiveNumberInputMask,
@@ -170,10 +170,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>
-        <span className="button_hint">
-          <Shift />
-          <Enter />
-        </span>
+        <KeyboardKeys keys={["shift", "enter"]} />
       </BottomBar>
     </form>
   );

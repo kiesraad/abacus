@@ -5,11 +5,10 @@ import { DifferencesCounts, useDifferences, useErrorsAndWarnings } from "@kiesra
 import {
   BottomBar,
   Button,
-  Enter,
   Feedback,
   InputGrid,
   InputGridRow,
-  Shift,
+  KeyboardKeys,
   useTooltip,
 } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
@@ -226,10 +225,7 @@ export function DifferencesForm() {
         <Button type="submit" size="lg" disabled={loading}>
           Volgende
         </Button>
-        <span className="button_hint">
-          <Shift />
-          <Enter />
-        </span>
+        <KeyboardKeys keys={["shift", "enter"]} />
       </BottomBar>
     </form>
   );

@@ -205,7 +205,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           <Button type="submit" size="lg" disabled={loading}>
             Volgende
           </Button>
-          <ShortcutHint id={`candidates-${group.number}-shortcut-hint`} shortcut="shift+enter" />
+          <ShortcutHint id={`candidates-${group.number}-shortcut-hint`} shortcut="Shift+Enter" />
         </BottomBar.Row>
       </BottomBar>
     </form>

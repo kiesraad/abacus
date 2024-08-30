@@ -4,8 +4,8 @@ import { IconEnterKey, IconShiftKey } from "@kiesraad/icon";
 
 import cls from "./ShortcutHint.module.css";
 
-export type KeyboardModifierKey = "ctrl" | "shift" | "alt";
-export type KeyboardKey = "enter" | "space" | "a" | "b";
+export type KeyboardModifierKey = "Control" | "Shift" | "Alt";
+export type KeyboardKey = "Enter" | "Space" | "a" | "b";
 export type ShortCut =
   | `${KeyboardKey}`
   | `${KeyboardModifierKey}+${KeyboardKey}`
@@ -31,15 +31,15 @@ export function ShortcutHint({ shortcut, ...divProps }: ShortcutHintProps) {
 
 function iconForKey(key: KeyboardKey | KeyboardModifierKey) {
   switch (key) {
-    case "ctrl":
+    case "Control":
       return <span aria-label="control key">⌃</span>;
-    case "shift":
+    case "Shift":
       return <IconShiftKey aria-label="shift key" />;
-    case "alt":
+    case "Alt":
       return <span aria-label="alt key">⌥</span>;
-    case "enter":
+    case "Enter":
       return <IconEnterKey aria-label="enter key" />;
-    case "space":
+    case "Space":
       return <span aria-label="space key">␣</span>;
     default:
       return "";

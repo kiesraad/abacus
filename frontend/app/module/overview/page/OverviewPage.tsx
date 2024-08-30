@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { Election, useElectionList } from "@kiesraad/api";
 import { IconCheckHeart, IconChevronRight } from "@kiesraad/icon";
-import { Alert, WorkStationNumber } from "@kiesraad/ui";
+import { Alert, Button, WorkStationNumber } from "@kiesraad/ui";
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -40,6 +40,14 @@ export function OverviewPage() {
       )}
       <main>
         <article>
+          <Button
+            onClick={() => {
+              alert("hello");
+            }}
+            keyboardShortcut="Shift+Enter"
+          >
+            Hello world
+          </Button>
           <table id="overview" className="overview_table">
             <thead>
               <tr>

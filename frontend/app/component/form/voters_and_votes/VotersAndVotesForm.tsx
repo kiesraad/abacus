@@ -339,7 +339,7 @@ export function VotersAndVotesForm() {
           <Button type="submit" size="lg" disabled={loading}>
             Volgende
           </Button>
-          <ShortcutHint id="voters-and-votes-shortcut-hint" shortcut="shift+enter" />
+          <ShortcutHint id="voters-and-votes-shortcut-hint" shortcut="Shift+Enter" />
         </BottomBar.Row>
       </BottomBar>
     </form>

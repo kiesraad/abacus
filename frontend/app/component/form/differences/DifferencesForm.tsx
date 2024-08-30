@@ -255,7 +255,7 @@ export function DifferencesForm() {
           <Button type="submit" size="lg" disabled={loading}>
             Volgende
           </Button>
-          <ShortcutHint id="differences-shortcut-hint" shortcut="shift+enter" />
+          <ShortcutHint id="differences-shortcut-hint" shortcut="Shift+Enter" />
         </BottomBar.Row>
       </BottomBar>
     </form>

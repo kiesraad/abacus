@@ -91,7 +91,7 @@ export function RecountedForm() {
           <Button type="submit" size="lg" disabled={loading}>
             Volgende
           </Button>
-          <ShortcutHint id="recounted-shortcut-hint" shortcut="shift+enter" />
+          <ShortcutHint id="recounted-shortcut-hint" shortcut="Shift+Enter" />
         </BottomBar.Row>
       </BottomBar>
     </form>

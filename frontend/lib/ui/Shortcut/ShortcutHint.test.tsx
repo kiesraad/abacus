@@ -5,10 +5,10 @@ import { ShortcutHint } from "./ShortcutHint";
 
 describe("Shortcut", () => {
   test("should render", () => {
-    render(<ShortcutHint id="test" shortcut="shift+enter" />);
+    render(<ShortcutHint id="test" shortcut="Shift+Enter" />);
     expect(screen.getByTestId("test")).toBeInTheDocument();
 
-    expect(screen.getByText("shift")).toBeInTheDocument();
-    expect(screen.getByText("enter")).toBeInTheDocument();
+    expect(screen.getByText("Shift")).toBeInTheDocument();
+    expect(screen.getByText("Enter")).toBeInTheDocument();
   });
 });

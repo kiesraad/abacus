@@ -9,7 +9,6 @@ export function DevHomePage() {
       <NavBar />
       <div style={{ padding: "32px" }}>
         <h1>Abacus 🧮</h1>
-
         <ul>
           <li>
             <Link to={`/user`}>User</Link>

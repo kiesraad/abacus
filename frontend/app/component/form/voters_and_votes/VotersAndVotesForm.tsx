@@ -9,6 +9,7 @@ import {
   Feedback,
   InputGrid,
   InputGridRow,
+  ShortcutHint,
   useTooltip,
 } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
@@ -338,7 +339,7 @@ export function VotersAndVotesForm() {
           <Button type="submit" size="lg" disabled={loading}>
             Volgende
           </Button>
-          <span className="button_hint">SHIFT + Enter</span>
+          <ShortcutHint id="voters-and-votes-shortcut-hint" shortcut="shift+enter" />
         </BottomBar.Row>
       </BottomBar>
     </form>

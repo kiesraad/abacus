@@ -9,6 +9,7 @@ import {
   Feedback,
   InputGrid,
   InputGridRow,
+  ShortcutHint,
   useTooltip,
 } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
@@ -254,7 +255,7 @@ export function DifferencesForm() {
           <Button type="submit" size="lg" disabled={loading}>
             Volgende
           </Button>
-          <span className="button_hint">SHIFT + Enter</span>
+          <ShortcutHint id="differences-shortcut-hint" shortcut="shift+enter" />
         </BottomBar.Row>
       </BottomBar>
     </form>

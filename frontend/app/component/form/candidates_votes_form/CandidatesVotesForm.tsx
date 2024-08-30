@@ -14,6 +14,7 @@ import {
   Feedback,
   InputGrid,
   InputGridRow,
+  ShortcutHint,
 } from "@kiesraad/ui";
 import {
   candidateNumberFromId,
@@ -204,7 +205,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           <Button type="submit" size="lg" disabled={loading}>
             Volgende
           </Button>
-          <span className="button_hint">SHIFT + Enter</span>
+          <ShortcutHint id={`candidates-${group.number}-shortcut-hint`} shortcut="shift+enter" />
         </BottomBar.Row>
       </BottomBar>
     </form>

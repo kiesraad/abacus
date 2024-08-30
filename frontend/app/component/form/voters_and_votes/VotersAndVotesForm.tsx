@@ -141,7 +141,7 @@ export function VotersAndVotesForm() {
     if (isSaved) {
       window.scrollTo(0, 0);
     }
-  }, [isSaved]);
+  }, [isSaved, warnings, errors]);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;

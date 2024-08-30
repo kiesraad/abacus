@@ -1,0 +1,24 @@
+.shortcuthint {
+  display: inline-flex;
+  gap: 4px;
+  kbd {
+    padding: 4px 8px;
+    gap: 4px;
+    border-radius: 4px;
+    background-color: var(--gray-200);
+    color: var(--color-help-text);
+    font-size: var(--font-size-sm);
+    display: flex;
+    align-items: center;
+    text-transform: capitalize;
+
+    svg {
+      fill: var(--color-help-text);
+      height: 16px;
+    }
+
+    &:global(.key-enter) {
+      flex-direction: row-reverse;
+    }
+  }
+}

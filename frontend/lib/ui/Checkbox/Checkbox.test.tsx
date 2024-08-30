@@ -14,6 +14,7 @@ describe("UI component: Checkbox", () => {
     expect(screen.getByText("Test label")).toBeInTheDocument();
 
     expect(screen.getByTestId("test-id")).not.toBeChecked();
+    expect(screen.queryByLabelText("Aangevinkt")).not.toBeInTheDocument();
   });
 
   test("The checkbox is checked", () => {
@@ -24,5 +25,6 @@ describe("UI component: Checkbox", () => {
     );
 
     expect(screen.getByTestId("test-id")).toBeChecked();
+    expect(screen.getByLabelText("Aangevinkt")).toBeInTheDocument();
   });
 });

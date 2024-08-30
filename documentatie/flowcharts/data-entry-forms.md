@@ -118,7 +118,6 @@ flowchart TD
     %% elements
     flow-start([start])
     go-to-prev-page([go to previous page])
-    abort-input([abort input])
 
     error-any-prev-page{"error for any \n previous page?"}
     error-cur-page{"error for \n current page?"}
@@ -146,7 +145,6 @@ flowchart TD
 
     error-cur-page -- yes --> user-addresses-error
     
-    user-addresses-error -- abort --> abort-input
     user-addresses-error -- resolve --> change-input
     change-input --> next-button
 
@@ -157,7 +155,6 @@ flowchart TD
     user-addresses-warning -- resolve --> change-input
     user-addresses-warning -- accept --> accept-warning
     accept-warning --> next-button
-    user-addresses-warning -- abort --> abort-input
 
     warning-cur-page -- no --> go-to-next-page
 ```

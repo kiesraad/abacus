@@ -303,17 +303,24 @@ describe("Polling Station data entry integration tests", () => {
   test("Progress list shows correct icons", async () => {
     render();
 
-    const formFillingSteps = [
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedForm,
-      submit,
-      expectVotersAndVotesForm,
-      fillVotersAndVotesForm,
-      submit,
-      expectDifferencesForm,
-      fillDifferencesForm,
-      submit,
+    await startPollingStationInput();
+    await expectRecountedForm();
+    await fillRecountedForm();
+    await submit();
+    await expectVotersAndVotesForm();
+    await fillVotersAndVotesForm();
+    await submit();
+    await expectDifferencesForm();
+
+    await gotoForm("voters_and_votes");
+    await expectElementContainsIcon("list-item-differences", "nog niet afgerond");
+
+    await gotoForm("differences");
+
+    await fillDifferencesForm();
+    await submit();
+
+    const politicalGroupillingSteps = [
       ...electionMockData.political_groups.flatMap((pg) => [
         () => expectPoliticalGroupCandidatesForm(pg.number),
         fillPoliticalGroupCandidatesVotesForm,
@@ -322,7 +329,7 @@ describe("Polling Station data entry integration tests", () => {
       expectCheckAndSavePage,
     ];
 
-    for (const step of formFillingSteps) {
+    for (const step of politicalGroupillingSteps) {
       await step();
     }
 

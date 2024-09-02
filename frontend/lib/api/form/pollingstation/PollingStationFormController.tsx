@@ -10,6 +10,7 @@ import {
   useApi,
   usePollingStationDataEntry,
   ValidationResult,
+  VotersRecounts,
 } from "@kiesraad/api";
 
 import {
@@ -397,14 +398,28 @@ export function PollingStationFormController({
             break;
           case "recounted": {
             const newValues = ref.getValues();
-            setValues((old) => ({
-              ...old,
-              ...newValues,
-              voters_recounts:
-                newValues.recounted && old.voters_recounts !== undefined
-                  ? { ...old.voters_recounts }
-                  : undefined,
-            }));
+
+            setValues((old) => {
+              let voters_recounts: VotersRecounts | undefined = undefined;
+
+              if (newValues.recounted) {
+                if (old.recounted === false) {
+                  voters_recounts = {
+                    poll_card_recount: 0,
+                    proxy_certificate_recount: 0,
+                    voter_card_recount: 0,
+                    total_admitted_voters_recount: 0,
+                  };
+                } else {
+                  voters_recounts = old.voters_recounts;
+                }
+              }
+              return {
+                ...old,
+                ...newValues,
+                voters_recounts,
+              };
+            });
             break;
           }
           case "voters_and_votes":

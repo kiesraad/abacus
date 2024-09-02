@@ -8,6 +8,6 @@ export class SaveFormPage extends InputBasePage {
   constructor(page: Page) {
     super(page);
 
-    this.heading = page.getByRole("heading", { level: 2, name: "Save form" });
+    this.heading = page.getByRole("heading", { level: 2, name: "Controleren en opslaan" });
   }
 }

@@ -15,9 +15,9 @@ export function PollingStationSaveForm() {
 
   return (
     <div>
-      <h2>Save form</h2>
+      <h2>Controleren en opslaan</h2>
 
-      <p>Lorem ipsum</p>
+      <p>Hieronder zie je een overzicht van alle eventuele fouten en waarschuwingen.</p>
 
       {Object.values(formState.sections).map((section) => (
         <div key={section.id}>

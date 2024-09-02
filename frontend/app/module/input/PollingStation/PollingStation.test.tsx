@@ -415,4 +415,40 @@ describe("Polling Station data entry integration tests", () => {
 
     await expectRecountedForm();
   });
+
+  test("Changing recount generates an error", async () => {
+    render();
+
+    const formFillingSteps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedForm,
+      submit,
+      expectVotersAndVotesForm,
+      fillVotersAndVotesForm,
+      submit,
+      expectDifferencesForm,
+      fillDifferencesForm,
+      submit,
+      ...electionMockData.political_groups.flatMap((pg) => [
+        () => expectPoliticalGroupCandidatesForm(pg.number),
+        fillPoliticalGroupCandidatesVotesForm,
+        submit,
+      ]),
+      expectCheckAndSavePage,
+    ];
+
+    for (const step of formFillingSteps) {
+      await step();
+    }
+
+    await gotoForm("recounted");
+
+    await user.click(screen.getByLabelText("Ja, er was een hertelling"));
+    await submit();
+
+    await expectVotersAndVotesForm();
+
+    await expectElementContainsIcon("list-item-differences", "bevat een fout");
+  });
 });

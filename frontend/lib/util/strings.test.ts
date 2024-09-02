@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { ellipsis, parseIntStrict } from "./strings";
+import { ellipsis, parseIntStrict, parsePollingStationNumber } from "./strings";
 
 describe("Strings util", () => {
   test.each([
@@ -10,6 +10,24 @@ describe("Strings util", () => {
     ["", "", 20],
   ])("ellipsis %s as %s", (input: string, expected: string, maxLength: number) => {
     expect(ellipsis(input, maxLength)).equals(expected);
+  });
+
+  test.each([
+    ["123", 123],
+    ["00123"],
+    ["123a"],
+    ["a123"],
+    ["123 456"],
+    [" 123456 "],
+    ["/123/456"],
+    ["'123456'"],
+    ["six"],
+  ])("parseIntStrict %s", (input: string, expected: number | undefined = undefined) => {
+    if (expected) {
+      expect(parseIntStrict(input)).toBe(expected);
+    } else {
+      expect(parseIntStrict(input)).toBeUndefined();
+    }
   });
 
   test.each([
@@ -28,9 +46,9 @@ describe("Strings util", () => {
     ["six"],
   ])("parseIntStrict %s", (input: string, expected: number | undefined = undefined) => {
     if (expected) {
-      expect(parseIntStrict(input)).toBe(expected);
+      expect(parsePollingStationNumber(input)).toBe(expected);
     } else {
-      expect(parseIntStrict(input)).toBeUndefined();
+      expect(parsePollingStationNumber(input)).toBeUndefined();
     }
   });
 });

@@ -18,9 +18,9 @@
   }
 
   &:disabled {
-    background: #f2f2f2;
-    border: 1px solid #f2f2f2;
-    color: #b3b3b3;
+    background: var(--button-color-bg-disabled);
+    border: 1px solid var(--button-color-bg-disabled);
+    color: var(--button-color-disabled);
   }
 
   &:global(.round) {
@@ -81,9 +81,9 @@
     }
 
     &:disabled {
-      background: #f2f2f2;
-      border: 1px solid #f2f2f2;
-      color: #b3b3b3;
+      background: var(--button-color-bg-disabled);
+      border: 1px solid var(--button-color-bg-disabled);
+      color: var(--button-color-disabled);
     }
   }
 }

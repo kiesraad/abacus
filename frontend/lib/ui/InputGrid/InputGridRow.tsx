@@ -2,11 +2,8 @@ import * as React from "react";
 
 import { ErrorsAndWarnings } from "@kiesraad/api";
 import { IconWarningSquare } from "@kiesraad/icon";
+import { FormField, Icon, InputGrid } from "@kiesraad/ui";
 import { ellipsis, FormatFunc } from "@kiesraad/util";
-
-import { FormField } from "../FormField/FormField";
-import { Icon } from "../Icon/Icon";
-import { InputGrid } from "./InputGrid";
 
 export interface InputGridRowProps {
   id: string;

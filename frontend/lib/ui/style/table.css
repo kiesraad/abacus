@@ -77,7 +77,7 @@ summary {
   display: block;
   .underlined {
     text-decoration: underline;
-    color: #1570ef;
+    color: var(--link-default);
   }
   .pointer {
     cursor: pointer;

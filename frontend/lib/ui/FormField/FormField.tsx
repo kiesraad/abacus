@@ -2,9 +2,9 @@ import * as React from "react";
 
 import { type FieldValidationResult } from "@kiesraad/api";
 import { IconError, IconWarning } from "@kiesraad/icon";
+import { Tooltip } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
-import { Tooltip } from "../Tooltip/Tooltip";
 import cls from "./FormField.module.css";
 
 export interface FormFieldProps {

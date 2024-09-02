@@ -8,9 +8,9 @@ import {
   IconPencil,
   IconWarning,
 } from "@kiesraad/icon";
+import { MenuStatus } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
-import { MenuStatus } from "../ui.types";
 import cls from "./ProgressList.module.css";
 
 export interface ProgressListProps {

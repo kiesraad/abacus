@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 import { PollingStation, usePollingStationList } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
 import { Icon, InputField, Spinner } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
+import { cn, removeLeadingZeros } from "@kiesraad/util";
 
 import cls from "./PollingStationSelector.module.css";
 
@@ -73,7 +73,9 @@ export function PollingStationSelector({
                 <span className={cls.icon}>
                   <Icon icon={<IconError />} color="error" />
                 </span>
-                <span>Geen stembureau gevonden met nummer {pollingStationNumber}</span>
+                <span>
+                  Geen stembureau gevonden met nummer {removeLeadingZeros(pollingStationNumber)}
+                </span>
               </div>
             );
           }

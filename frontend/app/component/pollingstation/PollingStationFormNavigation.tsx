@@ -191,7 +191,7 @@ function reasonsBlocked(
     if (formSection.warnings.length > 0 && !formSection.ignoreWarnings) {
       result.push("warnings");
     }
-    //if (!formSection.isSubmitted) {
+
     if (
       (currentForm.getIgnoreWarnings &&
         formSection.ignoreWarnings !== currentForm.getIgnoreWarnings()) ||

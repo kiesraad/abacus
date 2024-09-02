@@ -1,6 +1,6 @@
 import { createMemoryRouter } from "react-router-dom";
 
-import { render as rtlRender } from "@testing-library/react";
+import { render as rtlRender, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
@@ -126,8 +126,7 @@ const expectBlockerModal = async () => {
 const expectElementContainsIcon = async (id: string, ariaLabel: string) => {
   const el = await screen.findByTestId(id);
   expect(el).toBeInTheDocument();
-  //expect(within(el).getByRole("img")).toHaveAccessibleName(ariaLabel);
-  expect(el).toContainHTML(`aria-label="${ariaLabel}"`);
+  expect(within(el).getByRole("img")).toHaveAccessibleName(ariaLabel);
 };
 
 type FormIdentifier = "recounted" | "voters_and_votes" | "differences" | `candidates_${number}`;

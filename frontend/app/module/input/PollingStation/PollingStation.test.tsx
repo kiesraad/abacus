@@ -34,8 +34,12 @@ const expectRecountedForm = async () => {
   });
 };
 
-const fillRecountedForm = async () => {
+const fillRecountedFormNo = async () => {
   await user.click(screen.getByLabelText("Nee, er was geen hertelling"));
+};
+
+const fillRecountedFormYes = async () => {
+  await user.click(screen.getByLabelText("Ja, er was een hertelling"));
 };
 
 const expectVotersAndVotesForm = async () => {
@@ -117,10 +121,15 @@ const expectFeedbackWarning = async (code?: string) => {
   }
 };
 
+const acceptWarning = async () => {
+  await user.click(screen.getByTestId("differences_form_ignore_warnings"));
+  expect(screen.getByTestId("differences_form_ignore_warnings")).toBeChecked();
+};
+
 const expectBlockerModal = async () => {
-  await waitFor(() => {
-    expect(screen.getByTestId("modal-blocker-title")).toBeInTheDocument();
-  });
+  expect(await screen.findByTestId("modal-blocker-title")).toHaveTextContent(
+    "Let op: niet opgeslagen wijzigingen",
+  );
 };
 
 const expectElementContainsIcon = async (id: string, ariaLabel: string) => {
@@ -164,7 +173,7 @@ describe("Polling Station data entry integration tests", () => {
     const formFillingSteps = [
       startPollingStationInput,
       expectRecountedForm,
-      fillRecountedForm,
+      fillRecountedFormNo,
       submit,
       expectVotersAndVotesForm,
       fillVotersAndVotesForm,
@@ -192,7 +201,7 @@ describe("Polling Station data entry integration tests", () => {
       // fill up to and including the differences form
       startPollingStationInput,
       expectRecountedForm,
-      fillRecountedForm,
+      fillRecountedFormNo,
       submit,
       expectVotersAndVotesForm,
       fillVotersAndVotesForm,
@@ -217,7 +226,7 @@ describe("Polling Station data entry integration tests", () => {
       // fill up to and including the voters and votes form
       startPollingStationInput,
       expectRecountedForm,
-      fillRecountedForm,
+      fillRecountedFormNo,
       submit,
       expectVotersAndVotesForm,
       fillVotersAndVotesForm,
@@ -238,7 +247,7 @@ describe("Polling Station data entry integration tests", () => {
       // fill up to and including the differences form
       startPollingStationInput,
       expectRecountedForm,
-      fillRecountedForm,
+      fillRecountedFormNo,
       submit,
       expectVotersAndVotesForm,
       fillVotersAndVotesForm,
@@ -261,120 +270,110 @@ describe("Polling Station data entry integration tests", () => {
 
   test("Navigate triggers changes modal", async () => {
     render();
-    await startPollingStationInput();
-    await expectRecountedForm();
-    await fillRecountedForm();
-    await submit();
 
-    await expectVotersAndVotesForm();
+    const steps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedFormNo,
+      submit,
+      expectVotersAndVotesForm,
+      fillVotersAndVotesForm,
+      submit,
+      expectDifferencesForm,
+      () => gotoForm("voters_and_votes"),
+      expectVotersAndVotesForm,
+      () =>
+        fillVotersAndVotesForm({
+          poll_card_count: 1,
+          proxy_certificate_count: 1,
+          voter_card_count: 1,
+          total_admitted_voters_count: 2,
+          votes_candidates_counts: 1,
+          blank_votes_count: 1,
+          invalid_votes_count: 1,
+          total_votes_cast_count: 3,
+        }),
+      submit,
+      expectFeedbackError,
+      () =>
+        fillVotersAndVotesForm({
+          total_admitted_voters_count: 3,
+        }),
+      () => userEvent.click(screen.getByRole("link", { name: "Verschillen" })),
+      expectBlockerModal,
+    ];
 
-    await fillVotersAndVotesForm();
-    await submit();
-
-    await expectDifferencesForm();
-    await gotoForm("voters_and_votes");
-
-    await expectVotersAndVotesForm();
-
-    await fillVotersAndVotesForm({
-      poll_card_count: 1,
-      proxy_certificate_count: 1,
-      voter_card_count: 1,
-      total_admitted_voters_count: 2,
-      votes_candidates_counts: 1,
-      blank_votes_count: 1,
-      invalid_votes_count: 1,
-      total_votes_cast_count: 3,
-    });
-
-    await submit();
-    await expectFeedbackError();
-
-    await fillVotersAndVotesForm({
-      total_admitted_voters_count: 3,
-    });
-
-    await userEvent.click(screen.getByRole("link", { name: "Verschillen" }));
-
-    await expectBlockerModal();
+    for (const step of steps) {
+      await step();
+    }
   });
 
   test("Progress list shows correct icons", async () => {
     render();
 
-    await startPollingStationInput();
-    await expectRecountedForm();
-    await fillRecountedForm();
-    await submit();
-    await expectVotersAndVotesForm();
-    await fillVotersAndVotesForm();
-    await submit();
-    await expectDifferencesForm();
+    const steps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedFormNo,
+      submit,
+      expectVotersAndVotesForm,
+      fillVotersAndVotesForm,
+      submit,
+      expectDifferencesForm,
+      () => gotoForm("voters_and_votes"),
+      () => expectElementContainsIcon("list-item-differences", "nog niet afgerond"),
 
-    await gotoForm("voters_and_votes");
-    await expectElementContainsIcon("list-item-differences", "nog niet afgerond");
-
-    await gotoForm("differences");
-
-    await fillDifferencesForm();
-    await submit();
-
-    const politicalGroupillingSteps = [
+      () => gotoForm("differences"),
+      fillDifferencesForm,
+      submit,
       ...electionMockData.political_groups.flatMap((pg) => [
         () => expectPoliticalGroupCandidatesForm(pg.number),
         fillPoliticalGroupCandidatesVotesForm,
         submit,
       ]),
       expectCheckAndSavePage,
+      () => expectElementContainsIcon("list-item-recounted", "opgeslagen"),
+      () => expectElementContainsIcon("list-item-differences", "leeg"),
+
+      () => gotoForm("differences"),
+      () => expectElementContainsIcon("list-item-differences", "je bent hier"),
+      () =>
+        userTypeInputs(user, {
+          more_ballots_count: 1,
+          fewer_ballots_count: 1,
+        }),
+      submit,
+      expectFeedbackWarning,
+      acceptWarning,
+      submit,
+
+      () => expectPoliticalGroupCandidatesForm(1),
+      () => expectElementContainsIcon("list-item-differences", "bevat een waarschuwing"),
+
+      () => gotoForm("voters_and_votes"),
+      () =>
+        userTypeInputs(user, {
+          total_admitted_voters_count: 1,
+        }),
+      submit,
+      expectVotersAndVotesForm,
+
+      () => gotoForm("differences"),
+      () => expectElementContainsIcon("list-item-numbers", "bevat een fout"),
     ];
 
-    for (const step of politicalGroupillingSteps) {
+    for (const step of steps) {
       await step();
     }
-
-    await expectElementContainsIcon("list-item-recounted", "opgeslagen");
-    await expectElementContainsIcon("list-item-differences", "leeg");
-
-    await gotoForm("differences");
-
-    await expectElementContainsIcon("list-item-differences", "je bent hier");
-
-    await userTypeInputs(user, {
-      more_ballots_count: 1,
-      fewer_ballots_count: 1,
-    });
-
-    await submit();
-    await expectFeedbackWarning();
-
-    await user.click(screen.getByTestId("differences_form_ignore_warnings"));
-    expect(screen.getByTestId("differences_form_ignore_warnings")).toBeChecked();
-
-    await submit();
-
-    await expectPoliticalGroupCandidatesForm(1);
-    await expectElementContainsIcon("list-item-differences", "bevat een waarschuwing");
-
-    await gotoForm("voters_and_votes");
-
-    await userTypeInputs(user, {
-      total_admitted_voters_count: 1,
-    });
-
-    await submit();
-    await expectVotersAndVotesForm();
-
-    await gotoForm("differences");
-    await expectElementContainsIcon("list-item-numbers", "bevat een fout");
   });
 
   test("Navigating with changes goes to correct form", async () => {
     render();
 
-    const formFillingSteps = [
+    const steps = [
       startPollingStationInput,
       expectRecountedForm,
-      fillRecountedForm,
+      fillRecountedFormNo,
       submit,
       expectVotersAndVotesForm,
       fillVotersAndVotesForm,
@@ -388,41 +387,36 @@ describe("Polling Station data entry integration tests", () => {
         submit,
       ]),
       expectCheckAndSavePage,
+
+      () => gotoForm("voters_and_votes"),
+      () =>
+        userTypeInputs(user, {
+          total_admitted_voters_count: 1,
+        }),
+      submit,
+      expectFeedbackError,
+      () =>
+        userTypeInputs(user, {
+          total_admitted_voters_count: total_votes,
+        }),
+      () => userEvent.click(screen.getByRole("link", { name: "Is er herteld?" })),
+      expectBlockerModal,
+      () => user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" })),
+      expectRecountedForm,
     ];
 
-    for (const step of formFillingSteps) {
+    for (const step of steps) {
       await step();
     }
-
-    await gotoForm("voters_and_votes");
-    await userTypeInputs(user, {
-      total_admitted_voters_count: 1,
-    });
-    await submit();
-
-    await expectFeedbackError();
-
-    await userTypeInputs(user, {
-      total_admitted_voters_count: total_votes,
-    });
-
-    await userEvent.click(screen.getByRole("link", { name: "Is er herteld?" }));
-
-    const modalTitle = await screen.findByTestId("modal-blocker-title");
-    expect(modalTitle).toHaveTextContent("Let op: niet opgeslagen wijzigingen");
-
-    await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
-
-    await expectRecountedForm();
   });
 
   test("Changing recount generates an error", async () => {
     render();
 
-    const formFillingSteps = [
+    const steps = [
       startPollingStationInput,
       expectRecountedForm,
-      fillRecountedForm,
+      fillRecountedFormNo,
       submit,
       expectVotersAndVotesForm,
       fillVotersAndVotesForm,
@@ -436,19 +430,15 @@ describe("Polling Station data entry integration tests", () => {
         submit,
       ]),
       expectCheckAndSavePage,
+      () => gotoForm("recounted"),
+      fillRecountedFormYes,
+      submit,
+      expectVotersAndVotesForm,
+      () => expectElementContainsIcon("list-item-differences", "bevat een fout"),
     ];
 
-    for (const step of formFillingSteps) {
+    for (const step of steps) {
       await step();
     }
-
-    await gotoForm("recounted");
-
-    await user.click(screen.getByLabelText("Ja, er was een hertelling"));
-    await submit();
-
-    await expectVotersAndVotesForm();
-
-    await expectElementContainsIcon("list-item-differences", "bevat een fout");
   });
 });

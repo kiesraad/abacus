@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { assert, describe, expect, test } from "vitest";
 
 import {
   addValidationResultToFormState,
@@ -143,7 +143,6 @@ describe("PollingStationUtils", () => {
     expect(formState.sections.differences_counts.errors.length).toBe(1);
   });
 
-  // FIXME: F.204 is a global error, so is this test relevant?
   test("addValidationResultToFormState adds result to multiple sections", () => {
     const formState = structuredClone(defaultFormState);
 
@@ -153,7 +152,10 @@ describe("PollingStationUtils", () => {
 
     const validationResults: ValidationResult[] = [
       {
-        fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
+        fields: [
+          "data.votes_counts.votes_candidates_counts",
+          "data.political_group_votes[0].total",
+        ],
         code: "F204",
       },
     ];
@@ -161,6 +163,9 @@ describe("PollingStationUtils", () => {
     addValidationResultToFormState(formState, validationResults, "errors");
 
     expect(formState.sections.voters_votes_counts.errors.length).toBe(1);
+    const pg1 = formState.sections.political_group_votes_1;
+    assert(pg1);
+    expect(pg1.errors.length).toBe(1);
   });
 
   test("addValidationResultToFormState doesnt add errors to unsaved sections", () => {

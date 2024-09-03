@@ -2,8 +2,32 @@
   display: inline-flex;
   align-items: center;
 
+  /* https://css-tricks.com/inclusively-hidden/ */
   input {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
+  > div {
+    display: inline-block;
     margin-right: 8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    padding: 0;
+    border: 1px solid var(--base-dark-blue);
+    background-color: var(--bg-highlight);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    svg {
+      width: 14px;
+    }
   }
 
   &:global(.hidden) {
@@ -11,8 +35,8 @@
   }
 
   &:global(.has-error) {
-    input {
-      outline: 1px solid var(--color-error);
+    > div {
+      border-color: var(--color-error-darker);
     }
   }
 }

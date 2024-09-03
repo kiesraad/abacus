@@ -11,15 +11,8 @@ export function useVotersAndVotes(
   getValues: () => VotersAndVotesValues,
   getIgnoreWarnings?: () => boolean,
 ) {
-  const {
-    values,
-    loading,
-    formState,
-    setTemporaryCache,
-    cache,
-    registerCurrentForm,
-    submitCurrentForm,
-  } = usePollingStationFormController();
+  const { values, formState, setTemporaryCache, cache, registerCurrentForm, submitCurrentForm } =
+    usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
     if (cache && cache.key === "voters_votes_counts") {
@@ -59,7 +52,6 @@ export function useVotersAndVotes(
   }, [formState]);
 
   return {
-    loading,
     sectionValues,
     errors,
     warnings,

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 
 import {
   CandidateVotes,
@@ -39,6 +40,7 @@ export interface CandidatesVotesFormProps {
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
+  const [saving, setSaving] = useState(false);
 
   const _IGNORE_WARNINGS_ID = `candidates_votes_form_ignore_warnings_${group.number}`;
 
@@ -77,8 +79,11 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   usePreventFormEnterSubmit(formRef);
 
-  const { sectionValues, errors, warnings, loading, isSaved, submit, ignoreWarnings } =
-    usePoliticalGroup(group.number, getValues, getIgnoreWarnings);
+  const { sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } = usePoliticalGroup(
+    group.number,
+    getValues,
+    getIgnoreWarnings,
+  );
 
   const shouldWatch = warnings.length > 0 && isSaved;
   const { hasChanges } = useWatchForChanges(shouldWatch, sectionValues, getValues);
@@ -101,21 +106,23 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
 
-  function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
-    event.preventDefault();
+  const handleSubmit = (event: React.FormEvent<CandidatesVotesFormElement>) =>
+    void (async (event: React.FormEvent<CandidatesVotesFormElement>) => {
+      event.preventDefault();
+      const ignoreWarnings = (
+        document.getElementById(
+          `candidates_votes_form_ignore_warnings_${group.number}`,
+        ) as HTMLInputElement
+      ).checked;
 
-    const ignoreWarnings = (
-      document.getElementById(
-        `candidates_votes_form_ignore_warnings_${group.number}`,
-      ) as HTMLInputElement
-    ).checked;
-
-    if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
-      setWarningsWarning(true);
-    } else {
-      submit(ignoreWarnings);
-    }
-  }
+      if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
+        setWarningsWarning(true);
+      } else {
+        setSaving(true);
+        await submit(ignoreWarnings);
+        setSaving(false);
+      }
+    })(event);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
@@ -201,7 +208,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" size="lg" disabled={saving}>
             Volgende
           </Button>
           <span className="button_hint">SHIFT + Enter</span>

@@ -7,15 +7,8 @@ export function usePoliticalGroup(
   getValues: () => PoliticalGroupVotes,
   getIgnoreWarnings?: () => boolean,
 ) {
-  const {
-    values,
-    formState,
-    loading,
-    setTemporaryCache,
-    cache,
-    registerCurrentForm,
-    submitCurrentForm,
-  } = usePollingStationFormController();
+  const { values, formState, setTemporaryCache, cache, registerCurrentForm, submitCurrentForm } =
+    usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
     if (cache && cache.key === `political_group_votes_${political_group_number}`) {
@@ -49,7 +42,6 @@ export function usePoliticalGroup(
     sectionValues,
     errors,
     warnings,
-    loading,
     isSaved:
       formState.sections[`political_group_votes_${political_group_number}`]?.isSaved || false,
     setTemporaryCache,

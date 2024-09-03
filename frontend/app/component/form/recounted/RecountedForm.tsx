@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 
 import { useRecounted } from "@kiesraad/api";
 import { BottomBar, Button, Feedback } from "@kiesraad/ui";
@@ -17,6 +18,7 @@ export function RecountedForm() {
   const [hasValidationError, setHasValidationError] = React.useState(false);
   const formRef = React.useRef<RecountedFormElement>(null);
   usePreventFormEnterSubmit(formRef);
+  const [saving, setSaving] = useState(false);
 
   const getValues = React.useCallback(() => {
     const form = document.getElementById("recounted_form") as RecountedFormElement | null;
@@ -27,19 +29,22 @@ export function RecountedForm() {
     return { recounted: elements.yes.checked ? true : elements.no.checked ? false : undefined };
   }, []);
 
-  const { sectionValues, loading, isSaved, submit } = useRecounted(getValues);
+  const { sectionValues, isSaved, submit } = useRecounted(getValues);
 
-  function handleSubmit(event: React.FormEvent<RecountedFormElement>) {
-    event.preventDefault();
-    const elements = event.currentTarget.elements;
+  const handleSubmit = (event: React.FormEvent<RecountedFormElement>) =>
+    void (async (event: React.FormEvent<RecountedFormElement>) => {
+      event.preventDefault();
+      const elements = event.currentTarget.elements;
 
-    if (!elements.yes.checked && !elements.no.checked) {
-      setHasValidationError(true);
-    } else {
-      setHasValidationError(false);
-      submit();
-    }
-  }
+      if (!elements.yes.checked && !elements.no.checked) {
+        setHasValidationError(true);
+      } else {
+        setHasValidationError(false);
+        setSaving(true);
+        await submit();
+        setSaving(false);
+      }
+    })(event);
 
   React.useEffect(() => {
     if (isSaved) {
@@ -88,7 +93,7 @@ export function RecountedForm() {
       </div>
       <BottomBar type="form">
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" size="lg" disabled={saving}>
             Volgende
           </Button>
           <span className="button_hint">SHIFT + Enter</span>

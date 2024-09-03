@@ -8,15 +8,8 @@ export function useDifferences(
   getValues: () => DifferencesValues,
   getIgnoreWarnings?: () => boolean,
 ) {
-  const {
-    values,
-    formState,
-    loading,
-    submitCurrentForm,
-    setTemporaryCache,
-    registerCurrentForm,
-    cache,
-  } = usePollingStationFormController();
+  const { values, formState, submitCurrentForm, setTemporaryCache, registerCurrentForm, cache } =
+    usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
     if (cache && cache.key === "differences_counts") {
@@ -48,7 +41,6 @@ export function useDifferences(
   }, [registerCurrentForm, getValues, getIgnoreWarnings]);
 
   return {
-    loading,
     sectionValues,
     errors,
     warnings,

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 
 import { getErrorsAndWarnings, useVotersAndVotes, VotersAndVotesValues } from "@kiesraad/api";
 import {
@@ -46,6 +47,7 @@ export function VotersAndVotesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
   usePreventFormEnterSubmit(formRef);
+  const [saving, setSaving] = useState(false);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -103,7 +105,7 @@ export function VotersAndVotesForm() {
     return false;
   }, []);
 
-  const { sectionValues, loading, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
+  const { sectionValues, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
     useVotersAndVotes(getValues, getIgnoreWarnings);
 
   useTooltip({
@@ -123,17 +125,20 @@ export function VotersAndVotesForm() {
     }
   }, [hasChanges]);
 
-  function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
-    event.preventDefault();
-    const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
-      .checked;
+  const handleSubmit = (event: React.FormEvent<VotersAndVotesFormElement>) =>
+    void (async (event: React.FormEvent<VotersAndVotesFormElement>) => {
+      event.preventDefault();
+      const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
+        .checked;
 
-    if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
-      setWarningsWarning(true);
-    } else {
-      submit(ignoreWarnings);
-    }
-  }
+      if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
+        setWarningsWarning(true);
+      } else {
+        setSaving(true);
+        await submit(ignoreWarnings);
+        setSaving(false);
+      }
+    })(event);
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
@@ -335,7 +340,7 @@ export function VotersAndVotesForm() {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" size="lg" disabled={saving}>
             Volgende
           </Button>
           <span className="button_hint">SHIFT + Enter</span>

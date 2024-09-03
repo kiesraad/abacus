@@ -71,8 +71,8 @@ const expectDifferencesForm = async () => {
   });
 };
 
-const fillDifferencesForm = async () => {
-  await userTypeInputs(user, {
+const fillDifferencesForm = async (values?: Record<string, number>) => {
+  const userValues = values ?? {
     more_ballots_count: 0,
     fewer_ballots_count: 0,
     unreturned_ballots_count: 0,
@@ -80,7 +80,9 @@ const fillDifferencesForm = async () => {
     too_many_ballots_handed_out_count: 0,
     other_explanation_count: 0,
     no_explanation_count: 0,
-  });
+  };
+
+  await userTypeInputs(user, userValues);
 };
 
 const expectPoliticalGroupCandidatesForm = async (pgNumber: number) => {
@@ -335,15 +337,20 @@ describe("Polling Station data entry integration tests", () => {
       () => expectElementContainsIcon("list-item-recounted", "opgeslagen"),
       () => expectElementContainsIcon("list-item-differences", "leeg"),
 
-      () => gotoForm("differences"),
-      () => expectElementContainsIcon("list-item-differences", "je bent hier"),
+      () => gotoForm("voters_and_votes"),
+      () => expectElementContainsIcon("list-item-numbers", "je bent hier"),
       () =>
-        userTypeInputs(user, {
-          more_ballots_count: 1,
-          fewer_ballots_count: 1,
+        fillVotersAndVotesForm({
+          poll_card_count: total_votes + 1,
+          total_admitted_voters_count: total_votes + 1,
+          votes_candidates_counts: total_votes,
+          total_votes_cast_count: total_votes,
         }),
       submit,
-      expectFeedbackWarning,
+      expectDifferencesForm,
+      () => fillDifferencesForm({ fewer_ballots_count: 1, no_explanation_count: 2 }),
+      submit,
+      () => expectFeedbackWarning("W.302"),
       acceptWarning,
       submit,
 

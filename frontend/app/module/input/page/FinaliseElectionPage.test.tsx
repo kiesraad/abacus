@@ -1,11 +1,9 @@
-import { RouterProvider } from "react-router-dom";
-
 import { render as rtlRender, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { expectNotFound, overrideOnce, render, setupTestRouter } from "app/test/unit";
+import { expectNotFound, overrideOnce, Providers, render, setupTestRouter } from "app/test/unit";
 
-import { ApiProvider, ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
+import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 
 import { FinaliseElectionPage } from "./FinaliseElectionPage";
 
@@ -26,13 +24,7 @@ describe("FinaliseElectionPage", () => {
 
     await router.navigate("/1/input/finalise");
 
-    // NOTE: We're not using the wrapped render function here,
-    // since we want control over our own memory router.
-    rtlRender(
-      <ApiProvider host="http://testhost">
-        <RouterProvider router={router} />
-      </ApiProvider>,
-    );
+    rtlRender(<Providers router={router} />);
 
     await expectNotFound();
   });

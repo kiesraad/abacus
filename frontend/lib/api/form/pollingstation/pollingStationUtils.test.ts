@@ -370,7 +370,7 @@ describe("PollingStationUtils", () => {
 
     const clientWarnings: FieldValidationResult[] = [
       {
-        code: "W201",
+        code: "W202",
         id: "blank_votes_count",
       },
     ];
@@ -391,7 +391,7 @@ describe("PollingStationUtils", () => {
     expect(errorsAndWarnings.get("blank_votes_count")?.warnings).toEqual(
       expect.arrayContaining([
         {
-          code: "W201",
+          code: "W202",
           id: "blank_votes_count",
         },
       ]),

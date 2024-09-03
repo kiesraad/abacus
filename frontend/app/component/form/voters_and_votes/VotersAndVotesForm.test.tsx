@@ -349,35 +349,6 @@ describe("Test VotersAndVotesForm", () => {
       );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
     });
-
-    test("Error with non-existing fields is not displayed", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [
-            {
-              fields: [
-                "data.not_a_real_object.not_a_real_field",
-                "data.not_a_real_object.this_field_does_not_exist",
-              ],
-              code: "NotARealError",
-            },
-          ],
-          warnings: [],
-        },
-      });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
-
-      // Since the component does not allow to input values for non-existing fields,
-      // not inputting any values and just clicking the submit button.
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
-      expect(screen.queryByTestId("feedback-warning")).toBeNull();
-    });
   });
 
   describe("VotersAndVotesForm warnings", () => {

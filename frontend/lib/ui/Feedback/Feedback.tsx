@@ -1,10 +1,9 @@
 import { ReactNode } from "react";
 
 import { ApiResponseErrorData } from "@kiesraad/api";
+import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
-import { AlertType, FeedbackId } from "../ui.types";
-import { renderIconForType } from "../util";
 import cls from "./Feedback.module.css";
 import { ClientValidationResultCode, FeedbackItem, feedbackTypes } from "./Feedback.types";
 

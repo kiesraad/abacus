@@ -116,6 +116,7 @@ test.describe("errors and warnings", () => {
     await votersVotesPage.next.click();
 
     await expect(votersVotesPage.error).toBeHidden();
+    await expect(votersVotesPage.warning).toBeHidden();
 
     const differencesPage = new DifferencesPage(page);
     await differencesPage.heading.waitFor();
@@ -123,7 +124,7 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
-  test("correct error F204", async ({ page }) => {
+  test("correct error F.204", async ({ page }) => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
@@ -154,7 +155,9 @@ test.describe("errors and warnings", () => {
     await candidatesListPage_1.next.click();
 
     await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.error).toBeVisible();
+    await expect(votersVotesPage.error).toContainText(
+      "Controleer (totaal) aantal stemmen op kandidatenF.204De optelling van alle lijsten is niet gelijk aan de invoer bij E.Check of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
+    );
     await expect(votersVotesPage.warning).toBeHidden();
 
     await votersVotesPage.navPanel.list(1).click();

@@ -199,7 +199,6 @@ function reasonsBlocked(
     ) {
       result.push("changes");
     }
-    //}
   }
 
   return result;

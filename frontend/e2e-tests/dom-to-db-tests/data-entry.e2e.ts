@@ -157,7 +157,7 @@ test.describe("errors and warnings", () => {
 
     await votersVotesPage.navPanel.list(1).click();
     await expect(candidatesListPage_1.heading).toBeVisible();
-    // fill counts of List 1 with data that doet match the total votes on candidates
+    // fill counts of List 1 with data that does match the total votes on candidates
     await candidatesListPage_1.fillCandidatesAndTotal([70, 30], 100);
     await candidatesListPage_1.next.click();
 

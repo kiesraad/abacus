@@ -290,7 +290,6 @@ export function PollingStationFormController({
         const newFormState = { ...old };
         //reset all errors/warnings, and submitted, the server validates the entire request each time.
         //a reset is done before submitting the form to the server.
-        //resetFormSectionState(newFormState);
 
         const activeFormSection = newFormState.sections[newFormState.active];
 

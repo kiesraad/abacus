@@ -1,7 +1,7 @@
 import { ErrorsAndWarnings, FieldValidationResult } from "lib/api/api";
 
 import { ValidationResult } from "@kiesraad/api";
-import { FormSectionType } from "@kiesraad/ui";
+import { ValidationResultType } from "@kiesraad/ui";
 import {
   deepEqual,
   fieldNameFromPath,
@@ -24,7 +24,7 @@ import { VotersAndVotesValues } from "./useVotersAndVotes";
 
 function checkAndAddValidationResult(
   section: FormSection,
-  target: FormSectionType,
+  target: ValidationResultType,
   validationResult: ValidationResult,
 ) {
   //don't add errors and warnings to the form state if the section is not saved
@@ -39,7 +39,7 @@ function checkAndAddValidationResult(
 export function addValidationResultToFormState(
   formState: FormState,
   arr: ValidationResult[],
-  target: FormSectionType,
+  target: ValidationResultType,
 ) {
   arr.forEach((validationResult) => {
     const uniqueRootSections = uniqueFieldSections(validationResult.fields);

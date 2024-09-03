@@ -37,7 +37,7 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(
     return (
       <form
         ref={(node) => {
-          if (node) (innerRef as React.MutableRefObject<HTMLFormElement>).current = node;
+          if (node) innerRef.current = node;
           if (typeof ref === "function") {
             ref(node);
           } else if (ref) {

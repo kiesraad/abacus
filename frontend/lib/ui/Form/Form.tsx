@@ -5,7 +5,7 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
 }
 export const Form = React.forwardRef<HTMLFormElement, FormProps>(
   ({ children, ...formProps }, ref) => {
-    const innerRef = React.useRef<HTMLFormElement>(null);
+    const innerRef: MutableRefObject<HTMLFormElement > = React.useRef<HTMLFormElement>(null);
 
     React.useEffect(() => {
       const submitButton = innerRef.current?.querySelector(

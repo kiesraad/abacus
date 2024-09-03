@@ -7,13 +7,14 @@ import {
   Button,
   Checkbox,
   Feedback,
+  Form,
   InputGrid,
   InputGridRow,
   KeyboardKey,
   KeyboardKeys,
   useTooltip,
 } from "@kiesraad/ui";
-import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
+import { usePositiveNumberInputMask } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../useWatchForChanges";
 
@@ -47,7 +48,6 @@ export function VotersAndVotesForm() {
     resetWarnings,
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
-  usePreventFormEnterSubmit(formRef);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -149,7 +149,7 @@ export function VotersAndVotesForm() {
   const hasValidationWarning = warnings.length > 0;
 
   return (
-    <form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form">
+    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form">
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
       {isSaved && hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
@@ -343,6 +343,6 @@ export function VotersAndVotesForm() {
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
-    </form>
+    </Form>
   );
 }

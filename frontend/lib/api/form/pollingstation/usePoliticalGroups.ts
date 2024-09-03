@@ -1,78 +1,62 @@
 import * as React from "react";
 
-import {
-  PoliticalGroupVotes,
-  usePollingStationFormController,
-  ValidationResult,
-} from "@kiesraad/api";
-import { matchValidationResultWithFormSections } from "@kiesraad/util";
+import { PoliticalGroupVotes, usePollingStationFormController } from "@kiesraad/api";
 
-export function usePoliticalGroup(political_group_number: number) {
+export function usePoliticalGroup(
+  political_group_number: number,
+  getValues: () => PoliticalGroupVotes,
+  getIgnoreWarnings?: () => boolean,
+) {
   const {
     values,
-    setValues,
-    data,
+    formState,
     loading,
-    error: serverError,
     setTemporaryCache,
     cache,
+    registerCurrentForm,
+    submitCurrentForm,
   } = usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
-    if (cache && cache.key === "political_group_votes" && cache.id === political_group_number) {
+    if (cache && cache.key === `political_group_votes_${political_group_number}`) {
       const data = cache.data;
       setTemporaryCache(null);
-      return data;
+      return data as PoliticalGroupVotes;
     }
     return values.political_group_votes.find((pg) => pg.number === political_group_number);
   }, [values, political_group_number, setTemporaryCache, cache]);
 
   const errors = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.errors.filter((err) =>
-        matchValidationResultWithFormSections(err.fields, [
-          `political_group_votes[${political_group_number - 1}]`,
-        ]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data, political_group_number]);
+    return formState.sections[`political_group_votes_${political_group_number}`]?.errors || [];
+  }, [formState, political_group_number]);
 
   const warnings = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.warnings.filter((warning) =>
-        matchValidationResultWithFormSections(warning.fields, [
-          `political_group_votes[${political_group_number - 1}]`,
-        ]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data, political_group_number]);
+    return formState.sections[`political_group_votes_${political_group_number}`]?.warnings || [];
+  }, [formState, political_group_number]);
 
-  const setSectionValues = (values: PoliticalGroupVotes) => {
-    setValues((old) => ({
-      ...old,
-      political_group_votes: old.political_group_votes.map((pg) => {
-        if (pg.number === political_group_number) {
-          return values;
-        }
-        return pg;
-      }),
-    }));
-  };
-
-  const isCalled = React.useMemo(() => {
-    return !!(sectionValues && sectionValues.total);
-  }, [sectionValues]);
+  //Once form is rendered, register the form
+  React.useEffect(() => {
+    registerCurrentForm({
+      type: "political_group_votes",
+      id: `political_group_votes_${political_group_number}`,
+      number: political_group_number,
+      getValues,
+      getIgnoreWarnings,
+    });
+  }, [registerCurrentForm, getValues, political_group_number, getIgnoreWarnings]);
 
   return {
     sectionValues,
-    setSectionValues,
     errors,
     warnings,
     loading,
-    isCalled,
-    serverError,
+    isSaved:
+      formState.sections[`political_group_votes_${political_group_number}`]?.isSaved || false,
     setTemporaryCache,
+    submit: submitCurrentForm,
+    isCompleted: formState.isCompleted,
+    ignoreWarnings:
+      formState.sections[`political_group_votes_${political_group_number}`]?.ignoreWarnings ||
+      false,
   };
 }

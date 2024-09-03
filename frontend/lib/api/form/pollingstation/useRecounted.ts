@@ -1,67 +1,51 @@
 import * as React from "react";
 
-import { Recounted, usePollingStationFormController, ValidationResult } from "@kiesraad/api";
-import { matchValidationResultWithFormSections } from "@kiesraad/util";
+import { PollingStationValues, usePollingStationFormController } from "@kiesraad/api";
 
-export function useRecounted() {
-  const { values, setValues, data, loading, error, setTemporaryCache, cache } =
-    usePollingStationFormController();
+export type RecountedValue = Pick<PollingStationValues, "recounted">;
 
-  const sectionValues: Recounted = React.useMemo(() => {
+export function useRecounted(getValues: () => RecountedValue) {
+  const {
+    values,
+    formState,
+    loading,
+    submitCurrentForm,
+    setTemporaryCache,
+    registerCurrentForm,
+    cache,
+  } = usePollingStationFormController();
+
+  const sectionValues = React.useMemo(() => {
     if (cache && cache.key === "recounted") {
-      const data = cache.data;
+      const data = cache.data as RecountedValue;
       setTemporaryCache(null);
       return data;
     }
-    return {
-      yes: values.recounted !== undefined ? values.recounted : false,
-      no: values.recounted !== undefined ? !values.recounted : false,
-    };
+    return { recounted: values.recounted };
   }, [values, setTemporaryCache, cache]);
 
   const errors = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.errors.filter((err) =>
-        matchValidationResultWithFormSections(err.fields, ["recounted"]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data]);
+    return formState.sections.recounted.errors;
+  }, [formState]);
 
   const warnings = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.warnings.filter((warning) =>
-        matchValidationResultWithFormSections(warning.fields, ["recounted"]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data]);
+    return formState.sections.recounted.warnings;
+  }, [formState]);
 
-  const setSectionValues = (values: Recounted) => {
-    setValues((old) => ({
-      ...old,
-      recounted: values.yes || !values.no,
-      voters_recounts:
-        values.yes && old.voters_recounts
-          ? {
-              ...old.voters_recounts,
-            }
-          : undefined,
-    }));
-  };
-
-  const isCalled = React.useMemo(() => {
-    return sectionValues.yes || sectionValues.no;
-  }, [sectionValues]);
+  React.useEffect(() => {
+    registerCurrentForm({
+      id: "recounted",
+      type: "recounted",
+      getValues,
+    });
+  }, [registerCurrentForm, getValues]);
 
   return {
     loading,
     sectionValues,
-    setSectionValues,
     errors,
     warnings,
-    isCalled,
-    serverError: error,
-    setTemporaryCache,
+    isSaved: formState.sections.recounted.isSaved,
+    submit: submitCurrentForm,
   };
 }

@@ -17,6 +17,7 @@ interface VotesCounts {
 }
 
 export class VotersVotesPage extends InputBasePage {
+  readonly heading: Locator;
   readonly pollCardCount: Locator;
   readonly proxyCertificateCount: Locator;
   readonly voterCardCount: Locator;
@@ -25,10 +26,16 @@ export class VotersVotesPage extends InputBasePage {
   readonly blankVotesCount: Locator;
   readonly invalidVotesCount: Locator;
   readonly totalVotesCastCount: Locator;
+  readonly acceptWarnings: Locator;
   readonly next: Locator;
 
   constructor(page: Page) {
     super(page);
+
+    this.heading = page.getByRole("heading", {
+      level: 2,
+      name: "Toegelaten kiezers en uitgebrachte stemmen",
+    });
 
     this.pollCardCount = page.getByTestId("poll_card_count");
     this.proxyCertificateCount = page.getByTestId("proxy_certificate_count");
@@ -38,6 +45,10 @@ export class VotersVotesPage extends InputBasePage {
     this.blankVotesCount = page.getByTestId("blank_votes_count");
     this.invalidVotesCount = page.getByTestId("invalid_votes_count");
     this.totalVotesCastCount = page.getByTestId("total_votes_cast_count");
+
+    this.acceptWarnings = page.getByLabel(
+      "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+    );
 
     this.next = page.getByRole("button", { name: "Volgende" });
   }
@@ -54,5 +65,11 @@ export class VotersVotesPage extends InputBasePage {
     await this.blankVotesCount.fill(votesCounts.blank_votes_count);
     await this.invalidVotesCount.fill(votesCounts.invalid_votes_count);
     await this.totalVotesCastCount.fill(votesCounts.total_votes_cast_count);
+  }
+
+  async fillInPageAndClickNext(votersCounts: VotersCounts, votesCounts: VotesCounts) {
+    await this.inputVoters(votersCounts);
+    await this.inputVotes(votesCounts);
+    await this.next.click();
   }
 }

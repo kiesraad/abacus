@@ -1,12 +1,10 @@
-/**
- * @vitest-environment jsdom
- */
 import { userEvent } from "@testing-library/user-event";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
 
 import {
+  FormState,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
   PollingStationValues,
@@ -15,6 +13,50 @@ import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
+const defaultFormState: FormState = {
+  active: "recounted",
+  current: "recounted",
+  sections: {
+    recounted: {
+      index: 0,
+      id: "recounted",
+      isSaved: true,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+    voters_votes_counts: {
+      index: 1,
+      id: "voters_votes_counts",
+      isSaved: true,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+    differences_counts: {
+      index: 2,
+      id: "differences_counts",
+      isSaved: true,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+    save: {
+      index: 3,
+      id: "save",
+      isSaved: true,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+  },
+  unknown: {
+    errors: [],
+    warnings: [],
+  },
+  isCompleted: false,
+};
+
 function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   return render(
     <PollingStationFormController
@@ -22,6 +64,7 @@ function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
       pollingStationId={pollingStationMockData.id}
       entryNumber={1}
       defaultValues={defaultValues}
+      defaultFormState={defaultFormState}
     >
       <VotersAndVotesForm />
     </PollingStationFormController>,
@@ -65,15 +108,11 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
 };
 
 describe("Test VotersAndVotesForm", () => {
-  afterEach(() => {
-    vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
-  });
-
   describe("VotersAndVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
       const spy = vi.spyOn(global, "fetch");
 
       const pollCards = await screen.findByTestId("poll_card_count");
@@ -92,7 +131,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       const pollCards = await screen.findByTestId("poll_card_count");
       expect(pollCards).toHaveFocus();
@@ -151,9 +190,6 @@ describe("Test VotersAndVotesForm", () => {
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
-
-      const result = await screen.findByTestId("result");
-      expect(result).toHaveTextContent(/^Success$/);
     });
   });
 
@@ -179,7 +215,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
       const spy = vi.spyOn(global, "fetch");
 
       await userTypeInputs(user, {
@@ -196,46 +232,6 @@ describe("Test VotersAndVotesForm", () => {
       expect(url).toEqual("http://testhost/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
-
-      const result = await screen.findByTestId("result");
-      expect(result).toHaveTextContent(/^Success$/);
-    });
-
-    test("422 response results in display of error message", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
-        message: "422 error from mock",
-      });
-
-      const user = userEvent.setup();
-
-      renderForm();
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-      const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
-
-      expect(screen.queryByTestId("result")).not.toBeNull();
-      expect(screen.queryByTestId("result")).toHaveTextContent(/^422 error from mock$/);
-    });
-
-    test("500 response results in display of error message", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
-        message: "500 error from mock",
-        errorCode: "500_ERROR",
-      });
-
-      const user = userEvent.setup();
-
-      renderForm();
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-      const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
-
-      expect(screen.queryByTestId("result")).not.toBeNull();
-      expect(screen.queryByTestId("result")).toHaveTextContent(/^500 error from mock$/);
     });
   });
 
@@ -260,7 +256,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // We await the first element to appear, so we know the page is loaded
       await user.type(await screen.findByTestId("poll_card_count"), "1");
@@ -274,7 +270,6 @@ describe("Test VotersAndVotesForm", () => {
       const feedbackError = await screen.findByTestId("feedback-error");
       expect(feedbackError).toHaveTextContent(/^F201$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
     test("F.202 IncorrectTotal Votes counts", async () => {
@@ -297,7 +292,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // We await the first element to appear, so we know the page is loaded
       await user.type(await screen.findByTestId("votes_candidates_counts"), "1");
@@ -347,7 +342,6 @@ describe("Test VotersAndVotesForm", () => {
       const feedbackError = await screen.findByTestId("feedback-error");
       expect(feedbackError).toHaveTextContent(/^F203$/);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
 
     test("Error with non-existing fields is not displayed", async () => {
@@ -368,21 +362,60 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // Since the component does not allow to input values for non-existing fields,
       // not inputting any values and just clicking the submit button.
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      expect(screen.queryByTestId("result")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
     });
   });
 
   describe("VotersAndVotesForm warnings", () => {
+    test("clicking next without accepting warning results in alert shown", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: ["data.votes_counts.blank_votes_count"],
+              code: "W201",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      // We await the first element to appear, so we know the page is loaded
+      await user.type(await screen.findByTestId("votes_candidates_counts"), "0");
+      await user.type(screen.getByTestId("blank_votes_count"), "1");
+      await user.type(screen.getByTestId("invalid_votes_count"), "0");
+      await user.type(screen.getByTestId("total_votes_cast_count"), "1");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(/^W201$/);
+
+      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptFeedbackCheckbox).not.toBeChecked();
+
+      await user.click(submitButton);
+      const alertText = screen.getByRole("alert");
+      expect(alertText).toHaveTextContent(
+        /^Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.$/,
+      );
+    });
+
     test("W.201 AboveThreshold blank votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
@@ -398,7 +431,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // We await the first element to appear, so we know the page is loaded
       await user.type(await screen.findByTestId("votes_candidates_counts"), "0");
@@ -411,7 +444,6 @@ describe("Test VotersAndVotesForm", () => {
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^W201$/);
-      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
@@ -430,7 +462,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // We await the first element to appear, so we know the page is loaded
       await user.type(await screen.findByTestId("votes_candidates_counts"), "0");
@@ -443,7 +475,6 @@ describe("Test VotersAndVotesForm", () => {
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^W202$/);
-      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
@@ -462,7 +493,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       // We await the first element to appear, so we know the page is loaded
       await user.type(await screen.findByTestId("poll_card_count"), "1");
@@ -480,7 +511,6 @@ describe("Test VotersAndVotesForm", () => {
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^W209$/);
-      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
@@ -516,7 +546,6 @@ describe("Test VotersAndVotesForm", () => {
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(/^W210$/);
-      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
   });

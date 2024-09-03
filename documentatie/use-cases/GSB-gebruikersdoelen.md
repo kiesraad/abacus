@@ -1,6 +1,6 @@
 # Use cases GSB - gebruikersdoel, zee 🌊
 
-## 1. De eerste of tweede invoerder voert de resultaten van de telling in
+## De eerste of tweede invoerder voert de resultaten van de telling in
 
 __niveau:__ gebruikersdoel, zee, 🌊
 
@@ -8,7 +8,7 @@ __precondities:__
 
 - De invoerder is ingelogd in de applicatie.
 
-### 1.1. Hoofdscenario en uitbreidingen
+### Hoofdscenario en uitbreidingen
 
 __trigger:__ De coördinator geeft het SB PV en eventueel SB corrigendum PV aan de invoerder.
 
@@ -32,16 +32,16 @@ __uitbreidingen__:
 
 3a. De invoer voldoet niet aan de validatieregels voor fouten:  
 &emsp; 3a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel.  
-&emsp; 3a2. [De invoerder handelt de fout(en) af.](./GSB-subfuncties.md#1-de-invoerder-handelt-de-fouten-af)  
+&emsp; 3a2. [De invoerder handelt de fout(en) af.](./GSB-subfuncties.md#de-invoerder-handelt-de-fouten-af)  
 4a. De invoer voldoet niet aan de plausibiliteitschecks:  
 &emsp; 4a1. De applicatie toont een waarschuwing voor elke gefaalde plausibiliteitscheck.  
-&emsp; 4a2. [De invoerder handelt de waarschuwing(en) af.](./GSB-subfuncties.md#2-de-invoerder-handelt-de-waarschuwingen-af)  
+&emsp; 4a2. [De invoerder handelt de waarschuwing(en) af.](./GSB-subfuncties.md#de-invoerder-handelt-de-waarschuwingen-af)  
 
-## 2. De coördinator lost de verschillen tussen de twee invoeren op
+## De coördinator lost de verschillen tussen de twee invoeren op
 
 __niveau:__ gebruikersdoel, zee, 🌊
 
-### 2.1. Hoofdscenario en uitbreidingen
+### Hoofdscenario en uitbreidingen
 
 __trigger:__ De applicatie stelt vast dat beide invoeren niet gelijk zijn.
 
@@ -56,15 +56,15 @@ __uitbreidingen__:
 &emsp; 2a1. De coördinator verwijdert beide invoeren.  
 &emsp; 2a2. De coördinator laat het stembureau opnieuw invoeren door twee invoerders.  
 
-### 2.2. Open punten
+### Open punten
 
 - Als geen van beide invoeren correct zijn, moeten dan beide invoeren verwijderd en opnieuw ingevoerd worden? Of is er binnen de Kieswet / het Kiesbesluit ruimte voor andere oplossingen?
 
-## 3. GSB installeert de applicatie
+## GSB installeert de applicatie
 
 __niveau:__ gebruikersdoel, zee, 🌊
 
-### 3.1. Hoofdscenario en uitbreidingen
+### Hoofdscenario en uitbreidingen
 
 __trigger:__ De Kiesraad maakt de applicatie beschikbaar.
 
@@ -82,21 +82,21 @@ __uitbreidingen__:
 
 3a. De server en client zijn dezelfde machine:
 
-### 3.2. Open punten
+### Open punten
 
 - Hoe vaak wordt de server ook als client gebruikt? Bijvoorbeeld door de coördinator.
 - OSV richt de server ook gelijk als client in. Willen wij dit ook?
 - Afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
 
-## 4. GSB richt de applicatie in
+## GSB richt de applicatie in
 
 __niveau:__ gebruikersdoel, zee, 🌊
 
-### 4.1. Hoofdscenario en uitbreidingen
+### Hoofdscenario en uitbreidingen
 
 __trigger:__  
 
-- [GSB installeert de applicatie.](#3-gsb-installeert-de-applicatie)
+- [GSB installeert de applicatie.](#gsb-installeert-de-applicatie)
 - Het GSB maakt de kandidatenlijst beschikbaar.
 - De Kiesraad maakt de verkiezingsdefinitie beschikbaar.
 
@@ -116,7 +116,7 @@ __uitbreidingen__:
 3b. De lijst met stembureaus moet aangevuld of aangepast worden:  
 3c. Er is geen lijst met stembureaus:  
 
-### 4.2. Open punten
+### Open punten
 
 - Het is niet helemaal duidelijk hoe de stembureaus aangemaakt worden. Dit kan handmatig of door het importeren van een bestand. We weten niet hoe vaak welke van deze twee manieren of een combinatie van de twee gebruikt worden. Een stembureau-bestand kan door OSV geëxporteerd worden, maar er zouden ook andere tools bestaan die zo'n bestand kunnen genereren.
 - Bij het invoeren/beheren van stembureaus toont de applicatie een waarschuwing als het aantal kiesgerechtigden niet is ingevuld. De gebruiker heeft twee opties: (1) aantal kiesgerechtigden invullen, (2) aangeven dat aantal kiesgerechtigden bewust leeg wordt gelaten.

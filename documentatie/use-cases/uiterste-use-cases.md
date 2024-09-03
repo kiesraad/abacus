@@ -1,10 +1,10 @@
 # GSB - Uiterste use cases
 
-## 1. Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
+## Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
 
 _niveau:__ hoog-over, wolk, ☁️
 
-### 1.1. Hoofdscenario en uitbreidingen
+### Hoofdscenario en uitbreidingen
 
 __trigger:__ dag na de verkiezingen
 
@@ -12,7 +12,7 @@ __hoofdscenario__:
 
 1. Het GSB opent de zitting.
 2. (voor elk stembureau) Het GSB stelt de uitslag van een stembureau vast.
-3. (voor elk stembureau) [Het GSB voert de PV's en eventuele SB corrigenda's (DSO) in de applicatie in.](./GSB-hoogover.md#1-het-gsb-voert-de-pvs-en-eventuele-sb-corrigendas-dso-in-de-applicatie-in)
+3. (voor elk stembureau) [Het GSB voert de PV's en eventuele SB corrigenda's (DSO) in de applicatie in.](./GSB-hoogover.md#het-gsb-voert-de-pvs-en-eventuele-sb-corrigendas-dso-in-de-applicatie-in)
 4. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 5. Het GSB sluit de zitting.
 6. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
@@ -26,11 +26,11 @@ __uitbreidingen__:
 &emsp;&emsp; 4a2a. Het GSB vindt geen fout en bevestigt een verschil tussen de controles en de resultaten van de applicatie:  
 &emsp;&emsp;&emsp; 4a2a1. Het GSB neemt contact op met de Kiesraad.  
 
-## 2. Gemeentelijk stembureau (GSB) stelt uitslag vast in tweede zitting (corrigenda)
+## Gemeentelijk stembureau (GSB) stelt uitslag vast in tweede zitting (corrigenda)
 
 __niveau:__ hoog-over, wolk, ☁️
 
-### 2.1. Hoofdscenario en uitbreidingen
+### Hoofdscenario en uitbreidingen
 
 __trigger:__ één of meer stembureaus moeten herteld worden nav verzoek CSB
 
@@ -38,7 +38,7 @@ __hoofdscenario__:
 
 1. Het GSB opent de zitting.
 2. (voor elk te hertellen stembureau) Het GSB stelt de uitslag van een stembureau opnieuw vast.
-3. (voor elk herteld stembureau met gewijzigde uitslag) [Het GSB voert de corrigendum PV's in de applicatie in.](./GSB-hoogover.md#3-het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in)
+3. (voor elk herteld stembureau met gewijzigde uitslag) [Het GSB voert de corrigendum PV's in de applicatie in.](./GSB-hoogover.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in)
 4. Het GSB sluit de zitting.
 5. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
 
@@ -46,17 +46,17 @@ __uitbreidingen__:
 2a. Er zijn hertelde stembureaus met ongewijzigde uitslag:  
 2b. Er zijn alleen hertelde stembureaus met ongewijzigde uitslag:  
 
-### 2.2. Open punten
+### Open punten
 
 - Hoe ziet de trigger voor hertelling er precies uit voor gemeenteraadskverkiezingen? Het GSB (dus de gemeente) stelt de telling op gemeente-niveau vast, het CSB (ook de gemeente) controleert die telling en verzoekt als nodig om onderzoek en/of hertelling?
 
 ---
 
-## 3. Centraal stembureau (CSB) stelt verkiezingsuitslag vast ☁️
+## Centraal stembureau (CSB) stelt verkiezingsuitslag vast ☁️
 
 __niveau:__ hoog-over, wolk
 
-### 3.1. Hoofdscenario en uitbreidingen
+### Hoofdscenario en uitbreidingen
 
 __hoofdscenario__:  
 

@@ -1,10 +1,10 @@
 # Use cases GSB - subfunctie,  vis 🐟
 
-## 1. De invoerder handelt de fout(en) af
+## De invoerder handelt de fout(en) af
 
 __niveau:__ subfunctie, vis, 🐟
 
-### 1.1. Hoofdscenario en uitbreidingen
+### Hoofdscenario en uitbreidingen
 
 __trigger:__ De controles geven een foutmelding vanwege de [validatieregels voor fouten](./GSB-validatieregels-plausibiliteitschecks.md#validatieregels-geven-fouten).
 
@@ -24,15 +24,15 @@ __uitbreidingen__:
 &emsp; 2a3. De invoerder breekt de invoer af.  
 &emsp; 2a4. De applicatie verwijdert de ingevoerde data.  
 
-### 1.2. Open punten
+### Open punten
 
 - Als de coördinator het PV terugstuurt in het proces, naar welk punt dan precies?
 
-## 2. De invoerder handelt de waarschuwing(en) af
+## De invoerder handelt de waarschuwing(en) af
 
 __niveau:__ subfunctie, vis, 🐟
 
-### 2.1. Hoofdscenario en uitbreidingen
+### Hoofdscenario en uitbreidingen
 
 __trigger:__ De controles geven een waarschuwing vanwege de [plausibiliteitschecks](./GSB-validatieregels-plausibiliteitschecks.md#plausibiliteitschecks-geven-waarschuwingen).
 
@@ -56,7 +56,7 @@ __uitbreidingen__:
 &emsp; 4a2. De invoerder breekt de invoer af.  
 &emsp; 4a3. De applicatie verwijdert de ingevoerde data.  
 
-### 2.2. Open punten
+### Open punten
 
 - De eerste stap van invoer is aangeven of er herteld is vanwege een verschil tussen aantal toegelaten kiezers en aantal uitgebrachte stemmen. Hoe verhoudt de invoer van die stap zich tot het oplossen van waarschuwingen over aantallen toegelaten kiezers en uitgebrachte stemmen?
 - Als de coördinator het PV terugstuurt in het proces, naar welk punt dan precies?

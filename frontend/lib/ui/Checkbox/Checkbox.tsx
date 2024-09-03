@@ -12,8 +12,6 @@ interface CheckboxProps {
   defaultChecked?: boolean;
 }
 
-//TODO: you can't style a border for a checkbox, currently outline is used as a workaround but the border radius doesnt match
-
 export function Checkbox({ id, children, defaultChecked, hasError }: CheckboxProps) {
   const [checked, setChecked] = React.useState(defaultChecked);
 

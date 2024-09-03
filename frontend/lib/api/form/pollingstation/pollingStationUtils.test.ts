@@ -377,10 +377,27 @@ describe("PollingStationUtils", () => {
 
     const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, clientWarnings);
     expect(errorsAndWarnings.get("blank_votes_count")).toBeDefined();
-    expect(errorsAndWarnings.get("blank_votes_count")?.errors.length).toBe(1);
-    //warnings should not be added if errors.
+    expect(errorsAndWarnings.get("blank_votes_count")?.errors).toEqual(
+      expect.arrayContaining([
+        {
+          code: "F202",
+          id: "blank_votes_count",
+        },
+      ]),
+    );
+
+    //warnings should not be added if errors (excluding client warnings)
     expect(errorsAndWarnings.get("blank_votes_count")?.warnings.length).toBe(1);
+    expect(errorsAndWarnings.get("blank_votes_count")?.warnings).toEqual(
+      expect.arrayContaining([
+        {
+          code: "W201",
+          id: "blank_votes_count",
+        },
+      ]),
+    );
   });
+
   test("getErrorsAndWarnings warnings and clientWarnings", () => {
     const errors: ValidationResult[] = [];
 
@@ -393,7 +410,7 @@ describe("PollingStationUtils", () => {
 
     const clientWarnings: FieldValidationResult[] = [
       {
-        code: "W201",
+        code: "W202",
         id: "blank_votes_count",
       },
     ];
@@ -401,7 +418,18 @@ describe("PollingStationUtils", () => {
     const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, clientWarnings);
     expect(errorsAndWarnings.get("blank_votes_count")).toBeDefined();
     expect(errorsAndWarnings.get("blank_votes_count")?.errors.length).toBe(0);
-    expect(errorsAndWarnings.get("blank_votes_count")?.warnings.length).toBe(2);
+    expect(errorsAndWarnings.get("blank_votes_count")?.warnings).toEqual(
+      expect.arrayContaining([
+        {
+          code: "W201",
+          id: "blank_votes_count",
+        },
+        {
+          code: "W202",
+          id: "blank_votes_count",
+        },
+      ]),
+    );
   });
 
   test("isFormSectionEmpty", () => {

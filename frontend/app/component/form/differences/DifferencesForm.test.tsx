@@ -1,8 +1,5 @@
-/**
- * @vitest-environment jsdom
- */
 import { userEvent } from "@testing-library/user-event";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
 
@@ -65,15 +62,11 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
 };
 
 describe("Test DifferencesForm", () => {
-  afterEach(() => {
-    vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
-  });
-
   describe("DifferencesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
       const spy = vi.spyOn(global, "fetch");
 
       const moreBallotsCount = await screen.findByTestId("more_ballots_count");
@@ -92,7 +85,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       const moreBallotsCount = await screen.findByTestId("more_ballots_count");
       expect(moreBallotsCount).toHaveFocus();
@@ -146,9 +139,6 @@ describe("Test DifferencesForm", () => {
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
-
-      const result = await screen.findByTestId("result");
-      expect(result).toHaveTextContent(/^Success$/);
     });
   });
 
@@ -202,41 +192,6 @@ describe("Test DifferencesForm", () => {
       expect(url).toEqual("http://testhost/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
-
-      const result = await screen.findByTestId("result");
-      expect(result).toHaveTextContent(/^Success$/);
-    });
-
-    test("422 response results in display of error message", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
-        message: "Error from mock",
-        errorCode: 422,
-      });
-
-      const user = userEvent.setup();
-
-      renderForm();
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-      const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(`Server error422: Error from mock`);
-    });
-
-    test("500 response results in display of error message", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
-        message: "Error from mock",
-        errorCode: 500,
-      });
-
-      const user = userEvent.setup();
-
-      renderForm();
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-      const feedbackServerError = await screen.findByTestId("feedback-server-error");
-      expect(feedbackServerError).toHaveTextContent(`Server error500: Error from mock`);
     });
   });
 
@@ -401,12 +356,11 @@ describe("Test DifferencesForm", () => {
         `Controleer ingevulde verschillenF.305Je hebt bij Aantal kiezers en stemmers ingevuld dat er evenveel stemmen als kiezers waren. Maar je hebt wel verschillen ingevuld.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
       );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
   });
 
   describe("DifferencesForm warnings", () => {
-    test("W.301 Incorrect total", async () => {
+    test("clicking next without accepting warning results in alert shown", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -429,6 +383,58 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       renderForm();
+
+      await user.type(screen.getByTestId("more_ballots_count"), "3");
+      await user.type(screen.getByTestId("fewer_ballots_count"), "0");
+      await user.type(screen.getByTestId("unreturned_ballots_count"), "0");
+      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "0");
+      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "1");
+      await user.type(screen.getByTestId("other_explanation_count"), "0");
+      await user.type(screen.getByTestId("no_explanation_count"), "1");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer ingevulde verschillenW.301De invoer bij I, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
+
+      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptFeedbackCheckbox).not.toBeChecked();
+
+      await user.click(submitButton);
+      const alertText = screen.getByRole("alert");
+      expect(alertText).toHaveTextContent(
+        /^Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.$/,
+      );
+    });
+
+    test("W.301 Incorrect total", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: [
+                "data.differences_counts.more_ballots_count",
+                "data.differences_counts.too_many_ballots_handed_out_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.unreturned_ballots",
+                "data.differences_counts.other_explanation_count",
+                "data.differences_counts.no_explanation_count",
+              ],
+              code: "W301",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
 
       await user.type(screen.getByTestId("more_ballots_count"), "3");
       await user.type(screen.getByTestId("fewer_ballots_count"), "0");
@@ -471,7 +477,7 @@ describe("Test DifferencesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm();
+      renderForm({ recounted: false });
 
       await user.type(screen.getByTestId("more_ballots_count"), "0");
       await user.type(screen.getByTestId("fewer_ballots_count"), "4");

@@ -1,10 +1,19 @@
 import * as React from "react";
-import { createMemoryRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
+
+import type { Router as RemixRouter } from "@remix-run/router/dist/router";
 
 import { ApiProvider } from "@kiesraad/api";
 
-export const Providers = ({ children }: { children: React.ReactNode }) => {
-  const router = createMemoryRouter([{ path: "*", element: children }]);
+import { getRouter } from "./router";
+
+export const Providers = ({
+  children,
+  router = getRouter(children),
+}: {
+  children?: React.ReactNode;
+  router?: RemixRouter;
+}) => {
   return (
     <ApiProvider host="http://testhost">
       <RouterProvider router={router} />

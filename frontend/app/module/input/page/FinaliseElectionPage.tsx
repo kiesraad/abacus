@@ -28,7 +28,7 @@ export function FinaliseElectionPage() {
           const objectURL = window.URL.createObjectURL(file);
           window.location.assign(objectURL);
         },
-        (error) => {
+        (error: unknown) => {
           console.error(error);
         },
       );

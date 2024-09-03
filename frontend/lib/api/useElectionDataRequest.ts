@@ -2,7 +2,8 @@ import {
   Election,
   ELECTION_DETAILS_REQUEST_PARAMS,
   ELECTION_DETAILS_REQUEST_PATH,
-} from "./gen/openapi";
+} from "@kiesraad/api";
+
 import { useApiGetRequest } from "./useApiGetRequest";
 
 export function useElectionDataRequest(params: ELECTION_DETAILS_REQUEST_PARAMS) {

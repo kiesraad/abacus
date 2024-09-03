@@ -51,3 +51,41 @@ export function matchValidationResultWithFormSections(
   }
   return true;
 }
+
+/*
+  field examples
+  data.voters_counts.proxy_certificate_count
+  data.votes_counts.blank_votes_count
+  data.political_group_votes[0].total
+  data.political_group_votes[0].candidate_votes[0].votes
+  data.differences_counts.more_ballots_count
+*/
+
+export type FieldSection = {
+  name: string;
+  index?: number;
+};
+
+export function pathToFieldSections(path: string): FieldSection[] {
+  const parts = path.split(".");
+
+  const result = parts.map((part) => {
+    const name = part.replace(/\[(\d+)\]/, "");
+    const indexStr = part.match(/\[(\d+)\]/)?.[1];
+    return indexStr
+      ? {
+          name,
+          index: parseInt(indexStr),
+        }
+      : { name };
+  });
+  // skip "data"
+  return result[0]?.name === "data" ? result.slice(1) : result;
+}
+
+export function rootFieldSection(path: string | undefined): { name: string; index?: number } {
+  if (!path) return { name: "" };
+
+  const sections = pathToFieldSections(path);
+  return sections[0] || { name: "" };
+}

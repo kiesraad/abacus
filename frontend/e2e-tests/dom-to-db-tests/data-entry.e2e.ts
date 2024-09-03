@@ -147,7 +147,7 @@ test.describe("errors and warnings", () => {
     await differencesPage.next.click();
 
     const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
-    // fill counts of List 1 with data that doet not match the total votes on candidates
+    // fill counts of List 1 with data that does not match the total votes on candidates
     await candidatesListPage_1.fillCandidatesAndTotal([2, 1], 3);
     await candidatesListPage_1.next.click();
 

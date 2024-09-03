@@ -72,4 +72,16 @@ describe("UI Component: Form", () => {
 
     expect(onSubmit).toHaveBeenCalled();
   });
+
+  test("Ref is forwarded", () => {
+    const ref = { current: null };
+
+    render(
+      <Form ref={ref}>
+        <input id="test" />
+      </Form>,
+    );
+
+    expect(ref.current).toBeInstanceOf(HTMLFormElement);
+  });
 });

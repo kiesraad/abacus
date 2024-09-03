@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useState } from "react";
 
 import {
   CandidateVotes,
@@ -40,7 +39,7 @@ export interface CandidatesVotesFormProps {
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = React.useState(false);
 
   const _IGNORE_WARNINGS_ID = `candidates_votes_form_ignore_warnings_${group.number}`;
 

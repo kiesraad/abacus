@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useState } from "react";
 
 import { useRecounted } from "@kiesraad/api";
 import { BottomBar, Button, Feedback } from "@kiesraad/ui";
@@ -18,7 +17,7 @@ export function RecountedForm() {
   const [hasValidationError, setHasValidationError] = React.useState(false);
   const formRef = React.useRef<RecountedFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = React.useState(false);
 
   const getValues = React.useCallback(() => {
     const form = document.getElementById("recounted_form") as RecountedFormElement | null;

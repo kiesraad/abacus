@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useState } from "react";
 
 import { getErrorsAndWarnings, useDifferences } from "@kiesraad/api";
 import {
@@ -42,7 +41,7 @@ export function DifferencesForm() {
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<DifferencesFormElement>(null);
   usePreventFormEnterSubmit(formRef);
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = React.useState(false);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;

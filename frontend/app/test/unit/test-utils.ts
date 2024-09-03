@@ -55,7 +55,11 @@ export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: s
 }
 
 export const setupTestRouter = () => {
-  return createMemoryRouter(routes);
+  return createMemoryRouter(routes, {
+    future: {
+      v7_normalizeFormMethod: true,
+    },
+  });
 };
 
 export const expectNotFound = async () => {

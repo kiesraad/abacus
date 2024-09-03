@@ -2,8 +2,8 @@ import * as React from "react";
 
 import {
   IconArrowNarrowRight,
-  IconAsterisk,
   IconCheckmark,
+  IconError,
   IconMinus,
   IconPencil,
   IconWarning,
@@ -25,16 +25,22 @@ ProgressList.Ruler = () => <li className="ruler">&nbsp;</li>;
 
 // active is not a status since we might want to show both concurrently.
 export type ProgressListItemProps = {
-  active?: boolean;
   status: MenuStatus;
+  active?: boolean;
+  disabled?: boolean;
   children?: React.ReactNode;
+  id?: string;
 };
 
-ProgressList.Item = function ({ active, status, children }: ProgressListItemProps) {
+ProgressList.Item = function ({ active, status, disabled, children, id }: ProgressListItemProps) {
   const icon = renderStatusIcon(active ? "active" : status);
 
   return (
-    <li className={cn(active ? "active" : "idle", status)} aria-current={active ? "step" : false}>
+    <li
+      id={id}
+      className={cn(active ? "active" : "idle", status, { disabled: !!disabled })}
+      aria-current={active ? "step" : false}
+    >
       <aside>{icon}</aside>
       <label>{children}</label>
     </li>
@@ -44,17 +50,17 @@ ProgressList.Item = function ({ active, status, children }: ProgressListItemProp
 function renderStatusIcon(status: MenuStatus): React.JSX.Element {
   switch (status) {
     case "active":
-      return <IconArrowNarrowRight />; // "Actief"
+      return <IconArrowNarrowRight aria-label={"je bent hier"} />; // "Actief"
     case "accept":
-      return <IconCheckmark />; // "Ingevoerd"
+      return <IconCheckmark aria-label={"opgeslagen"} />; // "Ingevoerd"
     case "warning":
-      return <IconWarning />; // "Ingevoerd, met openstaande waarschuwingen"
+      return <IconWarning aria-label={"bevat een waarschuwing"} />; // "Ingevoerd, met openstaande waarschuwingen"
     case "empty":
-      return <IconMinus />; // "Geen invoer gedaan"
-    case "updates":
-      return <IconAsterisk />; // "Updates"
+      return <IconMinus aria-label={"leeg"} />; // "Geen invoer gedaan"
     case "unsaved":
-      return <IconPencil />; // "Niet opgeslagen wijzigingen"
+      return <IconPencil aria-label={"nog niet afgerond"} />; // "Niet opgeslagen wijzigingen"
+    case "error":
+      return <IconError aria-label={"bevat een fout"} />; // "Ingevoerd, met openstaande fouten"
     default:
       return <></>;
   }

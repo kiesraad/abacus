@@ -1,1 +1,1 @@
-export * from "./gen";
+export * from "./generated";

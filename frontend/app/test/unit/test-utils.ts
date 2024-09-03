@@ -16,6 +16,7 @@ const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">
 // Re-export everything in RTL but shadow the original `render` with our custom implementation.
 export * from "@testing-library/react";
 export { customRender as render };
+export { router } from "./router";
 /* eslint-enable import/export */
 
 export function getUrlMethodAndBody(
@@ -47,6 +48,7 @@ export function getUrlMethodAndBody(
 export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: string | number }) {
   for (const [key, value] of Object.entries(inputs)) {
     const input = await screen.findByTestId(key);
+    await user.clear(input);
     await user.type(input, value.toString());
     expect(input).toHaveValue(value.toString());
   }

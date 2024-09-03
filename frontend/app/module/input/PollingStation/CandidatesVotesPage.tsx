@@ -20,5 +20,5 @@ export function CandidatesVotesPage() {
     return <div>Geen lijst gevonden voor {listNumber}</div>;
   }
 
-  return <CandidatesVotesForm group={group} />;
+  return <CandidatesVotesForm group={group} key={group.number} />;
 }

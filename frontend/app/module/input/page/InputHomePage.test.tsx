@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { overrideOnce, render, screen, server, within } from "app/test/unit";
+import { overrideOnce, render, screen, within } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
@@ -17,10 +17,6 @@ describe("InputHomePage", () => {
         </ElectionStatusProvider>
       </ElectionProvider>,
     );
-  });
-
-  afterEach(() => {
-    server.restoreHandlers();
   });
 
   test("Election name", async () => {

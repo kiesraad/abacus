@@ -48,7 +48,7 @@ export function PollingStationChoiceForm() {
     );
 
     if (pollingStation) {
-      navigate(`./${pollingStation.id}/recounted`);
+      navigate(`./${pollingStation.id}`);
     } else {
       setShowAlert(true);
       setLoading(false);
@@ -88,16 +88,18 @@ export function PollingStationChoiceForm() {
         </div>
       )}
       <BottomBar type="form">
-        <Button
-          type="button"
-          size="lg"
-          onClick={() => {
-            handleSubmit();
-          }}
-        >
-          Beginnen
-        </Button>
-        <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+        <BottomBar.Row>
+          <Button
+            type="button"
+            size="lg"
+            onClick={() => {
+              handleSubmit();
+            }}
+          >
+            Beginnen
+          </Button>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+        </BottomBar.Row>
       </BottomBar>
       <details>
         <summary>

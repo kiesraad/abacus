@@ -1,7 +1,4 @@
 .bottom-bar {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
   &.footer {
     background: var(--base-white);
     width: calc(100% + 10rem);
@@ -17,5 +14,13 @@
     margin: 2.5rem 0;
     padding: 1.5rem 6.5rem;
     border-radius: 1rem;
+  }
+  > section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    &:global(.hidden) {
+      display: none;
+    }
   }
 }

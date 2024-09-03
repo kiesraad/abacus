@@ -1,6 +1,6 @@
 import type { Story } from "@ladle/react";
 
-import { IconWarning } from "@kiesraad/icon";
+import { IconCheckHeart } from "@kiesraad/icon";
 
 import { Size } from "../ui.types";
 import { Icon } from "./Icon";
@@ -11,7 +11,7 @@ type Props = {
 };
 
 export const DefaultIcon: Story<Props> = ({ color, size }) => (
-  <Icon size={size} color={color} icon={<IconWarning />} />
+  <Icon size={size} color={color} icon={<IconCheckHeart />} />
 );
 
 export default {

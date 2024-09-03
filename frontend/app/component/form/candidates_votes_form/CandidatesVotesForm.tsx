@@ -1,16 +1,16 @@
 import * as React from "react";
-import { useBlocker } from "react-router-dom";
 
 import {
   CandidateVotes,
+  getErrorsAndWarnings,
   PoliticalGroup,
-  PoliticalGroupVotes,
-  useErrorsAndWarnings,
   usePoliticalGroup,
 } from "@kiesraad/api";
 import {
+  Alert,
   BottomBar,
   Button,
+  Checkbox,
   Feedback,
   InputGrid,
   InputGridRow,
@@ -22,6 +22,8 @@ import {
   usePositiveNumberInputMask,
   usePreventFormEnterSubmit,
 } from "@kiesraad/util";
+
+import { useWatchForChanges } from "../useWatchForChanges";
 
 interface FormElements extends HTMLFormControlsCollection {
   total: HTMLInputElement;
@@ -39,79 +41,93 @@ export interface CandidatesVotesFormProps {
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
-  const {
-    sectionValues,
-    errors,
-    warnings,
-    setSectionValues,
-    loading,
-    serverError,
-    isCalled,
-    setTemporaryCache,
-  } = usePoliticalGroup(group.number);
+
+  const _IGNORE_WARNINGS_ID = `candidates_votes_form_ignore_warnings_${group.number}`;
+
+  const getValues = React.useCallback(() => {
+    const form = formRef.current;
+    if (!form) {
+      return {
+        number: group.number,
+        total: 0,
+        candidate_votes: [],
+      };
+    }
+
+    const elements = form.elements;
+    const candidate_votes: CandidateVotes[] = [];
+    for (const el of elements["candidatevotes[]"]) {
+      candidate_votes.push({
+        number: candidateNumberFromId(el.id),
+        votes: deformat(el.value),
+      });
+    }
+    return {
+      number: group.number,
+      total: deformat(elements.total.value),
+      candidate_votes: candidate_votes,
+    };
+  }, [deformat, group]);
+
+  const getIgnoreWarnings = React.useCallback(() => {
+    const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement | null;
+    if (checkbox) {
+      return checkbox.checked;
+    }
+    return false;
+  }, [_IGNORE_WARNINGS_ID]);
 
   usePreventFormEnterSubmit(formRef);
 
-  const getValues = React.useCallback(
-    (elements: CandidatesVotesFormElement["elements"]): PoliticalGroupVotes => {
-      const candidate_votes: CandidateVotes[] = [];
-      for (const el of elements["candidatevotes[]"]) {
-        candidate_votes.push({
-          number: candidateNumberFromId(el.id),
-          votes: deformat(el.value),
-        });
-      }
-      return {
-        number: group.number,
-        total: deformat(elements.total.value),
-        candidate_votes: candidate_votes,
-      };
-    },
-    [deformat, group],
-  );
+  const { sectionValues, errors, warnings, loading, isSaved, submit, ignoreWarnings } =
+    usePoliticalGroup(group.number, getValues, getIgnoreWarnings);
 
-  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+  const shouldWatch = warnings.length > 0 && isSaved;
+  const { hasChanges } = useWatchForChanges(shouldWatch, sectionValues, getValues);
 
-  //const blocker = useBlocker() use const blocker to render confirmation UI.
-  useBlocker(() => {
-    if (formRef.current && !isCalled) {
-      const elements = formRef.current.elements;
-      const values = getValues(elements);
-      setTemporaryCache({
-        key: "political_group_votes",
-        id: group.number,
-        data: values,
-      });
+  React.useEffect(() => {
+    if (hasChanges) {
+      const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
+      checkbox.checked = false;
+      setWarningsWarning(false);
     }
-    return false;
-  });
+  }, [hasChanges, _IGNORE_WARNINGS_ID]);
+
+  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+
+  React.useEffect(() => {
+    if (isSaved) {
+      window.scrollTo(0, 0);
+    }
+  }, [isSaved]);
+
+  const [warningsWarning, setWarningsWarning] = React.useState(false);
 
   function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
     event.preventDefault();
-    const elements = event.currentTarget.elements;
-    setSectionValues(getValues(elements));
+
+    const ignoreWarnings = (
+      document.getElementById(
+        `candidates_votes_form_ignore_warnings_${group.number}`,
+      ) as HTMLInputElement
+    ).checked;
+
+    if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
+      setWarningsWarning(true);
+    } else {
+      submit(ignoreWarnings);
+    }
   }
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-  const success =
-    isCalled && !serverError && !hasValidationError && !hasValidationWarning && !loading;
+
   return (
-    <form onSubmit={handleSubmit} ref={formRef}>
-      {/* Temporary while not navigating through form sections */}
-      {success && <div id="result">Success</div>}
+    <form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
       <h2>
         Lijst {group.number} - {group.name}
       </h2>
-      {serverError && (
-        <Feedback type="error" title="Error">
-          <div id="feedback-server-error">
-            <h2>Error</h2>
-            <p id="result">{serverError.message}</p>
-          </div>
-        </Feedback>
-      )}
-      {hasValidationError && (
+      {isSaved && hasValidationError && (
         <Feedback type="error" title="Controleer uitgebrachte stemmen">
           <div id="feedback-error">
             <ul>
@@ -122,8 +138,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </div>
         </Feedback>
       )}
-
-      {hasValidationWarning && !hasValidationError && (
+      {isSaved && hasValidationWarning && !hasValidationError && (
         <Feedback type="warning" title="Controleer uitgebrachte stemmen">
           <div id="feedback-warning">
             <ul>
@@ -151,7 +166,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 name="candidatevotes[]"
                 id={`candidate_votes[${candidate.number - 1}].votes`}
                 title={`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`}
-                errorsAndWarnings={errorsAndWarnings}
+                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
                 inputProps={register()}
                 format={format}
                 addSeparator={addSeparator}
@@ -166,7 +181,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             name="total"
             id="total"
             title={`Totaal lijst ${group.number}`}
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
             defaultValue={format(sectionValues?.total || "")}
@@ -175,10 +190,24 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         </InputGrid.Body>
       </InputGrid>
       <BottomBar type="input-grid">
-        <Button type="submit" size="lg" disabled={loading}>
-          Volgende
-        </Button>
-        <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+        {warningsWarning && (
+          <BottomBar.Row>
+            <Alert type="error" variant="small">
+              <p>Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.</p>
+            </Alert>
+          </BottomBar.Row>
+        )}
+        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
+          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings}>
+            Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
+          </Checkbox>
+        </BottomBar.Row>
+        <BottomBar.Row>
+          <Button type="submit" size="lg" disabled={loading}>
+            Volgende
+          </Button>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+        </BottomBar.Row>
       </BottomBar>
     </form>
   );

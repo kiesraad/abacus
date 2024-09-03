@@ -325,7 +325,7 @@ export function VotersAndVotesForm() {
         {warningsWarning && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
-              <p>Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.</p>
+              <p>Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.</p>
             </Alert>
           </BottomBar.Row>
         )}

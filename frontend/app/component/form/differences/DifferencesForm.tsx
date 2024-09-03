@@ -9,6 +9,8 @@ import {
   Feedback,
   InputGrid,
   InputGridRow,
+  KeyboardKey,
+  KeyboardKeys,
   useTooltip,
 } from "@kiesraad/ui";
 import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
@@ -233,7 +235,7 @@ export function DifferencesForm() {
           />
         </InputGrid.Body>
       </InputGrid>
-      <BottomBar type="inputgrid">
+      <BottomBar type="input-grid">
         {warningsWarning && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
@@ -254,7 +256,7 @@ export function DifferencesForm() {
           <Button type="submit" size="lg" disabled={loading}>
             Volgende
           </Button>
-          <span className="button_hint">SHIFT + Enter</span>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
     </form>

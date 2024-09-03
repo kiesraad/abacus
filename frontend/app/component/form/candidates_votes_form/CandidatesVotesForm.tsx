@@ -14,6 +14,8 @@ import {
   Feedback,
   InputGrid,
   InputGridRow,
+  KeyboardKey,
+  KeyboardKeys,
 } from "@kiesraad/ui";
 import {
   candidateNumberFromId,
@@ -187,7 +189,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           />
         </InputGrid.Body>
       </InputGrid>
-      <BottomBar type="inputgrid">
+      <BottomBar type="input-grid">
         {warningsWarning && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
@@ -204,7 +206,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           <Button type="submit" size="lg" disabled={loading}>
             Volgende
           </Button>
-          <span className="button_hint">SHIFT + Enter</span>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
     </form>

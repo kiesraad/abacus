@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { useRecounted } from "@kiesraad/api";
-import { BottomBar, Button, Feedback } from "@kiesraad/ui";
+import { BottomBar, Button, Feedback, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 import { usePreventFormEnterSubmit } from "@kiesraad/util";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -91,7 +91,7 @@ export function RecountedForm() {
           <Button type="submit" size="lg" disabled={loading}>
             Volgende
           </Button>
-          <span className="button_hint">SHIFT + Enter</span>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
     </form>

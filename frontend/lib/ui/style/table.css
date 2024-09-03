@@ -59,12 +59,6 @@ table.overview_table {
   }
 }
 
-.button_hint {
-  font-size: var(--font-size-sm);
-  line-height: 1.25rem;
-  white-space: nowrap;
-}
-
 details {
   margin: 2rem 0 0.5rem 0;
 }

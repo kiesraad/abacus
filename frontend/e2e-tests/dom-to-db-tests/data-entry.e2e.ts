@@ -89,8 +89,13 @@ test.describe("errors and warnings", () => {
       voter_card_count: "0",
       total_admitted_voters_count: "100",
     };
-    await votersVotesPage.inputVoters(voters);
-    await votersVotesPage.next.click();
+    const votes = {
+      votes_candidates_counts: "100",
+      blank_votes_count: "0",
+      invalid_votes_count: "0",
+      total_votes_cast_count: "100",
+    };
+    await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
     await expect(votersVotesPage.heading).toBeVisible();
     await expect(votersVotesPage.error).toContainText(
@@ -105,14 +110,7 @@ test.describe("errors and warnings", () => {
       voter_card_count: "1",
       total_admitted_voters_count: "100",
     };
-    const votes = {
-      votes_candidates_counts: "100",
-      blank_votes_count: "0",
-      invalid_votes_count: "0",
-      total_votes_cast_count: "100",
-    };
     await votersVotesPage.inputVoters(votersCorrected);
-    await votersVotesPage.inputVotes(votes);
     await votersVotesPage.next.click();
 
     await expect(votersVotesPage.error).toBeHidden();
@@ -193,7 +191,9 @@ test.describe("errors and warnings", () => {
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
     await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.warning).toBeVisible();
+    await expect(votersVotesPage.warning).toContainText(
+      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+    );
     await expect(votersVotesPage.error).toBeHidden();
 
     // accept the warning
@@ -286,7 +286,9 @@ test.describe("errors and warnings", () => {
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
     await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.warning).toBeVisible();
+    await expect(votersVotesPage.warning).toContainText(
+      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+    );
 
     await expect(votersVotesPage.acceptWarnings).toBeVisible();
 
@@ -295,7 +297,9 @@ test.describe("errors and warnings", () => {
     // Tab press needed for page to register change after Playwright's fill()
     await votersVotesPage.proxyCertificateCount.press("Tab");
     await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.warning).toBeVisible();
+    await expect(votersVotesPage.warning).toContainText(
+      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+    );
 
     await expect(votersVotesPage.acceptWarnings).toBeHidden();
   });

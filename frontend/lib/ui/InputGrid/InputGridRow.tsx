@@ -1,11 +1,9 @@
 import * as React from "react";
 
 import { ErrorsAndWarnings } from "@kiesraad/api";
-import { IconWarningSquare } from "@kiesraad/icon";
-import { ellipsis, FormatFunc } from "@kiesraad/util";
+import { FormatFunc } from "@kiesraad/util";
 
 import { FormField } from "../FormField/FormField";
-import { Icon } from "../Icon/Icon";
 import { InputGrid } from "./InputGrid";
 
 export interface InputGridRowProps {
@@ -42,30 +40,13 @@ export function InputGridRow({
   const warnings = errorsAndWarnings
     ?.get(id)
     ?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING");
-  const tooltip = errorsAndWarnings
-    ?.get(id)
-    ?.warnings.find((warning) => warning.code === "REFORMAT_WARNING")?.value;
 
   const [value, setValue] = React.useState(() => (defaultValue ? format(defaultValue) : ""));
   return isListTotal ? (
     <InputGrid.ListTotal id={id}>
       <td>{field}</td>
       <td>
-        <FormField
-          error={errors}
-          warning={warnings}
-          tooltip={
-            tooltip && (
-              <div className="tooltip-content">
-                <Icon color="warning" icon={<IconWarningSquare />} />
-                <div>
-                  Je probeert <strong>{ellipsis(tooltip)}</strong> te plakken. Je kunt hier alleen
-                  cijfers invullen.
-                </div>
-              </div>
-            )
-          }
-        >
+        <FormField error={errors} warning={warnings}>
           <input
             key={id}
             id={id}
@@ -87,21 +68,7 @@ export function InputGridRow({
     <InputGrid.Row isTotal={isTotal} isFocused={isFocused} addSeparator={addSeparator} id={id}>
       <td>{field}</td>
       <td>
-        <FormField
-          error={errors}
-          warning={warnings}
-          tooltip={
-            tooltip && (
-              <div className="tooltip-content">
-                <Icon color="warning" icon={<IconWarningSquare />} />
-                <div>
-                  Je probeert <strong>{ellipsis(tooltip)}</strong> te plakken. Je kunt hier alleen
-                  cijfers invullen.
-                </div>
-              </div>
-            )
-          }
-        >
+        <FormField error={errors} warning={warnings}>
           <input
             key={id}
             id={id}

@@ -4,17 +4,15 @@ import { type FieldValidationResult } from "@kiesraad/api";
 import { IconError, IconWarning } from "@kiesraad/icon";
 import { cn } from "@kiesraad/util";
 
-import { Tooltip } from "../Tooltip/Tooltip";
 import cls from "./FormField.module.css";
 
 export interface FormFieldProps {
   children: React.ReactNode;
   error?: FieldValidationResult[];
   warning?: FieldValidationResult[];
-  tooltip?: string | React.ReactNode;
 }
 
-export function FormField({ children, error, warning, tooltip }: FormFieldProps) {
+export function FormField({ children, error, warning }: FormFieldProps) {
   const hasError = error && error.length > 0;
   const hasWarning = warning && warning.length > 0;
 
@@ -34,7 +32,7 @@ export function FormField({ children, error, warning, tooltip }: FormFieldProps)
       })}
     >
       <aside>{icon}</aside>
-      <Tooltip content={tooltip}>{children}</Tooltip>
+      {children}
     </div>
   );
 }

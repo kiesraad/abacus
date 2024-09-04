@@ -145,9 +145,6 @@ export function PollingStationFormController({
   //reference to the current form on screen
   const currentForm = React.useRef<AnyFormReference | null>(defaultCurrentForm);
 
-  //consumable flag to ignore warnings for the active form section;
-  const _ignoreWarnings = React.useRef<FormSectionID | null>(null);
-
   //where to navigate to next
   const [targetFormSection, setTargetFormSection] = React.useState<FormSectionID | null>(
     INITIAL_FORM_SECTION_ID,
@@ -296,14 +293,11 @@ export function PollingStationFormController({
     [currentForm, formState],
   );
 
-  const submitCurrentForm = async (ignoreWarnings?: boolean) => {
+  const submitCurrentForm = async (ignoreWarnings = false) => {
     // React state is fixed within one render, so we update our own copy instead of using setValues directly
     let newValues: PollingStationValues = values;
     if (currentForm.current) {
       const ref: AnyFormReference = currentForm.current;
-
-      //flag this submit to ignore warnings
-      _ignoreWarnings.current = ignoreWarnings ? ref.id : null;
 
       switch (ref.type) {
         case "political_group_votes":
@@ -388,7 +382,7 @@ export function PollingStationFormController({
         //store that this section has been submitted, this resets on each request
         activeFormSection.isSubmitted = true;
         //flag ignore warnings
-        activeFormSection.ignoreWarnings = _ignoreWarnings.current === activeFormSection.id;
+        activeFormSection.ignoreWarnings = ignoreWarnings;
       }
 
       //distribute errors to sections

@@ -7,11 +7,14 @@ import {
   Button,
   Checkbox,
   Feedback,
+  Form,
   InputGrid,
   InputGridRow,
+  KeyboardKey,
+  KeyboardKeys,
   useTooltip,
 } from "@kiesraad/ui";
-import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
+import { usePositiveNumberInputMask } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../useWatchForChanges";
 
@@ -40,7 +43,6 @@ export function DifferencesForm() {
     resetWarnings,
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<DifferencesFormElement>(null);
-  usePreventFormEnterSubmit(formRef);
   const [saving, setSaving] = React.useState(false);
 
   const getValues = React.useCallback(() => {
@@ -131,7 +133,7 @@ export function DifferencesForm() {
   const hasValidationWarning = warnings.length > 0;
 
   return (
-    <form onSubmit={handleSubmit} ref={formRef} id="differences_form">
+    <Form onSubmit={handleSubmit} ref={formRef} id="differences_form">
       <h2>Verschil tussen aantal kiezers en getelde stemmen</h2>
       {isSaved && hasValidationError && (
         <Feedback type="error" title="Controleer ingevulde verschillen">
@@ -239,7 +241,7 @@ export function DifferencesForm() {
           />
         </InputGrid.Body>
       </InputGrid>
-      <BottomBar type="inputgrid">
+      <BottomBar type="input-grid">
         {warningsWarning && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
@@ -260,9 +262,9 @@ export function DifferencesForm() {
           <Button type="submit" size="lg" disabled={saving}>
             Volgende
           </Button>
-          <span className="button_hint">SHIFT + Enter</span>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
-    </form>
+    </Form>
   );
 }

@@ -1,8 +1,7 @@
 import * as React from "react";
 
 import { useRecounted } from "@kiesraad/api";
-import { BottomBar, Button, Feedback } from "@kiesraad/ui";
-import { usePreventFormEnterSubmit } from "@kiesraad/util";
+import { BottomBar, Button, Feedback, Form, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 
 interface FormElements extends HTMLFormControlsCollection {
   yes: HTMLInputElement;
@@ -16,7 +15,6 @@ interface RecountedFormElement extends HTMLFormElement {
 export function RecountedForm() {
   const [hasValidationError, setHasValidationError] = React.useState(false);
   const formRef = React.useRef<RecountedFormElement>(null);
-  usePreventFormEnterSubmit(formRef);
   const [saving, setSaving] = React.useState(false);
 
   const getValues = React.useCallback(() => {
@@ -52,7 +50,7 @@ export function RecountedForm() {
   }, [isSaved]);
 
   return (
-    <form onSubmit={handleSubmit} ref={formRef} id="recounted_form">
+    <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form">
       <h2>Is er herteld?</h2>
       {hasValidationError && (
         <Feedback type="error" title="Controleer het papieren proces-verbaal" code="F.101">
@@ -95,9 +93,9 @@ export function RecountedForm() {
           <Button type="submit" size="lg" disabled={saving}>
             Volgende
           </Button>
-          <span className="button_hint">SHIFT + Enter</span>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
-    </form>
+    </Form>
   );
 }

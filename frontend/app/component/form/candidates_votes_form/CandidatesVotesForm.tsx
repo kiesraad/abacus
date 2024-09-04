@@ -12,14 +12,13 @@ import {
   Button,
   Checkbox,
   Feedback,
+  Form,
   InputGrid,
   InputGridRow,
+  KeyboardKey,
+  KeyboardKeys,
 } from "@kiesraad/ui";
-import {
-  candidateNumberFromId,
-  usePositiveNumberInputMask,
-  usePreventFormEnterSubmit,
-} from "@kiesraad/util";
+import { candidateNumberFromId, usePositiveNumberInputMask } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../useWatchForChanges";
 
@@ -76,8 +75,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     return false;
   }, [_IGNORE_WARNINGS_ID]);
 
-  usePreventFormEnterSubmit(formRef);
-
   const { sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } = usePoliticalGroup(
     group.number,
     getValues,
@@ -127,7 +124,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const hasValidationWarning = warnings.length > 0;
 
   return (
-    <form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
+    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
       <h2>
         Lijst {group.number} - {group.name}
       </h2>
@@ -193,7 +190,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           />
         </InputGrid.Body>
       </InputGrid>
-      <BottomBar type="inputgrid">
+      <BottomBar type="input-grid">
         {warningsWarning && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
@@ -210,9 +207,9 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           <Button type="submit" size="lg" disabled={saving}>
             Volgende
           </Button>
-          <span className="button_hint">SHIFT + Enter</span>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
-    </form>
+    </Form>
   );
 }

@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import { PollingStation, usePollingStationList } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
-import { Alert, BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
-import { cn, parseIntStrict, useDebouncedCallback } from "@kiesraad/util";
+import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys, Spinner } from "@kiesraad/ui";
+import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
 
 import { PollingStationSelector } from "./PollingStationSelector";
 import cls from "./PollingStationSelector.module.css";
@@ -29,7 +29,7 @@ export function PollingStationChoiceForm() {
   }, USER_INPUT_DEBOUNCE);
 
   useMemo(() => {
-    const parsedInt = parseIntStrict(pollingStationNumber);
+    const parsedInt = parsePollingStationNumber(pollingStationNumber);
     setLoading(true);
     debouncedCallback(
       pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt),
@@ -42,7 +42,7 @@ export function PollingStationChoiceForm() {
       return;
     }
 
-    const parsedStationNumber = parseIntStrict(pollingStationNumber);
+    const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
     const pollingStation = pollingStations.find(
       (pollingStation) => pollingStation.number === parsedStationNumber,
     );
@@ -98,7 +98,7 @@ export function PollingStationChoiceForm() {
           >
             Beginnen
           </Button>
-          <span className="button_hint">SHIFT + Enter</span>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
       <details>

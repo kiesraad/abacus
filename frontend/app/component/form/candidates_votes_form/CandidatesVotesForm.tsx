@@ -12,16 +12,13 @@ import {
   Button,
   Checkbox,
   Feedback,
+  Form,
   InputGrid,
   InputGridRow,
   KeyboardKey,
   KeyboardKeys,
 } from "@kiesraad/ui";
-import {
-  candidateNumberFromId,
-  usePositiveNumberInputMask,
-  usePreventFormEnterSubmit,
-} from "@kiesraad/util";
+import { candidateNumberFromId, usePositiveNumberInputMask } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../useWatchForChanges";
 
@@ -77,8 +74,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     return false;
   }, [_IGNORE_WARNINGS_ID]);
 
-  usePreventFormEnterSubmit(formRef);
-
   const { sectionValues, errors, warnings, loading, isSaved, submit, ignoreWarnings } =
     usePoliticalGroup(group.number, getValues, getIgnoreWarnings);
 
@@ -123,7 +118,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const hasValidationWarning = warnings.length > 0;
 
   return (
-    <form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
+    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
       <h2>
         Lijst {group.number} - {group.name}
       </h2>
@@ -197,6 +192,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
-    </form>
+    </Form>
   );
 }

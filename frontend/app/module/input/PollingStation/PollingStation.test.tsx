@@ -1,20 +1,12 @@
-import { createMemoryRouter } from "react-router-dom";
-
 import { render as rtlRender, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { routes } from "app/routes";
-import { Providers, screen, userTypeInputs, waitFor } from "app/test/unit";
+import { Providers, screen, setupTestRouter, userTypeInputs, waitFor } from "app/test/unit";
 
 import { electionMockData } from "@kiesraad/api-mocks";
 
-const router = createMemoryRouter(routes, {
-  future: {
-    v7_normalizeFormMethod: true,
-  },
-});
-
+const router = setupTestRouter();
 const render = () => rtlRender(<Providers router={router} />);
 
 const user = userEvent.setup();

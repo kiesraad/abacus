@@ -45,15 +45,18 @@ __hoofdscenario__:
 2. [De eerste invoerder voert de resultaten van de telling in.](./GSB-gebruikersdoelen.md#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
 3. De coördinator geeft het SB PV evt met corrigendum aan de tweede invoerder.
 4. [De tweede invoerder voert de resultaten van de telling in.](./GSB-gebruikersdoelen.md#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
-5. De applicatie stelt vast dat beide invoeren gelijk zijn.
-6. De applicatie slaat het resultaat op.
+5. (na eerste en/of tweede invoer) De applicatie controleert dat de invoer niet resulteerde in (geaccepteerde) waarschuwingen.
+6. De applicatie controleert dat beide invoeren gelijk zijn.
+7. De applicatie slaat het resultaat op.
 
 __uitbreidingen__:  
-5a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
-&emsp; 5a1. [De coördinator lost de verschillen tussen de twee invoeren op.](./GSB-gebruikersdoelen.md#de-coördinator-lost-de-verschillen-tussen-de-twee-invoeren-op)
+5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
+&emsp; 5a1. De coördinator beoordeeldt de geaccepteerde waarschuwingen.
 
-5b. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
-&emsp; 5b1. De coördinator beoordeeldt de geaccepteerde waarschuwingen.
+6a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
+&emsp; 6a1. [De coördinator lost de verschillen tussen de twee invoeren op.](./GSB-gebruikersdoelen.md#de-coördinator-lost-de-verschillen-tussen-de-twee-invoeren-op)
+
+
 
 ## Het GSB voert de corrigendum PV's in de applicatie in
 

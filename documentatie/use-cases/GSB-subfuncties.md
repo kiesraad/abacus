@@ -43,18 +43,11 @@ Voor elke waarschuwing:
 
 1. De invoerder controleert de waarschuwing.
 2. De invoerder constateert dat de invoer klopt met het PV.
-3. De invoerder meldt de waarschuwing bij de coördinator.
-4. De coördinator beslist dat de waarschuwing genegeerd kan worden.
-5. De invoerder accepteert de waarschuwing in de applicatie.
+3. De invoerder accepteert de waarschuwing in de applicatie.
 
 __uitbreidingen__:  
 2a. De invoerder constateert dat hij/zij een fout heeft gemaakt in de invoer.  
 &emsp; 2a1. De invoerder corrigeert de fout in de invoer.  
-
-4a. De coördinator beslist dat de waarschuwing niet genegeerd kan worden:  
-&emsp; 4a1. De coördinator stuurt het PV terug in het proces.  
-&emsp; 4a2. De invoerder breekt de invoer af.  
-&emsp; 4a3. De applicatie verwijdert de ingevoerde data.  
 
 ### Open punten
 

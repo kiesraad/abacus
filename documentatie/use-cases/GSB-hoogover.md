@@ -18,11 +18,14 @@ __hoofdscenario__:
 1. De coördinator stelt invoer open.
 2. (voor elk SB PV evt met corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in)
 3. De coördinator sluit de invoer af.
-4. De applicatie genereert de PVs en emls etc.
+4. De applicatie controleert dat voor alle stembureaus resultaten zijn ingevoerd.
+5. De applicatie controleert dat er geen stembureaus met waarschuwingen zijn.
+5. De applicatie genereert de PVs en emls etc.
 
 __uitbreidingen__:  
-3a. De applicatie stelt vast dat niet voor niet alle stembureaus resultaten zijn ingevoerd:  
-3b. De applicatie stelt vast dat er stembureaus met waarschuwingen zijn:  
+4a. De applicatie stelt vast dat niet voor niet alle stembureaus resultaten zijn ingevoerd:
+
+5a. De applicatie stelt vast dat er stembureaus met waarschuwingen zijn:
 
 ### Open punten
 

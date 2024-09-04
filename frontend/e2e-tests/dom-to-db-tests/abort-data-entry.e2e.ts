@@ -19,7 +19,14 @@ test.describe("Abort data entry", () => {
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
+
+    // TODO: check saved data instead of API call in #137
+    const responsePromise = page.waitForResponse("**/polling_stations/1/data_entries/1");
+
     await abortInputModal.saveInput.click();
+
+    const response = await responsePromise;
+    expect(response.request().method()).toBe("POST");
 
     const inputPage = new InputPage(page);
     await expect(inputPage.heading).toBeVisible();
@@ -46,7 +53,14 @@ test.describe("Abort data entry", () => {
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
+
+    // TODO: check saved data instead of API call in #137
+    const responsePromise = page.waitForResponse("**/polling_stations/1/data_entries/1");
+
     await abortInputModal.saveInput.click();
+
+    const response = await responsePromise;
+    expect(response.request().method()).toBe("POST");
 
     const inputPage = new InputPage(page);
     await expect(inputPage.heading).toBeVisible();
@@ -84,7 +98,14 @@ test.describe("Abort data entry", () => {
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
+
+    // TODO: check saved data instead of API call in #137
+    const responsePromise = page.waitForResponse("**/polling_stations/1/data_entries/1");
+
     await abortInputModal.saveInput.click();
+
+    const response = await responsePromise;
+    expect(response.request().method()).toBe("POST");
 
     const inputPage = new InputPage(page);
     await expect(inputPage.heading).toBeVisible();

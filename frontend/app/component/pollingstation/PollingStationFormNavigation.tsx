@@ -163,13 +163,7 @@ export function PollingStationFormNavigation({
         </Modal>
       )}
 
-      {error && (
-        <Feedback type="error" title="Server error">
-          <div id="feedback-server-error">
-            {error.errorCode}: {error.message}
-          </div>
-        </Feedback>
-      )}
+      {error && <Feedback id="feedback-server-error" type="error" data={error} />}
     </>
   );
 }

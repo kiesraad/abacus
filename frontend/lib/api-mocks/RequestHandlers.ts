@@ -84,7 +84,6 @@ export const pollingStationDataEntryHandler = http.post<
     };
 
     const {
-      recounted,
       voters_counts,
       votes_counts,
       voters_recounts,
@@ -92,11 +91,35 @@ export const pollingStationDataEntryHandler = http.post<
       political_group_votes,
     } = json.data;
 
+    // Rules and checks implemented in this mock api:
+    // F.201-204, F.301-305, F.401, W.301-302
+    // Rules and checks not implemented in this mock api:
+    // W.201-210
+
     const total_votes_counts = votes_counts.total_votes_cast_count;
     let total_voters_counts;
 
-    // if recounted = true
+    //SECTION votes_counts
+    // F.202 E + F + G = H
+    if (
+      votes_counts.votes_candidates_counts +
+        votes_counts.blank_votes_count +
+        votes_counts.invalid_votes_count !==
+      votes_counts.total_votes_cast_count
+    ) {
+      response.validation_results.errors.push({
+        fields: [
+          "data.votes_counts.total_votes_cast_count",
+          "data.votes_counts.votes_candidates_counts",
+          "data.votes_counts.blank_votes_count",
+          "data.votes_counts.invalid_votes_count",
+        ],
+        code: "F202",
+      });
+    }
+
     if (voters_recounts) {
+      // if recounted = true
       //SECTION voters_recounts
       total_voters_counts = voters_recounts.total_admitted_voters_recount;
 
@@ -117,8 +140,8 @@ export const pollingStationDataEntryHandler = http.post<
           code: "F203",
         });
       }
-      // if recounted = false
     } else {
+      // if recounted = false
       //SECTION voters_counts
       total_voters_counts = voters_counts.total_admitted_voters_count;
 
@@ -141,66 +164,74 @@ export const pollingStationDataEntryHandler = http.post<
       }
     }
 
-    //SECTION votes_counts
-    // F.202 E + F + G = H
-    if (
-      votes_counts.votes_candidates_counts +
-        votes_counts.blank_votes_count +
-        votes_counts.invalid_votes_count !==
-      votes_counts.total_votes_cast_count
-    ) {
-      response.validation_results.errors.push({
-        fields: [
-          "data.votes_counts.total_votes_cast_count",
-          "data.votes_counts.votes_candidates_counts",
-          "data.votes_counts.blank_votes_count",
-          "data.votes_counts.invalid_votes_count",
-        ],
-        code: "F202",
-      });
-    }
-
     //SECTION differences_counts
-    // F.301 (recounted = false) or F.302 (recounted = true)
-    // validate that the difference for more ballots counted is correct
-    if (
-      total_voters_counts < total_votes_counts &&
-      total_votes_counts - total_voters_counts != differences_counts.more_ballots_count
-    ) {
-      response.validation_results.errors.push({
-        fields: ["data.differences_counts.more_ballots_count"],
-        code: recounted ? "F302" : "F301",
-      });
+    if (total_voters_counts < total_votes_counts) {
+      // F.301 validate that the difference for more ballots counted is correct
+      if (total_votes_counts - total_voters_counts != differences_counts.more_ballots_count) {
+        response.validation_results.errors.push({
+          fields: ["data.differences_counts.more_ballots_count"],
+          code: "F301",
+        });
+      }
+      // F.302 validate that fewer ballots counted is empty
+      if (differences_counts.fewer_ballots_count !== 0) {
+        response.validation_results.errors.push({
+          fields: ["data.differences_counts.fewer_ballots_count"],
+          code: "F302",
+        });
+      }
     }
 
-    // F.303 (recounted = false) or F.304 (recounted = true)
-    // validate that the difference for fewer ballots counted is correct
-    if (
-      total_voters_counts > total_votes_counts &&
-      total_voters_counts - total_votes_counts != differences_counts.fewer_ballots_count
-    ) {
-      response.validation_results.errors.push({
-        fields: ["data.differences_counts.fewer_ballots_count"],
-        code: recounted ? "F304" : "F303",
-      });
+    if (total_voters_counts > total_votes_counts) {
+      // F.303 validate that the difference for fewer ballots counted is correct
+      if (total_voters_counts - total_votes_counts != differences_counts.fewer_ballots_count) {
+        response.validation_results.errors.push({
+          fields: ["data.differences_counts.fewer_ballots_count"],
+          code: "F303",
+        });
+      }
+      // F.304 validate that more ballots counted is empty
+      if (differences_counts.more_ballots_count !== 0) {
+        response.validation_results.errors.push({
+          fields: ["data.differences_counts.more_ballots_count"],
+          code: "F304",
+        });
+      }
     }
 
-    // W.301 validate that only more or fewer ballots counted is filled in when there is a difference in the totals
-    if (
-      total_voters_counts != total_votes_counts &&
-      differences_counts.more_ballots_count != 0 &&
-      differences_counts.fewer_ballots_count != 0
-    ) {
-      response.validation_results.warnings.push({
-        fields: [
-          "data.differences_counts.more_ballots_count",
-          "data.differences_counts.fewer_ballots_count",
-        ],
-        code: "W301",
-      });
+    // F.305 validate that no differences should be filled in when there is no difference in the totals
+    if (total_voters_counts == total_votes_counts) {
+      const fields: string[] = [];
+      if (differences_counts.more_ballots_count != 0) {
+        fields.push("data.differences_counts.more_ballots_count");
+      }
+      if (differences_counts.fewer_ballots_count != 0) {
+        fields.push("data.differences_counts.fewer_ballots_count");
+      }
+      if (differences_counts.unreturned_ballots_count != 0) {
+        fields.push("data.differences_counts.unreturned_ballots_count");
+      }
+      if (differences_counts.too_few_ballots_handed_out_count != 0) {
+        fields.push("data.differences_counts.too_few_ballots_handed_out_count");
+      }
+      if (differences_counts.too_many_ballots_handed_out_count != 0) {
+        fields.push("data.differences_counts.too_many_ballots_handed_out_count");
+      }
+      if (differences_counts.other_explanation_count != 0) {
+        fields.push("data.differences_counts.other_explanation_count");
+      }
+      if (differences_counts.no_explanation_count != 0) {
+        fields.push("data.differences_counts.no_explanation_count");
+      }
+      if (fields.length > 0) {
+        response.validation_results.errors.push({
+          fields: fields,
+          code: "F305",
+        });
+      }
     }
 
-    // W.302 if I: M + N + O - K - L = I
+    // W.301 if I: M + N + O - K - L = I
     if (
       differences_counts.more_ballots_count !== 0 &&
       differences_counts.too_many_ballots_handed_out_count +
@@ -219,11 +250,11 @@ export const pollingStationDataEntryHandler = http.post<
           "data.differences_counts.other_explanation_count",
           "data.differences_counts.no_explanation_count",
         ],
-        code: "W302",
+        code: "W301",
       });
     }
 
-    // W.303 if J: K + L + N + O - M = J
+    // W.302 if J: K + L + N + O - M = J
     if (
       differences_counts.fewer_ballots_count !== 0 &&
       differences_counts.unreturned_ballots_count +
@@ -242,48 +273,7 @@ export const pollingStationDataEntryHandler = http.post<
           "data.differences_counts.other_explanation_count",
           "data.differences_counts.no_explanation_count",
         ],
-        code: "W303",
-      });
-    }
-
-    // W.304 (recounted = false) or W.305 (recounted = true)
-    // validate that no difference should be filled in when there is no difference in the totals
-    if (
-      total_voters_counts == total_votes_counts &&
-      (differences_counts.more_ballots_count != 0 || differences_counts.fewer_ballots_count != 0)
-    ) {
-      if (differences_counts.more_ballots_count != 0) {
-        response.validation_results.warnings.push({
-          fields: ["data.differences_counts.more_ballots_count"],
-          code: recounted ? "W305" : "W304",
-        });
-      }
-      if (differences_counts.fewer_ballots_count != 0) {
-        response.validation_results.warnings.push({
-          fields: ["data.differences_counts.fewer_ballots_count"],
-          code: recounted ? "W305" : "W304",
-        });
-      }
-    }
-
-    // W.306 validate that no difference specifics should be filled in when there is no difference in the totals
-    if (
-      total_voters_counts == total_votes_counts &&
-      (differences_counts.unreturned_ballots_count != 0 ||
-        differences_counts.too_few_ballots_handed_out_count != 0 ||
-        differences_counts.too_many_ballots_handed_out_count != 0 ||
-        differences_counts.other_explanation_count != 0 ||
-        differences_counts.no_explanation_count != 0)
-    ) {
-      response.validation_results.warnings.push({
-        fields: [
-          "data.differences_counts.unreturned_ballots_count",
-          "data.differences_counts.too_few_ballots_handed_out_count",
-          "data.differences_counts.too_many_ballots_handed_out_count",
-          "data.differences_counts.other_explanation_count",
-          "data.differences_counts.no_explanation_count",
-        ],
-        code: "W306",
+        code: "W302",
       });
     }
 
@@ -295,7 +285,7 @@ export const pollingStationDataEntryHandler = http.post<
       candidateVotesSum += sum;
       if (sum !== pg.total) {
         response.validation_results.errors.push({
-          fields: [`data.political_group_votes[${pg.number - 1}].total`],
+          fields: [`data.political_group_votes[${pg.number - 1}]`],
           code: "F401",
         });
       }
@@ -308,8 +298,6 @@ export const pollingStationDataEntryHandler = http.post<
         code: "F204",
       });
     }
-
-    //OPTION: threshold checks
 
     return HttpResponse.json(response, { status: 200 });
   } catch (e) {

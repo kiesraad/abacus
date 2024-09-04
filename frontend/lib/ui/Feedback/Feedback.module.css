@@ -4,33 +4,45 @@
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1.5rem;
 
-  header {
+  div:global(.feedback-item) {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 0.5rem;
 
-    svg {
-      flex: 0 0 24px;
-      width: 24px;
-      margin-right: 8px;
+    header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      svg {
+        flex: 0 0 24px;
+        width: 24px;
+        margin-right: 8px;
+      }
+
+      h3 {
+        margin-bottom: 0;
+        flex: 1 1 auto;
+      }
+
+      span {
+        flex: 0 0 32px;
+        font-weight: bold;
+        padding-left: 1.5rem;
+      }
     }
 
-    h3 {
-      margin-bottom: 0;
-      flex: 1 1 auto;
-    }
-
-    span {
-      flex: 0 0 32px;
-      font-weight: bold;
+    div:global(.content) {
+      max-width: 42.5rem;
     }
   }
 
-  div > ul {
-    margin-bottom: 0;
+  div:global(.feedback-action) {
+    ul {
+      margin: 0;
+    }
   }
 
   &.error {

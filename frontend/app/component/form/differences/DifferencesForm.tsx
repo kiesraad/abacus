@@ -128,28 +128,16 @@ export function DifferencesForm() {
 
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id="differences_form">
-      <h2>Verschil tussen aantal kiezers en getelde stemmen</h2>
+      <h2>Verschillen tussen toegelaten kiezers en uitgebrachte stemmen</h2>
       {isSaved && hasValidationError && (
-        <Feedback type="error" title="Controleer ingevulde verschillen">
-          <div id="feedback-error">
-            <ul>
-              {errors.map((error, n) => (
-                <li key={`${error.code}-${n}`}>{error.code}</li>
-              ))}
-            </ul>
-          </div>
-        </Feedback>
+        <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
       {isSaved && hasValidationWarning && !hasValidationError && (
-        <Feedback type="warning" title="Controleer ingevulde verschillen">
-          <div id="feedback-warning">
-            <ul>
-              {warnings.map((warning, n) => (
-                <li key={`${warning.code}-${n}`}>{warning.code}</li>
-              ))}
-            </ul>
-          </div>
-        </Feedback>
+        <Feedback
+          id="feedback-warning"
+          type="warning"
+          data={warnings.map((warning) => warning.code)}
+        />
       )}
       <InputGrid key="differences">
         <InputGrid.Header>

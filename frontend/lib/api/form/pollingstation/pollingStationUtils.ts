@@ -1,6 +1,7 @@
 import { ErrorsAndWarnings, FieldValidationResult } from "lib/api/api";
 
 import { ValidationResult } from "@kiesraad/api";
+import { ValidationResultType } from "@kiesraad/ui";
 import {
   deepEqual,
   fieldNameFromPath,
@@ -21,10 +22,24 @@ import { DifferencesValues } from "./useDifferences";
 import { RecountedValue } from "./useRecounted";
 import { VotersAndVotesValues } from "./useVotersAndVotes";
 
+function checkAndAddValidationResult(
+  section: FormSection,
+  target: ValidationResultType,
+  validationResult: ValidationResult,
+) {
+  //don't add errors and warnings to the form state if the section is not saved
+  if (section.isSaved) {
+    //don't add a duplicate validation result to the form state
+    if (!section[target].includes(validationResult)) {
+      section[target].push(validationResult);
+    }
+  }
+}
+
 export function addValidationResultToFormState(
   formState: FormState,
   arr: ValidationResult[],
-  target: "errors" | "warnings",
+  target: ValidationResultType,
 ) {
   arr.forEach((validationResult) => {
     const uniqueRootSections = uniqueFieldSections(validationResult.fields);
@@ -35,29 +50,25 @@ export function addValidationResultToFormState(
         case "votes_counts":
         case "voters_counts":
         case "voters_recounts":
-          //don't add errors and warnings to the form state if the section is not saved
-          if (formState.sections.voters_votes_counts.isSaved) {
-            //don't add a duplicate validation result to the form state
-            if (!formState.sections.voters_votes_counts[target].includes(validationResult)) {
-              formState.sections.voters_votes_counts[target].push(validationResult);
-            }
-          }
+          checkAndAddValidationResult(
+            formState.sections.voters_votes_counts,
+            target,
+            validationResult,
+          );
           break;
         case "differences_counts":
-          //don't add errors and warnings to the form state if the section is not saved
-          if (formState.sections.differences_counts.isSaved) {
-            formState.sections.differences_counts[target].push(validationResult);
-          }
+          checkAndAddValidationResult(
+            formState.sections.differences_counts,
+            target,
+            validationResult,
+          );
           break;
         case "political_group_votes":
           if (index !== undefined) {
             const sectionKey = `political_group_votes_${index + 1}` as FormSectionID;
             const section = formState.sections[sectionKey];
             if (section) {
-              //don't add errors and warnings to the form state if the section is not saved
-              if (section.isSaved) {
-                section[target].push(validationResult);
-              }
+              checkAndAddValidationResult(section, target, validationResult);
             }
           }
           break;

@@ -11,7 +11,7 @@ export class DifferencesPage extends InputBasePage {
 
     this.heading = page.getByRole("heading", {
       level: 2,
-      name: "Verschil tussen aantal kiezers en getelde stemmen",
+      name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
     });
 
     this.next = page.getByRole("button", { name: "Volgende" });

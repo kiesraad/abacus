@@ -38,7 +38,9 @@ test.describe("Abort data entry", () => {
     await votersVotesPage.heading.waitFor();
     await votersVotesPage.voterCardCount.fill("1000");
     await votersVotesPage.next.click();
-    await expect(votersVotesPage.error).toBeVisible();
+    await expect(votersVotesPage.error).toContainText(
+      "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
+    );
 
     await votersVotesPage.abortInput.click();
 
@@ -74,7 +76,9 @@ test.describe("Abort data entry", () => {
       total_votes_cast_count: "100",
     };
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
-    await expect(votersVotesPage.warning).toBeVisible();
+    await expect(votersVotesPage.warning).toContainText(
+      "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+    );
 
     await votersVotesPage.abortInput.click();
 
@@ -169,7 +173,9 @@ test.describe("Abort data entry", () => {
       total_votes_cast_count: "100",
     };
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
-    await expect(votersVotesPage.warning).toBeVisible();
+    await expect(votersVotesPage.warning).toContainText(
+      "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+    );
 
     await votersVotesPage.abortInput.click();
 

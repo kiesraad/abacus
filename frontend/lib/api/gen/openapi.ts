@@ -228,6 +228,7 @@ export type ValidationResultCode =
   | "F302"
   | "F303"
   | "F304"
+  | "F305"
   | "F401"
   | "W201"
   | "W202"
@@ -238,13 +239,8 @@ export type ValidationResultCode =
   | "W207"
   | "W208"
   | "W209"
-  | "W210"
   | "W301"
-  | "W302"
-  | "W303"
-  | "W304"
-  | "W305"
-  | "W306";
+  | "W302";
 
 export interface ValidationResults {
   errors: ValidationResult[];

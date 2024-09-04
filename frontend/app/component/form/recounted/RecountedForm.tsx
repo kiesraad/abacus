@@ -49,15 +49,12 @@ export function RecountedForm() {
     <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form">
       <h2>Is er herteld?</h2>
       {hasValidationError && (
-        <Feedback type="error" title="Controleer het papieren proces-verbaal" code="F.101">
-          <div id="feedback-error">
-            Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?
-            <ul>
-              <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
-              <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
-              <li>Geen vinkje? Kies dan 'nee'.</li>
-            </ul>
-          </div>
+        <Feedback id="feedback-error" type="error" data={["F101"]}>
+          <ul>
+            <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
+            <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
+            <li>Geen vinkje? Kies dan 'nee'.</li>
+          </ul>
         </Feedback>
       )}
       <p className="form-paragraph md">

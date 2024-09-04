@@ -49,6 +49,9 @@ __uitbreidingen__:
 5a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 5a1. [De coördinator lost de verschillen tussen de twee invoeren op.](./GSB-gebruikersdoelen.md#de-coördinator-lost-de-verschillen-tussen-de-twee-invoeren-op)
 
+5b. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
+&emsp; 5b1. De coördinator beoordeeldt de geaccepteerde waarschuwingen.
+
 ## Het GSB voert de corrigendum PV's in de applicatie in
 
 __niveau:__ hoog-over, vlieger, 🪁

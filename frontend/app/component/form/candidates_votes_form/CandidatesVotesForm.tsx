@@ -38,7 +38,6 @@ export interface CandidatesVotesFormProps {
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
-  const [saving, setSaving] = React.useState(false);
 
   const _IGNORE_WARNINGS_ID = `candidates_votes_form_ignore_warnings_${group.number}`;
 
@@ -75,11 +74,8 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     return false;
   }, [_IGNORE_WARNINGS_ID]);
 
-  const { sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } = usePoliticalGroup(
-    group.number,
-    getValues,
-    getIgnoreWarnings,
-  );
+  const { saving, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
+    usePoliticalGroup(group.number, getValues, getIgnoreWarnings);
 
   const shouldWatch = warnings.length > 0 && isSaved;
   const { hasChanges } = useWatchForChanges(shouldWatch, sectionValues, getValues);
@@ -114,9 +110,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
         setWarningsWarning(true);
       } else {
-        setSaving(true);
         await submit(ignoreWarnings);
-        setSaving(false);
       }
     })(event);
 

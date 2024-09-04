@@ -15,7 +15,6 @@ interface RecountedFormElement extends HTMLFormElement {
 export function RecountedForm() {
   const [hasValidationError, setHasValidationError] = React.useState(false);
   const formRef = React.useRef<RecountedFormElement>(null);
-  const [saving, setSaving] = React.useState(false);
 
   const getValues = React.useCallback(() => {
     const form = document.getElementById("recounted_form") as RecountedFormElement | null;
@@ -26,7 +25,7 @@ export function RecountedForm() {
     return { recounted: elements.yes.checked ? true : elements.no.checked ? false : undefined };
   }, []);
 
-  const { sectionValues, isSaved, submit } = useRecounted(getValues);
+  const { saving, sectionValues, isSaved, submit } = useRecounted(getValues);
 
   const handleSubmit = (event: React.FormEvent<RecountedFormElement>) =>
     void (async (event: React.FormEvent<RecountedFormElement>) => {
@@ -37,9 +36,7 @@ export function RecountedForm() {
         setHasValidationError(true);
       } else {
         setHasValidationError(false);
-        setSaving(true);
         await submit();
-        setSaving(false);
       }
     })(event);
 

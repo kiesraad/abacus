@@ -43,7 +43,6 @@ export function DifferencesForm() {
     resetWarnings,
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<DifferencesFormElement>(null);
-  const [saving, setSaving] = React.useState(false);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -84,10 +83,8 @@ export function DifferencesForm() {
     return false;
   }, []);
 
-  const { sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } = useDifferences(
-    getValues,
-    getIgnoreWarnings,
-  );
+  const { saving, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
+    useDifferences(getValues, getIgnoreWarnings);
 
   const shouldWatch = warnings.length > 0 && isSaved;
   const { hasChanges } = useWatchForChanges(shouldWatch, sectionValues, getValues);
@@ -115,9 +112,7 @@ export function DifferencesForm() {
       if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
         setWarningsWarning(true);
       } else {
-        setSaving(true);
         await submit(ignoreWarnings);
-        setSaving(false);
       }
     })(event);
 

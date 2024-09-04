@@ -48,7 +48,6 @@ export function VotersAndVotesForm() {
     resetWarnings,
   } = usePositiveNumberInputMask();
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
-  const [saving, setSaving] = React.useState(false);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -106,7 +105,7 @@ export function VotersAndVotesForm() {
     return false;
   }, []);
 
-  const { sectionValues, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
+  const { saving, sectionValues, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
     useVotersAndVotes(getValues, getIgnoreWarnings);
 
   useTooltip({
@@ -135,9 +134,7 @@ export function VotersAndVotesForm() {
       if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
         setWarningsWarning(true);
       } else {
-        setSaving(true);
         await submit(ignoreWarnings);
-        setSaving(false);
       }
     })(event);
 

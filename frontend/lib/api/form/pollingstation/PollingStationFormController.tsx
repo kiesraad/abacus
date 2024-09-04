@@ -72,6 +72,7 @@ export type AnyFormReference =
   | FormReferenceSave;
 
 export interface iPollingStationControllerContext {
+  saving: boolean;
   error: ApiResponseErrorData | null;
   formState: FormState;
   targetFormSection: FormSectionID | null;
@@ -149,6 +150,8 @@ export function PollingStationFormController({
   const [targetFormSection, setTargetFormSection] = React.useState<FormSectionID | null>(
     INITIAL_FORM_SECTION_ID,
   );
+
+  const [saving, setSaving] = React.useState<boolean>(false);
 
   // TODO: #277 render custom error page instead of passing error down
   const [error, setError] = React.useState<ApiResponseErrorData | null>(null);
@@ -359,11 +362,13 @@ export function PollingStationFormController({
     };
 
     // send data to server
+    setSaving(true);
     const response = await client.postRequest(request_path, { data: pollingStationResults });
     if (response.status !== ApiResponseStatus.Success) {
       // TODO: #277 render custom error page
       console.error("Failed to save data entry", response);
       setError(response.data as ApiResponseErrorData);
+      setSaving(false);
       throw new Error("Failed to save data entry");
     }
     const data = response.data as DataEntryResponse;
@@ -421,6 +426,7 @@ export function PollingStationFormController({
 
       return newFormState;
     });
+    setSaving(false);
   };
 
   const deleteDataEntry = async () => {
@@ -436,6 +442,7 @@ export function PollingStationFormController({
   return (
     <PollingStationControllerContext.Provider
       value={{
+        saving,
         error,
         formState,
         values,

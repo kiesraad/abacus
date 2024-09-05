@@ -1,4 +1,4 @@
-import { type ValidationResultCode } from "./gen/openapi";
+import { type ValidationResultCode } from "@kiesraad/api";
 
 export type ResultCode = ValidationResultCode | "REFORMAT_WARNING";
 

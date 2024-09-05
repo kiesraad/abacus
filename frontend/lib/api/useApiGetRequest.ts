@@ -1,7 +1,8 @@
 import * as React from "react";
 
+import { ErrorResponse } from "@kiesraad/api";
+
 import { ApiResponseErrorData, ApiResponseStatus } from "./ApiClient";
-import { ErrorResponse } from "./gen/openapi";
 import { useApi } from "./useApi";
 
 export type UseApiGetRequestReturn<DATA> = {
@@ -37,7 +38,7 @@ export function useApiGetRequest<DATA>(path: string): UseApiGetRequestReturn<DAT
 
     if (path !== "") {
       doRequest(path).catch((e: unknown) => {
-        console.log("Error", e);
+        console.error("Error", e);
       });
     }
 

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { MockTest } from "app/component/MockTest";
-import { NavBar } from "app/component/navbar/NavBar.tsx";
+import { NavBar } from "app/component/navbar/NavBar";
 
 export function DevHomePage() {
   return (

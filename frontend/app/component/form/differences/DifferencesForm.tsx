@@ -1,9 +1,23 @@
 import * as React from "react";
-import { useBlocker } from "react-router-dom";
 
-import { DifferencesCounts, useDifferences, useErrorsAndWarnings } from "@kiesraad/api";
-import { BottomBar, Button, Feedback, InputGrid, InputGridRow, useTooltip } from "@kiesraad/ui";
-import { usePositiveNumberInputMask, usePreventFormEnterSubmit } from "@kiesraad/util";
+import { getErrorsAndWarnings, useDifferences } from "@kiesraad/api";
+import {
+  Alert,
+  BottomBar,
+  Button,
+  Checkbox,
+  Feedback,
+  Form,
+  InputGrid,
+  InputGridRow,
+  KeyboardKey,
+  KeyboardKeys,
+} from "@kiesraad/ui";
+import { usePositiveNumberInputMask } from "@kiesraad/util";
+
+import { useWatchForChanges } from "../useWatchForChanges";
+
+const _IGNORE_WARNINGS_ID = "differences_form_ignore_warnings";
 
 interface FormElements extends HTMLFormControlsCollection {
   more_ballots_count: HTMLInputElement;
@@ -20,33 +34,27 @@ interface DifferencesFormElement extends HTMLFormElement {
 }
 
 export function DifferencesForm() {
-  const {
-    register,
-    format,
-    deformat,
-    warnings: inputMaskWarnings,
-    resetWarnings,
-  } = usePositiveNumberInputMask();
-  const formRef = React.useRef<HTMLFormElement>(null);
-  usePreventFormEnterSubmit(formRef);
-  const {
-    sectionValues,
-    setSectionValues,
-    loading,
-    errors,
-    warnings,
-    serverError,
-    isCalled,
-    setTemporaryCache,
-  } = useDifferences();
+  const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
+  const formRef = React.useRef<DifferencesFormElement>(null);
 
-  useTooltip({
-    onDismiss: resetWarnings,
-  });
-
-  const getValues = React.useCallback(
-    (elements: DifferencesFormElement["elements"]): DifferencesCounts => {
+  const getValues = React.useCallback(() => {
+    const form = formRef.current;
+    if (!form) {
       return {
+        differences_counts: {
+          more_ballots_count: 0,
+          fewer_ballots_count: 0,
+          unreturned_ballots_count: 0,
+          too_few_ballots_handed_out_count: 0,
+          too_many_ballots_handed_out_count: 0,
+          other_explanation_count: 0,
+          no_explanation_count: 0,
+        },
+      };
+    }
+    const elements = form.elements;
+    return {
+      differences_counts: {
         more_ballots_count: deformat(elements.more_ballots_count.value),
         fewer_ballots_count: deformat(elements.fewer_ballots_count.value),
         unreturned_ballots_count: deformat(elements.unreturned_ballots_count.value),
@@ -56,77 +64,70 @@ export function DifferencesForm() {
         ),
         other_explanation_count: deformat(elements.other_explanation_count.value),
         no_explanation_count: deformat(elements.no_explanation_count.value),
-      };
-    },
-    [deformat],
-  );
+      },
+    };
+  }, [formRef, deformat]);
 
-  const errorsAndWarnings = useErrorsAndWarnings(errors, warnings, inputMaskWarnings);
-
-  //const blocker = useBlocker() use const blocker to render confirmation UI.
-  useBlocker(() => {
-    if (formRef.current && !isCalled) {
-      const elements = formRef.current.elements as DifferencesFormElement["elements"];
-      const values = getValues(elements);
-      setTemporaryCache({
-        key: "differences",
-        data: values,
-      });
+  const getIgnoreWarnings = React.useCallback(() => {
+    const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement | null;
+    if (checkbox) {
+      return checkbox.checked;
     }
     return false;
-  });
+  }, []);
 
-  function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
-    event.preventDefault();
-    const elements = event.currentTarget.elements;
-    setSectionValues(getValues(elements));
-  }
+  const { saving, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
+    useDifferences(getValues, getIgnoreWarnings);
+
+  const shouldWatch = warnings.length > 0 && isSaved;
+  const { hasChanges } = useWatchForChanges(shouldWatch, sectionValues, getValues);
 
   React.useEffect(() => {
-    if (isCalled) {
+    if (hasChanges) {
+      const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
+      checkbox.checked = false;
+      setWarningsWarning(false);
+    }
+  }, [hasChanges]);
+
+  const [warningsWarning, setWarningsWarning] = React.useState(false);
+
+  const handleSubmit = (event: React.FormEvent<DifferencesFormElement>) =>
+    void (async (event: React.FormEvent<DifferencesFormElement>) => {
+      event.preventDefault();
+      const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
+        .checked;
+
+      if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
+        setWarningsWarning(true);
+      } else {
+        await submit(ignoreWarnings);
+      }
+    })(event);
+
+  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+
+  React.useEffect(() => {
+    if (isSaved) {
       window.scrollTo(0, 0);
     }
-  }, [isCalled]);
+  }, [isSaved, errors, warnings]);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-  const success =
-    isCalled && !serverError && !hasValidationError && !hasValidationWarning && !loading;
-  return (
-    <form onSubmit={handleSubmit} ref={formRef}>
-      {/* Temporary while not navigating through form sections */}
-      {success && <div id="result">Success</div>}
-      <h2>Verschil tussen aantal kiezers en getelde stemmen</h2>
-      {serverError && (
-        <Feedback type="error" title="Error">
-          <div id="feedback-server-error">
-            <h2>Error</h2>
-            <p id="result">{serverError.message}</p>
-          </div>
-        </Feedback>
-      )}
-      {hasValidationError && (
-        <Feedback type="error" title="Controleer ingevulde verschillen">
-          <div id="feedback-error">
-            <ul>
-              {errors.map((error, n) => (
-                <li key={`${error.code}-${n}`}>{error.code}</li>
-              ))}
-            </ul>
-          </div>
-        </Feedback>
-      )}
 
-      {hasValidationWarning && !hasValidationError && (
-        <Feedback type="warning" title="Controleer ingevulde verschillen">
-          <div id="feedback-warning">
-            <ul>
-              {warnings.map((warning, n) => (
-                <li key={`${warning.code}-${n}`}>{warning.code}</li>
-              ))}
-            </ul>
-          </div>
-        </Feedback>
+  return (
+    <Form onSubmit={handleSubmit} ref={formRef} id="differences_form">
+      <h2>Verschillen tussen toegelaten kiezers en uitgebrachte stemmen</h2>
+      {isSaved && hasValidationError && (
+        <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
+      )}
+      {isSaved && hasValidationWarning && !hasValidationError && (
+        <Feedback
+          id="feedback-warning"
+          type="warning"
+          data={warnings.map((warning) => warning.code)}
+        />
       )}
       <InputGrid key="differences">
         <InputGrid.Header>
@@ -140,10 +141,10 @@ export function DifferencesForm() {
             field="I"
             id="more_ballots_count"
             title="Stembiljetten méér geteld"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.more_ballots_count}
+            defaultValue={sectionValues.differences_counts.more_ballots_count}
             isFocused
           />
           <InputGridRow
@@ -151,10 +152,10 @@ export function DifferencesForm() {
             field="J"
             id="fewer_ballots_count"
             title="Stembiljetten minder geteld"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.fewer_ballots_count}
+            defaultValue={sectionValues.differences_counts.fewer_ballots_count}
             addSeparator
           />
 
@@ -163,41 +164,40 @@ export function DifferencesForm() {
             field="K"
             id="unreturned_ballots_count"
             title="Niet ingeleverde stembiljetten"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.unreturned_ballots_count}
+            defaultValue={sectionValues.differences_counts.unreturned_ballots_count}
           />
           <InputGridRow
             key="L"
             field="L"
             id="too_few_ballots_handed_out_count"
-            title="Te weinig uitgerekte stembiljetten"
-            errorsAndWarnings={errorsAndWarnings}
+            title="Te weinig uitgereikte stembiljetten"
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.too_few_ballots_handed_out_count}
+            defaultValue={sectionValues.differences_counts.too_few_ballots_handed_out_count}
           />
-
           <InputGridRow
             key="M"
             field="M"
             id="too_many_ballots_handed_out_count"
             title="Te veel uitgereikte stembiljetten"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.too_many_ballots_handed_out_count}
+            defaultValue={sectionValues.differences_counts.too_many_ballots_handed_out_count}
           />
           <InputGridRow
             key="N"
             field="N"
             id="other_explanation_count"
             title="Andere verklaring voor het verschil"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.other_explanation_count}
+            defaultValue={sectionValues.differences_counts.other_explanation_count}
             addSeparator
           />
 
@@ -206,19 +206,37 @@ export function DifferencesForm() {
             field="O"
             id="no_explanation_count"
             title="Geen verklaring voor het verschil"
-            errorsAndWarnings={errorsAndWarnings}
+            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.no_explanation_count}
+            defaultValue={sectionValues.differences_counts.no_explanation_count}
           />
         </InputGrid.Body>
       </InputGrid>
-      <BottomBar type="inputgrid">
-        <Button type="submit" size="lg" disabled={loading}>
-          Volgende
-        </Button>
-        <span className="button_hint">SHIFT + Enter</span>
+      <BottomBar type="input-grid">
+        {warningsWarning && (
+          <BottomBar.Row>
+            <Alert type="error" variant="small">
+              <p>Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.</p>
+            </Alert>
+          </BottomBar.Row>
+        )}
+        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
+          <Checkbox
+            id={_IGNORE_WARNINGS_ID}
+            defaultChecked={ignoreWarnings}
+            hasError={warningsWarning}
+          >
+            Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
+          </Checkbox>
+        </BottomBar.Row>
+        <BottomBar.Row>
+          <Button type="submit" size="lg" disabled={saving}>
+            Volgende
+          </Button>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+        </BottomBar.Row>
       </BottomBar>
-    </form>
+    </Form>
   );
 }

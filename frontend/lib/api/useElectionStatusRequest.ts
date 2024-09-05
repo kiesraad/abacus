@@ -2,7 +2,8 @@ import {
   ELECTION_STATUS_REQUEST_PARAMS,
   ELECTION_STATUS_REQUEST_PATH,
   ElectionStatusResponse,
-} from "./gen/openapi";
+} from "@kiesraad/api";
+
 import { useApiGetRequest } from "./useApiGetRequest";
 
 export function useElectionStatusRequest(params: ELECTION_STATUS_REQUEST_PARAMS) {

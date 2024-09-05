@@ -1,17 +1,24 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { Election, useElectionList } from "@kiesraad/api";
 import { IconCheckHeart, IconChevronRight } from "@kiesraad/icon";
-import { WorkStationNumber } from "@kiesraad/ui";
+import { Alert, WorkStationNumber } from "@kiesraad/ui";
 
 export function OverviewPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const handleRowClick = (election: Election) => {
     return () => {
       navigate(`/${election.id}/input`);
     };
   };
   const { electionList } = useElectionList();
+
+  const isNewAccount = location.hash === "#new_account";
+
+  function closeNewAccountAlert() {
+    navigate(location.pathname);
+  }
 
   return (
     <>
@@ -23,6 +30,14 @@ export function OverviewPage() {
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
+      {isNewAccount && (
+        <Alert type="success" onClose={closeNewAccountAlert}>
+          <h2>Je account is ingesteld</h2>
+          <p>
+            Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.
+          </p>
+        </Alert>
+      )}
       <main>
         <article>
           <table id="overview" className="overview_table">

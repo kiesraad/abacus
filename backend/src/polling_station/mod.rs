@@ -71,10 +71,18 @@ pub async fn polling_station_data_entry(
     let election = elections.get(polling_station.election_id).await?;
 
     let mut validation_results = ValidationResults::default();
-    data_entry_request
-        .data
-        .validate(&election, &mut validation_results, "data".to_string())?;
-
+    data_entry_request.data.validate(
+        &election,
+        &polling_station,
+        &mut validation_results,
+        "data".to_string(),
+    )?;
+    validation_results
+        .errors
+        .sort_by(|a, b| a.code.cmp(&b.code));
+    validation_results
+        .warnings
+        .sort_by(|a, b| a.code.cmp(&b.code));
     let data = serde_json::to_string(&data_entry_request.data)?;
 
     // Save the data entry or update it if it already exists
@@ -153,7 +161,12 @@ pub async fn polling_station_data_entry_finalise(
     let results = serde_json::from_slice::<PollingStationResults>(&data)?;
 
     let mut validation_results = ValidationResults::default();
-    results.validate(&election, &mut validation_results, "data".to_string())?;
+    results.validate(
+        &election,
+        &polling_station,
+        &mut validation_results,
+        "data".to_string(),
+    )?;
 
     if validation_results.has_errors() {
         return Err(APIError::Conflict(

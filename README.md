@@ -106,8 +106,8 @@ Licensed under the EUPL-1.2 or later, except where indicated otherwise:
 
 - Fonts in `frontend/public/font` are licensed under
   the SIL Open Font License version 1.1 (OFL v1.1).
-- The file `frontend/app/test/unit/server.ts` is licensed under
-  the Mozilla Public License v2.0 (MPL 2.0).
+- The files `frontend/app/msw-mock-api.ts` and `frontend/app/test/unit/server.ts`
+  are licensed under the Mozilla Public License v2.0 (MPL 2.0).
 - Dependencies from npm and Cargo are licensed under their respective licenses.
 
 Versions of the EUPL-1.2 in all official EU languages can be found at

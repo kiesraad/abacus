@@ -1,72 +1,60 @@
 import * as React from "react";
 
-import {
-  DifferencesCounts,
-  usePollingStationFormController,
-  ValidationResult,
-} from "@kiesraad/api";
-import { matchValidationResultWithFormSections } from "@kiesraad/util";
+import { PollingStationResults, usePollingStationFormController } from "@kiesraad/api";
 
-export function useDifferences() {
+export type DifferencesValues = Pick<PollingStationResults, "differences_counts">;
+
+export function useDifferences(
+  getValues: () => DifferencesValues,
+  getIgnoreWarnings?: () => boolean,
+) {
   const {
+    saving,
     values,
-    setValues,
-    data,
-    loading,
-    error: serverError,
+    formState,
+    submitCurrentForm,
     setTemporaryCache,
+    registerCurrentForm,
     cache,
   } = usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
-    if (cache && cache.key === "differences") {
-      const data = cache.data;
+    if (cache && cache.key === "differences_counts") {
+      const data = cache.data as DifferencesValues;
       setTemporaryCache(null);
       return data;
     }
-    return values.differences_counts;
+
+    return {
+      differences_counts: values.differences_counts,
+    };
   }, [values, setTemporaryCache, cache]);
 
   const errors = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.errors.filter((err) =>
-        matchValidationResultWithFormSections(err.fields, ["differences_counts"]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data]);
+    return formState.sections.differences_counts.errors;
+  }, [formState]);
 
   const warnings = React.useMemo(() => {
-    if (data) {
-      return data.validation_results.warnings.filter((warning) =>
-        matchValidationResultWithFormSections(warning.fields, ["differences_counts"]),
-      );
-    }
-    return [] as ValidationResult[];
-  }, [data]);
+    return formState.sections.differences_counts.warnings;
+  }, [formState]);
 
-  const setSectionValues = (values: DifferencesCounts) => {
-    setValues((old) => ({
-      ...old,
-      differences_counts: {
-        ...values,
-      },
-    }));
-  };
-
-  const isCalled = React.useMemo(() => {
-    // TODO: How to know if this is called, all values can be 0?
-    return !!sectionValues.more_ballots_count || !!sectionValues.fewer_ballots_count;
-  }, [sectionValues]);
+  React.useEffect(() => {
+    registerCurrentForm({
+      id: "differences_counts",
+      type: "differences",
+      getValues,
+      getIgnoreWarnings,
+    });
+  }, [registerCurrentForm, getValues, getIgnoreWarnings]);
 
   return {
-    loading,
+    saving,
     sectionValues,
-    setSectionValues,
     errors,
     warnings,
-    isCalled,
-    serverError,
-    setTemporaryCache,
+    isSaved: formState.sections.differences_counts.isSaved,
+    submit: submitCurrentForm,
+    isCompleted: formState.isCompleted,
+    ignoreWarnings: formState.sections.differences_counts.ignoreWarnings,
   };
 }

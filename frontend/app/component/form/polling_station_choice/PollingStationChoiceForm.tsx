@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { PollingStation, usePollingStationList } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
-import { Alert, BottomBar, Button, Icon, Spinner } from "@kiesraad/ui";
-import { cn, parseIntStrict } from "@kiesraad/util";
+import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys, Spinner } from "@kiesraad/ui";
+import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
 
 import { PollingStationSelector } from "./PollingStationSelector";
 import cls from "./PollingStationSelector.module.css";
 import { PollingStationsList } from "./PollingStationsList";
+
+const USER_INPUT_DEBOUNCE: number = 500; // ms
 
 export function PollingStationChoiceForm() {
   const navigate = useNavigate();
@@ -16,22 +18,41 @@ export function PollingStationChoiceForm() {
   const { pollingStations, pollingStationsLoading } = usePollingStationList();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(
     undefined,
   );
 
+  const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
+    setLoading(false);
+    setCurrentPollingStation(pollingStation);
+  }, USER_INPUT_DEBOUNCE);
+
+  useMemo(() => {
+    const parsedInt = parsePollingStationNumber(pollingStationNumber);
+    setLoading(true);
+    debouncedCallback(
+      pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt),
+    );
+  }, [pollingStationNumber, pollingStations, debouncedCallback]);
+
   const handleSubmit = () => {
-    if (!currentPollingStation || pollingStationNumber === "") {
+    if (pollingStationNumber === "") {
       setShowAlert(true);
       return;
     }
 
-    const parsedStationNumber = parseIntStrict(pollingStationNumber);
+    const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
     const pollingStation = pollingStations.find(
       (pollingStation) => pollingStation.number === parsedStationNumber,
     );
+
     if (pollingStation) {
-      navigate(`./${pollingStation.id}/recounted`);
+      navigate(`./${pollingStation.id}`);
+    } else {
+      setShowAlert(true);
+      setLoading(false);
+      return;
     }
   };
 
@@ -46,6 +67,8 @@ export function PollingStationChoiceForm() {
       <PollingStationSelector
         pollingStationNumber={pollingStationNumber}
         setPollingStationNumber={setPollingStationNumber}
+        loading={loading}
+        setLoading={setLoading}
         currentPollingStation={currentPollingStation}
         setCurrentPollingStation={setCurrentPollingStation}
         setShowAlert={setShowAlert}
@@ -65,26 +88,26 @@ export function PollingStationChoiceForm() {
         </div>
       )}
       <BottomBar type="form">
-        <Button
-          type="button"
-          size="lg"
-          onClick={() => {
-            handleSubmit();
-          }}
-        >
-          Beginnen
-        </Button>
-        <span className="button_hint">SHIFT + Enter</span>
+        <BottomBar.Row>
+          <Button
+            type="button"
+            size="lg"
+            onClick={() => {
+              handleSubmit();
+            }}
+          >
+            Beginnen
+          </Button>
+          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+        </BottomBar.Row>
       </BottomBar>
       <details>
         <summary>
-          <p>
-            Weet je het nummer niet?
-            <br />
-            <span id="openPollingStationList" className="underlined pointer">
-              Bekijk de lijst met alle stembureaus
-            </span>
-          </p>
+          Weet je het nummer niet?
+          <br />
+          <span id="openPollingStationList" className="underlined pointer">
+            Bekijk de lijst met alle stembureaus
+          </span>
         </summary>
         <h2 className="form_title table_title">Kies het stembureau</h2>
         {(() => {
@@ -92,7 +115,7 @@ export function PollingStationChoiceForm() {
             return (
               <div className="flex">
                 <Icon icon={<Spinner size="lg" />} />
-                aan het zoeken …
+                aan het laden …
               </div>
             );
           } else if (pollingStations.length === 0) {

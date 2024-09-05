@@ -1,17 +1,18 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
-import { DevHomePage } from "./module/DevHomePage.tsx";
+import { PollingStationSaveForm } from "./component/form/pollingstation_save/PollingStationSaveForm";
+import { DevHomePage } from "./module/DevHomePage";
 import { ElectionLayout } from "./module/ElectionLayout";
 import {
   CandidatesVotesPage,
   DifferencesPage,
   InputHomePage,
   InputLayout,
-  PollingStationHomePage,
   PollingStationLayout,
   RecountedPage,
   VotersAndVotesPage,
 } from "./module/input";
+import { FinaliseElectionPage } from "./module/input/page/FinaliseElectionPage";
 import { NotFound } from "./module/NotFound";
 import { OverviewLayout, OverviewPage } from "./module/overview";
 import { RootLayout } from "./module/RootLayout";
@@ -34,13 +35,14 @@ export const routes = createRoutesFromElements(
       <Route path="input" element={<InputLayout />}>
         <Route index element={<InputHomePage />} />
         <Route path=":pollingStationId" element={<PollingStationLayout />}>
-          <Route index element={<PollingStationHomePage />} />
+          <Route index element={<Navigate to="./recounted" replace />} />
           <Route path="recounted" element={<RecountedPage />} />
           <Route path="numbers" element={<VotersAndVotesPage />} />
           <Route path="differences" element={<DifferencesPage />} />
           <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-          <Route path="save" element={<div>Placeholder Check and Save Page</div>} />
+          <Route path="save" element={<PollingStationSaveForm />} />
         </Route>
+        <Route path="finalise" element={<FinaliseElectionPage />} />
       </Route>
     </Route>
   </Route>,

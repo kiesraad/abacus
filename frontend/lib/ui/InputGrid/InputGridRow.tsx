@@ -1,10 +1,8 @@
 import * as React from "react";
 
 import { ErrorsAndWarnings } from "@kiesraad/api";
+import { FormField, InputGrid } from "@kiesraad/ui";
 import { FormatFunc } from "@kiesraad/util";
-
-import { FormField } from "../FormField/FormField";
-import { InputGrid } from "./InputGrid";
 
 export interface InputGridRowProps {
   id: string;

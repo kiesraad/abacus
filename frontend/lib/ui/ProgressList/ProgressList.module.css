@@ -47,7 +47,7 @@
     &:global(.updates) {
       aside {
         svg {
-          fill: var(--menu-updates);
+          fill: var(--link-hover);
         }
       }
     }

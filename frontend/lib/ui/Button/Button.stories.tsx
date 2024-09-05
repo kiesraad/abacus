@@ -1,6 +1,7 @@
 import type { Story } from "@ladle/react";
 
-import { Size, Variant } from "../ui.types";
+import { Size, Variant } from "@kiesraad/ui";
+
 import { Button } from "./Button";
 
 type Props = {

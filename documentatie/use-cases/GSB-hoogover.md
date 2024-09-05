@@ -45,7 +45,7 @@ __hoofdscenario__:
 2. [De eerste invoerder voert de resultaten van de telling in.](./GSB-gebruikersdoelen.md#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
 3. De coördinator geeft het SB PV evt met corrigendum aan de tweede invoerder.
 4. [De tweede invoerder voert de resultaten van de telling in.](./GSB-gebruikersdoelen.md#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
-5. (na eerste en/of tweede invoer) De applicatie controleert dat de invoer niet resulteerde in (geaccepteerde) waarschuwingen.
+5. (na eerste en/of tweede invoer) De applicatie stelt vast dat de invoer geen (geaccepteerde) waarschuwingen bevat.
 6. De applicatie stelt vast dat beide invoeren gelijk zijn.
 7. De applicatie slaat het definitieve resultaat van het stembureau op.
 

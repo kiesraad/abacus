@@ -310,7 +310,11 @@ export function VotersAndVotesForm() {
           </BottomBar.Row>
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings}>
+          <Checkbox
+            id={_IGNORE_WARNINGS_ID}
+            defaultChecked={ignoreWarnings}
+            hasError={warningsWarning}
+          >
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

@@ -12,7 +12,6 @@ import {
   InputGridRow,
   KeyboardKey,
   KeyboardKeys,
-  useTooltip,
 } from "@kiesraad/ui";
 import { usePositiveNumberInputMask } from "@kiesraad/util";
 
@@ -35,13 +34,7 @@ interface DifferencesFormElement extends HTMLFormElement {
 }
 
 export function DifferencesForm() {
-  const {
-    register,
-    format,
-    deformat,
-    warnings: inputMaskWarnings,
-    resetWarnings,
-  } = usePositiveNumberInputMask();
+  const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<DifferencesFormElement>(null);
 
   const getValues = React.useCallback(() => {
@@ -96,10 +89,6 @@ export function DifferencesForm() {
       setWarningsWarning(false);
     }
   }, [hasChanges]);
-
-  useTooltip({
-    onDismiss: resetWarnings,
-  });
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
 

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export function UserHomePage() {
   return (
-    <div style={{ padding: "32px" }}>
+    <div style={{ padding: "2rem" }}>
       <h1>Abacus 🧮</h1>
       <p>User Homepage</p>
 

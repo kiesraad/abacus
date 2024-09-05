@@ -36,7 +36,7 @@
   --font-size-xl: 3.75rem;
 
   /* SPACING and CORNERS */
-  --rounded-default: 8px;
+  --rounded-default: 0.5rem;
 
   /* COLORS */
   --text-color-header: #101828;
@@ -102,6 +102,7 @@
   --blue-light-800: #065986;
   --blue-dark-100: #d1e0ff;
   --blue-dark-400: #528bff;
+  --menu-updates: #004eeb;
   --link-default: #155eef;
   --link-hover: #004eeb;
   --link-active: #0040c1;

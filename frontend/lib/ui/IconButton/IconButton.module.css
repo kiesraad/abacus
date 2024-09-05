@@ -9,7 +9,7 @@
   padding: 0.5rem;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
   cursor: pointer;
 
   &:focus {
@@ -28,15 +28,15 @@
   }
 
   svg {
-    height: 16px;
+    height: 1rem;
     fill: var(--base-white);
   }
 
   &.sm {
-    padding: 4px;
+    padding: 0.25rem;
 
     svg {
-      height: 12px;
+      height: 0.75rem;
     }
   }
 

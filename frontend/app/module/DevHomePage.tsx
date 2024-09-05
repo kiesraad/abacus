@@ -7,7 +7,7 @@ export function DevHomePage() {
   return (
     <div className="app-layout">
       <NavBar />
-      <div style={{ padding: "32px" }}>
+      <div style={{ padding: "2rem" }}>
         <h1>Abacus 🧮</h1>
 
         <ul>

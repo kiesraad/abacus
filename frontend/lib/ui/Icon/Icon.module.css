@@ -3,8 +3,8 @@
   fill: currentColor;
 
   svg {
-    width: 24px;
-    height: 24px;
+    width: 1.5rem;
+    height: 1.5rem;
     fill: var(--button-color-primary);
   }
 
@@ -22,36 +22,36 @@
 
   &.xs {
     svg {
-      width: 16px;
-      height: 16px;
+      width: 1rem;
+      height: 1rem;
     }
   }
 
   &.sm {
     svg {
-      width: 20px;
-      height: 20px;
+      width: 1.25rem;
+      height: 1.25rem;
     }
   }
 
   &.md {
     svg {
-      width: 24px;
-      height: 24px;
+      width: 1.5rem;
+      height: 1.5rem;
     }
   }
 
   &.lg {
     svg {
-      width: 32px;
-      height: 32px;
+      width: 2rem;
+      height: 2rem;
     }
   }
 
   &.xl {
     svg {
-      width: 48px;
-      height: 48px;
+      width: 3rem;
+      height: 3rem;
     }
   }
 }

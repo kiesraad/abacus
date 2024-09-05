@@ -6,9 +6,9 @@ export type RecountedValue = Pick<PollingStationValues, "recounted">;
 
 export function useRecounted(getValues: () => RecountedValue) {
   const {
+    saving,
     values,
     formState,
-    loading,
     submitCurrentForm,
     setTemporaryCache,
     registerCurrentForm,
@@ -41,7 +41,7 @@ export function useRecounted(getValues: () => RecountedValue) {
   }, [registerCurrentForm, getValues]);
 
   return {
-    loading,
+    saving,
     sectionValues,
     errors,
     warnings,

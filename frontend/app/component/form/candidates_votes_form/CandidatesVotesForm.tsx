@@ -74,7 +74,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     return false;
   }, [_IGNORE_WARNINGS_ID]);
 
-  const { sectionValues, errors, warnings, loading, isSaved, submit, ignoreWarnings } =
+  const { saving, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
     usePoliticalGroup(group.number, getValues, getIgnoreWarnings);
 
   const shouldWatch = warnings.length > 0 && isSaved;
@@ -98,21 +98,21 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
 
-  function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
-    event.preventDefault();
+  const handleSubmit = (event: React.FormEvent<CandidatesVotesFormElement>) =>
+    void (async (event: React.FormEvent<CandidatesVotesFormElement>) => {
+      event.preventDefault();
+      const ignoreWarnings = (
+        document.getElementById(
+          `candidates_votes_form_ignore_warnings_${group.number}`,
+        ) as HTMLInputElement
+      ).checked;
 
-    const ignoreWarnings = (
-      document.getElementById(
-        `candidates_votes_form_ignore_warnings_${group.number}`,
-      ) as HTMLInputElement
-    ).checked;
-
-    if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
-      setWarningsWarning(true);
-    } else {
-      submit(ignoreWarnings);
-    }
-  }
+      if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
+        setWarningsWarning(true);
+      } else {
+        await submit(ignoreWarnings);
+      }
+    })(event);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
@@ -186,7 +186,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" size="lg" disabled={saving}>
             Volgende
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

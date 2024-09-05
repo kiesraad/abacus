@@ -76,7 +76,7 @@ export function DifferencesForm() {
     return false;
   }, []);
 
-  const { sectionValues, loading, errors, warnings, isSaved, submit, ignoreWarnings } =
+  const { saving, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
     useDifferences(getValues, getIgnoreWarnings);
 
   const shouldWatch = warnings.length > 0 && isSaved;
@@ -92,17 +92,18 @@ export function DifferencesForm() {
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
 
-  function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
-    event.preventDefault();
-    const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
-      .checked;
+  const handleSubmit = (event: React.FormEvent<DifferencesFormElement>) =>
+    void (async (event: React.FormEvent<DifferencesFormElement>) => {
+      event.preventDefault();
+      const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
+        .checked;
 
-    if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
-      setWarningsWarning(true);
-    } else {
-      submit(ignoreWarnings);
-    }
-  }
+      if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
+        setWarningsWarning(true);
+      } else {
+        await submit(ignoreWarnings);
+      }
+    })(event);
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
@@ -230,7 +231,7 @@ export function DifferencesForm() {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" size="lg" disabled={saving}>
             Volgende
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

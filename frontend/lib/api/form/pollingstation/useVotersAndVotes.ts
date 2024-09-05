@@ -12,8 +12,8 @@ export function useVotersAndVotes(
   getIgnoreWarnings?: () => boolean,
 ) {
   const {
+    saving,
     values,
-    loading,
     formState,
     setTemporaryCache,
     cache,
@@ -59,7 +59,7 @@ export function useVotersAndVotes(
   }, [formState]);
 
   return {
-    loading,
+    saving,
     sectionValues,
     errors,
     warnings,

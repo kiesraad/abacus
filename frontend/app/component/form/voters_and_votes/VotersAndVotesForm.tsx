@@ -98,7 +98,7 @@ export function VotersAndVotesForm() {
     return false;
   }, []);
 
-  const { sectionValues, loading, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
+  const { saving, sectionValues, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
     useVotersAndVotes(getValues, getIgnoreWarnings);
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
@@ -114,17 +114,18 @@ export function VotersAndVotesForm() {
     }
   }, [hasChanges]);
 
-  function handleSubmit(event: React.FormEvent<VotersAndVotesFormElement>) {
-    event.preventDefault();
-    const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
-      .checked;
+  const handleSubmit = (event: React.FormEvent<VotersAndVotesFormElement>) =>
+    void (async (event: React.FormEvent<VotersAndVotesFormElement>) => {
+      event.preventDefault();
+      const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
+        .checked;
 
-    if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
-      setWarningsWarning(true);
-    } else {
-      submit(ignoreWarnings);
-    }
-  }
+      if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
+        setWarningsWarning(true);
+      } else {
+        await submit(ignoreWarnings);
+      }
+    })(event);
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
@@ -314,7 +315,7 @@ export function VotersAndVotesForm() {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" size="lg" disabled={saving}>
             Volgende
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

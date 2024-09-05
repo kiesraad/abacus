@@ -122,6 +122,13 @@ export function PollingStationFormNavigation({
     }
   }, [targetFormSection, getUrlForFormSection, navigate]);
 
+  const onSave = () =>
+    void (async () => {
+      if (blocker.location) overrideControllerNavigation.current = blocker.location.pathname;
+      await submitCurrentForm();
+      if (blocker.reset) blocker.reset();
+    })();
+
   return (
     <>
       {blocker.state === "blocked" && (
@@ -140,14 +147,7 @@ export function PollingStationFormNavigation({
           </p>
           <p>Wil je deze wijzigingen bewaren?</p>
           <nav>
-            <Button
-              size="lg"
-              onClick={() => {
-                overrideControllerNavigation.current = blocker.location.pathname;
-                submitCurrentForm();
-                blocker.reset();
-              }}
-            >
+            <Button size="lg" onClick={onSave}>
               Wijzigingen opslaan
             </Button>
             <Button

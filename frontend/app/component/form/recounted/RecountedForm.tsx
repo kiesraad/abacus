@@ -25,19 +25,20 @@ export function RecountedForm() {
     return { recounted: elements.yes.checked ? true : elements.no.checked ? false : undefined };
   }, []);
 
-  const { sectionValues, loading, isSaved, submit } = useRecounted(getValues);
+  const { saving, sectionValues, isSaved, submit } = useRecounted(getValues);
 
-  function handleSubmit(event: React.FormEvent<RecountedFormElement>) {
-    event.preventDefault();
-    const elements = event.currentTarget.elements;
+  const handleSubmit = (event: React.FormEvent<RecountedFormElement>) =>
+    void (async (event: React.FormEvent<RecountedFormElement>) => {
+      event.preventDefault();
+      const elements = event.currentTarget.elements;
 
-    if (!elements.yes.checked && !elements.no.checked) {
-      setHasValidationError(true);
-    } else {
-      setHasValidationError(false);
-      submit();
-    }
-  }
+      if (!elements.yes.checked && !elements.no.checked) {
+        setHasValidationError(true);
+      } else {
+        setHasValidationError(false);
+        await submit();
+      }
+    })(event);
 
   React.useEffect(() => {
     if (isSaved) {
@@ -83,7 +84,7 @@ export function RecountedForm() {
       </div>
       <BottomBar type="form">
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" size="lg" disabled={saving}>
             Volgende
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

@@ -54,19 +54,21 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
 
 #[cfg(test)]
 mod tests {
-    use models::ModelNa31_2Input;
+    use models::{ModelNa31_2Input, ModelNa31_2Summary};
 
     use super::*;
 
     #[test]
     fn it_generates_a_pdf() {
-        let pdf_result = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
-            aanduiding_verkiezing: "de gemeenteraad Zilverhaven".to_string(),
-            datum: "11-03-2024".to_string(),
-            plek: "Gemeente Zilverhaven".to_string(),
+        let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
+            election_for: "de gemeenteraad Zilverhaven".to_string(),
+            location: "Gemeente Zilverhaven".to_string(),
+            date: "11-03-2024".to_string(),
+            polling_stations: vec![],
+            summary: ModelNa31_2Summary::zero(),
         }))
         .unwrap();
 
-        assert!(!pdf_result.buffer.is_empty());
+        assert!(!content.buffer.is_empty());
     }
 }

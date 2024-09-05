@@ -1,3 +1,4 @@
 /.cargo
 /target
 db.sqlite*
+/templates/**/*.pdf

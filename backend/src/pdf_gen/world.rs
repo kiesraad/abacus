@@ -182,11 +182,14 @@ fn load_fonts() -> (Vec<Font>, FontBook) {
     // We include each file individually to make sure that all expected files are available.
     // Note that these font files are only read at font index 0 (i.e. font files with multiple
     // fonts are not supported, split them up in separate files instead)
-    include_font!("fonts/DM_Sans/DMSans-VariableFont_opsz,wght.ttf");
-    include_font!("fonts/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf");
+    // Typst also doesn't support variable fonts at this time, so we cannot use those either.
+    include_font!("fonts/DM_Sans/DMSans-Bold.ttf");
+    include_font!("fonts/DM_Sans/DMSans-BoldItalic.ttf");
+    include_font!("fonts/DM_Sans/DMSans-ExtraBold.ttf");
+    include_font!("fonts/DM_Sans/DMSans-ExtraBoldItalic.ttf");
+    include_font!("fonts/DM_Sans/DMSans-Italic.ttf");
+    include_font!("fonts/DM_Sans/DMSans-Regular.ttf");
     include_font!("fonts/Geist_Mono/GeistMono-Regular.otf");
-    include_font!("fonts/Geist_Mono/GeistMonoVF.ttf");
-    include_font!("fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf");
 
     (fonts, fontbook)
 }

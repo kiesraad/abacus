@@ -74,7 +74,7 @@ describe("useInputMask", () => {
     "100,000",
     "100 000",
     "11,00",
-  ])("unexpected string becomes empty and shows tooltip", (input: string) => {
+  ])("unexpected string becomes empty", (input: string) => {
     const { result } = renderHook(() => usePositiveNumberInputMask());
     expect(result.current.validate(input)).equals(false);
   });

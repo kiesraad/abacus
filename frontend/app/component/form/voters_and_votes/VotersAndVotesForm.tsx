@@ -12,7 +12,6 @@ import {
   InputGridRow,
   KeyboardKey,
   KeyboardKeys,
-  useTooltip,
 } from "@kiesraad/ui";
 import { usePositiveNumberInputMask } from "@kiesraad/util";
 
@@ -40,13 +39,7 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const {
-    register,
-    format,
-    deformat,
-    warnings: inputMaskWarnings,
-    resetWarnings,
-  } = usePositiveNumberInputMask();
+  const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
 
   const getValues = React.useCallback(() => {
@@ -107,10 +100,6 @@ export function VotersAndVotesForm() {
 
   const { sectionValues, loading, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
     useVotersAndVotes(getValues, getIgnoreWarnings);
-
-  useTooltip({
-    onDismiss: resetWarnings,
-  });
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
 

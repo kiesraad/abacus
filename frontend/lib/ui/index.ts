@@ -17,6 +17,5 @@ export * from "./KeyboardKeys/KeyboardKeys";
 export * from "./Modal/Modal";
 export * from "./ProgressList/ProgressList";
 export * from "./Spinner/Spinner";
-export * from "./Tooltip";
 export * from "./util";
 export * from "./ui.types.d";

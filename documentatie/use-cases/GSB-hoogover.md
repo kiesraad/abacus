@@ -18,8 +18,8 @@ __hoofdscenario__:
 1. De coördinator stelt invoer open.
 2. (voor elk SB PV evt met corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in)
 3. De coördinator sluit de invoer af.
-4. De applicatie controleert dat voor alle stembureaus resultaten zijn ingevoerd.
-5. De applicatie controleert dat er geen stembureaus met waarschuwingen zijn.
+4. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
+5. De applicatie stelt vast dat er geen stembureaus met (geaccepteerde) waarschuwingen zijn.
 5. De applicatie genereert de PVs en emls etc.
 
 __uitbreidingen__:  
@@ -46,8 +46,8 @@ __hoofdscenario__:
 3. De coördinator geeft het SB PV evt met corrigendum aan de tweede invoerder.
 4. [De tweede invoerder voert de resultaten van de telling in.](./GSB-gebruikersdoelen.md#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
 5. (na eerste en/of tweede invoer) De applicatie controleert dat de invoer niet resulteerde in (geaccepteerde) waarschuwingen.
-6. De applicatie controleert dat beide invoeren gelijk zijn.
-7. De applicatie slaat het resultaat op.
+6. De applicatie stelt vast dat beide invoeren gelijk zijn.
+7. De applicatie slaat het definitieve resultaat van het stembureau op.
 
 __uitbreidingen__:  
 5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  

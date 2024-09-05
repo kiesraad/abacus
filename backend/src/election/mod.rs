@@ -133,7 +133,7 @@ pub async fn election_download_results(
     let filename = model.as_filename();
     let content = generate_pdf(model)?;
 
-    let disposition_header = format!("attachment; filename=\"{}\"", filename);
+    let disposition_header = format!("attachment; filename=\"{}.pdf\"", filename);
 
     let mut headers = HeaderMap::new();
     headers.insert(header::CONTENT_TYPE, "application/pdf".parse()?);

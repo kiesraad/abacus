@@ -117,13 +117,14 @@ test.describe("data entry", () => {
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.heading).toBeVisible();
 
-    // ToDo: condense
-    await differencesPage.fewerBallotsCount.fill("20");
-    await differencesPage.unreturnedBallotsCount.fill("6");
-    await differencesPage.tooFewBallotsHandedOutCount.fill("3");
-    await differencesPage.otherExplanationCount.fill("7");
-    await differencesPage.noExplanationCount.fill("4");
-
+    const fewerBallotsFields = {
+      fewerBallotsCount: 20,
+      unreturnedBallotsCount: 6,
+      tooFewBallotsHandedOutCount: 3,
+      otherExplanationCount: 7,
+      noExplanationCount: 4,
+    };
+    await differencesPage.fillFewerBallotsFields(fewerBallotsFields);
     await differencesPage.next.click();
 
     const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");

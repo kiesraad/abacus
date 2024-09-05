@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { ErrorResponse } from "@kiesraad/api";
+
 import { ApiResponseErrorData, ApiResponseStatus } from "./ApiClient";
 import { useApi } from "./useApi";
 
@@ -32,7 +34,10 @@ export function useApiPostRequest<REQUEST_BODY, DATA>({
         if (response.status === ApiResponseStatus.Success) {
           setData(response.data as DATA);
         } else {
-          setError(response.data as ApiResponseErrorData);
+          setError({
+            message: (response.data as ErrorResponse).error,
+            errorCode: response.code,
+          });
         }
       }
     };

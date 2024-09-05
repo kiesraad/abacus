@@ -1,4 +1,5 @@
-import { ElectionListResponse } from "./gen/openapi";
+import { ElectionListResponse } from "@kiesraad/api";
+
 import { useApiGetRequest } from "./useApiGetRequest";
 
 export function useElectionListRequest() {

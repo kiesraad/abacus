@@ -81,11 +81,20 @@ describe("Test PollingStationChoiceForm", () => {
       );
       const pollingStation = screen.getByTestId("pollingStation");
 
-      // Test if the polling station name is shown
-      await user.type(pollingStation, "99");
+      // Test if the error message is shown correctly without leading zeroes
+      await user.type(pollingStation, "0099");
       const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
       expect(
         await within(pollingStationFeedback).findByText("Geen stembureau gevonden met nummer 99"),
+      ).toBeVisible();
+
+      await user.clear(pollingStation);
+
+      // Test if the error message is shown correctly when just entering number 0
+      await user.type(pollingStation, "0");
+      const pollingStationFeedback2 = await screen.findByTestId("pollingStationSelectorFeedback");
+      expect(
+        await within(pollingStationFeedback2).findByText("Geen stembureau gevonden met nummer 0"),
       ).toBeVisible();
     });
 

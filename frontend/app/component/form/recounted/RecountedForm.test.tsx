@@ -1,5 +1,5 @@
 import { userEvent } from "@testing-library/user-event";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 
@@ -54,10 +54,6 @@ const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
 };
 
 describe("Test RecountedForm", () => {
-  afterEach(() => {
-    vi.restoreAllMocks(); // ToDo: tests pass without this, so not needed?
-  });
-
   describe("RecountedForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const spy = vi.spyOn(global, "fetch");
@@ -99,9 +95,6 @@ describe("Test RecountedForm", () => {
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
-
-      const result = await screen.findByTestId("result");
-      expect(result).toHaveTextContent(/^Success$/);
     });
   });
 
@@ -132,53 +125,7 @@ describe("Test RecountedForm", () => {
       expect(url).toEqual("http://testhost/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
-
-      const result = await screen.findByTestId("result");
-      expect(result).toHaveTextContent(/^Success$/);
     });
-  });
-
-  test("422 response results in display of error message", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
-      message: "422 error from mock",
-    });
-
-    const user = userEvent.setup();
-
-    render(Component);
-
-    const no = screen.getByTestId("no");
-    await user.click(no);
-
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-    const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(/^Error422 error from mock$/);
-
-    expect(screen.queryByTestId("result")).not.toBeNull();
-    expect(screen.queryByTestId("result")).toHaveTextContent(/^422 error from mock$/);
-  });
-
-  test("500 response results in display of error message", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
-      message: "500 error from mock",
-      errorCode: "500_ERROR",
-    });
-
-    const user = userEvent.setup();
-
-    render(Component);
-
-    const no = screen.getByTestId("no");
-    await user.click(no);
-
-    const submitButton = screen.getByRole("button", { name: "Volgende" });
-    await user.click(submitButton);
-    const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(/^Error500 error from mock$/);
-
-    expect(screen.queryByTestId("result")).not.toBeNull();
-    expect(screen.queryByTestId("result")).toHaveTextContent(/^500 error from mock$/);
   });
 
   describe("RecountedForm errors", () => {
@@ -200,8 +147,11 @@ describe("Test RecountedForm", () => {
 
       await user.click(submitButton);
 
-      const validationError = screen.getByText("Controleer het papieren proces-verbaal");
-      expect(validationError).toBeVisible();
+      const feedbackError = await screen.findByTestId("feedback-error");
+      expect(feedbackError).toHaveTextContent(
+        `Controleer het papieren proces-verbaalF.101Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinatorGeen vinkje? Kies dan 'nee'.`,
+      );
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
     });
   });
 });

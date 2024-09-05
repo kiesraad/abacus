@@ -8,13 +8,14 @@ import cls from "./Alert.module.css";
 
 export interface AlertProps {
   type: AlertType;
+  variant?: "default" | "small";
   children: React.ReactNode;
   onClose?: () => void;
 }
 
-export function Alert({ type, onClose, children }: AlertProps) {
+export function Alert({ type, onClose, children, variant = "default" }: AlertProps) {
   return (
-    <div className={cn(cls.alert, cls[type])} role="alert">
+    <div className={cn(cls.alert, cls[type], variant)} role="alert">
       {onClose && (
         <IconButton
           icon={<IconCross />}

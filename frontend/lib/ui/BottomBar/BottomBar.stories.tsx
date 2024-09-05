@@ -7,7 +7,9 @@ import { BottomBar } from "./BottomBar";
 export const BottomBarFooter: Story = () => {
   return (
     <BottomBar type="footer">
-      <Button>Click me</Button>
+      <BottomBar.Row>
+        <Button>Click me</Button>
+      </BottomBar.Row>
     </BottomBar>
   );
 };
@@ -15,8 +17,10 @@ export const BottomBarFooter: Story = () => {
 export const BottomBarForm: Story = () => {
   return (
     <BottomBar type="form">
-      <Button>Click me</Button>
-      <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+      <BottomBar.Row>
+        <Button>Click me</Button>
+        <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+      </BottomBar.Row>
     </BottomBar>
   );
 };
@@ -24,8 +28,10 @@ export const BottomBarForm: Story = () => {
 export const BottomBarInputGrid: Story = () => {
   return (
     <BottomBar type="input-grid">
-      <Button>Click me</Button>
-      <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+      <BottomBar.Row>
+        <Button>Click me</Button>
+        <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+      </BottomBar.Row>
     </BottomBar>
   );
 };

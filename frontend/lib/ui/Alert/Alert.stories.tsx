@@ -25,6 +25,12 @@ export const ClosableAlert: Story<Props> = ({ type, title, text, onClose }) => (
   </Alert>
 );
 
+export const SmallAlert: Story<Props> = ({ type, text }) => (
+  <Alert type={type} variant="small">
+    <p>{text}</p>
+  </Alert>
+);
+
 export default {
   args: {
     title: "Nog niet ingesteld",

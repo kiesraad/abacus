@@ -1,7 +1,7 @@
 import * as router from "react-router";
 
 import { userEvent } from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { overrideOnce, render, screen, server } from "app/test/unit";
 
@@ -12,7 +12,7 @@ import {
   pollingStationMockData,
 } from "@kiesraad/api-mocks";
 
-import { AbortDataEntryControl } from "./AbortDataEntryControl.tsx";
+import { AbortDataEntryControl } from "./AbortDataEntryControl";
 
 const mockNavigate = vi.fn();
 
@@ -34,12 +34,6 @@ describe("Test AbortDataEntryControl", () => {
   beforeEach(() => {
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
     vi.spyOn(router, "useNavigate").mockImplementation(() => mockNavigate);
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-    server.restoreHandlers();
-    server.events.removeAllListeners();
   });
 
   test("renders and toggles the modal", async () => {

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { NavBar } from "app/component/navbar/NavBar.tsx";
+import { NavBar } from "app/component/navbar/NavBar";
 
 export function NotFound() {
   return (

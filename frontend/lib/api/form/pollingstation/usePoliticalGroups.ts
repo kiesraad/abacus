@@ -46,7 +46,7 @@ export function usePoliticalGroup(
   }, [registerCurrentForm, getValues, political_group_number, getIgnoreWarnings]);
 
   return {
-    status: status,
+    status,
     sectionValues,
     errors,
     warnings,

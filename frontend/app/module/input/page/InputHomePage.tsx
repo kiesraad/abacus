@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm";
 import { NavBar } from "app/component/navbar/NavBar.tsx";
@@ -8,7 +8,6 @@ import { useElection, useElectionStatus } from "@kiesraad/api";
 import { Alert, Button, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
 export function InputHomePage() {
-  const navigate = useNavigate();
   const { election } = useElection();
   const { statuses } = useElectionStatus();
   const [showAlert, setShowAlert] = useState(true);
@@ -18,7 +17,17 @@ export function InputHomePage() {
   }
 
   function finishInput() {
-    navigate("/");
+    void (async () => {
+      const result = await fetch(`/api/elections/${election.id}/download_results`);
+      const filename = result.headers
+        .get("Content-Disposition")
+        ?.split('filename="')[1]
+        ?.slice(0, -1);
+      const blob = await result.blob();
+      const file = new File([blob], filename ?? "document");
+      const objectURL = window.URL.createObjectURL(file);
+      window.location.assign(objectURL);
+    })();
   }
 
   return (
@@ -35,7 +44,7 @@ export function InputHomePage() {
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
-      {statuses.every((s) => s.status === "Complete") && (
+      {!statuses.every((s) => s.status === "Complete") && (
         <Alert type="success" onClose={hideAlert}>
           <h2>Alle stembureaus zijn twee keer ingevoerd</h2>
           <p>
@@ -43,6 +52,7 @@ export function InputHomePage() {
             uitslag nu definitief maken en het proces verbaal opmaken. Doe dit alleen als er vandaag
             niks meer herteld hoeft te worden.
           </p>
+
           <Button onClick={finishInput}>Invoer afronden</Button>
         </Alert>
       )}

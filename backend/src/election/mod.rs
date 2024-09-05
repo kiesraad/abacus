@@ -123,15 +123,15 @@ pub async fn election_download_results(
     let election = elections_repo.get(id).await?;
     let polling_stations = polling_stations_repo.list(election.id).await?;
 
-    let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
+    let model = PdfModel::ModelNa31_2(ModelNa31_2Input {
         election_for: election.name.clone(),
         location: election.name.clone(),
         date: election.election_date.format("%d-%m-%Y").to_string(),
         polling_stations,
         summary: ModelNa31_2Summary::zero(),
-    }))?;
-
-    let filename = "proces-verbaal.pdf";
+    });
+    let filename = model.as_filename();
+    let content = generate_pdf(model)?;
 
     let disposition_header = format!("attachment; filename=\"{}\"", filename);
 

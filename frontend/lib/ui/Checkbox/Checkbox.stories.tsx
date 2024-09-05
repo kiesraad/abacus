@@ -7,15 +7,21 @@ type Props = {
 };
 
 export const DefaultCheckbox: Story<Props> = ({ label }) => (
-  <Checkbox id="default-checkbox" defaultChecked={false}>
-    {label}
-  </Checkbox>
-);
+  <div>
+    <Checkbox id="default-checkbox" defaultChecked={false}>
+      {label}
+    </Checkbox>
 
-export const ErrorCheckbox: Story<Props> = ({ label }) => (
-  <Checkbox id="default-checkbox" hasError defaultChecked={false}>
-    {label}
-  </Checkbox>
+    <Checkbox id="default-checkbox-error" defaultChecked={false} hasError>
+      {label}
+    </Checkbox>
+
+    <div style={{ width: 200 }}>
+      <Checkbox id="default-checkbox-cramped" defaultChecked={false}>
+        {label}
+      </Checkbox>
+    </div>
+  </div>
 );
 
 export default {

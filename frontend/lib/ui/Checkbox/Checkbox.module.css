@@ -16,17 +16,31 @@
   > div {
     display: inline-block;
     margin-right: 8px;
+    flex: 0 0 20px;
     width: 20px;
     height: 20px;
     border-radius: 6px;
     padding: 0;
-    border: 1px solid var(--base-dark-blue);
-    background-color: var(--bg-highlight);
+    border: 1px solid var(--border-color-default);
+    background-color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 1px 1px rgba(66, 210, 243, 0.4);
+      border: 1px solid var(--blue-dark-400);
+    }
+
+    &:global(.checked) {
+      background-color: var(--bg-highlight);
+      border-color: var(--base-dark-blue);
+    }
+
     svg {
       width: 14px;
+      fill: var(--base-dark-blue);
     }
   }
 

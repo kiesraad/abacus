@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { IconCheckmark } from "@kiesraad/icon";
+import { IconCheckmarkSmall } from "@kiesraad/icon";
 import { cn } from "@kiesraad/util";
 
 import cls from "./Checkbox.module.css";
@@ -29,8 +29,13 @@ export function Checkbox({ id, children, defaultChecked, hasError }: CheckboxPro
       aria-label="input"
       id={`checkbox-container-${id}`}
     >
-      <div aria-hidden={true} onClick={toggleCheckbox} id={`checkbox-button-${id}`}>
-        {checked ? <IconCheckmark aria-label="Aangevinkt" /> : null}
+      <div
+        className={checked ? "checked" : "unchecked"}
+        aria-hidden={true}
+        onClick={toggleCheckbox}
+        id={`checkbox-button-${id}`}
+      >
+        {checked ? <IconCheckmarkSmall aria-label="Aangevinkt" /> : null}
       </div>
       <input type="checkbox" id={id} name={id} checked={checked} onChange={toggleCheckbox} />
       <label htmlFor={id}>{children}</label>

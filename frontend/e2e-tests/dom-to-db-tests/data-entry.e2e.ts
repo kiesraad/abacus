@@ -197,7 +197,9 @@ test.describe("errors and warnings", () => {
     await expect(votersVotesPage.error).toBeHidden();
 
     // accept the warning
-    await votersVotesPage.acceptWarnings.check();
+
+    // eslint-disable-next-line playwright/no-force-option -- force option needed to click on hidden element
+    await votersVotesPage.acceptWarnings.check({ force: true });
     await votersVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
@@ -448,7 +450,9 @@ test.describe("navigation", () => {
         total_votes_cast_count: "100",
       };
       await votersVotesPage.fillInPageAndClickNext(voters, votes);
-      await votersVotesPage.acceptWarnings.click();
+
+      // eslint-disable-next-line playwright/no-force-option -- force option needed to click on hidden element
+      await votersVotesPage.acceptWarnings.click({ force: true, noWaitAfter: true });
       await votersVotesPage.next.click();
 
       const differencesPage = new DifferencesPage(page);

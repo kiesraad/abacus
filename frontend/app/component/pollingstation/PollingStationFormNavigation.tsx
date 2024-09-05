@@ -12,6 +12,8 @@ import {
 } from "@kiesraad/api";
 import { Button, Feedback, Modal } from "@kiesraad/ui";
 
+import { getUrlForFormSectionID } from "./utils";
+
 export interface PollingStationFormNavigationProps {
   pollingStationId: number;
   election: Required<Election>;
@@ -39,27 +41,7 @@ export function PollingStationFormNavigation({
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionID) => {
       const baseUrl = `/${election.id}/input/${pollingStationId}`;
-      let url: string = "";
-      if (id.startsWith("political_group_votes_")) {
-        url = `${baseUrl}/list/${id.replace("political_group_votes_", "")}`;
-      } else {
-        switch (id) {
-          case "recounted":
-            url = `${baseUrl}/recounted`;
-            break;
-          case "differences_counts":
-            url = `${baseUrl}/differences`;
-            break;
-          case "voters_votes_counts":
-            url = `${baseUrl}/numbers`;
-            break;
-          case "save":
-            url = `${baseUrl}/save`;
-            break;
-        }
-      }
-
-      return url;
+      return getUrlForFormSectionID(baseUrl, id);
     },
     [election, pollingStationId],
   );

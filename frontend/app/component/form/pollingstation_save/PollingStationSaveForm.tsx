@@ -1,9 +1,35 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 
-import { usePollingStationFormController } from "@kiesraad/api";
+import { getUrlForFormSectionID } from "app/component/pollingstation/utils";
 
-export function PollingStationSaveForm() {
-  const { registerCurrentForm, formState } = usePollingStationFormController();
+import {
+  Election,
+  FormSectionID,
+  getPollingStationSummary,
+  PollingStationFormSectionStatus,
+  usePollingStationFormController,
+} from "@kiesraad/api";
+import { MenuStatus, StatusList } from "@kiesraad/ui";
+
+export interface PollingStationSaveFormProps {
+  pollingStationId: number;
+  election: Required<Election>;
+}
+
+export function PollingStationSaveForm({
+  pollingStationId,
+  election,
+}: PollingStationSaveFormProps) {
+  const { registerCurrentForm, formState, values } = usePollingStationFormController();
+
+  const getUrlForFormSection = React.useCallback(
+    (id: FormSectionID) => {
+      const baseUrl = `/${election.id}/input/${pollingStationId}`;
+      return getUrlForFormSectionID(baseUrl, id);
+    },
+    [election, pollingStationId],
+  );
 
   React.useEffect(() => {
     registerCurrentForm({
@@ -13,29 +39,69 @@ export function PollingStationSaveForm() {
     });
   }, [registerCurrentForm]);
 
+  const summary = React.useMemo(() => {
+    return getPollingStationSummary(formState, values);
+  }, [formState, values]);
+
   return (
     <div>
       <h2>Controleren en opslaan</h2>
 
-      <p>Hieronder zie je een overzicht van alle eventuele fouten en waarschuwingen.</p>
+      {!summary.hasBlocks && summary.countsAddUp && (
+        <p>
+          De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen.
+          Er zijn geen blokkerende fouten of waarschuwingen.
+        </p>
+      )}
+      {summary.hasBlocks && summary.countsAddUp && (
+        <>
+          <p>
+            De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet
+            tegen. Er zijn waarschuwingen die moeten worden gecontroleerd. Controleer de openstaande
+            waarschuwingen
+          </p>
 
-      {Object.values(formState.sections).map((section) => (
-        <div key={section.id}>
-          <h3>{section.title || section.id}</h3>
-          <h4>Errors:</h4>
-          {section.errors.map((error, n) => (
-            <p key={`error${n}`}>{error.code}</p>
-          ))}
-          <h4>Warnings:</h4>
-          {section.warnings.map((warning, n) => (
-            <p key={`warning${n}`}>{warning.code}</p>
-          ))}
+          <p>Hieronder zie je een overzicht van alle eventuele fouten en waarschuwingen.</p>
+        </>
+      )}
 
-          <br />
-          <br />
-          <br />
-        </div>
-      ))}
+      {summary.hasBlocks && !summary.countsAddUp && (
+        <>
+          <p>
+            De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar tegen. Je
+            kan de resultaten daarom niet opslaan.
+          </p>
+          <p>Los de blokkerende fouten op. Lukt dat niet? Overleg dan met de coördinator. </p>
+        </>
+      )}
+      <StatusList>
+        {summary.countsAddUp && (
+          <StatusList.Item status="accept">Alle optellingen kloppen</StatusList.Item>
+        )}
+
+        {summary.notableFormSections.map((section) => (
+          <StatusList.Item
+            key={section.formSection.id}
+            status={menuStatusForFormSectionStatus(section.status)}
+          >
+            {section.formSection.title}
+            <Link to={getUrlForFormSection(section.formSection.id)}>Ga naar</Link>
+          </StatusList.Item>
+        ))}
+      </StatusList>
     </div>
   );
+}
+
+function menuStatusForFormSectionStatus(status: PollingStationFormSectionStatus): MenuStatus {
+  switch (status) {
+    case "empty":
+      return "empty";
+    case "unaccepted-warnings":
+      return "warning";
+    case "accepted-warnings":
+      return "warning";
+    case "errors":
+      return "error";
+  }
 }

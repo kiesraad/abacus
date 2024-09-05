@@ -98,7 +98,7 @@ export function VotersAndVotesForm() {
     return false;
   }, []);
 
-  const { saving, sectionValues, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
+  const { status, sectionValues, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
     useVotersAndVotes(getValues, getIgnoreWarnings);
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
@@ -315,7 +315,7 @@ export function VotersAndVotesForm() {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={saving}>
+          <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

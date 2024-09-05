@@ -72,7 +72,7 @@ export type AnyFormReference =
   | FormReferenceSave;
 
 export interface iPollingStationControllerContext {
-  saving: boolean;
+  status: React.RefObject<Status>;
   error: ApiResponseErrorData | null;
   formState: FormState;
   targetFormSection: FormSectionID | null;
@@ -130,6 +130,10 @@ export const PollingStationControllerContext = React.createContext<
 
 const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
 
+// Status of the form controller
+// This is a type instead of an enum because of https://github.com/ArnaudBarre/eslint-plugin-react-refresh/issues/36
+export type Status = "idle" | "saving" | "deleting" | "deleted";
+
 export function PollingStationFormController({
   election,
   pollingStationId,
@@ -151,7 +155,8 @@ export function PollingStationFormController({
     INITIAL_FORM_SECTION_ID,
   );
 
-  const [saving, setSaving] = React.useState<boolean>(false);
+  // status as ref, because it needs to immediately propagate to the blocker function in `PollingStationFormNavigation`
+  const status = React.useRef<Status>("idle");
 
   // TODO: #277 render custom error page instead of passing error down
   const [error, setError] = React.useState<ApiResponseErrorData | null>(null);
@@ -362,13 +367,13 @@ export function PollingStationFormController({
     };
 
     // send data to server
-    setSaving(true);
+    status.current = "saving";
     const response = await client.postRequest(request_path, { data: pollingStationResults });
+    status.current = "idle";
     if (response.status !== ApiResponseStatus.Success) {
       // TODO: #277 render custom error page
       console.error("Failed to save data entry", response);
       setError(response.data as ApiResponseErrorData);
-      setSaving(false);
       throw new Error("Failed to save data entry");
     }
     const data = response.data as DataEntryResponse;
@@ -426,23 +431,25 @@ export function PollingStationFormController({
 
       return newFormState;
     });
-    setSaving(false);
   };
 
   const deleteDataEntry = async () => {
+    status.current = "deleting";
     const response = await client.deleteRequest(request_path);
     // ignore 404, as it means the data entry was never saved or already deleted
     if (response.status !== ApiResponseStatus.Success && response.code !== 404) {
       // TODO: #277 render custom error page
       console.error("Failed to delete data entry", response);
+      status.current = "idle";
       throw new Error("Failed to delete data entry");
     }
+    status.current = "deleted";
   };
 
   return (
     <PollingStationControllerContext.Provider
       value={{
-        saving,
+        status,
         error,
         formState,
         values,

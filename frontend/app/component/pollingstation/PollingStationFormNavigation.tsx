@@ -23,6 +23,7 @@ export function PollingStationFormNavigation({
 }: PollingStationFormNavigationProps) {
   const _lastKnownSection = React.useRef<FormSectionID | null>(null);
   const {
+    status,
     formState,
     error,
     currentForm,
@@ -66,10 +67,11 @@ export function PollingStationFormNavigation({
 
   const shouldBlock = React.useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
-      if (currentLocation.pathname === nextLocation.pathname) {
-        return false;
-      }
-      if (!currentForm) {
+      if (
+        status.current === "deleted" ||
+        currentLocation.pathname === nextLocation.pathname ||
+        !currentForm
+      ) {
         return false;
       }
 
@@ -88,7 +90,7 @@ export function PollingStationFormNavigation({
 
       return false;
     },
-    [formState, currentForm, setTemporaryCache, values],
+    [status, formState, currentForm, setTemporaryCache, values],
   );
 
   const blocker = useBlocker(shouldBlock);

@@ -57,6 +57,7 @@ describe("PollingStationFormNavigation", () => {
   const mockNavigate = vi.fn();
 
   const mockController = {
+    status: "idle",
     formState: mockFormState,
     currentForm: mockCurrentForm,
     error: null,
@@ -85,6 +86,7 @@ describe("PollingStationFormNavigation", () => {
 
   test("It blocks navigation when form has changes", () => {
     (usePollingStationFormController as Mock).mockReturnValueOnce({
+      status: "idle",
       formState: {
         ...mockFormState,
         current: "voters_votes_counts",
@@ -122,6 +124,7 @@ describe("PollingStationFormNavigation", () => {
 
   test("It blocks navigation when form has errors", async () => {
     (usePollingStationFormController as Mock).mockReturnValueOnce({
+      status: "idle",
       formState: {
         ...mockFormState,
         sections: {

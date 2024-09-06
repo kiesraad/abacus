@@ -1,11 +1,20 @@
 import * as router from "react-router";
 
 import { userEvent } from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { VotersAndVotesForm } from "app/component/form/voters_and_votes/VotersAndVotesForm.tsx";
 import { overrideOnce, render, screen, server } from "app/test/unit";
+import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
-import { ElectionProvider, PollingStationFormController } from "@kiesraad/api";
+import {
+  DataEntryResponse,
+  ElectionProvider,
+  ErrorResponse,
+  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
+  PollingStationFormController,
+} from "@kiesraad/api";
 import {
   electionDetailsMockResponse,
   electionMockData,
@@ -25,6 +34,7 @@ const renderAbortDataEntryControl = () => {
         entryNumber={1}
       >
         <AbortDataEntryControl />
+        <VotersAndVotesForm />
       </PollingStationFormController>
     </ElectionProvider>,
   );
@@ -58,8 +68,40 @@ describe("Test AbortDataEntryControl", () => {
     const abortButton = await screen.findByRole("button", { name: "Invoer afbreken" });
     await user.click(abortButton);
 
+    // fill in the form
+    await user.type(await screen.findByTestId("poll_card_count"), "42");
+
+    // set up a custom request handler that saves the request body
+    // this cannot be done with a listener because it would consume the request body
+    let request_body: POLLING_STATION_DATA_ENTRY_REQUEST_BODY | undefined;
+    server.use(
+      http.post<never, POLLING_STATION_DATA_ENTRY_REQUEST_BODY, DataEntryResponse | ErrorResponse>(
+        "http://testhost/api/polling_stations/1/data_entries/1",
+        async ({ request }) => {
+          request_body = await request.json();
+          return HttpResponse.json(
+            { validation_results: { errors: [], warnings: [] } },
+            { status: 200 },
+          );
+        },
+        { once: true },
+      ),
+    );
+
     // click the save button in the modal
     await user.click(screen.getByRole("button", { name: "Invoer bewaren" }));
+
+    // check that the save request was made with the correct data
+    expect(request_body).toEqual({
+      data: {
+        ...emptyDataEntryRequest.data,
+        voters_counts: {
+          ...emptyDataEntryRequest.data.voters_counts,
+          poll_card_count: 42,
+        },
+      },
+    });
+    // }
 
     // check that the user is navigated back to the input page
     expect(mockNavigate).toHaveBeenCalledWith("/1/input");
@@ -88,6 +130,8 @@ describe("Test AbortDataEntryControl", () => {
     // check that the delete request was made and the user is navigated back to the input page
     expect(request_method).toBe("DELETE");
     expect(request_url).toBe("http://testhost/api/polling_stations/1/data_entries/1");
+
+    // check that the user is navigated back to the input page
     expect(mockNavigate).toHaveBeenCalledWith("/1/input");
   });
 });

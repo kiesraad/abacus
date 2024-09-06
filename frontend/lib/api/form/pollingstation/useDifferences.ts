@@ -9,7 +9,7 @@ export function useDifferences(
   getIgnoreWarnings?: () => boolean,
 ) {
   const {
-    saving,
+    status,
     values,
     formState,
     submitCurrentForm,
@@ -48,7 +48,7 @@ export function useDifferences(
   }, [registerCurrentForm, getValues, getIgnoreWarnings]);
 
   return {
-    saving,
+    status,
     sectionValues,
     errors,
     warnings,

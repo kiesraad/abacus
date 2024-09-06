@@ -74,7 +74,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     return false;
   }, [_IGNORE_WARNINGS_ID]);
 
-  const { saving, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
+  const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
     usePoliticalGroup(group.number, getValues, getIgnoreWarnings);
 
   const shouldWatch = warnings.length > 0 && isSaved;
@@ -190,7 +190,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={saving}>
+          <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

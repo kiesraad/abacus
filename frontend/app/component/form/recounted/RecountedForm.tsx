@@ -25,7 +25,7 @@ export function RecountedForm() {
     return { recounted: elements.yes.checked ? true : elements.no.checked ? false : undefined };
   }, []);
 
-  const { saving, sectionValues, isSaved, submit } = useRecounted(getValues);
+  const { status, sectionValues, isSaved, submit } = useRecounted(getValues);
 
   const handleSubmit = (event: React.FormEvent<RecountedFormElement>) =>
     void (async (event: React.FormEvent<RecountedFormElement>) => {
@@ -84,7 +84,7 @@ export function RecountedForm() {
       </div>
       <BottomBar type="form">
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={saving}>
+          <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

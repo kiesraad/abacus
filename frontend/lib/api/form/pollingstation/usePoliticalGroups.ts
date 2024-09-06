@@ -8,7 +8,7 @@ export function usePoliticalGroup(
   getIgnoreWarnings?: () => boolean,
 ) {
   const {
-    saving,
+    status,
     values,
     formState,
     setTemporaryCache,
@@ -46,7 +46,7 @@ export function usePoliticalGroup(
   }, [registerCurrentForm, getValues, political_group_number, getIgnoreWarnings]);
 
   return {
-    saving,
+    status,
     sectionValues,
     errors,
     warnings,

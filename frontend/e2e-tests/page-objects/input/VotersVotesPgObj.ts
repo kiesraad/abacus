@@ -2,7 +2,6 @@ import { type Locator, type Page } from "@playwright/test";
 
 import { InputBasePage } from "./InputBasePgObj";
 
-// ToDo: do toString in method
 interface VotersCounts {
   poll_card_count: number;
   proxy_certificate_count: number;

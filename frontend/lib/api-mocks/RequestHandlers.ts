@@ -67,7 +67,7 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
   },
 );
 
-export const pollingStationDataEntryHandler = http.post<
+export const PollingStationDataEntryHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   DataEntryResponse | ErrorResponse
@@ -330,10 +330,17 @@ export const PollingStationListRequestHandler = http.get<ParamsToString<{ electi
 );
 
 // delete data entry handler
-export const pollingStationDataEntryDeleteHandler = http.delete<
+export const PollingStationDataEntryDeleteHandler = http.delete<
   ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>
 >("/api/polling_stations/:polling_station_id/data_entries/:entry_number", () => {
   return HttpResponse.text(null, { status: 204 });
+});
+
+// finalise data entry handler
+export const PollingStationDataEntryFinaliseHandler = http.post<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>
+>("/api/polling_stations/:polling_station_id/data_entries/:entry_number/finalise", () => {
+  return HttpResponse.text(null, { status: 200 });
 });
 
 export const handlers: HttpHandler[] = [
@@ -341,7 +348,8 @@ export const handlers: HttpHandler[] = [
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  pollingStationDataEntryHandler,
+  PollingStationDataEntryHandler,
   PollingStationListRequestHandler,
-  pollingStationDataEntryDeleteHandler,
+  PollingStationDataEntryDeleteHandler,
+  PollingStationDataEntryFinaliseHandler,
 ];

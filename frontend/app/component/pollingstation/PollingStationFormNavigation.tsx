@@ -69,6 +69,7 @@ export function PollingStationFormNavigation({
     ({ currentLocation, nextLocation }) => {
       if (
         status.current === "deleted" ||
+        status.current === "finalised" ||
         currentLocation.pathname === nextLocation.pathname ||
         !currentForm
       ) {

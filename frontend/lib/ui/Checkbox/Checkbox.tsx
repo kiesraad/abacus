@@ -35,7 +35,7 @@ export function Checkbox({ id, children, defaultChecked, hasError }: CheckboxPro
         onClick={toggleCheckbox}
         id={`checkbox-button-${id}`}
       >
-        {checked ? <IconCheckmarkSmall aria-label="Aangevinkt" /> : null}
+        <IconCheckmarkSmall aria-label={checked ? "Aangevinkt" : "uitgevinkt"} />
       </div>
       <input type="checkbox" id={id} name={id} checked={checked} onChange={toggleCheckbox} />
       <label htmlFor={id}>{children}</label>

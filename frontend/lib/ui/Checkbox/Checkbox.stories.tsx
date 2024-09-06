@@ -11,11 +11,13 @@ export const DefaultCheckbox: Story<Props> = ({ label }) => (
     <Checkbox id="default-checkbox" defaultChecked={false}>
       {label}
     </Checkbox>
-
+    <br />
+    <br />
     <Checkbox id="default-checkbox-error" defaultChecked={false} hasError>
       {label}
     </Checkbox>
-
+    <br />
+    <br />
     <div style={{ width: 200 }}>
       <Checkbox id="default-checkbox-cramped" defaultChecked={false}>
         {label}

@@ -13,9 +13,9 @@
 
   aside {
     padding-top: 2px;
-    flex: 0 0 40px;
+    flex: 0 0 2.25rem;
     svg {
-      width: 24px;
+      width: 1.5rem;
     }
   }
 

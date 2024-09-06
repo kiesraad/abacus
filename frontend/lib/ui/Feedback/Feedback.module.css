@@ -17,9 +17,9 @@
       justify-content: space-between;
 
       svg {
-        flex: 0 0 24px;
-        width: 24px;
-        margin-right: 8px;
+        flex: 0 0 1.5rem;
+        width: 1.5rem;
+        margin-right: 0.5rem;
       }
 
       h3 {
@@ -28,7 +28,7 @@
       }
 
       span {
-        flex: 0 0 32px;
+        flex: 0 0 2rem;
         font-weight: bold;
         padding-left: 1.5rem;
       }

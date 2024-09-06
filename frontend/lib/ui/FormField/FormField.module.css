@@ -2,12 +2,12 @@
   position: relative;
   aside {
     position: absolute;
-    left: 24px;
+    left: 1.5rem;
     z-index: 4;
     top: 50%;
-    margin-top: -12px;
+    margin-top: -0.75rem;
     svg {
-      width: 24px;
+      width: 1.5rem;
       fill: var(--color-error-darker);
     }
   }
@@ -22,7 +22,7 @@
 
   &:global(.has-error) {
     input {
-      padding-left: 56px !important;
+      padding-left: 3.5rem !important;
     }
     aside {
       svg {

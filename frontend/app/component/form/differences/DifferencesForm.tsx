@@ -95,13 +95,17 @@ export function DifferencesForm() {
   const handleSubmit = (event: React.FormEvent<DifferencesFormElement>) =>
     void (async (event: React.FormEvent<DifferencesFormElement>) => {
       event.preventDefault();
-      const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
-        .checked;
 
-      if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
-        setWarningsWarning(true);
+      if (errors.length === 0 && warnings.length > 0) {
+        const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
+          .checked;
+        if (!hasChanges && !ignoreWarnings) {
+          setWarningsWarning(true);
+        } else {
+          await submit(ignoreWarnings);
+        }
       } else {
-        await submit(ignoreWarnings);
+        await submit();
       }
     })(event);
 

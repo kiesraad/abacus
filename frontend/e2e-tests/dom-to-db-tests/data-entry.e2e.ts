@@ -162,7 +162,7 @@ test.describe("data entry", () => {
 
     await expect(votersVotesPage.warning).toContainText("W.203");
     await expect(votersVotesPage.warning).toContainText(
-      "r is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
+      "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
     );
     await votersVotesPage.acceptWarnings.check();
     await votersVotesPage.next.click();

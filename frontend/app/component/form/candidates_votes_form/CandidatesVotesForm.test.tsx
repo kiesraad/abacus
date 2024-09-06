@@ -84,6 +84,21 @@ describe("Test CandidatesVotesForm", () => {
       expect(spy).not.toHaveBeenCalled();
     });
 
+    test("hitting shift+enter does result in api call", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+      const spy = vi.spyOn(global, "fetch");
+
+      const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
+      await user.type(candidate1, "12345");
+      expect(candidate1).toHaveValue("12.345");
+
+      await user.keyboard("{shift>}{enter}{/shift}");
+
+      expect(spy).toHaveBeenCalled();
+    });
+
     test("Form field entry and keybindings", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [] },

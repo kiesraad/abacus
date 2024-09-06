@@ -33,6 +33,22 @@ describe("Test RecountedForm", () => {
       expect(spy).not.toHaveBeenCalled();
     });
 
+    test("hitting shift+enter does result in api call", async () => {
+      const spy = vi.spyOn(global, "fetch");
+
+      const user = userEvent.setup();
+
+      render(Component);
+
+      const yes = screen.getByTestId("yes");
+      await user.click(yes);
+      expect(yes).toBeChecked();
+
+      await user.keyboard("{shift>}{enter}{/shift}");
+
+      expect(spy).toHaveBeenCalled();
+    });
+
     test("Form field entry and keybindings", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: { errors: [], warnings: [] },

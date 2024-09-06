@@ -1,76 +1,268 @@
 import { expect, test } from "@playwright/test";
+import { formatNumber } from "e2e-tests/e2e-test-utils";
 import { CandidatesListPage } from "e2e-tests/page-objects/input/CandidatesListPgObj";
-import { DifferencesPage } from "e2e-tests/page-objects/input/DifferencesPgObj";
+import {
+  DifferencesPage,
+  FewerBallotsFields,
+  MoreBallotsFields,
+} from "e2e-tests/page-objects/input/DifferencesPgObj";
 import { InputPage } from "e2e-tests/page-objects/input/InputPgObj";
 import { RecountedPage } from "e2e-tests/page-objects/input/RecountedPgObj";
 import { SaveFormPage } from "e2e-tests/page-objects/input/SaveFormPgObj";
-import { VotersVotesPage } from "e2e-tests/page-objects/input/VotersVotesPgObj";
+import {
+  VotersCounts,
+  VotersRecounts,
+  VotersVotesPage,
+  VotesCounts,
+} from "e2e-tests/page-objects/input/VotersVotesPgObj";
 
 import { pollingStation33 } from "./test-data/PollingStationTestData";
 
 test.describe("data entry", () => {
-  test("no recount, no differences flow", async ({ page }) => {
+  test("no recount, no differences", async ({ page }) => {
     await page.goto("/1/input");
 
     const inputPage = new InputPage(page);
+    await expect(inputPage.heading).toBeVisible();
     const pollingStation = pollingStation33;
     await inputPage.pollingstationNumber.fill(pollingStation.number.toString());
     await expect(inputPage.pollingStationFeedback).toHaveText(pollingStation.name);
     await inputPage.clickStart();
 
     const recountedPage = new RecountedPage(page);
-    await recountedPage.heading.waitFor();
+    await expect(recountedPage.heading).toBeVisible();
     await recountedPage.no.check();
     await expect(recountedPage.no).toBeChecked();
     await recountedPage.next.click();
 
-    await expect(recountedPage.error).toBeHidden();
-    await expect(recountedPage.warning).toBeHidden();
-
     const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.heading.waitFor();
-
-    const voters = {
-      poll_card_count: "100",
-      proxy_certificate_count: "10",
-      voter_card_count: "15",
-      total_admitted_voters_count: "125",
+    await expect(votersVotesPage.heading).toBeVisible();
+    const voters: VotersCounts = {
+      poll_card_count: 1000,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 1125,
     };
-    const votes = {
-      votes_candidates_counts: "122",
-      blank_votes_count: "2",
-      invalid_votes_count: "1",
-      total_votes_cast_count: "125",
+    const votes: VotesCounts = {
+      votes_candidates_counts: 1090,
+      blank_votes_count: 20,
+      invalid_votes_count: 15,
+      total_votes_cast_count: 1125,
     };
-    await votersVotesPage.inputVoters(voters);
-    await votersVotesPage.inputVotes(votes);
-
-    await expect(votersVotesPage.pollCardCount).toHaveValue(voters.poll_card_count);
-
+    await votersVotesPage.inputVotersCounts(voters);
+    await votersVotesPage.inputVotesCounts(votes);
+    await expect(votersVotesPage.pollCardCount).toHaveValue(formatNumber(voters.poll_card_count));
     await votersVotesPage.next.click();
 
-    await expect(votersVotesPage.error).toBeHidden();
-    await expect(votersVotesPage.warning).toBeHidden();
-
     const differencesPage = new DifferencesPage(page);
-    await differencesPage.heading.waitFor();
+    await expect(differencesPage.heading).toBeVisible();
     await differencesPage.next.click();
 
-    await expect(differencesPage.error).toBeHidden();
-    await expect(differencesPage.warning).toBeHidden();
-
     const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
-    await candidatesListPage_1.heading.waitFor();
+    await expect(candidatesListPage_1.heading).toBeVisible();
 
-    await candidatesListPage_1.fillCandidate(0, 100);
-    await candidatesListPage_1.fillCandidate(1, 22);
-    await candidatesListPage_1.total.fill("122");
+    await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
     await candidatesListPage_1.next.click();
 
-    await expect(candidatesListPage_1.error).toBeHidden();
-    await expect(candidatesListPage_1.warning).toBeHidden();
+    const saveFormPage = new SaveFormPage(page);
+    await expect(saveFormPage.heading).toBeVisible();
 
-    // TODO: Controleren en opslaan
+    // TODO: extend as part of epic #95: data entry check and finalisation
+  });
+
+  test("recount, no differences", async ({ page }) => {
+    await page.goto("/1/input");
+
+    const inputPage = new InputPage(page);
+    await expect(inputPage.heading).toBeVisible();
+    const pollingStation = pollingStation33;
+    await inputPage.selectPollingStationAndClickStart(pollingStation.number);
+
+    const recountedPage = new RecountedPage(page);
+    await expect(recountedPage.heading).toBeVisible();
+    await recountedPage.yes.check();
+    await expect(recountedPage.yes).toBeChecked();
+    await recountedPage.next.click();
+
+    const votersVotesPage = new VotersVotesPage(page);
+    await expect(votersVotesPage.heading).toBeVisible();
+    const voters: VotersCounts = {
+      poll_card_count: 1000,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 1125,
+    };
+    await votersVotesPage.inputVotersCounts(voters);
+    const votes: VotesCounts = {
+      votes_candidates_counts: 1090,
+      blank_votes_count: 20,
+      invalid_votes_count: 15,
+      total_votes_cast_count: 1125,
+    };
+    await votersVotesPage.inputVotesCounts(votes);
+    const votersRecounts: VotersRecounts = {
+      poll_card_recount: 987,
+      proxy_certificate_recount: 103,
+      voter_card_recount: 35,
+      total_admitted_voters_recount: 1125,
+    };
+    await votersVotesPage.inputVotersRecounts(votersRecounts);
+    await expect(votersVotesPage.pollCardRecount).toHaveValue(
+      formatNumber(votersRecounts.poll_card_recount),
+    );
+    await votersVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toBeVisible();
+    await differencesPage.next.click();
+
+    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    await expect(candidatesListPage_1.heading).toBeVisible();
+
+    await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
+    await candidatesListPage_1.next.click();
+
+    const saveFormPage = new SaveFormPage(page);
+    await expect(saveFormPage.heading).toBeVisible();
+
+    // TODO: extend as part of epic #95: data entry check and finalisation
+  });
+
+  test("no recount, difference of more ballots counted", async ({ page }) => {
+    await page.goto("/1/input");
+
+    const inputPage = new InputPage(page);
+    await expect(inputPage.heading).toBeVisible();
+    const pollingStation = pollingStation33;
+    await inputPage.selectPollingStationAndClickStart(pollingStation.number);
+
+    const recountedPage = new RecountedPage(page);
+    await expect(recountedPage.heading).toBeVisible();
+    await recountedPage.no.check();
+    await recountedPage.next.click();
+
+    const votersVotesPage = new VotersVotesPage(page);
+    await expect(votersVotesPage.heading).toBeVisible();
+
+    const voters: VotersCounts = {
+      poll_card_count: 1000,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 1125,
+    };
+    await votersVotesPage.inputVotersCounts(voters);
+    const votes: VotesCounts = {
+      votes_candidates_counts: 1135,
+      blank_votes_count: 10,
+      invalid_votes_count: 5,
+      total_votes_cast_count: 1150,
+    };
+    await votersVotesPage.inputVotesCounts(votes);
+    await votersVotesPage.next.click();
+
+    await expect(votersVotesPage.warning).toContainText("W.203");
+    await expect(votersVotesPage.warning).toContainText(
+      "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
+    );
+    await votersVotesPage.acceptWarnings.check();
+    await votersVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toBeVisible();
+
+    const moreBallotsFields: MoreBallotsFields = {
+      moreBallotsCount: 25,
+      tooManyBallotsHandedOutCount: 9,
+      otherExplanationCount: 6,
+      noExplanationCount: 10,
+    };
+    await differencesPage.fillMoreBallotsFields(moreBallotsFields);
+    await differencesPage.next.click();
+
+    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    await expect(candidatesListPage_1.heading).toBeVisible();
+
+    await candidatesListPage_1.fillCandidatesAndTotal([902, 233], 1135);
+    await candidatesListPage_1.next.click();
+
+    const saveFormPage = new SaveFormPage(page);
+    await expect(saveFormPage.heading).toBeVisible();
+
+    // TODO: extend as part of epic #95: data entry check and finalisation
+  });
+
+  test("recount, difference of fewer ballots counted", async ({ page }) => {
+    await page.goto("/1/input");
+
+    const inputPage = new InputPage(page);
+    await expect(inputPage.heading).toBeVisible();
+    const pollingStation = pollingStation33;
+    await inputPage.selectPollingStationAndClickStart(pollingStation.number);
+
+    const recountedPage = new RecountedPage(page);
+    await expect(recountedPage.heading).toBeVisible();
+    await recountedPage.yes.check();
+    await recountedPage.next.click();
+
+    const votersVotesPage = new VotersVotesPage(page);
+    await expect(votersVotesPage.heading).toBeVisible();
+    await expect(votersVotesPage.headingRecount).toBeVisible();
+
+    const voters: VotersCounts = {
+      poll_card_count: 1000,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 1125,
+    };
+    await votersVotesPage.inputVotersCounts(voters);
+
+    const votes: VotesCounts = {
+      votes_candidates_counts: 1090,
+      blank_votes_count: 20,
+      invalid_votes_count: 15,
+      total_votes_cast_count: 1125,
+    };
+    await votersVotesPage.inputVotesCounts(votes);
+
+    const votersRecounts: VotersRecounts = {
+      poll_card_recount: 1020,
+      proxy_certificate_recount: 50,
+      voter_card_recount: 75,
+      total_admitted_voters_recount: 1145,
+    };
+    await votersVotesPage.inputVotersRecounts(votersRecounts);
+    await votersVotesPage.next.click();
+
+    await expect(votersVotesPage.warning).toContainText("W.204");
+    await expect(votersVotesPage.warning).toContainText(
+      "Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).",
+    );
+    await votersVotesPage.acceptWarnings.check();
+    await votersVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toBeVisible();
+
+    const fewerBallotsFields: FewerBallotsFields = {
+      fewerBallotsCount: 20,
+      unreturnedBallotsCount: 6,
+      tooFewBallotsHandedOutCount: 3,
+      otherExplanationCount: 7,
+      noExplanationCount: 4,
+    };
+    await differencesPage.fillFewerBallotsFields(fewerBallotsFields);
+    await differencesPage.next.click();
+
+    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    await expect(candidatesListPage_1.heading).toBeVisible();
+
+    await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
+    await candidatesListPage_1.next.click();
+
+    const saveFormPage = new SaveFormPage(page);
+    await expect(saveFormPage.heading).toBeVisible();
+
+    // TODO: extend as part of epic #95: data entry check and finalisation
   });
 });
 
@@ -84,16 +276,16 @@ test.describe("errors and warnings", () => {
     // fill form with data that results in an error
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
-      poll_card_count: "1",
-      proxy_certificate_count: "0",
-      voter_card_count: "0",
-      total_admitted_voters_count: "100",
+      poll_card_count: 1,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: "100",
-      blank_votes_count: "0",
-      invalid_votes_count: "0",
-      total_votes_cast_count: "100",
+      votes_candidates_counts: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
     };
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
@@ -105,12 +297,12 @@ test.describe("errors and warnings", () => {
 
     // fill form with corrected data (no errors, no warnings)
     const votersCorrected = {
-      poll_card_count: "98",
-      proxy_certificate_count: "1",
-      voter_card_count: "1",
-      total_admitted_voters_count: "100",
+      poll_card_count: 98,
+      proxy_certificate_count: 1,
+      voter_card_count: 1,
+      total_admitted_voters_count: 100,
     };
-    await votersVotesPage.inputVoters(votersCorrected);
+    await votersVotesPage.inputVotersCounts(votersCorrected);
     await votersVotesPage.next.click();
 
     await expect(votersVotesPage.error).toBeHidden();
@@ -130,16 +322,16 @@ test.describe("errors and warnings", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
-      poll_card_count: "99",
-      proxy_certificate_count: "1",
-      voter_card_count: "0",
-      total_admitted_voters_count: "100",
+      poll_card_count: 99,
+      proxy_certificate_count: 1,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: "100",
-      blank_votes_count: "0",
-      invalid_votes_count: "0",
-      total_votes_cast_count: "100",
+      votes_candidates_counts: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
     };
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
@@ -177,16 +369,16 @@ test.describe("errors and warnings", () => {
     // fill form with data that results in a warning
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
-      poll_card_count: "100",
-      proxy_certificate_count: "0",
-      voter_card_count: "0",
-      total_admitted_voters_count: "100",
+      poll_card_count: 100,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: "100",
-      blank_votes_count: "0",
-      invalid_votes_count: "0",
-      total_votes_cast_count: "100",
+      votes_candidates_counts: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
     };
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
@@ -217,16 +409,16 @@ test.describe("errors and warnings", () => {
     // fill form with data that results in a warning
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
-      poll_card_count: "100",
-      proxy_certificate_count: "0",
-      voter_card_count: "0",
-      total_admitted_voters_count: "100",
+      poll_card_count: 100,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: "100",
-      blank_votes_count: "0",
-      invalid_votes_count: "0",
-      total_votes_cast_count: "100",
+      votes_candidates_counts: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
     };
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
@@ -241,13 +433,13 @@ test.describe("errors and warnings", () => {
 
     // correct the warning
     const votersCorrected = {
-      poll_card_count: "98",
-      proxy_certificate_count: "1",
-      voter_card_count: "1",
-      total_admitted_voters_count: "100",
+      poll_card_count: 98,
+      proxy_certificate_count: 1,
+      voter_card_count: 1,
+      total_admitted_voters_count: 100,
     };
 
-    await votersVotesPage.inputVoters(votersCorrected);
+    await votersVotesPage.inputVotersCounts(votersCorrected);
     // Tab press needed for page to register change after Playwright's fill()
     await votersVotesPage.totalAdmittedVotersCount.press("Tab");
     await votersVotesPage.next.click();
@@ -272,16 +464,16 @@ test.describe("errors and warnings", () => {
     // fill form with data that results in a warning
     const votersVotesPage = new VotersVotesPage(page);
     const voters = {
-      poll_card_count: "100",
-      proxy_certificate_count: "0",
-      voter_card_count: "0",
-      total_admitted_voters_count: "100",
+      poll_card_count: 100,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: "100",
-      blank_votes_count: "0",
-      invalid_votes_count: "0",
-      total_votes_cast_count: "100",
+      votes_candidates_counts: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
     };
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
@@ -314,17 +506,17 @@ test.describe("navigation", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    const voters = {
-      poll_card_count: "99",
-      proxy_certificate_count: "1",
-      voter_card_count: "0",
-      total_admitted_voters_count: "100",
+    const voters: VotersCounts = {
+      poll_card_count: 99,
+      proxy_certificate_count: 1,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
     };
-    const votes = {
-      votes_candidates_counts: "100",
-      blank_votes_count: "0",
-      invalid_votes_count: "0",
-      total_votes_cast_count: "100",
+    const votes: VotesCounts = {
+      votes_candidates_counts: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
     };
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
@@ -334,13 +526,13 @@ test.describe("navigation", () => {
     await differencesPage.navPanel.votersAndVotes.click();
     await votersVotesPage.heading.waitFor();
 
-    const votersUpdates = {
-      poll_card_count: "90",
-      proxy_certificate_count: "5",
-      voter_card_count: "5",
-      total_admitted_voters_count: "100",
+    const votersUpdates: VotersCounts = {
+      poll_card_count: 90,
+      proxy_certificate_count: 5,
+      voter_card_count: 5,
+      total_admitted_voters_count: 100,
     };
-    await votersVotesPage.inputVoters(votersUpdates);
+    await votersVotesPage.inputVotersCounts(votersUpdates);
     // Tab press needed for page to register change after Playwright's fill()
     await votersVotesPage.totalAdmittedVotersCount.press("Tab");
 
@@ -370,17 +562,17 @@ test.describe("navigation", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    const voters = {
-      poll_card_count: "99",
-      proxy_certificate_count: "1",
-      voter_card_count: "0",
-      total_admitted_voters_count: "100",
+    const voters: VotersCounts = {
+      poll_card_count: 99,
+      proxy_certificate_count: 1,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
     };
-    const votes = {
-      votes_candidates_counts: "100",
-      blank_votes_count: "0",
-      invalid_votes_count: "0",
-      total_votes_cast_count: "100",
+    const votes: VotesCounts = {
+      votes_candidates_counts: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
     };
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
@@ -390,13 +582,13 @@ test.describe("navigation", () => {
     await differencesPage.navPanel.votersAndVotes.click();
     await votersVotesPage.heading.waitFor();
 
-    const votersUpdates = {
-      poll_card_count: "90",
-      proxy_certificate_count: "5",
-      voter_card_count: "5",
-      total_admitted_voters_count: "100",
+    const votersUpdates: VotersCounts = {
+      poll_card_count: 90,
+      proxy_certificate_count: 5,
+      voter_card_count: 5,
+      total_admitted_voters_count: 100,
     };
-    await votersVotesPage.inputVoters(votersUpdates);
+    await votersVotesPage.inputVotersCounts(votersUpdates);
     // Tab press needed for page to register change after Playwright's fill()
     await votersVotesPage.totalAdmittedVotersCount.press("Tab");
 
@@ -435,17 +627,17 @@ test.describe("navigation", () => {
         "je bent hier",
       );
 
-      const voters = {
-        poll_card_count: "100",
-        proxy_certificate_count: "0",
-        voter_card_count: "0",
-        total_admitted_voters_count: "100",
+      const voters: VotersCounts = {
+        poll_card_count: 100,
+        proxy_certificate_count: 0,
+        voter_card_count: 0,
+        total_admitted_voters_count: 100,
       };
-      const votes = {
-        votes_candidates_counts: "100",
-        blank_votes_count: "0",
-        invalid_votes_count: "0",
-        total_votes_cast_count: "100",
+      const votes: VotesCounts = {
+        votes_candidates_counts: 100,
+        blank_votes_count: 0,
+        invalid_votes_count: 0,
+        total_votes_cast_count: 100,
       };
       await votersVotesPage.fillInPageAndClickNext(voters, votes);
       await votersVotesPage.acceptWarnings.click();

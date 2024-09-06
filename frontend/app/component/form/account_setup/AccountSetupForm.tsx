@@ -43,9 +43,11 @@ export function AccountSetupForm() {
       />
       <InputField name="new_password2" label="Herhaal wachtwoord" type="password" margin={false} />
       <BottomBar type="footer">
-        <Button type="submit" size="lg">
-          Opslaan
-        </Button>
+        <BottomBar.Row>
+          <Button type="submit" size="lg">
+            Opslaan
+          </Button>
+        </BottomBar.Row>
       </BottomBar>
     </form>
   );

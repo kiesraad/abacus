@@ -33,9 +33,11 @@ export function LoginForm() {
         type="password"
       />
       <BottomBar type="footer">
-        <Button type="submit" size="lg">
-          Inloggen
-        </Button>
+        <BottomBar.Row>
+          <Button type="submit" size="lg">
+            Inloggen
+          </Button>
+        </BottomBar.Row>
       </BottomBar>
     </form>
   );

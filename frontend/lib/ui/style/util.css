@@ -1,7 +1,7 @@
 .flex {
   display: flex;
   justify-content: flex-start;
-  gap: 32px;
+  gap: 2rem;
   .flex-3 {
     > * {
       flex: 1 1 auto;
@@ -10,5 +10,5 @@
 }
 
 .mb {
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }

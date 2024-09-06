@@ -1,5 +1,5 @@
 .navBar {
-  flex: 0 0 44px;
+  flex: 0 0 2.75rem;
   padding: 0 5rem;
   background-color: var(--base-brand-blue);
   color: var(--base-white);

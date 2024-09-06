@@ -3,7 +3,7 @@
   align-items: center;
 
   input {
-    margin-right: 8px;
+    margin-right: 0.5rem;
   }
 
   &:global(.hidden) {

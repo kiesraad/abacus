@@ -1,10 +1,9 @@
 import * as React from "react";
 
 import { IconCross } from "@kiesraad/icon";
-import { IconButton, renderIconForType } from "@kiesraad/ui";
+import { AlertType, IconButton, renderIconForType } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
-import { AlertType } from "../ui.types";
 import cls from "./Alert.module.css";
 
 export interface AlertProps {

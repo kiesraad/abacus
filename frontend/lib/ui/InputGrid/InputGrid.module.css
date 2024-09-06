@@ -50,7 +50,7 @@
           font-family: var(--font-number);
           text-align: right;
           width: 100%;
-          height: 72px;
+          height: 4.5rem;
           border: 3px solid transparent;
           padding: 1rem 1.5rem;
           font-size: var(--font-size-body);
@@ -70,7 +70,7 @@
       &:global(.sep) {
         border: 0;
         border-bottom: 1px solid var(--bg-gray-darkest);
-        height: 24px;
+        height: 1.5rem;
       }
     }
 

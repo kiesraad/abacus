@@ -27,4 +27,9 @@ export class InputPage {
     // so added timeout to make it fail fast
     await button.click({ timeout: 2000 });
   }
+
+  async selectPollingStationAndClickStart(pollingStationNumber: number) {
+    await this.pollingstationNumber.fill(pollingStationNumber.toString());
+    await this.clickStart();
+  }
 }

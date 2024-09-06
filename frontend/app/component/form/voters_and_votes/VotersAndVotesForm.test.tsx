@@ -1,3 +1,4 @@
+import { within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
@@ -201,6 +202,15 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
+      expect(screen.getByTestId("poll_card_count")).toBeValid();
+      expect(screen.getByTestId("proxy_certificate_count")).toBeValid();
+      expect(screen.getByTestId("voter_card_count")).toBeValid();
+      expect(screen.getByTestId("total_admitted_voters_count")).toBeValid();
+      expect(screen.getByTestId("votes_candidates_counts")).toBeValid();
+      expect(screen.getByTestId("blank_votes_count")).toBeValid();
+      expect(screen.getByTestId("invalid_votes_count")).toBeValid();
+      expect(screen.getByTestId("total_votes_cast_count")).toBeValid();
+
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
 
@@ -233,20 +243,44 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      // We await the first element to appear, so we know the page is loaded
-      await user.type(await screen.findByTestId("poll_card_count"), "1");
-      await user.type(screen.getByTestId("proxy_certificate_count"), "1");
-      await user.type(screen.getByTestId("voter_card_count"), "1");
-      await user.type(screen.getByTestId("total_admitted_voters_count"), "4");
+      const pollCardCount = screen.getByTestId("poll_card_count");
+      const proxyCertificateCount = screen.getByTestId("proxy_certificate_count");
+      const voterCardCount = screen.getByTestId("voter_card_count");
+      const totalAdmittedVotersCount = screen.getByTestId("total_admitted_voters_count");
+
+      await user.type(pollCardCount, "1");
+      await user.type(proxyCertificateCount, "1");
+      await user.type(voterCardCount, "1");
+      await user.type(totalAdmittedVotersCount, "4");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
+      const feedbackMessage =
+        "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(
-        `Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
-      );
+      expect(feedbackError).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(pollCardCount).toBeInvalid();
+      expect(pollCardCount).toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(
+        within(pollCardCount.previousElementSibling as HTMLElement).getByRole("img"),
+      ).toHaveAccessibleName("bevat een fout");
+      expect(proxyCertificateCount).toBeInvalid();
+      expect(proxyCertificateCount).toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(
+        within(proxyCertificateCount.previousElementSibling as HTMLElement).getByRole("img"),
+      ).toHaveAccessibleName("bevat een fout");
+      expect(voterCardCount).toBeInvalid();
+      expect(voterCardCount).toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(
+        within(voterCardCount.previousElementSibling as HTMLElement).getByRole("img"),
+      ).toHaveAccessibleName("bevat een fout");
+      expect(totalAdmittedVotersCount).toBeInvalid();
+      expect(totalAdmittedVotersCount).toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(
+        within(totalAdmittedVotersCount.previousElementSibling as HTMLElement).getByRole("img"),
+      ).toHaveAccessibleName("bevat een fout");
     });
 
     test("F.202 IncorrectTotal Votes counts", async () => {
@@ -271,21 +305,32 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      // We await the first element to appear, so we know the page is loaded
-      await user.type(await screen.findByTestId("votes_candidates_counts"), "1");
-      await user.type(screen.getByTestId("blank_votes_count"), "1");
-      await user.type(screen.getByTestId("invalid_votes_count"), "1");
-      await user.type(screen.getByTestId("total_votes_cast_count"), "4");
+      const votesCandidatesCounts = screen.getByTestId("votes_candidates_counts");
+      const blankVotesCount = screen.getByTestId("blank_votes_count");
+      const invalidVotesCount = screen.getByTestId("invalid_votes_count");
+      const totalVotesCastCount = screen.getByTestId("total_votes_cast_count");
+
+      await user.type(votesCandidatesCounts, "1");
+      await user.type(blankVotesCount, "1");
+      await user.type(invalidVotesCount, "1");
+      await user.type(totalVotesCastCount, "4");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
+      const feedbackMessage =
+        "Controleer uitgebrachte stemmenF.202De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(
-        `Controleer uitgebrachte stemmenF.202De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
-      );
+      expect(feedbackError).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+      expect(votesCandidatesCounts).toBeInvalid();
+      expect(votesCandidatesCounts).toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(blankVotesCount).toBeInvalid();
+      expect(blankVotesCount).toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(invalidVotesCount).toBeInvalid();
+      expect(invalidVotesCount).toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(totalVotesCastCount).toBeInvalid();
+      expect(totalVotesCastCount).toHaveAccessibleErrorMessage(feedbackMessage);
     });
 
     test("F.203 IncorrectTotal Voters recounts", async () => {
@@ -310,24 +355,37 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: true });
 
-      await user.type(screen.getByTestId("poll_card_recount"), "1");
-      await user.type(screen.getByTestId("proxy_certificate_recount"), "1");
-      await user.type(screen.getByTestId("voter_card_recount"), "1");
-      await user.type(screen.getByTestId("total_admitted_voters_recount"), "4");
+      const pollCardRecount = screen.getByTestId("poll_card_recount");
+      const proxyCertificateRecount = screen.getByTestId("proxy_certificate_recount");
+      const voterCardRecount = screen.getByTestId("voter_card_recount");
+      const totalAdmittedVotersRecount = screen.getByTestId("total_admitted_voters_recount");
+
+      await user.type(pollCardRecount, "1");
+      await user.type(proxyCertificateRecount, "1");
+      await user.type(voterCardRecount, "1");
+      await user.type(totalAdmittedVotersRecount, "4");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
+      const feedbackMessage =
+        "Controleer hertelde toegelaten kiezersF.203De invoer bij A.2, B.2, C.2 of D.2 klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(
-        `Controleer hertelde toegelaten kiezersF.203De invoer bij A.2, B.2, C.2 of D.2 klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
-      );
+      expect(feedbackError).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      expect(pollCardRecount).toBeInvalid();
+      expect(pollCardRecount).toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(proxyCertificateRecount).toBeInvalid();
+      expect(proxyCertificateRecount).toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(voterCardRecount).toBeInvalid();
+      expect(voterCardRecount).toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(totalAdmittedVotersRecount).toBeInvalid();
+      expect(totalAdmittedVotersRecount).toHaveAccessibleErrorMessage(feedbackMessage);
     });
   });
 
   describe("VotersAndVotesForm warnings", () => {
-    test("clicking next without accepting warning results in alert shown", async () => {
+    test("clicking next without accepting warning results in alert shown and then accept warning", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -344,19 +402,32 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      // We await the first element to appear, so we know the page is loaded
-      await user.type(await screen.findByTestId("votes_candidates_counts"), "0");
-      await user.type(screen.getByTestId("blank_votes_count"), "1");
-      await user.type(screen.getByTestId("invalid_votes_count"), "0");
-      await user.type(screen.getByTestId("total_votes_cast_count"), "1");
+      const votesCandidatesCounts = screen.getByTestId("votes_candidates_counts");
+      const blankVotesCount = screen.getByTestId("blank_votes_count");
+      const invalidVotesCount = screen.getByTestId("invalid_votes_count");
+      const totalVotesCastCount = screen.getByTestId("total_votes_cast_count");
+
+      await user.type(votesCandidatesCounts, "0");
+      await user.type(blankVotesCount, "1");
+      await user.type(invalidVotesCount, "0");
+      await user.type(totalVotesCastCount, "1");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
+      const feedbackMessage =
+        "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(
-        `Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
-      );
+      expect(feedbackWarning).toHaveTextContent(feedbackMessage);
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      expect(votesCandidatesCounts).toBeValid();
+      expect(votesCandidatesCounts).not.toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(blankVotesCount).toBeInvalid();
+      expect(blankVotesCount).toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(invalidVotesCount).toBeValid();
+      expect(invalidVotesCount).not.toHaveAccessibleErrorMessage(feedbackMessage);
+      expect(totalVotesCastCount).toBeValid();
+      expect(totalVotesCastCount).not.toHaveAccessibleErrorMessage(feedbackMessage);
 
       const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
         name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
@@ -368,6 +439,13 @@ describe("Test VotersAndVotesForm", () => {
       expect(alertText).toHaveTextContent(
         /^Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.$/,
       );
+
+      acceptFeedbackCheckbox.click();
+      await user.click(submitButton);
+
+      expect(feedbackWarning).toHaveTextContent(feedbackMessage);
+      expect(blankVotesCount).toBeValid();
+      expect(blankVotesCount).not.toHaveAccessibleErrorMessage(feedbackMessage);
     });
 
     test("W.201 high number of blank votes", async () => {
@@ -637,7 +715,6 @@ describe("Test VotersAndVotesForm", () => {
       expect(feedbackWarning).toHaveTextContent(
         `Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezersW.207Het totaal aantal uitgebrachte stemmen (H) en/of het herteld totaal aantal toegelaten kiezers (D.2) is hoger dan het aantal kiesgerechtigden voor dit stembureau.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
       );
-      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 

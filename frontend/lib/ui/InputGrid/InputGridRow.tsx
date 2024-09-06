@@ -46,8 +46,8 @@ export function InputGridRow({
   const [value, setValue] = React.useState(() => (defaultValue ? format(defaultValue) : ""));
 
   const children: [React.ReactElement, React.ReactElement, React.ReactElement] = [
-    <td>{field}</td>,
-    <td>
+    <td key={`${id}-1`}>{field}</td>,
+    <td key={`${id}-2`}>
       <FormField hasError={hasError} hasWarning={hasWarning}>
         <input
           key={id}
@@ -72,7 +72,7 @@ export function InputGridRow({
         />
       </FormField>
     </td>,
-    <td>{title}</td>,
+    <td key={`${id}-3`}>{title}</td>,
   ];
   return isListTotal ? (
     <InputGrid.ListTotal id={id}>{children}</InputGrid.ListTotal>

@@ -101,16 +101,20 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const handleSubmit = (event: React.FormEvent<CandidatesVotesFormElement>) =>
     void (async (event: React.FormEvent<CandidatesVotesFormElement>) => {
       event.preventDefault();
-      const ignoreWarnings = (
-        document.getElementById(
-          `candidates_votes_form_ignore_warnings_${group.number}`,
-        ) as HTMLInputElement
-      ).checked;
 
-      if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
-        setWarningsWarning(true);
+      if (errors.length === 0 && warnings.length > 0) {
+        const ignoreWarnings = (
+          document.getElementById(
+            `candidates_votes_form_ignore_warnings_${group.number}`,
+          ) as HTMLInputElement
+        ).checked;
+        if (!hasChanges && !ignoreWarnings) {
+          setWarningsWarning(true);
+        } else {
+          await submit(ignoreWarnings);
+        }
       } else {
-        await submit(ignoreWarnings);
+        await submit();
       }
     })(event);
 

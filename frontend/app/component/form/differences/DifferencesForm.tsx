@@ -146,6 +146,7 @@ export function DifferencesForm() {
             id="more_ballots_count"
             title="Stembiljetten méér geteld"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.more_ballots_count}
@@ -157,6 +158,7 @@ export function DifferencesForm() {
             id="fewer_ballots_count"
             title="Stembiljetten minder geteld"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.fewer_ballots_count}
@@ -169,6 +171,7 @@ export function DifferencesForm() {
             id="unreturned_ballots_count"
             title="Niet ingeleverde stembiljetten"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.unreturned_ballots_count}
@@ -179,6 +182,7 @@ export function DifferencesForm() {
             id="too_few_ballots_handed_out_count"
             title="Te weinig uitgereikte stembiljetten"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.too_few_ballots_handed_out_count}
@@ -189,6 +193,7 @@ export function DifferencesForm() {
             id="too_many_ballots_handed_out_count"
             title="Te veel uitgereikte stembiljetten"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.too_many_ballots_handed_out_count}
@@ -199,6 +204,7 @@ export function DifferencesForm() {
             id="other_explanation_count"
             title="Andere verklaring voor het verschil"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.other_explanation_count}
@@ -211,6 +217,7 @@ export function DifferencesForm() {
             id="no_explanation_count"
             title="Geen verklaring voor het verschil"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.differences_counts.no_explanation_count}

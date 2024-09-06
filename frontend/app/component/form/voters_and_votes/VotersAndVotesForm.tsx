@@ -168,6 +168,7 @@ export function VotersAndVotesForm() {
             id="poll_card_count"
             title="Stempassen"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.voters_counts.poll_card_count}
@@ -179,6 +180,7 @@ export function VotersAndVotesForm() {
             id="proxy_certificate_count"
             title="Volmachtbewijzen"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             defaultValue={sectionValues.voters_counts.proxy_certificate_count}
             format={format}
@@ -189,6 +191,7 @@ export function VotersAndVotesForm() {
             id="voter_card_count"
             title="Kiezerspassen"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.voters_counts.voter_card_count}
@@ -199,6 +202,7 @@ export function VotersAndVotesForm() {
             id="total_admitted_voters_count"
             title="Totaal toegelaten kiezers"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.voters_counts.total_admitted_voters_count}
@@ -212,6 +216,7 @@ export function VotersAndVotesForm() {
             id="votes_candidates_counts"
             title="Stemmen op kandidaten"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.votes_counts.votes_candidates_counts}
@@ -222,6 +227,7 @@ export function VotersAndVotesForm() {
             id="blank_votes_count"
             title="Blanco stemmen"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.votes_counts.blank_votes_count}
@@ -232,6 +238,7 @@ export function VotersAndVotesForm() {
             id="invalid_votes_count"
             title="Ongeldige stemmen"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.votes_counts.invalid_votes_count}
@@ -242,6 +249,7 @@ export function VotersAndVotesForm() {
             id="total_votes_cast_count"
             title="Totaal uitgebrachte stemmen"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={sectionValues.votes_counts.total_votes_cast_count}
@@ -265,6 +273,7 @@ export function VotersAndVotesForm() {
                 id="poll_card_recount"
                 title="Stempassen"
                 errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+                warningsAccepted={getIgnoreWarnings()}
                 inputProps={register()}
                 format={format}
                 defaultValue={sectionValues.voters_recounts?.poll_card_recount}
@@ -275,6 +284,7 @@ export function VotersAndVotesForm() {
                 id="proxy_certificate_recount"
                 title="Volmachtbewijzen"
                 errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+                warningsAccepted={getIgnoreWarnings()}
                 inputProps={register()}
                 defaultValue={sectionValues.voters_recounts?.proxy_certificate_recount}
                 format={format}
@@ -285,6 +295,7 @@ export function VotersAndVotesForm() {
                 id="voter_card_recount"
                 title="Kiezerspassen"
                 errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+                warningsAccepted={getIgnoreWarnings()}
                 inputProps={register()}
                 format={format}
                 defaultValue={sectionValues.voters_recounts?.voter_card_recount}
@@ -295,6 +306,7 @@ export function VotersAndVotesForm() {
                 id="total_admitted_voters_recount"
                 title="Totaal toegelaten kiezers"
                 errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+                warningsAccepted={getIgnoreWarnings()}
                 inputProps={register()}
                 format={format}
                 defaultValue={sectionValues.voters_recounts?.total_admitted_voters_recount}

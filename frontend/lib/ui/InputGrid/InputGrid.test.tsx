@@ -3,53 +3,16 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "app/test/unit";
 
-import { InputGrid } from "./InputGrid";
-
-const component = (
-  <InputGrid>
-    <InputGrid.Header>
-      <th>Veld</th>
-      <th>Geteld aantal</th>
-      <th>Omschrijving</th>
-    </InputGrid.Header>
-    <InputGrid.Body>
-      <InputGrid.Row>
-        <td>A</td>
-        <td>
-          <input id="input1" defaultValue={1} />
-        </td>
-        <td>Input field 1</td>
-      </InputGrid.Row>
-
-      <InputGrid.Separator />
-
-      <InputGrid.Row>
-        <td>B</td>
-        <td>
-          <input id="input2" defaultValue={2} />
-        </td>
-        <td>Input field 2</td>
-      </InputGrid.Row>
-
-      <InputGrid.Row>
-        <td>C</td>
-        <td>
-          <input id="input3" defaultValue={3} />
-        </td>
-        <td>Input field 3</td>
-      </InputGrid.Row>
-    </InputGrid.Body>
-  </InputGrid>
-);
+import { DefaultGrid } from "./InputGrid.stories.tsx";
 
 describe("InputGrid", () => {
   test("InputGrid renders", () => {
-    render(component);
+    render(<DefaultGrid />);
     expect(true).toBe(true);
   });
 
   test("Row has focused class when input has focus", () => {
-    render(component);
+    render(<DefaultGrid />);
 
     const firstInput = screen.getByTestId("input1");
     firstInput.focus();
@@ -62,7 +25,7 @@ describe("InputGrid", () => {
   });
 
   test("Move focus arrow up and down and tab and enter", async () => {
-    render(component);
+    render(<DefaultGrid />);
 
     const firstInput = screen.getByTestId("input1");
     const secondInput = screen.getByTestId("input2");

@@ -154,6 +154,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 id={`candidate_votes[${candidate.number - 1}].votes`}
                 title={`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`}
                 errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+                warningsAccepted={getIgnoreWarnings()}
                 inputProps={register()}
                 format={format}
                 addSeparator={addSeparator}
@@ -169,6 +170,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             id="total"
             title={`Totaal lijst ${group.number}`}
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
+            warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
             defaultValue={format(sectionValues?.total || "")}

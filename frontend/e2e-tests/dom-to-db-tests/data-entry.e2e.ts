@@ -10,7 +10,7 @@ import { VotersVotesPage } from "e2e-tests/page-objects/input/VotersVotesPgObj";
 import { pollingStation33 } from "./test-data/PollingStationTestData";
 
 test.describe("data entry", () => {
-  test("no recount, no differences flow", async ({ page }) => {
+  test("no recount, no differences", async ({ page }) => {
     await page.goto("/1/input");
 
     const inputPage = new InputPage(page);
@@ -61,7 +61,7 @@ test.describe("data entry", () => {
     // TODO: extend as part of epic #95: data entry check and finalisation
   });
 
-  test("recount, differences flow", async ({ page }) => {
+  test("recount, no differences", async ({ page }) => {
     await page.goto("/1/input");
 
     const inputPage = new InputPage(page);
@@ -73,6 +73,126 @@ test.describe("data entry", () => {
     await expect(recountedPage.heading).toBeVisible();
     await recountedPage.yes.check();
     await expect(recountedPage.yes).toBeChecked();
+    await recountedPage.next.click();
+
+    const votersVotesPage = new VotersVotesPage(page);
+    await expect(votersVotesPage.heading).toBeVisible();
+    const voters = {
+      poll_card_count: 1000,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 1125,
+    };
+    await votersVotesPage.inputVotersCounts(voters);
+    const votes = {
+      votes_candidates_counts: 1090,
+      blank_votes_count: 20,
+      invalid_votes_count: 15,
+      total_votes_cast_count: 1125,
+    };
+    await votersVotesPage.inputVotesCounts(votes);
+    const votersRecounts = {
+      poll_card_recount: 987,
+      proxy_certificate_recount: 103,
+      voter_card_recount: 35,
+      total_admitted_voters_recount: 1125,
+    };
+    await votersVotesPage.inputVotersRecounts(votersRecounts);
+    await expect(votersVotesPage.pollCardRecount).toHaveValue(
+      formatNumber(votersRecounts.poll_card_recount),
+    );
+    await votersVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toBeVisible();
+    await differencesPage.next.click();
+
+    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    await expect(candidatesListPage_1.heading).toBeVisible();
+
+    await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
+    await candidatesListPage_1.next.click();
+
+    const saveFormPage = new SaveFormPage(page);
+    await expect(saveFormPage.heading).toBeVisible();
+
+    // TODO: extend as part of epic #95: data entry check and finalisation
+  });
+
+  test("no recount, difference of more ballots counted", async ({ page }) => {
+    await page.goto("/1/input");
+
+    const inputPage = new InputPage(page);
+    await expect(inputPage.heading).toBeVisible();
+    const pollingStation = pollingStation33;
+    await inputPage.selectPollingStationAndClickStart(pollingStation.number);
+
+    const recountedPage = new RecountedPage(page);
+    await expect(recountedPage.heading).toBeVisible();
+    await recountedPage.no.check();
+    await recountedPage.next.click();
+
+    const votersVotesPage = new VotersVotesPage(page);
+    await expect(votersVotesPage.heading).toBeVisible();
+
+    const voters = {
+      poll_card_count: 1000,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 1125,
+    };
+    await votersVotesPage.inputVotersCounts(voters);
+    const votes = {
+      votes_candidates_counts: 1135,
+      blank_votes_count: 10,
+      invalid_votes_count: 5,
+      total_votes_cast_count: 1150,
+    };
+    await votersVotesPage.inputVotesCounts(votes);
+    await votersVotesPage.next.click();
+
+    await expect(votersVotesPage.warning).toContainText("W.203");
+    await expect(votersVotesPage.warning).toContainText(
+      "r is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
+    );
+    await votersVotesPage.acceptWarnings.check();
+    await votersVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toBeVisible();
+
+    const moreBallotsFields = {
+      moreBallotsCount: 25,
+      tooManyBallotsHandedOutCount: 9,
+      otherExplanationCount: 6,
+      noExplanationCount: 10,
+    };
+    await differencesPage.fillMoreBallotsFields(moreBallotsFields);
+    await differencesPage.next.click();
+
+    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    await expect(candidatesListPage_1.heading).toBeVisible();
+
+    await candidatesListPage_1.fillCandidatesAndTotal([902, 233], 1135);
+    await candidatesListPage_1.next.click();
+
+    const saveFormPage = new SaveFormPage(page);
+    await expect(saveFormPage.heading).toBeVisible();
+
+    // TODO: extend as part of epic #95: data entry check and finalisation
+  });
+
+  test("recount, difference of fewer ballots counted", async ({ page }) => {
+    await page.goto("/1/input");
+
+    const inputPage = new InputPage(page);
+    await expect(inputPage.heading).toBeVisible();
+    const pollingStation = pollingStation33;
+    await inputPage.selectPollingStationAndClickStart(pollingStation.number);
+
+    const recountedPage = new RecountedPage(page);
+    await expect(recountedPage.heading).toBeVisible();
+    await recountedPage.yes.check();
     await recountedPage.next.click();
 
     const votersVotesPage = new VotersVotesPage(page);
@@ -102,9 +222,6 @@ test.describe("data entry", () => {
       total_admitted_voters_recount: 1145,
     };
     await votersVotesPage.inputVotersRecounts(votersRecounts);
-    await expect(votersVotesPage.pollCardRecount).toHaveValue(
-      formatNumber(votersRecounts.poll_card_recount),
-    );
     await votersVotesPage.next.click();
 
     await expect(votersVotesPage.warning).toContainText("W.204");

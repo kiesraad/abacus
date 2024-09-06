@@ -72,4 +72,8 @@ export class VotersVotesPage extends InputBasePage {
     await this.inputVotes(votesCounts);
     await this.next.click();
   }
+
+  async checkAcceptWarnings() {
+    await this.acceptWarnings.check({ force: true, noWaitAfter: true });
+  }
 }

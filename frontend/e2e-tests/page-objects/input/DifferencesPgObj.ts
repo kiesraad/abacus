@@ -2,14 +2,14 @@ import { type Locator, type Page } from "@playwright/test";
 
 import { InputBasePage } from "./InputBasePgObj";
 
-interface MoreBallotFields {
+export interface MoreBallotsFields {
   moreBallotsCount: number;
   tooManyBallotsHandedOutCount: number;
   otherExplanationCount: number;
   noExplanationCount: number;
 }
 
-interface FewerBallotsFields {
+export interface FewerBallotsFields {
   fewerBallotsCount: number;
   unreturnedBallotsCount: number;
   tooFewBallotsHandedOutCount: number;
@@ -48,7 +48,7 @@ export class DifferencesPage extends InputBasePage {
     this.next = page.getByRole("button", { name: "Volgende" });
   }
 
-  async fillMoreBallotsFields(fields: MoreBallotFields) {
+  async fillMoreBallotsFields(fields: MoreBallotsFields) {
     await this.moreBallotsCount.fill(fields.moreBallotsCount.toString());
     await this.tooManyBallotsHandedOutCount.fill(fields.tooManyBallotsHandedOutCount.toString());
     await this.otherExplanationCount.fill(fields.otherExplanationCount.toString());

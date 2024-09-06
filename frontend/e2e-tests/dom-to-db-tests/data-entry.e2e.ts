@@ -1,11 +1,20 @@
 import { expect, test } from "@playwright/test";
 import { formatNumber } from "e2e-tests/e2e-test-utils";
 import { CandidatesListPage } from "e2e-tests/page-objects/input/CandidatesListPgObj";
-import { DifferencesPage } from "e2e-tests/page-objects/input/DifferencesPgObj";
+import {
+  DifferencesPage,
+  FewerBallotsFields,
+  MoreBallotsFields,
+} from "e2e-tests/page-objects/input/DifferencesPgObj";
 import { InputPage } from "e2e-tests/page-objects/input/InputPgObj";
 import { RecountedPage } from "e2e-tests/page-objects/input/RecountedPgObj";
 import { SaveFormPage } from "e2e-tests/page-objects/input/SaveFormPgObj";
-import { VotersVotesPage } from "e2e-tests/page-objects/input/VotersVotesPgObj";
+import {
+  VotersCounts,
+  VotersRecounts,
+  VotersVotesPage,
+  VotesCounts,
+} from "e2e-tests/page-objects/input/VotersVotesPgObj";
 
 import { pollingStation33 } from "./test-data/PollingStationTestData";
 
@@ -28,13 +37,13 @@ test.describe("data entry", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await expect(votersVotesPage.heading).toBeVisible();
-    const voters = {
+    const voters: VotersCounts = {
       poll_card_count: 1000,
       proxy_certificate_count: 50,
       voter_card_count: 75,
       total_admitted_voters_count: 1125,
     };
-    const votes = {
+    const votes: VotesCounts = {
       votes_candidates_counts: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
@@ -77,21 +86,21 @@ test.describe("data entry", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await expect(votersVotesPage.heading).toBeVisible();
-    const voters = {
+    const voters: VotersCounts = {
       poll_card_count: 1000,
       proxy_certificate_count: 50,
       voter_card_count: 75,
       total_admitted_voters_count: 1125,
     };
     await votersVotesPage.inputVotersCounts(voters);
-    const votes = {
+    const votes: VotesCounts = {
       votes_candidates_counts: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
     };
     await votersVotesPage.inputVotesCounts(votes);
-    const votersRecounts = {
+    const votersRecounts: VotersRecounts = {
       poll_card_recount: 987,
       proxy_certificate_recount: 103,
       voter_card_recount: 35,
@@ -135,14 +144,14 @@ test.describe("data entry", () => {
     const votersVotesPage = new VotersVotesPage(page);
     await expect(votersVotesPage.heading).toBeVisible();
 
-    const voters = {
+    const voters: VotersCounts = {
       poll_card_count: 1000,
       proxy_certificate_count: 50,
       voter_card_count: 75,
       total_admitted_voters_count: 1125,
     };
     await votersVotesPage.inputVotersCounts(voters);
-    const votes = {
+    const votes: VotesCounts = {
       votes_candidates_counts: 1135,
       blank_votes_count: 10,
       invalid_votes_count: 5,
@@ -161,7 +170,7 @@ test.describe("data entry", () => {
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.heading).toBeVisible();
 
-    const moreBallotsFields = {
+    const moreBallotsFields: MoreBallotsFields = {
       moreBallotsCount: 25,
       tooManyBallotsHandedOutCount: 9,
       otherExplanationCount: 6,
@@ -199,7 +208,7 @@ test.describe("data entry", () => {
     await expect(votersVotesPage.heading).toBeVisible();
     await expect(votersVotesPage.headingRecount).toBeVisible();
 
-    const voters = {
+    const voters: VotersCounts = {
       poll_card_count: 1000,
       proxy_certificate_count: 50,
       voter_card_count: 75,
@@ -207,7 +216,7 @@ test.describe("data entry", () => {
     };
     await votersVotesPage.inputVotersCounts(voters);
 
-    const votes = {
+    const votes: VotesCounts = {
       votes_candidates_counts: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
@@ -215,7 +224,7 @@ test.describe("data entry", () => {
     };
     await votersVotesPage.inputVotesCounts(votes);
 
-    const votersRecounts = {
+    const votersRecounts: VotersRecounts = {
       poll_card_recount: 1020,
       proxy_certificate_recount: 50,
       voter_card_recount: 75,
@@ -234,7 +243,7 @@ test.describe("data entry", () => {
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.heading).toBeVisible();
 
-    const fewerBallotsFields = {
+    const fewerBallotsFields: FewerBallotsFields = {
       fewerBallotsCount: 20,
       unreturnedBallotsCount: 6,
       tooFewBallotsHandedOutCount: 3,
@@ -497,13 +506,13 @@ test.describe("navigation", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    const voters = {
+    const voters: VotersCounts = {
       poll_card_count: 99,
       proxy_certificate_count: 1,
       voter_card_count: 0,
       total_admitted_voters_count: 100,
     };
-    const votes = {
+    const votes: VotesCounts = {
       votes_candidates_counts: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
@@ -517,7 +526,7 @@ test.describe("navigation", () => {
     await differencesPage.navPanel.votersAndVotes.click();
     await votersVotesPage.heading.waitFor();
 
-    const votersUpdates = {
+    const votersUpdates: VotersCounts = {
       poll_card_count: 90,
       proxy_certificate_count: 5,
       voter_card_count: 5,
@@ -553,13 +562,13 @@ test.describe("navigation", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    const voters = {
+    const voters: VotersCounts = {
       poll_card_count: 99,
       proxy_certificate_count: 1,
       voter_card_count: 0,
       total_admitted_voters_count: 100,
     };
-    const votes = {
+    const votes: VotesCounts = {
       votes_candidates_counts: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
@@ -573,7 +582,7 @@ test.describe("navigation", () => {
     await differencesPage.navPanel.votersAndVotes.click();
     await votersVotesPage.heading.waitFor();
 
-    const votersUpdates = {
+    const votersUpdates: VotersCounts = {
       poll_card_count: 90,
       proxy_certificate_count: 5,
       voter_card_count: 5,
@@ -618,13 +627,13 @@ test.describe("navigation", () => {
         "je bent hier",
       );
 
-      const voters = {
+      const voters: VotersCounts = {
         poll_card_count: 100,
         proxy_certificate_count: 0,
         voter_card_count: 0,
         total_admitted_voters_count: 100,
       };
-      const votes = {
+      const votes: VotesCounts = {
         votes_candidates_counts: 100,
         blank_votes_count: 0,
         invalid_votes_count: 0,

@@ -2,21 +2,21 @@ import { type Locator, type Page } from "@playwright/test";
 
 import { InputBasePage } from "./InputBasePgObj";
 
-interface VotersCounts {
+export interface VotersCounts {
   poll_card_count: number;
   proxy_certificate_count: number;
   voter_card_count: number;
   total_admitted_voters_count: number;
 }
 
-interface VotesCounts {
+export interface VotesCounts {
   votes_candidates_counts: number;
   blank_votes_count: number;
   invalid_votes_count: number;
   total_votes_cast_count: number;
 }
 
-interface VotersRecounts {
+export interface VotersRecounts {
   poll_card_recount: number;
   proxy_certificate_recount: number;
   voter_card_recount: number;

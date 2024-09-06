@@ -2,7 +2,7 @@
 
 Doel van dit document is te beschrijven welke tests we hebben en welke tooling we ervoor gebruiken.
 
-De nadruk in dit document lijkt te liggen op testautomatisering, maar zoals in ons ["Testen en kwaliteit"](./testen-en-kwaliteit.rst)-document staat: *handmatig en automatisch testen gaan samen ("contemporary exploratory testing")*.
+De nadruk in dit document lijkt te liggen op testautomatisering, maar zoals in ons ["Testen en kwaliteit"](./testen-en-kwaliteit.md)-document staat: *handmatig en automatisch testen gaan samen ("contemporary exploratory testing")*.
 
 Ideaal gezien draaien alle testsoorten in onze CI/CD pipeline. Belangrijkste om als eerste in de pipeline op te nemen zijn de kleinere functionele testsoorten. Deze geven de snelste en meest specifieke feedback.
 
@@ -10,17 +10,16 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 
 
 ## Frontend
-- Linting: [eslint](https://eslint.org/)
-- Formatting: [prettier](https://prettier.io/)
-- Test runner: [Vitest](https://vitest.dev/)
-    - sneller dan [Jest](https://jestjs.io/)
-    - compatibel met de overige tools en libraries
-    - zelfde configuratie als dev (Vite)
-    - [test context](https://vitest.dev/guide/test-context.html) voor setup en teardown
-- Mock server: [Mock Service Worker](https://mswjs.io)
-- React componenten (stories): [Ladle](https://ladle.dev) en [Playwright](https://playwright.dev/)
-- React elementen: [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
-- Frontend (SPA): [Playwright](https://playwright.dev/)
+- Linting: [eslint][eslint]
+- Formatting: [prettier][prettier]
+- Test runners: [Vitest][vitest] en [Playwright][playwright]
+- Mock server: [Mock Service Worker][mock-service-worker]
+- Unit tests (utils e.d.): geen additionale tools of libraries nodig
+- React componenten (stories): [Ladle][ladle] en [Playwright][playwright]
+- React elementen en pagina's: [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
+- React integration test:  [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
+- Frontend (SPA) met mocked backend: [Playwright][playwright] en [Mock Service Worker][mock-service-worker]
+
 
 ```mermaid
 ---
@@ -56,15 +55,34 @@ flowchart LR
 
 ```mermaid
 ---
-title: Frontend (SPA)
+title: React integration test
+---
+flowchart LR
+    fe(Frontend)
+
+    rtl([React Testing Library])
+    msw([Mock Service Worker])
+
+    rtl ---> fe
+
+    fe --> msw
+```
+
+---
+
+```mermaid
+---
+title: Frontend (SPA) met mocked backend
 ---
 flowchart LR
     fe(Frontend)
 
     playwright([Playwright])
+    browser([Browser])
     msw([Mock Service Worker])
 
     playwright ---> fe
+    browser ---> fe
 
     subgraph app
         fe
@@ -75,17 +93,19 @@ flowchart LR
 
 
 ## Backend
-- linting: Rust compiler en [clippy](https://github.com/rust-lang/rust-clippy)
-- formatting: [rustfmt](https://github.com/rust-lang/rustfmt)
-- test runner: [cargo test](https://doc.rust-lang.org/cargo/commands/cargo-test.html)
-    - Als performance een factor wordt: [cargo-nextest](https://nexte.st/index.html).
-- unit en integratietests: geen additionele libraries of tools nodig
-- API clients: [ureq](https://crates.io/crates/ureq) of [reqwest](https://crates.io/crates/reqwest)
+- Linting: [Rust compiler][rust-compiler] en [clippy][clippy]
+- Formatting: [rustfmt][rustfmt]
+- Test runner: [cargo test][cargo test]
+- Unit en integratie-tests: geen additionele libraries of tools nodig
+- API (integration) tests: [reqwest][reqwest]
+
+Als de performance van `cargo test` een probleem wordt, kunnen we overstappen op [cargo-nextest](https://nexte.st/index.html).
+
 
 
 ```mermaid
 ---
-title: API tests
+title: API (integration) tests
 ---
 flowchart LR
     be(Backend)
@@ -103,7 +123,7 @@ flowchart LR
 
 ## End-to-end
 
-test runner: [Playwright](https://playwright.dev/)
+Test runner: [Playwright][playwright]
 
 ```mermaid
 ---
@@ -128,25 +148,48 @@ flowchart LR
 
 
 ## Security
-- GitHub Dependabot
-- GitHub Code Scanning (publieke repo's of GitHub Advanced Security)
-- GitHub Secret Scanning (publieke repo's of GitHub Advanced Security)
+- [GitHub Dependabot][github-depandabot]
+- [GitHub Code Scanning][github-code-scanning]
+- [GitHub Secret Scanning][github-secret-scanning]
 
 
 ## Performance
-- benchmarking opties:
+
+Nog te bepalen.
+
+- Benchmarking opties:
     - [`cargo bench`](https://doc.rust-lang.org/nightly/unstable-book/library-features/test.html)
     - [criterion.rs](https://github.com/bheisler/criterion.rs)
     - [divan](https://github.com/nvzqz/divan)
-- grote data sets
-- veel requests opties:
-    - [JMeter](https://jmeter.apache.org/)
-    - [Locust](https://locust.io/)
+- Load en stress testen:
+    - grote data sets
+    - opties voor API calls
+        - [JMeter](https://jmeter.apache.org/)
+        - [Locust](https://locust.io/)
 
 
 ## Toegankelijkheid
+Nog te bepalen.
+
 Opties:
 - [Google Lighthouse](https://developer.chrome.com/docs/lighthouse/overview/)
-- [Axe](https://github.com/dequelabs/axe-core)
-    - ondersteund door Ladle
+- [Axe](https://github.com/dequelabs/axe-core) (ondersteund door [Ladle][ladle])
 - [Pa11y](https://pa11y.org/)
+
+
+
+[cargo test]: https://doc.rust-lang.org/cargo/commands/cargo-test.html
+[clippy]: https://github.com/rust-lang/rust-clippy
+[eslint]: https://eslint.org/
+[github-code-scanning]: https://docs.github.com/en/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning
+[github-depandabot]: https://docs.github.com/en/code-security/dependabot/dependabot-security-updates/about-dependabot-security-updates
+[github-secret-scanning]: https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning
+[ladle]: https://ladle.dev
+[mock-service-worker]: https://mswjs.io
+[playwright]: https://playwright.dev/
+[prettier]: https://prettier.io/
+[react-testing-library]: https://testing-library.com/docs/react-testing-library/intro
+[reqwest]: https://crates.io/crates/reqwest
+[rustfmt]: https://github.com/rust-lang/rustfmt
+[rust-compiler]: https://rustc-dev-guide.rust-lang.org/overview.html
+[vitest]: https://vitest.dev

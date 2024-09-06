@@ -25,7 +25,7 @@ test.describe("data entry", () => {
     const inputPage = new InputPage(page);
     await expect(inputPage.heading).toBeVisible();
     const pollingStation = pollingStation33;
-    await inputPage.pollingstationNumber.fill(pollingStation.number.toString());
+    await inputPage.pollingStationNumber.fill(pollingStation.number.toString());
     await expect(inputPage.pollingStationFeedback).toHaveText(pollingStation.name);
     await inputPage.clickStart();
 
@@ -65,9 +65,10 @@ test.describe("data entry", () => {
     await candidatesListPage_1.next.click();
 
     const saveFormPage = new SaveFormPage(page);
-    await expect(saveFormPage.heading).toBeVisible();
+    await saveFormPage.heading.waitFor();
+    await saveFormPage.save.click();
 
-    // TODO: extend as part of epic #95: data entry check and finalisation
+    await inputPage.dataEntrySuccess.waitFor();
   });
 
   test("recount, no differences", async ({ page }) => {
@@ -260,9 +261,10 @@ test.describe("data entry", () => {
     await candidatesListPage_1.next.click();
 
     const saveFormPage = new SaveFormPage(page);
-    await expect(saveFormPage.heading).toBeVisible();
+    await saveFormPage.heading.waitFor();
+    await saveFormPage.save.click();
 
-    // TODO: extend as part of epic #95: data entry check and finalisation
+    await inputPage.dataEntrySuccess.waitFor();
   });
 });
 
@@ -357,7 +359,11 @@ test.describe("errors and warnings", () => {
     await candidatesListPage_1.next.click();
 
     const saveFormPage = new SaveFormPage(page);
-    await expect(saveFormPage.heading).toBeVisible();
+    await saveFormPage.heading.waitFor();
+    await saveFormPage.save.click();
+
+    const inputPage = new InputPage(page);
+    await inputPage.dataEntrySuccess.waitFor();
   });
 
   test("accept warning on voters and votes page", async ({ page }) => {

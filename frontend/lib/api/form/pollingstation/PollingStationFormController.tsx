@@ -450,11 +450,11 @@ export function PollingStationFormController({
   const finaliseDataEntry = async () => {
     status.current = "finalising";
     const response = await client.postRequest(request_path + "/finalise");
-    status.current = "idle";
     if (response.status !== ApiResponseStatus.Success) {
       console.error("Failed to finalise data entry", response);
       status.current = "idle";
       setError(response.data as ApiResponseErrorData);
+      throw new Error("Failed to finalise data entry");
     }
     status.current = "finalised";
   };

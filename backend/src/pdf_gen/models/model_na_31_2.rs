@@ -44,38 +44,38 @@ impl ModelNa31_2Summary {
 
 #[derive(Serialize, Deserialize)]
 pub struct SummaryDifferencesCounts {
-    pub more_ballots_count: SummaryCount,
-    pub fewer_ballots_count: SummaryCount,
-    pub unreturned_ballots_count: SummaryCount,
-    pub too_few_ballots_handed_out_count: SummaryCount,
-    pub too_many_ballots_handed_out_count: SummaryCount,
-    pub other_explanation_count: SummaryCount,
-    pub no_explanation_count: SummaryCount,
+    pub more_ballots_count: SumCount,
+    pub fewer_ballots_count: SumCount,
+    pub unreturned_ballots_count: SumCount,
+    pub too_few_ballots_handed_out_count: SumCount,
+    pub too_many_ballots_handed_out_count: SumCount,
+    pub other_explanation_count: SumCount,
+    pub no_explanation_count: SumCount,
 }
 
 impl SummaryDifferencesCounts {
     pub fn zero() -> SummaryDifferencesCounts {
         SummaryDifferencesCounts {
-            more_ballots_count: SummaryCount::zero(),
-            fewer_ballots_count: SummaryCount::zero(),
-            unreturned_ballots_count: SummaryCount::zero(),
-            too_few_ballots_handed_out_count: SummaryCount::zero(),
-            too_many_ballots_handed_out_count: SummaryCount::zero(),
-            other_explanation_count: SummaryCount::zero(),
-            no_explanation_count: SummaryCount::zero(),
+            more_ballots_count: SumCount::zero(),
+            fewer_ballots_count: SumCount::zero(),
+            unreturned_ballots_count: SumCount::zero(),
+            too_few_ballots_handed_out_count: SumCount::zero(),
+            too_many_ballots_handed_out_count: SumCount::zero(),
+            other_explanation_count: SumCount::zero(),
+            no_explanation_count: SumCount::zero(),
         }
     }
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct SummaryCount {
+pub struct SumCount {
     pub count: u32,
     pub polling_stations: Vec<String>,
 }
 
-impl SummaryCount {
-    pub fn zero() -> SummaryCount {
-        SummaryCount {
+impl SumCount {
+    pub fn zero() -> SumCount {
+        SumCount {
             count: 0,
             polling_stations: vec![],
         }

@@ -1,7 +1,14 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
+import {
+  getUrlMethodAndBody,
+  overrideOnce,
+  render,
+  screen,
+  userTypeInputs,
+  waitFor,
+} from "app/test/unit";
 
 import {
   FormState,
@@ -393,6 +400,18 @@ describe("Test VotersAndVotesForm", () => {
       expect(alertText).toHaveTextContent(
         /^Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.$/,
       );
+
+      await user.clear(screen.getByTestId("blank_votes_count"));
+      await user.type(screen.getByTestId("blank_votes_count"), "100");
+      await user.tab();
+      expect(screen.getByTestId("blank_votes_count"), "100").toHaveValue("100");
+
+      await waitFor(() => {
+        const bla = screen.getByRole("checkbox", {
+          name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+        });
+        expect(bla).not.toBeVisible();
+      });
     });
 
     test("W.201 high number of blank votes", async () => {

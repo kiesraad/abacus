@@ -25,10 +25,8 @@
 
     &:global(.hidden) {
       display: none;
-
-      input {
-        display: none;
-      }
+      visibility: hidden;
+      opacity: 0;
     }
   }
 }

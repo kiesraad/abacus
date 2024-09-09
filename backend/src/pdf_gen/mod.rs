@@ -50,16 +50,25 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
 
 #[cfg(test)]
 mod tests {
+    use chrono::Utc;
     use models::{ModelNa31_2Input, ModelNa31_2Summary};
+
+    use crate::election::{Election, ElectionCategory};
 
     use super::*;
 
     #[test]
     fn it_generates_a_pdf() {
         let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
-            election_for: "de gemeenteraad Zilverhaven".to_string(),
             location: "Gemeente Zilverhaven".to_string(),
-            date: "11-03-2024".to_string(),
+            election: Election {
+                id: 1,
+                name: "Gemeente Zilverhaven".to_string(),
+                category: ElectionCategory::Municipal,
+                election_date: Utc::now().date_naive(),
+                nomination_date: Utc::now().date_naive(),
+                political_groups: None,
+            },
             polling_stations: vec![],
             summary: ModelNa31_2Summary::zero(),
         }))

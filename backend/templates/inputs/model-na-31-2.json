@@ -1,7 +1,22 @@
 {
-  "election_for": "de gemeenteraad Zilverhaven",
   "location": "Gemeente Zilverhaven",
-  "date": "11-03-2024",
+  "election": {
+    "id": 1,
+    "name": "",
+    "category": "Municipal",
+    "election_date": "2024-03-11",
+    "nomination_date": "2024-02-11",
+    "political_groups": [
+      {
+        "number": 1,
+        "name": "Political Group A",
+        "candidates": [
+          { "number": 1, "initials": "A.", "first_name": "Alice", "last_name": "Foo", "locality": "Amsterdam", "gender": "Female" },
+          { "number": 2, "initials": "C.", "first_name": "Charlie", "last_name": "Doe", "locality": "Rotterdam" }
+        ]
+      }
+    ]
+  },
   "summary": {
     "voters_counts": {
       "poll_card_count": 0,
@@ -49,11 +64,15 @@
     "political_group_votes": [
       {
         "number": 1,
-        "total": 0,
+        "total": 30,
         "candidate_votes": [
           {
             "number": 1,
             "votes": 20
+          },
+          {
+            "number": 2,
+            "votes": 10
           }
         ]
       }

@@ -1,12 +1,14 @@
 use serde::{Deserialize, Serialize};
 
-use crate::polling_station::{PoliticalGroupVotes, PollingStation, VotersCounts, VotesCounts};
+use crate::{
+    election::Election,
+    polling_station::{PoliticalGroupVotes, PollingStation, VotersCounts, VotesCounts},
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct ModelNa31_2Input {
-    pub election_for: String,
+    pub election: Election,
     pub location: String,
-    pub date: String,
     pub summary: ModelNa31_2Summary,
     pub polling_stations: Vec<PollingStation>,
 }

@@ -178,6 +178,12 @@
   )
 }
 
+#let format_date(date) = {
+  let dp = date.split("-")
+  let date = datetime(year: int(dp.at(0)), month: int(dp.at(1)), day: int(dp.at(2)))
+  date.display("[day]-[month]-[year]")
+}
+
 /// Display a TODO label
 #let TODO = {
     box(fill: red, stroke: black, inset: 2pt)[#text(fill: white, size: 6pt)[*TODO*]]

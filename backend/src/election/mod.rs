@@ -124,11 +124,10 @@ pub async fn election_download_results(
     let polling_stations = polling_stations_repo.list(election.id).await?;
 
     let model = PdfModel::ModelNa31_2(ModelNa31_2Input {
-        election_for: election.name.clone(),
-        location: election.name.clone(),
-        date: election.election_date.format("%d-%m-%Y").to_string(),
         polling_stations,
+        location: election.name.clone(),
         summary: ModelNa31_2Summary::zero(),
+        election,
     });
     let filename = model.as_filename();
     let content = generate_pdf(model)?;

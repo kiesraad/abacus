@@ -1,16 +1,16 @@
 #import "common/style.typ": conf, title, mono
-#import "common/scripts.typ": alertbox, block_with_checkbox, date_input, time_input, letterbox_main, summary_table, text_input, TODO
+#import "common/scripts.typ": alertbox, block_with_checkbox, date_input, time_input, letterbox_main, summary_table, text_input, format_date, TODO
 #let input = json("inputs/model-na-31-2.json")
 
 #show: doc => conf(input, doc)
 
-#let is_municipality = (a, b) => [#a/#b]
+#let is_municipality = (municipal, public_body) => if input.election.category == "Municipal" [#municipal] else [#public_body]
 
 #title(
   [Model Na 31-2],
   [Proces-verbaal van een #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam] (centrale stemopneming)],
   [
-    De verkiezing van de leden van *#input.election_for* \ op *#input.date* \
+    De verkiezing van de leden van *#input.election.name* \ op *#format_date(input.election.election_date)* \
     #input.location
   ],
 )
@@ -279,6 +279,8 @@ de telling is onjuist.
 = Aantal stemmen per lijst en per kandidaat in #is_municipality[de gemeente][het openbaar lichaam]
 
 #for political_group in input.summary.political_group_votes [
+  #let election_pg = input.election.political_groups.find(pg => pg.number == political_group.number)
+
   #table(
     columns: (80pt, 1fr, auto),
     inset: 8pt,
@@ -288,15 +290,16 @@ de telling is onjuist.
       table.cell(colspan: 3, grid(
         columns: (auto, auto),
         gutter: 12pt,
-        [*Lijstnaam*],   [#TODO],
+        [*Lijstnaam*],   [#election_pg.name],
         [*Lijstnummer*], [#political_group.number],
       )),
       [*Nummer op de lijst*], [*Naam kandidaat*], [*Aantal stemmen*],
     ),
     ..for candidate in political_group.candidate_votes {
+      let election_candidate = election_pg.candidates.find(c => c.number == candidate.number)
       (
         align(right)[#candidate.number],
-        [#TODO],
+        [#election_candidate.initials #election_candidate.last_name (#election_candidate.first_name)],
         align(right, mono[#candidate.votes]),
       )
     },

@@ -76,7 +76,7 @@ export function DifferencesForm() {
     return false;
   }, []);
 
-  const { saving, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
+  const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
     useDifferences(getValues, getIgnoreWarnings);
 
   const shouldWatch = warnings.length > 0 && isSaved;
@@ -235,7 +235,7 @@ export function DifferencesForm() {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={saving}>
+          <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

@@ -9,13 +9,9 @@ import {
   userTypeInputs,
   waitFor,
 } from "app/test/unit";
+import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
-import {
-  FormState,
-  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
-  PollingStationFormController,
-  PollingStationValues,
-} from "@kiesraad/api";
+import { FormState, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
 import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
@@ -78,42 +74,6 @@ function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   );
 }
 
-const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
-  data: {
-    recounted: false,
-    voters_counts: {
-      poll_card_count: 0,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 0,
-    },
-    votes_counts: {
-      votes_candidates_counts: 0,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-    },
-    voters_recounts: undefined,
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
-    political_group_votes: electionMockData.political_groups.map((group) => ({
-      number: group.number,
-      total: 0,
-      candidate_votes: group.candidates.map((candidate) => ({
-        number: candidate.number,
-        votes: 0,
-      })),
-    })),
-  },
-};
-
 describe("Test VotersAndVotesForm", () => {
   describe("VotersAndVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
@@ -129,6 +89,21 @@ describe("Test VotersAndVotesForm", () => {
       await user.keyboard("{enter}");
 
       expect(spy).not.toHaveBeenCalled();
+    });
+
+    test("hitting shift+enter does result in api call", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+      const spy = vi.spyOn(global, "fetch");
+
+      const pollCards = await screen.findByTestId("poll_card_count");
+      await user.type(pollCards, "12345");
+      expect(pollCards).toHaveValue("12.345");
+
+      await user.keyboard("{shift>}{enter}{/shift}");
+
+      expect(spy).toHaveBeenCalled();
     });
 
     test("Form field entry and keybindings", async () => {
@@ -204,7 +179,7 @@ describe("Test VotersAndVotesForm", () => {
     test("VotersAndVotesForm request body is equal to the form data", async () => {
       const expectedRequest = {
         data: {
-          ...rootRequest.data,
+          ...emptyDataEntryRequest.data,
           voters_counts: {
             poll_card_count: 1,
             proxy_certificate_count: 2,

@@ -2,7 +2,11 @@ import { expect, test } from "@playwright/test";
 import { AbortInputModal } from "e2e-tests/page-objects/input/AbortInputModalPgObj";
 import { InputPage } from "e2e-tests/page-objects/input/InputPgObj";
 import { RecountedPage } from "e2e-tests/page-objects/input/RecountedPgObj";
-import { VotersVotesPage } from "e2e-tests/page-objects/input/VotersVotesPgObj";
+import {
+  VotersCounts,
+  VotersVotesPage,
+  VotesCounts,
+} from "e2e-tests/page-objects/input/VotersVotesPgObj";
 
 test.describe("Abort data entry", () => {
   test("Save input from empty voters and votes page", async ({ page }) => {
@@ -19,7 +23,14 @@ test.describe("Abort data entry", () => {
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
+
+    // TODO: check saved data instead of API call in #137
+    const responsePromise = page.waitForResponse("**/polling_stations/1/data_entries/1");
+
     await abortInputModal.saveInput.click();
+
+    const response = await responsePromise;
+    expect(response.request().method()).toBe("POST");
 
     const inputPage = new InputPage(page);
     await expect(inputPage.heading).toBeVisible();
@@ -46,7 +57,14 @@ test.describe("Abort data entry", () => {
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
+
+    // TODO: check saved data instead of API call in #137
+    const responsePromise = page.waitForResponse("**/polling_stations/1/data_entries/1");
+
     await abortInputModal.saveInput.click();
+
+    const response = await responsePromise;
+    expect(response.request().method()).toBe("POST");
 
     const inputPage = new InputPage(page);
     await expect(inputPage.heading).toBeVisible();
@@ -63,17 +81,17 @@ test.describe("Abort data entry", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    const voters = {
-      poll_card_count: "100",
-      proxy_certificate_count: "0",
-      voter_card_count: "0",
-      total_admitted_voters_count: "100",
+    const voters: VotersCounts = {
+      poll_card_count: 100,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
     };
-    const votes = {
-      votes_candidates_counts: "50",
-      blank_votes_count: "50", // exceeds threshold
-      invalid_votes_count: "0",
-      total_votes_cast_count: "100",
+    const votes: VotesCounts = {
+      votes_candidates_counts: 50,
+      blank_votes_count: 50, // exceeds threshold
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
     };
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
     await expect(votersVotesPage.warning).toContainText(
@@ -84,7 +102,14 @@ test.describe("Abort data entry", () => {
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
+
+    // TODO: check saved data instead of API call in #137
+    const responsePromise = page.waitForResponse("**/polling_stations/1/data_entries/1");
+
     await abortInputModal.saveInput.click();
+
+    const response = await responsePromise;
+    expect(response.request().method()).toBe("POST");
 
     const inputPage = new InputPage(page);
     await expect(inputPage.heading).toBeVisible();
@@ -160,17 +185,17 @@ test.describe("Abort data entry", () => {
 
     const votersVotesPage = new VotersVotesPage(page);
     await votersVotesPage.heading.waitFor();
-    const voters = {
-      poll_card_count: "100",
-      proxy_certificate_count: "0",
-      voter_card_count: "0",
-      total_admitted_voters_count: "100",
+    const voters: VotersCounts = {
+      poll_card_count: 100,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
     };
-    const votes = {
-      votes_candidates_counts: "50",
-      blank_votes_count: "50", // exceeds threshold
-      invalid_votes_count: "0",
-      total_votes_cast_count: "100",
+    const votes: VotesCounts = {
+      votes_candidates_counts: 50,
+      blank_votes_count: 50, // exceeds threshold
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
     };
     await votersVotesPage.fillInPageAndClickNext(voters, votes);
     await expect(votersVotesPage.warning).toContainText(

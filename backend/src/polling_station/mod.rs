@@ -264,7 +264,7 @@ mod tests {
         }
     }
 
-    #[sqlx::test(fixtures("../../fixtures/elections.sql", "../../fixtures/polling_stations.sql"))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
     async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
         let mut request_body = example_data_entry();
 
@@ -350,7 +350,7 @@ mod tests {
         assert_eq!(row_count.count, 1);
     }
 
-    #[sqlx::test(fixtures("../../fixtures/elections.sql", "../../fixtures/polling_stations.sql"))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
     async fn test_polling_station_data_entry_delete(pool: SqlitePool) {
         // create data entry
         let response = polling_station_data_entry(

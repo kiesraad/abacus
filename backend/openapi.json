@@ -663,6 +663,7 @@
         "required": [
           "id",
           "name",
+          "location",
           "category",
           "election_date",
           "nomination_date"
@@ -679,6 +680,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "location": {
+            "type": "string"
           },
           "name": {
             "type": "string"

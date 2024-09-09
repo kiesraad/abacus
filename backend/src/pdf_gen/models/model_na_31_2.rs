@@ -8,7 +8,6 @@ use crate::{
 #[derive(Serialize, Deserialize)]
 pub struct ModelNa31_2Input {
     pub election: Election,
-    pub location: String,
     pub summary: ModelNa31_2Summary,
     pub polling_stations: Vec<PollingStation>,
 }

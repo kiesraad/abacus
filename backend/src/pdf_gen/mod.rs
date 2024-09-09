@@ -60,10 +60,10 @@ mod tests {
     #[test]
     fn it_generates_a_pdf() {
         let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
-            location: "Gemeente Zilverhaven".to_string(),
             election: Election {
                 id: 1,
-                name: "Gemeente Zilverhaven".to_string(),
+                name: "Municipal Election".to_string(),
+                location: "Heemdamseburg".to_string(),
                 category: ElectionCategory::Municipal,
                 election_date: Utc::now().date_naive(),
                 nomination_date: Utc::now().date_naive(),

@@ -1,8 +1,8 @@
 {
-  "location": "Gemeente Zilverhaven",
   "election": {
     "id": 1,
     "name": "Municipal Election",
+    "location": "Heemdamseburg",
     "category": "Municipal",
     "election_date": "2024-11-30",
     "nomination_date": "2024-11-01",
@@ -90,7 +90,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -103,7 +103,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -116,7 +116,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -129,7 +129,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -142,7 +142,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -155,7 +155,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -168,7 +168,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -181,7 +181,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -194,7 +194,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -207,7 +207,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -220,7 +220,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -233,7 +233,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -246,7 +246,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -259,7 +259,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -272,7 +272,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -285,7 +285,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -298,7 +298,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -311,7 +311,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -324,7 +324,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -337,7 +337,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -350,7 +350,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -363,7 +363,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -376,7 +376,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -389,7 +389,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -402,7 +402,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -415,7 +415,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -428,7 +428,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -441,7 +441,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -454,7 +454,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -467,7 +467,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -480,7 +480,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -493,7 +493,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -506,7 +506,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -519,7 +519,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -532,7 +532,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -545,7 +545,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -558,7 +558,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -571,7 +571,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -584,7 +584,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -597,7 +597,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 11,
@@ -610,7 +610,7 @@
       "house_number": 3,
       "house_number_addition": "v1",
       "postal_code": "0321BA",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 12,
@@ -623,7 +623,7 @@
       "house_number": 0,
       "house_number_addition": null,
       "postal_code": "",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     },
     {
       "id": 10,
@@ -636,7 +636,7 @@
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",
-      "locality": "Zilverhaven"
+      "locality": "Heemdamseburg"
     }
   ]
 }

@@ -10,8 +10,8 @@
   [Model Na 31-2],
   [Proces-verbaal van een #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam] (centrale stemopneming)],
   [
-    De verkiezing van de leden van *#input.election.name* \ op *#format_date(input.election.election_date)* \
-    #input.location
+    De verkiezing van de leden van #is_municipality[de *gemeenteraad*][#TODO] \ op *#format_date(input.election.election_date)* \
+    #is_municipality[Gemeente *#input.election.location*][*#input.election.location*]
   ],
 )
 
@@ -59,7 +59,7 @@ zijn aan het einde van de zitting ondertekenen dit document.
 
 = Zitting en aantal kiesgerechtigden
 
-Het betreft de openbare zitting van het #is_municipality[gemeentelijk stembureau in de gemeente][stembureau voor het openbaar lichaam] *#input.location*.
+Het betreft de openbare zitting van het #is_municipality[gemeentelijk stembureau in de gemeente *#input.election.location*][stembureau voor het openbaar lichaam #TODO].
 
 #is_municipality[][
   Kieskring #TODO

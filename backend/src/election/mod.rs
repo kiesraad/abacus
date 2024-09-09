@@ -125,7 +125,6 @@ pub async fn election_download_results(
 
     let model = PdfModel::ModelNa31_2(ModelNa31_2Input {
         polling_stations,
-        location: election.name.clone(),
         summary: ModelNa31_2Summary::zero(),
         election,
     });

@@ -492,7 +492,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       const expectedInvalidFields = [blankVotesCount] as HTMLElement[];
-      const expectedValidFields = [
+      let expectedValidFields = [
         pollCardCount,
         proxyCertificateCount,
         voterCardCount,
@@ -528,7 +528,7 @@ describe("Test VotersAndVotesForm", () => {
 
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       // All fields should be considered valid now
-      expectedValidFields.concat(expectedInvalidFields);
+      expectedValidFields = expectedValidFields.concat(expectedInvalidFields);
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });

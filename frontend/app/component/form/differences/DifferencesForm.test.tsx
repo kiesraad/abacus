@@ -532,7 +532,7 @@ describe("Test DifferencesForm", () => {
         otherExplanationCount,
         noExplanationCount,
       ] as HTMLElement[];
-      const expectedValidFields = [fewerBallotsCount] as HTMLElement[];
+      let expectedValidFields = [fewerBallotsCount] as HTMLElement[];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
         expectedInvalidFields,
         feedbackMessage,
@@ -560,7 +560,7 @@ describe("Test DifferencesForm", () => {
 
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       // All fields should be considered valid now
-      expectedValidFields.concat(expectedInvalidFields);
+      expectedValidFields = expectedValidFields.concat(expectedInvalidFields);
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });

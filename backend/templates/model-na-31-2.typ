@@ -61,7 +61,9 @@ zijn aan het einde van de zitting ondertekenen dit document.
 
 Het betreft de openbare zitting van het #is_municipality[gemeentelijk stembureau in de gemeente][stembureau voor het openbaar lichaam] *#input.location*.
 
-Kieskring #TODO
+#is_municipality[][
+  Kieskring #TODO
+]
 
 Datum en tijdstip aanvang zitting: #date_input(date: none, top_label: ("Dag", "Maand", "Jaar")) #time_input(time: none, top_label: "Tijd")
 

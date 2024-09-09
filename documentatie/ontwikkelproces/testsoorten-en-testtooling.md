@@ -1,10 +1,8 @@
 # Testsoorten en test-tooling
 
-Doel van dit document is te beschrijven welke tests we hebben en welke tooling we ervoor gebruiken.
+Doel van dit document is beschrijven welke tooling we voor welke tests gebruiken.
 
-De nadruk in dit document lijkt te liggen op testautomatisering, maar zoals in ons ["Testen en kwaliteit"](./testen-en-kwaliteit.md)-document staat: *handmatig en automatisch testen gaan samen ("contemporary exploratory testing")*.
-
-Ideaal gezien draaien alle testsoorten in onze CI/CD pipeline. Belangrijkste om als eerste in de pipeline op te nemen zijn de kleinere functionele testsoorten. Deze geven de snelste en meest specifieke feedback.
+De nadruk in dit document lijkt te liggen op testautomatisering, maar zoals in ons ["Testen en kwaliteit"](./testen-en-kwaliteit.md)-document staat: *"handmatig en automatisch testen gaan samen"*.
 
 Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet opgenomen in dit document.
 
@@ -14,11 +12,11 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 - Formatting: [prettier][prettier]
 - Test runners: [Vitest][vitest] en [Playwright][playwright]
 - Mock server: [Mock Service Worker][mock-service-worker]
-- Unit tests (utils e.d.): geen additionale tools of libraries nodig
-- React componenten (stories): [Ladle][ladle] en [Playwright][playwright]
-- React elementen en pagina's: [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
-- React integration test:  [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
-- Frontend (SPA) met mocked backend: [Playwright][playwright] en [Mock Service Worker][mock-service-worker]
+- Unit tests (voor utils e.d.): geen additionele tools of libraries nodig
+- React UI elementen: [Ladle][ladle] en [Playwright][playwright]
+- React componenten: [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
+- React integration tests:  [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
+- Frontend met mocked backend: [Playwright][playwright] en [Mock Service Worker][mock-service-worker]
 
 
 ```mermaid
@@ -29,9 +27,11 @@ flowchart LR
     ladle-story(Ladle Story)
 
     playwright([Playwright])
+    browser([Browser])
     msw([Mock Service Worker])
 
     playwright --> ladle-story
+    browser --> ladle-story
     ladle-story ---> msw
 ```
 
@@ -72,7 +72,7 @@ flowchart LR
 
 ```mermaid
 ---
-title: Frontend (SPA) met mocked backend
+title: Frontend met mocked backend
 ---
 flowchart LR
     fe(Frontend)
@@ -97,7 +97,7 @@ flowchart LR
 - Formatting: [rustfmt][rustfmt]
 - Test runner: [cargo test][cargo test]
 - Unit en integratie-tests: geen additionele libraries of tools nodig
-- API (integration) tests: [reqwest][reqwest]
+- API client: [reqwest][reqwest]
 
 Als de performance van `cargo test` een probleem wordt, kunnen we overstappen op [cargo-nextest](https://nexte.st/index.html).
 
@@ -105,7 +105,7 @@ Als de performance van `cargo test` een probleem wordt, kunnen we overstappen op
 
 ```mermaid
 ---
-title: API (integration) tests
+title: API integration tests
 ---
 flowchart LR
     be(Backend)
@@ -171,10 +171,10 @@ Nog te bepalen.
 ## Toegankelijkheid
 Nog te bepalen.
 
-Opties:
-- [Google Lighthouse](https://developer.chrome.com/docs/lighthouse/overview/)
-- [Axe](https://github.com/dequelabs/axe-core) (ondersteund door [Ladle][ladle])
-- [Pa11y](https://pa11y.org/)
+- Opties:
+    - [Google Lighthouse](https://developer.chrome.com/docs/lighthouse/overview/)
+    - [Axe](https://github.com/dequelabs/axe-core) (ondersteund door [Ladle][ladle])
+    - [Pa11y](https://pa11y.org/)
 
 
 

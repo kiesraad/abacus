@@ -1,6 +1,12 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
+import {
+  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
+  expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
+  expectFieldsToHaveIconAndToHaveAccessibleName,
+  expectFieldsToNotHaveIcon,
+} from "app/component/form/testHelperFunctions.tsx";
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
@@ -240,25 +246,33 @@ describe("Test CandidatesVotesForm", () => {
 
       render(Component);
 
+      const candidateVotes0 = await screen.findByTestId("candidate_votes[0].votes");
+      const candidateVotes1 = screen.getByTestId("candidate_votes[1].votes");
+      const total = screen.getByTestId("total");
+
       const spy = vi.spyOn(global, "fetch");
 
       await user.type(
-        await screen.findByTestId("candidate_votes[0].votes"),
+        candidateVotes0,
         expectedRequest.data.political_group_votes[0]?.candidate_votes[0]?.votes.toString() ?? "0",
       );
 
       await user.type(
-        screen.getByTestId("candidate_votes[1].votes"),
+        candidateVotes1,
         expectedRequest.data.political_group_votes[0]?.candidate_votes[1]?.votes.toString() ?? "0",
       );
 
       await user.type(
-        screen.getByTestId("total"),
+        total,
         expectedRequest.data.political_group_votes[0]?.total.toString() ?? "0",
       );
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
+
+      const expectedValidFields = [candidateVotes0, candidateVotes1, total] as HTMLElement[];
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
@@ -286,19 +300,27 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      await user.type(await screen.findByTestId("candidate_votes[0].votes"), "1");
-      await user.type(screen.getByTestId("candidate_votes[1].votes"), "2");
-      await user.type(screen.getByTestId("total"), "10");
+      const candidateVotes0 = await screen.findByTestId("candidate_votes[0].votes");
+      const candidateVotes1 = screen.getByTestId("candidate_votes[1].votes");
+      const total = screen.getByTestId("total");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(
-        `Controleer ingevoerde aantallenF.401De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
-      );
+      const feedbackMessage =
+        "Controleer ingevoerde aantallenF.401De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+      // When all fields on a page are (potentially) invalid, we do not mark them as so
+      const expectedInvalidFields = [] as HTMLElement[];
+      const expectedValidFields = [candidateVotes0, candidateVotes1, total] as HTMLElement[];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
+        expectedInvalidFields,
+        feedbackMessage,
+      );
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
     });
   });
 });

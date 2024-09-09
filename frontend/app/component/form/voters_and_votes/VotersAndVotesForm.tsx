@@ -24,7 +24,7 @@ interface FormElements extends HTMLFormControlsCollection {
   proxy_certificate_count: HTMLInputElement;
   voter_card_count: HTMLInputElement;
   total_admitted_voters_count: HTMLInputElement;
-  votes_candidates_counts: HTMLInputElement;
+  votes_candidates_count: HTMLInputElement;
   blank_votes_count: HTMLInputElement;
   invalid_votes_count: HTMLInputElement;
   total_votes_cast_count: HTMLInputElement;
@@ -53,7 +53,7 @@ export function VotersAndVotesForm() {
           total_admitted_voters_count: 0,
         },
         votes_counts: {
-          votes_candidates_counts: 0,
+          votes_candidates_count: 0,
           blank_votes_count: 0,
           invalid_votes_count: 0,
           total_votes_cast_count: 0,
@@ -71,7 +71,7 @@ export function VotersAndVotesForm() {
         total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
       },
       votes_counts: {
-        votes_candidates_counts: deformat(elements.votes_candidates_counts.value),
+        votes_candidates_count: deformat(elements.votes_candidates_count.value),
         blank_votes_count: deformat(elements.blank_votes_count.value),
         invalid_votes_count: deformat(elements.invalid_votes_count.value),
         total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
@@ -213,13 +213,13 @@ export function VotersAndVotesForm() {
           <InputGridRow
             key="E"
             field="E"
-            id="votes_candidates_counts"
+            id="votes_candidates_count"
             title="Stemmen op kandidaten"
             errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
             warningsAccepted={getIgnoreWarnings()}
             inputProps={register()}
             format={format}
-            defaultValue={sectionValues.votes_counts.votes_candidates_counts}
+            defaultValue={sectionValues.votes_counts.votes_candidates_count}
           />
           <InputGridRow
             key="F"

@@ -79,7 +79,7 @@ function getFormFields(includingRecountedFields: boolean = false): HTMLElement[]
     screen.getByTestId("proxy_certificate_count"),
     screen.getByTestId("voter_card_count"),
     screen.getByTestId("total_admitted_voters_count"),
-    screen.getByTestId("votes_candidates_counts"),
+    screen.getByTestId("votes_candidates_count"),
     screen.getByTestId("blank_votes_count"),
     screen.getByTestId("invalid_votes_count"),
     screen.getByTestId("total_votes_cast_count"),
@@ -162,7 +162,7 @@ describe("Test VotersAndVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const votesOnCandidates = screen.getByTestId("votes_candidates_counts");
+      const votesOnCandidates = screen.getByTestId("votes_candidates_count");
       expect(votesOnCandidates).toHaveFocus();
       await user.type(votesOnCandidates, "12");
       expect(votesOnCandidates).toHaveValue("12");
@@ -206,7 +206,7 @@ describe("Test VotersAndVotesForm", () => {
             total_admitted_voters_count: 6,
           },
           votes_counts: {
-            votes_candidates_counts: 4,
+            votes_candidates_count: 4,
             blank_votes_count: 5,
             invalid_votes_count: 6,
             total_votes_cast_count: 15,
@@ -223,7 +223,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -244,7 +244,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -289,7 +289,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -309,7 +309,7 @@ describe("Test VotersAndVotesForm", () => {
         totalAdmittedVotersCount,
       ] as HTMLElement[];
       const expectedValidFields = [
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -330,7 +330,7 @@ describe("Test VotersAndVotesForm", () => {
             {
               fields: [
                 "data.votes_counts.total_votes_cast_count",
-                "data.votes_counts.votes_candidates_counts",
+                "data.votes_counts.votes_candidates_count",
                 "data.votes_counts.blank_votes_count",
                 "data.votes_counts.invalid_votes_count",
               ],
@@ -350,7 +350,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -364,7 +364,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       const expectedInvalidFields = [
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -411,7 +411,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -439,7 +439,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -477,7 +477,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -497,7 +497,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         invalidVotesCount,
         totalVotesCastCount,
       ] as HTMLElement[];
@@ -555,7 +555,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -574,7 +574,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         invalidVotesCount,
         totalVotesCastCount,
       ] as HTMLElement[];
@@ -612,7 +612,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -631,7 +631,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         totalVotesCastCount,
       ] as HTMLElement[];
@@ -672,7 +672,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -693,7 +693,7 @@ describe("Test VotersAndVotesForm", () => {
         pollCardCount,
         proxyCertificateCount,
         voterCardCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
       ] as HTMLElement[];
@@ -734,7 +734,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -760,7 +760,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         pollCardRecount,
@@ -801,7 +801,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -820,7 +820,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
       ] as HTMLElement[];
@@ -861,7 +861,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -882,7 +882,7 @@ describe("Test VotersAndVotesForm", () => {
         pollCardCount,
         proxyCertificateCount,
         voterCardCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
       ] as HTMLElement[];
@@ -923,7 +923,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -949,7 +949,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         pollCardRecount,
@@ -990,7 +990,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -1010,7 +1010,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalVotesCastCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalAdmittedVotersCount,
@@ -1034,7 +1034,7 @@ describe("Test VotersAndVotesForm", () => {
           warnings: [
             {
               fields: [
-                "data.votes_counts.votes_candidates_counts",
+                "data.votes_counts.votes_candidates_count",
                 "data.votes_counts.blank_votes_count",
                 "data.votes_counts.invalid_votes_count",
                 "data.votes_counts.total_votes_cast_count",
@@ -1058,7 +1058,7 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateCount,
         voterCardCount,
         totalAdmittedVotersCount,
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,
@@ -1076,7 +1076,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       const expectedInvalidFields = [
-        votesCandidatesCounts,
+        votesCandidatesCount,
         blankVotesCount,
         invalidVotesCount,
         totalVotesCastCount,

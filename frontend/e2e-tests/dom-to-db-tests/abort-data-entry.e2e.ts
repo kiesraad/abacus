@@ -88,7 +88,7 @@ test.describe("Abort data entry", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_counts: 50,
+      votes_candidates_count: 50,
       blank_votes_count: 50, // exceeds threshold
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -192,7 +192,7 @@ test.describe("Abort data entry", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_counts: 50,
+      votes_candidates_count: 50,
       blank_votes_count: 50, // exceeds threshold
       invalid_votes_count: 0,
       total_votes_cast_count: 100,

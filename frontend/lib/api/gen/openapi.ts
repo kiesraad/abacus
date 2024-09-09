@@ -274,5 +274,5 @@ export interface VotesCounts {
   blank_votes_count: number;
   invalid_votes_count: number;
   total_votes_cast_count: number;
-  votes_candidates_counts: number;
+  votes_candidates_count: number;
 }

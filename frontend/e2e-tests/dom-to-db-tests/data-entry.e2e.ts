@@ -44,7 +44,7 @@ test.describe("data entry", () => {
       total_admitted_voters_count: 1125,
     };
     const votes: VotesCounts = {
-      votes_candidates_counts: 1090,
+      votes_candidates_count: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
@@ -94,7 +94,7 @@ test.describe("data entry", () => {
     };
     await votersVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_counts: 1090,
+      votes_candidates_count: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
@@ -152,7 +152,7 @@ test.describe("data entry", () => {
     };
     await votersVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_counts: 1135,
+      votes_candidates_count: 1135,
       blank_votes_count: 10,
       invalid_votes_count: 5,
       total_votes_cast_count: 1150,
@@ -217,7 +217,7 @@ test.describe("data entry", () => {
     await votersVotesPage.inputVotersCounts(voters);
 
     const votes: VotesCounts = {
-      votes_candidates_counts: 1090,
+      votes_candidates_count: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
@@ -282,7 +282,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -328,7 +328,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -375,7 +375,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -415,7 +415,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -470,7 +470,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -513,7 +513,7 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -569,7 +569,7 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -634,7 +634,7 @@ test.describe("navigation", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        votes_candidates_counts: 100,
+        votes_candidates_count: 100,
         blank_votes_count: 0,
         invalid_votes_count: 0,
         total_votes_cast_count: 100,

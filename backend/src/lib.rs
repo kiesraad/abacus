@@ -11,6 +11,7 @@ use hyper::header::InvalidHeaderValue;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
+use typst::diag::SourceDiagnostic;
 use utoipa::ToSchema;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
@@ -149,7 +150,7 @@ pub enum APIError {
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
     InvalidHeaderValue,
-    PdfGenError(String),
+    PdfGenError(Vec<SourceDiagnostic>),
 }
 
 impl IntoResponse for APIError {

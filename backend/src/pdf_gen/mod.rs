@@ -41,11 +41,7 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
             );
             Ok(buffer)
         }
-        Err(err) => {
-            eprintln!("{:?}", err);
-            // TODO: Improve this error
-            Err(APIError::PdfGenError("PDF generation error".to_string()))
-        }
+        Err(err) => Err(APIError::PdfGenError(err.into_iter().collect())),
     }?;
 
     println!("Finished in {} ms", start.elapsed().as_millis());

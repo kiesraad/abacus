@@ -1,4 +1,4 @@
-# Testsoorten en test-tooling
+# Test-tooling
 
 Doel van dit document is beschrijven welke tooling we voor welke tests gebruiken.
 

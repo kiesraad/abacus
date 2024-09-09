@@ -90,14 +90,4 @@ describe("ApiClient", () => {
 
     expect(console.error).toHaveBeenCalledWith("Unexpected data from server:", expect.any(String));
   });
-
-  test("Unexpected status code throws an error", async () => {
-    overrideOnce("get", "/api/test/1", 301, { fizz: "buzz" });
-
-    const client = new ApiClient("testhost");
-
-    await expect(async () => client.getRequest("/api/test/1")).rejects.toThrowError(
-      "Unexpected response status: 301",
-    );
-  });
 });

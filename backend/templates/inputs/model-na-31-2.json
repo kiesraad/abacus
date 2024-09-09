@@ -2,10 +2,10 @@
   "location": "Gemeente Zilverhaven",
   "election": {
     "id": 1,
-    "name": "",
+    "name": "Municipal Election",
     "category": "Municipal",
-    "election_date": "2024-03-11",
-    "nomination_date": "2024-02-11",
+    "election_date": "2024-11-30",
+    "nomination_date": "2024-11-01",
     "political_groups": [
       {
         "number": 1,
@@ -19,16 +19,16 @@
   },
   "summary": {
     "voters_counts": {
-      "poll_card_count": 0,
+      "poll_card_count": 30,
       "proxy_certificate_count": 0,
       "voter_card_count": 0,
-      "total_admitted_voters_count": 0
+      "total_admitted_voters_count": 30
     },
     "votes_counts": {
-      "votes_candidates_counts": 0,
+      "votes_candidates_counts": 30,
       "blank_votes_count": 0,
       "invalid_votes_count": 0,
-      "total_votes_cast_count": 0
+      "total_votes_cast_count": 30
     },
     "differences_counts": {
       "more_ballots_count": {

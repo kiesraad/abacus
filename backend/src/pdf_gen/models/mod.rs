@@ -1,6 +1,6 @@
 mod model_na_31_2;
 
-use std::path::PathBuf;
+use std::{error::Error, path::PathBuf};
 
 pub use model_na_31_2::*;
 use typst::foundations::Bytes;
@@ -43,13 +43,12 @@ impl PdfModel {
         Ok(Bytes::from(data.as_bytes()))
     }
 
-    pub fn from_name_with_input(
-        name: &str,
-        input: &str,
-    ) -> Result<PdfModel, Box<dyn std::error::Error>> {
+    pub fn from_name_with_input(name: &str, input: &str) -> Result<PdfModel, Box<dyn Error>> {
+        use std::io::{Error, ErrorKind};
+
         match name {
             "model-na-31-2" => Ok(Self::ModelNa31_2(serde_json::from_str(input)?)),
-            _ => Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, "Unknown model").into()),
+            _ => Err(Error::new(ErrorKind::InvalidInput, "Unknown model").into()),
         }
     }
 }

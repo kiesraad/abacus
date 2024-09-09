@@ -107,6 +107,7 @@ export interface Election {
   category: ElectionCategory;
   election_date: string;
   id: number;
+  location: string;
   name: string;
   nomination_date: string;
   political_groups?: PoliticalGroup[];

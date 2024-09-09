@@ -20,5 +20,9 @@ BottomBar.Row = function BottomBarRow({
   children: React.ReactNode;
   hidden?: boolean;
 }) {
-  return <section className={cn("row", { hidden: !!hidden })}>{children}</section>;
+  return (
+    <section hidden={hidden} className={cn("row", { hidden: !!hidden })}>
+      {children}
+    </section>
+  );
 };

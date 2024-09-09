@@ -1,8 +1,15 @@
 import { render as rtlRender, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
-import { Providers, screen, setupTestRouter, userTypeInputs, waitFor } from "app/test/unit";
+import {
+  overrideOnce,
+  Providers,
+  screen,
+  setupTestRouter,
+  userTypeInputs,
+  waitFor,
+} from "app/test/unit";
 
 import { electionMockData } from "@kiesraad/api-mocks";
 
@@ -149,6 +156,32 @@ const expectPollingStationChoicePage = async () => {
   await waitFor(() => {
     expect(screen.getByTestId("polling-station-choice-form")).toBeInTheDocument();
   });
+};
+
+const submitWith422Response = async () => {
+  overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
+    error: "JSON error or invalid data (Unprocessable Content)",
+  });
+  await submit();
+};
+
+const expect422ClientError = async () => {
+  const feedbackServerError = await screen.findByTestId("feedback-server-error");
+  expect(feedbackServerError).toHaveTextContent(
+    "Client error422: JSON error or invalid data (Unprocessable Content)",
+  );
+};
+
+const submitWith500Response = async () => {
+  overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
+    error: "Internal server error",
+  });
+  await submit();
+};
+
+const expect500ServerError = async () => {
+  const feedbackServerError = await screen.findByTestId("feedback-server-error");
+  expect(feedbackServerError).toHaveTextContent("Server error500: Internal server eror");
 };
 
 type FormIdentifier = "recounted" | "voters_and_votes" | "differences" | `candidates_${number}`;
@@ -481,6 +514,40 @@ describe("Polling Station data entry integration tests", () => {
     const steps = [...stepsForPendingChanges, abortDataEntry, abortDelete, expectPollingStationChoicePage];
 
     for (const step of steps) {
+      await step();
+    }
+  });
+
+  test("4xx response results in error shown", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    render();
+
+    const formFillingSteps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedFormNo,
+      submitWith422Response,
+      expect422ClientError,
+    ];
+
+    for (const step of formFillingSteps) {
+      await step();
+    }
+  });
+
+  test("5xx response results in error shown", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    render();
+
+    const formFillingSteps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedFormNo,
+      submitWith500Response,
+      expect500ServerError,
+    ];
+
+    for (const step of formFillingSteps) {
       await step();
     }
   });

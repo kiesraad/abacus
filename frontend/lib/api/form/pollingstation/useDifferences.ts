@@ -4,19 +4,9 @@ import { PollingStationResults, usePollingStationFormController } from "@kiesraa
 
 export type DifferencesValues = Pick<PollingStationResults, "differences_counts">;
 
-export function useDifferences(
-  getValues: () => DifferencesValues,
-  getIgnoreWarnings?: () => boolean,
-) {
-  const {
-    status,
-    values,
-    formState,
-    submitCurrentForm,
-    setTemporaryCache,
-    registerCurrentForm,
-    cache,
-  } = usePollingStationFormController();
+export function useDifferences(getValues: () => DifferencesValues, getIgnoreWarnings?: () => boolean) {
+  const { status, values, formState, submitCurrentForm, setTemporaryCache, registerCurrentForm, cache } =
+    usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
     if (cache && cache.key === "differences_counts") {

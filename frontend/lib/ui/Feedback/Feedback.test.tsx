@@ -17,9 +17,7 @@ describe("UI component: Feedback", () => {
 
     expect(getByText("Controleer uitgebrachte stemmen")).toBeInTheDocument();
     expect(getByText("F.202")).toBeInTheDocument();
-    expect(
-      getByText("Heb je iets niet goed overgenomen? Herstel de fout en ga verder."),
-    ).toBeInTheDocument();
+    expect(getByText("Heb je iets niet goed overgenomen? Herstel de fout en ga verder.")).toBeInTheDocument();
     expect(
       getByText(
         "Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
@@ -32,12 +30,8 @@ describe("UI component: Feedback", () => {
 
     expect(getByText("Controleer het papieren proces-verbaal")).toBeInTheDocument();
     expect(getByText("F.101")).toBeInTheDocument();
-    expect(
-      getByText("Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'"),
-    ).toBeInTheDocument();
-    expect(
-      getByText("Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator"),
-    ).toBeInTheDocument();
+    expect(getByText("Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'")).toBeInTheDocument();
+    expect(getByText("Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator")).toBeInTheDocument();
     expect(getByText("Geen vinkje? Kies dan 'nee'.")).toBeInTheDocument();
   });
 
@@ -49,9 +43,7 @@ describe("UI component: Feedback", () => {
     expect(getByText("Controleer uitgebrachte stemmen")).toBeInTheDocument();
     expect(getByText("F.202")).toBeInTheDocument();
     expect(getByText("Voor alle foutmeldingen geldt het volgende:")).toBeInTheDocument();
-    expect(
-      getByText("Heb je iets niet goed overgenomen? Herstel de fout en ga verder."),
-    ).toBeInTheDocument();
+    expect(getByText("Heb je iets niet goed overgenomen? Herstel de fout en ga verder.")).toBeInTheDocument();
     expect(
       getByText(
         "Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
@@ -62,17 +54,11 @@ describe("UI component: Feedback", () => {
   test("Single Warning has expected children", () => {
     const { getByText } = render(<SingleWarning />);
 
-    expect(
-      getByText("Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen"),
-    ).toBeInTheDocument();
+    expect(getByText("Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen")).toBeInTheDocument();
     expect(getByText("W.203")).toBeInTheDocument();
+    expect(getByText("Heb je iets niet goed overgenomen? Herstel de fout en ga verder.")).toBeInTheDocument();
     expect(
-      getByText("Heb je iets niet goed overgenomen? Herstel de fout en ga verder."),
-    ).toBeInTheDocument();
-    expect(
-      getByText(
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      ),
+      getByText("Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder."),
     ).toBeInTheDocument();
   });
 
@@ -84,13 +70,9 @@ describe("UI component: Feedback", () => {
     expect(getByText("Controleer aantal ongeldige stemmen")).toBeInTheDocument();
     expect(getByText("W.202")).toBeInTheDocument();
     expect(getByText("Voor alle waarschuwingen geldt het volgende:")).toBeInTheDocument();
+    expect(getByText("Heb je iets niet goed overgenomen? Herstel de fout en ga verder.")).toBeInTheDocument();
     expect(
-      getByText("Heb je iets niet goed overgenomen? Herstel de fout en ga verder."),
-    ).toBeInTheDocument();
-    expect(
-      getByText(
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      ),
+      getByText("Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder."),
     ).toBeInTheDocument();
   });
 

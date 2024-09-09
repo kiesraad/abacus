@@ -50,12 +50,9 @@ describe("useWatchForChanges", () => {
     const getNewValues = () => ({ foo: "baz" });
     const nextOldValues = { foo: "baz" };
 
-    const { result, rerender } = renderHook(
-      ({ par1, par2, par3 }) => useWatchForChanges(par1, par2, par3),
-      {
-        initialProps: { par1: true, par2: oldValues, par3: getNewValues },
-      },
-    );
+    const { result, rerender } = renderHook(({ par1, par2, par3 }) => useWatchForChanges(par1, par2, par3), {
+      initialProps: { par1: true, par2: oldValues, par3: getNewValues },
+    });
 
     const user = userEvent.setup();
     await user.keyboard("a");

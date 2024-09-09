@@ -6,9 +6,7 @@ import { ClosableAlert, DefaultAlert } from "./Alert.stories";
 
 describe("UI component: Alert", () => {
   test("Alert has expected children", () => {
-    const { getByText } = render(
-      <DefaultAlert type="error" title="Alert title" text="Alert body" />,
-    );
+    const { getByText } = render(<DefaultAlert type="error" title="Alert title" text="Alert body" />);
 
     expect(getByText("Alert title")).toBeInTheDocument();
     expect(getByText("Alert body")).toBeInTheDocument();

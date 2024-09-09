@@ -17,21 +17,10 @@ export interface PollingStationFormNavigationProps {
   election: Required<Election>;
 }
 
-export function PollingStationFormNavigation({
-  pollingStationId,
-  election,
-}: PollingStationFormNavigationProps) {
+export function PollingStationFormNavigation({ pollingStationId, election }: PollingStationFormNavigationProps) {
   const _lastKnownSection = React.useRef<FormSectionID | null>(null);
-  const {
-    status,
-    formState,
-    error,
-    currentForm,
-    targetFormSection,
-    values,
-    setTemporaryCache,
-    submitCurrentForm,
-  } = usePollingStationFormController();
+  const { status, formState, error, currentForm, targetFormSection, values, setTemporaryCache, submitCurrentForm } =
+    usePollingStationFormController();
 
   const navigate = useNavigate();
   //one time flag to prioritize user navigation over controller navigation
@@ -67,11 +56,7 @@ export function PollingStationFormNavigation({
 
   const shouldBlock = React.useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
-      if (
-        status.current === "deleted" ||
-        currentLocation.pathname === nextLocation.pathname ||
-        !currentForm
-      ) {
+      if (status.current === "deleted" || currentLocation.pathname === nextLocation.pathname || !currentForm) {
         return false;
       }
 
@@ -141,10 +126,7 @@ export function PollingStationFormNavigation({
         >
           <h2 id="modal-blocker-title">Let op: niet opgeslagen wijzigingen</h2>
           <p>
-            Je hebt in{" "}
-            <strong>
-              {formState.sections[formState.active]?.title || "het huidige formulier"}
-            </strong>{" "}
+            Je hebt in <strong>{formState.sections[formState.active]?.title || "het huidige formulier"}</strong>{" "}
             wijzigingen gemaakt die nog niet zijn opgeslagen.
           </p>
           <p>Wil je deze wijzigingen bewaren?</p>
@@ -189,8 +171,7 @@ function reasonsBlocked(
     }
 
     if (
-      (currentForm.getIgnoreWarnings &&
-        formSection.ignoreWarnings !== currentForm.getIgnoreWarnings()) ||
+      (currentForm.getIgnoreWarnings && formSection.ignoreWarnings !== currentForm.getIgnoreWarnings()) ||
       currentFormHasChanges(currentForm, values)
     ) {
       result.push("changes");

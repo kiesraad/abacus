@@ -33,9 +33,8 @@ export function InputHomePage() {
         <Alert type="success">
           <h2>Alle stembureaus zijn twee keer ingevoerd</h2>
           <p>
-            De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de
-            uitslag nu definitief maken en het proces verbaal opmaken. Doe dit alleen als er vandaag
-            niks meer herteld hoeft te worden.
+            De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief
+            maken en het proces verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.
           </p>
           <Button onClick={finishInput} size="md">
             Invoerfase afronden

@@ -7,11 +7,7 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
 } from "@kiesraad/api";
 
-import {
-  electionListMockResponse,
-  electionStatusMockResponse,
-  getElectionMockData,
-} from "./ElectionMockData";
+import { electionListMockResponse, electionStatusMockResponse, getElectionMockData } from "./ElectionMockData";
 import { getPollingStationListMockResponse } from "./PollingStationMockData";
 
 type ParamsToString<T> = {
@@ -26,18 +22,15 @@ type PingResponseBody = {
   pong: string;
 };
 
-const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>(
-  "/ping",
-  async ({ request }) => {
-    const data = await request.json();
+const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>("/ping", async ({ request }) => {
+  const data = await request.json();
 
-    const pong = data.ping || "pong";
+  const pong = data.ping || "pong";
 
-    return HttpResponse.json({
-      pong,
-    });
-  },
-);
+  return HttpResponse.json({
+    pong,
+  });
+});
 
 export const ElectionListRequestHandler = http.get("/api/elections", () => {
   return HttpResponse.json(electionListMockResponse, { status: 200 });
@@ -83,13 +76,7 @@ export const pollingStationDataEntryHandler = http.post<
       },
     };
 
-    const {
-      voters_counts,
-      votes_counts,
-      voters_recounts,
-      differences_counts,
-      political_group_votes,
-    } = json.data;
+    const { voters_counts, votes_counts, voters_recounts, differences_counts, political_group_votes } = json.data;
 
     // Rules and checks implemented in this mock api:
     // F.201-204, F.301-305, F.401, W.301-302
@@ -102,9 +89,7 @@ export const pollingStationDataEntryHandler = http.post<
     //SECTION votes_counts
     // F.202 E + F + G = H
     if (
-      votes_counts.votes_candidates_counts +
-        votes_counts.blank_votes_count +
-        votes_counts.invalid_votes_count !==
+      votes_counts.votes_candidates_counts + votes_counts.blank_votes_count + votes_counts.invalid_votes_count !==
       votes_counts.total_votes_cast_count
     ) {
       response.validation_results.errors.push({
@@ -147,9 +132,7 @@ export const pollingStationDataEntryHandler = http.post<
 
       // F.201 A + B + C = D
       if (
-        voters_counts.poll_card_count +
-          voters_counts.proxy_certificate_count +
-          voters_counts.voter_card_count !==
+        voters_counts.poll_card_count + voters_counts.proxy_certificate_count + voters_counts.voter_card_count !==
         voters_counts.total_admitted_voters_count
       ) {
         response.validation_results.errors.push({

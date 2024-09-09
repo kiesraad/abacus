@@ -71,10 +71,7 @@ export interface ServerVariableObject {
   description?: string;
 }
 
-export interface PathsObject<
-  T extends object = Record<string, never>,
-  P extends object = Record<string, never>,
-> {
+export interface PathsObject<T extends object = Record<string, never>, P extends object = Record<string, never>> {
   [pattern: string]: (PathItemObject<T> & P) | undefined;
 }
 

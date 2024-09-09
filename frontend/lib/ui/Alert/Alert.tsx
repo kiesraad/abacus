@@ -17,13 +17,7 @@ export function Alert({ type, onClose, children, variant = "default" }: AlertPro
   return (
     <div className={cn(cls.alert, cls[type], variant)} role="alert">
       {onClose && (
-        <IconButton
-          icon={<IconCross />}
-          title="Melding sluiten"
-          variant="ghost"
-          size="lg"
-          onClick={onClose}
-        />
+        <IconButton icon={<IconCross />} title="Melding sluiten" variant="ghost" size="lg" onClick={onClose} />
       )}
       <aside>{renderIconForType(type)}</aside>
       <section>{children}</section>

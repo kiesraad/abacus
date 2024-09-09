@@ -18,13 +18,7 @@ export function Modal({ onClose, children }: ModalProps): React.ReactNode {
     <div className={cls.modal} role="dialog">
       <div className={cls["modal-container"]}>
         {onClose && (
-          <IconButton
-            onClick={onClose}
-            icon={<IconCross />}
-            title="Melding sluiten"
-            size="lg"
-            variant="ghost"
-          />
+          <IconButton onClick={onClose} icon={<IconCross />} title="Melding sluiten" size="lg" variant="ghost" />
         )}
         <div className={cls["modal-body"]}>{children}</div>
       </div>

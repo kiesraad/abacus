@@ -67,7 +67,7 @@ Het betreft de openbare zitting van het #is_municipality[gemeentelijk stembureau
 
 Datum en tijdstip aanvang zitting: #date_input(date: none, top_label: ("Dag", "Maand", "Jaar")) #time_input(time: none, top_label: "Tijd")
 
-Aantal kiesgerechtigden in #is_municipality[de gemeente][het openbaar lichaam] bedraagt #TODO
+Aantal kiesgerechtigden in #is_municipality[de gemeente][het openbaar lichaam] bedraagt *#input.election.number_of_voters*
 
 #pagebreak(weak: true)
 

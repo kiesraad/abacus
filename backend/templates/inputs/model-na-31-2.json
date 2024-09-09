@@ -3,6 +3,7 @@
     "id": 1,
     "name": "Municipal Election",
     "location": "Heemdamseburg",
+    "number_of_voters": 40,
     "category": "Municipal",
     "election_date": "2024-11-30",
     "nomination_date": "2024-11-01",

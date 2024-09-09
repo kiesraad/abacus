@@ -61,7 +61,12 @@ describe("Test PollingStationSaveForm", () => {
     formState.sections.voters_votes_counts.errors = [
       {
         code: "F201",
-        fields: ["data.voters_counts.poll_card_count"],
+        fields: [
+          "data.voters_counts.poll_card_count",
+          "data.voters_counts.proxy_certificate_count",
+          "data.voters_counts.voter_card_count",
+          "data.voters_counts.total_admitted_voters_count",
+        ],
       },
     ];
 
@@ -77,7 +82,7 @@ describe("Test PollingStationSaveForm", () => {
     formState.sections.voters_votes_counts.warnings = [
       {
         code: "W202",
-        fields: ["data.voters_counts.poll_card_count"],
+        fields: ["data.voters_counts.invalid_votes_count"],
       },
     ];
 
@@ -93,7 +98,7 @@ describe("Test PollingStationSaveForm", () => {
     formState.sections.voters_votes_counts.warnings = [
       {
         code: "W202",
-        fields: ["data.voters_counts.poll_card_count"],
+        fields: ["data.voters_counts.invalid_votes_count"],
       },
     ];
     formState.sections.voters_votes_counts.ignoreWarnings = true;

@@ -110,6 +110,7 @@ export interface Election {
   location: string;
   name: string;
   nomination_date: string;
+  number_of_voters: number;
   political_groups?: PoliticalGroup[];
 }
 

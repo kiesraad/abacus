@@ -64,6 +64,7 @@ mod tests {
                 id: 1,
                 name: "Municipal Election".to_string(),
                 location: "Heemdamseburg".to_string(),
+                number_of_voters: 100,
                 category: ElectionCategory::Municipal,
                 election_date: Utc::now().date_naive(),
                 nomination_date: Utc::now().date_naive(),

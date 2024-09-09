@@ -407,9 +407,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.getByTestId("blank_votes_count"), "100").toHaveValue("100");
 
       await waitFor(() => {
-        const checkbox = screen.getByRole("checkbox", {
-          name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
-        });
+        const checkbox = screen.getByTestId("voters_and_votes_form_ignore_warnings");
         expect(checkbox).toBeInTheDocument();
         expect(checkbox).not.toBeVisible();
       });

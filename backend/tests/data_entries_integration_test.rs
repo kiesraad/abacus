@@ -14,13 +14,13 @@ use crate::utils::serve_api;
 mod shared;
 mod utils;
 
-#[sqlx::test(fixtures("../fixtures/elections.sql", "../fixtures/polling_stations.sql"))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     shared::create_and_finalise_data_entry(&addr).await;
 }
 
-#[sqlx::test(fixtures("../fixtures/elections.sql", "../fixtures/polling_stations.sql"))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -157,7 +157,7 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
     );
 }
 
-#[sqlx::test(fixtures("../fixtures/elections.sql", "../fixtures/polling_stations.sql"))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -184,7 +184,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[sqlx::test(fixtures("../fixtures/elections.sql", "../fixtures/polling_stations.sql"))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

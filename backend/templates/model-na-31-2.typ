@@ -142,7 +142,7 @@ aantallen opgenomen in bijlage 2, rubriek 1 of, indien van toepassing, rubriek 3
   total: ([Het aantal tot de stemming toegelaten kiezers ( A + B + C = D )], [D], mono[#input.summary.voters_counts.total_admitted_voters_count])
 )
 
-= Aantal getelde stembillettenuitgebrachte stemmen zoals vastgesteld door het #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+= Aantal uitgebrachte stemmen zoals vastgesteld door het #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
 #emph[Som van de aantallen uitgebrachte stemmen in alle stembureaus in #is_municipality[de gemeente][het openbaar lichaam]. Dit is de som van
 de aantallen opgenomen in bijlage 2, rubriek 2.]

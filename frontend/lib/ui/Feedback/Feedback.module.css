@@ -36,6 +36,9 @@
 
     div:global(.content) {
       max-width: 42.5rem;
+      a:visited {
+        color: var(--link-default);
+      }
     }
   }
 

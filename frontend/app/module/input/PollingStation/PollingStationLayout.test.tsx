@@ -12,11 +12,7 @@ import {
   PollingStationFormController,
   PollingStationListProvider,
 } from "@kiesraad/api";
-import {
-  electionDetailsMockResponse,
-  pollingStationMockData,
-  pollingStationsMockResponse,
-} from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse, pollingStationMockData, pollingStationsMockResponse } from "@kiesraad/api-mocks";
 
 describe("PollingStationLayout", () => {
   const election = electionDetailsMockResponse.election as Required<Election>;
@@ -54,13 +50,7 @@ describe("PollingStationLayout", () => {
 
     // Check if the navigation bar displays the correct information
     const nav = await screen.findByRole("navigation", { name: /primary-navigation/i });
-    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute(
-      "href",
-      "/overview",
-    );
-    expect(within(nav).getByRole("link", { name: election.name })).toHaveAttribute(
-      "href",
-      `/${election.id}/input`,
-    );
+    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute("href", "/overview");
+    expect(within(nav).getByRole("link", { name: election.name })).toHaveAttribute("href", `/${election.id}/input`);
   });
 });

@@ -73,9 +73,7 @@ export function PollingStationSelector({
                 <span className={cls.icon}>
                   <Icon icon={<IconError />} color="error" />
                 </span>
-                <span>
-                  Geen stembureau gevonden met nummer {removeLeadingZeros(pollingStationNumber)}
-                </span>
+                <span>Geen stembureau gevonden met nummer {removeLeadingZeros(pollingStationNumber)}</span>
               </div>
             );
           }

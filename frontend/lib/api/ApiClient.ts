@@ -57,10 +57,7 @@ export class ApiClient {
     } as ApiResponse<SuccessResponseType>;
   }
 
-  async postRequest<SuccessResponseType>(
-    path: string,
-    requestBody: object,
-  ): Promise<ApiResponse<SuccessResponseType>> {
+  async postRequest<SuccessResponseType>(path: string, requestBody: object): Promise<ApiResponse<SuccessResponseType>> {
     const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
 
     const response = await fetch(host + path, {
@@ -87,9 +84,7 @@ export class ApiClient {
     return this.responseHandler<SuccessResponseType>(response);
   }
 
-  async deleteRequest<SuccessResponseType>(
-    path: string,
-  ): Promise<ApiResponse<SuccessResponseType>> {
+  async deleteRequest<SuccessResponseType>(path: string): Promise<ApiResponse<SuccessResponseType>> {
     const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
     const response = await fetch(host + path, { method: "DELETE" });
     return this.responseHandler<SuccessResponseType>(response);

@@ -19,9 +19,7 @@ export function PollingStationChoiceForm() {
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(
-    undefined,
-  );
+  const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(undefined);
 
   const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
     setLoading(false);
@@ -31,9 +29,7 @@ export function PollingStationChoiceForm() {
   useMemo(() => {
     const parsedInt = parsePollingStationNumber(pollingStationNumber);
     setLoading(true);
-    debouncedCallback(
-      pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt),
-    );
+    debouncedCallback(pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt));
   }, [pollingStationNumber, pollingStations, debouncedCallback]);
 
   const handleSubmit = () => {
@@ -43,9 +39,7 @@ export function PollingStationChoiceForm() {
     }
 
     const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
-    const pollingStation = pollingStations.find(
-      (pollingStation) => pollingStation.number === parsedStationNumber,
-    );
+    const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
 
     if (pollingStation) {
       navigate(`./${pollingStation.id}`);

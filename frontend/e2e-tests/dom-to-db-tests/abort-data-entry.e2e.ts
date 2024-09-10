@@ -2,11 +2,7 @@ import { expect, test } from "@playwright/test";
 import { AbortInputModal } from "e2e-tests/page-objects/input/AbortInputModalPgObj";
 import { InputPage } from "e2e-tests/page-objects/input/InputPgObj";
 import { RecountedPage } from "e2e-tests/page-objects/input/RecountedPgObj";
-import {
-  VotersCounts,
-  VotersVotesPage,
-  VotesCounts,
-} from "e2e-tests/page-objects/input/VotersVotesPgObj";
+import { VotersCounts, VotersVotesPage, VotesCounts } from "e2e-tests/page-objects/input/VotersVotesPgObj";
 
 test.describe("Abort data entry", () => {
   test("Save input from empty voters and votes page", async ({ page }) => {

@@ -33,8 +33,6 @@ function renderKey(keyboardKey: KeyboardKey, index: number): React.JSX.Element {
 
 export function KeyboardKeys({ keys }: KeyboardKeysProps) {
   return (
-    <div className={cn(cls["keyboard-keys"])}>
-      {keys.map((keyboardKey, index) => renderKey(keyboardKey, index))}
-    </div>
+    <div className={cn(cls["keyboard-keys"])}>{keys.map((keyboardKey, index) => renderKey(keyboardKey, index))}</div>
   );
 }

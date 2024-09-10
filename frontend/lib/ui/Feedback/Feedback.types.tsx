@@ -15,11 +15,7 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
   F101: {
     title: "Controleer het papieren proces-verbaal",
     code: "F.101",
-    content: (
-      <span>
-        Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?
-      </span>
-    ),
+    content: <span>Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?</span>,
   },
   F201: {
     title: "Controleer toegelaten kiezers",
@@ -61,8 +57,7 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
       <div>
         De optelling van alle lijsten is niet gelijk aan de invoer bij E.
         <br />
-        Check of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle
-        lijsten hebt ingevoerd.
+        Check of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd.
       </div>
     ),
   },
@@ -71,9 +66,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "F.301",
     content: (
       <div>
-        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er meer
-        stemmen dan kiezers waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het
-        aantal meer getelde stembiljetten.
+        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er meer stemmen dan kiezers
+        waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het aantal meer getelde stembiljetten.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -84,8 +78,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "F.302",
     content: (
       <div>
-        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er meer
-        stemmen dan kiezers waren. Daarom mag J niet ingevuld zijn.
+        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er meer stemmen dan kiezers
+        waren. Daarom mag J niet ingevuld zijn.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -96,9 +90,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "F.303",
     content: (
       <div>
-        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er minder
-        stemmen dan kiezers waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het
-        aantal minder getelde stembiljetten.
+        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er minder stemmen dan kiezers
+        waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het aantal minder getelde stembiljetten.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -109,8 +102,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "F.304",
     content: (
       <div>
-        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er minder
-        stemmen dan kiezers waren. Daarom mag I niet ingevuld zijn.
+        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er minder stemmen dan kiezers
+        waren. Daarom mag I niet ingevuld zijn.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -121,8 +114,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "F.305",
     content: (
       <div>
-        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er
-        evenveel stemmen als kiezers waren. Maar je hebt wel verschillen ingevuld.
+        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er evenveel stemmen als
+        kiezers waren. Maar je hebt wel verschillen ingevuld.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -166,8 +159,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "W.203",
     content: (
       <div>
-        Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal
-        uitgebrachte stemmen (E t/m H).
+        Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen
+        (E t/m H).
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -178,8 +171,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "W.204",
     content: (
       <div>
-        Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het
-        herteld aantal toegelaten kiezers (A.2 t/m D.2).
+        Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten
+        kiezers (A.2 t/m D.2).
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -201,8 +194,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "W.206",
     content: (
       <div>
-        Het totaal aantal toegelaten kiezers (D) en/of het totaal aantal uitgebrachte stemmen (H) is
-        hoger dan het aantal kiesgerechtigden voor dit stembureau.
+        Het totaal aantal toegelaten kiezers (D) en/of het totaal aantal uitgebrachte stemmen (H) is hoger dan het
+        aantal kiesgerechtigden voor dit stembureau.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -213,8 +206,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "W.207",
     content: (
       <div>
-        Het totaal aantal uitgebrachte stemmen (H) en/of het herteld totaal aantal toegelaten
-        kiezers (D.2) is hoger dan het aantal kiesgerechtigden voor dit stembureau.
+        Het totaal aantal uitgebrachte stemmen (H) en/of het herteld totaal aantal toegelaten kiezers (D.2) is hoger dan
+        het aantal kiesgerechtigden voor dit stembureau.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>

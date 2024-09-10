@@ -24,9 +24,7 @@ describe("Test PollingStationChoiceForm", () => {
       // Test if the feedback field shows an error
       await user.type(pollingStation, "abc");
       const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
-      expect(
-        await within(pollingStationFeedback).findByText("Geen stembureau gevonden met nummer abc"),
-      ).toBeVisible();
+      expect(await within(pollingStationFeedback).findByText("Geen stembureau gevonden met nummer abc")).toBeVisible();
 
       await user.clear(pollingStation);
 
@@ -50,9 +48,7 @@ describe("Test PollingStationChoiceForm", () => {
       // Test if the polling station name is shown
       await user.type(pollingStation, "33");
       const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
-      expect(
-        await within(pollingStationFeedback).findByText('Stembureau "Op Rolletjes"'),
-      ).toBeVisible();
+      expect(await within(pollingStationFeedback).findByText('Stembureau "Op Rolletjes"')).toBeVisible();
     });
 
     test("Selecting a valid polling station with leading zeros", async () => {
@@ -84,18 +80,14 @@ describe("Test PollingStationChoiceForm", () => {
       // Test if the error message is shown correctly without leading zeroes
       await user.type(pollingStation, "0099");
       const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
-      expect(
-        await within(pollingStationFeedback).findByText("Geen stembureau gevonden met nummer 99"),
-      ).toBeVisible();
+      expect(await within(pollingStationFeedback).findByText("Geen stembureau gevonden met nummer 99")).toBeVisible();
 
       await user.clear(pollingStation);
 
       // Test if the error message is shown correctly when just entering number 0
       await user.type(pollingStation, "0");
       const pollingStationFeedback2 = await screen.findByTestId("pollingStationSelectorFeedback");
-      expect(
-        await within(pollingStationFeedback2).findByText("Geen stembureau gevonden met nummer 0"),
-      ).toBeVisible();
+      expect(await within(pollingStationFeedback2).findByText("Geen stembureau gevonden met nummer 0")).toBeVisible();
     });
 
     test("Submitting an empty or invalid polling station shows alert", async () => {
@@ -112,13 +104,9 @@ describe("Test PollingStationChoiceForm", () => {
       await user.click(submitButton);
 
       // Test that an alert is visible
-      const pollingStationSubmitFeedback = await screen.findByTestId(
-        "pollingStationSubmitFeedback",
-      );
+      const pollingStationSubmitFeedback = await screen.findByTestId("pollingStationSubmitFeedback");
       expect(
-        within(pollingStationSubmitFeedback).getByText(
-          "Voer een geldig nummer van een stembureau in om te beginnen",
-        ),
+        within(pollingStationSubmitFeedback).getByText("Voer een geldig nummer van een stembureau in om te beginnen"),
       ).toBeVisible();
 
       // Now start typing an invalid polling station number
@@ -138,13 +126,7 @@ describe("Test PollingStationChoiceForm", () => {
     });
 
     test("Form displays message when searching", async () => {
-      overrideOnce(
-        "get",
-        "/api/elections/1/polling_stations",
-        200,
-        pollingStationsMockResponse,
-        "infinite",
-      );
+      overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse, "infinite");
       const user = userEvent.setup();
       render(
         <PollingStationListProvider electionId={1}>

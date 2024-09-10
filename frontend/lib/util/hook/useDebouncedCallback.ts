@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
-export function useDebouncedCallback<T extends (...args: never[]) => unknown>(
-  callback: T,
-  delay: number,
-) {
+export function useDebouncedCallback<T extends (...args: never[]) => unknown>(callback: T, delay: number) {
   const callbackRef = useRef(callback);
   const debounceTimerRef = useRef(0);
 

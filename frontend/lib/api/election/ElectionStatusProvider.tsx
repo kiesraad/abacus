@@ -6,9 +6,7 @@ export interface iElectionStatusProviderContext {
   statuses: Required<PollingStationStatusEntry[]>;
 }
 
-export const ElectionStatusProviderContext = React.createContext<
-  iElectionStatusProviderContext | undefined
->(undefined);
+export const ElectionStatusProviderContext = React.createContext<iElectionStatusProviderContext | undefined>(undefined);
 
 export interface ElectionStatusProviderProps {
   children: React.ReactNode;

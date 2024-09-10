@@ -26,10 +26,7 @@ export function candidateNumberFromId(id: string) {
  * @param formSections keys in response data to match
  * @returns true if fields match formSections
  */
-export function matchValidationResultWithFormSections(
-  fields: string[],
-  formSections: string[],
-): boolean {
+export function matchValidationResultWithFormSections(fields: string[], formSections: string[]): boolean {
   for (let i = 0; i < fields.length; i++) {
     const field = fields[i];
     if (field) {

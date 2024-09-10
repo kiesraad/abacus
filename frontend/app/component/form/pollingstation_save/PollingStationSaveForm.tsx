@@ -46,48 +46,89 @@ export function PollingStationSaveForm({
   return (
     <div>
       <h2>Controleren en opslaan</h2>
-
-      {!summary.hasBlocks && summary.countsAddUp && (
-        <p>
-          De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen.
-          Er zijn geen blokkerende fouten of waarschuwingen.
-        </p>
-      )}
-      {summary.hasBlocks && summary.countsAddUp && (
-        <>
-          <p>
+      <section className="md">
+        {!summary.hasBlocks && summary.countsAddUp && (
+          <p className="md">
             De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet
-            tegen. Er zijn waarschuwingen die moeten worden gecontroleerd. Controleer de openstaande
-            waarschuwingen
+            tegen. Er zijn geen blokkerende fouten of waarschuwingen.
           </p>
+        )}
+        {summary.hasBlocks && summary.countsAddUp && (
+          <>
+            <p className="md">
+              De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet
+              tegen. Er zijn waarschuwingen die moeten worden gecontroleerd. Controleer de
+              openstaande waarschuwingen
+            </p>
 
-          <p>Hieronder zie je een overzicht van alle eventuele fouten en waarschuwingen.</p>
-        </>
-      )}
+            <p className="md">
+              Hieronder zie je een overzicht van alle eventuele fouten en waarschuwingen.
+            </p>
+          </>
+        )}
 
-      {summary.hasBlocks && !summary.countsAddUp && (
-        <>
-          <p>
-            De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar tegen. Je
-            kan de resultaten daarom niet opslaan.
-          </p>
-          <p>Los de blokkerende fouten op. Lukt dat niet? Overleg dan met de coördinator. </p>
-        </>
-      )}
+        {summary.hasBlocks && !summary.countsAddUp && (
+          <>
+            <p className="md">
+              De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar tegen.
+              Je kan de resultaten daarom niet opslaan.
+            </p>
+            <p className="md">
+              Los de blokkerende fouten op. Lukt dat niet? Overleg dan met de coördinator.{" "}
+            </p>
+          </>
+        )}
+      </section>
+
       <StatusList>
         {summary.countsAddUp && (
           <StatusList.Item status="accept">Alle optellingen kloppen</StatusList.Item>
         )}
 
-        {summary.notableFormSections.map((section) => (
-          <StatusList.Item
-            key={section.formSection.id}
-            status={menuStatusForFormSectionStatus(section.status)}
-          >
-            {section.formSection.title}
-            <Link to={getUrlForFormSection(section.formSection.id)}>Ga naar</Link>
+        {summary.notableFormSections.map((section) => {
+          const link = (
+            <Link to={getUrlForFormSection(section.formSection.id)}>
+              {section.formSection.title}
+            </Link>
+          );
+          let content = <></>;
+          switch (section.status) {
+            case "empty":
+              content = <>Op {link} zijn geen stemmen ingevoerd</>;
+              break;
+            case "accepted-warnings":
+              content = <>{link} heeft geaccepteerde waarschuwingen</>;
+              break;
+            case "unaccepted-warnings":
+              content = <>Controleer waarschuwingen bij {link}</>;
+              break;
+            case "errors":
+              content = <>{link} heeft blokkerende fouten</>;
+          }
+          return (
+            <StatusList.Item
+              key={section.formSection.id}
+              status={menuStatusForFormSectionStatus(section.status)}
+            >
+              {content}
+            </StatusList.Item>
+          );
+        })}
+
+        {!summary.hasBlocks && !summary.hasWarnings && (
+          <StatusList.Item status="accept">
+            Er zijn geen blokkerende fouten of waarschuwingen
           </StatusList.Item>
-        ))}
+        )}
+        {summary.hasBlocks ? (
+          <StatusList.Item status="warning">
+            Je kan de resultaten van dit stembureau nog niet opslaan
+          </StatusList.Item>
+        ) : (
+          <StatusList.Item status="accept" emphasis>
+            Je kan de resultaten van dit stembureau opslaan
+          </StatusList.Item>
+        )}
       </StatusList>
     </div>
   );

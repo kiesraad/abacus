@@ -23,6 +23,10 @@ export function Checkbox({ id, children, defaultChecked, hasError }: CheckboxPro
     setChecked((prev) => !prev);
   };
 
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.target.checked);
+  };
+
   return (
     <div
       className={cn(cls.checkbox, { "has-error": !!hasError })}
@@ -37,7 +41,7 @@ export function Checkbox({ id, children, defaultChecked, hasError }: CheckboxPro
       >
         <IconCheckmarkSmall aria-label={checked ? "Aangevinkt" : "uitgevinkt"} />
       </div>
-      <input type="checkbox" id={id} name={id} checked={checked} onChange={toggleCheckbox} />
+      <input type="checkbox" id={id} name={id} checked={checked} onChange={onChange} />
       <label htmlFor={id}>{children}</label>
     </div>
   );

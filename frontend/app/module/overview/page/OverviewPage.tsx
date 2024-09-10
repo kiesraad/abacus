@@ -33,9 +33,7 @@ export function OverviewPage() {
       {isNewAccount && (
         <Alert type="success" onClose={closeNewAccountAlert}>
           <h2>Je account is ingesteld</h2>
-          <p>
-            Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.
-          </p>
+          <p>Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.</p>
         </Alert>
       )}
       <main>

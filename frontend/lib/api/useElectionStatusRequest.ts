@@ -1,8 +1,4 @@
-import {
-  ELECTION_STATUS_REQUEST_PARAMS,
-  ELECTION_STATUS_REQUEST_PATH,
-  ElectionStatusResponse,
-} from "@kiesraad/api";
+import { ELECTION_STATUS_REQUEST_PARAMS, ELECTION_STATUS_REQUEST_PATH, ElectionStatusResponse } from "@kiesraad/api";
 
 import { useApiGetRequest } from "./useApiGetRequest";
 

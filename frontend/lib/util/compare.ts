@@ -4,11 +4,7 @@ export function isPrimitive(value: unknown): value is Primitive {
   return value === null || (typeof value !== "object" && typeof value !== "function");
 }
 
-export function deepEqual(
-  obj1: unknown,
-  obj2: unknown,
-  zeroIsEqualToEmptyString?: boolean,
-): boolean {
+export function deepEqual(obj1: unknown, obj2: unknown, zeroIsEqualToEmptyString?: boolean): boolean {
   if (zeroIsEqualToEmptyString) {
     if ((obj1 === 0 && obj2 === "") || (obj1 === "" && obj2 === 0)) {
       return true;

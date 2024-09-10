@@ -72,9 +72,7 @@ export class VotersVotesPage extends InputBasePage {
     this.voterCardRecount = page.getByTestId("voter_card_recount");
     this.totalAdmittedVotersRecount = page.getByTestId("total_admitted_voters_recount");
 
-    this.acceptWarnings = page.getByLabel(
-      "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
-    );
+    this.acceptWarnings = page.getByLabel("Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.");
 
     this.next = page.getByRole("button", { name: "Volgende" });
   }
@@ -97,16 +95,10 @@ export class VotersVotesPage extends InputBasePage {
     await this.pollCardRecount.fill(votersRecounts.poll_card_recount.toString());
     await this.proxyCertificateRecount.fill(votersRecounts.proxy_certificate_recount.toString());
     await this.voterCardRecount.fill(votersRecounts.voter_card_recount.toString());
-    await this.totalAdmittedVotersRecount.fill(
-      votersRecounts.total_admitted_voters_recount.toString(),
-    );
+    await this.totalAdmittedVotersRecount.fill(votersRecounts.total_admitted_voters_recount.toString());
   }
 
-  async fillInPageAndClickNext(
-    votersCounts: VotersCounts,
-    votesCounts: VotesCounts,
-    votersRecounts?: VotersRecounts,
-  ) {
+  async fillInPageAndClickNext(votersCounts: VotersCounts, votesCounts: VotesCounts, votersRecounts?: VotersRecounts) {
     await this.inputVotersCounts(votersCounts);
     await this.inputVotesCounts(votesCounts);
     if (votersRecounts) {

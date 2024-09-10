@@ -1,14 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import {
-  getUrlMethodAndBody,
-  overrideOnce,
-  render,
-  screen,
-  userTypeInputs,
-  waitFor,
-} from "app/test/unit";
+import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs, waitFor } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
 import { FormState, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
@@ -460,10 +453,7 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.total_votes_cast_count",
-                "data.voters_counts.total_admitted_voters_count",
-              ],
+              fields: ["data.votes_counts.total_votes_cast_count", "data.voters_counts.total_admitted_voters_count"],
               code: "W203",
             },
           ],
@@ -577,10 +567,7 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.total_votes_cast_count",
-                "data.voters_counts.total_admitted_voters_count",
-              ],
+              fields: ["data.votes_counts.total_votes_cast_count", "data.voters_counts.total_admitted_voters_count"],
               code: "W206",
             },
           ],

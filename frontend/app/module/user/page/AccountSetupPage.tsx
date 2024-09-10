@@ -25,10 +25,7 @@ export function AccountSetupPage() {
       {showAlert && (
         <Alert type="success" onClose={hideAlert}>
           <h2>Inloggen gelukt</h2>
-          <p>
-            We gaan je account instellen voor gebruik. Vul onderstaande gegevens in om verder te
-            gaan.
-          </p>
+          <p>We gaan je account instellen voor gebruik. Vul onderstaande gegevens in om verder te gaan.</p>
         </Alert>
       )}
       <main>

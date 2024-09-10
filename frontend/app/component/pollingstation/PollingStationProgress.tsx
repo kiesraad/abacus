@@ -77,9 +77,7 @@ export function PollingStationProgress() {
         active={formState.active === "voters_votes_counts"}
       >
         {formState.active !== "voters_votes_counts" ? (
-          <Link to={`/${election.id}/input/${pollingStationId}/numbers`}>
-            Aantal kiezers en stemmen
-          </Link>
+          <Link to={`/${election.id}/input/${pollingStationId}/numbers`}>Aantal kiezers en stemmen</Link>
         ) : (
           <span>Aantal kiezers en stemmen</span>
         )}

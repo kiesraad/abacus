@@ -1,11 +1,6 @@
 import * as React from "react";
 
-import {
-  CandidateVotes,
-  getErrorsAndWarnings,
-  PoliticalGroup,
-  usePoliticalGroup,
-} from "@kiesraad/api";
+import { CandidateVotes, getErrorsAndWarnings, PoliticalGroup, usePoliticalGroup } from "@kiesraad/api";
 import {
   Alert,
   BottomBar,
@@ -74,8 +69,11 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     return false;
   }, [_IGNORE_WARNINGS_ID]);
 
-  const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
-    usePoliticalGroup(group.number, getValues, getIgnoreWarnings);
+  const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } = usePoliticalGroup(
+    group.number,
+    getValues,
+    getIgnoreWarnings,
+  );
 
   const shouldWatch = warnings.length > 0 && isSaved;
   const { hasChanges } = useWatchForChanges(shouldWatch, sectionValues, getValues);
@@ -104,9 +102,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
       if (errors.length === 0 && warnings.length > 0) {
         const ignoreWarnings = (
-          document.getElementById(
-            `candidates_votes_form_ignore_warnings_${group.number}`,
-          ) as HTMLInputElement
+          document.getElementById(`candidates_votes_form_ignore_warnings_${group.number}`) as HTMLInputElement
         ).checked;
         if (!hasChanges && !ignoreWarnings) {
           setWarningsWarning(true);
@@ -130,11 +126,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
       {isSaved && hasValidationWarning && !hasValidationError && (
-        <Feedback
-          id="feedback-warning"
-          type="warning"
-          data={warnings.map((warning) => warning.code)}
-        />
+        <Feedback id="feedback-warning" type="warning" data={warnings.map((warning) => warning.code)} />
       )}
       <InputGrid key={`list${group.number}`} zebra>
         <InputGrid.Header>
@@ -185,11 +177,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </BottomBar.Row>
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox
-            id={_IGNORE_WARNINGS_ID}
-            defaultChecked={ignoreWarnings}
-            hasError={warningsWarning}
-          >
+          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings} hasError={warningsWarning}>
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

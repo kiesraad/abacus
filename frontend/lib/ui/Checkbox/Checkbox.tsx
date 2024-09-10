@@ -28,11 +28,7 @@ export function Checkbox({ id, children, defaultChecked, hasError }: CheckboxPro
   };
 
   return (
-    <div
-      className={cn(cls.checkbox, { "has-error": !!hasError })}
-      aria-label="input"
-      id={`checkbox-container-${id}`}
-    >
+    <div className={cn(cls.checkbox, { "has-error": !!hasError })} aria-label="input" id={`checkbox-container-${id}`}>
       <div
         className={checked ? "checked" : "unchecked"}
         aria-hidden={true}

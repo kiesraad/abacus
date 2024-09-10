@@ -131,11 +131,7 @@ InputGrid.SectionTitleHeader = ({
   </thead>
 );
 
-InputGrid.Header = ({
-  children,
-}: {
-  children: [React.ReactElement, React.ReactElement, React.ReactElement];
-}) => (
+InputGrid.Header = ({ children }: { children: [React.ReactElement, React.ReactElement, React.ReactElement] }) => (
   <thead>
     <tr>{children}</tr>
   </thead>

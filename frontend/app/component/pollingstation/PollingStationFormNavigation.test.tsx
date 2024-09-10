@@ -15,9 +15,7 @@ vi.mock("react-router-dom", () => ({
 }));
 
 vi.mock("@kiesraad/api", async () => {
-  const utils = await vi.importActual(
-    "../../../lib/api/form/pollingstation/pollingStationUtils.ts",
-  );
+  const utils = await vi.importActual("../../../lib/api/form/pollingstation/pollingStationUtils.ts");
   return {
     usePollingStationFormController: vi.fn(),
     currentFormHasChanges: utils.currentFormHasChanges,
@@ -116,9 +114,7 @@ describe("PollingStationFormNavigation", () => {
         nextLocation: { pathname: string };
       }) => boolean;
 
-      expect(blocker({ currentLocation: { pathname: "a" }, nextLocation: { pathname: "b" } })).toBe(
-        true,
-      );
+      expect(blocker({ currentLocation: { pathname: "a" }, nextLocation: { pathname: "b" } })).toBe(true);
     }
   });
 
@@ -169,9 +165,7 @@ describe("PollingStationFormNavigation", () => {
       }) => boolean;
 
       //TODO: check these tests after determining what should be blocked
-      expect(blocker({ currentLocation: { pathname: "a" }, nextLocation: { pathname: "b" } })).toBe(
-        false,
-      );
+      expect(blocker({ currentLocation: { pathname: "a" }, nextLocation: { pathname: "b" } })).toBe(false);
 
       const title = await screen.findByTestId("modal-blocker-title");
       expect(title).toBeInTheDocument();

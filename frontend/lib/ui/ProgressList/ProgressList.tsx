@@ -1,13 +1,6 @@
 import * as React from "react";
 
-import {
-  IconArrowNarrowRight,
-  IconCheckmark,
-  IconError,
-  IconMinus,
-  IconPencil,
-  IconWarning,
-} from "@kiesraad/icon";
+import { IconArrowNarrowRight, IconCheckmark, IconError, IconMinus, IconPencil, IconWarning } from "@kiesraad/icon";
 import { MenuStatus } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 

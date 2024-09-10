@@ -15,11 +15,7 @@ import {
   POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
 } from "@kiesraad/api";
-import {
-  electionDetailsMockResponse,
-  electionMockData,
-  pollingStationMockData,
-} from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse, electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { AbortDataEntryControl } from "./AbortDataEntryControl";
 
@@ -79,10 +75,7 @@ describe("Test AbortDataEntryControl", () => {
         "http://testhost/api/polling_stations/1/data_entries/1",
         async ({ request }) => {
           request_body = await request.json();
-          return HttpResponse.json(
-            { validation_results: { errors: [], warnings: [] } },
-            { status: 200 },
-          );
+          return HttpResponse.json({ validation_results: { errors: [], warnings: [] } }, { status: 200 });
         },
         { once: true },
       ),

@@ -1,5 +1,6 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
+import { PollingStationSaveForm } from "./component/form/pollingstation_save/PollingStationSaveForm";
 import { DevHomePage } from "./module/DevHomePage";
 import { ElectionLayout } from "./module/ElectionLayout";
 import {
@@ -12,7 +13,6 @@ import {
   VotersAndVotesPage,
 } from "./module/input";
 import { FinaliseElectionPage } from "./module/input/page/FinaliseElectionPage";
-import { PollingStationSaveFormPage } from "./module/input/PollingStation/PollingStationSaveFormPage";
 import { NotFound } from "./module/NotFound";
 import { OverviewLayout, OverviewPage } from "./module/overview";
 import { RootLayout } from "./module/RootLayout";
@@ -40,7 +40,7 @@ export const routes = createRoutesFromElements(
           <Route path="numbers" element={<VotersAndVotesPage />} />
           <Route path="differences" element={<DifferencesPage />} />
           <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-          <Route path="save" element={<PollingStationSaveFormPage />} />
+          <Route path="save" element={<PollingStationSaveForm />} />
         </Route>
         <Route path="finalise" element={<FinaliseElectionPage />} />
       </Route>

@@ -13,7 +13,7 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 - Test runners: [Vitest][vitest] en [Playwright][playwright]
 - Mock server: [Mock Service Worker][mock-service-worker]
 - Unit tests (voor utils e.d.): geen additionele tools of libraries nodig
-- React UI elementen: [Ladle][ladle] en [Playwright][playwright]
+- React UI elementen: [React Testing Library][react-testing-library]; [Ladle][ladle] en [Playwright][playwright]
 - React componenten: [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
 - React integration tests: [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
 - Frontend met mocked backend: [Playwright][playwright] en [Mock Service Worker][mock-service-worker]

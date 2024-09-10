@@ -7,8 +7,7 @@ import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys } from "@kiesraad/ui
 export function PollingStationSaveForm() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { registerCurrentForm, formState, status, finaliseDataEntry } =
-    usePollingStationFormController();
+  const { registerCurrentForm, formState, status, finaliseDataEntry } = usePollingStationFormController();
 
   React.useEffect(() => {
     registerCurrentForm({
@@ -19,8 +18,7 @@ export function PollingStationSaveForm() {
   }, [registerCurrentForm]);
 
   const finalisationAllowed = Object.values(formState.sections).every(
-    (section) =>
-      section.errors.length === 0 && (section.warnings.length === 0 || section.ignoreWarnings),
+    (section) => section.errors.length === 0 && (section.warnings.length === 0 || section.ignoreWarnings),
   );
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>

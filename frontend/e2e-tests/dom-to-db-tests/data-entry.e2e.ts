@@ -1,11 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { formatNumber } from "e2e-tests/e2e-test-utils";
 import { CandidatesListPage } from "e2e-tests/page-objects/input/CandidatesListPgObj";
-import {
-  DifferencesPage,
-  FewerBallotsFields,
-  MoreBallotsFields,
-} from "e2e-tests/page-objects/input/DifferencesPgObj";
+import { DifferencesPage, FewerBallotsFields, MoreBallotsFields } from "e2e-tests/page-objects/input/DifferencesPgObj";
 import { InputPage } from "e2e-tests/page-objects/input/InputPgObj";
 import { RecountedPage } from "e2e-tests/page-objects/input/RecountedPgObj";
 import { SaveFormPage } from "e2e-tests/page-objects/input/SaveFormPgObj";
@@ -109,9 +105,7 @@ test.describe("data entry", () => {
       total_admitted_voters_recount: 1125,
     };
     await votersVotesPage.inputVotersRecounts(votersRecounts);
-    await expect(votersVotesPage.pollCardRecount).toHaveValue(
-      formatNumber(votersRecounts.poll_card_recount),
-    );
+    await expect(votersVotesPage.pollCardRecount).toHaveValue(formatNumber(votersRecounts.poll_card_recount));
     await votersVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
@@ -404,9 +398,7 @@ test.describe("errors and warnings", () => {
     const differencesPage = new DifferencesPage(page);
     await differencesPage.heading.waitFor();
 
-    await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName(
-      "bevat een waarschuwing",
-    );
+    await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
   });
 
   test("correct warning on voters and votes page", async ({ page }) => {
@@ -462,9 +454,7 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
-  test("remove option to accept warning on voters and votes page after input change", async ({
-    page,
-  }) => {
+  test("remove option to accept warning on voters and votes page after input change", async ({ page }) => {
     await page.goto("/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
@@ -548,9 +538,7 @@ test.describe("navigation", () => {
     // navigate to previous page with unsaved changes
     await votersVotesPage.navPanel.recounted.click();
     await expect(votersVotesPage.unsavedChangesModal.heading).toBeVisible();
-    await expect(votersVotesPage.unsavedChangesModal.modal).toContainText(
-      "Toegelaten kiezers en uitgebrachte stemmen",
-    );
+    await expect(votersVotesPage.unsavedChangesModal.modal).toContainText("Toegelaten kiezers en uitgebrachte stemmen");
     // do not save changes
     await votersVotesPage.unsavedChangesModal.discardInput.click();
 
@@ -604,9 +592,7 @@ test.describe("navigation", () => {
     // navigate to previous page with unsaved changes
     await votersVotesPage.navPanel.recounted.click();
     await expect(votersVotesPage.unsavedChangesModal.heading).toBeVisible();
-    await expect(votersVotesPage.unsavedChangesModal.modal).toContainText(
-      "Toegelaten kiezers en uitgebrachte stemmen",
-    );
+    await expect(votersVotesPage.unsavedChangesModal.modal).toContainText("Toegelaten kiezers en uitgebrachte stemmen");
     // save changes
     await votersVotesPage.unsavedChangesModal.saveInput.click();
 
@@ -620,9 +606,7 @@ test.describe("navigation", () => {
   });
 
   test.describe("navigation panel icons", () => {
-    test("check icons for accept, active, empty, error, warning, unsaved statuses", async ({
-      page,
-    }) => {
+    test("check icons for accept, active, empty, error, warning, unsaved statuses", async ({ page }) => {
       await page.goto("/1/input/1/recounted");
 
       const recountedPage = new RecountedPage(page);
@@ -632,9 +616,7 @@ test.describe("navigation", () => {
       const votersVotesPage = new VotersVotesPage(page);
       await votersVotesPage.heading.waitFor();
       await expect(votersVotesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
-      await expect(votersVotesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName(
-        "je bent hier",
-      );
+      await expect(votersVotesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("je bent hier");
 
       const voters: VotersCounts = {
         poll_card_count: 100,
@@ -655,16 +637,12 @@ test.describe("navigation", () => {
       const differencesPage = new DifferencesPage(page);
       await differencesPage.heading.waitFor();
       await expect(differencesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
-      await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName(
-        "bevat een waarschuwing",
-      );
+      await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
       await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
       await differencesPage.navPanel.votersAndVotes.click();
 
       await votersVotesPage.heading.waitFor();
-      await expect(votersVotesPage.navPanel.differencesIcon).toHaveAccessibleName(
-        "nog niet afgerond",
-      );
+      await expect(votersVotesPage.navPanel.differencesIcon).toHaveAccessibleName("nog niet afgerond");
       await votersVotesPage.navPanel.differences.click();
 
       await differencesPage.heading.waitFor();
@@ -674,9 +652,7 @@ test.describe("navigation", () => {
       const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
       await candidatesListPage_1.heading.waitFor();
       await expect(candidatesListPage_1.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
-      await expect(candidatesListPage_1.navPanel.votersAndVotesIcon).toHaveAccessibleName(
-        "bevat een waarschuwing",
-      );
+      await expect(candidatesListPage_1.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
       await expect(candidatesListPage_1.navPanel.differencesIcon).toHaveAccessibleName("leeg");
 
       await candidatesListPage_1.fillCandidatesAndTotal([1, 1], 100);
@@ -685,9 +661,7 @@ test.describe("navigation", () => {
 
       await differencesPage.heading.waitFor();
       await expect(differencesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
-      await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName(
-        "bevat een waarschuwing",
-      );
+      await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
       await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
       await expect(differencesPage.navPanel.listIcon(1)).toHaveAccessibleName("bevat een fout");
     });

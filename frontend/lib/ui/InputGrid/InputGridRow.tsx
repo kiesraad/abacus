@@ -35,9 +35,7 @@ export function InputGridRow({
   addSeparator,
 }: InputGridRowProps) {
   const errors = errorsAndWarnings?.get(id)?.errors;
-  const warnings = errorsAndWarnings
-    ?.get(id)
-    ?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING");
+  const warnings = errorsAndWarnings?.get(id)?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING");
 
   const [value, setValue] = React.useState(() => (defaultValue ? format(defaultValue) : ""));
   return isListTotal ? (

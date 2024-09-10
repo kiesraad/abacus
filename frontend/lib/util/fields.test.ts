@@ -48,18 +48,11 @@ describe("Field utils", () => {
   });
 
   test.each([
-    [
-      "votes_counts.total_votes_cast_count",
-      [{ name: "votes_counts" }, { name: "total_votes_cast_count" }],
-    ],
+    ["votes_counts.total_votes_cast_count", [{ name: "votes_counts" }, { name: "total_votes_cast_count" }]],
     ["test", [{ name: "test" }]],
     [
       "data.political_group_votes[1].candidate_votes[1].votes",
-      [
-        { name: "political_group_votes", index: 1 },
-        { name: "candidate_votes", index: 1 },
-        { name: "votes" },
-      ],
+      [{ name: "political_group_votes", index: 1 }, { name: "candidate_votes", index: 1 }, { name: "votes" }],
     ],
     ["", [{ name: "" }]],
   ])("fieldName from path %s as %s", (input: string, expected: object[]) => {

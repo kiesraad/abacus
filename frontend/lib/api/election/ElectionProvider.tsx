@@ -6,9 +6,7 @@ export interface iElectionProviderContext {
   election: Required<Election>;
 }
 
-export const ElectionProviderContext = React.createContext<iElectionProviderContext | undefined>(
-  undefined,
-);
+export const ElectionProviderContext = React.createContext<iElectionProviderContext | undefined>(undefined);
 
 export interface ElectionProviderProps {
   children: React.ReactNode;

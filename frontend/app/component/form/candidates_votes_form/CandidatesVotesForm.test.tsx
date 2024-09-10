@@ -4,17 +4,8 @@ import { describe, expect, test, vi } from "vitest";
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
-import {
-  Election,
-  PoliticalGroup,
-  PollingStationFormController,
-  PollingStationValues,
-} from "@kiesraad/api";
-import {
-  electionMockData,
-  politicalGroupMockData,
-  pollingStationMockData,
-} from "@kiesraad/api-mocks";
+import { Election, PoliticalGroup, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
+import { electionMockData, politicalGroupMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 

@@ -40,86 +40,30 @@ export const MultipleWarnings: Story = () => {
 
 export const SingleServerError: Story = () => {
   return (
-    <Feedback
-      id="feedback-server-error"
-      type="error"
-      data={{ errorCode: 500, message: "Internal Server Error" }}
-    />
+    <Feedback id="feedback-server-error" type="error" data={{ errorCode: 500, message: "Internal Server Error" }} />
   );
 };
 
-export const CustomizableErrors: Story<Props> = ({
-  id = "feedback-error",
-  type = "error",
-  data,
-}) => <Feedback id={id} type={type} data={data} />;
+export const CustomizableErrors: Story<Props> = ({ id = "feedback-error", type = "error", data }) => (
+  <Feedback id={id} type={type} data={data} />
+);
 
 CustomizableErrors.argTypes = {
   data: {
-    options: [
-      "F101",
-      "F201",
-      "F202",
-      "F203",
-      "F204",
-      "F301",
-      "F302",
-      "F303",
-      "F304",
-      "F305",
-      "F401",
-    ],
+    options: ["F101", "F201", "F202", "F203", "F204", "F301", "F302", "F303", "F304", "F305", "F401"],
     control: { type: "multi-select" },
-    defaultValue: [
-      "F101",
-      "F201",
-      "F202",
-      "F203",
-      "F204",
-      "F301",
-      "F302",
-      "F303",
-      "F304",
-      "F305",
-      "F401",
-    ],
+    defaultValue: ["F101", "F201", "F202", "F203", "F204", "F301", "F302", "F303", "F304", "F305", "F401"],
   },
 };
 
-export const CustomizableWarnings: Story<Props> = ({
-  id = "feedback-warning",
-  type = "warning",
-  data,
-}) => <Feedback id={id} type={type} data={data} />;
+export const CustomizableWarnings: Story<Props> = ({ id = "feedback-warning", type = "warning", data }) => (
+  <Feedback id={id} type={type} data={data} />
+);
 
 CustomizableWarnings.argTypes = {
   data: {
-    options: [
-      "W201",
-      "W202",
-      "W203",
-      "W204",
-      "W205",
-      "W206",
-      "W207",
-      "W208",
-      "W209",
-      "W301",
-      "W302",
-    ],
+    options: ["W201", "W202", "W203", "W204", "W205", "W206", "W207", "W208", "W209", "W301", "W302"],
     control: { type: "multi-select" },
-    defaultValue: [
-      "W201",
-      "W202",
-      "W203",
-      "W204",
-      "W205",
-      "W206",
-      "W207",
-      "W208",
-      "W209",
-      "W301",
-      "W302",
-    ],
+    defaultValue: ["W201", "W202", "W203", "W204", "W205", "W206", "W207", "W208", "W209", "W301", "W302"],
   },
 };

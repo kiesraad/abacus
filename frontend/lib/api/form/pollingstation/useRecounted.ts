@@ -5,15 +5,8 @@ import { PollingStationValues, usePollingStationFormController } from "@kiesraad
 export type RecountedValue = Pick<PollingStationValues, "recounted">;
 
 export function useRecounted(getValues: () => RecountedValue) {
-  const {
-    status,
-    values,
-    formState,
-    submitCurrentForm,
-    setTemporaryCache,
-    registerCurrentForm,
-    cache,
-  } = usePollingStationFormController();
+  const { status, values, formState, submitCurrentForm, setTemporaryCache, registerCurrentForm, cache } =
+    usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
     if (cache && cache.key === "recounted") {

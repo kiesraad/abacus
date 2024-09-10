@@ -36,10 +36,7 @@ describe("InputHomePage", () => {
 
     // Check if the navigation bar displays the correct information
     const nav = await screen.findByRole("navigation", { name: /primary-navigation/i });
-    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute(
-      "href",
-      "/overview",
-    );
+    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute("href", "/overview");
   });
 
   test("Finish input not visible when not finished", async () => {
@@ -95,9 +92,7 @@ describe("InputHomePage", () => {
     expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
 
     // Close the alert and expect it to be hidden
-    const alertClosed = waitForElementToBeRemoved(
-      screen.getByRole("heading", { level: 2, name: alertHeading }),
-    );
+    const alertClosed = waitForElementToBeRemoved(screen.getByRole("heading", { level: 2, name: alertHeading }));
     await user.click(screen.getByRole("button", { name: "Melding sluiten" }));
     await alertClosed;
   });

@@ -59,26 +59,16 @@ export function RecountedForm() {
         </Feedback>
       )}
       <p className="form-paragraph md">
-        Was er een onverklaard verschil tussen het aantal toegelaten kiezers en het aantal
-        uitgebrachte stemmen? Is er op basis daarvan herteld door het gemeentelijk stembureau?
+        Was er een onverklaard verschil tussen het aantal toegelaten kiezers en het aantal uitgebrachte stemmen? Is er
+        op basis daarvan herteld door het gemeentelijk stembureau?
       </p>
       <div className="radio-form">
         <label>
-          <input
-            type="radio"
-            name="recounted"
-            id="yes"
-            defaultChecked={sectionValues.recounted === true}
-          />
+          <input type="radio" name="recounted" id="yes" defaultChecked={sectionValues.recounted === true} />
           Ja, er was een hertelling
         </label>
         <label>
-          <input
-            type="radio"
-            name="recounted"
-            id="no"
-            defaultChecked={sectionValues.recounted === false}
-          />
+          <input type="radio" name="recounted" id="no" defaultChecked={sectionValues.recounted === false} />
           Nee, er was geen hertelling
         </label>
       </div>

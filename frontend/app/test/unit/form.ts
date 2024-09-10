@@ -1,4 +1,4 @@
-import { POLLING_STATION_DATA_ENTRY_REQUEST_BODY, ValidationResult } from "@kiesraad/api";
+import { FormState, POLLING_STATION_DATA_ENTRY_REQUEST_BODY, ValidationResult } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
 export const emptyDataEntryRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
@@ -74,4 +74,64 @@ export const errorWarningMocks: ErrorMap = {
     ],
     code: "W302",
   },
+};
+
+export const defaultFormState: FormState = {
+  active: "recounted",
+  current: "recounted",
+  sections: {
+    recounted: {
+      index: 0,
+      id: "recounted",
+      isSaved: false,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+    voters_votes_counts: {
+      index: 1,
+      id: "voters_votes_counts",
+      isSaved: false,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+    differences_counts: {
+      index: 2,
+      id: "differences_counts",
+      isSaved: false,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+    political_group_votes_1: {
+      index: 3,
+      id: "political_group_votes_1",
+      isSaved: false,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+    political_group_votes_2: {
+      index: 4,
+      id: "political_group_votes_2",
+      isSaved: false,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+    save: {
+      index: 5,
+      id: "save",
+      isSaved: false,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    },
+  },
+  unknown: {
+    errors: [],
+    warnings: [],
+  },
+  isCompleted: false,
 };

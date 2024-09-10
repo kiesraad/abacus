@@ -98,8 +98,10 @@ export function VotersAndVotesForm() {
     return false;
   }, []);
 
-  const { status, sectionValues, errors, warnings, isSaved, ignoreWarnings, submit, recounted } =
-    useVotersAndVotes(getValues, getIgnoreWarnings);
+  const { status, sectionValues, errors, warnings, isSaved, ignoreWarnings, submit, recounted } = useVotersAndVotes(
+    getValues,
+    getIgnoreWarnings,
+  );
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
 
@@ -119,8 +121,7 @@ export function VotersAndVotesForm() {
       event.preventDefault();
 
       if (errors.length === 0 && warnings.length > 0) {
-        const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
-          .checked;
+        const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement).checked;
         if (!hasChanges && !ignoreWarnings) {
           setWarningsWarning(true);
         } else {
@@ -149,11 +150,7 @@ export function VotersAndVotesForm() {
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
       {isSaved && hasValidationWarning && !hasValidationError && (
-        <Feedback
-          id="feedback-warning"
-          type="warning"
-          data={warnings.map((warning) => warning.code)}
-        />
+        <Feedback id="feedback-warning" type="warning" data={warnings.map((warning) => warning.code)} />
       )}
       <InputGrid key="numbers">
         <InputGrid.Header>
@@ -251,9 +248,7 @@ export function VotersAndVotesForm() {
         {recounted && (
           <>
             <InputGrid.SectionTitleHeader>
-              <h2 id="recounted_title">
-                Toegelaten kiezers na hertelling door gemeentelijk stembureau
-              </h2>
+              <h2 id="recounted_title">Toegelaten kiezers na hertelling door gemeentelijk stembureau</h2>
               <th>Veld</th>
               <th>Geteld aantal</th>
               <th>Omschrijving</th>

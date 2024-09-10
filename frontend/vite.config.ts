@@ -56,8 +56,5 @@ export default defineConfig(() => ({
   },
 }));
 
-const mapObj = <V0, V>(
-  obj: Record<string, V0>,
-  kf: (t: string) => string,
-  vf: (t: V0) => V,
-): Record<string, V> => Object.fromEntries(Object.entries(obj).map(([k, v]) => [kf(k), vf(v)]));
+const mapObj = <V0, V>(obj: Record<string, V0>, kf: (t: string) => string, vf: (t: V0) => V): Record<string, V> =>
+  Object.fromEntries(Object.entries(obj).map(([k, v]) => [kf(k), vf(v)]));

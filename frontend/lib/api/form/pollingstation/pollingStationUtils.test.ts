@@ -1,6 +1,6 @@
 import { assert, describe, expect, test } from "vitest";
 
-import { errorWarningMocks } from "app/test/unit/form";
+import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/test/unit/form.ts";
 
 import {
   addValidationResultToFormState,
@@ -10,7 +10,6 @@ import {
   FieldValidationResult,
   FormSection,
   formSectionComplete,
-  FormState,
   getErrorsAndWarnings,
   getNextSection,
   getPollingStationSummary,
@@ -22,113 +21,7 @@ import {
   ValidationResult,
 } from "@kiesraad/api";
 
-const defaultFormState: FormState = {
-  active: "recounted",
-  current: "recounted",
-  sections: {
-    recounted: {
-      index: 0,
-      id: "recounted",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    voters_votes_counts: {
-      index: 1,
-      id: "voters_votes_counts",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    differences_counts: {
-      index: 2,
-      id: "differences_counts",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    political_group_votes_1: {
-      index: 3,
-      id: "political_group_votes_1",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    political_group_votes_2: {
-      index: 4,
-      id: "political_group_votes_2",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    save: {
-      index: 5,
-      id: "save",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-  },
-  unknown: {
-    errors: [],
-    warnings: [],
-  },
-  isCompleted: false,
-};
-
-const defaultValues: PollingStationValues = {
-  recounted: undefined,
-  voters_counts: {
-    poll_card_count: 0,
-    proxy_certificate_count: 0,
-    voter_card_count: 0,
-    total_admitted_voters_count: 0,
-  },
-  votes_counts: {
-    votes_candidates_counts: 0,
-    blank_votes_count: 0,
-    invalid_votes_count: 0,
-    total_votes_cast_count: 0,
-  },
-  voters_recounts: undefined,
-  differences_counts: {
-    more_ballots_count: 0,
-    fewer_ballots_count: 0,
-    unreturned_ballots_count: 0,
-    too_few_ballots_handed_out_count: 0,
-    too_many_ballots_handed_out_count: 0,
-    other_explanation_count: 0,
-    no_explanation_count: 0,
-  },
-  political_group_votes: [
-    {
-      number: 1,
-      total: 0,
-      candidate_votes: [
-        {
-          number: 1,
-          votes: 0,
-        },
-      ],
-    },
-    {
-      number: 2,
-      total: 0,
-      candidate_votes: [
-        {
-          number: 1,
-          votes: 0,
-        },
-      ],
-    },
-  ],
-};
+const defaultValues: PollingStationValues = emptyDataEntryRequest.data;
 
 describe("PollingStationUtils", () => {
   test("addValidationResultToFormState adds result to correct section", () => {
@@ -150,15 +43,11 @@ describe("PollingStationUtils", () => {
     const formState = structuredClone(defaultFormState);
 
     formState.sections.voters_votes_counts.isSaved = true;
-    if (formState.sections.political_group_votes_1)
-      formState.sections.political_group_votes_1.isSaved = true;
+    if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
 
     const validationResults: ValidationResult[] = [
       {
-        fields: [
-          "data.votes_counts.votes_candidates_counts",
-          "data.political_group_votes[0].total",
-        ],
+        fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes[0].total"],
         code: "F204",
       },
     ];
@@ -476,9 +365,7 @@ describe("PollingStationUtils", () => {
     expect(summary.countsAddUp).toBe(true);
     expect(summary.hasBlocks).toBe(false);
     expect(summary.notableFormSections.length).toBe(1);
-    expect(
-      summary.notableFormSections.some((item) => item.formSection.id == "political_group_votes_2"),
-    );
+    expect(summary.notableFormSections.some((item) => item.formSection.id == "political_group_votes_2"));
 
     state.sections.differences_counts.ignoreWarnings = true;
     state.sections.differences_counts.warnings = [errorWarningMocks.W301];
@@ -493,8 +380,7 @@ describe("PollingStationUtils", () => {
     );
     expect(
       summary.notableFormSections.some(
-        (item) =>
-          item.formSection.id == "differences_counts" && item.status === "accepted-warnings",
+        (item) => item.formSection.id == "differences_counts" && item.status === "accepted-warnings",
       ),
     );
 
@@ -516,8 +402,7 @@ describe("PollingStationUtils", () => {
 
     expect(
       summary.notableFormSections.some(
-        (item) =>
-          item.formSection.id == "differences_counts" && item.status === "unaccepted-warnings",
+        (item) => item.formSection.id == "differences_counts" && item.status === "unaccepted-warnings",
       ),
     );
   });

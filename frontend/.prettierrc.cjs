@@ -1,5 +1,5 @@
 module.exports = {
-  printWidth: 100,
+  printWidth: 120,
   plugins: ["@trivago/prettier-plugin-sort-imports"],
   importOrder: [
     "^react.*$", // anything react

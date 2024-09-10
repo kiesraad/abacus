@@ -2,13 +2,7 @@ import { ErrorsAndWarnings, FieldValidationResult } from "lib/api/api";
 
 import { ValidationResult } from "@kiesraad/api";
 import { ValidationResultType } from "@kiesraad/ui";
-import {
-  deepEqual,
-  fieldNameFromPath,
-  FieldSection,
-  objectHasOnlyEmptyValues,
-  rootFieldSection,
-} from "@kiesraad/util";
+import { deepEqual, fieldNameFromPath, FieldSection, objectHasOnlyEmptyValues, rootFieldSection } from "@kiesraad/util";
 
 import {
   AnyFormReference,
@@ -50,18 +44,10 @@ export function addValidationResultToFormState(
         case "votes_counts":
         case "voters_counts":
         case "voters_recounts":
-          checkAndAddValidationResult(
-            formState.sections.voters_votes_counts,
-            target,
-            validationResult,
-          );
+          checkAndAddValidationResult(formState.sections.voters_votes_counts, target, validationResult);
           break;
         case "differences_counts":
-          checkAndAddValidationResult(
-            formState.sections.differences_counts,
-            target,
-            validationResult,
-          );
+          checkAndAddValidationResult(formState.sections.differences_counts, target, validationResult);
           break;
         case "political_group_votes":
           if (index !== undefined) {
@@ -85,9 +71,7 @@ export function uniqueFieldSections(fields: string[]): FieldSection[] {
 
   fields.forEach((field) => {
     const rootSection = rootFieldSection(field);
-    if (
-      result.findIndex((s) => s.name === rootSection.name && s.index === rootSection.index) === -1
-    ) {
+    if (result.findIndex((s) => s.name === rootSection.name && s.index === rootSection.index) === -1) {
       result.push(rootSection);
     }
   });
@@ -111,10 +95,7 @@ export function hasOnlyGlobalValidationResults(arr: ClientValidationResult[]): b
 }
 
 //get the next section in the form based on index
-export function getNextSection(
-  formState: FormState,
-  currentSection: FormSection,
-): FormSectionID | null {
+export function getNextSection(formState: FormState, currentSection: FormSection): FormSectionID | null {
   for (const section of Object.values(formState.sections)) {
     if (formState.isCompleted && section.errors.length > 0) {
       return section.id;
@@ -137,10 +118,7 @@ export function resetFormSectionState(formState: FormState) {
   formState.unknown.warnings = [];
 }
 
-export function currentFormHasChanges(
-  currentForm: AnyFormReference,
-  values: PollingStationValues,
-): boolean {
+export function currentFormHasChanges(currentForm: AnyFormReference, values: PollingStationValues): boolean {
   if (currentForm.type === "recounted") {
     const valA: RecountedValue = { recounted: values.recounted };
     const valB = currentForm.getValues();
@@ -249,8 +227,7 @@ export function isFormSectionEmpty(section: FormSection, values: PollingStationV
   switch (section.id) {
     case "voters_votes_counts":
       return (
-        objectHasOnlyEmptyValues({ ...values.votes_counts }) &&
-        objectHasOnlyEmptyValues({ ...values.voters_counts })
+        objectHasOnlyEmptyValues({ ...values.votes_counts }) && objectHasOnlyEmptyValues({ ...values.voters_counts })
       );
     case "differences_counts":
       return objectHasOnlyEmptyValues({ ...values.differences_counts });
@@ -261,11 +238,7 @@ export function isFormSectionEmpty(section: FormSection, values: PollingStationV
   }
 }
 
-export type PollingStationFormSectionStatus =
-  | "empty"
-  | "unaccepted-warnings"
-  | "accepted-warnings"
-  | "errors";
+export type PollingStationFormSectionStatus = "empty" | "unaccepted-warnings" | "accepted-warnings" | "errors";
 export type PollingStationSummary = {
   countsAddUp: boolean;
   hasBlocks: boolean;
@@ -276,10 +249,7 @@ export type PollingStationSummary = {
   }[];
 };
 
-export function getPollingStationSummary(
-  formState: FormState,
-  values: PollingStationValues,
-): PollingStationSummary {
+export function getPollingStationSummary(formState: FormState, values: PollingStationValues): PollingStationSummary {
   const result: PollingStationSummary = {
     countsAddUp: true,
     hasBlocks: false,
@@ -303,10 +273,7 @@ export function getPollingStationSummary(
           result.notableFormSections.push({ status: "unaccepted-warnings", formSection: section });
           result.hasBlocks = true;
         }
-      } else if (
-        section.id.startsWith("political_group_votes_") &&
-        isFormSectionEmpty(section, values)
-      ) {
+      } else if (section.id.startsWith("political_group_votes_") && isFormSectionEmpty(section, values)) {
         result.notableFormSections.push({ status: "empty", formSection: section });
       }
     });

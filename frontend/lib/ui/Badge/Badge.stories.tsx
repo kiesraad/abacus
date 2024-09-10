@@ -20,15 +20,7 @@ export const CustomizableBadge: Story<BadgeProps> = ({ type }) => <Badge type={t
 
 CustomizableBadge.argTypes = {
   type: {
-    options: [
-      "correction",
-      "definitive",
-      "difference",
-      "extra_entry",
-      "first_entry",
-      "objections",
-      "second_entry",
-    ],
+    options: ["correction", "definitive", "difference", "extra_entry", "first_entry", "objections", "second_entry"],
     defaultValue: "first_entry",
   },
 };

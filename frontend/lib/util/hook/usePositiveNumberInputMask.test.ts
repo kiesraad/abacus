@@ -10,13 +10,10 @@ describe("useInputMask", () => {
     expect(result.current.format).toBeDefined();
   });
 
-  test.each(["", null, undefined])(
-    "%s renders as empty string",
-    (input: string | null | undefined) => {
-      const { result } = renderHook(() => usePositiveNumberInputMask());
-      expect(result.current.format(input)).equals("");
-    },
-  );
+  test.each(["", null, undefined])("%s renders as empty string", (input: string | null | undefined) => {
+    const { result } = renderHook(() => usePositiveNumberInputMask());
+    expect(result.current.format(input)).equals("");
+  });
 
   // Allowed String cases:
   test.each([
@@ -63,21 +60,13 @@ describe("useInputMask", () => {
   });
 
   // Disallowed cases
-  test.each([
-    "a25",
-    "-50",
-    "75-",
-    "100.00",
-    "10000.000",
-    "afasd382asd",
-    "100 10",
-    "100,000",
-    "100 000",
-    "11,00",
-  ])("unexpected string becomes empty", (input: string) => {
-    const { result } = renderHook(() => usePositiveNumberInputMask());
-    expect(result.current.validate(input)).equals(false);
-  });
+  test.each(["a25", "-50", "75-", "100.00", "10000.000", "afasd382asd", "100 10", "100,000", "100 000", "11,00"])(
+    "unexpected string becomes empty",
+    (input: string) => {
+      const { result } = renderHook(() => usePositiveNumberInputMask());
+      expect(result.current.validate(input)).equals(false);
+    },
+  );
 
   test("reverse format", () => {
     const { result } = renderHook(() => usePositiveNumberInputMask());

@@ -442,10 +442,7 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.total_votes_cast_count",
-                "data.voters_counts.total_admitted_voters_count",
-              ],
+              fields: ["data.votes_counts.total_votes_cast_count", "data.voters_counts.total_admitted_voters_count"],
               code: "W203",
             },
           ],
@@ -559,10 +556,7 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.total_votes_cast_count",
-                "data.voters_counts.total_admitted_voters_count",
-              ],
+              fields: ["data.votes_counts.total_votes_cast_count", "data.voters_counts.total_admitted_voters_count"],
               code: "W206",
             },
           ],

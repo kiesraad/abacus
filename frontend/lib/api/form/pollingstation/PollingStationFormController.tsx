@@ -37,20 +37,16 @@ export interface FormReference<T> {
   getIgnoreWarnings?: () => boolean;
 }
 
-export interface FormReferenceRecounted
-  extends FormReference<Pick<PollingStationValues, "recounted">> {
+export interface FormReferenceRecounted extends FormReference<Pick<PollingStationValues, "recounted">> {
   type: "recounted";
 }
 
 export interface FormReferenceVotersAndVotes
-  extends FormReference<
-    Pick<PollingStationResults, "voters_counts" | "votes_counts" | "voters_recounts">
-  > {
+  extends FormReference<Pick<PollingStationResults, "voters_counts" | "votes_counts" | "voters_recounts">> {
   type: "voters_and_votes";
 }
 
-export interface FormReferenceDifferences
-  extends FormReference<Pick<PollingStationResults, "differences_counts">> {
+export interface FormReferenceDifferences extends FormReference<Pick<PollingStationResults, "differences_counts">> {
   type: "differences";
 }
 
@@ -83,6 +79,8 @@ export interface iPollingStationControllerContext {
   submitCurrentForm: (ignoreWarnings?: boolean) => Promise<void>;
   registerCurrentForm: (form: AnyFormReference) => void;
   deleteDataEntry: () => Promise<void>;
+  finaliseDataEntry: () => Promise<void>;
+  pollingStationId: number;
 }
 
 export type FormSectionID =
@@ -124,15 +122,15 @@ export type TemporaryCache = {
   data: unknown;
 };
 
-export const PollingStationControllerContext = React.createContext<
-  iPollingStationControllerContext | undefined
->(undefined);
+export const PollingStationControllerContext = React.createContext<iPollingStationControllerContext | undefined>(
+  undefined,
+);
 
 const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
 
 // Status of the form controller
 // This is a type instead of an enum because of https://github.com/ArnaudBarre/eslint-plugin-react-refresh/issues/36
-export type Status = "idle" | "saving" | "deleting" | "deleted";
+export type Status = "idle" | "saving" | "deleting" | "deleted" | "finalising" | "finalised";
 
 export function PollingStationFormController({
   election,
@@ -151,9 +149,7 @@ export function PollingStationFormController({
   const currentForm = React.useRef<AnyFormReference | null>(defaultCurrentForm);
 
   //where to navigate to next
-  const [targetFormSection, setTargetFormSection] = React.useState<FormSectionID | null>(
-    INITIAL_FORM_SECTION_ID,
-  );
+  const [targetFormSection, setTargetFormSection] = React.useState<FormSectionID | null>(INITIAL_FORM_SECTION_ID);
 
   // status as ref, because it needs to immediately propagate to the blocker function in `PollingStationFormNavigation`
   const status = React.useRef<Status>("idle");
@@ -446,6 +442,18 @@ export function PollingStationFormController({
     status.current = "deleted";
   };
 
+  const finaliseDataEntry = async () => {
+    status.current = "finalising";
+    const response = await client.postRequest(request_path + "/finalise");
+    if (response.status !== ApiResponseStatus.Success) {
+      console.error("Failed to finalise data entry", response);
+      status.current = "idle";
+      setError(response.data as ApiResponseErrorData);
+      throw new Error("Failed to finalise data entry");
+    }
+    status.current = "finalised";
+  };
+
   return (
     <PollingStationControllerContext.Provider
       value={{
@@ -460,6 +468,8 @@ export function PollingStationFormController({
         submitCurrentForm,
         targetFormSection,
         deleteDataEntry,
+        finaliseDataEntry,
+        pollingStationId,
       }}
     >
       {children}

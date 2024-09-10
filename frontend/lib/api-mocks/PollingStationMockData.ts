@@ -14,9 +14,7 @@ export const pollingStationMockData: PollingStation = {
   locality: "Den Haag",
 };
 
-export const getPollingStationListMockResponse = (
-  election_id: number,
-): PollingStationListResponse => {
+export const getPollingStationListMockResponse = (election_id: number): PollingStationListResponse => {
   return {
     polling_stations: [
       { ...pollingStationMockData, election_id },
@@ -37,5 +35,4 @@ export const getPollingStationListMockResponse = (
   };
 };
 
-export const pollingStationsMockResponse: PollingStationListResponse =
-  getPollingStationListMockResponse(1);
+export const pollingStationsMockResponse: PollingStationListResponse = getPollingStationListMockResponse(1);

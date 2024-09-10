@@ -2,24 +2,11 @@ import * as React from "react";
 
 import { PollingStationResults, usePollingStationFormController } from "@kiesraad/api";
 
-export type VotersAndVotesValues = Pick<
-  PollingStationResults,
-  "voters_counts" | "votes_counts" | "voters_recounts"
->;
+export type VotersAndVotesValues = Pick<PollingStationResults, "voters_counts" | "votes_counts" | "voters_recounts">;
 
-export function useVotersAndVotes(
-  getValues: () => VotersAndVotesValues,
-  getIgnoreWarnings?: () => boolean,
-) {
-  const {
-    status,
-    values,
-    formState,
-    setTemporaryCache,
-    cache,
-    registerCurrentForm,
-    submitCurrentForm,
-  } = usePollingStationFormController();
+export function useVotersAndVotes(getValues: () => VotersAndVotesValues, getIgnoreWarnings?: () => boolean) {
+  const { status, values, formState, setTemporaryCache, cache, registerCurrentForm, submitCurrentForm } =
+    usePollingStationFormController();
 
   const sectionValues = React.useMemo(() => {
     if (cache && cache.key === "voters_votes_counts") {

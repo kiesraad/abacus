@@ -366,8 +366,7 @@ export const getElectionMockData = (election_id: number): Required<ElectionDetai
   return { election: election };
 };
 
-export const electionDetailsMockResponse: Required<ElectionDetailsResponse> =
-  getElectionMockData(1);
+export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData(1);
 export const electionMockData = electionDetailsMockResponse.election as Required<Election>;
 
 export const electionStatusMockResponse: ElectionStatusResponse = {

@@ -4,11 +4,7 @@ import { describe, expect, test } from "vitest";
 
 import { overrideOnce, renderHook, waitFor } from "app/test/unit";
 
-import {
-  ApiProvider,
-  PollingStationFormController,
-  usePollingStationFormController,
-} from "@kiesraad/api";
+import { ApiProvider, PollingStationFormController, usePollingStationFormController } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (

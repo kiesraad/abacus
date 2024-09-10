@@ -19,9 +19,7 @@ export { customRender as render };
 export { router } from "./router";
 /* eslint-enable import/export */
 
-export function getUrlMethodAndBody(
-  call: [input: string | URL | Request, init?: RequestInit | undefined][],
-) {
+export function getUrlMethodAndBody(call: [input: string | URL | Request, init?: RequestInit | undefined][]) {
   let url;
   let method;
   let body;

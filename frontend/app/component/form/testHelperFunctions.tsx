@@ -11,20 +11,13 @@ export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
   });
 }
 
-export function expectFieldsToHaveIconAndToHaveAccessibleName(
-  fields: Array<HTMLElement>,
-  accessibleName: string,
-) {
+export function expectFieldsToHaveIconAndToHaveAccessibleName(fields: Array<HTMLElement>, accessibleName: string) {
   fields.forEach((field) => {
-    expect(
-      within(field.previousElementSibling as HTMLElement).getByRole("img"),
-    ).toHaveAccessibleName(accessibleName);
+    expect(within(field.previousElementSibling as HTMLElement).getByRole("img")).toHaveAccessibleName(accessibleName);
   });
 }
 
-export function expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(
-  fields: Array<HTMLElement>,
-) {
+export function expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(fields: Array<HTMLElement>) {
   fields.forEach((field) => {
     expect(field).toBeValid();
     expect(field).not.toHaveAccessibleErrorMessage();

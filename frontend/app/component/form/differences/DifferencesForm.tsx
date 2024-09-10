@@ -59,9 +59,7 @@ export function DifferencesForm() {
         fewer_ballots_count: deformat(elements.fewer_ballots_count.value),
         unreturned_ballots_count: deformat(elements.unreturned_ballots_count.value),
         too_few_ballots_handed_out_count: deformat(elements.too_few_ballots_handed_out_count.value),
-        too_many_ballots_handed_out_count: deformat(
-          elements.too_many_ballots_handed_out_count.value,
-        ),
+        too_many_ballots_handed_out_count: deformat(elements.too_many_ballots_handed_out_count.value),
         other_explanation_count: deformat(elements.other_explanation_count.value),
         no_explanation_count: deformat(elements.no_explanation_count.value),
       },
@@ -76,8 +74,10 @@ export function DifferencesForm() {
     return false;
   }, []);
 
-  const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
-    useDifferences(getValues, getIgnoreWarnings);
+  const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } = useDifferences(
+    getValues,
+    getIgnoreWarnings,
+  );
 
   const shouldWatch = warnings.length > 0 && isSaved;
   const { hasChanges } = useWatchForChanges(shouldWatch, sectionValues, getValues);
@@ -97,8 +97,7 @@ export function DifferencesForm() {
       event.preventDefault();
 
       if (errors.length === 0 && warnings.length > 0) {
-        const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
-          .checked;
+        const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement).checked;
         if (!hasChanges && !ignoreWarnings) {
           setWarningsWarning(true);
         } else {
@@ -127,11 +126,7 @@ export function DifferencesForm() {
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
       {isSaved && hasValidationWarning && !hasValidationError && (
-        <Feedback
-          id="feedback-warning"
-          type="warning"
-          data={warnings.map((warning) => warning.code)}
-        />
+        <Feedback id="feedback-warning" type="warning" data={warnings.map((warning) => warning.code)} />
       )}
       <InputGrid key="differences">
         <InputGrid.Header>
@@ -233,11 +228,7 @@ export function DifferencesForm() {
           </BottomBar.Row>
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox
-            id={_IGNORE_WARNINGS_ID}
-            defaultChecked={ignoreWarnings}
-            hasError={warningsWarning}
-          >
+          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings} hasError={warningsWarning}>
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

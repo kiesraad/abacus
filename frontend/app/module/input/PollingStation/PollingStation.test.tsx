@@ -121,9 +121,7 @@ const acceptWarning = async () => {
 };
 
 const expectBlockerModal = async () => {
-  expect(await screen.findByTestId("modal-blocker-title")).toHaveTextContent(
-    "Let op: niet opgeslagen wijzigingen",
-  );
+  expect(await screen.findByTestId("modal-blocker-title")).toHaveTextContent("Let op: niet opgeslagen wijzigingen");
 };
 
 const expectElementContainsIcon = async (id: string, ariaLabel: string) => {
@@ -470,12 +468,7 @@ describe("Polling Station data entry integration tests", () => {
   test("Aborting and save with pending changes is possible", async () => {
     render();
 
-    const steps = [
-      ...stepsForPendingChanges,
-      abortDataEntry,
-      abortSaveChanges,
-      expectPollingStationChoicePage,
-    ];
+    const steps = [...stepsForPendingChanges, abortDataEntry, abortSaveChanges, expectPollingStationChoicePage];
 
     for (const step of steps) {
       await step();
@@ -485,12 +478,7 @@ describe("Polling Station data entry integration tests", () => {
   test("Abort and delete with pending changes is possible", async () => {
     render();
 
-    const steps = [
-      ...stepsForPendingChanges,
-      abortDataEntry,
-      abortDelete,
-      expectPollingStationChoicePage,
-    ];
+    const steps = [...stepsForPendingChanges, abortDataEntry, abortDelete, expectPollingStationChoicePage];
 
     for (const step of steps) {
       await step();

@@ -31,11 +31,7 @@ export const WideInputField: Story = () => {
         hint="Default Medium Wide hint"
         fieldSize="medium"
       />
-      <InputField
-        name="default-large-wide"
-        label="Default Large Wide"
-        hint="Default Large Wide hint"
-      />
+      <InputField name="default-large-wide" label="Default Large Wide" hint="Default Large Wide hint" />
       <InputField
         name="disabled-large-wide"
         label="Disabled Large Wide"

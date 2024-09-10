@@ -14,9 +14,7 @@ export interface FeedbackProps {
   children?: ReactNode;
 }
 
-function getFeedbackListFromData(
-  data: ClientValidationResultCode[] | ApiResponseErrorData,
-): FeedbackItem[] {
+function getFeedbackListFromData(data: ClientValidationResultCode[] | ApiResponseErrorData): FeedbackItem[] {
   const feedbackList: FeedbackItem[] = [];
   if (Array.isArray(data)) {
     for (const code of data) {
@@ -56,10 +54,7 @@ export function Feedback({ id, type, data, children }: FeedbackProps) {
           ) : (
             <>
               {feedbackList.length > 1 ? (
-                <h3>
-                  Voor alle {type === "error" ? "foutmeldingen" : "waarschuwingen"} geldt het
-                  volgende:
-                </h3>
+                <h3>Voor alle {type === "error" ? "foutmeldingen" : "waarschuwingen"} geldt het volgende:</h3>
               ) : (
                 <></>
               )}
@@ -67,14 +62,11 @@ export function Feedback({ id, type, data, children }: FeedbackProps) {
                 <li>Heb je iets niet goed overgenomen? Herstel de fout en ga verder.</li>
                 {type === "error" ? (
                   <li>
-                    Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder.
-                    Overleg met de coördinator.
+                    Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de
+                    coördinator.
                   </li>
                 ) : (
-                  <li>
-                    Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan
-                    verder.
-                  </li>
+                  <li>Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.</li>
                 )}
               </ul>
             </>

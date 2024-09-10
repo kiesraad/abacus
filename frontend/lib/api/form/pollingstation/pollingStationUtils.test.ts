@@ -147,8 +147,7 @@ describe("PollingStationUtils", () => {
     const formState = structuredClone(defaultFormState);
 
     formState.sections.voters_votes_counts.isSaved = true;
-    if (formState.sections.political_group_votes_1)
-      formState.sections.political_group_votes_1.isSaved = true;
+    if (formState.sections.political_group_votes_1) formState.sections.political_group_votes_1.isSaved = true;
 
     const validationResults: ValidationResult[] = [
       {

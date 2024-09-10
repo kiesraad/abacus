@@ -13,11 +13,7 @@ interface CheckboxProps {
 
 export function Checkbox({ id, children, defaultChecked, hasError }: CheckboxProps) {
   return (
-    <div
-      className={cn(cls.checkbox, { "has-error": !!hasError })}
-      aria-label="input"
-      id={`checkbox-container-${id}`}
-    >
+    <div className={cn(cls.checkbox, { "has-error": !!hasError })} aria-label="input" id={`checkbox-container-${id}`}>
       <input type="checkbox" id={id} name={id} defaultChecked={defaultChecked} />
       <label htmlFor={id}>{children}</label>
     </div>

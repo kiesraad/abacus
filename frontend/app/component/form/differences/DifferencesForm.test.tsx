@@ -256,10 +256,7 @@ describe("Test DifferencesForm", () => {
         otherExplanationCount,
         noExplanationCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
@@ -308,10 +305,7 @@ describe("Test DifferencesForm", () => {
         otherExplanationCount,
         noExplanationCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
@@ -360,10 +354,7 @@ describe("Test DifferencesForm", () => {
         otherExplanationCount,
         noExplanationCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
@@ -412,10 +403,7 @@ describe("Test DifferencesForm", () => {
         otherExplanationCount,
         noExplanationCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
@@ -471,10 +459,7 @@ describe("Test DifferencesForm", () => {
         noExplanationCount,
       ] as HTMLElement[];
       const expectedValidFields = [moreBallotsCount] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
@@ -533,14 +518,8 @@ describe("Test DifferencesForm", () => {
         noExplanationCount,
       ] as HTMLElement[];
       let expectedValidFields = [fewerBallotsCount] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
 
@@ -615,14 +594,8 @@ describe("Test DifferencesForm", () => {
         noExplanationCount,
       ] as HTMLElement[];
       const expectedValidFields = [fewerBallotsCount] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });
@@ -677,14 +650,8 @@ describe("Test DifferencesForm", () => {
         noExplanationCount,
       ] as HTMLElement[];
       const expectedValidFields = [moreBallotsCount] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });

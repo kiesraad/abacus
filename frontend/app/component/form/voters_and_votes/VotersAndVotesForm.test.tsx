@@ -314,10 +314,7 @@ describe("Test VotersAndVotesForm", () => {
         invalidVotesCount,
         totalVotesCastCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
@@ -375,10 +372,7 @@ describe("Test VotersAndVotesForm", () => {
         voterCardCount,
         totalAdmittedVotersCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
@@ -444,10 +438,7 @@ describe("Test VotersAndVotesForm", () => {
         invalidVotesCount,
         totalVotesCastCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
@@ -501,14 +492,8 @@ describe("Test VotersAndVotesForm", () => {
         invalidVotesCount,
         totalVotesCastCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
 
@@ -578,14 +563,8 @@ describe("Test VotersAndVotesForm", () => {
         invalidVotesCount,
         totalVotesCastCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });
@@ -635,14 +614,8 @@ describe("Test VotersAndVotesForm", () => {
         blankVotesCount,
         totalVotesCastCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });
@@ -653,10 +626,7 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.total_votes_cast_count",
-                "data.voters_counts.total_admitted_voters_count",
-              ],
+              fields: ["data.votes_counts.total_votes_cast_count", "data.voters_counts.total_admitted_voters_count"],
               code: "W203",
             },
           ],
@@ -685,10 +655,7 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmenW.203Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [
-        totalVotesCastCount,
-        totalAdmittedVotersCount,
-      ] as HTMLElement[];
+      const expectedInvalidFields = [totalVotesCastCount, totalAdmittedVotersCount] as HTMLElement[];
       const expectedValidFields = [
         pollCardCount,
         proxyCertificateCount,
@@ -697,14 +664,8 @@ describe("Test VotersAndVotesForm", () => {
         blankVotesCount,
         invalidVotesCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });
@@ -751,10 +712,7 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezersW.204Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [
-        totalVotesCastCount,
-        totalAdmittedVotersRecount,
-      ] as HTMLElement[];
+      const expectedInvalidFields = [totalVotesCastCount, totalAdmittedVotersRecount] as HTMLElement[];
       const expectedValidFields = [
         pollCardCount,
         proxyCertificateCount,
@@ -767,14 +725,8 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateRecount,
         voterCardRecount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });
@@ -824,14 +776,8 @@ describe("Test VotersAndVotesForm", () => {
         blankVotesCount,
         invalidVotesCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });
@@ -842,10 +788,7 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.total_votes_cast_count",
-                "data.voters_counts.total_admitted_voters_count",
-              ],
+              fields: ["data.votes_counts.total_votes_cast_count", "data.voters_counts.total_admitted_voters_count"],
               code: "W206",
             },
           ],
@@ -874,10 +817,7 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmenW.206Het totaal aantal toegelaten kiezers (D) en/of het totaal aantal uitgebrachte stemmen (H) is hoger dan het aantal kiesgerechtigden voor dit stembureau.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [
-        totalAdmittedVotersCount,
-        totalVotesCastCount,
-      ] as HTMLElement[];
+      const expectedInvalidFields = [totalAdmittedVotersCount, totalVotesCastCount] as HTMLElement[];
       const expectedValidFields = [
         pollCardCount,
         proxyCertificateCount,
@@ -886,14 +826,8 @@ describe("Test VotersAndVotesForm", () => {
         blankVotesCount,
         invalidVotesCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });
@@ -940,10 +874,7 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezersW.207Het totaal aantal uitgebrachte stemmen (H) en/of het herteld totaal aantal toegelaten kiezers (D.2) is hoger dan het aantal kiesgerechtigden voor dit stembureau.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [
-        totalVotesCastCount,
-        totalAdmittedVotersRecount,
-      ] as HTMLElement[];
+      const expectedInvalidFields = [totalVotesCastCount, totalAdmittedVotersRecount] as HTMLElement[];
       const expectedValidFields = [
         pollCardCount,
         proxyCertificateCount,
@@ -956,14 +887,8 @@ describe("Test VotersAndVotesForm", () => {
         proxyCertificateRecount,
         voterCardRecount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });
@@ -1015,14 +940,8 @@ describe("Test VotersAndVotesForm", () => {
         invalidVotesCount,
         totalAdmittedVotersCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });
@@ -1091,14 +1010,8 @@ describe("Test VotersAndVotesForm", () => {
         voterCardCount,
         totalAdmittedVotersCount,
       ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
-      expectFieldsToHaveIconAndToHaveAccessibleName(
-        expectedInvalidFields,
-        "bevat een waarschuwing",
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });

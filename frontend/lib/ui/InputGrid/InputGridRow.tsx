@@ -37,9 +37,7 @@ export function InputGridRow({
   addSeparator,
 }: InputGridRowProps) {
   const errors = errorsAndWarnings?.get(id)?.errors;
-  const warnings = errorsAndWarnings
-    ?.get(id)
-    ?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING");
+  const warnings = errorsAndWarnings?.get(id)?.warnings.filter((warning) => warning.code !== "REFORMAT_WARNING");
   const hasError = errors && errors.length > 0;
   const hasWarning = warnings && warnings.length > 0;
 
@@ -60,11 +58,7 @@ export function InputGridRow({
           autoFocus={isFocused}
           aria-invalid={hasError || (hasWarning && !warningsAccepted) ? "true" : "false"}
           aria-errormessage={
-            hasError
-              ? "feedback-error"
-              : hasWarning && !warningsAccepted
-                ? "feedback-warning"
-                : undefined
+            hasError ? "feedback-error" : hasWarning && !warningsAccepted ? "feedback-warning" : undefined
           }
           onChange={(e) => {
             setValue(format(e.currentTarget.value));

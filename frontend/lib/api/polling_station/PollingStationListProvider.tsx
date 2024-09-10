@@ -7,21 +7,17 @@ export interface iPollingStationListProviderContext {
   pollingStations: PollingStation[];
 }
 
-export const PollingStationListProviderContext =
-  React.createContext<iPollingStationListProviderContext>({
-    pollingStationsLoading: true,
-    pollingStations: [],
-  });
+export const PollingStationListProviderContext = React.createContext<iPollingStationListProviderContext>({
+  pollingStationsLoading: true,
+  pollingStations: [],
+});
 
 export interface PollingStationListProviderProps {
   electionId: number | undefined;
   children: React.ReactNode;
 }
 
-export function PollingStationListProvider({
-  electionId,
-  children,
-}: PollingStationListProviderProps) {
+export function PollingStationListProvider({ electionId, children }: PollingStationListProviderProps) {
   const { data, loading } = usePollingStationListRequest({ election_id: electionId as number });
 
   return (

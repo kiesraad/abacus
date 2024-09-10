@@ -10,17 +10,8 @@ import {
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
-import {
-  Election,
-  PoliticalGroup,
-  PollingStationFormController,
-  PollingStationValues,
-} from "@kiesraad/api";
-import {
-  electionMockData,
-  politicalGroupMockData,
-  pollingStationMockData,
-} from "@kiesraad/api-mocks";
+import { Election, PoliticalGroup, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
+import { electionMockData, politicalGroupMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
@@ -262,10 +253,7 @@ describe("Test CandidatesVotesForm", () => {
         expectedRequest.data.political_group_votes[0]?.candidate_votes[1]?.votes.toString() ?? "0",
       );
 
-      await user.type(
-        total,
-        expectedRequest.data.political_group_votes[0]?.total.toString() ?? "0",
-      );
+      await user.type(total, expectedRequest.data.political_group_votes[0]?.total.toString() ?? "0");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -314,10 +302,7 @@ describe("Test CandidatesVotesForm", () => {
       // When all fields on a page are (potentially) invalid, we do not mark them as so
       const expectedInvalidFields = [] as HTMLElement[];
       const expectedValidFields = [candidateVotes0, candidateVotes1, total] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-        expectedInvalidFields,
-        feedbackMessage,
-      );
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);

@@ -37,20 +37,16 @@ export interface FormReference<T> {
   getIgnoreWarnings?: () => boolean;
 }
 
-export interface FormReferenceRecounted
-  extends FormReference<Pick<PollingStationValues, "recounted">> {
+export interface FormReferenceRecounted extends FormReference<Pick<PollingStationValues, "recounted">> {
   type: "recounted";
 }
 
 export interface FormReferenceVotersAndVotes
-  extends FormReference<
-    Pick<PollingStationResults, "voters_counts" | "votes_counts" | "voters_recounts">
-  > {
+  extends FormReference<Pick<PollingStationResults, "voters_counts" | "votes_counts" | "voters_recounts">> {
   type: "voters_and_votes";
 }
 
-export interface FormReferenceDifferences
-  extends FormReference<Pick<PollingStationResults, "differences_counts">> {
+export interface FormReferenceDifferences extends FormReference<Pick<PollingStationResults, "differences_counts">> {
   type: "differences";
 }
 
@@ -124,9 +120,9 @@ export type TemporaryCache = {
   data: unknown;
 };
 
-export const PollingStationControllerContext = React.createContext<
-  iPollingStationControllerContext | undefined
->(undefined);
+export const PollingStationControllerContext = React.createContext<iPollingStationControllerContext | undefined>(
+  undefined,
+);
 
 const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
 
@@ -151,9 +147,7 @@ export function PollingStationFormController({
   const currentForm = React.useRef<AnyFormReference | null>(defaultCurrentForm);
 
   //where to navigate to next
-  const [targetFormSection, setTargetFormSection] = React.useState<FormSectionID | null>(
-    INITIAL_FORM_SECTION_ID,
-  );
+  const [targetFormSection, setTargetFormSection] = React.useState<FormSectionID | null>(INITIAL_FORM_SECTION_ID);
 
   // status as ref, because it needs to immediately propagate to the blocker function in `PollingStationFormNavigation`
   const status = React.useRef<Status>("idle");

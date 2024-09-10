@@ -151,6 +151,7 @@ pub enum APIError {
     SqlxError(sqlx::Error),
     InvalidHeaderValue,
     PdfGenError(Vec<SourceDiagnostic>),
+    AddError(String),
 }
 
 impl IntoResponse for APIError {
@@ -197,6 +198,13 @@ impl IntoResponse for APIError {
             ),
             APIError::PdfGenError(err) => {
                 println!("PDF generation error: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error("Internal server error".into()),
+                )
+            }
+            APIError::AddError(err) => {
+                println!("Error while adding totals: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error".into()),

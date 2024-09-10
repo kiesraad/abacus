@@ -2,9 +2,11 @@ use crate::election::Election;
 use crate::validation::{
     above_percentage_threshold, ValidationResult, ValidationResultCode, ValidationResults,
 };
+use crate::APIError;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use std::fmt;
+use std::ops::AddAssign;
 use utoipa::ToSchema;
 
 #[derive(Debug)]
@@ -35,7 +37,7 @@ pub trait Validate {
 }
 
 /// Polling station of a certain [Election]
-#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
 pub struct PollingStation {
     pub id: u32,
     pub election_id: u32,
@@ -79,6 +81,12 @@ fn difference_admitted_voters_count_and_votes_cast_count_above_threshold(
     let float_votes_cast: f64 = f64::from(votes_cast);
     f64::abs(float_admitted_voters - float_votes_cast) / float_votes_cast >= 0.02
         || f64::abs(float_admitted_voters - float_votes_cast) >= 15.0
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct PollingStationResultsEntry {
+    pub polling_station_id: u32,
+    pub data: PollingStationResults,
 }
 
 /// PollingStationResults, following the fields in
@@ -355,7 +363,7 @@ pub enum PollingStationStatus {
     Complete,
 }
 
-type Count = u32;
+pub type Count = u32;
 
 impl Validate for Count {
     fn validate(
@@ -387,6 +395,15 @@ pub struct VotersCounts {
     /// Total number of admitted voters ("Totaal aantal toegelaten kiezers")
     #[schema(value_type = u32)]
     pub total_admitted_voters_count: Count,
+}
+
+impl AddAssign<&VotersCounts> for VotersCounts {
+    fn add_assign(&mut self, other: &Self) {
+        self.poll_card_count += other.poll_card_count;
+        self.proxy_certificate_count += other.proxy_certificate_count;
+        self.voter_card_count += other.voter_card_count;
+        self.total_admitted_voters_count += other.total_admitted_voters_count;
+    }
 }
 
 /// Check if all voters counts and votes counts are equal to zero.
@@ -482,6 +499,15 @@ pub struct VotesCounts {
     /// Total number of votes cast ("Totaal aantal getelde stemmen")
     #[schema(value_type = u32)]
     pub total_votes_cast_count: Count,
+}
+
+impl AddAssign<&VotesCounts> for VotesCounts {
+    fn add_assign(&mut self, other: &Self) {
+        self.votes_candidates_counts += other.votes_candidates_counts;
+        self.blank_votes_count += other.blank_votes_count;
+        self.invalid_votes_count += other.invalid_votes_count;
+        self.total_votes_cast_count += other.total_votes_cast_count;
+    }
 }
 
 impl Validate for VotesCounts {
@@ -792,6 +818,32 @@ pub struct PoliticalGroupVotes {
     #[schema(value_type = u32)]
     pub total: Count,
     pub candidate_votes: Vec<CandidateVotes>,
+}
+
+impl PoliticalGroupVotes {
+    pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
+        if self.number != other.number {
+            return Err(APIError::AddError(format!(
+                "Attempted to add votes of group '{}' to '{}'",
+                other.number, self.number
+            )));
+        }
+
+        self.total += other.total;
+
+        for cv in other.candidate_votes.iter() {
+            let Some(found_can) = self
+                .candidate_votes
+                .iter_mut()
+                .find(|c| c.number == cv.number)
+            else {
+                return Err(APIError::AddError(format!("Attempted to add candidate '{}' votes in group '{}', but no such candidate exists", cv.number, self.number)));
+            };
+            found_can.votes += cv.votes;
+        }
+
+        Ok(())
+    }
 }
 
 impl Validate for Vec<PoliticalGroupVotes> {
@@ -2199,5 +2251,49 @@ mod tests {
             "political_group_votes".to_string(),
         );
         assert!(res.is_err());
+    }
+
+    #[test]
+    fn test_votes_addition() {
+        let mut curr_votes = VotesCounts {
+            votes_candidates_counts: 2,
+            blank_votes_count: 3,
+            invalid_votes_count: 4,
+            total_votes_cast_count: 9,
+        };
+
+        curr_votes += &VotesCounts {
+            votes_candidates_counts: 1,
+            blank_votes_count: 2,
+            invalid_votes_count: 3,
+            total_votes_cast_count: 5,
+        };
+
+        assert_eq!(curr_votes.votes_candidates_counts, 3);
+        assert_eq!(curr_votes.blank_votes_count, 5);
+        assert_eq!(curr_votes.invalid_votes_count, 7);
+        assert_eq!(curr_votes.total_votes_cast_count, 14);
+    }
+
+    #[test]
+    fn test_voters_addition() {
+        let mut curr_votes = VotersCounts {
+            poll_card_count: 2,
+            proxy_certificate_count: 3,
+            voter_card_count: 4,
+            total_admitted_voters_count: 9,
+        };
+
+        curr_votes += &VotersCounts {
+            poll_card_count: 1,
+            proxy_certificate_count: 2,
+            voter_card_count: 3,
+            total_admitted_voters_count: 5,
+        };
+
+        assert_eq!(curr_votes.poll_card_count, 3);
+        assert_eq!(curr_votes.proxy_certificate_count, 5);
+        assert_eq!(curr_votes.voter_card_count, 7);
+        assert_eq!(curr_votes.total_admitted_voters_count, 14);
     }
 }

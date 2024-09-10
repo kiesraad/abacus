@@ -56,6 +56,17 @@ describe("Test PollingStationSaveForm", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/1/input#data_entry_saved");
   });
 
+  test("Shift+Enter submits form", async () => {
+    renderForm();
+
+    const user = userEvent.setup();
+    const spy = vi.spyOn(global, "fetch");
+
+    await user.keyboard("{shift>}{enter}{/shift}");
+
+    expect(spy).toHaveBeenCalled();
+  });
+
   test("Data entry does not show finalise button with errors", async () => {
     const formState = structuredClone(defaultFormState);
     formState.sections.voters_votes_counts.errors = [

@@ -28,13 +28,10 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(
         }
       };
 
-      const node = innerRef.current;
-      if (node) {
-        node.addEventListener("keydown", handleKeyDown);
-        return () => {
-          node.removeEventListener("keydown", handleKeyDown);
-        };
-      }
+      document.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+      };
     }, []);
 
     return (

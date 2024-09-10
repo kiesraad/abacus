@@ -15,7 +15,7 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 - Unit tests (voor utils e.d.): geen additionele tools of libraries nodig
 - React UI elementen: [Ladle][ladle] en [Playwright][playwright]
 - React componenten: [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
-- React integration tests:  [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
+- React integration tests: [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
 - Frontend met mocked backend: [Playwright][playwright] en [Mock Service Worker][mock-service-worker]
 
 
@@ -148,7 +148,7 @@ flowchart LR
 
 
 ## Security
-- [GitHub Dependabot][github-depandabot]
+- [GitHub Dependabot][github-dependabot]
 - [GitHub Code Scanning][github-code-scanning]
 - [GitHub Secret Scanning][github-secret-scanning]
 
@@ -182,7 +182,7 @@ Nog te bepalen.
 [clippy]: https://github.com/rust-lang/rust-clippy
 [eslint]: https://eslint.org/
 [github-code-scanning]: https://docs.github.com/en/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning
-[github-depandabot]: https://docs.github.com/en/code-security/dependabot/dependabot-security-updates/about-dependabot-security-updates
+[github-dependabot]: https://docs.github.com/en/code-security/dependabot/dependabot-security-updates/about-dependabot-security-updates
 [github-secret-scanning]: https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning
 [ladle]: https://ladle.dev
 [mock-service-worker]: https://mswjs.io

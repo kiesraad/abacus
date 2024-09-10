@@ -79,6 +79,7 @@ export interface iPollingStationControllerContext {
   submitCurrentForm: (ignoreWarnings?: boolean) => Promise<void>;
   registerCurrentForm: (form: AnyFormReference) => void;
   deleteDataEntry: () => Promise<void>;
+  finaliseDataEntry: () => Promise<void>;
 }
 
 export type FormSectionID =
@@ -128,7 +129,7 @@ const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
 
 // Status of the form controller
 // This is a type instead of an enum because of https://github.com/ArnaudBarre/eslint-plugin-react-refresh/issues/36
-export type Status = "idle" | "saving" | "deleting" | "deleted";
+export type Status = "idle" | "saving" | "deleting" | "deleted" | "finalising" | "finalised";
 
 export function PollingStationFormController({
   election,
@@ -440,6 +441,18 @@ export function PollingStationFormController({
     status.current = "deleted";
   };
 
+  const finaliseDataEntry = async () => {
+    status.current = "finalising";
+    const response = await client.postRequest(request_path + "/finalise");
+    if (response.status !== ApiResponseStatus.Success) {
+      console.error("Failed to finalise data entry", response);
+      status.current = "idle";
+      setError(response.data as ApiResponseErrorData);
+      throw new Error("Failed to finalise data entry");
+    }
+    status.current = "finalised";
+  };
+
   return (
     <PollingStationControllerContext.Provider
       value={{
@@ -454,6 +467,7 @@ export function PollingStationFormController({
         submitCurrentForm,
         targetFormSection,
         deleteDataEntry,
+        finaliseDataEntry,
       }}
     >
       {children}

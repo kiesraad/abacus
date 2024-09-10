@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm";
 import { NavBar } from "app/component/navbar/NavBar";
@@ -8,8 +8,15 @@ import { Alert, Button, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
 export function InputHomePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { election } = useElection();
   const { statuses } = useElectionStatus();
+
+  const showDataEntrySavedAlert = location.hash === "#data_entry_saved";
+
+  function closeDataEntrySavedAlert() {
+    navigate({ hash: "" });
+  }
 
   function finishInput() {
     navigate("finalise");
@@ -29,9 +36,19 @@ export function InputHomePage() {
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
+      {showDataEntrySavedAlert && (
+        <Alert type="success" onClose={closeDataEntrySavedAlert}>
+          <h2>Je invoer is opgeslagen</h2>
+          <p>
+            Geef het papieren proces verbaal terug aan de coördinator.
+            <br />
+            Een andere invoerder doet straks de tweede invoer.
+          </p>
+        </Alert>
+      )}
       {statuses.every((s) => s.status === "Complete") && (
         <Alert type="success">
-          <h2>Alle stembureaus zijn twee keer ingevoerd</h2>
+          <h2>Alle stembureaus zijn ingevoerd</h2>
           <p>
             De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief
             maken en het proces verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.

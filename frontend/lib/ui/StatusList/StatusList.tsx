@@ -19,8 +19,8 @@ export interface StatusListItemProps {
 StatusList.Item = function StatusListItem({ status, children, emphasis }: StatusListItemProps) {
   return (
     <li className={cn(status, { emphasis: !!emphasis })}>
-      {renderStatusIcon(status)}
-      {children}
+      <aside>{renderStatusIcon(status)}</aside>
+      <article>{children}</article>
     </li>
   );
 };

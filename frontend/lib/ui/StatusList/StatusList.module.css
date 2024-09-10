@@ -8,9 +8,15 @@
     align-items: center;
     margin-bottom: 1rem;
     gap: 0.5rem;
-    svg {
+
+    aside {
+      display: flex;
+      align-items: center;
       flex: 0 0 1.5rem;
-      width: 1.5rem;
+      svg {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
     }
 
     &:global(.emphasis) {

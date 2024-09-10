@@ -11,11 +11,13 @@ use hyper::header::InvalidHeaderValue;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
+use typst::diag::SourceDiagnostic;
 use utoipa::ToSchema;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod election;
+pub mod pdf_gen;
 pub mod polling_station;
 pub mod validation;
 
@@ -148,6 +150,7 @@ pub enum APIError {
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
     InvalidHeaderValue,
+    PdfGenError(Vec<SourceDiagnostic>),
 }
 
 impl IntoResponse for APIError {
@@ -192,6 +195,13 @@ impl IntoResponse for APIError {
                 StatusCode::INTERNAL_SERVER_ERROR,
                 to_error("Internal server error".to_string()),
             ),
+            APIError::PdfGenError(err) => {
+                println!("PDF generation error: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error("Internal server error".into()),
+                )
+            }
         };
 
         (status, response).into_response()

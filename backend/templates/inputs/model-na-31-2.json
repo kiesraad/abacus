@@ -1,0 +1,643 @@
+{
+  "election": {
+    "id": 1,
+    "name": "Municipal Election",
+    "location": "Heemdamseburg",
+    "number_of_voters": 40,
+    "category": "Municipal",
+    "election_date": "2024-11-30",
+    "nomination_date": "2024-11-01",
+    "political_groups": [
+      {
+        "number": 1,
+        "name": "Political Group A",
+        "candidates": [
+          { "number": 1, "initials": "A.", "first_name": "Alice", "last_name": "Foo", "locality": "Amsterdam", "gender": "Female" },
+          { "number": 2, "initials": "C.", "first_name": "Charlie", "last_name": "Doe", "locality": "Rotterdam" }
+        ]
+      }
+    ]
+  },
+  "summary": {
+    "voters_counts": {
+      "poll_card_count": 30,
+      "proxy_certificate_count": 0,
+      "voter_card_count": 0,
+      "total_admitted_voters_count": 30
+    },
+    "votes_counts": {
+      "votes_candidates_counts": 30,
+      "blank_votes_count": 0,
+      "invalid_votes_count": 0,
+      "total_votes_cast_count": 30
+    },
+    "differences_counts": {
+      "more_ballots_count": {
+        "count": 0,
+        "polling_stations": []
+      },
+      "fewer_ballots_count": {
+        "count": 0,
+        "polling_stations": []
+      },
+      "unreturned_ballots_count": {
+        "count": 0,
+        "polling_stations": []
+      },
+      "too_few_ballots_handed_out_count": {
+        "count": 0,
+        "polling_stations": []
+      },
+      "too_many_ballots_handed_out_count": {
+        "count": 0,
+        "polling_stations": []
+      },
+      "other_explanation_count": {
+        "count": 0,
+        "polling_stations": []
+      },
+      "no_explanation_count": {
+        "count": 0,
+        "polling_stations": []
+      }
+    },
+    "recounted_polling_stations": [],
+    "political_group_votes": [
+      {
+        "number": 1,
+        "total": 30,
+        "candidate_votes": [
+          {
+            "number": 1,
+            "votes": 20
+          },
+          {
+            "number": 2,
+            "votes": 10
+          }
+        ]
+      }
+    ]
+  },
+  "polling_stations": [
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 11,
+      "election_id": 10,
+      "name": "Locatie 2",
+      "number": 11,
+      "number_of_voters": 109,
+      "polling_station_type": "VasteLocatie",
+      "street": "Straat der tests",
+      "house_number": 3,
+      "house_number_addition": "v1",
+      "postal_code": "0321BA",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 12,
+      "election_id": 10,
+      "name": "Locatie 3",
+      "number": 12,
+      "number_of_voters": 22,
+      "polling_station_type": "Mobiel",
+      "street": "",
+      "house_number": 0,
+      "house_number_addition": null,
+      "postal_code": "",
+      "locality": "Heemdamseburg"
+    },
+    {
+      "id": 10,
+      "election_id": 10,
+      "name": "Locatie 1",
+      "number": 10,
+      "number_of_voters": 123,
+      "polling_station_type": "VasteLocatie",
+      "street": "Teststraat van de lange staatnaam der straten van de straatnamen",
+      "house_number": 1,
+      "house_number_addition": null,
+      "postal_code": "0123AB",
+      "locality": "Heemdamseburg"
+    }
+  ]
+}

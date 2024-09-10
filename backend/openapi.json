@@ -663,6 +663,8 @@
         "required": [
           "id",
           "name",
+          "location",
+          "number_of_voters",
           "category",
           "election_date",
           "nomination_date"
@@ -680,12 +682,20 @@
             "format": "int32",
             "minimum": 0
           },
+          "location": {
+            "type": "string"
+          },
           "name": {
             "type": "string"
           },
           "nomination_date": {
             "type": "string",
             "format": "date"
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           },
           "political_groups": {
             "type": "array",

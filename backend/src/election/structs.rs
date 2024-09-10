@@ -8,6 +8,8 @@ use utoipa::ToSchema;
 pub struct Election {
     pub id: u32,
     pub name: String,
+    pub location: String,
+    pub number_of_voters: u32,
     pub category: ElectionCategory,
     #[schema(value_type = String, format = "date")]
     pub election_date: NaiveDate,
@@ -94,6 +96,8 @@ pub(crate) mod tests {
         Election {
             id: 1,
             name: "Test".to_string(),
+            location: "Test".to_string(),
+            number_of_voters: 100,
             category: ElectionCategory::Municipal,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),

@@ -339,6 +339,8 @@ export const electionListMockResponse: ElectionListResponse = {
     {
       id: 1,
       name: "Gemeenteraadsverkiezingen 2026",
+      location: "Heemdamseburg",
+      number_of_voters: 100,
       category: "Municipal",
       election_date: "2024-11-30",
       nomination_date: "2024-11-01",
@@ -346,6 +348,8 @@ export const electionListMockResponse: ElectionListResponse = {
     {
       id: 2,
       name: "Gemeenteraadsverkiezingen 2030",
+      location: "Heemdamseburg",
+      number_of_voters: 100,
       category: "Municipal",
       election_date: "2024-01-30",
       nomination_date: "2024-01-01",

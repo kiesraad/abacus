@@ -104,7 +104,7 @@
     border: solid var(--bg-gray-darkest);
     background: var(--bg-gray-darker);
     :global(.text-area) & {
-      min-height: 204px;
+      min-height: 12.75rem;
       word-wrap: anywhere;
     }
   }

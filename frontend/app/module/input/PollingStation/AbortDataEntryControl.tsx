@@ -12,26 +12,28 @@ export function AbortDataEntryControl() {
   const [deleting, setDeleting] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const c = usePollingStationFormController();
+  const controller = usePollingStationFormController();
 
   function toggleAbortModal() {
     setOpenAbortModal(!openAbortModal);
   }
 
-  function onAbortModalSave() {
-    // TODO: implement by saving the current form state, this requires functionality from #133;
-    //       right now, only the last submitted form is saved
-    setSaving(true);
-    navigate(`/${election.id}/input`);
-  }
+  const onAbortModalSave = () =>
+    void (async () => {
+      try {
+        setSaving(true);
+        await controller.submitCurrentForm();
+        navigate(`/${election.id}/input`);
+      } finally {
+        setSaving(false);
+      }
+    })();
 
   const onAbortModalDelete = () =>
     void (async () => {
-      // TODO: check if a data entry is already saved, this requires functionality from #133;
-      //       right now, we always delete but ignore 404 errors
       try {
         setDeleting(true);
-        await c.deleteDataEntry();
+        await controller.deleteDataEntry();
         navigate(`/${election.id}/input`);
       } finally {
         setDeleting(false);

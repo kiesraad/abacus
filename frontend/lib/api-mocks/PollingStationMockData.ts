@@ -1,15 +1,17 @@
 import { PollingStation, PollingStationListResponse } from "@kiesraad/api";
 
 export const pollingStationMockData: PollingStation = {
-  election_id: 1,
   id: 1,
-  number: 33,
+  election_id: 1,
   name: 'Stembureau "Op Rolletjes"',
-  house_number: "1",
-  locality: "Den Haag",
+  number: 33,
+  number_of_voters: undefined,
   polling_station_type: "Mobiel",
-  postal_code: "1234 YQ",
   street: "Rijksweg A12",
+  house_number: "1",
+  house_number_addition: undefined,
+  postal_code: "1234 YQ",
+  locality: "Den Haag",
 };
 
 export const getPollingStationListMockResponse = (
@@ -19,15 +21,17 @@ export const getPollingStationListMockResponse = (
     polling_stations: [
       { ...pollingStationMockData, election_id },
       {
-        election_id,
         id: 2,
-        number: 34,
+        election_id,
         name: "Testplek",
-        house_number: "2",
-        locality: "Testdorp",
+        number: 34,
+        number_of_voters: 1000,
         polling_station_type: "Bijzonder",
-        postal_code: "1234 QY",
         street: "Teststraat",
+        house_number: "2",
+        house_number_addition: "b",
+        postal_code: "1234 QY",
+        locality: "Testdorp",
       },
     ],
   };

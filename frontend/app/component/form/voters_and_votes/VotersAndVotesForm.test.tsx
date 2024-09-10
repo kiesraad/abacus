@@ -2,13 +2,9 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
+import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
-import {
-  FormState,
-  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
-  PollingStationFormController,
-  PollingStationValues,
-} from "@kiesraad/api";
+import { FormState, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
 import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
@@ -71,42 +67,6 @@ function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   );
 }
 
-const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
-  data: {
-    recounted: false,
-    voters_counts: {
-      poll_card_count: 0,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 0,
-    },
-    votes_counts: {
-      votes_candidates_counts: 0,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-    },
-    voters_recounts: undefined,
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
-    political_group_votes: electionMockData.political_groups.map((group) => ({
-      number: group.number,
-      total: 0,
-      candidate_votes: group.candidates.map((candidate) => ({
-        number: candidate.number,
-        votes: 0,
-      })),
-    })),
-  },
-};
-
 describe("Test VotersAndVotesForm", () => {
   describe("VotersAndVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
@@ -122,6 +82,21 @@ describe("Test VotersAndVotesForm", () => {
       await user.keyboard("{enter}");
 
       expect(spy).not.toHaveBeenCalled();
+    });
+
+    test("hitting shift+enter does result in api call", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+      const spy = vi.spyOn(global, "fetch");
+
+      const pollCards = await screen.findByTestId("poll_card_count");
+      await user.type(pollCards, "12345");
+      expect(pollCards).toHaveValue("12.345");
+
+      await user.keyboard("{shift>}{enter}{/shift}");
+
+      expect(spy).toHaveBeenCalled();
     });
 
     test("Form field entry and keybindings", async () => {
@@ -197,7 +172,7 @@ describe("Test VotersAndVotesForm", () => {
     test("VotersAndVotesForm request body is equal to the form data", async () => {
       const expectedRequest = {
         data: {
-          ...rootRequest.data,
+          ...emptyDataEntryRequest.data,
           voters_counts: {
             poll_card_count: 1,
             proxy_certificate_count: 2,
@@ -268,7 +243,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F201$/);
+      expect(feedbackError).toHaveTextContent(
+        `Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
     });
 
@@ -304,7 +281,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F202$/);
+      expect(feedbackError).toHaveTextContent(
+        `Controleer uitgebrachte stemmenF.202De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
     });
@@ -340,36 +319,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F203$/);
-      expect(screen.queryByTestId("feedback-warning")).toBeNull();
-    });
-
-    test("Error with non-existing fields is not displayed", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [
-            {
-              fields: [
-                "data.not_a_real_object.not_a_real_field",
-                "data.not_a_real_object.this_field_does_not_exist",
-              ],
-              code: "NotARealError",
-            },
-          ],
-          warnings: [],
-        },
-      });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
-
-      // Since the component does not allow to input values for non-existing fields,
-      // not inputting any values and just clicking the submit button.
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      expect(feedbackError).toHaveTextContent(
+        `Controleer hertelde toegelaten kiezersF.203De invoer bij A.2, B.2, C.2 of D.2 klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
     });
   });
@@ -402,7 +354,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W201$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
 
       const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
         name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
@@ -416,7 +370,7 @@ describe("Test VotersAndVotesForm", () => {
       );
     });
 
-    test("W.201 AboveThreshold blank votes", async () => {
+    test("W.201 high number of blank votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -443,11 +397,13 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W201$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
-    test("W.202 AboveThreshold invalid votes", async () => {
+    test("W.202 high number of invalid votes", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -474,18 +430,225 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W202$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
-    test("W.209 EqualInput voters counts and votes counts", async () => {
+    test("W.203 voters counts and votes counts difference above threshold", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: [
+                "data.votes_counts.total_votes_cast_count",
+                "data.voters_counts.total_admitted_voters_count",
+              ],
+              code: "W203",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm();
+
+      // We await the first element to appear, so we know the page is loaded
+      await user.type(await screen.findByTestId("poll_card_count"), "20");
+      await user.type(screen.getByTestId("proxy_certificate_count"), "0");
+      await user.type(screen.getByTestId("voter_card_count"), "0");
+      await user.type(screen.getByTestId("total_admitted_voters_count"), "20");
+
+      await user.type(screen.getByTestId("votes_candidates_counts"), "5");
+      await user.type(screen.getByTestId("blank_votes_count"), "0");
+      await user.type(screen.getByTestId("invalid_votes_count"), "0");
+      await user.type(screen.getByTestId("total_votes_cast_count"), "5");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmenW.203Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
+
+    test("W.204 votes counts and voters recounts difference above threshold", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: [
+                "data.votes_counts.total_votes_cast_count",
+                "data.voters_recounts.total_admitted_voters_recount",
+              ],
+              code: "W204",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      // We await the first element to appear, so we know the page is loaded
+      await user.type(await screen.findByTestId("poll_card_count"), "5");
+      await user.type(screen.getByTestId("proxy_certificate_count"), "0");
+      await user.type(screen.getByTestId("voter_card_count"), "0");
+      await user.type(screen.getByTestId("total_admitted_voters_count"), "5");
+
+      await user.type(screen.getByTestId("votes_candidates_counts"), "20");
+      await user.type(screen.getByTestId("blank_votes_count"), "0");
+      await user.type(screen.getByTestId("invalid_votes_count"), "0");
+      await user.type(screen.getByTestId("total_votes_cast_count"), "20");
+
+      await user.type(screen.getByTestId("poll_card_recount"), "5");
+      await user.type(screen.getByTestId("proxy_certificate_recount"), "0");
+      await user.type(screen.getByTestId("voter_card_recount"), "0");
+      await user.type(screen.getByTestId("total_admitted_voters_recount"), "5");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezersW.204Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
+
+    test("W.205 total votes cast should not be zero", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: ["data.votes_counts.total_votes_cast_count"],
+              code: "W205",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm();
+
+      // We await the first element to appear, so we know the page is loaded
+      await user.type(screen.getByTestId("total_votes_cast_count"), "0");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer aantal uitgebrachte stemmenW.205Het totaal aantal uitgebrachte stemmen (H) is nul.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
+
+    test("W.206 total admitted voters and total votes cast should not exceed polling stations number of eligible voters", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: [
+                "data.votes_counts.total_votes_cast_count",
+                "data.voters_counts.total_admitted_voters_count",
+              ],
+              code: "W206",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm();
+
+      // We await the first element to appear, so we know the page is loaded
+      await user.type(await screen.findByTestId("poll_card_count"), "50");
+      await user.type(screen.getByTestId("proxy_certificate_count"), "1");
+      await user.type(screen.getByTestId("voter_card_count"), "0");
+      await user.type(screen.getByTestId("total_admitted_voters_count"), "51");
+
+      await user.type(screen.getByTestId("votes_candidates_counts"), "49");
+      await user.type(screen.getByTestId("blank_votes_count"), "1");
+      await user.type(screen.getByTestId("invalid_votes_count"), "1");
+      await user.type(screen.getByTestId("total_votes_cast_count"), "51");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmenW.206Het totaal aantal toegelaten kiezers (D) en/of het totaal aantal uitgebrachte stemmen (H) is hoger dan het aantal kiesgerechtigden voor dit stembureau.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
+
+    test("W.207 total votes cast and total admitted voters recount should not exceed polling stations number of eligible voters", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: [
+                "data.votes_counts.total_votes_cast_count",
+                "data.voters_recounts.total_admitted_voters_recount",
+              ],
+              code: "W207",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      // We await the first element to appear, so we know the page is loaded
+      await user.type(await screen.findByTestId("poll_card_count"), "50");
+      await user.type(screen.getByTestId("proxy_certificate_count"), "1");
+      await user.type(screen.getByTestId("voter_card_count"), "0");
+      await user.type(screen.getByTestId("total_admitted_voters_count"), "51");
+
+      await user.type(screen.getByTestId("votes_candidates_counts"), "49");
+      await user.type(screen.getByTestId("blank_votes_count"), "1");
+      await user.type(screen.getByTestId("invalid_votes_count"), "1");
+      await user.type(screen.getByTestId("total_votes_cast_count"), "51");
+
+      await user.type(screen.getByTestId("poll_card_recount"), "50");
+      await user.type(screen.getByTestId("proxy_certificate_recount"), "0");
+      await user.type(screen.getByTestId("voter_card_recount"), "1");
+      await user.type(screen.getByTestId("total_admitted_voters_recount"), "51");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackWarning = await screen.findByTestId("feedback-warning");
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezersW.207Het totaal aantal uitgebrachte stemmen (H) en/of het herteld totaal aantal toegelaten kiezers (D.2) is hoger dan het aantal kiesgerechtigden voor dit stembureau.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
+      expect(screen.queryByTestId("feedback-server-error")).toBeNull();
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+    });
+
+    test("W.208 EqualInput voters counts and votes counts", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
           warnings: [
             {
               fields: ["data.voters_counts", "data.votes_counts"],
-              code: "W209",
+              code: "W208",
             },
           ],
         },
@@ -510,18 +673,29 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W209$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
 
-    test("W.210 EqualInput voters recounts and votes counts", async () => {
+    test("W.209 EqualInput voters recounts and votes counts", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
           warnings: [
             {
-              fields: ["data.voters_recounts", "data.votes_counts"],
-              code: "W210",
+              fields: [
+                "data.votes_counts.votes_candidates_counts",
+                "data.votes_counts.blank_votes_count",
+                "data.votes_counts.invalid_votes_count",
+                "data.votes_counts.total_votes_cast_count",
+                "data.voters_recounts.poll_card_recount",
+                "data.voters_recounts.proxy_certificate_recount",
+                "data.voters_recounts.voter_card_recount",
+                "data.voters_recounts.total_admitted_voters_recount",
+              ],
+              code: "W209",
             },
           ],
         },
@@ -545,7 +719,9 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^W210$/);
+      expect(feedbackWarning).toHaveTextContent(
+        `Controleer E t/m H en A.2 t/m D.2W.209De getallen bij E t/m H zijn precies hetzelfde als A.2 t/m D.2.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
       expect(screen.queryByTestId("feedback-error")).toBeNull();
     });
   });

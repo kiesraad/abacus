@@ -16,6 +16,8 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(
       const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key === "Enter") {
           if (event.shiftKey || document.activeElement === submitButton) {
+            event.preventDefault();
+            event.stopPropagation();
             //ref.current.submit fails in testing environment (jsdom)
             innerRef.current?.dispatchEvent(
               new Event("submit", { bubbles: true, cancelable: true }),

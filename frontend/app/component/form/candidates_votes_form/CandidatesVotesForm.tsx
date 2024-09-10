@@ -74,7 +74,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     return false;
   }, [_IGNORE_WARNINGS_ID]);
 
-  const { sectionValues, errors, warnings, loading, isSaved, submit, ignoreWarnings } =
+  const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
     usePoliticalGroup(group.number, getValues, getIgnoreWarnings);
 
   const shouldWatch = warnings.length > 0 && isSaved;
@@ -98,21 +98,25 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
 
-  function handleSubmit(event: React.FormEvent<CandidatesVotesFormElement>) {
-    event.preventDefault();
+  const handleSubmit = (event: React.FormEvent<CandidatesVotesFormElement>) =>
+    void (async (event: React.FormEvent<CandidatesVotesFormElement>) => {
+      event.preventDefault();
 
-    const ignoreWarnings = (
-      document.getElementById(
-        `candidates_votes_form_ignore_warnings_${group.number}`,
-      ) as HTMLInputElement
-    ).checked;
-
-    if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
-      setWarningsWarning(true);
-    } else {
-      submit(ignoreWarnings);
-    }
-  }
+      if (errors.length === 0 && warnings.length > 0) {
+        const ignoreWarnings = (
+          document.getElementById(
+            `candidates_votes_form_ignore_warnings_${group.number}`,
+          ) as HTMLInputElement
+        ).checked;
+        if (!hasChanges && !ignoreWarnings) {
+          setWarningsWarning(true);
+        } else {
+          await submit(ignoreWarnings);
+        }
+      } else {
+        await submit();
+      }
+    })(event);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
@@ -123,26 +127,14 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         Lijst {group.number} - {group.name}
       </h2>
       {isSaved && hasValidationError && (
-        <Feedback type="error" title="Controleer uitgebrachte stemmen">
-          <div id="feedback-error">
-            <ul>
-              {errors.map((error, n) => (
-                <li key={`${error.code}-${n}`}>{error.code}</li>
-              ))}
-            </ul>
-          </div>
-        </Feedback>
+        <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
       {isSaved && hasValidationWarning && !hasValidationError && (
-        <Feedback type="warning" title="Controleer uitgebrachte stemmen">
-          <div id="feedback-warning">
-            <ul>
-              {warnings.map((warning, n) => (
-                <li key={`${warning.code}-${n}`}>{warning.code}</li>
-              ))}
-            </ul>
-          </div>
-        </Feedback>
+        <Feedback
+          id="feedback-warning"
+          type="warning"
+          data={warnings.map((warning) => warning.code)}
+        />
       )}
       <InputGrid key={`list${group.number}`} zebra>
         <InputGrid.Header>
@@ -198,7 +190,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

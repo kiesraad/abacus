@@ -9,9 +9,9 @@ export function useDifferences(
   getIgnoreWarnings?: () => boolean,
 ) {
   const {
+    status,
     values,
     formState,
-    loading,
     submitCurrentForm,
     setTemporaryCache,
     registerCurrentForm,
@@ -48,7 +48,7 @@ export function useDifferences(
   }, [registerCurrentForm, getValues, getIgnoreWarnings]);
 
   return {
-    loading,
+    status,
     sectionValues,
     errors,
     warnings,

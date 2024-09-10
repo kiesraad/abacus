@@ -25,19 +25,20 @@ export function RecountedForm() {
     return { recounted: elements.yes.checked ? true : elements.no.checked ? false : undefined };
   }, []);
 
-  const { sectionValues, loading, isSaved, submit } = useRecounted(getValues);
+  const { status, sectionValues, isSaved, submit } = useRecounted(getValues);
 
-  function handleSubmit(event: React.FormEvent<RecountedFormElement>) {
-    event.preventDefault();
-    const elements = event.currentTarget.elements;
+  const handleSubmit = (event: React.FormEvent<RecountedFormElement>) =>
+    void (async (event: React.FormEvent<RecountedFormElement>) => {
+      event.preventDefault();
+      const elements = event.currentTarget.elements;
 
-    if (!elements.yes.checked && !elements.no.checked) {
-      setHasValidationError(true);
-    } else {
-      setHasValidationError(false);
-      submit();
-    }
-  }
+      if (!elements.yes.checked && !elements.no.checked) {
+        setHasValidationError(true);
+      } else {
+        setHasValidationError(false);
+        await submit();
+      }
+    })(event);
 
   React.useEffect(() => {
     if (isSaved) {
@@ -49,15 +50,12 @@ export function RecountedForm() {
     <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form">
       <h2>Is er herteld?</h2>
       {hasValidationError && (
-        <Feedback type="error" title="Controleer het papieren proces-verbaal" code="F.101">
-          <div id="feedback-error">
-            Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?
-            <ul>
-              <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
-              <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
-              <li>Geen vinkje? Kies dan 'nee'.</li>
-            </ul>
-          </div>
+        <Feedback id="feedback-error" type="error" data={["F101"]}>
+          <ul>
+            <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
+            <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
+            <li>Geen vinkje? Kies dan 'nee'.</li>
+          </ul>
         </Feedback>
       )}
       <p className="form-paragraph md">
@@ -86,7 +84,7 @@ export function RecountedForm() {
       </div>
       <BottomBar type="form">
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

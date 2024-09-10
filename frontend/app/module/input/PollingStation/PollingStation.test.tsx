@@ -11,9 +11,9 @@ const render = () => rtlRender(<Providers router={router} />);
 
 const user = userEvent.setup();
 
-async function submit() {
+const submit = async () => {
   await user.click(screen.getByRole("button", { name: "Volgende" }));
-}
+};
 
 const startPollingStationInput = async () => {
   await router.navigate("/1/input/1");
@@ -63,8 +63,8 @@ const expectDifferencesForm = async () => {
   });
 };
 
-const fillDifferencesForm = async () => {
-  await userTypeInputs(user, {
+const fillDifferencesForm = async (values?: Record<string, number>) => {
+  const userValues = values ?? {
     more_ballots_count: 0,
     fewer_ballots_count: 0,
     unreturned_ballots_count: 0,
@@ -72,7 +72,9 @@ const fillDifferencesForm = async () => {
     too_many_ballots_handed_out_count: 0,
     other_explanation_count: 0,
     no_explanation_count: 0,
-  });
+  };
+
+  await userTypeInputs(user, userValues);
 };
 
 const expectPoliticalGroupCandidatesForm = async (pgNumber: number) => {
@@ -130,6 +132,27 @@ const expectElementContainsIcon = async (id: string, ariaLabel: string) => {
   expect(within(el).getByRole("img")).toHaveAccessibleName(ariaLabel);
 };
 
+const abortDataEntry = async () => {
+  await user.click(screen.getByRole("button", { name: "Invoer afbreken" }));
+};
+
+const abortSaveChanges = async () => {
+  await user.click(screen.getByRole("button", { name: "Invoer bewaren" }));
+};
+
+const abortDelete = async () => {
+  await user.click(screen.getByRole("button", { name: "Niet bewaren" }));
+};
+
+const expectPollingStationChoicePage = async () => {
+  await waitFor(() => {
+    expect(router.state.location.pathname).toEqual("/1/input");
+  });
+  await waitFor(() => {
+    expect(screen.getByTestId("polling-station-choice-form")).toBeInTheDocument();
+  });
+};
+
 type FormIdentifier = "recounted" | "voters_and_votes" | "differences" | `candidates_${number}`;
 
 const gotoForm = async (id: FormIdentifier) => {
@@ -157,6 +180,37 @@ const gotoForm = async (id: FormIdentifier) => {
       break;
   }
 };
+
+// Steps to fill up to the 'voters and votes' form, submit, and leave pending changes
+const stepsForPendingChanges = [
+  startPollingStationInput,
+  expectRecountedForm,
+  fillRecountedFormNo,
+  submit,
+  expectVotersAndVotesForm,
+  fillVotersAndVotesForm,
+  submit,
+  expectDifferencesForm,
+  () => gotoForm("voters_and_votes"),
+  expectVotersAndVotesForm,
+  () =>
+    fillVotersAndVotesForm({
+      poll_card_count: 1,
+      proxy_certificate_count: 1,
+      voter_card_count: 1,
+      total_admitted_voters_count: 2,
+      votes_candidates_counts: 1,
+      blank_votes_count: 1,
+      invalid_votes_count: 1,
+      total_votes_cast_count: 3,
+    }),
+  submit,
+  expectFeedbackError,
+  () =>
+    fillVotersAndVotesForm({
+      total_admitted_voters_count: 3,
+    }),
+];
 
 describe("Polling Station data entry integration tests", () => {
   test("Navigate through complete form", async () => {
@@ -260,37 +314,11 @@ describe("Polling Station data entry integration tests", () => {
     }
   });
 
-  test("Navigate triggers changes modal", async () => {
+  test("Navigating with changes triggers changes modal", async () => {
     render();
 
     const steps = [
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedFormNo,
-      submit,
-      expectVotersAndVotesForm,
-      fillVotersAndVotesForm,
-      submit,
-      expectDifferencesForm,
-      () => gotoForm("voters_and_votes"),
-      expectVotersAndVotesForm,
-      () =>
-        fillVotersAndVotesForm({
-          poll_card_count: 1,
-          proxy_certificate_count: 1,
-          voter_card_count: 1,
-          total_admitted_voters_count: 2,
-          votes_candidates_counts: 1,
-          blank_votes_count: 1,
-          invalid_votes_count: 1,
-          total_votes_cast_count: 3,
-        }),
-      submit,
-      expectFeedbackError,
-      () =>
-        fillVotersAndVotesForm({
-          total_admitted_voters_count: 3,
-        }),
+      ...stepsForPendingChanges,
       () => userEvent.click(screen.getByRole("link", { name: "Verschillen" })),
       expectBlockerModal,
     ];
@@ -327,15 +355,20 @@ describe("Polling Station data entry integration tests", () => {
       () => expectElementContainsIcon("list-item-recounted", "opgeslagen"),
       () => expectElementContainsIcon("list-item-differences", "leeg"),
 
-      () => gotoForm("differences"),
-      () => expectElementContainsIcon("list-item-differences", "je bent hier"),
+      () => gotoForm("voters_and_votes"),
+      () => expectElementContainsIcon("list-item-numbers", "je bent hier"),
       () =>
-        userTypeInputs(user, {
-          more_ballots_count: 1,
-          fewer_ballots_count: 1,
+        fillVotersAndVotesForm({
+          poll_card_count: total_votes + 1,
+          total_admitted_voters_count: total_votes + 1,
+          votes_candidates_counts: total_votes,
+          total_votes_cast_count: total_votes,
         }),
       submit,
-      expectFeedbackWarning,
+      expectDifferencesForm,
+      () => fillDifferencesForm({ fewer_ballots_count: 1, no_explanation_count: 2 }),
+      submit,
+      () => expectFeedbackWarning("W.302"),
       acceptWarning,
       submit,
 
@@ -427,6 +460,36 @@ describe("Polling Station data entry integration tests", () => {
       submit,
       expectVotersAndVotesForm,
       () => expectElementContainsIcon("list-item-differences", "bevat een fout"),
+    ];
+
+    for (const step of steps) {
+      await step();
+    }
+  });
+
+  test("Aborting and save with pending changes is possible", async () => {
+    render();
+
+    const steps = [
+      ...stepsForPendingChanges,
+      abortDataEntry,
+      abortSaveChanges,
+      expectPollingStationChoicePage,
+    ];
+
+    for (const step of steps) {
+      await step();
+    }
+  });
+
+  test("Abort and delete with pending changes is possible", async () => {
+    render();
+
+    const steps = [
+      ...stepsForPendingChanges,
+      abortDataEntry,
+      abortDelete,
+      expectPollingStationChoicePage,
     ];
 
     for (const step of steps) {

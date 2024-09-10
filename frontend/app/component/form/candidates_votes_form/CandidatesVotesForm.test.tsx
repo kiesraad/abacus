@@ -2,11 +2,11 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
+import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
 import {
   Election,
   PoliticalGroup,
-  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
   PollingStationFormController,
   PollingStationValues,
 } from "@kiesraad/api";
@@ -31,42 +31,6 @@ function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   );
 }
 
-const rootRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
-  data: {
-    recounted: false,
-    voters_counts: {
-      poll_card_count: 0,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 0,
-    },
-    votes_counts: {
-      votes_candidates_counts: 0,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-    },
-    voters_recounts: undefined,
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
-    political_group_votes: electionMockData.political_groups.map((group) => ({
-      number: group.number,
-      total: 0,
-      candidate_votes: group.candidates.map((candidate) => ({
-        number: candidate.number,
-        votes: 0,
-      })),
-    })),
-  },
-};
-
 describe("Test CandidatesVotesForm", () => {
   describe("CandidatesVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
@@ -82,6 +46,21 @@ describe("Test CandidatesVotesForm", () => {
       await user.keyboard("{enter}");
 
       expect(spy).not.toHaveBeenCalled();
+    });
+
+    test("hitting shift+enter does result in api call", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+      const spy = vi.spyOn(global, "fetch");
+
+      const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
+      await user.type(candidate1, "12345");
+      expect(candidate1).toHaveValue("12.345");
+
+      await user.keyboard("{shift>}{enter}{/shift}");
+
+      expect(spy).toHaveBeenCalled();
     });
 
     test("Form field entry and keybindings", async () => {
@@ -223,7 +202,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const expectedRequest = {
         data: {
-          ...rootRequest.data,
+          ...emptyDataEntryRequest.data,
           political_group_votes: [
             {
               number: 1,
@@ -295,7 +274,7 @@ describe("Test CandidatesVotesForm", () => {
         validation_results: {
           errors: [
             {
-              fields: ["data.political_group_votes[0].total"],
+              fields: ["data.political_group_votes[0]"],
               code: "F401",
             },
           ],
@@ -315,75 +294,11 @@ describe("Test CandidatesVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(/^F401$/);
+      expect(feedbackError).toHaveTextContent(
+        `Controleer ingevoerde aantallenF.401De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
+      );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       expect(screen.queryByTestId("server-feedback-error")).toBeNull();
-    });
-  });
-
-  describe("CandidatesVotesForm warnings", () => {
-    test("Warnings can be displayed", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [],
-          warnings: [
-            {
-              fields: ["data.political_group_votes[0].total"],
-              code: "NotAnActualWarning",
-            },
-          ],
-        },
-      });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
-
-      // Since no warnings exist for the fields on this page,
-      // not inputting any values and just clicking submit.
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
-    });
-
-    test("clicking next without accepting warning results in alert shown", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [],
-          warnings: [
-            {
-              fields: ["data.political_group_votes[0].total"],
-              code: "NotAnActualWarning",
-            },
-          ],
-        },
-      });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
-
-      // Since no warnings exist for the fields on this page,
-      // not inputting any values and just clicking submit.
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(/^NotAnActualWarning$/);
-
-      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
-        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
-      });
-      expect(acceptFeedbackCheckbox).not.toBeChecked();
-
-      await user.click(submitButton);
-      const alertText = screen.getByRole("alert");
-      expect(alertText).toHaveTextContent(
-        /^Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.$/,
-      );
     });
   });
 });

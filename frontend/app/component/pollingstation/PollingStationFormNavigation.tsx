@@ -25,6 +25,7 @@ export function PollingStationFormNavigation({
 }: PollingStationFormNavigationProps) {
   const _lastKnownSection = React.useRef<FormSectionID | null>(null);
   const {
+    status,
     formState,
     error,
     currentForm,
@@ -48,10 +49,11 @@ export function PollingStationFormNavigation({
 
   const shouldBlock = React.useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
-      if (currentLocation.pathname === nextLocation.pathname) {
-        return false;
-      }
-      if (!currentForm) {
+      if (
+        status.current === "deleted" ||
+        currentLocation.pathname === nextLocation.pathname ||
+        !currentForm
+      ) {
         return false;
       }
 
@@ -70,7 +72,7 @@ export function PollingStationFormNavigation({
 
       return false;
     },
-    [formState, currentForm, setTemporaryCache, values],
+    [status, formState, currentForm, setTemporaryCache, values],
   );
 
   const blocker = useBlocker(shouldBlock);
@@ -104,6 +106,13 @@ export function PollingStationFormNavigation({
     }
   }, [targetFormSection, getUrlForFormSection, navigate]);
 
+  const onSave = () =>
+    void (async () => {
+      if (blocker.location) overrideControllerNavigation.current = blocker.location.pathname;
+      await submitCurrentForm();
+      if (blocker.reset) blocker.reset();
+    })();
+
   return (
     <>
       {blocker.state === "blocked" && (
@@ -122,14 +131,7 @@ export function PollingStationFormNavigation({
           </p>
           <p>Wil je deze wijzigingen bewaren?</p>
           <nav>
-            <Button
-              size="lg"
-              onClick={() => {
-                overrideControllerNavigation.current = blocker.location.pathname;
-                submitCurrentForm();
-                blocker.reset();
-              }}
-            >
+            <Button size="lg" onClick={onSave}>
               Wijzigingen opslaan
             </Button>
             <Button
@@ -145,13 +147,7 @@ export function PollingStationFormNavigation({
         </Modal>
       )}
 
-      {error && (
-        <Feedback type="error" title="Server error">
-          <div id="feedback-server-error">
-            {error.errorCode}: {error.message}
-          </div>
-        </Feedback>
-      )}
+      {error && <Feedback id="feedback-server-error" type="error" data={error} />}
     </>
   );
 }

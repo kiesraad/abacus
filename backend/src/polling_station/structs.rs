@@ -28,6 +28,7 @@ pub trait Validate {
     fn validate(
         &self,
         election: &Election,
+        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         field_name: String,
     ) -> Result<(), DataError>;
@@ -68,6 +69,18 @@ impl From<String> for PollingStationType {
     }
 }
 
+/// Check if the difference between the total admitted voters count and the total votes cast count
+/// is above the threshold, meaning 2% or more or 15 or more, which should result in a warning.
+fn difference_admitted_voters_count_and_votes_cast_count_above_threshold(
+    admitted_voters: u32,
+    votes_cast: u32,
+) -> bool {
+    let float_admitted_voters: f64 = f64::from(admitted_voters);
+    let float_votes_cast: f64 = f64::from(votes_cast);
+    f64::abs(float_admitted_voters - float_votes_cast) / float_votes_cast >= 0.02
+        || f64::abs(float_admitted_voters - float_votes_cast) >= 15.0
+}
+
 /// PollingStationResults, following the fields in
 /// "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar lichaam
 ///  in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht"
@@ -93,168 +106,219 @@ impl Validate for PollingStationResults {
     fn validate(
         &self,
         election: &Election,
+        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         field_name: String,
     ) -> Result<(), DataError> {
+        let total_votes_count = self.votes_counts.total_votes_cast_count;
+        let total_voters_count: Count;
+
         self.votes_counts.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.votes_counts"),
         )?;
 
-        let total_votes_counts = self.votes_counts.total_votes_cast_count;
-        let total_voters_counts: Count;
-
-        // if recounted = true
         if let Some(voters_recounts) = &self.voters_recounts {
-            total_voters_counts = voters_recounts.total_admitted_voters_recount;
+            // if recounted = true
+            total_voters_count = voters_recounts.total_admitted_voters_recount;
             voters_recounts.validate(
                 election,
+                polling_station,
                 validation_results,
                 format!("{field_name}.voters_recounts"),
             )?;
 
-            // W.210 validate that the numbers in voters_recounts and votes_counts are not the same
+            // W.209 validate that the numbers in voters_recounts and votes_counts are not the same
             if identical_voters_recounts_and_votes_counts(voters_recounts, &self.votes_counts) {
                 validation_results.warnings.push(ValidationResult {
                     fields: vec![
-                        format!("{field_name}.voters_recounts"),
-                        format!("{field_name}.votes_counts"),
+                        format!("{field_name}.votes_counts.votes_candidates_counts"),
+                        format!("{field_name}.votes_counts.blank_votes_count"),
+                        format!("{field_name}.votes_counts.invalid_votes_count"),
+                        format!("{field_name}.votes_counts.total_votes_cast_count"),
+                        format!("{field_name}.voters_recounts.poll_card_recount"),
+                        format!("{field_name}.voters_recounts.proxy_certificate_recount"),
+                        format!("{field_name}.voters_recounts.voter_card_recount"),
+                        format!("{field_name}.voters_recounts.total_admitted_voters_recount"),
                     ],
-                    code: ValidationResultCode::W210,
+                    code: ValidationResultCode::W209,
                 });
             }
-        // if recounted = false
         } else {
-            total_voters_counts = self.voters_counts.total_admitted_voters_count;
+            // if recounted = false
+            total_voters_count = self.voters_counts.total_admitted_voters_count;
             self.voters_counts.validate(
                 election,
+                polling_station,
                 validation_results,
                 format!("{field_name}.voters_counts"),
             )?;
 
-            // W.209 validate that the numbers in voters_counts and votes_counts are not the same
+            // W.208 validate that the numbers in voters_counts and votes_counts are not the same
             if identical_voters_counts_and_votes_counts(&self.voters_counts, &self.votes_counts) {
                 validation_results.warnings.push(ValidationResult {
                     fields: vec![
                         format!("{field_name}.voters_counts"),
                         format!("{field_name}.votes_counts"),
                     ],
-                    code: ValidationResultCode::W209,
+                    code: ValidationResultCode::W208,
                 });
             }
         }
 
-        // F.301 (recounted = false) or F.302 (recounted = true)
-        // validate that the difference for more ballots counted is correct
-        if total_voters_counts < total_votes_counts
-            && (total_votes_counts - total_voters_counts
-                != self.differences_counts.more_ballots_count)
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![format!(
-                    "{field_name}.differences_counts.more_ballots_count"
-                )],
-                code: if self.recounted {
-                    ValidationResultCode::F302
-                } else {
-                    ValidationResultCode::F301
-                },
-            });
-        }
-
-        // F.303 (recounted = false) or F.304 (recounted = true)
-        // validate that the difference for fewer ballots counted is correct
-        if total_voters_counts > total_votes_counts
-            && (total_voters_counts - total_votes_counts
-                != self.differences_counts.fewer_ballots_count)
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![format!(
-                    "{field_name}.differences_counts.fewer_ballots_count"
-                )],
-                code: if self.recounted {
-                    ValidationResultCode::F304
-                } else {
-                    ValidationResultCode::F303
-                },
-            });
-        }
-
-        // W.301 validate that only more or fewer ballots counted is filled in when there is a difference in the totals
-        if total_voters_counts != total_votes_counts
-            && (self.differences_counts.more_ballots_count != 0
-                && self.differences_counts.fewer_ballots_count != 0)
-        {
+        // W.203 & W.204 validate that the difference between total votes count and total voters count is not above threshold
+        if difference_admitted_voters_count_and_votes_cast_count_above_threshold(
+            total_voters_count,
+            total_votes_count,
+        ) {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![
-                    format!("{field_name}.differences_counts.more_ballots_count"),
-                    format!("{field_name}.differences_counts.fewer_ballots_count"),
+                    format!("{field_name}.votes_counts.total_votes_cast_count"),
+                    if self.recounted {
+                        format!("{field_name}.voters_recounts.total_admitted_voters_recount")
+                    } else {
+                        format!("{field_name}.voters_counts.total_admitted_voters_count")
+                    },
                 ],
-                code: ValidationResultCode::W301,
+                code: if self.recounted {
+                    ValidationResultCode::W204
+                } else {
+                    ValidationResultCode::W203
+                },
             });
         }
 
-        // W.304 (recounted = false) or W.305 (recounted = true)
-        // validate that no difference should be filled in when there is no difference in the totals
-        if total_voters_counts == total_votes_counts
-            && (self.differences_counts.more_ballots_count != 0
-                || self.differences_counts.fewer_ballots_count != 0)
-        {
-            if self.differences_counts.more_ballots_count != 0 {
+        if let Some(number_of_voters) = polling_station.number_of_voters {
+            // W.206 & W.207 validate that total votes count and total voters count are not exceeding polling stations number of eligible voters
+            let mut fields = vec![];
+            if i64::from(total_votes_count) > number_of_voters {
+                fields.append(&mut vec![format!(
+                    "{field_name}.votes_counts.total_votes_cast_count"
+                )])
+            }
+            if i64::from(total_voters_count) > number_of_voters {
+                fields.append(&mut vec![if self.recounted {
+                    format!("{field_name}.voters_recounts.total_admitted_voters_recount")
+                } else {
+                    format!("{field_name}.voters_counts.total_admitted_voters_count")
+                }])
+            }
+            if !fields.is_empty() {
                 validation_results.warnings.push(ValidationResult {
+                    fields,
+                    code: if self.recounted {
+                        ValidationResultCode::W207
+                    } else {
+                        ValidationResultCode::W206
+                    },
+                });
+            }
+        }
+
+        if total_voters_count < total_votes_count {
+            // F.301 validate that the difference for more ballots counted is correct
+            if (total_votes_count - total_voters_count)
+                != self.differences_counts.more_ballots_count
+            {
+                validation_results.errors.push(ValidationResult {
                     fields: vec![format!(
                         "{field_name}.differences_counts.more_ballots_count"
                     )],
-                    code: if self.recounted {
-                        ValidationResultCode::W305
-                    } else {
-                        ValidationResultCode::W304
-                    },
+                    code: ValidationResultCode::F301,
                 });
             }
+            // F.302 validate that fewer ballots counted is empty
             if self.differences_counts.fewer_ballots_count != 0 {
-                validation_results.warnings.push(ValidationResult {
+                validation_results.errors.push(ValidationResult {
                     fields: vec![format!(
                         "{field_name}.differences_counts.fewer_ballots_count"
                     )],
-                    code: if self.recounted {
-                        ValidationResultCode::W305
-                    } else {
-                        ValidationResultCode::W304
-                    },
+                    code: ValidationResultCode::F302,
                 });
             }
         }
 
-        // W.306 validate that no difference specifics should be filled in when there is no difference in the totals
-        if total_voters_counts == total_votes_counts
-            && (self.differences_counts.unreturned_ballots_count != 0
-                || self.differences_counts.too_few_ballots_handed_out_count != 0
-                || self.differences_counts.too_many_ballots_handed_out_count != 0
-                || self.differences_counts.other_explanation_count != 0
-                || self.differences_counts.no_explanation_count != 0)
-        {
-            validation_results.warnings.push(ValidationResult {
-                fields: vec![
-                    format!("{field_name}.differences_counts.unreturned_ballots_count"),
-                    format!("{field_name}.differences_counts.too_few_ballots_handed_out_count"),
-                    format!("{field_name}.differences_counts.too_many_ballots_handed_out_count"),
-                    format!("{field_name}.differences_counts.other_explanation_count"),
-                    format!("{field_name}.differences_counts.no_explanation_count"),
-                ],
-                code: ValidationResultCode::W306,
-            });
+        if total_voters_count > total_votes_count {
+            // F.303 validate that the difference for fewer ballots counted is correct
+            if (total_voters_count - total_votes_count)
+                != self.differences_counts.fewer_ballots_count
+            {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![format!(
+                        "{field_name}.differences_counts.fewer_ballots_count"
+                    )],
+                    code: ValidationResultCode::F303,
+                });
+            }
+            // F.304 validate that more ballots counted is empty
+            if self.differences_counts.more_ballots_count != 0 {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![format!(
+                        "{field_name}.differences_counts.more_ballots_count"
+                    )],
+                    code: ValidationResultCode::F304,
+                });
+            }
+        }
+
+        // F.305 validate that no differences should be filled in when there is no difference in the totals
+        if total_voters_count == total_votes_count {
+            let mut fields = vec![];
+            if self.differences_counts.more_ballots_count != 0 {
+                fields.append(&mut vec![format!(
+                    "{field_name}.differences_counts.more_ballots_count"
+                )])
+            }
+            if self.differences_counts.fewer_ballots_count != 0 {
+                fields.append(&mut vec![format!(
+                    "{field_name}.differences_counts.fewer_ballots_count"
+                )])
+            }
+            if self.differences_counts.unreturned_ballots_count != 0 {
+                fields.append(&mut vec![format!(
+                    "{field_name}.differences_counts.unreturned_ballots_count"
+                )])
+            }
+            if self.differences_counts.too_few_ballots_handed_out_count != 0 {
+                fields.append(&mut vec![format!(
+                    "{field_name}.differences_counts.too_few_ballots_handed_out_count"
+                )])
+            }
+            if self.differences_counts.too_many_ballots_handed_out_count != 0 {
+                fields.append(&mut vec![format!(
+                    "{field_name}.differences_counts.too_many_ballots_handed_out_count"
+                )])
+            }
+            if self.differences_counts.other_explanation_count != 0 {
+                fields.append(&mut vec![format!(
+                    "{field_name}.differences_counts.other_explanation_count"
+                )])
+            }
+            if self.differences_counts.no_explanation_count != 0 {
+                fields.append(&mut vec![format!(
+                    "{field_name}.differences_counts.no_explanation_count"
+                )])
+            }
+            if !fields.is_empty() {
+                validation_results.errors.push(ValidationResult {
+                    fields,
+                    code: ValidationResultCode::F305,
+                });
+            }
         }
 
         self.differences_counts.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.differences_counts"),
         )?;
 
         self.political_group_votes.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.political_group_votes"),
         )?;
@@ -297,6 +361,7 @@ impl Validate for Count {
     fn validate(
         &self,
         _election: &Election,
+        _polling_station: &PollingStation,
         _validation_results: &mut ValidationResults,
         _field_name: String,
     ) -> Result<(), DataError> {
@@ -353,27 +418,32 @@ impl Validate for VotersCounts {
     fn validate(
         &self,
         election: &Election,
+        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         field_name: String,
     ) -> Result<(), DataError> {
         // validate all counts
         self.poll_card_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.poll_card_count"),
         )?;
         self.proxy_certificate_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.proxy_certificate_count"),
         )?;
         self.voter_card_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.voter_card_count"),
         )?;
         self.total_admitted_voters_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.total_admitted_voters_count"),
         )?;
@@ -384,10 +454,10 @@ impl Validate for VotersCounts {
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![
-                    format!("{field_name}.total_admitted_voters_count"),
                     format!("{field_name}.poll_card_count"),
                     format!("{field_name}.proxy_certificate_count"),
                     format!("{field_name}.voter_card_count"),
+                    format!("{field_name}.total_admitted_voters_count"),
                 ],
                 code: ValidationResultCode::F201,
             });
@@ -418,27 +488,32 @@ impl Validate for VotesCounts {
     fn validate(
         &self,
         election: &Election,
+        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         field_name: String,
     ) -> Result<(), DataError> {
         // validate all counts
         self.votes_candidates_counts.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.votes_candidates_counts"),
         )?;
         self.blank_votes_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.blank_votes_count"),
         )?;
         self.invalid_votes_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.invalid_votes_count"),
         )?;
         self.total_votes_cast_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.total_votes_cast_count"),
         )?;
@@ -449,10 +524,10 @@ impl Validate for VotesCounts {
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![
-                    format!("{field_name}.total_votes_cast_count"),
                     format!("{field_name}.votes_candidates_counts"),
                     format!("{field_name}.blank_votes_count"),
                     format!("{field_name}.invalid_votes_count"),
+                    format!("{field_name}.total_votes_cast_count"),
                 ],
                 code: ValidationResultCode::F202,
             });
@@ -476,6 +551,14 @@ impl Validate for VotesCounts {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![format!("{field_name}.invalid_votes_count")],
                 code: ValidationResultCode::W202,
+            });
+        }
+
+        // W.205 validate that total number of votes cast is not 0
+        if self.total_votes_cast_count == 0 {
+            validation_results.warnings.push(ValidationResult {
+                fields: vec![format!("{field_name}.total_votes_cast_count")],
+                code: ValidationResultCode::W205,
             });
         }
         Ok(())
@@ -531,27 +614,32 @@ impl Validate for VotersRecounts {
     fn validate(
         &self,
         election: &Election,
+        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         field_name: String,
     ) -> Result<(), DataError> {
         // validate all counts
         self.poll_card_recount.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.poll_card_recount"),
         )?;
         self.proxy_certificate_recount.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.proxy_certificate_recount"),
         )?;
         self.voter_card_recount.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.voter_card_recount"),
         )?;
         self.total_admitted_voters_recount.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.total_admitted_voters_recount"),
         )?;
@@ -562,10 +650,10 @@ impl Validate for VotersRecounts {
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![
-                    format!("{field_name}.total_admitted_voters_recount"),
                     format!("{field_name}.poll_card_recount"),
                     format!("{field_name}.proxy_certificate_recount"),
                     format!("{field_name}.voter_card_recount"),
+                    format!("{field_name}.total_admitted_voters_recount"),
                 ],
                 code: ValidationResultCode::F203,
             });
@@ -604,47 +692,55 @@ impl Validate for DifferencesCounts {
     fn validate(
         &self,
         election: &Election,
+        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         field_name: String,
     ) -> Result<(), DataError> {
         // validate all counts
         self.more_ballots_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.more_ballots_count"),
         )?;
         self.fewer_ballots_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.fewer_ballots_count"),
         )?;
         self.unreturned_ballots_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.unreturned_ballots_count"),
         )?;
         self.too_few_ballots_handed_out_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.too_few_ballots_handed_out_count"),
         )?;
         self.too_many_ballots_handed_out_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.too_many_ballots_handed_out_count"),
         )?;
         self.other_explanation_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.other_explanation_count"),
         )?;
         self.no_explanation_count.validate(
             election,
+            polling_station,
             validation_results,
             format!("{field_name}.no_explanation_count"),
         )?;
 
-        // W.302 validate that more_ballots_count == too_many_ballots_handed_out_count + other_explanation_count + no_explanation_count - unreturned_ballots_count - too_few_ballots_handed_out_count
+        // W.301 validate that more_ballots_count == too_many_ballots_handed_out_count + other_explanation_count + no_explanation_count - unreturned_ballots_count - too_few_ballots_handed_out_count
         if self.more_ballots_count != 0
             && (i64::from(self.too_many_ballots_handed_out_count)
                 + i64::from(self.other_explanation_count)
@@ -662,10 +758,10 @@ impl Validate for DifferencesCounts {
                     format!("{field_name}.unreturned_ballots_count"),
                     format!("{field_name}.too_few_ballots_handed_out_count"),
                 ],
-                code: ValidationResultCode::W302,
+                code: ValidationResultCode::W301,
             });
         }
-        // W.303 validate that fewer_ballots_count == unreturned_ballots_count + too_few_ballots_handed_out_count + other_explanation_count + no_explanation_count
+        // W.302 validate that fewer_ballots_count == unreturned_ballots_count + too_few_ballots_handed_out_count + other_explanation_count + no_explanation_count
         if self.fewer_ballots_count != 0
             && (i64::from(self.unreturned_ballots_count)
                 + i64::from(self.too_few_ballots_handed_out_count)
@@ -683,7 +779,7 @@ impl Validate for DifferencesCounts {
                     format!("{field_name}.other_explanation_count"),
                     format!("{field_name}.no_explanation_count"),
                 ],
-                code: ValidationResultCode::W303,
+                code: ValidationResultCode::W302,
             });
         }
         Ok(())
@@ -702,6 +798,7 @@ impl Validate for Vec<PoliticalGroupVotes> {
     fn validate(
         &self,
         election: &Election,
+        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         field_name: String,
     ) -> Result<(), DataError> {
@@ -721,7 +818,12 @@ impl Validate for Vec<PoliticalGroupVotes> {
                     "political group numbers are not consecutive",
                 ));
             }
-            pgv.validate(election, validation_results, format!("{field_name}[{i}]"))?;
+            pgv.validate(
+                election,
+                polling_station,
+                validation_results,
+                format!("{field_name}[{i}]"),
+            )?;
         }
         Ok(())
     }
@@ -731,6 +833,7 @@ impl Validate for PoliticalGroupVotes {
     fn validate(
         &self,
         election: &Election,
+        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         field_name: String,
     ) -> Result<(), DataError> {
@@ -755,14 +858,19 @@ impl Validate for PoliticalGroupVotes {
             }
             cv.validate(
                 election,
+                polling_station,
                 validation_results,
                 format!("{field_name}.candidate_votes[{i}]"),
             )?;
         }
 
         // validate the total number of votes
-        self.total
-            .validate(election, validation_results, format!("{field_name}.total"))?;
+        self.total.validate(
+            election,
+            polling_station,
+            validation_results,
+            format!("{field_name}.total"),
+        )?;
 
         // F.401 validate whether the total number of votes matches the sum of all candidate votes,
         // cast to u64 to avoid overflow
@@ -774,7 +882,7 @@ impl Validate for PoliticalGroupVotes {
                 .sum::<u64>()
         {
             validation_results.errors.push(ValidationResult {
-                fields: vec![format!("{field_name}.total")],
+                fields: vec![format!("{field_name}")],
                 code: ValidationResultCode::F401,
             });
         }
@@ -793,11 +901,16 @@ impl Validate for CandidateVotes {
     fn validate(
         &self,
         election: &Election,
+        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         field_name: String,
     ) -> Result<(), DataError> {
-        self.votes
-            .validate(election, validation_results, format!("{field_name}.votes"))
+        self.votes.validate(
+            election,
+            polling_station,
+            validation_results,
+            format!("{field_name}.votes"),
+        )
     }
 }
 
@@ -807,23 +920,40 @@ mod tests {
 
     use super::*;
 
+    /// Create a test polling station.
+    pub fn polling_station_fixture(number_of_voters: Option<i64>) -> PollingStation {
+        PollingStation {
+            id: 1,
+            election_id: election_fixture(&[]).id,
+            name: "Testplek".to_string(),
+            number: 34,
+            number_of_voters,
+            polling_station_type: PollingStationType::Bijzonder,
+            street: "Teststraat".to_string(),
+            house_number: "2".to_string(),
+            house_number_addition: Some("b".to_string()),
+            postal_code: "1234 QY".to_string(),
+            locality: "Testdorp".to_string(),
+        }
+    }
+
     #[test]
     fn test_polling_station_results_incorrect_total_and_difference_validation() {
-        // test F.201 incorrect total, F.202 incorrect total and F.301 incorrect difference
+        // test F.201 incorrect total, F.202 incorrect total, F.301 incorrect difference & W.203 above threshold in absolute numbers
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: false,
             voters_counts: VotersCounts {
-                poll_card_count: 1,
+                poll_card_count: 29,
                 proxy_certificate_count: 2,
                 voter_card_count: 3,
-                total_admitted_voters_count: 5, // F.201 incorrect total
+                total_admitted_voters_count: 35, // F.201 incorrect total & W.203 above threshold in absolute numbers
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 2,
+                votes_candidates_counts: 44,
                 blank_votes_count: 1,
                 invalid_votes_count: 4,
-                total_votes_cast_count: 8, // F.202 incorrect total
+                total_votes_cast_count: 50, // F.202 incorrect total & W.203 above threshold in absolute numbers
             },
             voters_recounts: None,
             differences_counts: DifferencesCounts {
@@ -837,23 +967,25 @@ mod tests {
             },
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,
-                total: 2,
+                total: 44,
                 candidate_votes: vec![CandidateVotes {
                     number: 1,
-                    votes: 2,
+                    votes: 44,
                 }],
             }],
         };
         let election = election_fixture(&[1]);
+        let polling_station = polling_station_fixture(None);
         polling_station_results
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "polling_station_results".to_string(),
             )
             .unwrap();
         assert_eq!(validation_results.errors.len(), 3);
-        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F202
@@ -861,10 +993,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.votes_counts.votes_candidates_counts",
                 "polling_station_results.votes_counts.blank_votes_count",
-                "polling_station_results.votes_counts.invalid_votes_count"
+                "polling_station_results.votes_counts.invalid_votes_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
             ]
         );
         assert_eq!(
@@ -874,10 +1006,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[1].fields,
             vec![
-                "polling_station_results.voters_counts.total_admitted_voters_count",
                 "polling_station_results.voters_counts.poll_card_count",
                 "polling_station_results.voters_counts.proxy_certificate_count",
-                "polling_station_results.voters_counts.voter_card_count"
+                "polling_station_results.voters_counts.voter_card_count",
+                "polling_station_results.voters_counts.total_admitted_voters_count",
             ]
         );
         assert_eq!(
@@ -888,8 +1020,81 @@ mod tests {
             validation_results.errors[2].fields,
             vec!["polling_station_results.differences_counts.more_ballots_count"]
         );
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W203
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.voters_counts.total_admitted_voters_count",
+            ]
+        );
 
-        // test F.201 incorrect total, F.202 incorrect total, F.203 incorrect total and F.302 incorrect difference
+        // test F.303 incorrect difference & F.304 should be empty
+        validation_results = ValidationResults::default();
+        let polling_station_results = PollingStationResults {
+            recounted: false,
+            voters_counts: VotersCounts {
+                poll_card_count: 100,
+                proxy_certificate_count: 2,
+                voter_card_count: 3,
+                total_admitted_voters_count: 105,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_counts: 100,
+                blank_votes_count: 2,
+                invalid_votes_count: 2,
+                total_votes_cast_count: 104,
+            },
+            voters_recounts: None,
+            differences_counts: DifferencesCounts {
+                more_ballots_count: 2,  // F.304 should be empty
+                fewer_ballots_count: 0, // F.303 incorrect difference
+                unreturned_ballots_count: 0,
+                too_few_ballots_handed_out_count: 0,
+                too_many_ballots_handed_out_count: 0,
+                other_explanation_count: 0,
+                no_explanation_count: 2,
+            },
+            political_group_votes: vec![PoliticalGroupVotes {
+                number: 1,
+                total: 100,
+                candidate_votes: vec![CandidateVotes {
+                    number: 1,
+                    votes: 100,
+                }],
+            }],
+        };
+        polling_station_results
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                "polling_station_results".to_string(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 2);
+        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(
+            validation_results.errors[0].code,
+            ValidationResultCode::F303
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["polling_station_results.differences_counts.fewer_ballots_count",]
+        );
+        assert_eq!(
+            validation_results.errors[1].code,
+            ValidationResultCode::F304
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
+            vec!["polling_station_results.differences_counts.more_ballots_count"]
+        );
+
+        // test F.201 incorrect total, F.202 incorrect total, F.203 incorrect total, F.301 incorrect difference, F.302 should be empty & W.204 above threshold in percentage
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: true,
@@ -897,27 +1102,27 @@ mod tests {
                 poll_card_count: 1,
                 proxy_certificate_count: 2,
                 voter_card_count: 3,
-                total_admitted_voters_count: 5, // F.201 incorrect total
+                total_admitted_voters_count: 5, // F.201 incorrect total & W.204 above threshold in percentage
             },
             votes_counts: VotesCounts {
                 votes_candidates_counts: 3,
-                blank_votes_count: 2,
+                blank_votes_count: 1,
                 invalid_votes_count: 1,
-                total_votes_cast_count: 5, // F.202 incorrect total
+                total_votes_cast_count: 6, // F.202 incorrect total & W.204 above threshold in percentage
             },
             voters_recounts: Some(VotersRecounts {
-                poll_card_recount: 2,
-                proxy_certificate_recount: 1,
-                voter_card_recount: 4,
-                total_admitted_voters_recount: 8, // F.203 incorrect total
+                poll_card_recount: 1,
+                proxy_certificate_recount: 2,
+                voter_card_recount: 3,
+                total_admitted_voters_recount: 5, // F.203 incorrect total
             }),
             differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 0, // F.302 incorrect difference
+                more_ballots_count: 0,  // F.301 incorrect difference
+                fewer_ballots_count: 2, // F.302 should be empty
                 unreturned_ballots_count: 0,
                 too_few_ballots_handed_out_count: 0,
                 too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 0,
+                other_explanation_count: 2,
                 no_explanation_count: 0,
             },
             political_group_votes: vec![PoliticalGroupVotes {
@@ -929,16 +1134,16 @@ mod tests {
                 }],
             }],
         };
-        let election = election_fixture(&[1]);
         polling_station_results
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "polling_station_results".to_string(),
             )
             .unwrap();
-        assert_eq!(validation_results.errors.len(), 3);
-        assert_eq!(validation_results.warnings.len(), 0);
+        assert_eq!(validation_results.errors.len(), 4);
+        assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F202
@@ -946,10 +1151,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.votes_counts.votes_candidates_counts",
                 "polling_station_results.votes_counts.blank_votes_count",
-                "polling_station_results.votes_counts.invalid_votes_count"
+                "polling_station_results.votes_counts.invalid_votes_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
             ]
         );
         assert_eq!(
@@ -959,25 +1164,122 @@ mod tests {
         assert_eq!(
             validation_results.errors[1].fields,
             vec![
-                "polling_station_results.voters_recounts.total_admitted_voters_recount",
                 "polling_station_results.voters_recounts.poll_card_recount",
                 "polling_station_results.voters_recounts.proxy_certificate_recount",
-                "polling_station_results.voters_recounts.voter_card_recount"
+                "polling_station_results.voters_recounts.voter_card_recount",
+                "polling_station_results.voters_recounts.total_admitted_voters_recount",
             ]
         );
         assert_eq!(
             validation_results.errors[2].code,
-            ValidationResultCode::F304
+            ValidationResultCode::F301
         );
         assert_eq!(
             validation_results.errors[2].fields,
+            vec!["polling_station_results.differences_counts.more_ballots_count",]
+        );
+        assert_eq!(
+            validation_results.errors[3].code,
+            ValidationResultCode::F302
+        );
+        assert_eq!(
+            validation_results.errors[3].fields,
             vec!["polling_station_results.differences_counts.fewer_ballots_count"]
+        );
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W204
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.voters_recounts.total_admitted_voters_recount"
+            ]
+        );
+
+        // test F.303 incorrect difference, F.304 should be empty & W.204 above threshold in absolute numbers
+        validation_results = ValidationResults::default();
+        let polling_station_results = PollingStationResults {
+            recounted: true,
+            voters_counts: VotersCounts {
+                poll_card_count: 100,
+                proxy_certificate_count: 2,
+                voter_card_count: 3,
+                total_admitted_voters_count: 105,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_counts: 101,
+                blank_votes_count: 2,
+                invalid_votes_count: 2,
+                total_votes_cast_count: 105, // W.204 above threshold in absolute numbers
+            },
+            voters_recounts: Some(VotersRecounts {
+                poll_card_recount: 115,
+                proxy_certificate_recount: 2,
+                voter_card_recount: 3,
+                total_admitted_voters_recount: 120, // W.204 above threshold in absolute numbers
+            }),
+            differences_counts: DifferencesCounts {
+                more_ballots_count: 15, // F.304 should be empty
+                fewer_ballots_count: 0, // F.303 incorrect difference
+                unreturned_ballots_count: 0,
+                too_few_ballots_handed_out_count: 0,
+                too_many_ballots_handed_out_count: 0,
+                other_explanation_count: 8,
+                no_explanation_count: 7,
+            },
+            political_group_votes: vec![PoliticalGroupVotes {
+                number: 1,
+                total: 101,
+                candidate_votes: vec![CandidateVotes {
+                    number: 1,
+                    votes: 101,
+                }],
+            }],
+        };
+        polling_station_results
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                "polling_station_results".to_string(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 2);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.errors[0].code,
+            ValidationResultCode::F303
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["polling_station_results.differences_counts.fewer_ballots_count",]
+        );
+        assert_eq!(
+            validation_results.errors[1].code,
+            ValidationResultCode::F304
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
+            vec!["polling_station_results.differences_counts.more_ballots_count",]
+        );
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W204
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.voters_recounts.total_admitted_voters_recount"
+            ]
         );
     }
 
     #[test]
     fn test_polling_station_results_wrong_and_no_difference_validation() {
-        // test W.301 conflicting differences
+        // test F.304 should be empty & W.203 above threshold in percentage
         let mut validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: false,
@@ -985,18 +1287,18 @@ mod tests {
                 poll_card_count: 50,
                 proxy_certificate_count: 2,
                 voter_card_count: 4,
-                total_admitted_voters_count: 56,
+                total_admitted_voters_count: 56, // W.203 above threshold in percentage
             },
             votes_counts: VotesCounts {
                 votes_candidates_counts: 50,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
-                total_votes_cast_count: 52,
+                total_votes_cast_count: 52, // W.203 above threshold in percentage
             },
             voters_recounts: None,
             differences_counts: DifferencesCounts {
-                more_ballots_count: 4,  // W.301 conflicting differences
-                fewer_ballots_count: 4, // W.301 conflicting differences
+                more_ballots_count: 4, // F.304 should be empty
+                fewer_ballots_count: 4,
                 unreturned_ballots_count: 0,
                 too_few_ballots_handed_out_count: 0,
                 too_many_ballots_handed_out_count: 0,
@@ -1013,28 +1315,38 @@ mod tests {
             }],
         };
         let election = election_fixture(&[1]);
+        let polling_station = polling_station_fixture(None);
         polling_station_results
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "polling_station_results".to_string(),
             )
             .unwrap();
-        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.errors.len(), 1);
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
+            validation_results.errors[0].code,
+            ValidationResultCode::F304
+        );
+        assert_eq!(
+            validation_results.errors[0].fields,
+            vec!["polling_station_results.differences_counts.more_ballots_count",]
+        );
+        assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::W301
+            ValidationResultCode::W203
         );
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
-                "polling_station_results.differences_counts.more_ballots_count",
-                "polling_station_results.differences_counts.fewer_ballots_count"
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.voters_counts.total_admitted_voters_count",
             ]
         );
 
-        // test W.304 and W.306 no difference expected
+        // test F.305 no difference expected
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: false,
@@ -1052,13 +1364,13 @@ mod tests {
             },
             voters_recounts: None,
             differences_counts: DifferencesCounts {
-                more_ballots_count: 4, // W.304 no difference expected
+                more_ballots_count: 4, // F.305 no difference expected
                 fewer_ballots_count: 0,
                 unreturned_ballots_count: 0,
                 too_few_ballots_handed_out_count: 0,
                 too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 2, // W.306 no difference expected
-                no_explanation_count: 2,    // W.306 no difference expected
+                other_explanation_count: 2, // F.305 no difference expected
+                no_explanation_count: 2,    // F.305 no difference expected
             },
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,
@@ -1069,40 +1381,30 @@ mod tests {
                 }],
             }],
         };
-        let election = election_fixture(&[1]);
         polling_station_results
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "polling_station_results".to_string(),
             )
             .unwrap();
-        assert_eq!(validation_results.errors.len(), 0);
-        assert_eq!(validation_results.warnings.len(), 2);
+        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.warnings.len(), 0);
         assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W304
+            validation_results.errors[0].code,
+            ValidationResultCode::F305
         );
         assert_eq!(
-            validation_results.warnings[0].fields,
-            vec!["polling_station_results.differences_counts.more_ballots_count",]
-        );
-        assert_eq!(
-            validation_results.warnings[1].code,
-            ValidationResultCode::W306
-        );
-        assert_eq!(
-            validation_results.warnings[1].fields,
+            validation_results.errors[0].fields,
             vec![
-                "polling_station_results.differences_counts.unreturned_ballots_count",
-                "polling_station_results.differences_counts.too_few_ballots_handed_out_count",
-                "polling_station_results.differences_counts.too_many_ballots_handed_out_count",
+                "polling_station_results.differences_counts.more_ballots_count",
                 "polling_station_results.differences_counts.other_explanation_count",
                 "polling_station_results.differences_counts.no_explanation_count",
             ]
         );
 
-        // test W.305 and W.306 no difference expected and F.204 incorrect total
+        // test F.305 no difference expected & F.204 incorrect total
         validation_results = ValidationResults::default();
         let polling_station_results = PollingStationResults {
             recounted: true,
@@ -1126,12 +1428,12 @@ mod tests {
             }),
             differences_counts: DifferencesCounts {
                 more_ballots_count: 0,
-                fewer_ballots_count: 4,      // W.305 no difference expected
-                unreturned_ballots_count: 1, // W.306 no difference expected
-                too_few_ballots_handed_out_count: 1, // W.306 no difference expected
+                fewer_ballots_count: 4,      // F.305 no difference expected
+                unreturned_ballots_count: 1, // F.305 no difference expected
+                too_few_ballots_handed_out_count: 1, // F.305 no difference expected
                 too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 1, // W.306 no difference expected
-                no_explanation_count: 1,    // W.306 no difference expected
+                other_explanation_count: 1, // F.305 no difference expected
+                no_explanation_count: 1,    // F.305 no difference expected
             },
             political_group_votes: vec![PoliticalGroupVotes {
                 number: 1,
@@ -1142,47 +1444,132 @@ mod tests {
                 }],
             }],
         };
-        let election = election_fixture(&[1]);
         polling_station_results
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "polling_station_results".to_string(),
             )
             .unwrap();
-        assert_eq!(validation_results.errors.len(), 1);
-        assert_eq!(validation_results.warnings.len(), 2);
+        assert_eq!(validation_results.errors.len(), 2);
+        assert_eq!(validation_results.warnings.len(), 0);
         assert_eq!(
             validation_results.errors[0].code,
-            ValidationResultCode::F204
+            ValidationResultCode::F305
         );
         assert_eq!(
             validation_results.errors[0].fields,
+            vec![
+                "polling_station_results.differences_counts.fewer_ballots_count",
+                "polling_station_results.differences_counts.unreturned_ballots_count",
+                "polling_station_results.differences_counts.too_few_ballots_handed_out_count",
+                "polling_station_results.differences_counts.other_explanation_count",
+                "polling_station_results.differences_counts.no_explanation_count"
+            ]
+        );
+        assert_eq!(
+            validation_results.errors[1].code,
+            ValidationResultCode::F204
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
             vec![
                 "polling_station_results.votes_counts.votes_candidates_counts",
                 "polling_station_results.political_group_votes"
             ]
         );
+    }
+
+    #[test]
+    fn test_polling_station_above_eligible_voters_threshold_validation() {
+        let mut validation_results = ValidationResults::default();
+        // test W.206 total admitted voters and total votes cast are not exceeding polling stations number of eligible voters
+        let mut polling_station_results = PollingStationResults {
+            recounted: false,
+            voters_counts: VotersCounts {
+                poll_card_count: 50,
+                proxy_certificate_count: 1,
+                voter_card_count: 0,
+                total_admitted_voters_count: 51, // W.206 should not exceed polling stations eligible voters
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_counts: 51,
+                blank_votes_count: 0,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 51, // W.206 should not exceed polling stations eligible voters
+            },
+            voters_recounts: None,
+            differences_counts: DifferencesCounts {
+                more_ballots_count: 0,
+                fewer_ballots_count: 0,
+                unreturned_ballots_count: 0,
+                too_few_ballots_handed_out_count: 0,
+                too_many_ballots_handed_out_count: 0,
+                other_explanation_count: 0,
+                no_explanation_count: 0,
+            },
+            political_group_votes: vec![PoliticalGroupVotes {
+                number: 1,
+                total: 51,
+                candidate_votes: vec![CandidateVotes {
+                    number: 1,
+                    votes: 51,
+                }],
+            }],
+        };
+        let election = election_fixture(&[1]);
+        let polling_station = polling_station_fixture(Some(i64::from(50)));
+        polling_station_results
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                "polling_station_results".to_string(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::W305
+            ValidationResultCode::W206
         );
         assert_eq!(
             validation_results.warnings[0].fields,
-            vec!["polling_station_results.differences_counts.fewer_ballots_count"]
-        );
-        assert_eq!(
-            validation_results.warnings[1].code,
-            ValidationResultCode::W306
-        );
-        assert_eq!(
-            validation_results.warnings[1].fields,
             vec![
-                "polling_station_results.differences_counts.unreturned_ballots_count",
-                "polling_station_results.differences_counts.too_few_ballots_handed_out_count",
-                "polling_station_results.differences_counts.too_many_ballots_handed_out_count",
-                "polling_station_results.differences_counts.other_explanation_count",
-                "polling_station_results.differences_counts.no_explanation_count"
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.voters_counts.total_admitted_voters_count",
+            ]
+        );
+
+        // test W.207 total votes cast count and total admitted voters recount are not exceeding polling stations number of eligible voters
+        validation_results = ValidationResults::default();
+        polling_station_results.recounted = true;
+        polling_station_results.voters_recounts = Some(VotersRecounts {
+            poll_card_recount: 50,
+            proxy_certificate_recount: 0,
+            voter_card_recount: 1,
+            total_admitted_voters_recount: 51, // W.207 should not exceed polling stations eligible voters
+        });
+        polling_station_results
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                "polling_station_results".to_string(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W207
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.voters_recounts.total_admitted_voters_recount"
             ]
         );
     }
@@ -1190,18 +1577,18 @@ mod tests {
     #[test]
     fn test_polling_station_identical_counts_validation() {
         let mut validation_results = ValidationResults::default();
-        // test W.209 equal input
+        // test W.208 equal input
         let mut polling_station_results = PollingStationResults {
             recounted: false,
             voters_counts: VotersCounts {
-                // W.209 equal input
+                // W.208 equal input
                 poll_card_count: 1000,
                 proxy_certificate_count: 1,
                 voter_card_count: 1,
                 total_admitted_voters_count: 1002,
             },
             votes_counts: VotesCounts {
-                // W.209 equal input
+                // W.208 equal input
                 votes_candidates_counts: 1000,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
@@ -1227,9 +1614,50 @@ mod tests {
             }],
         };
         let election = election_fixture(&[1]);
+        let polling_station = polling_station_fixture(None);
         polling_station_results
             .validate(
                 &election,
+                &polling_station,
+                &mut validation_results,
+                "polling_station_results".to_string(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W208
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec![
+                "polling_station_results.voters_counts",
+                "polling_station_results.votes_counts"
+            ]
+        );
+
+        // test W.209 equal input
+        validation_results = ValidationResults::default();
+        polling_station_results.recounted = true;
+        // voters_counts is not equal to votes_counts
+        polling_station_results.voters_counts = VotersCounts {
+            poll_card_count: 998,
+            proxy_certificate_count: 1,
+            voter_card_count: 1,
+            total_admitted_voters_count: 1000,
+        };
+        // voters_recounts is now equal to votes_counts: W.209 equal input
+        polling_station_results.voters_recounts = Some(VotersRecounts {
+            poll_card_recount: 1000,
+            proxy_certificate_recount: 1,
+            voter_card_recount: 1,
+            total_admitted_voters_recount: 1002,
+        });
+        polling_station_results
+            .validate(
+                &election,
+                &polling_station,
                 &mut validation_results,
                 "polling_station_results".to_string(),
             )
@@ -1243,46 +1671,14 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
-                "polling_station_results.voters_counts",
-                "polling_station_results.votes_counts"
-            ]
-        );
-
-        // test W.210 equal input
-        validation_results = ValidationResults::default();
-        polling_station_results.recounted = true;
-        // voters_counts is not equal to votes_counts
-        polling_station_results.voters_counts = VotersCounts {
-            poll_card_count: 998,
-            proxy_certificate_count: 1,
-            voter_card_count: 1,
-            total_admitted_voters_count: 1000,
-        };
-        // voters_recounts is now equal to votes_counts: W.210 equal input
-        polling_station_results.voters_recounts = Some(VotersRecounts {
-            poll_card_recount: 1000,
-            proxy_certificate_recount: 1,
-            voter_card_recount: 1,
-            total_admitted_voters_recount: 1002,
-        });
-        polling_station_results
-            .validate(
-                &election,
-                &mut validation_results,
-                "polling_station_results".to_string(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 0);
-        assert_eq!(validation_results.warnings.len(), 1);
-        assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W210
-        );
-        assert_eq!(
-            validation_results.warnings[0].fields,
-            vec![
-                "polling_station_results.voters_recounts",
-                "polling_station_results.votes_counts"
+                "polling_station_results.votes_counts.votes_candidates_counts",
+                "polling_station_results.votes_counts.blank_votes_count",
+                "polling_station_results.votes_counts.invalid_votes_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
+                "polling_station_results.voters_recounts.poll_card_recount",
+                "polling_station_results.voters_recounts.proxy_certificate_recount",
+                "polling_station_results.voters_recounts.voter_card_recount",
+                "polling_station_results.voters_recounts.total_admitted_voters_recount"
             ]
         );
     }
@@ -1298,8 +1694,10 @@ mod tests {
             total_admitted_voters_count: 1_000_000_006, // correct but out of range
         };
         let election = election_fixture(&[]);
+        let polling_station = polling_station_fixture(None);
         let res = voters_counts.validate(
             &election,
+            &polling_station,
             &mut validation_results,
             "voters_counts".to_string(),
         );
@@ -1313,10 +1711,10 @@ mod tests {
             voter_card_count: 7,
             total_admitted_voters_count: 20, // F.201 incorrect total
         };
-
         voters_counts
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "voters_counts".to_string(),
             )
@@ -1330,10 +1728,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "voters_counts.total_admitted_voters_count",
                 "voters_counts.poll_card_count",
                 "voters_counts.proxy_certificate_count",
-                "voters_counts.voter_card_count"
+                "voters_counts.voter_card_count",
+                "voters_counts.total_admitted_voters_count",
             ]
         );
     }
@@ -1349,8 +1747,10 @@ mod tests {
             total_votes_cast_count: 1_000_000_006, // correct but out of range
         };
         let election = election_fixture(&[]);
+        let polling_station = polling_station_fixture(None);
         let res = votes_counts.validate(
             &election,
+            &polling_station,
             &mut validation_results,
             "votes_counts".to_string(),
         );
@@ -1364,10 +1764,10 @@ mod tests {
             invalid_votes_count: 7,
             total_votes_cast_count: 20, // F.202 incorrect total
         };
-        let election = election_fixture(&[]);
         votes_counts
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "votes_counts".to_string(),
             )
@@ -1381,10 +1781,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "votes_counts.total_votes_cast_count",
                 "votes_counts.votes_candidates_counts",
                 "votes_counts.blank_votes_count",
-                "votes_counts.invalid_votes_count"
+                "votes_counts.invalid_votes_count",
+                "votes_counts.total_votes_cast_count",
             ]
         );
 
@@ -1399,6 +1799,7 @@ mod tests {
         votes_counts
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "votes_counts".to_string(),
             )
@@ -1425,6 +1826,7 @@ mod tests {
         votes_counts
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "votes_counts".to_string(),
             )
@@ -1439,6 +1841,33 @@ mod tests {
             validation_results.warnings[0].fields,
             vec!["votes_counts.invalid_votes_count",]
         );
+
+        // test W.205 total votes cast should not be zero
+        validation_results = ValidationResults::default();
+        votes_counts = VotesCounts {
+            votes_candidates_counts: 0,
+            blank_votes_count: 0,
+            invalid_votes_count: 0,
+            total_votes_cast_count: 0, // W.205 should not be zero
+        };
+        votes_counts
+            .validate(
+                &election,
+                &polling_station,
+                &mut validation_results,
+                "votes_counts".to_string(),
+            )
+            .unwrap();
+        assert_eq!(validation_results.errors.len(), 0);
+        assert_eq!(validation_results.warnings.len(), 1);
+        assert_eq!(
+            validation_results.warnings[0].code,
+            ValidationResultCode::W205
+        );
+        assert_eq!(
+            validation_results.warnings[0].fields,
+            vec!["votes_counts.total_votes_cast_count",]
+        );
     }
 
     #[test]
@@ -1452,8 +1881,10 @@ mod tests {
             total_admitted_voters_recount: 1_000_000_006, // correct but out of range
         };
         let election = election_fixture(&[]);
+        let polling_station = polling_station_fixture(None);
         let res = voters_recounts.validate(
             &election,
+            &polling_station,
             &mut validation_results,
             "voters_recounts".to_string(),
         );
@@ -1467,10 +1898,10 @@ mod tests {
             voter_card_recount: 7,
             total_admitted_voters_recount: 20, // F.203 incorrect total
         };
-        let election = election_fixture(&[]);
         voters_recounts
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "voters_recounts".to_string(),
             )
@@ -1484,10 +1915,10 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "voters_recounts.total_admitted_voters_recount",
                 "voters_recounts.poll_card_recount",
                 "voters_recounts.proxy_certificate_recount",
-                "voters_recounts.voter_card_recount"
+                "voters_recounts.voter_card_recount",
+                "voters_recounts.total_admitted_voters_recount",
             ]
         );
     }
@@ -1506,8 +1937,10 @@ mod tests {
             no_explanation_count: 1_000_000_000, // out of range
         };
         let election = election_fixture(&[]);
+        let polling_station = polling_station_fixture(None);
         let res = differences_counts.validate(
             &election,
+            &polling_station,
             &mut validation_results,
             "differences_counts".to_string(),
         );
@@ -1516,18 +1949,18 @@ mod tests {
         // test calculation for more_ballots_count does not add up and becomes minus
         validation_results = ValidationResults::default();
         differences_counts = DifferencesCounts {
-            more_ballots_count: 1,
+            more_ballots_count: 1, // W.301 incorrect total
             fewer_ballots_count: 0,
-            unreturned_ballots_count: 2,
-            too_few_ballots_handed_out_count: 0,
-            too_many_ballots_handed_out_count: 1,
-            other_explanation_count: 0,
-            no_explanation_count: 0,
+            unreturned_ballots_count: 2,          // W.301 incorrect total
+            too_few_ballots_handed_out_count: 0,  // W.301 incorrect total
+            too_many_ballots_handed_out_count: 1, // W.301 incorrect total
+            other_explanation_count: 0,           // W.301 incorrect total
+            no_explanation_count: 0,              // W.301 incorrect total
         };
-        let election = election_fixture(&[]);
         differences_counts
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "differences_counts".to_string(),
             )
@@ -1536,7 +1969,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::W302
+            ValidationResultCode::W301
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1550,21 +1983,21 @@ mod tests {
             ]
         );
 
-        // test W.302 incorrect total
+        // test W.301 incorrect total
         validation_results = ValidationResults::default();
         differences_counts = DifferencesCounts {
-            more_ballots_count: 5, // F.302 incorrect total
+            more_ballots_count: 5, // W.301 incorrect total
             fewer_ballots_count: 0,
-            unreturned_ballots_count: 0,
-            too_few_ballots_handed_out_count: 0,
-            too_many_ballots_handed_out_count: 1,
-            other_explanation_count: 1,
-            no_explanation_count: 1,
+            unreturned_ballots_count: 0,          // W.301 incorrect total
+            too_few_ballots_handed_out_count: 0,  // W.301 incorrect total
+            too_many_ballots_handed_out_count: 1, // W.301 incorrect total
+            other_explanation_count: 1,           // W.301 incorrect total
+            no_explanation_count: 1,              // W.301 incorrect total
         };
-        let election = election_fixture(&[]);
         differences_counts
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "differences_counts".to_string(),
             )
@@ -1573,7 +2006,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::W302
+            ValidationResultCode::W301
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1591,17 +2024,17 @@ mod tests {
         validation_results = ValidationResults::default();
         differences_counts = DifferencesCounts {
             more_ballots_count: 0,
-            fewer_ballots_count: 1,
-            unreturned_ballots_count: 1,
-            too_few_ballots_handed_out_count: 0,
-            too_many_ballots_handed_out_count: 2,
-            other_explanation_count: 0,
-            no_explanation_count: 0,
+            fewer_ballots_count: 1,               // W.302 incorrect total
+            unreturned_ballots_count: 1,          // W.302 incorrect total
+            too_few_ballots_handed_out_count: 0,  // W.302 incorrect total
+            too_many_ballots_handed_out_count: 2, // W.302 incorrect total
+            other_explanation_count: 0,           // W.302 incorrect total
+            no_explanation_count: 0,              // W.302 incorrect total
         };
-        let election = election_fixture(&[]);
         differences_counts
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "differences_counts".to_string(),
             )
@@ -1610,7 +2043,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::W303
+            ValidationResultCode::W302
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1624,21 +2057,21 @@ mod tests {
             ]
         );
 
-        // test W.303 incorrect total
+        // test W.302 incorrect total
         validation_results = ValidationResults::default();
         differences_counts = DifferencesCounts {
             more_ballots_count: 0,
-            fewer_ballots_count: 5, // W.303 incorrect total
-            unreturned_ballots_count: 1,
-            too_few_ballots_handed_out_count: 1,
-            too_many_ballots_handed_out_count: 0,
-            other_explanation_count: 1,
-            no_explanation_count: 1,
+            fewer_ballots_count: 5,               // W.302 incorrect total
+            unreturned_ballots_count: 1,          // W.302 incorrect total
+            too_few_ballots_handed_out_count: 1,  // W.302 incorrect total
+            too_many_ballots_handed_out_count: 0, // W.302 incorrect total
+            other_explanation_count: 1,           // W.302 incorrect total
+            no_explanation_count: 1,              // W.302 incorrect total
         };
-        let election = election_fixture(&[]);
         differences_counts
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "differences_counts".to_string(),
             )
@@ -1647,7 +2080,7 @@ mod tests {
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.warnings[0].code,
-            ValidationResultCode::W303
+            ValidationResultCode::W302
         );
         assert_eq!(
             validation_results.warnings[0].fields,
@@ -1697,10 +2130,12 @@ mod tests {
             },
         ];
         let mut election = election_fixture(&[2, 2]);
+        let polling_station = polling_station_fixture(None);
 
         // validate out of range number of candidates
         let res = political_group_votes.validate(
             &election,
+            &polling_station,
             &mut validation_results,
             "political_group_votes".to_string(),
         );
@@ -1714,6 +2149,7 @@ mod tests {
         political_group_votes
             .validate(
                 &election,
+                &polling_station,
                 &mut validation_results,
                 "political_group_votes".to_string(),
             )
@@ -1726,7 +2162,7 @@ mod tests {
         );
         assert_eq!(
             validation_results.errors[0].fields,
-            vec!["political_group_votes[0].total"]
+            vec!["political_group_votes[0]"]
         );
 
         // validate with incorrect number of candidates for the first political group
@@ -1735,6 +2171,7 @@ mod tests {
         political_group_votes[0].total = 25;
         let res = political_group_votes.validate(
             &election,
+            &polling_station,
             &mut validation_results,
             "political_group_votes".to_string(),
         );
@@ -1745,6 +2182,7 @@ mod tests {
         election = election_fixture(&[2, 2, 2]);
         let res = political_group_votes.validate(
             &election,
+            &polling_station,
             &mut validation_results,
             "political_group_votes".to_string(),
         );
@@ -1756,6 +2194,7 @@ mod tests {
         political_group_votes[0].number = 2;
         let res = political_group_votes.validate(
             &election,
+            &polling_station,
             &mut validation_results,
             "political_group_votes".to_string(),
         );

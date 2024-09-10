@@ -20,7 +20,7 @@ table.overview_table {
   }
   td {
     height: 3.5rem;
-    font-size: 18px;
+    font-size: 1.125rem;
     > *:not(:last-child) {
       margin-right: 0.5rem;
     }
@@ -77,7 +77,7 @@ summary {
   display: block;
   .underlined {
     text-decoration: underline;
-    color: #1570ef;
+    color: var(--link-default);
   }
   .pointer {
     cursor: pointer;

@@ -14,7 +14,7 @@
   padding: 1rem 1.75rem;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
   cursor: pointer;
 
   &:hover {
@@ -28,13 +28,13 @@
   }
 
   &:disabled {
-    background: #f2f2f2;
-    border: 1px solid #f2f2f2;
-    color: #b3b3b3;
+    background: var(--button-color-bg-disabled);
+    border: 1px solid var(--button-color-bg-disabled);
+    color: var(--button-color-disabled);
   }
 
   svg {
-    height: 16px;
+    height: 1rem;
     fill: black;
   }
 
@@ -49,16 +49,16 @@
     }
 
     &:disabled {
-      background: #f2f2f2;
-      border: 1px solid #f2f2f2;
-      color: #b3b3b3;
+      background: var(--button-color-bg-disabled);
+      border: 1px solid var(--button-color-bg-disabled);
+      color: var(--button-color-disabled);
     }
   }
 
   &.alert {
     border: 1px solid var(--color-error);
     background: var(--color-error);
-    color: #fff;
+    color: var(--base-white);
   }
 
   &.ghost {

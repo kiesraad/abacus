@@ -12,7 +12,6 @@ import {
   InputGridRow,
   KeyboardKey,
   KeyboardKeys,
-  useTooltip,
 } from "@kiesraad/ui";
 import { usePositiveNumberInputMask } from "@kiesraad/util";
 
@@ -35,13 +34,7 @@ interface DifferencesFormElement extends HTMLFormElement {
 }
 
 export function DifferencesForm() {
-  const {
-    register,
-    format,
-    deformat,
-    warnings: inputMaskWarnings,
-    resetWarnings,
-  } = usePositiveNumberInputMask();
+  const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<DifferencesFormElement>(null);
 
   const getValues = React.useCallback(() => {
@@ -83,7 +76,7 @@ export function DifferencesForm() {
     return false;
   }, []);
 
-  const { sectionValues, loading, errors, warnings, isSaved, submit, ignoreWarnings } =
+  const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } =
     useDifferences(getValues, getIgnoreWarnings);
 
   const shouldWatch = warnings.length > 0 && isSaved;
@@ -97,23 +90,24 @@ export function DifferencesForm() {
     }
   }, [hasChanges]);
 
-  useTooltip({
-    onDismiss: resetWarnings,
-  });
-
   const [warningsWarning, setWarningsWarning] = React.useState(false);
 
-  function handleSubmit(event: React.FormEvent<DifferencesFormElement>) {
-    event.preventDefault();
-    const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
-      .checked;
+  const handleSubmit = (event: React.FormEvent<DifferencesFormElement>) =>
+    void (async (event: React.FormEvent<DifferencesFormElement>) => {
+      event.preventDefault();
 
-    if (!hasChanges && warnings.length > 0 && !ignoreWarnings) {
-      setWarningsWarning(true);
-    } else {
-      submit(ignoreWarnings);
-    }
-  }
+      if (errors.length === 0 && warnings.length > 0) {
+        const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement)
+          .checked;
+        if (!hasChanges && !ignoreWarnings) {
+          setWarningsWarning(true);
+        } else {
+          await submit(ignoreWarnings);
+        }
+      } else {
+        await submit();
+      }
+    })(event);
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
 
@@ -128,28 +122,16 @@ export function DifferencesForm() {
 
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id="differences_form">
-      <h2>Verschil tussen aantal kiezers en getelde stemmen</h2>
+      <h2>Verschillen tussen toegelaten kiezers en uitgebrachte stemmen</h2>
       {isSaved && hasValidationError && (
-        <Feedback type="error" title="Controleer ingevulde verschillen">
-          <div id="feedback-error">
-            <ul>
-              {errors.map((error, n) => (
-                <li key={`${error.code}-${n}`}>{error.code}</li>
-              ))}
-            </ul>
-          </div>
-        </Feedback>
+        <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
       {isSaved && hasValidationWarning && !hasValidationError && (
-        <Feedback type="warning" title="Controleer ingevulde verschillen">
-          <div id="feedback-warning">
-            <ul>
-              {warnings.map((warning, n) => (
-                <li key={`${warning.code}-${n}`}>{warning.code}</li>
-              ))}
-            </ul>
-          </div>
-        </Feedback>
+        <Feedback
+          id="feedback-warning"
+          type="warning"
+          data={warnings.map((warning) => warning.code)}
+        />
       )}
       <InputGrid key="differences">
         <InputGrid.Header>
@@ -253,7 +235,7 @@ export function DifferencesForm() {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={loading}>
+          <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

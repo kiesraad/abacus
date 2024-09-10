@@ -16,7 +16,7 @@ use backend::ErrorResponse;
 mod shared;
 mod utils;
 
-#[sqlx::test(fixtures("../fixtures/elections.sql", "../fixtures/polling_stations.sql"))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -106,7 +106,7 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
     );
 }
 
-#[sqlx::test(fixtures("../fixtures/elections.sql", "../fixtures/polling_stations.sql"))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -172,43 +172,51 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let errors = body.validation_results.errors;
     assert_eq!(errors.len(), 4);
     // error 1
-    assert_eq!(errors[0].code, ValidationResultCode::F202);
+    assert_eq!(errors[0].code, ValidationResultCode::F201);
     assert_eq!(
         errors[0].fields,
         vec![
-            "data.votes_counts.total_votes_cast_count",
-            "data.votes_counts.votes_candidates_counts",
-            "data.votes_counts.blank_votes_count",
-            "data.votes_counts.invalid_votes_count"
+            "data.voters_counts.poll_card_count",
+            "data.voters_counts.proxy_certificate_count",
+            "data.voters_counts.voter_card_count",
+            "data.voters_counts.total_admitted_voters_count",
         ]
     );
     // error 2
-    assert_eq!(errors[1].code, ValidationResultCode::F201);
+    assert_eq!(errors[1].code, ValidationResultCode::F202);
     assert_eq!(
         errors[1].fields,
         vec![
-            "data.voters_counts.total_admitted_voters_count",
-            "data.voters_counts.poll_card_count",
-            "data.voters_counts.proxy_certificate_count",
-            "data.voters_counts.voter_card_count"
+            "data.votes_counts.votes_candidates_counts",
+            "data.votes_counts.blank_votes_count",
+            "data.votes_counts.invalid_votes_count",
+            "data.votes_counts.total_votes_cast_count",
         ]
     );
     // error 3
-    assert_eq!(errors[2].code, ValidationResultCode::F401);
+    assert_eq!(errors[2].code, ValidationResultCode::F204);
     assert_eq!(
         errors[2].fields,
-        vec!["data.political_group_votes[0].total"]
-    );
-    // error 4
-    assert_eq!(errors[3].code, ValidationResultCode::F204);
-    assert_eq!(
-        errors[3].fields,
         vec![
             "data.votes_counts.votes_candidates_counts",
             "data.political_group_votes"
         ]
     );
-    assert_eq!(body.validation_results.warnings.len(), 0);
+    // error 4
+    assert_eq!(errors[3].code, ValidationResultCode::F401);
+    assert_eq!(errors[3].fields, vec!["data.political_group_votes[0]"]);
+
+    let warnings = body.validation_results.warnings;
+    assert_eq!(warnings.len(), 1);
+    // warning 1
+    assert_eq!(warnings[0].code, ValidationResultCode::W203);
+    assert_eq!(
+        warnings[0].fields,
+        vec![
+            "data.votes_counts.total_votes_cast_count",
+            "data.voters_counts.total_admitted_voters_count",
+        ]
+    );
 }
 
 #[sqlx::test(fixtures("../fixtures/elections.sql"))]
@@ -253,7 +261,7 @@ async fn test_election_details_not_found(pool: SqlitePool) {
     assert_eq!(status, StatusCode::NOT_FOUND);
 }
 
-#[sqlx::test(fixtures("../fixtures/elections.sql", "../fixtures/polling_stations.sql"))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

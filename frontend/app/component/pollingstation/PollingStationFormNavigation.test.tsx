@@ -9,6 +9,7 @@ import { electionMockData } from "@kiesraad/api-mocks";
 import { PollingStationFormNavigation } from "./PollingStationFormNavigation";
 
 vi.mock("react-router-dom", () => ({
+  Link: vi.fn(),
   useNavigate: vi.fn(),
   useBlocker: vi.fn(),
 }));
@@ -56,6 +57,7 @@ describe("PollingStationFormNavigation", () => {
   const mockNavigate = vi.fn();
 
   const mockController = {
+    status: "idle",
     formState: mockFormState,
     currentForm: mockCurrentForm,
     error: null,
@@ -84,6 +86,7 @@ describe("PollingStationFormNavigation", () => {
 
   test("It blocks navigation when form has changes", () => {
     (usePollingStationFormController as Mock).mockReturnValueOnce({
+      status: "idle",
       formState: {
         ...mockFormState,
         current: "voters_votes_counts",
@@ -121,6 +124,7 @@ describe("PollingStationFormNavigation", () => {
 
   test("It blocks navigation when form has errors", async () => {
     (usePollingStationFormController as Mock).mockReturnValueOnce({
+      status: "idle",
       formState: {
         ...mockFormState,
         sections: {
@@ -174,6 +178,37 @@ describe("PollingStationFormNavigation", () => {
     }
   });
 
+  test("422 response results in display of error message", async () => {
+    (usePollingStationFormController as Mock).mockReturnValueOnce({
+      formState: {
+        ...mockFormState,
+      },
+      error: {
+        errorCode: 422,
+        message: "JSON error or invalid data (Unprocessable Content)",
+      },
+      currentForm: {
+        id: "recounted",
+        type: "recounted",
+        getValues: () => ({
+          recounted: true,
+        }),
+      },
+      setTemporaryCache: vi.fn(),
+      targetFormSection: "recounted",
+      values: {
+        recounted: true,
+      },
+    });
+
+    render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
+
+    const feedbackServerError = await screen.findByTestId("feedback-server-error");
+    expect(feedbackServerError).toHaveTextContent(
+      "Server error422: JSON error or invalid data (Unprocessable Content)",
+    );
+  });
+
   test("500 response results in display of error message", async () => {
     (usePollingStationFormController as Mock).mockReturnValueOnce({
       formState: {
@@ -200,6 +235,6 @@ describe("PollingStationFormNavigation", () => {
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
     const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(/^500: Internal server error$/);
+    expect(feedbackServerError).toHaveTextContent("Server error500: Internal server error");
   });
 });

@@ -103,19 +103,27 @@ export function PollingStationSaveForm() {
               content = <>{link} heeft blokkerende fouten</>;
           }
           return (
-            <StatusList.Item key={section.formSection.id} status={menuStatusForFormSectionStatus(section.status)}>
+            <StatusList.Item
+              key={section.formSection.id}
+              status={menuStatusForFormSectionStatus(section.status)}
+              id={`section-status-${section.formSection.id}`}
+            >
               {content}
             </StatusList.Item>
           );
         })}
 
         {!summary.hasBlocks && !summary.hasWarnings && (
-          <StatusList.Item status="accept">Er zijn geen blokkerende fouten of waarschuwingen</StatusList.Item>
+          <StatusList.Item status="accept" id="no-blocking-errors-or-warnings">
+            Er zijn geen blokkerende fouten of waarschuwingen
+          </StatusList.Item>
         )}
         {summary.hasBlocks ? (
-          <StatusList.Item status="warning">Je kan de resultaten van dit stembureau nog niet opslaan</StatusList.Item>
+          <StatusList.Item status="warning" id="form-cannot-be-saved">
+            Je kan de resultaten van dit stembureau nog niet opslaan
+          </StatusList.Item>
         ) : (
-          <StatusList.Item status="accept" emphasis>
+          <StatusList.Item status="accept" id="form-can-be-saved" emphasis>
             Je kan de resultaten van dit stembureau opslaan
           </StatusList.Item>
         )}

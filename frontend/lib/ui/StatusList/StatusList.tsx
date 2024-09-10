@@ -10,15 +10,15 @@ export function StatusList({ children }: { children: React.ReactNode }) {
   return <ul className={cls.list}>{children}</ul>;
 }
 
-export interface StatusListItemProps {
+export interface StatusListItemProps extends React.HTMLAttributes<HTMLLIElement> {
   status: MenuStatus;
   children: React.ReactNode;
   emphasis?: boolean;
 }
 
-StatusList.Item = function StatusListItem({ status, children, emphasis }: StatusListItemProps) {
+StatusList.Item = function StatusListItem({ status, children, emphasis, ...props }: StatusListItemProps) {
   return (
-    <li className={cn(status, { emphasis: !!emphasis })}>
+    <li className={cn(status, { emphasis: !!emphasis })} {...props}>
       <aside>{renderStatusIcon(status)}</aside>
       <article>{children}</article>
     </li>

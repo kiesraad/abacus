@@ -86,6 +86,8 @@ describe("Test PollingStationSaveForm", () => {
     // Wait for the page to be loaded and check that the save button is not visible
     expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" }));
     expect(screen.queryByRole("button", { name: "Opslaan" })).not.toBeInTheDocument();
+
+    expect(screen.getByTestId("section-status-voters_votes_counts")).toHaveTextContent("heeft blokkerende fouten");
   });
 
   test("Data entry does not show finalise button with unaccepted warnings", async () => {
@@ -102,6 +104,8 @@ describe("Test PollingStationSaveForm", () => {
     // Wait for the page to be loaded and check that the save button is not visible
     expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" }));
     expect(screen.queryByRole("button", { name: "Opslaan" })).not.toBeInTheDocument();
+
+    expect(screen.getByTestId("section-status-voters_votes_counts")).toHaveTextContent("Controleer waarschuwingen bij");
   });
 
   test("Data entry shows finalise button with accepted warnings", async () => {
@@ -118,5 +122,9 @@ describe("Test PollingStationSaveForm", () => {
 
     // Check that the save button is visible
     expect(await screen.findByRole("button", { name: "Opslaan" })).toBeInTheDocument();
+
+    expect(screen.getByTestId("section-status-voters_votes_counts")).toHaveTextContent(
+      "heeft geaccepteerde waarschuwingen",
+    );
   });
 });

@@ -164,7 +164,7 @@ test.describe("data entry", () => {
     await expect(votersVotesPage.warning).toContainText(
       "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
     );
-    await votersVotesPage.acceptWarnings.check();
+    await votersVotesPage.checkAcceptWarnings();
     await votersVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
@@ -237,7 +237,7 @@ test.describe("data entry", () => {
     await expect(votersVotesPage.warning).toContainText(
       "Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).",
     );
-    await votersVotesPage.acceptWarnings.check();
+    await votersVotesPage.checkAcceptWarnings();
     await votersVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);

@@ -65,10 +65,10 @@ export function PollingStationSaveForm() {
           <>
             <p className="md">
               De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn
-              waarschuwingen die moeten worden gecontroleerd. Controleer de openstaande waarschuwingen
+              waarschuwingen die moeten worden gecontroleerd.
             </p>
 
-            <p className="md">Hieronder zie je een overzicht van alle eventuele fouten en waarschuwingen.</p>
+            <p className="md">Controleer de openstaande waarschuwingen</p>
           </>
         )}
 

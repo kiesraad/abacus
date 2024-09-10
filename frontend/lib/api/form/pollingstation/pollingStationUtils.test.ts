@@ -1,5 +1,7 @@
 import { assert, describe, expect, test } from "vitest";
 
+import { errorWarningMocks } from "app/test/unit/form";
+
 import {
   addValidationResultToFormState,
   AnyFormReference,
@@ -11,6 +13,7 @@ import {
   FormState,
   getErrorsAndWarnings,
   getNextSection,
+  getPollingStationSummary,
   hasOnlyGlobalValidationResults,
   isFormSectionEmpty,
   isGlobalValidationResult,
@@ -446,5 +449,76 @@ describe("PollingStationUtils", () => {
 
     values.voters_counts.poll_card_count = 1;
     expect(isFormSectionEmpty(formSection, values)).toBe(false);
+  });
+
+  test("getPollingStationSummary", () => {
+    const state = structuredClone(defaultFormState);
+    const values = structuredClone(defaultValues);
+
+    values.voters_counts.poll_card_count = 4;
+    values.voters_counts.total_admitted_voters_count = 4;
+    values.votes_counts.votes_candidates_counts = 4;
+    values.votes_counts.total_votes_cast_count = 4;
+
+    values.political_group_votes[0] = {
+      number: 1,
+      total: 4,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 4,
+        },
+      ],
+    };
+
+    let summary = getPollingStationSummary(state, values);
+
+    expect(summary.countsAddUp).toBe(true);
+    expect(summary.hasBlocks).toBe(false);
+    expect(summary.notableFormSections.length).toBe(1);
+    expect(
+      summary.notableFormSections.some((item) => item.formSection.id == "political_group_votes_2"),
+    );
+
+    state.sections.differences_counts.ignoreWarnings = true;
+    state.sections.differences_counts.warnings = [errorWarningMocks.W301];
+
+    summary = getPollingStationSummary(state, values);
+    expect(summary.hasWarnings).toBe(true);
+    expect(summary.notableFormSections.length).toBe(2);
+    expect(
+      summary.notableFormSections.some(
+        (item) => item.formSection.id == "political_group_votes_2" && item.status === "empty",
+      ),
+    );
+    expect(
+      summary.notableFormSections.some(
+        (item) =>
+          item.formSection.id == "differences_counts" && item.status === "accepted-warnings",
+      ),
+    );
+
+    state.sections.voters_votes_counts.errors = [errorWarningMocks.F201];
+
+    summary = getPollingStationSummary(state, values);
+
+    expect(summary.hasBlocks).toBe(true);
+    expect(summary.notableFormSections.length).toBe(3);
+    expect(
+      summary.notableFormSections.some(
+        (item) => item.formSection.id == "voters_votes_counts" && item.status === "errors",
+      ),
+    );
+
+    state.sections.differences_counts.ignoreWarnings = false;
+
+    summary = getPollingStationSummary(state, values);
+
+    expect(
+      summary.notableFormSections.some(
+        (item) =>
+          item.formSection.id == "differences_counts" && item.status === "unaccepted-warnings",
+      ),
+    );
   });
 });

@@ -269,6 +269,7 @@ export type PollingStationFormSectionStatus =
 export type PollingStationSummary = {
   countsAddUp: boolean;
   hasBlocks: boolean;
+  hasWarnings: boolean;
   notableFormSections: {
     status: PollingStationFormSectionStatus;
     formSection: FormSection;
@@ -282,10 +283,12 @@ export function getPollingStationSummary(
   const result: PollingStationSummary = {
     countsAddUp: true,
     hasBlocks: false,
+    hasWarnings: false,
     notableFormSections: [],
   };
 
   Object.values(formState.sections)
+    .filter((section) => section.id !== "save")
     .sort(sortFormSections)
     .forEach((section) => {
       if (section.errors.length > 0) {
@@ -293,13 +296,17 @@ export function getPollingStationSummary(
         result.countsAddUp = false;
         result.hasBlocks = true;
       } else if (section.warnings.length > 0) {
+        result.hasWarnings = true;
         if (section.ignoreWarnings) {
           result.notableFormSections.push({ status: "accepted-warnings", formSection: section });
         } else {
           result.notableFormSections.push({ status: "unaccepted-warnings", formSection: section });
           result.hasBlocks = true;
         }
-      } else if (isFormSectionEmpty(section, values)) {
+      } else if (
+        section.id.startsWith("political_group_votes_") &&
+        isFormSectionEmpty(section, values)
+      ) {
         result.notableFormSections.push({ status: "empty", formSection: section });
       }
     });

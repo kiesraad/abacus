@@ -155,6 +155,16 @@ impl PollingStationDataEntries {
 
         Ok(())
     }
+
+    pub async fn exists_finalised(&self, id: u32) -> Result<bool, sqlx::Error> {
+        let res = query!(
+            "SELECT EXISTS(SELECT 1 FROM polling_station_results WHERE polling_station_id = ?) AS `exists`",
+            id
+        )
+        .fetch_one(&self.0)
+        .await?;
+        Ok(res.exists == 1)
+    }
 }
 
 impl FromRef<AppState> for PollingStations {

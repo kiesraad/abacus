@@ -67,6 +67,13 @@ pub async fn polling_station_data_entry(
         ));
     }
 
+    if polling_station_data_entries.exists_finalised(id).await? {
+        return Err(APIError::Conflict(
+            "Cannot save data entry for a polling station that has already been finalised"
+                .to_string(),
+        ));
+    }
+
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
 

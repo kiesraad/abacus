@@ -372,6 +372,7 @@ export function PollingStationFormController({
       throw new Error("Failed to save data entry");
     }
     const data = response.data as DataEntryResponse;
+    setApiError(null);
 
     // update form state based on response
     setFormState((old) => {
@@ -450,6 +451,7 @@ export function PollingStationFormController({
       setApiError(response);
       throw new Error("Failed to finalise data entry");
     }
+    setApiError(null);
     status.current = "finalised";
   };
 

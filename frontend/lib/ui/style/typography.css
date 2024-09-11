@@ -66,17 +66,14 @@ p.md {
 }
 
 a {
-  text-decoration: none;
   color: var(--link-default);
   &:visited {
     color: var(--link-visited);
   }
   &:hover {
-    text-decoration: underline;
     color: var(--link-hover) !important;
   }
   &:active {
-    text-decoration: underline;
     color: var(--link-active) !important;
   }
 }

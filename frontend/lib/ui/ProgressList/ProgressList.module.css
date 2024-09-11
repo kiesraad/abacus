@@ -114,6 +114,7 @@
     }
 
     a {
+      text-decoration: none;
       color: inherit;
       display: inline-block;
       width: 100%;
@@ -125,7 +126,6 @@
       white-space: nowrap;
       &:hover,
       &:active {
-        text-decoration: none;
         color: inherit !important;
       }
     }

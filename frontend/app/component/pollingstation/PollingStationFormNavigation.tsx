@@ -114,6 +114,13 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
     }
   }, [targetFormSection, getUrlForFormSection, navigate]);
 
+  // scroll up when an error occurs
+  React.useEffect(() => {
+    if (apiError) {
+      window.scrollTo(0, 0);
+    }
+  }, [apiError]);
+
   const onSave = () =>
     void (async () => {
       if (blocker.location) overrideControllerNavigation.current = blocker.location.pathname;

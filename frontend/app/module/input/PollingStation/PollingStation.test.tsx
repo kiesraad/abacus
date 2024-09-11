@@ -2,14 +2,7 @@ import { render as rtlRender, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import {
-  overrideOnce,
-  Providers,
-  screen,
-  setupTestRouter,
-  userTypeInputs,
-  waitFor,
-} from "app/test/unit";
+import { overrideOnce, Providers, screen, setupTestRouter, userTypeInputs, waitFor } from "app/test/unit";
 
 import { electionMockData } from "@kiesraad/api-mocks";
 
@@ -168,7 +161,7 @@ const submitWith422Response = async () => {
 const expect422ClientError = async () => {
   const feedbackServerError = await screen.findByTestId("feedback-server-error");
   expect(feedbackServerError).toHaveTextContent(
-    "Client error422: JSON error or invalid data (Unprocessable Content)",
+    "Sorry, er ging iets mis422: JSON error or invalid data (Unprocessable Content)",
   );
 };
 
@@ -181,7 +174,7 @@ const submitWith500Response = async () => {
 
 const expect500ServerError = async () => {
   const feedbackServerError = await screen.findByTestId("feedback-server-error");
-  expect(feedbackServerError).toHaveTextContent("Server error500: Internal server eror");
+  expect(feedbackServerError).toHaveTextContent("Sorry, er ging iets mis500: Internal server error");
 };
 
 type FormIdentifier = "recounted" | "voters_and_votes" | "differences" | `candidates_${number}`;

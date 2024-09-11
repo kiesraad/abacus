@@ -124,8 +124,9 @@
       overflow: hidden;
       white-space: nowrap;
       &:hover,
-      &:focus {
+      &:active {
         text-decoration: none;
+        color: inherit !important;
       }
     }
     span {

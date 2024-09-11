@@ -1,5 +1,7 @@
 import { assert, describe, expect, test } from "vitest";
 
+import { defaultFormState, emptyDataEntryRequest } from "app/test/unit/form.ts";
+
 import {
   addValidationResultToFormState,
   AnyFormReference,
@@ -8,7 +10,6 @@ import {
   FieldValidationResult,
   FormSection,
   formSectionComplete,
-  FormState,
   getErrorsAndWarnings,
   getNextSection,
   hasOnlyGlobalValidationResults,
@@ -19,113 +20,7 @@ import {
   ValidationResult,
 } from "@kiesraad/api";
 
-const defaultFormState: FormState = {
-  active: "recounted",
-  current: "recounted",
-  sections: {
-    recounted: {
-      index: 0,
-      id: "recounted",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    voters_votes_counts: {
-      index: 1,
-      id: "voters_votes_counts",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    differences_counts: {
-      index: 2,
-      id: "differences_counts",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    political_group_votes_1: {
-      index: 3,
-      id: "political_group_votes_1",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    political_group_votes_2: {
-      index: 4,
-      id: "political_group_votes_2",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    save: {
-      index: 5,
-      id: "save",
-      isSaved: false,
-      ignoreWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-  },
-  unknown: {
-    errors: [],
-    warnings: [],
-  },
-  isCompleted: false,
-};
-
-const defaultValues: PollingStationValues = {
-  recounted: undefined,
-  voters_counts: {
-    poll_card_count: 0,
-    proxy_certificate_count: 0,
-    voter_card_count: 0,
-    total_admitted_voters_count: 0,
-  },
-  votes_counts: {
-    votes_candidates_count: 0,
-    blank_votes_count: 0,
-    invalid_votes_count: 0,
-    total_votes_cast_count: 0,
-  },
-  voters_recounts: undefined,
-  differences_counts: {
-    more_ballots_count: 0,
-    fewer_ballots_count: 0,
-    unreturned_ballots_count: 0,
-    too_few_ballots_handed_out_count: 0,
-    too_many_ballots_handed_out_count: 0,
-    other_explanation_count: 0,
-    no_explanation_count: 0,
-  },
-  political_group_votes: [
-    {
-      number: 1,
-      total: 0,
-      candidate_votes: [
-        {
-          number: 1,
-          votes: 0,
-        },
-      ],
-    },
-    {
-      number: 2,
-      total: 0,
-      candidate_votes: [
-        {
-          number: 1,
-          votes: 0,
-        },
-      ],
-    },
-  ],
-};
+const defaultValues: PollingStationValues = emptyDataEntryRequest.data;
 
 describe("PollingStationUtils", () => {
   test("addValidationResultToFormState adds result to correct section", () => {

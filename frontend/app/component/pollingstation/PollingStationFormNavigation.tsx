@@ -56,7 +56,12 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
 
   const shouldBlock = React.useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
-      if (status.current === "deleted" || currentLocation.pathname === nextLocation.pathname || !currentForm) {
+      if (
+        status.current === "deleted" ||
+        status.current === "finalised" ||
+        currentLocation.pathname === nextLocation.pathname ||
+        !currentForm
+      ) {
         return false;
       }
 

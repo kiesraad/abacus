@@ -11,11 +11,13 @@ use hyper::header::InvalidHeaderValue;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
+use typst::diag::SourceDiagnostic;
 use utoipa::ToSchema;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod election;
+pub mod pdf_gen;
 pub mod polling_station;
 pub mod validation;
 
@@ -148,6 +150,7 @@ pub enum APIError {
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
     InvalidHeaderValue,
+    PdfGenError(Vec<SourceDiagnostic>),
 }
 
 impl IntoResponse for APIError {
@@ -160,7 +163,7 @@ impl IntoResponse for APIError {
             APIError::NotFound(message) => (StatusCode::NOT_FOUND, to_error(message)),
             APIError::Conflict(message) => (StatusCode::CONFLICT, to_error(message)),
             APIError::InvalidData(err) => {
-                println!("Invalid data error: {}", err);
+                eprintln!("Invalid data error: {}", err);
                 (
                     StatusCode::UNPROCESSABLE_ENTITY,
                     to_error("Invalid data".to_string()),
@@ -171,7 +174,7 @@ impl IntoResponse for APIError {
                 to_error(rejection.body_text()),
             ),
             APIError::SerdeJsonError(err) => {
-                println!("Serde JSON error: {:?}", err);
+                eprintln!("Serde JSON error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error".to_string()),
@@ -182,7 +185,7 @@ impl IntoResponse for APIError {
                 to_error("Resource not found".to_string()),
             ),
             APIError::SqlxError(err) => {
-                println!("SQLx error: {:?}", err);
+                eprintln!("SQLx error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error".to_string()),
@@ -192,6 +195,13 @@ impl IntoResponse for APIError {
                 StatusCode::INTERNAL_SERVER_ERROR,
                 to_error("Internal server error".to_string()),
             ),
+            APIError::PdfGenError(err) => {
+                println!("PDF generation error: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error("Internal server error".into()),
+                )
+            }
         };
 
         (status, response).into_response()

@@ -4,15 +4,17 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { PollingStationSaveForm } from "app/component/form/pollingstation_save/PollingStationSaveForm.tsx";
-import { overrideOnce, render, screen, server } from "app/test/unit";
-import { defaultFormState } from "app/test/unit/form.ts";
+import { overrideOnce, render, screen, server, within } from "app/test/unit";
+import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/test/unit/form.ts";
 
-import { ElectionProvider, FormState, PollingStationFormController } from "@kiesraad/api";
+import { ElectionProvider, FormState, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionMockData } from "@kiesraad/api-mocks";
 
 const mockNavigate = vi.fn();
 
-function renderForm(defaultFormState: Partial<FormState> = {}) {
+const defaultValues = emptyDataEntryRequest.data;
+
+function renderForm(defaultFormState: Partial<FormState> = {}, defaultValues?: Partial<PollingStationValues>) {
   return render(
     <ElectionProvider electionId={1}>
       <PollingStationFormController
@@ -20,6 +22,7 @@ function renderForm(defaultFormState: Partial<FormState> = {}) {
         pollingStationId={1}
         entryNumber={1}
         defaultFormState={defaultFormState}
+        defaultValues={defaultValues}
       >
         <PollingStationSaveForm />
       </PollingStationFormController>
@@ -122,9 +125,74 @@ describe("Test PollingStationSaveForm", () => {
 
     // Check that the save button is visible
     expect(await screen.findByRole("button", { name: "Opslaan" })).toBeInTheDocument();
+  });
+});
 
-    expect(screen.getByTestId("section-status-voters_votes_counts")).toHaveTextContent(
-      "heeft geaccepteerde waarschuwingen",
-    );
+describe("Test PollingStationSaveForm summary", () => {
+  test("Blocking", async () => {
+    const formState = structuredClone(defaultFormState);
+    formState.sections.voters_votes_counts.errors = [errorWarningMocks.F201];
+    formState.sections.differences_counts.warnings = [errorWarningMocks.W301];
+
+    const values = structuredClone(defaultValues);
+
+    renderForm(formState, values);
+
+    expect(
+      await screen.findByText(
+        "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar tegen. Je kan de resultaten daarom niet opslaan.",
+      ),
+    ).toBeInTheDocument();
+
+    const votersItem = screen.getByTestId("section-status-voters_votes_counts");
+    expect(votersItem).toHaveTextContent("heeft blokkerende fouten");
+    expect(within(votersItem).getByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
+
+    const differencesItem = screen.getByTestId("section-status-differences_counts");
+    expect(differencesItem).toHaveTextContent("Controleer waarschuwingen bij");
+    expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
+
+    const pg1Item = screen.getByTestId("section-status-political_group_votes_1");
+    expect(pg1Item).toHaveTextContent("Op Lijst 1 zijn geen stemmen ingevoerd");
+    expect(within(pg1Item).getByRole("img", { name: "leeg" })).toBeInTheDocument();
+
+    expect(screen.getByTestId("form-cannot-be-saved")).toBeInTheDocument();
+  });
+
+  test("Accepted with warnings", async () => {
+    const formState = structuredClone(defaultFormState);
+
+    formState.sections.differences_counts.warnings = [errorWarningMocks.W301];
+    formState.sections.differences_counts.ignoreWarnings = true;
+
+    renderForm(formState);
+
+    expect(
+      await screen.findByText(
+        "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
+      ),
+    ).toBeInTheDocument();
+
+    const differencesItem = screen.getByTestId("section-status-differences_counts");
+    expect(differencesItem).toHaveTextContent("heeft geaccepteerde waarschuwingen");
+    expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
+  });
+
+  test("Unaccepted warnings", async () => {
+    const formState = structuredClone(defaultFormState);
+
+    formState.sections.differences_counts.warnings = [errorWarningMocks.W301];
+
+    renderForm(formState);
+
+    expect(
+      await screen.findByText(
+        "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn waarschuwingen die moeten worden gecontroleerd.",
+      ),
+    ).toBeInTheDocument();
+
+    const differencesItem = screen.getByTestId("section-status-differences_counts");
+    expect(differencesItem).toHaveTextContent("Controleer waarschuwingen bij");
+    expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
   });
 });

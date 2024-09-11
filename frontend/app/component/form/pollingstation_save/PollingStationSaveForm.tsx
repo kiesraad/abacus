@@ -87,7 +87,9 @@ export function PollingStationSaveForm() {
         {summary.countsAddUp && <StatusList.Item status="accept">Alle optellingen kloppen</StatusList.Item>}
 
         {summary.notableFormSections.map((section) => {
-          const link = <Link to={getUrlForFormSection(section.formSection.id)}>{section.formSection.title}</Link>;
+          const link = (
+            <Link to={getUrlForFormSection(section.formSection.id)}>{section.title || section.formSection.title}</Link>
+          );
           let content = <></>;
           switch (section.status) {
             case "empty":
@@ -119,7 +121,7 @@ export function PollingStationSaveForm() {
           </StatusList.Item>
         )}
         {summary.hasBlocks ? (
-          <StatusList.Item status="warning" id="form-cannot-be-saved">
+          <StatusList.Item status={summary.hasErrors ? "error" : "warning"} id="form-cannot-be-saved">
             Je kan de resultaten van dit stembureau nog niet opslaan
           </StatusList.Item>
         ) : (

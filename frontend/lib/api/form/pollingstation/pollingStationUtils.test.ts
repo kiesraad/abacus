@@ -375,7 +375,8 @@ describe("PollingStationUtils", () => {
     expect(summary.notableFormSections.length).toBe(2);
     expect(
       summary.notableFormSections.some(
-        (item) => item.formSection.id == "political_group_votes_2" && item.status === "empty",
+        (item) =>
+          item.formSection.id == "political_group_votes_2" && item.status === "empty" && item.title === "Lijst 2",
       ),
     );
     expect(

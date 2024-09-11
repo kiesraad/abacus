@@ -243,8 +243,10 @@ export type PollingStationSummary = {
   countsAddUp: boolean;
   hasBlocks: boolean;
   hasWarnings: boolean;
+  hasErrors: boolean;
   notableFormSections: {
     status: PollingStationFormSectionStatus;
+    title?: string;
     formSection: FormSection;
   }[];
 };
@@ -254,6 +256,7 @@ export function getPollingStationSummary(formState: FormState, values: PollingSt
     countsAddUp: true,
     hasBlocks: false,
     hasWarnings: false,
+    hasErrors: false,
     notableFormSections: [],
   };
 
@@ -265,6 +268,7 @@ export function getPollingStationSummary(formState: FormState, values: PollingSt
         result.notableFormSections.push({ status: "errors", formSection: section });
         result.countsAddUp = false;
         result.hasBlocks = true;
+        result.hasErrors = true;
       } else if (section.warnings.length > 0) {
         result.hasWarnings = true;
         if (section.ignoreWarnings) {
@@ -274,7 +278,11 @@ export function getPollingStationSummary(formState: FormState, values: PollingSt
           result.hasBlocks = true;
         }
       } else if (section.id.startsWith("political_group_votes_") && isFormSectionEmpty(section, values)) {
-        result.notableFormSections.push({ status: "empty", formSection: section });
+        result.notableFormSections.push({
+          status: "empty",
+          formSection: section,
+          title: `Lijst ${section.id.substring(22)}`,
+        });
       }
     });
 

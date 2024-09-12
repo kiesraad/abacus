@@ -24,7 +24,7 @@ export function Checkbox({ id, children, defaultChecked, hasError }: CheckboxPro
   };
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setChecked(event.target.checked);
+    setChecked(event.currentTarget.checked);
   };
 
   return (

@@ -121,7 +121,7 @@ export function PollingStationSaveForm() {
           </StatusList.Item>
         )}
         {summary.hasBlocks ? (
-          <StatusList.Item status={summary.hasErrors ? "error" : "warning"} id="form-cannot-be-saved">
+          <StatusList.Item status={summary.hasErrors ? "error" : "warning"} id="form-cannot-be-saved" emphasis>
             Je kan de resultaten van dit stembureau nog niet opslaan
           </StatusList.Item>
         ) : (
@@ -132,7 +132,7 @@ export function PollingStationSaveForm() {
       </StatusList>
 
       {finalisationAllowed && (
-        <BottomBar type="input-grid">
+        <BottomBar type="form">
           <BottomBar.Row>
             <Button type="submit" size="lg" disabled={status.current === "finalising"}>
               Opslaan

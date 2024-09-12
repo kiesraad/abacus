@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { formatNumber } from "e2e-tests/e2e-test-utils";
 import { CandidatesListPage } from "e2e-tests/page-objects/input/CandidatesListPgObj";
 import { DifferencesPage, FewerBallotsFields, MoreBallotsFields } from "e2e-tests/page-objects/input/DifferencesPgObj";
@@ -12,6 +12,7 @@ import {
   VotesCounts,
 } from "e2e-tests/page-objects/input/VotersVotesPgObj";
 
+import { test } from "./fixtures";
 import { pollingStation33 } from "./test-data/PollingStationTestData";
 
 test.describe("data entry", () => {

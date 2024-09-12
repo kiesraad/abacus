@@ -54,7 +54,7 @@ export function PollingStationSaveForm() {
   return (
     <Form onSubmit={handleSubmit} id="check_save_form">
       <h2>Controleren en opslaan</h2>
-      <section className="md">
+      <section className="md" id="save-form-summary-text">
         {!summary.hasBlocks && summary.countsAddUp && (
           <p className="md">
             De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen
@@ -83,7 +83,7 @@ export function PollingStationSaveForm() {
         )}
       </section>
 
-      <StatusList>
+      <StatusList id="save-form-summary-list">
         {summary.countsAddUp && <StatusList.Item status="accept">Alle optellingen kloppen</StatusList.Item>}
 
         {summary.notableFormSections.map((section) => {

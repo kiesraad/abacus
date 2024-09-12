@@ -6,8 +6,15 @@ import { MenuStatus } from "../ui.types";
 import { renderStatusIcon } from "../util";
 import cls from "./StatusList.module.css";
 
-export function StatusList({ children }: { children: React.ReactNode }) {
-  return <ul className={cls.list}>{children}</ul>;
+export interface StatusListProps extends React.HTMLAttributes<HTMLUListElement> {
+  children: React.ReactNode;
+}
+export function StatusList({ children, ...props }: StatusListProps) {
+  return (
+    <ul className={cls.list} {...props}>
+      {children}
+    </ul>
+  );
 }
 
 export interface StatusListItemProps extends React.HTMLAttributes<HTMLLIElement> {

@@ -688,7 +688,7 @@ test.describe("navigation", () => {
   });
 
   test.describe("check and save", () => {
-    test("asd", async ({ page }) => {
+    test("accepted flow", async ({ page }) => {
       await page.goto("/1/input/1/recounted");
 
       const recountedPage = new RecountedPage(page);
@@ -696,6 +696,7 @@ test.describe("navigation", () => {
 
       // fill form with data that results in a warning
       const votersVotesPage = new VotersVotesPage(page);
+      await votersVotesPage.heading.waitFor();
       const voters = {
         poll_card_count: 100,
         proxy_certificate_count: 0,
@@ -703,33 +704,20 @@ test.describe("navigation", () => {
         total_admitted_voters_count: 100,
       };
       const votes = {
-        votes_candidates_counts: 100,
-        blank_votes_count: 0,
-        invalid_votes_count: 0,
+        votes_candidates_counts: 96,
+        blank_votes_count: 2,
+        invalid_votes_count: 2,
         total_votes_cast_count: 100,
       };
       await votersVotesPage.fillInPageAndClickNext(voters, votes);
 
-      await expect(votersVotesPage.heading).toBeVisible();
-      await expect(votersVotesPage.warning).toContainText(
-        "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      );
-      await expect(votersVotesPage.error).toBeHidden();
-
-      // accept the warning
-      await votersVotesPage.acceptWarnings.check();
-      await votersVotesPage.next.click();
-
       const differencesPage = new DifferencesPage(page);
       await differencesPage.heading.waitFor();
-
-      await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
-
       await differencesPage.next.click();
 
       const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
       await candidatesListPage_1.heading.waitFor();
-      await candidatesListPage_1.fillCandidatesAndTotal([99, 1], 100);
+      await candidatesListPage_1.fillCandidatesAndTotal([95, 1], 96);
       await candidatesListPage_1.next.click();
 
       const savePage = new SaveFormPage(page);
@@ -740,8 +728,11 @@ test.describe("navigation", () => {
       );
 
       await expect(savePage.summaryList).toContainText("Alle optellingen kloppen");
-      const li = savePage.summaryListItem("Toegelaten kiezers en uitgebrachte stemmen");
-      await expect(li.getByRole("img")).toHaveAccessibleName("bevat een waarschuwing");
+      const liNoBlocks = savePage.summaryListItem("Er zijn geen blokkerende fouten of waarschuwingen");
+      await expect(liNoBlocks.getByRole("img")).toHaveAccessibleName("opgeslagen");
+
+      const liCanSave = savePage.summaryListItem("Je kan de resultaten van dit stembureau opslaan");
+      await expect(liCanSave.getByRole("img")).toHaveAccessibleName("opgeslagen");
     });
   });
 });

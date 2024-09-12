@@ -450,12 +450,7 @@ describe("Test VotersAndVotesForm", () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
-          warnings: [
-            {
-              fields: ["data.votes_counts.blank_votes_count"],
-              code: "W201",
-            },
-          ],
+          warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
         },
       });
 
@@ -522,12 +517,7 @@ describe("Test VotersAndVotesForm", () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
-          warnings: [
-            {
-              fields: ["data.votes_counts.blank_votes_count"],
-              code: "W201",
-            },
-          ],
+          warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
         },
       });
 
@@ -573,12 +563,7 @@ describe("Test VotersAndVotesForm", () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
-          warnings: [
-            {
-              fields: ["data.votes_counts.invalid_votes_count"],
-              code: "W202",
-            },
-          ],
+          warnings: [{ fields: ["data.votes_counts.invalid_votes_count"], code: "W202" }],
         },
       });
 
@@ -735,12 +720,7 @@ describe("Test VotersAndVotesForm", () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
-          warnings: [
-            {
-              fields: ["data.votes_counts.total_votes_cast_count"],
-              code: "W205",
-            },
-          ],
+          warnings: [{ fields: ["data.votes_counts.total_votes_cast_count"], code: "W205" }],
         },
       });
 

@@ -276,12 +276,7 @@ describe("Test CandidatesVotesForm", () => {
     test("F.401 IncorrectTotal group total", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.political_group_votes[0]"],
-              code: "F401",
-            },
-          ],
+          errors: [{ fields: ["data.political_group_votes[0]"], code: "F401" }],
           warnings: [],
         },
       });
@@ -306,6 +301,40 @@ describe("Test CandidatesVotesForm", () => {
       const expectedValidFields = [candidateVotes0, candidateVotes1, total] as HTMLElement[];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
+    });
+  });
+
+  describe("CandidatesVotesForm warnings", () => {
+    test("Imagined warning on this form", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [{ fields: ["data.political_group_votes[0]"], code: "F401" }],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      const candidateVotes0 = await screen.findByTestId("candidate_votes[0].votes");
+      const candidateVotes1 = screen.getByTestId("candidate_votes[1].votes");
+      const total = screen.getByTestId("total");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackMessage =
+        "Controleer ingevoerde aantallenF.401De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      // When all fields on a page are (potentially) invalid, we do not mark them as so
+      const expectedInvalidFields = [] as HTMLElement[];
+      const expectedValidFields = [candidateVotes0, candidateVotes1, total] as HTMLElement[];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });

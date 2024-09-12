@@ -216,12 +216,7 @@ describe("Test DifferencesForm", () => {
     test("F.301 IncorrectDifference", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.differences_counts.more_ballots_count"],
-              code: "F301",
-            },
-          ],
+          errors: [{ fields: ["data.differences_counts.more_ballots_count"], code: "F301" }],
           warnings: [],
         },
       });
@@ -265,12 +260,7 @@ describe("Test DifferencesForm", () => {
     test("F.302 Should be empty", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.differences_counts.fewer_ballots_count"],
-              code: "F302",
-            },
-          ],
+          errors: [{ fields: ["data.differences_counts.fewer_ballots_count"], code: "F302" }],
           warnings: [],
         },
       });
@@ -314,12 +304,7 @@ describe("Test DifferencesForm", () => {
     test("F.303 IncorrectDifference", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.differences_counts.fewer_ballots_count"],
-              code: "F303",
-            },
-          ],
+          errors: [{ fields: ["data.differences_counts.fewer_ballots_count"], code: "F303" }],
           warnings: [],
         },
       });
@@ -363,12 +348,7 @@ describe("Test DifferencesForm", () => {
     test("F.304 Should be empty", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.differences_counts.more_ballots_count"],
-              code: "F304",
-            },
-          ],
+          errors: [{ fields: ["data.differences_counts.more_ballots_count"], code: "F304" }],
           warnings: [],
         },
       });

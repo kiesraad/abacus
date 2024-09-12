@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::polling_station::Validate;
+use crate::validation::ValidationResults;
 use crate::{
     election::Election,
     polling_station::{
@@ -73,6 +75,21 @@ impl ModelNa31_2Summary {
 
         // loop over results and add them to the running total
         for (polling_station, result) in results {
+            // validate result and make sure that there are no errors
+            let mut validation_results = ValidationResults::default();
+            result.validate(
+                election,
+                polling_station,
+                &mut validation_results,
+                "data".to_string(),
+            )?;
+            if validation_results.has_errors() {
+                return Err(APIError::AddError(format!(
+                    "Polling station {} has validation errors",
+                    polling_station.number
+                )));
+            }
+
             // add voters and votes to the total
             totals.voters_counts += &result.voters_counts;
             totals.votes_counts += &result.votes_counts;

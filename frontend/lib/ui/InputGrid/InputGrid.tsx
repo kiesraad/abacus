@@ -19,12 +19,15 @@ export function InputGrid({ zebra, children }: InputGridProps) {
   const ref = React.useRef<HTMLTableElement>(null);
   const inputList = React.useRef<InputEntry[]>([]);
 
-  const moveFocus = React.useCallback((dir: number) => {
+  const moveFocus = React.useCallback((dir: number, toLastIndex?: boolean) => {
     let activeIndex = inputList.current.findIndex((input) => input.active);
     if (activeIndex === -1) {
       activeIndex = 0;
     }
     let targetIndex = activeIndex + dir;
+    if (toLastIndex) {
+      targetIndex = inputList.current.length - 1;
+    }
     if (targetIndex < 0) {
       targetIndex = inputList.current.length - 1;
     } else if (targetIndex >= inputList.current.length) {
@@ -50,7 +53,12 @@ export function InputGrid({ zebra, children }: InputGridProps) {
           moveFocus(-1);
           break;
         case "ArrowDown":
-          moveFocus(1);
+          if (event.shiftKey) {
+            moveFocus(1, true);
+          } else {
+            moveFocus(1);
+          }
+
           break;
         case "Enter":
           moveFocus(1);

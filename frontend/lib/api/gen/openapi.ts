@@ -188,11 +188,13 @@ export interface PollingStationListResponse {
 }
 
 /**
- * PollingStationResults, following the fields in
-"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar lichaam
-in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht"
-"Bijlage 2: uitkomsten per stembureau"
-<https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieNa31.2
+ * PollingStationResults, following the fields in Model Na 31-2 Bijage 2.
+
+See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
+lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
+Bijlage 2: uitkomsten per stembureau" from the
+[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
+[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
  */
 export interface PollingStationResults {
   differences_counts: DifferencesCounts;
@@ -259,7 +261,7 @@ export interface VotersCounts {
 }
 
 /**
- * Voters recounts, part of the polling station results.
+ * Recounted voters counts, this replaces the original voters counts in the polling station results.
  */
 export interface VotersRecounts {
   poll_card_recount: number;

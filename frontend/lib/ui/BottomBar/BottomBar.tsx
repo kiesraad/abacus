@@ -14,5 +14,9 @@ export function BottomBar({ type, children }: BottomBarProps) {
 }
 
 BottomBar.Row = function BottomBarRow({ children, hidden }: { children: React.ReactNode; hidden?: boolean }) {
-  return <section className={cn("row", { hidden: hidden })}>{children}</section>;
+  return (
+    <section hidden={hidden} className={cn("row", { hidden: !!hidden })}>
+      {children}
+    </section>
+  );
 };

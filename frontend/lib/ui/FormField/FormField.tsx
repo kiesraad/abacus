@@ -1,30 +1,28 @@
 import * as React from "react";
 
-import { type FieldValidationResult } from "@kiesraad/api";
 import { IconError, IconWarning } from "@kiesraad/icon";
 import { cn } from "@kiesraad/util";
 
 import cls from "./FormField.module.css";
 
 export interface FormFieldProps {
+  id?: string;
   children: React.ReactNode;
-  error?: FieldValidationResult[];
-  warning?: FieldValidationResult[];
+  hasError?: boolean;
+  hasWarning?: boolean;
 }
 
-export function FormField({ children, error, warning }: FormFieldProps) {
-  const hasError = error && error.length > 0;
-  const hasWarning = warning && warning.length > 0;
-
+export function FormField({ id, children, hasError, hasWarning }: FormFieldProps) {
   let icon: React.ReactNode | null = null;
   if (hasError) {
-    icon = <IconError />;
+    icon = <IconError aria-label={"bevat een fout"} />;
   } else if (hasWarning) {
-    icon = <IconWarning />;
+    icon = <IconWarning aria-label={"bevat een waarschuwing"} />;
   }
 
   return (
     <div
+      id={id}
       className={cn(cls["form-field"], {
         "has-icon": !!icon,
         "has-error": hasError,

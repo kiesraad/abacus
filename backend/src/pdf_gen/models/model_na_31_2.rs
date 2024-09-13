@@ -31,7 +31,7 @@ impl ModelNa31_2Summary {
                 total_admitted_voters_count: 0,
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 0,
+                votes_candidates_count: 0,
                 blank_votes_count: 0,
                 invalid_votes_count: 0,
                 total_votes_cast_count: 0,

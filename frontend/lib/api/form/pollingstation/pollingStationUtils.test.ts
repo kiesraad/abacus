@@ -46,7 +46,7 @@ describe("PollingStationUtils", () => {
 
     const validationResults: ValidationResult[] = [
       {
-        fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes[0].total"],
+        fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes[0].total"],
         code: "F204",
       },
     ];
@@ -170,7 +170,7 @@ describe("PollingStationUtils", () => {
     expect(
       isGlobalValidationResult({
         code: "F204",
-        fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
+        fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
       }),
     ).toBe(true);
 
@@ -193,7 +193,7 @@ describe("PollingStationUtils", () => {
     const onlyGlobalResults: ClientValidationResult[] = [
       {
         code: "F204",
-        fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
+        fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
       },
     ];
 
@@ -217,7 +217,7 @@ describe("PollingStationUtils", () => {
     const mixedResults: ClientValidationResult[] = [
       {
         code: "F204",
-        fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
+        fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
         isGlobal: true,
       },
       {
@@ -245,7 +245,7 @@ describe("PollingStationUtils", () => {
         code: "F202",
         fields: [
           "data.votes_counts.total_votes_cast_count",
-          "data.votes_counts.votes_candidates_counts",
+          "data.votes_counts.votes_candidates_count",
           "data.votes_counts.blank_votes_count",
           "data.votes_counts.invalid_votes_count",
         ],

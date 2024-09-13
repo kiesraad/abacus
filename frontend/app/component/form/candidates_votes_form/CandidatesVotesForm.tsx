@@ -125,6 +125,13 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
 
+  const defaultProps = {
+    errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
+    warningsAccepted: getIgnoreWarnings(),
+    inputProps: register(),
+    format,
+  };
+
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
       <h2>
@@ -153,12 +160,10 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 name="candidatevotes[]"
                 id={`candidate_votes[${candidate.number - 1}].votes`}
                 title={`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`}
-                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-                inputProps={register()}
-                format={format}
                 addSeparator={addSeparator}
                 defaultValue={defaultValue}
                 isFocused={index === 0}
+                {...defaultProps}
               />
             );
           })}
@@ -168,11 +173,9 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             name="total"
             id="total"
             title={`Totaal lijst ${group.number}`}
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            inputProps={register()}
-            format={format}
             defaultValue={format(sectionValues?.total || "")}
             isListTotal
+            {...defaultProps}
           />
         </InputGrid.Body>
       </InputGrid>

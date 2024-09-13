@@ -27,7 +27,7 @@ StatusList.Item = function StatusListItem({ status, children, emphasis, ...props
   return (
     <li className={cn(status, { emphasis: !!emphasis })} {...props}>
       <aside>{renderStatusIcon(status)}</aside>
-      <span>{children}?</span>
+      <span>{children}</span>
     </li>
   );
 };

@@ -1,2 +1,2 @@
 export * from "./PageTitle";
-export * from "./Util";
+export * from "./Icons";

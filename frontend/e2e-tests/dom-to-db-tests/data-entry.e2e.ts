@@ -693,7 +693,7 @@ test.describe("navigation", () => {
       const recountedPage = new RecountedPage(page);
       await recountedPage.checkNoAndClickNext();
 
-      // fill form with data that results in a warning
+      // fill form with data that does not result in a warning
       const votersVotesPage = new VotersVotesPage(page);
       await votersVotesPage.heading.waitFor();
       const voters = {

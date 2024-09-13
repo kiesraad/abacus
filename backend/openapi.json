@@ -1106,7 +1106,7 @@
         "type": "object",
         "description": "Votes counts, part of the polling station results.",
         "required": [
-          "votes_candidates_counts",
+          "votes_candidates_count",
           "blank_votes_count",
           "invalid_votes_count",
           "total_votes_cast_count"
@@ -1130,7 +1130,7 @@
             "description": "Total number of votes cast (\"Totaal aantal getelde stemmen\")",
             "minimum": 0
           },
-          "votes_candidates_counts": {
+          "votes_candidates_count": {
             "type": "integer",
             "format": "int32",
             "description": "Number of valid votes on candidates\n(\"Aantal stembiljetten met een geldige stem op een kandidaat\")",

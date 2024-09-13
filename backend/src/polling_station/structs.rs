@@ -155,7 +155,7 @@ impl Validate for PollingStationResults {
             if identical_voters_recounts_and_votes_counts(voters_recounts, &self.votes_counts) {
                 validation_results.warnings.push(ValidationResult {
                     fields: vec![
-                        format!("{field_name}.votes_counts.votes_candidates_counts"),
+                        format!("{field_name}.votes_counts.votes_candidates_count"),
                         format!("{field_name}.votes_counts.blank_votes_count"),
                         format!("{field_name}.votes_counts.invalid_votes_count"),
                         format!("{field_name}.votes_counts.total_votes_cast_count"),
@@ -345,7 +345,7 @@ impl Validate for PollingStationResults {
         )?;
 
         // F.204 validate that the total number of valid votes is equal to the sum of all political group totals
-        if self.votes_counts.votes_candidates_counts as u64
+        if self.votes_counts.votes_candidates_count as u64
             != self
                 .political_group_votes
                 .iter()
@@ -354,7 +354,7 @@ impl Validate for PollingStationResults {
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![
-                    format!("{field_name}.votes_counts.votes_candidates_counts"),
+                    format!("{field_name}.votes_counts.votes_candidates_count"),
                     format!("{field_name}.political_group_votes"),
                 ],
                 code: ValidationResultCode::F204,
@@ -426,7 +426,7 @@ fn all_zero_voters_counts_and_votes_counts(voters: &VotersCounts, votes: &VotesC
         && voters.proxy_certificate_count == 0
         && voters.voter_card_count == 0
         && voters.total_admitted_voters_count == 0
-        && votes.votes_candidates_counts == 0
+        && votes.votes_candidates_count == 0
         && votes.blank_votes_count == 0
         && votes.invalid_votes_count == 0
         && votes.total_votes_cast_count == 0
@@ -438,7 +438,7 @@ fn all_zero_voters_counts_and_votes_counts(voters: &VotersCounts, votes: &VotesC
 /// between these two sets of numbers.
 fn identical_voters_counts_and_votes_counts(voters: &VotersCounts, votes: &VotesCounts) -> bool {
     !all_zero_voters_counts_and_votes_counts(voters, votes)
-        && voters.poll_card_count == votes.votes_candidates_counts
+        && voters.poll_card_count == votes.votes_candidates_count
         && voters.proxy_certificate_count == votes.blank_votes_count
         && voters.voter_card_count == votes.invalid_votes_count
         && voters.total_admitted_voters_count == votes.total_votes_cast_count
@@ -502,7 +502,7 @@ pub struct VotesCounts {
     /// Number of valid votes on candidates
     /// ("Aantal stembiljetten met een geldige stem op een kandidaat")
     #[schema(value_type = u32)]
-    pub votes_candidates_counts: Count,
+    pub votes_candidates_count: Count,
     /// Number of blank votes ("Aantal blanco stembiljetten")
     #[schema(value_type = u32)]
     pub blank_votes_count: Count,
@@ -532,11 +532,11 @@ impl Validate for VotesCounts {
         field_name: String,
     ) -> Result<(), DataError> {
         // validate all counts
-        self.votes_candidates_counts.validate(
+        self.votes_candidates_count.validate(
             election,
             polling_station,
             validation_results,
-            format!("{field_name}.votes_candidates_counts"),
+            format!("{field_name}.votes_candidates_count"),
         )?;
         self.blank_votes_count.validate(
             election,
@@ -557,13 +557,13 @@ impl Validate for VotesCounts {
             format!("{field_name}.total_votes_cast_count"),
         )?;
 
-        // F.202 validate that total_votes_cast_count == votes_candidates_counts + blank_votes_count + invalid_votes_count
-        if self.votes_candidates_counts + self.blank_votes_count + self.invalid_votes_count
+        // F.202 validate that total_votes_cast_count == votes_candidates_count + blank_votes_count + invalid_votes_count
+        if self.votes_candidates_count + self.blank_votes_count + self.invalid_votes_count
             != self.total_votes_cast_count
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![
-                    format!("{field_name}.votes_candidates_counts"),
+                    format!("{field_name}.votes_candidates_count"),
                     format!("{field_name}.blank_votes_count"),
                     format!("{field_name}.invalid_votes_count"),
                     format!("{field_name}.total_votes_cast_count"),
@@ -637,7 +637,7 @@ fn all_zero_voters_recounts_and_votes_counts(voters: &VotersRecounts, votes: &Vo
         && voters.proxy_certificate_recount == 0
         && voters.voter_card_recount == 0
         && voters.total_admitted_voters_recount == 0
-        && votes.votes_candidates_counts == 0
+        && votes.votes_candidates_count == 0
         && votes.blank_votes_count == 0
         && votes.invalid_votes_count == 0
         && votes.total_votes_cast_count == 0
@@ -652,7 +652,7 @@ fn identical_voters_recounts_and_votes_counts(
     votes: &VotesCounts,
 ) -> bool {
     !all_zero_voters_recounts_and_votes_counts(voters, votes)
-        && voters.poll_card_recount == votes.votes_candidates_counts
+        && voters.poll_card_recount == votes.votes_candidates_count
         && voters.proxy_certificate_recount == votes.blank_votes_count
         && voters.voter_card_recount == votes.invalid_votes_count
         && voters.total_admitted_voters_recount == votes.total_votes_cast_count
@@ -1024,7 +1024,7 @@ mod tests {
                 total_admitted_voters_count: 35, // F.201 incorrect total & W.203 above threshold in absolute numbers
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 44,
+                votes_candidates_count: 44,
                 blank_votes_count: 1,
                 invalid_votes_count: 4,
                 total_votes_cast_count: 50, // F.202 incorrect total & W.203 above threshold in absolute numbers
@@ -1067,7 +1067,7 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "polling_station_results.votes_counts.votes_candidates_counts",
+                "polling_station_results.votes_counts.votes_candidates_count",
                 "polling_station_results.votes_counts.blank_votes_count",
                 "polling_station_results.votes_counts.invalid_votes_count",
                 "polling_station_results.votes_counts.total_votes_cast_count",
@@ -1117,7 +1117,7 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 100,
+                votes_candidates_count: 100,
                 blank_votes_count: 2,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 104,
@@ -1179,7 +1179,7 @@ mod tests {
                 total_admitted_voters_count: 5, // F.201 incorrect total & W.204 above threshold in percentage
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 3,
+                votes_candidates_count: 3,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 6, // F.202 incorrect total & W.204 above threshold in percentage
@@ -1225,7 +1225,7 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "polling_station_results.votes_counts.votes_candidates_counts",
+                "polling_station_results.votes_counts.votes_candidates_count",
                 "polling_station_results.votes_counts.blank_votes_count",
                 "polling_station_results.votes_counts.invalid_votes_count",
                 "polling_station_results.votes_counts.total_votes_cast_count",
@@ -1283,7 +1283,7 @@ mod tests {
                 total_admitted_voters_count: 105,
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 101,
+                votes_candidates_count: 101,
                 blank_votes_count: 2,
                 invalid_votes_count: 2,
                 total_votes_cast_count: 105, // W.204 above threshold in absolute numbers
@@ -1364,7 +1364,7 @@ mod tests {
                 total_admitted_voters_count: 56, // W.203 above threshold in percentage
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 50,
+                votes_candidates_count: 50,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 52, // W.203 above threshold in percentage
@@ -1431,7 +1431,7 @@ mod tests {
                 total_admitted_voters_count: 52,
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 50,
+                votes_candidates_count: 50,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 52,
@@ -1489,7 +1489,7 @@ mod tests {
                 total_admitted_voters_count: 56,
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 50,
+                votes_candidates_count: 50,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 52,
@@ -1549,7 +1549,7 @@ mod tests {
         assert_eq!(
             validation_results.errors[1].fields,
             vec![
-                "polling_station_results.votes_counts.votes_candidates_counts",
+                "polling_station_results.votes_counts.votes_candidates_count",
                 "polling_station_results.political_group_votes"
             ]
         );
@@ -1568,7 +1568,7 @@ mod tests {
                 total_admitted_voters_count: 51, // W.206 should not exceed polling stations eligible voters
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 51,
+                votes_candidates_count: 51,
                 blank_votes_count: 0,
                 invalid_votes_count: 0,
                 total_votes_cast_count: 51, // W.206 should not exceed polling stations eligible voters
@@ -1663,7 +1663,7 @@ mod tests {
             },
             votes_counts: VotesCounts {
                 // W.208 equal input
-                votes_candidates_counts: 1000,
+                votes_candidates_count: 1000,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 1002,
@@ -1745,7 +1745,7 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
-                "polling_station_results.votes_counts.votes_candidates_counts",
+                "polling_station_results.votes_counts.votes_candidates_count",
                 "polling_station_results.votes_counts.blank_votes_count",
                 "polling_station_results.votes_counts.invalid_votes_count",
                 "polling_station_results.votes_counts.total_votes_cast_count",
@@ -1815,7 +1815,7 @@ mod tests {
         let mut validation_results = ValidationResults::default();
         // test out of range
         let mut votes_counts = VotesCounts {
-            votes_candidates_counts: 1_000_000_001, // out of range
+            votes_candidates_count: 1_000_000_001, // out of range
             blank_votes_count: 2,
             invalid_votes_count: 3,
             total_votes_cast_count: 1_000_000_006, // correct but out of range
@@ -1833,7 +1833,7 @@ mod tests {
         // test F.202 incorrect total
         validation_results = ValidationResults::default();
         votes_counts = VotesCounts {
-            votes_candidates_counts: 5,
+            votes_candidates_count: 5,
             blank_votes_count: 6,
             invalid_votes_count: 7,
             total_votes_cast_count: 20, // F.202 incorrect total
@@ -1855,7 +1855,7 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec![
-                "votes_counts.votes_candidates_counts",
+                "votes_counts.votes_candidates_count",
                 "votes_counts.blank_votes_count",
                 "votes_counts.invalid_votes_count",
                 "votes_counts.total_votes_cast_count",
@@ -1865,7 +1865,7 @@ mod tests {
         // test W.201 high number of blank votes
         validation_results = ValidationResults::default();
         votes_counts = VotesCounts {
-            votes_candidates_counts: 100,
+            votes_candidates_count: 100,
             blank_votes_count: 10, // W.201 above threshold
             invalid_votes_count: 1,
             total_votes_cast_count: 111,
@@ -1892,7 +1892,7 @@ mod tests {
         // test W.202 high number of invalid votes
         validation_results = ValidationResults::default();
         votes_counts = VotesCounts {
-            votes_candidates_counts: 100,
+            votes_candidates_count: 100,
             blank_votes_count: 1,
             invalid_votes_count: 10, // W.202 above threshold
             total_votes_cast_count: 111,
@@ -1919,7 +1919,7 @@ mod tests {
         // test W.205 total votes cast should not be zero
         validation_results = ValidationResults::default();
         votes_counts = VotesCounts {
-            votes_candidates_counts: 0,
+            votes_candidates_count: 0,
             blank_votes_count: 0,
             invalid_votes_count: 0,
             total_votes_cast_count: 0, // W.205 should not be zero

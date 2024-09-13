@@ -76,7 +76,7 @@ export function PollingStationChoiceForm() {
       {showAlert && (
         <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
           <span className={cls.icon}>
-            <Icon icon={<IconError />} color="error" />
+            <Icon icon={<IconError aria-label={"bevat een fout"} />} color="error" />
           </span>
           <span>Voer een geldig nummer van een stembureau in om te beginnen</span>
         </div>

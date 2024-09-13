@@ -89,13 +89,13 @@ export const PollingStationDataEntryHandler = http.post<
     //SECTION votes_counts
     // F.202 E + F + G = H
     if (
-      votes_counts.votes_candidates_counts + votes_counts.blank_votes_count + votes_counts.invalid_votes_count !==
+      votes_counts.votes_candidates_count + votes_counts.blank_votes_count + votes_counts.invalid_votes_count !==
       votes_counts.total_votes_cast_count
     ) {
       response.validation_results.errors.push({
         fields: [
           "data.votes_counts.total_votes_cast_count",
-          "data.votes_counts.votes_candidates_counts",
+          "data.votes_counts.votes_candidates_count",
           "data.votes_counts.blank_votes_count",
           "data.votes_counts.invalid_votes_count",
         ],
@@ -275,9 +275,9 @@ export const PollingStationDataEntryHandler = http.post<
     });
 
     // F.204
-    if (votes_counts.votes_candidates_counts !== candidateVotesSum) {
+    if (votes_counts.votes_candidates_count !== candidateVotesSum) {
       response.validation_results.errors.push({
-        fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
+        fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
         code: "F204",
       });
     }

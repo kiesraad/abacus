@@ -19,7 +19,7 @@ pub fn example_data_entry() -> DataEntryRequest {
                 total_admitted_voters_count: 104,
             },
             votes_counts: VotesCounts {
-                votes_candidates_counts: 102,
+                votes_candidates_count: 102,
                 blank_votes_count: 1,
                 invalid_votes_count: 1,
                 total_votes_cast_count: 104,

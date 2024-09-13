@@ -61,7 +61,7 @@ describe("PollingStationFormController", () => {
             blank_votes_count: 0,
             invalid_votes_count: 0,
             total_votes_cast_count: 0,
-            votes_candidates_counts: 0,
+            votes_candidates_count: 0,
           },
           voters_recounts: undefined,
         };
@@ -83,7 +83,7 @@ describe("PollingStationFormController", () => {
       validation_results: {
         errors: [
           {
-            fields: ["data.votes_counts.votes_candidates_counts", "data.political_group_votes"],
+            fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
             code: "F204",
           },
         ],
@@ -110,7 +110,7 @@ describe("PollingStationFormController", () => {
             blank_votes_count: 1,
             invalid_votes_count: 1,
             total_votes_cast_count: 1,
-            votes_candidates_counts: 3,
+            votes_candidates_count: 3,
           },
           voters_recounts: undefined,
         };

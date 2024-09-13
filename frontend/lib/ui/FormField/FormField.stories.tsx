@@ -1,27 +1,15 @@
 import type { Story } from "@ladle/react";
 
-import { ResultCode } from "@kiesraad/api";
-
 import { FormField } from "./FormField";
 
 type Props = {
-  error?: ResultCode;
+  hasError: boolean;
+  hasWarning: boolean;
 };
 
-export const DefaultFormField: Story<Props> = ({ error }) => (
-  <FormField
-    error={
-      error
-        ? [
-            {
-              id: "test-input",
-              code: error,
-            },
-          ]
-        : undefined
-    }
-  >
-    <input id="test-input" type="text" />
+export const DefaultFormField: Story<Props> = ({ hasError, hasWarning }) => (
+  <FormField id="test-form-field" hasError={hasError} hasWarning={hasWarning}>
+    <input id="test-input" type="text" aria-invalid={hasError || hasWarning ? "true" : "false"} />
   </FormField>
 );
 
@@ -31,32 +19,12 @@ export default {
     text: "Invoer",
   },
   argTypes: {
-    error: {
-      options: [
-        undefined,
-        "F201",
-        "F202",
-        "F203",
-        "F204",
-        "F301",
-        "F302",
-        "F303",
-        "F304",
-        "F305",
-        "F401",
-        "W201",
-        "W202",
-        "W203",
-        "W204",
-        "W205",
-        "W206",
-        "W207",
-        "W208",
-        "W209",
-        "W301",
-        "W302",
-      ],
-      defaultValue: "F201",
+    hasError: {
+      options: [true, false],
+      control: { type: "radio" },
+    },
+    hasWarning: {
+      options: [true, false],
       control: { type: "radio" },
     },
   },

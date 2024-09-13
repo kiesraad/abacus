@@ -14,8 +14,6 @@ import {
 
 import { pollingStation33 } from "./test-data/PollingStationTestData";
 
-//import { PollingStationValues } from "@kiesraad/api";
-
 test.describe("data entry", () => {
   test("no recount, no differences", async ({ page }) => {
     await page.goto("/1/input");
@@ -417,8 +415,9 @@ test.describe("errors and warnings", () => {
     );
 
     await expect(savePage.summaryList).toContainText("Alle optellingen kloppen");
-    const li = savePage.summaryListItem("Toegelaten kiezers en uitgebrachte stemmen");
-    await expect(li.getByRole("img")).toHaveAccessibleName("bevat een waarschuwing");
+    await expect(savePage.summaryListItemIcon("Toegelaten kiezers en uitgebrachte stemmen")).toHaveAccessibleName(
+      "bevat een waarschuwing",
+    );
   });
 
   test("correct warning on voters and votes page", async ({ page }) => {
@@ -728,11 +727,13 @@ test.describe("navigation", () => {
       );
 
       await expect(savePage.summaryList).toContainText("Alle optellingen kloppen");
-      const liNoBlocks = savePage.summaryListItem("Er zijn geen blokkerende fouten of waarschuwingen");
-      await expect(liNoBlocks.getByRole("img")).toHaveAccessibleName("opgeslagen");
+      await expect(
+        savePage.summaryListItemIcon("Er zijn geen blokkerende fouten of waarschuwingen"),
+      ).toHaveAccessibleName("opgeslagen");
 
-      const liCanSave = savePage.summaryListItem("Je kan de resultaten van dit stembureau opslaan");
-      await expect(liCanSave.getByRole("img")).toHaveAccessibleName("opgeslagen");
+      await expect(
+        savePage.summaryListItemIcon("Je kan de resultaten van dit stembureau opslaan"),
+      ).toHaveAccessibleName("opgeslagen");
     });
   });
 });

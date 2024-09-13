@@ -21,4 +21,10 @@ export class SaveFormPage extends InputBasePage {
     const li = this.summaryList.locator("li", { hasText: text });
     return li;
   }
+
+  summaryListItemIcon(text: string) {
+    const li = this.summaryListItem(text);
+    const icon = li.getByRole("img");
+    return icon;
+  }
 }

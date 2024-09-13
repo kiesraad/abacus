@@ -55,11 +55,12 @@ describe("PollingStationFormNavigation", () => {
   const mockNavigate = vi.fn();
 
   const mockController = {
-    status: "idle",
+    status: { current: "idle" },
     formState: mockFormState,
     currentForm: mockCurrentForm,
     error: null,
     targetFormSection: "voters_votes_counts",
+    apiError: null,
     values: {},
     setTemporaryCache: vi.fn(),
     submitCurrentForm: vi.fn(),
@@ -75,7 +76,7 @@ describe("PollingStationFormNavigation", () => {
   });
 
   test("It Navigates to targetFormSection", () => {
-    (usePollingStationFormController as Mock).mockReturnValueOnce(mockController);
+    (usePollingStationFormController as Mock).mockReturnValue(mockController);
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
@@ -83,7 +84,7 @@ describe("PollingStationFormNavigation", () => {
   });
 
   test("It blocks navigation when form has changes", () => {
-    (usePollingStationFormController as Mock).mockReturnValueOnce({
+    (usePollingStationFormController as Mock).mockReturnValue({
       status: "idle",
       formState: {
         ...mockFormState,
@@ -119,7 +120,7 @@ describe("PollingStationFormNavigation", () => {
   });
 
   test("It blocks navigation when form has errors", async () => {
-    (usePollingStationFormController as Mock).mockReturnValueOnce({
+    (usePollingStationFormController as Mock).mockReturnValue({
       status: "idle",
       formState: {
         ...mockFormState,
@@ -133,6 +134,7 @@ describe("PollingStationFormNavigation", () => {
         active: "recounted",
         current: "recounted",
       },
+      apiError: null,
       error: null,
       currentForm: {
         id: "recounted",
@@ -150,6 +152,7 @@ describe("PollingStationFormNavigation", () => {
 
     (useBlocker as Mock).mockReturnValue({
       state: "blocked",
+      location: { pathname: "/1/input/1" },
     });
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
@@ -165,7 +168,12 @@ describe("PollingStationFormNavigation", () => {
       }) => boolean;
 
       //TODO: check these tests after determining what should be blocked
-      expect(blocker({ currentLocation: { pathname: "a" }, nextLocation: { pathname: "b" } })).toBe(false);
+      expect(
+        blocker({
+          currentLocation: { pathname: "/1/input/1/numbers" },
+          nextLocation: { pathname: "/1/input/1/differences" },
+        }),
+      ).toBe(false);
 
       const title = await screen.findByTestId("modal-blocker-title");
       expect(title).toBeInTheDocument();
@@ -173,7 +181,8 @@ describe("PollingStationFormNavigation", () => {
   });
 
   test("422 response results in display of error message", async () => {
-    (usePollingStationFormController as Mock).mockReturnValueOnce({
+    (usePollingStationFormController as Mock).mockReturnValue({
+      status: { current: "idle" },
       formState: {
         ...mockFormState,
       },
@@ -204,7 +213,8 @@ describe("PollingStationFormNavigation", () => {
   });
 
   test("500 response results in display of error message", async () => {
-    (usePollingStationFormController as Mock).mockReturnValueOnce({
+    (usePollingStationFormController as Mock).mockReturnValue({
+      status: { current: "idle" },
       formState: {
         ...mockFormState,
       },

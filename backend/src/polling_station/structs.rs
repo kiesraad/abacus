@@ -89,11 +89,13 @@ pub struct PollingStationResultsEntry {
     pub data: PollingStationResults,
 }
 
-/// PollingStationResults, following the fields in
-/// "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar lichaam
-///  in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht"
-/// "Bijlage 2: uitkomsten per stembureau"
-///  <https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieNa31.2
+/// PollingStationResults, following the fields in Model Na 31-2 Bijage 2.
+///
+/// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
+/// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
+/// Bijlage 2: uitkomsten per stembureau" from the
+/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
+/// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PollingStationResults {
     /// Recounted ("Is er herteld? - See form for official long description of the checkbox")
@@ -103,6 +105,7 @@ pub struct PollingStationResults {
     /// Votes counts ("2. Aantal getelde stembiljetten")
     pub votes_counts: VotesCounts,
     /// Voters recounts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
+    /// When filled in, this field should replace `voters_counts` when using the results.
     pub voters_recounts: Option<VotersRecounts>,
     /// Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
     pub differences_counts: DifferencesCounts,
@@ -127,6 +130,16 @@ impl Validate for PollingStationResults {
             validation_results,
             format!("{field_name}.votes_counts"),
         )?;
+
+        if self.recounted && self.voters_recounts.is_none() {
+            return Err(DataError::new(
+                "recounted==true but voters_recounts is None",
+            ));
+        } else if !self.recounted && self.voters_recounts.is_some() {
+            return Err(DataError::new(
+                "recounted==false but voters_recounts is Some",
+            ));
+        }
 
         if let Some(voters_recounts) = &self.voters_recounts {
             // if recounted = true
@@ -591,7 +604,7 @@ impl Validate for VotesCounts {
     }
 }
 
-/// Voters recounts, part of the polling station results.
+/// Recounted voters counts, this replaces the original voters counts in the polling station results.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct VotersRecounts {
     /// Number of valid poll cards ("Aantal geldige stempassen")
@@ -606,6 +619,15 @@ pub struct VotersRecounts {
     /// Total number of admitted voters ("Totaal aantal toegelaten kiezers")
     #[schema(value_type = u32)]
     pub total_admitted_voters_recount: Count,
+}
+
+impl AddAssign<&VotersRecounts> for VotersCounts {
+    fn add_assign(&mut self, other: &VotersRecounts) {
+        self.poll_card_count += other.poll_card_recount;
+        self.proxy_certificate_count += other.proxy_certificate_recount;
+        self.voter_card_count += other.voter_card_recount;
+        self.total_admitted_voters_count += other.total_admitted_voters_recount;
+    }
 }
 
 /// Check if all voters recounts and votes counts are equal to zero.

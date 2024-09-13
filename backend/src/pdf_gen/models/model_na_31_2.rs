@@ -91,7 +91,11 @@ impl ModelNa31_2Summary {
             }
 
             // add voters and votes to the total
-            totals.voters_counts += &result.voters_counts;
+            if let Some(voters_recounts) = &result.voters_recounts {
+                totals.voters_counts += voters_recounts;
+            } else {
+                totals.voters_counts += &result.voters_counts;
+            }
             totals.votes_counts += &result.votes_counts;
 
             // add any differences noted to the total
@@ -200,9 +204,163 @@ impl SumCount {
 mod tests {
     use polling_station::{CandidateVotes, PollingStationType};
 
+    use super::*;
+    use crate::polling_station::VotersRecounts;
     use crate::{election::tests::election_fixture, polling_station::DifferencesCounts};
 
-    use super::*;
+    fn polling_station_fixture(election: &Election) -> (PollingStation, PollingStation) {
+        (
+            PollingStation {
+                id: 1,
+                election_id: election.id,
+                name: "Testplek".to_string(),
+                number: 34,
+                number_of_voters: Some(20),
+                polling_station_type: PollingStationType::Bijzonder,
+                street: "Teststraat".to_string(),
+                house_number: "2".to_string(),
+                house_number_addition: Some("b".to_string()),
+                postal_code: "1234 QY".to_string(),
+                locality: "Testdorp".to_string(),
+            },
+            PollingStation {
+                id: 2,
+                election_id: election.id,
+                name: "Testplek twee".to_string(),
+                number: 37,
+                number_of_voters: Some(20),
+                polling_station_type: PollingStationType::Bijzonder,
+                street: "Testlaan".to_string(),
+                house_number: "3".to_string(),
+                house_number_addition: Some("b".to_string()),
+                postal_code: "0123AB".to_string(),
+                locality: "Testdorp".to_string(),
+            },
+        )
+    }
+
+    fn polling_station_results_fixture() -> (PollingStationResults, PollingStationResults) {
+        (
+            PollingStationResults {
+                recounted: false,
+                voters_counts: VotersCounts {
+                    poll_card_count: 20,
+                    proxy_certificate_count: 5,
+                    voter_card_count: 10,
+                    total_admitted_voters_count: 35,
+                },
+                votes_counts: VotesCounts {
+                    votes_candidates_counts: 31,
+                    blank_votes_count: 2,
+                    invalid_votes_count: 3,
+                    total_votes_cast_count: 36,
+                },
+                voters_recounts: None,
+                differences_counts: DifferencesCounts {
+                    more_ballots_count: 1,
+                    fewer_ballots_count: 0,
+                    unreturned_ballots_count: 0,
+                    too_few_ballots_handed_out_count: 0,
+                    too_many_ballots_handed_out_count: 0,
+                    other_explanation_count: 0,
+                    no_explanation_count: 0,
+                },
+                political_group_votes: vec![
+                    PoliticalGroupVotes {
+                        number: 1,
+                        total: 21,
+                        candidate_votes: vec![
+                            CandidateVotes {
+                                number: 1,
+                                votes: 18,
+                            },
+                            CandidateVotes {
+                                number: 2,
+                                votes: 3,
+                            },
+                        ],
+                    },
+                    PoliticalGroupVotes {
+                        number: 2,
+                        total: 10,
+                        candidate_votes: vec![
+                            CandidateVotes {
+                                number: 1,
+                                votes: 4,
+                            },
+                            CandidateVotes {
+                                number: 2,
+                                votes: 4,
+                            },
+                            CandidateVotes {
+                                number: 3,
+                                votes: 2,
+                            },
+                        ],
+                    },
+                ],
+            },
+            PollingStationResults {
+                recounted: false,
+                voters_counts: VotersCounts {
+                    poll_card_count: 39,
+                    proxy_certificate_count: 1,
+                    voter_card_count: 10,
+                    total_admitted_voters_count: 50,
+                },
+                votes_counts: VotesCounts {
+                    votes_candidates_counts: 46,
+                    blank_votes_count: 2,
+                    invalid_votes_count: 0,
+                    total_votes_cast_count: 48,
+                },
+                voters_recounts: None,
+                differences_counts: DifferencesCounts {
+                    more_ballots_count: 0,
+                    fewer_ballots_count: 2,
+                    unreturned_ballots_count: 0,
+                    too_few_ballots_handed_out_count: 0,
+                    too_many_ballots_handed_out_count: 0,
+                    other_explanation_count: 0,
+                    no_explanation_count: 0,
+                },
+                political_group_votes: vec![
+                    PoliticalGroupVotes {
+                        number: 1,
+                        total: 16,
+                        candidate_votes: vec![
+                            CandidateVotes {
+                                number: 1,
+                                votes: 10,
+                            },
+                            CandidateVotes {
+                                number: 2,
+                                votes: 6,
+                            },
+                        ],
+                    },
+                    PoliticalGroupVotes {
+                        number: 2,
+                        total: 30,
+                        candidate_votes: vec![
+                            CandidateVotes {
+                                number: 1,
+                                votes: 12,
+                            },
+                            CandidateVotes {
+                                number: 2,
+                                votes: 10,
+                            },
+                            CandidateVotes {
+                                number: 3,
+                                votes: 8,
+                            },
+                        ],
+                    },
+                ],
+            },
+        )
+    }
 
     #[test]
     fn test_differences_counts_addition() {
@@ -217,19 +375,8 @@ mod tests {
             no_explanation_count: 0,
         };
 
-        let mut ps = PollingStation {
-            id: 1,
-            election_id: 1,
-            name: "Test".to_string(),
-            number: 123,
-            number_of_voters: None,
-            polling_station_type: PollingStationType::VasteLocatie,
-            street: "Test".to_string(),
-            house_number: "20".to_string(),
-            house_number_addition: None,
-            postal_code: "1234AB".to_string(),
-            locality: "Test".to_string(),
-        };
+        let (mut ps, _) = polling_station_fixture(&election_fixture(&[1, 2]));
+        ps.number = 123;
 
         diff.add_polling_station_results(&ps, &diff2);
 
@@ -253,158 +400,13 @@ mod tests {
     #[test]
     fn test_political_group_counting() {
         let election = election_fixture(&[2, 3]);
-        let ps1 = PollingStation {
-            id: 1,
-            election_id: election.id,
-            name: "Testplek".to_string(),
-            number: 34,
-            number_of_voters: Some(20),
-            polling_station_type: PollingStationType::Bijzonder,
-            street: "Teststraat".to_string(),
-            house_number: "2".to_string(),
-            house_number_addition: Some("b".to_string()),
-            postal_code: "1234 QY".to_string(),
-            locality: "Testdorp".to_string(),
-        };
-        let ps2 = PollingStation {
-            id: 2,
-            election_id: election.id,
-            name: "Testplek twee".to_string(),
-            number: 37,
-            number_of_voters: Some(20),
-            polling_station_type: PollingStationType::Bijzonder,
-            street: "Testlaan".to_string(),
-            house_number: "3".to_string(),
-            house_number_addition: Some("b".to_string()),
-            postal_code: "0123AB".to_string(),
-            locality: "Testdorp".to_string(),
-        };
-
-        let ps1_votes = PollingStationResults {
-            recounted: false,
-            voters_counts: VotersCounts {
-                poll_card_count: 20,
-                proxy_certificate_count: 5,
-                voter_card_count: 10,
-                total_admitted_voters_count: 35,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_counts: 31,
-                blank_votes_count: 2,
-                invalid_votes_count: 3,
-                total_votes_cast_count: 36,
-            },
-            voters_recounts: None,
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 1,
-                fewer_ballots_count: 0,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
-            },
-            political_group_votes: vec![
-                PoliticalGroupVotes {
-                    number: 1,
-                    total: 21,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 18,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 3,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 2,
-                    total: 10,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 4,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 4,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 2,
-                        },
-                    ],
-                },
-            ],
-        };
-
-        let ps2_votes = PollingStationResults {
-            recounted: true,
-            voters_counts: VotersCounts {
-                poll_card_count: 39,
-                proxy_certificate_count: 1,
-                voter_card_count: 10,
-                total_admitted_voters_count: 50,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_counts: 46,
-                blank_votes_count: 2,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 48,
-            },
-            voters_recounts: None,
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 2,
-                unreturned_ballots_count: 0,
-                too_few_ballots_handed_out_count: 0,
-                too_many_ballots_handed_out_count: 0,
-                other_explanation_count: 0,
-                no_explanation_count: 0,
-            },
-            political_group_votes: vec![
-                PoliticalGroupVotes {
-                    number: 1,
-                    total: 16,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 10,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 6,
-                        },
-                    ],
-                },
-                PoliticalGroupVotes {
-                    number: 2,
-                    total: 30,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 12,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 10,
-                        },
-                        CandidateVotes {
-                            number: 3,
-                            votes: 8,
-                        },
-                    ],
-                },
-            ],
-        };
-
-        let results = vec![(ps1, ps1_votes), (ps2, ps2_votes)];
+        let (ps1, ps2) = polling_station_fixture(&election);
+        let (ps1_results, ps2_results) = polling_station_results_fixture();
+        let results = vec![(ps1, ps1_results), (ps2, ps2_results)];
         let totals = ModelNa31_2Summary::from_results(&election, &results).unwrap();
 
-        // check recounted polling stations list is complete
-        assert_eq!(totals.recounted_polling_stations, vec![37]);
+        // check that the recounted polling stations list is empty
+        assert!(totals.recounted_polling_stations.is_empty());
 
         // check values in the differences counts
         assert_eq!(totals.differences_counts.more_ballots_count.count, 1);
@@ -462,5 +464,38 @@ mod tests {
         assert_eq!(group2.candidate_votes.first().unwrap().votes, 16);
         assert_eq!(group2.candidate_votes.get(1).unwrap().votes, 14);
         assert_eq!(group2.candidate_votes.get(2).unwrap().votes, 10);
+    }
+
+    #[test]
+    fn test_voters_recounts_addition() {
+        let election = election_fixture(&[2, 3]);
+        let (ps1, ps2) = polling_station_fixture(&election);
+        let (ps1_results, mut ps2_results) = polling_station_results_fixture();
+
+        ps2_results.recounted = true;
+        ps2_results.voters_counts = VotersCounts {
+            poll_card_count: 50,
+            proxy_certificate_count: 0,
+            voter_card_count: 0,
+            total_admitted_voters_count: 50,
+        };
+        ps2_results.voters_recounts = Some(VotersRecounts {
+            poll_card_recount: 48,
+            proxy_certificate_recount: 1,
+            voter_card_recount: 1,
+            total_admitted_voters_recount: 50,
+        });
+
+        let results = vec![(ps1, ps1_results), (ps2, ps2_results)];
+        let totals = ModelNa31_2Summary::from_results(&election, &results).unwrap();
+
+        // check that the recounted polling stations list is complete
+        assert_eq!(totals.recounted_polling_stations, vec![37]);
+
+        // check that the voters_recounts are added to voters_counts in the totals
+        assert_eq!(totals.voters_counts.poll_card_count, 68);
+        assert_eq!(totals.voters_counts.proxy_certificate_count, 6);
+        assert_eq!(totals.voters_counts.voter_card_count, 11);
+        assert_eq!(totals.voters_counts.total_admitted_voters_count, 85);
     }
 }

@@ -85,7 +85,7 @@ export function DifferencesForm() {
   React.useEffect(() => {
     if (hasChanges) {
       const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
-      checkbox.checked = false;
+      if (checkbox.checked) checkbox.click();
       setWarningsWarning(false);
     }
   }, [hasChanges]);
@@ -101,10 +101,18 @@ export function DifferencesForm() {
         if (!hasChanges && !ignoreWarnings) {
           setWarningsWarning(true);
         } else {
-          await submit(ignoreWarnings);
+          try {
+            await submit(ignoreWarnings);
+          } catch (e) {
+            console.error("Error saving data entry", e);
+          }
         }
       } else {
-        await submit();
+        try {
+          await submit();
+        } catch (e) {
+          console.error("Error saving data entry", e);
+        }
       }
     })(event);
 
@@ -118,6 +126,13 @@ export function DifferencesForm() {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
+
+  const defaultProps = {
+    errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
+    warningsAccepted: getIgnoreWarnings(),
+    inputProps: register(),
+    format,
+  };
 
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id="differences_form">
@@ -140,22 +155,18 @@ export function DifferencesForm() {
             field="I"
             id="more_ballots_count"
             title="Stembiljetten méér geteld"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.differences_counts.more_ballots_count}
             isFocused
+            {...defaultProps}
           />
           <InputGridRow
             key="J"
             field="J"
             id="fewer_ballots_count"
             title="Stembiljetten minder geteld"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.differences_counts.fewer_ballots_count}
             addSeparator
+            {...defaultProps}
           />
 
           <InputGridRow
@@ -163,41 +174,33 @@ export function DifferencesForm() {
             field="K"
             id="unreturned_ballots_count"
             title="Niet ingeleverde stembiljetten"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.differences_counts.unreturned_ballots_count}
+            {...defaultProps}
           />
           <InputGridRow
             key="L"
             field="L"
             id="too_few_ballots_handed_out_count"
             title="Te weinig uitgereikte stembiljetten"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.differences_counts.too_few_ballots_handed_out_count}
+            {...defaultProps}
           />
           <InputGridRow
             key="M"
             field="M"
             id="too_many_ballots_handed_out_count"
             title="Te veel uitgereikte stembiljetten"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.differences_counts.too_many_ballots_handed_out_count}
+            {...defaultProps}
           />
           <InputGridRow
             key="N"
             field="N"
             id="other_explanation_count"
             title="Andere verklaring voor het verschil"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.differences_counts.other_explanation_count}
             addSeparator
+            {...defaultProps}
           />
 
           <InputGridRow
@@ -205,10 +208,8 @@ export function DifferencesForm() {
             field="O"
             id="no_explanation_count"
             title="Geen verklaring voor het verschil"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.differences_counts.no_explanation_count}
+            {...defaultProps}
           />
         </InputGrid.Body>
       </InputGrid>

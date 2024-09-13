@@ -1,6 +1,12 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
+import {
+  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
+  expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
+  expectFieldsToHaveIconAndToHaveAccessibleName,
+  expectFieldsToNotHaveIcon,
+} from "app/component/form/testHelperFunctions.tsx";
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
@@ -20,6 +26,18 @@ function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
       <DifferencesForm />
     </PollingStationFormController>,
   );
+}
+
+function getFormFields(): HTMLElement[] {
+  return [
+    screen.getByTestId("more_ballots_count"),
+    screen.getByTestId("fewer_ballots_count"),
+    screen.getByTestId("unreturned_ballots_count"),
+    screen.getByTestId("too_few_ballots_handed_out_count"),
+    screen.getByTestId("too_many_ballots_handed_out_count"),
+    screen.getByTestId("other_explanation_count"),
+    screen.getByTestId("no_explanation_count"),
+  ];
 }
 
 describe("Test DifferencesForm", () => {
@@ -128,7 +146,7 @@ describe("Test DifferencesForm", () => {
           total_admitted_voters_count: 53,
         },
         votes_counts: {
-          votes_candidates_counts: 52,
+          votes_candidates_count: 52,
           blank_votes_count: 1,
           invalid_votes_count: 2,
           total_votes_cast_count: 55,
@@ -154,6 +172,17 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       renderForm({ ...votersAndVotesValues });
+
+      const [
+        moreBallotsCount,
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ]: HTMLElement[] = getFormFields();
+
       const spy = vi.spyOn(global, "fetch");
 
       await userTypeInputs(user, {
@@ -162,6 +191,18 @@ describe("Test DifferencesForm", () => {
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
+
+      const expectedValidFields = [
+        moreBallotsCount,
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ] as HTMLElement[];
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
@@ -175,12 +216,7 @@ describe("Test DifferencesForm", () => {
     test("F.301 IncorrectDifference", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.differences_counts.more_ballots_count"],
-              code: "F301",
-            },
-          ],
+          errors: [{ fields: ["data.differences_counts.more_ballots_count"], code: "F301" }],
           warnings: [],
         },
       });
@@ -189,28 +225,42 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      // Since the component does not allow to change values in other components,
-      // not inputting any values and just clicking the submit button.
+      const [
+        moreBallotsCount,
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ]: HTMLElement[] = getFormFields();
+
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(
-        `Controleer I (stembiljetten meer geteld)F.301Je hebt bij Aantal kiezers en stemmers ingevuld dat er meer stemmen dan kiezers waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het aantal meer getelde stembiljetten.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
-      );
+      const feedbackMessage =
+        "Controleer I (stembiljetten meer geteld)F.301Je hebt bij Aantal kiezers en stemmers ingevuld dat er meer stemmen dan kiezers waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het aantal meer getelde stembiljetten.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+      const expectedInvalidFields = [moreBallotsCount] as HTMLElement[];
+      const expectedValidFields = [
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ] as HTMLElement[];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
     });
 
     test("F.302 Should be empty", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.differences_counts.fewer_ballots_count"],
-              code: "F302",
-            },
-          ],
+          errors: [{ fields: ["data.differences_counts.fewer_ballots_count"], code: "F302" }],
           warnings: [],
         },
       });
@@ -219,28 +269,42 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: true });
 
-      // Since the component does not allow to change values in other components,
-      // not inputting any values and just clicking the submit button.
+      const [
+        moreBallotsCount,
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ]: HTMLElement[] = getFormFields();
+
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(
-        `Controleer J (stembiljetten minder geteld)F.302Je hebt bij Aantal kiezers en stemmers ingevuld dat er meer stemmen dan kiezers waren. Daarom mag J niet ingevuld zijn.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
-      );
+      const feedbackMessage =
+        "Controleer J (stembiljetten minder geteld)F.302Je hebt bij Aantal kiezers en stemmers ingevuld dat er meer stemmen dan kiezers waren. Daarom mag J niet ingevuld zijn.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+      const expectedInvalidFields = [fewerBallotsCount] as HTMLElement[];
+      const expectedValidFields = [
+        moreBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ] as HTMLElement[];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
     });
 
     test("F.303 IncorrectDifference", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.differences_counts.fewer_ballots_count"],
-              code: "F303",
-            },
-          ],
+          errors: [{ fields: ["data.differences_counts.fewer_ballots_count"], code: "F303" }],
           warnings: [],
         },
       });
@@ -249,28 +313,42 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      // Since the component does not allow to change values in other components,
-      // not inputting any values and just clicking the submit button.
+      const [
+        moreBallotsCount,
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ]: HTMLElement[] = getFormFields();
+
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(
-        `Controleer J (stembiljetten minder geteld)F.303Je hebt bij Aantal kiezers en stemmers ingevuld dat er minder stemmen dan kiezers waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het aantal minder getelde stembiljetten.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
-      );
+      const feedbackMessage =
+        "Controleer J (stembiljetten minder geteld)F.303Je hebt bij Aantal kiezers en stemmers ingevuld dat er minder stemmen dan kiezers waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het aantal minder getelde stembiljetten.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+      const expectedInvalidFields = [fewerBallotsCount] as HTMLElement[];
+      const expectedValidFields = [
+        moreBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ] as HTMLElement[];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
     });
 
     test("F.304 Should be empty", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
-          errors: [
-            {
-              fields: ["data.differences_counts.more_ballots_count"],
-              code: "F304",
-            },
-          ],
+          errors: [{ fields: ["data.differences_counts.more_ballots_count"], code: "F304" }],
           warnings: [],
         },
       });
@@ -279,17 +357,36 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: true });
 
-      // Since the component does not allow to change values in other components,
-      // not inputting any values and just clicking the submit button.
+      const [
+        moreBallotsCount,
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ]: HTMLElement[] = getFormFields();
+
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(
-        `Controleer I (stembiljetten meer geteld)F.304Je hebt bij Aantal kiezers en stemmers ingevuld dat er minder stemmen dan kiezers waren. Daarom mag I niet ingevuld zijn.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
-      );
+      const feedbackMessage =
+        "Controleer I (stembiljetten meer geteld)F.304Je hebt bij Aantal kiezers en stemmers ingevuld dat er minder stemmen dan kiezers waren. Daarom mag I niet ingevuld zijn.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+      const expectedInvalidFields = [moreBallotsCount] as HTMLElement[];
+      const expectedValidFields = [
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ] as HTMLElement[];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
     });
 
     test("F.305 No difference expected", async () => {
@@ -300,7 +397,7 @@ describe("Test DifferencesForm", () => {
               fields: [
                 "data.differences_counts.fewer_ballots_count",
                 "data.differences_counts.unreturned_ballots_count",
-                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.too_many_ballots_handed_out_count",
                 "data.differences_counts.too_few_ballots_handed_out_count",
                 "data.differences_counts.other_explanation_count",
                 "data.differences_counts.no_explanation_count",
@@ -316,27 +413,41 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      await user.type(screen.getByTestId("more_ballots_count"), "0");
-      await user.type(screen.getByTestId("fewer_ballots_count"), "4");
-      await user.type(screen.getByTestId("unreturned_ballots_count"), "1");
-      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "1");
-      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "0");
-      await user.type(screen.getByTestId("other_explanation_count"), "1");
-      await user.type(screen.getByTestId("no_explanation_count"), "1");
+      const [
+        moreBallotsCount,
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ]: HTMLElement[] = getFormFields();
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackWarning = await screen.findByTestId("feedback-error");
-      expect(feedbackWarning).toHaveTextContent(
-        `Controleer ingevulde verschillenF.305Je hebt bij Aantal kiezers en stemmers ingevuld dat er evenveel stemmen als kiezers waren. Maar je hebt wel verschillen ingevuld.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.`,
-      );
+      const feedbackMessage =
+        "Controleer ingevulde verschillenF.305Je hebt bij Aantal kiezers en stemmers ingevuld dat er evenveel stemmen als kiezers waren. Maar je hebt wel verschillen ingevuld.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      const expectedInvalidFields = [
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ] as HTMLElement[];
+      const expectedValidFields = [moreBallotsCount] as HTMLElement[];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
     });
   });
 
   describe("DifferencesForm warnings", () => {
-    test("clicking next without accepting warning results in alert shown", async () => {
+    test("clicking next without accepting warning results in alert shown and then accept warning", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -346,59 +457,7 @@ describe("Test DifferencesForm", () => {
                 "data.differences_counts.more_ballots_count",
                 "data.differences_counts.too_many_ballots_handed_out_count",
                 "data.differences_counts.too_few_ballots_handed_out_count",
-                "data.differences_counts.unreturned_ballots",
-                "data.differences_counts.other_explanation_count",
-                "data.differences_counts.no_explanation_count",
-              ],
-              code: "W301",
-            },
-          ],
-        },
-      });
-
-      const user = userEvent.setup();
-
-      renderForm();
-
-      await user.type(screen.getByTestId("more_ballots_count"), "3");
-      await user.type(screen.getByTestId("fewer_ballots_count"), "0");
-      await user.type(screen.getByTestId("unreturned_ballots_count"), "0");
-      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "0");
-      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "1");
-      await user.type(screen.getByTestId("other_explanation_count"), "0");
-      await user.type(screen.getByTestId("no_explanation_count"), "1");
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(
-        `Controleer ingevulde verschillenW.301De invoer bij I, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
-      );
-
-      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
-        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
-      });
-      expect(acceptFeedbackCheckbox).not.toBeChecked();
-
-      await user.click(submitButton);
-      const alertText = screen.getByRole("alert");
-      expect(alertText).toHaveTextContent(
-        /^Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.$/,
-      );
-    });
-
-    test("W.301 Incorrect total", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [],
-          warnings: [
-            {
-              fields: [
-                "data.differences_counts.more_ballots_count",
-                "data.differences_counts.too_many_ballots_handed_out_count",
-                "data.differences_counts.too_few_ballots_handed_out_count",
-                "data.differences_counts.unreturned_ballots",
+                "data.differences_counts.unreturned_ballots_count",
                 "data.differences_counts.other_explanation_count",
                 "data.differences_counts.no_explanation_count",
               ],
@@ -412,23 +471,113 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      await user.type(screen.getByTestId("more_ballots_count"), "3");
-      await user.type(screen.getByTestId("fewer_ballots_count"), "0");
-      await user.type(screen.getByTestId("unreturned_ballots_count"), "0");
-      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "0");
-      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "1");
-      await user.type(screen.getByTestId("other_explanation_count"), "0");
-      await user.type(screen.getByTestId("no_explanation_count"), "1");
+      const [
+        moreBallotsCount,
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ]: HTMLElement[] = getFormFields();
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
+      const feedbackMessage =
+        "Controleer ingevulde verschillenW.301De invoer bij I, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(
-        `Controleer ingevulde verschillenW.301De invoer bij I, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
-      );
+      expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+      const expectedInvalidFields = [
+        moreBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ] as HTMLElement[];
+      let expectedValidFields = [fewerBallotsCount] as HTMLElement[];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
+
+      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
+      expect(acceptFeedbackCheckbox).not.toBeChecked();
+
+      await user.click(submitButton);
+      const alertText = screen.getByRole("alert");
+      expect(alertText).toHaveTextContent(
+        "Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.",
+      );
+
+      acceptFeedbackCheckbox.click();
+      await user.click(submitButton);
+
+      expect(feedbackWarning).toHaveTextContent(feedbackMessage);
+      // All fields should be considered valid now
+      expectedValidFields = expectedValidFields.concat(expectedInvalidFields);
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
+    });
+
+    test("W.301 Incorrect total", async () => {
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: [
+                "data.differences_counts.more_ballots_count",
+                "data.differences_counts.too_many_ballots_handed_out_count",
+                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.unreturned_ballots_count",
+                "data.differences_counts.other_explanation_count",
+                "data.differences_counts.no_explanation_count",
+              ],
+              code: "W301",
+            },
+          ],
+        },
+      });
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      const [
+        moreBallotsCount,
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ]: HTMLElement[] = getFormFields();
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackMessage =
+        "Controleer ingevulde verschillenW.301De invoer bij I, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      const expectedInvalidFields = [
+        moreBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ] as HTMLElement[];
+      const expectedValidFields = [fewerBallotsCount] as HTMLElement[];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
     });
 
     test("W.302 Incorrect total", async () => {
@@ -440,7 +589,7 @@ describe("Test DifferencesForm", () => {
               fields: [
                 "data.differences_counts.fewer_ballots_count",
                 "data.differences_counts.unreturned_ballots_count",
-                "data.differences_counts.too_few_ballots_handed_out_count",
+                "data.differences_counts.too_many_ballots_handed_out_count",
                 "data.differences_counts.too_few_ballots_handed_out_count",
                 "data.differences_counts.other_explanation_count",
                 "data.differences_counts.no_explanation_count",
@@ -455,23 +604,36 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      await user.type(screen.getByTestId("more_ballots_count"), "0");
-      await user.type(screen.getByTestId("fewer_ballots_count"), "4");
-      await user.type(screen.getByTestId("unreturned_ballots_count"), "0");
-      await user.type(screen.getByTestId("too_few_ballots_handed_out_count"), "1");
-      await user.type(screen.getByTestId("too_many_ballots_handed_out_count"), "0");
-      await user.type(screen.getByTestId("other_explanation_count"), "1");
-      await user.type(screen.getByTestId("no_explanation_count"), "1");
+      const [
+        moreBallotsCount,
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ]: HTMLElement[] = getFormFields();
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(
-        `Controleer ingevulde verschillenW.302De invoer bij J, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
-      );
+      const feedbackMessage =
+        "Controleer ingevulde verschillenW.302De invoer bij J, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
+      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      expect(screen.queryByTestId("server-feedback-error")).toBeNull();
+      const expectedInvalidFields = [
+        fewerBallotsCount,
+        unreturnedBallotsCount,
+        tooFewBallotsHandedOutCount,
+        tooManyBallotsHandedOutCount,
+        otherExplanationCount,
+        noExplanationCount,
+      ] as HTMLElement[];
+      const expectedValidFields = [moreBallotsCount] as HTMLElement[];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
+      expectFieldsToNotHaveIcon(expectedValidFields);
     });
   });
 });

@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { formatNumber } from "e2e-tests/e2e-test-utils";
 import { CandidatesListPage } from "e2e-tests/page-objects/input/CandidatesListPgObj";
 import { DifferencesPage, FewerBallotsFields, MoreBallotsFields } from "e2e-tests/page-objects/input/DifferencesPgObj";
@@ -12,6 +12,7 @@ import {
   VotesCounts,
 } from "e2e-tests/page-objects/input/VotersVotesPgObj";
 
+import { test } from "./fixtures";
 import { pollingStation33 } from "./test-data/PollingStationTestData";
 
 test.describe("data entry", () => {
@@ -40,7 +41,7 @@ test.describe("data entry", () => {
       total_admitted_voters_count: 1125,
     };
     const votes: VotesCounts = {
-      votes_candidates_counts: 1090,
+      votes_candidates_count: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
@@ -92,7 +93,7 @@ test.describe("data entry", () => {
     };
     await votersVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_counts: 1090,
+      votes_candidates_count: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
@@ -148,7 +149,7 @@ test.describe("data entry", () => {
     };
     await votersVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_counts: 1135,
+      votes_candidates_count: 1135,
       blank_votes_count: 10,
       invalid_votes_count: 5,
       total_votes_cast_count: 1150,
@@ -160,7 +161,7 @@ test.describe("data entry", () => {
     await expect(votersVotesPage.warning).toContainText(
       "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
     );
-    await votersVotesPage.acceptWarnings.check();
+    await votersVotesPage.checkAcceptWarnings();
     await votersVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
@@ -213,7 +214,7 @@ test.describe("data entry", () => {
     await votersVotesPage.inputVotersCounts(voters);
 
     const votes: VotesCounts = {
-      votes_candidates_counts: 1090,
+      votes_candidates_count: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
@@ -233,7 +234,7 @@ test.describe("data entry", () => {
     await expect(votersVotesPage.warning).toContainText(
       "Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).",
     );
-    await votersVotesPage.acceptWarnings.check();
+    await votersVotesPage.checkAcceptWarnings();
     await votersVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
@@ -280,7 +281,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -326,7 +327,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -378,7 +379,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -392,7 +393,7 @@ test.describe("errors and warnings", () => {
     await expect(votersVotesPage.error).toBeHidden();
 
     // accept the warning
-    await votersVotesPage.acceptWarnings.check();
+    await votersVotesPage.checkAcceptWarnings();
     await votersVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
@@ -416,7 +417,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -469,7 +470,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -512,7 +513,7 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -566,7 +567,7 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -625,13 +626,14 @@ test.describe("navigation", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        votes_candidates_counts: 100,
+        votes_candidates_count: 100,
         blank_votes_count: 0,
         invalid_votes_count: 0,
         total_votes_cast_count: 100,
       };
       await votersVotesPage.fillInPageAndClickNext(voters, votes);
-      await votersVotesPage.acceptWarnings.click();
+
+      await votersVotesPage.checkAcceptWarnings();
       await votersVotesPage.next.click();
 
       const differencesPage = new DifferencesPage(page);

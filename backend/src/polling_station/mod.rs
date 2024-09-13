@@ -231,7 +231,7 @@ mod tests {
                     total_admitted_voters_count: 100,
                 },
                 votes_counts: VotesCounts {
-                    votes_candidates_counts: 96,
+                    votes_candidates_count: 96,
                     blank_votes_count: 2,
                     invalid_votes_count: 2,
                     total_votes_cast_count: 100,

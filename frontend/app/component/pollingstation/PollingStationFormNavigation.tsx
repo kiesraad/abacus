@@ -19,7 +19,7 @@ export interface PollingStationFormNavigationProps {
 
 export function PollingStationFormNavigation({ pollingStationId, election }: PollingStationFormNavigationProps) {
   const _lastKnownSection = React.useRef<FormSectionID | null>(null);
-  const { status, formState, error, currentForm, targetFormSection, values, setTemporaryCache, submitCurrentForm } =
+  const { status, formState, apiError, currentForm, targetFormSection, values, setTemporaryCache, submitCurrentForm } =
     usePollingStationFormController();
 
   const navigate = useNavigate();
@@ -114,6 +114,13 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
     }
   }, [targetFormSection, getUrlForFormSection, navigate]);
 
+  // scroll up when an error occurs
+  React.useEffect(() => {
+    if (apiError) {
+      window.scrollTo(0, 0);
+    }
+  }, [apiError]);
+
   const onSave = () =>
     void (async () => {
       if (blocker.location) overrideControllerNavigation.current = blocker.location.pathname;
@@ -152,7 +159,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
         </Modal>
       )}
 
-      {error && <Feedback id="feedback-server-error" type="error" data={error} />}
+      {apiError && <Feedback id="feedback-server-error" type="error" apiError={apiError} />}
     </>
   );
 }

@@ -151,7 +151,7 @@ de aantallen opgenomen in bijlage 2, rubriek 2.]
 
 #summary_table(
   (
-    ([Aantal geldige stemmen op kandidaten], [E], mono[#input.summary.votes_counts.votes_candidates_counts]),
+    ([Aantal geldige stemmen op kandidaten], [E], mono[#input.summary.votes_counts.votes_candidates_count]),
     ([Aantal blanco stemmen], [F], mono[#input.summary.votes_counts.blank_votes_count]),
     ([Aantal ongeldige stemmen], [G], mono[#input.summary.votes_counts.invalid_votes_count]),
   ),

@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { ApiResponseErrorData } from "@kiesraad/api";
+import { ApiError } from "@kiesraad/api";
 import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
@@ -10,33 +10,33 @@ import { ClientValidationResultCode, FeedbackItem, feedbackTypes } from "./Feedb
 export interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
-  data: ClientValidationResultCode[] | ApiResponseErrorData;
+  data?: ClientValidationResultCode[];
+  // TODO: #277 move to error page or modal
+  apiError?: ApiError;
   children?: ReactNode;
 }
 
-function getFeedbackListFromData(data: ClientValidationResultCode[] | ApiResponseErrorData): FeedbackItem[] {
+export function Feedback({ id, type, data, apiError, children }: FeedbackProps) {
   const feedbackList: FeedbackItem[] = [];
-  if (Array.isArray(data)) {
+  if (data) {
     for (const code of data) {
       feedbackList.push(feedbackTypes[code]);
     }
-  } else {
-    feedbackList.push({
-      title: "Server error",
-      content: (
-        <div>
-          {data.errorCode}: {data.message}
-        </div>
-      ),
-    });
   }
-  return feedbackList;
-}
 
-export function Feedback({ id, type, data, children }: FeedbackProps) {
-  const feedbackList = getFeedbackListFromData(data);
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>
+      {apiError && (
+        <div className="feedback-item">
+          <header>
+            {renderIconForType(type)}
+            <h3>Sorry, er ging iets mis</h3>
+          </header>
+          <div className="content">
+            {apiError.code}: {apiError.error}
+          </div>
+        </div>
+      )}
       {feedbackList.map((feedback, index) => (
         <div key={`feedback-${index}`} className="feedback-item">
           <header>
@@ -47,7 +47,7 @@ export function Feedback({ id, type, data, children }: FeedbackProps) {
           <div className="content">{feedback.content}</div>
         </div>
       ))}
-      {id !== "feedback-server-error" && (
+      {(children || feedbackList.length > 0) && (
         <div className="feedback-action">
           {children ? (
             children

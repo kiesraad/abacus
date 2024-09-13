@@ -79,7 +79,7 @@ describe("UI component: Feedback", () => {
   test("Server error has expected children", () => {
     const { getByText } = render(<SingleServerError />);
 
-    expect(getByText("Server error")).toBeInTheDocument();
+    expect(getByText("Sorry, er ging iets mis")).toBeInTheDocument();
     expect(getByText("500: Internal Server Error")).toBeInTheDocument();
   });
 });

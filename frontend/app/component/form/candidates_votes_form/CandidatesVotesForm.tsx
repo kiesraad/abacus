@@ -81,7 +81,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   React.useEffect(() => {
     if (hasChanges) {
       const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
-      checkbox.checked = false;
+      if (checkbox.checked) checkbox.click();
       setWarningsWarning(false);
     }
   }, [hasChanges, _IGNORE_WARNINGS_ID]);
@@ -107,15 +107,30 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         if (!hasChanges && !ignoreWarnings) {
           setWarningsWarning(true);
         } else {
-          await submit(ignoreWarnings);
+          try {
+            await submit(ignoreWarnings);
+          } catch (e) {
+            console.error("Error saving data entry", e);
+          }
         }
       } else {
-        await submit();
+        try {
+          await submit();
+        } catch (e) {
+          console.error("Error saving data entry", e);
+        }
       }
     })(event);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
+
+  const defaultProps = {
+    errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
+    warningsAccepted: getIgnoreWarnings(),
+    inputProps: register(),
+    format,
+  };
 
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
@@ -145,12 +160,10 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 name="candidatevotes[]"
                 id={`candidate_votes[${candidate.number - 1}].votes`}
                 title={`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`}
-                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-                inputProps={register()}
-                format={format}
                 addSeparator={addSeparator}
                 defaultValue={defaultValue}
                 isFocused={index === 0}
+                {...defaultProps}
               />
             );
           })}
@@ -160,11 +173,9 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             name="total"
             id="total"
             title={`Totaal lijst ${group.number}`}
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            inputProps={register()}
-            format={format}
             defaultValue={format(sectionValues?.total || "")}
             isListTotal
+            {...defaultProps}
           />
         </InputGrid.Body>
       </InputGrid>
@@ -177,7 +188,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </BottomBar.Row>
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings}>
+          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings} hasError={warningsWarning}>
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

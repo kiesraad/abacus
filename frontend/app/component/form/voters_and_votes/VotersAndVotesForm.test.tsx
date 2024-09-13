@@ -1,7 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
+import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs, waitFor } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
 import { FormState, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
@@ -353,8 +353,7 @@ describe("Test VotersAndVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackWarning = await screen.findByTestId("feedback-warning");
-      expect(feedbackWarning).toHaveTextContent(
+      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(
         `Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
       );
 
@@ -368,6 +367,44 @@ describe("Test VotersAndVotesForm", () => {
       expect(alertText).toHaveTextContent(
         /^Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.$/,
       );
+
+      const checkbox = screen.getByTestId("voters_and_votes_form_ignore_warnings");
+      expect(checkbox).toBeInTheDocument();
+      expect(checkbox).toBeVisible();
+      await user.click(checkbox);
+      expect(checkbox).toBeChecked();
+
+      await user.clear(screen.getByTestId("blank_votes_count"));
+      await user.type(screen.getByTestId("blank_votes_count"), "100");
+      await user.tab();
+      expect(screen.getByTestId("blank_votes_count"), "100").toHaveValue("100");
+
+      await waitFor(() => {
+        const checkbox = screen.getByTestId("voters_and_votes_form_ignore_warnings");
+        expect(checkbox).toBeInTheDocument();
+        expect(checkbox).not.toBeVisible();
+      });
+
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [
+            {
+              fields: ["data.votes_counts.blank_votes_count"],
+              code: "W201",
+            },
+          ],
+        },
+      });
+
+      await user.click(submitButton);
+
+      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(
+        `Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.`,
+      );
+
+      expect(checkbox).toBeVisible();
+      expect(checkbox).not.toBeChecked();
     });
 
     test("W.201 high number of blank votes", async () => {

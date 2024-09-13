@@ -21,6 +21,8 @@ function returnWebserverCommand(): string {
 
 const config: PlaywrightTestConfig = defineConfig({
   ...commonConfig,
+  workers: 1, // overrides commonConfig to disable parallel test execution
+  reportSlowTests: { max: 5, threshold: 25000 }, // TODO: split test files so we can return to default of 15 seconds
   testDir: "./e2e-tests/dom-to-db-tests",
   outputDir: "./test-results/dom-to-db",
   testMatch: /\.e2e\.ts/,

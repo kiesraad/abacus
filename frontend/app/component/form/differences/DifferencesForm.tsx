@@ -85,7 +85,7 @@ export function DifferencesForm() {
   React.useEffect(() => {
     if (hasChanges) {
       const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
-      checkbox.checked = false;
+      if (checkbox.checked) checkbox.click();
       setWarningsWarning(false);
     }
   }, [hasChanges]);
@@ -101,10 +101,18 @@ export function DifferencesForm() {
         if (!hasChanges && !ignoreWarnings) {
           setWarningsWarning(true);
         } else {
-          await submit(ignoreWarnings);
+          try {
+            await submit(ignoreWarnings);
+          } catch (e) {
+            console.error("Error saving data entry", e);
+          }
         }
       } else {
-        await submit();
+        try {
+          await submit();
+        } catch (e) {
+          console.error("Error saving data entry", e);
+        }
       }
     })(event);
 

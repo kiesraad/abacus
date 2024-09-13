@@ -32,12 +32,12 @@ describe("ApiClient", () => {
     expect(parsedResponse).toStrictEqual({
       status: ApiResponseStatus.ClientError,
       code: 422,
-      data: responseBody,
+      error: undefined,
     });
   });
 
   test("500 response is parsed as server error", async () => {
-    const responseBody = { fizz: "buzz" };
+    const responseBody = { error: "foo" };
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, responseBody);
 
     const client = new ApiClient("testhost");
@@ -48,7 +48,7 @@ describe("ApiClient", () => {
     expect(parsedResponse).toStrictEqual({
       status: ApiResponseStatus.ServerError,
       code: 500,
-      data: responseBody,
+      error: responseBody.error,
     });
   });
 

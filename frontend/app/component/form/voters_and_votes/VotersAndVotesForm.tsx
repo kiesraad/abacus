@@ -151,6 +151,13 @@ export function VotersAndVotesForm() {
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
 
+  const defaultProps = {
+    errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
+    warningsAccepted: getIgnoreWarnings(),
+    inputProps: register(),
+    format,
+  };
+
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form">
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
@@ -172,47 +179,35 @@ export function VotersAndVotesForm() {
             field="A"
             id="poll_card_count"
             title="Stempassen"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            warningsAccepted={getIgnoreWarnings()}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.voters_counts.poll_card_count}
             isFocused
+            {...defaultProps}
           />
           <InputGridRow
             key="B"
             field="B"
             id="proxy_certificate_count"
             title="Volmachtbewijzen"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            warningsAccepted={getIgnoreWarnings()}
-            inputProps={register()}
             defaultValue={sectionValues.voters_counts.proxy_certificate_count}
-            format={format}
+            {...defaultProps}
           />
           <InputGridRow
             key="C"
             field="C"
             id="voter_card_count"
             title="Kiezerspassen"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            warningsAccepted={getIgnoreWarnings()}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.voters_counts.voter_card_count}
+            {...defaultProps}
           />
           <InputGridRow
             key="D"
             field="D"
             id="total_admitted_voters_count"
             title="Totaal toegelaten kiezers"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            warningsAccepted={getIgnoreWarnings()}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.voters_counts.total_admitted_voters_count}
             isTotal
             addSeparator
+            {...defaultProps}
           />
 
           <InputGridRow
@@ -220,45 +215,33 @@ export function VotersAndVotesForm() {
             field="E"
             id="votes_candidates_count"
             title="Stemmen op kandidaten"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            warningsAccepted={getIgnoreWarnings()}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.votes_counts.votes_candidates_count}
+            {...defaultProps}
           />
           <InputGridRow
             key="F"
             field="F"
             id="blank_votes_count"
             title="Blanco stemmen"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            warningsAccepted={getIgnoreWarnings()}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.votes_counts.blank_votes_count}
+            {...defaultProps}
           />
           <InputGridRow
             key="G"
             field="G"
             id="invalid_votes_count"
             title="Ongeldige stemmen"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            warningsAccepted={getIgnoreWarnings()}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.votes_counts.invalid_votes_count}
+            {...defaultProps}
           />
           <InputGridRow
             key="H"
             field="H"
             id="total_votes_cast_count"
             title="Totaal uitgebrachte stemmen"
-            errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-            warningsAccepted={getIgnoreWarnings()}
-            inputProps={register()}
-            format={format}
             defaultValue={sectionValues.votes_counts.total_votes_cast_count}
             isTotal
+            {...defaultProps}
           />
         </InputGrid.Body>
         {recounted && (
@@ -275,45 +258,33 @@ export function VotersAndVotesForm() {
                 field="A.2"
                 id="poll_card_recount"
                 title="Stempassen"
-                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-                warningsAccepted={getIgnoreWarnings()}
-                inputProps={register()}
-                format={format}
                 defaultValue={sectionValues.voters_recounts?.poll_card_recount}
+                {...defaultProps}
               />
               <InputGridRow
                 key="B.2"
                 field="B.2"
                 id="proxy_certificate_recount"
                 title="Volmachtbewijzen"
-                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-                warningsAccepted={getIgnoreWarnings()}
-                inputProps={register()}
                 defaultValue={sectionValues.voters_recounts?.proxy_certificate_recount}
-                format={format}
+                {...defaultProps}
               />
               <InputGridRow
                 key="C.2"
                 field="C.2"
                 id="voter_card_recount"
                 title="Kiezerspassen"
-                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-                warningsAccepted={getIgnoreWarnings()}
-                inputProps={register()}
-                format={format}
                 defaultValue={sectionValues.voters_recounts?.voter_card_recount}
+                {...defaultProps}
               />
               <InputGridRow
                 key="D.2"
                 field="D.2"
                 id="total_admitted_voters_recount"
                 title="Totaal toegelaten kiezers"
-                errorsAndWarnings={isSaved ? errorsAndWarnings : undefined}
-                warningsAccepted={getIgnoreWarnings()}
-                inputProps={register()}
-                format={format}
                 defaultValue={sectionValues.voters_recounts?.total_admitted_voters_recount}
                 isTotal
+                {...defaultProps}
               />
             </InputGrid.Body>
           </>

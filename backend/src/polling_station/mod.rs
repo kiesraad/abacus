@@ -355,6 +355,10 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(row_count.count, 1);
+
+        // Check that we can't save a new data entry after finalising
+        let response = save(pool.clone(), request_body.clone()).await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
     }
 
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]

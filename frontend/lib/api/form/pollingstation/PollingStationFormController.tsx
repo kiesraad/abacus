@@ -318,15 +318,15 @@ export function PollingStationFormController({
           const formValues = ref.getValues();
           let voters_recounts: VotersRecounts | undefined = undefined;
           if (formValues.recounted) {
-            if (values.recounted === false) {
+            if (values.voters_recounts !== undefined) {
+              voters_recounts = values.voters_recounts;
+            } else {
               voters_recounts = {
                 poll_card_recount: 0,
                 proxy_certificate_recount: 0,
                 voter_card_recount: 0,
                 total_admitted_voters_recount: 0,
               };
-            } else {
-              voters_recounts = values.voters_recounts;
             }
           }
           newValues = {

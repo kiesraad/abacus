@@ -2,9 +2,11 @@ use crate::election::Election;
 use crate::validation::{
     above_percentage_threshold, ValidationResult, ValidationResultCode, ValidationResults,
 };
+use crate::APIError;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use std::fmt;
+use std::ops::AddAssign;
 use utoipa::ToSchema;
 
 #[derive(Debug)]
@@ -35,7 +37,7 @@ pub trait Validate {
 }
 
 /// Polling station of a certain [Election]
-#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
 pub struct PollingStation {
     pub id: u32,
     pub election_id: u32,
@@ -81,11 +83,19 @@ fn difference_admitted_voters_count_and_votes_cast_count_above_threshold(
         || f64::abs(float_admitted_voters - float_votes_cast) >= 15.0
 }
 
-/// PollingStationResults, following the fields in
-/// "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar lichaam
-///  in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht"
-/// "Bijlage 2: uitkomsten per stembureau"
-///  <https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieNa31.2
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct PollingStationResultsEntry {
+    pub polling_station_id: u32,
+    pub data: PollingStationResults,
+}
+
+/// PollingStationResults, following the fields in Model Na 31-2 Bijage 2.
+///
+/// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
+/// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
+/// Bijlage 2: uitkomsten per stembureau" from the
+/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
+/// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PollingStationResults {
     /// Recounted ("Is er herteld? - See form for official long description of the checkbox")
@@ -95,6 +105,7 @@ pub struct PollingStationResults {
     /// Votes counts ("2. Aantal getelde stembiljetten")
     pub votes_counts: VotesCounts,
     /// Voters recounts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
+    /// When filled in, this field should replace `voters_counts` when using the results.
     pub voters_recounts: Option<VotersRecounts>,
     /// Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
     pub differences_counts: DifferencesCounts,
@@ -119,6 +130,16 @@ impl Validate for PollingStationResults {
             validation_results,
             format!("{field_name}.votes_counts"),
         )?;
+
+        if self.recounted && self.voters_recounts.is_none() {
+            return Err(DataError::new(
+                "recounted==true but voters_recounts is None",
+            ));
+        } else if !self.recounted && self.voters_recounts.is_some() {
+            return Err(DataError::new(
+                "recounted==false but voters_recounts is Some",
+            ));
+        }
 
         if let Some(voters_recounts) = &self.voters_recounts {
             // if recounted = true
@@ -355,7 +376,7 @@ pub enum PollingStationStatus {
     Complete,
 }
 
-type Count = u32;
+pub type Count = u32;
 
 impl Validate for Count {
     fn validate(
@@ -387,6 +408,15 @@ pub struct VotersCounts {
     /// Total number of admitted voters ("Totaal aantal toegelaten kiezers")
     #[schema(value_type = u32)]
     pub total_admitted_voters_count: Count,
+}
+
+impl AddAssign<&VotersCounts> for VotersCounts {
+    fn add_assign(&mut self, other: &Self) {
+        self.poll_card_count += other.poll_card_count;
+        self.proxy_certificate_count += other.proxy_certificate_count;
+        self.voter_card_count += other.voter_card_count;
+        self.total_admitted_voters_count += other.total_admitted_voters_count;
+    }
 }
 
 /// Check if all voters counts and votes counts are equal to zero.
@@ -484,6 +514,15 @@ pub struct VotesCounts {
     pub total_votes_cast_count: Count,
 }
 
+impl AddAssign<&VotesCounts> for VotesCounts {
+    fn add_assign(&mut self, other: &Self) {
+        self.votes_candidates_count += other.votes_candidates_count;
+        self.blank_votes_count += other.blank_votes_count;
+        self.invalid_votes_count += other.invalid_votes_count;
+        self.total_votes_cast_count += other.total_votes_cast_count;
+    }
+}
+
 impl Validate for VotesCounts {
     fn validate(
         &self,
@@ -565,7 +604,7 @@ impl Validate for VotesCounts {
     }
 }
 
-/// Voters recounts, part of the polling station results.
+/// Recounted voters counts, this replaces the original voters counts in the polling station results.
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct VotersRecounts {
     /// Number of valid poll cards ("Aantal geldige stempassen")
@@ -580,6 +619,15 @@ pub struct VotersRecounts {
     /// Total number of admitted voters ("Totaal aantal toegelaten kiezers")
     #[schema(value_type = u32)]
     pub total_admitted_voters_recount: Count,
+}
+
+impl AddAssign<&VotersRecounts> for VotersCounts {
+    fn add_assign(&mut self, other: &VotersRecounts) {
+        self.poll_card_count += other.poll_card_recount;
+        self.proxy_certificate_count += other.proxy_certificate_recount;
+        self.voter_card_count += other.voter_card_recount;
+        self.total_admitted_voters_count += other.total_admitted_voters_recount;
+    }
 }
 
 /// Check if all voters recounts and votes counts are equal to zero.
@@ -792,6 +840,32 @@ pub struct PoliticalGroupVotes {
     #[schema(value_type = u32)]
     pub total: Count,
     pub candidate_votes: Vec<CandidateVotes>,
+}
+
+impl PoliticalGroupVotes {
+    pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
+        if self.number != other.number {
+            return Err(APIError::AddError(format!(
+                "Attempted to add votes of group '{}' to '{}'",
+                other.number, self.number
+            )));
+        }
+
+        self.total += other.total;
+
+        for cv in other.candidate_votes.iter() {
+            let Some(found_can) = self
+                .candidate_votes
+                .iter_mut()
+                .find(|c| c.number == cv.number)
+            else {
+                return Err(APIError::AddError(format!("Attempted to add candidate '{}' votes in group '{}', but no such candidate exists", cv.number, self.number)));
+            };
+            found_can.votes += cv.votes;
+        }
+
+        Ok(())
+    }
 }
 
 impl Validate for Vec<PoliticalGroupVotes> {
@@ -2199,5 +2273,49 @@ mod tests {
             "political_group_votes".to_string(),
         );
         assert!(res.is_err());
+    }
+
+    #[test]
+    fn test_votes_addition() {
+        let mut curr_votes = VotesCounts {
+            votes_candidates_count: 2,
+            blank_votes_count: 3,
+            invalid_votes_count: 4,
+            total_votes_cast_count: 9,
+        };
+
+        curr_votes += &VotesCounts {
+            votes_candidates_count: 1,
+            blank_votes_count: 2,
+            invalid_votes_count: 3,
+            total_votes_cast_count: 5,
+        };
+
+        assert_eq!(curr_votes.votes_candidates_count, 3);
+        assert_eq!(curr_votes.blank_votes_count, 5);
+        assert_eq!(curr_votes.invalid_votes_count, 7);
+        assert_eq!(curr_votes.total_votes_cast_count, 14);
+    }
+
+    #[test]
+    fn test_voters_addition() {
+        let mut curr_votes = VotersCounts {
+            poll_card_count: 2,
+            proxy_certificate_count: 3,
+            voter_card_count: 4,
+            total_admitted_voters_count: 9,
+        };
+
+        curr_votes += &VotersCounts {
+            poll_card_count: 1,
+            proxy_certificate_count: 2,
+            voter_card_count: 3,
+            total_admitted_voters_count: 5,
+        };
+
+        assert_eq!(curr_votes.poll_card_count, 3);
+        assert_eq!(curr_votes.proxy_certificate_count, 5);
+        assert_eq!(curr_votes.voter_card_count, 7);
+        assert_eq!(curr_votes.total_admitted_voters_count, 14);
     }
 }

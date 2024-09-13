@@ -893,7 +893,7 @@
       },
       "PollingStationResults": {
         "type": "object",
-        "description": "PollingStationResults, following the fields in\n\"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar lichaam\nin een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht\"\n\"Bijlage 2: uitkomsten per stembureau\"\n<https://wetten.overheid.nl/BWBR0034180/2023-11-01#Bijlage1_DivisieNa31.2",
+        "description": "PollingStationResults, following the fields in Model Na 31-2 Bijage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
         "required": [
           "recounted",
           "voters_counts",
@@ -1068,7 +1068,7 @@
       },
       "VotersRecounts": {
         "type": "object",
-        "description": "Voters recounts, part of the polling station results.",
+        "description": "Recounted voters counts, this replaces the original voters counts in the polling station results.",
         "required": [
           "poll_card_recount",
           "proxy_certificate_recount",

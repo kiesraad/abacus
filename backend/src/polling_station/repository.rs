@@ -3,7 +3,9 @@ use sqlx::{query, query_as, Sqlite, SqlitePool, Transaction};
 
 use crate::AppState;
 
-use super::{PollingStation, PollingStationStatusEntry};
+use super::{
+    PollingStation, PollingStationResults, PollingStationResultsEntry, PollingStationStatusEntry,
+};
 
 pub struct PollingStations(SqlitePool);
 
@@ -167,6 +169,65 @@ impl PollingStationDataEntries {
     }
 }
 
+pub struct PollingStationResultsEntries(SqlitePool);
+
+impl PollingStationResultsEntries {
+    #[cfg(test)]
+    pub fn new(pool: SqlitePool) -> Self {
+        Self(pool)
+    }
+
+    /// Get a list of polling station results for an election
+    pub async fn list(
+        &self,
+        election_id: u32,
+    ) -> Result<Vec<PollingStationResultsEntry>, sqlx::Error> {
+        query!(
+            r#"
+            SELECT
+                r.polling_station_id AS "polling_station_id: u32",
+                r.data
+            FROM polling_station_results AS r
+            LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
+            WHERE p.election_id = $1
+        "#,
+            election_id
+        )
+        .try_map(|row| {
+            let data = serde_json::from_slice(&row.data)
+                .map_err(|err| sqlx::Error::Decode(Box::new(err)))?;
+            Ok(PollingStationResultsEntry {
+                polling_station_id: row.polling_station_id,
+                data,
+            })
+        })
+        .fetch_all(&self.0)
+        .await
+    }
+
+    /// Get a list of polling stations with their results for an election
+    pub async fn list_with_polling_stations(
+        &self,
+        election_id: u32,
+    ) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
+        // first get the list of results and polling stations related to an election
+        let list = self.list(election_id).await?;
+        let polling_stations = PollingStations(self.0.clone()).list(election_id).await?;
+
+        // find the corresponding polling station for each entry, or fail if any polling station could not be found
+        list.into_iter()
+            .map(|entry| {
+                let polling_station = polling_stations
+                    .iter()
+                    .find(|p| p.id == entry.polling_station_id)
+                    .cloned()
+                    .ok_or(sqlx::Error::RowNotFound)?;
+                Ok((polling_station, entry.data))
+            })
+            .collect::<Result<_, sqlx::Error>>() // this collect causes the iterator to fail early if there was any error
+    }
+}
+
 impl FromRef<AppState> for PollingStations {
     fn from_ref(input: &AppState) -> Self {
         Self(input.pool.clone())
@@ -174,6 +235,12 @@ impl FromRef<AppState> for PollingStations {
 }
 
 impl FromRef<AppState> for PollingStationDataEntries {
+    fn from_ref(input: &AppState) -> Self {
+        Self(input.pool.clone())
+    }
+}
+
+impl FromRef<AppState> for PollingStationResultsEntries {
     fn from_ref(input: &AppState) -> Self {
         Self(input.pool.clone())
     }

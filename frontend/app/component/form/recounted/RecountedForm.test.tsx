@@ -84,6 +84,12 @@ describe("Test RecountedForm", () => {
         data: {
           ...emptyDataEntryRequest.data,
           recounted: true,
+          voters_recounts: {
+            poll_card_recount: 0,
+            proxy_certificate_recount: 0,
+            voter_card_recount: 0,
+            total_admitted_voters_recount: 0,
+          },
         },
       };
 

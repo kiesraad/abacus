@@ -159,6 +159,7 @@ pub enum APIError {
     InvalidHeaderValue,
     PdfGenError(Vec<SourceDiagnostic>),
     StdError(Box<dyn Error>),
+    AddError(String),
 }
 
 impl IntoResponse for APIError {
@@ -215,6 +216,13 @@ impl IntoResponse for APIError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error".to_string()),
+                )
+            }
+            APIError::AddError(err) => {
+                println!("Error while adding totals: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error("Internal server error".into()),
                 )
             }
         };

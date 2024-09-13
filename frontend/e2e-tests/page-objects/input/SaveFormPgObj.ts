@@ -18,13 +18,10 @@ export class SaveFormPage extends InputBasePage {
   }
 
   summaryListItem(text: string) {
-    const li = this.summaryList.locator("li", { hasText: text });
-    return li;
+    return this.summaryList.locator("li", { hasText: text });
   }
 
   summaryListItemIcon(text: string) {
-    const li = this.summaryListItem(text);
-    const icon = li.getByRole("img");
-    return icon;
+    return this.summaryListItem(text).getByRole("img");
   }
 }

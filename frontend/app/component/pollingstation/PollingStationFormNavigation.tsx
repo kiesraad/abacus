@@ -1,6 +1,8 @@
 import * as React from "react";
 import { BlockerFunction, useBlocker, useNavigate } from "react-router-dom";
 
+import { AbortDataEntryModal } from "app/module/input/PollingStation/AbortDataEntryModal";
+
 import {
   AnyFormReference,
   currentFormHasChanges,
@@ -65,6 +67,14 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
         return false;
       }
 
+      //check if nextLocation is outside the input flow
+      if (
+        status.current !== "aborted" &&
+        !nextLocation.pathname.startsWith(`/${election.id}/input/${pollingStationId}`)
+      ) {
+        return true;
+      }
+
       const reasons = reasonsBlocked(formState, currentForm, values);
       //currently only block on changes
       if (reasons.includes("changes")) {
@@ -80,7 +90,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
 
       return false;
     },
-    [status, formState, currentForm, setTemporaryCache, values],
+    [status, formState, currentForm, setTemporaryCache, values, election, pollingStationId],
   );
 
   const blocker = useBlocker(shouldBlock);
@@ -131,32 +141,48 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
   return (
     <>
       {blocker.state === "blocked" && (
-        <Modal
-          onClose={() => {
-            blocker.reset();
-          }}
-        >
-          <h2 id="modal-blocker-title">Let op: niet opgeslagen wijzigingen</h2>
-          <p>
-            Je hebt in <strong>{formState.sections[formState.active]?.title || "het huidige formulier"}</strong>{" "}
-            wijzigingen gemaakt die nog niet zijn opgeslagen.
-          </p>
-          <p>Wil je deze wijzigingen bewaren?</p>
-          <nav>
-            <Button size="lg" onClick={onSave}>
-              Wijzigingen opslaan
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={() => {
+        <>
+          {!blocker.location.pathname.startsWith(`/${election.id}/input/${pollingStationId}`) ? (
+            <AbortDataEntryModal
+              onCancel={() => {
+                blocker.reset();
+              }}
+              onSave={() => {
                 blocker.proceed();
               }}
+              onDelete={() => {
+                blocker.proceed();
+              }}
+            />
+          ) : (
+            <Modal
+              onClose={() => {
+                blocker.reset();
+              }}
             >
-              Niet bewaren
-            </Button>
-          </nav>
-        </Modal>
+              <h2 id="modal-blocker-title">Let op: niet opgeslagen wijzigingen</h2>
+              <p>
+                Je hebt in <strong>{formState.sections[formState.active]?.title || "het huidige formulier"}</strong>{" "}
+                wijzigingen gemaakt die nog niet zijn opgeslagen.
+              </p>
+              <p>Wil je deze wijzigingen bewaren?</p>
+              <nav>
+                <Button size="lg" onClick={onSave}>
+                  Wijzigingen opslaan
+                </Button>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  onClick={() => {
+                    blocker.proceed();
+                  }}
+                >
+                  Niet bewaren
+                </Button>
+              </nav>
+            </Modal>
+          )}
+        </>
       )}
 
       {apiError && <Feedback id="feedback-server-error" type="error" apiError={apiError} />}

@@ -352,6 +352,27 @@ describe("Polling Station data entry integration tests", () => {
     }
   });
 
+  test("Navigating away from data entry shows abort modal", async () => {
+    render();
+    const steps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedFormNo,
+      submit,
+      expectVotersAndVotesForm,
+      fillVotersAndVotesForm,
+    ];
+
+    for (const step of steps) {
+      await step();
+    }
+
+    await router.navigate("/");
+
+    const modal = await screen.findByTestId("abort-modal-title");
+    expect(modal).toHaveTextContent("Wat wil je doen met je invoer?");
+  });
+
   test("Progress list shows correct icons", async () => {
     render();
 

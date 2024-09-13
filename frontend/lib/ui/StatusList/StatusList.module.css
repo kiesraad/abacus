@@ -20,7 +20,7 @@
     }
 
     &:global(.emphasis) {
-      font-weight: var(--font-weight-bold);
+      font-weight: bold;
     }
 
     &:global(.empty) {

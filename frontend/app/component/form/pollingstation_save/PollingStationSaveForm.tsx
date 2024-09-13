@@ -27,8 +27,12 @@ export function PollingStationSaveForm() {
 
       if (!finalisationAllowed) return;
 
-      await finaliseDataEntry();
-      navigate(`/${election.id}/input#data_entry_saved`);
+      try {
+        await finaliseDataEntry();
+        navigate(`/${election.id}/input#data_entry_saved`);
+      } catch (e) {
+        console.error("Error", e);
+      }
     })(event);
 
   return (

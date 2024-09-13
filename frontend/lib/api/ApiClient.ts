@@ -1,19 +1,22 @@
-export interface ApiResponse<DataType> {
-  status: ApiResponseStatus;
-  code: number;
-  data?: DataType;
-}
-
-export interface ApiResponseErrorData {
-  errorCode: number;
-  message: string;
-}
+export type ApiResult<T> = ApiResponse<T> | ApiError;
 
 export enum ApiResponseStatus {
   Success,
   ClientError,
   ServerError,
 }
+
+export interface ApiResponse<T> {
+  status: ApiResponseStatus.Success;
+  code: number;
+  data: T;
+}
+
+export type ApiError = {
+  status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError;
+  code: number;
+  error?: string;
+};
 
 export class ApiClient {
   host: string;
@@ -22,20 +25,20 @@ export class ApiClient {
     this.host = host;
   }
 
-  async responseHandler<SuccessResponseType>(response: Response) {
-    let data;
+  async responseHandler<T>(response: Response): Promise<ApiResult<T>> {
+    let body;
     if (response.headers.get("Content-Type") === "application/json") {
       try {
-        data = (await response.json()) as SuccessResponseType;
+        body = (await response.json()) as T | ApiError;
       } catch (err: unknown) {
         console.error("Server response parse error:", err);
         throw new Error(`Server response parse error: ${response.status}`);
       }
     } else {
-      data = await response.text();
-      if (data.length > 0) {
-        console.error("Unexpected data from server:", data);
-        throw new Error(`Unexpected data from server: ${data}`);
+      body = await response.text();
+      if (body.length > 0) {
+        console.error("Unexpected data from server:", body);
+        throw new Error(`Unexpected data from server: ${body}`);
       }
     }
 
@@ -50,17 +53,22 @@ export class ApiClient {
       throw new Error(`Unexpected response status: ${response.status}`);
     }
 
-    return {
-      status: status,
-      code: response.status,
-      data,
-    } as ApiResponse<SuccessResponseType>;
+    if (status === ApiResponseStatus.Success) {
+      return {
+        status,
+        code: response.status,
+        data: body as T,
+      };
+    } else {
+      return {
+        status,
+        code: response.status,
+        error: (body as ApiError).error,
+      };
+    }
   }
 
-  async postRequest<SuccessResponseType>(
-    path: string,
-    requestBody?: object,
-  ): Promise<ApiResponse<SuccessResponseType>> {
+  async postRequest<T>(path: string, requestBody?: object): Promise<ApiResult<T>> {
     const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
 
     let requestInit: RequestInit = {
@@ -77,10 +85,10 @@ export class ApiClient {
     }
     const response = await fetch(host + path, requestInit);
 
-    return this.responseHandler<SuccessResponseType>(response);
+    return this.responseHandler<T>(response);
   }
 
-  async getRequest<SuccessResponseType>(path: string): Promise<ApiResponse<SuccessResponseType>> {
+  async getRequest<T>(path: string): Promise<ApiResult<T>> {
     const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
 
     const response = await fetch(host + path, {
@@ -90,12 +98,12 @@ export class ApiClient {
       },
     });
 
-    return this.responseHandler<SuccessResponseType>(response);
+    return this.responseHandler<T>(response);
   }
 
-  async deleteRequest<SuccessResponseType>(path: string): Promise<ApiResponse<SuccessResponseType>> {
+  async deleteRequest<T>(path: string): Promise<ApiResult<T>> {
     const host = process.env.NODE_ENV === "test" ? "http://testhost" : "";
     const response = await fetch(host + path, { method: "DELETE" });
-    return this.responseHandler<SuccessResponseType>(response);
+    return this.responseHandler<T>(response);
   }
 }

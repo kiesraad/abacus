@@ -19,6 +19,7 @@ describe("Test PollingStationChoiceForm", () => {
         </PollingStationListProvider>,
       );
 
+      expect(await screen.findByRole("heading", { level: 2, name: "Welk stembureau ga je invoeren?" }));
       const pollingStation = screen.getByTestId("pollingStation");
 
       // Test if the feedback field shows an error
@@ -40,9 +41,11 @@ describe("Test PollingStationChoiceForm", () => {
       const user = userEvent.setup();
       render(
         <PollingStationListProvider electionId={1}>
-          <PollingStationChoiceForm />
+          <PollingStationChoiceForm anotherEntry />
         </PollingStationListProvider>,
       );
+
+      expect(await screen.findByRole("heading", { level: 2, name: "Verder met een volgend stembureau?" }));
       const pollingStation = screen.getByTestId("pollingStation");
 
       // Test if the polling station name is shown

@@ -111,7 +111,7 @@ export function VotersAndVotesForm() {
   React.useEffect(() => {
     if (hasChanges) {
       const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
-      checkbox.checked = false;
+      if (checkbox.checked) checkbox.click();
       setWarningsWarning(false);
     }
   }, [hasChanges]);
@@ -125,10 +125,18 @@ export function VotersAndVotesForm() {
         if (!hasChanges && !ignoreWarnings) {
           setWarningsWarning(true);
         } else {
-          await submit(ignoreWarnings);
+          try {
+            await submit(ignoreWarnings);
+          } catch (e) {
+            console.error("Error saving data entry", e);
+          }
         }
       } else {
-        await submit();
+        try {
+          await submit();
+        } catch (e) {
+          console.error("Error saving data entry", e);
+        }
       }
     })(event);
 
@@ -321,7 +329,7 @@ export function VotersAndVotesForm() {
           </BottomBar.Row>
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings}>
+          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings} hasError={warningsWarning}>
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

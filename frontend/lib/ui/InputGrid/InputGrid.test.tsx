@@ -49,4 +49,16 @@ describe("InputGrid", () => {
 
     expect(thirdInput).toHaveFocus();
   });
+
+  test("Move to last input with shortcut", async () => {
+    render(<DefaultGrid />);
+
+    const firstInput = screen.getByTestId("input1");
+    const thirdInput = screen.getByTestId("input3");
+
+    firstInput.focus();
+
+    await userEvent.keyboard("{Shift>}{arrowdown}{/Shift}");
+    expect(thirdInput).toHaveFocus();
+  });
 });

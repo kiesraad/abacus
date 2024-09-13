@@ -36,7 +36,11 @@ export function RecountedForm() {
         setHasValidationError(true);
       } else {
         setHasValidationError(false);
-        await submit();
+        try {
+          await submit();
+        } catch (e) {
+          console.error("Error saving data entry", e);
+        }
       }
     })(event);
 

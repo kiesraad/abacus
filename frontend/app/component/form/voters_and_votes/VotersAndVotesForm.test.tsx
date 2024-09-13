@@ -7,7 +7,7 @@ import {
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
 } from "app/component/form/testHelperFunctions.tsx";
-import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
+import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs, waitFor } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
 import { FormState, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
@@ -495,6 +495,8 @@ describe("Test VotersAndVotesForm", () => {
       const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
         name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
       });
+      expect(acceptFeedbackCheckbox).toBeInTheDocument();
+      expect(acceptFeedbackCheckbox).toBeVisible();
       expect(acceptFeedbackCheckbox).not.toBeChecked();
 
       await user.click(submitButton);
@@ -504,6 +506,33 @@ describe("Test VotersAndVotesForm", () => {
       );
 
       acceptFeedbackCheckbox.click();
+      expect(acceptFeedbackCheckbox).toBeChecked();
+
+      await user.clear(screen.getByTestId("blank_votes_count"));
+      await user.type(screen.getByTestId("blank_votes_count"), "100");
+      await user.tab();
+      expect(screen.getByTestId("blank_votes_count"), "100").toHaveValue("100");
+      await user.clear(screen.getByTestId("blank_votes_count"));
+
+      await waitFor(() => {
+        expect(acceptFeedbackCheckbox).toBeInTheDocument();
+        expect(acceptFeedbackCheckbox).not.toBeVisible();
+      });
+
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: {
+          errors: [],
+          warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
+        },
+      });
+
+      await user.click(submitButton);
+
+      expect(acceptFeedbackCheckbox).toBeVisible();
+      expect(acceptFeedbackCheckbox).not.toBeChecked();
+      acceptFeedbackCheckbox.click();
+      expect(acceptFeedbackCheckbox).toBeChecked();
+
       await user.click(submitButton);
 
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);

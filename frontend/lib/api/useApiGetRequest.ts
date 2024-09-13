@@ -1,37 +1,32 @@
 import * as React from "react";
 
-import { ErrorResponse } from "@kiesraad/api";
-
-import { ApiResponseErrorData, ApiResponseStatus } from "./ApiClient";
+import { ApiError, ApiResponseStatus } from "./ApiClient";
 import { useApi } from "./useApi";
 
-export type UseApiGetRequestReturn<DATA> = {
+export type UseApiGetRequestReturn<T> = {
   loading: boolean;
-  error: ApiResponseErrorData | null;
-  data: DATA | null;
+  error: ApiError | null;
+  data: T | null;
 };
 
 export interface UseApiGetRequestParams {
   path: string;
 }
 
-export function useApiGetRequest<DATA>(path: string): UseApiGetRequestReturn<DATA> {
+export function useApiGetRequest<T>(path: string): UseApiGetRequestReturn<T> {
   const { client } = useApi();
-  const [data, setData] = React.useState<DATA | null>(null);
-  const [error, setError] = React.useState<ApiResponseErrorData | null>(null);
+  const [data, setData] = React.useState<T | null>(null);
+  const [error, setError] = React.useState<ApiError | null>(null);
 
   React.useEffect(() => {
     let isSubscribed = true;
     const doRequest = async (path: string) => {
       if (isSubscribed) {
-        const response = await client.getRequest<DATA>(path);
+        const response = await client.getRequest<T>(path);
         if (response.status === ApiResponseStatus.Success) {
-          setData(response.data as DATA);
+          setData(response.data);
         } else {
-          setError({
-            message: (response.data as ErrorResponse).error,
-            errorCode: response.code,
-          });
+          setError(response);
         }
       }
     };

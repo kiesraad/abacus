@@ -106,8 +106,10 @@ export interface Election {
   category: ElectionCategory;
   election_date: string;
   id: number;
+  location: string;
   name: string;
   nomination_date: string;
+  number_of_voters: number;
   political_groups?: PoliticalGroup[];
 }
 
@@ -273,5 +275,5 @@ export interface VotesCounts {
   blank_votes_count: number;
   invalid_votes_count: number;
   total_votes_cast_count: number;
-  votes_candidates_counts: number;
+  votes_candidates_count: number;
 }

@@ -1,9 +1,8 @@
 import * as React from "react";
 
+import { MenuStatus, renderStatusIcon } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
-import { MenuStatus } from "../ui.types";
-import { renderStatusIcon } from "../util";
 import cls from "./StatusList.module.css";
 
 export interface StatusListProps extends React.HTMLAttributes<HTMLUListElement> {

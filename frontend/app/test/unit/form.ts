@@ -11,7 +11,7 @@ export const emptyDataEntryRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
       total_admitted_voters_count: 0,
     },
     votes_counts: {
-      votes_candidates_counts: 0,
+      votes_candidates_count: 0,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 0,

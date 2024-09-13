@@ -1,8 +1,8 @@
 import { render as rtlRender, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
-import { Providers, screen, setupTestRouter, userTypeInputs, waitFor } from "app/test/unit";
+import { overrideOnce, Providers, screen, setupTestRouter, userTypeInputs, waitFor } from "app/test/unit";
 
 import { electionMockData } from "@kiesraad/api-mocks";
 
@@ -48,7 +48,7 @@ const fillVotersAndVotesForm = async (values?: Record<string, number>) => {
     proxy_certificate_count: 0,
     voter_card_count: 0,
     total_admitted_voters_count: total_votes,
-    votes_candidates_counts: total_votes,
+    votes_candidates_count: total_votes,
     blank_votes_count: 0,
     invalid_votes_count: 0,
     total_votes_cast_count: total_votes,
@@ -151,6 +151,32 @@ const expectPollingStationChoicePage = async () => {
   });
 };
 
+const submitWith422Response = async () => {
+  overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
+    error: "JSON error or invalid data (Unprocessable Content)",
+  });
+  await submit();
+};
+
+const expect422ClientError = async () => {
+  const feedbackServerError = await screen.findByTestId("feedback-server-error");
+  expect(feedbackServerError).toHaveTextContent(
+    "Sorry, er ging iets mis422: JSON error or invalid data (Unprocessable Content)",
+  );
+};
+
+const submitWith500Response = async () => {
+  overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
+    error: "Internal server error",
+  });
+  await submit();
+};
+
+const expect500ServerError = async () => {
+  const feedbackServerError = await screen.findByTestId("feedback-server-error");
+  expect(feedbackServerError).toHaveTextContent("Sorry, er ging iets mis500: Internal server error");
+};
+
 type FormIdentifier = "recounted" | "voters_and_votes" | "differences" | `candidates_${number}`;
 
 const gotoForm = async (id: FormIdentifier) => {
@@ -197,7 +223,7 @@ const stepsForPendingChanges = [
       proxy_certificate_count: 1,
       voter_card_count: 1,
       total_admitted_voters_count: 2,
-      votes_candidates_counts: 1,
+      votes_candidates_count: 1,
       blank_votes_count: 1,
       invalid_votes_count: 1,
       total_votes_cast_count: 3,
@@ -359,7 +385,7 @@ describe("Polling Station data entry integration tests", () => {
         fillVotersAndVotesForm({
           poll_card_count: total_votes + 1,
           total_admitted_voters_count: total_votes + 1,
-          votes_candidates_counts: total_votes,
+          votes_candidates_count: total_votes,
           total_votes_cast_count: total_votes,
         }),
       submit,
@@ -481,6 +507,40 @@ describe("Polling Station data entry integration tests", () => {
     const steps = [...stepsForPendingChanges, abortDataEntry, abortDelete, expectPollingStationChoicePage];
 
     for (const step of steps) {
+      await step();
+    }
+  });
+
+  test("4xx response results in error shown", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    render();
+
+    const formFillingSteps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedFormNo,
+      submitWith422Response,
+      expect422ClientError,
+    ];
+
+    for (const step of formFillingSteps) {
+      await step();
+    }
+  });
+
+  test("5xx response results in error shown", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    render();
+
+    const formFillingSteps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedFormNo,
+      submitWith500Response,
+      expect500ServerError,
+    ];
+
+    for (const step of formFillingSteps) {
       await step();
     }
   });

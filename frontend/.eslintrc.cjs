@@ -35,13 +35,16 @@ module.exports = {
   },
   overrides: [
     {
-      files: "*.e2e.ts",
+      files: ["*.e2e.ts", "*PgObj.ts"],
       extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended-type-checked",
+        "plugin:import/recommended",
+        "plugin:import/typescript",
         "plugin:playwright/recommended",
+        "prettier",
       ],
-      plugins: ["@typescript-eslint"],
+      plugins: ["@typescript-eslint", "prettier"],
       rules: {
         "@typescript-eslint/no-floating-promises": "error",
       },

@@ -11,11 +11,15 @@ use hyper::header::InvalidHeaderValue;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
+use typst::diag::SourceDiagnostic;
 use utoipa::ToSchema;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod election;
+#[cfg(feature = "dev-database")]
+pub mod fixtures;
+pub mod pdf_gen;
 pub mod polling_station;
 pub mod validation;
 
@@ -26,8 +30,6 @@ pub struct AppState {
 
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
-    let state = AppState { pool };
-
     let polling_station_routes = Router::new()
         .route(
             "/:polling_station_id/data_entries/:entry_number",
@@ -55,12 +57,19 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route("/:election_id/status", get(election::election_status));
 
-    let app: Router = Router::new()
+    let app = Router::new()
         .nest("/api/elections", election_routes)
-        .nest("/api/polling_stations", polling_station_routes)
-        .with_state(state);
+        .nest("/api/polling_stations", polling_station_routes);
 
-    // Always create an OpenAPI Json spec, but only provide a swagger frontend in release builds
+    // Add a route to reset the database if the dev-database feature is enabled
+    #[cfg(feature = "dev-database")]
+    let app = app.route("/reset", post(fixtures::reset_database));
+
+    // Add the state to the app
+    let state = AppState { pool };
+    let app = app.with_state(state);
+
+    // Only include the OpenAPI spec if the feature is enabled
     #[cfg(feature = "openapi")]
     let app = {
         let openapi = create_openapi();
@@ -148,6 +157,8 @@ pub enum APIError {
     SerdeJsonError(serde_json::Error),
     SqlxError(sqlx::Error),
     InvalidHeaderValue,
+    PdfGenError(Vec<SourceDiagnostic>),
+    StdError(Box<dyn Error>),
 }
 
 impl IntoResponse for APIError {
@@ -192,6 +203,20 @@ impl IntoResponse for APIError {
                 StatusCode::INTERNAL_SERVER_ERROR,
                 to_error("Internal server error".to_string()),
             ),
+            APIError::PdfGenError(err) => {
+                println!("PDF generation error: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error("Internal server error".into()),
+                )
+            }
+            APIError::StdError(err) => {
+                eprintln!("Error: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error("Internal server error".to_string()),
+                )
+            }
         };
 
         (status, response).into_response()
@@ -225,6 +250,12 @@ impl From<DataError> for APIError {
 impl From<InvalidHeaderValue> for APIError {
     fn from(_: InvalidHeaderValue) -> Self {
         APIError::InvalidHeaderValue
+    }
+}
+
+impl From<Box<dyn Error>> for APIError {
+    fn from(err: Box<dyn Error>) -> Self {
+        APIError::StdError(err)
     }
 }
 

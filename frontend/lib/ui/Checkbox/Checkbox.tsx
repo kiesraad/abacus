@@ -1,3 +1,6 @@
+import * as React from "react";
+
+import { IconCheckmarkSmall } from "@kiesraad/icon";
 import { cn } from "@kiesraad/util";
 
 import cls from "./Checkbox.module.css";
@@ -9,12 +12,32 @@ interface CheckboxProps {
   defaultChecked?: boolean;
 }
 
-//TODO: you can't style a border for a checkbox, currently outline is used as a workaround but the border radius doesnt match
-
 export function Checkbox({ id, children, defaultChecked, hasError }: CheckboxProps) {
+  const [checked, setChecked] = React.useState(defaultChecked);
+
+  React.useEffect(() => {
+    setChecked(defaultChecked);
+  }, [defaultChecked]);
+
+  const toggleCheckbox = () => {
+    setChecked((prev) => !prev);
+  };
+
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.currentTarget.checked);
+  };
+
   return (
     <div className={cn(cls.checkbox, { "has-error": !!hasError })} aria-label="input" id={`checkbox-container-${id}`}>
-      <input type="checkbox" id={id} name={id} defaultChecked={defaultChecked} />
+      <div
+        className={checked ? "checked" : "unchecked"}
+        aria-hidden={true}
+        onClick={toggleCheckbox}
+        id={`checkbox-button-${id}`}
+      >
+        <IconCheckmarkSmall aria-label={checked ? "Aangevinkt" : "uitgevinkt"} />
+      </div>
+      <input type="checkbox" id={id} name={id} checked={checked} onChange={onChange} />
       <label htmlFor={id}>{children}</label>
     </div>
   );

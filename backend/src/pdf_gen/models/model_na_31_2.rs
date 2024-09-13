@@ -250,7 +250,7 @@ mod tests {
                     total_admitted_voters_count: 35,
                 },
                 votes_counts: VotesCounts {
-                    votes_candidates_counts: 31,
+                    votes_candidates_count: 31,
                     blank_votes_count: 2,
                     invalid_votes_count: 3,
                     total_votes_cast_count: 36,
@@ -309,7 +309,7 @@ mod tests {
                     total_admitted_voters_count: 50,
                 },
                 votes_counts: VotesCounts {
-                    votes_candidates_counts: 46,
+                    votes_candidates_count: 46,
                     blank_votes_count: 2,
                     invalid_votes_count: 0,
                     total_votes_cast_count: 48,
@@ -444,7 +444,7 @@ mod tests {
 
         // tests for votes counts
         assert_eq!(totals.votes_counts.total_votes_cast_count, 84);
-        assert_eq!(totals.votes_counts.votes_candidates_counts, 77);
+        assert_eq!(totals.votes_counts.votes_candidates_count, 77);
         assert_eq!(totals.votes_counts.blank_votes_count, 4);
         assert_eq!(totals.votes_counts.invalid_votes_count, 3);
 

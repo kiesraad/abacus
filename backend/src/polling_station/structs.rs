@@ -516,7 +516,7 @@ pub struct VotesCounts {
 
 impl AddAssign<&VotesCounts> for VotesCounts {
     fn add_assign(&mut self, other: &Self) {
-        self.votes_candidates_counts += other.votes_candidates_counts;
+        self.votes_candidates_count += other.votes_candidates_count;
         self.blank_votes_count += other.blank_votes_count;
         self.invalid_votes_count += other.invalid_votes_count;
         self.total_votes_cast_count += other.total_votes_cast_count;
@@ -2278,20 +2278,20 @@ mod tests {
     #[test]
     fn test_votes_addition() {
         let mut curr_votes = VotesCounts {
-            votes_candidates_counts: 2,
+            votes_candidates_count: 2,
             blank_votes_count: 3,
             invalid_votes_count: 4,
             total_votes_cast_count: 9,
         };
 
         curr_votes += &VotesCounts {
-            votes_candidates_counts: 1,
+            votes_candidates_count: 1,
             blank_votes_count: 2,
             invalid_votes_count: 3,
             total_votes_cast_count: 5,
         };
 
-        assert_eq!(curr_votes.votes_candidates_counts, 3);
+        assert_eq!(curr_votes.votes_candidates_count, 3);
         assert_eq!(curr_votes.blank_votes_count, 5);
         assert_eq!(curr_votes.invalid_votes_count, 7);
         assert_eq!(curr_votes.total_votes_cast_count, 14);

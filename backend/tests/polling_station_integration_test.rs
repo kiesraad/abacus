@@ -25,7 +25,7 @@ async fn test_polling_station_listing_works(pool: SqlitePool) {
     assert!(body
         .polling_stations
         .iter()
-        .any(|ps| ps.name == "Stembureau \"Op Rolletjes\""));
+        .any(|ps| ps.name == "Op Rolletjes"));
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]

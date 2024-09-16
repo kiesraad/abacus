@@ -2,7 +2,7 @@ import * as Router from "react-router";
 
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { PollingStationLayout } from "app/module/input";
+import { PollingStationLayout } from "app/module/data_entry";
 import { overrideOnce, render, screen, within } from "app/test/unit";
 
 import {
@@ -53,7 +53,7 @@ describe("PollingStationLayout", () => {
     expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute("href", "/overview");
     expect(within(nav).getByRole("link", { name: election.name })).toHaveAttribute(
       "href",
-      `/elections/${election.id}/input`,
+      `/elections/${election.id}/data-entry`,
     );
   });
 });

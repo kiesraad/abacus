@@ -1,14 +1,14 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { PollingStationChoiceForm } from "app/component/form/input/polling_station_choice/PollingStationChoiceForm";
+import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 import { overrideOnce, render, screen, within } from "app/test/unit";
 
 import { PollingStationListProvider } from "@kiesraad/api";
 import { pollingStationsMockResponse } from "@kiesraad/api-mocks";
 
 describe("Test PollingStationChoiceForm", () => {
-  describe("Polling station input form", () => {
+  describe("Polling station data entry form", () => {
     test("Form field entry", async () => {
       overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
       const user = userEvent.setup();

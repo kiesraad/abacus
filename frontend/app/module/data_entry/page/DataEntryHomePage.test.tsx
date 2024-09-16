@@ -8,13 +8,13 @@ import { overrideOnce, Providers, render, screen, setupTestRouter, within } from
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
 
-import { InputHomePage } from "./InputHomePage";
+import { DataEntryHomePage } from "./DataEntryHomePage";
 
 const renderInputHomePage = () =>
   render(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
-        <InputHomePage />
+        <DataEntryHomePage />
       </ElectionStatusProvider>
     </ElectionProvider>,
   );
@@ -70,9 +70,9 @@ describe("InputHomePage", () => {
   test("Data entry saved alert works", async () => {
     const user = userEvent.setup();
 
-    // Set up router and navigate to the input home page
+    // Set up router and navigate to the data entry home page
     const router = setupTestRouter();
-    await router.navigate("/elections/1/input");
+    await router.navigate("/elections/1/data-entry");
     rtlRender(<Providers router={router} />);
 
     // Wait for the page to be loaded

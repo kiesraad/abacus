@@ -64,7 +64,7 @@ export function PollingStationProgress() {
         active={formState.active === "recounted"}
       >
         {formState.active !== "recounted" ? (
-          <Link to={`/elections/${election.id}/input/${pollingStationId}/recounted`}>Is er herteld?</Link>
+          <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/recounted`}>Is er herteld?</Link>
         ) : (
           <span>Is er herteld?</span>
         )}
@@ -77,7 +77,7 @@ export function PollingStationProgress() {
         active={formState.active === "voters_votes_counts"}
       >
         {formState.active !== "voters_votes_counts" ? (
-          <Link to={`/elections/${election.id}/input/${pollingStationId}/voters-and-votes`}>
+          <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/voters-and-votes`}>
             Aantal kiezers en stemmen
           </Link>
         ) : (
@@ -92,7 +92,7 @@ export function PollingStationProgress() {
         active={formState.active === "differences_counts"}
       >
         {formState.active !== "differences_counts" ? (
-          <Link to={`/elections/${election.id}/input/${pollingStationId}/differences`}>Verschillen</Link>
+          <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/differences`}>Verschillen</Link>
         ) : (
           <span>Verschillen</span>
         )}
@@ -111,7 +111,7 @@ export function PollingStationProgress() {
             active={formState.active === formSection.id}
           >
             {formState.active !== formSection.id ? (
-              <Link to={`/elections/${election.id}/input/${pollingStationId}/list/${listId}`}>
+              <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/list/${listId}`}>
                 Lijst {list.number} - {list.name}
               </Link>
             ) : (
@@ -131,7 +131,7 @@ export function PollingStationProgress() {
         disabled={!formState.isCompleted}
       >
         {formState.active !== "save" && formState.isCompleted ? (
-          <Link to={`/elections/${election.id}/input/${pollingStationId}/save`}>Controleren en opslaan</Link>
+          <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/save`}>Controleren en opslaan</Link>
         ) : (
           <span>Controleren en opslaan</span>
         )}

@@ -9,7 +9,7 @@ export function OverviewPage() {
   const location = useLocation();
   const handleRowClick = (election: Election) => {
     return () => {
-      navigate(`/elections/${election.id}/input`);
+      navigate(`/elections/${election.id}/data-entry`);
     };
   };
   const { electionList } = useElectionList();

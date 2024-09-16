@@ -48,7 +48,7 @@ export function CheckAndSaveForm() {
 
       try {
         await finaliseDataEntry();
-        navigate(`/elections/${election.id}/input#data_entry_saved`);
+        navigate(`/elections/${election.id}/data-entry#data_entry_saved`);
       } catch (e) {
         console.error("Error", e);
       }

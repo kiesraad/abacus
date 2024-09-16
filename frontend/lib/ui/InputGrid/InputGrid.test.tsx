@@ -11,7 +11,7 @@ describe("InputGrid", () => {
     expect(true).toBe(true);
   });
 
-  test("Row has focused class when input has focus", () => {
+  test("Row has focused class when data_entry has focus", () => {
     render(<DefaultGrid />);
 
     const firstInput = screen.getByTestId("input1");
@@ -50,7 +50,7 @@ describe("InputGrid", () => {
     expect(thirdInput).toHaveFocus();
   });
 
-  test("Move to last input with shortcut", async () => {
+  test("Move to last data_entry with shortcut", async () => {
     render(<DefaultGrid />);
 
     const firstInput = screen.getByTestId("input1");

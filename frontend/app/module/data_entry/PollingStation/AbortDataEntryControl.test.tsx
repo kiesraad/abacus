@@ -4,7 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { VotersAndVotesForm } from "app/component/form/input/voters_and_votes/VotersAndVotesForm";
+import { VotersAndVotesForm } from "app/component/form/data_entry/voters_and_votes/VotersAndVotesForm";
 import { overrideOnce, render, screen, server } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form";
 
@@ -96,8 +96,8 @@ describe("Test AbortDataEntryControl", () => {
     });
     // }
 
-    // check that the user is navigated back to the input page
-    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/input");
+    // check that the user is navigated back to the data entry page
+    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry");
   });
 
   test("deletes the data entry and navigates on delete", async () => {
@@ -120,11 +120,11 @@ describe("Test AbortDataEntryControl", () => {
     // click the delete button in the modal
     await user.click(screen.getByRole("button", { name: "Niet bewaren" }));
 
-    // check that the delete request was made and the user is navigated back to the input page
+    // check that the delete request was made and the user is navigated back to the data entry page
     expect(request_method).toBe("DELETE");
     expect(request_url).toBe("http://testhost/api/polling_stations/1/data_entries/1");
 
-    // check that the user is navigated back to the input page
-    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/input");
+    // check that the user is navigated back to the data entry page
+    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry");
   });
 });

@@ -1,19 +1,19 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
-import { CheckAndSaveForm } from "app/component/form/input/check_and_save/CheckAndSaveForm";
+import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
+import { FinaliseElectionPage } from "app/module/data_entry/page/FinaliseElectionPage";
 
-import { DevHomePage } from "./module/DevHomePage";
-import { ElectionLayout } from "./module/ElectionLayout";
 import {
   CandidatesVotesPage,
+  DataEntryHomePage,
+  DataEntryLayout,
   DifferencesPage,
-  InputHomePage,
-  InputLayout,
   PollingStationLayout,
   RecountedPage,
   VotersAndVotesPage,
-} from "./module/input";
-import { FinaliseElectionPage } from "./module/input/page/FinaliseElectionPage";
+} from "./module/data_entry";
+import { DevHomePage } from "./module/DevHomePage";
+import { ElectionLayout } from "./module/ElectionLayout";
 import { NotFound } from "./module/NotFound";
 import { OverviewLayout, OverviewPage } from "./module/overview";
 import { RootLayout } from "./module/RootLayout";
@@ -33,8 +33,8 @@ export const routes = createRoutesFromElements(
       <Route index element={<OverviewPage />} />
     </Route>
     <Route path="elections/:electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
-      <Route path="input" element={<InputLayout />}>
-        <Route index element={<InputHomePage />} />
+      <Route path="data-entry" element={<DataEntryLayout />}>
+        <Route index element={<DataEntryHomePage />} />
         <Route path=":pollingStationId" element={<PollingStationLayout />}>
           <Route index element={<Navigate to="./recounted" replace />} />
           <Route path="recounted" element={<RecountedPage />} />

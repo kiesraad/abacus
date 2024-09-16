@@ -1,12 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import { PollingStationChoiceForm } from "app/component/form/input/polling_station_choice/PollingStationChoiceForm";
+import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { Alert, Button, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
-export function InputHomePage() {
+export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { election } = useElection();

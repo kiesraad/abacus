@@ -1,5 +1,5 @@
 export function getUrlForFormSectionID(electionId: number, pollingStationId: number, sectionId: string) {
-  const baseUrl = `/elections/${electionId}/input/${pollingStationId}`;
+  const baseUrl = `/elections/${electionId}/data-entry/${pollingStationId}`;
 
   let url: string = "";
   if (sectionId.startsWith("political_group_votes_")) {

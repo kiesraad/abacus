@@ -3,7 +3,7 @@ import * as router from "react-router";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { CheckAndSaveForm } from "app/component/form/input/check_and_save/CheckAndSaveForm";
+import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { overrideOnce, render, screen, server, within } from "app/test/unit";
 import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/test/unit/form";
 
@@ -55,8 +55,8 @@ describe("Test CheckAndSaveForm", () => {
     expect(request_method).toBe("POST");
     expect(request_url).toBe("http://testhost/api/polling_stations/1/data_entries/1/finalise");
 
-    // check that the user is navigated back to the input page
-    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/input#data_entry_saved");
+    // check that the user is navigated back to the data entry page
+    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry#data_entry_saved");
   });
 
   test("Shift+Enter submits form", async () => {

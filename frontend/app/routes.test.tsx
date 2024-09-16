@@ -20,8 +20,8 @@ describe("routes", () => {
 
     // Router sanity checks
     expect(router.state.location.pathname).toEqual("/");
-    await router.navigate("/elections/1/input");
-    expect(router.state.location.pathname).toEqual("/elections/1/input");
+    await router.navigate("/elections/1/data-entry");
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
 
     // Navigate to a non existing route
     await router.navigate("/thisroutedoesnotexist");
@@ -40,7 +40,7 @@ describe("routes", () => {
 
   test("Malformed election ID should result in not found page", async () => {
     const router = setupTestRouter();
-    await router.navigate("/elections/1asd/input/");
+    await router.navigate("/elections/1asd/data-entry/");
 
     // NOTE: We're not using the wrapped render function here,
     // since we want control over our own memory router.
@@ -57,8 +57,8 @@ describe("routes", () => {
     const router = setupTestRouter();
 
     // Navigate to a non-existing page
-    await router.navigate("/elections/9876/input");
-    expect(router.state.location.pathname).toEqual("/elections/9876/input");
+    await router.navigate("/elections/9876/data-entry");
+    expect(router.state.location.pathname).toEqual("/elections/9876/data-entry");
 
     // NOTE: We're not using the wrapped render function here,
     // since we want control over our own memory router.
@@ -76,8 +76,8 @@ describe("routes", () => {
     const router = setupTestRouter();
 
     // Navigate to a non-existing page
-    await router.navigate("/elections/1/input/9876");
-    expect(router.state.location.pathname).toEqual("/elections/1/input/9876");
+    await router.navigate("/elections/1/data-entry/9876");
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/9876");
 
     // NOTE: We're not using the wrapped render function here,
     // since we want control over our own memory router.

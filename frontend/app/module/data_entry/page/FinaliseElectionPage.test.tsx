@@ -22,7 +22,7 @@ describe("FinaliseElectionPage", () => {
       ],
     });
 
-    await router.navigate("/elections/1/input/finalise");
+    await router.navigate("/elections/1/data-entry/finalise");
 
     rtlRender(<Providers router={router} />);
 

@@ -16,8 +16,8 @@ const submit = async () => {
 };
 
 const startPollingStationInput = async () => {
-  await router.navigate("/elections/1/input/1");
-  expect(router.state.location.pathname).toEqual("/elections/1/input/1");
+  await router.navigate("/elections/1/data-entry/1");
+  expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1");
 };
 
 const expectRecountedForm = async () => {
@@ -93,7 +93,7 @@ const fillPoliticalGroupCandidatesVotesForm = async () => {
 
 const expectCheckAndSavePage = async () => {
   await waitFor(() => {
-    expect(router.state.location.pathname).toEqual("/elections/1/input/1/save");
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/save");
   });
 };
 
@@ -144,7 +144,7 @@ const abortDelete = async () => {
 
 const expectPollingStationChoicePage = async () => {
   await waitFor(() => {
-    expect(router.state.location.pathname).toEqual("/elections/1/input");
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
   });
   await waitFor(() => {
     expect(screen.getByTestId("polling-station-choice-form")).toBeInTheDocument();

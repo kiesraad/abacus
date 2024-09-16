@@ -79,7 +79,7 @@ describe("PollingStationFormNavigation", () => {
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/input/1/voters-and-votes");
+    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry/1/voters-and-votes");
   });
 
   test("It blocks navigation when form has changes", () => {

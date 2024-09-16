@@ -4,7 +4,7 @@ import { Footer } from "app/component/footer/Footer";
 
 import { ElectionStatusProvider, PollingStationListProvider, useElection } from "@kiesraad/api";
 
-export function InputLayout() {
+export function DataEntryLayout() {
   const { election } = useElection();
   return (
     <PollingStationListProvider electionId={election.id}>

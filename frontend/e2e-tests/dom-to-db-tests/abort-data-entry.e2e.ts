@@ -8,7 +8,7 @@ import { test } from "./fixtures";
 
 test.describe("Abort data entry", () => {
   test("Save input from empty voters and votes page", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.heading.waitFor();
@@ -37,7 +37,7 @@ test.describe("Abort data entry", () => {
   });
 
   test("Save input from voters and votes page with error", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.heading.waitFor();
@@ -71,7 +71,7 @@ test.describe("Abort data entry", () => {
   });
 
   test("Save input from voters and votes page with warning", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.heading.waitFor();
@@ -116,7 +116,7 @@ test.describe("Abort data entry", () => {
   });
 
   test("Discard input from empty voters and votes page", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.heading.waitFor();
@@ -144,7 +144,7 @@ test.describe("Abort data entry", () => {
   });
 
   test("Discard input from voters and votes page with error", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.heading.waitFor();
@@ -175,7 +175,7 @@ test.describe("Abort data entry", () => {
   });
 
   test("Discard input from voters and votes page with warning", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.heading.waitFor();

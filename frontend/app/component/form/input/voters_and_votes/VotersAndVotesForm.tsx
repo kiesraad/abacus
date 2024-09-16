@@ -15,7 +15,7 @@ import {
 } from "@kiesraad/ui";
 import { usePositiveNumberInputMask } from "@kiesraad/util";
 
-import { useWatchForChanges } from "../useWatchForChanges";
+import { useWatchForChanges } from "../../useWatchForChanges.ts";
 
 const _IGNORE_WARNINGS_ID = "voters_and_votes_form_ignore_warnings";
 
@@ -167,7 +167,7 @@ export function VotersAndVotesForm() {
       {isSaved && hasValidationWarning && !hasValidationError && (
         <Feedback id="feedback-warning" type="warning" data={warnings.map((warning) => warning.code)} />
       )}
-      <InputGrid key="numbers">
+      <InputGrid key="voters-and-votes">
         <InputGrid.Header>
           <th>Veld</th>
           <th>Geteld aantal</th>

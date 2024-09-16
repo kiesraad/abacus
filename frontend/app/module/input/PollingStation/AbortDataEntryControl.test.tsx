@@ -4,7 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { VotersAndVotesForm } from "app/component/form/voters_and_votes/VotersAndVotesForm.tsx";
+import { VotersAndVotesForm } from "app/component/form/input/voters_and_votes/VotersAndVotesForm.tsx";
 import { overrideOnce, render, screen, server } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 
@@ -97,7 +97,7 @@ describe("Test AbortDataEntryControl", () => {
     // }
 
     // check that the user is navigated back to the input page
-    expect(mockNavigate).toHaveBeenCalledWith("/1/input");
+    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/input");
   });
 
   test("deletes the data entry and navigates on delete", async () => {
@@ -125,6 +125,6 @@ describe("Test AbortDataEntryControl", () => {
     expect(request_url).toBe("http://testhost/api/polling_stations/1/data_entries/1");
 
     // check that the user is navigated back to the input page
-    expect(mockNavigate).toHaveBeenCalledWith("/1/input");
+    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/input");
   });
 });

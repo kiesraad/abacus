@@ -13,7 +13,7 @@ import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 import { Election, PoliticalGroup, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
 import { electionMockData, politicalGroupMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
-import { CandidatesVotesForm } from "./CandidatesVotesForm";
+import { CandidatesVotesForm } from "./CandidatesVotesForm.tsx";
 
 function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   return render(

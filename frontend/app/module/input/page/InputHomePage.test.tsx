@@ -72,7 +72,7 @@ describe("InputHomePage", () => {
 
     // Set up router and navigate to the input home page
     const router = setupTestRouter();
-    await router.navigate("/1/input");
+    await router.navigate("/elections/1/input");
     rtlRender(<Providers router={router} />);
 
     // Wait for the page to be loaded

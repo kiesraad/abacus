@@ -16,8 +16,8 @@ const submit = async () => {
 };
 
 const startPollingStationInput = async () => {
-  await router.navigate("/1/input/1");
-  expect(router.state.location.pathname).toEqual("/1/input/1");
+  await router.navigate("/elections/1/input/1");
+  expect(router.state.location.pathname).toEqual("/elections/1/input/1");
 };
 
 const expectRecountedForm = async () => {
@@ -93,7 +93,7 @@ const fillPoliticalGroupCandidatesVotesForm = async () => {
 
 const expectCheckAndSavePage = async () => {
   await waitFor(() => {
-    expect(router.state.location.pathname).toEqual("/1/input/1/save");
+    expect(router.state.location.pathname).toEqual("/elections/1/input/1/save");
   });
 };
 
@@ -144,7 +144,7 @@ const abortDelete = async () => {
 
 const expectPollingStationChoicePage = async () => {
   await waitFor(() => {
-    expect(router.state.location.pathname).toEqual("/1/input");
+    expect(router.state.location.pathname).toEqual("/elections/1/input");
   });
   await waitFor(() => {
     expect(screen.getByTestId("polling-station-choice-form")).toBeInTheDocument();
@@ -380,7 +380,7 @@ describe("Polling Station data entry integration tests", () => {
       () => expectElementContainsIcon("list-item-differences", "leeg"),
 
       () => gotoForm("voters_and_votes"),
-      () => expectElementContainsIcon("list-item-numbers", "je bent hier"),
+      () => expectElementContainsIcon("list-item-voters-and-votes", "je bent hier"),
       () =>
         fillVotersAndVotesForm({
           poll_card_count: total_votes + 1,
@@ -408,7 +408,7 @@ describe("Polling Station data entry integration tests", () => {
       expectVotersAndVotesForm,
 
       () => gotoForm("differences"),
-      () => expectElementContainsIcon("list-item-numbers", "bevat een fout"),
+      () => expectElementContainsIcon("list-item-voters-and-votes", "bevat een fout"),
     ];
 
     for (const step of steps) {

@@ -7,7 +7,7 @@ import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 import { PollingStationFormController } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
-import { RecountedForm } from "./RecountedForm";
+import { RecountedForm } from "./RecountedForm.tsx";
 
 const Component = (
   <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>

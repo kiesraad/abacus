@@ -8,7 +8,7 @@ test("smoke test", async ({ page }) => {
 });
 
 test("input form", async ({ page }) => {
-  await page.goto("/1/input/1/recounted", { waitUntil: "domcontentloaded" });
+  await page.goto("/elections/1/input/1/recounted", { waitUntil: "domcontentloaded" });
   const recountedPage = new RecountedPage(page);
   await expect(recountedPage.no).toBeVisible();
 });

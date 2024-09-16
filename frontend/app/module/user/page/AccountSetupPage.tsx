@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { AccountSetupForm } from "app/component/form/account_setup/AccountSetupForm";
+import { AccountSetupForm } from "app/component/form/user/account_setup/AccountSetupForm";
 
 import { Alert, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 

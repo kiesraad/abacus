@@ -1,7 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm";
+import { PollingStationChoiceForm } from "app/component/form/input/polling_station_choice/PollingStationChoiceForm.tsx";
 import { overrideOnce, render, screen, within } from "app/test/unit";
 
 import { PollingStationListProvider } from "@kiesraad/api";

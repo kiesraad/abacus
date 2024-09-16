@@ -23,7 +23,7 @@ export function AbortDataEntryControl() {
       try {
         setSaving(true);
         await controller.submitCurrentForm();
-        navigate(`/${election.id}/input`);
+        navigate(`/elections/${election.id}/input`);
       } finally {
         setSaving(false);
       }
@@ -34,7 +34,7 @@ export function AbortDataEntryControl() {
       try {
         setDeleting(true);
         await controller.deleteDataEntry();
-        navigate(`/${election.id}/input`);
+        navigate(`/elections/${election.id}/input`);
       } finally {
         setDeleting(false);
       }

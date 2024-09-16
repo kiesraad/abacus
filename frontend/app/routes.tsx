@@ -1,6 +1,7 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
-import { PollingStationSaveForm } from "./component/form/pollingstation_save/PollingStationSaveForm";
+import { CheckAndSaveForm } from "app/component/form/input/check_and_save/CheckAndSaveForm.tsx";
+
 import { DevHomePage } from "./module/DevHomePage";
 import { ElectionLayout } from "./module/ElectionLayout";
 import {
@@ -31,16 +32,16 @@ export const routes = createRoutesFromElements(
     <Route path="/overview" element={<OverviewLayout />} errorElement={<NotFound />}>
       <Route index element={<OverviewPage />} />
     </Route>
-    <Route path=":electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
+    <Route path="elections/:electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
       <Route path="input" element={<InputLayout />}>
         <Route index element={<InputHomePage />} />
         <Route path=":pollingStationId" element={<PollingStationLayout />}>
           <Route index element={<Navigate to="./recounted" replace />} />
           <Route path="recounted" element={<RecountedPage />} />
-          <Route path="numbers" element={<VotersAndVotesPage />} />
+          <Route path="voters-and-votes" element={<VotersAndVotesPage />} />
           <Route path="differences" element={<DifferencesPage />} />
           <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-          <Route path="save" element={<PollingStationSaveForm />} />
+          <Route path="save" element={<CheckAndSaveForm />} />
         </Route>
         <Route path="finalise" element={<FinaliseElectionPage />} />
       </Route>

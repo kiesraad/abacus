@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import { PollingStationChoiceForm } from "app/component/form/polling_station_choice/PollingStationChoiceForm";
+import { PollingStationChoiceForm } from "app/component/form/input/polling_station_choice/PollingStationChoiceForm";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";

@@ -17,7 +17,7 @@ import { pollingStation33 } from "./test-data/PollingStationTestData";
 
 test.describe("full data entry flow", () => {
   test("no recount, no differences", async ({ page }) => {
-    await page.goto("/1/input");
+    await page.goto("/elections/1/input");
 
     const inputPage = new InputPage(page);
     await expect(inputPage.heading).toBeVisible();
@@ -87,7 +87,7 @@ test.describe("full data entry flow", () => {
   });
 
   test("recount, no differences", async ({ page }) => {
-    await page.goto("/1/input");
+    await page.goto("/elections/1/input");
 
     const inputPage = new InputPage(page);
     await expect(inputPage.heading).toBeVisible();
@@ -143,7 +143,7 @@ test.describe("full data entry flow", () => {
   });
 
   test("no recount, difference of more ballots counted", async ({ page }) => {
-    await page.goto("/1/input");
+    await page.goto("/elections/1/input");
 
     const inputPage = new InputPage(page);
     await expect(inputPage.heading).toBeVisible();
@@ -206,7 +206,7 @@ test.describe("full data entry flow", () => {
   });
 
   test("recount, difference of fewer ballots counted", async ({ page }) => {
-    await page.goto("/1/input");
+    await page.goto("/elections/1/input");
 
     const inputPage = new InputPage(page);
     await expect(inputPage.heading).toBeVisible();
@@ -282,7 +282,7 @@ test.describe("full data entry flow", () => {
   });
 
   test("submit with accepted warning on voters and votes page", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -356,7 +356,7 @@ test.describe("full data entry flow", () => {
 
 test.describe("errors and warnings", () => {
   test("correct error on voters and votes page", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -403,7 +403,7 @@ test.describe("errors and warnings", () => {
   });
 
   test("correct error F.204", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -454,7 +454,7 @@ test.describe("errors and warnings", () => {
   });
 
   test("correct warning on voters and votes page", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -507,7 +507,7 @@ test.describe("errors and warnings", () => {
   });
 
   test("remove option to accept warning on voters and votes page after input change", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -550,7 +550,7 @@ test.describe("errors and warnings", () => {
 
 test.describe("navigation", () => {
   test("navigate away from Differences page without saving", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -604,7 +604,7 @@ test.describe("navigation", () => {
   });
 
   test("navigate away from Differences page with saving", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
+    await page.goto("/elections/1/input/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -659,7 +659,7 @@ test.describe("navigation", () => {
 
   test.describe("navigation panel icons", () => {
     test("check icons for accept, active, empty, error, warning, unsaved statuses", async ({ page }) => {
-      await page.goto("/1/input/1/recounted");
+      await page.goto("/elections/1/input/1/recounted");
 
       const recountedPage = new RecountedPage(page);
       await expect(recountedPage.navPanel.recountedIcon).toHaveAccessibleName("je bent hier");

@@ -3,7 +3,7 @@ import * as router from "react-router";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { PollingStationSaveForm } from "app/component/form/pollingstation_save/PollingStationSaveForm.tsx";
+import { CheckAndSaveForm } from "app/component/form/input/check_and_save/CheckAndSaveForm.tsx";
 import { overrideOnce, render, screen, server, within } from "app/test/unit";
 import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/test/unit/form.ts";
 
@@ -24,13 +24,13 @@ function renderForm(defaultFormState: Partial<FormState> = {}, defaultValues?: P
         defaultFormState={defaultFormState}
         defaultValues={defaultValues}
       >
-        <PollingStationSaveForm />
+        <CheckAndSaveForm />
       </PollingStationFormController>
     </ElectionProvider>,
   );
 }
 
-describe("Test PollingStationSaveForm", () => {
+describe("Test CheckAndSaveForm", () => {
   beforeEach(() => {
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
     vi.spyOn(router, "useNavigate").mockImplementation(() => mockNavigate);
@@ -56,7 +56,7 @@ describe("Test PollingStationSaveForm", () => {
     expect(request_url).toBe("http://testhost/api/polling_stations/1/data_entries/1/finalise");
 
     // check that the user is navigated back to the input page
-    expect(mockNavigate).toHaveBeenCalledWith("/1/input#data_entry_saved");
+    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/input#data_entry_saved");
   });
 
   test("Shift+Enter submits form", async () => {
@@ -128,7 +128,7 @@ describe("Test PollingStationSaveForm", () => {
   });
 });
 
-describe("Test PollingStationSaveForm summary", () => {
+describe("Test CheckAndSaveForm summary", () => {
   test("Blocking", async () => {
     const formState = structuredClone(defaultFormState);
     formState.sections.voters_votes_counts.errors = [errorWarningMocks.F201];

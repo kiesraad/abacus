@@ -15,7 +15,7 @@ import {
 } from "@kiesraad/ui";
 import { candidateNumberFromId, usePositiveNumberInputMask } from "@kiesraad/util";
 
-import { useWatchForChanges } from "../useWatchForChanges";
+import { useWatchForChanges } from "../../useWatchForChanges.ts";
 
 interface FormElements extends HTMLFormControlsCollection {
   total: HTMLInputElement;

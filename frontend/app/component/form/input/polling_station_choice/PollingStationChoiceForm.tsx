@@ -6,9 +6,9 @@ import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys, Spinner } from "@kiesraad/ui";
 import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
 
-import { PollingStationSelector } from "./PollingStationSelector";
 import cls from "./PollingStationSelector.module.css";
-import { PollingStationsList } from "./PollingStationsList";
+import { PollingStationSelector } from "./PollingStationSelector.tsx";
+import { PollingStationsList } from "./PollingStationsList.tsx";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
 

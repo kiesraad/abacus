@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import { CandidatesVotesForm } from "app/component/form/candidates_votes_form/CandidatesVotesForm";
+import { CandidatesVotesForm } from "app/component/form/input/candidates_votes/CandidatesVotesForm";
 
 import { useElection } from "@kiesraad/api";
 import { parseIntStrict } from "@kiesraad/util";

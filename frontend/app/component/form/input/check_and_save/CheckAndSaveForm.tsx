@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { getUrlForFormSectionID } from "app/component/pollingstation/utils";
+import { getUrlForFormSectionID } from "app/component/pollingstation/utils.ts";
 
 import {
   FormSectionID,
@@ -12,7 +12,7 @@ import {
 } from "@kiesraad/api";
 import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusList } from "@kiesraad/ui";
 
-export function PollingStationSaveForm() {
+export function CheckAndSaveForm() {
   const navigate = useNavigate();
   const { election } = useElection();
   const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId, values } =
@@ -48,7 +48,7 @@ export function PollingStationSaveForm() {
 
       try {
         await finaliseDataEntry();
-        navigate(`/${election.id}/input#data_entry_saved`);
+        navigate(`/elections/${election.id}/input#data_entry_saved`);
       } catch (e) {
         console.error("Error", e);
       }

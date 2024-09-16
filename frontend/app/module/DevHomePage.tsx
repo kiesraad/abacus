@@ -18,7 +18,7 @@ export function DevHomePage() {
             <Link to={"/overview"}>Overview</Link>
           </li>
           <li>
-            <Link to={`/1/input`}>Input</Link>
+            <Link to={`/elections/1/input`}>Input</Link>
           </li>
         </ul>
 

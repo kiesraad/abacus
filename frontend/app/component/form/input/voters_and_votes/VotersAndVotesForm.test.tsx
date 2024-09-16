@@ -13,7 +13,7 @@ import { emptyDataEntryRequest } from "app/test/unit/form.ts";
 import { FormState, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
 import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
-import { VotersAndVotesForm } from "./VotersAndVotesForm";
+import { VotersAndVotesForm } from "./VotersAndVotesForm.tsx";
 
 const defaultFormState: FormState = {
   active: "recounted",

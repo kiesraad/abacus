@@ -237,350 +237,356 @@ const stepsForPendingChanges = [
 ];
 
 describe("Polling Station data entry integration tests", () => {
-  test("Navigate through complete form", async () => {
-    render();
+  describe("Navigation throught the form", () => {
+    test("Fill in complete form", async () => {
+      render();
 
-    const formFillingSteps = [
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedFormNo,
-      submit,
-      expectVotersAndVotesForm,
-      fillVotersAndVotesForm,
-      submit,
-      expectDifferencesForm,
-      fillDifferencesForm,
-      submit,
-      ...electionMockData.political_groups.flatMap((pg) => [
-        () => expectPoliticalGroupCandidatesForm(pg.number),
-        fillPoliticalGroupCandidatesVotesForm,
+      const formFillingSteps = [
+        startPollingStationInput,
+        expectRecountedForm,
+        fillRecountedFormNo,
         submit,
-      ]),
-      expectCheckAndSavePage,
-    ];
-
-    for (const step of formFillingSteps) {
-      await step();
-    }
-  });
-
-  test("Error F204 navigates back to voters and votes page", async () => {
-    render();
-
-    const formFillingSteps = [
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedFormNo,
-      submit,
-      expectVotersAndVotesForm,
-      () =>
-        fillVotersAndVotesForm({
-          poll_card_count: total_votes,
-          proxy_certificate_count: 1,
-          voter_card_count: 0,
-          total_admitted_voters_count: total_votes + 1,
-          // to get the F204 error, votes_candidates_count should not match total_votes
-          votes_candidates_count: total_votes + 1,
-          blank_votes_count: 0,
-          invalid_votes_count: 0,
-          total_votes_cast_count: total_votes + 1,
-        }),
-      submit,
-      expectDifferencesForm,
-      fillDifferencesForm,
-      submit,
-      ...electionMockData.political_groups.flatMap((pg) => [
-        () => expectPoliticalGroupCandidatesForm(pg.number),
-        fillPoliticalGroupCandidatesVotesForm,
+        expectVotersAndVotesForm,
+        fillVotersAndVotesForm,
         submit,
-      ]),
-      expectVotersAndVotesForm,
-      () => expectFeedbackError("F.204"),
-    ];
-
-    for (const step of formFillingSteps) {
-      await step();
-    }
-  });
-
-  test("Navigate back", async () => {
-    render();
-
-    const steps = [
-      // fill up to and including the differences form
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedFormNo,
-      submit,
-      expectVotersAndVotesForm,
-      fillVotersAndVotesForm,
-      submit,
-      expectDifferencesForm,
-      fillDifferencesForm,
-      submit,
-      // navigate back to the 'voters and votes' form
-      () => userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
-      expectVotersAndVotesForm,
-    ];
-
-    for (const step of steps) {
-      await step();
-    }
-  });
-
-  test("Navigate back with dirty state", async () => {
-    render();
-
-    const steps = [
-      // fill up to and including the voters and votes form
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedFormNo,
-      submit,
-      expectVotersAndVotesForm,
-      fillVotersAndVotesForm,
-      // don't submit, and navigate back to the 'recounted' form
-      () => userEvent.click(screen.getByRole("link", { name: "Is er herteld?" })),
-      expectRecountedForm,
-    ];
-
-    for (const step of steps) {
-      await step();
-    }
-  });
-
-  test("Navigate to correct page after navigating back and submitting", async () => {
-    render();
-
-    const steps = [
-      // fill up to and including the differences form
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedFormNo,
-      submit,
-      expectVotersAndVotesForm,
-      fillVotersAndVotesForm,
-      submit,
-      expectDifferencesForm,
-      fillDifferencesForm,
-      submit,
-      // navigate back to the 'voters and votes' form and submit
-      () => userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
-      expectVotersAndVotesForm,
-      submit,
-      // expect to be on the 'differences' form
-      expectDifferencesForm,
-    ];
-
-    for (const step of steps) {
-      await step();
-    }
-  });
-
-  test("Navigating with changes triggers changes modal", async () => {
-    render();
-
-    const steps = [
-      ...stepsForPendingChanges,
-      () => userEvent.click(screen.getByRole("link", { name: "Verschillen" })),
-      expectBlockerModal,
-    ];
-
-    for (const step of steps) {
-      await step();
-    }
-  });
-
-  test("Progress list shows correct icons", async () => {
-    render();
-
-    const steps = [
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedFormNo,
-      submit,
-      expectVotersAndVotesForm,
-      fillVotersAndVotesForm,
-      submit,
-      expectDifferencesForm,
-      () => gotoForm("voters_and_votes"),
-      () => expectElementContainsIcon("list-item-differences", "nog niet afgerond"),
-
-      () => gotoForm("differences"),
-      fillDifferencesForm,
-      submit,
-      ...electionMockData.political_groups.flatMap((pg) => [
-        () => expectPoliticalGroupCandidatesForm(pg.number),
-        fillPoliticalGroupCandidatesVotesForm,
+        expectDifferencesForm,
+        fillDifferencesForm,
         submit,
-      ]),
-      expectCheckAndSavePage,
-      () => expectElementContainsIcon("list-item-recounted", "opgeslagen"),
-      () => expectElementContainsIcon("list-item-differences", "leeg"),
+        ...electionMockData.political_groups.flatMap((pg) => [
+          () => expectPoliticalGroupCandidatesForm(pg.number),
+          fillPoliticalGroupCandidatesVotesForm,
+          submit,
+        ]),
+        expectCheckAndSavePage,
+      ];
 
-      () => gotoForm("voters_and_votes"),
-      () => expectElementContainsIcon("list-item-numbers", "je bent hier"),
-      () =>
-        fillVotersAndVotesForm({
-          poll_card_count: total_votes + 1,
-          total_admitted_voters_count: total_votes + 1,
-          votes_candidates_count: total_votes,
-          total_votes_cast_count: total_votes,
-        }),
-      submit,
-      expectDifferencesForm,
-      () => fillDifferencesForm({ fewer_ballots_count: 1, no_explanation_count: 2 }),
-      submit,
-      () => expectFeedbackWarning("W.302"),
-      acceptWarning,
-      submit,
+      for (const step of formFillingSteps) {
+        await step();
+      }
+    });
 
-      () => expectPoliticalGroupCandidatesForm(1),
-      () => expectElementContainsIcon("list-item-differences", "bevat een waarschuwing"),
+    test("Error F204 navigates back to voters and votes page", async () => {
+      render();
 
-      () => gotoForm("voters_and_votes"),
-      () =>
-        userTypeInputs(user, {
-          total_admitted_voters_count: 1,
-        }),
-      submit,
-      expectVotersAndVotesForm,
-
-      () => gotoForm("differences"),
-      () => expectElementContainsIcon("list-item-numbers", "bevat een fout"),
-    ];
-
-    for (const step of steps) {
-      await step();
-    }
-  });
-
-  test("Navigating with changes goes to correct form", async () => {
-    render();
-
-    const steps = [
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedFormNo,
-      submit,
-      expectVotersAndVotesForm,
-      fillVotersAndVotesForm,
-      submit,
-      expectDifferencesForm,
-      fillDifferencesForm,
-      submit,
-      ...electionMockData.political_groups.flatMap((pg) => [
-        () => expectPoliticalGroupCandidatesForm(pg.number),
-        fillPoliticalGroupCandidatesVotesForm,
+      const formFillingSteps = [
+        startPollingStationInput,
+        expectRecountedForm,
+        fillRecountedFormNo,
         submit,
-      ]),
-      expectCheckAndSavePage,
-
-      () => gotoForm("voters_and_votes"),
-      () =>
-        userTypeInputs(user, {
-          total_admitted_voters_count: 1,
-        }),
-      submit,
-      expectFeedbackError,
-      () =>
-        userTypeInputs(user, {
-          total_admitted_voters_count: total_votes,
-        }),
-      () => userEvent.click(screen.getByRole("link", { name: "Is er herteld?" })),
-      expectBlockerModal,
-      () => user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" })),
-      expectRecountedForm,
-    ];
-
-    for (const step of steps) {
-      await step();
-    }
-  });
-
-  test("Changing recount generates an error", async () => {
-    render();
-
-    const steps = [
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedFormNo,
-      submit,
-      expectVotersAndVotesForm,
-      fillVotersAndVotesForm,
-      submit,
-      expectDifferencesForm,
-      fillDifferencesForm,
-      submit,
-      ...electionMockData.political_groups.flatMap((pg) => [
-        () => expectPoliticalGroupCandidatesForm(pg.number),
-        fillPoliticalGroupCandidatesVotesForm,
+        expectVotersAndVotesForm,
+        () =>
+          fillVotersAndVotesForm({
+            poll_card_count: total_votes,
+            proxy_certificate_count: 1,
+            voter_card_count: 0,
+            total_admitted_voters_count: total_votes + 1,
+            // to get the F204 error, votes_candidates_count should not match total_votes
+            votes_candidates_count: total_votes + 1,
+            blank_votes_count: 0,
+            invalid_votes_count: 0,
+            total_votes_cast_count: total_votes + 1,
+          }),
         submit,
-      ]),
-      expectCheckAndSavePage,
-      () => gotoForm("recounted"),
-      fillRecountedFormYes,
-      submit,
-      expectVotersAndVotesForm,
-      () => expectElementContainsIcon("list-item-differences", "bevat een fout"),
-    ];
+        expectDifferencesForm,
+        fillDifferencesForm,
+        submit,
+        ...electionMockData.political_groups.flatMap((pg) => [
+          () => expectPoliticalGroupCandidatesForm(pg.number),
+          fillPoliticalGroupCandidatesVotesForm,
+          submit,
+        ]),
+        expectVotersAndVotesForm,
+        () => expectFeedbackError("F.204"),
+      ];
 
-    for (const step of steps) {
-      await step();
-    }
+      for (const step of formFillingSteps) {
+        await step();
+      }
+    });
+
+    test("Navigate back", async () => {
+      render();
+
+      const steps = [
+        // fill up to and including the differences form
+        startPollingStationInput,
+        expectRecountedForm,
+        fillRecountedFormNo,
+        submit,
+        expectVotersAndVotesForm,
+        fillVotersAndVotesForm,
+        submit,
+        expectDifferencesForm,
+        fillDifferencesForm,
+        submit,
+        // navigate back to the 'voters and votes' form
+        () => userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
+        expectVotersAndVotesForm,
+      ];
+
+      for (const step of steps) {
+        await step();
+      }
+    });
+
+    test("Navigate back with dirty state", async () => {
+      render();
+
+      const steps = [
+        // fill up to and including the voters and votes form
+        startPollingStationInput,
+        expectRecountedForm,
+        fillRecountedFormNo,
+        submit,
+        expectVotersAndVotesForm,
+        fillVotersAndVotesForm,
+        // don't submit, and navigate back to the 'recounted' form
+        () => userEvent.click(screen.getByRole("link", { name: "Is er herteld?" })),
+        expectRecountedForm,
+      ];
+
+      for (const step of steps) {
+        await step();
+      }
+    });
+
+    test("Navigate to next page after navigating back and submitting", async () => {
+      render();
+
+      const steps = [
+        // fill up to and including the differences form
+        startPollingStationInput,
+        expectRecountedForm,
+        fillRecountedFormNo,
+        submit,
+        expectVotersAndVotesForm,
+        fillVotersAndVotesForm,
+        submit,
+        expectDifferencesForm,
+        fillDifferencesForm,
+        submit,
+        // navigate back to the 'voters and votes' form and submit
+        () => userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
+        expectVotersAndVotesForm,
+        submit,
+        // expect to be on the 'differences' form
+        expectDifferencesForm,
+      ];
+
+      for (const step of steps) {
+        await step();
+      }
+    });
+
+    test("Navigating with changes triggers changes modal", async () => {
+      render();
+
+      const steps = [
+        ...stepsForPendingChanges,
+        () => userEvent.click(screen.getByRole("link", { name: "Verschillen" })),
+        expectBlockerModal,
+      ];
+
+      for (const step of steps) {
+        await step();
+      }
+    });
+
+    test("Navigating with saved changes goes to correct form", async () => {
+      render();
+
+      const steps = [
+        startPollingStationInput,
+        expectRecountedForm,
+        fillRecountedFormNo,
+        submit,
+        expectVotersAndVotesForm,
+        fillVotersAndVotesForm,
+        submit,
+        expectDifferencesForm,
+        fillDifferencesForm,
+        submit,
+        ...electionMockData.political_groups.flatMap((pg) => [
+          () => expectPoliticalGroupCandidatesForm(pg.number),
+          fillPoliticalGroupCandidatesVotesForm,
+          submit,
+        ]),
+        expectCheckAndSavePage,
+
+        () => gotoForm("voters_and_votes"),
+        () =>
+          userTypeInputs(user, {
+            total_admitted_voters_count: 1,
+          }),
+        submit,
+        expectFeedbackError,
+        () =>
+          userTypeInputs(user, {
+            total_admitted_voters_count: total_votes,
+          }),
+        () => userEvent.click(screen.getByRole("link", { name: "Is er herteld?" })),
+        expectBlockerModal,
+        () => user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" })),
+        expectRecountedForm,
+      ];
+
+      for (const step of steps) {
+        await step();
+      }
+    });
+
+    test("Changing recount generates an error for differences page", async () => {
+      render();
+
+      const steps = [
+        startPollingStationInput,
+        expectRecountedForm,
+        fillRecountedFormNo,
+        submit,
+        expectVotersAndVotesForm,
+        fillVotersAndVotesForm,
+        submit,
+        expectDifferencesForm,
+        fillDifferencesForm,
+        submit,
+        ...electionMockData.political_groups.flatMap((pg) => [
+          () => expectPoliticalGroupCandidatesForm(pg.number),
+          fillPoliticalGroupCandidatesVotesForm,
+          submit,
+        ]),
+        expectCheckAndSavePage,
+        () => gotoForm("recounted"),
+        fillRecountedFormYes,
+        submit,
+        expectVotersAndVotesForm,
+        () => expectElementContainsIcon("list-item-differences", "bevat een fout"),
+      ];
+
+      for (const step of steps) {
+        await step();
+      }
+    });
+
+    test("Progress list shows correct icons", async () => {
+      render();
+
+      const steps = [
+        startPollingStationInput,
+        expectRecountedForm,
+        fillRecountedFormNo,
+        submit,
+        expectVotersAndVotesForm,
+        fillVotersAndVotesForm,
+        submit,
+        expectDifferencesForm,
+        () => gotoForm("voters_and_votes"),
+        () => expectElementContainsIcon("list-item-differences", "nog niet afgerond"),
+
+        () => gotoForm("differences"),
+        fillDifferencesForm,
+        submit,
+        ...electionMockData.political_groups.flatMap((pg) => [
+          () => expectPoliticalGroupCandidatesForm(pg.number),
+          fillPoliticalGroupCandidatesVotesForm,
+          submit,
+        ]),
+        expectCheckAndSavePage,
+        () => expectElementContainsIcon("list-item-recounted", "opgeslagen"),
+        () => expectElementContainsIcon("list-item-differences", "leeg"),
+
+        () => gotoForm("voters_and_votes"),
+        () => expectElementContainsIcon("list-item-numbers", "je bent hier"),
+        () =>
+          fillVotersAndVotesForm({
+            poll_card_count: total_votes + 1,
+            total_admitted_voters_count: total_votes + 1,
+            votes_candidates_count: total_votes,
+            total_votes_cast_count: total_votes,
+          }),
+        submit,
+        expectDifferencesForm,
+        () => fillDifferencesForm({ fewer_ballots_count: 1, no_explanation_count: 2 }),
+        submit,
+        () => expectFeedbackWarning("W.302"),
+        acceptWarning,
+        submit,
+
+        () => expectPoliticalGroupCandidatesForm(1),
+        () => expectElementContainsIcon("list-item-differences", "bevat een waarschuwing"),
+
+        () => gotoForm("voters_and_votes"),
+        () =>
+          userTypeInputs(user, {
+            total_admitted_voters_count: 1,
+          }),
+        submit,
+        expectVotersAndVotesForm,
+
+        () => gotoForm("differences"),
+        () => expectElementContainsIcon("list-item-numbers", "bevat een fout"),
+      ];
+
+      for (const step of steps) {
+        await step();
+      }
+    });
   });
 
-  test("Aborting and save with pending changes is possible", async () => {
-    render();
+  describe("Aborting data entry", () => {
+    test("Aborting and save with pending changes is possible", async () => {
+      render();
 
-    const steps = [...stepsForPendingChanges, abortDataEntry, abortSaveChanges, expectPollingStationChoicePage];
+      const steps = [...stepsForPendingChanges, abortDataEntry, abortSaveChanges, expectPollingStationChoicePage];
 
-    for (const step of steps) {
-      await step();
-    }
+      for (const step of steps) {
+        await step();
+      }
+    });
+
+    test("Abort and delete with pending changes is possible", async () => {
+      render();
+
+      const steps = [...stepsForPendingChanges, abortDataEntry, abortDelete, expectPollingStationChoicePage];
+
+      for (const step of steps) {
+        await step();
+      }
+    });
   });
 
-  test("Abort and delete with pending changes is possible", async () => {
-    render();
+  describe("API error responses", () => {
+    test("4xx response results in error shown", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      render();
 
-    const steps = [...stepsForPendingChanges, abortDataEntry, abortDelete, expectPollingStationChoicePage];
+      const formFillingSteps = [
+        startPollingStationInput,
+        expectRecountedForm,
+        fillRecountedFormNo,
+        submitWith422Response,
+        expect422ClientError,
+      ];
 
-    for (const step of steps) {
-      await step();
-    }
-  });
+      for (const step of formFillingSteps) {
+        await step();
+      }
+    });
 
-  test("4xx response results in error shown", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => {});
-    render();
+    test("5xx response results in error shown", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      render();
 
-    const formFillingSteps = [
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedFormNo,
-      submitWith422Response,
-      expect422ClientError,
-    ];
+      const formFillingSteps = [
+        startPollingStationInput,
+        expectRecountedForm,
+        fillRecountedFormNo,
+        submitWith500Response,
+        expect500ServerError,
+      ];
 
-    for (const step of formFillingSteps) {
-      await step();
-    }
-  });
-
-  test("5xx response results in error shown", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => {});
-    render();
-
-    const formFillingSteps = [
-      startPollingStationInput,
-      expectRecountedForm,
-      fillRecountedFormNo,
-      submitWith500Response,
-      expect500ServerError,
-    ];
-
-    for (const step of formFillingSteps) {
-      await step();
-    }
+      for (const step of formFillingSteps) {
+        await step();
+      }
+    });
   });
 });

@@ -2,12 +2,12 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form.ts";
+import { emptyDataEntryRequest } from "app/test/unit/form";
 
 import { PollingStationFormController } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
-import { RecountedForm } from "./RecountedForm.tsx";
+import { RecountedForm } from "./RecountedForm";
 
 const Component = (
   <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>

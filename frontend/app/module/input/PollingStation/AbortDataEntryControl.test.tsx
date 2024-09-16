@@ -4,9 +4,9 @@ import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { VotersAndVotesForm } from "app/component/form/input/voters_and_votes/VotersAndVotesForm.tsx";
+import { VotersAndVotesForm } from "app/component/form/input/voters_and_votes/VotersAndVotesForm";
 import { overrideOnce, render, screen, server } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form.ts";
+import { emptyDataEntryRequest } from "app/test/unit/form";
 
 import {
   DataEntryResponse,

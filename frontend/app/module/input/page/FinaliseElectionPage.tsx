@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { NavBar } from "app/component/navbar/NavBar.tsx";
+import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";

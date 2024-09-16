@@ -15,7 +15,7 @@ import {
 } from "@kiesraad/ui";
 import { usePositiveNumberInputMask } from "@kiesraad/util";
 
-import { useWatchForChanges } from "../../useWatchForChanges.ts";
+import { useWatchForChanges } from "../../useWatchForChanges";
 
 const _IGNORE_WARNINGS_ID = "differences_form_ignore_warnings";
 

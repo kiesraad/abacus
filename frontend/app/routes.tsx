@@ -1,6 +1,6 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
-import { CheckAndSaveForm } from "app/component/form/input/check_and_save/CheckAndSaveForm.tsx";
+import { CheckAndSaveForm } from "app/component/form/input/check_and_save/CheckAndSaveForm";
 
 import { DevHomePage } from "./module/DevHomePage";
 import { ElectionLayout } from "./module/ElectionLayout";

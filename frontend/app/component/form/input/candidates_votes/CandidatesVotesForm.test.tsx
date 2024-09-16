@@ -6,14 +6,14 @@ import {
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
-} from "app/component/form/testHelperFunctions.tsx";
+} from "app/component/form/testHelperFunctions";
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form.ts";
+import { emptyDataEntryRequest } from "app/test/unit/form";
 
 import { Election, PoliticalGroup, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
 import { electionMockData, politicalGroupMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
-import { CandidatesVotesForm } from "./CandidatesVotesForm.tsx";
+import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   return render(

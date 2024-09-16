@@ -6,14 +6,14 @@ import {
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
-} from "app/component/form/testHelperFunctions.tsx";
+} from "app/component/form/testHelperFunctions";
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs, waitFor } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form.ts";
+import { emptyDataEntryRequest } from "app/test/unit/form";
 
 import { FormState, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
 import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
-import { VotersAndVotesForm } from "./VotersAndVotesForm.tsx";
+import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const defaultFormState: FormState = {
   active: "recounted",

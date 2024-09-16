@@ -85,7 +85,7 @@ describe("PollingStationFormNavigation", () => {
 
   test("It blocks navigation when form has changes", () => {
     (usePollingStationFormController as Mock).mockReturnValue({
-      status: "idle",
+      status: { current: "idle" },
       formState: {
         ...mockFormState,
         current: "voters_votes_counts",
@@ -121,7 +121,7 @@ describe("PollingStationFormNavigation", () => {
 
   test("It blocks navigation when form has errors", async () => {
     (usePollingStationFormController as Mock).mockReturnValue({
-      status: "idle",
+      status: { current: "idle" },
       formState: {
         ...mockFormState,
         sections: {

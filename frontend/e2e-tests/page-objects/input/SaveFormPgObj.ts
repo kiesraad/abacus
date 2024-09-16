@@ -17,6 +17,10 @@ export class SaveFormPage extends InputBasePage {
     this.save = page.getByRole("button", { name: "Opslaan" });
   }
 
+  allSummaryListItems() {
+    return this.summaryList.getByRole("listitem");
+  }
+
   summaryListItem(text: string) {
     return this.summaryList.locator("li", { hasText: text });
   }

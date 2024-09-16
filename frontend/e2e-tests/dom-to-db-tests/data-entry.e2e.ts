@@ -15,7 +15,7 @@ import {
 import { test } from "./fixtures";
 import { pollingStation33 } from "./test-data/PollingStationTestData";
 
-test.describe("data entry", () => {
+test.describe("full data entry flow", () => {
   test("no recount, no differences", async ({ page }) => {
     await page.goto("/1/input");
 
@@ -63,10 +63,27 @@ test.describe("data entry", () => {
 
     const saveFormPage = new SaveFormPage(page);
     await saveFormPage.heading.waitFor();
-    await saveFormPage.save.click();
 
-    // TODO: #318 reset database to allow polling station to be finalised in multiple tests
-    // await inputPage.dataEntrySuccess.waitFor();
+    await expect(saveFormPage.summaryText).toContainText(
+      "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
+    );
+
+    const expectedSummaryItems = [
+      { text: "Alle optellingen kloppen", iconLabel: "opgeslagen" },
+      { text: "Er zijn geen blokkerende fouten of waarschuwingen", iconLabel: "opgeslagen" },
+      { text: "Je kan de resultaten van dit stembureau opslaan", iconLabel: "opgeslagen" },
+    ];
+    const listItems = saveFormPage.allSummaryListItems();
+    const expectedTexts = Array.from(expectedSummaryItems, (item) => item.text);
+    await expect(listItems).toHaveText(expectedTexts);
+
+    for (const expectedItem of expectedSummaryItems) {
+      await expect(saveFormPage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(expectedItem.iconLabel);
+    }
+
+    await saveFormPage.save.click();
+    await inputPage.headingNextPollingStation.waitFor();
+    await inputPage.dataEntrySuccess.waitFor();
   });
 
   test("recount, no differences", async ({ page }) => {
@@ -685,57 +702,6 @@ test.describe("navigation", () => {
       await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
       await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
       await expect(differencesPage.navPanel.listIcon(1)).toHaveAccessibleName("bevat een fout");
-    });
-  });
-
-  test.describe("check and save", () => {
-    test("accepted flow", async ({ page }) => {
-      await page.goto("/1/input/1/recounted");
-
-      const recountedPage = new RecountedPage(page);
-      await recountedPage.checkNoAndClickNext();
-
-      // fill form with data that does not result in a warning
-      const votersVotesPage = new VotersVotesPage(page);
-      await votersVotesPage.heading.waitFor();
-      const voters = {
-        poll_card_count: 100,
-        proxy_certificate_count: 0,
-        voter_card_count: 0,
-        total_admitted_voters_count: 100,
-      };
-      const votes = {
-        votes_candidates_count: 96,
-        blank_votes_count: 2,
-        invalid_votes_count: 2,
-        total_votes_cast_count: 100,
-      };
-      await votersVotesPage.fillInPageAndClickNext(voters, votes);
-
-      const differencesPage = new DifferencesPage(page);
-      await differencesPage.heading.waitFor();
-      await differencesPage.next.click();
-
-      const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
-      await candidatesListPage_1.heading.waitFor();
-      await candidatesListPage_1.fillCandidatesAndTotal([95, 1], 96);
-      await candidatesListPage_1.next.click();
-
-      const savePage = new SaveFormPage(page);
-      await savePage.heading.waitFor();
-
-      await expect(savePage.summaryText).toContainText(
-        "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
-      );
-
-      await expect(savePage.summaryList).toContainText("Alle optellingen kloppen");
-      await expect(
-        savePage.summaryListItemIcon("Er zijn geen blokkerende fouten of waarschuwingen"),
-      ).toHaveAccessibleName("opgeslagen");
-
-      await expect(
-        savePage.summaryListItemIcon("Je kan de resultaten van dit stembureau opslaan"),
-      ).toHaveAccessibleName("opgeslagen");
     });
   });
 });

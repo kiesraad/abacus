@@ -1,9 +1,11 @@
-export function getUrlForFormSectionID(baseUrl: string, id: string) {
+export function getUrlForFormSectionID(electionId: number, pollingStationId: number, sectionId: string) {
+  const baseUrl = `/${electionId}/input/${pollingStationId}`;
+
   let url: string = "";
-  if (id.startsWith("political_group_votes_")) {
-    url = `${baseUrl}/list/${id.replace("political_group_votes_", "")}`;
+  if (sectionId.startsWith("political_group_votes_")) {
+    url = `${baseUrl}/list/${sectionId.replace("political_group_votes_", "")}`;
   } else {
-    switch (id) {
+    switch (sectionId) {
       case "recounted":
         url = `${baseUrl}/recounted`;
         break;

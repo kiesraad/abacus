@@ -30,8 +30,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionID) => {
-      const baseUrl = `/${election.id}/input/${pollingStationId}`;
-      return getUrlForFormSectionID(baseUrl, id);
+      return getUrlForFormSectionID(election.id, pollingStationId, id);
     },
     [election, pollingStationId],
   );

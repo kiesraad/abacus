@@ -5,7 +5,7 @@ import { render, screen } from "app/test/unit";
 
 import { NarrowInputField, TextAreaInputField, WideInputField } from "./InputField.stories";
 
-test("The wide data_entry fields are rendered", () => {
+test("The wide input fields are rendered", () => {
   render(<WideInputField />);
 
   const smallElement = screen.getByRole("textbox", { name: "Default Small Wide with subtext" });
@@ -30,7 +30,7 @@ test("The wide data_entry fields are rendered", () => {
   expect(errorElement).toHaveAccessibleErrorMessage("There is an error");
 });
 
-test("The narrow data_entry fields are rendered", async () => {
+test("The narrow input fields are rendered", async () => {
   render(<NarrowInputField />);
 
   const smallElement = screen.getByRole("textbox", { name: "Default Small Narrow" });
@@ -59,7 +59,7 @@ test("The narrow data_entry fields are rendered", async () => {
   expect(errorElement).toHaveAccessibleErrorMessage("There is an error");
 });
 
-test("The text area data_entry fields are rendered", () => {
+test("The text area input fields are rendered", () => {
   render(<TextAreaInputField />);
 
   const defaultElement = screen.getByRole("textbox", { name: "Default Text Area with subtext" });

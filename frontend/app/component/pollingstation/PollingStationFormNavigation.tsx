@@ -28,32 +28,33 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
   //one time flag to prioritize user navigation over controller navigation
   const overrideControllerNavigation = React.useRef<string | null>(null);
 
+  const baseUrl = React.useMemo(() => `/${election.id}/input/${pollingStationId}/`, [election, pollingStationId]);
+
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionID) => {
-      const baseUrl = `/${election.id}/input/${pollingStationId}`;
       let url: string = "";
       if (id.startsWith("political_group_votes_")) {
-        url = `${baseUrl}/list/${id.replace("political_group_votes_", "")}`;
+        url = `${baseUrl}list/${id.replace("political_group_votes_", "")}`;
       } else {
         switch (id) {
           case "recounted":
-            url = `${baseUrl}/recounted`;
+            url = `${baseUrl}recounted`;
             break;
           case "differences_counts":
-            url = `${baseUrl}/differences`;
+            url = `${baseUrl}differences`;
             break;
           case "voters_votes_counts":
-            url = `${baseUrl}/numbers`;
+            url = `${baseUrl}numbers`;
             break;
           case "save":
-            url = `${baseUrl}/save`;
+            url = `${baseUrl}save`;
             break;
         }
       }
 
       return url;
     },
-    [election, pollingStationId],
+    [baseUrl],
   );
 
   const shouldBlock = React.useCallback<BlockerFunction>(
@@ -68,10 +69,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
       }
 
       //check if nextLocation is outside the input flow
-      if (
-        status.current !== "aborted" &&
-        !nextLocation.pathname.startsWith(`/${election.id}/input/${pollingStationId}/`)
-      ) {
+      if (status.current !== "aborted" && !nextLocation.pathname.startsWith(baseUrl)) {
         return true;
       }
 
@@ -90,7 +88,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
 
       return false;
     },
-    [status, formState, currentForm, setTemporaryCache, values, election, pollingStationId],
+    [status, formState, currentForm, setTemporaryCache, values, baseUrl],
   );
 
   const blocker = useBlocker(shouldBlock);
@@ -142,7 +140,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
     <>
       {blocker.state === "blocked" && (
         <>
-          {!blocker.location.pathname.startsWith(`/${election.id}/input/${pollingStationId}/`) ? (
+          {!blocker.location.pathname.startsWith(baseUrl) ? (
             <AbortDataEntryModal
               onCancel={() => {
                 blocker.reset();

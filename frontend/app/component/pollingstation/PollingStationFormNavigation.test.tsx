@@ -152,7 +152,7 @@ describe("PollingStationFormNavigation", () => {
 
     (useBlocker as Mock).mockReturnValue({
       state: "blocked",
-      location: { pathname: "/1/input/1" },
+      location: { pathname: "/1/input/1/" },
     });
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);

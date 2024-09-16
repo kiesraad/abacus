@@ -5,7 +5,7 @@ import { PollingStation } from "@kiesraad/api";
 export const pollingStation33: PollingStation = {
   id: 1,
   election_id: 1,
-  name: 'Stembureau "Op Rolletjes"',
+  name: "Op Rolletjes",
   number: 33,
   number_of_voters: undefined,
   polling_station_type: "Mobiel",

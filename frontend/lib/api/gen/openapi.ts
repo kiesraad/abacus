@@ -177,6 +177,7 @@ export interface PollingStation {
   number_of_voters?: number;
   polling_station_type: PollingStationType;
   postal_code: string;
+  status: PollingStationStatus;
   street: string;
 }
 
@@ -205,7 +206,14 @@ export interface PollingStationResults {
   votes_counts: VotesCounts;
 }
 
-export type PollingStationStatus = "Incomplete" | "Complete";
+export type PollingStationStatus =
+  | "correction"
+  | "definitive"
+  | "difference"
+  | "extra_entry"
+  | "first_entry"
+  | "objections"
+  | "second_entry";
 
 export interface PollingStationStatusEntry {
   id: number;

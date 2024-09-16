@@ -830,7 +830,8 @@
           "street",
           "house_number",
           "postal_code",
-          "locality"
+          "locality",
+          "status"
         ],
         "properties": {
           "election_id": {
@@ -870,6 +871,9 @@
           },
           "postal_code": {
             "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PollingStationStatus"
           },
           "street": {
             "type": "string"
@@ -935,8 +939,13 @@
       "PollingStationStatus": {
         "type": "string",
         "enum": [
-          "Incomplete",
-          "Complete"
+          "correction",
+          "definitive",
+          "difference",
+          "extra_entry",
+          "first_entry",
+          "objections",
+          "second_entry"
         ]
       },
       "PollingStationStatusEntry": {

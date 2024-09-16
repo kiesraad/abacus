@@ -222,6 +222,7 @@ mod tests {
                 house_number_addition: Some("b".to_string()),
                 postal_code: "1234 QY".to_string(),
                 locality: "Testdorp".to_string(),
+                status: polling_station::PollingStationStatus::FirstEntry,
             },
             PollingStation {
                 id: 2,
@@ -235,6 +236,7 @@ mod tests {
                 house_number_addition: Some("b".to_string()),
                 postal_code: "0123AB".to_string(),
                 locality: "Testdorp".to_string(),
+                status: polling_station::PollingStationStatus::FirstEntry,
             },
         )
     }

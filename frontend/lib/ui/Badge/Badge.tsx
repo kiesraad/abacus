@@ -1,6 +1,8 @@
+import { type PollingStationStatus } from "@kiesraad/api";
+
 import classes from "./badge.module.css";
 
-const typeToTextDict = {
+const typeToTextDict: { [S in PollingStationStatus]: string } = {
   correction: "Corrigendum",
   definitive: "Definitief",
   difference: "Verschil invoer 1 en 2",

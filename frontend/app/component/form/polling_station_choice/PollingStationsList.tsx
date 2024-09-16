@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { PollingStation } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
+import { Badge } from "@kiesraad/ui";
 
 export interface PollingStationsListProps {
   pollingStations: PollingStation[];
@@ -31,7 +32,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
             </td>
             <td>
               <span>{pollingStation.name}</span>
-              {/* TODO: <Badge type="first_entry" />*/}
+              <Badge type={pollingStation.status} />
             </td>
             <td width="5rem">
               <div className="link">

@@ -14,4 +14,5 @@ export const pollingStation33: PollingStation = {
   house_number_addition: undefined,
   postal_code: "1234 YQ",
   locality: "Den Haag",
+  status: "first_entry",
 };

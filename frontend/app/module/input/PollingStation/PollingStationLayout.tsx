@@ -34,7 +34,7 @@ export function PollingStationLayout() {
         <section>
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          <Badge type="first_entry" />
+          <Badge type={pollingStation.status} />
         </section>
         <section>
           <AbortDataEntryControl />

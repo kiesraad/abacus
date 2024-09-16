@@ -17,8 +17,8 @@ describe("FinaliseElectionPage", () => {
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "Incomplete" },
-        { id: 2, status: "Complete" },
+        { id: 1, status: "first_entry" },
+        { id: 2, status: "definitive" },
       ],
     });
 
@@ -32,8 +32,8 @@ describe("FinaliseElectionPage", () => {
   test("Shows button", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "Complete" },
-        { id: 2, status: "Complete" },
+        { id: 1, status: "definitive" },
+        { id: 2, status: "definitive" },
       ],
     });
 

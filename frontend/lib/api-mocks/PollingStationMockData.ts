@@ -12,6 +12,7 @@ export const pollingStationMockData: PollingStation = {
   house_number_addition: undefined,
   postal_code: "1234 YQ",
   locality: "Den Haag",
+  status: "first_entry",
 };
 
 export const getPollingStationListMockResponse = (election_id: number): PollingStationListResponse => {
@@ -30,6 +31,7 @@ export const getPollingStationListMockResponse = (election_id: number): PollingS
         house_number_addition: "b",
         postal_code: "1234 QY",
         locality: "Testdorp",
+        status: "first_entry",
       },
     ],
   };

@@ -12,7 +12,7 @@ export function DataEntryHomePage() {
   const { election } = useElection();
   const { statuses } = useElectionStatus();
 
-  const showDataEntrySavedAlert = location.hash === "#data_entry_saved";
+  const showDataEntrySavedAlert = location.hash === "#data-entry-saved";
 
   function closeDataEntrySavedAlert() {
     navigate({ hash: "" });

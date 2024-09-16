@@ -223,7 +223,6 @@ dependencies = [
  "tokio",
  "tower 0.5.1",
  "tower-http",
- "tower-layer",
  "typst",
  "typst-pdf",
  "utoipa",

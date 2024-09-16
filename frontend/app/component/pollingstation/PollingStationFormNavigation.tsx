@@ -142,7 +142,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
     <>
       {blocker.state === "blocked" && (
         <>
-          {!blocker.location.pathname.startsWith(`/${election.id}/input/${pollingStationId}`) ? (
+          {!blocker.location.pathname.startsWith(`/${election.id}/input/${pollingStationId}/`) ? (
             <AbortDataEntryModal
               onCancel={() => {
                 blocker.reset();

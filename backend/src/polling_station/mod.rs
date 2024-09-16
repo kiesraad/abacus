@@ -67,6 +67,13 @@ pub async fn polling_station_data_entry(
         ));
     }
 
+    if polling_station_data_entries.exists_finalised(id).await? {
+        return Err(APIError::Conflict(
+            "Cannot save data entry for a polling station that has already been finalised"
+                .to_string(),
+        ));
+    }
+
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
 
@@ -231,7 +238,7 @@ mod tests {
                     total_admitted_voters_count: 100,
                 },
                 votes_counts: VotesCounts {
-                    votes_candidates_counts: 96,
+                    votes_candidates_count: 96,
                     blank_votes_count: 2,
                     invalid_votes_count: 2,
                     total_votes_cast_count: 100,
@@ -348,6 +355,10 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(row_count.count, 1);
+
+        // Check that we can't save a new data entry after finalising
+        let response = save(pool.clone(), request_body.clone()).await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
     }
 
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
@@ -396,7 +407,7 @@ mod tests {
         let _ = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, street, house_number, house_number_addition, postal_code, locality)
 VALUES
-(1, 1, 'Stembureau "Op Rolletjes"', 33, NULL, 'mobiel', 'Rijksweg A12', '1', NULL, '1234 YQ', 'Den Haag'),
+(1, 1, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12', '1', NULL, '1234 YQ', 'Den Haag'),
 (2, 1, 'Testplek', 34, NULL, 'bijzonder', 'Teststraat', '2', 'b', '1234 QY', 'Testdorp')
 "#)
             .execute(&pool)
@@ -407,7 +418,7 @@ VALUES
         let _ = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, street, house_number, house_number_addition, postal_code, locality)
 VALUES
-(3, 2, 'Stembureau "Op Rolletjes"', 33, NULL, 'mobiel', 'Rijksweg A12', '1', NULL, '1234 YQ', 'Den Haag');
+(3, 2, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12', '1', NULL, '1234 YQ', 'Den Haag');
 "#)
             .execute(&pool)
             .await
@@ -417,7 +428,7 @@ VALUES
         let result = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, street, house_number, house_number_addition, postal_code, locality)
 VALUES
-(4, 1, 'Stembureau "Op Rolletjes"', 33, NULL, 'mobiel', 'Rijksweg A12', '1', NULL, '1234 YQ', 'Den Haag');
+(4, 1, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12', '1', NULL, '1234 YQ', 'Den Haag');
 "#)
             .execute(&pool)
             .await;

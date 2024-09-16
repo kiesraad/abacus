@@ -16,17 +16,36 @@ export function FinaliseElectionPage() {
   }
 
   function downloadResults() {
-    let filename: string | undefined;
+    let filename: string;
     fetch(`/api/elections/${election.id}/download_results`)
       .then((result) => {
-        filename = result.headers.get("Content-Disposition")?.split('filename="')[1]?.slice(0, -1);
+        if (result.status !== 200) {
+          // TODO: #277 handle error according to design
+          const message = `Failed to download PDF: status code ${result.status}`;
+          alert(message);
+          throw Error(message);
+        }
+        filename = result.headers.get("Content-Disposition")?.split('filename="')[1]?.slice(0, -1) ?? "document";
         return result.blob();
       })
       .then(
         (blob) => {
-          const file = new File([blob], filename ?? "document");
-          const objectURL = window.URL.createObjectURL(file);
-          window.location.assign(objectURL);
+          const file = new File([blob], filename);
+          const fileUrl = window.URL.createObjectURL(file);
+          const anchorElement = document.createElement("a");
+
+          anchorElement.href = fileUrl;
+          anchorElement.download = filename;
+          anchorElement.hidden = true;
+
+          document.body.appendChild(anchorElement);
+
+          anchorElement.click();
+          anchorElement.remove();
+
+          setTimeout(() => {
+            window.URL.revokeObjectURL(fileUrl);
+          }, 30000);
         },
         (error: unknown) => {
           console.error(error);

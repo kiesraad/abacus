@@ -15,7 +15,7 @@ import {
 import { test } from "./fixtures";
 import { pollingStation33 } from "./test-data/PollingStationTestData";
 
-test.describe("data entry", () => {
+test.describe("full data entry flow", () => {
   test("no recount, no differences", async ({ page }) => {
     await page.goto("/1/input");
 
@@ -41,7 +41,7 @@ test.describe("data entry", () => {
       total_admitted_voters_count: 1125,
     };
     const votes: VotesCounts = {
-      votes_candidates_counts: 1090,
+      votes_candidates_count: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
@@ -63,10 +63,27 @@ test.describe("data entry", () => {
 
     const saveFormPage = new SaveFormPage(page);
     await saveFormPage.heading.waitFor();
-    await saveFormPage.save.click();
 
-    // TODO: #318 reset database to allow polling station to be finalised in multiple tests
-    // await inputPage.dataEntrySuccess.waitFor();
+    await expect(saveFormPage.summaryText).toContainText(
+      "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
+    );
+
+    const expectedSummaryItems = [
+      { text: "Alle optellingen kloppen", iconLabel: "opgeslagen" },
+      { text: "Er zijn geen blokkerende fouten of waarschuwingen", iconLabel: "opgeslagen" },
+      { text: "Je kan de resultaten van dit stembureau opslaan", iconLabel: "opgeslagen" },
+    ];
+    const listItems = saveFormPage.allSummaryListItems();
+    const expectedTexts = Array.from(expectedSummaryItems, (item) => item.text);
+    await expect(listItems).toHaveText(expectedTexts);
+
+    for (const expectedItem of expectedSummaryItems) {
+      await expect(saveFormPage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(expectedItem.iconLabel);
+    }
+
+    await saveFormPage.save.click();
+    await inputPage.headingNextPollingStation.waitFor();
+    await inputPage.dataEntrySuccess.waitFor();
   });
 
   test("recount, no differences", async ({ page }) => {
@@ -93,7 +110,7 @@ test.describe("data entry", () => {
     };
     await votersVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_counts: 1090,
+      votes_candidates_count: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
@@ -149,7 +166,7 @@ test.describe("data entry", () => {
     };
     await votersVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
-      votes_candidates_counts: 1135,
+      votes_candidates_count: 1135,
       blank_votes_count: 10,
       invalid_votes_count: 5,
       total_votes_cast_count: 1150,
@@ -214,7 +231,7 @@ test.describe("data entry", () => {
     await votersVotesPage.inputVotersCounts(voters);
 
     const votes: VotesCounts = {
-      votes_candidates_counts: 1090,
+      votes_candidates_count: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
@@ -263,6 +280,78 @@ test.describe("data entry", () => {
     // TODO: #318 reset database to allow polling station to be finalised in multiple tests
     // await inputPage.dataEntrySuccess.waitFor();
   });
+
+  test("submit with accepted warning on voters and votes page", async ({ page }) => {
+    await page.goto("/1/input/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkNoAndClickNext();
+
+    // fill form with data that results in a warning
+    const votersVotesPage = new VotersVotesPage(page);
+    const voters = {
+      poll_card_count: 100,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
+    };
+    const votes = {
+      votes_candidates_count: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
+    };
+    await votersVotesPage.fillInPageAndClickNext(voters, votes);
+
+    await expect(votersVotesPage.heading).toBeVisible();
+    await expect(votersVotesPage.warning).toContainText(
+      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+    );
+
+    // accept the warning
+    await votersVotesPage.checkAcceptWarnings();
+    await votersVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await differencesPage.heading.waitFor();
+
+    await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
+
+    await differencesPage.next.click();
+
+    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    await candidatesListPage_1.heading.waitFor();
+    await candidatesListPage_1.fillCandidatesAndTotal([99, 1], 100);
+    await candidatesListPage_1.next.click();
+
+    const saveFormPage = new SaveFormPage(page);
+    await saveFormPage.heading.waitFor();
+
+    await expect(saveFormPage.summaryText).toContainText(
+      "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
+    );
+
+    const expectedSummaryItems = [
+      { text: "Alle optellingen kloppen", iconLabel: "opgeslagen" },
+      {
+        text: "Toegelaten kiezers en uitgebrachte stemmen heeft geaccepteerde waarschuwingen",
+        iconLabel: "bevat een waarschuwing",
+      },
+      { text: "Je kan de resultaten van dit stembureau opslaan", iconLabel: "opgeslagen" },
+    ];
+    const listItems = saveFormPage.allSummaryListItems();
+    const expectedTexts = Array.from(expectedSummaryItems, (item) => item.text);
+    await expect(listItems).toHaveText(expectedTexts);
+
+    for (const expectedItem of expectedSummaryItems) {
+      await expect(saveFormPage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(expectedItem.iconLabel);
+    }
+
+    await saveFormPage.save.click();
+    const inputPage = new InputPage(page);
+    await inputPage.headingNextPollingStation.waitFor();
+    await inputPage.dataEntrySuccess.waitFor();
+  });
 });
 
 test.describe("errors and warnings", () => {
@@ -281,7 +370,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -327,7 +416,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -364,44 +453,6 @@ test.describe("errors and warnings", () => {
     // await inputPage.dataEntrySuccess.waitFor();
   });
 
-  test("accept warning on voters and votes page", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
-
-    const recountedPage = new RecountedPage(page);
-    await recountedPage.checkNoAndClickNext();
-
-    // fill form with data that results in a warning
-    const votersVotesPage = new VotersVotesPage(page);
-    const voters = {
-      poll_card_count: 100,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 100,
-    };
-    const votes = {
-      votes_candidates_counts: 100,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 100,
-    };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
-
-    await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.warning).toContainText(
-      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-    );
-    await expect(votersVotesPage.error).toBeHidden();
-
-    // accept the warning
-    await votersVotesPage.checkAcceptWarnings();
-    await votersVotesPage.next.click();
-
-    const differencesPage = new DifferencesPage(page);
-    await differencesPage.heading.waitFor();
-
-    await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
-  });
-
   test("correct warning on voters and votes page", async ({ page }) => {
     await page.goto("/1/input/1/recounted");
 
@@ -417,7 +468,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -470,7 +521,7 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
     const votes = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -513,7 +564,7 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -567,7 +618,7 @@ test.describe("navigation", () => {
       total_admitted_voters_count: 100,
     };
     const votes: VotesCounts = {
-      votes_candidates_counts: 100,
+      votes_candidates_count: 100,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
@@ -626,7 +677,7 @@ test.describe("navigation", () => {
         total_admitted_voters_count: 100,
       };
       const votes: VotesCounts = {
-        votes_candidates_counts: 100,
+        votes_candidates_count: 100,
         blank_votes_count: 0,
         invalid_votes_count: 0,
         total_votes_cast_count: 100,

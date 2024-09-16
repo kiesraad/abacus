@@ -237,3 +237,60 @@ export function isFormSectionEmpty(section: FormSection, values: PollingStationV
       return true;
   }
 }
+
+export type PollingStationFormSectionStatus = "empty" | "unaccepted-warnings" | "accepted-warnings" | "errors";
+export type PollingStationSummary = {
+  countsAddUp: boolean;
+  hasBlocks: boolean;
+  hasWarnings: boolean;
+  hasErrors: boolean;
+  notableFormSections: {
+    status: PollingStationFormSectionStatus;
+    title?: string;
+    formSection: FormSection;
+  }[];
+};
+
+export function getPollingStationSummary(formState: FormState, values: PollingStationValues): PollingStationSummary {
+  const result: PollingStationSummary = {
+    countsAddUp: true,
+    hasBlocks: false,
+    hasWarnings: false,
+    hasErrors: false,
+    notableFormSections: [],
+  };
+
+  Object.values(formState.sections)
+    .filter((section) => section.id !== "save")
+    .sort(sortFormSections)
+    .forEach((section) => {
+      if (section.errors.length > 0) {
+        result.notableFormSections.push({ status: "errors", formSection: section });
+        result.countsAddUp = false;
+        result.hasBlocks = true;
+        result.hasErrors = true;
+      } else if (section.warnings.length > 0) {
+        result.hasWarnings = true;
+        if (section.ignoreWarnings) {
+          result.notableFormSections.push({ status: "accepted-warnings", formSection: section });
+        } else {
+          result.notableFormSections.push({ status: "unaccepted-warnings", formSection: section });
+          result.hasBlocks = true;
+        }
+      } else if (section.id.startsWith("political_group_votes_") && isFormSectionEmpty(section, values)) {
+        result.notableFormSections.push({
+          status: "empty",
+          formSection: section,
+          title: `Lijst ${section.id.substring(22)}`,
+        });
+      }
+    });
+
+  return result;
+}
+
+function sortFormSections(a: FormSection, b: FormSection): number {
+  if (a.index < b.index) return -1;
+  if (a.index > b.index) return 1;
+  return 0;
+}

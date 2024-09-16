@@ -19,3 +19,4 @@ export * from "./ProgressList/ProgressList";
 export * from "./Spinner/Spinner";
 export * from "./util";
 export * from "./ui.types.d";
+export * from "./StatusList/StatusList";

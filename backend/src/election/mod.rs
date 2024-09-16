@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 
 use crate::pdf_gen::generate_pdf;
 use crate::pdf_gen::models::{ModelNa31_2Input, ModelNa31_2Summary, PdfModel};
-use crate::polling_station::repository::PollingStations;
+use crate::polling_station::repository::{PollingStationResultsEntries, PollingStations};
 use crate::polling_station::PollingStationStatusEntry;
 use crate::APIError;
 
@@ -118,14 +118,19 @@ pub async fn election_status(
 pub async fn election_download_results(
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
+    State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     Path(id): Path<u32>,
 ) -> Result<(HeaderMap, Vec<u8>), APIError> {
     let election = elections_repo.get(id).await?;
     let polling_stations = polling_stations_repo.list(election.id).await?;
+    let results = polling_station_results_entries_repo
+        .list_with_polling_stations(election.id)
+        .await?;
+    let summary = ModelNa31_2Summary::from_results(&election, &results)?;
 
     let model = PdfModel::ModelNa31_2(ModelNa31_2Input {
         polling_stations,
-        summary: ModelNa31_2Summary::zero(),
+        summary,
         election,
     });
     let filename = model.as_filename();

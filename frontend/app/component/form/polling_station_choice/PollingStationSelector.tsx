@@ -71,7 +71,7 @@ export function PollingStationSelector({
             return (
               <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.error)}>
                 <span className={cls.icon}>
-                  <Icon icon={<IconError />} color="error" />
+                  <Icon icon={<IconError aria-label={"bevat een fout"} />} color="error" />
                 </span>
                 <span>Geen stembureau gevonden met nummer {removeLeadingZeros(pollingStationNumber)}</span>
               </div>

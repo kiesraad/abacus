@@ -10,7 +10,7 @@ export interface VotersCounts {
 }
 
 export interface VotesCounts {
-  votes_candidates_counts: number;
+  votes_candidates_count: number;
   blank_votes_count: number;
   invalid_votes_count: number;
   total_votes_cast_count: number;
@@ -61,7 +61,7 @@ export class VotersVotesPage extends InputBasePage {
     this.totalAdmittedVotersCount = page.getByTestId("total_admitted_voters_count");
 
     // votes counts
-    this.votesCandidatesCount = page.getByTestId("votes_candidates_counts");
+    this.votesCandidatesCount = page.getByTestId("votes_candidates_count");
     this.blankVotesCount = page.getByTestId("blank_votes_count");
     this.invalidVotesCount = page.getByTestId("invalid_votes_count");
     this.totalVotesCastCount = page.getByTestId("total_votes_cast_count");
@@ -85,7 +85,7 @@ export class VotersVotesPage extends InputBasePage {
   }
 
   async inputVotesCounts(votesCounts: VotesCounts) {
-    await this.votesCandidatesCount.fill(votesCounts.votes_candidates_counts.toString());
+    await this.votesCandidatesCount.fill(votesCounts.votes_candidates_count.toString());
     await this.blankVotesCount.fill(votesCounts.blank_votes_count.toString());
     await this.invalidVotesCount.fill(votesCounts.invalid_votes_count.toString());
     await this.totalVotesCastCount.fill(votesCounts.total_votes_cast_count.toString());
@@ -108,6 +108,7 @@ export class VotersVotesPage extends InputBasePage {
   }
 
   async checkAcceptWarnings() {
+    await this.acceptWarnings.waitFor();
     // eslint-disable-next-line playwright/no-force-option -- force option needed to click on hidden element
     await this.acceptWarnings.check({ force: true, noWaitAfter: true });
   }

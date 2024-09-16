@@ -12,7 +12,11 @@ import { PollingStationsList } from "./PollingStationsList";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
 
-export function PollingStationChoiceForm() {
+export interface PollingStationChoiceFormProps {
+  anotherEntry?: boolean;
+}
+
+export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
 
   const { pollingStations, pollingStationsLoading } = usePollingStationList();
@@ -57,7 +61,9 @@ export function PollingStationChoiceForm() {
         return;
       }}
     >
-      <h2 className="form_title">Welk stembureau ga je invoeren?</h2>
+      <h2 className="form_title">
+        {anotherEntry ? "Verder met een volgend stembureau?" : "Welk stembureau ga je invoeren?"}
+      </h2>
       <PollingStationSelector
         pollingStationNumber={pollingStationNumber}
         setPollingStationNumber={setPollingStationNumber}
@@ -76,7 +82,7 @@ export function PollingStationChoiceForm() {
       {showAlert && (
         <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
           <span className={cls.icon}>
-            <Icon icon={<IconError />} color="error" />
+            <Icon icon={<IconError aria-label={"bevat een fout"} />} color="error" />
           </span>
           <span>Voer een geldig nummer van een stembureau in om te beginnen</span>
         </div>

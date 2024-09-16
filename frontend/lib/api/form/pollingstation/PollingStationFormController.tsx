@@ -80,6 +80,7 @@ export interface iPollingStationControllerContext {
   registerCurrentForm: (form: AnyFormReference) => void;
   deleteDataEntry: () => Promise<void>;
   finaliseDataEntry: () => Promise<void>;
+  pollingStationId: number;
 }
 
 export type FormSectionID =
@@ -230,7 +231,7 @@ export function PollingStationFormController({
       total_admitted_voters_count: 0,
     },
     votes_counts: {
-      votes_candidates_counts: 0,
+      votes_candidates_count: 0,
       blank_votes_count: 0,
       invalid_votes_count: 0,
       total_votes_cast_count: 0,
@@ -318,15 +319,15 @@ export function PollingStationFormController({
           const formValues = ref.getValues();
           let voters_recounts: VotersRecounts | undefined = undefined;
           if (formValues.recounted) {
-            if (values.recounted === false) {
+            if (values.voters_recounts !== undefined) {
+              voters_recounts = values.voters_recounts;
+            } else {
               voters_recounts = {
                 poll_card_recount: 0,
                 proxy_certificate_recount: 0,
                 voter_card_recount: 0,
                 total_admitted_voters_recount: 0,
               };
-            } else {
-              voters_recounts = values.voters_recounts;
             }
           }
           newValues = {
@@ -470,6 +471,7 @@ export function PollingStationFormController({
         targetFormSection,
         deleteDataEntry,
         finaliseDataEntry,
+        pollingStationId,
       }}
     >
       {children}

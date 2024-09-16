@@ -66,10 +66,15 @@ p.md {
 }
 
 a {
-  text-decoration: none;
-  &:hover,
-  &:focus {
-    text-decoration: underline;
+  color: var(--link-default);
+  &:visited {
+    color: var(--link-visited);
+  }
+  &:hover {
+    color: var(--link-hover) !important;
+  }
+  &:active {
+    color: var(--link-active) !important;
   }
 }
 
@@ -88,4 +93,11 @@ h2#recounted_title {
 p.form-paragraph {
   width: 37.5rem;
   margin-top: 1rem;
+}
+
+section.md {
+  margin-bottom: 2rem;
+  p {
+    max-width: 38rem;
+  }
 }

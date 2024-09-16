@@ -84,6 +84,12 @@ describe("Test RecountedForm", () => {
         data: {
           ...emptyDataEntryRequest.data,
           recounted: true,
+          voters_recounts: {
+            poll_card_recount: 0,
+            proxy_certificate_recount: 0,
+            voter_card_recount: 0,
+            total_admitted_voters_recount: 0,
+          },
         },
       };
 
@@ -125,9 +131,8 @@ describe("Test RecountedForm", () => {
 
       await user.click(submitButton);
 
-      const feedbackError = await screen.findByTestId("feedback-error");
-      expect(feedbackError).toHaveTextContent(
-        `Controleer het papieren proces-verbaalF.101Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinatorGeen vinkje? Kies dan 'nee'.`,
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(
+        "Controleer het papieren proces-verbaalF.101Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinatorGeen vinkje? Kies dan 'nee'.",
       );
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
     });

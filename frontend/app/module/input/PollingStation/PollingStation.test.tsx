@@ -264,6 +264,45 @@ describe("Polling Station data entry integration tests", () => {
     }
   });
 
+  test("Error F204 navigates back to voters and votes page", async () => {
+    render();
+
+    const formFillingSteps = [
+      startPollingStationInput,
+      expectRecountedForm,
+      fillRecountedFormNo,
+      submit,
+      expectVotersAndVotesForm,
+      () =>
+        fillVotersAndVotesForm({
+          poll_card_count: total_votes,
+          proxy_certificate_count: 1,
+          voter_card_count: 0,
+          total_admitted_voters_count: total_votes + 1,
+          // to get the F204 error, votes_candidates_count should not match total_votes
+          votes_candidates_count: total_votes + 1,
+          blank_votes_count: 0,
+          invalid_votes_count: 0,
+          total_votes_cast_count: total_votes + 1,
+        }),
+      submit,
+      expectDifferencesForm,
+      fillDifferencesForm,
+      submit,
+      ...electionMockData.political_groups.flatMap((pg) => [
+        () => expectPoliticalGroupCandidatesForm(pg.number),
+        fillPoliticalGroupCandidatesVotesForm,
+        submit,
+      ]),
+      expectVotersAndVotesForm,
+      () => expectFeedbackError("F.204"),
+    ];
+
+    for (const step of formFillingSteps) {
+      await step();
+    }
+  });
+
   test("Navigate back", async () => {
     render();
 

@@ -5,6 +5,10 @@
   position: relative;
   display: flex;
 
+  a:visited {
+    color: var(--link-default);
+  }
+
   > button {
     position: absolute;
     right: 2rem;

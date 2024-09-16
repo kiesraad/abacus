@@ -19,6 +19,10 @@
       }
     }
 
+    a:visited {
+      color: var(--link-default);
+    }
+
     &:global(.emphasis) {
       font-weight: bold;
     }

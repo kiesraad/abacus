@@ -19,7 +19,12 @@
   }
 
   a {
+    text-decoration: none;
     color: inherit;
+    &:hover,
+    &:active {
+      color: inherit !important;
+    }
   }
 
   span {

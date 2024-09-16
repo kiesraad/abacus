@@ -21,11 +21,7 @@ export class SaveFormPage extends InputBasePage {
     return this.summaryList.getByRole("listitem");
   }
 
-  summaryListItem(text: string) {
-    return this.summaryList.locator("li", { hasText: text });
-  }
-
   summaryListItemIcon(text: string) {
-    return this.summaryListItem(text).getByRole("img");
+    return this.summaryList.locator("li", { hasText: text }).getByRole("img");
   }
 }

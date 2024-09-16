@@ -108,6 +108,7 @@ export class VotersVotesPage extends InputBasePage {
   }
 
   async checkAcceptWarnings() {
+    await this.acceptWarnings.waitFor();
     // eslint-disable-next-line playwright/no-force-option -- force option needed to click on hidden element
     await this.acceptWarnings.check({ force: true, noWaitAfter: true });
   }

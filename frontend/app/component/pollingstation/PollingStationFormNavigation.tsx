@@ -70,7 +70,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
       //check if nextLocation is outside the input flow
       if (
         status.current !== "aborted" &&
-        !nextLocation.pathname.startsWith(`/${election.id}/input/${pollingStationId}`)
+        !nextLocation.pathname.startsWith(`/${election.id}/input/${pollingStationId}/`)
       ) {
         return true;
       }

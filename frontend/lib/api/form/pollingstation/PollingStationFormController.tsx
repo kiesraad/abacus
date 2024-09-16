@@ -80,6 +80,7 @@ export interface iPollingStationControllerContext {
   registerCurrentForm: (form: AnyFormReference) => void;
   deleteDataEntry: () => Promise<void>;
   finaliseDataEntry: () => Promise<void>;
+  pollingStationId: number;
 }
 
 export type FormSectionID =
@@ -470,6 +471,7 @@ export function PollingStationFormController({
         targetFormSection,
         deleteDataEntry,
         finaliseDataEntry,
+        pollingStationId,
       }}
     >
       {children}

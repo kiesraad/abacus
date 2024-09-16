@@ -1,13 +1,29 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import { useElection, usePollingStationFormController } from "@kiesraad/api";
-import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
+import { getUrlForFormSectionID } from "app/component/pollingstation/utils";
+
+import {
+  FormSectionID,
+  getPollingStationSummary,
+  PollingStationFormSectionStatus,
+  useElection,
+  usePollingStationFormController,
+} from "@kiesraad/api";
+import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusList } from "@kiesraad/ui";
 
 export function PollingStationSaveForm() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { registerCurrentForm, formState, status, finaliseDataEntry } = usePollingStationFormController();
+  const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId, values } =
+    usePollingStationFormController();
+
+  const getUrlForFormSection = React.useCallback(
+    (id: FormSectionID) => {
+      return getUrlForFormSectionID(election.id, pollingStationId, id);
+    },
+    [election, pollingStationId],
+  );
 
   React.useEffect(() => {
     registerCurrentForm({
@@ -17,6 +33,9 @@ export function PollingStationSaveForm() {
     });
   }, [registerCurrentForm]);
 
+  const summary = React.useMemo(() => {
+    return getPollingStationSummary(formState, values);
+  }, [formState, values]);
   const finalisationAllowed = Object.values(formState.sections).every(
     (section) => section.errors.length === 0 && (section.warnings.length === 0 || section.ignoreWarnings),
   );
@@ -38,43 +57,85 @@ export function PollingStationSaveForm() {
   return (
     <Form onSubmit={handleSubmit} id="check_save_form">
       <h2>Controleren en opslaan</h2>
+      <section className="md" id="save-form-summary-text">
+        {!summary.hasBlocks && summary.countsAddUp && (
+          <p className="md">
+            De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen
+            blokkerende fouten of waarschuwingen.
+          </p>
+        )}
+        {summary.hasBlocks && summary.countsAddUp && (
+          <>
+            <p className="md">
+              De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn
+              waarschuwingen die moeten worden gecontroleerd.
+            </p>
 
-      {/* TODO: #103 format this according to design */}
-      <p>Hieronder zie je een overzicht van alle eventuele fouten en waarschuwingen.</p>
-      <ul>
-        {Object.values(formState.sections).map((section) => (
-          <li key={section.id}>
-            <span>{section.title || section.id}</span>
-            <ul>
-              <li>
-                <span>Fouten:</span>
-                <ul>
-                  {section.errors.map((error, n) => (
-                    <li key={`error${n}`}>{error.code}</li>
-                  ))}
-                </ul>
-              </li>
-              <li>
-                <span>Waarschuwingen:</span>
-                <ul>
-                  {section.warnings.map((warning, n) => (
-                    <li key={`warning${n}`}>{warning.code}</li>
-                  ))}
-                </ul>
-              </li>
-              <li>Waarschuwingen geaccepteerd: {section.ignoreWarnings ? "Ja" : "Nee"}</li>
-            </ul>
-          </li>
-        ))}
-      </ul>
-      {finalisationAllowed ? (
-        <p>Je kan de resultaten van dit stembureau opslaan.</p>
-      ) : (
-        <p>Je kan de resultaten van dit stembureau nog niet opslaan.</p>
-      )}
+            <p className="md">Controleer de openstaande waarschuwingen</p>
+          </>
+        )}
+
+        {summary.hasBlocks && !summary.countsAddUp && (
+          <>
+            <p className="md">
+              De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar tegen. Je kan de resultaten
+              daarom niet opslaan.
+            </p>
+            <p className="md">Los de blokkerende fouten op. Lukt dat niet? Overleg dan met de coördinator. </p>
+          </>
+        )}
+      </section>
+
+      <StatusList id="save-form-summary-list">
+        {summary.countsAddUp && <StatusList.Item status="accept">Alle optellingen kloppen</StatusList.Item>}
+
+        {summary.notableFormSections.map((section) => {
+          const link = (
+            <Link to={getUrlForFormSection(section.formSection.id)}>{section.title || section.formSection.title}</Link>
+          );
+          let content = <></>;
+          switch (section.status) {
+            case "empty":
+              content = <>Op {link} zijn geen stemmen ingevoerd</>;
+              break;
+            case "accepted-warnings":
+              content = <>{link} heeft geaccepteerde waarschuwingen</>;
+              break;
+            case "unaccepted-warnings":
+              content = <>Controleer waarschuwingen bij {link}</>;
+              break;
+            case "errors":
+              content = <>{link} heeft blokkerende fouten</>;
+          }
+          return (
+            <StatusList.Item
+              key={section.formSection.id}
+              status={menuStatusForFormSectionStatus(section.status)}
+              id={`section-status-${section.formSection.id}`}
+            >
+              {content}
+            </StatusList.Item>
+          );
+        })}
+
+        {!summary.hasBlocks && !summary.hasWarnings && (
+          <StatusList.Item status="accept" id="no-blocking-errors-or-warnings">
+            Er zijn geen blokkerende fouten of waarschuwingen
+          </StatusList.Item>
+        )}
+        {summary.hasBlocks ? (
+          <StatusList.Item status={summary.hasErrors ? "error" : "warning"} id="form-cannot-be-saved" emphasis>
+            Je kan de resultaten van dit stembureau nog niet opslaan
+          </StatusList.Item>
+        ) : (
+          <StatusList.Item status="accept" id="form-can-be-saved" emphasis>
+            Je kan de resultaten van dit stembureau opslaan
+          </StatusList.Item>
+        )}
+      </StatusList>
 
       {finalisationAllowed && (
-        <BottomBar type="input-grid">
+        <BottomBar type="form">
           <BottomBar.Row>
             <Button type="submit" size="lg" disabled={status.current === "finalising"}>
               Opslaan
@@ -85,4 +146,17 @@ export function PollingStationSaveForm() {
       )}
     </Form>
   );
+}
+
+function menuStatusForFormSectionStatus(status: PollingStationFormSectionStatus): MenuStatus {
+  switch (status) {
+    case "empty":
+      return "empty";
+    case "unaccepted-warnings":
+      return "warning";
+    case "accepted-warnings":
+      return "warning";
+    case "errors":
+      return "error";
+  }
 }

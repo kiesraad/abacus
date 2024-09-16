@@ -1,0 +1,50 @@
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+
+    aside {
+      display: flex;
+      align-items: center;
+      flex: 0 0 1.5rem;
+      svg {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+
+    &:global(.emphasis) {
+      font-weight: bold;
+    }
+
+    &:global(.empty) {
+      svg {
+        fill: var(--menu-empty);
+      }
+    }
+
+    &:global(.warning) {
+      svg {
+        fill: var(--menu-warning);
+      }
+    }
+
+    &:global(.accept) {
+      svg {
+        fill: var(--menu-accept);
+      }
+    }
+
+    &:global(.error) {
+      svg {
+        fill: var(--color-error-darkest);
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ export class InputPage {
   protected readonly page: Page;
 
   readonly heading: Locator;
+  readonly headingNextPollingStation: Locator;
   readonly pollingStationNumber: Locator;
   readonly pollingStationFeedback: Locator;
   protected readonly start: Locator; // use clickStart() instead
@@ -15,6 +16,11 @@ export class InputPage {
     this.heading = page.getByRole("heading", {
       level: 2,
       name: "Welk stembureau ga je invoeren?",
+    });
+
+    this.headingNextPollingStation = page.getByRole("heading", {
+      level: 2,
+      name: "Verder met een volgend stembureau?",
     });
 
     this.pollingStationNumber = page.getByRole("textbox", { name: "Voer het nummer in: " });

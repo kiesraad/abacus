@@ -280,6 +280,78 @@ test.describe("full data entry flow", () => {
     // TODO: #318 reset database to allow polling station to be finalised in multiple tests
     // await inputPage.dataEntrySuccess.waitFor();
   });
+
+  test("submit with accepted warning on voters and votes page", async ({ page }) => {
+    await page.goto("/1/input/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkNoAndClickNext();
+
+    // fill form with data that results in a warning
+    const votersVotesPage = new VotersVotesPage(page);
+    const voters = {
+      poll_card_count: 100,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
+    };
+    const votes = {
+      votes_candidates_count: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
+    };
+    await votersVotesPage.fillInPageAndClickNext(voters, votes);
+
+    await expect(votersVotesPage.heading).toBeVisible();
+    await expect(votersVotesPage.warning).toContainText(
+      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+    );
+
+    // accept the warning
+    await votersVotesPage.checkAcceptWarnings();
+    await votersVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await differencesPage.heading.waitFor();
+
+    await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
+
+    await differencesPage.next.click();
+
+    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    await candidatesListPage_1.heading.waitFor();
+    await candidatesListPage_1.fillCandidatesAndTotal([99, 1], 100);
+    await candidatesListPage_1.next.click();
+
+    const saveFormPage = new SaveFormPage(page);
+    await saveFormPage.heading.waitFor();
+
+    await expect(saveFormPage.summaryText).toContainText(
+      "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
+    );
+
+    const expectedSummaryItems = [
+      { text: "Alle optellingen kloppen", iconLabel: "opgeslagen" },
+      {
+        text: "Toegelaten kiezers en uitgebrachte stemmen heeft geaccepteerde waarschuwingen",
+        iconLabel: "bevat een waarschuwing",
+      },
+      { text: "Je kan de resultaten van dit stembureau opslaan", iconLabel: "opgeslagen" },
+    ];
+    const listItems = saveFormPage.allSummaryListItems();
+    const expectedTexts = Array.from(expectedSummaryItems, (item) => item.text);
+    await expect(listItems).toHaveText(expectedTexts);
+
+    for (const expectedItem of expectedSummaryItems) {
+      await expect(saveFormPage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(expectedItem.iconLabel);
+    }
+
+    await saveFormPage.save.click();
+    const inputPage = new InputPage(page);
+    await inputPage.headingNextPollingStation.waitFor();
+    await inputPage.dataEntrySuccess.waitFor();
+  });
 });
 
 test.describe("errors and warnings", () => {
@@ -379,63 +451,6 @@ test.describe("errors and warnings", () => {
     // TODO: #318 reset database to allow polling station to be finalised in multiple tests
     // const inputPage = new InputPage(page);
     // await inputPage.dataEntrySuccess.waitFor();
-  });
-
-  test("accept warning on voters and votes page", async ({ page }) => {
-    await page.goto("/1/input/1/recounted");
-
-    const recountedPage = new RecountedPage(page);
-    await recountedPage.checkNoAndClickNext();
-
-    // fill form with data that results in a warning
-    const votersVotesPage = new VotersVotesPage(page);
-    const voters = {
-      poll_card_count: 100,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 100,
-    };
-    const votes = {
-      votes_candidates_count: 100,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 100,
-    };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
-
-    await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.warning).toContainText(
-      "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-    );
-    await expect(votersVotesPage.error).toBeHidden();
-
-    // accept the warning
-    await votersVotesPage.checkAcceptWarnings();
-    await votersVotesPage.next.click();
-
-    const differencesPage = new DifferencesPage(page);
-    await differencesPage.heading.waitFor();
-
-    await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
-
-    await differencesPage.next.click();
-
-    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
-    await candidatesListPage_1.heading.waitFor();
-    await candidatesListPage_1.fillCandidatesAndTotal([99, 1], 100);
-    await candidatesListPage_1.next.click();
-
-    const savePage = new SaveFormPage(page);
-    await savePage.heading.waitFor();
-
-    await expect(savePage.summaryText).toContainText(
-      "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
-    );
-
-    await expect(savePage.summaryList).toContainText("Alle optellingen kloppen");
-    await expect(savePage.summaryListItemIcon("Toegelaten kiezers en uitgebrachte stemmen")).toHaveAccessibleName(
-      "bevat een waarschuwing",
-    );
   });
 
   test("correct warning on voters and votes page", async ({ page }) => {

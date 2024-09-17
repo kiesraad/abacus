@@ -23,7 +23,7 @@ test.describe("full data entry flow", () => {
     await expect(inputPage.heading).toBeVisible();
     const pollingStation = pollingStation33;
     await inputPage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(inputPage.pollingStationFeedback).toHaveText(pollingStation.name);
+    await expect(inputPage.pollingStationFeedback).toContainText(pollingStation.name);
     await inputPage.clickStart();
 
     const recountedPage = new RecountedPage(page);

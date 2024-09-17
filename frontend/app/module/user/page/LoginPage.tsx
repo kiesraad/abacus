@@ -1,4 +1,4 @@
-import { LoginForm } from "app/component/form/login/LoginForm";
+import { LoginForm } from "app/component/form/user/login/LoginForm";
 
 import { PageTitle, WorkStationNumber } from "@kiesraad/ui";
 

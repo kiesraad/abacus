@@ -1,5 +1,5 @@
 export function getUrlForFormSectionID(electionId: number, pollingStationId: number, sectionId: string) {
-  const baseUrl = `/${electionId}/input/${pollingStationId}`;
+  const baseUrl = `/elections/${electionId}/data-entry/${pollingStationId}`;
 
   let url: string = "";
   if (sectionId.startsWith("political_group_votes_")) {
@@ -13,7 +13,7 @@ export function getUrlForFormSectionID(electionId: number, pollingStationId: num
         url = `${baseUrl}/differences`;
         break;
       case "voters_votes_counts":
-        url = `${baseUrl}/numbers`;
+        url = `${baseUrl}/voters-and-votes`;
         break;
       case "save":
         url = `${baseUrl}/save`;

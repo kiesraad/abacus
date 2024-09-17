@@ -1,6 +1,6 @@
 import { assert, describe, expect, test } from "vitest";
 
-import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/test/unit/form.ts";
+import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/test/unit/form";
 
 import {
   addValidationResultToFormState,

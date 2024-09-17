@@ -66,8 +66,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "F.301",
     content: (
       <div>
-        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er meer stemmen dan kiezers
-        waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het aantal meer getelde stembiljetten.
+        Je hebt bij <Link to={`../voters-and-votes`}>Aantal kiezers en stemmers</Link> ingevuld dat er meer stemmen dan
+        kiezers waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het aantal meer getelde stembiljetten.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -78,8 +78,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "F.302",
     content: (
       <div>
-        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er meer stemmen dan kiezers
-        waren. Daarom mag J niet ingevuld zijn.
+        Je hebt bij <Link to={`../voters-and-votes`}>Aantal kiezers en stemmers</Link> ingevuld dat er meer stemmen dan
+        kiezers waren. Daarom mag J niet ingevuld zijn.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -90,8 +90,9 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "F.303",
     content: (
       <div>
-        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er minder stemmen dan kiezers
-        waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het aantal minder getelde stembiljetten.
+        Je hebt bij <Link to={`../voters-and-votes`}>Aantal kiezers en stemmers</Link> ingevuld dat er minder stemmen
+        dan kiezers waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het aantal minder getelde
+        stembiljetten.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -102,8 +103,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "F.304",
     content: (
       <div>
-        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er minder stemmen dan kiezers
-        waren. Daarom mag I niet ingevuld zijn.
+        Je hebt bij <Link to={`../voters-and-votes`}>Aantal kiezers en stemmers</Link> ingevuld dat er minder stemmen
+        dan kiezers waren. Daarom mag I niet ingevuld zijn.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>
@@ -114,8 +115,8 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     code: "F.305",
     content: (
       <div>
-        Je hebt bij <Link to={`../numbers`}>Aantal kiezers en stemmers</Link> ingevuld dat er evenveel stemmen als
-        kiezers waren. Maar je hebt wel verschillen ingevuld.
+        Je hebt bij <Link to={`../voters-and-votes`}>Aantal kiezers en stemmers</Link> ingevuld dat er evenveel stemmen
+        als kiezers waren. Maar je hebt wel verschillen ingevuld.
         <br />
         Check of je het papieren proces-verbaal goed hebt overgenomen.
       </div>

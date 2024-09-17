@@ -84,4 +84,57 @@ describe("UI Component: Form", () => {
 
     expect(ref.current).toBeInstanceOf(HTMLFormElement);
   });
+
+  test("Move focus", async () => {
+    const onSubmit = vi.fn((e: React.FormEvent) => {
+      e.preventDefault();
+    });
+
+    render(
+      <Form onSubmit={onSubmit} id="test-form">
+        <input id="inp1" defaultValue="fizz1" />
+        <input id="inp2" defaultValue="fizz2" />
+        <input id="inp3" defaultValue="fizz3" />
+        <button id="test-submit-button" type="submit">
+          Submit
+        </button>
+      </Form>,
+    );
+
+    const firstInput = screen.getByTestId("inp1");
+    const secondInput = screen.getByTestId("inp2");
+    const thirdInput = screen.getByTestId("inp3");
+    const submitButton = screen.getByTestId("test-submit-button");
+
+    firstInput.focus();
+    expect(firstInput).toHaveFocus();
+
+    await userEvent.keyboard("{arrowdown}");
+
+    expect(secondInput).toHaveFocus();
+
+    await userEvent.keyboard("{arrowup}");
+
+    expect(firstInput).toHaveFocus();
+
+    await userEvent.keyboard("{tab}");
+
+    expect(secondInput).toHaveFocus();
+
+    await userEvent.keyboard("{enter}");
+
+    expect(thirdInput).toHaveFocus();
+
+    await userEvent.keyboard("{enter}");
+
+    expect(submitButton).toHaveFocus();
+
+    await userEvent.keyboard("{arrowup}");
+    await userEvent.keyboard("{arrowup}");
+    await userEvent.keyboard("{arrowup}");
+    expect(firstInput).toHaveFocus();
+
+    await userEvent.keyboard("{Shift>}{arrowdown}{/Shift}");
+    expect(thirdInput).toHaveFocus();
+  });
 });

@@ -2,23 +2,78 @@ import * as React from "react";
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   children: React.ReactNode;
+  skip?: string[];
 }
-export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, ...formProps }, ref) => {
+
+type Dir = "up" | "down" | "last";
+
+export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, skip, ...formProps }, ref) => {
   const innerRef: React.MutableRefObject<HTMLFormElement | null> = React.useRef<HTMLFormElement>(null);
 
-  React.useEffect(() => {
-    const submitButton = innerRef.current?.querySelector("button[type=submit]") as HTMLButtonElement | null;
+  const inputList = React.useRef<HTMLInputElement[]>([]);
+  const submitButton = React.useRef<HTMLButtonElement | null>(null);
 
+  const moveFocus = React.useCallback((dir: Dir) => {
+    let activeIndex = inputList.current.findIndex((input) => document.activeElement === input);
+    if (activeIndex === -1) {
+      activeIndex = 0;
+    }
+    let targetIndex = activeIndex;
+    switch (dir) {
+      case "up":
+        targetIndex = activeIndex - 1;
+        break;
+      case "down":
+        targetIndex = activeIndex + 1;
+        break;
+      case "last":
+        targetIndex = inputList.current.length - 1;
+        break;
+    }
+    if (targetIndex < 0) {
+      targetIndex = inputList.current.length - 1;
+    } else if (targetIndex >= inputList.current.length) {
+      targetIndex = -1; //end of the line
+    }
+
+    if (targetIndex >= 0) {
+      const next = inputList.current[targetIndex];
+      if (next) {
+        next.focus();
+        setTimeout(() => {
+          next.select();
+        }, 1);
+      }
+    } else {
+      submitButton.current?.focus();
+    }
+  }, []);
+
+  React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Enter") {
-        if (event.shiftKey || document.activeElement === submitButton) {
+      switch (event.key) {
+        case "ArrowUp":
+          moveFocus("up");
+          break;
+        case "ArrowDown":
+          if (event.shiftKey) {
+            moveFocus("last");
+          } else {
+            moveFocus("down");
+          }
+
+          break;
+        case "Enter":
           event.preventDefault();
-          event.stopPropagation();
-          //ref.current.submit fails in testing environment (jsdom)
-          innerRef.current?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-        } else {
-          event.preventDefault();
-        }
+          if (event.shiftKey || document.activeElement === submitButton.current) {
+            //ref.current.submit fails in testing environment (jsdom)
+            innerRef.current?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+          } else {
+            moveFocus("down");
+          }
+          break;
+        default:
+          break;
       }
     };
 
@@ -26,7 +81,19 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, ..
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [moveFocus]);
+
+  //cache children inputs and submit
+  React.useEffect(() => {
+    const inputs = innerRef.current?.querySelectorAll("input, select, textarea") as NodeListOf<HTMLInputElement>;
+    inputList.current = Array.from(inputs);
+
+    //filter out inputs we should skip
+    if (skip && skip.length) {
+      inputList.current = inputList.current.filter((input) => !skip.includes(input.id));
+    }
+    submitButton.current = innerRef.current?.querySelector("button[type=submit]") as HTMLButtonElement | null;
+  }, [children, skip]);
 
   return (
     <form

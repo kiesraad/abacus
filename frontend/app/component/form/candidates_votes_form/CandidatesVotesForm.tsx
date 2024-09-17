@@ -133,7 +133,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
+    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`} skip={[_IGNORE_WARNINGS_ID]}>
       <h2>
         Lijst {group.number} - {group.name}
       </h2>

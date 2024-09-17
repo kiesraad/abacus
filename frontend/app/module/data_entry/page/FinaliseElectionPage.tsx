@@ -11,7 +11,7 @@ export function FinaliseElectionPage() {
   const { statuses } = useElectionStatus();
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
-  if (statuses.some((s) => s.status !== "Complete")) {
+  if (statuses.some((s) => s.status !== "definitive")) {
     throw Error("election not ready for finalisation");
   }
 

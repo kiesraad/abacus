@@ -9,6 +9,7 @@ import {
   Election,
   ElectionListProvider,
   ElectionProvider,
+  ElectionStatusProvider,
   PollingStationFormController,
   PollingStationListProvider,
 } from "@kiesraad/api";
@@ -31,15 +32,17 @@ describe("PollingStationLayout", () => {
     render(
       <ElectionListProvider>
         <ElectionProvider electionId={election.id}>
-          <PollingStationListProvider electionId={election.id}>
-            <PollingStationFormController
-              election={election}
-              pollingStationId={pollingStationMockData.id}
-              entryNumber={1}
-            >
-              <PollingStationLayout />
-            </PollingStationFormController>
-          </PollingStationListProvider>
+          <ElectionStatusProvider electionId={election.id}>
+            <PollingStationListProvider electionId={election.id}>
+              <PollingStationFormController
+                election={election}
+                pollingStationId={pollingStationMockData.id}
+                entryNumber={1}
+              >
+                <PollingStationLayout />
+              </PollingStationFormController>
+            </PollingStationListProvider>
+          </ElectionStatusProvider>
         </ElectionProvider>
       </ElectionListProvider>,
     );

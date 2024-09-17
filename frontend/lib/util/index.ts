@@ -2,6 +2,7 @@ export * from "./hook/useDebouncedCallback";
 export * from "./hook/useNumericParam";
 export * from "./hook/usePositiveNumberInputMask";
 export * from "./hook/usePreventFormEnterSubmit";
+export * from "./hook/usePollingStationStatus";
 export * from "./classnames";
 export * from "./compare";
 export * from "./domtoren";

@@ -19,6 +19,7 @@
   align-content: center;
   font-size: var(--font-size-body);
   display: inline-flex;
+  gap: 1rem;
   align-items: center;
   width: 100%;
 

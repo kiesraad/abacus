@@ -46,7 +46,7 @@ export function DataEntryHomePage() {
           </p>
         </Alert>
       )}
-      {statuses.every((s) => s.status === "Complete") && (
+      {statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
           <h2>Alle stembureaus zijn ingevoerd</h2>
           <p>

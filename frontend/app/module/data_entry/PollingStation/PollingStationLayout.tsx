@@ -8,11 +8,13 @@ import { AbortDataEntryControl } from "app/module/data_entry/PollingStation/Abor
 import { PollingStationFormController, useElection, usePollingStation } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
 import { Badge, PageTitle, PollingStationNumber, WorkStationNumber } from "@kiesraad/ui";
+import { usePollingStationStatus } from "@kiesraad/util";
 
 export function PollingStationLayout() {
   const { election } = useElection();
   const { pollingStationId } = useParams();
   const { pollingStation, loading } = usePollingStation(pollingStationId);
+  const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
 
   if (loading) {
     return null;
@@ -34,7 +36,7 @@ export function PollingStationLayout() {
         <section>
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          <Badge type="first_entry" />
+          {pollingStationStatus && <Badge type={pollingStationStatus} />}
         </section>
         <section>
           <AbortDataEntryControl />

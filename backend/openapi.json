@@ -935,13 +935,8 @@
       "PollingStationStatus": {
         "type": "string",
         "enum": [
-          "correction",
-          "definitive",
-          "difference",
-          "extra_entry",
           "first_entry",
-          "objections",
-          "second_entry"
+          "definitive"
         ]
       },
       "PollingStationStatusEntry": {

@@ -373,13 +373,8 @@ pub struct PollingStationStatusEntry {
 #[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum PollingStationStatus {
-    Correction,
-    Definitive,
-    Difference,
-    ExtraEntry,
     FirstEntry,
-    Objections,
-    SecondEntry,
+    Definitive,
 }
 
 pub type Count = u32;

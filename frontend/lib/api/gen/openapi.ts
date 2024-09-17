@@ -205,14 +205,7 @@ export interface PollingStationResults {
   votes_counts: VotesCounts;
 }
 
-export type PollingStationStatus =
-  | "correction"
-  | "definitive"
-  | "difference"
-  | "extra_entry"
-  | "first_entry"
-  | "objections"
-  | "second_entry";
+export type PollingStationStatus = "first_entry" | "definitive";
 
 export interface PollingStationStatusEntry {
   id: number;

@@ -31,7 +31,7 @@ export const getPollingStationListMockResponse = (election_id: number): PollingS
         house_number_addition: "b",
         postal_code: "1234 QY",
         locality: "Testdorp",
-        status: "first_entry",
+        status: "definitive",
       },
     ],
   };

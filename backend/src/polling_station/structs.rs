@@ -50,7 +50,6 @@ pub struct PollingStation {
     pub house_number_addition: Option<String>,
     pub postal_code: String,
     pub locality: String,
-    pub status: PollingStationStatus,
 }
 
 /// Type of Polling station
@@ -1015,7 +1014,6 @@ mod tests {
             house_number_addition: Some("b".to_string()),
             postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
-            status: PollingStationStatus::FirstEntry,
         }
     }
 

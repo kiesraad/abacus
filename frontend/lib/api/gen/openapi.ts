@@ -177,7 +177,6 @@ export interface PollingStation {
   number_of_voters?: number;
   polling_station_type: PollingStationType;
   postal_code: string;
-  status: PollingStationStatus;
   street: string;
 }
 

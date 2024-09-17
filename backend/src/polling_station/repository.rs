@@ -30,10 +30,8 @@ impl PollingStations {
                 house_number,
                 house_number_addition,
                 postal_code,
-                locality,
-                CASE WHEN r.polling_station_id IS NULL THEN 'FirstEntry' ELSE 'Definitive' END AS "status!: _"
-            FROM polling_stations AS p
-            LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
+                locality
+            FROM polling_stations
             WHERE election_id = $1
         "#,
             election_id
@@ -57,10 +55,8 @@ impl PollingStations {
                 house_number,
                 house_number_addition,
                 postal_code,
-                locality,
-                CASE WHEN r.polling_station_id IS NULL THEN 'FirstEntry' ELSE 'Definitive' END AS "status!: _"
-            FROM polling_stations AS p
-            LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
+                locality
+            FROM polling_stations
             WHERE id = $1
         "#,
             id

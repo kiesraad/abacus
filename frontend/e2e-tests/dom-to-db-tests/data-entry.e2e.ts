@@ -1,20 +1,18 @@
 import { expect } from "@playwright/test";
 import { formatNumber } from "e2e-tests/e2e-test-utils";
-import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
-import { InputPage } from "e2e-tests/page-objects/data_entry/DataEntryPgObj";
 import {
+  CandidatesListPage,
+  CheckAndSavePage,
   DifferencesPage,
   FewerBallotsFields,
   MoreBallotsFields,
-} from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
-import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
-import { SaveFormPage } from "e2e-tests/page-objects/data_entry/SaveFormPgObj";
-import {
+  PollingStationChoicePage,
+  RecountedPage,
+  VotersAndVotesPage,
   VotersCounts,
   VotersRecounts,
-  VotersVotesPage,
   VotesCounts,
-} from "e2e-tests/page-objects/data_entry/VotersVotesPgObj";
+} from "e2e-tests/page-objects/data_entry";
 
 import { test } from "./fixtures";
 import { pollingStation33 } from "./test-data/PollingStationTestData";
@@ -23,12 +21,12 @@ test.describe("full data entry flow", () => {
   test("no recount, no differences", async ({ page }) => {
     await page.goto("/elections/1/data-entry");
 
-    const inputPage = new InputPage(page);
-    await expect(inputPage.heading).toBeVisible();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
     const pollingStation = pollingStation33;
-    await inputPage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(inputPage.pollingStationFeedback).toHaveText(pollingStation.name);
-    await inputPage.clickStart();
+    await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());
+    await expect(pollingStationChoicePage.pollingStationFeedback).toHaveText(pollingStation.name);
+    await pollingStationChoicePage.clickStart();
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.heading).toBeVisible();
@@ -36,8 +34,8 @@ test.describe("full data entry flow", () => {
     await expect(recountedPage.no).toBeChecked();
     await recountedPage.next.click();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await expect(votersVotesPage.heading).toBeVisible();
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await expect(votersAndVotesPage.heading).toBeVisible();
     const voters: VotersCounts = {
       poll_card_count: 1000,
       proxy_certificate_count: 50,
@@ -50,10 +48,10 @@ test.describe("full data entry flow", () => {
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
     };
-    await votersVotesPage.inputVotersCounts(voters);
-    await votersVotesPage.inputVotesCounts(votes);
-    await expect(votersVotesPage.pollCardCount).toHaveValue(formatNumber(voters.poll_card_count));
-    await votersVotesPage.next.click();
+    await votersAndVotesPage.inputVotersCounts(voters);
+    await votersAndVotesPage.inputVotesCounts(votes);
+    await expect(votersAndVotesPage.pollCardCount).toHaveValue(formatNumber(voters.poll_card_count));
+    await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.heading).toBeVisible();
@@ -65,10 +63,10 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
     await candidatesListPage_1.next.click();
 
-    const saveFormPage = new SaveFormPage(page);
-    await saveFormPage.heading.waitFor();
+    const checkAndSavePage = new CheckAndSavePage(page);
+    await checkAndSavePage.heading.waitFor();
 
-    await expect(saveFormPage.summaryText).toContainText(
+    await expect(checkAndSavePage.summaryText).toContainText(
       "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
     );
 
@@ -77,26 +75,28 @@ test.describe("full data entry flow", () => {
       { text: "Er zijn geen blokkerende fouten of waarschuwingen", iconLabel: "opgeslagen" },
       { text: "Je kan de resultaten van dit stembureau opslaan", iconLabel: "opgeslagen" },
     ];
-    const listItems = saveFormPage.allSummaryListItems();
+    const listItems = checkAndSavePage.allSummaryListItems();
     const expectedTexts = Array.from(expectedSummaryItems, (item) => item.text);
     await expect(listItems).toHaveText(expectedTexts);
 
     for (const expectedItem of expectedSummaryItems) {
-      await expect(saveFormPage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(expectedItem.iconLabel);
+      await expect(checkAndSavePage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(
+        expectedItem.iconLabel,
+      );
     }
 
-    await saveFormPage.save.click();
-    await inputPage.headingNextPollingStation.waitFor();
-    await inputPage.dataEntrySuccess.waitFor();
+    await checkAndSavePage.save.click();
+    await pollingStationChoicePage.headingNextPollingStation.waitFor();
+    await pollingStationChoicePage.dataEntrySuccess.waitFor();
   });
 
   test("recount, no differences", async ({ page }) => {
     await page.goto("/elections/1/data-entry");
 
-    const inputPage = new InputPage(page);
-    await expect(inputPage.heading).toBeVisible();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
     const pollingStation = pollingStation33;
-    await inputPage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.heading).toBeVisible();
@@ -104,31 +104,31 @@ test.describe("full data entry flow", () => {
     await expect(recountedPage.yes).toBeChecked();
     await recountedPage.next.click();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await expect(votersVotesPage.heading).toBeVisible();
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await expect(votersAndVotesPage.heading).toBeVisible();
     const voters: VotersCounts = {
       poll_card_count: 1000,
       proxy_certificate_count: 50,
       voter_card_count: 75,
       total_admitted_voters_count: 1125,
     };
-    await votersVotesPage.inputVotersCounts(voters);
+    await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
       votes_candidates_count: 1090,
       blank_votes_count: 20,
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
     };
-    await votersVotesPage.inputVotesCounts(votes);
+    await votersAndVotesPage.inputVotesCounts(votes);
     const votersRecounts: VotersRecounts = {
       poll_card_recount: 987,
       proxy_certificate_recount: 103,
       voter_card_recount: 35,
       total_admitted_voters_recount: 1125,
     };
-    await votersVotesPage.inputVotersRecounts(votersRecounts);
-    await expect(votersVotesPage.pollCardRecount).toHaveValue(formatNumber(votersRecounts.poll_card_recount));
-    await votersVotesPage.next.click();
+    await votersAndVotesPage.inputVotersRecounts(votersRecounts);
+    await expect(votersAndVotesPage.pollCardRecount).toHaveValue(formatNumber(votersRecounts.poll_card_recount));
+    await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.heading).toBeVisible();
@@ -140,8 +140,8 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
     await candidatesListPage_1.next.click();
 
-    const saveFormPage = new SaveFormPage(page);
-    await expect(saveFormPage.heading).toBeVisible();
+    const checkAndSavePage = new CheckAndSavePage(page);
+    await expect(checkAndSavePage.heading).toBeVisible();
 
     // TODO: extend as part of epic #95: data entry check and finalisation
   });
@@ -149,18 +149,18 @@ test.describe("full data entry flow", () => {
   test("no recount, difference of more ballots counted", async ({ page }) => {
     await page.goto("/elections/1/data-entry");
 
-    const inputPage = new InputPage(page);
-    await expect(inputPage.heading).toBeVisible();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
     const pollingStation = pollingStation33;
-    await inputPage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.heading).toBeVisible();
     await recountedPage.no.check();
     await recountedPage.next.click();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await expect(votersVotesPage.heading).toBeVisible();
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await expect(votersAndVotesPage.heading).toBeVisible();
 
     const voters: VotersCounts = {
       poll_card_count: 1000,
@@ -168,22 +168,22 @@ test.describe("full data entry flow", () => {
       voter_card_count: 75,
       total_admitted_voters_count: 1125,
     };
-    await votersVotesPage.inputVotersCounts(voters);
+    await votersAndVotesPage.inputVotersCounts(voters);
     const votes: VotesCounts = {
       votes_candidates_count: 1135,
       blank_votes_count: 10,
       invalid_votes_count: 5,
       total_votes_cast_count: 1150,
     };
-    await votersVotesPage.inputVotesCounts(votes);
-    await votersVotesPage.next.click();
+    await votersAndVotesPage.inputVotesCounts(votes);
+    await votersAndVotesPage.next.click();
 
-    await expect(votersVotesPage.warning).toContainText("W.203");
-    await expect(votersVotesPage.warning).toContainText(
+    await expect(votersAndVotesPage.warning).toContainText("W.203");
+    await expect(votersAndVotesPage.warning).toContainText(
       "Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).",
     );
-    await votersVotesPage.checkAcceptWarnings();
-    await votersVotesPage.next.click();
+    await votersAndVotesPage.checkAcceptWarnings();
+    await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.heading).toBeVisible();
@@ -203,8 +203,8 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([902, 233], 1135);
     await candidatesListPage_1.next.click();
 
-    const saveFormPage = new SaveFormPage(page);
-    await expect(saveFormPage.heading).toBeVisible();
+    const checkAndSavePage = new CheckAndSavePage(page);
+    await expect(checkAndSavePage.heading).toBeVisible();
 
     // TODO: extend as part of epic #95: data entry check and finalisation
   });
@@ -212,19 +212,19 @@ test.describe("full data entry flow", () => {
   test("recount, difference of fewer ballots counted", async ({ page }) => {
     await page.goto("/elections/1/data-entry");
 
-    const inputPage = new InputPage(page);
-    await expect(inputPage.heading).toBeVisible();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
     const pollingStation = pollingStation33;
-    await inputPage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.heading).toBeVisible();
     await recountedPage.yes.check();
     await recountedPage.next.click();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.headingRecount).toBeVisible();
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await expect(votersAndVotesPage.heading).toBeVisible();
+    await expect(votersAndVotesPage.headingRecount).toBeVisible();
 
     const voters: VotersCounts = {
       poll_card_count: 1000,
@@ -232,7 +232,7 @@ test.describe("full data entry flow", () => {
       voter_card_count: 75,
       total_admitted_voters_count: 1125,
     };
-    await votersVotesPage.inputVotersCounts(voters);
+    await votersAndVotesPage.inputVotersCounts(voters);
 
     const votes: VotesCounts = {
       votes_candidates_count: 1090,
@@ -240,7 +240,7 @@ test.describe("full data entry flow", () => {
       invalid_votes_count: 15,
       total_votes_cast_count: 1125,
     };
-    await votersVotesPage.inputVotesCounts(votes);
+    await votersAndVotesPage.inputVotesCounts(votes);
 
     const votersRecounts: VotersRecounts = {
       poll_card_recount: 1020,
@@ -248,15 +248,15 @@ test.describe("full data entry flow", () => {
       voter_card_recount: 75,
       total_admitted_voters_recount: 1145,
     };
-    await votersVotesPage.inputVotersRecounts(votersRecounts);
-    await votersVotesPage.next.click();
+    await votersAndVotesPage.inputVotersRecounts(votersRecounts);
+    await votersAndVotesPage.next.click();
 
-    await expect(votersVotesPage.warning).toContainText("W.204");
-    await expect(votersVotesPage.warning).toContainText(
+    await expect(votersAndVotesPage.warning).toContainText("W.204");
+    await expect(votersAndVotesPage.warning).toContainText(
       "Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).",
     );
-    await votersVotesPage.checkAcceptWarnings();
-    await votersVotesPage.next.click();
+    await votersAndVotesPage.checkAcceptWarnings();
+    await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.heading).toBeVisible();
@@ -277,9 +277,9 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
     await candidatesListPage_1.next.click();
 
-    const saveFormPage = new SaveFormPage(page);
-    await saveFormPage.heading.waitFor();
-    await saveFormPage.save.click();
+    const checkAndSavePage = new CheckAndSavePage(page);
+    await checkAndSavePage.heading.waitFor();
+    await checkAndSavePage.save.click();
 
     // TODO: #318 reset database to allow polling station to be finalised in multiple tests
     // await inputPage.dataEntrySuccess.waitFor();
@@ -292,7 +292,7 @@ test.describe("full data entry flow", () => {
     await recountedPage.checkNoAndClickNext();
 
     // fill form with data that results in a warning
-    const votersVotesPage = new VotersVotesPage(page);
+    const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
       poll_card_count: 100,
       proxy_certificate_count: 0,
@@ -305,16 +305,16 @@ test.describe("full data entry flow", () => {
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
     };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
-    await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.warning).toContainText(
+    await expect(votersAndVotesPage.heading).toBeVisible();
+    await expect(votersAndVotesPage.warning).toContainText(
       "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
 
     // accept the warning
-    await votersVotesPage.checkAcceptWarnings();
-    await votersVotesPage.next.click();
+    await votersAndVotesPage.checkAcceptWarnings();
+    await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
     await differencesPage.heading.waitFor();
@@ -328,10 +328,10 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([99, 1], 100);
     await candidatesListPage_1.next.click();
 
-    const saveFormPage = new SaveFormPage(page);
-    await saveFormPage.heading.waitFor();
+    const checkAndSavePage = new CheckAndSavePage(page);
+    await checkAndSavePage.heading.waitFor();
 
-    await expect(saveFormPage.summaryText).toContainText(
+    await expect(checkAndSavePage.summaryText).toContainText(
       "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
     );
 
@@ -343,18 +343,20 @@ test.describe("full data entry flow", () => {
       },
       { text: "Je kan de resultaten van dit stembureau opslaan", iconLabel: "opgeslagen" },
     ];
-    const listItems = saveFormPage.allSummaryListItems();
+    const listItems = checkAndSavePage.allSummaryListItems();
     const expectedTexts = Array.from(expectedSummaryItems, (item) => item.text);
     await expect(listItems).toHaveText(expectedTexts);
 
     for (const expectedItem of expectedSummaryItems) {
-      await expect(saveFormPage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(expectedItem.iconLabel);
+      await expect(checkAndSavePage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(
+        expectedItem.iconLabel,
+      );
     }
 
-    await saveFormPage.save.click();
-    const inputPage = new InputPage(page);
-    await inputPage.headingNextPollingStation.waitFor();
-    await inputPage.dataEntrySuccess.waitFor();
+    await checkAndSavePage.save.click();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await pollingStationChoicePage.headingNextPollingStation.waitFor();
+    await pollingStationChoicePage.dataEntrySuccess.waitFor();
   });
 });
 
@@ -366,7 +368,7 @@ test.describe("errors and warnings", () => {
     await recountedPage.checkNoAndClickNext();
 
     // fill form with data that results in an error
-    const votersVotesPage = new VotersVotesPage(page);
+    const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
       poll_card_count: 1,
       proxy_certificate_count: 0,
@@ -379,13 +381,13 @@ test.describe("errors and warnings", () => {
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
     };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
-    await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.error).toContainText(
+    await expect(votersAndVotesPage.heading).toBeVisible();
+    await expect(votersAndVotesPage.error).toContainText(
       "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
     );
-    await expect(votersVotesPage.warning).toBeHidden();
+    await expect(votersAndVotesPage.warning).toBeHidden();
 
     // fill form with corrected data (no errors, no warnings)
     const votersCorrected = {
@@ -394,11 +396,11 @@ test.describe("errors and warnings", () => {
       voter_card_count: 1,
       total_admitted_voters_count: 100,
     };
-    await votersVotesPage.inputVotersCounts(votersCorrected);
-    await votersVotesPage.next.click();
+    await votersAndVotesPage.inputVotersCounts(votersCorrected);
+    await votersAndVotesPage.next.click();
 
-    await expect(votersVotesPage.error).toBeHidden();
-    await expect(votersVotesPage.warning).toBeHidden();
+    await expect(votersAndVotesPage.error).toBeHidden();
+    await expect(votersAndVotesPage.warning).toBeHidden();
 
     const differencesPage = new DifferencesPage(page);
     await differencesPage.heading.waitFor();
@@ -412,7 +414,7 @@ test.describe("errors and warnings", () => {
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
 
-    const votersVotesPage = new VotersVotesPage(page);
+    const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
       poll_card_count: 99,
       proxy_certificate_count: 1,
@@ -425,7 +427,7 @@ test.describe("errors and warnings", () => {
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
     };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
     const differencesPage = new DifferencesPage(page);
     await differencesPage.heading.waitFor();
@@ -436,21 +438,21 @@ test.describe("errors and warnings", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([2, 1], 3);
     await candidatesListPage_1.next.click();
 
-    await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.error).toContainText(
+    await expect(votersAndVotesPage.heading).toBeVisible();
+    await expect(votersAndVotesPage.error).toContainText(
       "Controleer (totaal) aantal stemmen op kandidatenF.204De optelling van alle lijsten is niet gelijk aan de invoer bij E.Check of je invoer bij E gelijk is aan het papieren proces-verbaal. En check of je alle lijsten hebt ingevoerd.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
     );
-    await expect(votersVotesPage.warning).toBeHidden();
+    await expect(votersAndVotesPage.warning).toBeHidden();
 
-    await votersVotesPage.navPanel.list(1).click();
+    await votersAndVotesPage.navPanel.list(1).click();
     await expect(candidatesListPage_1.heading).toBeVisible();
     // fill counts of List 1 with data that does match the total votes on candidates
     await candidatesListPage_1.fillCandidatesAndTotal([70, 30], 100);
     await candidatesListPage_1.next.click();
 
-    const saveFormPage = new SaveFormPage(page);
-    await saveFormPage.heading.waitFor();
-    await saveFormPage.save.click();
+    const checkAndSavePage = new CheckAndSavePage(page);
+    await checkAndSavePage.heading.waitFor();
+    await checkAndSavePage.save.click();
 
     // TODO: #318 reset database to allow polling station to be finalised in multiple tests
     // const inputPage = new InputPage(page);
@@ -464,7 +466,7 @@ test.describe("errors and warnings", () => {
     await recountedPage.checkNoAndClickNext();
 
     // fill form with data that results in a warning
-    const votersVotesPage = new VotersVotesPage(page);
+    const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
       poll_card_count: 100,
       proxy_certificate_count: 0,
@@ -477,16 +479,16 @@ test.describe("errors and warnings", () => {
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
     };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
-    await expect(votersVotesPage.proxyCertificateCount).toHaveValue("0");
+    await expect(votersAndVotesPage.proxyCertificateCount).toHaveValue("0");
 
-    await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.warning).toContainText(
+    await expect(votersAndVotesPage.heading).toBeVisible();
+    await expect(votersAndVotesPage.warning).toContainText(
       "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
-    await expect(votersVotesPage.error).toBeHidden();
-    await expect(votersVotesPage.acceptWarnings).toBeVisible();
+    await expect(votersAndVotesPage.error).toBeHidden();
+    await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
 
     // correct the warning
     const votersCorrected = {
@@ -496,13 +498,13 @@ test.describe("errors and warnings", () => {
       total_admitted_voters_count: 100,
     };
 
-    await votersVotesPage.inputVotersCounts(votersCorrected);
+    await votersAndVotesPage.inputVotersCounts(votersCorrected);
     // Tab press needed for page to register change after Playwright's fill()
-    await votersVotesPage.totalAdmittedVotersCount.press("Tab");
-    await votersVotesPage.next.click();
+    await votersAndVotesPage.totalAdmittedVotersCount.press("Tab");
+    await votersAndVotesPage.next.click();
 
-    await expect(votersVotesPage.warning).toBeHidden();
-    await expect(votersVotesPage.acceptWarnings).toBeHidden();
+    await expect(votersAndVotesPage.warning).toBeHidden();
+    await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
 
     const differencesPage = new DifferencesPage(page);
     await differencesPage.heading.waitFor();
@@ -517,7 +519,7 @@ test.describe("errors and warnings", () => {
     await recountedPage.checkNoAndClickNext();
 
     // fill form with data that results in a warning
-    const votersVotesPage = new VotersVotesPage(page);
+    const votersAndVotesPage = new VotersAndVotesPage(page);
     const voters = {
       poll_card_count: 100,
       proxy_certificate_count: 0,
@@ -530,25 +532,25 @@ test.describe("errors and warnings", () => {
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
     };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
-    await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.warning).toContainText(
+    await expect(votersAndVotesPage.heading).toBeVisible();
+    await expect(votersAndVotesPage.warning).toContainText(
       "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
 
-    await expect(votersVotesPage.acceptWarnings).toBeVisible();
+    await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
 
     // change input
-    await votersVotesPage.proxyCertificateCount.fill("7");
+    await votersAndVotesPage.proxyCertificateCount.fill("7");
     // Tab press needed for page to register change after Playwright's fill()
-    await votersVotesPage.proxyCertificateCount.press("Tab");
-    await expect(votersVotesPage.heading).toBeVisible();
-    await expect(votersVotesPage.warning).toContainText(
+    await votersAndVotesPage.proxyCertificateCount.press("Tab");
+    await expect(votersAndVotesPage.heading).toBeVisible();
+    await expect(votersAndVotesPage.warning).toContainText(
       "Controleer A t/m D en E t/m HW.208De getallen bij A t/m D zijn precies hetzelfde als E t/m H.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
 
-    await expect(votersVotesPage.acceptWarnings).toBeHidden();
+    await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
   });
 });
 
@@ -559,8 +561,8 @@ test.describe("navigation", () => {
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.heading.waitFor();
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await votersAndVotesPage.heading.waitFor();
     const voters: VotersCounts = {
       poll_card_count: 99,
       proxy_certificate_count: 1,
@@ -573,13 +575,13 @@ test.describe("navigation", () => {
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
     };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.heading).toBeVisible();
 
     await differencesPage.navPanel.votersAndVotes.click();
-    await votersVotesPage.heading.waitFor();
+    await votersAndVotesPage.heading.waitFor();
 
     const votersUpdates: VotersCounts = {
       poll_card_count: 90,
@@ -587,24 +589,26 @@ test.describe("navigation", () => {
       voter_card_count: 5,
       total_admitted_voters_count: 100,
     };
-    await votersVotesPage.inputVotersCounts(votersUpdates);
+    await votersAndVotesPage.inputVotersCounts(votersUpdates);
     // Tab press needed for page to register change after Playwright's fill()
-    await votersVotesPage.totalAdmittedVotersCount.press("Tab");
+    await votersAndVotesPage.totalAdmittedVotersCount.press("Tab");
 
     // navigate to previous page with unsaved changes
-    await votersVotesPage.navPanel.recounted.click();
-    await expect(votersVotesPage.unsavedChangesModal.heading).toBeVisible();
-    await expect(votersVotesPage.unsavedChangesModal.modal).toContainText("Toegelaten kiezers en uitgebrachte stemmen");
+    await votersAndVotesPage.navPanel.recounted.click();
+    await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
+    await expect(votersAndVotesPage.unsavedChangesModal.modal).toContainText(
+      "Toegelaten kiezers en uitgebrachte stemmen",
+    );
     // do not save changes
-    await votersVotesPage.unsavedChangesModal.discardInput.click();
+    await votersAndVotesPage.unsavedChangesModal.discardInput.click();
 
     await expect(recountedPage.heading).toBeVisible();
     await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
 
     // return to VotersAndVotes page and verify change is not saved
     await recountedPage.navPanel.votersAndVotes.click();
-    await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.pollCardCount).toHaveValue("99");
+    await votersAndVotesPage.heading.waitFor();
+    await expect(votersAndVotesPage.pollCardCount).toHaveValue("99");
   });
 
   test("navigate away from Differences page with saving", async ({ page }) => {
@@ -613,8 +617,8 @@ test.describe("navigation", () => {
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.heading.waitFor();
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await votersAndVotesPage.heading.waitFor();
     const voters: VotersCounts = {
       poll_card_count: 99,
       proxy_certificate_count: 1,
@@ -627,13 +631,13 @@ test.describe("navigation", () => {
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
     };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.heading).toBeVisible();
 
     await differencesPage.navPanel.votersAndVotes.click();
-    await votersVotesPage.heading.waitFor();
+    await votersAndVotesPage.heading.waitFor();
 
     const votersUpdates: VotersCounts = {
       poll_card_count: 90,
@@ -641,24 +645,26 @@ test.describe("navigation", () => {
       voter_card_count: 5,
       total_admitted_voters_count: 100,
     };
-    await votersVotesPage.inputVotersCounts(votersUpdates);
+    await votersAndVotesPage.inputVotersCounts(votersUpdates);
     // Tab press needed for page to register change after Playwright's fill()
-    await votersVotesPage.totalAdmittedVotersCount.press("Tab");
+    await votersAndVotesPage.totalAdmittedVotersCount.press("Tab");
 
     // navigate to previous page with unsaved changes
-    await votersVotesPage.navPanel.recounted.click();
-    await expect(votersVotesPage.unsavedChangesModal.heading).toBeVisible();
-    await expect(votersVotesPage.unsavedChangesModal.modal).toContainText("Toegelaten kiezers en uitgebrachte stemmen");
+    await votersAndVotesPage.navPanel.recounted.click();
+    await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
+    await expect(votersAndVotesPage.unsavedChangesModal.modal).toContainText(
+      "Toegelaten kiezers en uitgebrachte stemmen",
+    );
     // save changes
-    await votersVotesPage.unsavedChangesModal.saveInput.click();
+    await votersAndVotesPage.unsavedChangesModal.saveInput.click();
 
     await expect(recountedPage.heading).toBeVisible(); // fails here because navigated to next page, i.e. Differences
     await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
 
     // return to VotersAndVotes page and verify change is saved
     await recountedPage.navPanel.votersAndVotes.click();
-    await votersVotesPage.heading.waitFor();
-    await expect(votersVotesPage.pollCardCount).toHaveValue("90");
+    await votersAndVotesPage.heading.waitFor();
+    await expect(votersAndVotesPage.pollCardCount).toHaveValue("90");
   });
 
   test.describe("navigation panel icons", () => {
@@ -669,10 +675,10 @@ test.describe("navigation", () => {
       await expect(recountedPage.navPanel.recountedIcon).toHaveAccessibleName("je bent hier");
       await recountedPage.checkNoAndClickNext();
 
-      const votersVotesPage = new VotersVotesPage(page);
-      await votersVotesPage.heading.waitFor();
-      await expect(votersVotesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
-      await expect(votersVotesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("je bent hier");
+      const votersAndVotesPage = new VotersAndVotesPage(page);
+      await votersAndVotesPage.heading.waitFor();
+      await expect(votersAndVotesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
+      await expect(votersAndVotesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("je bent hier");
 
       const voters: VotersCounts = {
         poll_card_count: 100,
@@ -686,10 +692,10 @@ test.describe("navigation", () => {
         invalid_votes_count: 0,
         total_votes_cast_count: 100,
       };
-      await votersVotesPage.fillInPageAndClickNext(voters, votes);
+      await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
-      await votersVotesPage.checkAcceptWarnings();
-      await votersVotesPage.next.click();
+      await votersAndVotesPage.checkAcceptWarnings();
+      await votersAndVotesPage.next.click();
 
       const differencesPage = new DifferencesPage(page);
       await differencesPage.heading.waitFor();
@@ -698,9 +704,9 @@ test.describe("navigation", () => {
       await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
       await differencesPage.navPanel.votersAndVotes.click();
 
-      await votersVotesPage.heading.waitFor();
-      await expect(votersVotesPage.navPanel.differencesIcon).toHaveAccessibleName("nog niet afgerond");
-      await votersVotesPage.navPanel.differences.click();
+      await votersAndVotesPage.heading.waitFor();
+      await expect(votersAndVotesPage.navPanel.differencesIcon).toHaveAccessibleName("nog niet afgerond");
+      await votersAndVotesPage.navPanel.differences.click();
 
       await differencesPage.heading.waitFor();
       await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");

@@ -1,8 +1,12 @@
 import { expect } from "@playwright/test";
-import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
-import { InputPage } from "e2e-tests/page-objects/data_entry/DataEntryPgObj";
-import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj";
-import { VotersCounts, VotersVotesPage, VotesCounts } from "e2e-tests/page-objects/data_entry/VotersVotesPgObj";
+import {
+  AbortInputModal,
+  PollingStationChoicePage,
+  RecountedPage,
+  VotersAndVotesPage,
+  VotersCounts,
+  VotesCounts,
+} from "e2e-tests/page-objects/data_entry";
 
 import { test } from "./fixtures";
 
@@ -14,10 +18,10 @@ test.describe("Abort data entry", () => {
     await recountedPage.heading.waitFor();
     await recountedPage.checkNoAndClickNext();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.heading.waitFor();
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await votersAndVotesPage.heading.waitFor();
 
-    await votersVotesPage.abortInput.click();
+    await votersAndVotesPage.abortInput.click();
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
@@ -30,8 +34,8 @@ test.describe("Abort data entry", () => {
     const response = await responsePromise;
     expect(response.request().method()).toBe("POST");
 
-    const inputPage = new InputPage(page);
-    await expect(inputPage.heading).toBeVisible();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
 
     // TODO: extend test as part of epic #137 resume data entry
   });
@@ -43,15 +47,15 @@ test.describe("Abort data entry", () => {
     await recountedPage.heading.waitFor();
     await recountedPage.checkNoAndClickNext();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.heading.waitFor();
-    await votersVotesPage.voterCardCount.fill("1000");
-    await votersVotesPage.next.click();
-    await expect(votersVotesPage.error).toContainText(
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await votersAndVotesPage.heading.waitFor();
+    await votersAndVotesPage.voterCardCount.fill("1000");
+    await votersAndVotesPage.next.click();
+    await expect(votersAndVotesPage.error).toContainText(
       "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
     );
 
-    await votersVotesPage.abortInput.click();
+    await votersAndVotesPage.abortInput.click();
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
@@ -64,8 +68,8 @@ test.describe("Abort data entry", () => {
     const response = await responsePromise;
     expect(response.request().method()).toBe("POST");
 
-    const inputPage = new InputPage(page);
-    await expect(inputPage.heading).toBeVisible();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
 
     // TODO: extend test as part of epic #137 resume data entry
   });
@@ -77,8 +81,8 @@ test.describe("Abort data entry", () => {
     await recountedPage.heading.waitFor();
     await recountedPage.checkNoAndClickNext();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.heading.waitFor();
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await votersAndVotesPage.heading.waitFor();
     const voters: VotersCounts = {
       poll_card_count: 100,
       proxy_certificate_count: 0,
@@ -91,12 +95,12 @@ test.describe("Abort data entry", () => {
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
     };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
-    await expect(votersVotesPage.warning).toContainText(
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+    await expect(votersAndVotesPage.warning).toContainText(
       "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
 
-    await votersVotesPage.abortInput.click();
+    await votersAndVotesPage.abortInput.click();
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
@@ -109,8 +113,8 @@ test.describe("Abort data entry", () => {
     const response = await responsePromise;
     expect(response.request().method()).toBe("POST");
 
-    const inputPage = new InputPage(page);
-    await expect(inputPage.heading).toBeVisible();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
 
     // TODO: extend test as part of epic #137 resume data entry
   });
@@ -122,10 +126,10 @@ test.describe("Abort data entry", () => {
     await recountedPage.heading.waitFor();
     await recountedPage.checkNoAndClickNext();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.heading.waitFor();
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await votersAndVotesPage.heading.waitFor();
 
-    await votersVotesPage.abortInput.click();
+    await votersAndVotesPage.abortInput.click();
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
@@ -139,8 +143,8 @@ test.describe("Abort data entry", () => {
     const response = await responsePromise;
     expect(response.request().method()).toBe("DELETE");
 
-    const inputPage = new InputPage(page);
-    await expect(inputPage.heading).toBeVisible();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
   });
 
   test("Discard input from voters and votes page with error", async ({ page }) => {
@@ -150,13 +154,13 @@ test.describe("Abort data entry", () => {
     await recountedPage.heading.waitFor();
     await recountedPage.checkNoAndClickNext();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.heading.waitFor();
-    await votersVotesPage.voterCardCount.fill("1000");
-    await votersVotesPage.next.click();
-    await expect(votersVotesPage.error).toBeVisible();
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await votersAndVotesPage.heading.waitFor();
+    await votersAndVotesPage.voterCardCount.fill("1000");
+    await votersAndVotesPage.next.click();
+    await expect(votersAndVotesPage.error).toBeVisible();
 
-    await votersVotesPage.abortInput.click();
+    await votersAndVotesPage.abortInput.click();
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
@@ -170,8 +174,8 @@ test.describe("Abort data entry", () => {
     const response = await responsePromise;
     expect(response.request().method()).toBe("DELETE");
 
-    const inputPage = new InputPage(page);
-    await expect(inputPage.heading).toBeVisible();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
   });
 
   test("Discard input from voters and votes page with warning", async ({ page }) => {
@@ -181,8 +185,8 @@ test.describe("Abort data entry", () => {
     await recountedPage.heading.waitFor();
     await recountedPage.checkNoAndClickNext();
 
-    const votersVotesPage = new VotersVotesPage(page);
-    await votersVotesPage.heading.waitFor();
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await votersAndVotesPage.heading.waitFor();
     const voters: VotersCounts = {
       poll_card_count: 100,
       proxy_certificate_count: 0,
@@ -195,12 +199,12 @@ test.describe("Abort data entry", () => {
       invalid_votes_count: 0,
       total_votes_cast_count: 100,
     };
-    await votersVotesPage.fillInPageAndClickNext(voters, votes);
-    await expect(votersVotesPage.warning).toContainText(
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+    await expect(votersAndVotesPage.warning).toContainText(
       "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
     );
 
-    await votersVotesPage.abortInput.click();
+    await votersAndVotesPage.abortInput.click();
 
     const abortInputModal = new AbortInputModal(page);
     await abortInputModal.heading.waitFor();
@@ -214,7 +218,7 @@ test.describe("Abort data entry", () => {
     const response = await responsePromise;
     expect(response.request().method()).toBe("DELETE");
 
-    const inputPage = new InputPage(page);
-    await expect(inputPage.heading).toBeVisible();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
   });
 });

@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-import { InputBasePage } from "./DataEntryBasePgObj";
+import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export interface VotersCounts {
   poll_card_count: number;
@@ -23,7 +23,7 @@ export interface VotersRecounts {
   total_admitted_voters_recount: number;
 }
 
-export class VotersVotesPage extends InputBasePage {
+export class VotersAndVotesPage extends DataEntryBasePage {
   readonly heading: Locator;
   readonly headingRecount: Locator;
   readonly pollCardCount: Locator;

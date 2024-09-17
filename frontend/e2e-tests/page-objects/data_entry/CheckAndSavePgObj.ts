@@ -1,8 +1,8 @@
 import { type Locator, type Page } from "@playwright/test";
 
-import { InputBasePage } from "./DataEntryBasePgObj";
+import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
-export class SaveFormPage extends InputBasePage {
+export class CheckAndSavePage extends DataEntryBasePage {
   readonly heading: Locator;
   readonly summaryText: Locator;
   readonly summaryList: Locator;

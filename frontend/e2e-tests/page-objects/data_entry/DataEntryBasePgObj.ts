@@ -3,7 +3,7 @@ import { type Locator, type Page } from "@playwright/test";
 import { NavigationPanel } from "./NavigationPanelPgObj";
 import { UnsavedChangesModal } from "./UnsavedChangesModalPgObj";
 
-export class InputBasePage {
+export class DataEntryBasePage {
   protected readonly page: Page;
 
   readonly unsavedChangesModal: UnsavedChangesModal;

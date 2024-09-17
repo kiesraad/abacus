@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-export class InputPage {
+export class PollingStationChoicePage {
   protected readonly page: Page;
 
   readonly heading: Locator;

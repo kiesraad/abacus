@@ -1,8 +1,8 @@
 import { type Locator, type Page } from "@playwright/test";
 
-import { InputBasePage } from "./DataEntryBasePgObj";
+import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
-export class CandidatesListPage extends InputBasePage {
+export class CandidatesListPage extends DataEntryBasePage {
   readonly heading: Locator;
 
   readonly next: Locator;

@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-import { InputBasePage } from "./DataEntryBasePgObj";
+import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export interface MoreBallotsFields {
   moreBallotsCount: number;
@@ -17,7 +17,7 @@ export interface FewerBallotsFields {
   noExplanationCount: number;
 }
 
-export class DifferencesPage extends InputBasePage {
+export class DifferencesPage extends DataEntryBasePage {
   readonly heading: Locator;
   readonly next: Locator;
 

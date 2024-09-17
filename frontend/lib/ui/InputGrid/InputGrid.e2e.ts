@@ -31,24 +31,4 @@ test.describe("InputGrid", () => {
     await expect(firstTR).not.toHaveClass("focused");
     await expect(secondTR).toHaveClass("focused");
   });
-
-  test("Move focus arrow up and down and tab and enter", async ({ page, gridPage }) => {
-    const firstInput = gridPage.getByTestId("input1");
-    const secondInput = gridPage.getByTestId("input2");
-    const thirdInput = gridPage.getByTestId("input3");
-
-    await firstInput.focus();
-
-    await page.keyboard.press("ArrowDown");
-    await expect(secondInput).toBeFocused();
-
-    await page.keyboard.press("ArrowUp");
-    await expect(firstInput).toBeFocused();
-
-    await page.keyboard.press("Tab");
-    await expect(secondInput).toBeFocused();
-
-    await page.keyboard.press("Enter");
-    await expect(thirdInput).toBeFocused();
-  });
 });

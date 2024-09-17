@@ -237,7 +237,7 @@ const stepsForPendingChanges = [
 ];
 
 describe("Polling Station data entry integration tests", () => {
-  describe("Navigation throught the form", () => {
+  describe("Navigation through the form", () => {
     test("Fill in complete form", async () => {
       render();
 

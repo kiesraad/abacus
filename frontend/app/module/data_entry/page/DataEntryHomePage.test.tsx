@@ -3,9 +3,9 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { overrideOnce, Providers, render, screen, setupTestRouter, within } from "app/test/unit";
+import { overrideOnce, Providers, render, screen, setupTestRouter, waitFor, within } from "app/test/unit";
 
-import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
+import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
 
 import { DataEntryHomePage } from "./DataEntryHomePage";
@@ -19,7 +19,7 @@ const renderInputHomePage = () =>
     </ElectionProvider>,
   );
 
-describe("InputHomePage", () => {
+describe("DataEntryHomePage", () => {
   beforeEach(() => {
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
   });
@@ -64,6 +64,50 @@ describe("InputHomePage", () => {
       ],
     });
 
+    expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
+  });
+
+  test("Rerender re-fetches election status", async () => {
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [
+        { id: 1, status: "first_entry" },
+        { id: 2, status: "first_entry" },
+      ],
+    } satisfies ElectionStatusResponse);
+
+    // render and expect the initial status to be fetched
+    const { rerender } = renderInputHomePage();
+    expect(await screen.findByText("Welk stembureau ga je invoeren?")).toBeVisible();
+    expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
+
+    // unmount DataEntryHomePage, but keep the providers as-is
+    rerender(
+      <ElectionProvider electionId={1}>
+        <ElectionStatusProvider electionId={1}>
+          <></>
+        </ElectionStatusProvider>
+      </ElectionProvider>,
+    );
+    await waitFor(() => {
+      expect(screen.queryByText("Welk stembureau ga je invoeren?")).not.toBeInTheDocument();
+    });
+
+    // new status is that all polling stations are definitive, so the finish input message should be visible
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [
+        { id: 1, status: "definitive" },
+        { id: 2, status: "definitive" },
+      ],
+    } satisfies ElectionStatusResponse);
+
+    // rerender DataEntryHomePage and expect the new status to be fetched
+    rerender(
+      <ElectionProvider electionId={1}>
+        <ElectionStatusProvider electionId={1}>
+          <DataEntryHomePage />
+        </ElectionStatusProvider>
+      </ElectionProvider>,
+    );
     expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
   });
 

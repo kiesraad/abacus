@@ -12,7 +12,7 @@ const mapObj = <V0, V>(obj: Record<string, V0>, kf: (t: string) => string, vf: (
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
   const apiMode = process.env.API_MODE ?? "mock";
-  const apiHost = process.env.API_HOST ?? (apiMode === "mock" ? "" : "http://localhost:8080");
+  const apiHost = process.env.API_HOST ?? "";
 
   let gitDetails = {
     __GIT_DIRTY__: undefined as string | undefined,

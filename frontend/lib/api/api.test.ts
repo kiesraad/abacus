@@ -6,7 +6,7 @@ type Response = {
 
 describe("Mock api works", () => {
   test("echos a value", async () => {
-    const resp = await fetch("http://testhost/ping", {
+    const resp = await fetch("/ping", {
       method: "POST",
       headers: {
         "content-type": "application/json",

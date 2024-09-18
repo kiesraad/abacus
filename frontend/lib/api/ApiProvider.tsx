@@ -9,16 +9,16 @@ export interface iApiProviderContext {
 export const ApiProviderContext = React.createContext<iApiProviderContext | null>(null);
 
 export interface ApiProviderProps {
-  host: string;
   children: React.ReactNode;
 }
 
-export function ApiProvider({ children, host }: ApiProviderProps) {
-  const context = React.useMemo(() => {
-    return {
-      client: new ApiClient(host),
-    };
-  }, [host]);
+export function ApiProvider({ children }: ApiProviderProps) {
+  const context = React.useMemo(
+    () => ({
+      client: new ApiClient(),
+    }),
+    [],
+  );
 
   return <ApiProviderContext.Provider value={context}>{children}</ApiProviderContext.Provider>;
 }

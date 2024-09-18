@@ -22,7 +22,7 @@ function render() {
 
   root.render(
     <StrictMode>
-      <ApiProvider host={(__API_HOST__ as string | undefined) || ""}>
+      <ApiProvider>
         <RouterProvider router={router} />
       </ApiProvider>
     </StrictMode>,

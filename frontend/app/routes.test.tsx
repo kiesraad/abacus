@@ -30,7 +30,7 @@ describe("routes", () => {
     // NOTE: We're not using the wrapped render function here,
     // since we want control over our own memory router.
     rtlRender(
-      <ApiProvider host="http://testhost">
+      <ApiProvider>
         <RouterProvider router={router} />
       </ApiProvider>,
     );
@@ -45,7 +45,7 @@ describe("routes", () => {
     // NOTE: We're not using the wrapped render function here,
     // since we want control over our own memory router.
     rtlRender(
-      <ApiProvider host="http://testhost">
+      <ApiProvider>
         <RouterProvider router={router} />
       </ApiProvider>,
     );
@@ -63,7 +63,7 @@ describe("routes", () => {
     // NOTE: We're not using the wrapped render function here,
     // since we want control over our own memory router.
     rtlRender(
-      <ApiProvider host="http://testhost">
+      <ApiProvider>
         <RouterProvider router={router} />
       </ApiProvider>,
     );
@@ -82,7 +82,7 @@ describe("routes", () => {
     // NOTE: We're not using the wrapped render function here,
     // since we want control over our own memory router.
     rtlRender(
-      <ApiProvider host="http://testhost">
+      <ApiProvider>
         <RouterProvider router={router} />
       </ApiProvider>,
     );

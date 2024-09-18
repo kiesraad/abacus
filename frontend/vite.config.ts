@@ -11,9 +11,9 @@ const mapObj = <V0, V>(obj: Record<string, V0>, kf: (t: string) => string, vf: (
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
-  const apiMode = process.env.API_MODE ?? "mock";
-  const apiHost = process.env.API_HOST ?? "";
+  const apiHost = process.env.API_HOST ?? "http://localhost:8080";
 
+  const mswEnabled = process.env.API_MODE == "mock";
   let gitDetails = {
     __GIT_DIRTY__: undefined as string | undefined,
     __GIT_BRANCH__: undefined as string | undefined,
@@ -43,9 +43,8 @@ export default defineConfig(({ command }) => {
       },
     },
     define: {
-      __API_MSW__: JSON.stringify(apiMode === "mock"),
+      __API_MSW__: JSON.stringify(mswEnabled),
       __APP_VERSION__: JSON.stringify(pkgjson.version),
-      __API_HOST__: JSON.stringify(apiHost),
       ...gitDetails,
     },
     optimizeDeps: { exclude: ["msw"] },

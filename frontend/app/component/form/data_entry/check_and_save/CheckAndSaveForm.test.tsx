@@ -53,7 +53,7 @@ describe("Test CheckAndSaveForm", () => {
 
     // check that the finalisation request was made
     expect(request_method).toBe("POST");
-    expect(request_url).toBe("http://testhost/api/polling_stations/1/data_entries/1/finalise");
+    expect(request_url).toBe("http://localhost:3000/api/polling_stations/1/data_entries/1/finalise");
 
     // check that the user is navigated back to the data entry page
     expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry#data-entry-saved");

@@ -72,7 +72,7 @@ describe("Test AbortDataEntryControl", () => {
     let request_body: POLLING_STATION_DATA_ENTRY_REQUEST_BODY | undefined;
     server.use(
       http.post<never, POLLING_STATION_DATA_ENTRY_REQUEST_BODY, DataEntryResponse | ErrorResponse>(
-        "http://testhost/api/polling_stations/1/data_entries/1",
+        "/api/polling_stations/1/data_entries/1",
         async ({ request }) => {
           request_body = await request.json();
           return HttpResponse.json({ validation_results: { errors: [], warnings: [] } }, { status: 200 });
@@ -122,7 +122,7 @@ describe("Test AbortDataEntryControl", () => {
 
     // check that the delete request was made and the user is navigated back to the data entry page
     expect(request_method).toBe("DELETE");
-    expect(request_url).toBe("http://testhost/api/polling_stations/1/data_entries/1");
+    expect(request_url).toBe("http://localhost:3000/api/polling_stations/1/data_entries/1");
 
     // check that the user is navigated back to the data entry page
     expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry");

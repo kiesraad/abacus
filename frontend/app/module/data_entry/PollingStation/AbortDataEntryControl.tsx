@@ -25,10 +25,10 @@ export function AbortDataEntryControl() {
         <AbortDataEntryModal
           onCancel={toggleAbortModal}
           onSave={() => {
-            navigate(`/${election.id}/input`);
+            navigate(`/elections/${election.id}/data-entry`);
           }}
           onDelete={() => {
-            navigate(`/${election.id}/input`);
+            navigate(`/elections/${election.id}/data-entry`);
           }}
         />
       )}

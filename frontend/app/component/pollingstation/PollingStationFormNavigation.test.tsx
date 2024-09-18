@@ -152,7 +152,7 @@ describe("PollingStationFormNavigation", () => {
 
     (useBlocker as Mock).mockReturnValue({
       state: "blocked",
-      location: { pathname: "/1/input/1/" },
+      location: { pathname: "/elections/1/data-entry/1/" },
     });
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
@@ -170,8 +170,8 @@ describe("PollingStationFormNavigation", () => {
       //TODO: check these tests after determining what should be blocked
       expect(
         blocker({
-          currentLocation: { pathname: "/1/input/1/numbers" },
-          nextLocation: { pathname: "/1/input/1/differences" },
+          currentLocation: { pathname: "/elections/1/data-entry/1/numbers" },
+          nextLocation: { pathname: "/elections/1/data-entry/1/differences" },
         }),
       ).toBe(false);
 

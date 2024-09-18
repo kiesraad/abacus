@@ -1,7 +1,7 @@
 import * as React from "react";
 import { BlockerFunction, useBlocker, useNavigate } from "react-router-dom";
 
-import { AbortDataEntryModal } from "app/module/input/PollingStation/AbortDataEntryModal";
+import { AbortDataEntryModal } from "app/module/data_entry/PollingStation/AbortDataEntryModal";
 
 import {
   AnyFormReference,
@@ -31,7 +31,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
   const overrideControllerNavigation = React.useRef<string | null>(null);
 
   const isPartOfInputFlow = React.useCallback(
-    (pathname: string) => pathname.startsWith(`/${election.id}/input/${pollingStationId}/`),
+    (pathname: string) => pathname.startsWith(`/elections/${election.id}/data-entry/${pollingStationId}/`),
     [election, pollingStationId],
   );
 

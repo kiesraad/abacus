@@ -193,6 +193,12 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
+          <KeyboardKeys.HintText>
+            <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Down]} />
+            Snel naar totaal van de lijst
+          </KeyboardKeys.HintText>
+        </BottomBar.Row>
+        <BottomBar.Row>
           <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende
           </Button>

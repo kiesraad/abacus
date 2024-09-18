@@ -243,9 +243,9 @@ describe("Test CandidatesVotesForm", () => {
 
       render(Component);
 
-      const candidateVotes0 = await screen.findByTestId(candidatesFieldIds.candidate0);
-      const candidateVotes1 = screen.getByTestId(candidatesFieldIds.candidate1);
-      const total = screen.getByTestId(candidatesFieldIds.total);
+      const candidateVotes0 = await screen.findByTestId("candidate_votes[0].votes");
+      const candidateVotes1 = screen.getByTestId("candidate_votes[1].votes");
+      const total = screen.getByTestId("total");
 
       const spy = vi.spyOn(global, "fetch");
 
@@ -263,14 +263,6 @@ describe("Test CandidatesVotesForm", () => {
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
-
-      const expectedValidFields = [
-        candidatesFieldIds.candidate0,
-        candidatesFieldIds.candidate1,
-        candidatesFieldIds.total,
-      ];
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);

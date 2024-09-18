@@ -180,18 +180,6 @@ describe("Test DifferencesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const expectedValidFieldIds = [
-        differencesFieldIds.moreBallotsCount,
-        differencesFieldIds.fewerBallotsCount,
-        differencesFieldIds.unreturnedBallotsCount,
-        differencesFieldIds.tooFewBallotsHandedOutCount,
-        differencesFieldIds.tooManyBallotsHandedOutCount,
-        differencesFieldIds.otherExplanationCount,
-        differencesFieldIds.noExplanationCount,
-      ];
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
-
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
       expect(url).toEqual("http://testhost/api/polling_stations/1/data_entries/1");

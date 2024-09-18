@@ -1,31 +1,35 @@
 import { within } from "@testing-library/react";
 import { expect } from "vitest";
 
-export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(
-  fields: Array<HTMLElement>,
-  feedbackMessage: string,
-) {
+import { screen } from "app/test/unit";
+
+export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(fields: Array<string>, feedbackMessage: string) {
   fields.forEach((field) => {
-    expect(field).toBeInvalid();
-    expect(field).toHaveAccessibleErrorMessage(feedbackMessage);
+    const inputField = within(screen.getByTestId(`cell-${field}`)).getByRole("textbox");
+    expect(inputField).toBeInvalid();
+    expect(inputField).toHaveAccessibleErrorMessage(feedbackMessage);
   });
 }
 
-export function expectFieldsToHaveIconAndToHaveAccessibleName(fields: Array<HTMLElement>, accessibleName: string) {
+export function expectFieldsToHaveIconAndToHaveAccessibleName(fields: Array<string>, accessibleName: string) {
   fields.forEach((field) => {
-    expect(within(field.previousElementSibling as HTMLElement).getByRole("img")).toHaveAccessibleName(accessibleName);
+    const icon = within(screen.getByTestId(`cell-${field}`)).queryByRole("img");
+    expect(icon).toHaveAccessibleName(accessibleName);
   });
 }
 
-export function expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(fields: Array<HTMLElement>) {
+export function expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(fields: Array<string>) {
   fields.forEach((field) => {
-    expect(field).toBeValid();
-    expect(field).not.toHaveAccessibleErrorMessage();
+    // const inputField = screen.getByTestId(field)
+    const inputField = within(screen.getByTestId(`cell-${field}`)).getByRole("textbox");
+    expect(inputField).toBeValid();
+    expect(inputField).not.toHaveAccessibleErrorMessage();
   });
 }
 
-export function expectFieldsToNotHaveIcon(fields: Array<HTMLElement>) {
+export function expectFieldsToNotHaveIcon(fields: Array<string>) {
   fields.forEach((field) => {
-    expect(within(field.previousElementSibling as HTMLElement).queryByRole("img")).toBeNull();
+    const icon = within(screen.getByTestId(`cell-${field}`)).queryByRole("img");
+    expect(icon).toBeNull();
   });
 }

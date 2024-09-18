@@ -6,7 +6,7 @@ import {
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
-} from "app/component/form/testHelperFunctions";
+} from "app/component/form/testHelperFunctionsOld";
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form";
 

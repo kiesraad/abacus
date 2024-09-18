@@ -73,25 +73,26 @@ function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   );
 }
 
-function getFormFields(includingRecountedFields: boolean = false): HTMLElement[] {
-  const fields: HTMLElement[] = [
-    screen.getByTestId("poll_card_count"),
-    screen.getByTestId("proxy_certificate_count"),
-    screen.getByTestId("voter_card_count"),
-    screen.getByTestId("total_admitted_voters_count"),
-    screen.getByTestId("votes_candidates_count"),
-    screen.getByTestId("blank_votes_count"),
-    screen.getByTestId("invalid_votes_count"),
-    screen.getByTestId("total_votes_cast_count"),
-  ];
-  if (includingRecountedFields) {
-    fields.push(screen.getByTestId("poll_card_recount"));
-    fields.push(screen.getByTestId("proxy_certificate_recount"));
-    fields.push(screen.getByTestId("voter_card_recount"));
-    fields.push(screen.getByTestId("total_admitted_voters_recount"));
-  }
-  return fields;
-}
+const votersFieldIds = {
+  pollCardCount: "poll_card_count",
+  proxyCertificateCount: "proxy_certificate_count",
+  voterCardCount: "voter_card_count",
+  totalAdmittedVotersCount: "total_admitted_voters_count",
+};
+
+const votesFieldIds = {
+  votesCandidatesCount: "votes_candidates_count",
+  blankVotesCount: "blank_votes_count",
+  invalidVotesCount: "invalid_votes_count",
+  totalVotesCastCount: "total_votes_cast_count",
+};
+
+const recountFieldIds = {
+  pollcardRecount: "poll_card_recount",
+  proxyCertificateRecount: "proxy_certificate_recount",
+  voterCardRecount: "voter_card_recount",
+  totalAdmittedVotersRecount: "total_admitted_voters_recount",
+};
 
 describe("Test VotersAndVotesForm", () => {
   describe("VotersAndVotesForm user interactions", () => {
@@ -218,17 +219,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ]: HTMLElement[] = getFormFields();
-
       const spy = vi.spyOn(global, "fetch");
 
       await userTypeInputs(user, {
@@ -238,19 +228,6 @@ describe("Test VotersAndVotesForm", () => {
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
-
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ] as HTMLElement[];
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
@@ -284,17 +261,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ]: HTMLElement[] = getFormFields();
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -302,22 +268,22 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-      ] as HTMLElement[];
-      const expectedValidFields = [
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votersFieldIds.totalAdmittedVotersCount,
+      ];
+      const expectedValidFieldIds = [
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.blankVotesCount,
+        votesFieldIds.invalidVotesCount,
+        votesFieldIds.totalVotesCastCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("F.202 IncorrectTotal Votes counts", async () => {
@@ -342,17 +308,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ]: HTMLElement[] = getFormFields();
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -360,22 +315,22 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer uitgebrachte stemmenF.202De invoer bij E, F, G of H klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFields = [
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ] as HTMLElement[];
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.blankVotesCount,
+        votesFieldIds.invalidVotesCount,
+        votesFieldIds.totalVotesCastCount,
+      ];
+      const expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votersFieldIds.totalAdmittedVotersCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("F.203 IncorrectTotal Voters recounts", async () => {
@@ -400,21 +355,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: true });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-        pollCardRecount,
-        proxyCertificateRecount,
-        voterCardRecount,
-        totalAdmittedVotersRecount,
-      ]: HTMLElement[] = getFormFields(true);
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -422,26 +362,27 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer hertelde toegelaten kiezersF.203De invoer bij A.2, B.2, C.2 of D.2 klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFields = [
-        pollCardRecount,
-        proxyCertificateRecount,
-        voterCardRecount,
-        totalAdmittedVotersRecount,
-      ] as HTMLElement[];
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+
+      const expectedInvalidFieldIds = [
+        recountFieldIds.pollcardRecount,
+        recountFieldIds.proxyCertificateRecount,
+        recountFieldIds.voterCardRecount,
+        recountFieldIds.totalAdmittedVotersRecount,
+      ];
+      const expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votersFieldIds.totalAdmittedVotersCount,
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.blankVotesCount,
+        votesFieldIds.invalidVotesCount,
+        votesFieldIds.totalVotesCastCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
   });
 
@@ -458,17 +399,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ]: HTMLElement[] = getFormFields();
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -477,20 +407,20 @@ describe("Test VotersAndVotesForm", () => {
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [blankVotesCount] as HTMLElement[];
-      let expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [votesFieldIds.blankVotesCount];
+      let expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votersFieldIds.totalAdmittedVotersCount,
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.invalidVotesCount,
+        votesFieldIds.totalVotesCastCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
 
       const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
         name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
@@ -537,9 +467,9 @@ describe("Test VotersAndVotesForm", () => {
 
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       // All fields should be considered valid now
-      expectedValidFields = expectedValidFields.concat(expectedInvalidFields);
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      expectedValidFieldIds = expectedValidFieldIds.concat(expectedInvalidFieldIds);
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("W.201 high number of blank votes", async () => {
@@ -554,17 +484,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ]: HTMLElement[] = getFormFields();
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -572,20 +491,20 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [blankVotesCount] as HTMLElement[];
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [votesFieldIds.blankVotesCount];
+      const expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votersFieldIds.totalAdmittedVotersCount,
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.invalidVotesCount,
+        votesFieldIds.totalVotesCastCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("W.202 high number of invalid votes", async () => {
@@ -600,17 +519,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ]: HTMLElement[] = getFormFields();
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -618,20 +526,20 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [invalidVotesCount] as HTMLElement[];
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        totalVotesCastCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [votesFieldIds.invalidVotesCount];
+      const expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votersFieldIds.totalAdmittedVotersCount,
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.blankVotesCount,
+        votesFieldIds.totalVotesCastCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("W.203 voters counts and votes counts difference above threshold", async () => {
@@ -651,17 +559,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ]: HTMLElement[] = getFormFields();
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -669,19 +566,19 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmenW.203Er is een onverwacht verschil tussen het aantal toegelaten kiezers (A t/m D) en het aantal uitgebrachte stemmen (E t/m H).Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [totalVotesCastCount, totalAdmittedVotersCount] as HTMLElement[];
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [votesFieldIds.totalVotesCastCount, votersFieldIds.totalAdmittedVotersCount];
+      const expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.blankVotesCount,
+        votesFieldIds.invalidVotesCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("W.204 votes counts and voters recounts difference above threshold", async () => {
@@ -704,21 +601,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: true });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-        pollCardRecount,
-        proxyCertificateRecount,
-        voterCardRecount,
-        totalAdmittedVotersRecount,
-      ]: HTMLElement[] = getFormFields(true);
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -726,23 +608,24 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezersW.204Er is een onverwacht verschil tussen het aantal uitgebrachte stemmen (E t/m H) en het herteld aantal toegelaten kiezers (A.2 t/m D.2).Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [totalVotesCastCount, totalAdmittedVotersRecount] as HTMLElement[];
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        pollCardRecount,
-        proxyCertificateRecount,
-        voterCardRecount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+
+      const expectedInvalidFieldIds = [votesFieldIds.totalVotesCastCount, recountFieldIds.totalAdmittedVotersRecount];
+      const expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votersFieldIds.totalAdmittedVotersCount,
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.blankVotesCount,
+        votesFieldIds.invalidVotesCount,
+        recountFieldIds.pollcardRecount,
+        recountFieldIds.proxyCertificateRecount,
+        recountFieldIds.voterCardRecount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("W.205 total votes cast should not be zero", async () => {
@@ -757,17 +640,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ]: HTMLElement[] = getFormFields();
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -775,20 +647,20 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer aantal uitgebrachte stemmenW.205Het totaal aantal uitgebrachte stemmen (H) is nul.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [totalVotesCastCount] as HTMLElement[];
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [votesFieldIds.totalVotesCastCount];
+      const expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votersFieldIds.totalAdmittedVotersCount,
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.blankVotesCount,
+        votesFieldIds.invalidVotesCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("W.206 total admitted voters and total votes cast should not exceed polling stations number of eligible voters", async () => {
@@ -808,17 +680,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ]: HTMLElement[] = getFormFields();
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -826,19 +687,19 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmenW.206Het totaal aantal toegelaten kiezers (D) en/of het totaal aantal uitgebrachte stemmen (H) is hoger dan het aantal kiesgerechtigden voor dit stembureau.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [totalAdmittedVotersCount, totalVotesCastCount] as HTMLElement[];
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [votersFieldIds.totalAdmittedVotersCount, votesFieldIds.totalVotesCastCount];
+      const expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.blankVotesCount,
+        votesFieldIds.invalidVotesCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("W.207 total votes cast and total admitted voters recount should not exceed polling stations number of eligible voters", async () => {
@@ -861,21 +722,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: true });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-        pollCardRecount,
-        proxyCertificateRecount,
-        voterCardRecount,
-        totalAdmittedVotersRecount,
-      ]: HTMLElement[] = getFormFields(true);
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -883,23 +729,23 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer aantal uitgebrachte stemmen en herteld aantal toegelaten kiezersW.207Het totaal aantal uitgebrachte stemmen (H) en/of het herteld totaal aantal toegelaten kiezers (D.2) is hoger dan het aantal kiesgerechtigden voor dit stembureau.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [totalVotesCastCount, totalAdmittedVotersRecount] as HTMLElement[];
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        pollCardRecount,
-        proxyCertificateRecount,
-        voterCardRecount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [votesFieldIds.totalVotesCastCount, recountFieldIds.totalAdmittedVotersRecount];
+      const expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votersFieldIds.totalAdmittedVotersCount,
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.blankVotesCount,
+        votesFieldIds.invalidVotesCount,
+        recountFieldIds.pollcardRecount,
+        recountFieldIds.proxyCertificateRecount,
+        recountFieldIds.voterCardRecount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("W.208 EqualInput voters counts and votes counts", async () => {
@@ -919,17 +765,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-      ]: HTMLElement[] = getFormFields();
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -938,21 +773,18 @@ describe("Test VotersAndVotesForm", () => {
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       // When all fields on a page are (potentially) invalid, we do not mark them as so
-      const expectedInvalidFields = [] as HTMLElement[];
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalVotesCastCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalAdmittedVotersCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votersFieldIds.totalAdmittedVotersCount,
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.blankVotesCount,
+        votesFieldIds.invalidVotesCount,
+        votesFieldIds.totalVotesCastCount,
+      ];
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("W.209 EqualInput voters recounts and votes counts", async () => {
@@ -981,21 +813,6 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: true });
 
-      const [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-        pollCardRecount,
-        proxyCertificateRecount,
-        voterCardRecount,
-        totalAdmittedVotersRecount,
-      ]: HTMLElement[] = getFormFields(true);
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -1003,26 +820,26 @@ describe("Test VotersAndVotesForm", () => {
         "Controleer E t/m H en A.2 t/m D.2W.209De getallen bij E t/m H zijn precies hetzelfde als A.2 t/m D.2.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [
-        votesCandidatesCount,
-        blankVotesCount,
-        invalidVotesCount,
-        totalVotesCastCount,
-        pollCardRecount,
-        proxyCertificateRecount,
-        voterCardRecount,
-        totalAdmittedVotersRecount,
-      ] as HTMLElement[];
-      const expectedValidFields = [
-        pollCardCount,
-        proxyCertificateCount,
-        voterCardCount,
-        totalAdmittedVotersCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [
+        votesFieldIds.votesCandidatesCount,
+        votesFieldIds.blankVotesCount,
+        votesFieldIds.invalidVotesCount,
+        votesFieldIds.totalVotesCastCount,
+        recountFieldIds.pollcardRecount,
+        recountFieldIds.proxyCertificateRecount,
+        recountFieldIds.voterCardRecount,
+        recountFieldIds.totalAdmittedVotersRecount,
+      ];
+      const expectedValidFieldIds = [
+        votersFieldIds.pollCardCount,
+        votersFieldIds.proxyCertificateCount,
+        votersFieldIds.voterCardCount,
+        votersFieldIds.totalAdmittedVotersCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
   });
 });

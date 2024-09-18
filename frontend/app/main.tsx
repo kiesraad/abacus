@@ -22,14 +22,14 @@ function render() {
 
   root.render(
     <StrictMode>
-      <ApiProvider host={process.env.API_HOST || ""}>
+      <ApiProvider host={(__API_HOST__ as string | undefined) || ""}>
         <RouterProvider router={router} />
       </ApiProvider>
     </StrictMode>,
   );
 }
 
-if (process.env.MSW) {
+if (__API_MSW__) {
   startMockAPI()
     .then(render)
     .catch((e: unknown) => {

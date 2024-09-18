@@ -14,15 +14,19 @@ export default defineConfig(({ command }) => {
   const apiMode = process.env.API_MODE ?? "mock";
   const apiHost = process.env.API_HOST ?? (apiMode === "mock" ? "" : "http://localhost:8080");
 
-  let gitDetails = {};
+  let gitDetails = {
+    __GIT_DIRTY__: undefined as string | undefined,
+    __GIT_BRANCH__: undefined as string | undefined,
+    __GIT_COMMIT__: undefined as string | undefined,
+  };
   if (command == "build") {
     const gitDirty = execSync("git status --porcelain").toString().trimEnd().length > 0;
     const gitBranch = execSync("git rev-parse --abbrev-ref HEAD").toString().trimEnd();
     const gitCommit = execSync("git rev-parse --short HEAD").toString().trimEnd();
     gitDetails = {
-      "import.meta.env.GIT_DIRTY": JSON.stringify(gitDirty),
-      "import.meta.env.GIT_BRANCH": JSON.stringify(gitBranch),
-      "import.meta.env.GIT_COMMIT": JSON.stringify(gitCommit),
+      __GIT_DIRTY__: JSON.stringify(gitDirty),
+      __GIT_BRANCH__: JSON.stringify(gitBranch),
+      __GIT_COMMIT__: JSON.stringify(gitCommit),
     };
   }
 
@@ -39,9 +43,9 @@ export default defineConfig(({ command }) => {
       },
     },
     define: {
-      "process.env.MSW": apiMode === "mock",
-      "process.env.VERSION": JSON.stringify(pkgjson.version),
-      "process.env.API_HOST": JSON.stringify(apiHost),
+      __API_MSW__: JSON.stringify(apiMode === "mock"),
+      __APP_VERSION__: JSON.stringify(pkgjson.version),
+      __API_HOST__: JSON.stringify(apiHost),
       ...gitDetails,
     },
     optimizeDeps: { exclude: ["msw"] },

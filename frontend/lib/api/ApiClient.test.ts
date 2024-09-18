@@ -8,7 +8,7 @@ describe("ApiClient", () => {
   test("200 response is parsed as success", async () => {
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, { fizz: "buzz" });
 
-    const client = new ApiClient("testhost");
+    const client = new ApiClient("http://testhost");
     const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
       data: null,
     });
@@ -24,7 +24,7 @@ describe("ApiClient", () => {
     const responseBody = { fizz: "buzz" };
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, responseBody);
 
-    const client = new ApiClient("testhost");
+    const client = new ApiClient("http://testhost");
     const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
       data: null,
     });
@@ -40,7 +40,7 @@ describe("ApiClient", () => {
     const responseBody = { error: "foo" };
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, responseBody);
 
-    const client = new ApiClient("testhost");
+    const client = new ApiClient("http://testhost");
     const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
       data: null,
     });
@@ -56,7 +56,7 @@ describe("ApiClient", () => {
     const responseStatus = 318;
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", responseStatus, "");
 
-    const client = new ApiClient("testhost");
+    const client = new ApiClient("http://testhost");
 
     await expect(async () => {
       await client.postRequest("/api/polling_stations/1/data_entries/1", { data: null });
@@ -66,7 +66,7 @@ describe("ApiClient", () => {
   test("Get request returns expected data", async () => {
     overrideOnce("get", "/api/test/1", 200, { fizz: "buzz" });
 
-    const client = new ApiClient("testhost");
+    const client = new ApiClient("http://testhost");
     const parsedResponse = await client.getRequest("/api/test/1");
 
     expect(parsedResponse).toStrictEqual({
@@ -79,7 +79,7 @@ describe("ApiClient", () => {
   test("Invalid server response throws an error", async () => {
     overrideOnce("get", "/api/test/1", 200, "invalid");
 
-    const client = new ApiClient("testhost");
+    const client = new ApiClient("http://testhost");
 
     // error is expected
     vi.spyOn(console, "error").mockImplementation(() => {});

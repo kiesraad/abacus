@@ -5,7 +5,7 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   skip?: string[];
 }
 
-type Dir = "up" | "down" | "last";
+type Dir = "up" | "down" | "first" | "last";
 
 export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, skip, ...formProps }, ref) => {
   const innerRef: React.MutableRefObject<HTMLFormElement | null> = React.useRef<HTMLFormElement>(null);
@@ -25,6 +25,9 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
         break;
       case "down":
         targetIndex = activeIndex + 1;
+        break;
+      case "first":
+        targetIndex = 0;
         break;
       case "last":
         targetIndex = inputList.current.length - 1;
@@ -53,7 +56,11 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
         case "ArrowUp":
-          moveFocus("up");
+          if (event.shiftKey) {
+            moveFocus("first");
+          } else {
+            moveFocus("up");
+          }
           break;
         case "ArrowDown":
           if (event.shiftKey) {

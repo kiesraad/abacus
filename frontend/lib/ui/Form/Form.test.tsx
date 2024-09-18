@@ -129,9 +129,7 @@ describe("UI Component: Form", () => {
 
     expect(submitButton).toHaveFocus();
 
-    await userEvent.keyboard("{arrowup}");
-    await userEvent.keyboard("{arrowup}");
-    await userEvent.keyboard("{arrowup}");
+    await userEvent.keyboard("{Shift>}{arrowup}{/Shift}");
     expect(firstInput).toHaveFocus();
 
     await userEvent.keyboard("{Shift>}{arrowdown}{/Shift}");

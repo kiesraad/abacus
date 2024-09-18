@@ -13,14 +13,13 @@ export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(fields: A
 
 export function expectFieldsToHaveIconAndToHaveAccessibleName(fields: Array<string>, accessibleName: string) {
   fields.forEach((field) => {
-    const icon = within(screen.getByTestId(`cell-${field}`)).queryByRole("img");
+    const icon = within(screen.getByTestId(`cell-${field}`)).getByRole("img");
     expect(icon).toHaveAccessibleName(accessibleName);
   });
 }
 
 export function expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(fields: Array<string>) {
   fields.forEach((field) => {
-    // const inputField = screen.getByTestId(field)
     const inputField = within(screen.getByTestId(`cell-${field}`)).getByRole("textbox");
     expect(inputField).toBeValid();
     expect(inputField).not.toHaveAccessibleErrorMessage();

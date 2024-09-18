@@ -21,7 +21,7 @@ export default defineConfig(({ command }) => {
   };
   if (command == "build") {
     const gitDirty = execSync("git status --porcelain").toString().trimEnd().length > 0;
-    const gitBranch = execSync("git rev-parse --abbrev-ref HEAD").toString().trimEnd();
+    const gitBranch = process.env.GITHUB_HEAD_REF ?? execSync("git rev-parse --abbrev-ref HEAD").toString().trimEnd();
     const gitCommit = execSync("git rev-parse --short HEAD").toString().trimEnd();
     gitDetails = {
       __GIT_DIRTY__: JSON.stringify(gitDirty),

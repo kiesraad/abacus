@@ -8,3 +8,4 @@ export * from "./compare";
 export * from "./domtoren";
 export * from "./fields";
 export * from "./strings";
+export * from "./format";

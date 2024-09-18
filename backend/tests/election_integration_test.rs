@@ -274,8 +274,8 @@ async fn test_election_details_status(pool: SqlitePool) {
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
-    assert_eq!(body.statuses[0].status, PollingStationStatus::Incomplete);
-    assert_eq!(body.statuses[1].status, PollingStationStatus::Incomplete);
+    assert_eq!(body.statuses[0].status, PollingStationStatus::FirstEntry);
+    assert_eq!(body.statuses[1].status, PollingStationStatus::FirstEntry);
 
     shared::create_and_finalise_data_entry(&addr).await;
 
@@ -291,11 +291,11 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert!(!body.statuses.is_empty());
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
-        PollingStationStatus::Complete
+        PollingStationStatus::Definitive
     );
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,
-        PollingStationStatus::Incomplete
+        PollingStationStatus::FirstEntry
     );
 }
 

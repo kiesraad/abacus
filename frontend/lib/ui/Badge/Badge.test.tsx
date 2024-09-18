@@ -4,6 +4,7 @@ import { render, screen } from "app/test/unit";
 
 import { Badge } from "./Badge";
 
+/*
 test("The correction badge is visible", () => {
   render(<Badge type="correction" />);
 
@@ -11,7 +12,7 @@ test("The correction badge is visible", () => {
 
   expect(badgeElement).toBeVisible();
 });
-
+ */
 test("The definitive badge is visible", () => {
   render(<Badge type="definitive" />);
 
@@ -19,7 +20,7 @@ test("The definitive badge is visible", () => {
 
   expect(badgeElement).toBeVisible();
 });
-
+/*
 test("The difference badge is visible", () => {
   render(<Badge type="difference" />);
 
@@ -35,7 +36,7 @@ test("The extra entry badge is visible", () => {
 
   expect(badgeElement).toBeVisible();
 });
-
+ */
 test("The first entry badge is visible", () => {
   render(<Badge type="first_entry" />);
 
@@ -43,7 +44,7 @@ test("The first entry badge is visible", () => {
 
   expect(badgeElement).toBeVisible();
 });
-
+/*
 test("The objections badge is visible", () => {
   render(<Badge type="objections" />);
 
@@ -59,3 +60,4 @@ test("The second entry badge is visible", () => {
 
   expect(badgeElement).toBeVisible();
 });
+ */

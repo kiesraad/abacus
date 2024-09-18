@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "app/test/unit";
 
-import { DefaultGrid } from "./InputGrid.stories.tsx";
+import { DefaultGrid } from "./InputGrid.stories";
 
 describe("InputGrid", () => {
   test("InputGrid renders", () => {

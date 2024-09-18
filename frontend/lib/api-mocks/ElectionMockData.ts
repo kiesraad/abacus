@@ -377,11 +377,11 @@ export const electionStatusMockResponse: ElectionStatusResponse = {
   statuses: [
     {
       id: 1,
-      status: "Incomplete",
+      status: "first_entry",
     },
     {
       id: 2,
-      status: "Complete",
+      status: "definitive",
     },
   ],
 };

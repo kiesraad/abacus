@@ -1,13 +1,17 @@
+import { type PollingStationStatus } from "@kiesraad/api";
+
 import classes from "./badge.module.css";
 
-const typeToTextDict = {
-  correction: "Corrigendum",
+const typeToTextDict: { [S in PollingStationStatus]: string } = {
+  first_entry: "1e invoer",
   definitive: "Definitief",
+  /*
   difference: "Verschil invoer 1 en 2",
   extra_entry: "Extra invoer",
-  first_entry: "1e invoer",
+  correction: "Corrigendum",
   objections: "Bezwaren",
   second_entry: "2e invoer",
+   */
 };
 
 export interface BadgeProps {

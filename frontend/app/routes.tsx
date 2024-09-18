@@ -1,18 +1,19 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
-import { PollingStationSaveForm } from "./component/form/pollingstation_save/PollingStationSaveForm";
-import { DevHomePage } from "./module/DevHomePage";
-import { ElectionLayout } from "./module/ElectionLayout";
+import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
+import { FinaliseElectionPage } from "app/module/data_entry/page/FinaliseElectionPage";
+
 import {
   CandidatesVotesPage,
+  DataEntryHomePage,
+  DataEntryLayout,
   DifferencesPage,
-  InputHomePage,
-  InputLayout,
   PollingStationLayout,
   RecountedPage,
   VotersAndVotesPage,
-} from "./module/input";
-import { FinaliseElectionPage } from "./module/input/page/FinaliseElectionPage";
+} from "./module/data_entry";
+import { DevHomePage } from "./module/DevHomePage";
+import { ElectionLayout } from "./module/ElectionLayout";
 import { NotFound } from "./module/NotFound";
 import { OverviewLayout, OverviewPage } from "./module/overview";
 import { RootLayout } from "./module/RootLayout";
@@ -31,16 +32,16 @@ export const routes = createRoutesFromElements(
     <Route path="/overview" element={<OverviewLayout />} errorElement={<NotFound />}>
       <Route index element={<OverviewPage />} />
     </Route>
-    <Route path=":electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
-      <Route path="input" element={<InputLayout />}>
-        <Route index element={<InputHomePage />} />
+    <Route path="elections/:electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
+      <Route path="data-entry" element={<DataEntryLayout />}>
+        <Route index element={<DataEntryHomePage />} />
         <Route path=":pollingStationId" element={<PollingStationLayout />}>
           <Route index element={<Navigate to="./recounted" replace />} />
           <Route path="recounted" element={<RecountedPage />} />
-          <Route path="numbers" element={<VotersAndVotesPage />} />
+          <Route path="voters-and-votes" element={<VotersAndVotesPage />} />
           <Route path="differences" element={<DifferencesPage />} />
           <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-          <Route path="save" element={<PollingStationSaveForm />} />
+          <Route path="save" element={<CheckAndSaveForm />} />
         </Route>
         <Route path="finalise" element={<FinaliseElectionPage />} />
       </Route>

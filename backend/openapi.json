@@ -935,8 +935,8 @@
       "PollingStationStatus": {
         "type": "string",
         "enum": [
-          "Incomplete",
-          "Complete"
+          "first_entry",
+          "definitive"
         ]
       },
       "PollingStationStatusEntry": {

@@ -205,7 +205,7 @@ export interface PollingStationResults {
   votes_counts: VotesCounts;
 }
 
-export type PollingStationStatus = "Incomplete" | "Complete";
+export type PollingStationStatus = "first_entry" | "definitive";
 
 export interface PollingStationStatusEntry {
   id: number;

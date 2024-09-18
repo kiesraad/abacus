@@ -10,7 +10,7 @@ import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
 
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
-const renderInputHomePage = () =>
+const renderDataEntryHomePage = () =>
   render(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
@@ -25,7 +25,7 @@ describe("DataEntryHomePage", () => {
   });
 
   test("Election name", async () => {
-    renderInputHomePage();
+    renderDataEntryHomePage();
 
     expect(
       await screen.findByRole("heading", {
@@ -40,7 +40,7 @@ describe("DataEntryHomePage", () => {
   });
 
   test("Finish input not visible when not finished", async () => {
-    renderInputHomePage();
+    renderDataEntryHomePage();
 
     // Wait for the page to be loaded
     expect(
@@ -55,7 +55,7 @@ describe("DataEntryHomePage", () => {
   });
 
   test("Finish input visible when finished", async () => {
-    renderInputHomePage();
+    renderDataEntryHomePage();
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
@@ -76,7 +76,7 @@ describe("DataEntryHomePage", () => {
     } satisfies ElectionStatusResponse);
 
     // render and expect the initial status to be fetched
-    const { rerender } = renderInputHomePage();
+    const { rerender } = renderDataEntryHomePage();
     expect(await screen.findByText("Welk stembureau ga je invoeren?")).toBeVisible();
     expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
 

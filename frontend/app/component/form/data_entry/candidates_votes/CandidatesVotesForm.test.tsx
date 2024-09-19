@@ -324,13 +324,13 @@ describe("Test CandidatesVotesForm", () => {
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       // When all fields on a page are (potentially) invalid, we do not mark them as so
-      const expectedValidFields = [
+      const expectedValidFieldIds = [
         candidatesFieldIds.candidate0,
         candidatesFieldIds.candidate1,
         candidatesFieldIds.total,
       ];
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
   });
 });

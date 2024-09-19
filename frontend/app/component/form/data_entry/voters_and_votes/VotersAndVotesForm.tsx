@@ -307,7 +307,7 @@ export function VotersAndVotesForm() {
         <BottomBar.Row>
           <KeyboardKeys.HintText>
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Down]} />
-            Snel naar totaal van de lijst
+            Snel naar het onderste invoerveld
           </KeyboardKeys.HintText>
         </BottomBar.Row>
         <BottomBar.Row>

@@ -26,6 +26,18 @@ function renderKey(keyboardKey: KeyboardKey, index: number): React.JSX.Element {
           <span>Shift</span>
         </kbd>
       );
+    case KeyboardKey.Down:
+      return (
+        <kbd key={index}>
+          <span>￬</span>
+        </kbd>
+      );
+    case KeyboardKey.Up:
+      return (
+        <kbd key={index}>
+          <span>￪</span>
+        </kbd>
+      );
     default:
       return <></>;
   }
@@ -36,3 +48,7 @@ export function KeyboardKeys({ keys }: KeyboardKeysProps) {
     <div className={cn(cls["keyboard-keys"])}>{keys.map((keyboardKey, index) => renderKey(keyboardKey, index))}</div>
   );
 }
+
+KeyboardKeys.HintText = function KeyboardKeysHintText({ children }: { children: React.ReactNode }) {
+  return <div className={cls["keyboard-keys-hint-text"]}>{children}</div>;
+};

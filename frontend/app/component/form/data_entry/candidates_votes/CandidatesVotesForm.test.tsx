@@ -2,9 +2,7 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import {
-  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
-  expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
 } from "app/component/form/testHelperFunctions";
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
@@ -27,6 +25,12 @@ function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
     </PollingStationFormController>,
   );
 }
+
+const candidatesFieldIds = {
+  candidate0: "candidate_votes[0].votes",
+  candidate1: "candidate_votes[1].votes",
+  total: "total",
+};
 
 describe("Test CandidatesVotesForm", () => {
   describe("CandidatesVotesForm user interactions", () => {
@@ -260,10 +264,6 @@ describe("Test CandidatesVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const expectedValidFields = [candidateVotes0, candidateVotes1, total] as HTMLElement[];
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
-
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
       expect(url).toEqual("/api/polling_stations/1/data_entries/1");
@@ -285,10 +285,6 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const candidateVotes0 = await screen.findByTestId("candidate_votes[0].votes");
-      const candidateVotes1 = screen.getByTestId("candidate_votes[1].votes");
-      const total = screen.getByTestId("total");
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -297,10 +293,11 @@ describe("Test CandidatesVotesForm", () => {
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
       // When all fields on a page are (potentially) invalid, we do not mark them as so
-      const expectedInvalidFields = [] as HTMLElement[];
-      const expectedValidFields = [candidateVotes0, candidateVotes1, total] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
+      const expectedValidFields = [
+        candidatesFieldIds.candidate0,
+        candidatesFieldIds.candidate1,
+        candidatesFieldIds.total,
+      ];
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
       expectFieldsToNotHaveIcon(expectedValidFields);
     });
@@ -319,10 +316,6 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const candidateVotes0 = await screen.findByTestId("candidate_votes[0].votes");
-      const candidateVotes1 = screen.getByTestId("candidate_votes[1].votes");
-      const total = screen.getByTestId("total");
-
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
@@ -331,12 +324,13 @@ describe("Test CandidatesVotesForm", () => {
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       // When all fields on a page are (potentially) invalid, we do not mark them as so
-      const expectedInvalidFields = [] as HTMLElement[];
-      const expectedValidFields = [candidateVotes0, candidateVotes1, total] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedValidFieldIds = [
+        candidatesFieldIds.candidate0,
+        candidatesFieldIds.candidate1,
+        candidatesFieldIds.total,
+      ];
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
   });
 });

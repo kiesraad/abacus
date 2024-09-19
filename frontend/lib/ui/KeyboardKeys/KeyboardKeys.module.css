@@ -22,3 +22,9 @@
     }
   }
 }
+
+.keyboard-keys-hint-text {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}

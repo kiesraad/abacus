@@ -227,12 +227,6 @@ export function DifferencesForm() {
           </Checkbox>
         </BottomBar.Row>
         <BottomBar.Row>
-          <KeyboardKeys.HintText>
-            <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Down]} />
-            Snel naar het onderste invoerveld
-          </KeyboardKeys.HintText>
-        </BottomBar.Row>
-        <BottomBar.Row>
           <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende
           </Button>

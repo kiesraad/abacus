@@ -106,7 +106,7 @@ describe("Test RecountedForm", () => {
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
 
-      expect(url).toEqual("http://testhost/api/polling_stations/1/data_entries/1");
+      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
     });

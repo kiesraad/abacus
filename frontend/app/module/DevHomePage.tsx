@@ -22,7 +22,7 @@ export function DevHomePage() {
           </li>
         </ul>
 
-        {process.env.MSW && <MockTest />}
+        {__API_MSW__ && <MockTest />}
       </div>
     </div>
   );

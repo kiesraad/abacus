@@ -29,13 +29,13 @@ function renderKey(keyboardKey: KeyboardKey, index: number): React.JSX.Element {
     case KeyboardKey.Down:
       return (
         <kbd key={index}>
-          <span>↓</span>
+          <span>￬</span>
         </kbd>
       );
     case KeyboardKey.Up:
       return (
         <kbd key={index}>
-          <span>↑</span>
+          <span>￪</span>
         </kbd>
       );
     default:

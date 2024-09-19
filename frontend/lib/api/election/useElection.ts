@@ -10,9 +10,9 @@ export function useElection(pollingStationId?: string) {
   if (context === undefined) {
     throw new Error("useElection must be used within an ElectionProvider");
   }
-  context.pollingStation = useMemo(() => {
+  const pollingStation = useMemo(() => {
     const parsedStationId = parsePollingStationNumber(pollingStationId ?? "0");
     return context.pollingStations.find((ps) => ps.id === parsedStationId);
   }, [pollingStationId, context.pollingStations]);
-  return context;
+  return { ...context, pollingStation };
 }

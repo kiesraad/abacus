@@ -167,7 +167,6 @@ describe("PollingStationFormNavigation", () => {
         nextLocation: { pathname: string };
       }) => boolean;
 
-      //TODO: check these tests after determining what should be blocked
       expect(
         blocker({
           currentLocation: { pathname: "/elections/1/data-entry/1/voters-and-votes" },

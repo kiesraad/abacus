@@ -25,12 +25,12 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
-export interface POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS {
+export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: number;
   entry_number: number;
 }
-export type POLLING_STATION_DATA_ENTRY_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
-export type POLLING_STATION_DATA_ENTRY_REQUEST_BODY = DataEntryRequest;
+export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
+export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = SaveDataEntryRequest;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
 export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
@@ -64,20 +64,6 @@ export type CandidateGender = "Male" | "Female" | "X";
 export interface CandidateVotes {
   number: number;
   votes: number;
-}
-
-/**
- * Request structure for data entry of polling station results
- */
-export interface DataEntryRequest {
-  data: PollingStationResults;
-}
-
-/**
- * Response structure for data entry of polling station results
- */
-export interface DataEntryResponse {
-  validation_results: ValidationResults;
 }
 
 /**
@@ -144,6 +130,14 @@ export interface ErrorResponse {
 }
 
 /**
+ * Response structure for getting data entry of polling station results
+ */
+export interface GetDataEntryResponse {
+  data: PollingStationResults;
+  validation_results: ValidationResults;
+}
+
+/**
  * Political group with its candidates
  */
 export interface PoliticalGroup {
@@ -204,6 +198,20 @@ export interface PollingStationStatusEntry {
  * Type of Polling station
  */
 export type PollingStationType = "VasteLocatie" | "Bijzonder" | "Mobiel";
+
+/**
+ * Request structure for saving data entry of polling station results
+ */
+export interface SaveDataEntryRequest {
+  data: PollingStationResults;
+}
+
+/**
+ * Response structure for saving data entry of polling station results
+ */
+export interface SaveDataEntryResponse {
+  validation_results: ValidationResults;
+}
 
 export interface ValidationResult {
   code: ValidationResultCode;

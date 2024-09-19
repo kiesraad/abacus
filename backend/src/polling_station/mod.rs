@@ -6,31 +6,31 @@ use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
-use crate::election::repository::Elections;
-use crate::validation::ValidationResults;
-use crate::APIError;
-
 use self::repository::{PollingStationDataEntries, PollingStations};
 pub use self::structs::*;
+use crate::election::repository::Elections;
+use crate::election::Election;
+use crate::validation::ValidationResults;
+use crate::APIError;
 
 pub mod repository;
 pub mod structs;
 
-/// Request structure for data entry of polling station results
+/// Request structure for saving data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
-pub struct DataEntryRequest {
+pub struct SaveDataEntryRequest {
     /// Data entry for a polling station
     pub data: PollingStationResults,
 }
 
-/// Response structure for data entry of polling station results
+/// Response structure for saving data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct DataEntryResponse {
+pub struct SaveDataEntryResponse {
     pub validation_results: ValidationResults,
 }
 
-impl IntoResponse for DataEntryResponse {
+impl IntoResponse for SaveDataEntryResponse {
     fn into_response(self) -> Response {
         Json(self).into_response()
     }
@@ -40,9 +40,9 @@ impl IntoResponse for DataEntryResponse {
 #[utoipa::path(
     post,
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
-    request_body = DataEntryRequest,
+    request_body = SaveDataEntryRequest,
     responses(
-        (status = 200, description = "Data entry saved successfully", body = DataEntryResponse),
+        (status = 200, description = "Data entry saved successfully", body = SaveDataEntryResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -53,13 +53,13 @@ impl IntoResponse for DataEntryResponse {
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
 )]
-pub async fn polling_station_data_entry(
+pub async fn polling_station_data_entry_save(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
     State(elections): State<Elections>,
     Path((id, entry_number)): Path<(u32, u8)>,
-    data_entry_request: DataEntryRequest,
-) -> Result<DataEntryResponse, APIError> {
+    data_entry_request: SaveDataEntryRequest,
+) -> Result<SaveDataEntryResponse, APIError> {
     // only the first data entry is supported for now
     if entry_number != 1 {
         return Err(APIError::NotFound(
@@ -77,10 +77,27 @@ pub async fn polling_station_data_entry(
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
 
+    let validation_results =
+        validate_polling_station_results(&data_entry_request.data, &polling_station, &election)?;
+    let data = serde_json::to_string(&data_entry_request.data)?;
+
+    // Save the data entry or update it if it already exists
+    polling_station_data_entries
+        .upsert(id, entry_number, data)
+        .await?;
+
+    Ok(SaveDataEntryResponse { validation_results })
+}
+
+fn validate_polling_station_results(
+    polling_station_results: &PollingStationResults,
+    polling_station: &PollingStation,
+    election: &Election,
+) -> Result<ValidationResults, APIError> {
     let mut validation_results = ValidationResults::default();
-    data_entry_request.data.validate(
-        &election,
-        &polling_station,
+    polling_station_results.validate(
+        election,
+        polling_station,
         &mut validation_results,
         "data".to_string(),
     )?;
@@ -90,14 +107,49 @@ pub async fn polling_station_data_entry(
     validation_results
         .warnings
         .sort_by(|a, b| a.code.cmp(&b.code));
-    let data = serde_json::to_string(&data_entry_request.data)?;
+    Ok(validation_results)
+}
 
-    // Save the data entry or update it if it already exists
-    polling_station_data_entries
-        .upsert(id, entry_number, data)
+/// Response structure for getting data entry of polling station results
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct GetDataEntryResponse {
+    pub data: PollingStationResults,
+    pub validation_results: ValidationResults,
+}
+
+/// Get an in-progress (not finalised) data entry for a polling station
+#[utoipa::path(
+    get,
+    path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
+    responses(
+        (status = 200, description = "Data entry retrieved successfully", body = GetDataEntryResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
+    ),
+)]
+pub async fn polling_station_data_entry_get(
+    State(pool): State<SqlitePool>,
+    State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(polling_stations): State<PollingStations>,
+    State(elections): State<Elections>,
+    Path((id, entry_number)): Path<(u32, u8)>,
+) -> Result<Json<GetDataEntryResponse>, APIError> {
+    let mut tx = pool.begin().await?;
+    let polling_station = polling_stations.get(id).await?;
+    let election = elections.get(polling_station.election_id).await?;
+    let data = polling_station_data_entries
+        .get(&mut tx, id, entry_number)
         .await?;
-
-    Ok(DataEntryResponse { validation_results })
+    let data = serde_json::from_slice(&data)?;
+    let validation_results = validate_polling_station_results(&data, &polling_station, &election)?;
+    Ok(Json(GetDataEntryResponse {
+        data,
+        validation_results,
+    }))
 }
 
 /// Delete an in-progress (not finalised) data entry for a polling station
@@ -137,7 +189,7 @@ pub async fn polling_station_data_entry_delete(
     post,
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise",
     responses(
-        (status = 200, description = "Data entry finalised successfully", body = DataEntryResponse),
+        (status = 200, description = "Data entry finalised successfully"),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -160,7 +212,8 @@ pub async fn polling_station_data_entry_finalise(
 
     let mut tx = pool.begin().await?;
 
-    // future: support for second data entry, #129 validate whether first and second data entries are equal, #129
+    // TODO: #129 support for second data entry
+    // TODO: #129 validate whether first and second data entries are equal
 
     let data = polling_station_data_entries
         .get(&mut tx, id, entry_number)
@@ -195,8 +248,8 @@ mod tests {
 
     use super::*;
 
-    fn example_data_entry() -> DataEntryRequest {
-        DataEntryRequest {
+    fn example_data_entry() -> SaveDataEntryRequest {
+        SaveDataEntryRequest {
             data: PollingStationResults {
                 recounted: false,
                 voters_counts: VotersCounts {
@@ -243,8 +296,8 @@ mod tests {
     async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
         let mut request_body = example_data_entry();
 
-        async fn save(pool: SqlitePool, request_body: DataEntryRequest) -> Response {
-            polling_station_data_entry(
+        async fn save(pool: SqlitePool, request_body: SaveDataEntryRequest) -> Response {
+            polling_station_data_entry_save(
                 State(PollingStationDataEntries::new(pool.clone())),
                 State(PollingStations::new(pool.clone())),
                 State(Elections::new(pool.clone())),
@@ -332,7 +385,7 @@ mod tests {
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
     async fn test_polling_station_data_entry_delete(pool: SqlitePool) {
         // create data entry
-        let response = polling_station_data_entry(
+        let response = polling_station_data_entry_save(
             State(PollingStationDataEntries::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
             State(Elections::new(pool.clone())),

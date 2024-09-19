@@ -5,7 +5,7 @@ use serde_json::json;
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
 
-use backend::polling_station::DataEntryResponse;
+use backend::polling_station::{GetDataEntryResponse, SaveDataEntryResponse};
 use backend::validation::ValidationResultCode;
 use backend::ErrorResponse;
 
@@ -82,7 +82,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         println!("response body: {:?}", &response.text().await.unwrap());
         panic!("Unexpected response status: {:?}", status);
     }
-    let body: DataEntryResponse = response.json().await.unwrap();
+    let body: SaveDataEntryResponse = response.json().await.unwrap();
     let errors = body.validation_results.errors;
     assert_eq!(errors.len(), 4);
     // error 1
@@ -181,6 +181,49 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
     let response = reqwest::Client::new().post(&url).send().await.unwrap();
 
     // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+/// test that we can get a data entry after saving it
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+async fn test_polling_station_data_entry_get(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let request_body = shared::example_data_entry();
+
+    // create a data entry
+    let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&request_body)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    let save_response: SaveDataEntryResponse = response.json().await.unwrap();
+
+    // get the data entry
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // check that the data entry is the same
+    let get_response: GetDataEntryResponse = response.json().await.unwrap();
+    assert_eq!(get_response.data, request_body.data);
+    assert_eq!(
+        get_response.validation_results,
+        save_response.validation_results
+    );
+}
+
+/// test that we can only get a non-finalised data entry
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    shared::create_and_finalise_data_entry(&addr).await;
+
+    // get the data entry and expect 404 Not Found
+    let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 

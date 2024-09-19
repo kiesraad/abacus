@@ -1,10 +1,10 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
-  DataEntryResponse,
   ErrorResponse,
-  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
-  POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS,
+  SaveDataEntryResponse,
 } from "@kiesraad/api";
 
 import { electionListMockResponse, electionStatusMockResponse, getElectionMockData } from "./ElectionMockData";
@@ -60,15 +60,15 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
 );
 
 export const PollingStationDataEntryHandler = http.post<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>,
-  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
-  DataEntryResponse | ErrorResponse
+  ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  SaveDataEntryResponse | ErrorResponse
 >("/api/polling_stations/:polling_station_id/data_entries/:entry_number", async ({ request }) => {
-  let json: POLLING_STATION_DATA_ENTRY_REQUEST_BODY;
+  let json: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
 
   try {
     json = await request.json();
-    const response: DataEntryResponse = {
+    const response: SaveDataEntryResponse = {
       validation_results: {
         errors: [],
         warnings: [],
@@ -304,14 +304,14 @@ export const PollingStationDataEntryHandler = http.post<
 
 // delete data entry handler
 export const PollingStationDataEntryDeleteHandler = http.delete<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>
+  ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
 >("/api/polling_stations/:polling_station_id/data_entries/:entry_number", () => {
   return HttpResponse.text(null, { status: 204 });
 });
 
 // finalise data entry handler
 export const PollingStationDataEntryFinaliseHandler = http.post<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>
+  ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
 >("/api/polling_stations/:polling_station_id/data_entries/:entry_number/finalise", () => {
   return HttpResponse.text(null, { status: 200 });
 });

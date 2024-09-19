@@ -4,11 +4,11 @@ import {
   addValidationResultToFormState,
   ApiError,
   ApiResponseStatus,
-  DataEntryResponse,
   Election,
   isGlobalValidationResult,
-  POLLING_STATION_DATA_ENTRY_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   PollingStationResults,
+  SaveDataEntryResponse,
   useApi,
   ValidationResult,
   VotersRecounts,
@@ -141,7 +141,7 @@ export function PollingStationFormController({
   defaultFormState = {},
   defaultCurrentForm = null,
 }: PollingStationFormControllerProps) {
-  const request_path: POLLING_STATION_DATA_ENTRY_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+  const request_path: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
 
   const temporaryCache = React.useRef<TemporaryCache | null>(null);
 
@@ -372,7 +372,7 @@ export function PollingStationFormController({
       setApiError(response);
       throw new Error("Failed to save data entry");
     }
-    const data = response.data as DataEntryResponse;
+    const data = response.data as SaveDataEntryResponse;
     setApiError(null);
 
     // update form state based on response

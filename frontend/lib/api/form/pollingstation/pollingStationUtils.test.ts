@@ -230,7 +230,7 @@ describe("PollingStationUtils", () => {
     expect(hasOnlyGlobalValidationResults(mixedResults)).toBe(false);
   });
 
-  test("getErrorsAndWarnings errors and clientWarnings", () => {
+  test("getErrorsAndWarnings errors", () => {
     const errors: ValidationResult[] = [
       {
         code: "F201",
@@ -270,11 +270,11 @@ describe("PollingStationUtils", () => {
       ]),
     );
 
-    //warnings should not be added if errors (excluding client warnings)
+    //warnings should not be added if errors
     expect(errorsAndWarnings.get("blank_votes_count")?.warnings.length).toBe(0);
   });
 
-  test("getErrorsAndWarnings warnings and clientWarnings", () => {
+  test("getErrorsAndWarnings warnings", () => {
     const errors: ValidationResult[] = [];
 
     const warnings: ValidationResult[] = [

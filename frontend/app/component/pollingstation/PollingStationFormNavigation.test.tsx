@@ -170,7 +170,7 @@ describe("PollingStationFormNavigation", () => {
       //TODO: check these tests after determining what should be blocked
       expect(
         blocker({
-          currentLocation: { pathname: "/elections/1/data-entry/1/numbers" },
+          currentLocation: { pathname: "/elections/1/data-entry/1/voters-and-votes" },
           nextLocation: { pathname: "/elections/1/data-entry/1/differences" },
         }),
       ).toBe(false);

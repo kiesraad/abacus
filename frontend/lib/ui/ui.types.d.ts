@@ -8,4 +8,6 @@ export type ValidationResultType = "errors" | "warnings";
 export enum KeyboardKey {
   Enter,
   Shift,
+  Down,
+  Up,
 }

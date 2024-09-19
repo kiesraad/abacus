@@ -9,101 +9,30 @@ export interface InputGridProps {
   children: React.ReactNode;
 }
 
-type InputEntry = {
-  el: HTMLInputElement;
-  trEl: HTMLTableRowElement;
-  active?: boolean;
-};
-
 export function InputGrid({ zebra, children }: InputGridProps) {
   const ref = React.useRef<HTMLTableElement>(null);
-  const inputList = React.useRef<InputEntry[]>([]);
-
-  const moveFocus = React.useCallback((dir: number, toLastIndex?: boolean) => {
-    let activeIndex = inputList.current.findIndex((input) => input.active);
-    if (activeIndex === -1) {
-      activeIndex = 0;
-    }
-    let targetIndex = activeIndex + dir;
-    if (toLastIndex) {
-      targetIndex = inputList.current.length - 1;
-    }
-    if (targetIndex < 0) {
-      targetIndex = inputList.current.length - 1;
-    } else if (targetIndex >= inputList.current.length) {
-      targetIndex = 0;
-    }
-
-    const cur = inputList.current[activeIndex];
-    const next = inputList.current[targetIndex];
-
-    if (cur && next) {
-      cur.el.blur();
-      next.el.focus();
-      setTimeout(() => {
-        next.el.select();
-      }, 1);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "ArrowUp":
-          moveFocus(-1);
-          break;
-        case "ArrowDown":
-          if (event.shiftKey) {
-            moveFocus(1, true);
-          } else {
-            moveFocus(1);
-          }
-
-          break;
-        case "Enter":
-          moveFocus(1);
-          break;
-        default:
-          break;
-      }
-    };
-
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [moveFocus]);
 
   const handleFocus = React.useCallback((event: FocusEvent) => {
     // Handle focus event
     if (event.target) {
       const el = event.target as HTMLElement;
-      const entry = inputList.current.find((input) => input.el.id === el.id);
-      if (entry) {
-        entry.active = true;
-        domtoren(entry.trEl).addClass("focused");
-      }
+      const trEl = domtoren(el).closest("tr").el() as HTMLTableRowElement;
+      domtoren(trEl).addClass("focused");
     }
   }, []);
 
   const handleBlur = React.useCallback((event: FocusEvent) => {
     if (event.target) {
       const el = event.target as HTMLElement;
-      const entry = inputList.current.find((input) => input.el.id === el.id);
-      if (entry) {
-        entry.active = false;
-        domtoren(entry.trEl).removeClass("focused");
-      }
+      const trEl = domtoren(el).closest("tr").el() as HTMLTableRowElement;
+      domtoren(trEl).removeClass("focused");
     }
   }, []);
 
   React.useEffect(() => {
     const tableEl = ref.current;
     if (tableEl) {
-      inputList.current = [];
       tableEl.querySelectorAll("input").forEach((input) => {
-        const trEl = domtoren(input).closest("tr").el() as HTMLTableRowElement;
-        inputList.current.push({ el: input, trEl });
         input.addEventListener("focus", handleFocus);
         input.addEventListener("blur", handleBlur);
       });

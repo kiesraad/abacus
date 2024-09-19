@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
@@ -10,7 +11,12 @@ export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { election } = useElection();
-  const { statuses } = useElectionStatus();
+  const { statuses, refetch } = useElectionStatus();
+
+  // re-fetch statuses when component mounts
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const showDataEntrySavedAlert = location.hash === "#data-entry-saved";
 

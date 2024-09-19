@@ -7,7 +7,6 @@ import {
   AnyFormReference,
   ClientValidationResult,
   currentFormHasChanges,
-  FieldValidationResult,
   FormSection,
   formSectionComplete,
   getErrorsAndWarnings,
@@ -260,14 +259,7 @@ describe("PollingStationUtils", () => {
       },
     ];
 
-    const clientWarnings: FieldValidationResult[] = [
-      {
-        code: "W202",
-        id: "blank_votes_count",
-      },
-    ];
-
-    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, clientWarnings);
+    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings);
     expect(errorsAndWarnings.get("blank_votes_count")).toBeDefined();
     expect(errorsAndWarnings.get("blank_votes_count")?.errors).toEqual(
       expect.arrayContaining([
@@ -279,15 +271,7 @@ describe("PollingStationUtils", () => {
     );
 
     //warnings should not be added if errors (excluding client warnings)
-    expect(errorsAndWarnings.get("blank_votes_count")?.warnings.length).toBe(1);
-    expect(errorsAndWarnings.get("blank_votes_count")?.warnings).toEqual(
-      expect.arrayContaining([
-        {
-          code: "W202",
-          id: "blank_votes_count",
-        },
-      ]),
-    );
+    expect(errorsAndWarnings.get("blank_votes_count")?.warnings.length).toBe(0);
   });
 
   test("getErrorsAndWarnings warnings and clientWarnings", () => {
@@ -300,24 +284,13 @@ describe("PollingStationUtils", () => {
       },
     ];
 
-    const clientWarnings: FieldValidationResult[] = [
-      {
-        code: "W202",
-        id: "blank_votes_count",
-      },
-    ];
-
-    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, clientWarnings);
+    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings);
     expect(errorsAndWarnings.get("blank_votes_count")).toBeDefined();
     expect(errorsAndWarnings.get("blank_votes_count")?.errors.length).toBe(0);
     expect(errorsAndWarnings.get("blank_votes_count")?.warnings).toEqual(
       expect.arrayContaining([
         {
           code: "W201",
-          id: "blank_votes_count",
-        },
-        {
-          code: "W202",
           id: "blank_votes_count",
         },
       ]),

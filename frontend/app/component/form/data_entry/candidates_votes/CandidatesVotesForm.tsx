@@ -13,7 +13,7 @@ import {
   KeyboardKey,
   KeyboardKeys,
 } from "@kiesraad/ui";
-import { candidateNumberFromId, usePositiveNumberInputMask } from "@kiesraad/util";
+import { candidateNumberFromId, deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
 
@@ -31,7 +31,6 @@ export interface CandidatesVotesFormProps {
 }
 
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
-  const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
 
   const _IGNORE_WARNINGS_ID = `candidates_votes_form_ignore_warnings_${group.number}`;
@@ -51,15 +50,15 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     for (const el of elements["candidatevotes[]"]) {
       candidate_votes.push({
         number: candidateNumberFromId(el.id),
-        votes: deformat(el.value),
+        votes: deformatNumber(el.value),
       });
     }
     return {
       number: group.number,
-      total: deformat(elements.total.value),
+      total: deformatNumber(elements.total.value),
       candidate_votes: candidate_votes,
     };
-  }, [deformat, group]);
+  }, [group]);
 
   const getIgnoreWarnings = React.useCallback(() => {
     const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement | null;
@@ -86,7 +85,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     }
   }, [hasChanges, _IGNORE_WARNINGS_ID]);
 
-  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings);
 
   React.useEffect(() => {
     if (isSaved) {
@@ -128,8 +127,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
     warningsAccepted: getIgnoreWarnings(),
-    inputProps: register(),
-    format,
   };
 
   return (
@@ -173,7 +170,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             name="total"
             id="total"
             title={`Totaal lijst ${group.number}`}
-            defaultValue={format(sectionValues?.total || "")}
+            defaultValue={sectionValues?.total || ""}
             isListTotal
             {...defaultProps}
           />

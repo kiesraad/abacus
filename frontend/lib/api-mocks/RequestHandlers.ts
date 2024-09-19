@@ -8,7 +8,6 @@ import {
 } from "@kiesraad/api";
 
 import { electionListMockResponse, electionStatusMockResponse, getElectionMockData } from "./ElectionMockData";
-import { getPollingStationListMockResponse } from "./PollingStationMockData";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -303,15 +302,6 @@ export const PollingStationDataEntryHandler = http.post<
   }
 });
 
-export const PollingStationListRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
-  "/api/elections/:election_id/polling_stations",
-  ({ params }) => {
-    return HttpResponse.json(getPollingStationListMockResponse(Number(params.election_id)), {
-      status: 200,
-    });
-  },
-);
-
 // delete data entry handler
 export const PollingStationDataEntryDeleteHandler = http.delete<
   ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>
@@ -332,7 +322,6 @@ export const handlers: HttpHandler[] = [
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationDataEntryHandler,
-  PollingStationListRequestHandler,
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
 ];

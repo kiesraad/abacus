@@ -1,11 +1,9 @@
 import { useMemo } from "react";
 
-import { usePollingStationList } from "@kiesraad/api";
+import { PollingStation } from "@kiesraad/api";
 import { parsePollingStationNumber } from "@kiesraad/util";
 
-export function usePollingStation(pollingStationId: string | undefined) {
-  const { pollingStations, pollingStationsLoading } = usePollingStationList();
-
+export function usePollingStation(pollingStationId: string | undefined, pollingStations: PollingStation[]) {
   const pollingStation = useMemo(() => {
     const parsedStationId = parsePollingStationNumber(pollingStationId ?? "0");
     return pollingStations.find((ps) => ps.id === parsedStationId);
@@ -13,6 +11,5 @@ export function usePollingStation(pollingStationId: string | undefined) {
 
   return {
     pollingStation,
-    loading: pollingStationsLoading,
   };
 }

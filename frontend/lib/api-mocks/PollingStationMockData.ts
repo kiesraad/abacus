@@ -1,4 +1,4 @@
-import { PollingStation, PollingStationListResponse } from "@kiesraad/api";
+import { PollingStation } from "@kiesraad/api";
 
 export const pollingStationMockData: PollingStation = {
   id: 1,
@@ -14,25 +14,21 @@ export const pollingStationMockData: PollingStation = {
   locality: "Den Haag",
 };
 
-export const getPollingStationListMockResponse = (election_id: number): PollingStationListResponse => {
-  return {
-    polling_stations: [
-      { ...pollingStationMockData, election_id },
-      {
-        id: 2,
-        election_id,
-        name: "Testplek",
-        number: 34,
-        number_of_voters: 1000,
-        polling_station_type: "Bijzonder",
-        street: "Teststraat",
-        house_number: "2",
-        house_number_addition: "b",
-        postal_code: "1234 QY",
-        locality: "Testdorp",
-      },
-    ],
-  };
+export const getPollingStationMockData = (election_id: number): PollingStation[] => {
+  return [
+    { ...pollingStationMockData, election_id },
+    {
+      id: 2,
+      election_id,
+      name: "Testplek",
+      number: 34,
+      number_of_voters: 1000,
+      polling_station_type: "Bijzonder",
+      street: "Teststraat",
+      house_number: "2",
+      house_number_addition: "b",
+      postal_code: "1234 QY",
+      locality: "Testdorp",
+    },
+  ];
 };
-
-export const pollingStationsMockResponse: PollingStationListResponse = getPollingStationListMockResponse(1);

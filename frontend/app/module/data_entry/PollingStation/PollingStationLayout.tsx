@@ -11,14 +11,10 @@ import { Badge, PageTitle, PollingStationNumber, WorkStationNumber } from "@kies
 import { usePollingStationStatus } from "@kiesraad/util";
 
 export function PollingStationLayout() {
-  const { election } = useElection();
+  const { election, pollingStations } = useElection();
   const { pollingStationId } = useParams();
-  const { pollingStation, loading } = usePollingStation(pollingStationId);
+  const { pollingStation } = usePollingStation(pollingStationId, pollingStations);
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
-
-  if (loading) {
-    return null;
-  }
 
   if (!pollingStation) {
     throw Error("Polling station not found");

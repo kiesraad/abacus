@@ -19,12 +19,12 @@ export function ElectionStatusProvider({ children, electionId }: ElectionStatusP
     election_id: electionId,
   });
 
-  if (data === null) {
-    return null;
-  }
-
   if (error) {
     throw new Error("Could not fetch election statuses");
+  }
+
+  if (data === null) {
+    return null;
   }
 
   return (

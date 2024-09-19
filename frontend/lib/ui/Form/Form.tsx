@@ -44,7 +44,11 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
       if (next) {
         next.focus();
         setTimeout(() => {
-          next.select();
+          if (next.type === "radio") {
+            next.checked = true;
+          } else {
+            next.select();
+          }
         }, 1);
       }
     } else {
@@ -54,6 +58,7 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      event.preventDefault();
       switch (event.key) {
         case "ArrowUp":
           if (event.shiftKey) {

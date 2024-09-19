@@ -88,7 +88,7 @@ const votesFieldIds = {
 };
 
 const recountFieldIds = {
-  pollcardRecount: "poll_card_recount",
+  pollCardRecount: "poll_card_recount",
   proxyCertificateRecount: "proxy_certificate_recount",
   voterCardRecount: "voter_card_recount",
   totalAdmittedVotersRecount: "total_admitted_voters_recount",
@@ -364,7 +364,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
 
       const expectedInvalidFieldIds = [
-        recountFieldIds.pollcardRecount,
+        recountFieldIds.pollCardRecount,
         recountFieldIds.proxyCertificateRecount,
         recountFieldIds.voterCardRecount,
         recountFieldIds.totalAdmittedVotersRecount,
@@ -618,7 +618,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.votesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
-        recountFieldIds.pollcardRecount,
+        recountFieldIds.pollCardRecount,
         recountFieldIds.proxyCertificateRecount,
         recountFieldIds.voterCardRecount,
       ];
@@ -738,7 +738,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.votesCandidatesCount,
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
-        recountFieldIds.pollcardRecount,
+        recountFieldIds.pollCardRecount,
         recountFieldIds.proxyCertificateRecount,
         recountFieldIds.voterCardRecount,
       ];
@@ -825,7 +825,7 @@ describe("Test VotersAndVotesForm", () => {
         votesFieldIds.blankVotesCount,
         votesFieldIds.invalidVotesCount,
         votesFieldIds.totalVotesCastCount,
-        recountFieldIds.pollcardRecount,
+        recountFieldIds.pollCardRecount,
         recountFieldIds.proxyCertificateRecount,
         recountFieldIds.voterCardRecount,
         recountFieldIds.totalAdmittedVotersRecount,

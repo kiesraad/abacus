@@ -5,6 +5,7 @@ import { Election, PollingStation, useElectionDataRequest } from "@kiesraad/api"
 export interface iElectionProviderContext {
   election: Required<Election>;
   pollingStations: Required<PollingStation[]>;
+  pollingStation?: PollingStation;
 }
 
 export const ElectionProviderContext = React.createContext<iElectionProviderContext | undefined>(undefined);

@@ -15,7 +15,10 @@ export function Footer() {
         Abacus{" "}
         {gitBranch && (
           <>
-            — <a href={"https://github.com/kiesraad/abacus/tree/" + gitBranch}>{gitBranchShort}</a>
+            —{" "}
+            <a href={"https://github.com/kiesraad/abacus/tree/" + gitBranch} target="_blank">
+              {gitBranchShort}
+            </a>
           </>
         )}
       </section>
@@ -26,7 +29,9 @@ export function Footer() {
           gitDirty ? (
             <>{gitCommit}-dirty</>
           ) : (
-            <a href={"https://github.com/kiesraad/abacus/commit/" + gitCommit}>{gitCommit}</a>
+            <a href={"https://github.com/kiesraad/abacus/commit/" + gitCommit} target="_blank">
+              {gitCommit}
+            </a>
           )
         ) : (
           mode

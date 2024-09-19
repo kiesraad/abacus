@@ -45,7 +45,7 @@
         "tags": [
           "election"
         ],
-        "summary": "Get election details including its candidate list",
+        "summary": "Get election details including the election's candidate list (political groups) and its polling stations",
         "operationId": "election_details",
         "parameters": [
           {
@@ -99,7 +99,7 @@
         "tags": [
           "election"
         ],
-        "summary": "Download a generated PDF",
+        "summary": "Download a generated PDF with election results",
         "operationId": "election_download_results",
         "parameters": [
           {
@@ -155,66 +155,12 @@
         }
       }
     },
-    "/api/elections/{election_id}/polling_stations": {
-      "get": {
-        "tags": [
-          "polling_station"
-        ],
-        "summary": "List all polling stations of an election",
-        "operationId": "polling_station_list",
-        "parameters": [
-          {
-            "name": "election_id",
-            "in": "path",
-            "description": "Election database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Polling station listing successful",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PollingStationListResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Election not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/elections/{election_id}/status": {
       "get": {
         "tags": [
           "election"
         ],
-        "summary": "Get election data entry status",
+        "summary": "Get election polling stations data entry statuses",
         "operationId": "election_status",
         "parameters": [
           {
@@ -715,13 +661,20 @@
       },
       "ElectionDetailsResponse": {
         "type": "object",
-        "description": "Election details response, including the election's candidate list (political groups)",
+        "description": "Election details response, including the election's candidate list (political groups) and its polling stations",
         "required": [
-          "election"
+          "election",
+          "polling_stations"
         ],
         "properties": {
           "election": {
             "$ref": "#/components/schemas/Election"
+          },
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStation"
+            }
           }
         }
       },
@@ -742,7 +695,7 @@
       },
       "ElectionStatusResponse": {
         "type": "object",
-        "description": "Election status response",
+        "description": "Election polling stations data entry statuses response",
         "required": [
           "statuses"
         ],
@@ -873,21 +826,6 @@
           },
           "street": {
             "type": "string"
-          }
-        }
-      },
-      "PollingStationListResponse": {
-        "type": "object",
-        "description": "Polling station list response",
-        "required": [
-          "polling_stations"
-        ],
-        "properties": {
-          "polling_stations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PollingStation"
-            }
           }
         }
       },

@@ -8,7 +8,7 @@ use utoipa::ToSchema;
 
 use crate::election::repository::Elections;
 use crate::validation::ValidationResults;
-use crate::{APIError, JsonResponse};
+use crate::APIError;
 
 use self::repository::{PollingStationDataEntries, PollingStations};
 pub use self::structs::*;
@@ -186,38 +186,6 @@ pub async fn polling_station_data_entry_finalise(
     tx.commit().await?;
 
     Ok(())
-}
-
-/// Polling station list response
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct PollingStationListResponse {
-    pub polling_stations: Vec<PollingStation>,
-}
-
-/// List all polling stations of an election
-#[utoipa::path(
-    get,
-    path = "/api/elections/{election_id}/polling_stations",
-    responses(
-        (status = 200, description = "Polling station listing successful", body = PollingStationListResponse),
-        (status = 404, description = "Election not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("election_id" = u32, description = "Election database id"),
-    ),
-)]
-pub async fn polling_station_list(
-    State(polling_stations): State<PollingStations>,
-    State(elections): State<Elections>,
-    Path(election_id): Path<u32>,
-) -> Result<JsonResponse<PollingStationListResponse>, APIError> {
-    // Check if the election exists, will respond with NOT_FOUND otherwise
-    elections.get(election_id).await?;
-
-    Ok(JsonResponse(PollingStationListResponse {
-        polling_stations: polling_stations.list(election_id).await?,
-    }))
 }
 
 #[cfg(test)]

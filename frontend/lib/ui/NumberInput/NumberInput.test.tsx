@@ -38,4 +38,28 @@ describe("UI Component: number input", () => {
     expect(input).toHaveValue("12.500");
     expect(input.selectionStart).toBe(4);
   });
+
+  test("should backspace the right character", async () => {
+    render(<NumberInput id="test" defaultValue={12345} />);
+    const input: HTMLInputElement = screen.getByTestId("test");
+    const user = userEvent.setup();
+
+    input.focus();
+    //value should be 12.345
+    await user.keyboard("{arrowleft}{arrowleft}{arrowleft}");
+    await user.keyboard("{backspace}");
+    expect(input).toHaveValue("1.345");
+  });
+
+  test("should delete the right character", async () => {
+    render(<NumberInput id="test" defaultValue={12345} />);
+    const input: HTMLInputElement = screen.getByTestId("test");
+    const user = userEvent.setup();
+
+    input.focus();
+    //value should be 12.345
+    await user.keyboard("{arrowleft}{arrowleft}{arrowleft}{arrowLeft}");
+    await user.keyboard("{delete}");
+    expect(input).toHaveValue("1.245");
+  });
 });

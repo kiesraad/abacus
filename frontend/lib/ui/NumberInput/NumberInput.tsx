@@ -23,16 +23,47 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
     }
   }, []);
 
-  return <input {...props} onChange={onChange} onPaste={onPaste} id={id} name={props.name || id} />;
+  return (
+    <input
+      style={{ textAlign: "right" }}
+      {...props}
+      onChange={onChange}
+      onPaste={onPaste}
+      onKeyDown={onKeyDown}
+      id={id}
+      name={props.name || id}
+    />
+  );
 }
 
 function onChange(event: React.ChangeEvent<HTMLInputElement>) {
   let caretPosition = event.target.selectionStart;
-  const newValue = formatNumber(event.target.value);
+  const inputValue = event.target.value;
+  const newValue = formatNumber(inputValue);
+
   if (caretPosition) {
-    caretPosition += newValue.length - event.target.value.length;
+    caretPosition += newValue.length - inputValue.length;
   }
   event.target.value = formatNumber(event.target.value);
   //restore caret position
   event.target.setSelectionRange(caretPosition, caretPosition);
+}
+
+function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+  if (event.key !== "Delete" && event.key !== "Backspace") return;
+  const inputValue = event.currentTarget.value;
+  const caretPosition = event.currentTarget.selectionStart;
+  if (!caretPosition) return;
+
+  if (event.key === "Backspace") {
+    if (inputValue.charAt(caretPosition - 1) === ".") {
+      //remove an extra char
+      event.currentTarget.setSelectionRange(caretPosition - 1, caretPosition - 1);
+    }
+  } else {
+    if (inputValue.charAt(caretPosition) === ".") {
+      //remove an extra char
+      event.currentTarget.setSelectionRange(caretPosition + 1, caretPosition + 1);
+    }
+  }
 }

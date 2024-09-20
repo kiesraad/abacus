@@ -11,16 +11,14 @@ import {
   ElectionProvider,
   ElectionStatusProvider,
   PollingStationFormController,
-  PollingStationListProvider,
 } from "@kiesraad/api";
-import { electionDetailsMockResponse, pollingStationMockData, pollingStationsMockResponse } from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse, pollingStationMockData } from "@kiesraad/api-mocks";
 
 describe("PollingStationLayout", () => {
   const election = electionDetailsMockResponse.election as Required<Election>;
 
   beforeEach(() => {
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-    overrideOnce("get", "/api/elections/1/polling_stations", 200, pollingStationsMockResponse);
 
     vi.spyOn(Router, "useParams").mockReturnValue({
       electionId: election.id.toString(),
@@ -33,15 +31,13 @@ describe("PollingStationLayout", () => {
       <ElectionListProvider>
         <ElectionProvider electionId={election.id}>
           <ElectionStatusProvider electionId={election.id}>
-            <PollingStationListProvider electionId={election.id}>
-              <PollingStationFormController
-                election={election}
-                pollingStationId={pollingStationMockData.id}
-                entryNumber={1}
-              >
-                <PollingStationLayout />
-              </PollingStationFormController>
-            </PollingStationListProvider>
+            <PollingStationFormController
+              election={election}
+              pollingStationId={pollingStationMockData.id}
+              entryNumber={1}
+            >
+              <PollingStationLayout />
+            </PollingStationFormController>
           </ElectionStatusProvider>
         </ElectionProvider>
       </ElectionListProvider>,

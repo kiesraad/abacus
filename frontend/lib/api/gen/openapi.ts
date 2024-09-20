@@ -18,12 +18,6 @@ export interface ELECTION_DOWNLOAD_RESULTS_REQUEST_PARAMS {
 }
 export type ELECTION_DOWNLOAD_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_results`;
 
-// /api/elections/{election_id}/polling_stations
-export interface POLLING_STATION_LIST_REQUEST_PARAMS {
-  election_id: number;
-}
-export type POLLING_STATION_LIST_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
-
 // /api/elections/{election_id}/status
 export interface ELECTION_STATUS_REQUEST_PARAMS {
   election_id: number;
@@ -119,10 +113,11 @@ export interface Election {
 export type ElectionCategory = "Municipal";
 
 /**
- * Election details response, including the election's candidate list (political groups)
+ * Election details response, including the election's candidate list (political groups) and its polling stations
  */
 export interface ElectionDetailsResponse {
   election: Election;
+  polling_stations: PollingStation[];
 }
 
 /**
@@ -135,7 +130,7 @@ export interface ElectionListResponse {
 }
 
 /**
- * Election status response
+ * Election polling stations data entry statuses response
  */
 export interface ElectionStatusResponse {
   statuses: PollingStationStatusEntry[];
@@ -178,13 +173,6 @@ export interface PollingStation {
   polling_station_type: PollingStationType;
   postal_code: string;
   street: string;
-}
-
-/**
- * Polling station list response
- */
-export interface PollingStationListResponse {
-  polling_stations: PollingStation[];
 }
 
 /**

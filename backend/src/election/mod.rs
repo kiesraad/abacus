@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 use crate::pdf_gen::generate_pdf;
 use crate::pdf_gen::models::{ModelNa31_2Input, ModelNa31_2Summary, PdfModel};
 use crate::polling_station::repository::{PollingStationResultsEntries, PollingStations};
-use crate::polling_station::PollingStationStatusEntry;
+use crate::polling_station::{PollingStation, PollingStationStatusEntry};
 use crate::APIError;
 
 use self::repository::Elections;
@@ -24,13 +24,14 @@ pub struct ElectionListResponse {
     pub elections: Vec<Election>,
 }
 
-/// Election details response, including the election's candidate list (political groups)
+/// Election details response, including the election's candidate list (political groups) and its polling stations
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionDetailsResponse {
     pub election: Election,
+    pub polling_stations: Vec<PollingStation>,
 }
 
-/// Election status response
+/// Election polling stations data entry statuses response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionStatusResponse {
     pub statuses: Vec<PollingStationStatusEntry>,
@@ -52,7 +53,7 @@ pub async fn election_list(
     Ok(Json(ElectionListResponse { elections }))
 }
 
-/// Get election details including its candidate list
+/// Get election details including the election's candidate list (political groups) and its polling stations
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}",
@@ -67,13 +68,18 @@ pub async fn election_list(
 )]
 pub async fn election_details(
     State(elections_repo): State<Elections>,
+    State(polling_stations): State<PollingStations>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let election = elections_repo.get(id).await?;
-    Ok(Json(ElectionDetailsResponse { election }))
+    let polling_stations = polling_stations.list(id).await?;
+    Ok(Json(ElectionDetailsResponse {
+        election,
+        polling_stations,
+    }))
 }
 
-/// Get election data entry status
+/// Get election polling stations data entry statuses
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}/status",
@@ -94,7 +100,7 @@ pub async fn election_status(
     Ok(Json(ElectionStatusResponse { statuses }))
 }
 
-/// Download a generated PDF
+/// Download a generated PDF with election results
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}/download_results",

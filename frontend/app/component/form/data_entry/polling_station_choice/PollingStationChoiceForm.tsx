@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { PollingStation, usePollingStationList } from "@kiesraad/api";
+import { PollingStation, useElection } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
-import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys, Spinner } from "@kiesraad/ui";
+import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
 
 import { PollingStationSelector } from "./PollingStationSelector";
@@ -19,7 +19,7 @@ export interface PollingStationChoiceFormProps {
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
 
-  const { pollingStations, pollingStationsLoading } = usePollingStationList();
+  const { pollingStations } = useElection();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -111,14 +111,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         </summary>
         <h2 className="form_title table_title">Kies het stembureau</h2>
         {(() => {
-          if (pollingStationsLoading) {
-            return (
-              <div className="flex">
-                <Icon icon={<Spinner size="lg" />} />
-                aan het laden …
-              </div>
-            );
-          } else if (pollingStations.length === 0) {
+          if (pollingStations.length === 0) {
             return <Alert type={"error"}>Geen stembureaus gevonden</Alert>;
           } else {
             return <PollingStationsList pollingStations={pollingStations} />;

@@ -7,6 +7,8 @@ import {
   PoliticalGroup,
 } from "@kiesraad/api";
 
+import { getPollingStationMockData } from "./PollingStationMockData.ts";
+
 export const politicalGroupMockData: PoliticalGroup = {
   number: 1,
   name: "Vurige Vleugels Partij",
@@ -367,7 +369,7 @@ export const getElectionMockData = (election_id: number): Required<ElectionDetai
   } else {
     election.political_groups = politicalGroupsMockData;
   }
-  return { election: election };
+  return { election: election, polling_stations: getPollingStationMockData(election_id) };
 };
 
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData(1);

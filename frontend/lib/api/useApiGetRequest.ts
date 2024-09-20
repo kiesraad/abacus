@@ -10,10 +10,6 @@ export type UseApiGetRequestReturn<T> = {
   refetch: () => void;
 };
 
-export interface UseApiGetRequestParams {
-  path: string;
-}
-
 export function useApiGetRequest<T>(path: string): UseApiGetRequestReturn<T> {
   const { client } = useApi();
   const [data, setData] = React.useState<T | null>(null);

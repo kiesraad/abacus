@@ -24,15 +24,7 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
   }, []);
 
   return (
-    <input
-      style={{ textAlign: "right" }}
-      {...props}
-      onChange={onChange}
-      onPaste={onPaste}
-      onKeyDown={onKeyDown}
-      id={id}
-      name={props.name || id}
-    />
+    <input {...props} onChange={onChange} onPaste={onPaste} onKeyDown={onKeyDown} id={id} name={props.name || id} />
   );
 }
 

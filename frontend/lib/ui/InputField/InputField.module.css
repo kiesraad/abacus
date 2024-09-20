@@ -71,17 +71,17 @@
     background: var(--base-white);
     &:hover,
     &:focus {
-      border: solid var(--blue-dark-400);
+      border: solid var(--border-color-focus);
       outline: none;
     }
     &:focus {
       :global(.large) &,
       :global(.text-area) & {
-        box-shadow: 0 0 0 4px var(--blue-dark-100);
+        box-shadow: 0 0 0 4px var(--shadow-color-focus);
       }
       :global(.medium) &,
       :global(.small) & {
-        box-shadow: 0 0 0 3px var(--blue-dark-100);
+        box-shadow: 0 0 0 3px var(--shadow-color-focus);
       }
     }
     :global(.error) & {

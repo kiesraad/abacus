@@ -28,9 +28,8 @@
     justify-content: center;
 
     &:focus {
-      outline: none;
-      box-shadow: 0 0 1px 1px rgba(66, 210, 243, 0.4);
-      border: 1px solid var(--blue-dark-400);
+      border: 2px solid var(--border-color-focus);
+      box-shadow: 0 0 0 4px var(--shadow-color-focus);
     }
 
     &:global(.checked) {

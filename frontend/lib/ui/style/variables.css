@@ -42,13 +42,20 @@
   --text-color-header: #101828;
   --text-color-body: #344054;
 
-  --button-color-primary: var(--base-brand-blue);
-  --button-color-primary-hover: #384c73;
+  --button-color-primary: var(--base-dark-blue);
+  --button-color-primary-hover: #00447a;
   --button-color-primary-focus: var(--base-dark-blue);
+  --button-color-primary-active: #00254e;
+  --button-color-secondary: var(--base-white);
+  --button-color-secondary-hover: var(--bg-gray);
+  --button-color-secondary-focus: var(--base-white);
+  --button-color-secondary-active: var(--gray-200);
   --button-color-disabled: #b3b3b3;
   --button-color-bg-disabled: #f2f2f2;
 
+  --shadow-color-focus: #d1e0ff;
   --border-color-default: #d0d5dd;
+  --border-color-focus: #528bff;
 
   --color-error: #f04438;
   --color-error-border: #fda29b;
@@ -100,8 +107,6 @@
 
   --blue-light-100: #e0f2fe;
   --blue-light-800: #065986;
-  --blue-dark-100: #d1e0ff;
-  --blue-dark-400: #528bff;
   --menu-updates: #004eeb;
   --link-default: #155eef;
   --link-hover: #004eeb;

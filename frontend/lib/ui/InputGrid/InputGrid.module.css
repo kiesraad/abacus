@@ -57,7 +57,7 @@
           font-style: normal;
           font-feature-settings: "ss09" on;
           &:focus {
-            border: 3px solid var(--blue-dark-400, #528bff);
+            border: 3px solid var(--border-color-focus);
             outline: none;
           }
         }

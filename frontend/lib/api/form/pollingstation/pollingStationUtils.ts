@@ -296,7 +296,10 @@ function sortFormSections(a: FormSection, b: FormSection): number {
   return 0;
 }
 
-export function getInitialValues(election: Required<Election>, defaultValues?: Partial<PollingStationValues>) {
+export function getInitialValues(
+  election: Required<Election>,
+  defaultValues?: Partial<PollingStationValues>,
+): PollingStationValues {
   return {
     recounted: undefined,
     voters_counts: {
@@ -333,7 +336,7 @@ export function getInitialValues(election: Required<Election>, defaultValues?: P
   };
 }
 
-export function getInitialFormState(election: Required<Election>, defaultFormState?: Partial<FormState>) {
+export function getInitialFormState(election: Required<Election>, defaultFormState?: Partial<FormState>): FormState {
   const result: FormState = {
     active: INITIAL_FORM_SECTION_ID,
     current: INITIAL_FORM_SECTION_ID,

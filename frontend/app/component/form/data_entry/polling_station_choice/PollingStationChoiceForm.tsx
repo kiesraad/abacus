@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { PollingStation, useElection } from "@kiesraad/api";
+import { PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
@@ -16,14 +16,19 @@ export interface PollingStationChoiceFormProps {
   anotherEntry?: boolean;
 }
 
+const INVALID_POLLING_STATION_ALERT: string = "Voer een geldig nummer van een stembureau in om te beginnen";
+const DEFINITIVE_POLLING_STATION_ALERT: string =
+  "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden";
+
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
 
   const { pollingStations } = useElection();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
-  const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(undefined);
+  const electionStatuses = useElectionStatus();
 
   const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
     setLoading(false);
@@ -38,17 +43,24 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
   const handleSubmit = () => {
     if (pollingStationNumber === "") {
-      setShowAlert(true);
+      setAlert(INVALID_POLLING_STATION_ALERT);
       return;
     }
 
     const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
+    const pollingStationStatus = electionStatuses.statuses.find((status) => status.id === pollingStation?.id);
+
+    if (pollingStationStatus?.status === "definitive") {
+      setAlert(DEFINITIVE_POLLING_STATION_ALERT);
+      setLoading(false);
+      return;
+    }
 
     if (pollingStation) {
       navigate(`./${pollingStation.id}`);
     } else {
-      setShowAlert(true);
+      setAlert(INVALID_POLLING_STATION_ALERT);
       setLoading(false);
       return;
     }
@@ -71,7 +83,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         setLoading={setLoading}
         currentPollingStation={currentPollingStation}
         setCurrentPollingStation={setCurrentPollingStation}
-        setShowAlert={setShowAlert}
+        setAlert={setAlert}
         handleSubmit={handleSubmit}
       />
       <p className="md">
@@ -79,12 +91,12 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         <br />
         Dan kan je beginnen. Klopt de naam niet? Overleg met de coördinator.
       </p>
-      {showAlert && (
+      {alert && (
         <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
           <span className={cls.icon}>
             <Icon icon={<IconError aria-label={"bevat een fout"} />} color="error" />
           </span>
-          <span>Voer een geldig nummer van een stembureau in om te beginnen</span>
+          <span>{alert}</span>
         </div>
       )}
       <BottomBar type="form">

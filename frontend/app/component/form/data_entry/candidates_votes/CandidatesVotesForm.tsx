@@ -134,7 +134,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`} skip={[_IGNORE_WARNINGS_ID]}>
-      <h2>
+      <h2 id="form-title" tabIndex={-1}>
         Lijst {group.number} - {group.name}
       </h2>
       {isSaved && hasValidationError && (
@@ -162,7 +162,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 title={`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`}
                 addSeparator={addSeparator}
                 defaultValue={defaultValue}
-                isFocused={index === 0}
                 {...defaultProps}
               />
             );

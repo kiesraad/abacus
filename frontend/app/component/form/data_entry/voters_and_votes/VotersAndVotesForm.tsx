@@ -160,7 +160,9 @@ export function VotersAndVotesForm() {
 
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form" skip={[_IGNORE_WARNINGS_ID]}>
-      <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
+      <h2 id="form-title" tabIndex={-1}>
+        Toegelaten kiezers en uitgebrachte stemmen
+      </h2>
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
@@ -180,7 +182,6 @@ export function VotersAndVotesForm() {
             id="poll_card_count"
             title="Stempassen"
             defaultValue={sectionValues.voters_counts.poll_card_count}
-            isFocused
             {...defaultProps}
           />
           <InputGridRow

@@ -50,9 +50,15 @@ export function RecountedForm() {
     }
   }, [isSaved]);
 
+  React.useEffect(() => {
+    document.getElementById("form-title")?.focus();
+  }, []);
+
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form">
-      <h2>Is er herteld?</h2>
+      <h2 id="form-title" tabIndex={-1}>
+        Is er herteld?
+      </h2>
       {hasValidationError && (
         <Feedback id="feedback-error" type="error" data={["F101"]}>
           <ul>

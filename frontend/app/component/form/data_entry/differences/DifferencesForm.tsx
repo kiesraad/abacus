@@ -136,7 +136,9 @@ export function DifferencesForm() {
 
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id="differences_form" skip={[_IGNORE_WARNINGS_ID]}>
-      <h2>Verschillen tussen toegelaten kiezers en uitgebrachte stemmen</h2>
+      <h2 id="form-title" tabIndex={-1}>
+        Verschillen tussen toegelaten kiezers en uitgebrachte stemmen
+      </h2>
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
@@ -156,7 +158,6 @@ export function DifferencesForm() {
             id="more_ballots_count"
             title="Stembiljetten méér geteld"
             defaultValue={sectionValues.differences_counts.more_ballots_count}
-            isFocused
             {...defaultProps}
           />
           <InputGridRow

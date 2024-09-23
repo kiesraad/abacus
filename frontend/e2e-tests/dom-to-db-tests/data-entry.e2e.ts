@@ -1,6 +1,7 @@
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 import { formatNumber } from "e2e-tests/e2e-test-utils";
 import {
+  AbortInputModal,
   CandidatesListPage,
   CheckAndSavePage,
   DifferencesPage,
@@ -728,5 +729,79 @@ test.describe("navigation", () => {
       await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
       await expect(differencesPage.navPanel.listIcon(1)).toHaveAccessibleName("bevat een fout");
     });
+  });
+});
+
+test.describe("resume data entry flow", () => {
+  const fillFirstTwoPagesAndAbort = async (page: Page) => {
+    await page.goto("/elections/1/data-entry/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await recountedPage.checkNoAndClickNext();
+
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await votersAndVotesPage.heading.waitFor();
+    const voters: VotersCounts = {
+      poll_card_count: 99,
+      proxy_certificate_count: 1,
+      voter_card_count: 0,
+      total_admitted_voters_count: 100,
+    };
+    const votes: VotesCounts = {
+      votes_candidates_count: 100,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 100,
+    };
+    await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.heading).toBeVisible();
+
+    await differencesPage.abortInput.click();
+
+    return new AbortInputModal(page);
+  };
+
+  test("resuming data entry shows previous data", async ({ page }) => {
+    const abortInputModal = await fillFirstTwoPagesAndAbort(page);
+    await abortInputModal.saveInput.click();
+
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
+
+    await page.goto("/elections/1/data-entry/1/recounted");
+
+    const recountedPage = new RecountedPage(page);
+    await expect(recountedPage.no).toBeChecked();
+    await recountedPage.next.click();
+
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await expect(votersAndVotesPage.heading).toBeVisible();
+
+    await expect(votersAndVotesPage.pollCardCount).toHaveValue("99");
+    await expect(votersAndVotesPage.proxyCertificateCount).toHaveValue("1");
+    await expect(votersAndVotesPage.voterCardCount).toBeEmpty();
+    await expect(votersAndVotesPage.totalAdmittedVotersCount).toHaveValue("100");
+
+    await expect(votersAndVotesPage.votesCandidatesCount).toHaveValue("100");
+    await expect(votersAndVotesPage.blankVotesCount).toBeEmpty();
+    await expect(votersAndVotesPage.invalidVotesCount).toBeEmpty();
+    await expect(votersAndVotesPage.totalVotesCastCount).toHaveValue("100");
+  });
+
+  test("deleting data entry doesn't show previous data", async ({ page }) => {
+    const abortInputModal = await fillFirstTwoPagesAndAbort(page);
+    await abortInputModal.discardInput.click();
+
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.heading).toBeVisible();
+
+    await page.goto("/elections/1/data-entry/1/recounted");
+
+    // recounted page should have no option selected
+    const recountedPage = new RecountedPage(page);
+    await expect(recountedPage.yes).not.toBeChecked();
+    await expect(recountedPage.no).not.toBeChecked();
   });
 });

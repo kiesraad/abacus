@@ -30,7 +30,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
   //one time flag to prioritize user navigation over controller navigation
   const overrideControllerNavigation = React.useRef<string | null>(null);
 
-  const isPartOfInputFlow = React.useCallback(
+  const isPartOfDataEntryFlow = React.useCallback(
     (pathname: string) => pathname.startsWith(`/elections/${election.id}/data-entry/${pollingStationId}/`),
     [election, pollingStationId],
   );
@@ -53,8 +53,8 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
         return false;
       }
 
-      //check if nextLocation is outside the input flow
-      if (status.current !== "aborted" && !isPartOfInputFlow(nextLocation.pathname)) {
+      //check if nextLocation is outside the data entry flow
+      if (status.current !== "aborted" && !isPartOfDataEntryFlow(nextLocation.pathname)) {
         return true;
       }
 
@@ -73,7 +73,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
 
       return false;
     },
-    [status, formState, currentForm, setTemporaryCache, values, isPartOfInputFlow],
+    [status, formState, currentForm, setTemporaryCache, values, isPartOfDataEntryFlow],
   );
 
   const blocker = useBlocker(shouldBlock);
@@ -125,7 +125,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
     <>
       {blocker.state === "blocked" && (
         <>
-          {!isPartOfInputFlow(blocker.location.pathname) ? (
+          {!isPartOfDataEntryFlow(blocker.location.pathname) ? (
             <AbortDataEntryModal
               onCancel={() => {
                 blocker.reset();

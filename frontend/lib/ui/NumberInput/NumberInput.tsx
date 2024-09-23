@@ -42,7 +42,8 @@ function onChange(event: React.ChangeEvent<HTMLInputElement>) {
 }
 
 function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-  if (event.key !== "Delete" && event.key !== "Backspace") return;
+  if (event.key !== "Delete" && event.key !== "Backspace" && event.key !== "ArrowLeft" && event.key !== "ArrowRight")
+    return;
   const inputValue = event.currentTarget.value;
   const caretPosition = event.currentTarget.selectionStart;
   if (!caretPosition) return;
@@ -52,9 +53,19 @@ function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
       //remove an extra char
       event.currentTarget.setSelectionRange(caretPosition - 1, caretPosition - 1);
     }
-  } else {
+  } else if (event.key === "Delete") {
     if (inputValue.charAt(caretPosition) === ".") {
       //remove an extra char
+      event.currentTarget.setSelectionRange(caretPosition + 1, caretPosition + 1);
+    }
+  } else if (event.key === "ArrowLeft") {
+    if (inputValue.charAt(caretPosition - 2) === ".") {
+      //skip the dot
+      event.currentTarget.setSelectionRange(caretPosition - 1, caretPosition - 1);
+    }
+  } else {
+    if (inputValue.charAt(caretPosition + 1) === ".") {
+      //skip the dot
       event.currentTarget.setSelectionRange(caretPosition + 1, caretPosition + 1);
     }
   }

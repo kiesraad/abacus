@@ -58,7 +58,7 @@ describe("UI Component: number input", () => {
 
     input.focus();
     //value should be 12.345
-    await user.keyboard("{arrowleft}{arrowleft}{arrowleft}{arrowLeft}");
+    await user.keyboard("{arrowleft}{arrowleft}{arrowleft}");
     await user.keyboard("{delete}");
     expect(input).toHaveValue("1.245");
   });

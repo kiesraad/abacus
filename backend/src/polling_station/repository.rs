@@ -73,9 +73,13 @@ impl PollingStations {
             PollingStationStatusEntry,
             r#"
 SELECT p.id AS "id: u32",
-CASE WHEN r.polling_station_id IS NULL THEN 'FirstEntry' ELSE 'Definitive' END AS "status!: _"
+CASE
+  WHEN de.polling_station_id IS NOT NULL THEN 'FirstEntryInProgress'
+  WHEN r.polling_station_id IS NOT NULL THEN 'Definitive'
+  ELSE 'FirstEntry' END AS "status!: _"
 FROM polling_stations AS p
 LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
+LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
 WHERE election_id = $1
 "#,
             election_id

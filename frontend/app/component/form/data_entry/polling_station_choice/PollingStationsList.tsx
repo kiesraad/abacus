@@ -28,6 +28,10 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
       <tbody>
         {pollingStations.map((pollingStation: PollingStation) => {
           const pollingStationStatus = electionStatus.statuses.find((status) => status.id === pollingStation.id);
+          if (pollingStationStatus?.status === "definitive") {
+            return null;
+          }
+
           return (
             <tr onClick={handleRowClick(pollingStation.id)} key={pollingStation.number}>
               <td width="6.5rem" className="number">

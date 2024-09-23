@@ -155,8 +155,10 @@ describe("Test PollingStationChoiceForm", () => {
       const pollingStationList = screen.getByTestId("polling_station_list");
       expect(within(pollingStationList).getByText("33")).toBeVisible();
       expect(within(pollingStationList).getByText("Op Rolletjes")).toBeVisible();
-      expect(within(pollingStationList).getByText("34")).toBeVisible();
-      expect(within(pollingStationList).getByText("Testplek")).toBeVisible();
+
+      // These should not exist, as they are finalised
+      expect(within(pollingStationList).queryByText("34")).toBe(null);
+      expect(within(pollingStationList).queryByText("Testplek")).toBe(null);
     });
 
     test("Polling station list no stations", async () => {

@@ -21,24 +21,51 @@
     height: 1.25rem;
     border-radius: 0.375rem;
     padding: 0;
-    border: 1px solid var(--border-color-default);
-    background-color: #fff;
+    border: 1px solid var(--checkbox-color-border);
+    background: var(--checkbox-color-bg-default);
     display: flex;
     align-items: center;
     justify-content: center;
 
+    &:has(+ input:active) {
+      border-width: 2px;
+      background: var(--checkbox-color-bg-active);
+    }
+
+    &:hover,
+    &:has(+ input:hover) {
+      border-width: 2px;
+      background: var(--checkbox-color-bg-hover);
+    }
+
     &:has(+ input:focus),
     &:has(+ input:focus-visible) {
       outline: none;
+      background: var(--checkbox-color-bg-default);
       border: 2px solid var(--border-color-focus);
-      box-shadow: 0 0 0 4px var(--shadow-color-focus);
+      box-shadow: 0 0 0 3px var(--shadow-color-focus);
     }
 
     &:global(.checked) {
-      background-color: var(--bg-highlight);
-      border-color: var(--base-dark-blue);
+      border: none;
+      background-color: var(--checkbox-color-bg-default-checked);
       svg {
+        fill: var(--base-white);
         opacity: 1;
+      }
+      &:has(+ input:active) {
+        background: var(--checkbox-color-bg-active-checked);
+      }
+      &:hover,
+      &:has(+ input:hover) {
+        background: var(--checkbox-color-bg-hover-checked);
+      }
+      &:has(+ input:focus),
+      &:has(+ input:focus-visible) {
+        background: var(--checkbox-color-bg-focus-checked);
+        svg {
+          fill: var(--base-dark-blue);
+        }
       }
     }
 

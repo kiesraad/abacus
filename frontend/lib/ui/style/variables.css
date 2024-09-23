@@ -53,6 +53,15 @@
   --button-color-disabled: #b3b3b3;
   --button-color-bg-disabled: #f2f2f2;
 
+  --checkbox-color-border: #98a2b3;
+  --checkbox-color-bg-default: var(--base-white);
+  --checkbox-color-bg-active: var(--bg-gray);
+  --checkbox-color-bg-hover: var(--bg-gray-darker);
+  --checkbox-color-bg-default-checked: var(--button-color-primary);
+  --checkbox-color-bg-active-checked: var(--button-color-primary-active);
+  --checkbox-color-bg-hover-checked: var(--button-color-primary-hover);
+  --checkbox-color-bg-focus-checked: var(--checkbox-color-bg-default);
+
   --shadow-color-focus: #d1e0ff;
   --border-color-default: #d0d5dd;
   --border-color-focus: #528bff;

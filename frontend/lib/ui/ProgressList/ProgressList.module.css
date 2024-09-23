@@ -6,21 +6,16 @@
 
   li {
     height: 2.75rem;
-    border-radius: 0.5rem;
+    border-radius: var(--rounded-default);
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.625rem 0 0.625rem 0.75rem;
 
-    :not(&:global(.ruler)):not(&:global(.disabled)):not(&:global(.active))&:hover {
+    &:hover {
       background-color: var(--color-hover);
-    }
-
-    :not(&:global(.ruler)):not(&:global(.disabled)):not(&:global(.active))&:focus {
-      border-radius: var(--rounded-default);
-      border: 4px solid var(--shadow-color-focus);
-      padding-left: calc(0.75rem - 4px);
-      background-color: transparent;
+      &:has(label > a:focus) {
+        background-color: transparent;
+      }
     }
 
     &:global(.ruler) {
@@ -28,11 +23,15 @@
       height: 1rem;
       padding: 0;
       background-color: transparent;
+      &:hover {
+        background-color: transparent !important;
+      }
     }
 
     aside {
       display: flex;
       flex: 0 0 2rem;
+      padding: 0.625rem 0 0.625rem 0.75rem;
       width: 1.5rem;
       svg {
         width: 1.5rem; /* needed for Safari to show the svg */
@@ -45,6 +44,31 @@
       overflow: hidden;
       white-space: nowrap;
       line-height: 1.5rem;
+      margin-left: -2.5rem;
+      max-height: 2.75rem;
+      a {
+        text-decoration: none;
+        color: inherit;
+        display: inline-block;
+        width: 100%;
+        padding: 0.625rem 0.75rem 0.625rem 2.5rem;
+        vertical-align: middle;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        &:focus {
+          border-radius: var(--rounded-default);
+          border: 4px solid var(--shadow-color-focus);
+          max-height: 2.75rem;
+          padding: calc(0.625rem - 4px) calc(0.75rem - 4px) calc(0.625rem - 4px) calc(2.5rem - 4px);
+        }
+        &:global(:hover) {
+          color: inherit !important;
+        }
+      }
+      > span {
+        padding: 0.625rem 0.75rem 0.625rem 2.5rem;
+      }
     }
 
     &:global(.active) {
@@ -115,25 +139,8 @@
 
     &:global(.disabled) {
       opacity: 0.5;
-
-      a {
-        pointer-events: none;
-        cursor: default;
-      }
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
-      display: inline-block;
-      width: 100%;
-      height: 100%;
-      vertical-align: middle;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
       &:hover {
-        color: inherit !important;
+        background-color: transparent !important;
       }
     }
   }

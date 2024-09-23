@@ -19,7 +19,7 @@
   line-height: 2.75rem;
   letter-spacing: -0.045rem;
   padding: 1.125rem 1.3125rem;
-  border-radius: 0.5rem;
+  border-radius: var(--rounded-default);
   background: var(--bg-gray-darker);
   color: var(--base-brand-blue);
 }

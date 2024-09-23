@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useEffect } from "react";
 
 import {
   addValidationResultToFormState,
@@ -155,7 +154,7 @@ export function PollingStationFormController({
   const [values, setValues] = React.useState<PollingStationValues>();
 
   const initialDataRequest = useApiGetRequest<GetDataEntryResponse>(request_path);
-  useEffect(() => {
+  React.useEffect(() => {
     if (initialDataRequest.data) {
       const responseData = initialDataRequest.data;
       setValues(responseData.data);

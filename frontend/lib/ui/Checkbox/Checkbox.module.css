@@ -27,7 +27,8 @@
     align-items: center;
     justify-content: center;
 
-    &:focus {
+    &:focus,
+    &:focus-visible {
       outline: none;
       border: 2px solid var(--border-color-focus);
       box-shadow: 0 0 0 4px var(--shadow-color-focus);

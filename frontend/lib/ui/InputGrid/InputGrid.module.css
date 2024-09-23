@@ -56,7 +56,8 @@
           font-size: var(--font-size-body);
           font-style: normal;
           font-feature-settings: "ss09" on;
-          &:focus {
+          &:focus,
+          &:focus-visible {
             outline: none;
             border: 3px solid var(--border-color-focus);
           }

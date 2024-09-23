@@ -57,6 +57,7 @@
         overflow: hidden;
         white-space: nowrap;
         &:focus {
+          outline: none;
           border-radius: var(--rounded-default);
           border: 4px solid var(--shadow-color-focus);
           max-height: 2.75rem;

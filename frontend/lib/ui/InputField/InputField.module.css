@@ -71,8 +71,8 @@
     background: var(--base-white);
     &:hover,
     &:focus {
-      border: solid var(--border-color-focus);
       outline: none;
+      border: solid var(--border-color-focus);
     }
     &:focus {
       :global(.large) &,

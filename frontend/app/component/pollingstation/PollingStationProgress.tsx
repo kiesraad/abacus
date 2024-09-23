@@ -76,7 +76,7 @@ export function PollingStationProgress() {
         disabled={formState.sections.voters_votes_counts.index > currentIndex}
         active={formState.active === "voters_votes_counts"}
       >
-        {formState.active !== "voters_votes_counts" ? (
+        {formState.active !== "voters_votes_counts" && formState.sections.voters_votes_counts.index <= currentIndex ? (
           <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/voters-and-votes`}>
             Aantal kiezers en stemmen
           </Link>
@@ -91,7 +91,7 @@ export function PollingStationProgress() {
         status={menuStatusForFormSection(formState.sections.differences_counts)}
         active={formState.active === "differences_counts"}
       >
-        {formState.active !== "differences_counts" ? (
+        {formState.active !== "differences_counts" && formState.sections.differences_counts.index <= currentIndex ? (
           <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/differences`}>Verschillen</Link>
         ) : (
           <span>Verschillen</span>
@@ -110,7 +110,7 @@ export function PollingStationProgress() {
             status={menuStatusForFormSection(formSection)}
             active={formState.active === formSection.id}
           >
-            {formState.active !== formSection.id ? (
+            {formState.active !== formSection.id && formSection.index <= currentIndex ? (
               <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/list/${listId}`}>
                 Lijst {list.number} - {list.name}
               </Link>

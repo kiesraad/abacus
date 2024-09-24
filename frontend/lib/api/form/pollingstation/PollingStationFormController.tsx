@@ -80,7 +80,7 @@ export interface iPollingStationControllerContext {
   setTemporaryCache: (cache: TemporaryCache | null) => boolean;
   cache: TemporaryCache | null;
   currentForm: AnyFormReference | null;
-  submitCurrentForm: (ignoreWarnings?: boolean) => Promise<void>;
+  submitCurrentForm: (ignoreWarnings?: boolean, aborting?: boolean) => Promise<void>;
   registerCurrentForm: (form: AnyFormReference) => void;
   deleteDataEntry: () => Promise<void>;
   finaliseDataEntry: () => Promise<void>;
@@ -134,7 +134,7 @@ export const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
 
 // Status of the form controller
 // This is a type instead of an enum because of https://github.com/ArnaudBarre/eslint-plugin-react-refresh/issues/36
-export type Status = "idle" | "saving" | "deleting" | "deleted" | "finalising" | "finalised";
+export type Status = "idle" | "saving" | "deleting" | "deleted" | "finalising" | "finalised" | "aborted";
 
 export function PollingStationFormController({
   election,
@@ -234,7 +234,7 @@ export function PollingStationFormController({
     return null;
   }
 
-  const submitCurrentForm = async (ignoreWarnings = false) => {
+  const submitCurrentForm = async (ignoreWarnings = false, aborting?: boolean) => {
     // React state is fixed within one render, so we update our own copy instead of using setValues directly
     let newValues: PollingStationValues = values;
     if (currentForm.current) {
@@ -302,7 +302,7 @@ export function PollingStationFormController({
     // send data to server
     status.current = "saving";
     const response = await client.postRequest(request_path, { data: pollingStationResults });
-    status.current = "idle";
+    status.current = aborting ? "aborted" : "idle";
     if (response.status !== ApiResponseStatus.Success) {
       // TODO: #277 render custom error page
       console.error("Failed to save data entry", response);

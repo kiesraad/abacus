@@ -126,6 +126,33 @@ describe("Test PollingStationChoiceForm", () => {
       ).toBeVisible();
     });
 
+    test("Selecting a valid, but finalised polling station shows alert", async () => {
+      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+      const user = userEvent.setup();
+      render(
+        <ElectionProvider electionId={1}>
+          <ElectionStatusProvider electionId={1}>
+            <PollingStationChoiceForm anotherEntry />
+          </ElectionStatusProvider>
+        </ElectionProvider>,
+      );
+
+      const submitButton = await screen.findByRole("button", { name: "Beginnen" });
+      const pollingStation = screen.getByTestId("pollingStation");
+
+      // Test if the polling station name is shown
+      await user.type(pollingStation, "34");
+
+      // Click submit again and see that the alert appeared again
+      await user.click(submitButton);
+
+      expect(
+        within(screen.getByTestId("pollingStationSubmitFeedback")).getByText(
+          "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
+        ),
+      ).toBeVisible();
+    });
+
     test("Form displays message when searching", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
@@ -155,8 +182,10 @@ describe("Test PollingStationChoiceForm", () => {
       const pollingStationList = screen.getByTestId("polling_station_list");
       expect(within(pollingStationList).getByText("33")).toBeVisible();
       expect(within(pollingStationList).getByText("Op Rolletjes")).toBeVisible();
-      expect(within(pollingStationList).getByText("34")).toBeVisible();
-      expect(within(pollingStationList).getByText("Testplek")).toBeVisible();
+
+      // These should not exist, as they are finalised
+      expect(within(pollingStationList).queryByText("34")).toBe(null);
+      expect(within(pollingStationList).queryByText("Testplek")).toBe(null);
     });
 
     test("Polling station list no stations", async () => {

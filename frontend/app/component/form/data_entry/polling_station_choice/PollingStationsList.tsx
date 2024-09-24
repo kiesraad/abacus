@@ -27,8 +27,8 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
       </thead>
       <tbody>
         {pollingStations.map((pollingStation: PollingStation) => {
-          const pollingStationStatus = electionStatus.statuses.find((status) => status.id === pollingStation.id);
-          if (pollingStationStatus?.status === "definitive") {
+          const pollingStationStatusEntry = electionStatus.statuses.find((status) => status.id === pollingStation.id);
+          if (pollingStationStatusEntry?.status === "definitive") {
             return null;
           }
 
@@ -39,7 +39,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
               </td>
               <td>
                 <span>{pollingStation.name}</span>
-                {pollingStationStatus && <Badge type={pollingStationStatus.status} />}
+                {pollingStationStatusEntry && <Badge type={pollingStationStatusEntry.status} />}
               </td>
               <td width="5rem">
                 <div className="link">

@@ -49,9 +49,9 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
     const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
-    const pollingStationStatus = electionStatuses.statuses.find((status) => status.id === pollingStation?.id);
+    const pollingStationStatusEntry = electionStatuses.statuses.find((status) => status.id === pollingStation?.id);
 
-    if (pollingStationStatus?.status === "definitive") {
+    if (pollingStationStatusEntry?.status === "definitive") {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
       setLoading(false);
       return;

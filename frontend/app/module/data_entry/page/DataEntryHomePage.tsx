@@ -11,6 +11,7 @@ export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { election } = useElection();
+
   const { statuses, refetch } = useElectionStatus();
 
   // re-fetch statuses when component mounts
@@ -52,6 +53,7 @@ export function DataEntryHomePage() {
           </p>
         </Alert>
       )}
+
       {statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
           <h2>Alle stembureaus zijn ingevoerd</h2>

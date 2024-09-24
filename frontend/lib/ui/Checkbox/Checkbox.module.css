@@ -83,7 +83,7 @@
 
   &:global(.has-error) {
     > div {
-      border-color: var(--color-error-darker);
+      border: 2px solid var(--color-error-darker);
     }
   }
 }

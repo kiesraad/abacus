@@ -21,6 +21,11 @@ describe("PollingStationFormController", () => {
       wrapper: Wrapper,
     });
 
+    // wait for the controller to be initialised
+    await waitFor(() => {
+      expect(result.current).not.toBeNull();
+    });
+
     result.current.registerCurrentForm({
       id: "recounted",
       type: "recounted",
@@ -93,6 +98,11 @@ describe("PollingStationFormController", () => {
 
     const { result } = renderHook(() => usePollingStationFormController(), {
       wrapper: Wrapper,
+    });
+
+    // wait for the controller to be initialised
+    await waitFor(() => {
+      expect(result.current).not.toBeNull();
     });
 
     result.current.registerCurrentForm({

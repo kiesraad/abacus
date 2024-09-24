@@ -18,13 +18,12 @@ const Component = (
 describe("Test RecountedForm", () => {
   describe("RecountedForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
-      const spy = vi.spyOn(global, "fetch");
-
-      const user = userEvent.setup();
-
       render(Component);
 
-      const yes = screen.getByTestId("yes");
+      const user = userEvent.setup();
+      const spy = vi.spyOn(global, "fetch");
+
+      const yes = await screen.findByTestId("yes");
       await user.click(yes);
       expect(yes).toBeChecked();
 
@@ -34,13 +33,12 @@ describe("Test RecountedForm", () => {
     });
 
     test("hitting shift+enter does result in api call", async () => {
-      const spy = vi.spyOn(global, "fetch");
-
-      const user = userEvent.setup();
-
       render(Component);
 
-      const yes = screen.getByTestId("yes");
+      const user = userEvent.setup();
+      const spy = vi.spyOn(global, "fetch");
+
+      const yes = await screen.findByTestId("yes");
       await user.click(yes);
       expect(yes).toBeChecked();
 
@@ -58,8 +56,8 @@ describe("Test RecountedForm", () => {
 
       render(Component);
 
-      const yes = screen.getByTestId("yes");
-      const no = screen.getByTestId("no");
+      const yes = await screen.findByTestId("yes");
+      const no = await screen.findByTestId("no");
 
       expect(yes).not.toBeChecked();
       expect(no).not.toBeChecked();
@@ -78,8 +76,6 @@ describe("Test RecountedForm", () => {
 
   describe("RecountedForm API request and response", () => {
     test("RecountedForm request body is equal to the form data", async () => {
-      const spy = vi.spyOn(global, "fetch");
-
       const expectedRequest = {
         data: {
           ...emptyDataEntryRequest.data,
@@ -93,14 +89,15 @@ describe("Test RecountedForm", () => {
         },
       };
 
-      const user = userEvent.setup();
-
       render(Component);
 
-      const yes = screen.getByTestId("yes");
+      const spy = vi.spyOn(global, "fetch");
+      const user = userEvent.setup();
+
+      const yes = await screen.findByTestId("yes");
       await user.click(yes);
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       expect(spy).toHaveBeenCalled();
@@ -122,8 +119,8 @@ describe("Test RecountedForm", () => {
 
       render(Component);
 
-      const yes = screen.getByTestId("yes");
-      const no = screen.getByTestId("no");
+      const yes = await screen.findByTestId("yes");
+      const no = await screen.findByTestId("no");
       const submitButton = screen.getByRole("button", { name: "Volgende" });
 
       expect(yes).not.toBeChecked();

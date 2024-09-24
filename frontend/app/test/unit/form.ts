@@ -1,7 +1,7 @@
-import { FormState, POLLING_STATION_DATA_ENTRY_REQUEST_BODY, ValidationResult } from "@kiesraad/api";
+import { FormState, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, ValidationResult } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
-export const emptyDataEntryRequest: POLLING_STATION_DATA_ENTRY_REQUEST_BODY = {
+export const emptyDataEntryRequest: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = {
   data: {
     recounted: false,
     voters_counts: {

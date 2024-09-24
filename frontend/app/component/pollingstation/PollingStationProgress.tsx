@@ -64,7 +64,9 @@ export function PollingStationProgress() {
         active={formState.active === "recounted"}
       >
         {formState.active !== "recounted" ? (
-          <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/recounted`}>Is er herteld?</Link>
+          <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/recounted`}>
+            <span>Is er herteld?</span>
+          </Link>
         ) : (
           <span>Is er herteld?</span>
         )}
@@ -76,9 +78,9 @@ export function PollingStationProgress() {
         disabled={formState.sections.voters_votes_counts.index > currentIndex}
         active={formState.active === "voters_votes_counts"}
       >
-        {formState.active !== "voters_votes_counts" ? (
+        {formState.active !== "voters_votes_counts" && formState.sections.voters_votes_counts.index <= currentIndex ? (
           <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/voters-and-votes`}>
-            Aantal kiezers en stemmen
+            <span>Aantal kiezers en stemmen</span>
           </Link>
         ) : (
           <span>Aantal kiezers en stemmen</span>
@@ -91,8 +93,10 @@ export function PollingStationProgress() {
         status={menuStatusForFormSection(formState.sections.differences_counts)}
         active={formState.active === "differences_counts"}
       >
-        {formState.active !== "differences_counts" ? (
-          <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/differences`}>Verschillen</Link>
+        {formState.active !== "differences_counts" && formState.sections.differences_counts.index <= currentIndex ? (
+          <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/differences`}>
+            <span>Verschillen</span>
+          </Link>
         ) : (
           <span>Verschillen</span>
         )}
@@ -110,9 +114,11 @@ export function PollingStationProgress() {
             status={menuStatusForFormSection(formSection)}
             active={formState.active === formSection.id}
           >
-            {formState.active !== formSection.id ? (
+            {formState.active !== formSection.id && formSection.index <= currentIndex ? (
               <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/list/${listId}`}>
-                Lijst {list.number} - {list.name}
+                <span>
+                  Lijst {list.number} - {list.name}
+                </span>
               </Link>
             ) : (
               <span>
@@ -131,7 +137,9 @@ export function PollingStationProgress() {
         disabled={!formState.isCompleted}
       >
         {formState.active !== "save" && formState.isCompleted ? (
-          <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/save`}>Controleren en opslaan</Link>
+          <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/save`}>
+            <span>Controleren en opslaan</span>
+          </Link>
         ) : (
           <span>Controleren en opslaan</span>
         )}

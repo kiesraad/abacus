@@ -22,6 +22,9 @@
     display: flex;
     align-items: center;
     gap: 2rem;
+    &:has(button) {
+      min-height: 4rem;
+    }
 
     &:global(.hidden) {
       display: none;

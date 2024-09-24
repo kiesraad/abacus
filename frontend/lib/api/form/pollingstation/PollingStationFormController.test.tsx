@@ -8,7 +8,7 @@ import { ApiProvider, PollingStationFormController, usePollingStationFormControl
 import { electionMockData } from "@kiesraad/api-mocks";
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
-  <ApiProvider host="http://testhost">
+  <ApiProvider>
     <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
       {children}
     </PollingStationFormController>
@@ -19,6 +19,11 @@ describe("PollingStationFormController", () => {
   test("PollingStationFormController renderHook", async () => {
     const { result, rerender } = renderHook(() => usePollingStationFormController(), {
       wrapper: Wrapper,
+    });
+
+    // wait for the controller to be initialised
+    await waitFor(() => {
+      expect(result.current).not.toBeNull();
     });
 
     result.current.registerCurrentForm({
@@ -93,6 +98,11 @@ describe("PollingStationFormController", () => {
 
     const { result } = renderHook(() => usePollingStationFormController(), {
       wrapper: Wrapper,
+    });
+
+    // wait for the controller to be initialised
+    await waitFor(() => {
+      expect(result.current).not.toBeNull();
     });
 
     result.current.registerCurrentForm({

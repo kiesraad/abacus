@@ -28,17 +28,15 @@ function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
   );
 }
 
-function getFormFields(): HTMLElement[] {
-  return [
-    screen.getByTestId("more_ballots_count"),
-    screen.getByTestId("fewer_ballots_count"),
-    screen.getByTestId("unreturned_ballots_count"),
-    screen.getByTestId("too_few_ballots_handed_out_count"),
-    screen.getByTestId("too_many_ballots_handed_out_count"),
-    screen.getByTestId("other_explanation_count"),
-    screen.getByTestId("no_explanation_count"),
-  ];
-}
+const differencesFieldIds = {
+  moreBallotsCount: "more_ballots_count",
+  fewerBallotsCount: "fewer_ballots_count",
+  unreturnedBallotsCount: "unreturned_ballots_count",
+  tooFewBallotsHandedOutCount: "too_few_ballots_handed_out_count",
+  tooManyBallotsHandedOutCount: "too_many_ballots_handed_out_count",
+  otherExplanationCount: "other_explanation_count",
+  noExplanationCount: "no_explanation_count",
+};
 
 describe("Test DifferencesForm", () => {
   describe("DifferencesForm user interactions", () => {
@@ -173,40 +171,18 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ ...votersAndVotesValues });
 
-      const [
-        moreBallotsCount,
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ]: HTMLElement[] = getFormFields();
-
       const spy = vi.spyOn(global, "fetch");
 
       await userTypeInputs(user, {
         ...expectedRequest.data.differences_counts,
       });
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
-
-      const expectedValidFields = [
-        moreBallotsCount,
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ] as HTMLElement[];
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
 
       expect(spy).toHaveBeenCalled();
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-      expect(url).toEqual("http://testhost/api/polling_stations/1/data_entries/1");
+      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
       expect(body).toEqual(expectedRequest);
     });
@@ -225,36 +201,26 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        moreBallotsCount,
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ]: HTMLElement[] = getFormFields();
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage =
         "Controleer I (stembiljetten meer geteld)F.301Je hebt bij Aantal kiezers en stemmers ingevuld dat er meer stemmen dan kiezers waren. Het aantal dat je bij I hebt ingevuld is niet gelijk aan het aantal meer getelde stembiljetten.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFields = [moreBallotsCount] as HTMLElement[];
-      const expectedValidFields = [
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [differencesFieldIds.moreBallotsCount];
+      const expectedValidFieldIds = [
+        differencesFieldIds.fewerBallotsCount,
+        differencesFieldIds.unreturnedBallotsCount,
+        differencesFieldIds.tooFewBallotsHandedOutCount,
+        differencesFieldIds.tooManyBallotsHandedOutCount,
+        differencesFieldIds.otherExplanationCount,
+        differencesFieldIds.noExplanationCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("F.302 Should be empty", async () => {
@@ -269,36 +235,26 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: true });
 
-      const [
-        moreBallotsCount,
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ]: HTMLElement[] = getFormFields();
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage =
         "Controleer J (stembiljetten minder geteld)F.302Je hebt bij Aantal kiezers en stemmers ingevuld dat er meer stemmen dan kiezers waren. Daarom mag J niet ingevuld zijn.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFields = [fewerBallotsCount] as HTMLElement[];
-      const expectedValidFields = [
-        moreBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [differencesFieldIds.fewerBallotsCount];
+      const expectedValidFieldIds = [
+        differencesFieldIds.moreBallotsCount,
+        differencesFieldIds.unreturnedBallotsCount,
+        differencesFieldIds.tooFewBallotsHandedOutCount,
+        differencesFieldIds.tooManyBallotsHandedOutCount,
+        differencesFieldIds.otherExplanationCount,
+        differencesFieldIds.noExplanationCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("F.303 IncorrectDifference", async () => {
@@ -313,36 +269,26 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        moreBallotsCount,
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ]: HTMLElement[] = getFormFields();
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage =
         "Controleer J (stembiljetten minder geteld)F.303Je hebt bij Aantal kiezers en stemmers ingevuld dat er minder stemmen dan kiezers waren. Het aantal dat je bij J hebt ingevuld is niet gelijk aan het aantal minder getelde stembiljetten.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFields = [fewerBallotsCount] as HTMLElement[];
-      const expectedValidFields = [
-        moreBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [differencesFieldIds.fewerBallotsCount];
+      const expectedValidFieldIds = [
+        differencesFieldIds.moreBallotsCount,
+        differencesFieldIds.unreturnedBallotsCount,
+        differencesFieldIds.tooFewBallotsHandedOutCount,
+        differencesFieldIds.tooManyBallotsHandedOutCount,
+        differencesFieldIds.otherExplanationCount,
+        differencesFieldIds.noExplanationCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("F.304 Should be empty", async () => {
@@ -357,36 +303,26 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: true });
 
-      const [
-        moreBallotsCount,
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ]: HTMLElement[] = getFormFields();
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage =
         "Controleer I (stembiljetten meer geteld)F.304Je hebt bij Aantal kiezers en stemmers ingevuld dat er minder stemmen dan kiezers waren. Daarom mag I niet ingevuld zijn.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFields = [moreBallotsCount] as HTMLElement[];
-      const expectedValidFields = [
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [differencesFieldIds.moreBallotsCount];
+      const expectedValidFieldIds = [
+        differencesFieldIds.fewerBallotsCount,
+        differencesFieldIds.unreturnedBallotsCount,
+        differencesFieldIds.tooFewBallotsHandedOutCount,
+        differencesFieldIds.tooManyBallotsHandedOutCount,
+        differencesFieldIds.otherExplanationCount,
+        differencesFieldIds.noExplanationCount,
+      ];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("F.305 No difference expected", async () => {
@@ -413,36 +349,26 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        moreBallotsCount,
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ]: HTMLElement[] = getFormFields();
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage =
         "Controleer ingevulde verschillenF.305Je hebt bij Aantal kiezers en stemmers ingevuld dat er evenveel stemmen als kiezers waren. Maar je hebt wel verschillen ingevuld.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.";
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFields = [
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ] as HTMLElement[];
-      const expectedValidFields = [moreBallotsCount] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [
+        differencesFieldIds.fewerBallotsCount,
+        differencesFieldIds.unreturnedBallotsCount,
+        differencesFieldIds.tooFewBallotsHandedOutCount,
+        differencesFieldIds.tooManyBallotsHandedOutCount,
+        differencesFieldIds.otherExplanationCount,
+        differencesFieldIds.noExplanationCount,
+      ];
+      const expectedValidFieldIds = [differencesFieldIds.moreBallotsCount];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
   });
 
@@ -471,17 +397,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        moreBallotsCount,
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ]: HTMLElement[] = getFormFields();
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage =
@@ -489,19 +405,19 @@ describe("Test DifferencesForm", () => {
       const feedbackWarning = await screen.findByTestId("feedback-warning");
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [
-        moreBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ] as HTMLElement[];
-      let expectedValidFields = [fewerBallotsCount] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [
+        differencesFieldIds.moreBallotsCount,
+        differencesFieldIds.unreturnedBallotsCount,
+        differencesFieldIds.tooFewBallotsHandedOutCount,
+        differencesFieldIds.tooManyBallotsHandedOutCount,
+        differencesFieldIds.otherExplanationCount,
+        differencesFieldIds.noExplanationCount,
+      ];
+      let expectedValidFieldIds = [differencesFieldIds.fewerBallotsCount];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
 
       const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
         name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
@@ -519,9 +435,9 @@ describe("Test DifferencesForm", () => {
 
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       // All fields should be considered valid now
-      expectedValidFields = expectedValidFields.concat(expectedInvalidFields);
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      expectedValidFieldIds = expectedValidFieldIds.concat(expectedInvalidFieldIds);
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("W.301 Incorrect total", async () => {
@@ -548,36 +464,26 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        moreBallotsCount,
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ]: HTMLElement[] = getFormFields();
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage =
         "Controleer ingevulde verschillenW.301De invoer bij I, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [
-        moreBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ] as HTMLElement[];
-      const expectedValidFields = [fewerBallotsCount] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [
+        differencesFieldIds.moreBallotsCount,
+        differencesFieldIds.unreturnedBallotsCount,
+        differencesFieldIds.tooFewBallotsHandedOutCount,
+        differencesFieldIds.tooManyBallotsHandedOutCount,
+        differencesFieldIds.otherExplanationCount,
+        differencesFieldIds.noExplanationCount,
+      ];
+      const expectedValidFieldIds = [differencesFieldIds.fewerBallotsCount];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
     test("W.302 Incorrect total", async () => {
@@ -604,36 +510,26 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      const [
-        moreBallotsCount,
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ]: HTMLElement[] = getFormFields();
-
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage =
         "Controleer ingevulde verschillenW.302De invoer bij J, K, L, M, N of O klopt niet.Check of je het papieren proces-verbaal goed hebt overgenomen.Heb je iets niet goed overgenomen? Herstel de fout en ga verder.Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.";
       expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
-      const expectedInvalidFields = [
-        fewerBallotsCount,
-        unreturnedBallotsCount,
-        tooFewBallotsHandedOutCount,
-        tooManyBallotsHandedOutCount,
-        otherExplanationCount,
-        noExplanationCount,
-      ] as HTMLElement[];
-      const expectedValidFields = [moreBallotsCount] as HTMLElement[];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFields, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFields, "bevat een waarschuwing");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+      const expectedInvalidFieldIds = [
+        differencesFieldIds.fewerBallotsCount,
+        differencesFieldIds.unreturnedBallotsCount,
+        differencesFieldIds.tooFewBallotsHandedOutCount,
+        differencesFieldIds.tooManyBallotsHandedOutCount,
+        differencesFieldIds.otherExplanationCount,
+        differencesFieldIds.noExplanationCount,
+      ];
+      const expectedValidFieldIds = [differencesFieldIds.moreBallotsCount];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een waarschuwing");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
   });
 });

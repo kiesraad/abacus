@@ -133,7 +133,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
+    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`} skip={[_IGNORE_WARNINGS_ID]}>
       <h2>
         Lijst {group.number} - {group.name}
       </h2>
@@ -191,6 +191,12 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings} hasError={warningsWarning}>
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
+        </BottomBar.Row>
+        <BottomBar.Row>
+          <KeyboardKeys.HintText>
+            <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Down]} />
+            Snel naar totaal van de lijst
+          </KeyboardKeys.HintText>
         </BottomBar.Row>
         <BottomBar.Row>
           <Button type="submit" size="lg" disabled={status.current === "saving"}>

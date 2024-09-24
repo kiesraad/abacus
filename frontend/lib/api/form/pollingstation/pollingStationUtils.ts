@@ -1,6 +1,6 @@
 import { ErrorsAndWarnings, FieldValidationResult } from "lib/api/api";
 
-import { ValidationResult } from "@kiesraad/api";
+import { Election, ValidationResult } from "@kiesraad/api";
 import { ValidationResultType } from "@kiesraad/ui";
 import { deepEqual, fieldNameFromPath, FieldSection, objectHasOnlyEmptyValues, rootFieldSection } from "@kiesraad/util";
 
@@ -10,6 +10,7 @@ import {
   FormSection,
   FormSectionID,
   FormState,
+  INITIAL_FORM_SECTION_ID,
   PollingStationValues,
 } from "./PollingStationFormController";
 import { DifferencesValues } from "./useDifferences";
@@ -293,4 +294,108 @@ function sortFormSections(a: FormSection, b: FormSection): number {
   if (a.index < b.index) return -1;
   if (a.index > b.index) return 1;
   return 0;
+}
+
+export function getInitialValues(
+  election: Required<Election>,
+  defaultValues?: Partial<PollingStationValues>,
+): PollingStationValues {
+  return {
+    recounted: undefined,
+    voters_counts: {
+      poll_card_count: 0,
+      proxy_certificate_count: 0,
+      voter_card_count: 0,
+      total_admitted_voters_count: 0,
+    },
+    votes_counts: {
+      votes_candidates_count: 0,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 0,
+    },
+    voters_recounts: undefined,
+    differences_counts: {
+      more_ballots_count: 0,
+      fewer_ballots_count: 0,
+      unreturned_ballots_count: 0,
+      too_few_ballots_handed_out_count: 0,
+      too_many_ballots_handed_out_count: 0,
+      other_explanation_count: 0,
+      no_explanation_count: 0,
+    },
+    political_group_votes: election.political_groups.map((pg) => ({
+      number: pg.number,
+      total: 0,
+      candidate_votes: pg.candidates.map((c) => ({
+        number: c.number,
+        votes: 0,
+      })),
+    })),
+    ...defaultValues,
+  };
+}
+
+export function getInitialFormState(election: Required<Election>, defaultFormState?: Partial<FormState>): FormState {
+  const result: FormState = {
+    active: INITIAL_FORM_SECTION_ID,
+    current: INITIAL_FORM_SECTION_ID,
+    sections: {
+      recounted: {
+        index: 0,
+        id: "recounted",
+        title: "Is er herteld?",
+        isSaved: false,
+        ignoreWarnings: false,
+        errors: [],
+        warnings: [],
+      },
+      voters_votes_counts: {
+        index: 1,
+        id: "voters_votes_counts",
+        title: "Toegelaten kiezers en uitgebrachte stemmen",
+        isSaved: false,
+        ignoreWarnings: false,
+        errors: [],
+        warnings: [],
+      },
+      differences_counts: {
+        index: 2,
+        id: "differences_counts",
+        title: "Verschillen",
+        isSaved: false,
+        ignoreWarnings: false,
+        errors: [],
+        warnings: [],
+      },
+      save: {
+        index: election.political_groups.length + 3,
+        id: "save",
+        title: "Controleren en opslaan",
+        isSaved: false,
+        ignoreWarnings: false,
+        errors: [],
+        warnings: [],
+      },
+    },
+    unknown: {
+      errors: [],
+      warnings: [],
+    },
+    isCompleted: false,
+  };
+
+  election.political_groups.forEach((pg, n) => {
+    result.sections[`political_group_votes_${pg.number}`] = {
+      index: n + 3,
+      id: `political_group_votes_${pg.number}`,
+      title: pg.name,
+      isSaved: false,
+      ignoreWarnings: false,
+      errors: [],
+      warnings: [],
+    };
+  });
+
+  return structuredClone({ ...result, ...defaultFormState });
 }

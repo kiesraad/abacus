@@ -7,46 +7,51 @@ export type UseApiGetRequestReturn<T> = {
   loading: boolean;
   error: ApiError | null;
   data: T | null;
+  refetch: () => void;
 };
-
-export interface UseApiGetRequestParams {
-  path: string;
-}
 
 export function useApiGetRequest<T>(path: string): UseApiGetRequestReturn<T> {
   const { client } = useApi();
   const [data, setData] = React.useState<T | null>(null);
   const [error, setError] = React.useState<ApiError | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
-  React.useEffect(() => {
+  const fetchData = React.useCallback(() => {
     let isSubscribed = true;
-    const doRequest = async (path: string) => {
-      if (isSubscribed) {
-        const response = await client.getRequest<T>(path);
-        if (response.status === ApiResponseStatus.Success) {
-          setData(response.data);
-        } else {
-          setError(response);
+    setLoading(true);
+    client
+      .getRequest<T>(path)
+      .then((response) => {
+        if (isSubscribed) {
+          if (response.status === ApiResponseStatus.Success) {
+            setData(response.data);
+            setError(null);
+            setLoading(false);
+          } else {
+            setLoading(false);
+            setError(response);
+          }
         }
-      }
-    };
-
-    if (path !== "") {
-      doRequest(path).catch((e: unknown) => {
-        console.error("Error", e);
+      })
+      .catch((e: unknown) => {
+        setLoading(false);
+        if (isSubscribed) {
+          console.error("GET API error", e);
+        }
       });
-    }
-
     return () => {
       isSubscribed = false;
     };
   }, [client, path]);
 
-  const loading = React.useMemo(() => data === null && error === null, [data, error]);
+  React.useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   return {
     loading,
     error,
     data,
+    refetch: fetchData,
   };
 }

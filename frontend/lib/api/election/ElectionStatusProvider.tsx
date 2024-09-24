@@ -4,6 +4,7 @@ import { PollingStationStatusEntry, useElectionStatusRequest } from "@kiesraad/a
 
 export interface iElectionStatusProviderContext {
   statuses: Required<PollingStationStatusEntry[]>;
+  refetch: () => void;
 }
 
 export const ElectionStatusProviderContext = React.createContext<iElectionStatusProviderContext | undefined>(undefined);
@@ -14,20 +15,20 @@ export interface ElectionStatusProviderProps {
 }
 
 export function ElectionStatusProvider({ children, electionId }: ElectionStatusProviderProps) {
-  const { data, loading, error } = useElectionStatusRequest({
+  const { data, error, refetch } = useElectionStatusRequest({
     election_id: electionId,
   });
 
-  if (loading) {
+  if (error) {
+    throw new Error("Could not fetch election statuses");
+  }
+
+  if (data === null) {
     return null;
   }
 
-  if (!data || error) {
-    throw new Error();
-  }
-
   return (
-    <ElectionStatusProviderContext.Provider value={{ statuses: data.statuses }}>
+    <ElectionStatusProviderContext.Provider value={{ statuses: data.statuses, refetch }}>
       {children}
     </ElectionStatusProviderContext.Provider>
   );

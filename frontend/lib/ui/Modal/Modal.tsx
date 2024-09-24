@@ -7,12 +7,17 @@ import { IconButton } from "@kiesraad/ui";
 import cls from "./Modal.module.css";
 
 export interface ModalProps {
+  id: string;
   onClose?: () => void;
   children: React.ReactNode;
 }
 
-export function Modal({ onClose, children }: ModalProps): React.ReactNode {
+export function Modal({ id, onClose, children }: ModalProps): React.ReactNode {
   const modalRoot = document.body;
+
+  React.useEffect(() => {
+    document.getElementById(id)?.focus();
+  }, [id]);
 
   return createPortal(
     <div className={cls.modal} role="dialog">

@@ -135,6 +135,13 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
+      const formTitle = await screen.findByRole("heading", {
+        level: 2,
+        name: "Toegelaten kiezers en uitgebrachte stemmen",
+      });
+      expect(formTitle).toHaveFocus();
+      await user.keyboard("{tab}");
+
       const pollCards = await screen.findByTestId("poll_card_count");
       expect(pollCards).toHaveFocus();
       await user.type(pollCards, "12345");

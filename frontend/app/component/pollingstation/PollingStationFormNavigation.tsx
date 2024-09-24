@@ -111,6 +111,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
   React.useEffect(() => {
     if (apiError) {
       window.scrollTo(0, 0);
+      document.getElementById("feedback-title-0")?.focus();
     }
   }, [apiError]);
 
@@ -139,11 +140,14 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
             />
           ) : (
             <Modal
+              id="modal-blocker-title"
               onClose={() => {
                 blocker.reset();
               }}
             >
-              <h2 id="modal-blocker-title">Let op: niet opgeslagen wijzigingen</h2>
+              <h2 id="modal-blocker-title" tabIndex={-1}>
+                Let op: niet opgeslagen wijzigingen
+              </h2>
               <p>
                 Je hebt in <strong>{formState.sections[formState.active]?.title || "het huidige formulier"}</strong>{" "}
                 wijzigingen gemaakt die nog niet zijn opgeslagen.

@@ -62,6 +62,9 @@ describe("Test CheckAndSaveForm", () => {
   test("Shift+Enter submits form", async () => {
     renderForm();
 
+    const formTitle = await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" });
+    expect(formTitle).toHaveFocus();
+
     const user = userEvent.setup();
     const spy = vi.spyOn(global, "fetch");
 

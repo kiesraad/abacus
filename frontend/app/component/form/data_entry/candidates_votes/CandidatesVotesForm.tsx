@@ -91,6 +91,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   React.useEffect(() => {
     if (isSaved) {
       window.scrollTo(0, 0);
+      document.getElementById("feedback-title-0")?.focus();
     }
   }, [isSaved]);
 

@@ -30,7 +30,9 @@ export function Feedback({ id, type, data, apiError, children }: FeedbackProps) 
         <div className="feedback-item">
           <header>
             {renderIconForType(type)}
-            <h3>Sorry, er ging iets mis</h3>
+            <h3 id="feedback-title-0" tabIndex={-1}>
+              Sorry, er ging iets mis
+            </h3>
           </header>
           <div className="content">
             {apiError.code}: {apiError.error}
@@ -41,7 +43,9 @@ export function Feedback({ id, type, data, apiError, children }: FeedbackProps) 
         <div key={`feedback-${index}`} className="feedback-item">
           <header>
             {renderIconForType(type)}
-            <h3>{feedback.title}</h3>
+            <h3 id={`feedback-title-${index}`} tabIndex={-1}>
+              {feedback.title}
+            </h3>
             {feedback.code && <span>{feedback.code}</span>}
           </header>
           <div className="content">{feedback.content}</div>

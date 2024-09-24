@@ -58,7 +58,7 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.target instanceof HTMLInputElement && event.target.type === "radio") {
+      if (event.key !== "Tab" && event.target instanceof HTMLInputElement && event.target.type === "radio") {
         event.preventDefault();
       }
       switch (event.key) {
@@ -75,15 +75,18 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
           } else {
             moveFocus("down");
           }
-
           break;
         case "Enter":
-          event.preventDefault();
-          if (event.shiftKey || document.activeElement === submitButton.current) {
-            //ref.current.submit fails in testing environment (jsdom)
-            innerRef.current?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-          } else {
-            moveFocus("down");
+          if (event.target instanceof HTMLInputElement || event.target instanceof HTMLHeadingElement) {
+            event.preventDefault();
+            if (event.shiftKey || document.activeElement === submitButton.current) {
+              //ref.current.submit fails in testing environment (jsdom)
+              innerRef.current?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+            } else if (event.target instanceof HTMLInputElement && event.target.type === "radio") {
+              submitButton.current?.focus();
+            } else {
+              moveFocus("down");
+            }
           }
           break;
         default:
@@ -108,6 +111,11 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
     }
     submitButton.current = innerRef.current?.querySelector("button[type=submit]") as HTMLButtonElement | null;
   }, [children, skip]);
+
+  // TODO: Need to perform this also when modal closes
+  React.useEffect(() => {
+    document.getElementById("form-title")?.focus();
+  }, []);
 
   return (
     <form

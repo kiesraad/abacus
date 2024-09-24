@@ -7,8 +7,10 @@ import { Modal } from "./Modal";
 const component = (onClose: () => void) => (
   <div>
     <div id="modal"></div>
-    <Modal onClose={onClose}>
-      <h2 id="modal-title">Modal</h2>
+    <Modal id="modal-title" onClose={onClose}>
+      <h2 id="modal-title" tabIndex={-1}>
+        Modal
+      </h2>
     </Modal>
   </div>
 );

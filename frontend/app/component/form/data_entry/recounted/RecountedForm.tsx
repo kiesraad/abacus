@@ -47,12 +47,9 @@ export function RecountedForm() {
   React.useEffect(() => {
     if (isSaved) {
       window.scrollTo(0, 0);
+      document.getElementById("feedback-title-0")?.focus();
     }
   }, [isSaved]);
-
-  React.useEffect(() => {
-    document.getElementById("form-title")?.focus();
-  }, []);
 
   return (
     <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form">

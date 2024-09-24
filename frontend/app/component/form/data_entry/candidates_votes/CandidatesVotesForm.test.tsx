@@ -107,8 +107,8 @@ describe("Test CandidatesVotesForm", () => {
       const candidate6 = screen.getByTestId("candidate_votes[5].votes");
       expect(candidate6).toHaveFocus();
       // Test if maxLength on field works
-      await user.type(candidate6, "100000000000");
-      expect(candidate6).toHaveValue("10000000000");
+      await user.type(candidate6, "1234567890");
+      expect(candidate6).toHaveValue("123456789");
 
       await user.keyboard("{enter}");
 

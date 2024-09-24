@@ -9,10 +9,10 @@ export interface NumberInputProps
 
 export function NumberInput({ id, ...inputProps }: NumberInputProps) {
   const props = {
+    maxLength: 9,
     ...inputProps,
     defaultValue: inputProps.defaultValue ? formatNumber(inputProps.defaultValue) : "",
     type: "text",
-    maxLength: 11,
   };
 
   const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback((event) => {

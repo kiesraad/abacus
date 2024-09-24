@@ -119,8 +119,8 @@ describe("Test DifferencesForm", () => {
       const otherExplanationCount = screen.getByTestId("other_explanation_count");
       expect(otherExplanationCount).toHaveFocus();
       // Test if maxLength on field works
-      await user.type(otherExplanationCount, "100000000000");
-      expect(otherExplanationCount).toHaveValue("10000000000");
+      await user.type(otherExplanationCount, "1234567890");
+      expect(otherExplanationCount).toHaveValue("123456789");
 
       await user.keyboard("{enter}");
 

@@ -126,7 +126,7 @@ describe("Test PollingStationChoiceForm", () => {
       ).toBeVisible();
     });
 
-    test("Selecting a valid, but finalised polling station show alert", async () => {
+    test("Selecting a valid, but finalised polling station shows alert", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
       render(

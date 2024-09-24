@@ -285,7 +285,7 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage =
@@ -316,7 +316,7 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage =

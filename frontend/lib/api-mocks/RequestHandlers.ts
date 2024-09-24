@@ -1,10 +1,10 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
-  DataEntryResponse,
   ErrorResponse,
-  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
-  POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS,
+  SaveDataEntryResponse,
 } from "@kiesraad/api";
 
 import { electionListMockResponse, electionStatusMockResponse, getElectionMockData } from "./ElectionMockData";
@@ -21,6 +21,7 @@ type PingResponseBody = {
   pong: string;
 };
 
+// ping handler for testing
 const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>("/ping", async ({ request }) => {
   const data = await request.json();
 
@@ -31,10 +32,12 @@ const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>("/p
   });
 });
 
+// get election list handler
 export const ElectionListRequestHandler = http.get("/api/elections", () => {
   return HttpResponse.json(electionListMockResponse, { status: 200 });
 });
 
+// get election details handler
 export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id",
   ({ params }) => {
@@ -47,6 +50,7 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
   },
 );
 
+// get election status handler
 export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id/status",
   ({ params }) => {
@@ -59,16 +63,17 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
   },
 );
 
-export const PollingStationDataEntryHandler = http.post<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>,
-  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
-  DataEntryResponse | ErrorResponse
+// save data entry handler
+export const PollingStationDataEntrySaveHandler = http.post<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  SaveDataEntryResponse | ErrorResponse
 >("/api/polling_stations/:polling_station_id/data_entries/:entry_number", async ({ request }) => {
-  let json: POLLING_STATION_DATA_ENTRY_REQUEST_BODY;
+  let json: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
 
   try {
     json = await request.json();
-    const response: DataEntryResponse = {
+    const response: SaveDataEntryResponse = {
       validation_results: {
         errors: [],
         warnings: [],
@@ -302,16 +307,24 @@ export const PollingStationDataEntryHandler = http.post<
   }
 });
 
+// get data entry handler
+export const PollingStationDataEntryGetHandler = http.get<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
+>("/api/polling_stations/:polling_station_id/data_entries/:entry_number", () => {
+  // Currently we have no persistence in MSW, so always return 404
+  return HttpResponse.text(null, { status: 404 });
+});
+
 // delete data entry handler
 export const PollingStationDataEntryDeleteHandler = http.delete<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>
+  ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
 >("/api/polling_stations/:polling_station_id/data_entries/:entry_number", () => {
   return HttpResponse.text(null, { status: 204 });
 });
 
 // finalise data entry handler
 export const PollingStationDataEntryFinaliseHandler = http.post<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS>
+  ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
 >("/api/polling_stations/:polling_station_id/data_entries/:entry_number/finalise", () => {
   return HttpResponse.text(null, { status: 200 });
 });
@@ -321,7 +334,8 @@ export const handlers: HttpHandler[] = [
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  PollingStationDataEntryHandler,
+  PollingStationDataEntrySaveHandler,
+  PollingStationDataEntryGetHandler,
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
 ];

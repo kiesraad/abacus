@@ -12,7 +12,8 @@
   gap: 0.75rem;
   cursor: pointer;
 
-  &:focus {
+  &:focus,
+  &:focus-visible {
     outline: none;
     box-shadow: 0 0 4px 4px rgba(66, 210, 243, 0.4);
   }
@@ -75,7 +76,8 @@
     background: white;
     /* Shadow/xs */
 
-    &:focus {
+    &:focus,
+    &:focus-visible {
       outline: none;
       box-shadow: 0 0 4px 4px rgba(66, 210, 243, 0.4);
     }

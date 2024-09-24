@@ -210,12 +210,75 @@
       }
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
+      "get": {
+        "tags": [
+          "polling_station"
+        ],
+        "summary": "Get an in-progress (not finalised) data entry for a polling station",
+        "operationId": "polling_station_data_entry_get",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "entry_number",
+            "in": "path",
+            "description": "Data entry number (first or second data entry)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data entry retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDataEntryResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "polling_station"
         ],
         "summary": "Save or update a data entry for a polling station",
-        "operationId": "polling_station_data_entry",
+        "operationId": "polling_station_data_entry_save",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -244,7 +307,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DataEntryRequest"
+                "$ref": "#/components/schemas/SaveDataEntryRequest"
               }
             }
           },
@@ -256,7 +319,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DataEntryResponse"
+                  "$ref": "#/components/schemas/SaveDataEntryResponse"
                 }
               }
             }
@@ -393,14 +456,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Data entry finalised successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DataEntryResponse"
-                }
-              }
-            }
+            "description": "Data entry finalised successfully"
           },
           "404": {
             "description": "Not found",
@@ -519,30 +575,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          }
-        }
-      },
-      "DataEntryRequest": {
-        "type": "object",
-        "description": "Request structure for data entry of polling station results",
-        "required": [
-          "data"
-        ],
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
-          }
-        }
-      },
-      "DataEntryResponse": {
-        "type": "object",
-        "description": "Response structure for data entry of polling station results",
-        "required": [
-          "validation_results"
-        ],
-        "properties": {
-          "validation_results": {
-            "$ref": "#/components/schemas/ValidationResults"
           }
         }
       },
@@ -717,6 +749,22 @@
         "properties": {
           "error": {
             "type": "string"
+          }
+        }
+      },
+      "GetDataEntryResponse": {
+        "type": "object",
+        "description": "Response structure for getting data entry of polling station results",
+        "required": [
+          "data",
+          "validation_results"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PollingStationResults"
+          },
+          "validation_results": {
+            "$ref": "#/components/schemas/ValidationResults"
           }
         }
       },
@@ -903,6 +951,30 @@
           "Bijzonder",
           "Mobiel"
         ]
+      },
+      "SaveDataEntryRequest": {
+        "type": "object",
+        "description": "Request structure for saving data entry of polling station results",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PollingStationResults"
+          }
+        }
+      },
+      "SaveDataEntryResponse": {
+        "type": "object",
+        "description": "Response structure for saving data entry of polling station results",
+        "required": [
+          "validation_results"
+        ],
+        "properties": {
+          "validation_results": {
+            "$ref": "#/components/schemas/ValidationResults"
+          }
+        }
       },
       "ValidationResult": {
         "type": "object",

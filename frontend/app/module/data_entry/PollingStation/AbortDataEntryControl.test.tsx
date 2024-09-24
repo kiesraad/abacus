@@ -9,11 +9,11 @@ import { overrideOnce, render, screen, server } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form";
 
 import {
-  DataEntryResponse,
   ElectionProvider,
   ErrorResponse,
-  POLLING_STATION_DATA_ENTRY_REQUEST_BODY,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationFormController,
+  SaveDataEntryResponse,
 } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
@@ -69,9 +69,9 @@ describe("Test AbortDataEntryControl", () => {
 
     // set up a custom request handler that saves the request body
     // this cannot be done with a listener because it would consume the request body
-    let request_body: POLLING_STATION_DATA_ENTRY_REQUEST_BODY | undefined;
+    let request_body: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY | undefined;
     server.use(
-      http.post<never, POLLING_STATION_DATA_ENTRY_REQUEST_BODY, DataEntryResponse | ErrorResponse>(
+      http.post<never, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, SaveDataEntryResponse | ErrorResponse>(
         "/api/polling_stations/1/data_entries/1",
         async ({ request }) => {
           request_body = await request.json();

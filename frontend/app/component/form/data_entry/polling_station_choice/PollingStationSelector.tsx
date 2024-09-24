@@ -14,7 +14,7 @@ export interface PollingStationSelectorProps {
   setLoading: Dispatch<SetStateAction<boolean>>;
   currentPollingStation: PollingStation | undefined;
   setCurrentPollingStation: Dispatch<SetStateAction<PollingStation | undefined>>;
-  setShowAlert: Dispatch<SetStateAction<boolean>>;
+  setAlert: Dispatch<SetStateAction<string | undefined>>;
   handleSubmit: () => void;
 }
 
@@ -23,7 +23,7 @@ export function PollingStationSelector({
   setPollingStationNumber,
   loading,
   currentPollingStation,
-  setShowAlert,
+  setAlert,
   handleSubmit,
 }: PollingStationSelectorProps) {
   const currentPollingStationStatus = usePollingStationStatus(currentPollingStation?.id);
@@ -40,7 +40,7 @@ export function PollingStationSelector({
         margin={false}
         maxLength={6}
         onChange={(e) => {
-          setShowAlert(false);
+          setAlert(undefined);
           setPollingStationNumber(e.target.value);
         }}
         onKeyDown={(e) => {

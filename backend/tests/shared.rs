@@ -3,13 +3,13 @@
 use std::net::SocketAddr;
 
 use backend::polling_station::{
-    CandidateVotes, DataEntryRequest, DataEntryResponse, DifferencesCounts, PoliticalGroupVotes,
-    PollingStationResults, VotersCounts, VotesCounts,
+    CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
+    SaveDataEntryRequest, SaveDataEntryResponse, VotersCounts, VotesCounts,
 };
 use hyper::StatusCode;
 
-pub fn example_data_entry() -> DataEntryRequest {
-    DataEntryRequest {
+pub fn example_data_entry() -> SaveDataEntryRequest {
+    SaveDataEntryRequest {
         data: PollingStationResults {
             recounted: false,
             voters_counts: VotersCounts {
@@ -69,7 +69,7 @@ pub async fn create_and_finalise_data_entry(addr: &SocketAddr) {
         println!("Response body: {:?}", &response.text().await.unwrap());
         panic!("Unexpected response status: {:?}", status);
     }
-    let validation_results: DataEntryResponse = response.json().await.unwrap();
+    let validation_results: SaveDataEntryResponse = response.json().await.unwrap();
     assert_eq!(validation_results.validation_results.errors.len(), 0);
     assert_eq!(validation_results.validation_results.warnings.len(), 0);
 

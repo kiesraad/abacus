@@ -4,12 +4,16 @@ import {
   addValidationResultToFormState,
   ApiError,
   ApiResponseStatus,
-  DataEntryResponse,
   Election,
+  GetDataEntryResponse,
+  getInitialFormState,
+  getInitialValues,
   isGlobalValidationResult,
-  POLLING_STATION_DATA_ENTRY_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   PollingStationResults,
+  SaveDataEntryResponse,
   useApi,
+  useApiGetRequest,
   ValidationResult,
   VotersRecounts,
 } from "@kiesraad/api";
@@ -76,7 +80,7 @@ export interface iPollingStationControllerContext {
   setTemporaryCache: (cache: TemporaryCache | null) => boolean;
   cache: TemporaryCache | null;
   currentForm: AnyFormReference | null;
-  submitCurrentForm: (ignoreWarnings?: boolean) => Promise<void>;
+  submitCurrentForm: (ignoreWarnings?: boolean, aborting?: boolean) => Promise<void>;
   registerCurrentForm: (form: AnyFormReference) => void;
   deleteDataEntry: () => Promise<void>;
   finaliseDataEntry: () => Promise<void>;
@@ -126,142 +130,70 @@ export const PollingStationControllerContext = React.createContext<iPollingStati
   undefined,
 );
 
-const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
+export const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
 
 // Status of the form controller
 // This is a type instead of an enum because of https://github.com/ArnaudBarre/eslint-plugin-react-refresh/issues/36
-export type Status = "idle" | "saving" | "deleting" | "deleted" | "finalising" | "finalised";
+export type Status = "idle" | "saving" | "deleting" | "deleted" | "finalising" | "finalised" | "aborted";
 
 export function PollingStationFormController({
   election,
   pollingStationId,
   entryNumber,
   children,
-  defaultValues = {},
-  defaultFormState = {},
+  defaultValues = undefined,
+  defaultFormState = undefined,
   defaultCurrentForm = null,
 }: PollingStationFormControllerProps) {
-  const request_path: POLLING_STATION_DATA_ENTRY_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+  const request_path: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+  const { client } = useApi();
+
+  // TODO: #277 render custom error page instead of passing error down
+  const [apiError, setApiError] = React.useState<ApiError | null>(null);
+
+  const [values, setValues] = React.useState<PollingStationValues>();
+
+  const initialDataRequest = useApiGetRequest<GetDataEntryResponse>(request_path);
+  React.useEffect(() => {
+    if (initialDataRequest.data) {
+      const responseData = initialDataRequest.data;
+      setValues(responseData.data);
+      setFormState((old) => {
+        const newFormState = { ...old };
+        addValidationResultToFormState(newFormState, responseData.validation_results.errors, "errors");
+        addValidationResultToFormState(newFormState, responseData.validation_results.warnings, "warnings");
+        return newFormState;
+      });
+    } else if (initialDataRequest.error) {
+      if (initialDataRequest.error.code === 404) {
+        // data entry not found, set initial values
+        setValues(getInitialValues(election, defaultValues));
+      } else {
+        setApiError(initialDataRequest.error);
+        throw new Error("Failed to load data entry");
+      }
+    }
+  }, [initialDataRequest.data, initialDataRequest.error, defaultValues, election]);
+
+  const [formState, setFormState] = React.useState<FormState>(() => {
+    return getInitialFormState(election, defaultFormState);
+  });
+
+  // status as ref, because it needs to immediately propagate to the blocker function in `PollingStationFormNavigation`
+  const status = React.useRef<Status>("idle");
 
   const temporaryCache = React.useRef<TemporaryCache | null>(null);
+  const setTemporaryCache = React.useCallback((cache: TemporaryCache | null) => {
+    //OPTIONAL: allow only cache for unvalidated data
+    temporaryCache.current = cache;
+    return true;
+  }, []);
 
   //reference to the current form on screen
   const currentForm = React.useRef<AnyFormReference | null>(defaultCurrentForm);
 
   //where to navigate to next
   const [targetFormSection, setTargetFormSection] = React.useState<FormSectionID | null>(INITIAL_FORM_SECTION_ID);
-
-  // status as ref, because it needs to immediately propagate to the blocker function in `PollingStationFormNavigation`
-  const status = React.useRef<Status>("idle");
-
-  // TODO: #277 render custom error page instead of passing error down
-  const [apiError, setApiError] = React.useState<ApiError | null>(null);
-
-  const [formState, setFormState] = React.useState<FormState>(() => {
-    const result: FormState = {
-      active: INITIAL_FORM_SECTION_ID,
-      current: INITIAL_FORM_SECTION_ID,
-      sections: {
-        recounted: {
-          index: 0,
-          id: "recounted",
-          title: "Is er herteld?",
-          isSaved: false,
-          ignoreWarnings: false,
-          errors: [],
-          warnings: [],
-        },
-        voters_votes_counts: {
-          index: 1,
-          id: "voters_votes_counts",
-          title: "Toegelaten kiezers en uitgebrachte stemmen",
-          isSaved: false,
-          ignoreWarnings: false,
-          errors: [],
-          warnings: [],
-        },
-        differences_counts: {
-          index: 2,
-          id: "differences_counts",
-          title: "Verschillen",
-          isSaved: false,
-          ignoreWarnings: false,
-          errors: [],
-          warnings: [],
-        },
-        save: {
-          index: election.political_groups.length + 3,
-          id: "save",
-          title: "Controleren en opslaan",
-          isSaved: false,
-          ignoreWarnings: false,
-          errors: [],
-          warnings: [],
-        },
-      },
-      unknown: {
-        errors: [],
-        warnings: [],
-      },
-      isCompleted: false,
-    };
-
-    election.political_groups.forEach((pg, n) => {
-      result.sections[`political_group_votes_${pg.number}`] = {
-        index: n + 3,
-        id: `political_group_votes_${pg.number}`,
-        title: pg.name,
-        isSaved: false,
-        ignoreWarnings: false,
-        errors: [],
-        warnings: [],
-      };
-    });
-
-    return structuredClone({ ...result, ...defaultFormState });
-  });
-  const { client } = useApi();
-
-  const [values, setValues] = React.useState<PollingStationValues>(() => ({
-    recounted: undefined,
-    voters_counts: {
-      poll_card_count: 0,
-      proxy_certificate_count: 0,
-      voter_card_count: 0,
-      total_admitted_voters_count: 0,
-    },
-    votes_counts: {
-      votes_candidates_count: 0,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-    },
-    voters_recounts: undefined,
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      unreturned_ballots_count: 0,
-      too_few_ballots_handed_out_count: 0,
-      too_many_ballots_handed_out_count: 0,
-      other_explanation_count: 0,
-      no_explanation_count: 0,
-    },
-    political_group_votes: election.political_groups.map((pg) => ({
-      number: pg.number,
-      total: 0,
-      candidate_votes: pg.candidates.map((c) => ({
-        number: c.number,
-        votes: 0,
-      })),
-    })),
-    ...defaultValues,
-  }));
-
-  const setTemporaryCache = React.useCallback((cache: TemporaryCache | null) => {
-    //OPTIONAL: allow only cache for unvalidated data
-    temporaryCache.current = cache;
-    return true;
-  }, []);
 
   //tell the "outside world" which form section to show next
   React.useEffect(() => {
@@ -297,7 +229,12 @@ export function PollingStationFormController({
     [currentForm, formState],
   );
 
-  const submitCurrentForm = async (ignoreWarnings = false) => {
+  if (values === undefined) {
+    // loading
+    return null;
+  }
+
+  const submitCurrentForm = async (ignoreWarnings = false, aborting?: boolean) => {
     // React state is fixed within one render, so we update our own copy instead of using setValues directly
     let newValues: PollingStationValues = values;
     if (currentForm.current) {
@@ -319,7 +256,7 @@ export function PollingStationFormController({
           const formValues = ref.getValues();
           let voters_recounts: VotersRecounts | undefined = undefined;
           if (formValues.recounted) {
-            if (values.voters_recounts !== undefined) {
+            if (values.voters_recounts) {
               voters_recounts = values.voters_recounts;
             } else {
               voters_recounts = {
@@ -365,14 +302,14 @@ export function PollingStationFormController({
     // send data to server
     status.current = "saving";
     const response = await client.postRequest(request_path, { data: pollingStationResults });
-    status.current = "idle";
+    status.current = aborting ? "aborted" : "idle";
     if (response.status !== ApiResponseStatus.Success) {
       // TODO: #277 render custom error page
       console.error("Failed to save data entry", response);
       setApiError(response);
       throw new Error("Failed to save data entry");
     }
-    const data = response.data as DataEntryResponse;
+    const data = response.data as SaveDataEntryResponse;
     setApiError(null);
 
     // update form state based on response

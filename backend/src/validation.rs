@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, Default)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]
 pub struct ValidationResults {
     pub errors: Vec<ValidationResult>,
     pub warnings: Vec<ValidationResult>,
@@ -22,7 +22,7 @@ impl ValidationResults {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq)]
 pub struct ValidationResult {
     pub fields: Vec<String>,
     pub code: ValidationResultCode,

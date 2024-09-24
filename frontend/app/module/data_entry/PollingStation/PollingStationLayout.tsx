@@ -19,6 +19,10 @@ export function PollingStationLayout() {
     throw Error("Polling station not found");
   }
 
+  if (pollingStationStatus === "definitive") {
+    throw Error("Polling station already finalised");
+  }
+
   return (
     <PollingStationFormController election={election} pollingStationId={pollingStation.id} entryNumber={1}>
       <PageTitle title={`Invoeren ${pollingStation.number} ${pollingStation.name} - Abacus`} />

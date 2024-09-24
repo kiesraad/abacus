@@ -122,5 +122,5 @@
   --purple-100: #ebe9fe;
   --purple-800: #4a1fb8;
 
-  --menu-warning: #dc6803;
+  --menu-warning: var(--color-warning-darker);
 }

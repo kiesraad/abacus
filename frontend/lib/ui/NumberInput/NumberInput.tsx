@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { formatNumber, validateNumberString } from "@kiesraad/util";
+import { deformatNumber, formatNumber, validateNumberString } from "@kiesraad/util";
 
 export interface NumberInputProps
   extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
@@ -24,9 +24,42 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
   }, []);
 
   return (
-    <input {...props} onChange={onChange} onPaste={onPaste} onKeyDown={onKeyDown} id={id} name={props.name || id} />
+    <input
+      {...props}
+      onPaste={onPaste}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      onKeyDown={onKeyDown}
+      id={id}
+      name={props.name || id}
+    />
   );
 }
+
+//deformat number on focus
+function onFocus(event: React.FocusEvent<HTMLInputElement>) {
+  if (event.target.value === "") return;
+  event.target.value = `${deformatNumber(event.target.value)}`;
+}
+//format number on blur
+function onBlur(event: React.FocusEvent<HTMLInputElement>) {
+  if (event.target.value === "") return;
+  event.target.value = formatNumber(event.target.value);
+}
+
+//only accept numbers
+function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+  //allow keyboard shortcuts and navigation (eg. copy pase, select all, arrow keys)
+  if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) {
+    return;
+  }
+  if (event.key.length === 1 && isNaN(parseInt(event.key))) {
+    event.preventDefault();
+  }
+}
+
+/**
+ Archived for potential future use
 
 function onChange(event: React.ChangeEvent<HTMLInputElement>) {
   let caretPosition = event.target.selectionStart;
@@ -45,8 +78,8 @@ function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
   if (event.key !== "Delete" && event.key !== "Backspace" && event.key !== "ArrowLeft" && event.key !== "ArrowRight")
     return;
   const inputValue = event.currentTarget.value;
-  const caretPosition = event.currentTarget.selectionStart;
-  if (!caretPosition) return;
+  let caretPosition = event.currentTarget.selectionStart || 0;
+  let selectionEnd = event.currentTarget.selectionEnd || caretPosition;
 
   if (event.key === "Backspace") {
     if (inputValue.charAt(caretPosition - 1) === ".") {
@@ -58,15 +91,26 @@ function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
       //remove an extra char
       event.currentTarget.setSelectionRange(caretPosition + 1, caretPosition + 1);
     }
-  } else if (event.key === "ArrowLeft") {
-    if (inputValue.charAt(caretPosition - 2) === ".") {
-      //skip the dot
-      event.currentTarget.setSelectionRange(caretPosition - 1, caretPosition - 1);
-    }
+
+    // ArrowLeft and ArrowRight selection
   } else {
-    if (inputValue.charAt(caretPosition + 1) === ".") {
-      //skip the dot
-      event.currentTarget.setSelectionRange(caretPosition + 1, caretPosition + 1);
+    console.log("S:", caretPosition, "E:", selectionEnd);
+    if (event.key === "ArrowLeft") {
+      if (inputValue.charAt(caretPosition - 1) === ".") {
+        caretPosition -= 1;
+      }
+      //event.key === ArrowRight
+    } else {
+      if (inputValue.charAt(selectionEnd) === ".") {
+        selectionEnd += 1;
+      }
+    }
+
+    if (event.shiftKey) {
+      event.currentTarget.setSelectionRange(caretPosition, selectionEnd);
+    } else {
+      event.currentTarget.setSelectionRange(caretPosition, caretPosition);
     }
   }
 }
+ */

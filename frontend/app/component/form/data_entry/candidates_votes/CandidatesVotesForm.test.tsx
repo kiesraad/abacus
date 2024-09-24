@@ -38,7 +38,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
       await user.type(candidate1, "12345");
-      expect(candidate1).toHaveValue("12.345");
+      expect(candidate1).toHaveValue("12345");
 
       await user.keyboard("{enter}");
 
@@ -53,7 +53,7 @@ describe("Test CandidatesVotesForm", () => {
 
       const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
       await user.type(candidate1, "12345");
-      expect(candidate1).toHaveValue("12.345");
+      expect(candidate1).toHaveValue("12345");
 
       await user.keyboard("{shift>}{enter}{/shift}");
 
@@ -72,14 +72,14 @@ describe("Test CandidatesVotesForm", () => {
       const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
       expect(candidate1).toHaveFocus();
       await user.type(candidate1, "12345");
-      expect(candidate1).toHaveValue("12.345");
+      expect(candidate1).toHaveValue("12345");
 
       await user.keyboard("{enter}");
 
       const candidate2 = screen.getByTestId("candidate_votes[1].votes");
       expect(candidate2).toHaveFocus();
       await user.type(candidate2, "6789");
-      expect(candidate2).toHaveValue("6.789");
+      expect(candidate2).toHaveValue("6789");
 
       await user.keyboard("{enter}");
 
@@ -93,7 +93,7 @@ describe("Test CandidatesVotesForm", () => {
       const candidate4 = screen.getByTestId("candidate_votes[3].votes");
       expect(candidate4).toHaveFocus();
       await user.paste("4242");
-      expect(candidate4).toHaveValue("4.242");
+      expect(candidate4).toHaveValue("4242");
 
       await user.keyboard("{enter}");
 
@@ -107,8 +107,8 @@ describe("Test CandidatesVotesForm", () => {
       const candidate6 = screen.getByTestId("candidate_votes[5].votes");
       expect(candidate6).toHaveFocus();
       // Test if maxLength on field works
-      await user.type(candidate6, "1000000000");
-      expect(candidate6).toHaveValue("100.000.000");
+      await user.type(candidate6, "100000000000");
+      expect(candidate6).toHaveValue("10000000000");
 
       await user.keyboard("{enter}");
 

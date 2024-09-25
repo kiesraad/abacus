@@ -16,16 +16,9 @@ export function ElectionProgress() {
 
   const stats: Stat[] = React.useMemo(() => {
     const total = pollingStations.length;
-    const totalFirstEntry = statuses.filter((s) => s.status === "first_entry").length;
     const totalDefinitive = statuses.filter((s) => s.status === "definitive").length;
 
     return [
-      {
-        title: "Eerste invoer",
-        id: "first_entry",
-        total: totalFirstEntry,
-        percentage: totalFirstEntry / total,
-      },
       {
         title: "Alles samen",
         id: "definitive",

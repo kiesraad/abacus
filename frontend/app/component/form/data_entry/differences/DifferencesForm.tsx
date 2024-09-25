@@ -132,7 +132,7 @@ export function DifferencesForm() {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="differences_form">
+    <Form onSubmit={handleSubmit} ref={formRef} id="differences_form" skip={[_IGNORE_WARNINGS_ID]}>
       <h2>Verschillen tussen toegelaten kiezers en uitgebrachte stemmen</h2>
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />

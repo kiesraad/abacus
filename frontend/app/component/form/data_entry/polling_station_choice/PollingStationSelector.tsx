@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { PollingStation, usePollingStationList } from "@kiesraad/api";
+import { PollingStation } from "@kiesraad/api";
 import { IconError } from "@kiesraad/icon";
 import { Badge, Icon, InputField, Spinner } from "@kiesraad/ui";
 import { cn, removeLeadingZeros, usePollingStationStatus } from "@kiesraad/util";
@@ -14,7 +14,7 @@ export interface PollingStationSelectorProps {
   setLoading: Dispatch<SetStateAction<boolean>>;
   currentPollingStation: PollingStation | undefined;
   setCurrentPollingStation: Dispatch<SetStateAction<PollingStation | undefined>>;
-  setShowAlert: Dispatch<SetStateAction<boolean>>;
+  setAlert: Dispatch<SetStateAction<string | undefined>>;
   handleSubmit: () => void;
 }
 
@@ -23,11 +23,9 @@ export function PollingStationSelector({
   setPollingStationNumber,
   loading,
   currentPollingStation,
-  setShowAlert,
+  setAlert,
   handleSubmit,
 }: PollingStationSelectorProps) {
-  const { pollingStationsLoading } = usePollingStationList();
-
   const currentPollingStationStatus = usePollingStationStatus(currentPollingStation?.id);
 
   return (
@@ -42,7 +40,7 @@ export function PollingStationSelector({
         margin={false}
         maxLength={6}
         onChange={(e) => {
-          setShowAlert(false);
+          setAlert(undefined);
           setPollingStationNumber(e.target.value);
         }}
         onKeyDown={(e) => {
@@ -53,7 +51,7 @@ export function PollingStationSelector({
       />
       {pollingStationNumber.trim() !== "" &&
         (() => {
-          if (pollingStationsLoading || loading) {
+          if (loading) {
             return (
               <div id="pollingStationSelectorFeedback" className={cls.message}>
                 <span className={cls.icon}>

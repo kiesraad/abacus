@@ -38,7 +38,7 @@ export function InputGridRow({
 
   const children: [React.ReactElement, React.ReactElement, React.ReactElement] = [
     <td key={`${id}-1`}>{field}</td>,
-    <td key={`${id}-2`}>
+    <td key={`${id}-2`} id={`cell-${id}`}>
       <FormField hasError={hasError} hasWarning={hasWarning}>
         <NumberInput
           key={id}

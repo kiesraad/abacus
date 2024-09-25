@@ -156,7 +156,7 @@ export function VotersAndVotesForm() {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form">
+    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form" skip={[_IGNORE_WARNINGS_ID]}>
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />

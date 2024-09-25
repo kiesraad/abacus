@@ -18,12 +18,6 @@ export interface ELECTION_DOWNLOAD_RESULTS_REQUEST_PARAMS {
 }
 export type ELECTION_DOWNLOAD_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_results`;
 
-// /api/elections/{election_id}/polling_stations
-export interface POLLING_STATION_LIST_REQUEST_PARAMS {
-  election_id: number;
-}
-export type POLLING_STATION_LIST_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
-
 // /api/elections/{election_id}/status
 export interface ELECTION_STATUS_REQUEST_PARAMS {
   election_id: number;
@@ -31,12 +25,12 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
-export interface POLLING_STATION_DATA_ENTRY_REQUEST_PARAMS {
+export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: number;
   entry_number: number;
 }
-export type POLLING_STATION_DATA_ENTRY_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
-export type POLLING_STATION_DATA_ENTRY_REQUEST_BODY = DataEntryRequest;
+export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
+export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = SaveDataEntryRequest;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
 export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
@@ -73,20 +67,6 @@ export interface CandidateVotes {
 }
 
 /**
- * Request structure for data entry of polling station results
- */
-export interface DataEntryRequest {
-  data: PollingStationResults;
-}
-
-/**
- * Response structure for data entry of polling station results
- */
-export interface DataEntryResponse {
-  validation_results: ValidationResults;
-}
-
-/**
  * Differences counts, part of the polling station results.
  */
 export interface DifferencesCounts {
@@ -119,10 +99,11 @@ export interface Election {
 export type ElectionCategory = "Municipal";
 
 /**
- * Election details response, including the election's candidate list (political groups)
+ * Election details response, including the election's candidate list (political groups) and its polling stations
  */
 export interface ElectionDetailsResponse {
   election: Election;
+  polling_stations: PollingStation[];
 }
 
 /**
@@ -135,7 +116,7 @@ export interface ElectionListResponse {
 }
 
 /**
- * Election status response
+ * Election polling stations data entry statuses response
  */
 export interface ElectionStatusResponse {
   statuses: PollingStationStatusEntry[];
@@ -146,6 +127,14 @@ export interface ElectionStatusResponse {
  */
 export interface ErrorResponse {
   error: string;
+}
+
+/**
+ * Response structure for getting data entry of polling station results
+ */
+export interface GetDataEntryResponse {
+  data: PollingStationResults;
+  validation_results: ValidationResults;
 }
 
 /**
@@ -181,13 +170,6 @@ export interface PollingStation {
 }
 
 /**
- * Polling station list response
- */
-export interface PollingStationListResponse {
-  polling_stations: PollingStation[];
-}
-
-/**
  * PollingStationResults, following the fields in Model Na 31-2 Bijage 2.
 
 See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
@@ -216,6 +198,20 @@ export interface PollingStationStatusEntry {
  * Type of Polling station
  */
 export type PollingStationType = "VasteLocatie" | "Bijzonder" | "Mobiel";
+
+/**
+ * Request structure for saving data entry of polling station results
+ */
+export interface SaveDataEntryRequest {
+  data: PollingStationResults;
+}
+
+/**
+ * Response structure for saving data entry of polling station results
+ */
+export interface SaveDataEntryResponse {
+  validation_results: ValidationResults;
+}
 
 export interface ValidationResult {
   code: ValidationResultCode;

@@ -15,7 +15,7 @@ export const Providers = ({
   router?: RemixRouter;
 }) => {
   return (
-    <ApiProvider host="http://testhost">
+    <ApiProvider>
       <RouterProvider router={router} />
     </ApiProvider>
   );

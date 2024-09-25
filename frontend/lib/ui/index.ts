@@ -21,3 +21,4 @@ export * from "./Spinner/Spinner";
 export * from "./StatusList/StatusList";
 export * from "./ui.types.d";
 export * from "./util";
+export * from "./ProgressBar/ProgressBar";

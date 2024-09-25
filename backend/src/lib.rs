@@ -33,7 +33,11 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let polling_station_routes = Router::new()
         .route(
             "/:polling_station_id/data_entries/:entry_number",
-            post(polling_station::polling_station_data_entry),
+            post(polling_station::polling_station_data_entry_save),
+        )
+        .route(
+            "/:polling_station_id/data_entries/:entry_number",
+            get(polling_station::polling_station_data_entry_get),
         )
         .route(
             "/:polling_station_id/data_entries/:entry_number",
@@ -50,10 +54,6 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route(
             "/:election_id/download_results",
             get(election::election_download_results),
-        )
-        .route(
-            "/:election_id/polling_stations",
-            get(polling_station::polling_station_list),
         )
         .route("/:election_id/status", get(election::election_status));
 
@@ -90,8 +90,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             election::election_details,
             election::election_status,
             election::election_download_results,
-            polling_station::polling_station_list,
-            polling_station::polling_station_data_entry,
+            polling_station::polling_station_data_entry_save,
+            polling_station::polling_station_data_entry_get,
             polling_station::polling_station_data_entry_delete,
             polling_station::polling_station_data_entry_finalise,
         ),
@@ -110,12 +110,12 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 election::ElectionDetailsResponse,
                 election::ElectionStatusResponse,
                 polling_station::CandidateVotes,
-                polling_station::DataEntryRequest,
-                polling_station::DataEntryResponse,
+                polling_station::SaveDataEntryRequest,
+                polling_station::SaveDataEntryResponse,
+                polling_station::GetDataEntryResponse,
                 polling_station::DifferencesCounts,
                 polling_station::PoliticalGroupVotes,
                 polling_station::PollingStationResults,
-                polling_station::PollingStationListResponse,
                 polling_station::PollingStationType,
                 polling_station::PollingStationStatusEntry,
                 polling_station::PollingStationStatus,

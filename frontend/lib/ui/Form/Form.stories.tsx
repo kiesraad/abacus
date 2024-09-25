@@ -6,8 +6,12 @@ import { Form } from "./Form";
 
 export const DefaultForm: Story = () => (
   <Form>
-    <input id="test1" />
-    <input id="test2" />
-    <button type="submit" />
+    <input id="inp1" />
+    <br />
+    <input id="inp2" />
+    <br />
+    <input id="inp3" />
+    <br />
+    <button type="submit">Submit</button>
   </Form>
 );

@@ -74,16 +74,6 @@
       }
     }
 
-    &:global(.active) {
-      background-color: var(--color-hover);
-      font-weight: bold;
-      aside {
-        svg {
-          fill: var(--menu-active);
-        }
-      }
-    }
-
     &:global(.updates) {
       aside {
         svg {
@@ -127,7 +117,7 @@
     &:global(.unsaved) {
       aside {
         svg {
-          fill: var(--menu-updates);
+          fill: var(--menu-active);
         }
       }
     }
@@ -144,6 +134,16 @@
       opacity: 0.5;
       &:hover {
         background-color: transparent !important;
+      }
+    }
+
+    &:global(.active) {
+      background-color: var(--color-hover);
+      font-weight: bold;
+      aside {
+        svg {
+          fill: var(--menu-active);
+        }
       }
     }
   }

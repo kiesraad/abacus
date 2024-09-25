@@ -39,17 +39,15 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
 //deformat number on focus
 function onFocus(event: React.FocusEvent<HTMLInputElement>) {
   if (event.target.value === "") return;
-  const originalValue = event.target.value;
-  const wasSelected = event.target.selectionStart === 0 && event.target.selectionEnd === event.target.value.length;
-  const cursorPosition = event.target.selectionStart || 0;
-  event.target.value = `${deformatNumber(event.target.value)}`;
+  const input = event.currentTarget;
+  const newValue = `${deformatNumber(event.target.value)}`;
+  const wasSelected = input.selectionStart === 0 && input.selectionEnd === input.value.length;
+
+  input.value = newValue;
+
   //if text is selected, keep it selected
   if (wasSelected) {
-    event.target.setSelectionRange(0, event.target.value.length);
-  } else {
-    if (originalValue.charAt(cursorPosition) === ".") {
-      event.target.setSelectionRange(cursorPosition + 1, cursorPosition + 1);
-    }
+    input.setSelectionRange(0, event.currentTarget.value.length);
   }
 }
 //format number on blur

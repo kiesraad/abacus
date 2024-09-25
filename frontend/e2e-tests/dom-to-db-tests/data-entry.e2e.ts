@@ -728,6 +728,17 @@ test.describe("navigation", () => {
       await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een waarschuwing");
       await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
       await expect(differencesPage.navPanel.listIcon(1)).toHaveAccessibleName("bevat een fout");
+
+      await differencesPage.navPanel.list(1).click();
+      await candidatesListPage_1.fillCandidatesAndTotal([50, 50], 100);
+      await candidatesListPage_1.next.click();
+      const checkAndSavePage = new CheckAndSavePage(page);
+      await checkAndSavePage.heading.waitFor();
+      await expect(checkAndSavePage.navPanel.checkAndSaveIcon).toHaveAccessibleName("je bent hier");
+      await expect(checkAndSavePage.navPanel.listIcon(1)).toHaveAccessibleName("opgeslagen");
+
+      await checkAndSavePage.navPanel.list(1).click();
+      await expect(candidatesListPage_1.navPanel.checkAndSaveIcon).toHaveAccessibleName("nog niet afgerond");
     });
   });
 });

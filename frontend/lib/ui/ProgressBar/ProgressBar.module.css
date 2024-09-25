@@ -1,0 +1,39 @@
+.progressbar-container {
+  label {
+    display: block;
+    font-weight: bold;
+  }
+
+  section {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+
+    aside {
+      flex: 0 0 2rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  &:global(.small) {
+    margin-bottom: 1rem;
+  }
+
+  &:global(.large) {
+    margin-bottom: 2rem;
+  }
+}
+
+.progressbar-outer {
+  flex: 1 1 auto;
+  height: 8px;
+  background-color: var(--gray-200);
+  border-radius: 0.5rem;
+}
+
+.progressbar-inner {
+  background-color: var(--color-notify);
+  height: 8px;
+  border-radius: 0.5rem;
+  width: 50%;
+}

@@ -117,7 +117,7 @@
     &:global(.unsaved) {
       aside {
         svg {
-          fill: var(--menu-active);
+          fill: var(--menu-updates);
         }
       }
     }

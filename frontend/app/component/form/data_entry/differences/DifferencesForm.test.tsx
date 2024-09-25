@@ -48,7 +48,7 @@ describe("Test DifferencesForm", () => {
 
       const moreBallotsCount = await screen.findByTestId("more_ballots_count");
       await user.type(moreBallotsCount, "12345");
-      expect(moreBallotsCount).toHaveValue("12.345");
+      expect(moreBallotsCount).toHaveValue("12345");
 
       await user.keyboard("{enter}");
 
@@ -63,7 +63,7 @@ describe("Test DifferencesForm", () => {
 
       const moreBallotsCount = await screen.findByTestId("more_ballots_count");
       await user.type(moreBallotsCount, "12345");
-      expect(moreBallotsCount).toHaveValue("12.345");
+      expect(moreBallotsCount).toHaveValue("12345");
 
       await user.keyboard("{shift>}{enter}{/shift}");
 
@@ -82,14 +82,14 @@ describe("Test DifferencesForm", () => {
       const moreBallotsCount = await screen.findByTestId("more_ballots_count");
       expect(moreBallotsCount).toHaveFocus();
       await user.type(moreBallotsCount, "12345");
-      expect(moreBallotsCount).toHaveValue("12.345");
+      expect(moreBallotsCount).toHaveValue("12345");
 
       await user.keyboard("{enter}");
 
       const fewerBallotsCount = screen.getByTestId("fewer_ballots_count");
       expect(fewerBallotsCount).toHaveFocus();
       await user.paste("6789");
-      expect(fewerBallotsCount).toHaveValue("6.789");
+      expect(fewerBallotsCount).toHaveValue("6789");
 
       await user.keyboard("{enter}");
 
@@ -103,7 +103,7 @@ describe("Test DifferencesForm", () => {
       const tooFewBallotsHandedOutCount = screen.getByTestId("too_few_ballots_handed_out_count");
       expect(tooFewBallotsHandedOutCount).toHaveFocus();
       await user.paste("4242");
-      expect(tooFewBallotsHandedOutCount).toHaveValue("4.242");
+      expect(tooFewBallotsHandedOutCount).toHaveValue("4242");
 
       await user.keyboard("{enter}");
 
@@ -117,8 +117,8 @@ describe("Test DifferencesForm", () => {
       const otherExplanationCount = screen.getByTestId("other_explanation_count");
       expect(otherExplanationCount).toHaveFocus();
       // Test if maxLength on field works
-      await user.type(otherExplanationCount, "1000000000");
-      expect(otherExplanationCount).toHaveValue("100.000.000");
+      await user.type(otherExplanationCount, "1234567890");
+      expect(otherExplanationCount).toHaveValue("123456789");
 
       await user.keyboard("{enter}");
 

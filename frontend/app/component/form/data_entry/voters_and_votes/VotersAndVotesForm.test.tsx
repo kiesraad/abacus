@@ -104,7 +104,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const pollCards = await screen.findByTestId("poll_card_count");
       await user.type(pollCards, "12345");
-      expect(pollCards).toHaveValue("12.345");
+      expect(pollCards).toHaveValue("12345");
 
       await user.keyboard("{enter}");
 
@@ -119,7 +119,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const pollCards = await screen.findByTestId("poll_card_count");
       await user.type(pollCards, "12345");
-      expect(pollCards).toHaveValue("12.345");
+      expect(pollCards).toHaveValue("12345");
 
       await user.keyboard("{shift>}{enter}{/shift}");
 
@@ -138,14 +138,14 @@ describe("Test VotersAndVotesForm", () => {
       const pollCards = await screen.findByTestId("poll_card_count");
       expect(pollCards).toHaveFocus();
       await user.type(pollCards, "12345");
-      expect(pollCards).toHaveValue("12.345");
+      expect(pollCards).toHaveValue("12345");
 
       await user.keyboard("{enter}");
 
       const proxyCertificates = screen.getByTestId("proxy_certificate_count");
       expect(proxyCertificates).toHaveFocus();
       await user.paste("6789");
-      expect(proxyCertificates).toHaveValue("6.789");
+      expect(proxyCertificates).toHaveValue("6789");
 
       await user.keyboard("{enter}");
 
@@ -159,7 +159,7 @@ describe("Test VotersAndVotesForm", () => {
       const totalAdmittedVoters = screen.getByTestId("total_admitted_voters_count");
       expect(totalAdmittedVoters).toHaveFocus();
       await user.paste("4242");
-      expect(totalAdmittedVoters).toHaveValue("4.242");
+      expect(totalAdmittedVoters).toHaveValue("4242");
 
       await user.keyboard("{enter}");
 
@@ -173,8 +173,8 @@ describe("Test VotersAndVotesForm", () => {
       const blankVotes = screen.getByTestId("blank_votes_count");
       expect(blankVotes).toHaveFocus();
       // Test if maxLength on field works
-      await user.type(blankVotes, "1000000000");
-      expect(blankVotes).toHaveValue("100.000.000");
+      await user.type(blankVotes, "1234567890");
+      expect(blankVotes).toHaveValue("123456789");
 
       await user.keyboard("{enter}");
 

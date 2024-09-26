@@ -9,6 +9,8 @@ export class NavigationPanel {
   readonly votersAndVotesIcon: Locator;
   readonly differences: Locator;
   readonly differencesIcon: Locator;
+  readonly checkAndSave: Locator;
+  readonly checkAndSaveIcon: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -19,6 +21,8 @@ export class NavigationPanel {
     this.votersAndVotesIcon = this.votersAndVotes.getByRole("img");
     this.differences = page.locator("li").filter({ hasText: "Verschillen" });
     this.differencesIcon = this.differences.getByRole("img");
+    this.checkAndSave = page.locator("li").filter({ hasText: "Controleren en opslaan" });
+    this.checkAndSaveIcon = this.checkAndSave.getByRole("img");
   }
 
   list(listNumber: number) {

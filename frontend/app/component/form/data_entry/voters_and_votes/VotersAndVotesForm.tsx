@@ -13,7 +13,7 @@ import {
   KeyboardKey,
   KeyboardKeys,
 } from "@kiesraad/ui";
-import { usePositiveNumberInputMask } from "@kiesraad/util";
+import { deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
 
@@ -39,7 +39,6 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
 
   const getValues = React.useCallback(() => {
@@ -65,30 +64,30 @@ export function VotersAndVotesForm() {
 
     const values: VotersAndVotesValues = {
       voters_counts: {
-        poll_card_count: deformat(elements.poll_card_count.value),
-        proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
-        voter_card_count: deformat(elements.voter_card_count.value),
-        total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
+        poll_card_count: deformatNumber(elements.poll_card_count.value),
+        proxy_certificate_count: deformatNumber(elements.proxy_certificate_count.value),
+        voter_card_count: deformatNumber(elements.voter_card_count.value),
+        total_admitted_voters_count: deformatNumber(elements.total_admitted_voters_count.value),
       },
       votes_counts: {
-        votes_candidates_count: deformat(elements.votes_candidates_count.value),
-        blank_votes_count: deformat(elements.blank_votes_count.value),
-        invalid_votes_count: deformat(elements.invalid_votes_count.value),
-        total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
+        votes_candidates_count: deformatNumber(elements.votes_candidates_count.value),
+        blank_votes_count: deformatNumber(elements.blank_votes_count.value),
+        invalid_votes_count: deformatNumber(elements.invalid_votes_count.value),
+        total_votes_cast_count: deformatNumber(elements.total_votes_cast_count.value),
       },
       voters_recounts: undefined,
     };
     const recountForm = document.getElementById("recounted_title");
     if (recountForm) {
       values.voters_recounts = {
-        poll_card_recount: deformat(elements.poll_card_recount.value),
-        proxy_certificate_recount: deformat(elements.proxy_certificate_recount.value),
-        voter_card_recount: deformat(elements.voter_card_recount.value),
-        total_admitted_voters_recount: deformat(elements.total_admitted_voters_recount.value),
+        poll_card_recount: deformatNumber(elements.poll_card_recount.value),
+        proxy_certificate_recount: deformatNumber(elements.proxy_certificate_recount.value),
+        voter_card_recount: deformatNumber(elements.voter_card_recount.value),
+        total_admitted_voters_recount: deformatNumber(elements.total_admitted_voters_recount.value),
       };
     }
     return values;
-  }, [deformat]);
+  }, []);
 
   const getIgnoreWarnings = React.useCallback(() => {
     const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement | null;
@@ -140,7 +139,7 @@ export function VotersAndVotesForm() {
       }
     })(event);
 
-  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings);
 
   React.useEffect(() => {
     if (isSaved) {
@@ -155,8 +154,6 @@ export function VotersAndVotesForm() {
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
     warningsAccepted: getIgnoreWarnings(),
-    inputProps: register(),
-    format,
   };
 
   return (

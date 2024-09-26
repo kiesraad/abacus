@@ -13,7 +13,7 @@ import {
   KeyboardKey,
   KeyboardKeys,
 } from "@kiesraad/ui";
-import { usePositiveNumberInputMask } from "@kiesraad/util";
+import { deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
 
@@ -34,7 +34,6 @@ interface DifferencesFormElement extends HTMLFormElement {
 }
 
 export function DifferencesForm() {
-  const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<DifferencesFormElement>(null);
 
   const getValues = React.useCallback(() => {
@@ -55,16 +54,16 @@ export function DifferencesForm() {
     const elements = form.elements;
     return {
       differences_counts: {
-        more_ballots_count: deformat(elements.more_ballots_count.value),
-        fewer_ballots_count: deformat(elements.fewer_ballots_count.value),
-        unreturned_ballots_count: deformat(elements.unreturned_ballots_count.value),
-        too_few_ballots_handed_out_count: deformat(elements.too_few_ballots_handed_out_count.value),
-        too_many_ballots_handed_out_count: deformat(elements.too_many_ballots_handed_out_count.value),
-        other_explanation_count: deformat(elements.other_explanation_count.value),
-        no_explanation_count: deformat(elements.no_explanation_count.value),
+        more_ballots_count: deformatNumber(elements.more_ballots_count.value),
+        fewer_ballots_count: deformatNumber(elements.fewer_ballots_count.value),
+        unreturned_ballots_count: deformatNumber(elements.unreturned_ballots_count.value),
+        too_few_ballots_handed_out_count: deformatNumber(elements.too_few_ballots_handed_out_count.value),
+        too_many_ballots_handed_out_count: deformatNumber(elements.too_many_ballots_handed_out_count.value),
+        other_explanation_count: deformatNumber(elements.other_explanation_count.value),
+        no_explanation_count: deformatNumber(elements.no_explanation_count.value),
       },
     };
-  }, [formRef, deformat]);
+  }, [formRef]);
 
   const getIgnoreWarnings = React.useCallback(() => {
     const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement | null;
@@ -116,7 +115,7 @@ export function DifferencesForm() {
       }
     })(event);
 
-  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings);
 
   React.useEffect(() => {
     if (isSaved) {
@@ -131,8 +130,6 @@ export function DifferencesForm() {
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
     warningsAccepted: getIgnoreWarnings(),
-    inputProps: register(),
-    format,
   };
 
   return (

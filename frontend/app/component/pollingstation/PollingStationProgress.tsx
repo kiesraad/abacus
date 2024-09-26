@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import {
   FormSection,
@@ -13,7 +13,6 @@ import { MenuStatus, ProgressList } from "@kiesraad/ui";
 export function PollingStationProgress() {
   const { pollingStationId } = useParams();
   const { election } = useElection();
-  const { pathname } = useLocation();
 
   const { formState, values } = usePollingStationFormController();
 
@@ -49,8 +48,6 @@ export function PollingStationProgress() {
     },
     [formState, values],
   );
-
-  const targetForm = currentSectionFromPath(pathname);
 
   const lists = election.political_groups;
   const currentIndex = formState.sections[formState.current]?.index || 0;
@@ -132,8 +129,8 @@ export function PollingStationProgress() {
       <ProgressList.Item
         key="save"
         id="list-item-save"
-        status="idle"
-        active={targetForm === "save"}
+        status={menuStatusForFormSection(formState.sections.save)}
+        active={formState.active === "save"}
         disabled={!formState.isCompleted}
       >
         {formState.active !== "save" && formState.isCompleted ? (
@@ -146,13 +143,4 @@ export function PollingStationProgress() {
       </ProgressList.Item>
     </ProgressList>
   );
-}
-
-function currentSectionFromPath(pathname: string): string {
-  //4 deep;
-  const pathParts = pathname.split("/");
-  if (pathParts.length >= 4) {
-    return pathParts[4] || "";
-  }
-  return "";
 }

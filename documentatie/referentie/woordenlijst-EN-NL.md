@@ -26,3 +26,4 @@ Voor de vertaling van begrippen uit de wet naar variabelen en functienamen in on
 | Kandidaten | | Candidates | |
 | Uitgebrachte stemmen | | Votes Cast | |
 | Stembiljet | | Ballot | |
+| Zetel | | Seat | |

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { IconArrowBlockUp, IconCornerDownLeft } from "@kiesraad/icon";
+import { IconArrowBlockUp, IconArrowNarrowDown, IconArrowNarrowUp, IconCornerDownLeft } from "@kiesraad/icon";
 import { KeyboardKey } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
@@ -29,13 +29,13 @@ function renderKey(keyboardKey: KeyboardKey, index: number): React.JSX.Element {
     case KeyboardKey.Down:
       return (
         <kbd key={index}>
-          <span>￬</span>
+          <IconArrowNarrowDown />
         </kbd>
       );
     case KeyboardKey.Up:
       return (
         <kbd key={index}>
-          <span>￪</span>
+          <IconArrowNarrowUp />
         </kbd>
       );
     default:

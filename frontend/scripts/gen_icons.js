@@ -13,6 +13,10 @@ async function run() {
     // regex captures two or more groups of letters seperated by dashes, if followed by an equal sign
     content = content.replace(/[A-Za-z]+(-[A-Za-z]+)+(?==)/g, kebabToCamelCase);
     content = content.replace(/^<svg /, "<svg {...props} ");
+    //check for role="img" and add it if not present
+    if (!content.includes("role=")) {
+      content = content.replace(/^<svg /, '<svg role="img" ');
+    }
 
     result.push(
       `export const Icon${ucfirst(file.replace(".svg", ""))} = (props:React.SVGAttributes<SVGElement>) => (${content});\n`,

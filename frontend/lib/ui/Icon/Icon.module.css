@@ -1,6 +1,8 @@
 .icon {
   display: inline-block;
   fill: currentColor;
+  width: 1.5rem;
+  height: 1.5rem;
 
   svg {
     width: 1.5rem;
@@ -17,6 +19,12 @@
   &.error {
     svg {
       fill: var(--color-error-darkest);
+    }
+  }
+
+  &.accept {
+    svg {
+      fill: var(--color-success);
     }
   }
 

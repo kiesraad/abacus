@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { Election, useElectionList } from "@kiesraad/api";
 import { IconCheckHeart, IconChevronRight } from "@kiesraad/icon";
-import { Alert, WorkStationNumber } from "@kiesraad/ui";
+import { Alert, Icon, WorkStationNumber } from "@kiesraad/ui";
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ export function OverviewPage() {
                   <td></td>
                   <td>
                     <div className="flex_overview">
-                      <IconCheckHeart />
+                      <Icon icon={<IconCheckHeart />} color="accept" />
                       <span>Invoerders bezig</span>
                       {/* TODO <IconHourglass />
                       <span>Invoer opgeschort</span>

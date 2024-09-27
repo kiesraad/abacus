@@ -9,7 +9,7 @@ export function NavBar({ children }: { children?: React.ReactNode }) {
     <nav aria-label="primary-navigation" className={styles.navBar}>
       <div className={styles.links}>{children}</div>
       <div className={styles.userInfo}>
-        <IconUser />
+        <IconUser style={{ fill: "white" }} />
         <span>Invoerder</span>
       </div>
     </nav>

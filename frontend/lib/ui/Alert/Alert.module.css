@@ -46,6 +46,11 @@
   &.warning {
     border-color: var(--color-warning-darker);
     background-color: var(--color-warning-bg);
+    > button:focus,
+    > button:focus-visible {
+      background: var(--color-warning-hover);
+      border-color: var(--color-warning-focus);
+    }
     > button:hover {
       background: var(--color-warning-hover);
     }
@@ -56,6 +61,11 @@
   &.notify {
     border-color: var(--color-notify);
     background-color: var(--color-notify-bg);
+    > button:focus,
+    > button:focus-visible {
+      background: var(--color-notify-hover);
+      border-color: var(--color-notify-focus);
+    }
     > button:hover {
       background: var(--color-notify-hover);
     }
@@ -66,6 +76,11 @@
   &.success {
     border-color: var(--color-success);
     background-color: var(--color-success-bg);
+    > button:focus,
+    > button:focus-visible {
+      background: var(--color-success-hover);
+      border-color: var(--color-success-focus);
+    }
     > button:hover {
       background: var(--color-success-hover);
     }

@@ -62,7 +62,8 @@
   --checkbox-color-bg-hover-checked: var(--button-color-primary-hover);
   --checkbox-color-bg-focus-checked: var(--checkbox-color-bg-default);
 
-  --button-icon-ghost-color-svg: var(--menu-empty);
+  --button-icon-modal-close-color-svg: var(--menu-empty);
+  --button-icon-ghost-color-svg: var(--base-black);
   --button-icon-ghost-color-border-focus: var(--checkbox-color-border);
   --button-icon-ghost-color-bg-focus: var(--bg-gray-darker);
   --button-icon-ghost-color-bg-hover: var(--bg-gray-darker);
@@ -84,15 +85,18 @@
   --color-warning-darker: #dc6803;
   --color-warning-bg: #fef0c7;
   --color-warning-hover: #fedf89;
+  --color-warning-focus: #fdb022;
   --color-warning-text: #93370d;
 
   --color-notify: #2e90fa;
   --color-notify-bg: #e0f2fe;
   --color-notify-hover: #b9e6fe;
+  --color-notify-focus: #36bffa;
 
   --color-success: #12b76a;
   --color-success-bg: #d1fadf;
   --color-success-hover: #a6f4c5;
+  --color-success-focus: #32d583;
 
   --color-help-text: #475467;
   --color-hover: #eaecf0;

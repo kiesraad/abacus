@@ -1,5 +1,4 @@
 import * as React from "react";
-import { createPortal } from "react-dom";
 
 import { IconCross } from "@kiesraad/icon";
 import { IconButton } from "@kiesraad/ui";
@@ -13,22 +12,35 @@ export interface ModalProps {
 }
 
 export function Modal({ id, onClose, children }: ModalProps): React.ReactNode {
-  const modalRoot = document.body;
+  const dialogRef = React.useRef<HTMLDialogElement | null>(null);
 
   React.useEffect(() => {
-    document.getElementById(id)?.focus();
+    if (dialogRef.current) {
+      dialogRef.current.showModal();
+      document.getElementById(id)?.focus();
+    }
   }, [id]);
 
-  return createPortal(
-    <div className={cls.modal} role="dialog">
+  return (
+    <dialog id="modal-dialog" className={cls.modal} ref={dialogRef}>
       <div className={cls["modal-container"]}>
         {onClose && (
-          // TODO: How to make sure thus button can focus with keyboard?
-          <IconButton onClick={onClose} icon={<IconCross />} title="Melding sluiten" size="lg" variant="ghost" />
+          <IconButton
+            onClick={() => {
+              if (dialogRef.current) {
+                dialogRef.current.close();
+                dialogRef.current = null;
+              }
+              onClose();
+            }}
+            icon={<IconCross />}
+            title="Melding sluiten"
+            size="lg"
+            variant="ghost"
+          />
         )}
         <div className={cls["modal-body"]}>{children}</div>
       </div>
-    </div>,
-    modalRoot,
+    </dialog>
   );
 }

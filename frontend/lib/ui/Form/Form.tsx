@@ -112,7 +112,6 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
     submitButton.current = innerRef.current?.querySelector("button[type=submit]") as HTMLButtonElement | null;
   }, [children, skip]);
 
-  // TODO: Need to perform this also when modal closes
   React.useEffect(() => {
     document.getElementById("form-title")?.focus();
   }, []);

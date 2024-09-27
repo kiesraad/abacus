@@ -171,7 +171,6 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
           )}
         </>
       )}
-
       {apiError && <Feedback id="feedback-server-error" type="error" apiError={apiError} />}
     </>
   );

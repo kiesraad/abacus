@@ -31,6 +31,11 @@
   &.error {
     border-color: var(--color-error-darkest);
     background-color: var(--color-error-bg);
+    > button:focus,
+    > button:focus-visible {
+      background: var(--color-error-hover);
+      border-color: var(--color-error-focus);
+    }
     > button:hover {
       background: var(--color-error-hover);
     }

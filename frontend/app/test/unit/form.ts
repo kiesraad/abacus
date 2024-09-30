@@ -34,6 +34,9 @@ export const emptyDataEntryRequest: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY
       })),
     })),
   },
+  client_state: {
+    test: "test",
+  },
 };
 
 type ErrorMap = {

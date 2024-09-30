@@ -10,6 +10,7 @@ export interface NumberInputProps
 export function NumberInput({ id, ...inputProps }: NumberInputProps) {
   const props = {
     maxLength: 9,
+    autoComplete: "off",
     ...inputProps,
     defaultValue: inputProps.defaultValue ? formatNumber(inputProps.defaultValue) : "",
     type: "text",

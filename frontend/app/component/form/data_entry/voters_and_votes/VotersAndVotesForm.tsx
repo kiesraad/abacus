@@ -40,6 +40,7 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 
 export function VotersAndVotesForm() {
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
+  const ignoreWarnignsRef = React.useRef<HTMLInputElement>(null);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -90,7 +91,7 @@ export function VotersAndVotesForm() {
   }, []);
 
   const getIgnoreWarnings = React.useCallback(() => {
-    const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement | null;
+    const checkbox = ignoreWarnignsRef.current;
     if (checkbox) {
       return checkbox.checked;
     }
@@ -297,7 +298,12 @@ export function VotersAndVotesForm() {
           </BottomBar.Row>
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings} hasError={warningsWarning}>
+          <Checkbox
+            id={_IGNORE_WARNINGS_ID}
+            defaultChecked={ignoreWarnings}
+            hasError={warningsWarning}
+            ref={ignoreWarnignsRef}
+          >
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

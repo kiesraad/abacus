@@ -32,7 +32,7 @@ export interface CandidatesVotesFormProps {
 
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
-
+  const ignoreWarnignsRef = React.useRef<HTMLInputElement>(null);
   const _IGNORE_WARNINGS_ID = `candidates_votes_form_ignore_warnings_${group.number}`;
 
   const getValues = React.useCallback(() => {
@@ -61,12 +61,12 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   }, [group]);
 
   const getIgnoreWarnings = React.useCallback(() => {
-    const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement | null;
+    const checkbox = ignoreWarnignsRef.current;
     if (checkbox) {
       return checkbox.checked;
     }
     return false;
-  }, [_IGNORE_WARNINGS_ID]);
+  }, []);
 
   const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } = usePoliticalGroup(
     group.number,
@@ -79,11 +79,12 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   React.useEffect(() => {
     if (hasChanges) {
-      const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
-      if (checkbox.checked) checkbox.click();
+      const checkbox = ignoreWarnignsRef.current;
+
+      if (checkbox && checkbox.checked) checkbox.click();
       setWarningsWarning(false);
     }
-  }, [hasChanges, _IGNORE_WARNINGS_ID]);
+  }, [hasChanges]);
 
   const errorsAndWarnings = getErrorsAndWarnings(errors, warnings);
 
@@ -100,9 +101,8 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       event.preventDefault();
 
       if (errors.length === 0 && warnings.length > 0) {
-        const ignoreWarnings = (
-          document.getElementById(`candidates_votes_form_ignore_warnings_${group.number}`) as HTMLInputElement
-        ).checked;
+        const ignoreWarnings = ignoreWarnignsRef.current?.checked || false;
+
         if (!hasChanges && !ignoreWarnings) {
           setWarningsWarning(true);
         } else {
@@ -185,7 +185,12 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           </BottomBar.Row>
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings} hasError={warningsWarning}>
+          <Checkbox
+            id={_IGNORE_WARNINGS_ID}
+            defaultChecked={ignoreWarnings}
+            hasError={warningsWarning}
+            ref={ignoreWarnignsRef}
+          >
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

@@ -41,6 +41,7 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 export function VotersAndVotesForm() {
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
   const ignoreWarnignsRef = React.useRef<HTMLInputElement>(null);
+  const recountTitleRef = React.useRef<HTMLHeadingElement>(null);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -78,7 +79,7 @@ export function VotersAndVotesForm() {
       },
       voters_recounts: undefined,
     };
-    const recountForm = document.getElementById("recounted_title");
+    const recountForm = recountTitleRef.current;
     if (recountForm) {
       values.voters_recounts = {
         poll_card_recount: deformatNumber(elements.poll_card_recount.value),
@@ -110,8 +111,8 @@ export function VotersAndVotesForm() {
 
   React.useEffect(() => {
     if (hasChanges) {
-      const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
-      if (checkbox.checked) checkbox.click();
+      const checkbox = ignoreWarnignsRef.current;
+      if (checkbox && checkbox.checked) checkbox.click();
       setWarningsWarning(false);
     }
   }, [hasChanges]);
@@ -121,7 +122,7 @@ export function VotersAndVotesForm() {
       event.preventDefault();
 
       if (errors.length === 0 && warnings.length > 0) {
-        const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement).checked;
+        const ignoreWarnings = ignoreWarnignsRef.current?.checked || false;
         if (!hasChanges && !ignoreWarnings) {
           setWarningsWarning(true);
         } else {
@@ -245,7 +246,9 @@ export function VotersAndVotesForm() {
         {recounted && (
           <>
             <InputGrid.SectionTitleHeader>
-              <h2 id="recounted_title">Toegelaten kiezers na hertelling door gemeentelijk stembureau</h2>
+              <h2 id="recounted_title" ref={recountTitleRef}>
+                Toegelaten kiezers na hertelling door gemeentelijk stembureau
+              </h2>
               <th>Veld</th>
               <th>Geteld aantal</th>
               <th>Omschrijving</th>

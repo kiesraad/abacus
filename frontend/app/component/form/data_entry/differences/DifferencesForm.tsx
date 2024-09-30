@@ -35,6 +35,7 @@ interface DifferencesFormElement extends HTMLFormElement {
 
 export function DifferencesForm() {
   const formRef = React.useRef<DifferencesFormElement>(null);
+  const ignoreWarnignsRef = React.useRef<HTMLInputElement>(null);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -66,7 +67,7 @@ export function DifferencesForm() {
   }, [formRef]);
 
   const getIgnoreWarnings = React.useCallback(() => {
-    const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement | null;
+    const checkbox = ignoreWarnignsRef.current;
     if (checkbox) {
       return checkbox.checked;
     }
@@ -83,8 +84,8 @@ export function DifferencesForm() {
 
   React.useEffect(() => {
     if (hasChanges) {
-      const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
-      if (checkbox.checked) checkbox.click();
+      const checkbox = ignoreWarnignsRef.current;
+      if (checkbox && checkbox.checked) checkbox.click();
       setWarningsWarning(false);
     }
   }, [hasChanges]);
@@ -96,7 +97,7 @@ export function DifferencesForm() {
       event.preventDefault();
 
       if (errors.length === 0 && warnings.length > 0) {
-        const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement).checked;
+        const ignoreWarnings = ignoreWarnignsRef.current?.checked || false;
         if (!hasChanges && !ignoreWarnings) {
           setWarningsWarning(true);
         } else {
@@ -219,7 +220,12 @@ export function DifferencesForm() {
           </BottomBar.Row>
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings} hasError={warningsWarning}>
+          <Checkbox
+            id={_IGNORE_WARNINGS_ID}
+            defaultChecked={ignoreWarnings}
+            hasError={warningsWarning}
+            ref={ignoreWarnignsRef}
+          >
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

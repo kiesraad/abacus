@@ -38,14 +38,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         >
           <IconCheckmarkSmall aria-label={checked ? "Aangevinkt" : "uitgevinkt"} />
         </div>
-        <input
-          type="checkbox"
-          id={id}
-          name={id}
-          checked={checked}
-          onChange={onChange}
-          ref={ref} // forward the ref here
-        />
+        <input type="checkbox" id={id} name={id} checked={checked} onChange={onChange} ref={ref} />
         <label htmlFor={id}>{children}</label>
       </div>
     );

@@ -17,7 +17,7 @@ import { deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
 
-const _IGNORE_WARNINGS_ID = "voters_and_votes_form_ignore_warnings";
+const _ACCEPT_WARNINGS_ID = "voters_and_votes_form_accept_warnings";
 
 interface FormElements extends HTMLFormControlsCollection {
   poll_card_count: HTMLInputElement;
@@ -40,7 +40,7 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 
 export function VotersAndVotesForm() {
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
-  const ignoreWarnignsRef = React.useRef<HTMLInputElement>(null);
+  const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
   const recountTitleRef = React.useRef<HTMLHeadingElement>(null);
 
   const getValues = React.useCallback(() => {
@@ -91,8 +91,8 @@ export function VotersAndVotesForm() {
     return values;
   }, []);
 
-  const getIgnoreWarnings = React.useCallback(() => {
-    const checkbox = ignoreWarnignsRef.current;
+  const getAcceptWarnings = React.useCallback(() => {
+    const checkbox = acceptWarningsRef.current;
     if (checkbox) {
       return checkbox.checked;
     }
@@ -101,7 +101,7 @@ export function VotersAndVotesForm() {
 
   const { status, sectionValues, errors, warnings, isSaved, ignoreWarnings, submit, recounted } = useVotersAndVotes(
     getValues,
-    getIgnoreWarnings,
+    getAcceptWarnings,
   );
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
@@ -111,7 +111,7 @@ export function VotersAndVotesForm() {
 
   React.useEffect(() => {
     if (hasChanges) {
-      const checkbox = ignoreWarnignsRef.current;
+      const checkbox = acceptWarningsRef.current;
       if (checkbox && checkbox.checked) checkbox.click();
       setWarningsWarning(false);
     }
@@ -122,8 +122,8 @@ export function VotersAndVotesForm() {
       event.preventDefault();
 
       if (errors.length === 0 && warnings.length > 0) {
-        const ignoreWarnings = ignoreWarnignsRef.current?.checked || false;
-        if (!hasChanges && !ignoreWarnings) {
+        const acceptWarnings = acceptWarningsRef.current?.checked || false;
+        if (!hasChanges && !acceptWarnings) {
           setWarningsWarning(true);
         } else {
           try {
@@ -154,11 +154,11 @@ export function VotersAndVotesForm() {
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
-    warningsAccepted: getIgnoreWarnings(),
+    warningsAccepted: getAcceptWarnings(),
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form" skip={[_IGNORE_WARNINGS_ID]}>
+    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form" skip={[_ACCEPT_WARNINGS_ID]}>
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
@@ -302,10 +302,10 @@ export function VotersAndVotesForm() {
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
           <Checkbox
-            id={_IGNORE_WARNINGS_ID}
+            id={_ACCEPT_WARNINGS_ID}
             defaultChecked={ignoreWarnings}
             hasError={warningsWarning}
-            ref={ignoreWarnignsRef}
+            ref={acceptWarningsRef}
           >
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>

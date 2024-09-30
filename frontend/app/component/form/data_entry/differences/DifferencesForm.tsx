@@ -17,7 +17,7 @@ import { deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
 
-const _IGNORE_WARNINGS_ID = "differences_form_ignore_warnings";
+const _ACCEPT_WARNINGS_ID = "differences_form_accept_warnings";
 
 interface FormElements extends HTMLFormControlsCollection {
   more_ballots_count: HTMLInputElement;
@@ -35,7 +35,7 @@ interface DifferencesFormElement extends HTMLFormElement {
 
 export function DifferencesForm() {
   const formRef = React.useRef<DifferencesFormElement>(null);
-  const ignoreWarnignsRef = React.useRef<HTMLInputElement>(null);
+  const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -67,7 +67,7 @@ export function DifferencesForm() {
   }, [formRef]);
 
   const getIgnoreWarnings = React.useCallback(() => {
-    const checkbox = ignoreWarnignsRef.current;
+    const checkbox = acceptWarningsRef.current;
     if (checkbox) {
       return checkbox.checked;
     }
@@ -84,7 +84,7 @@ export function DifferencesForm() {
 
   React.useEffect(() => {
     if (hasChanges) {
-      const checkbox = ignoreWarnignsRef.current;
+      const checkbox = acceptWarningsRef.current;
       if (checkbox && checkbox.checked) checkbox.click();
       setWarningsWarning(false);
     }
@@ -97,12 +97,12 @@ export function DifferencesForm() {
       event.preventDefault();
 
       if (errors.length === 0 && warnings.length > 0) {
-        const ignoreWarnings = ignoreWarnignsRef.current?.checked || false;
-        if (!hasChanges && !ignoreWarnings) {
+        const acceptWarnings = acceptWarningsRef.current?.checked || false;
+        if (!hasChanges && !acceptWarnings) {
           setWarningsWarning(true);
         } else {
           try {
-            await submit(ignoreWarnings);
+            await submit(acceptWarnings);
           } catch (e) {
             console.error("Error saving data entry", e);
           }
@@ -133,7 +133,7 @@ export function DifferencesForm() {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="differences_form" skip={[_IGNORE_WARNINGS_ID]}>
+    <Form onSubmit={handleSubmit} ref={formRef} id="differences_form" skip={[_ACCEPT_WARNINGS_ID]}>
       <h2>Verschillen tussen toegelaten kiezers en uitgebrachte stemmen</h2>
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
@@ -221,10 +221,10 @@ export function DifferencesForm() {
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
           <Checkbox
-            id={_IGNORE_WARNINGS_ID}
+            id={_ACCEPT_WARNINGS_ID}
             defaultChecked={ignoreWarnings}
             hasError={warningsWarning}
-            ref={ignoreWarnignsRef}
+            ref={acceptWarningsRef}
           >
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>

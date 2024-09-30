@@ -32,8 +32,8 @@ export interface CandidatesVotesFormProps {
 
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
-  const ignoreWarnignsRef = React.useRef<HTMLInputElement>(null);
-  const _IGNORE_WARNINGS_ID = `candidates_votes_form_ignore_warnings_${group.number}`;
+  const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
+  const _ACCEPT_WARNINGS_ID = `candidates_votes_form_accept_warnings_${group.number}`;
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -60,8 +60,8 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     };
   }, [group]);
 
-  const getIgnoreWarnings = React.useCallback(() => {
-    const checkbox = ignoreWarnignsRef.current;
+  const getAcceptWarnings = React.useCallback(() => {
+    const checkbox = acceptWarningsRef.current;
     if (checkbox) {
       return checkbox.checked;
     }
@@ -71,7 +71,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } = usePoliticalGroup(
     group.number,
     getValues,
-    getIgnoreWarnings,
+    getAcceptWarnings,
   );
 
   const shouldWatch = warnings.length > 0 && isSaved;
@@ -79,7 +79,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   React.useEffect(() => {
     if (hasChanges) {
-      const checkbox = ignoreWarnignsRef.current;
+      const checkbox = acceptWarningsRef.current;
 
       if (checkbox && checkbox.checked) checkbox.click();
       setWarningsWarning(false);
@@ -101,13 +101,13 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       event.preventDefault();
 
       if (errors.length === 0 && warnings.length > 0) {
-        const ignoreWarnings = ignoreWarnignsRef.current?.checked || false;
+        const acceptWarnings = acceptWarningsRef.current?.checked || false;
 
-        if (!hasChanges && !ignoreWarnings) {
+        if (!hasChanges && !acceptWarnings) {
           setWarningsWarning(true);
         } else {
           try {
-            await submit(ignoreWarnings);
+            await submit(acceptWarnings);
           } catch (e) {
             console.error("Error saving data entry", e);
           }
@@ -126,11 +126,11 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
-    warningsAccepted: getIgnoreWarnings(),
+    warningsAccepted: getAcceptWarnings(),
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`} skip={[_IGNORE_WARNINGS_ID]}>
+    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`} skip={[_ACCEPT_WARNINGS_ID]}>
       <h2>
         Lijst {group.number} - {group.name}
       </h2>
@@ -186,10 +186,10 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
           <Checkbox
-            id={_IGNORE_WARNINGS_ID}
+            id={_ACCEPT_WARNINGS_ID}
             defaultChecked={ignoreWarnings}
             hasError={warningsWarning}
-            ref={ignoreWarnignsRef}
+            ref={acceptWarningsRef}
           >
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>

@@ -187,12 +187,12 @@ function reasonsBlocked(
     if (formSection.errors.length > 0) {
       result.push("errors");
     }
-    if (formSection.warnings.length > 0 && !formSection.ignoreWarnings) {
+    if (formSection.warnings.length > 0 && !formSection.acceptWarnings) {
       result.push("warnings");
     }
 
     if (
-      (currentForm.getIgnoreWarnings && formSection.ignoreWarnings !== currentForm.getIgnoreWarnings()) ||
+      (currentForm.getIgnoreWarnings && formSection.acceptWarnings !== currentForm.getIgnoreWarnings()) ||
       currentFormHasChanges(currentForm, values)
     ) {
       result.push("changes");

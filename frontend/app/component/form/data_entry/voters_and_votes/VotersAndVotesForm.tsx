@@ -99,7 +99,7 @@ export function VotersAndVotesForm() {
     return false;
   }, []);
 
-  const { status, sectionValues, errors, warnings, isSaved, ignoreWarnings, submit, recounted } = useVotersAndVotes(
+  const { status, sectionValues, errors, warnings, isSaved, acceptWarnings, submit, recounted } = useVotersAndVotes(
     getValues,
     getAcceptWarnings,
   );
@@ -127,7 +127,7 @@ export function VotersAndVotesForm() {
           setWarningsWarning(true);
         } else {
           try {
-            await submit(ignoreWarnings);
+            await submit(acceptWarnings);
           } catch (e) {
             console.error("Error saving data entry", e);
           }
@@ -303,7 +303,7 @@ export function VotersAndVotesForm() {
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
           <Checkbox
             id={_ACCEPT_WARNINGS_ID}
-            defaultChecked={ignoreWarnings}
+            defaultChecked={acceptWarnings}
             hasError={warningsWarning}
             ref={acceptWarningsRef}
           >

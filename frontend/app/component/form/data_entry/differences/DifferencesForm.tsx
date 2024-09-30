@@ -74,7 +74,7 @@ export function DifferencesForm() {
     return false;
   }, []);
 
-  const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } = useDifferences(
+  const { status, sectionValues, errors, warnings, isSaved, submit, acceptWarnings } = useDifferences(
     getValues,
     getIgnoreWarnings,
   );
@@ -222,7 +222,7 @@ export function DifferencesForm() {
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
           <Checkbox
             id={_ACCEPT_WARNINGS_ID}
-            defaultChecked={ignoreWarnings}
+            defaultChecked={acceptWarnings}
             hasError={warningsWarning}
             ref={acceptWarningsRef}
           >

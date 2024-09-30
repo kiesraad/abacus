@@ -80,7 +80,7 @@ export interface iPollingStationControllerContext {
   setTemporaryCache: (cache: TemporaryCache | null) => boolean;
   cache: TemporaryCache | null;
   currentForm: AnyFormReference | null;
-  submitCurrentForm: (ignoreWarnings?: boolean, aborting?: boolean) => Promise<void>;
+  submitCurrentForm: (acceptWarnings?: boolean, aborting?: boolean) => Promise<void>;
   registerCurrentForm: (form: AnyFormReference) => void;
   deleteDataEntry: () => Promise<void>;
   finaliseDataEntry: () => Promise<void>;
@@ -100,7 +100,7 @@ export type FormSection = {
   title?: string;
   isSaved: boolean; //has this section been sent to the server
   isSubmitted?: boolean; //has this section been submitted in the latest request
-  ignoreWarnings: boolean;
+  acceptWarnings: boolean;
   errors: ValidationResult[];
   warnings: ValidationResult[];
 };
@@ -234,7 +234,7 @@ export function PollingStationFormController({
     return null;
   }
 
-  const submitCurrentForm = async (ignoreWarnings = false, aborting?: boolean) => {
+  const submitCurrentForm = async (acceptWarnings = false, aborting?: boolean) => {
     // React state is fixed within one render, so we update our own copy instead of using setValues directly
     let newValues: PollingStationValues = values;
     if (currentForm.current) {
@@ -326,7 +326,7 @@ export function PollingStationFormController({
         //store that this section has been submitted, this resets on each request
         activeFormSection.isSubmitted = true;
         //flag ignore warnings
-        activeFormSection.ignoreWarnings = ignoreWarnings;
+        activeFormSection.acceptWarnings = acceptWarnings;
       }
 
       //distribute errors to sections
@@ -342,7 +342,7 @@ export function PollingStationFormController({
             activeFormSection.errors.length === 0 ||
             activeFormSection.errors.every((vr) => isGlobalValidationResult(vr))
           ) {
-            if (activeFormSection.warnings.length === 0 || activeFormSection.ignoreWarnings) {
+            if (activeFormSection.warnings.length === 0 || activeFormSection.acceptWarnings) {
               const nextSectionID = getNextSection(newFormState, activeFormSection);
               if (nextSectionID) {
                 newFormState.current = nextSectionID;

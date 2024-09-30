@@ -68,7 +68,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     return false;
   }, []);
 
-  const { status, sectionValues, errors, warnings, isSaved, submit, ignoreWarnings } = usePoliticalGroup(
+  const { status, sectionValues, errors, warnings, isSaved, submit, acceptWarnings } = usePoliticalGroup(
     group.number,
     getValues,
     getAcceptWarnings,
@@ -187,7 +187,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
           <Checkbox
             id={_ACCEPT_WARNINGS_ID}
-            defaultChecked={ignoreWarnings}
+            defaultChecked={acceptWarnings}
             hasError={warningsWarning}
             ref={acceptWarningsRef}
           >

@@ -70,7 +70,7 @@ export default defineConfig(({ command }) => {
     },
     test: {
       environment: "jsdom",
-      setupFiles: ["app/test/unit/setup.ts"],
+      setupFiles: ["app/test/unit/setup.ts", "app/test/unit/modal.ts"],
       includeSource: ["app/**/*.ts", "lib/**/*.ts"],
     },
   } satisfies UserConfig;

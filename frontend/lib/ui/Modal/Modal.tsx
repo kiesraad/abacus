@@ -13,9 +13,11 @@ export interface ModalProps {
 
 export function Modal({ id, onClose, children }: ModalProps): React.ReactNode {
   const dialogRef = React.useRef<HTMLDialogElement | null>(null);
+  const lastActiveElement = React.useRef<HTMLElement | null>(null);
 
   React.useEffect(() => {
-    if (dialogRef.current) {
+    if (dialogRef.current && !dialogRef.current.open) {
+      lastActiveElement.current = document.activeElement as HTMLElement;
       dialogRef.current.showModal();
       document.getElementById(id)?.focus();
     }
@@ -30,6 +32,7 @@ export function Modal({ id, onClose, children }: ModalProps): React.ReactNode {
               if (dialogRef.current) {
                 dialogRef.current.close();
                 dialogRef.current = null;
+                lastActiveElement.current?.focus();
               }
               onClose();
             }}

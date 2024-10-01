@@ -7,7 +7,6 @@ import {
   AnyFormReference,
   ClientValidationResult,
   currentFormHasChanges,
-  FieldValidationResult,
   FormSection,
   formSectionComplete,
   getErrorsAndWarnings,
@@ -81,7 +80,7 @@ describe("PollingStationUtils", () => {
         index: 0,
         id: "recounted",
         isSaved: false,
-        ignoreWarnings: false,
+        acceptWarnings: false,
         errors: [],
         warnings: [],
       }),
@@ -92,7 +91,7 @@ describe("PollingStationUtils", () => {
         index: 0,
         id: "recounted",
         isSaved: true,
-        ignoreWarnings: false,
+        acceptWarnings: false,
         errors: [],
         warnings: [],
       }),
@@ -106,7 +105,7 @@ describe("PollingStationUtils", () => {
       index: 0,
       id: "recounted",
       isSaved: false,
-      ignoreWarnings: false,
+      acceptWarnings: false,
       errors: [],
       warnings: [],
     });
@@ -231,7 +230,7 @@ describe("PollingStationUtils", () => {
     expect(hasOnlyGlobalValidationResults(mixedResults)).toBe(false);
   });
 
-  test("getErrorsAndWarnings errors and clientWarnings", () => {
+  test("getErrorsAndWarnings errors", () => {
     const errors: ValidationResult[] = [
       {
         code: "F201",
@@ -260,14 +259,7 @@ describe("PollingStationUtils", () => {
       },
     ];
 
-    const clientWarnings: FieldValidationResult[] = [
-      {
-        code: "W202",
-        id: "blank_votes_count",
-      },
-    ];
-
-    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, clientWarnings);
+    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings);
     expect(errorsAndWarnings.get("blank_votes_count")).toBeDefined();
     expect(errorsAndWarnings.get("blank_votes_count")?.errors).toEqual(
       expect.arrayContaining([
@@ -278,19 +270,11 @@ describe("PollingStationUtils", () => {
       ]),
     );
 
-    //warnings should not be added if errors (excluding client warnings)
-    expect(errorsAndWarnings.get("blank_votes_count")?.warnings.length).toBe(1);
-    expect(errorsAndWarnings.get("blank_votes_count")?.warnings).toEqual(
-      expect.arrayContaining([
-        {
-          code: "W202",
-          id: "blank_votes_count",
-        },
-      ]),
-    );
+    //warnings should not be added if errors
+    expect(errorsAndWarnings.get("blank_votes_count")?.warnings.length).toBe(0);
   });
 
-  test("getErrorsAndWarnings warnings and clientWarnings", () => {
+  test("getErrorsAndWarnings warnings", () => {
     const errors: ValidationResult[] = [];
 
     const warnings: ValidationResult[] = [
@@ -300,24 +284,13 @@ describe("PollingStationUtils", () => {
       },
     ];
 
-    const clientWarnings: FieldValidationResult[] = [
-      {
-        code: "W202",
-        id: "blank_votes_count",
-      },
-    ];
-
-    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, clientWarnings);
+    const errorsAndWarnings = getErrorsAndWarnings(errors, warnings);
     expect(errorsAndWarnings.get("blank_votes_count")).toBeDefined();
     expect(errorsAndWarnings.get("blank_votes_count")?.errors.length).toBe(0);
     expect(errorsAndWarnings.get("blank_votes_count")?.warnings).toEqual(
       expect.arrayContaining([
         {
           code: "W201",
-          id: "blank_votes_count",
-        },
-        {
-          code: "W202",
           id: "blank_votes_count",
         },
       ]),
@@ -329,7 +302,7 @@ describe("PollingStationUtils", () => {
       index: 0,
       id: "voters_votes_counts",
       isSaved: false,
-      ignoreWarnings: false,
+      acceptWarnings: false,
       errors: [],
       warnings: [],
     };
@@ -367,7 +340,7 @@ describe("PollingStationUtils", () => {
     expect(summary.notableFormSections.length).toBe(1);
     expect(summary.notableFormSections.some((item) => item.formSection.id == "political_group_votes_2"));
 
-    state.sections.differences_counts.ignoreWarnings = true;
+    state.sections.differences_counts.acceptWarnings = true;
     state.sections.differences_counts.warnings = [errorWarningMocks.W301];
 
     summary = getPollingStationSummary(state, values);
@@ -397,7 +370,7 @@ describe("PollingStationUtils", () => {
       ),
     );
 
-    state.sections.differences_counts.ignoreWarnings = false;
+    state.sections.differences_counts.acceptWarnings = false;
 
     summary = getPollingStationSummary(state, values);
 

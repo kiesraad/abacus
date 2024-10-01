@@ -32,7 +32,7 @@ describe("PollingStationFormNavigation", () => {
         id: "recounted",
         errors: [],
         warnings: [],
-        ignoreWarnings: false,
+        acceptWarnings: false,
         isSaved: false,
       },
       voters_votes_counts: {
@@ -40,7 +40,7 @@ describe("PollingStationFormNavigation", () => {
         id: "voters_votes_counts",
         errors: [],
         warnings: [],
-        ignoreWarnings: false,
+        acceptWarnings: false,
         isSaved: false,
       },
     },

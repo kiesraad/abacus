@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import { ElectionProgress } from "app/component/election/ElectionProgress";
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -72,7 +73,7 @@ export function DataEntryHomePage() {
         </article>
         <nav id="progress">
           <h2 className="form_title">Voortgang</h2>
-          {/* TODO: Add Progress bars */}
+          <ElectionProgress />
         </nav>
       </main>
     </>

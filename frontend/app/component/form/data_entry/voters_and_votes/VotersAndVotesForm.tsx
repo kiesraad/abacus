@@ -13,11 +13,11 @@ import {
   KeyboardKey,
   KeyboardKeys,
 } from "@kiesraad/ui";
-import { usePositiveNumberInputMask } from "@kiesraad/util";
+import { deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
 
-const _IGNORE_WARNINGS_ID = "voters_and_votes_form_ignore_warnings";
+const _ACCEPT_WARNINGS_ID = "voters_and_votes_form_accept_warnings";
 
 interface FormElements extends HTMLFormControlsCollection {
   poll_card_count: HTMLInputElement;
@@ -39,8 +39,9 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 }
 
 export function VotersAndVotesForm() {
-  const { register, format, deformat, warnings: inputMaskWarnings } = usePositiveNumberInputMask();
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
+  const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
+  const recountTitleRef = React.useRef<HTMLHeadingElement>(null);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -65,42 +66,42 @@ export function VotersAndVotesForm() {
 
     const values: VotersAndVotesValues = {
       voters_counts: {
-        poll_card_count: deformat(elements.poll_card_count.value),
-        proxy_certificate_count: deformat(elements.proxy_certificate_count.value),
-        voter_card_count: deformat(elements.voter_card_count.value),
-        total_admitted_voters_count: deformat(elements.total_admitted_voters_count.value),
+        poll_card_count: deformatNumber(elements.poll_card_count.value),
+        proxy_certificate_count: deformatNumber(elements.proxy_certificate_count.value),
+        voter_card_count: deformatNumber(elements.voter_card_count.value),
+        total_admitted_voters_count: deformatNumber(elements.total_admitted_voters_count.value),
       },
       votes_counts: {
-        votes_candidates_count: deformat(elements.votes_candidates_count.value),
-        blank_votes_count: deformat(elements.blank_votes_count.value),
-        invalid_votes_count: deformat(elements.invalid_votes_count.value),
-        total_votes_cast_count: deformat(elements.total_votes_cast_count.value),
+        votes_candidates_count: deformatNumber(elements.votes_candidates_count.value),
+        blank_votes_count: deformatNumber(elements.blank_votes_count.value),
+        invalid_votes_count: deformatNumber(elements.invalid_votes_count.value),
+        total_votes_cast_count: deformatNumber(elements.total_votes_cast_count.value),
       },
       voters_recounts: undefined,
     };
-    const recountForm = document.getElementById("recounted_title");
+    const recountForm = recountTitleRef.current;
     if (recountForm) {
       values.voters_recounts = {
-        poll_card_recount: deformat(elements.poll_card_recount.value),
-        proxy_certificate_recount: deformat(elements.proxy_certificate_recount.value),
-        voter_card_recount: deformat(elements.voter_card_recount.value),
-        total_admitted_voters_recount: deformat(elements.total_admitted_voters_recount.value),
+        poll_card_recount: deformatNumber(elements.poll_card_recount.value),
+        proxy_certificate_recount: deformatNumber(elements.proxy_certificate_recount.value),
+        voter_card_recount: deformatNumber(elements.voter_card_recount.value),
+        total_admitted_voters_recount: deformatNumber(elements.total_admitted_voters_recount.value),
       };
     }
     return values;
-  }, [deformat]);
+  }, []);
 
-  const getIgnoreWarnings = React.useCallback(() => {
-    const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement | null;
+  const getAcceptWarnings = React.useCallback(() => {
+    const checkbox = acceptWarningsRef.current;
     if (checkbox) {
       return checkbox.checked;
     }
     return false;
   }, []);
 
-  const { status, sectionValues, errors, warnings, isSaved, ignoreWarnings, submit, recounted } = useVotersAndVotes(
+  const { status, sectionValues, errors, warnings, isSaved, acceptWarnings, submit, recounted } = useVotersAndVotes(
     getValues,
-    getIgnoreWarnings,
+    getAcceptWarnings,
   );
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
@@ -110,8 +111,8 @@ export function VotersAndVotesForm() {
 
   React.useEffect(() => {
     if (hasChanges) {
-      const checkbox = document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement;
-      if (checkbox.checked) checkbox.click();
+      const checkbox = acceptWarningsRef.current;
+      if (checkbox && checkbox.checked) checkbox.click();
       setWarningsWarning(false);
     }
   }, [hasChanges]);
@@ -121,12 +122,12 @@ export function VotersAndVotesForm() {
       event.preventDefault();
 
       if (errors.length === 0 && warnings.length > 0) {
-        const ignoreWarnings = (document.getElementById(_IGNORE_WARNINGS_ID) as HTMLInputElement).checked;
-        if (!hasChanges && !ignoreWarnings) {
+        const acceptWarnings = acceptWarningsRef.current?.checked || false;
+        if (!hasChanges && !acceptWarnings) {
           setWarningsWarning(true);
         } else {
           try {
-            await submit(ignoreWarnings);
+            await submit(acceptWarnings);
           } catch (e) {
             console.error("Error saving data entry", e);
           }
@@ -140,7 +141,7 @@ export function VotersAndVotesForm() {
       }
     })(event);
 
-  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings, inputMaskWarnings);
+  const errorsAndWarnings = getErrorsAndWarnings(errors, warnings);
 
   React.useEffect(() => {
     if (isSaved) {
@@ -153,13 +154,11 @@ export function VotersAndVotesForm() {
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
-    warningsAccepted: getIgnoreWarnings(),
-    inputProps: register(),
-    format,
+    warningsAccepted: getAcceptWarnings(),
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form" skip={[_IGNORE_WARNINGS_ID]}>
+    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form" skip={[_ACCEPT_WARNINGS_ID]}>
       <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
@@ -247,7 +246,9 @@ export function VotersAndVotesForm() {
         {recounted && (
           <>
             <InputGrid.SectionTitleHeader>
-              <h2 id="recounted_title">Toegelaten kiezers na hertelling door gemeentelijk stembureau</h2>
+              <h2 id="recounted_title" ref={recountTitleRef}>
+                Toegelaten kiezers na hertelling door gemeentelijk stembureau
+              </h2>
               <th>Veld</th>
               <th>Geteld aantal</th>
               <th>Omschrijving</th>
@@ -300,7 +301,12 @@ export function VotersAndVotesForm() {
           </BottomBar.Row>
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox id={_IGNORE_WARNINGS_ID} defaultChecked={ignoreWarnings} hasError={warningsWarning}>
+          <Checkbox
+            id={_ACCEPT_WARNINGS_ID}
+            defaultChecked={acceptWarnings}
+            hasError={warningsWarning}
+            ref={acceptWarningsRef}
+          >
             Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
           </Checkbox>
         </BottomBar.Row>

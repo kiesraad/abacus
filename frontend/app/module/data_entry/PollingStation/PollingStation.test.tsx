@@ -116,8 +116,8 @@ const expectFeedbackWarning = async (code?: string) => {
 };
 
 const acceptWarning = async () => {
-  await user.click(screen.getByTestId("differences_form_ignore_warnings"));
-  expect(screen.getByTestId("differences_form_ignore_warnings")).toBeChecked();
+  await user.click(screen.getByTestId("differences_form_accept_warnings"));
+  expect(screen.getByTestId("differences_form_accept_warnings")).toBeChecked();
 };
 
 const expectBlockerModal = async () => {
@@ -455,7 +455,9 @@ describe("Polling Station data entry integration tests", () => {
           submit,
         ]),
         expectCheckAndSavePage,
+        () => expectElementContainsIcon("list-item-save", "je bent hier"),
         () => gotoForm("recounted"),
+        () => expectElementContainsIcon("list-item-save", "nog niet afgerond"),
         fillRecountedFormYes,
         submit,
         expectVotersAndVotesForm,

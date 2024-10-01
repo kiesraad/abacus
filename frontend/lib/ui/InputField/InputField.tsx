@@ -39,6 +39,7 @@ export function InputField({
           <textarea
             name={name}
             value={value}
+            autoComplete="off"
             aria-invalid={error ? "true" : "false"}
             aria-errormessage={error ? `${name}-hint_or_error` : undefined}
             rows={7}
@@ -48,6 +49,7 @@ export function InputField({
             name={name}
             value={value}
             type={type}
+            autoComplete="off"
             aria-invalid={error ? "true" : "false"}
             aria-errormessage={error ? `${name}-hint_or_error` : undefined}
             {...InputFieldProps}

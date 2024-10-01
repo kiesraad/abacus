@@ -57,10 +57,12 @@
   --checkbox-color-bg-default: var(--base-white);
   --checkbox-color-bg-active: var(--bg-gray);
   --checkbox-color-bg-hover: var(--bg-gray-darker);
+  --checkbox-color-bg-disabled: var(--checkbox-color-bg-hover);
   --checkbox-color-bg-default-checked: var(--button-color-primary);
   --checkbox-color-bg-active-checked: var(--button-color-primary-active);
   --checkbox-color-bg-hover-checked: var(--button-color-primary-hover);
   --checkbox-color-bg-focus-checked: var(--checkbox-color-bg-default);
+  --checkbox-color-bg-disabled-checked: var(--checkbox-color-border);
 
   --shadow-color-focus: #d1e0ff;
   --border-color-default: #d0d5dd;

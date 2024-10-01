@@ -1,6 +1,13 @@
-.checkbox {
+.choice-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  border: none;
+}
+
+.checkbox-and-radio {
   display: inline-flex;
-  align-items: center;
 
   /* https://css-tricks.com/inclusively-hidden/ */
   input {
@@ -13,9 +20,19 @@
     width: 1px;
   }
 
-  > div {
+  > div:global(.labels) {
+    display: flex;
+    flex-direction: column;
+
+    span:global(.description) {
+      color: var(--color-help-text);
+    }
+  }
+
+  > div:global(.field) {
     overflow: hidden;
     margin-right: 0.5rem;
+    margin-top: 0.1rem;
     flex: 0 0 1.25rem;
     width: 1.25rem;
     height: 1.25rem;
@@ -26,6 +43,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    &:global(.radio) {
+      border-radius: 1rem;
+    }
+
+    &:global(.disabled) {
+      background: var(--checkbox-color-bg-disabled);
+      &:hover,
+      &:has(+ input:hover) {
+        border-width: 1px;
+        background: var(--checkbox-color-bg-disabled);
+      }
+      &:global(.checked) {
+        background: var(--checkbox-color-bg-disabled-checked);
+        &:hover,
+        &:has(+ input:hover) {
+          background: var(--checkbox-color-bg-disabled-checked);
+        }
+      }
+    }
 
     &:has(+ input:active) {
       border-width: 2px;
@@ -48,7 +85,7 @@
 
     &:global(.checked) {
       border: none;
-      background-color: var(--checkbox-color-bg-default-checked);
+      background: var(--checkbox-color-bg-default-checked);
       svg {
         fill: var(--base-white);
         opacity: 1;
@@ -69,6 +106,10 @@
       }
     }
 
+    &:global(.has-error) {
+      border: 2px solid var(--color-error-darker);
+    }
+
     svg {
       width: 0.875rem;
       height: 0.875rem;
@@ -79,11 +120,5 @@
 
   &:global(.hidden) {
     display: none;
-  }
-
-  &:global(.has-error) {
-    > div {
-      border: 2px solid var(--color-error-darker);
-    }
   }
 }

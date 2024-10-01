@@ -4,6 +4,7 @@ export class AbortInputModal {
   protected readonly page: Page;
 
   readonly modal: Locator;
+  readonly close: Locator;
   readonly heading: Locator;
   readonly saveInput: Locator;
   readonly discardInput: Locator;
@@ -12,6 +13,7 @@ export class AbortInputModal {
     this.page = page;
 
     this.modal = page.getByRole("dialog");
+    this.close = this.modal.getByRole("button", { name: "Annuleren" });
     this.heading = this.modal.getByRole("heading", {
       level: 2,
       name: "Wat wil je doen met je invoer?",

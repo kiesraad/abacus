@@ -37,7 +37,7 @@ export function Modal({ id, onClose, children }: ModalProps): React.ReactNode {
               onClose();
             }}
             icon={<IconCross />}
-            title="Melding sluiten"
+            title="Annuleren"
             size="lg"
             variant="ghost"
           />

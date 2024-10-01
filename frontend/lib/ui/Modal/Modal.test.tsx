@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { getQueriesForElement, render } from "app/test/unit";
+import { getQueriesForElement, render, screen } from "app/test/unit";
 
 import { Modal } from "./Modal";
 
@@ -28,5 +28,6 @@ describe("UI component: Modal", () => {
     const modal = getQueriesForElement(baseElement).getByRole("dialog");
 
     expect(modal).toHaveTextContent("Modal");
+    expect(screen.getByTestId("modal-title")).toHaveFocus();
   });
 });

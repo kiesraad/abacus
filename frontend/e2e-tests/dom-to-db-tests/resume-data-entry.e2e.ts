@@ -68,6 +68,10 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.blankVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.invalidVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.totalVotesCastCount).toHaveValue("100");
+
+      await votersAndVotesPage.abortInput.click();
+      await abortInputModal.close.click();
+      await expect(votersAndVotesPage.abortInput).toBeFocused();
     });
 
     test("save input from voters and votes page with error", async ({ page }) => {

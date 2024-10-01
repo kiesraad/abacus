@@ -116,8 +116,8 @@ const expectFeedbackWarning = async (code?: string) => {
 };
 
 const acceptWarning = async () => {
-  await user.click(screen.getByTestId("differences_form_ignore_warnings"));
-  expect(screen.getByTestId("differences_form_ignore_warnings")).toBeChecked();
+  await user.click(screen.getByTestId("differences_form_accept_warnings"));
+  expect(screen.getByTestId("differences_form_accept_warnings")).toBeChecked();
 };
 
 const expectBlockerModal = async () => {

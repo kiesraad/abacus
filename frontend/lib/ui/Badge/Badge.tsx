@@ -11,7 +11,7 @@ const typeToLabel: { [S in PollingStationStatus]: string | ReactElement } = {
   definitive: "Definitief",
   first_entry_in_progress: (
     <>
-      1e invoer bezig <Icon icon={<IconPencil />} />
+      1e invoer <Icon icon={<IconPencil />} />
     </>
   ),
 };

@@ -57,7 +57,8 @@
   color: var(--green-800);
 }
 
-.first_entry {
+.first_entry,
+.first_entry_in_progress {
   background: var(--color-warning-bg);
   color: var(--color-warning-text);
 }

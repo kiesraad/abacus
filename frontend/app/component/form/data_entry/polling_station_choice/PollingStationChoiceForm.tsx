@@ -30,6 +30,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(undefined);
   const electionStatus = useElectionStatus();
+  const [inProgressAlert, setInProgressAlert] = useState<boolean>(true);
 
   const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
     setLoading(false);
@@ -78,9 +79,15 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         return;
       }}
     >
-      {inProgress.length > 0 && (
+      {inProgress.length > 0 && inProgressAlert && (
         <div className={cls["in-progress-alert"]}>
-          <Alert type="notify" variant="no-icon">
+          <Alert
+            type="notify"
+            variant="no-icon"
+            onClose={() => {
+              setInProgressAlert(false);
+            }}
+          >
             <h2>Je hebt nog een openstaande invoer</h2>
             <p>
               Je bent begonnen met het invoeren van onderstaande stembureaus, maar hebt deze nog niet helemaal afgerond:

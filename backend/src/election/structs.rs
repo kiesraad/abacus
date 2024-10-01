@@ -16,6 +16,7 @@ pub struct Election {
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     #[sqlx(default, json)]
     pub political_groups: Option<Vec<PoliticalGroup>>,
 }
@@ -40,14 +41,18 @@ pub struct Candidate {
     pub number: u8,
     pub initials: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub first_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub last_name_prefix: Option<String>,
     pub last_name: String,
     pub locality: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub country_code: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub gender: Option<CandidateGender>,
 }
 

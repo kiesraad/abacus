@@ -46,12 +46,12 @@ export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
  * Candidate
  */
 export interface Candidate {
-  country_code?: string | null;
-  first_name?: string | null;
+  country_code?: string;
+  first_name?: string;
   gender?: CandidateGender;
   initials: string;
   last_name: string;
-  last_name_prefix?: string | null;
+  last_name_prefix?: string;
   locality: string;
   number: number;
 }
@@ -90,7 +90,7 @@ export interface Election {
   name: string;
   nomination_date: string;
   number_of_voters: number;
-  political_groups?: PoliticalGroup[] | null;
+  political_groups?: PoliticalGroup[];
 }
 
 /**

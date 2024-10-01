@@ -1,0 +1,10 @@
+.link {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+  text-decoration: none;
+
+  .number {
+    font-weight: bold;
+  }
+}

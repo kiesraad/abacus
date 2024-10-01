@@ -6,6 +6,7 @@ import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
 
+import { PollingStationLink } from "./PollingStationLink";
 import { PollingStationSelector } from "./PollingStationSelector";
 import cls from "./PollingStationSelector.module.css";
 import { PollingStationsList } from "./PollingStationsList";
@@ -28,7 +29,8 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(undefined);
-  const electionStatuses = useElectionStatus();
+  const electionStatus = useElectionStatus();
+  const [inProgressAlert, setInProgressAlert] = useState<boolean>(true);
 
   const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
     setLoading(false);
@@ -49,7 +51,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
     const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
-    const pollingStationStatusEntry = electionStatuses.statuses.find((status) => status.id === pollingStation?.id);
+    const pollingStationStatusEntry = electionStatus.statuses.find((status) => status.id === pollingStation?.id);
 
     if (pollingStationStatusEntry?.status === "definitive") {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
@@ -66,6 +68,10 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     }
   };
 
+  const inProgress = electionStatus.statuses
+    .filter((status) => status.status === "first_entry_in_progress")
+    .map((status) => pollingStations.find((ps) => ps.id == status.id));
+
   return (
     <form
       onSubmit={(e) => {
@@ -73,6 +79,27 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         return;
       }}
     >
+      {inProgress.length > 0 && inProgressAlert && (
+        <div className={cls["in-progress-alert"]}>
+          <Alert
+            type="notify"
+            variant="no-icon"
+            onClose={() => {
+              setInProgressAlert(false);
+            }}
+          >
+            <h2>Je hebt nog een openstaande invoer</h2>
+            <p>
+              Je bent begonnen met het invoeren van onderstaande stembureaus, maar hebt deze nog niet helemaal afgerond:
+            </p>
+            {inProgress.map((pollingStation) => {
+              return pollingStation === undefined ? null : (
+                <PollingStationLink key={pollingStation.id} pollingStation={pollingStation} />
+              );
+            })}
+          </Alert>
+        </div>
+      )}
       <h2 className="form_title">
         {anotherEntry ? "Verder met een volgend stembureau?" : "Welk stembureau ga je invoeren?"}
       </h2>

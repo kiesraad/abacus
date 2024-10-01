@@ -65,6 +65,12 @@ impl PollingStations {
         .await
     }
 
+    /// Determines the status of the polling station.
+    /// - When an entry of the polling station is found in the `polling_station_results` table, the status is FirstEntryInProgress
+    /// - When an entry of the polling station is found in the `polling_station_data_entries` table, the status is Definitive
+    /// - If no entries are found, it has the FirstEntry status
+    ///
+    /// The implementation and determination will probably change while we implement more statuses
     pub async fn status(
         &self,
         election_id: u32,
@@ -73,9 +79,13 @@ impl PollingStations {
             PollingStationStatusEntry,
             r#"
 SELECT p.id AS "id: u32",
-CASE WHEN r.polling_station_id IS NULL THEN 'FirstEntry' ELSE 'Definitive' END AS "status!: _"
+CASE
+  WHEN de.polling_station_id IS NOT NULL THEN 'FirstEntryInProgress'
+  WHEN r.polling_station_id IS NOT NULL THEN 'Definitive'
+  ELSE 'FirstEntry' END AS "status!: _"
 FROM polling_stations AS p
 LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
+LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
 WHERE election_id = $1
 "#,
             election_id

@@ -17,7 +17,7 @@ export function RecountedForm() {
   const formRef = React.useRef<RecountedFormElement>(null);
 
   const getValues = React.useCallback(() => {
-    const form = document.getElementById("recounted_form") as RecountedFormElement | null;
+    const form = formRef.current;
     if (!form) {
       return { recounted: undefined };
     }

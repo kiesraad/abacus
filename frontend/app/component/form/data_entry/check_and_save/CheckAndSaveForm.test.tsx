@@ -122,7 +122,7 @@ describe("Test CheckAndSaveForm", () => {
         fields: ["data.voters_counts.invalid_votes_count"],
       },
     ];
-    formState.sections.voters_votes_counts.ignoreWarnings = true;
+    formState.sections.voters_votes_counts.acceptWarnings = true;
 
     renderForm(formState);
 
@@ -166,7 +166,7 @@ describe("Test CheckAndSaveForm summary", () => {
     const formState = structuredClone(defaultFormState);
 
     formState.sections.differences_counts.warnings = [errorWarningMocks.W301];
-    formState.sections.differences_counts.ignoreWarnings = true;
+    formState.sections.differences_counts.acceptWarnings = true;
 
     renderForm(formState);
 

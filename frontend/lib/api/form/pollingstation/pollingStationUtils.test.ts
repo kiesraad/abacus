@@ -80,7 +80,7 @@ describe("PollingStationUtils", () => {
         index: 0,
         id: "recounted",
         isSaved: false,
-        ignoreWarnings: false,
+        acceptWarnings: false,
         errors: [],
         warnings: [],
       }),
@@ -91,7 +91,7 @@ describe("PollingStationUtils", () => {
         index: 0,
         id: "recounted",
         isSaved: true,
-        ignoreWarnings: false,
+        acceptWarnings: false,
         errors: [],
         warnings: [],
       }),
@@ -105,7 +105,7 @@ describe("PollingStationUtils", () => {
       index: 0,
       id: "recounted",
       isSaved: false,
-      ignoreWarnings: false,
+      acceptWarnings: false,
       errors: [],
       warnings: [],
     });
@@ -302,7 +302,7 @@ describe("PollingStationUtils", () => {
       index: 0,
       id: "voters_votes_counts",
       isSaved: false,
-      ignoreWarnings: false,
+      acceptWarnings: false,
       errors: [],
       warnings: [],
     };
@@ -340,7 +340,7 @@ describe("PollingStationUtils", () => {
     expect(summary.notableFormSections.length).toBe(1);
     expect(summary.notableFormSections.some((item) => item.formSection.id == "political_group_votes_2"));
 
-    state.sections.differences_counts.ignoreWarnings = true;
+    state.sections.differences_counts.acceptWarnings = true;
     state.sections.differences_counts.warnings = [errorWarningMocks.W301];
 
     summary = getPollingStationSummary(state, values);
@@ -370,7 +370,7 @@ describe("PollingStationUtils", () => {
       ),
     );
 
-    state.sections.differences_counts.ignoreWarnings = false;
+    state.sections.differences_counts.acceptWarnings = false;
 
     summary = getPollingStationSummary(state, values);
 

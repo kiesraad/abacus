@@ -37,7 +37,7 @@ export function CheckAndSaveForm() {
     return getPollingStationSummary(formState, values);
   }, [formState, values]);
   const finalisationAllowed = Object.values(formState.sections).every(
-    (section) => section.errors.length === 0 && (section.warnings.length === 0 || section.ignoreWarnings),
+    (section) => section.errors.length === 0 && (section.warnings.length === 0 || section.acceptWarnings),
   );
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>

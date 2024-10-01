@@ -83,7 +83,7 @@ export function uniqueFieldSections(fields: string[]): FieldSection[] {
 export function formSectionComplete(section: FormSection): boolean {
   if (section.isSaved) {
     if (section.errors.length === 0 || hasOnlyGlobalValidationResults(section.errors)) {
-      if (section.warnings.length === 0 || section.ignoreWarnings) {
+      if (section.warnings.length === 0 || section.acceptWarnings) {
         return true;
       }
     }
@@ -261,7 +261,7 @@ export function getPollingStationSummary(formState: FormState, values: PollingSt
         result.hasErrors = true;
       } else if (section.warnings.length > 0) {
         result.hasWarnings = true;
-        if (section.ignoreWarnings) {
+        if (section.acceptWarnings) {
           result.notableFormSections.push({ status: "accepted-warnings", formSection: section });
         } else {
           result.notableFormSections.push({ status: "unaccepted-warnings", formSection: section });
@@ -335,7 +335,7 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
         id: "recounted",
         title: "Is er herteld?",
         isSaved: false,
-        ignoreWarnings: false,
+        acceptWarnings: false,
         errors: [],
         warnings: [],
       },
@@ -344,7 +344,7 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
         id: "voters_votes_counts",
         title: "Toegelaten kiezers en uitgebrachte stemmen",
         isSaved: false,
-        ignoreWarnings: false,
+        acceptWarnings: false,
         errors: [],
         warnings: [],
       },
@@ -353,7 +353,7 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
         id: "differences_counts",
         title: "Verschillen",
         isSaved: false,
-        ignoreWarnings: false,
+        acceptWarnings: false,
         errors: [],
         warnings: [],
       },
@@ -362,7 +362,7 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
         id: "save",
         title: "Controleren en opslaan",
         isSaved: false,
-        ignoreWarnings: false,
+        acceptWarnings: false,
         errors: [],
         warnings: [],
       },
@@ -380,7 +380,7 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
       id: `political_group_votes_${pg.number}`,
       title: pg.name,
       isSaved: false,
-      ignoreWarnings: false,
+      acceptWarnings: false,
       errors: [],
       warnings: [],
     };

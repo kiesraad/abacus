@@ -51,7 +51,7 @@ export function useVotersAndVotes(getValues: () => VotersAndVotesValues, getIgno
     errors,
     warnings,
     isSaved: formState.sections.voters_votes_counts.isSaved,
-    ignoreWarnings: formState.sections.voters_votes_counts.ignoreWarnings,
+    acceptWarnings: formState.sections.voters_votes_counts.acceptWarnings,
     submit: submitCurrentForm,
     recounted: values.recounted,
     isCompleted: formState.isCompleted,

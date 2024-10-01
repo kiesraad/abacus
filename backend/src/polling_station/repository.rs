@@ -65,6 +65,12 @@ impl PollingStations {
         .await
     }
 
+    /// Determines the status of the polling station.
+    /// - When an entry of the polling station is found in the `polling_station_results` table, the status is FirstEntryInProgress
+    /// - When an entry of the polling station is found in the `polling_station_data_entries` table, the status is Definitive
+    /// - If no entries are found, it has the FirstEntry status
+    ///
+    /// The implementation and determination will probably change while we implement more statuses
     pub async fn status(
         &self,
         election_id: u32,

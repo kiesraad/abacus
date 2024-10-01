@@ -46,12 +46,12 @@ export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
  * Candidate
  */
 export interface Candidate {
-  country_code?: string;
-  first_name?: string;
+  country_code?: string | null;
+  first_name?: string | null;
   gender?: CandidateGender;
   initials: string;
   last_name: string;
-  last_name_prefix?: string;
+  last_name_prefix?: string | null;
   locality: string;
   number: number;
 }
@@ -90,7 +90,7 @@ export interface Election {
   name: string;
   nomination_date: string;
   number_of_voters: number;
-  political_groups?: PoliticalGroup[];
+  political_groups?: PoliticalGroup[] | null;
 }
 
 /**
@@ -158,12 +158,12 @@ export interface PoliticalGroupVotes {
 export interface PollingStation {
   election_id: number;
   house_number: string;
-  house_number_addition?: string;
+  house_number_addition?: string | null;
   id: number;
   locality: string;
   name: string;
   number: number;
-  number_of_voters?: number;
+  number_of_voters?: number | null;
   polling_station_type: PollingStationType;
   postal_code: string;
   street: string;

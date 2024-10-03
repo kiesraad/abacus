@@ -57,9 +57,6 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, ..
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Tab" && event.target instanceof HTMLInputElement && event.target.type === "radio") {
-        event.preventDefault();
-      }
       switch (event.key) {
         case "ArrowUp":
           if (event.shiftKey) {

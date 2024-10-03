@@ -44,7 +44,6 @@ export function useDifferences(getValues: () => DifferencesValues, getAcceptWarn
     warnings,
     isSaved: formState.sections.differences_counts.isSaved,
     submit: submitCurrentForm,
-    isCompleted: formState.isCompleted,
     acceptWarnings: formState.sections.differences_counts.acceptWarnings,
   };
 }

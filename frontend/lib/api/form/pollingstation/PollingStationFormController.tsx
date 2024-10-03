@@ -123,7 +123,6 @@ export interface FormState {
   // the form section that the user is currently working on
   current: FormSectionID;
   sections: Record<FormSectionID, FormSection>;
-  isCompleted: boolean;
 }
 
 export interface ClientState {

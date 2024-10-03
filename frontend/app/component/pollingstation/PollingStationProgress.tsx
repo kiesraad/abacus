@@ -131,9 +131,9 @@ export function PollingStationProgress() {
         id="list-item-save"
         status={menuStatusForFormSection(formState.sections.save)}
         active={formState.current === "save"}
-        disabled={!formState.isCompleted}
+        disabled={formState.furthest !== "save"}
       >
-        {formState.current !== "save" && formState.isCompleted ? (
+        {formState.current !== "save" && formState.furthest === "save" ? (
           <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/save`}>
             <span>Controleren en opslaan</span>
           </Link>

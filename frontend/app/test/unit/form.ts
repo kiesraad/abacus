@@ -132,5 +132,4 @@ export const defaultFormState: FormState = {
       warnings: [],
     },
   },
-  isCompleted: false,
 };

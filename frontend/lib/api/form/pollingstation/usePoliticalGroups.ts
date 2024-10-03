@@ -46,7 +46,6 @@ export function usePoliticalGroup(
     isSaved: formState.sections[`political_group_votes_${political_group_number}`]?.isSaved || false,
     setTemporaryCache,
     submit: submitCurrentForm,
-    isCompleted: formState.isCompleted,
     acceptWarnings: formState.sections[`political_group_votes_${political_group_number}`]?.acceptWarnings || false,
   };
 }

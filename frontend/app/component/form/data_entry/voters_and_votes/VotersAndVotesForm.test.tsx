@@ -57,7 +57,6 @@ const defaultFormState: FormState = {
       warnings: [],
     },
   },
-  isCompleted: false,
 };
 
 function renderForm(defaultValues: Partial<PollingStationValues> = {}) {

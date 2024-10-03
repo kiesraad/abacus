@@ -54,6 +54,5 @@ export function useVotersAndVotes(getValues: () => VotersAndVotesValues, getAcce
     acceptWarnings: formState.sections.voters_votes_counts.acceptWarnings,
     submit: submitCurrentForm,
     recounted: values.recounted,
-    isCompleted: formState.isCompleted,
   };
 }

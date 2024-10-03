@@ -106,7 +106,7 @@ export function getNextSectionID(formState: FormState) {
   const currentSection = formState.sections[formState.current];
   if (currentSection && currentSection.isSubmitted && formSectionComplete(currentSection)) {
     for (const section of Object.values(formState.sections)) {
-      if ((formState.isCompleted && section.errors.length > 0) || section.index === currentSection.index + 1) {
+      if ((formState.furthest === "save" && section.errors.length > 0) || section.index === currentSection.index + 1) {
         return section.id;
       }
     }
@@ -362,7 +362,6 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
         warnings: [],
       },
     },
-    isCompleted: false,
   };
 
   election.political_groups.forEach((pg, n) => {
@@ -425,9 +424,7 @@ export function updateFormStateAfterSubmit(
     formState.furthest = getNextSectionID(formState) ?? formState.furthest;
   }
 
-  if (formState.furthest === "save") {
-    formState.isCompleted = true;
-  } else {
+  if (formState.furthest !== "save") {
     //if the entire form is not completed yet, filter out global validation results since they don't have meaning yet.
     Object.values(formState.sections).forEach((section) => {
       section.errors = section.errors.filter((err) => !isGlobalValidationResult(err));

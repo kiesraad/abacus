@@ -17,8 +17,6 @@ import { deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
 
-const _ACCEPT_WARNINGS_ID = "voters_and_votes_form_accept_warnings";
-
 interface FormElements extends HTMLFormControlsCollection {
   poll_card_count: HTMLInputElement;
   proxy_certificate_count: HTMLInputElement;
@@ -152,6 +150,7 @@ export function VotersAndVotesForm() {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
+  const showAcceptWarnings = errors.length == 0 && warnings.length > 0 && !hasChanges;
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
@@ -159,7 +158,7 @@ export function VotersAndVotesForm() {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form" skip={[_ACCEPT_WARNINGS_ID]}>
+    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form">
       <h2 id="form-title" tabIndex={-1}>
         Toegelaten kiezers en uitgebrachte stemmen
       </h2>
@@ -302,16 +301,18 @@ export function VotersAndVotesForm() {
             </Alert>
           </BottomBar.Row>
         )}
-        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox
-            id={_ACCEPT_WARNINGS_ID}
-            defaultChecked={acceptWarnings}
-            hasError={warningsWarning}
-            ref={acceptWarningsRef}
-          >
-            Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
-          </Checkbox>
-        </BottomBar.Row>
+        {showAcceptWarnings && (
+          <BottomBar.Row>
+            <Checkbox
+              id="voters_and_votes_form_accept_warnings"
+              defaultChecked={acceptWarnings}
+              hasError={warningsWarning}
+              ref={acceptWarningsRef}
+            >
+              Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
+            </Checkbox>
+          </BottomBar.Row>
+        )}
         <BottomBar.Row>
           <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende

@@ -429,7 +429,7 @@ describe("Test VotersAndVotesForm", () => {
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
 
-      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+      let acceptFeedbackCheckbox = screen.getByRole("checkbox", {
         name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
       });
       expect(acceptFeedbackCheckbox).toBeInTheDocument();
@@ -451,10 +451,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.getByTestId("blank_votes_count"), "100").toHaveValue("100");
       await user.clear(screen.getByTestId("blank_votes_count"));
 
-      await waitFor(() => {
-        expect(acceptFeedbackCheckbox).toBeInTheDocument();
-        expect(acceptFeedbackCheckbox).not.toBeVisible();
-      });
+      await waitFor(() => expect(acceptFeedbackCheckbox).not.toBeInTheDocument());
 
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
@@ -465,6 +462,9 @@ describe("Test VotersAndVotesForm", () => {
 
       await user.click(submitButton);
 
+      acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
       expect(acceptFeedbackCheckbox).toBeVisible();
       expect(acceptFeedbackCheckbox).not.toBeChecked();
       acceptFeedbackCheckbox.click();

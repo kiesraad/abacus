@@ -33,8 +33,6 @@ export interface CandidatesVotesFormProps {
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
   const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
-  const _ACCEPT_WARNINGS_ID = `candidates_votes_form_accept_warnings_${group.number}`;
-
   const getValues = React.useCallback(() => {
     const form = formRef.current;
     if (!form) {
@@ -124,6 +122,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
+  const showAcceptWarnings = errors.length == 0 && warnings.length > 0 && !hasChanges;
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
@@ -131,7 +130,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`} skip={[_ACCEPT_WARNINGS_ID]}>
+    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
       <h2 id="form-title" tabIndex={-1}>
         Lijst {group.number} - {group.name}
       </h2>
@@ -184,16 +183,18 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             </Alert>
           </BottomBar.Row>
         )}
-        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox
-            id={_ACCEPT_WARNINGS_ID}
-            defaultChecked={acceptWarnings}
-            hasError={warningsWarning}
-            ref={acceptWarningsRef}
-          >
-            Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
-          </Checkbox>
-        </BottomBar.Row>
+        {showAcceptWarnings && (
+          <BottomBar.Row>
+            <Checkbox
+              id={`candidates_votes_form_accept_warnings_${group.number}`}
+              defaultChecked={acceptWarnings}
+              hasError={warningsWarning}
+              ref={acceptWarningsRef}
+            >
+              Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
+            </Checkbox>
+          </BottomBar.Row>
+        )}
         <BottomBar.Row>
           <KeyboardKeys.HintText>
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Down]} />

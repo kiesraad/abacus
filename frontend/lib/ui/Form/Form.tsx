@@ -2,12 +2,11 @@ import * as React from "react";
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   children: React.ReactNode;
-  skip?: string[];
 }
 
 type Dir = "up" | "down" | "first" | "last";
 
-export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, skip, ...formProps }, ref) => {
+export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, ...formProps }, ref) => {
   const innerRef: React.MutableRefObject<HTMLFormElement | null> = React.useRef<HTMLFormElement>(null);
 
   const inputList = React.useRef<HTMLInputElement[]>([]);
@@ -104,13 +103,8 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
   React.useEffect(() => {
     const inputs = innerRef.current?.querySelectorAll("input, select, textarea") as NodeListOf<HTMLInputElement>;
     inputList.current = Array.from(inputs);
-
-    //filter out inputs we should skip
-    if (skip && skip.length) {
-      inputList.current = inputList.current.filter((input) => !skip.includes(input.id));
-    }
     submitButton.current = innerRef.current?.querySelector("button[type=submit]") as HTMLButtonElement | null;
-  }, [children, skip]);
+  }, [children]);
 
   React.useEffect(() => {
     document.getElementById("form-title")?.focus();

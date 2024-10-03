@@ -1,4 +1,6 @@
-export function getUrlForFormSectionID(electionId: number, pollingStationId: number, sectionId: string) {
+import { FormSectionID } from "@kiesraad/api";
+
+export function getUrlForFormSectionID(electionId: number, pollingStationId: number, sectionId: FormSectionID) {
   const baseUrl = `/elections/${electionId}/data-entry/${pollingStationId}`;
 
   let url: string = "";

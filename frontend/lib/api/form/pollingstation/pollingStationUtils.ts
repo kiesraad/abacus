@@ -1,11 +1,12 @@
 import { ErrorsAndWarnings } from "lib/api/api";
 
-import { Election, ValidationResult } from "@kiesraad/api";
+import { Election, ValidationResult, ValidationResults } from "@kiesraad/api";
 import { ValidationResultType } from "@kiesraad/ui";
 import { deepEqual, fieldNameFromPath, FieldSection, objectHasOnlyEmptyValues, rootFieldSection } from "@kiesraad/util";
 
 import {
   AnyFormReference,
+  ClientState,
   ClientValidationResult,
   FormSection,
   FormSectionID,
@@ -60,7 +61,7 @@ export function addValidationResultToFormState(
           }
           break;
         default:
-          formState.unknown[target].push(validationResult);
+          console.error("Unknown validation result target", target);
           break;
       }
     });
@@ -81,42 +82,36 @@ export function uniqueFieldSections(fields: string[]): FieldSection[] {
 }
 
 export function formSectionComplete(section: FormSection): boolean {
-  if (section.isSaved) {
-    if (section.errors.length === 0 || hasOnlyGlobalValidationResults(section.errors)) {
-      if (section.warnings.length === 0 || section.acceptWarnings) {
-        return true;
-      }
-    }
-  }
-  return false;
+  return (
+    section.isSaved &&
+    (section.errors.length === 0 || hasOnlyGlobalValidationResults(section.errors)) &&
+    (section.warnings.length === 0 || section.acceptWarnings)
+  );
 }
 
 export function hasOnlyGlobalValidationResults(arr: ClientValidationResult[]): boolean {
   return arr.every((result) => isGlobalValidationResult(result));
 }
 
-//get the next section in the form based on index
-export function getNextSection(formState: FormState, currentSection: FormSection): FormSectionID | null {
-  for (const section of Object.values(formState.sections)) {
-    if (formState.isCompleted && section.errors.length > 0) {
-      return section.id;
-    }
-    if (section.index === currentSection.index + 1) {
-      return section.id;
-    }
-  }
-
-  return null;
-}
-
 export function resetFormSectionState(formState: FormState) {
   Object.values(formState.sections).forEach((section) => {
+    // the server response contains the validation results for the entire form, so we can clear the old validation results
     section.errors = [];
     section.warnings = [];
     section.isSubmitted = undefined;
   });
-  formState.unknown.errors = [];
-  formState.unknown.warnings = [];
+}
+
+export function getNextSectionID(formState: FormState) {
+  const currentSection = formState.sections[formState.current];
+  if (currentSection && currentSection.isSubmitted && formSectionComplete(currentSection)) {
+    for (const section of Object.values(formState.sections)) {
+      if ((formState.isCompleted && section.errors.length > 0) || section.index === currentSection.index + 1) {
+        return section.id;
+      }
+    }
+  }
+  return null;
 }
 
 export function currentFormHasChanges(currentForm: AnyFormReference, values: PollingStationValues): boolean {
@@ -327,8 +322,8 @@ export function getInitialValues(
 
 export function getInitialFormState(election: Required<Election>, defaultFormState?: Partial<FormState>): FormState {
   const result: FormState = {
-    active: INITIAL_FORM_SECTION_ID,
     current: INITIAL_FORM_SECTION_ID,
+    furthest: INITIAL_FORM_SECTION_ID,
     sections: {
       recounted: {
         index: 0,
@@ -367,10 +362,6 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
         warnings: [],
       },
     },
-    unknown: {
-      errors: [],
-      warnings: [],
-    },
     isCompleted: false,
   };
 
@@ -387,4 +378,60 @@ export function getInitialFormState(election: Required<Election>, defaultFormSta
   });
 
   return structuredClone({ ...result, ...defaultFormState });
+}
+
+export function getClientState(formState: FormState, acceptWarnings: boolean, continueToNextSection: boolean) {
+  const clientState: ClientState = {
+    furthest: formState.furthest,
+    current: formState.current,
+    acceptedWarnings: Object.values(formState.sections)
+      .filter((s: FormSection) => s.acceptWarnings)
+      .filter((s: FormSection) => s.id !== formState.current)
+      .map((s: FormSection) => s.id),
+    continue: continueToNextSection,
+  };
+  // the form state is not updated for the current submission,
+  // so add the current section to the accepted warnings if needed
+  if (acceptWarnings) {
+    clientState.acceptedWarnings.push(formState.current);
+  }
+  return clientState;
+}
+
+export function updateFormStateAfterSubmit(
+  formState: FormState,
+  validationResults: ValidationResults,
+  acceptWarnings: boolean,
+  continueToNextSection: boolean = false,
+) {
+  resetFormSectionState(formState);
+
+  const currentFormSection = formState.sections[formState.current];
+  if (currentFormSection) {
+    //store that this section has been sent to the server
+    currentFormSection.isSaved = continueToNextSection;
+    //store that this section has been submitted, this resets on each request
+    currentFormSection.isSubmitted = continueToNextSection;
+    //flag ignore warnings
+    currentFormSection.acceptWarnings = acceptWarnings;
+  }
+
+  //distribute errors and warnings to sections
+  addValidationResultToFormState(formState, validationResults.errors, "errors");
+  addValidationResultToFormState(formState, validationResults.warnings, "warnings");
+
+  //determine the new furthest section, if applicable
+  if (continueToNextSection && currentFormSection && formState.furthest === currentFormSection.id) {
+    formState.furthest = getNextSectionID(formState) ?? formState.furthest;
+  }
+
+  if (formState.furthest === "save") {
+    formState.isCompleted = true;
+  } else {
+    //if the entire form is not completed yet, filter out global validation results since they don't have meaning yet.
+    Object.values(formState.sections).forEach((section) => {
+      section.errors = section.errors.filter((err) => !isGlobalValidationResult(err));
+      section.warnings = section.warnings.filter((err) => !isGlobalValidationResult(err));
+    });
+  }
 }

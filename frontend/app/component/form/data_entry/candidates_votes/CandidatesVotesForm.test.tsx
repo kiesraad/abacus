@@ -8,7 +8,13 @@ import {
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form";
 
-import { Election, PoliticalGroup, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
+import {
+  Election,
+  PoliticalGroup,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  PollingStationFormController,
+  PollingStationValues,
+} from "@kiesraad/api";
 import { electionMockData, politicalGroupMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
@@ -268,7 +274,8 @@ describe("Test CandidatesVotesForm", () => {
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
       expect(url).toEqual("/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
-      expect(body).toEqual(expectedRequest);
+      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+      expect(request_body.data).toEqual(expectedRequest.data);
     });
   });
 

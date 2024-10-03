@@ -1,24 +1,27 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
+
+import { getUrlForFormSectionID } from "app/component/pollingstation/utils";
 
 import {
-  addValidationResultToFormState,
   ApiError,
   ApiResponseStatus,
   Election,
+  getClientState,
   GetDataEntryResponse,
   getInitialFormState,
   getInitialValues,
-  isGlobalValidationResult,
+  getNextSectionID,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   PollingStationResults,
+  SaveDataEntryRequest,
   SaveDataEntryResponse,
+  updateFormStateAfterSubmit,
   useApi,
   useApiGetRequest,
   ValidationResult,
   VotersRecounts,
 } from "@kiesraad/api";
-
-import { formSectionComplete, getNextSection, resetFormSectionState } from "./pollingStationUtils";
 
 export interface PollingStationValues extends Omit<PollingStationResults, "recounted"> {
   recounted: boolean | undefined;
@@ -38,7 +41,7 @@ export interface FormReference<T> {
   type: string;
   id: FormSectionID;
   getValues: () => T;
-  getIgnoreWarnings?: () => boolean;
+  getAcceptWarnings?: () => boolean;
 }
 
 export interface FormReferenceRecounted extends FormReference<Pick<PollingStationValues, "recounted">> {
@@ -71,16 +74,21 @@ export type AnyFormReference =
   | FormReferencePoliticalGroupVotes
   | FormReferenceSave;
 
+interface SubmitCurrentFormOptions {
+  acceptWarnings?: boolean;
+  aborting?: boolean;
+  continueToNextSection?: boolean;
+}
+
 export interface iPollingStationControllerContext {
   status: React.RefObject<Status>;
   apiError: ApiError | null;
   formState: FormState;
-  targetFormSection: FormSectionID | null;
   values: PollingStationValues;
   setTemporaryCache: (cache: TemporaryCache | null) => boolean;
   cache: TemporaryCache | null;
   currentForm: AnyFormReference | null;
-  submitCurrentForm: (acceptWarnings?: boolean, aborting?: boolean) => Promise<void>;
+  submitCurrentForm: (params?: SubmitCurrentFormOptions) => Promise<void>;
   registerCurrentForm: (form: AnyFormReference) => void;
   deleteDataEntry: () => Promise<void>;
   finaliseDataEntry: () => Promise<void>;
@@ -98,8 +106,8 @@ export type FormSection = {
   index: number; //fixate the order of filling in sections
   id: FormSectionID;
   title?: string;
-  isSaved: boolean; //has this section been sent to the server
-  isSubmitted?: boolean; //has this section been submitted in the latest request
+  isSaved: boolean; //whether this section has been sent to the server
+  isSubmitted?: boolean; //whether this section has been submitted in the latest request
   acceptWarnings: boolean;
   errors: ValidationResult[];
   warnings: ValidationResult[];
@@ -110,14 +118,19 @@ export interface ClientValidationResult extends ValidationResult {
 }
 
 export interface FormState {
-  current: FormSectionID; //the current step that needs completion
-  active: FormSectionID; //the form that is currently active
+  // the furthest form section that the user has reached
+  furthest: FormSectionID;
+  // the form section that the user is currently working on
+  current: FormSectionID;
   sections: Record<FormSectionID, FormSection>;
-  unknown: {
-    errors: ClientValidationResult[];
-    warnings: ClientValidationResult[];
-  };
   isCompleted: boolean;
+}
+
+export interface ClientState {
+  furthest: FormSectionID;
+  current: FormSectionID;
+  acceptedWarnings: FormSectionID[];
+  continue: boolean;
 }
 
 //store unvalidated data
@@ -147,40 +160,22 @@ export function PollingStationFormController({
 }: PollingStationFormControllerProps) {
   const request_path: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
   const { client } = useApi();
+  const navigate = useNavigate();
+
+  const [values, setValues] = React.useState<PollingStationValues>();
+  const [formState, setFormState] = React.useState<FormState>();
 
   // TODO: #277 render custom error page instead of passing error down
   const [apiError, setApiError] = React.useState<ApiError | null>(null);
 
-  const [values, setValues] = React.useState<PollingStationValues>();
-
-  const initialDataRequest = useApiGetRequest<GetDataEntryResponse>(request_path);
-  React.useEffect(() => {
-    if (initialDataRequest.data) {
-      const responseData = initialDataRequest.data;
-      setValues(responseData.data);
-      setFormState((old) => {
-        const newFormState = { ...old };
-        addValidationResultToFormState(newFormState, responseData.validation_results.errors, "errors");
-        addValidationResultToFormState(newFormState, responseData.validation_results.warnings, "warnings");
-        return newFormState;
-      });
-    } else if (initialDataRequest.error) {
-      if (initialDataRequest.error.code === 404) {
-        // data entry not found, set initial values
-        setValues(getInitialValues(election, defaultValues));
-      } else {
-        setApiError(initialDataRequest.error);
-        throw new Error("Failed to load data entry");
-      }
-    }
-  }, [initialDataRequest.data, initialDataRequest.error, defaultValues, election]);
-
-  const [formState, setFormState] = React.useState<FormState>(() => {
-    return getInitialFormState(election, defaultFormState);
-  });
+  // the form section to navigate to next
+  const [targetFormSectionID, setTargetFormSectionID] = React.useState<FormSectionID | null>(null);
 
   // status as ref, because it needs to immediately propagate to the blocker function in `PollingStationFormNavigation`
   const status = React.useRef<Status>("idle");
+
+  // reference to the current form on screen
+  const currentForm = React.useRef<AnyFormReference | null>(defaultCurrentForm);
 
   const temporaryCache = React.useRef<TemporaryCache | null>(null);
   const setTemporaryCache = React.useCallback((cache: TemporaryCache | null) => {
@@ -189,54 +184,112 @@ export function PollingStationFormController({
     return true;
   }, []);
 
-  //reference to the current form on screen
-  const currentForm = React.useRef<AnyFormReference | null>(defaultCurrentForm);
-
-  //where to navigate to next
-  const [targetFormSection, setTargetFormSection] = React.useState<FormSectionID | null>(INITIAL_FORM_SECTION_ID);
-
-  //tell the "outside world" which form section to show next
+  const initialDataRequest = useApiGetRequest<GetDataEntryResponse>(request_path);
   React.useEffect(() => {
-    const activeSection = formState.sections[formState.active];
-    if (activeSection) {
-      if (activeSection.isSubmitted) {
-        if (formSectionComplete(activeSection)) {
-          const nextSectionID = getNextSection(formState, activeSection);
-          setTargetFormSection(nextSectionID);
+    if (initialDataRequest.data) {
+      const responseData = initialDataRequest.data;
+      setValues(responseData.data);
+
+      if (responseData.client_state) {
+        const newFormState = getInitialFormState(election);
+
+        const clientState = responseData.client_state as ClientState;
+
+        // set the furthest and current section
+        newFormState.furthest = clientState.furthest;
+        newFormState.current = clientState.current;
+
+        // set accepted warnings
+        clientState.acceptedWarnings.forEach((sectionID: FormSectionID) => {
+          const section = newFormState.sections[sectionID];
+          if (section) {
+            section.acceptWarnings = true;
+          }
+        });
+
+        // set saved sections to all sections before the current section
+        const currentIndex = newFormState.sections[newFormState.current]?.index ?? 0;
+        for (const section of Object.values(newFormState.sections)) {
+          if (section.index < currentIndex) {
+            section.isSaved = true;
+          }
         }
+
+        const acceptWarnings = clientState.acceptedWarnings.some(
+          (sectionID: FormSectionID) => sectionID === newFormState.current,
+        );
+
+        updateFormStateAfterSubmit(newFormState, responseData.validation_results, acceptWarnings, clientState.continue);
+
+        if (clientState.continue) {
+          setTargetFormSectionID(getNextSectionID(newFormState) ?? newFormState.current);
+        } else {
+          setTargetFormSectionID(newFormState.current);
+        }
+
+        setFormState(newFormState);
+      } else {
+        setFormState(getInitialFormState(election));
+        setTargetFormSectionID(INITIAL_FORM_SECTION_ID);
+      }
+    } else if (initialDataRequest.error) {
+      if (initialDataRequest.error.code === 404) {
+        // data entry not found, set initial values
+        setValues(getInitialValues(election, defaultValues));
+        setFormState(getInitialFormState(election, defaultFormState));
+        setTargetFormSectionID(INITIAL_FORM_SECTION_ID);
+      } else {
+        setApiError(initialDataRequest.error);
+        throw new Error("Failed to load data entry");
       }
     }
-  }, [formState]);
+  }, [defaultValues, defaultFormState, election, pollingStationId, initialDataRequest.data, initialDataRequest.error]);
+
+  // check if the targetFormSectionID has changed and navigate to the url for that section
+  React.useEffect(() => {
+    if (!targetFormSectionID) return;
+    const url = getUrlForFormSectionID(election.id, pollingStationId, targetFormSectionID);
+    navigate(url);
+  }, [targetFormSectionID, navigate, election.id, pollingStationId]);
 
   const registerCurrentForm = React.useCallback(
     (form: AnyFormReference) => {
+      if (formState === undefined) {
+        throw new Error("Form state is undefined, cannot register form");
+      }
       if (currentForm.current === null || form.id !== currentForm.current.id) {
         currentForm.current = form;
-        if (form.id !== formState.active) {
-          setFormState((old) => {
-            const newFormState = { ...old };
-            const oldActive = old.sections[old.active];
-            if (oldActive) {
-              oldActive.isSubmitted = false;
-            }
-            newFormState.active = form.id;
-            return newFormState;
-          });
-          setTargetFormSection(null);
-        }
+      }
+      if (form.id !== formState.current) {
+        setFormState((old) => {
+          if (old === undefined) {
+            throw new Error("Form state is undefined, cannot register form");
+          }
+          const newFormState = structuredClone(old);
+          const currentSection = newFormState.sections[newFormState.current];
+          if (currentSection) {
+            currentSection.isSubmitted = false;
+          }
+          newFormState.current = form.id;
+          return newFormState;
+        });
       }
     },
     [currentForm, formState],
   );
 
-  if (values === undefined) {
-    // loading
+  if (values === undefined || formState === undefined) {
+    // do not continue while loading initial data
     return null;
   }
 
-  const submitCurrentForm = async (acceptWarnings = false, aborting?: boolean) => {
+  const submitCurrentForm = async ({
+    acceptWarnings = false,
+    aborting = false,
+    continueToNextSection = true,
+  }: SubmitCurrentFormOptions = {}) => {
     // React state is fixed within one render, so we update our own copy instead of using setValues directly
-    let newValues: PollingStationValues = values;
+    let newValues: PollingStationValues = structuredClone(values);
     if (currentForm.current) {
       const ref: AnyFormReference = currentForm.current;
 
@@ -284,24 +337,22 @@ export function PollingStationFormController({
           break;
       }
       setValues(newValues);
-      //when submitting, all previous errors and warnings are invalid
-      setFormState((old) => {
-        const newFormState = { ...old };
-        resetFormSectionState(newFormState);
-        return newFormState;
-      });
     }
 
-    // prepare data
+    // prepare data to send to server
     const pollingStationResults: PollingStationResults = {
       ...newValues,
       recounted: newValues.recounted !== undefined ? newValues.recounted : false,
       voters_recounts: newValues.recounted ? newValues.voters_recounts : undefined,
     };
+    const clientState = getClientState(formState, acceptWarnings, continueToNextSection);
 
     // send data to server
     status.current = "saving";
-    const response = await client.postRequest(request_path, { data: pollingStationResults });
+    const response = await client.postRequest(request_path, {
+      data: pollingStationResults,
+      client_state: clientState,
+    } satisfies SaveDataEntryRequest);
     status.current = aborting ? "aborted" : "idle";
     if (response.status !== ApiResponseStatus.Success) {
       // TODO: #277 render custom error page
@@ -312,59 +363,13 @@ export function PollingStationFormController({
     const data = response.data as SaveDataEntryResponse;
     setApiError(null);
 
-    // update form state based on response
-    setFormState((old) => {
-      const newFormState = { ...old };
-      //reset all errors/warnings, and submitted, the server validates the entire request each time.
-      //a reset is done before submitting the form to the server.
+    const newFormState = structuredClone(formState);
+    updateFormStateAfterSubmit(newFormState, data.validation_results, acceptWarnings, !aborting);
+    setFormState(newFormState);
 
-      const activeFormSection = newFormState.sections[newFormState.active];
-
-      if (activeFormSection) {
-        //store that this section has been sent to the server
-        activeFormSection.isSaved = true;
-        //store that this section has been submitted, this resets on each request
-        activeFormSection.isSubmitted = true;
-        //flag ignore warnings
-        activeFormSection.acceptWarnings = acceptWarnings;
-      }
-
-      //distribute errors to sections
-      addValidationResultToFormState(newFormState, data.validation_results.errors, "errors");
-      //distribute warnings to sections
-      addValidationResultToFormState(newFormState, data.validation_results.warnings, "warnings");
-
-      //what form section is active
-      if (activeFormSection) {
-        //determine new current if applicable
-        if (newFormState.current === activeFormSection.id) {
-          if (
-            activeFormSection.errors.length === 0 ||
-            activeFormSection.errors.every((vr) => isGlobalValidationResult(vr))
-          ) {
-            if (activeFormSection.warnings.length === 0 || activeFormSection.acceptWarnings) {
-              const nextSectionID = getNextSection(newFormState, activeFormSection);
-              if (nextSectionID) {
-                newFormState.current = nextSectionID;
-              }
-              if (nextSectionID === "save") {
-                newFormState.isCompleted = true;
-              }
-            }
-          }
-        }
-      }
-
-      //if the entire form is not completed yet, filter out global validation results since they don't have meaning yet.
-      if (!newFormState.isCompleted) {
-        Object.values(newFormState.sections).forEach((section) => {
-          section.errors = section.errors.filter((err) => !isGlobalValidationResult(err));
-          section.warnings = section.warnings.filter((err) => !isGlobalValidationResult(err));
-        });
-      }
-
-      return newFormState;
-    });
+    if (continueToNextSection) {
+      setTargetFormSectionID(getNextSectionID(newFormState));
+    }
   };
 
   const deleteDataEntry = async () => {
@@ -405,7 +410,6 @@ export function PollingStationFormController({
         currentForm: currentForm.current,
         registerCurrentForm,
         submitCurrentForm,
-        targetFormSection,
         deleteDataEntry,
         finaliseDataEntry,
         pollingStationId,

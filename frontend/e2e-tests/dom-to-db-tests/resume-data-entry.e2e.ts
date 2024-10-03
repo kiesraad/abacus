@@ -53,6 +53,10 @@ test.describe("resume data entry flow", () => {
 
       await page.goto("/elections/1/data-entry/1/recounted");
 
+      const differencesPage = new DifferencesPage(page);
+      await expect(differencesPage.heading).toBeVisible();
+      await differencesPage.navPanel.recounted.click();
+
       const recountedPage = new RecountedPage(page);
       await expect(recountedPage.no).toBeChecked();
       await recountedPage.next.click();
@@ -95,6 +99,7 @@ test.describe("resume data entry flow", () => {
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.heading).toBeVisible();
+      await expect(pollingStationChoicePage.resumeDataEntry).toBeVisible();
 
       const dataEntryResponse = await request.get(`/api/polling_stations/1/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(200);
@@ -129,7 +134,8 @@ test.describe("resume data entry flow", () => {
         },
       });
 
-      // TODO: extend test as part of epic #137 resume data entry
+      await pollingStationChoicePage.selectPollingStationAndClickStart(33);
+      await votersAndVotesPage.heading.waitFor();
     });
 
     test("save input from voters and votes page with warning", async ({ page, request }) => {
@@ -201,7 +207,9 @@ test.describe("resume data entry flow", () => {
           ],
         },
       });
-      // TODO: extend test as part of epic #137 resume data entry
+
+      await pollingStationChoicePage.selectPollingStationAndClickStart(33);
+      await votersAndVotesPage.heading.waitFor();
     });
   });
 

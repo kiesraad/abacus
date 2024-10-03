@@ -80,8 +80,8 @@ export const errorWarningMocks: ErrorMap = {
 };
 
 export const defaultFormState: FormState = {
-  active: "recounted",
   current: "recounted",
+  furthest: "recounted",
   sections: {
     recounted: {
       index: 0,
@@ -131,10 +131,6 @@ export const defaultFormState: FormState = {
       errors: [],
       warnings: [],
     },
-  },
-  unknown: {
-    errors: [],
-    warnings: [],
   },
   isCompleted: false,
 };

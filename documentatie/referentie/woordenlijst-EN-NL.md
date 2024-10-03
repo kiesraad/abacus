@@ -29,3 +29,5 @@ Voor de vertaling van begrippen uit de wet naar variabelen en functienamen in on
 | Zetel | | Seat | |
 | Restzetel | | Residual seat | via https://english.kiesraad.nl/latest-news/news/2019/06/04/official-results-of-the-2019-elections-tot-the-european-parliament |
 | Zetelverdeling | | Apportionment | |
+| Voorkeursdrempel | | Preference threshold | via EML_NL standaard | 
+| Gemeenteraad | | Municipal council | |

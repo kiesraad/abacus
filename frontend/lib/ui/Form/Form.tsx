@@ -13,17 +13,13 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, ..
   const submitButton = React.useRef<HTMLButtonElement | null>(null);
 
   const moveFocus = React.useCallback((dir: Dir) => {
-    let activeIndex = inputList.current.findIndex((input) => document.activeElement === input);
-    if (activeIndex === -1) {
-      activeIndex = 0;
-    }
-    let targetIndex = activeIndex;
+    let targetIndex = inputList.current.findIndex((input) => document.activeElement === input);
     switch (dir) {
       case "up":
-        targetIndex = activeIndex - 1;
+        targetIndex -= 1;
         break;
       case "down":
-        targetIndex = activeIndex + 1;
+        targetIndex += 1;
         break;
       case "first":
         targetIndex = 0;
@@ -35,23 +31,16 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, ..
     if (targetIndex < 0) {
       targetIndex = inputList.current.length - 1;
     } else if (targetIndex >= inputList.current.length) {
-      targetIndex = -1; //end of the line
+      submitButton.current?.focus();
+      return;
     }
 
-    if (targetIndex >= 0) {
-      const next = inputList.current[targetIndex];
-      if (next) {
-        next.focus();
-        setTimeout(() => {
-          if (next.type === "radio") {
-            next.checked = true;
-          } else {
-            next.select();
-          }
-        }, 1);
-      }
-    } else {
-      submitButton.current?.focus();
+    const next = inputList.current[targetIndex];
+    if (next) {
+      next.focus();
+      setTimeout(() => {
+        next.select();
+      }, 1);
     }
   }, []);
 

@@ -1,6 +1,7 @@
 import { expect, Page } from "@playwright/test";
 import {
   AbortInputModal,
+  CandidatesListPage,
   DifferencesPage,
   PollingStationChoicePage,
   RecountedPage,
@@ -51,7 +52,7 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.heading).toBeVisible();
 
-      await page.goto("/elections/1/data-entry/1/recounted");
+      await page.goto("/elections/1/data-entry/1");
 
       const differencesPage = new DifferencesPage(page);
       await expect(differencesPage.heading).toBeVisible();
@@ -73,6 +74,32 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.blankVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.invalidVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.totalVotesCastCount).toHaveValue("100");
+    });
+
+    // Reproduce issue where navigating between sections is blocked by modal, even though there are no changes.
+    // https://github.com/kiesraad/abacus/pull/417#pullrequestreview-2347886699
+    test("navigation works after resuming data entry", async ({ page }) => {
+      const abortInputModal = await fillFirstTwoPagesAndAbort(page);
+      await abortInputModal.saveInput.click();
+
+      const pollingStationChoicePage = new PollingStationChoicePage(page);
+      await expect(pollingStationChoicePage.heading).toBeVisible();
+
+      await page.goto("/elections/1/data-entry/1");
+
+      const differencesPage = new DifferencesPage(page);
+      await expect(differencesPage.heading).toBeVisible();
+      await differencesPage.next.click();
+
+      const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+      await expect(candidatesListPage_1.heading).toBeVisible();
+      await candidatesListPage_1.navPanel.votersAndVotes.click();
+
+      const votersAndVotesPage = new VotersAndVotesPage(page);
+      await expect(votersAndVotesPage.heading).toBeVisible();
+      await votersAndVotesPage.navPanel.list(1).click();
+
+      await expect(candidatesListPage_1.heading).toBeVisible();
     });
 
     test("save input from voters and votes page with error", async ({ page, request }) => {

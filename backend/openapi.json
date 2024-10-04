@@ -914,8 +914,7 @@
               {
                 "$ref": "#/components/schemas/VotersRecounts"
               }
-            ],
-            "nullable": true
+            ]
           },
           "votes_counts": {
             "$ref": "#/components/schemas/VotesCounts"

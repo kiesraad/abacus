@@ -407,10 +407,11 @@ export function updateFormStateAfterSubmit(
 
   const currentFormSection = formState.sections[formState.current];
   if (currentFormSection) {
+    const saved = formState.furthest !== formState.current || continueToNextSection;
     //store that this section has been sent to the server
-    currentFormSection.isSaved = continueToNextSection;
+    currentFormSection.isSaved = saved;
     //store that this section has been submitted, this resets on each request
-    currentFormSection.isSubmitted = continueToNextSection;
+    currentFormSection.isSubmitted = saved;
     //flag ignore warnings
     currentFormSection.acceptWarnings = acceptWarnings;
   }

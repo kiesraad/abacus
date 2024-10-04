@@ -206,8 +206,8 @@ export function PollingStationFormController({
           }
         });
 
-        // set saved sections to all sections before the current section
-        const currentIndex = newFormState.sections[newFormState.current]?.index ?? 0;
+        // set saved sections to all sections before the furthest section
+        const currentIndex = newFormState.sections[newFormState.furthest]?.index ?? 0;
         for (const section of Object.values(newFormState.sections)) {
           if (section.index < currentIndex) {
             section.isSaved = true;

@@ -922,6 +922,7 @@
         "type": "string",
         "enum": [
           "first_entry",
+          "first_entry_in_progress",
           "definitive"
         ]
       },

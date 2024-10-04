@@ -73,7 +73,9 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(body.statuses[0].status, PollingStationStatus::FirstEntry);
     assert_eq!(body.statuses[1].status, PollingStationStatus::FirstEntry);
 
-    shared::create_and_finalise_data_entry(&addr).await;
+    // Finalise one and save the other
+    shared::create_and_finalise_data_entry(&addr, 1).await;
+    shared::create_and_save_data_entry(&addr, 2).await;
 
     let url = format!("http://{addr}/api/elections/1/status");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
@@ -91,7 +93,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     );
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,
-        PollingStationStatus::FirstEntry
+        PollingStationStatus::FirstEntryInProgress
     );
 }
 

@@ -102,4 +102,8 @@
       font-size: var(--font-size-md);
     }
   }
+
+  &:global(.no-icon) {
+    padding: 2rem 2.5rem;
+  }
 }

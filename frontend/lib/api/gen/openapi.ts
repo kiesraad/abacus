@@ -187,7 +187,7 @@ export interface PollingStationResults {
   votes_counts: VotesCounts;
 }
 
-export type PollingStationStatus = "first_entry" | "definitive";
+export type PollingStationStatus = "first_entry" | "first_entry_in_progress" | "definitive";
 
 export interface PollingStationStatusEntry {
   id: number;

@@ -2,7 +2,7 @@ use std::time::Instant;
 
 use crate::APIError;
 use models::PdfModel;
-use typst_pdf::PdfOptions;
+use typst_pdf::{PdfOptions, PdfStandard, PdfStandards};
 
 use self::world::PdfWorld;
 
@@ -32,7 +32,13 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
 
     println!("Generating PDF...");
     let pdf_gen_start = Instant::now();
-    let buffer = typst_pdf::pdf(&document, &PdfOptions::default())
+    let pdf_standards =
+        PdfStandards::new(&[PdfStandard::A_2b]).expect("PDF standards should be valid");
+    let pdf_options = PdfOptions {
+        standards: pdf_standards,
+        ..Default::default()
+    };
+    let buffer = typst_pdf::pdf(&document, &pdf_options)
         .map_err(|err| APIError::PdfGenError(err.to_vec()))?;
     println!(
         "PDF generation took {} ms",

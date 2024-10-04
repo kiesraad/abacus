@@ -65,3 +65,11 @@ export const CheckboxAndRadio = React.forwardRef<HTMLInputElement, CheckboxAndRa
 );
 
 CheckboxAndRadio.displayName = "CheckboxAndRadio";
+
+export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxAndRadioProps>((props, ref) => {
+  return <CheckboxAndRadio {...props} type="checkbox" ref={ref} />;
+});
+
+export const Radio = React.forwardRef<HTMLInputElement, CheckboxAndRadioProps>((props, ref) => {
+  return <CheckboxAndRadio {...props} type="radio" ref={ref} />;
+});

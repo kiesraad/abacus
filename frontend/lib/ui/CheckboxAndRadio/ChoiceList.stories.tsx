@@ -26,49 +26,6 @@ DefaultChoiceListCheckbox.args = {
   label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
 };
 
-export const DefaultChoiceListCheckboxIndeterminate: Story<Props> = ({ label }) => (
-  <ChoiceList>
-    <ChoiceList.Title>ChoiceList Checkbox Indeterminate Title</ChoiceList.Title>
-    <ChoiceList.CheckboxIndeterminate id="default-checkbox-indeterminate" defaultChecked={false} label={label} />
-    <ChoiceList.CheckboxIndeterminate
-      id="default-checkbox-indeterminate-with-description"
-      defaultChecked={false}
-      label={label}
-    >
-      This is a description
-    </ChoiceList.CheckboxIndeterminate>
-    <ChoiceList.CheckboxIndeterminate
-      id="default-checkbox-indeterminate-error"
-      defaultChecked={false}
-      label={label}
-      hasError
-    />
-    <ChoiceList.CheckboxIndeterminate
-      id="default-checkbox-indeterminate-disabled"
-      defaultChecked={false}
-      label={label}
-      disabled
-    />
-    <ChoiceList.CheckboxIndeterminate
-      id="default-checkbox-indeterminate-disabled-checked"
-      defaultChecked={true}
-      label={label}
-      disabled
-    />
-    <div style={{ width: 200 }}>
-      <ChoiceList.CheckboxIndeterminate
-        id="default-checkbox-indeterminate-cramped"
-        defaultChecked={false}
-        label={label}
-      />
-    </div>
-  </ChoiceList>
-);
-
-DefaultChoiceListCheckboxIndeterminate.args = {
-  label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
-};
-
 export const DefaultChoiceListRadio: Story<Props> = ({ label }) => (
   <ChoiceList>
     <ChoiceList.Title>ChoiceList Radio Title</ChoiceList.Title>

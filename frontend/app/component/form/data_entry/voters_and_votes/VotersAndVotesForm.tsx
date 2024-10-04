@@ -5,7 +5,7 @@ import {
   Alert,
   BottomBar,
   Button,
-  ChoiceList,
+  Checkbox,
   Feedback,
   Form,
   InputGrid,
@@ -301,15 +301,13 @@ export function VotersAndVotesForm() {
           </BottomBar.Row>
         )}
         <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <ChoiceList>
-            <ChoiceList.Checkbox
-              id={_ACCEPT_WARNINGS_ID}
-              defaultChecked={acceptWarnings}
-              hasError={warningsWarning}
-              reference={acceptWarningsRef}
-              label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
-            />
-          </ChoiceList>
+          <Checkbox
+            id={_ACCEPT_WARNINGS_ID}
+            defaultChecked={acceptWarnings}
+            hasError={warningsWarning}
+            ref={acceptWarningsRef}
+            label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
+          />
         </BottomBar.Row>
         <BottomBar.Row>
           <Button type="submit" size="lg" disabled={status.current === "saving"}>

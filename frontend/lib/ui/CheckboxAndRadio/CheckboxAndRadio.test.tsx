@@ -34,6 +34,7 @@ describe("UI component: Checkbox", () => {
     expect(screen.getByTestId("test-id")).toBeChecked();
     expect(screen.getByLabelText("Aangevinkt")).toBeInTheDocument();
   });
+
   test("The checkbox toggles", async () => {
     render(<CheckboxAndRadio id="test-id" type="checkbox" defaultChecked={true} label="Test label" />);
 
@@ -81,6 +82,7 @@ describe("UI component: Checkbox Indeterminate", () => {
     expect(screen.getByTestId("test-id")).toBeChecked();
     expect(screen.getByLabelText("Aangevinkt")).toBeInTheDocument();
   });
+
   test("The checkbox indeterminate toggles", async () => {
     render(<CheckboxAndRadio id="test-id" type="checkbox" defaultChecked={false} label="Test label" indeterminate />);
 
@@ -128,6 +130,7 @@ describe("UI component: Radio", () => {
     expect(screen.getByTestId("test-id")).toBeChecked();
     expect(screen.getByLabelText("Aangevinkt")).toBeInTheDocument();
   });
+
   test("The radio toggles", async () => {
     render(<CheckboxAndRadio id="test-id" type="radio" defaultChecked={false} label="Test label" />);
 

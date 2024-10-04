@@ -53,16 +53,18 @@
   --button-color-disabled: #b3b3b3;
   --button-color-bg-disabled: #f2f2f2;
 
-  --checkbox-color-border: #98a2b3;
-  --checkbox-color-bg-default: var(--base-white);
-  --checkbox-color-bg-active: var(--bg-gray);
-  --checkbox-color-bg-hover: var(--bg-gray-darker);
-  --checkbox-color-bg-disabled: var(--checkbox-color-bg-hover);
-  --checkbox-color-bg-default-checked: var(--button-color-primary);
-  --checkbox-color-bg-active-checked: var(--button-color-primary-active);
-  --checkbox-color-bg-hover-checked: var(--button-color-primary-hover);
-  --checkbox-color-bg-focus-checked: var(--checkbox-color-bg-default);
-  --checkbox-color-bg-disabled-checked: var(--checkbox-color-border);
+  --checkbox-radio-color-border: #98a2b3;
+  --checkbox-radio-color-bg-default: var(--base-white);
+  --checkbox-radio-color-bg-active: var(--bg-gray);
+  --checkbox-radio-color-bg-hover: var(--bg-gray-darker);
+  --checkbox-radio-color-bg-disabled: var(--checkbox-radio-color-bg-hover);
+  --checkbox-radio-color-bg-default-checked: var(--button-color-primary);
+  --checkbox-radio-color-bg-active-checked: var(--button-color-primary-active);
+  --checkbox-radio-color-bg-hover-checked: var(--button-color-primary-hover);
+  --checkbox-radio-color-bg-focus-checked: var(--checkbox-radio-color-bg-default);
+  --checkbox-radio-color-bg-disabled-checked: var(--checkbox-radio-color-border);
+  --checkbox-radio-size: 1.25rem;
+  --checkbox-radio-svg-size: 0.875rem;
 
   --shadow-color-focus: #d1e0ff;
   --border-color-default: #d0d5dd;

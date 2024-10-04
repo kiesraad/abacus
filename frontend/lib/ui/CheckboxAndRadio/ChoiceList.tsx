@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { CheckboxAndRadio, CheckboxAndRadioProps } from "@kiesraad/ui";
+import { Checkbox, CheckboxAndRadioProps, Radio } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
 import cls from "./CheckboxAndRadio.module.css";
@@ -29,10 +29,9 @@ ChoiceList.Checkbox = ({
   hasError,
   reference,
 }: ChoiceListOptionProps) => (
-  <CheckboxAndRadio
+  <Checkbox
     id={id}
     name={name}
-    type="checkbox"
     label={label}
     disabled={disabled}
     defaultChecked={defaultChecked}
@@ -40,32 +39,7 @@ ChoiceList.Checkbox = ({
     ref={reference}
   >
     {children}
-  </CheckboxAndRadio>
-);
-
-ChoiceList.CheckboxIndeterminate = ({
-  id,
-  name,
-  label,
-  children,
-  disabled,
-  defaultChecked,
-  hasError,
-  reference,
-}: ChoiceListOptionProps) => (
-  <CheckboxAndRadio
-    id={id}
-    name={name}
-    type="checkbox"
-    label={label}
-    indeterminate
-    disabled={disabled}
-    defaultChecked={defaultChecked}
-    hasError={hasError}
-    ref={reference}
-  >
-    {children}
-  </CheckboxAndRadio>
+  </Checkbox>
 );
 
 ChoiceList.Radio = ({
@@ -78,10 +52,9 @@ ChoiceList.Radio = ({
   hasError,
   reference,
 }: ChoiceListOptionProps) => (
-  <CheckboxAndRadio
+  <Radio
     id={id}
     name={name}
-    type="radio"
     label={label}
     disabled={disabled}
     defaultChecked={defaultChecked}
@@ -89,5 +62,5 @@ ChoiceList.Radio = ({
     ref={reference}
   >
     {children}
-  </CheckboxAndRadio>
+  </Radio>
 );

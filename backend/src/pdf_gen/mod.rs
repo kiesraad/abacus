@@ -1,9 +1,8 @@
 use std::time::Instant;
 
-use models::PdfModel;
-use typst::{eval::Tracer, foundations::Smart};
-
 use crate::APIError;
+use models::PdfModel;
+use typst_pdf::PdfOptions;
 
 use self::world::PdfWorld;
 
@@ -20,29 +19,25 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
     world.set_input_model(model);
 
     let compile_start = Instant::now();
-    let mut tracer = Tracer::new();
-    let result = typst::compile(&world, &mut tracer);
+    let result = typst::compile(&world);
+    let document = result
+        .output
+        .map_err(|err| APIError::PdfGenError(err.to_vec()))?;
     println!("Compile took {} ms", compile_start.elapsed().as_millis());
 
-    let warnings = &tracer.warnings();
-    println!("{} warnings", warnings.len());
-    warnings.iter().for_each(|warning| {
+    println!("{} warnings", result.warnings.len());
+    result.warnings.iter().for_each(|warning| {
         println!("Warning: {:?}", warning);
     });
 
-    let buffer = match result {
-        Ok(document) => {
-            println!("Generating PDF...");
-            let pdf_gen_start = Instant::now();
-            let buffer: Vec<u8> = typst_pdf::pdf(&document, Smart::Auto, None);
-            println!(
-                "PDF generation took {} ms",
-                pdf_gen_start.elapsed().as_millis()
-            );
-            Ok(buffer)
-        }
-        Err(err) => Err(APIError::PdfGenError(err.into_iter().collect())),
-    }?;
+    println!("Generating PDF...");
+    let pdf_gen_start = Instant::now();
+    let buffer = typst_pdf::pdf(&document, &PdfOptions::default())
+        .map_err(|err| APIError::PdfGenError(err.to_vec()))?;
+    println!(
+        "PDF generation took {} ms",
+        pdf_gen_start.elapsed().as_millis()
+    );
 
     println!("Finished in {} ms", start.elapsed().as_millis());
     Ok(PdfGenResult { buffer })

@@ -38,6 +38,7 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 
 export function VotersAndVotesForm() {
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
+  const feedbackHeadingFocusRef = React.useRef<HTMLHeadingElement>(null);
   const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
   const recountTitleRef = React.useRef<HTMLHeadingElement>(null);
 
@@ -144,7 +145,7 @@ export function VotersAndVotesForm() {
   React.useEffect(() => {
     if (isSaved) {
       window.scrollTo(0, 0);
-      document.getElementById("feedback-title-0")?.focus();
+      feedbackHeadingFocusRef.current?.focus();
     }
   }, [isSaved, warnings, errors]);
 
@@ -158,15 +159,27 @@ export function VotersAndVotesForm() {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form">
-      <h2 id="form-title" tabIndex={-1}>
-        Toegelaten kiezers en uitgebrachte stemmen
-      </h2>
+    <Form
+      onSubmit={handleSubmit}
+      ref={formRef}
+      id="voters_and_votes_form"
+      title="Toegelaten kiezers en uitgebrachte stemmen"
+    >
       {isSaved && hasValidationError && (
-        <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
+        <Feedback
+          id="feedback-error"
+          type="error"
+          data={errors.map((error) => error.code)}
+          ref={feedbackHeadingFocusRef}
+        />
       )}
       {isSaved && hasValidationWarning && !hasValidationError && (
-        <Feedback id="feedback-warning" type="warning" data={warnings.map((warning) => warning.code)} />
+        <Feedback
+          id="feedback-warning"
+          type="warning"
+          data={warnings.map((warning) => warning.code)}
+          ref={feedbackHeadingFocusRef}
+        />
       )}
       <InputGrid key="voters-and-votes">
         <InputGrid.Header>

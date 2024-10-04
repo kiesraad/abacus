@@ -32,6 +32,7 @@ export interface CandidatesVotesFormProps {
 
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
+  const feedbackHeadingFocusRef = React.useRef<HTMLHeadingElement>(null);
   const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -89,7 +90,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   React.useEffect(() => {
     if (isSaved) {
       window.scrollTo(0, 0);
-      document.getElementById("feedback-title-0")?.focus();
+      feedbackHeadingFocusRef.current?.focus();
     }
   }, [isSaved]);
 
@@ -130,15 +131,27 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`}>
-      <h2 id="form-title" tabIndex={-1}>
-        Lijst {group.number} - {group.name}
-      </h2>
+    <Form
+      onSubmit={handleSubmit}
+      ref={formRef}
+      id={`candidates_form_${group.number}`}
+      title={`Lijst ${group.number} - ${group.name}`}
+    >
       {isSaved && hasValidationError && (
-        <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
+        <Feedback
+          id="feedback-error"
+          type="error"
+          data={errors.map((error) => error.code)}
+          ref={feedbackHeadingFocusRef}
+        />
       )}
       {isSaved && hasValidationWarning && !hasValidationError && (
-        <Feedback id="feedback-warning" type="warning" data={warnings.map((warning) => warning.code)} />
+        <Feedback
+          id="feedback-warning"
+          type="warning"
+          data={warnings.map((warning) => warning.code)}
+          ref={feedbackHeadingFocusRef}
+        />
       )}
       <InputGrid key={`list${group.number}`} zebra>
         <InputGrid.Header>

@@ -1,16 +1,18 @@
 import * as React from "react";
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
+  title?: string;
   children: React.ReactNode;
 }
 
 type Dir = "up" | "down" | "first" | "last";
 
-export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, ...formProps }, ref) => {
+export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, children, ...formProps }, ref) => {
   const innerRef: React.MutableRefObject<HTMLFormElement | null> = React.useRef<HTMLFormElement>(null);
 
   const inputList = React.useRef<HTMLInputElement[]>([]);
   const submitButton = React.useRef<HTMLButtonElement | null>(null);
+  const formTitle = React.useRef<HTMLHeadingElement | null>(null);
 
   const moveFocus = React.useCallback((dir: Dir) => {
     let targetIndex = inputList.current.findIndex((input) => document.activeElement === input);
@@ -93,7 +95,7 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, ..
   }, [children]);
 
   React.useEffect(() => {
-    document.getElementById("form-title")?.focus();
+    formTitle.current?.focus();
   }, []);
 
   return (
@@ -108,6 +110,9 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, ..
       }}
       {...formProps}
     >
+      <h2 tabIndex={-1} ref={formTitle}>
+        {title}
+      </h2>
       {children}
     </form>
   );

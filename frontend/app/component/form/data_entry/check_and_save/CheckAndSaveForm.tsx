@@ -55,10 +55,7 @@ export function CheckAndSaveForm() {
     })(event);
 
   return (
-    <Form onSubmit={handleSubmit} id="check_save_form">
-      <h2 id="form-title" tabIndex={-1}>
-        Controleren en opslaan
-      </h2>
+    <Form onSubmit={handleSubmit} id="check_save_form" title="Controleren en opslaan">
       <section className="md" id="save-form-summary-text">
         {!summary.hasBlocks && summary.countsAddUp && (
           <p className="md">

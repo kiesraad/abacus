@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { forwardRef, ReactNode } from "react";
 
 import { ApiError } from "@kiesraad/api";
 import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";
@@ -7,7 +7,7 @@ import { cn } from "@kiesraad/util";
 import cls from "./Feedback.module.css";
 import { ClientValidationResultCode, FeedbackItem, feedbackTypes } from "./Feedback.types";
 
-export interface FeedbackProps {
+interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
   data?: ClientValidationResultCode[];
@@ -16,7 +16,7 @@ export interface FeedbackProps {
   children?: ReactNode;
 }
 
-export function Feedback({ id, type, data, apiError, children }: FeedbackProps) {
+export const Feedback = forwardRef<HTMLHeadingElement, FeedbackProps>(({ id, type, data, apiError, children }, ref) => {
   const feedbackList: FeedbackItem[] = [];
   if (data) {
     for (const code of data) {
@@ -30,7 +30,7 @@ export function Feedback({ id, type, data, apiError, children }: FeedbackProps) 
         <div className="feedback-item">
           <header>
             {renderIconForType(type)}
-            <h3 id="feedback-title-0" tabIndex={-1}>
+            <h3 tabIndex={-1} ref={ref}>
               Sorry, er ging iets mis
             </h3>
           </header>
@@ -43,7 +43,7 @@ export function Feedback({ id, type, data, apiError, children }: FeedbackProps) 
         <div key={`feedback-${index}`} className="feedback-item">
           <header>
             {renderIconForType(type)}
-            <h3 id={`feedback-title-${index}`} tabIndex={-1}>
+            <h3 tabIndex={-1} ref={index === 0 ? ref : undefined}>
               {feedback.title}
             </h3>
             {feedback.code && <span>{feedback.code}</span>}
@@ -79,4 +79,4 @@ export function Feedback({ id, type, data, apiError, children }: FeedbackProps) 
       )}
     </article>
   );
-}
+});

@@ -33,6 +33,7 @@ interface DifferencesFormElement extends HTMLFormElement {
 
 export function DifferencesForm() {
   const formRef = React.useRef<DifferencesFormElement>(null);
+  const feedbackHeadingFocusRef = React.useRef<HTMLHeadingElement>(null);
   const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
 
   const getValues = React.useCallback(() => {
@@ -119,7 +120,7 @@ export function DifferencesForm() {
   React.useEffect(() => {
     if (isSaved) {
       window.scrollTo(0, 0);
-      document.getElementById("feedback-title-0")?.focus();
+      feedbackHeadingFocusRef.current?.focus();
     }
   }, [isSaved, errors, warnings]);
 
@@ -133,15 +134,27 @@ export function DifferencesForm() {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="differences_form">
-      <h2 id="form-title" tabIndex={-1}>
-        Verschillen tussen toegelaten kiezers en uitgebrachte stemmen
-      </h2>
+    <Form
+      onSubmit={handleSubmit}
+      ref={formRef}
+      id="differences_form"
+      title="Verschillen tussen toegelaten kiezers en uitgebrachte stemmen"
+    >
       {isSaved && hasValidationError && (
-        <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
+        <Feedback
+          id="feedback-error"
+          type="error"
+          data={errors.map((error) => error.code)}
+          ref={feedbackHeadingFocusRef}
+        />
       )}
       {isSaved && hasValidationWarning && !hasValidationError && (
-        <Feedback id="feedback-warning" type="warning" data={warnings.map((warning) => warning.code)} />
+        <Feedback
+          id="feedback-warning"
+          type="warning"
+          data={warnings.map((warning) => warning.code)}
+          ref={feedbackHeadingFocusRef}
+        />
       )}
       <InputGrid key="differences">
         <InputGrid.Header>

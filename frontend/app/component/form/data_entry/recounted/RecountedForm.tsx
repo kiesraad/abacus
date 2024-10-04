@@ -15,6 +15,7 @@ interface RecountedFormElement extends HTMLFormElement {
 export function RecountedForm() {
   const [hasValidationError, setHasValidationError] = React.useState(false);
   const formRef = React.useRef<RecountedFormElement>(null);
+  const feedbackHeadingFocusRef = React.useRef<HTMLHeadingElement>(null);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -47,17 +48,14 @@ export function RecountedForm() {
   React.useEffect(() => {
     if (isSaved) {
       window.scrollTo(0, 0);
-      document.getElementById("feedback-title-0")?.focus();
+      feedbackHeadingFocusRef.current?.focus();
     }
   }, [isSaved]);
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form">
-      <h2 id="form-title" tabIndex={-1}>
-        Is er herteld?
-      </h2>
+    <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form" title="Is er herteld?">
       {hasValidationError && (
-        <Feedback id="feedback-error" type="error" data={["F101"]}>
+        <Feedback id="feedback-error" type="error" data={["F101"]} ref={feedbackHeadingFocusRef}>
           <ul>
             <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
             <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>

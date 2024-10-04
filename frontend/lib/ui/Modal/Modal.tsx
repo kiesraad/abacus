@@ -1,4 +1,4 @@
-import * as React from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
 import { IconCross } from "@kiesraad/icon";
 import { IconButton } from "@kiesraad/ui";
@@ -8,14 +8,14 @@ import cls from "./Modal.module.css";
 export interface ModalProps {
   id: string;
   onClose?: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export function Modal({ id, onClose, children }: ModalProps): React.ReactNode {
-  const dialogRef = React.useRef<HTMLDialogElement | null>(null);
-  const lastActiveElement = React.useRef<HTMLElement | null>(null);
+export function Modal({ id, onClose, children }: ModalProps): ReactNode {
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const lastActiveElement = useRef<HTMLElement | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (dialogRef.current && !dialogRef.current.open) {
       lastActiveElement.current = document.activeElement as HTMLElement;
       dialogRef.current.showModal();

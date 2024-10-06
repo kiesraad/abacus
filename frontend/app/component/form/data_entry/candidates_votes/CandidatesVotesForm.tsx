@@ -92,7 +92,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       window.scrollTo(0, 0);
       feedbackHeadingFocusRef.current?.focus();
     }
-  }, [isSaved]);
+  }, [isSaved, errors, warnings]);
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
 

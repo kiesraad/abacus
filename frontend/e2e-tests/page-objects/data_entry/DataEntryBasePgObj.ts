@@ -13,6 +13,7 @@ export class DataEntryBasePage {
 
   readonly error: Locator;
   readonly warning: Locator;
+  readonly feedbackHeader: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -24,5 +25,6 @@ export class DataEntryBasePage {
 
     this.error = page.getByTestId("feedback-error");
     this.warning = page.getByTestId("feedback-warning");
+    this.feedbackHeader = page.getByRole("heading", { level: 3 });
   }
 }

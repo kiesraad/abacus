@@ -25,7 +25,9 @@ const expectRecountedForm = async (headingShouldNotHaveFocus?: boolean) => {
     expect(screen.getByTestId("recounted_form")).toBeInTheDocument();
   });
   if (!headingShouldNotHaveFocus) {
-    expect(screen.getByRole("heading", { level: 2, name: "Is er herteld?" })).toHaveFocus();
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 2, name: "Is er herteld?" })).toHaveFocus();
+    });
   }
 };
 
@@ -42,7 +44,11 @@ const expectVotersAndVotesForm = async (headingShouldNotHaveFocus?: boolean) => 
     expect(screen.getByTestId("voters_and_votes_form")).toBeInTheDocument();
   });
   if (!headingShouldNotHaveFocus) {
-    expect(screen.getByRole("heading", { level: 2, name: "Toegelaten kiezers en uitgebrachte stemmen" })).toHaveFocus();
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { level: 2, name: "Toegelaten kiezers en uitgebrachte stemmen" }),
+      ).toHaveFocus();
+    });
   }
 };
 
@@ -68,9 +74,14 @@ const expectDifferencesForm = async (headingShouldNotHaveFocus?: boolean) => {
     expect(screen.getByTestId("differences_form")).toBeInTheDocument();
   });
   if (!headingShouldNotHaveFocus) {
-    expect(
-      screen.getByRole("heading", { level: 2, name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen" }),
-    ).toHaveFocus();
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", {
+          level: 2,
+          name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+        }),
+      ).toHaveFocus();
+    });
   }
 };
 
@@ -93,7 +104,9 @@ const expectPoliticalGroupCandidatesForm = async (pgNumber: number, headingShoul
     expect(screen.getByTestId(`candidates_form_${pgNumber}`)).toBeInTheDocument();
   });
   if (!headingShouldNotHaveFocus) {
-    expect(screen.getByRole("heading", { level: 2 })).toHaveFocus();
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 2 })).toHaveFocus();
+    });
   }
 };
 
@@ -110,7 +123,9 @@ const expectCheckAndSavePage = async (headingShouldNotHaveFocus?: boolean) => {
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/save");
   });
   if (!headingShouldNotHaveFocus) {
-    expect(screen.getByRole("heading", { level: 2, name: "Controleren en opslaan" })).toHaveFocus();
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 2, name: "Controleren en opslaan" })).toHaveFocus();
+    });
   }
 };
 
@@ -121,7 +136,9 @@ const expectFeedbackError = async (code?: string) => {
   if (code) {
     expect(screen.getByText(code)).toBeInTheDocument();
   }
-  expect(screen.getByRole("heading", { level: 3 })).toHaveFocus();
+  await waitFor(() => {
+    expect(screen.getByRole("heading", { level: 3 })).toHaveFocus();
+  });
 };
 
 const expectFeedbackWarning = async (code?: string) => {
@@ -131,7 +148,9 @@ const expectFeedbackWarning = async (code?: string) => {
   if (code) {
     expect(screen.getByText(code)).toBeInTheDocument();
   }
-  expect(screen.getByRole("heading", { level: 3 })).toHaveFocus();
+  await waitFor(() => {
+    expect(screen.getByRole("heading", { level: 3 })).toHaveFocus();
+  });
 };
 
 const acceptWarning = async () => {

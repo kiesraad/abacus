@@ -1,3 +1,4 @@
+import * as React from "react";
 import { forwardRef, ReactNode } from "react";
 
 import { ApiError } from "@kiesraad/api";
@@ -16,7 +17,8 @@ interface FeedbackProps {
   children?: ReactNode;
 }
 
-export const Feedback = forwardRef<HTMLHeadingElement, FeedbackProps>(({ id, type, data, apiError, children }, ref) => {
+export const Feedback = forwardRef<HTMLHeadingElement, FeedbackProps>(({ id, type, data, apiError, children }) => {
+  const feedbackHeader = React.useRef<HTMLHeadingElement | null>(null);
   const feedbackList: FeedbackItem[] = [];
   if (data) {
     for (const code of data) {
@@ -24,13 +26,17 @@ export const Feedback = forwardRef<HTMLHeadingElement, FeedbackProps>(({ id, typ
     }
   }
 
+  React.useEffect(() => {
+    feedbackHeader.current?.focus();
+  }, []);
+
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>
       {apiError && (
         <div className="feedback-item">
           <header>
             {renderIconForType(type)}
-            <h3 tabIndex={-1} ref={ref}>
+            <h3 tabIndex={-1} ref={feedbackHeader}>
               Sorry, er ging iets mis
             </h3>
           </header>
@@ -43,7 +49,7 @@ export const Feedback = forwardRef<HTMLHeadingElement, FeedbackProps>(({ id, typ
         <div key={`feedback-${index}`} className="feedback-item">
           <header>
             {renderIconForType(type)}
-            <h3 tabIndex={-1} ref={index === 0 ? ref : undefined}>
+            <h3 tabIndex={-1} ref={index === 0 ? feedbackHeader : undefined}>
               {feedback.title}
             </h3>
             {feedback.code && <span>{feedback.code}</span>}

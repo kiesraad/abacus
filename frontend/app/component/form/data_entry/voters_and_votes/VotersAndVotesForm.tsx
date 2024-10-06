@@ -38,7 +38,6 @@ interface VotersAndVotesFormElement extends HTMLFormElement {
 
 export function VotersAndVotesForm() {
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
-  const feedbackHeadingFocusRef = React.useRef<HTMLHeadingElement>(null);
   const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
   const recountTitleRef = React.useRef<HTMLHeadingElement>(null);
 
@@ -145,7 +144,6 @@ export function VotersAndVotesForm() {
   React.useEffect(() => {
     if (isSaved) {
       window.scrollTo(0, 0);
-      feedbackHeadingFocusRef.current?.focus();
     }
   }, [isSaved, warnings, errors]);
 
@@ -166,20 +164,10 @@ export function VotersAndVotesForm() {
       title="Toegelaten kiezers en uitgebrachte stemmen"
     >
       {isSaved && hasValidationError && (
-        <Feedback
-          id="feedback-error"
-          type="error"
-          data={errors.map((error) => error.code)}
-          ref={feedbackHeadingFocusRef}
-        />
+        <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
       {isSaved && hasValidationWarning && !hasValidationError && (
-        <Feedback
-          id="feedback-warning"
-          type="warning"
-          data={warnings.map((warning) => warning.code)}
-          ref={feedbackHeadingFocusRef}
-        />
+        <Feedback id="feedback-warning" type="warning" data={warnings.map((warning) => warning.code)} />
       )}
       <InputGrid key="voters-and-votes">
         <InputGrid.Header>

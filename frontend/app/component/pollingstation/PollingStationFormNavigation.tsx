@@ -23,7 +23,6 @@ export interface PollingStationFormNavigationProps {
 
 export function PollingStationFormNavigation({ pollingStationId, election }: PollingStationFormNavigationProps) {
   const _lastKnownSection = React.useRef<FormSectionID | null>(null);
-  const feedbackHeadingFocusRef = React.useRef<HTMLHeadingElement>(null);
   const { status, formState, apiError, currentForm, targetFormSection, values, setTemporaryCache, submitCurrentForm } =
     usePollingStationFormController();
 
@@ -112,7 +111,6 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
   React.useEffect(() => {
     if (apiError) {
       window.scrollTo(0, 0);
-      feedbackHeadingFocusRef.current?.focus();
     }
   }, [apiError]);
 
@@ -172,9 +170,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
           )}
         </>
       )}
-      {apiError && (
-        <Feedback id="feedback-server-error" type="error" apiError={apiError} ref={feedbackHeadingFocusRef} />
-      )}
+      {apiError && <Feedback id="feedback-server-error" type="error" apiError={apiError} />}
     </>
   );
 }

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { forwardRef, ReactNode } from "react";
+import { ReactNode } from "react";
 
 import { ApiError } from "@kiesraad/api";
 import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";
@@ -17,7 +17,7 @@ interface FeedbackProps {
   children?: ReactNode;
 }
 
-export const Feedback = forwardRef<HTMLHeadingElement, FeedbackProps>(({ id, type, data, apiError, children }) => {
+export const Feedback = ({ id, type, data, apiError, children }: FeedbackProps) => {
   const feedbackHeader = React.useRef<HTMLHeadingElement | null>(null);
   const feedbackList: FeedbackItem[] = [];
   if (data) {
@@ -85,4 +85,4 @@ export const Feedback = forwardRef<HTMLHeadingElement, FeedbackProps>(({ id, typ
       )}
     </article>
   );
-});
+};

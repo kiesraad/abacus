@@ -561,8 +561,8 @@ describe("Polling Station data entry integration tests", () => {
             total_admitted_voters_count: 1,
           }),
         submit,
-        expectVotersAndVotesForm,
-        () => gotoForm("differences", true),
+        () => expectVotersAndVotesForm(true),
+        () => gotoForm("differences"),
         () => expectElementContainsIcon("list-item-voters-and-votes", "bevat een fout"),
       ];
 

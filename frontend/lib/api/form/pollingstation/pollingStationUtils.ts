@@ -397,6 +397,50 @@ export function getClientState(formState: FormState, acceptWarnings: boolean, co
   return clientState;
 }
 
+export function buildFormState(
+  clientState: ClientState,
+  validationResults: ValidationResults,
+  election: Required<Election>,
+) {
+  const newFormState = getInitialFormState(election);
+
+  // set the furthest and current section
+  newFormState.furthest = clientState.furthest;
+  newFormState.current = clientState.current;
+
+  // set accepted warnings
+  clientState.acceptedWarnings.forEach((sectionID: FormSectionID) => {
+    const section = newFormState.sections[sectionID];
+    if (section) {
+      section.acceptWarnings = true;
+    }
+  });
+
+  // set saved sections to all sections before the furthest section
+  const currentIndex = newFormState.sections[newFormState.furthest]?.index ?? 0;
+  for (const section of Object.values(newFormState.sections)) {
+    if (section.index < currentIndex) {
+      section.isSaved = true;
+    }
+  }
+
+  // set accepted warnings for the current section
+  const acceptWarnings = clientState.acceptedWarnings.some(
+    (sectionID: FormSectionID) => sectionID === newFormState.current,
+  );
+
+  updateFormStateAfterSubmit(newFormState, validationResults, acceptWarnings, clientState.continue);
+
+  let targetFormSectionID: FormSectionID;
+  if (clientState.continue) {
+    targetFormSectionID = getNextSectionID(newFormState) ?? newFormState.current;
+  } else {
+    targetFormSectionID = newFormState.current;
+  }
+
+  return { formState: newFormState, targetFormSectionID };
+}
+
 export function updateFormStateAfterSubmit(
   formState: FormState,
   validationResults: ValidationResults,

@@ -6,6 +6,7 @@ import { getUrlForFormSectionID } from "app/component/pollingstation/utils";
 import {
   ApiError,
   ApiResponseStatus,
+  buildFormState,
   Election,
   getClientState,
   GetDataEntryResponse,
@@ -190,43 +191,13 @@ export function PollingStationFormController({
       setValues(responseData.data);
 
       if (responseData.client_state) {
-        const newFormState = getInitialFormState(election);
-
-        const clientState = responseData.client_state as ClientState;
-
-        // set the furthest and current section
-        newFormState.furthest = clientState.furthest;
-        newFormState.current = clientState.current;
-
-        // set accepted warnings
-        clientState.acceptedWarnings.forEach((sectionID: FormSectionID) => {
-          const section = newFormState.sections[sectionID];
-          if (section) {
-            section.acceptWarnings = true;
-          }
-        });
-
-        // set saved sections to all sections before the furthest section
-        const currentIndex = newFormState.sections[newFormState.furthest]?.index ?? 0;
-        for (const section of Object.values(newFormState.sections)) {
-          if (section.index < currentIndex) {
-            section.isSaved = true;
-          }
-        }
-
-        const acceptWarnings = clientState.acceptedWarnings.some(
-          (sectionID: FormSectionID) => sectionID === newFormState.current,
+        const { formState, targetFormSectionID } = buildFormState(
+          responseData.client_state as ClientState,
+          responseData.validation_results,
+          election,
         );
-
-        updateFormStateAfterSubmit(newFormState, responseData.validation_results, acceptWarnings, clientState.continue);
-
-        if (clientState.continue) {
-          setTargetFormSectionID(getNextSectionID(newFormState) ?? newFormState.current);
-        } else {
-          setTargetFormSectionID(newFormState.current);
-        }
-
-        setFormState(newFormState);
+        setTargetFormSectionID(targetFormSectionID);
+        setFormState(formState);
       } else {
         setFormState(getInitialFormState(election));
         setTargetFormSectionID(INITIAL_FORM_SECTION_ID);

@@ -19,7 +19,8 @@ export function AbortDataEntryModal({ onCancel, onSave, onDelete }: AbortDataEnt
     void (async () => {
       try {
         setSaving(true);
-        await controller.submitCurrentForm({ aborting: true, continueToNextSection: false });
+        const acceptWarnings = controller.currentForm?.getAcceptWarnings?.() ?? false;
+        await controller.submitCurrentForm({ acceptWarnings, aborting: true, continueToNextSection: false });
         onSave();
       } finally {
         setSaving(false);

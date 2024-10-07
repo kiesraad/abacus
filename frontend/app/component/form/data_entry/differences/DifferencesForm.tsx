@@ -124,7 +124,7 @@ export function DifferencesForm() {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-  const showAcceptWarnings = errors.length == 0 && warnings.length > 0 && !hasChanges;
+  const showAcceptWarnings = errors.length === 0 && warnings.length > 0 && !hasChanges;
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,

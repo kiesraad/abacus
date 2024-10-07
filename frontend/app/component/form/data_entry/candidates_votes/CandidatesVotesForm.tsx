@@ -121,7 +121,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-  const showAcceptWarnings = errors.length == 0 && warnings.length > 0 && !hasChanges;
+  const showAcceptWarnings = errors.length === 0 && warnings.length > 0 && !hasChanges;
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
@@ -149,7 +149,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         </InputGrid.Header>
         <InputGrid.Body>
           {group.candidates.map((candidate, index) => {
-            const addSeparator = (index + 1) % 25 == 0 && index + 1 !== group.candidates.length;
+            const addSeparator = (index + 1) % 25 === 0 && index + 1 !== group.candidates.length;
             const defaultValue = sectionValues?.candidate_votes[index]?.votes || "";
             return (
               <InputGridRow

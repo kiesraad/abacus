@@ -1,6 +1,7 @@
 use std::time::Instant;
 
 use models::PdfModel;
+use tracing::{debug, info, warn};
 use typst::{eval::Tracer, foundations::Smart};
 
 use crate::APIError;
@@ -22,20 +23,20 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
     let compile_start = Instant::now();
     let mut tracer = Tracer::new();
     let result = typst::compile(&world, &mut tracer);
-    println!("Compile took {} ms", compile_start.elapsed().as_millis());
+    info!("Compile took {} ms", compile_start.elapsed().as_millis());
 
     let warnings = &tracer.warnings();
-    println!("{} warnings", warnings.len());
+    info!("{} warnings", warnings.len());
     warnings.iter().for_each(|warning| {
-        println!("Warning: {:?}", warning);
+        warn!("Warning: {:?}", warning);
     });
 
     let buffer = match result {
         Ok(document) => {
-            println!("Generating PDF...");
+            debug!("Generating PDF...");
             let pdf_gen_start = Instant::now();
             let buffer: Vec<u8> = typst_pdf::pdf(&document, Smart::Auto, None);
-            println!(
+            debug!(
                 "PDF generation took {} ms",
                 pdf_gen_start.elapsed().as_millis()
             );
@@ -44,7 +45,7 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
         Err(err) => Err(APIError::PdfGenError(err.into_iter().collect())),
     }?;
 
-    println!("Finished in {} ms", start.elapsed().as_millis());
+    info!("Finished in {} ms", start.elapsed().as_millis());
     Ok(PdfGenResult { buffer })
 }
 

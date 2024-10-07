@@ -12,6 +12,7 @@ use sqlx::SqlitePool;
 use tokio::net::TcpListener;
 use tokio::signal;
 use tower_http::services::{ServeDir, ServeFile};
+use tracing::info;
 
 /// Abacus API server
 #[derive(Parser, Debug)]
@@ -39,10 +40,12 @@ struct Args {
     reset_database: bool,
 }
 
-/// Main entry point for the application, sets up the database and starts the
-/// API server on port 8080.
+/// Main entry point for the application. Sets up the database, and starts the
+/// API server and in-memory file router on port 8080.
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    tracing_subscriber::fmt().init();
+
     let args = Args::parse();
     let pool = create_sqlite_pool(&args).await?;
     let app = router(pool)?;
@@ -57,7 +60,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(&address).await?;
-    println!("Starting API server on http://{}", listener.local_addr()?);
+    info!("Starting API server on http://{}", listener.local_addr()?);
     axum::serve(listener, app.into_make_service())
         .with_graceful_shutdown(shutdown_signal())
         .tcp_nodelay(true)

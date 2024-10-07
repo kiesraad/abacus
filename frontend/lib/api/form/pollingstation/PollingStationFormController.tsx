@@ -220,6 +220,7 @@ export function PollingStationFormController({
     if (!targetFormSectionID) return;
     const url = getUrlForFormSectionID(election.id, pollingStationId, targetFormSectionID);
     navigate(url);
+    setTargetFormSectionID(null);
   }, [targetFormSectionID, navigate, election.id, pollingStationId]);
 
   const registerCurrentForm = React.useCallback(

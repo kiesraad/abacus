@@ -350,7 +350,24 @@ describe("Polling Station data entry integration tests", () => {
       }
     });
 
-    test("Navigate to next page after navigating back and submitting", async () => {
+    test("Navigate to next page after navigating back one page submitting", async () => {
+      // https://github.com/kiesraad/abacus/issues/426
+      render();
+      await startPollingStationInput();
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submit();
+      await expectVotersAndVotesForm();
+      await fillVotersAndVotesForm();
+      await submit();
+      await expectDifferencesForm();
+      await userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
+      await expectVotersAndVotesForm();
+      await submit();
+      await expectDifferencesForm();
+    });
+
+    test("Navigate to next page after navigating back two pages and submitting", async () => {
       render();
 
       const steps = [

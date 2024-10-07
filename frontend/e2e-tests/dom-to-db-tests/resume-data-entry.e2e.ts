@@ -1,6 +1,7 @@
 import { expect, Page } from "@playwright/test";
 import {
   AbortInputModal,
+  CandidatesListPage,
   DifferencesPage,
   PollingStationChoicePage,
   RecountedPage,
@@ -10,6 +11,7 @@ import {
 } from "e2e-tests/page-objects/data_entry";
 
 import { test } from "./fixtures";
+import { emptyDataEntryResponse } from "./test-data/PollingStationTestData";
 
 test.describe("resume data entry flow", () => {
   const fillFirstTwoPagesAndAbort = async (page: Page) => {
@@ -50,7 +52,11 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.heading).toBeVisible();
 
-      await page.goto("/elections/1/data-entry/1/recounted");
+      await page.goto("/elections/1/data-entry/1");
+
+      const differencesPage = new DifferencesPage(page);
+      await expect(differencesPage.heading).toBeVisible();
+      await differencesPage.navPanel.recounted.click();
 
       const recountedPage = new RecountedPage(page);
       await expect(recountedPage.no).toBeChecked();
@@ -70,7 +76,33 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.totalVotesCastCount).toHaveValue("100");
     });
 
-    test("save input from voters and votes page with error", async ({ page }) => {
+    // Reproduce issue where navigating between sections is blocked by modal, even though there are no changes.
+    // https://github.com/kiesraad/abacus/pull/417#pullrequestreview-2347886699
+    test("navigation works after resuming data entry", async ({ page }) => {
+      const abortInputModal = await fillFirstTwoPagesAndAbort(page);
+      await abortInputModal.saveInput.click();
+
+      const pollingStationChoicePage = new PollingStationChoicePage(page);
+      await expect(pollingStationChoicePage.heading).toBeVisible();
+
+      await page.goto("/elections/1/data-entry/1");
+
+      const differencesPage = new DifferencesPage(page);
+      await expect(differencesPage.heading).toBeVisible();
+      await differencesPage.next.click();
+
+      const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+      await expect(candidatesListPage_1.heading).toBeVisible();
+      await candidatesListPage_1.navPanel.votersAndVotes.click();
+
+      const votersAndVotesPage = new VotersAndVotesPage(page);
+      await expect(votersAndVotesPage.heading).toBeVisible();
+      await votersAndVotesPage.navPanel.list(1).click();
+
+      await expect(candidatesListPage_1.heading).toBeVisible();
+    });
+
+    test("save input from voters and votes page with error", async ({ page, request }) => {
       await page.goto("/elections/1/data-entry/1/recounted");
 
       const recountedPage = new RecountedPage(page);
@@ -90,21 +122,50 @@ test.describe("resume data entry flow", () => {
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
 
-      // TODO: check saved data instead of API call in #137
-      const responsePromise = page.waitForResponse("**/polling_stations/1/data_entries/1");
-
       await abortInputModal.saveInput.click();
-
-      const response = await responsePromise;
-      expect(response.request().method()).toBe("POST");
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.heading).toBeVisible();
+      await expect(pollingStationChoicePage.resumeDataEntry).toBeVisible();
 
-      // TODO: extend test as part of epic #137 resume data entry
+      const dataEntryResponse = await request.get(`/api/polling_stations/1/data_entries/1`);
+      expect(dataEntryResponse.status()).toBe(200);
+      expect(await dataEntryResponse.json()).toMatchObject({
+        data: {
+          ...emptyDataEntryResponse.data,
+          voters_counts: {
+            poll_card_count: 0,
+            proxy_certificate_count: 0,
+            voter_card_count: 1000,
+            total_admitted_voters_count: 0,
+          },
+        },
+        validation_results: {
+          errors: [
+            {
+              fields: [
+                "data.voters_counts.poll_card_count",
+                "data.voters_counts.proxy_certificate_count",
+                "data.voters_counts.voter_card_count",
+                "data.voters_counts.total_admitted_voters_count",
+              ],
+              code: "F201",
+            },
+          ],
+          warnings: [
+            {
+              fields: ["data.votes_counts.total_votes_cast_count"],
+              code: "W205",
+            },
+          ],
+        },
+      });
+
+      await pollingStationChoicePage.selectPollingStationAndClickStart(33);
+      await votersAndVotesPage.heading.waitFor();
     });
 
-    test("save input from voters and votes page with warning", async ({ page }) => {
+    test("save input from voters and votes page with warning", async ({ page, request }) => {
       await page.goto("/elections/1/data-entry/1/recounted");
 
       const recountedPage = new RecountedPage(page);
@@ -135,18 +196,47 @@ test.describe("resume data entry flow", () => {
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
 
-      // TODO: check saved data instead of API call in #137
-      const responsePromise = page.waitForResponse("**/polling_stations/1/data_entries/1");
-
       await abortInputModal.saveInput.click();
-
-      const response = await responsePromise;
-      expect(response.request().method()).toBe("POST");
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.heading).toBeVisible();
 
-      // TODO: extend test as part of epic #137 resume data entry
+      const dataEntryResponse = await request.get(`/api/polling_stations/1/data_entries/1`);
+      expect(dataEntryResponse.status()).toBe(200);
+      expect(await dataEntryResponse.json()).toMatchObject({
+        data: {
+          ...emptyDataEntryResponse.data,
+          voters_counts: {
+            poll_card_count: 100,
+            proxy_certificate_count: 0,
+            voter_card_count: 0,
+            total_admitted_voters_count: 100,
+          },
+          votes_counts: {
+            votes_candidates_count: 50,
+            blank_votes_count: 50,
+            invalid_votes_count: 0,
+            total_votes_cast_count: 100,
+          },
+        },
+        validation_results: {
+          errors: [
+            {
+              fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
+              code: "F204",
+            },
+          ],
+          warnings: [
+            {
+              fields: ["data.votes_counts.blank_votes_count"],
+              code: "W201",
+            },
+          ],
+        },
+      });
+
+      await pollingStationChoicePage.selectPollingStationAndClickStart(33);
+      await votersAndVotesPage.heading.waitFor();
     });
   });
 
@@ -166,7 +256,7 @@ test.describe("resume data entry flow", () => {
       await expect(recountedPage.no).not.toBeChecked();
     });
 
-    test("discard input from voters and votes page with error", async ({ page }) => {
+    test("discard input from voters and votes page with error", async ({ page, request }) => {
       await page.goto("/elections/1/data-entry/1/recounted");
 
       const recountedPage = new RecountedPage(page);
@@ -184,20 +274,16 @@ test.describe("resume data entry flow", () => {
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
 
-      // TODO: replace checking API call with checking form is empty at the end of the test
-      // should be done as part of epic #137 resume data entry
-      const responsePromise = page.waitForResponse("**/polling_stations/1/data_entries/1");
-
       await abortInputModal.discardInput.click();
-
-      const response = await responsePromise;
-      expect(response.request().method()).toBe("DELETE");
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.heading).toBeVisible();
+
+      const dataEntryResponse = await request.get(`/api/polling_stations/1/data_entries/1`);
+      expect(dataEntryResponse.status()).toBe(404);
     });
 
-    test("discard input from voters and votes page with warning", async ({ page }) => {
+    test("discard input from voters and votes page with warning", async ({ page, request }) => {
       await page.goto("/elections/1/data-entry/1/recounted");
 
       const recountedPage = new RecountedPage(page);
@@ -228,17 +314,13 @@ test.describe("resume data entry flow", () => {
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
 
-      // TODO: replace checking API call with checking form is empty at the end of the test
-      // should be done as part of epic #137 resume data entry
-      const responsePromise = page.waitForResponse("**/polling_stations/1/data_entries/1");
-
       await abortInputModal.discardInput.click();
-
-      const response = await responsePromise;
-      expect(response.request().method()).toBe("DELETE");
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.heading).toBeVisible();
+
+      const dataEntryResponse = await request.get(`/api/polling_stations/1/data_entries/1`);
+      expect(dataEntryResponse.status()).toBe(404);
     });
   });
 });

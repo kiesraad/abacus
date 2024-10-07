@@ -17,7 +17,7 @@ mod utils;
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
-    shared::create_and_finalise_data_entry(&addr).await;
+    shared::create_and_finalise_data_entry(&addr, 1).await;
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
@@ -65,7 +65,8 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
             ]
           }
         ]
-      }
+      },
+      "client_state": {"foo": "bar"}
     });
 
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
@@ -209,6 +210,7 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     // check that the data entry is the same
     let get_response: GetDataEntryResponse = response.json().await.unwrap();
     assert_eq!(get_response.data, request_body.data);
+    assert_eq!(get_response.client_state, request_body.client_state);
     assert_eq!(
         get_response.validation_results,
         save_response.validation_results
@@ -219,7 +221,7 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
-    shared::create_and_finalise_data_entry(&addr).await;
+    shared::create_and_finalise_data_entry(&addr, 1).await;
 
     // get the data entry and expect 404 Not Found
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");

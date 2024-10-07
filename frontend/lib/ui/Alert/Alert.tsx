@@ -8,7 +8,7 @@ import cls from "./Alert.module.css";
 
 export interface AlertProps {
   type: AlertType;
-  variant?: "default" | "small";
+  variant?: "default" | "small" | "no-icon";
   children: React.ReactNode;
   onClose?: () => void;
 }
@@ -19,7 +19,7 @@ export function Alert({ type, onClose, children, variant = "default" }: AlertPro
       {onClose && (
         <IconButton icon={<IconCross />} title="Melding sluiten" variant="ghost" size="lg" onClick={onClose} />
       )}
-      <aside>{renderIconForType(type)}</aside>
+      {variant !== "no-icon" && <aside>{renderIconForType(type)}</aside>}
       <section>{children}</section>
     </div>
   );

@@ -155,8 +155,7 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
     case "array":
       return `${tsType(s.items)}[]`;
     default:
-      //TODO: catch all types, any is not allowed
-      return "any";
+      return "unknown";
   }
 }
 

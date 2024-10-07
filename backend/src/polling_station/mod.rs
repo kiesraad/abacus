@@ -22,6 +22,9 @@ pub mod structs;
 pub struct SaveDataEntryRequest {
     /// Data entry for a polling station
     pub data: PollingStationResults,
+    #[schema(value_type = Object)]
+    /// Client state for the data entry (arbitrary JSON)
+    pub client_state: Option<serde_json::Value>,
 }
 
 /// Response structure for saving data entry of polling station results
@@ -80,10 +83,11 @@ pub async fn polling_station_data_entry_save(
     let validation_results =
         validate_polling_station_results(&data_entry_request.data, &polling_station, &election)?;
     let data = serde_json::to_string(&data_entry_request.data)?;
+    let client_state = serde_json::to_string(&data_entry_request.client_state)?;
 
     // Save the data entry or update it if it already exists
     polling_station_data_entries
-        .upsert(id, entry_number, data)
+        .upsert(id, entry_number, data, client_state)
         .await?;
 
     Ok(SaveDataEntryResponse { validation_results })
@@ -114,6 +118,8 @@ fn validate_polling_station_results(
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct GetDataEntryResponse {
     pub data: PollingStationResults,
+    #[schema(value_type = Object)]
+    pub client_state: Option<serde_json::Value>,
     pub validation_results: ValidationResults,
 }
 
@@ -141,13 +147,17 @@ pub async fn polling_station_data_entry_get(
     let mut tx = pool.begin().await?;
     let polling_station = polling_stations.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
-    let data = polling_station_data_entries
+    let (data, client_state) = polling_station_data_entries
         .get(&mut tx, id, entry_number)
         .await?;
     let data = serde_json::from_slice(&data)?;
+
+    let client_state = serde_json::from_slice(&client_state)?;
+
     let validation_results = validate_polling_station_results(&data, &polling_station, &election)?;
     Ok(Json(GetDataEntryResponse {
         data,
+        client_state,
         validation_results,
     }))
 }
@@ -215,7 +225,7 @@ pub async fn polling_station_data_entry_finalise(
     // TODO: #129 support for second data entry
     // TODO: #129 validate whether first and second data entries are equal
 
-    let data = polling_station_data_entries
+    let (data, _) = polling_station_data_entries
         .get(&mut tx, id, entry_number)
         .await?;
     let results = serde_json::from_slice::<PollingStationResults>(&data)?;
@@ -289,6 +299,7 @@ mod tests {
                     ],
                 }],
             },
+            client_state: Some(serde_json::Value::Null),
         }
     }
 

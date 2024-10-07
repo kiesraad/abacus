@@ -85,16 +85,13 @@ describe("Test AbortDataEntryControl", () => {
     await user.click(screen.getByRole("button", { name: "Invoer bewaren" }));
 
     // check that the save request was made with the correct data
-    expect(request_body).toEqual({
-      data: {
-        ...emptyDataEntryRequest.data,
-        voters_counts: {
-          ...emptyDataEntryRequest.data.voters_counts,
-          poll_card_count: 42,
-        },
+    expect(request_body?.data).toEqual({
+      ...emptyDataEntryRequest.data,
+      voters_counts: {
+        ...emptyDataEntryRequest.data.voters_counts,
+        poll_card_count: 42,
       },
     });
-    // }
 
     // check that the user is navigated back to the data entry page
     expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry");

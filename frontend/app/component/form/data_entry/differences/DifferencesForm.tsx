@@ -66,7 +66,7 @@ export function DifferencesForm() {
     };
   }, [formRef]);
 
-  const getIgnoreWarnings = React.useCallback(() => {
+  const getAcceptWarnings = React.useCallback(() => {
     const checkbox = acceptWarningsRef.current;
     if (checkbox) {
       return checkbox.checked;
@@ -76,7 +76,7 @@ export function DifferencesForm() {
 
   const { status, sectionValues, errors, warnings, isSaved, submit, acceptWarnings } = useDifferences(
     getValues,
-    getIgnoreWarnings,
+    getAcceptWarnings,
   );
 
   const shouldWatch = warnings.length > 0 && isSaved;
@@ -102,7 +102,7 @@ export function DifferencesForm() {
           setWarningsWarning(true);
         } else {
           try {
-            await submit(acceptWarnings);
+            await submit({ acceptWarnings });
           } catch (e) {
             console.error("Error saving data entry", e);
           }
@@ -129,7 +129,7 @@ export function DifferencesForm() {
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
-    warningsAccepted: getIgnoreWarnings(),
+    warningsAccepted: getAcceptWarnings(),
   };
 
   return (

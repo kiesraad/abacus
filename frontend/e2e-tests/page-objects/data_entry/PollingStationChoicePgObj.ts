@@ -9,6 +9,7 @@ export class PollingStationChoicePage {
   readonly pollingStationFeedback: Locator;
   protected readonly start: Locator; // use clickStart() instead
   readonly dataEntrySuccess: Locator;
+  readonly resumeDataEntry: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -31,6 +32,7 @@ export class PollingStationChoicePage {
       level: 2,
       name: "Je invoer is opgeslagen",
     });
+    this.resumeDataEntry = page.getByRole("heading", { level: 2, name: "Je hebt nog een openstaande invoer" });
   }
 
   async clickStart() {

@@ -28,7 +28,7 @@ export const Feedback = ({ id, type, data, apiError, children }: FeedbackProps) 
 
   React.useEffect(() => {
     feedbackHeader.current?.focus();
-  }, []);
+  }, [feedbackHeader]);
 
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>

@@ -95,8 +95,12 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
   }, [children]);
 
   React.useEffect(() => {
-    formTitle.current?.focus();
-  }, []);
+    // Only focus on form title if current active element is body,
+    // to prevent feedback header focus from being overwritten
+    if (document.activeElement?.nodeName === "BODY") {
+      formTitle.current?.focus();
+    }
+  }, [formTitle]);
 
   return (
     <form

@@ -106,6 +106,8 @@ pub struct PollingStationResults {
     pub votes_counts: VotesCounts,
     /// Voters recounts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
     /// When filled in, this field should replace `voters_counts` when using the results.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub voters_recounts: Option<VotersRecounts>,
     /// Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
     pub differences_counts: DifferencesCounts,

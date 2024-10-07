@@ -31,8 +31,6 @@ export const emptyDataEntryResponse: GetDataEntryResponse = {
       invalid_votes_count: 0,
       total_votes_cast_count: 0,
     },
-    // @ts-expect-error spec doesnt match server response
-    voters_recounts: null,
     differences_counts: {
       more_ballots_count: 0,
       fewer_ballots_count: 0,
@@ -63,4 +61,5 @@ export const emptyDataEntryResponse: GetDataEntryResponse = {
     errors: [],
     warnings: [],
   },
+  client_state: {},
 };

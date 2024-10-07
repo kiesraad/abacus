@@ -13,7 +13,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
   const navigate = useNavigate();
 
   const handleRowClick = (pollingStationId: number) => () => {
-    navigate(`./${pollingStationId}/recounted`);
+    navigate(`./${pollingStationId}`);
   };
 
   return (

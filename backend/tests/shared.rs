@@ -49,6 +49,7 @@ pub fn example_data_entry() -> SaveDataEntryRequest {
                 ],
             }],
         },
+        client_state: None,
     }
 }
 

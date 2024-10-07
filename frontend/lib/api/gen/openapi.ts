@@ -133,6 +133,7 @@ export interface ErrorResponse {
  * Response structure for getting data entry of polling station results
  */
 export interface GetDataEntryResponse {
+  client_state: unknown;
   data: PollingStationResults;
   validation_results: ValidationResults;
 }
@@ -203,6 +204,7 @@ export type PollingStationType = "VasteLocatie" | "Bijzonder" | "Mobiel";
  * Request structure for saving data entry of polling station results
  */
 export interface SaveDataEntryRequest {
+  client_state: unknown;
   data: PollingStationResults;
 }
 

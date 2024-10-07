@@ -10,7 +10,7 @@ import {
   FormSection,
   formSectionComplete,
   getErrorsAndWarnings,
-  getNextSection,
+  getNextSectionID,
   getPollingStationSummary,
   hasOnlyGlobalValidationResults,
   isFormSectionEmpty,
@@ -98,17 +98,12 @@ describe("PollingStationUtils", () => {
     ).toBe(true);
   });
 
-  test("getNextSection", () => {
+  test("getNextSectionID", () => {
     const formState = structuredClone(defaultFormState);
+    formState.sections.recounted.isSaved = true;
+    formState.sections.recounted.isSubmitted = true;
 
-    const nextSection = getNextSection(formState, {
-      index: 0,
-      id: "recounted",
-      isSaved: false,
-      acceptWarnings: false,
-      errors: [],
-      warnings: [],
-    });
+    const nextSection = getNextSectionID(formState);
 
     expect(nextSection).toBe("voters_votes_counts");
   });

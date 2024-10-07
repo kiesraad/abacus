@@ -1,6 +1,6 @@
 use axum::extract::{Path, State};
 use axum::Json;
-use hyper::{header, HeaderMap};
+use axum_extra::response::Attachment;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -126,7 +126,7 @@ pub async fn election_download_results(
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     Path(id): Path<u32>,
-) -> Result<(HeaderMap, Vec<u8>), APIError> {
+) -> Result<Attachment<Vec<u8>>, APIError> {
     let election = elections_repo.get(id).await?;
     let polling_stations = polling_stations_repo.list(election.id).await?;
     let results = polling_station_results_entries_repo
@@ -139,14 +139,11 @@ pub async fn election_download_results(
         summary,
         election,
     });
-    let filename = model.as_filename();
+    let mut filename: String = model.as_filename().to_string();
+    filename.push_str(".pdf");
     let content = generate_pdf(model)?;
 
-    let disposition_header = format!("attachment; filename=\"{}.pdf\"", filename);
-
-    let mut headers = HeaderMap::new();
-    headers.insert(header::CONTENT_TYPE, "application/pdf".parse()?);
-    headers.insert(header::CONTENT_DISPOSITION, disposition_header.parse()?);
-
-    Ok((headers, content.buffer))
+    Ok(Attachment::new(content.buffer)
+        .filename(filename)
+        .content_type("application/pdf"))
 }

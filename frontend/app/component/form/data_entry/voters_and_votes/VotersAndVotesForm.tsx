@@ -125,7 +125,7 @@ export function VotersAndVotesForm() {
           setWarningsWarning(true);
         } else {
           try {
-            await submit(acceptWarnings);
+            await submit({ acceptWarnings });
           } catch (e) {
             console.error("Error saving data entry", e);
           }

@@ -143,7 +143,9 @@ test.describe("full data entry flow", () => {
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.heading).toBeVisible();
 
-    // TODO: extend as part of epic #95: data entry check and finalisation
+    await checkAndSavePage.save.click();
+
+    await pollingStationChoicePage.dataEntrySuccess.waitFor();
   });
 
   test("no recount, difference of more ballots counted", async ({ page }) => {
@@ -207,7 +209,9 @@ test.describe("full data entry flow", () => {
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.heading).toBeVisible();
 
-    // TODO: extend as part of epic #95: data entry check and finalisation
+    await checkAndSavePage.save.click();
+
+    await pollingStationChoicePage.dataEntrySuccess.waitFor();
   });
 
   test("recount, difference of fewer ballots counted", async ({ page }) => {
@@ -283,8 +287,7 @@ test.describe("full data entry flow", () => {
     await checkAndSavePage.heading.waitFor();
     await checkAndSavePage.save.click();
 
-    // TODO: #318 reset database to allow polling station to be finalised in multiple tests
-    // await inputPage.dataEntrySuccess.waitFor();
+    await pollingStationChoicePage.dataEntrySuccess.waitFor();
   });
 
   test("submit with accepted warning on voters and votes page", async ({ page }) => {
@@ -459,9 +462,8 @@ test.describe("errors and warnings", () => {
     await checkAndSavePage.heading.waitFor();
     await checkAndSavePage.save.click();
 
-    // TODO: #318 reset database to allow polling station to be finalised in multiple tests
-    // const inputPage = new InputPage(page);
-    // await inputPage.dataEntrySuccess.waitFor();
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await pollingStationChoicePage.dataEntrySuccess.waitFor();
   });
 
   test("correct warning on voters and votes page", async ({ page }) => {
@@ -667,7 +669,7 @@ test.describe("navigation", () => {
     // save changes
     await votersAndVotesPage.unsavedChangesModal.saveInput.click();
 
-    await expect(recountedPage.heading).toBeVisible(); // fails here because navigated to next page, i.e. Differences
+    await expect(recountedPage.heading).toBeVisible();
     await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
 
     // return to VotersAndVotes page and verify change is saved

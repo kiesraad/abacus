@@ -34,6 +34,9 @@ export const emptyDataEntryRequest: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY
       })),
     })),
   },
+  client_state: {
+    test: "test",
+  },
 };
 
 type ErrorMap = {
@@ -77,8 +80,8 @@ export const errorWarningMocks: ErrorMap = {
 };
 
 export const defaultFormState: FormState = {
-  active: "recounted",
   current: "recounted",
+  furthest: "recounted",
   sections: {
     recounted: {
       index: 0,
@@ -129,9 +132,4 @@ export const defaultFormState: FormState = {
       warnings: [],
     },
   },
-  unknown: {
-    errors: [],
-    warnings: [],
-  },
-  isCompleted: false,
 };

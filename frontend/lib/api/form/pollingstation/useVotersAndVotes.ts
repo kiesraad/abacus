@@ -4,7 +4,7 @@ import { PollingStationResults, usePollingStationFormController } from "@kiesraa
 
 export type VotersAndVotesValues = Pick<PollingStationResults, "voters_counts" | "votes_counts" | "voters_recounts">;
 
-export function useVotersAndVotes(getValues: () => VotersAndVotesValues, getIgnoreWarnings?: () => boolean) {
+export function useVotersAndVotes(getValues: () => VotersAndVotesValues, getAcceptWarnings?: () => boolean) {
   const { status, values, formState, setTemporaryCache, cache, registerCurrentForm, submitCurrentForm } =
     usePollingStationFormController();
 
@@ -33,9 +33,9 @@ export function useVotersAndVotes(getValues: () => VotersAndVotesValues, getIgno
       id: "voters_votes_counts",
       type: "voters_and_votes",
       getValues,
-      getIgnoreWarnings,
+      getAcceptWarnings: getAcceptWarnings,
     });
-  }, [registerCurrentForm, getValues, getIgnoreWarnings]);
+  }, [registerCurrentForm, getValues, getAcceptWarnings]);
 
   const errors = React.useMemo(() => {
     return formState.sections.voters_votes_counts.errors;
@@ -54,6 +54,5 @@ export function useVotersAndVotes(getValues: () => VotersAndVotesValues, getIgno
     acceptWarnings: formState.sections.voters_votes_counts.acceptWarnings,
     submit: submitCurrentForm,
     recounted: values.recounted,
-    isCompleted: formState.isCompleted,
   };
 }

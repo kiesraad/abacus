@@ -10,14 +10,19 @@ import {
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs, waitFor } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form";
 
-import { FormState, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
+import {
+  FormState,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  PollingStationFormController,
+  PollingStationValues,
+} from "@kiesraad/api";
 import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const defaultFormState: FormState = {
-  active: "recounted",
   current: "recounted",
+  furthest: "recounted",
   sections: {
     recounted: {
       index: 0,
@@ -52,11 +57,6 @@ const defaultFormState: FormState = {
       warnings: [],
     },
   },
-  unknown: {
-    errors: [],
-    warnings: [],
-  },
-  isCompleted: false,
 };
 
 function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
@@ -220,6 +220,7 @@ describe("Test VotersAndVotesForm", () => {
             total_votes_cast_count: 15,
           },
         },
+        client_state: {},
       };
 
       const user = userEvent.setup();
@@ -241,7 +242,8 @@ describe("Test VotersAndVotesForm", () => {
 
       expect(url).toEqual("/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
-      expect(body).toEqual(expectedRequest);
+      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+      expect(request_body.data).toEqual(expectedRequest.data);
     });
   });
 

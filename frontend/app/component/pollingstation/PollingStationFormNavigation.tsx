@@ -22,13 +22,10 @@ export interface PollingStationFormNavigationProps {
 }
 
 export function PollingStationFormNavigation({ pollingStationId, election }: PollingStationFormNavigationProps) {
-  const _lastKnownSection = React.useRef<FormSectionID | null>(null);
-  const { status, formState, apiError, currentForm, targetFormSection, values, setTemporaryCache, submitCurrentForm } =
+  const { status, formState, apiError, currentForm, values, setTemporaryCache, submitCurrentForm } =
     usePollingStationFormController();
 
   const navigate = useNavigate();
-  //one time flag to prioritize user navigation over controller navigation
-  const overrideControllerNavigation = React.useRef<string | null>(null);
 
   const isPartOfDataEntryFlow = React.useCallback(
     (pathname: string) => pathname.startsWith(`/elections/${election.id}/data-entry/${pollingStationId}/`),
@@ -59,9 +56,10 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
       }
 
       const reasons = reasonsBlocked(formState, currentForm, values);
+
       //currently only block on changes
       if (reasons.includes("changes")) {
-        if (formState.active === formState.current) {
+        if (formState.current === formState.furthest) {
           setTemporaryCache({
             key: currentForm.id,
             data: currentForm.getValues(),
@@ -80,32 +78,15 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
 
   //prevent navigating to sections that are not yet active
   React.useEffect(() => {
-    const activeSection = formState.sections[formState.active];
     const currentSection = formState.sections[formState.current];
-    if (activeSection && currentSection) {
-      if (activeSection.index > currentSection.index) {
-        const url = getUrlForFormSection(currentSection.id);
+    const furthestSection = formState.sections[formState.furthest];
+    if (currentSection && furthestSection) {
+      if (currentSection.index > furthestSection.index) {
+        const url = getUrlForFormSection(furthestSection.id);
         navigate(url);
       }
     }
-    _lastKnownSection.current = formState.active;
   }, [formState, navigate, getUrlForFormSection]);
-
-  //check if the targetFormSection has changed and navigate to the correct url
-  React.useEffect(() => {
-    if (!targetFormSection) return;
-    if (overrideControllerNavigation.current) {
-      const url = overrideControllerNavigation.current;
-      overrideControllerNavigation.current = null;
-      navigate(url);
-      return;
-    }
-    if (targetFormSection !== _lastKnownSection.current) {
-      _lastKnownSection.current = targetFormSection;
-      const url = getUrlForFormSection(targetFormSection);
-      navigate(url);
-    }
-  }, [targetFormSection, getUrlForFormSection, navigate]);
 
   // scroll up when an error occurs
   React.useEffect(() => {
@@ -116,8 +97,8 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
 
   const onSave = () =>
     void (async () => {
-      if (blocker.location) overrideControllerNavigation.current = blocker.location.pathname;
-      await submitCurrentForm();
+      await submitCurrentForm({ continueToNextSection: false });
+      if (blocker.location) navigate(blocker.location.pathname);
       if (blocker.reset) blocker.reset();
     })();
 
@@ -148,7 +129,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
                 Let op: niet opgeslagen wijzigingen
               </h2>
               <p>
-                Je hebt in <strong>{formState.sections[formState.active]?.title || "het huidige formulier"}</strong>{" "}
+                Je hebt in <strong>{formState.sections[formState.current]?.title || "het huidige formulier"}</strong>{" "}
                 wijzigingen gemaakt die nog niet zijn opgeslagen.
               </p>
               <p>Wil je deze wijzigingen bewaren?</p>
@@ -194,7 +175,7 @@ function reasonsBlocked(
     }
 
     if (
-      (currentForm.getIgnoreWarnings && formSection.acceptWarnings !== currentForm.getIgnoreWarnings()) ||
+      (currentForm.getAcceptWarnings && formSection.acceptWarnings !== currentForm.getAcceptWarnings()) ||
       currentFormHasChanges(currentForm, values)
     ) {
       result.push("changes");

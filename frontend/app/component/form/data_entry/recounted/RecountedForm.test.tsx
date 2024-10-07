@@ -4,7 +4,7 @@ import { describe, expect, test, vi } from "vitest";
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form";
 
-import { PollingStationFormController } from "@kiesraad/api";
+import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationFormController } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
 import { RecountedForm } from "./RecountedForm";
@@ -91,6 +91,7 @@ describe("Test RecountedForm", () => {
             total_admitted_voters_recount: 0,
           },
         },
+        client_state: {},
       };
 
       render(Component);
@@ -109,7 +110,8 @@ describe("Test RecountedForm", () => {
 
       expect(url).toEqual("/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
-      expect(body).toEqual(expectedRequest);
+      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+      expect(request_body.data).toEqual(expectedRequest.data);
     });
   });
 

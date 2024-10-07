@@ -562,7 +562,7 @@ describe("Polling Station data entry integration tests", () => {
           }),
         submit,
         () => expectVotersAndVotesForm(true),
-        () => gotoForm("differences"),
+        () => gotoForm("differences", true),
         () => expectElementContainsIcon("list-item-voters-and-votes", "bevat een fout"),
       ];
 

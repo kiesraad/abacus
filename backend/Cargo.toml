@@ -10,6 +10,7 @@ default-run = "api"
 [features]
 default = ["openapi", "dev-database"]
 openapi = ["dep:utoipa-swagger-ui"]
+memory-serve = ["dep:memory-serve"]
 dev-database = []
 
 [[bin]]
@@ -33,7 +34,7 @@ clap = { version = "4.5", default-features = false, features = ["derive", "std",
 typst = "0.11.1"
 comemo = "0.4.0"
 typst-pdf = "0.11.1"
-memory-serve = "0.6.0"
+memory-serve = { version = "0.6.0", optional = true }
 tracing-subscriber = "0.3.18"
 tracing = "0.1.40"
 

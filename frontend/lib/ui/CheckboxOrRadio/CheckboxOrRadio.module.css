@@ -1,0 +1,166 @@
+.choice-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  border: none;
+}
+
+.checkbox-and-radio {
+  display: inline-flex;
+
+  .radio,
+  .checkbox {
+    position: absolute;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 0;
+    height: 0;
+    width: 0;
+    pointer-events: none;
+  }
+
+  .radio + label,
+  .checkbox + label {
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .radio + label::before,
+  .checkbox + label::before {
+    content: "";
+    display: inline-block;
+    width: var(--checkbox-radio-size);
+    height: var(--checkbox-radio-size);
+    background-color: var(--checkbox-radio-color-bg-default);
+    border: 1px solid var(--checkbox-radio-color-border);
+    margin-right: 0.5rem;
+    transition: 0.2s;
+  }
+
+  .radio + label::before {
+    border-radius: 1rem;
+  }
+
+  .checkbox + label::before {
+    border-radius: 0.375rem;
+  }
+
+  .radio:checked + label::before,
+  .checkbox:checked + label::before {
+    background-color: var(--checkbox-radio-color-bg-default-checked);
+    border: none;
+  }
+
+  .radio:checked + label::before {
+    background-image: url("../../icon/svg/dot.svg");
+    /*background-size: var(--radio-marker-size);*/
+  }
+
+  .checkbox:checked + label::before {
+    background-image: url("../../icon/svg/checkmarkSmall.svg");
+    /*background-size: var(--checkbox-marker-size);*/
+  }
+
+  /*> div:global(.labels) {*/
+  /*  display: flex;*/
+  /*  flex-direction: column;*/
+
+  /*  span:global(.description) {*/
+  /*    color: var(--color-help-text);*/
+  /*  }*/
+  /*}*/
+
+  /*> div:global(.field) {*/
+  /*  overflow: hidden;*/
+  /*  margin-right: 0.5rem;*/
+  /*  margin-top: 0.15rem;*/
+  /*  flex: 0 0 var(--checkbox-radio-size);*/
+  /*  width: var(--checkbox-radio-size);*/
+  /*  height: var(--checkbox-radio-size);*/
+  /*  border-radius: 0.375rem;*/
+  /*  padding: 0;*/
+  /*  border: 1px solid var(--checkbox-radio-color-border);*/
+  /*  background: var(--checkbox-radio-color-bg-default);*/
+  /*  display: flex;*/
+  /*  align-items: center;*/
+  /*  justify-content: center;*/
+
+  /*  &:global(.radio) {*/
+  /*    border-radius: 1rem;*/
+  /*  }*/
+
+  /*  &:global(.disabled) {*/
+  /*    background: var(--checkbox-radio-color-bg-disabled);*/
+  /*    &:hover,*/
+  /*    &:has(+ input:hover) {*/
+  /*      border-width: 1px;*/
+  /*      background: var(--checkbox-radio-color-bg-disabled);*/
+  /*    }*/
+  /*    &:global(.checked) {*/
+  /*      background: var(--checkbox-radio-color-bg-disabled-checked);*/
+  /*      &:hover,*/
+  /*      &:has(+ input:hover) {*/
+  /*        background: var(--checkbox-radio-color-bg-disabled-checked);*/
+  /*      }*/
+  /*    }*/
+  /*  }*/
+
+  /*  &:has(+ input:active) {*/
+  /*    border-width: 2px;*/
+  /*    background: var(--checkbox-radio-color-bg-active);*/
+  /*  }*/
+
+  /*  &:hover,*/
+  /*  &:has(+ input:hover) {*/
+  /*    border-width: 2px;*/
+  /*    background: var(--checkbox-radio-color-bg-hover);*/
+  /*  }*/
+
+  /*  &:has(+ input:focus),*/
+  /*  &:has(+ input:focus-visible) {*/
+  /*    outline: none;*/
+  /*    background: var(--checkbox-radio-color-bg-default);*/
+  /*    border: 2px solid var(--border-color-focus);*/
+  /*    box-shadow: 0 0 0 3px var(--shadow-color-focus);*/
+  /*  }*/
+
+  /*  &:global(.checked) {*/
+  /*    border: none;*/
+  /*    background: var(--checkbox-radio-color-bg-default-checked);*/
+  /*    svg {*/
+  /*      fill: var(--base-white);*/
+  /*      opacity: 1;*/
+  /*    }*/
+  /*    &:has(+ input:active) {*/
+  /*      background: var(--checkbox-radio-color-bg-active-checked);*/
+  /*    }*/
+  /*    &:hover,*/
+  /*    &:has(+ input:hover) {*/
+  /*      background: var(--checkbox-radio-color-bg-hover-checked);*/
+  /*    }*/
+  /*    &:has(+ input:focus),*/
+  /*    &:has(+ input:focus-visible) {*/
+  /*      background: var(--checkbox-radio-color-bg-focus-checked);*/
+  /*      svg {*/
+  /*        fill: var(--base-dark-blue);*/
+  /*      }*/
+  /*    }*/
+  /*  }*/
+
+  /*  &:global(.has-error) {*/
+  /*    border: 2px solid var(--color-error-darker);*/
+  /*  }*/
+
+  /*  svg {*/
+  /*    width: var(--checkbox-radio-svg-size);*/
+  /*    height: var(--checkbox-radio-svg-size);*/
+  /*    fill: var(--base-dark-blue);*/
+  /*    opacity: 0;*/
+  /*  }*/
+  /*}*/
+
+  &:global(.hidden) {
+    display: none;
+  }
+}

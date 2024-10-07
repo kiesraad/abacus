@@ -8,6 +8,7 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};
 use hyper::header::InvalidHeaderValue;
+#[cfg(feature = "memory-serve")]
 use memory_serve::{load_assets, MemoryServe};
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
@@ -32,10 +33,6 @@ pub struct AppState {
 
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
-    let memory_router = MemoryServe::new(load_assets!("../frontend/dist"))
-        .index_file(Some("/index.html"))
-        .into_router();
-
     let polling_station_routes = Router::new()
         .route(
             "/:polling_station_id/data_entries/:entry_number",
@@ -64,9 +61,18 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/:election_id/status", get(election::election_status));
 
     let app = Router::new()
-        .merge(memory_router)
         .nest("/api/elections", election_routes)
         .nest("/api/polling_stations", polling_station_routes);
+
+    #[cfg(feature = "memory-serve")]
+    let app = {
+        app.merge(
+            MemoryServe::new(load_assets!("../frontend/dist"))
+                .index_file(Some("/index.html"))
+                .fallback(Some("/index.html"))
+                .into_router(),
+        )
+    };
 
     // Add a route to reset the database if the dev-database feature is enabled
     #[cfg(feature = "dev-database")]

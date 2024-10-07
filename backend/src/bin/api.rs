@@ -11,7 +11,6 @@ use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::SqlitePool;
 use tokio::net::TcpListener;
 use tokio::signal;
-use tower_http::services::{ServeDir, ServeFile};
 use tracing::info;
 
 /// Abacus API server
@@ -48,15 +47,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let args = Args::parse();
     let pool = create_sqlite_pool(&args).await?;
-    let app = router(pool)?;
 
-    let app = if let Some(fd) = args.frontend_dist {
-        app.fallback_service(
-            ServeDir::new(fd.clone()).fallback(ServeFile::new(fd.join("index.html"))),
-        )
-    } else {
-        app
-    };
+    let app = router(pool)?;
 
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(&address).await?;

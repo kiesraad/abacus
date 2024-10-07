@@ -8,9 +8,11 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};
 use hyper::header::InvalidHeaderValue;
+use memory_serve::{load_assets, MemoryServe};
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
+use tracing::error;
 use typst::diag::SourceDiagnostic;
 use utoipa::ToSchema;
 #[cfg(feature = "openapi")]
@@ -31,6 +33,10 @@ pub struct AppState {
 
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
+    let memory_router = MemoryServe::new(load_assets!("../frontend/dist"))
+        .index_file(Some("/index.html"))
+        .into_router();
+
     let data_entry_routes = Router::new()
         .route(
             "/:entry_number",
@@ -58,10 +64,13 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route("/:election_id/status", get(election::election_status));
 
-    let app = Router::new().nest("/api/elections", election_routes).nest(
-        "/api/polling_stations/:polling_station_id/data_entries",
-        data_entry_routes,
-    );
+    let app = Router::new()
+        .merge(memory_router)
+        .nest("/api/elections", election_routes)
+        .nest(
+            "/api/polling_stations/:polling_station_id/data_entries",
+            data_entry_routes,
+        );
 
     // Add a route to reset the database if the dev-database feature is enabled
     #[cfg(feature = "dev-database")]
@@ -174,7 +183,7 @@ impl IntoResponse for APIError {
             APIError::NotFound(message) => (StatusCode::NOT_FOUND, to_error(message)),
             APIError::Conflict(message) => (StatusCode::CONFLICT, to_error(message)),
             APIError::InvalidData(err) => {
-                eprintln!("Invalid data error: {}", err);
+                error!("Invalid data error: {}", err);
                 (
                     StatusCode::UNPROCESSABLE_ENTITY,
                     to_error("Invalid data".to_string()),
@@ -185,7 +194,7 @@ impl IntoResponse for APIError {
                 to_error(rejection.body_text()),
             ),
             APIError::SerdeJsonError(err) => {
-                eprintln!("Serde JSON error: {:?}", err);
+                error!("Serde JSON error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error".to_string()),
@@ -196,7 +205,7 @@ impl IntoResponse for APIError {
                 to_error("Resource not found".to_string()),
             ),
             APIError::SqlxError(err) => {
-                eprintln!("SQLx error: {:?}", err);
+                error!("SQLx error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error".to_string()),
@@ -207,21 +216,21 @@ impl IntoResponse for APIError {
                 to_error("Internal server error".to_string()),
             ),
             APIError::PdfGenError(err) => {
-                println!("PDF generation error: {:?}", err);
+                error!("PDF generation error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error".into()),
                 )
             }
             APIError::StdError(err) => {
-                eprintln!("Error: {:?}", err);
+                error!("Error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error".to_string()),
                 )
             }
             APIError::AddError(err) => {
-                println!("Error while adding totals: {:?}", err);
+                error!("Error while adding totals: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error("Internal server error".into()),

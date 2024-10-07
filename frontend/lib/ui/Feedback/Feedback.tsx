@@ -28,7 +28,7 @@ export const Feedback = ({ id, type, data, apiError, children }: FeedbackProps) 
 
   React.useEffect(() => {
     feedbackHeader.current?.focus();
-  }, [feedbackHeader]);
+  }, []);
 
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>
@@ -36,7 +36,7 @@ export const Feedback = ({ id, type, data, apiError, children }: FeedbackProps) 
         <div className="feedback-item">
           <header>
             {renderIconForType(type)}
-            <h3 tabIndex={-1} ref={feedbackHeader}>
+            <h3 tabIndex={-1} ref={feedbackHeader} className="feedback-header">
               Sorry, er ging iets mis
             </h3>
           </header>
@@ -49,7 +49,7 @@ export const Feedback = ({ id, type, data, apiError, children }: FeedbackProps) 
         <div key={`feedback-${index}`} className="feedback-item">
           <header>
             {renderIconForType(type)}
-            <h3 tabIndex={-1} ref={index === 0 ? feedbackHeader : undefined}>
+            <h3 tabIndex={-1} ref={index === 0 ? feedbackHeader : undefined} className="feedback-header">
               {feedback.title}
             </h3>
             {feedback.code && <span>{feedback.code}</span>}

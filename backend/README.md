@@ -44,8 +44,7 @@ The following dependencies (crates) are used:
 - `axum`: web application framework that focuses on ergonomics and modularity.
 - `hyper`: fast and correct HTTP implementation.
 - `tokio`: runtime for writing asynchronous applications.
-- `tower`: library for building robust networking clients and servers.
-- `tower-http`: Tower middleware and utilities for HTTP clients and servers.
+- `memory-serve`: serves frontend assets from memory, but ad-hoc from disk during development.
 - `utoipa`: library for documenting REST APIs using OpenAPI.
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `serde`: framework for serializing and deserializing data structures.

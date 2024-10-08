@@ -1,6 +1,6 @@
 import type { Story } from "@ladle/react";
 
-import { CheckboxAndRadio } from "@kiesraad/ui";
+import { Checkbox, Radio } from "@kiesraad/ui";
 
 type Props = {
   label: string;
@@ -8,31 +8,25 @@ type Props = {
 
 export const DefaultCheckbox: Story<Props> = ({ label }) => (
   <div>
-    <CheckboxAndRadio id="default-checkbox" type="checkbox" defaultChecked={false} label={label} />
+    <Checkbox id="default-checkbox" defaultChecked={false} label={label} />
     <br />
     <br />
-    <CheckboxAndRadio id="default-checkbox-with-description" type="checkbox" defaultChecked={false} label={label}>
+    <Checkbox id="default-checkbox-with-description" defaultChecked={false} label={label}>
       This is a description
-    </CheckboxAndRadio>
+    </Checkbox>
     <br />
     <br />
-    <CheckboxAndRadio id="default-checkbox-error" type="checkbox" defaultChecked={false} label={label} hasError />
+    <Checkbox id="default-checkbox-error" defaultChecked={false} label={label} hasError />
     <br />
     <br />
-    <CheckboxAndRadio id="default-checkbox-disabled" type="checkbox" defaultChecked={false} label={label} disabled />
+    <Checkbox id="default-checkbox-disabled" defaultChecked={false} label={label} disabled />
     <br />
     <br />
-    <CheckboxAndRadio
-      id="default-checkbox-disabled-checked"
-      type="checkbox"
-      defaultChecked={true}
-      label={label}
-      disabled
-    />
+    <Checkbox id="default-checkbox-disabled-checked" defaultChecked={true} label={label} disabled />
     <br />
     <br />
     <div style={{ width: 200 }}>
-      <CheckboxAndRadio id="default-checkbox-cramped" type="checkbox" defaultChecked={false} label={label} />
+      <Checkbox id="default-checkbox-cramped" defaultChecked={false} label={label} />
     </div>
   </div>
 );
@@ -41,41 +35,21 @@ DefaultCheckbox.args = {
   label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
 };
 
-export const DefaultCheckboxIndeterminate: Story<Props> = ({ label }) => (
+export const DefaultCheckboxIndeterminateNew: Story<Props> = ({ label }) => (
   <div>
-    <CheckboxAndRadio
-      id="default-checkbox-indeterminate"
-      type="checkbox"
-      defaultChecked={false}
-      label={label}
-      indeterminate
-    />
+    <Checkbox id="default-checkbox-indeterminate" defaultChecked={false} label={label} indeterminate />
     <br />
     <br />
-    <CheckboxAndRadio
-      id="default-checkbox-indeterminate-with-description"
-      type="checkbox"
-      defaultChecked={false}
-      label={label}
-      indeterminate
-    >
+    <Checkbox id="default-checkbox-indeterminate-with-description" defaultChecked={false} label={label} indeterminate>
       This is a description
-    </CheckboxAndRadio>
+    </Checkbox>
     <br />
     <br />
-    <CheckboxAndRadio
-      id="default-checkbox-indeterminate-error"
-      type="checkbox"
-      defaultChecked={false}
-      label={label}
-      indeterminate
-      hasError
-    />
+    <Checkbox id="default-checkbox-indeterminate-error" defaultChecked={false} label={label} indeterminate hasError />
     <br />
     <br />
-    <CheckboxAndRadio
+    <Checkbox
       id="default-checkbox-indeterminate-disabled"
-      type="checkbox"
       defaultChecked={false}
       label={label}
       indeterminate
@@ -83,9 +57,8 @@ export const DefaultCheckboxIndeterminate: Story<Props> = ({ label }) => (
     />
     <br />
     <br />
-    <CheckboxAndRadio
+    <Checkbox
       id="default-checkbox-indeterminate-disabled-checked"
-      type="checkbox"
       defaultChecked={true}
       label={label}
       indeterminate
@@ -94,42 +67,36 @@ export const DefaultCheckboxIndeterminate: Story<Props> = ({ label }) => (
     <br />
     <br />
     <div style={{ width: 200 }}>
-      <CheckboxAndRadio
-        id="default-checkbox-indeterminate-cramped"
-        type="checkbox"
-        defaultChecked={false}
-        label={label}
-        indeterminate
-      />
+      <Checkbox id="default-checkbox-indeterminate-cramped" defaultChecked={false} label={label} indeterminate />
     </div>
   </div>
 );
 
-DefaultCheckboxIndeterminate.args = {
+DefaultCheckboxIndeterminateNew.args = {
   label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
 };
 
 export const DefaultRadio: Story<Props> = ({ label }) => (
   <div>
-    <CheckboxAndRadio id="default-radio" type="radio" defaultChecked={false} label={label} />
+    <Radio id="default-radio" defaultChecked={false} label={label} />
     <br />
     <br />
-    <CheckboxAndRadio id="default-radio-with-description" type="radio" defaultChecked={false} label={label}>
+    <Radio id="default-radio-with-description" defaultChecked={false} label={label}>
       This is a description
-    </CheckboxAndRadio>
+    </Radio>
     <br />
     <br />
-    <CheckboxAndRadio id="default-radio-error" type="radio" defaultChecked={false} label={label} hasError />
+    <Radio id="default-radio-error" defaultChecked={false} label={label} hasError />
     <br />
     <br />
-    <CheckboxAndRadio id="default-radio-disabled" type="radio" defaultChecked={false} label={label} disabled />
+    <Radio id="default-radio-disabled" defaultChecked={false} label={label} disabled />
     <br />
     <br />
-    <CheckboxAndRadio id="default-radio-disabled-checked" type="radio" defaultChecked={true} label={label} disabled />
+    <Radio id="default-radio-disabled-checked" defaultChecked={true} label={label} disabled />
     <br />
     <br />
     <div style={{ width: 200 }}>
-      <CheckboxAndRadio id="default-radio-cramped" type="radio" defaultChecked={false} label={label} />
+      <Radio id="default-radio-cramped" defaultChecked={false} label={label} />
     </div>
   </div>
 );

@@ -22,8 +22,6 @@ axum = { version = "0.7", features = ["macros"] }
 axum-extra = { version = "0.9.4", default-features = false, features = ["attachment"] }
 hyper = { version = "1", features = ["full"] }
 tokio = { version = "1", features = ["full"] }
-tower = "0.5"
-tower-http = { version = "0.6.1", features = ["fs"] }
 utoipa = { version = "4.2", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "7.1.0", features = ["axum"], optional = true }
 serde = { version = "1.0", features = ["derive"] }

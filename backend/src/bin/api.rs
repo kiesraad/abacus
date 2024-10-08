@@ -1,6 +1,5 @@
 use std::error::Error;
 use std::net::{Ipv4Addr, SocketAddr};
-use std::path::PathBuf;
 use std::str::FromStr;
 
 #[cfg(feature = "dev-database")]
@@ -16,10 +15,6 @@ use tracing::info;
 /// Abacus API server
 #[derive(Parser, Debug)]
 struct Args {
-    /// Path to the frontend dist directory to serve through the API server
-    #[arg(short, long)]
-    frontend_dist: Option<PathBuf>,
-
     /// Server port, optional
     #[arg(short, long, default_value_t = 8080)]
     port: u16,

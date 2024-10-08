@@ -35,7 +35,7 @@ DefaultCheckbox.args = {
   label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
 };
 
-export const DefaultCheckboxIndeterminateNew: Story<Props> = ({ label }) => (
+export const DefaultCheckboxIndeterminate: Story<Props> = ({ label }) => (
   <div>
     <Checkbox id="default-checkbox-indeterminate" defaultChecked={false} label={label} indeterminate />
     <br />
@@ -72,7 +72,7 @@ export const DefaultCheckboxIndeterminateNew: Story<Props> = ({ label }) => (
   </div>
 );
 
-DefaultCheckboxIndeterminateNew.args = {
+DefaultCheckboxIndeterminate.args = {
   label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
 };
 

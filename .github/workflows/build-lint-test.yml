@@ -12,6 +12,8 @@ env:
 jobs:
   backend:
     name: Backend
+    needs:
+        - frontend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -33,12 +35,15 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
-      - name: Create frontend asset directory
-        run: mkdir -p ../frontend/dist
       - name: Install sqlx-cli
         run: cargo install sqlx-cli --no-default-features --features sqlite
       - name: Create database and run migrations
         run: sqlx database setup
+      - name: Download frontend-build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: ../frontend/dist
       - name: Check rustfmt
         run: cargo --verbose --locked fmt --all -- --check
       - name: Check Clippy with all features

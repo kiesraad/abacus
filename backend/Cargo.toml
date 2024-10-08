@@ -18,7 +18,7 @@ name = "gen-openapi"
 required-features = ["openapi"]
 
 [dependencies]
-axum = { version = "0.7", features = ["macros"] }
+axum = { version = "0.7", features = ["macros", "tracing"] }
 axum-extra = { version = "0.9.4", default-features = false, features = ["attachment"] }
 hyper = { version = "1", features = ["full"] }
 tokio = { version = "1", features = ["full"] }

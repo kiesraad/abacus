@@ -11,6 +11,8 @@ const commonConfig: PlaywrightTestConfig = defineConfig({
   // Use all available cores on GitHub Actions. Default is 50%, use that locally.
   workers: process.env.CI ? "100%" : undefined,
   timeout: 10 * 1000, // 10 seconds, because tests are small for now
+  // Use the list reporter even on CI, to get immediate feedback
+  reporter: "list",
   fullyParallel: true,
   use: {
     trace: "retain-on-failure",

@@ -1,13 +1,12 @@
 #![cfg(test)]
 
+use backend::data_entry::{GetDataEntryResponse, SaveDataEntryResponse};
+use backend::validation::ValidationResultCode;
+use backend::ErrorResponse;
 use reqwest::{Response, StatusCode};
 use serde_json::json;
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
-
-use backend::polling_station::{GetDataEntryResponse, SaveDataEntryResponse};
-use backend::validation::ValidationResultCode;
-use backend::ErrorResponse;
 
 use crate::utils::serve_api;
 

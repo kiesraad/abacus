@@ -130,7 +130,7 @@ pub async fn election_download_results(
     let election = elections_repo.get(id).await?;
     let polling_stations = polling_stations_repo.list(election.id).await?;
     let results = polling_station_results_entries_repo
-        .list_with_polling_stations(election.id)
+        .list_with_polling_stations(polling_stations_repo, election.id)
         .await?;
     let summary = ModelNa31_2Summary::from_results(&election, &results)?;
 

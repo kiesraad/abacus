@@ -138,13 +138,12 @@ impl PollingStationResultsEntries {
     /// Get a list of polling stations with their results for an election
     pub async fn list_with_polling_stations(
         &self,
+        polling_stations_repo: PollingStations,
         election_id: u32,
     ) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
         // first get the list of results and polling stations related to an election
         let list = self.list(election_id).await?;
-        let polling_stations = PollingStations::new(self.0.clone())
-            .list(election_id)
-            .await?;
+        let polling_stations = polling_stations_repo.list(election_id).await?;
 
         // find the corresponding polling station for each entry, or fail if any polling station could not be found
         list.into_iter()

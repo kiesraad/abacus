@@ -1,15 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use crate::polling_station::Validate;
-use crate::validation::ValidationResults;
-use crate::{
-    election::Election,
-    polling_station::{
-        self, Count, DifferencesCounts, PoliticalGroupVotes, PollingStation, PollingStationResults,
-        VotersCounts, VotesCounts,
-    },
-    APIError,
+use crate::data_entry::{
+    CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults, Validate,
+    VotersCounts, VotesCounts,
 };
+use crate::polling_station::structs::PollingStation;
+use crate::validation::ValidationResults;
+use crate::{election::Election, APIError};
 
 #[derive(Serialize, Deserialize)]
 pub struct ModelNa31_2Input {
@@ -64,7 +61,7 @@ impl ModelNa31_2Summary {
                     candidate_votes: group
                         .candidates
                         .iter()
-                        .map(|c| polling_station::CandidateVotes {
+                        .map(|c| CandidateVotes {
                             number: c.number,
                             votes: 0,
                         })
@@ -202,11 +199,10 @@ impl SumCount {
 
 #[cfg(test)]
 mod tests {
-    use polling_station::{CandidateVotes, PollingStationType};
-
     use super::*;
-    use crate::polling_station::VotersRecounts;
-    use crate::{election::tests::election_fixture, polling_station::DifferencesCounts};
+    use crate::data_entry::VotersRecounts;
+    use crate::election::tests::election_fixture;
+    use crate::polling_station::structs::PollingStationType;
 
     fn polling_station_fixture(election: &Election) -> (PollingStation, PollingStation) {
         (

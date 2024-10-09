@@ -17,7 +17,7 @@ export interface CheckboxAndRadioProps extends React.InputHTMLAttributes<HTMLInp
 export const CheckboxAndRadio = React.forwardRef<HTMLInputElement, CheckboxAndRadioProps>(
   ({ id, value, name, type, label, children, indeterminate, disabled, hasError, defaultChecked }, ref) => {
     return (
-      <div className={cn(cls["checkbox-and-radio"])} aria-label="input" id={`${type}-container-${id}`}>
+      <div className={cn(cls["checkbox-and-radio"])} id={`${type}-container-${id}`}>
         <input
           className={`${type}${indeterminate ? " indeterminate" : ""}`}
           type={type}

@@ -15,7 +15,6 @@
 
   /* General checkbox and radio styling */
   input {
-    -webkit-appearance: none;
     appearance: none;
     width: var(--checkbox-radio-size);
     height: var(--checkbox-radio-size);
@@ -67,19 +66,16 @@
 
     /* Set radio icon */
     &[type="radio"]:checked::before {
-      -webkit-mask-image: url("../../icon/svg/dot.svg");
       mask-image: url("../../icon/svg/dot.svg");
     }
 
     /* Set checkbox icon */
     &[type="checkbox"]:checked::before {
-      -webkit-mask-image: url("../../icon/svg/checkmarkSmall.svg");
       mask-image: url("../../icon/svg/checkmarkSmall.svg");
     }
 
     /* Set checkbox indeterminate icon */
     &[type="checkbox"]:global(.indeterminate):checked::before {
-      -webkit-mask-image: url("../../icon/svg/minus.svg");
       mask-image: url("../../icon/svg/minus.svg");
     }
 
@@ -120,7 +116,7 @@
     }
 
     /* Has error styling */
-    &[aria-invalid] {
+    &[aria-invalid="true"] {
       border: 2px solid var(--color-error-darker);
     }
   }

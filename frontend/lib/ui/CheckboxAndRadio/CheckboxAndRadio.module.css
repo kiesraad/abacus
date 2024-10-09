@@ -4,6 +4,8 @@
   align-items: flex-start;
   gap: 1rem;
   border: none;
+  margin: 0;
+  padding: 0;
 }
 
 .checkbox-and-radio {
@@ -19,8 +21,10 @@
     display: inline-block;
     vertical-align: text-bottom;
     position: relative;
+    margin-left: 0;
     margin-right: 0.5rem;
     flex-shrink: 0; /* do not remove, this keeps the input from misshaping */
+    cursor: pointer;
 
     &:global(.radio) {
       border-radius: 1rem;

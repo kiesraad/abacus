@@ -2,22 +2,22 @@ import * as React from "react";
 
 import { describe, expect, test } from "vitest";
 
-import { overrideOnce, renderHook, waitFor } from "app/test/unit";
+import { overrideOnce, Providers, renderHook, waitFor } from "app/test/unit";
 
-import { ApiProvider, PollingStationFormController, usePollingStationFormController } from "@kiesraad/api";
+import { PollingStationFormController, usePollingStationFormController } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
-  <ApiProvider>
+  <Providers>
     <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
       {children}
     </PollingStationFormController>
-  </ApiProvider>
+  </Providers>
 );
 
 describe("PollingStationFormController", () => {
   test("PollingStationFormController renderHook", async () => {
-    const { result, rerender } = renderHook(() => usePollingStationFormController(), {
+    const { result } = renderHook(() => usePollingStationFormController(), {
       wrapper: Wrapper,
     });
 
@@ -35,21 +35,14 @@ describe("PollingStationFormController", () => {
         };
       },
     });
-
     expect(result.current.values.recounted).toEqual(undefined);
-
-    rerender();
 
     await result.current.submitCurrentForm();
 
-    rerender();
-    expect(result.current.values.recounted).toEqual(true);
-
     await waitFor(() => {
-      expect(result.current.formState.current).toBe("voters_votes_counts");
+      expect(result.current.values.recounted).toEqual(true);
+      expect(result.current.formState.furthest).toBe("voters_votes_counts");
     });
-
-    expect(result.current.targetFormSection).toBe("voters_votes_counts");
 
     result.current.registerCurrentForm({
       id: "voters_votes_counts",
@@ -72,9 +65,12 @@ describe("PollingStationFormController", () => {
         };
       },
     });
-    rerender();
+    await waitFor(() => {
+      // wait for the form state to be updated after registering the form
+      expect(result.current.formState.current).toBe("voters_votes_counts");
+    });
+
     await result.current.submitCurrentForm();
-    rerender();
 
     await waitFor(() => {
       expect(result.current.formState.sections.voters_votes_counts.errors.length).toBe(1);
@@ -125,6 +121,10 @@ describe("PollingStationFormController", () => {
           voters_recounts: undefined,
         };
       },
+    });
+    await waitFor(() => {
+      // wait for the form state to be updated after registering the form
+      expect(result.current.formState.current).toBe("voters_votes_counts");
     });
 
     await result.current.submitCurrentForm();

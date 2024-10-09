@@ -49,13 +49,13 @@ pub fn example_data_entry() -> SaveDataEntryRequest {
                 ],
             }],
         },
+        client_state: None,
     }
 }
 
-pub async fn create_and_finalise_data_entry(addr: &SocketAddr) {
+pub async fn create_and_save_data_entry(addr: &SocketAddr, polling_station_id: u32) {
     let request_body = example_data_entry();
-
-    let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
+    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/1");
     let response = reqwest::Client::new()
         .post(&url)
         .json(&request_body)
@@ -72,6 +72,10 @@ pub async fn create_and_finalise_data_entry(addr: &SocketAddr) {
     let validation_results: SaveDataEntryResponse = response.json().await.unwrap();
     assert_eq!(validation_results.validation_results.errors.len(), 0);
     assert_eq!(validation_results.validation_results.warnings.len(), 0);
+}
+
+pub async fn create_and_finalise_data_entry(addr: &SocketAddr, polling_station_id: u32) {
+    create_and_save_data_entry(addr, polling_station_id).await;
 
     // Finalise the data entry
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/finalise");

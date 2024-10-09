@@ -752,9 +752,13 @@
         "description": "Response structure for getting data entry of polling station results",
         "required": [
           "data",
+          "client_state",
           "validation_results"
         ],
         "properties": {
+          "client_state": {
+            "type": "object"
+          },
           "data": {
             "$ref": "#/components/schemas/PollingStationResults"
           },
@@ -916,6 +920,7 @@
         "type": "string",
         "enum": [
           "first_entry",
+          "first_entry_in_progress",
           "definitive"
         ]
       },
@@ -949,9 +954,14 @@
         "type": "object",
         "description": "Request structure for saving data entry of polling station results",
         "required": [
-          "data"
+          "data",
+          "client_state"
         ],
         "properties": {
+          "client_state": {
+            "type": "object",
+            "description": "Client state for the data entry (arbitrary JSON)"
+          },
           "data": {
             "$ref": "#/components/schemas/PollingStationResults"
           }

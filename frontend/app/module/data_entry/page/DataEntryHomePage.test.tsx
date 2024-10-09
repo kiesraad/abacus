@@ -67,6 +67,33 @@ describe("DataEntryHomePage", () => {
     expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
   });
 
+  test("Resume input visible when some are in progress", async () => {
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [
+        { id: 1, status: "first_entry_in_progress" },
+        { id: 2, status: "first_entry" },
+      ],
+    });
+    renderDataEntryHomePage();
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText("Je hebt nog een openstaande invoer")).toBeVisible();
+    expect(within(alert).getByText("Op Rolletjes")).toBeVisible();
+    expect(within(alert).queryByText("Testplek")).toBeNull();
+  });
+
+  test("Resume input invisible when none are in progress", async () => {
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [
+        { id: 1, status: "first_entry" },
+        { id: 2, status: "definitive" },
+      ],
+    });
+    renderDataEntryHomePage();
+    // Ensure the page is rendered before testing
+    await screen.findByText("Gemeenteraadsverkiezingen 2026");
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
   test("Rerender re-fetches election status", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [

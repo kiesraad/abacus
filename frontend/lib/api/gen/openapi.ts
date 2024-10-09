@@ -133,6 +133,7 @@ export interface ErrorResponse {
  * Response structure for getting data entry of polling station results
  */
 export interface GetDataEntryResponse {
+  client_state: unknown;
   data: PollingStationResults;
   validation_results: ValidationResults;
 }
@@ -187,7 +188,7 @@ export interface PollingStationResults {
   votes_counts: VotesCounts;
 }
 
-export type PollingStationStatus = "first_entry" | "definitive";
+export type PollingStationStatus = "first_entry" | "first_entry_in_progress" | "definitive";
 
 export interface PollingStationStatusEntry {
   id: number;
@@ -203,6 +204,7 @@ export type PollingStationType = "VasteLocatie" | "Bijzonder" | "Mobiel";
  * Request structure for saving data entry of polling station results
  */
 export interface SaveDataEntryRequest {
+  client_state: unknown;
   data: PollingStationResults;
 }
 

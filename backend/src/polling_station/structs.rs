@@ -376,6 +376,7 @@ pub struct PollingStationStatusEntry {
 #[serde(rename_all = "snake_case")]
 pub enum PollingStationStatus {
     FirstEntry,
+    FirstEntryInProgress,
     Definitive,
 }
 

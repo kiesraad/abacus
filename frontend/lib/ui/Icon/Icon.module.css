@@ -7,7 +7,6 @@
   svg {
     width: 1.5rem;
     height: 1.5rem;
-    fill: var(--button-color-primary);
   }
 
   &.warning {

@@ -1,23 +1,25 @@
-import { type PollingStationStatus } from "@kiesraad/api";
+import { ReactElement } from "react";
 
+import { type PollingStationStatus } from "@kiesraad/api";
+import { IconPencil } from "@kiesraad/icon";
+
+import { Icon } from "../Icon/Icon";
 import classes from "./badge.module.css";
 
-const typeToTextDict: { [S in PollingStationStatus]: string } = {
+const typeToLabel: { [S in PollingStationStatus]: string | ReactElement } = {
   first_entry: "1e invoer",
   definitive: "Definitief",
-  /*
-  difference: "Verschil invoer 1 en 2",
-  extra_entry: "Extra invoer",
-  correction: "Corrigendum",
-  objections: "Bezwaren",
-  second_entry: "2e invoer",
-   */
+  first_entry_in_progress: (
+    <>
+      1e invoer <Icon icon={<IconPencil />} />
+    </>
+  ),
 };
 
 export interface BadgeProps {
-  type: keyof typeof typeToTextDict;
+  type: keyof typeof typeToLabel;
 }
 
 export function Badge({ type }: BadgeProps) {
-  return <div className={`${classes[type]} ${classes.badge}`}>{typeToTextDict[type]}</div>;
+  return <div className={`${classes[type]} ${classes.badge}`}>{typeToLabel[type]}</div>;
 }

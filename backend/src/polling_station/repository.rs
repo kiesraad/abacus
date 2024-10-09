@@ -65,6 +65,12 @@ impl PollingStations {
         .await
     }
 
+    /// Determines the status of the polling station.
+    /// - When an entry of the polling station is found in the `polling_station_results` table, the status is FirstEntryInProgress
+    /// - When an entry of the polling station is found in the `polling_station_data_entries` table, the status is Definitive
+    /// - If no entries are found, it has the FirstEntry status
+    ///
+    /// The implementation and determination will probably change while we implement more statuses
     pub async fn status(
         &self,
         election_id: u32,
@@ -73,9 +79,13 @@ impl PollingStations {
             PollingStationStatusEntry,
             r#"
 SELECT p.id AS "id: u32",
-CASE WHEN r.polling_station_id IS NULL THEN 'FirstEntry' ELSE 'Definitive' END AS "status!: _"
+CASE
+  WHEN de.polling_station_id IS NOT NULL THEN 'FirstEntryInProgress'
+  WHEN r.polling_station_id IS NOT NULL THEN 'Definitive'
+  ELSE 'FirstEntry' END AS "status!: _"
 FROM polling_stations AS p
 LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
+LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
 WHERE election_id = $1
 "#,
             election_id
@@ -94,10 +104,16 @@ impl PollingStationDataEntries {
     }
 
     /// Saves the data entry or updates it if it already exists
-    pub async fn upsert(&self, id: u32, entry_number: u8, data: String) -> Result<(), sqlx::Error> {
-        sqlx::query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data) VALUES (?, ?, ?)\
-              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET data = excluded.data",
-            id, entry_number, data)
+    pub async fn upsert(
+        &self,
+        id: u32,
+        entry_number: u8,
+        data: String,
+        client_state: String,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data, client_state) VALUES (?, ?, ?, ?)\
+              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET data = excluded.data, client_state = excluded.client_state",
+            id, entry_number, data, client_state)
             .execute(&self.0)
             .await?;
 
@@ -109,15 +125,19 @@ impl PollingStationDataEntries {
         tx: &mut Transaction<'_, Sqlite>,
         id: u32,
         entry_number: u8,
-    ) -> Result<Vec<u8>, sqlx::Error> {
+    ) -> Result<(Vec<u8>, Vec<u8>), sqlx::Error> {
         let res = query!(
-            "SELECT data FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
+            "SELECT data, client_state FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
             id,
             entry_number
         )
             .fetch_one(&mut **tx)
         .await?;
-        res.data.ok_or_else(|| sqlx::Error::RowNotFound)
+        if let (Some(data), Some(client_state)) = (res.data, res.client_state) {
+            Ok((data, client_state))
+        } else {
+            Err(sqlx::Error::RowNotFound)
+        }
     }
 
     pub async fn delete(&self, id: u32, entry_number: u8) -> Result<(), sqlx::Error> {

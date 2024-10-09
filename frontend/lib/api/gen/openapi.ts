@@ -159,12 +159,12 @@ export interface PoliticalGroupVotes {
 export interface PollingStation {
   election_id: number;
   house_number: string;
-  house_number_addition?: string | null;
+  house_number_addition?: string;
   id: number;
   locality: string;
   name: string;
   number: number;
-  number_of_voters?: number | null;
+  number_of_voters?: number;
   polling_station_type: PollingStationType;
   postal_code: string;
   street: string;

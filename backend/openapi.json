@@ -842,8 +842,7 @@
             "type": "string"
           },
           "house_number_addition": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "id": {
             "type": "integer",
@@ -862,8 +861,7 @@
           },
           "number_of_voters": {
             "type": "integer",
-            "format": "int64",
-            "nullable": true
+            "format": "int64"
           },
           "polling_station_type": {
             "$ref": "#/components/schemas/PollingStationType"

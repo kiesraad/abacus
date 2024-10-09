@@ -43,10 +43,14 @@ pub struct PollingStation {
     pub election_id: u32,
     pub name: String,
     pub number: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub number_of_voters: Option<i64>,
     pub polling_station_type: PollingStationType,
     pub street: String,
     pub house_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub house_number_addition: Option<String>,
     pub postal_code: String,
     pub locality: String,

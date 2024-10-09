@@ -23,6 +23,11 @@ updates:
         patterns: ["*"]
     ignore:
       - dependency-name: "@types/node"
+        # Depends on Node.js version, which we upgrade manually
         update-types: ["version-update:semver-major"]
       - dependency-name: "eslint"
+        # ESLint major upgrades usually have breaking changes, #213 for ESLint 9
         update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        # TypeScript 5.6 is not compatible with typescript-eslint, #439
+        update-types: ["version-update:semver-minor"]

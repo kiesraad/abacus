@@ -33,19 +33,19 @@ pub struct AppState {
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let data_entry_routes = Router::new()
         .route(
-            "/:polling_station_id/data_entries/:entry_number",
+            "/:entry_number",
             post(data_entry::polling_station_data_entry_save),
         )
         .route(
-            "/:polling_station_id/data_entries/:entry_number",
+            "/:entry_number",
             get(data_entry::polling_station_data_entry_get),
         )
         .route(
-            "/:polling_station_id/data_entries/:entry_number",
+            "/:entry_number",
             delete(data_entry::polling_station_data_entry_delete),
         )
         .route(
-            "/:polling_station_id/data_entries/:entry_number/finalise",
+            "/:entry_number/finalise",
             post(data_entry::polling_station_data_entry_finalise),
         );
 
@@ -58,9 +58,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route("/:election_id/status", get(election::election_status));
 
-    let app = Router::new()
-        .nest("/api/elections", election_routes)
-        .nest("/api/polling_stations", data_entry_routes);
+    let app = Router::new().nest("/api/elections", election_routes).nest(
+        "/api/polling_stations/:polling_station_id/data_entries",
+        data_entry_routes,
+    );
 
     // Add a route to reset the database if the dev-database feature is enabled
     #[cfg(feature = "dev-database")]

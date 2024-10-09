@@ -70,12 +70,14 @@ export function RecountedForm() {
         <ChoiceList>
           <ChoiceList.Radio
             id="yes"
+            value="yes"
             name="recounted"
             defaultChecked={sectionValues.recounted === true}
             label="Ja, er was een hertelling"
           />
           <ChoiceList.Radio
             id="no"
+            value="no"
             name="recounted"
             defaultChecked={sectionValues.recounted === false}
             label="Nee, er was geen hertelling"

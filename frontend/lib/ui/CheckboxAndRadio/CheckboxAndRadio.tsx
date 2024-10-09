@@ -4,46 +4,27 @@ import { cn } from "@kiesraad/util";
 
 import cls from "./CheckboxAndRadio.module.css";
 
-export interface CheckboxAndRadioProps {
+export interface CheckboxAndRadioProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
-  name?: string;
   type?: "checkbox" | "radio";
   label: string;
   children?: React.ReactNode;
   indeterminate?: boolean;
-  disabled?: boolean;
   hasError?: boolean;
   defaultChecked?: boolean;
 }
 
 export const CheckboxAndRadio = React.forwardRef<HTMLInputElement, CheckboxAndRadioProps>(
-  ({ id, name, type, label, children, indeterminate, disabled, hasError, defaultChecked }, ref) => {
-    const [checked, setChecked] = React.useState(defaultChecked);
-
-    React.useEffect(() => {
-      setChecked(defaultChecked);
-    }, [defaultChecked]);
-
-    React.useEffect(() => {
-      if (checked && indeterminate) {
-        const input = document.getElementById(id) as HTMLInputElement;
-        input.indeterminate = true;
-      }
-    }, [id, indeterminate, checked]);
-
-    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setChecked(event.currentTarget.checked);
-    };
-
+  ({ id, value, name, type, label, children, indeterminate, disabled, hasError, defaultChecked }, ref) => {
     return (
       <div className={cn(cls["checkbox-and-radio"])} aria-label="input" id={`${type}-container-${id}`}>
         <input
-          className={type}
+          className={`${type}${indeterminate ? " indeterminate" : ""}`}
           type={type}
           id={id}
+          value={value}
           name={name}
-          checked={checked}
-          onChange={onChange}
+          defaultChecked={defaultChecked}
           ref={ref}
           disabled={disabled}
           aria-invalid={hasError}

@@ -66,7 +66,6 @@ describe("Test RecountedForm", () => {
       expect(yes).toBeChecked();
       expect(no).not.toBeChecked();
       await user.click(no);
-      await user.click(no);
       expect(no).toBeChecked();
       expect(yes).not.toBeChecked();
 

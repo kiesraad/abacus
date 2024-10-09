@@ -28,14 +28,12 @@ const expectRecountedForm = async () => {
 
 const fillRecountedFormNo = async () => {
   await user.click(screen.getByLabelText("Nee, er was geen hertelling"));
-  await user.click(screen.getByLabelText("Nee, er was geen hertelling"));
   await waitFor(() => {
     expect(screen.getByLabelText("Nee, er was geen hertelling")).toBeChecked();
   });
 };
 
 const fillRecountedFormYes = async () => {
-  await user.click(screen.getByLabelText("Ja, er was een hertelling"));
   await user.click(screen.getByLabelText("Ja, er was een hertelling"));
   await waitFor(() => {
     expect(screen.getByLabelText("Ja, er was een hertelling")).toBeChecked();

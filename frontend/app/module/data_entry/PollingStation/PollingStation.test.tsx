@@ -153,9 +153,11 @@ const expectFeedbackWarning = async (code?: string) => {
   });
 };
 
-const acceptWarning = async () => {
-  await user.click(screen.getByTestId("differences_form_accept_warnings"));
-  expect(screen.getByTestId("differences_form_accept_warnings")).toBeChecked();
+const acceptWarnings = async () => {
+  await user.click(screen.getByLabelText("Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."));
+  expect(
+    screen.getByLabelText("Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."),
+  ).toBeChecked();
 };
 
 const expectBlockerModal = async () => {
@@ -549,7 +551,7 @@ describe("Polling Station data entry integration tests", () => {
         () => fillDifferencesForm({ fewer_ballots_count: 1, no_explanation_count: 2 }),
         submit,
         () => expectFeedbackWarning("W.302"),
-        acceptWarning,
+        acceptWarnings,
         submit,
 
         () => expectPoliticalGroupCandidatesForm(1),

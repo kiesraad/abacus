@@ -4,14 +4,14 @@ use axum_extra::response::Attachment;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::pdf_gen::generate_pdf;
-use crate::pdf_gen::models::{ModelNa31_2Input, ModelNa31_2Summary, PdfModel};
-use crate::polling_station::repository::{PollingStationResultsEntries, PollingStations};
-use crate::polling_station::{PollingStation, PollingStationStatusEntry};
-use crate::APIError;
-
 use self::repository::Elections;
 pub use self::structs::*;
+use crate::data_entry::repository::PollingStationResultsEntries;
+use crate::pdf_gen::generate_pdf;
+use crate::pdf_gen::models::{ModelNa31_2Input, ModelNa31_2Summary, PdfModel};
+use crate::polling_station::repository::PollingStations;
+use crate::polling_station::structs::{PollingStation, PollingStationStatusEntry};
+use crate::APIError;
 
 pub(crate) mod repository;
 pub mod structs;

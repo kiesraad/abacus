@@ -212,7 +212,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "get": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Get an in-progress (not finalised) data entry for a polling station",
         "operationId": "polling_station_data_entry_get",
@@ -275,7 +275,7 @@
       },
       "post": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Save or update a data entry for a polling station",
         "operationId": "polling_station_data_entry_save",
@@ -368,7 +368,7 @@
       },
       "delete": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Delete an in-progress (not finalised) data entry for a polling station",
         "operationId": "polling_station_data_entry_delete",
@@ -426,7 +426,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise": {
       "post": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Finalise the data entry for a polling station",
         "operationId": "polling_station_data_entry_finalise",

@@ -1,7 +1,7 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { getUrlForFormSectionID } from "app/component/pollingstation/utils";
+import { getBaseUrl, getUrlForFormSectionID } from "app/component/pollingstation/utils";
 
 import {
   ApiError,
@@ -161,6 +161,7 @@ export function PollingStationFormController({
   const request_path: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
   const { client } = useApi();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [values, setValues] = React.useState<PollingStationValues>();
   const [formState, setFormState] = React.useState<FormState>();
@@ -219,9 +220,13 @@ export function PollingStationFormController({
   React.useEffect(() => {
     if (!targetFormSectionID) return;
     const url = getUrlForFormSectionID(election.id, pollingStationId, targetFormSectionID);
-    navigate(url);
+    if (location.pathname === getBaseUrl(election.id, pollingStationId)) {
+      navigate(url, { replace: true });
+    } else if (location.pathname !== url) {
+      navigate(url);
+    }
     setTargetFormSectionID(null);
-  }, [targetFormSectionID, navigate, election.id, pollingStationId]);
+  }, [targetFormSectionID, navigate, election.id, pollingStationId, location.pathname]);
 
   const registerCurrentForm = React.useCallback(
     (form: AnyFormReference) => {

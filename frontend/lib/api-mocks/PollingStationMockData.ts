@@ -15,10 +15,11 @@ export const pollingStationMockData: PollingStation = {
 };
 
 export const getPollingStationMockData = (election_id: number): PollingStation[] => {
+  const offset = (election_id - 1) * 10;
   return [
-    { ...pollingStationMockData, election_id },
+    { ...pollingStationMockData, id: offset + 1, election_id },
     {
-      id: 2,
+      id: offset + 2,
       election_id,
       name: "Testplek",
       number: 34,

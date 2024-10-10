@@ -43,5 +43,6 @@
   svg {
     width: 1.5rem;
     color: var(--base-white);
+    fill: var(--base-white);
   }
 }

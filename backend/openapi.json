@@ -212,7 +212,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "get": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Get an in-progress (not finalised) data entry for a polling station",
         "operationId": "polling_station_data_entry_get",
@@ -275,7 +275,7 @@
       },
       "post": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Save or update a data entry for a polling station",
         "operationId": "polling_station_data_entry_save",
@@ -368,7 +368,7 @@
       },
       "delete": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Delete an in-progress (not finalised) data entry for a polling station",
         "operationId": "polling_station_data_entry_delete",
@@ -426,7 +426,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise": {
       "post": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Finalise the data entry for a polling station",
         "operationId": "polling_station_data_entry_finalise",
@@ -515,20 +515,17 @@
         ],
         "properties": {
           "country_code": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "first_name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "gender": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/CandidateGender"
               }
-            ],
-            "nullable": true
+            ]
           },
           "initials": {
             "type": "string"
@@ -537,8 +534,7 @@
             "type": "string"
           },
           "last_name_prefix": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "locality": {
             "type": "string"
@@ -679,8 +675,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
-            },
-            "nullable": true
+            }
           }
         }
       },
@@ -847,8 +842,7 @@
             "type": "string"
           },
           "house_number_addition": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "id": {
             "type": "integer",
@@ -867,8 +861,7 @@
           },
           "number_of_voters": {
             "type": "integer",
-            "format": "int64",
-            "nullable": true
+            "format": "int64"
           },
           "polling_station_type": {
             "$ref": "#/components/schemas/PollingStationType"

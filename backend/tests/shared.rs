@@ -2,7 +2,7 @@
 
 use std::net::SocketAddr;
 
-use backend::polling_station::{
+use backend::data_entry::{
     CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
     SaveDataEntryRequest, SaveDataEntryResponse, VotersCounts, VotesCounts,
 };

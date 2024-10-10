@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { useRecounted } from "@kiesraad/api";
-import { BottomBar, Button, Feedback, Form, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
+import { BottomBar, Button, ChoiceList, Feedback, Form, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 
 interface FormElements extends HTMLFormControlsCollection {
   yes: HTMLInputElement;
@@ -66,14 +66,22 @@ export function RecountedForm() {
         op basis daarvan herteld door het gemeentelijk stembureau?
       </p>
       <div className="radio-form">
-        <label>
-          <input type="radio" name="recounted" id="yes" defaultChecked={sectionValues.recounted === true} />
-          Ja, er was een hertelling
-        </label>
-        <label>
-          <input type="radio" name="recounted" id="no" defaultChecked={sectionValues.recounted === false} />
-          Nee, er was geen hertelling
-        </label>
+        <ChoiceList>
+          <ChoiceList.Radio
+            id="yes"
+            value="yes"
+            name="recounted"
+            defaultChecked={sectionValues.recounted === true}
+            label="Ja, er was een hertelling"
+          />
+          <ChoiceList.Radio
+            id="no"
+            value="no"
+            name="recounted"
+            defaultChecked={sectionValues.recounted === false}
+            label="Nee, er was geen hertelling"
+          />
+        </ChoiceList>
       </div>
       <BottomBar type="form">
         <BottomBar.Row>

@@ -309,9 +309,8 @@ export function VotersAndVotesForm() {
               defaultChecked={acceptWarnings}
               hasError={warningsWarning}
               ref={acceptWarningsRef}
-            >
-              Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.
-            </Checkbox>
+              label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
+            />
           </BottomBar.Row>
         )}
         <BottomBar.Row>

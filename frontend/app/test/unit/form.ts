@@ -3,7 +3,6 @@ import { electionMockData } from "@kiesraad/api-mocks";
 
 export const emptyDataEntryRequest: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = {
   data: {
-    recounted: false,
     voters_counts: {
       poll_card_count: 0,
       proxy_certificate_count: 0,

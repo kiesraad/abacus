@@ -30,6 +30,7 @@ pub struct ValidationResult {
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ValidationResultCode {
+    F101,
     F201,
     F202,
     F203,

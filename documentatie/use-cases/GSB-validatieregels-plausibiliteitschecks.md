@@ -33,6 +33,8 @@ Er zijn geen regels omdat het niet mogelijk is om foute aantallen in te vullen i
 
 Velden markeren: geen (laat alleen error zien op de pagina)
 
+Bij deze foutmelding wordt het standaard handelingsperspectief niet getoond.
+
 ### Regels voor totalen (reeks F.2xx)
 
 #### F.201: (Als niet herteld) `stempassen + volmachten + kiezerspassen = totaal toegelaten kiezers`

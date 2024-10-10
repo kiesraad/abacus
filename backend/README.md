@@ -20,11 +20,11 @@ The built binary will be located in `target/release/`.
 Use `cargo run` to run the API on port 8080 (http://localhost:8080).
 
 To let the API server serve the frontend, first compile the frontend using
-`npm run build` in the `frontend` directory. The run the API server with the
-`--frontend-dist` flag pointing to the frontend build directory, e.g.:
+`npm run build` in the `frontend/dist` directory. The run the API server with the
+`memory-serve` feature enabled:
 
 ```shell
-cargo run -- --frontend-dist ../frontend/dist
+cargo run --features memory-serve
 ```
 
 ### Linting
@@ -44,8 +44,7 @@ The following dependencies (crates) are used:
 - `axum`: web application framework that focuses on ergonomics and modularity.
 - `hyper`: fast and correct HTTP implementation.
 - `tokio`: runtime for writing asynchronous applications.
-- `tower`: library for building robust networking clients and servers.
-- `tower-http`: Tower middleware and utilities for HTTP clients and servers.
+- `memory-serve`: serves frontend assets from memory, but ad-hoc from disk during development.
 - `utoipa`: library for documenting REST APIs using OpenAPI.
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `serde`: framework for serializing and deserializing data structures.

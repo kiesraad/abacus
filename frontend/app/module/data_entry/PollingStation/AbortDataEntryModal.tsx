@@ -39,15 +39,12 @@ export function AbortDataEntryModal({ onCancel, onSave, onDelete }: AbortDataEnt
     })();
 
   return (
-    <Modal onClose={onCancel}>
-      <h2 id="abort-modal-title">Wat wil je doen met je invoer?</h2>
+    <Modal title="Wat wil je doen met je invoer?" onClose={onCancel}>
       <p>
         Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de invoer die je al hebt gedaan
         bewaren.
-        <br />
-        <br />
-        Twijfel je? Overleg dan met de coördinator.
       </p>
+      <p>Twijfel je? Overleg dan met de coördinator.</p>
       <nav>
         <Button size="lg" onClick={onAbortModalSave} disabled={saving}>
           Invoer bewaren

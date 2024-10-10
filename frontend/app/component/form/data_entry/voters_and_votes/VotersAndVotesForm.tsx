@@ -17,8 +17,6 @@ import { deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
 
-const _ACCEPT_WARNINGS_ID = "voters_and_votes_form_accept_warnings";
-
 interface FormElements extends HTMLFormControlsCollection {
   poll_card_count: HTMLInputElement;
   proxy_certificate_count: HTMLInputElement;
@@ -151,6 +149,7 @@ export function VotersAndVotesForm() {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
+  const showAcceptWarnings = errors.length === 0 && warnings.length > 0 && !hasChanges;
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
@@ -158,8 +157,12 @@ export function VotersAndVotesForm() {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form" skip={[_ACCEPT_WARNINGS_ID]}>
-      <h2>Toegelaten kiezers en uitgebrachte stemmen</h2>
+    <Form
+      onSubmit={handleSubmit}
+      ref={formRef}
+      id="voters_and_votes_form"
+      title="Toegelaten kiezers en uitgebrachte stemmen"
+    >
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
@@ -179,7 +182,6 @@ export function VotersAndVotesForm() {
             id="poll_card_count"
             title="Stempassen"
             defaultValue={sectionValues.voters_counts.poll_card_count}
-            isFocused
             {...defaultProps}
           />
           <InputGridRow
@@ -300,15 +302,17 @@ export function VotersAndVotesForm() {
             </Alert>
           </BottomBar.Row>
         )}
-        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox
-            id={_ACCEPT_WARNINGS_ID}
-            defaultChecked={acceptWarnings}
-            hasError={warningsWarning}
-            ref={acceptWarningsRef}
-            label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
-          />
-        </BottomBar.Row>
+        {showAcceptWarnings && (
+          <BottomBar.Row>
+            <Checkbox
+              id="voters_and_votes_form_accept_warnings"
+              defaultChecked={acceptWarnings}
+              hasError={warningsWarning}
+              ref={acceptWarningsRef}
+              label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
+            />
+          </BottomBar.Row>
+        )}
         <BottomBar.Row>
           <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende

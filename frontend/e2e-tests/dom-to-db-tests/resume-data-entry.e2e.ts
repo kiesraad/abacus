@@ -47,6 +47,7 @@ test.describe("resume data entry flow", () => {
   test.describe("resume after saving", () => {
     test("resuming data entry shows previous data", async ({ page }) => {
       const abortInputModal = await fillFirstTwoPagesAndAbort(page);
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
@@ -74,6 +75,11 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.blankVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.invalidVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.totalVotesCastCount).toHaveValue("100");
+
+      await votersAndVotesPage.abortInput.click();
+      await expect(abortInputModal.heading).toBeFocused();
+      await abortInputModal.close.click();
+      await expect(votersAndVotesPage.abortInput).toBeFocused();
     });
 
     // Reproduce issue where navigating between sections is blocked by modal, even though there are no changes.
@@ -121,7 +127,7 @@ test.describe("resume data entry flow", () => {
 
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
-
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
@@ -195,7 +201,7 @@ test.describe("resume data entry flow", () => {
 
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
-
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
@@ -243,6 +249,7 @@ test.describe("resume data entry flow", () => {
   test.describe("resume after deleting", () => {
     test("deleting data entry doesn't show previous data", async ({ page }) => {
       const abortInputModal = await fillFirstTwoPagesAndAbort(page);
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.discardInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
@@ -273,7 +280,7 @@ test.describe("resume data entry flow", () => {
 
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
-
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.discardInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
@@ -313,7 +320,7 @@ test.describe("resume data entry flow", () => {
 
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
-
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.discardInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);

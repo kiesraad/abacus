@@ -5,13 +5,14 @@ import { describe, expect, test, vi } from "vitest";
 import { Form } from "./Form";
 
 describe("UI Component: Form", () => {
-  test("Form renders with children", () => {
+  test("Form renders with title and children", () => {
     render(
-      <Form>
+      <Form title="Form title">
         <input id="test" />
       </Form>,
     );
 
+    expect(screen.getByText("Form title")).toBeInTheDocument();
     expect(screen.getByTestId("test")).toBeInTheDocument();
   });
 

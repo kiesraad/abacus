@@ -84,6 +84,13 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
+      const formTitle = await screen.findByRole("heading", {
+        level: 2,
+        name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+      });
+      expect(formTitle).toHaveFocus();
+      await user.keyboard("{tab}");
+
       const moreBallotsCount = await screen.findByTestId("more_ballots_count");
       expect(moreBallotsCount).toHaveFocus();
       await user.type(moreBallotsCount, "12345");

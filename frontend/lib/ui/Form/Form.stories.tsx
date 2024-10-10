@@ -2,10 +2,8 @@ import type { Story } from "@ladle/react";
 
 import { Form } from "./Form";
 
-/** Story stub for form */
-
 export const DefaultForm: Story = () => (
-  <Form>
+  <Form title="Form title">
     <input id="inp1" />
     <br />
     <input id="inp2" />

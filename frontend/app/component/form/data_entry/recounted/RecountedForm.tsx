@@ -46,8 +46,7 @@ export function RecountedForm() {
   const hasValidationError = errors.length > 0;
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form">
-      <h2>Is er herteld?</h2>
+    <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form" title="Is er herteld?">
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}

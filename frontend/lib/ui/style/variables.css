@@ -66,6 +66,12 @@
   --checkbox-radio-size: 1.25rem;
   --checkbox-radio-svg-size: 0.875rem;
 
+  --button-icon-modal-close-color-svg: var(--menu-empty);
+  --button-icon-ghost-color-svg: var(--base-black);
+  --button-icon-ghost-color-border-focus: var(--checkbox-radio-color-border);
+  --button-icon-ghost-color-bg-focus: var(--bg-gray-darker);
+  --button-icon-ghost-color-bg-hover: var(--bg-gray-darker);
+
   --shadow-color-focus: #d1e0ff;
   --border-color-default: #d0d5dd;
   --border-color-focus: #528bff;
@@ -76,21 +82,25 @@
   --color-error-darkest: #b42318;
   --color-error-bg: #fee4e2;
   --color-error-hover: #fecdca;
+  --color-error-focus: #f97066;
 
   --color-warning: #f79009;
   --color-warning-border: #fec84b;
   --color-warning-darker: #dc6803;
   --color-warning-bg: #fef0c7;
   --color-warning-hover: #fedf89;
+  --color-warning-focus: #fdb022;
   --color-warning-text: #93370d;
 
   --color-notify: #2e90fa;
   --color-notify-bg: #e0f2fe;
   --color-notify-hover: #b9e6fe;
+  --color-notify-focus: #36bffa;
 
   --color-success: #12b76a;
   --color-success-bg: #d1fadf;
   --color-success-hover: #a6f4c5;
+  --color-success-focus: #32d583;
 
   --color-help-text: #475467;
   --color-hover: #eaecf0;
@@ -126,8 +136,6 @@
   --link-active: #0040c1;
   --link-visited: #6927da;
 
-  --error-400: #f97066;
-
   --gray-200: #eaecf0;
   --menu-empty: #667085;
   --menu-unsaved: #475467;
@@ -140,5 +148,5 @@
   --purple-100: #ebe9fe;
   --purple-800: #4a1fb8;
 
-  --menu-warning: #dc6803;
+  --menu-warning: var(--color-warning-darker);
 }

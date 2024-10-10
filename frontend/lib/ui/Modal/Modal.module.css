@@ -1,11 +1,8 @@
 .modal {
-  position: fixed;
-  top: 0;
-  z-index: 10;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  min-width: 100%;
+  min-height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
+  border: 0;
 
   .modal-container {
     position: fixed;
@@ -26,21 +23,32 @@
       > svg {
         height: 2rem;
         width: 2rem;
+        fill: var(--button-icon-modal-close-color-svg);
       }
     }
   }
 
   .modal-body {
-    background-color: white;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--base-white);
+    gap: 1rem;
+
+    > h2 {
+      margin: 0;
+    }
 
     > p {
+      display: flex;
+      flex-direction: column;
       padding-right: 2rem;
+      margin: 0;
     }
 
     > nav {
-      margin-top: 1.5rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      align-items: center;
+      min-height: 4rem;
       gap: 1rem;
 
       > button {

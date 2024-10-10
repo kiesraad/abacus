@@ -33,8 +33,6 @@ export interface CandidatesVotesFormProps {
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
   const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
-  const _ACCEPT_WARNINGS_ID = `candidates_votes_form_accept_warnings_${group.number}`;
-
   const getValues = React.useCallback(() => {
     const form = formRef.current;
     if (!form) {
@@ -92,7 +90,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     if (isSaved) {
       window.scrollTo(0, 0);
     }
-  }, [isSaved]);
+  }, [isSaved, errors, warnings]);
 
   const [warningsWarning, setWarningsWarning] = React.useState(false);
 
@@ -123,6 +121,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
+  const showAcceptWarnings = errors.length === 0 && warnings.length > 0 && !hasChanges;
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
@@ -130,10 +129,12 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id={`candidates_form_${group.number}`} skip={[_ACCEPT_WARNINGS_ID]}>
-      <h2>
-        Lijst {group.number} - {group.name}
-      </h2>
+    <Form
+      onSubmit={handleSubmit}
+      ref={formRef}
+      id={`candidates_form_${group.number}`}
+      title={`Lijst ${group.number} - ${group.name}`}
+    >
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
@@ -148,7 +149,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         </InputGrid.Header>
         <InputGrid.Body>
           {group.candidates.map((candidate, index) => {
-            const addSeparator = (index + 1) % 25 == 0 && index + 1 !== group.candidates.length;
+            const addSeparator = (index + 1) % 25 === 0 && index + 1 !== group.candidates.length;
             const defaultValue = sectionValues?.candidate_votes[index]?.votes || "";
             return (
               <InputGridRow
@@ -159,7 +160,6 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
                 title={`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`}
                 addSeparator={addSeparator}
                 defaultValue={defaultValue}
-                isFocused={index === 0}
                 {...defaultProps}
               />
             );
@@ -184,15 +184,17 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             </Alert>
           </BottomBar.Row>
         )}
-        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox
-            id={_ACCEPT_WARNINGS_ID}
-            defaultChecked={acceptWarnings}
-            hasError={warningsWarning}
-            ref={acceptWarningsRef}
-            label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
-          />
-        </BottomBar.Row>
+        {showAcceptWarnings && (
+          <BottomBar.Row>
+            <Checkbox
+              id={`candidates_votes_form_accept_warnings_${group.number}`}
+              defaultChecked={acceptWarnings}
+              hasError={warningsWarning}
+              ref={acceptWarningsRef}
+              label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
+            />
+          </BottomBar.Row>
+        )}
         <BottomBar.Row>
           <KeyboardKeys.HintText>
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Down]} />

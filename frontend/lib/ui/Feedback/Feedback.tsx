@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import { ApiError } from "@kiesraad/api";
 import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
@@ -5,7 +7,7 @@ import { cn } from "@kiesraad/util";
 import cls from "./Feedback.module.css";
 import { ClientValidationResultCode, FeedbackItem, feedbackTypes } from "./Feedback.types";
 
-export interface FeedbackProps {
+interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
   data?: ClientValidationResultCode[];
@@ -14,6 +16,7 @@ export interface FeedbackProps {
 }
 
 export function Feedback({ id, type, data, apiError }: FeedbackProps) {
+  const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
   const feedbackList: FeedbackItem[] = [];
   if (data) {
     for (const code of data) {
@@ -21,13 +24,19 @@ export function Feedback({ id, type, data, apiError }: FeedbackProps) {
     }
   }
 
+  useEffect(() => {
+    feedbackHeader.current?.focus();
+  }, []);
+
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>
       {apiError && (
         <div className="feedback-item">
           <header>
             {renderIconForType(type)}
-            <h3>Sorry, er ging iets mis</h3>
+            <h3 tabIndex={-1} ref={feedbackHeader} className="feedback-header">
+              Sorry, er ging iets mis
+            </h3>
           </header>
           <div className="content">
             {apiError.code}: {apiError.error}
@@ -38,7 +47,9 @@ export function Feedback({ id, type, data, apiError }: FeedbackProps) {
         <div key={`feedback-${index}`} className="feedback-item">
           <header>
             {renderIconForType(type)}
-            <h3>{feedback.title}</h3>
+            <h3 tabIndex={-1} ref={index === 0 ? feedbackHeader : undefined} className="feedback-header">
+              {feedback.title}
+            </h3>
             {feedback.code && <span>{feedback.code}</span>}
           </header>
           <div className="content">{feedback.content}</div>

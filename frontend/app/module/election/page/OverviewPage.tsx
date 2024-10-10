@@ -15,6 +15,7 @@ export function OverviewPage() {
   const { electionList } = useElectionList();
 
   const isNewAccount = location.hash === "#new_account";
+  const isAdministrator = location.hash === "#administrator";
 
   function closeNewAccountAlert() {
     navigate(location.pathname);
@@ -24,7 +25,7 @@ export function OverviewPage() {
     <>
       <header>
         <section>
-          <h1>Verkiezingen</h1>
+          <h1>{`Verkiezingen${isAdministrator ? " beheren" : ""}`}</h1>
         </section>
         <section>
           <WorkStationNumber>16</WorkStationNumber>

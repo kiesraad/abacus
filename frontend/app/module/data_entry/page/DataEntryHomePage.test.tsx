@@ -36,7 +36,7 @@ describe("DataEntryHomePage", () => {
 
     // Check if the navigation bar displays the correct information
     const nav = await screen.findByRole("navigation", { name: /primary-navigation/i });
-    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute("href", "/overview");
+    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute("href", "/elections");
   });
 
   test("Finish input not visible when not finished", async () => {

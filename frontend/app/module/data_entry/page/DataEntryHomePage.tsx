@@ -33,7 +33,7 @@ export function DataEntryHomePage() {
     <>
       <PageTitle title="Kies een stembureau - Abacus" />
       <NavBar>
-        <Link to={"/overview"}>Overzicht</Link>
+        <Link to={"/elections"}>Overzicht</Link>
       </NavBar>
       <header>
         <section>

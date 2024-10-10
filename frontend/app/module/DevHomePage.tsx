@@ -15,10 +15,13 @@ export function DevHomePage() {
             <Link to={`/user`}>User</Link>
           </li>
           <li>
-            <Link to={"/overview"}>Overview</Link>
+            <Link to={"/elections#administrator"}>Verkiezingen beheren</Link>
           </li>
           <li>
-            <Link to={`/elections/1/data-entry`}>Input</Link>
+            <Link to={"/elections"}>Verkiezingen</Link>
+          </li>
+          <li>
+            <Link to={`/elections/1/data-entry`}>Verkiezing 1 invoeren</Link>
           </li>
         </ul>
 

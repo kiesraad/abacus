@@ -27,7 +27,7 @@ export function PollingStationLayout() {
     <PollingStationFormController election={election} pollingStationId={pollingStation.id} entryNumber={1}>
       <PageTitle title={`Invoeren ${pollingStation.number} ${pollingStation.name} - Abacus`} />
       <NavBar>
-        <Link to={"/overview"}>Overzicht</Link>
+        <Link to={"/elections"}>Overzicht</Link>
         <IconChevronRight style={{ fill: "white" }} />
         <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
       </NavBar>

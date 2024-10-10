@@ -49,7 +49,7 @@ describe("PollingStationLayout", () => {
 
     // Check if the navigation bar displays the correct information
     const nav = await screen.findByRole("navigation", { name: /primary-navigation/i });
-    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute("href", "/overview");
+    expect(within(nav).getByRole("link", { name: "Verkiezingen" })).toHaveAttribute("href", "/elections");
     expect(within(nav).getByRole("link", { name: election.name })).toHaveAttribute(
       "href",
       `/elections/${election.id}/data-entry`,

@@ -57,7 +57,7 @@ export function FinaliseElectionPage() {
     <>
       <PageTitle title="Invoerfase afronden - Abacus" />
       <NavBar>
-        <Link to={"/overview"}>Overzicht</Link>
+        <Link to={"/elections"}>Overzicht</Link>
         <IconChevronRight />
         <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
       </NavBar>

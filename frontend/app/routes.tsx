@@ -13,15 +13,14 @@ import {
   VotersAndVotesPage,
 } from "./module/data_entry";
 import { DevHomePage } from "./module/DevHomePage";
-import { ElectionLayout } from "./module/ElectionLayout";
+import { ElectionHomePage, ElectionLayout, OverviewLayout, OverviewPage } from "./module/election";
 import { NotFound } from "./module/NotFound";
-import { OverviewLayout, OverviewPage } from "./module/overview";
 import { RootLayout } from "./module/RootLayout";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/user";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />}>
-    <Route index path="/" element={<Navigate to="/overview" replace />} />
+    <Route index path="/" element={<Navigate to="/elections" replace />} />
     <Route path="*" element={<NotFound />} />
     <Route path="/dev" element={<DevHomePage />} />
     <Route path="user" element={<LoginLayout />}>
@@ -29,22 +28,23 @@ export const routes = createRoutesFromElements(
       <Route path="login" element={<LoginPage />} />
       <Route path="account/setup" element={<AccountSetupPage />} />
     </Route>
-    <Route path="/overview" element={<OverviewLayout />} errorElement={<NotFound />}>
+    <Route path="elections/" element={<OverviewLayout />} errorElement={<NotFound />}>
       <Route index element={<OverviewPage />} />
-    </Route>
-    <Route path="elections/:electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
-      <Route path="data-entry" element={<DataEntryLayout />}>
-        <Route index element={<DataEntryHomePage />} />
-        <Route path=":pollingStationId" element={<PollingStationLayout />}>
-          {/* The PollingStationFormController will navigate to the correct section. */}
-          <Route index element={null} />
-          <Route path="recounted" element={<RecountedPage />} />
-          <Route path="voters-and-votes" element={<VotersAndVotesPage />} />
-          <Route path="differences" element={<DifferencesPage />} />
-          <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-          <Route path="save" element={<CheckAndSaveForm />} />
+      <Route path=":electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
+        <Route index element={<ElectionHomePage />} />
+        <Route path="data-entry" element={<DataEntryLayout />}>
+          <Route index element={<DataEntryHomePage />} />
+          <Route path=":pollingStationId" element={<PollingStationLayout />}>
+            {/* The PollingStationFormController will navigate to the correct section. */}
+            <Route index element={null} />
+            <Route path="recounted" element={<RecountedPage />} />
+            <Route path="voters-and-votes" element={<VotersAndVotesPage />} />
+            <Route path="differences" element={<DifferencesPage />} />
+            <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
+            <Route path="save" element={<CheckAndSaveForm />} />
+          </Route>
+          <Route path="finalise" element={<FinaliseElectionPage />} />
         </Route>
-        <Route path="finalise" element={<FinaliseElectionPage />} />
       </Route>
     </Route>
   </Route>,

@@ -48,7 +48,7 @@
 
   &.ghost {
     background: transparent;
-    border: 1px solid transparent;
+    border: none;
     box-shadow: none;
     svg {
       fill: var(--button-icon-ghost-color-svg);
@@ -57,7 +57,7 @@
     &:focus-visible {
       border: 2px solid var(--button-icon-ghost-color-border-focus);
       background: var(--button-icon-ghost-color-bg-focus);
-      padding: calc(0.5rem - 1px);
+      padding: calc(0.5rem - 2px);
     }
     &:hover {
       background: var(--button-icon-ghost-color-bg-hover);

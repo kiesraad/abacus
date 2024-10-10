@@ -68,7 +68,7 @@
 
   --button-icon-modal-close-color-svg: var(--menu-empty);
   --button-icon-ghost-color-svg: var(--base-black);
-  --button-icon-ghost-color-border-focus: var(--checkbox-color-border);
+  --button-icon-ghost-color-border-focus: var(--checkbox-radio-color-border);
   --button-icon-ghost-color-bg-focus: var(--bg-gray-darker);
   --button-icon-ghost-color-bg-hover: var(--bg-gray-darker);
 

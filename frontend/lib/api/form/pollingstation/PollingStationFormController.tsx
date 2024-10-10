@@ -154,7 +154,7 @@ export function PollingStationFormController({
   defaultFormState = undefined,
   defaultCurrentForm = null,
 }: PollingStationFormControllerProps) {
-  const request_path: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+  const requestPath: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
   const { client } = useApi();
   const navigate = useNavigate();
   const location = useLocation();
@@ -181,7 +181,7 @@ export function PollingStationFormController({
     return true;
   }, []);
 
-  const initialDataRequest = useApiGetRequest<GetDataEntryResponse>(request_path);
+  const initialDataRequest = useApiGetRequest<GetDataEntryResponse>(requestPath);
   React.useEffect(() => {
     if (initialDataRequest.data) {
       const responseData = initialDataRequest.data;
@@ -202,15 +202,41 @@ export function PollingStationFormController({
     } else if (initialDataRequest.error) {
       if (initialDataRequest.error.code === 404) {
         // data entry not found, set initial values
-        setValues(getInitialValues(election, defaultValues));
-        setFormState(getInitialFormState(election, defaultFormState));
+        const values = getInitialValues(election, defaultValues);
+        const formState = getInitialFormState(election, defaultFormState);
+        setValues(values);
+        setFormState(formState);
         setTargetFormSectionID(INITIAL_FORM_SECTION_ID);
+
+        // save initial data entry
+        const clientState = getClientState(formState, false, false);
+        const requestBody: SaveDataEntryRequest = {
+          data: values,
+          client_state: clientState,
+        };
+        void client.postRequest(requestPath, requestBody).then((response) => {
+          if (response.status !== ApiResponseStatus.Success) {
+            // TODO: #277 render custom error page
+            console.error("Failed to save data entry", response);
+            setApiError(response);
+            throw new Error("Failed to save data entry");
+          }
+        });
       } else {
         setApiError(initialDataRequest.error);
         throw new Error("Failed to load data entry");
       }
     }
-  }, [defaultValues, defaultFormState, election, pollingStationId, initialDataRequest.data, initialDataRequest.error]);
+  }, [
+    defaultValues,
+    defaultFormState,
+    election,
+    pollingStationId,
+    initialDataRequest.data,
+    initialDataRequest.error,
+    client,
+    requestPath,
+  ]);
 
   // check if the targetFormSectionID has changed and navigate to the url for that section
   React.useEffect(() => {
@@ -316,7 +342,7 @@ export function PollingStationFormController({
 
     // send data to server
     status.current = "saving";
-    const response = await client.postRequest(request_path, {
+    const response = await client.postRequest(requestPath, {
       data: newValues,
       client_state: clientState,
     } satisfies SaveDataEntryRequest);
@@ -341,7 +367,7 @@ export function PollingStationFormController({
 
   const deleteDataEntry = async () => {
     status.current = "deleting";
-    const response = await client.deleteRequest(request_path);
+    const response = await client.deleteRequest(requestPath);
     // ignore 404, as it means the data entry was never saved or already deleted
     if (response.status !== ApiResponseStatus.Success && response.code !== 404) {
       // TODO: #277 render custom error page
@@ -354,7 +380,7 @@ export function PollingStationFormController({
 
   const finaliseDataEntry = async () => {
     status.current = "finalising";
-    const response = await client.postRequest(request_path + "/finalise");
+    const response = await client.postRequest(requestPath + "/finalise");
     if (response.status !== ApiResponseStatus.Success) {
       console.error("Failed to finalise data entry", response);
       status.current = "idle";

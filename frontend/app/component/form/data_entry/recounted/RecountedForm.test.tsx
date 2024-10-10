@@ -21,11 +21,12 @@ describe("Test RecountedForm", () => {
       render(Component);
 
       const user = userEvent.setup();
-      const spy = vi.spyOn(global, "fetch");
 
       const yes = await screen.findByTestId("yes");
       await user.click(yes);
       expect(yes).toBeChecked();
+
+      const spy = vi.spyOn(global, "fetch");
 
       await user.keyboard("{enter}");
 
@@ -92,11 +93,12 @@ describe("Test RecountedForm", () => {
 
       render(Component);
 
-      const spy = vi.spyOn(global, "fetch");
       const user = userEvent.setup();
 
       const yes = await screen.findByTestId("yes");
       await user.click(yes);
+
+      const spy = vi.spyOn(global, "fetch");
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);

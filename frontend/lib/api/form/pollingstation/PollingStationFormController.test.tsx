@@ -80,18 +80,6 @@ describe("PollingStationFormController", () => {
   });
 
   test("It filters out global errors", async () => {
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-      validation_results: {
-        errors: [
-          {
-            fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
-            code: "F204",
-          },
-        ],
-        warnings: [],
-      },
-    });
-
     const { result } = renderHook(() => usePollingStationFormController(), {
       wrapper: Wrapper,
     });
@@ -125,6 +113,18 @@ describe("PollingStationFormController", () => {
     await waitFor(() => {
       // wait for the form state to be updated after registering the form
       expect(result.current.formState.current).toBe("voters_votes_counts");
+    });
+
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      validation_results: {
+        errors: [
+          {
+            fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
+            code: "F204",
+          },
+        ],
+        warnings: [],
+      },
     });
 
     await result.current.submitCurrentForm();

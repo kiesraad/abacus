@@ -126,7 +126,7 @@ describe("PollingStationFormNavigation", () => {
         }),
       ).toBe(false);
 
-      const title = await screen.findByTestId("modal-blocker-title");
+      const title = await screen.findByTestId("modal-title");
       expect(title).toBeInTheDocument();
     }
   });

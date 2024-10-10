@@ -7,11 +7,7 @@ import { Modal } from "./Modal";
 const component = (onClose: () => void) => (
   <div>
     <div id="modal"></div>
-    <Modal id="modal-title" onClose={onClose}>
-      <h2 id="modal-title" tabIndex={-1}>
-        Modal
-      </h2>
-    </Modal>
+    <Modal title="Modal Title" onClose={onClose} />
   </div>
 );
 
@@ -27,7 +23,7 @@ describe("UI component: Modal", () => {
     const { baseElement } = render(component(() => {}));
     const modal = getQueriesForElement(baseElement).getByRole("dialog");
 
-    expect(modal).toHaveTextContent("Modal");
+    expect(modal).toHaveTextContent("Modal Title");
     expect(screen.getByTestId("modal-title")).toHaveFocus();
   });
 });

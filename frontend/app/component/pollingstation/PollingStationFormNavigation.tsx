@@ -120,14 +120,11 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
             />
           ) : (
             <Modal
-              id="modal-blocker-title"
+              title="Let op: niet opgeslagen wijzigingen"
               onClose={() => {
                 blocker.reset();
               }}
             >
-              <h2 id="modal-blocker-title" tabIndex={-1}>
-                Let op: niet opgeslagen wijzigingen
-              </h2>
               <p>
                 Je hebt in <strong>{formState.sections[formState.current]?.title || "het huidige formulier"}</strong>{" "}
                 wijzigingen gemaakt die nog niet zijn opgeslagen.

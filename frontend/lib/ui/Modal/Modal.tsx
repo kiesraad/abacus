@@ -6,12 +6,12 @@ import { IconButton } from "@kiesraad/ui";
 import cls from "./Modal.module.css";
 
 export interface ModalProps {
-  id: string;
+  title: string;
   onClose?: () => void;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
-export function Modal({ id, onClose, children }: ModalProps): ReactNode {
+export function Modal({ title, onClose, children }: ModalProps): ReactNode {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const lastActiveElement = useRef<HTMLElement | null>(null);
 
@@ -19,9 +19,9 @@ export function Modal({ id, onClose, children }: ModalProps): ReactNode {
     if (dialogRef.current && !dialogRef.current.open) {
       lastActiveElement.current = document.activeElement as HTMLElement;
       dialogRef.current.showModal();
-      document.getElementById(id)?.focus();
+      document.getElementById("modal-title")?.focus();
     }
-  }, [id]);
+  }, []);
 
   return (
     <dialog id="modal-dialog" className={cls.modal} ref={dialogRef}>
@@ -42,7 +42,12 @@ export function Modal({ id, onClose, children }: ModalProps): ReactNode {
             variant="ghost"
           />
         )}
-        <div className={cls["modal-body"]}>{children}</div>
+        <div className={cls["modal-body"]}>
+          <h2 id="modal-title" tabIndex={-1}>
+            {title}
+          </h2>
+          {children}
+        </div>
       </div>
     </dialog>
   );

@@ -20,11 +20,11 @@ const startPollingStationInput = async () => {
   expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1");
 };
 
-const expectRecountedForm = async (headingShouldNotHaveFocus?: boolean) => {
+const expectRecountedForm = async (headingShouldHaveFocus = true) => {
   await waitFor(() => {
     expect(screen.getByTestId("recounted_form")).toBeInTheDocument();
   });
-  if (!headingShouldNotHaveFocus) {
+  if (headingShouldHaveFocus) {
     await waitFor(() => {
       expect(screen.getByRole("heading", { level: 2, name: "Is er herteld?" })).toHaveFocus();
     });
@@ -39,11 +39,11 @@ const fillRecountedFormYes = async () => {
   await user.click(screen.getByLabelText("Ja, er was een hertelling"));
 };
 
-const expectVotersAndVotesForm = async (headingShouldNotHaveFocus?: boolean) => {
+const expectVotersAndVotesForm = async (headingShouldHaveFocus = true) => {
   await waitFor(() => {
     expect(screen.getByTestId("voters_and_votes_form")).toBeInTheDocument();
   });
-  if (!headingShouldNotHaveFocus) {
+  if (headingShouldHaveFocus) {
     await waitFor(() => {
       expect(
         screen.getByRole("heading", { level: 2, name: "Toegelaten kiezers en uitgebrachte stemmen" }),
@@ -69,11 +69,11 @@ const fillVotersAndVotesForm = async (values?: Record<string, number>) => {
   await userTypeInputs(user, userValues);
 };
 
-const expectDifferencesForm = async (headingShouldNotHaveFocus?: boolean) => {
+const expectDifferencesForm = async (headingShouldHaveFocus = true) => {
   await waitFor(() => {
     expect(screen.getByTestId("differences_form")).toBeInTheDocument();
   });
-  if (!headingShouldNotHaveFocus) {
+  if (headingShouldHaveFocus) {
     await waitFor(() => {
       expect(
         screen.getByRole("heading", {
@@ -99,11 +99,11 @@ const fillDifferencesForm = async (values?: Record<string, number>) => {
   await userTypeInputs(user, userValues);
 };
 
-const expectPoliticalGroupCandidatesForm = async (pgNumber: number, headingShouldNotHaveFocus?: boolean) => {
+const expectPoliticalGroupCandidatesForm = async (pgNumber: number, headingShouldHaveFocus = true) => {
   await waitFor(() => {
     expect(screen.getByTestId(`candidates_form_${pgNumber}`)).toBeInTheDocument();
   });
-  if (!headingShouldNotHaveFocus) {
+  if (headingShouldHaveFocus) {
     await waitFor(() => {
       expect(screen.getByRole("heading", { level: 2 })).toHaveFocus();
     });
@@ -118,11 +118,11 @@ const fillPoliticalGroupCandidatesVotesForm = async () => {
   });
 };
 
-const expectCheckAndSavePage = async (headingShouldNotHaveFocus?: boolean) => {
+const expectCheckAndSavePage = async (headingShouldHaveFocus = true) => {
   await waitFor(() => {
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/save");
   });
-  if (!headingShouldNotHaveFocus) {
+  if (headingShouldHaveFocus) {
     await waitFor(() => {
       expect(screen.getByRole("heading", { level: 2, name: "Controleren en opslaan" })).toHaveFocus();
     });
@@ -161,8 +161,8 @@ const acceptWarnings = async () => {
 };
 
 const expectBlockerModal = async () => {
-  expect(await screen.findByTestId("modal-blocker-title")).toHaveFocus();
-  expect(await screen.findByTestId("modal-blocker-title")).toHaveTextContent("Let op: niet opgeslagen wijzigingen");
+  expect(await screen.findByTestId("modal-title")).toHaveFocus();
+  expect(await screen.findByTestId("modal-title")).toHaveTextContent("Let op: niet opgeslagen wijzigingen");
 };
 
 const expectElementContainsIcon = async (id: string, ariaLabel: string) => {
@@ -220,28 +220,28 @@ const expect500ServerError = async () => {
 
 type FormIdentifier = "recounted" | "voters_and_votes" | "differences" | `candidates_${number}`;
 
-const gotoForm = async (id: FormIdentifier, headingShouldNotHaveFocus?: boolean) => {
+const gotoForm = async (id: FormIdentifier, headingShouldHaveFocus = true) => {
   if (id.startsWith("candidates_")) {
     const bits = id.split("_");
     if (bits.length === 2 && bits[1]) {
       const pgNumber = parseInt(bits[1]);
       await userEvent.click(screen.getByRole("link", { name: `Lijst ${pgNumber}` }));
-      await expectPoliticalGroupCandidatesForm(pgNumber, headingShouldNotHaveFocus);
+      await expectPoliticalGroupCandidatesForm(pgNumber, headingShouldHaveFocus);
       return;
     }
   }
   switch (id) {
     case "recounted":
       await userEvent.click(screen.getByRole("link", { name: "Is er herteld?" }));
-      await expectRecountedForm(headingShouldNotHaveFocus);
+      await expectRecountedForm(headingShouldHaveFocus);
       break;
     case "voters_and_votes":
       await userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
-      await expectVotersAndVotesForm(headingShouldNotHaveFocus);
+      await expectVotersAndVotesForm(headingShouldHaveFocus);
       break;
     case "differences":
       await userEvent.click(screen.getByRole("link", { name: "Verschillen" }));
-      await expectDifferencesForm(headingShouldNotHaveFocus);
+      await expectDifferencesForm(headingShouldHaveFocus);
       break;
   }
 };
@@ -336,7 +336,7 @@ describe("Polling Station data entry integration tests", () => {
           fillPoliticalGroupCandidatesVotesForm,
           submit,
         ]),
-        () => expectVotersAndVotesForm(true),
+        () => expectVotersAndVotesForm(false),
         () => expectFeedbackError("F.204"),
       ];
 
@@ -547,7 +547,7 @@ describe("Polling Station data entry integration tests", () => {
             total_votes_cast_count: total_votes,
           }),
         submit,
-        () => expectDifferencesForm(true),
+        () => expectDifferencesForm(false),
         () => fillDifferencesForm({ fewer_ballots_count: 1, no_explanation_count: 2 }),
         submit,
         () => expectFeedbackWarning("W.302"),
@@ -563,8 +563,8 @@ describe("Polling Station data entry integration tests", () => {
             total_admitted_voters_count: 1,
           }),
         submit,
-        () => expectVotersAndVotesForm(true),
-        () => gotoForm("differences", true),
+        () => expectVotersAndVotesForm(false),
+        () => gotoForm("differences", false),
         () => expectElementContainsIcon("list-item-voters-and-votes", "bevat een fout"),
       ];
 

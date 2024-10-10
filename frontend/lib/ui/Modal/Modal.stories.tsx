@@ -5,10 +5,7 @@ import { Button } from "@kiesraad/ui";
 import { Modal } from "./Modal";
 
 export const DefaultModal: Story = () => (
-  <Modal id="modal-title" onClose={() => {}}>
-    <h2 id="modal-title" tabIndex={-1}>
-      Wat wil je doen met je invoer?
-    </h2>
+  <Modal title="Wat wil je doen met je invoer?" onClose={() => {}}>
     <p>
       Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de invoer die je al hebt gedaan
       bewaren.

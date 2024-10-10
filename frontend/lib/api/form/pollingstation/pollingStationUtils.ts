@@ -42,6 +42,9 @@ export function addValidationResultToFormState(
     uniqueRootSections.forEach((fieldSection) => {
       const { name: rootSection, index } = fieldSection;
       switch (rootSection) {
+        case "recounted":
+          checkAndAddValidationResult(formState.sections.recounted, target, validationResult);
+          break;
         case "votes_counts":
         case "voters_counts":
         case "voters_recounts":

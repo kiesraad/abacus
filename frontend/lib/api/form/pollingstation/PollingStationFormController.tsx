@@ -1,7 +1,7 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { getUrlForFormSectionID } from "app/component/pollingstation/utils";
+import { getBaseUrl, getUrlForFormSectionID } from "app/component/pollingstation/utils";
 
 import {
   ApiError,
@@ -24,16 +24,12 @@ import {
   VotersRecounts,
 } from "@kiesraad/api";
 
-export interface PollingStationValues extends Omit<PollingStationResults, "recounted"> {
-  recounted: boolean | undefined;
-}
-
 export interface PollingStationFormControllerProps {
   election: Required<Election>;
   pollingStationId: number;
   entryNumber: number;
   children: React.ReactNode;
-  defaultValues?: Partial<PollingStationValues>;
+  defaultValues?: Partial<PollingStationResults>;
   defaultFormState?: Partial<FormState>;
   defaultCurrentForm?: AnyFormReference | null;
 }
@@ -45,7 +41,7 @@ export interface FormReference<T> {
   getAcceptWarnings?: () => boolean;
 }
 
-export interface FormReferenceRecounted extends FormReference<Pick<PollingStationValues, "recounted">> {
+export interface FormReferenceRecounted extends FormReference<Pick<PollingStationResults, "recounted">> {
   type: "recounted";
 }
 
@@ -85,7 +81,7 @@ export interface iPollingStationControllerContext {
   status: React.RefObject<Status>;
   apiError: ApiError | null;
   formState: FormState;
-  values: PollingStationValues;
+  values: PollingStationResults;
   setTemporaryCache: (cache: TemporaryCache | null) => boolean;
   cache: TemporaryCache | null;
   currentForm: AnyFormReference | null;
@@ -158,11 +154,12 @@ export function PollingStationFormController({
   defaultFormState = undefined,
   defaultCurrentForm = null,
 }: PollingStationFormControllerProps) {
-  const request_path: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+  const requestPath: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
   const { client } = useApi();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [values, setValues] = React.useState<PollingStationValues>();
+  const [values, setValues] = React.useState<PollingStationResults>();
   const [formState, setFormState] = React.useState<FormState>();
 
   // TODO: #277 render custom error page instead of passing error down
@@ -184,7 +181,7 @@ export function PollingStationFormController({
     return true;
   }, []);
 
-  const initialDataRequest = useApiGetRequest<GetDataEntryResponse>(request_path);
+  const initialDataRequest = useApiGetRequest<GetDataEntryResponse>(requestPath);
   React.useEffect(() => {
     if (initialDataRequest.data) {
       const responseData = initialDataRequest.data;
@@ -205,23 +202,53 @@ export function PollingStationFormController({
     } else if (initialDataRequest.error) {
       if (initialDataRequest.error.code === 404) {
         // data entry not found, set initial values
-        setValues(getInitialValues(election, defaultValues));
-        setFormState(getInitialFormState(election, defaultFormState));
+        const values = getInitialValues(election, defaultValues);
+        const formState = getInitialFormState(election, defaultFormState);
+        setValues(values);
+        setFormState(formState);
         setTargetFormSectionID(INITIAL_FORM_SECTION_ID);
+
+        // save initial data entry
+        const clientState = getClientState(formState, false, false);
+        const requestBody: SaveDataEntryRequest = {
+          data: values,
+          client_state: clientState,
+        };
+        void client.postRequest(requestPath, requestBody).then((response) => {
+          if (response.status !== ApiResponseStatus.Success) {
+            // TODO: #277 render custom error page
+            console.error("Failed to save data entry", response);
+            setApiError(response);
+            throw new Error("Failed to save data entry");
+          }
+        });
       } else {
         setApiError(initialDataRequest.error);
         throw new Error("Failed to load data entry");
       }
     }
-  }, [defaultValues, defaultFormState, election, pollingStationId, initialDataRequest.data, initialDataRequest.error]);
+  }, [
+    defaultValues,
+    defaultFormState,
+    election,
+    pollingStationId,
+    initialDataRequest.data,
+    initialDataRequest.error,
+    client,
+    requestPath,
+  ]);
 
   // check if the targetFormSectionID has changed and navigate to the url for that section
   React.useEffect(() => {
     if (!targetFormSectionID) return;
     const url = getUrlForFormSectionID(election.id, pollingStationId, targetFormSectionID);
-    navigate(url);
+    if (location.pathname === getBaseUrl(election.id, pollingStationId)) {
+      navigate(url, { replace: true });
+    } else if (location.pathname !== url) {
+      navigate(url);
+    }
     setTargetFormSectionID(null);
-  }, [targetFormSectionID, navigate, election.id, pollingStationId]);
+  }, [targetFormSectionID, navigate, election.id, pollingStationId, location.pathname]);
 
   const registerCurrentForm = React.useCallback(
     (form: AnyFormReference) => {
@@ -260,7 +287,7 @@ export function PollingStationFormController({
     continueToNextSection = true,
   }: SubmitCurrentFormOptions = {}) => {
     // React state is fixed within one render, so we update our own copy instead of using setValues directly
-    let newValues: PollingStationValues = structuredClone(values);
+    let newValues: PollingStationResults = structuredClone(values);
     if (currentForm.current) {
       const ref: AnyFormReference = currentForm.current;
 
@@ -311,17 +338,12 @@ export function PollingStationFormController({
     }
 
     // prepare data to send to server
-    const pollingStationResults: PollingStationResults = {
-      ...newValues,
-      recounted: newValues.recounted !== undefined ? newValues.recounted : false,
-      voters_recounts: newValues.recounted ? newValues.voters_recounts : undefined,
-    };
     const clientState = getClientState(formState, acceptWarnings, continueToNextSection);
 
     // send data to server
     status.current = "saving";
-    const response = await client.postRequest(request_path, {
-      data: pollingStationResults,
+    const response = await client.postRequest(requestPath, {
+      data: newValues,
       client_state: clientState,
     } satisfies SaveDataEntryRequest);
     status.current = aborting ? "aborted" : "idle";
@@ -345,7 +367,7 @@ export function PollingStationFormController({
 
   const deleteDataEntry = async () => {
     status.current = "deleting";
-    const response = await client.deleteRequest(request_path);
+    const response = await client.deleteRequest(requestPath);
     // ignore 404, as it means the data entry was never saved or already deleted
     if (response.status !== ApiResponseStatus.Success && response.code !== 404) {
       // TODO: #277 render custom error page
@@ -358,7 +380,7 @@ export function PollingStationFormController({
 
   const finaliseDataEntry = async () => {
     status.current = "finalising";
-    const response = await client.postRequest(request_path + "/finalise");
+    const response = await client.postRequest(requestPath + "/finalise");
     if (response.status !== ApiResponseStatus.Success) {
       console.error("Failed to finalise data entry", response);
       status.current = "idle";

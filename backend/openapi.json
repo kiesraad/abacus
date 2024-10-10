@@ -878,7 +878,6 @@
         "type": "object",
         "description": "PollingStationResults, following the fields in Model Na 31-2 Bijage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
         "required": [
-          "recounted",
           "voters_counts",
           "votes_counts",
           "differences_counts",
@@ -897,7 +896,8 @@
           },
           "recounted": {
             "type": "boolean",
-            "description": "Recounted (\"Is er herteld? - See form for official long description of the checkbox\")"
+            "description": "Recounted (\"Is er herteld? - See form for official long description of the checkbox\")",
+            "nullable": true
           },
           "voters_counts": {
             "$ref": "#/components/schemas/VotersCounts"
@@ -998,6 +998,7 @@
       "ValidationResultCode": {
         "type": "string",
         "enum": [
+          "F101",
           "F201",
           "F202",
           "F203",

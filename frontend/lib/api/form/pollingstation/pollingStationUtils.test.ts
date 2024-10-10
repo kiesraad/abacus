@@ -15,12 +15,12 @@ import {
   hasOnlyGlobalValidationResults,
   isFormSectionEmpty,
   isGlobalValidationResult,
-  PollingStationValues,
+  PollingStationResults,
   resetFormSectionState,
   ValidationResult,
 } from "@kiesraad/api";
 
-const defaultValues: PollingStationValues = emptyDataEntryRequest.data;
+const defaultValues: PollingStationResults = emptyDataEntryRequest.data;
 
 describe("PollingStationUtils", () => {
   test("addValidationResultToFormState adds result to correct section", () => {

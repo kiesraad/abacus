@@ -1,7 +1,11 @@
 import { FormSectionID } from "@kiesraad/api";
 
+export function getBaseUrl(electionId: number, pollingStationId: number) {
+  return `/elections/${electionId}/data-entry/${pollingStationId}`;
+}
+
 export function getUrlForFormSectionID(electionId: number, pollingStationId: number, sectionId: FormSectionID) {
-  const baseUrl = `/elections/${electionId}/data-entry/${pollingStationId}`;
+  const baseUrl = getBaseUrl(electionId, pollingStationId);
 
   let url: string = "";
   if (sectionId.startsWith("political_group_votes_")) {

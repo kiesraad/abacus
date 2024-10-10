@@ -13,13 +13,13 @@ import { emptyDataEntryRequest } from "app/test/unit/form";
 import {
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationFormController,
-  PollingStationValues,
+  PollingStationResults,
 } from "@kiesraad/api";
 import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { DifferencesForm } from "./DifferencesForm";
 
-function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
+function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
   return render(
     <PollingStationFormController
       election={electionMockData}
@@ -48,11 +48,12 @@ describe("Test DifferencesForm", () => {
       const user = userEvent.setup();
 
       renderForm({ recounted: false });
-      const spy = vi.spyOn(global, "fetch");
 
       const moreBallotsCount = await screen.findByTestId("more_ballots_count");
       await user.type(moreBallotsCount, "12345");
       expect(moreBallotsCount).toHaveValue("12345");
+
+      const spy = vi.spyOn(global, "fetch");
 
       await user.keyboard("{enter}");
 
@@ -183,6 +184,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ ...votersAndVotesValues });
 
+      await screen.findByTestId("differences_form");
       const spy = vi.spyOn(global, "fetch");
 
       await userTypeInputs(user, {
@@ -203,16 +205,17 @@ describe("Test DifferencesForm", () => {
 
   describe("DifferencesForm errors", () => {
     test("F.301 IncorrectDifference", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [{ fields: ["data.differences_counts.more_ballots_count"], code: "F301" }],
           warnings: [],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -237,16 +240,17 @@ describe("Test DifferencesForm", () => {
     });
 
     test("F.302 Should be empty", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [{ fields: ["data.differences_counts.fewer_ballots_count"], code: "F302" }],
           warnings: [],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: true });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -271,16 +275,17 @@ describe("Test DifferencesForm", () => {
     });
 
     test("F.303 IncorrectDifference", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [{ fields: ["data.differences_counts.fewer_ballots_count"], code: "F303" }],
           warnings: [],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -305,16 +310,17 @@ describe("Test DifferencesForm", () => {
     });
 
     test("F.304 Should be empty", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [{ fields: ["data.differences_counts.more_ballots_count"], code: "F304" }],
           warnings: [],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: true });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -339,6 +345,11 @@ describe("Test DifferencesForm", () => {
     });
 
     test("F.305 No difference expected", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -357,10 +368,6 @@ describe("Test DifferencesForm", () => {
           warnings: [],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -387,6 +394,11 @@ describe("Test DifferencesForm", () => {
 
   describe("DifferencesForm warnings", () => {
     test("clicking next without accepting warning results in alert shown and then accept warning", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -405,10 +417,6 @@ describe("Test DifferencesForm", () => {
           ],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -454,6 +462,11 @@ describe("Test DifferencesForm", () => {
     });
 
     test("W.301 Incorrect total", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -472,10 +485,6 @@ describe("Test DifferencesForm", () => {
           ],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -500,6 +509,11 @@ describe("Test DifferencesForm", () => {
     });
 
     test("W.302 Incorrect total", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("differences_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -518,10 +532,6 @@ describe("Test DifferencesForm", () => {
           ],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);

@@ -1,5 +1,4 @@
-import * as React from "react";
-import { ReactNode } from "react";
+import { useEffect, useRef } from "react";
 
 import { ApiError } from "@kiesraad/api";
 import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";
@@ -14,11 +13,10 @@ interface FeedbackProps {
   data?: ClientValidationResultCode[];
   // TODO: #277 move to error page or modal
   apiError?: ApiError;
-  children?: ReactNode;
 }
 
-export const Feedback = ({ id, type, data, apiError, children }: FeedbackProps) => {
-  const feedbackHeader = React.useRef<HTMLHeadingElement | null>(null);
+export function Feedback({ id, type, data, apiError }: FeedbackProps) {
+  const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
   const feedbackList: FeedbackItem[] = [];
   if (data) {
     for (const code of data) {
@@ -26,7 +24,7 @@ export const Feedback = ({ id, type, data, apiError, children }: FeedbackProps) 
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     feedbackHeader.current?.focus();
   }, []);
 
@@ -57,32 +55,29 @@ export const Feedback = ({ id, type, data, apiError, children }: FeedbackProps) 
           <div className="content">{feedback.content}</div>
         </div>
       ))}
-      {(children || feedbackList.length > 0) && (
+      {feedbackList.length > 0 && (
         <div className="feedback-action">
-          {children ? (
-            children
+          {feedbackList.length > 1 ? (
+            <h3>Voor alle {type === "error" ? "foutmeldingen" : "waarschuwingen"} geldt het volgende:</h3>
           ) : (
-            <>
-              {feedbackList.length > 1 ? (
-                <h3>Voor alle {type === "error" ? "foutmeldingen" : "waarschuwingen"} geldt het volgende:</h3>
+            <></>
+          )}
+          {feedbackList.length > 1 || !feedbackList[0]?.action ? (
+            <ul>
+              <li>Heb je iets niet goed overgenomen? Herstel de fout en ga verder.</li>
+              {type === "error" ? (
+                <li>
+                  Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.
+                </li>
               ) : (
-                <></>
+                <li>Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.</li>
               )}
-              <ul>
-                <li>Heb je iets niet goed overgenomen? Herstel de fout en ga verder.</li>
-                {type === "error" ? (
-                  <li>
-                    Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de
-                    coördinator.
-                  </li>
-                ) : (
-                  <li>Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.</li>
-                )}
-              </ul>
-            </>
+            </ul>
+          ) : (
+            feedbackList[0].action
           )}
         </div>
       )}
     </article>
   );
-};
+}

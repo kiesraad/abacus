@@ -13,13 +13,13 @@ import {
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationFormController,
-  PollingStationValues,
+  PollingStationResults,
 } from "@kiesraad/api";
 import { electionMockData, politicalGroupMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
-function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
+function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
   return render(
     <PollingStationFormController
       election={electionMockData}
@@ -44,11 +44,12 @@ describe("Test CandidatesVotesForm", () => {
       const user = userEvent.setup();
 
       renderForm({ recounted: false });
-      const spy = vi.spyOn(global, "fetch");
 
       const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12345");
+
+      const spy = vi.spyOn(global, "fetch");
 
       await user.keyboard("{enter}");
 
@@ -285,16 +286,17 @@ describe("Test CandidatesVotesForm", () => {
 
   describe("CandidatesVotesForm errors", () => {
     test("F.401 IncorrectTotal group total", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("candidates_form_1");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [{ fields: ["data.political_group_votes[0]"], code: "F401" }],
           warnings: [],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -316,16 +318,17 @@ describe("Test CandidatesVotesForm", () => {
 
   describe("CandidatesVotesForm warnings", () => {
     test("Imagined warning on this form", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("candidates_form_1");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
           warnings: [{ fields: ["data.political_group_votes[0]"], code: "F401" }],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);

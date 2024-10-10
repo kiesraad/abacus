@@ -9,6 +9,7 @@ export interface FeedbackItem {
   title: string;
   code?: string;
   content: ReactNode;
+  action?: ReactNode;
 }
 
 export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: FeedbackItem } = {
@@ -16,6 +17,13 @@ export const feedbackTypes: { [feedbackCode in ClientValidationResultCode]: Feed
     title: "Controleer het papieren proces-verbaal",
     code: "F.101",
     content: <span>Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?</span>,
+    action: (
+      <ul>
+        <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
+        <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
+        <li>Geen vinkje? Kies dan 'nee'.</li>
+      </ul>
+    ),
   },
   F201: {
     title: "Controleer toegelaten kiezers",

@@ -6,7 +6,7 @@ import {
   MultipleErrors,
   MultipleWarnings,
   SingleError,
-  SingleErrorWithCustomAction,
+  SingleErrorCustomAction,
   SingleServerError,
   SingleWarning,
 } from "./Feedback.stories";
@@ -25,14 +25,12 @@ describe("UI component: Feedback", () => {
     ).toBeInTheDocument();
   });
 
-  test("Single Error With Custom Action has expected children", () => {
-    const { getByText } = render(<SingleErrorWithCustomAction />);
+  test("Single error with custom action does not have default action text", () => {
+    const { getByText, queryByText } = render(<SingleErrorCustomAction />);
 
     expect(getByText("Controleer het papieren proces-verbaal")).toBeInTheDocument();
     expect(getByText("F.101")).toBeInTheDocument();
-    expect(getByText("Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'")).toBeInTheDocument();
-    expect(getByText("Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator")).toBeInTheDocument();
-    expect(getByText("Geen vinkje? Kies dan 'nee'.")).toBeInTheDocument();
+    expect(queryByText("Heb je iets niet goed overgenomen? Herstel de fout en ga verder.")).not.toBeInTheDocument();
   });
 
   test("Multiple errors has expected children", () => {

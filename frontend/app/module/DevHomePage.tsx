@@ -20,6 +20,9 @@ export function DevHomePage() {
           <li>
             <Link to={`/elections/1/data-entry`}>Input</Link>
           </li>
+          <li>
+            <Link to={`/elections/1/polling-stations`}>Polling stations</Link>
+          </li>
         </ul>
 
         {__API_MSW__ && <MockTest />}

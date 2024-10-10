@@ -11,7 +11,7 @@ use hyper::StatusCode;
 pub fn example_data_entry() -> SaveDataEntryRequest {
     SaveDataEntryRequest {
         data: PollingStationResults {
-            recounted: false,
+            recounted: Some(false),
             voters_counts: VotersCounts {
                 poll_card_count: 100,
                 proxy_certificate_count: 2,

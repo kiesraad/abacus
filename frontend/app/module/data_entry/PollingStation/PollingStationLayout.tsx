@@ -28,7 +28,7 @@ export function PollingStationLayout() {
       <PageTitle title={`Invoeren ${pollingStation.number} ${pollingStation.name} - Abacus`} />
       <NavBar>
         <Link to={"/elections"}>Overzicht</Link>
-        <IconChevronRight style={{ fill: "white" }} />
+        <IconChevronRight />
         <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
       </NavBar>
       <header>

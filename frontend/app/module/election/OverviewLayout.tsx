@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 
-import { Footer } from "app/component/footer/Footer.tsx";
-import { NavBar } from "app/component/navbar/NavBar.tsx";
+import { Footer } from "app/component/footer/Footer";
+import { NavBar } from "app/component/navbar/NavBar";
 
 import { ElectionListProvider } from "@kiesraad/api";
 import { PageTitle } from "@kiesraad/ui";

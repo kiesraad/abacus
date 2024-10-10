@@ -182,7 +182,7 @@ Bijlage 2: uitkomsten per stembureau" from the
 export interface PollingStationResults {
   differences_counts: DifferencesCounts;
   political_group_votes: PoliticalGroupVotes[];
-  recounted: boolean;
+  recounted?: boolean;
   voters_counts: VotersCounts;
   voters_recounts?: VotersRecounts;
   votes_counts: VotesCounts;
@@ -221,6 +221,7 @@ export interface ValidationResult {
 }
 
 export type ValidationResultCode =
+  | "F101"
   | "F201"
   | "F202"
   | "F203"

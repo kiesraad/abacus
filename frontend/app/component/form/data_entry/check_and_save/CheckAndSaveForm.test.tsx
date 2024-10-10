@@ -7,14 +7,14 @@ import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/C
 import { overrideOnce, render, screen, server, within } from "app/test/unit";
 import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/test/unit/form";
 
-import { ElectionProvider, FormState, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
+import { ElectionProvider, FormState, PollingStationFormController, PollingStationResults } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionMockData } from "@kiesraad/api-mocks";
 
 const mockNavigate = vi.fn();
 
 const defaultValues = emptyDataEntryRequest.data;
 
-function renderForm(defaultFormState: Partial<FormState> = {}, defaultValues?: Partial<PollingStationValues>) {
+function renderForm(defaultFormState: Partial<FormState> = {}, defaultValues?: Partial<PollingStationResults>) {
   return render(
     <ElectionProvider electionId={1}>
       <PollingStationFormController
@@ -42,7 +42,7 @@ describe("Test CheckAndSaveForm", () => {
 
     // set up a listener to check if the finalisation request is made
     let request_method, request_url;
-    overrideOnce("delete", "/api/polling_stations/1/data_entries/1/finalise", 200, null);
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, null);
     server.events.on("request:start", ({ request }) => {
       request_method = request.method;
       request_url = request.url;
@@ -61,6 +61,8 @@ describe("Test CheckAndSaveForm", () => {
 
   test("Shift+Enter submits form", async () => {
     renderForm();
+
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, null);
 
     const user = userEvent.setup();
     const spy = vi.spyOn(global, "fetch");

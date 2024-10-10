@@ -2,6 +2,7 @@ import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { FinaliseElectionPage } from "app/module/data_entry/page/FinaliseElectionPage";
+import { NotAvailableInMock } from "app/module/NotAvailableInMock.tsx";
 
 import {
   CandidatesVotesPage,
@@ -44,7 +45,10 @@ export const routes = createRoutesFromElements(
           <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
           <Route path="save" element={<CheckAndSaveForm />} />
         </Route>
-        <Route path="finalise" element={<FinaliseElectionPage />} />
+        <Route
+          path="finalise"
+          element={__API_MSW__ ? <NotAvailableInMock title="Invoerfase afronden - Abacus" /> : <FinaliseElectionPage />}
+        />
       </Route>
     </Route>
   </Route>,

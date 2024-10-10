@@ -42,7 +42,7 @@ describe("Test CheckAndSaveForm", () => {
 
     // set up a listener to check if the finalisation request is made
     let request_method, request_url;
-    overrideOnce("delete", "/api/polling_stations/1/data_entries/1/finalise", 200, null);
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, null);
     server.events.on("request:start", ({ request }) => {
       request_method = request.method;
       request_url = request.url;
@@ -64,6 +64,8 @@ describe("Test CheckAndSaveForm", () => {
 
     const formTitle = await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" });
     expect(formTitle).toHaveFocus();
+
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, null);
 
     const user = userEvent.setup();
     const spy = vi.spyOn(global, "fetch");

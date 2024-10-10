@@ -1,7 +1,9 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { expectNotFound, Providers, setupTestRouter } from "app/test/unit";
+import { expectNotFound, overrideOnce, Providers, setupTestRouter } from "app/test/unit";
+
+import { electionStatusMockResponse } from "@kiesraad/api-mocks";
 
 // NOTE: We're not using the wrapped render function here,
 // since we want control over our own memory router.
@@ -52,6 +54,8 @@ describe("routes", () => {
   });
 
   test("Not found page when polling station is finalised", async () => {
+    overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
+
     await router.navigate("/elections/1/data-entry/2");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/2");
     render();

@@ -13,13 +13,13 @@ import { emptyDataEntryRequest } from "app/test/unit/form";
 import {
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationFormController,
-  PollingStationValues,
+  PollingStationResults,
 } from "@kiesraad/api";
 import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { DifferencesForm } from "./DifferencesForm";
 
-function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
+function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
   return render(
     <PollingStationFormController
       election={electionMockData}

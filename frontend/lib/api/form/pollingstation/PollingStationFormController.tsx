@@ -24,16 +24,12 @@ import {
   VotersRecounts,
 } from "@kiesraad/api";
 
-export interface PollingStationValues extends Omit<PollingStationResults, "recounted"> {
-  recounted: boolean | undefined;
-}
-
 export interface PollingStationFormControllerProps {
   election: Required<Election>;
   pollingStationId: number;
   entryNumber: number;
   children: React.ReactNode;
-  defaultValues?: Partial<PollingStationValues>;
+  defaultValues?: Partial<PollingStationResults>;
   defaultFormState?: Partial<FormState>;
   defaultCurrentForm?: AnyFormReference | null;
 }
@@ -45,7 +41,7 @@ export interface FormReference<T> {
   getAcceptWarnings?: () => boolean;
 }
 
-export interface FormReferenceRecounted extends FormReference<Pick<PollingStationValues, "recounted">> {
+export interface FormReferenceRecounted extends FormReference<Pick<PollingStationResults, "recounted">> {
   type: "recounted";
 }
 
@@ -85,7 +81,7 @@ export interface iPollingStationControllerContext {
   status: React.RefObject<Status>;
   apiError: ApiError | null;
   formState: FormState;
-  values: PollingStationValues;
+  values: PollingStationResults;
   setTemporaryCache: (cache: TemporaryCache | null) => boolean;
   cache: TemporaryCache | null;
   currentForm: AnyFormReference | null;
@@ -163,7 +159,7 @@ export function PollingStationFormController({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [values, setValues] = React.useState<PollingStationValues>();
+  const [values, setValues] = React.useState<PollingStationResults>();
   const [formState, setFormState] = React.useState<FormState>();
 
   // TODO: #277 render custom error page instead of passing error down
@@ -265,7 +261,7 @@ export function PollingStationFormController({
     continueToNextSection = true,
   }: SubmitCurrentFormOptions = {}) => {
     // React state is fixed within one render, so we update our own copy instead of using setValues directly
-    let newValues: PollingStationValues = structuredClone(values);
+    let newValues: PollingStationResults = structuredClone(values);
     if (currentForm.current) {
       const ref: AnyFormReference = currentForm.current;
 
@@ -316,17 +312,12 @@ export function PollingStationFormController({
     }
 
     // prepare data to send to server
-    const pollingStationResults: PollingStationResults = {
-      ...newValues,
-      recounted: newValues.recounted !== undefined ? newValues.recounted : false,
-      voters_recounts: newValues.recounted ? newValues.voters_recounts : undefined,
-    };
     const clientState = getClientState(formState, acceptWarnings, continueToNextSection);
 
     // send data to server
     status.current = "saving";
     const response = await client.postRequest(request_path, {
-      data: pollingStationResults,
+      data: newValues,
       client_state: clientState,
     } satisfies SaveDataEntryRequest);
     status.current = aborting ? "aborted" : "idle";

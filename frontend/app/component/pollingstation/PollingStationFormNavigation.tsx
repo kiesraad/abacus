@@ -9,7 +9,7 @@ import {
   Election,
   FormSectionID,
   FormState,
-  PollingStationValues,
+  PollingStationResults,
   usePollingStationFormController,
 } from "@kiesraad/api";
 import { Button, Feedback, Modal } from "@kiesraad/ui";
@@ -159,7 +159,7 @@ type BlockReason = "errors" | "warnings" | "changes";
 function reasonsBlocked(
   formState: FormState,
   currentForm: AnyFormReference,
-  values: PollingStationValues,
+  values: PollingStationResults,
 ): BlockReason[] {
   const result: BlockReason[] = [];
 

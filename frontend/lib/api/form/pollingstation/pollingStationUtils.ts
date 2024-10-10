@@ -1,6 +1,6 @@
 import { ErrorsAndWarnings } from "lib/api/api";
 
-import { Election, ValidationResult, ValidationResults } from "@kiesraad/api";
+import { Election, PollingStationResults, ValidationResult, ValidationResults } from "@kiesraad/api";
 import { ValidationResultType } from "@kiesraad/ui";
 import { deepEqual, fieldNameFromPath, FieldSection, objectHasOnlyEmptyValues, rootFieldSection } from "@kiesraad/util";
 
@@ -12,7 +12,6 @@ import {
   FormSectionID,
   FormState,
   INITIAL_FORM_SECTION_ID,
-  PollingStationValues,
 } from "./PollingStationFormController";
 import { DifferencesValues } from "./useDifferences";
 import { RecountedValue } from "./useRecounted";
@@ -114,7 +113,7 @@ export function getNextSectionID(formState: FormState) {
   return null;
 }
 
-export function currentFormHasChanges(currentForm: AnyFormReference, values: PollingStationValues): boolean {
+export function currentFormHasChanges(currentForm: AnyFormReference, values: PollingStationResults): boolean {
   if (currentForm.type === "recounted") {
     const valA: RecountedValue = { recounted: values.recounted };
     const valB = currentForm.getValues();
@@ -197,7 +196,7 @@ export function getErrorsAndWarnings(
   return result;
 }
 
-export function isFormSectionEmpty(section: FormSection, values: PollingStationValues): boolean {
+export function isFormSectionEmpty(section: FormSection, values: PollingStationResults): boolean {
   if (section.id.startsWith("political_group_votes_")) {
     const index = parseInt(section.id.replace("political_group_votes_", "")) - 1;
     const g = values.political_group_votes[index];
@@ -236,7 +235,7 @@ export type PollingStationSummary = {
   }[];
 };
 
-export function getPollingStationSummary(formState: FormState, values: PollingStationValues): PollingStationSummary {
+export function getPollingStationSummary(formState: FormState, values: PollingStationResults): PollingStationSummary {
   const result: PollingStationSummary = {
     countsAddUp: true,
     hasBlocks: false,
@@ -282,8 +281,8 @@ function sortFormSections(a: FormSection, b: FormSection): number {
 
 export function getInitialValues(
   election: Required<Election>,
-  defaultValues?: Partial<PollingStationValues>,
-): PollingStationValues {
+  defaultValues?: Partial<PollingStationResults>,
+): PollingStationResults {
   return {
     recounted: undefined,
     voters_counts: {

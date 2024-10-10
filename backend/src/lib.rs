@@ -69,7 +69,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     #[cfg(feature = "memory-serve")]
     let app = {
         app.merge(
-            MemoryServe::new(load_assets!("../frontend/dist"))
+            MemoryServe::new(load_assets!("frontend-dist"))
                 .index_file(Some("/index.html"))
                 .fallback(Some("/index.html"))
                 .into_router(),

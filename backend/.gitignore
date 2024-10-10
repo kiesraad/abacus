@@ -2,3 +2,4 @@
 /target
 db.sqlite*
 /templates/**/*.pdf
+frontend-dist

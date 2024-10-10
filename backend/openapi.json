@@ -515,20 +515,17 @@
         ],
         "properties": {
           "country_code": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "first_name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "gender": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/CandidateGender"
               }
-            ],
-            "nullable": true
+            ]
           },
           "initials": {
             "type": "string"
@@ -537,8 +534,7 @@
             "type": "string"
           },
           "last_name_prefix": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "locality": {
             "type": "string"
@@ -679,8 +675,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
-            },
-            "nullable": true
+            }
           }
         }
       },
@@ -847,8 +842,7 @@
             "type": "string"
           },
           "house_number_addition": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "id": {
             "type": "integer",
@@ -867,8 +861,7 @@
           },
           "number_of_voters": {
             "type": "integer",
-            "format": "int64",
-            "nullable": true
+            "format": "int64"
           },
           "polling_station_type": {
             "$ref": "#/components/schemas/PollingStationType"

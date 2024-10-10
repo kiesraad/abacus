@@ -143,20 +143,25 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
     }
   }
 
+  let type = "unknown";
   switch (s.type) {
     case "string":
-      return "string";
-    case "integer":
-      return "number";
-    case "number":
-      return "number";
     case "boolean":
-      return "boolean";
+      type = s.type;
+      break;
+    case "integer":
+    case "number":
+      type = "number";
+      break;
     case "array":
-      return `${tsType(s.items)}[]`;
-    default:
-      return "unknown";
+      type = `${tsType(s.items)}[]`;
+      break;
   }
+
+  if (s.nullable) {
+    type += " | null";
+  }
+  return type;
 }
 
 function isRequired(k: string, req: string[] | undefined): string {

@@ -478,4 +478,11 @@ export function updateFormStateAfterSubmit(
       section.warnings = section.warnings.filter((err) => !isGlobalValidationResult(err));
     });
   }
+
+  // Reset acceptWarnings when a page gets an error or has no warnings anymore
+  Object.values(formState.sections).forEach((section) => {
+    if (section.acceptWarnings && (section.errors.length > 0 || section.warnings.length === 0)) {
+      section.acceptWarnings = false;
+    }
+  });
 }

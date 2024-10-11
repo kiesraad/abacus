@@ -4,6 +4,7 @@
   padding: 2rem 2rem 2rem 5rem;
   position: relative;
   display: flex;
+  gap: 1rem;
 
   a:visited {
     color: var(--link-default);
@@ -16,40 +17,55 @@
   }
 
   aside {
-    padding-top: 2px;
-    flex: 0 0 2.25rem;
+    padding-top: 0.125rem;
     svg {
       width: 1.5rem;
     }
   }
 
-  section {
-    max-width: 38rem;
+  p {
+    line-height: 1.5rem;
+    margin: 0;
   }
 
   &.error {
     border-color: var(--color-error-darkest);
     background-color: var(--color-error-bg);
+    > button:focus,
+    > button:focus-visible {
+      background: var(--color-error-hover);
+      border-color: var(--color-error-focus);
+    }
     > button:hover {
       background: var(--color-error-hover);
     }
     svg {
-      fill: var(--color-error);
+      fill: var(--color-error-darkest);
     }
   }
   &.warning {
     border-color: var(--color-warning-darker);
     background-color: var(--color-warning-bg);
+    > button:focus,
+    > button:focus-visible {
+      background: var(--color-warning-hover);
+      border-color: var(--color-warning-focus);
+    }
     > button:hover {
       background: var(--color-warning-hover);
     }
     svg {
-      fill: var(--color-warning);
+      fill: var(--color-warning-darker);
     }
   }
   &.notify {
     border-color: var(--color-notify);
     background-color: var(--color-notify-bg);
+    > button:focus,
+    > button:focus-visible {
+      background: var(--color-notify-hover);
+      border-color: var(--color-notify-focus);
+    }
     > button:hover {
       background: var(--color-notify-hover);
     }
@@ -60,6 +76,11 @@
   &.success {
     border-color: var(--color-success);
     background-color: var(--color-success-bg);
+    > button:focus,
+    > button:focus-visible {
+      background: var(--color-success-hover);
+      border-color: var(--color-success-focus);
+    }
     > button:hover {
       background: var(--color-success-hover);
     }
@@ -69,11 +90,14 @@
   }
 
   &:global(.small) {
-    padding: 1rem 1rem 1rem 1.4rem;
+    padding: 1rem 1.5rem;
     align-items: center;
-    p {
+    max-width: 41rem;
+    aside {
+      display: flex;
       padding: 0;
-      margin: 0;
+    }
+    p {
       color: var(--color-error-darkest);
       font-size: var(--font-size-md);
     }

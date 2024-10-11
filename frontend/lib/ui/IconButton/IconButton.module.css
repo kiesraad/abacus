@@ -9,7 +9,6 @@
   padding: 0.5rem;
   justify-content: center;
   align-items: center;
-  gap: 0.75rem;
   cursor: pointer;
 
   &:focus,
@@ -49,14 +48,19 @@
 
   &.ghost {
     background: transparent;
-    border: 1px solid transparent;
+    border: none;
     box-shadow: none;
     svg {
-      fill: var(--menu-empty);
+      fill: var(--button-icon-ghost-color-svg);
     }
-
+    &:focus,
+    &:focus-visible {
+      border: 2px solid var(--button-icon-ghost-color-border-focus);
+      background: var(--button-icon-ghost-color-bg-focus);
+      padding: calc(0.5rem - 2px);
+    }
     &:hover {
-      background: var(--bg-gray-darker);
+      background: var(--button-icon-ghost-color-bg-hover);
     }
   }
 

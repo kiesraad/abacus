@@ -1,15 +1,13 @@
 import { describe, expect, test } from "vitest";
 
-import { getQueriesForElement, render } from "app/test/unit";
+import { getQueriesForElement, render, screen } from "app/test/unit";
 
 import { Modal } from "./Modal";
 
 const component = (onClose: () => void) => (
   <div>
     <div id="modal"></div>
-    <Modal onClose={onClose}>
-      <h2 id="modal-title">Modal</h2>
-    </Modal>
+    <Modal title="Modal Title" onClose={onClose} />
   </div>
 );
 
@@ -25,6 +23,7 @@ describe("UI component: Modal", () => {
     const { baseElement } = render(component(() => {}));
     const modal = getQueriesForElement(baseElement).getByRole("dialog");
 
-    expect(modal).toHaveTextContent("Modal");
+    expect(modal).toHaveTextContent("Modal Title");
+    expect(screen.getByTestId("modal-title")).toHaveFocus();
   });
 });

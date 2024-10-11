@@ -32,8 +32,12 @@
   > main {
     flex: 1 1 auto;
     display: flex;
-
+    background-color: var(--bg-gray);
     > nav {
+      position: sticky;
+      top: 0;
+      max-height: calc(100vh - 7rem - 2.75rem);
+      overflow: hidden;
       flex: 0 0 26.25rem;
       padding: 2rem 0 2rem 5rem;
       background-color: var(--bg-gray);

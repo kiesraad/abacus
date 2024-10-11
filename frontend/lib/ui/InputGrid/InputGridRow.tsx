@@ -13,9 +13,7 @@ export interface InputGridRowProps {
   defaultValue?: string | number;
   isTotal?: boolean;
   isListTotal?: boolean;
-  isFocused?: boolean;
   addSeparator?: boolean;
-  autoFocus?: boolean;
 }
 
 export function InputGridRow({
@@ -28,7 +26,6 @@ export function InputGridRow({
   isTotal,
   isListTotal,
   id,
-  isFocused = false,
   addSeparator,
 }: InputGridRowProps) {
   const errors = errorsAndWarnings?.get(id)?.errors;
@@ -45,8 +42,6 @@ export function InputGridRow({
           id={id}
           name={name || id}
           defaultValue={defaultValue}
-          /* eslint-disable-next-line jsx-a11y/no-autofocus */
-          autoFocus={isFocused}
           aria-invalid={hasError || (hasWarning && !warningsAccepted) ? "true" : "false"}
           aria-errormessage={
             hasError ? "feedback-error" : hasWarning && !warningsAccepted ? "feedback-warning" : undefined
@@ -59,7 +54,7 @@ export function InputGridRow({
   return isListTotal ? (
     <InputGrid.ListTotal id={id}>{children}</InputGrid.ListTotal>
   ) : (
-    <InputGrid.Row isTotal={isTotal} isFocused={isFocused} addSeparator={addSeparator} id={id}>
+    <InputGrid.Row isTotal={isTotal} addSeparator={addSeparator} id={id}>
       {children}
     </InputGrid.Row>
   );

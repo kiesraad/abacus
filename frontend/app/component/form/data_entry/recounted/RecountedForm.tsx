@@ -13,7 +13,6 @@ interface RecountedFormElement extends HTMLFormElement {
 }
 
 export function RecountedForm() {
-  const [hasValidationError, setHasValidationError] = React.useState(false);
   const formRef = React.useRef<RecountedFormElement>(null);
 
   const getValues = React.useCallback(() => {
@@ -25,22 +24,16 @@ export function RecountedForm() {
     return { recounted: elements.yes.checked ? true : elements.no.checked ? false : undefined };
   }, []);
 
-  const { status, sectionValues, isSaved, submit } = useRecounted(getValues);
+  const { status, sectionValues, errors, isSaved, submit } = useRecounted(getValues);
 
   const handleSubmit = (event: React.FormEvent<RecountedFormElement>) =>
     void (async (event: React.FormEvent<RecountedFormElement>) => {
       event.preventDefault();
-      const elements = event.currentTarget.elements;
 
-      if (!elements.yes.checked && !elements.no.checked) {
-        setHasValidationError(true);
-      } else {
-        setHasValidationError(false);
-        try {
-          await submit();
-        } catch (e) {
-          console.error("Error saving data entry", e);
-        }
+      try {
+        await submit();
+      } catch (e) {
+        console.error("Error saving data entry", e);
       }
     })(event);
 
@@ -48,19 +41,14 @@ export function RecountedForm() {
     if (isSaved) {
       window.scrollTo(0, 0);
     }
-  }, [isSaved]);
+  }, [isSaved, errors]);
+
+  const hasValidationError = errors.length > 0;
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form">
-      <h2>Is er herteld?</h2>
-      {hasValidationError && (
-        <Feedback id="feedback-error" type="error" data={["F101"]}>
-          <ul>
-            <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
-            <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
-            <li>Geen vinkje? Kies dan 'nee'.</li>
-          </ul>
-        </Feedback>
+    <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form" title="Is er herteld?">
+      {isSaved && hasValidationError && (
+        <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
       <p className="form-paragraph md">
         Was er een onverklaard verschil tussen het aantal toegelaten kiezers en het aantal uitgebrachte stemmen? Is er

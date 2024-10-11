@@ -101,7 +101,7 @@ impl ModelNa31_2Summary {
                 .add_polling_station_results(polling_station, &result.differences_counts);
 
             // if this polling station was recounted, add it to the list
-            if result.recounted {
+            if result.recounted == Some(true) {
                 totals
                     .recounted_polling_stations
                     .push(polling_station.number);
@@ -238,7 +238,7 @@ mod tests {
     fn polling_station_results_fixture() -> (PollingStationResults, PollingStationResults) {
         (
             PollingStationResults {
-                recounted: false,
+                recounted: Some(false),
                 voters_counts: VotersCounts {
                     poll_card_count: 20,
                     proxy_certificate_count: 5,
@@ -297,7 +297,7 @@ mod tests {
                 ],
             },
             PollingStationResults {
-                recounted: false,
+                recounted: Some(false),
                 voters_counts: VotersCounts {
                     poll_card_count: 39,
                     proxy_certificate_count: 1,
@@ -468,7 +468,7 @@ mod tests {
         let (ps1, ps2) = polling_station_fixture(&election);
         let (ps1_results, mut ps2_results) = polling_station_results_fixture();
 
-        ps2_results.recounted = true;
+        ps2_results.recounted = Some(true);
         ps2_results.voters_counts = VotersCounts {
             poll_card_count: 50,
             proxy_certificate_count: 0,

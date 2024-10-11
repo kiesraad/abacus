@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import { PollingStationValues, usePollingStationFormController } from "@kiesraad/api";
+import { PollingStationResults, usePollingStationFormController } from "@kiesraad/api";
 
-export type RecountedValue = Pick<PollingStationValues, "recounted">;
+export type RecountedValue = Pick<PollingStationResults, "recounted">;
 
 export function useRecounted(getValues: () => RecountedValue) {
   const { status, values, formState, submitCurrentForm, setTemporaryCache, registerCurrentForm, cache } =

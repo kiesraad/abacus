@@ -15,16 +15,8 @@ export const SingleError: Story = () => {
   return <Feedback id="feedback-error" type="error" data={["F202"]} />;
 };
 
-export const SingleErrorWithCustomAction: Story = () => {
-  return (
-    <Feedback id="feedback-error" type="error" data={["F101"]}>
-      <ul>
-        <li>Controleer of rubriek 3 is ingevuld. Is dat zo? Kies hieronder 'ja'</li>
-        <li>Wel een vinkje, maar rubriek 3 niet ingevuld? Overleg met de coördinator</li>
-        <li>Geen vinkje? Kies dan 'nee'.</li>
-      </ul>
-    </Feedback>
-  );
+export const SingleErrorCustomAction: Story = () => {
+  return <Feedback id="feedback-error" type="error" data={["F101"]} />;
 };
 
 export const MultipleErrors: Story = () => {

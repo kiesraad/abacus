@@ -9,7 +9,7 @@ import {
   Election,
   FormSectionID,
   FormState,
-  PollingStationValues,
+  PollingStationResults,
   usePollingStationFormController,
 } from "@kiesraad/api";
 import { Button, Feedback, Modal } from "@kiesraad/ui";
@@ -120,11 +120,11 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
             />
           ) : (
             <Modal
+              title="Let op: niet opgeslagen wijzigingen"
               onClose={() => {
                 blocker.reset();
               }}
             >
-              <h2 id="modal-blocker-title">Let op: niet opgeslagen wijzigingen</h2>
               <p>
                 Je hebt in <strong>{formState.sections[formState.current]?.title || "het huidige formulier"}</strong>{" "}
                 wijzigingen gemaakt die nog niet zijn opgeslagen.
@@ -148,7 +148,6 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
           )}
         </>
       )}
-
       {apiError && <Feedback id="feedback-server-error" type="error" apiError={apiError} />}
     </>
   );
@@ -159,7 +158,7 @@ type BlockReason = "errors" | "warnings" | "changes";
 function reasonsBlocked(
   formState: FormState,
   currentForm: AnyFormReference,
-  values: PollingStationValues,
+  values: PollingStationResults,
 ): BlockReason[] {
   const result: BlockReason[] = [];
 

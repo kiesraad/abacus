@@ -20,7 +20,7 @@ The built binary will be located in `target/release/`.
 Use `cargo run` to run the API on port 8080 (http://localhost:8080).
 
 To let the API server serve the frontend, first compile the frontend using
-`npm run build` in the `frontend/dist` directory. The run the API server with the
+`npm run build` in the `frontend` directory. The run the API server with the
 `memory-serve` feature enabled:
 
 ```shell

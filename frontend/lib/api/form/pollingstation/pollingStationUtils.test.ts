@@ -333,7 +333,7 @@ describe("PollingStationUtils", () => {
     expect(summary.countsAddUp).toBe(true);
     expect(summary.hasBlocks).toBe(false);
     expect(summary.notableFormSections.length).toBe(1);
-    expect(summary.notableFormSections.some((item) => item.formSection.id == "political_group_votes_2"));
+    expect(summary.notableFormSections.some((item) => item.formSection.id === "political_group_votes_2"));
 
     state.sections.differences_counts.acceptWarnings = true;
     state.sections.differences_counts.warnings = [errorWarningMocks.W301];
@@ -344,12 +344,12 @@ describe("PollingStationUtils", () => {
     expect(
       summary.notableFormSections.some(
         (item) =>
-          item.formSection.id == "political_group_votes_2" && item.status === "empty" && item.title === "Lijst 2",
+          item.formSection.id === "political_group_votes_2" && item.status === "empty" && item.title === "Lijst 2",
       ),
     );
     expect(
       summary.notableFormSections.some(
-        (item) => item.formSection.id == "differences_counts" && item.status === "accepted-warnings",
+        (item) => item.formSection.id === "differences_counts" && item.status === "accepted-warnings",
       ),
     );
 
@@ -361,7 +361,7 @@ describe("PollingStationUtils", () => {
     expect(summary.notableFormSections.length).toBe(3);
     expect(
       summary.notableFormSections.some(
-        (item) => item.formSection.id == "voters_votes_counts" && item.status === "errors",
+        (item) => item.formSection.id === "voters_votes_counts" && item.status === "errors",
       ),
     );
 

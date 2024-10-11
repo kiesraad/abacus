@@ -57,9 +57,13 @@ describe("Test RecountedForm", () => {
 
       render(Component);
 
+      const formTitle = await screen.findByRole("heading", { level: 2, name: "Is er herteld?" });
+      expect(formTitle).toHaveFocus();
+      await user.keyboard("{tab}");
+
       const yes = await screen.findByTestId("yes");
       const no = await screen.findByTestId("no");
-
+      expect(yes).toHaveFocus();
       expect(yes).not.toBeChecked();
       expect(no).not.toBeChecked();
 

@@ -17,8 +17,6 @@ import { deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
 
-const _ACCEPT_WARNINGS_ID = "differences_form_accept_warnings";
-
 interface FormElements extends HTMLFormControlsCollection {
   more_ballots_count: HTMLInputElement;
   fewer_ballots_count: HTMLInputElement;
@@ -126,6 +124,7 @@ export function DifferencesForm() {
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
+  const showAcceptWarnings = errors.length === 0 && warnings.length > 0 && !hasChanges;
 
   const defaultProps = {
     errorsAndWarnings: isSaved ? errorsAndWarnings : undefined,
@@ -133,8 +132,12 @@ export function DifferencesForm() {
   };
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="differences_form" skip={[_ACCEPT_WARNINGS_ID]}>
-      <h2>Verschillen tussen toegelaten kiezers en uitgebrachte stemmen</h2>
+    <Form
+      onSubmit={handleSubmit}
+      ref={formRef}
+      id="differences_form"
+      title="Verschillen tussen toegelaten kiezers en uitgebrachte stemmen"
+    >
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
@@ -154,7 +157,6 @@ export function DifferencesForm() {
             id="more_ballots_count"
             title="Stembiljetten méér geteld"
             defaultValue={sectionValues.differences_counts.more_ballots_count}
-            isFocused
             {...defaultProps}
           />
           <InputGridRow
@@ -219,15 +221,17 @@ export function DifferencesForm() {
             </Alert>
           </BottomBar.Row>
         )}
-        <BottomBar.Row hidden={errors.length > 0 || warnings.length === 0 || hasChanges}>
-          <Checkbox
-            id={_ACCEPT_WARNINGS_ID}
-            defaultChecked={acceptWarnings}
-            hasError={warningsWarning}
-            ref={acceptWarningsRef}
-            label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
-          />
-        </BottomBar.Row>
+        {showAcceptWarnings && (
+          <BottomBar.Row>
+            <Checkbox
+              id="differences_form_accept_warnings"
+              defaultChecked={acceptWarnings}
+              hasError={warningsWarning}
+              ref={acceptWarningsRef}
+              label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
+            />
+          </BottomBar.Row>
+        )}
         <BottomBar.Row>
           <Button type="submit" size="lg" disabled={status.current === "saving"}>
             Volgende

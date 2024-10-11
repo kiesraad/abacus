@@ -1,30 +1,27 @@
 import * as React from "react";
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
+  title?: string;
   children: React.ReactNode;
-  skip?: string[];
 }
 
 type Dir = "up" | "down" | "first" | "last";
 
-export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, skip, ...formProps }, ref) => {
+export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, children, ...formProps }, ref) => {
   const innerRef: React.MutableRefObject<HTMLFormElement | null> = React.useRef<HTMLFormElement>(null);
 
   const inputList = React.useRef<HTMLInputElement[]>([]);
   const submitButton = React.useRef<HTMLButtonElement | null>(null);
+  const formTitle = React.useRef<HTMLHeadingElement | null>(null);
 
   const moveFocus = React.useCallback((dir: Dir) => {
-    let activeIndex = inputList.current.findIndex((input) => document.activeElement === input);
-    if (activeIndex === -1) {
-      activeIndex = 0;
-    }
-    let targetIndex = activeIndex;
+    let targetIndex = inputList.current.findIndex((input) => document.activeElement === input);
     switch (dir) {
       case "up":
-        targetIndex = activeIndex - 1;
+        targetIndex -= 1;
         break;
       case "down":
-        targetIndex = activeIndex + 1;
+        targetIndex += 1;
         break;
       case "first":
         targetIndex = 0;
@@ -36,31 +33,21 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
     if (targetIndex < 0) {
       targetIndex = inputList.current.length - 1;
     } else if (targetIndex >= inputList.current.length) {
-      targetIndex = -1; //end of the line
+      submitButton.current?.focus();
+      return;
     }
 
-    if (targetIndex >= 0) {
-      const next = inputList.current[targetIndex];
-      if (next) {
-        next.focus();
-        setTimeout(() => {
-          if (next.type === "radio") {
-            next.checked = true;
-          } else {
-            next.select();
-          }
-        }, 1);
-      }
-    } else {
-      submitButton.current?.focus();
+    const next = inputList.current[targetIndex];
+    if (next) {
+      next.focus();
+      setTimeout(() => {
+        next.select();
+      }, 1);
     }
   }, []);
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.target instanceof HTMLInputElement && event.target.type === "radio") {
-        event.preventDefault();
-      }
       switch (event.key) {
         case "ArrowUp":
           if (event.shiftKey) {
@@ -75,15 +62,18 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
           } else {
             moveFocus("down");
           }
-
           break;
         case "Enter":
-          event.preventDefault();
-          if (event.shiftKey || document.activeElement === submitButton.current) {
-            //ref.current.submit fails in testing environment (jsdom)
-            innerRef.current?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-          } else {
-            moveFocus("down");
+          if (event.target instanceof HTMLInputElement || event.target instanceof HTMLHeadingElement) {
+            event.preventDefault();
+            if (event.shiftKey || document.activeElement === submitButton.current) {
+              //ref.current.submit fails in testing environment (jsdom)
+              innerRef.current?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+            } else if (event.target instanceof HTMLInputElement && event.target.type === "radio") {
+              submitButton.current?.focus();
+            } else {
+              moveFocus("down");
+            }
           }
           break;
         default:
@@ -101,13 +91,16 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
   React.useEffect(() => {
     const inputs = innerRef.current?.querySelectorAll("input, select, textarea") as NodeListOf<HTMLInputElement>;
     inputList.current = Array.from(inputs);
-
-    //filter out inputs we should skip
-    if (skip && skip.length) {
-      inputList.current = inputList.current.filter((input) => !skip.includes(input.id));
-    }
     submitButton.current = innerRef.current?.querySelector("button[type=submit]") as HTMLButtonElement | null;
-  }, [children, skip]);
+  }, [children]);
+
+  React.useEffect(() => {
+    // Only focus on form title if current active element is not feedback header,
+    // to prevent feedback header focus from being overwritten
+    if (document.activeElement?.className !== "feedback-header") {
+      formTitle.current?.focus();
+    }
+  }, []);
 
   return (
     <form
@@ -121,6 +114,9 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ children, sk
       }}
       {...formProps}
     >
+      <h2 tabIndex={-1} ref={formTitle}>
+        {title}
+      </h2>
       {children}
     </form>
   );

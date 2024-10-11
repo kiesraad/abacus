@@ -20,6 +20,18 @@ jobs:
         working-directory: ./backend
     steps:
       - uses: actions/checkout@v4
+      # Build frontend so that it can be included in the backend build
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./frontend
+      - name: Build
+        run: npm run build
+        working-directory: ./frontend
+      # Compile and test backend
       - name: Setup Rust
         run: rustup update stable && rustup default stable
       - name: Cargo cache
@@ -32,11 +44,11 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            target/
+            ./backend/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
       - name: Install sqlx-cli
-        run: cargo install sqlx-cli --no-default-features --features sqlite
+        run: cargo --verbose --locked install sqlx-cli --no-default-features --features sqlite
       - name: Create database and run migrations
         run: sqlx database setup
       - name: Download frontend-build
@@ -52,12 +64,13 @@ jobs:
         run: cargo --verbose --locked clippy --all-targets --no-default-features -- -D warnings
       - name: Run tests
         run: cargo --verbose --locked test
+      # Release build includes the frontend through the memory-serve crate
       - name: Build
-        run: cargo --verbose --locked build
+        run: cargo --verbose --locked build --release --features memory-serve
       - uses: actions/upload-artifact@v4
         with:
           name: backend-build
-          path: backend/target/debug/api
+          path: backend/target/release/api
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
@@ -87,8 +100,7 @@ jobs:
   playwright:
     name: Playwright
     needs:
-        - backend
-        - frontend
+      - backend # frontend is included in backend build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -99,19 +111,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install dependencies
+      - name: Install npm dependencies
         run: npm ci
-      - name: e2e test install
+      - name: Install Playwright
         run: npx playwright install --with-deps
       - name: e2e test - lib ui
         run: npm run e2e:lib-ui
       - name: e2e test - app
         run: npm run e2e:app
-      - name: Download frontend-build
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-          path: builds/frontend
       - name: Download backend-build
         uses: actions/download-artifact@v4
         with:

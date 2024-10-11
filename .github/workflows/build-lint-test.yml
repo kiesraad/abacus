@@ -51,11 +51,6 @@ jobs:
         run: cargo --verbose --locked install sqlx-cli --no-default-features --features sqlite
       - name: Create database and run migrations
         run: sqlx database setup
-      - name: Download frontend-build
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-          path: ../frontend/dist
       - name: Check rustfmt
         run: cargo --verbose --locked fmt --all -- --check
       - name: Check Clippy with all features

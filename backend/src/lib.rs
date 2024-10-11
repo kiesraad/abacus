@@ -9,7 +9,7 @@ use axum::routing::{delete, get, post};
 use axum::{Json, Router};
 use hyper::header::InvalidHeaderValue;
 #[cfg(feature = "memory-serve")]
-use memory_serve::{load_assets, MemoryServe};
+use memory_serve::MemoryServe;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
@@ -71,7 +71,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     #[cfg(feature = "memory-serve")]
     let app = {
         app.merge(
-            MemoryServe::new(load_assets!("../frontend/dist"))
+            MemoryServe::new()
                 .index_file(Some("/index.html"))
                 .fallback(Some("/index.html"))
                 .into_router(),

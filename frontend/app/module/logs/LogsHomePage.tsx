@@ -7,7 +7,7 @@ export function LogsHomePage() {
     <div className="app-layout">
       <NavBar>
         <Link to={"/elections#administrator"}>Verkiezingen</Link>
-        <Link to={"/users#administrator"}>Gebruikers</Link>
+        <Link to={"/users#administratorcoordinator"}>Gebruikers</Link>
         <Link to={"/workstations#administrator"}>Invoerstations</Link>
         <span className="active">Logs</span>
       </NavBar>

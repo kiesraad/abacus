@@ -11,7 +11,7 @@ export function UsersHomePage() {
         <Link to={"/elections#administrator"}>Verkiezingen</Link>
         <span className="active">Gebruikers</span>
         <Link to={"/workstations#administrator"}>Invoerstations</Link>
-        <Link to={"/logs#administrator"}>Logs</Link>
+        <Link to={"/logs#administratorcoordinator"}>Logs</Link>
       </NavBar>
       <PageTitle title="Gebruikersbeheer - Abacus" />
       <header>

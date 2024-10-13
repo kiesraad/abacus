@@ -9,9 +9,9 @@ export function WorkstationsHomePage() {
     <div className="app-layout">
       <NavBar>
         <Link to={"/elections#administrator"}>Verkiezingen</Link>
-        <Link to={"/users#administrator"}>Gebruikers</Link>
+        <Link to={"/users#administratorcoordinator"}>Gebruikers</Link>
         <span className="active">Invoerstations</span>
-        <Link to={"/logs#administrator"}>Logs</Link>
+        <Link to={"/logs#administratorcoordinator"}>Logs</Link>
       </NavBar>
       <PageTitle title="Invoerstations - Abacus" />
       <header>

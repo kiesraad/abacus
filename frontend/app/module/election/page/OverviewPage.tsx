@@ -16,8 +16,8 @@ export function OverviewPage() {
   };
   const { electionList } = useElectionList();
 
-  const isNewAccount = location.hash === "#new_account";
-  const isAdministrator = location.hash === "#administrator";
+  const isNewAccount = location.hash.includes("new-account");
+  const isAdministrator = location.hash.includes("administrator");
 
   function closeNewAccountAlert() {
     navigate(location.pathname);
@@ -29,9 +29,9 @@ export function OverviewPage() {
         <span className={isAdministrator ? "active" : ""}>{isAdministrator ? "Verkiezingen" : "Overzicht"}</span>
         {isAdministrator && (
           <>
-            <Link to={"/users#administrator"}>Gebruikers</Link>
+            <Link to={"/users#administratorcoordinator"}>Gebruikers</Link>
             <Link to={"/workstations#administrator"}>Invoerstations</Link>
-            <Link to={"/logs#administrator"}>Logs</Link>
+            <Link to={"/logs#administratorcoordinator"}>Logs</Link>
           </>
         )}
       </NavBar>

@@ -21,16 +21,19 @@ export function DevHomePage() {
             <Link to={`/elections/1/data-entry`}>Verkiezing 1 invoeren</Link>
           </li>
           <li>
+            <Link to={`/elections/1/status#coordinator`}>Verkiezing 1 status</Link>
+          </li>
+          <li>
             <Link to={"/elections#administrator"}>Verkiezingen beheren</Link>
           </li>
           <li>
-            <Link to={`/users#administrator`}>Gebruikers beheren</Link>
+            <Link to={`/users#administratorcoordinator`}>Gebruikers beheren</Link>
           </li>
           <li>
             <Link to={`/workstations#administrator`}>Werkplekken beheren</Link>
           </li>
           <li>
-            <Link to={`/logs#administrator`}>Activiteitenlog</Link>
+            <Link to={`/logs#administratorcoordinator`}>Activiteitenlog</Link>
           </li>
         </ul>
 

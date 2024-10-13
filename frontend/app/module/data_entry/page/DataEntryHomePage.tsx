@@ -19,14 +19,14 @@ export function DataEntryHomePage() {
     refetch();
   }, [refetch]);
 
-  const showDataEntrySavedAlert = location.hash.includes("data-entry-saved");
+  const showDataEntrySavedAlert = location.hash === "#data-entry-saved";
 
   function closeDataEntrySavedAlert() {
-    navigate({ hash: "" });
+    navigate(location.pathname);
   }
 
   function finishInput() {
-    navigate("finalise");
+    navigate("finalise#coordinator");
   }
 
   return (

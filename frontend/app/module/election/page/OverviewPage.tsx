@@ -16,7 +16,7 @@ export function OverviewPage() {
   };
   const { electionList } = useElectionList();
 
-  const isNewAccount = location.hash.includes("new-account");
+  const isNewAccount = location.hash === "#new-account";
   const isAdministrator = location.hash.includes("administrator");
 
   function closeNewAccountAlert() {

@@ -15,22 +15,22 @@ export function DevHomePage() {
             <Link to={`/account`}>Account</Link>
           </li>
           <li>
-            <Link to={"/elections#administrator"}>Verkiezingen beheren</Link>
-          </li>
-          <li>
             <Link to={"/elections"}>Verkiezingen</Link>
           </li>
           <li>
             <Link to={`/elections/1/data-entry`}>Verkiezing 1 invoeren</Link>
           </li>
           <li>
-            <Link to={`/users`}>Gebruikers beheren</Link>
+            <Link to={"/elections#administrator"}>Verkiezingen beheren</Link>
           </li>
           <li>
-            <Link to={`/workstations`}>Werkplekken beheren</Link>
+            <Link to={`/users#administrator`}>Gebruikers beheren</Link>
           </li>
           <li>
-            <Link to={`/logs`}>Activiteitenlog</Link>
+            <Link to={`/workstations#administrator`}>Werkplekken beheren</Link>
+          </li>
+          <li>
+            <Link to={`/logs#administrator`}>Activiteitenlog</Link>
           </li>
         </ul>
 

@@ -2,8 +2,12 @@ import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { FinaliseElectionPage } from "app/module/data_entry/page/FinaliseElectionPage";
+import { LogsHomePage } from "app/module/logs";
 import { NotAvailableInMock } from "app/module/NotAvailableInMock";
+import { UsersHomePage } from "app/module/users";
+import { WorkstationsHomePage } from "app/module/workstations";
 
+import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
 import {
   CandidatesVotesPage,
   DataEntryHomePage,
@@ -14,17 +18,16 @@ import {
   VotersAndVotesPage,
 } from "./module/data_entry";
 import { DevHomePage } from "./module/DevHomePage";
-import { ElectionHomePage, ElectionLayout, OverviewLayout, OverviewPage } from "./module/election";
+import { ElectionHomePage, ElectionLayout, ElectionStatusPage, OverviewLayout, OverviewPage } from "./module/election";
 import { NotFound } from "./module/NotFound";
 import { RootLayout } from "./module/RootLayout";
-import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/user";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />}>
     <Route index path="/" element={<Navigate to="/elections" replace />} />
     <Route path="*" element={<NotFound />} />
     <Route path="/dev" element={<DevHomePage />} />
-    <Route path="user" element={<LoginLayout />}>
+    <Route path="account" element={<LoginLayout />}>
       <Route index element={<UserHomePage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="account/setup" element={<AccountSetupPage />} />
@@ -33,6 +36,7 @@ export const routes = createRoutesFromElements(
       <Route index element={<OverviewPage />} />
       <Route path=":electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
         <Route index element={<ElectionHomePage />} />
+        <Route path="status" element={<ElectionStatusPage />} />
         <Route path="data-entry" element={<DataEntryLayout />}>
           <Route index element={<DataEntryHomePage />} />
           <Route path=":pollingStationId" element={<PollingStationLayout />}>
@@ -51,5 +55,8 @@ export const routes = createRoutesFromElements(
         />
       </Route>
     </Route>
+    <Route path="/logs" element={<LogsHomePage />} />
+    <Route path="/users" element={<UsersHomePage />} />
+    <Route path="/workstations" element={<WorkstationsHomePage />} />
   </Route>,
 );

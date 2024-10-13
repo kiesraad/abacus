@@ -12,7 +12,7 @@ export function DevHomePage() {
 
         <ul>
           <li>
-            <Link to={`/user`}>User</Link>
+            <Link to={`/account`}>Account</Link>
           </li>
           <li>
             <Link to={"/elections#administrator"}>Verkiezingen beheren</Link>
@@ -22,6 +22,15 @@ export function DevHomePage() {
           </li>
           <li>
             <Link to={`/elections/1/data-entry`}>Verkiezing 1 invoeren</Link>
+          </li>
+          <li>
+            <Link to={`/users`}>Gebruikers beheren</Link>
+          </li>
+          <li>
+            <Link to={`/workstations`}>Werkplekken beheren</Link>
+          </li>
+          <li>
+            <Link to={`/logs`}>Activiteitenlog</Link>
           </li>
         </ul>
 

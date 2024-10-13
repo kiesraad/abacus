@@ -6,9 +6,7 @@ export function NotFound() {
   return (
     <div className="app-layout">
       <NavBar>
-        <span>
-          <Link to={"/elections"}>Overzicht</Link>
-        </span>
+        <Link to={"/elections"}>Overzicht</Link>
       </NavBar>
 
       <main>

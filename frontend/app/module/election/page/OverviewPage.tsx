@@ -1,4 +1,6 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
+import { NavBar } from "app/component/navbar/NavBar";
 
 import { Election, useElectionList } from "@kiesraad/api";
 import { IconCheckHeart, IconChevronRight } from "@kiesraad/icon";
@@ -22,14 +24,26 @@ export function OverviewPage() {
   }
 
   return (
-    <>
+    <div className="app-layout">
+      <NavBar>
+        <span className={isAdministrator ? "active" : ""}>{isAdministrator ? "Verkiezingen" : "Overzicht"}</span>
+        {isAdministrator && (
+          <>
+            <Link to={"/users#administrator"}>Gebruikers</Link>
+            <Link to={"/workstations#administrator"}>Invoerstations</Link>
+            <Link to={"/logs#administrator"}>Logs</Link>
+          </>
+        )}
+      </NavBar>
       <header>
         <section>
           <h1>{`Verkiezingen${isAdministrator ? " beheren" : ""}`}</h1>
         </section>
-        <section>
-          <WorkStationNumber>16</WorkStationNumber>
-        </section>
+        {!isAdministrator && (
+          <section>
+            <WorkStationNumber>16</WorkStationNumber>
+          </section>
+        )}
       </header>
       {isNewAccount && (
         <Alert type="success" onClose={closeNewAccountAlert}>
@@ -43,7 +57,7 @@ export function OverviewPage() {
             <thead>
               <tr>
                 <th>Verkiezing</th>
-                <th>Rol</th>
+                {isAdministrator && <th>Rol</th>}
                 <th>Status</th>
                 <th></th>
               </tr>
@@ -52,11 +66,11 @@ export function OverviewPage() {
               {electionList.map((election) => (
                 <tr onClick={handleRowClick(election)} key={election.id}>
                   <td>{election.name}</td>
-                  <td></td>
+                  {isAdministrator && <td></td>}
                   <td>
                     <div className="flex_overview">
                       <Icon icon={<IconCheckHeart />} color="accept" />
-                      <span>Invoerders bezig</span>
+                      <span>{isAdministrator ? "Invoerders bezig" : "Invoer gestart"}</span>
                       {/* TODO <IconHourglass />
                       <span>Invoer opgeschort</span>
                       <IconClock />
@@ -76,6 +90,6 @@ export function OverviewPage() {
           </table>
         </article>
       </main>
-    </>
+    </div>
   );
 }

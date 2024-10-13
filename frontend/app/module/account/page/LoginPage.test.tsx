@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { LoginPage } from "app/module/user";
+import { LoginPage } from "app/module/account";
 import { render } from "app/test/unit";
 
 describe("LoginPage", () => {

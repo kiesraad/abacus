@@ -26,7 +26,7 @@ export function PollingStationSelector({
   setAlert,
   handleSubmit,
 }: PollingStationSelectorProps) {
-  const currentPollingStationStatus = usePollingStationStatus(currentPollingStation?.id, true);
+  const currentPollingStationStatus = usePollingStationStatus(currentPollingStation?.id);
 
   return (
     <div className={cls.container}>
@@ -64,7 +64,7 @@ export function PollingStationSelector({
             return (
               <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.success)}>
                 <span className="bold">{currentPollingStation.name}</span>
-                {currentPollingStationStatus && <Badge type={currentPollingStationStatus} />}
+                {currentPollingStationStatus && <Badge type={currentPollingStationStatus} showIcon />}
               </div>
             );
           } else {

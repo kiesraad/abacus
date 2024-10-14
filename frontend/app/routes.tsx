@@ -1,7 +1,8 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
-import { FinaliseElectionPage } from "app/module/data_entry/page/FinaliseElectionPage";
+import { AdministratorLayout } from "app/module/AdministratorLayout";
+import { ElectionReportPage } from "app/module/election/page/ElectionReportPage";
 import { LogsHomePage } from "app/module/logs";
 import { NotAvailableInMock } from "app/module/NotAvailableInMock";
 import { UsersHomePage } from "app/module/users";
@@ -31,10 +32,14 @@ export const routes = createRoutesFromElements(
       <Route path="login" element={<LoginPage />} />
       <Route path="account/setup" element={<AccountSetupPage />} />
     </Route>
-    <Route path="elections/" element={<OverviewLayout />} errorElement={<NotFound />}>
+    <Route path="elections" element={<OverviewLayout />} errorElement={<NotFound />}>
       <Route index element={<OverviewPage />} />
       <Route path=":electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
         <Route index element={<ElectionHomePage />} />
+        <Route
+          path="report"
+          element={__API_MSW__ ? <NotAvailableInMock title="Invoerfase afronden - Abacus" /> : <ElectionReportPage />}
+        />
         <Route path="status" element={<ElectionStatusPage />} />
         <Route path="data-entry" element={<DataEntryLayout />}>
           <Route index element={<DataEntryHomePage />} />
@@ -48,10 +53,6 @@ export const routes = createRoutesFromElements(
             <Route path="save" element={<CheckAndSaveForm />} />
           </Route>
         </Route>
-        <Route
-          path="finalise"
-          element={__API_MSW__ ? <NotAvailableInMock title="Invoerfase afronden - Abacus" /> : <FinaliseElectionPage />}
-        />
       </Route>
     </Route>
     <Route element={<AdministratorLayout />}>

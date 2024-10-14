@@ -5,9 +5,9 @@ import { expectNotFound, overrideOnce, Providers, render, setupTestRouter } from
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 
-import { FinaliseElectionPage } from "./FinaliseElectionPage";
+import { ElectionReportPage } from "./ElectionReportPage";
 
-describe("FinaliseElectionPage", () => {
+describe("ElectionReportPage", () => {
   test("Error when election is not ready", async () => {
     // Since we test what happens after an error, we want vitest to ignore them
     vi.spyOn(console, "error").mockImplementation(() => {
@@ -22,7 +22,7 @@ describe("FinaliseElectionPage", () => {
       ],
     });
 
-    await router.navigate("/elections/1/data-entry/finalise");
+    await router.navigate("/elections/1/report");
 
     rtlRender(<Providers router={router} />);
 
@@ -40,7 +40,7 @@ describe("FinaliseElectionPage", () => {
     render(
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <FinaliseElectionPage />
+          <ElectionReportPage />
         </ElectionStatusProvider>
       </ElectionProvider>,
     );

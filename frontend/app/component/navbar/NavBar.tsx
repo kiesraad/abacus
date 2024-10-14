@@ -23,7 +23,7 @@ export function NavBar({ children }: { children?: React.ReactNode }) {
     <nav aria-label="primary-navigation" className={styles.navBar}>
       <div className={styles.links}>{children}</div>
       <div className={styles.userInfo}>
-        <IconUser style={{ fill: "white" }} />
+        <IconUser />
         <span>{role.join("/")}</span>
       </div>
     </nav>

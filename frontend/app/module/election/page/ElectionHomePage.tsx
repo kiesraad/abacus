@@ -3,22 +3,32 @@ import { Link } from "react-router-dom";
 import { MockTest } from "app/component/MockTest";
 import { NavBar } from "app/component/navbar/NavBar";
 
+import { useElection } from "@kiesraad/api";
+
 export function ElectionHomePage() {
+  const { election } = useElection();
+
   return (
-    <div className="app-layout">
+    <>
       <NavBar />
-      <div style={{ padding: "2rem" }}>
-        <h2>Verkiezing configureren</h2>
-
-        <ul>
-          <li>Proces-verbaal maken</li>
-          <li>
-            <Link to={`polling-stations`}>Polling stations configureren</Link>
-          </li>
-        </ul>
-
-        {__API_MSW__ && <MockTest />}
-      </div>
-    </div>
+      <header>
+        <section>
+          <h1>{election.name}</h1>
+        </section>
+      </header>
+      <main>
+        <article>
+          <ul>
+            <li>
+              <Link to={`status#coordinator`}>Status</Link>
+            </li>
+            <li>
+              <Link to={`polling-stations#coordinator`}>Polling stations configureren</Link>
+            </li>
+          </ul>
+          {__API_MSW__ && <MockTest />}
+        </article>
+      </main>
+    </>
   );
 }

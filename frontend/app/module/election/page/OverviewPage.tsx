@@ -4,27 +4,33 @@ import { NavBar } from "app/component/navbar/NavBar";
 
 import { Election, useElectionList } from "@kiesraad/api";
 import { IconCheckHeart, IconChevronRight } from "@kiesraad/icon";
-import { Alert, Icon, WorkStationNumber } from "@kiesraad/ui";
+import { Alert, Icon, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
 export function OverviewPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const handleRowClick = (election: Election) => {
-    return () => {
-      navigate(`/elections/${election.id}/data-entry`);
-    };
-  };
   const { electionList } = useElectionList();
 
   const isNewAccount = location.hash === "#new-account";
   const isAdministrator = location.hash.includes("administrator");
+
+  const handleRowClick = (election: Election) => {
+    return () => {
+      if (isAdministrator) {
+        navigate(`/elections/${election.id}`);
+      } else {
+        navigate(`/elections/${election.id}/data-entry`);
+      }
+    };
+  };
 
   function closeNewAccountAlert() {
     navigate(location.pathname);
   }
 
   return (
-    <div className="app-layout">
+    <>
+      <PageTitle title="Overzicht verkiezingen - Abacus" />
       <NavBar>
         <span className={isAdministrator ? "active" : ""}>{isAdministrator ? "Verkiezingen" : "Overzicht"}</span>
         {isAdministrator && (
@@ -90,6 +96,6 @@ export function OverviewPage() {
           </table>
         </article>
       </main>
-    </div>
+    </>
   );
 }

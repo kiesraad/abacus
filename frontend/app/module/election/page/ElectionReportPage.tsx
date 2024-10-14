@@ -3,16 +3,15 @@ import { Link } from "react-router-dom";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
-import { IconChevronRight } from "@kiesraad/icon";
-import { Button, PageTitle, WorkStationNumber } from "@kiesraad/ui";
+import { Button, PageTitle } from "@kiesraad/ui";
 
-export function FinaliseElectionPage() {
+export function ElectionReportPage() {
   const { election } = useElection();
   const { statuses } = useElectionStatus();
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
   if (statuses.some((s) => s.status !== "definitive")) {
-    throw Error("election not ready for finalisation");
+    throw Error("Election not ready for finalisation");
   }
 
   function downloadResults() {
@@ -57,19 +56,13 @@ export function FinaliseElectionPage() {
     <>
       <PageTitle title="Invoerfase afronden - Abacus" />
       <NavBar>
-        <Link to={"/elections"}>Overzicht</Link>
-        <IconChevronRight />
-        <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
+        <Link to={`/elections/${election.id}#coordinator`}>{election.name}</Link>
       </NavBar>
       <header>
         <section>
           <h1>{election.name}</h1>
         </section>
-        <section>
-          <WorkStationNumber>16</WorkStationNumber>
-        </section>
       </header>
-
       <main>
         <article>
           <Button onClick={downloadResults}>Download proces-verbaal</Button>

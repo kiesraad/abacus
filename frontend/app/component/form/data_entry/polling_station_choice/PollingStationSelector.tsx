@@ -26,7 +26,7 @@ export function PollingStationSelector({
   setAlert,
   handleSubmit,
 }: PollingStationSelectorProps) {
-  const currentPollingStationStatus = usePollingStationStatus(currentPollingStation?.id);
+  const currentPollingStationStatus = usePollingStationStatus(currentPollingStation?.id, true);
 
   return (
     <div className={cls.container}>

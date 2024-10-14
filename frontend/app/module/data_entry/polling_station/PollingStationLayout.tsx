@@ -15,8 +15,6 @@ export function PollingStationLayout() {
   const { election, pollingStation } = useElection(pollingStationId);
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
 
-  console.log(pollingStation);
-
   if (!pollingStation) {
     throw Error("Polling station not found");
   }

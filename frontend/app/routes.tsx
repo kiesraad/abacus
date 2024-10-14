@@ -19,7 +19,6 @@ import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module
 import {
   CandidatesVotesPage,
   DataEntryHomePage,
-  DataEntryLayout,
   DifferencesPage,
   PollingStationLayout,
   RecountedPage,
@@ -47,7 +46,7 @@ export const routes = createRoutesFromElements(
           element={__API_MSW__ ? <NotAvailableInMock title="Invoerfase afronden - Abacus" /> : <ElectionReportPage />}
         />
         <Route path="status" element={<ElectionStatusPage />} />
-        <Route path="data-entry" element={<DataEntryLayout />}>
+        <Route path="data-entry" element={null}>
           <Route index element={<DataEntryHomePage />} />
           <Route path=":pollingStationId" element={<PollingStationLayout />}>
             {/* The PollingStationFormController will navigate to the correct section. */}

@@ -1,15 +1,23 @@
+import { Link, useNavigate } from "react-router-dom";
+
 import { NavBar } from "app/component/navbar/NavBar";
 
-import { useElection } from "@kiesraad/api";
-import { PageTitle } from "@kiesraad/ui";
+import { useElection, useElectionStatus } from "@kiesraad/api";
+import { Alert, Button, PageTitle } from "@kiesraad/ui";
 
 export function ElectionStatusPage() {
+  const navigate = useNavigate();
   const { election } = useElection();
+  const { statuses } = useElectionStatus();
+
+  function finishInput() {
+    navigate("../report#coordinator");
+  }
 
   return (
-    <div className="app-layout">
+    <>
       <NavBar>
-        <span>{election.name}</span>
+        <Link to={`/elections/${election.id}#coordinator`}>{election.name}</Link>
       </NavBar>
       <PageTitle title="Status verkiezing - Abacus" />
       <header>
@@ -17,9 +25,21 @@ export function ElectionStatusPage() {
           <h1>Eerste zitting</h1>
         </section>
       </header>
+      {statuses.every((s) => s.status === "definitive") && (
+        <Alert type="success">
+          <h2>Alle stembureaus zijn ingevoerd</h2>
+          <p>
+            De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief
+            maken en het proces verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.
+          </p>
+          <Button onClick={finishInput} size="md">
+            Invoerfase afronden
+          </Button>
+        </Alert>
+      )}
       <main>
         <article>Placeholder</article>
       </main>
-    </div>
+    </>
   );
 }

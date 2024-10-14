@@ -12,6 +12,7 @@ use crate::APIError;
 pub mod repository;
 pub mod structs;
 
+/// Polling station list response
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct PollingStationListResponse {
     pub polling_stations: Vec<PollingStation>,
@@ -23,6 +24,7 @@ impl IntoResponse for PollingStationListResponse {
     }
 }
 
+/// Get a list of all pollingstations for an election
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}/polling_stations",

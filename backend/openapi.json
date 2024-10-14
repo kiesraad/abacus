@@ -160,6 +160,7 @@
         "tags": [
           "polling_station"
         ],
+        "summary": "Get a list of all pollingstations for an election",
         "operationId": "polling_station_list",
         "parameters": [
           {
@@ -929,6 +930,7 @@
       },
       "PollingStationListResponse": {
         "type": "object",
+        "description": "Polling station list response",
         "required": [
           "polling_stations"
         ],

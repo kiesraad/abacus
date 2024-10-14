@@ -1,0 +1,7 @@
+services:
+  abacus:
+    image: abacus
+    ports:
+      - "8080:8080"
+    build:
+      dockerfile: ./Dockerfile

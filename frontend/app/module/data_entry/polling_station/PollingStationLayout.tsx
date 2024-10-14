@@ -3,7 +3,7 @@ import { Link, Outlet, useParams } from "react-router-dom";
 import { NavBar } from "app/component/navbar/NavBar";
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
-import { AbortDataEntryControl } from "app/module/data_entry/PollingStation/AbortDataEntryControl";
+import { AbortDataEntryControl } from "app/module/data_entry";
 
 import { PollingStationFormController, useElection } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
@@ -14,6 +14,8 @@ export function PollingStationLayout() {
   const { pollingStationId } = useParams();
   const { election, pollingStation } = useElection(pollingStationId);
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
+
+  console.log(pollingStation);
 
   if (!pollingStation) {
     throw Error("Polling station not found");

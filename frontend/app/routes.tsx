@@ -2,7 +2,14 @@ import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AdministratorLayout } from "app/module/AdministratorLayout";
-import { ElectionReportPage } from "app/module/election/page/ElectionReportPage";
+import {
+  ElectionHomePage,
+  ElectionLayout,
+  ElectionReportPage,
+  ElectionStatusPage,
+  OverviewLayout,
+  OverviewPage,
+} from "app/module/election";
 import { LogsHomePage } from "app/module/logs";
 import { NotAvailableInMock } from "app/module/NotAvailableInMock";
 import { UsersHomePage } from "app/module/users";
@@ -19,7 +26,6 @@ import {
   VotersAndVotesPage,
 } from "./module/data_entry";
 import { DevHomePage } from "./module/DevHomePage";
-import { ElectionHomePage, ElectionLayout, ElectionStatusPage, OverviewLayout, OverviewPage } from "./module/election";
 import { NotFound } from "./module/NotFound";
 import { RootLayout } from "./module/RootLayout";
 

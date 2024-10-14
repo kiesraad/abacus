@@ -6,7 +6,7 @@ import { Size } from "@kiesraad/ui";
 import { Icon } from "./Icon";
 
 type Props = {
-  color: "primary" | "warning";
+  color: "primary" | "accept" | "warning" | "error";
   size: Size;
 };
 
@@ -15,17 +15,15 @@ export const DefaultIcon: Story<Props> = ({ color, size }) => (
 );
 
 export default {
-  args: {
-    label: "Invoer",
-    text: "Invoer",
-  },
   argTypes: {
     color: {
-      options: ["primary", "warning"],
+      options: ["primary", "accept", "warning", "error"],
+      defaultValue: "accept",
       control: { type: "radio" },
     },
     size: {
       options: ["xs", "sm", "md", "lg", "xl"],
+      defaultValue: "md",
       control: { type: "radio" },
     },
   },

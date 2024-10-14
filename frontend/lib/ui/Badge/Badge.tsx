@@ -9,7 +9,7 @@ import classes from "./badge.module.css";
 const typeToLabel: { [S in PollingStationStatus]: { label: string; icon?: ReactElement } } = {
   first_entry: { label: "1e invoer" },
   definitive: { label: "Definitief" },
-  first_entry_in_progress: { label: "1e invoer", icon: <Icon icon={<IconPencil />} /> },
+  first_entry_in_progress: { label: "1e invoer", icon: <Icon size="xs" icon={<IconPencil />} /> },
 };
 
 export interface BadgeProps {

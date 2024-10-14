@@ -12,7 +12,7 @@ function pollingStationType(pollingStationType: PollingStationType): string {
   }
 }
 
-export function PollingStationsPage() {
+export function PollingStationListPage() {
   const { pollingStations } = usePollingStationList();
 
   return (

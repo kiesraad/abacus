@@ -3,7 +3,7 @@ import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { FinaliseElectionPage } from "app/module/data_entry/page/FinaliseElectionPage";
 import { NotAvailableInMock } from "app/module/NotAvailableInMock.tsx";
-import { PollingStationsLayout, PollingStationsPage } from "app/module/polling_stations";
+import { PollingStationListPage, PollingStationsLayout } from "app/module/polling_stations";
 
 import {
   CandidatesVotesPage,
@@ -52,7 +52,7 @@ export const routes = createRoutesFromElements(
         />
       </Route>
       <Route path="polling-stations" element={<PollingStationsLayout />}>
-        <Route index element={<PollingStationsPage />} />
+        <Route index element={<PollingStationListPage />} />
       </Route>
     </Route>
   </Route>,

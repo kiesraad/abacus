@@ -6,14 +6,14 @@ import { PageTitle } from "@kiesraad/ui";
 
 export function UsersHomePage() {
   return (
-    <div className="app-layout">
+    <>
+      <PageTitle title="Gebruikersbeheer - Abacus" />
       <NavBar>
         <Link to={"/elections#administrator"}>Verkiezingen</Link>
         <span className="active">Gebruikers</span>
         <Link to={"/workstations#administrator"}>Invoerstations</Link>
         <Link to={"/logs#administratorcoordinator"}>Logs</Link>
       </NavBar>
-      <PageTitle title="Gebruikersbeheer - Abacus" />
       <header>
         <section>
           <h1>Gebruikers beheren</h1>
@@ -22,6 +22,6 @@ export function UsersHomePage() {
       <main>
         <article>Placeholder</article>
       </main>
-    </div>
+    </>
   );
 }

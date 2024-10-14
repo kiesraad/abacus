@@ -4,14 +4,14 @@ import { Link } from "react-router-dom";
 
 export function LogsHomePage() {
   return (
-    <div className="app-layout">
+    <>
+      <PageTitle title="Activiteitenlog - Abacus" />
       <NavBar>
         <Link to={"/elections#administrator"}>Verkiezingen</Link>
         <Link to={"/users#administratorcoordinator"}>Gebruikers</Link>
         <Link to={"/workstations#administrator"}>Invoerstations</Link>
         <span className="active">Logs</span>
       </NavBar>
-      <PageTitle title="Activiteitenlog - Abacus" />
       <header>
         <section>
           <h1>Activiteitenlog</h1>
@@ -22,6 +22,6 @@ export function LogsHomePage() {
           Placeholder
         </article>
       </main>
-    </div>
+    </>
   );
 }

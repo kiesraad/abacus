@@ -1,16 +1,25 @@
 import { Link } from "react-router-dom";
 
+import { PageTitle } from "@kiesraad/ui";
+
 export function UserHomePage() {
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Abacus 🧮</h1>
-      <p>User Homepage</p>
-
-      <ul>
-        <li>
-          <Link to={`login`}>Inloggen</Link>
-        </li>
-      </ul>
-    </div>
+    <>
+      <PageTitle title="Account - Abacus" />
+      <header>
+        <section>
+          <h1>Account</h1>
+        </section>
+      </header>
+      <main>
+        <article>
+          <ul>
+            <li>
+              <Link to={`login`}>Inloggen</Link>
+            </li>
+          </ul>
+        </article>
+      </main>
+    </>
   );
 }

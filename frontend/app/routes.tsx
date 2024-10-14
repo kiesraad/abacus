@@ -26,7 +26,6 @@ export const routes = createRoutesFromElements(
   <Route element={<RootLayout />}>
     <Route index path="/" element={<Navigate to="/elections" replace />} />
     <Route path="*" element={<NotFound />} />
-    <Route path="/dev" element={<DevHomePage />} />
     <Route path="account" element={<LoginLayout />}>
       <Route index element={<UserHomePage />} />
       <Route path="login" element={<LoginPage />} />
@@ -55,8 +54,11 @@ export const routes = createRoutesFromElements(
         />
       </Route>
     </Route>
-    <Route path="/logs" element={<LogsHomePage />} />
-    <Route path="/users" element={<UsersHomePage />} />
-    <Route path="/workstations" element={<WorkstationsHomePage />} />
+    <Route element={<AdministratorLayout />}>
+      <Route path="dev" element={<DevHomePage />} />
+      <Route path="logs" element={<LogsHomePage />} />
+      <Route path="users" element={<UsersHomePage />} />
+      <Route path="workstations" element={<WorkstationsHomePage />} />
+    </Route>
   </Route>,
 );

@@ -9,12 +9,15 @@ import {
   GetDataEntryResponse,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS,
+  POLLING_STATION_LIST_REQUEST_PARAMS,
+  PollingStationListResponse,
   SaveDataEntryResponse,
 } from "@kiesraad/api";
 
 import { Database, DataEntryRecord } from "./Database.ts";
 import { validate } from "./DataEntry.ts";
 import { getElectionMockData } from "./ElectionMockData";
+import { getPollingStationMockData } from "./PollingStationMockData";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -91,6 +94,21 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
       return HttpResponse.json(response, { status: 200 });
     } catch {
       return HttpResponse.text(null, { status: 404 });
+    }
+  },
+);
+
+// get polling stations
+export const PollingStationListRequestHandler = http.get<ParamsToString<POLLING_STATION_LIST_REQUEST_PARAMS>>(
+  "/api/elections/:election_id/polling_stations",
+  ({ params }) => {
+    try {
+      const pollingStations = getPollingStationMockData(Number(params.election_id));
+      return HttpResponse.json({ polling_stations: pollingStations } satisfies PollingStationListResponse, {
+        status: 200,
+      });
+    } catch {
+      return HttpResponse.json({}, { status: 404 });
     }
   },
 );
@@ -196,6 +214,7 @@ export const handlers: HttpHandler[] = [
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  PollingStationListRequestHandler,
   PollingStationDataEntrySaveHandler,
   PollingStationDataEntryGetHandler,
   PollingStationDataEntryDeleteHandler,

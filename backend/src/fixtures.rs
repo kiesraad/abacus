@@ -1,6 +1,7 @@
 use crate::APIError;
 use axum::extract::State;
 use sqlx::SqlitePool;
+use tracing::info;
 
 /// Macro to convert a single fixture name to the contents of a fixture file
 macro_rules! load_fixture {
@@ -35,7 +36,7 @@ pub async fn seed_fixture_data(pool: &SqlitePool) -> Result<(), Box<dyn std::err
     for fixture in FIXTURES {
         sqlx::raw_sql(fixture.data).execute(pool).await?;
     }
-
+    info!("loaded fixtures");
     Ok(())
 }
 

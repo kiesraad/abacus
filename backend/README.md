@@ -21,10 +21,13 @@ Use `cargo run` to run the API on port 8080 (http://localhost:8080).
 
 To let the API server serve the frontend, first compile the frontend using
 `npm run build` in the `frontend` directory. The run the API server with the
-`memory-serve` feature enabled:
+`memory-serve` feature enabled. Also make sure to point the `ASSET_DIR` environment
+variable to the directory where `vite` outputs the assets, e.g. `frontend/dist`.
+In this version of `memory-serve`, the path must be absolute, since `build.rs`
+has no knowledge of the project it is currently built in. Example:
 
 ```shell
-cargo run --features memory-serve
+ASSET_DIR=$PWD/frontend/dist cargo run --features memory-serve
 ```
 
 ### Linting

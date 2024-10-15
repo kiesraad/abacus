@@ -22,7 +22,7 @@ export function Badge({ type, showIcon = false }: BadgeProps) {
   return (
     <div className={`${classes[type]} ${classes.badge}`}>
       {label}
-      {showIcon && icon && <> {icon}</>}
+      {showIcon && icon}
     </div>
   );
 }

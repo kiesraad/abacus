@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "02befb6eb6070ce836af6be44d313ec5c65708549e54e5de5ac3b23f3aa0a3da"
+}

@@ -1,0 +1,80 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                id AS \"id: u32\",\n                election_id AS \"election_id: u32\",\n                name,\n                number,\n                number_of_voters,\n                polling_station_type,\n                street,\n                house_number,\n                house_number_addition,\n                postal_code,\n                locality\n            FROM polling_stations\n            WHERE election_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "election_id: u32",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "number",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "number_of_voters",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "polling_station_type",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "street",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "house_number",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "house_number_addition",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "postal_code",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "locality",
+        "ordinal": 10,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "6c4ca8837760eec1f4d06d0401052004a291644f3a5855eeedbab3684825ca34"
+}

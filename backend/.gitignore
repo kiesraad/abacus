@@ -1,4 +1,5 @@
 /.cargo
 /target
+/target-docker/
 db.sqlite*
 /templates/**/*.pdf

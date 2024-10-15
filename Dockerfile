@@ -1,11 +1,6 @@
-FROM debian:stable
+FROM debian:bookworm-slim
 
 WORKDIR /abacus
-
-# Install 
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy the binary, database and migrations
 COPY --chown=abacus:abacus ./backend/target/release/api /abacus/backend

@@ -30,10 +30,11 @@ __uitbreidingen__:
 &emsp; &emsp; 1a2a. Het stembureau is niet aanwezig in de applicatie:  
 &emsp; &emsp; &emsp; 1a2a1. De coördinator voegt het stembureau toe in de applicatie.  
 1b. De tweede invoerder heeft ook de eerste invoer gedaan:  
-1c. De invoerder selecteert het verkeerde stembureau:  
+1c. De invoerder selecteert een ander stembureau dan op het PV staat:  
 1d. De invoerder selecteert een stembureau waar iemand anders mee bezig is:  
 1e. De invoerder selecteert een stembureau waar een andere gebruiker invoer voor heeft opgeslagen:  
-1f. De invoerder selecteert een stembureau waarvan de invoer al definitief is:
+1f. De invoerder selecteert een stembureau waarvan de invoer al definitief is:  
+&emsp; 1f1. De applicatie toont een foutmelding.
 
 2a. De applicatie stelt vast dat de invoerder eerdere invoer voor het stembureau heeft opgeslagen:  
 &emsp; 2a1. De applicatie laadt de eerder ingevoerde data.

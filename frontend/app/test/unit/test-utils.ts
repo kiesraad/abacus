@@ -61,5 +61,5 @@ export const setupTestRouter = () => {
 };
 
 export const expectNotFound = async () => {
-  expect(await screen.findByText(/Er ging iets mis./)).toBeVisible();
+  expect(await screen.findByText(/404 Pagina niet gevonden/)).toBeVisible();
 };

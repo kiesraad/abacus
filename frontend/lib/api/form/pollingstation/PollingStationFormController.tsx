@@ -23,6 +23,7 @@ import {
   ValidationResult,
   VotersRecounts,
 } from "@kiesraad/api";
+import { useError } from "@kiesraad/state";
 
 export interface PollingStationFormControllerProps {
   election: Required<Election>;
@@ -158,6 +159,7 @@ export function PollingStationFormController({
   const { client } = useApi();
   const navigate = useNavigate();
   const location = useLocation();
+  const { clearError, setError } = useError();
 
   const [values, setValues] = React.useState<PollingStationResults>();
   const [formState, setFormState] = React.useState<FormState>();
@@ -182,6 +184,7 @@ export function PollingStationFormController({
   }, []);
 
   const initialDataRequest = useApiGetRequest<GetDataEntryResponse>(requestPath);
+
   React.useEffect(() => {
     if (initialDataRequest.data) {
       const responseData = initialDataRequest.data;
@@ -216,15 +219,24 @@ export function PollingStationFormController({
         };
         void client.postRequest(requestPath, requestBody).then((response) => {
           if (response.status !== ApiResponseStatus.Success) {
-            // TODO: #277 render custom error page
-            console.error("Failed to save data entry", response);
+            setError({
+              message: "Failed to save data entry",
+              trace: response.error || "",
+            });
+
+            // console.error("Failed to save data entry", response);
             setApiError(response);
-            throw new Error("Failed to save data entry");
+            // throw new Error("Failed to save data entry");
           }
         });
       } else {
+        setError({
+          message: "Failed to load data entry",
+          trace: initialDataRequest.error.error || "",
+        });
+
         setApiError(initialDataRequest.error);
-        throw new Error("Failed to load data entry");
+        // throw new Error("Failed to load data entry");
       }
     }
   }, [
@@ -236,6 +248,7 @@ export function PollingStationFormController({
     initialDataRequest.error,
     client,
     requestPath,
+    setError,
   ]);
 
   // check if the targetFormSectionID has changed and navigate to the url for that section
@@ -347,21 +360,28 @@ export function PollingStationFormController({
       client_state: clientState,
     } satisfies SaveDataEntryRequest);
     status.current = aborting ? "aborted" : "idle";
+
     if (response.status !== ApiResponseStatus.Success) {
+      setError({
+        message: "Failed to load data entry",
+        trace: response.error || "",
+      });
+
       // TODO: #277 render custom error page
-      console.error("Failed to save data entry", response);
+      // console.error("Failed to save data entry", response);
       setApiError(response);
-      throw new Error("Failed to save data entry");
-    }
-    const data = response.data as SaveDataEntryResponse;
-    setApiError(null);
+      // throw new Error("Failed to save data entry");
+    } else {
+      const data = response.data as SaveDataEntryResponse;
+      clearError();
 
-    const newFormState = structuredClone(formState);
-    updateFormStateAfterSubmit(newFormState, data.validation_results, acceptWarnings, !aborting);
-    setFormState(newFormState);
+      const newFormState = structuredClone(formState);
+      updateFormStateAfterSubmit(newFormState, data.validation_results, acceptWarnings, !aborting);
+      setFormState(newFormState);
 
-    if (continueToNextSection) {
-      setTargetFormSectionID(getNextSectionID(newFormState));
+      if (continueToNextSection) {
+        setTargetFormSectionID(getNextSectionID(newFormState));
+      }
     }
   };
 
@@ -382,22 +402,28 @@ export function PollingStationFormController({
     status.current = "finalising";
     const response = await client.postRequest(requestPath + "/finalise");
     if (response.status !== ApiResponseStatus.Success) {
-      console.error("Failed to finalise data entry", response);
+      // console.error("Failed to finalise data entry", response);
       status.current = "idle";
       setApiError(response);
-      throw new Error("Failed to finalise data entry");
+      // throw new Error("Failed to finalise data entry");
+
+      setError({
+        message: "Failed to finalise data entry",
+        trace: response.error || "",
+      });
+    } else {
+      clearError();
+      status.current = "finalised";
     }
-    setApiError(null);
-    status.current = "finalised";
   };
 
   return (
     <PollingStationControllerContext.Provider
       value={{
         status,
-        apiError,
         formState,
         values,
+        apiError,
         cache: temporaryCache.current,
         setTemporaryCache,
         currentForm: currentForm.current,

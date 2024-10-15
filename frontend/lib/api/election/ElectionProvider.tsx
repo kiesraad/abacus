@@ -15,16 +15,12 @@ export interface ElectionProviderProps {
 }
 
 export function ElectionProvider({ children, electionId }: ElectionProviderProps) {
-  const { data, loading, error } = useElectionDataRequest({
+  const { data, loading } = useElectionDataRequest({
     election_id: electionId,
   });
 
-  if (loading) {
+  if (loading || !data) {
     return null;
-  }
-
-  if (!data || error) {
-    throw new Error();
   }
 
   return (

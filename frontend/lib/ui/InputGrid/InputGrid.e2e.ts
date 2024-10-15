@@ -7,7 +7,6 @@ const test = base.extend<{ gridPage: Locator }>({
     const grid = main.locator("table");
     await grid.waitFor();
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(grid);
   },
 });

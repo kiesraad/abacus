@@ -67,6 +67,7 @@ async fn create_sqlite_pool(
     if args.reset_database {
         // remove the file, ignoring any errors that occurred (such as the file not existing)
         let _ = tokio::fs::remove_file(opts.get_filename()).await;
+        info!("removed database file");
     }
 
     let pool = SqlitePool::connect_with(opts).await?;

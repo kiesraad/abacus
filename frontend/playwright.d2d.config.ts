@@ -10,10 +10,10 @@ function returnWebserverCommand(): string {
     // LOCAL CI: build frontend, then build and run backend with database reset and seed playwright-specific database
     return `npm run build &&
       cd ../backend &&
-      cargo run --features memory-serve -- --database target/debug/playwright.sqlite --reset-database --seed-data --port 8081`;
+    ASSET_DIR=$PWD/../frontend/dist cargo run --features memory-serve -- --database target/debug/playwright.sqlite --reset-database --seed-data --port 8081`;
   } else {
     // DEV: expects frontend build and playwright-specific database setup/seeding to have been done
-    return `cd ../backend && cargo run --features memory-serve -- --database ../backend/target/debug/playwright.sqlite --port 8081`;
+    return `cd ../backend && ASSET_DIR=$PWD/../frontend/dist cargo run --features memory-serve -- --database ../backend/target/debug/playwright.sqlite --port 8081`;
   }
 }
 

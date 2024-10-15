@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -n "$1" ]
+then
+  git checkout "$1"
+fi
+
 echo "Building frontend..."
 
 pushd "frontend" > /dev/null 2>&1

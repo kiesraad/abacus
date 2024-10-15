@@ -40,6 +40,6 @@ describe("DataEntryHomePage", () => {
       ],
     });
 
-    expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
+    expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
   });
 });

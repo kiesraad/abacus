@@ -17,7 +17,7 @@ export function OverviewPage() {
   const handleRowClick = (election: Election) => {
     return () => {
       if (isAdministrator) {
-        navigate(`/elections/${election.id}`);
+        navigate(`/elections/${election.id}#coordinator`);
       } else {
         navigate(`/elections/${election.id}/data-entry`);
       }

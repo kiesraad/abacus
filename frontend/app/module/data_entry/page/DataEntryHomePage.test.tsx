@@ -51,7 +51,7 @@ describe("DataEntryHomePage", () => {
     );
 
     // Test that the message doesn't exist
-    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
+    expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
   });
 
   test("Alert visible when finished", async () => {

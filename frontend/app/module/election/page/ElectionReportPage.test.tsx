@@ -1,11 +1,10 @@
 import { render as rtlRender, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
+import { ElectionReportPage } from "app/module/election";
 import { expectNotFound, overrideOnce, Providers, render, setupTestRouter } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
-
-import { ElectionReportPage } from "./ElectionReportPage";
 
 describe("ElectionReportPage", () => {
   test("Error when election is not ready", async () => {

@@ -16,10 +16,10 @@ export function ElectionStatusPage() {
 
   return (
     <>
+      <PageTitle title="Status verkiezing - Abacus" />
       <NavBar>
         <Link to={`/elections/${election.id}#coordinator`}>{election.name}</Link>
       </NavBar>
-      <PageTitle title="Status verkiezing - Abacus" />
       <header>
         <section>
           <h1>Eerste zitting</h1>

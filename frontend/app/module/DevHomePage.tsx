@@ -3,9 +3,12 @@ import { Link } from "react-router-dom";
 import { MockTest } from "app/component/MockTest";
 import { NavBar } from "app/component/navbar/NavBar";
 
+import { PageTitle } from "@kiesraad/ui";
+
 export function DevHomePage() {
   return (
     <>
+      <PageTitle title="Dev Homepage - Abacus" />
       <NavBar />
       <header>
         <section>

@@ -15,7 +15,7 @@ const renderElectionStatusPage = () =>
     </ElectionProvider>,
   );
 
-describe("DataEntryHomePage", () => {
+describe("ElectionStatusPage", () => {
   beforeEach(() => {
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
   });

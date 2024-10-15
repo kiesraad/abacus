@@ -38,14 +38,14 @@ __uitbreidingen__:
 2a. De applicatie stelt vast dat de invoerder eerdere invoer voor het stembureau heeft opgeslagen:  
 &emsp; 2a1. De applicatie laadt de eerder ingevoerde data.
 
-3a. De invoer voldoet niet aan de validatieregels voor fouten:  
-&emsp; 3a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel.  
-&emsp; 3a2. [De invoerder handelt de fout(en) af.](./GSB-subfuncties.md#de-invoerder-handelt-de-fouten-af)  
+4a. De invoer voldoet niet aan de validatieregels voor fouten:  
+&emsp; 4a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel.  
+&emsp; 4a2. [De invoerder handelt de fout(en) af.](./GSB-subfuncties.md#de-invoerder-handelt-de-fouten-af)  
 
-4a. De invoer voldoet niet aan de plausibiliteitschecks:  
-&emsp; 4a1. De applicatie toont een waarschuwing voor elke gefaalde plausibiliteitscheck.  
+5a. De invoer voldoet niet aan de plausibiliteitschecks:  
+&emsp; 5a1. De applicatie toont een waarschuwing voor elke gefaalde plausibiliteitscheck.  
 &emsp;
-4a2. [De invoerder handelt de waarschuwing(en) af.](./GSB-subfuncties.md#de-invoerder-handelt-de-waarschuwingen-af)
+5a2. [De invoerder handelt de waarschuwing(en) af.](./GSB-subfuncties.md#de-invoerder-handelt-de-waarschuwingen-af)
 
 6a. De invoerder breekt de invoer af en bewaart de invoer:  
 &emsp; 6a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  

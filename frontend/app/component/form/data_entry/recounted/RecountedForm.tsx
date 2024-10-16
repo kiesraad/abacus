@@ -71,10 +71,6 @@ export function RecountedForm() {
             label="Nee, er was geen hertelling"
           />
         </ChoiceList>
-
-        {Array.from({ length: 20 }).map((_, index) => (
-          <div key={index}>Content test</div>
-        ))}
       </div>
       <BottomBar type="form">
         <BottomBar.Row>

@@ -99,18 +99,10 @@ export function DifferencesForm() {
         if (!hasChanges && !acceptWarnings) {
           setWarningsWarning(true);
         } else {
-          try {
-            await submit({ acceptWarnings });
-          } catch (e) {
-            console.error("Error saving data entry", e);
-          }
+          await submit({ acceptWarnings });
         }
       } else {
-        try {
-          await submit();
-        } catch (e) {
-          console.error("Error saving data entry", e);
-        }
+        await submit();
       }
     })(event);
 

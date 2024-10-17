@@ -11,7 +11,6 @@ interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
   data?: ClientValidationResultCode[];
-  // TODO: #277 move to error page or modal
   apiError?: ApiError;
 }
 

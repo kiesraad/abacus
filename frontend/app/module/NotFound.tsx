@@ -1,22 +1,27 @@
-import { Link } from "react-router-dom";
-
+import { Error, ErrorAction } from "app/component/error";
+import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
-export function NotFound() {
+export interface NotFoundProps {
+  message?: string;
+  path?: string;
+}
+
+export function NotFound({ message, path }: NotFoundProps) {
   return (
     <div className="app-layout">
-      <NavBar>
-        <Link to={"/elections"}>Overzicht</Link>
-      </NavBar>
-
+      <NavBar />
       <main>
-        <article>
-          <section>
-            Er ging iets mis. De link die je hebt gebruikt is niet (meer) geldig. Ga naar het{" "}
-            <Link to="/elections">overzicht met verkiezingen</Link>.
-          </section>
-        </article>
+        <Error title={message || "Pagina niet gevonden"} action={ErrorAction.Back}>
+          {path && (
+            <p>
+              De pagina <code>{path}</code> is niet gevonden.
+            </p>
+          )}
+          <p>We kunnen de pagina die je zoekt niet vinden. Het kan zijn dat de pagina is verplaatst of verwijderd.</p>
+        </Error>
       </main>
+      <Footer />
     </div>
   );
 }

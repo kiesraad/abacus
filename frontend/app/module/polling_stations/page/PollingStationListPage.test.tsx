@@ -2,9 +2,9 @@ import { screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
 import { PollingStationListPage } from "app/module/polling_stations";
-import { render } from "app/test/unit";
+import { overrideOnce, render } from "app/test/unit";
 
-import { PollingStationListProvider } from "@kiesraad/api";
+import { PollingStationListProvider, PollingStationListResponse } from "@kiesraad/api";
 
 describe("PollingStationListPage", () => {
   test("Show polling stations", async () => {
@@ -30,5 +30,20 @@ describe("PollingStationListPage", () => {
     expect(rows[2]).toHaveTextContent(/34/);
     expect(rows[2]).toHaveTextContent(/Testplek/);
     expect(rows[2]).toHaveTextContent(/Bijzonder/);
+  });
+
+  test("Show no polling stations message", async () => {
+    overrideOnce("get", "/api/elections/42/polling_stations", 200, {
+      polling_stations: [],
+    } satisfies PollingStationListResponse);
+
+    render(
+      <PollingStationListProvider electionId={42}>
+        <PollingStationListPage />
+      </PollingStationListProvider>,
+    );
+
+    expect(await screen.findByTestId("no-polling-station-data")).toBeVisible();
+    expect(screen.queryByRole("table")).toBeNull();
   });
 });

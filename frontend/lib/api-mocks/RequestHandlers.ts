@@ -16,7 +16,7 @@ import {
 
 import { Database, DataEntryRecord } from "./Database.ts";
 import { validate } from "./DataEntry.ts";
-import { getElectionMockData } from "./ElectionMockData";
+import { electionListMockResponse, getElectionMockData } from "./ElectionMockData";
 import { getPollingStationMockData } from "./PollingStationMockData";
 
 type ParamsToString<T> = {
@@ -102,14 +102,15 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
 export const PollingStationListRequestHandler = http.get<ParamsToString<POLLING_STATION_LIST_REQUEST_PARAMS>>(
   "/api/elections/:election_id/polling_stations",
   ({ params }) => {
-    try {
-      const pollingStations = getPollingStationMockData(Number(params.election_id));
-      return HttpResponse.json({ polling_stations: pollingStations } satisfies PollingStationListResponse, {
-        status: 200,
-      });
-    } catch {
+    const electionId = Number(params.election_id);
+    if (!electionListMockResponse.elections.some((e) => e.id === electionId)) {
       return HttpResponse.json({}, { status: 404 });
     }
+
+    const pollingStations = getPollingStationMockData(electionId);
+    return HttpResponse.json({ polling_stations: pollingStations } satisfies PollingStationListResponse, {
+      status: 200,
+    });
   },
 );
 

@@ -22,8 +22,8 @@ export function PollingStationListProvider({ children, electionId }: PollingStat
     return null;
   }
 
-  if (!data) {
-    return <div>Error no polling stations data</div>;
+  if (!data || !data.polling_stations.length) {
+    return <div id="no-polling-station-data">Er zijn nog geen stembureaus aangemaakt voor deze verkiezing.</div>;
   }
 
   return (

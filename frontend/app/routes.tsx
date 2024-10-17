@@ -4,6 +4,7 @@ import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/C
 import { FinaliseElectionPage } from "app/module/data_entry/page/FinaliseElectionPage";
 import { NotAvailableInMock } from "app/module/NotAvailableInMock.tsx";
 
+import { ErrorBoundary } from "./component/error/ErrorBoundry";
 import {
   CandidatesVotesPage,
   DataEntryHomePage,
@@ -21,7 +22,7 @@ import { RootLayout } from "./module/RootLayout";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/user";
 
 export const routes = createRoutesFromElements(
-  <Route element={<RootLayout />}>
+  <Route element={<RootLayout />} errorElement={<ErrorBoundary />}>
     <Route index path="/" element={<Navigate to="/overview" replace />} />
     <Route path="*" element={<NotFound />} />
     <Route path="/dev" element={<DevHomePage />} />
@@ -30,10 +31,10 @@ export const routes = createRoutesFromElements(
       <Route path="login" element={<LoginPage />} />
       <Route path="account/setup" element={<AccountSetupPage />} />
     </Route>
-    <Route path="/overview" element={<OverviewLayout />} errorElement={<NotFound />}>
+    <Route path="/overview" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />
     </Route>
-    <Route path="elections/:electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
+    <Route path="elections/:electionId" element={<ElectionLayout />}>
       <Route path="data-entry" element={<DataEntryLayout />}>
         <Route index element={<DataEntryHomePage />} />
         <Route path=":pollingStationId" element={<PollingStationLayout />}>

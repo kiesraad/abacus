@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { ApiProvider } from "@kiesraad/api";
-import { AppStateProvider } from "@kiesraad/state";
 
 // ignore in prod
 import { startMockAPI } from "./msw-mock-api";
@@ -23,11 +22,9 @@ function render() {
 
   root.render(
     <StrictMode>
-      <AppStateProvider>
-        <ApiProvider>
-          <RouterProvider router={router} />
-        </ApiProvider>
-      </AppStateProvider>
+      <ApiProvider>
+        <RouterProvider router={router} />
+      </ApiProvider>
     </StrictMode>,
   );
 }

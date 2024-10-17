@@ -23,8 +23,12 @@ export function ElectionProvider({ children, electionId }: ElectionProviderProps
     return null;
   }
 
-  if (!data || error) {
-    throw new Error();
+  if (!data) {
+    throw new Error("Election not found");
+  }
+
+  if (error) {
+    throw error;
   }
 
   return (

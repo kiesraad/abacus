@@ -12,11 +12,18 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-export type ApiError = {
+export class ApiError extends Error {
   status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError;
   code: number;
   error?: string;
-};
+
+  constructor(status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError, code: number, error?: string) {
+    super(error);
+    this.status = status;
+    this.code = code;
+    this.error = error;
+  }
+}
 
 export class ApiClient {
   async responseHandler<T>(response: Response): Promise<ApiResult<T>> {
@@ -58,7 +65,7 @@ export class ApiClient {
         status,
         code: response.status,
         error: (body as ApiError).error,
-      };
+      } as ApiError;
     }
   }
 

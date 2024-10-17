@@ -19,9 +19,8 @@ export function ElectionReportPage() {
     fetch(`/api/elections/${election.id}/download_results`)
       .then((result) => {
         if (result.status !== 200) {
-          // TODO: #277 handle error according to design
           const message = `Failed to download PDF: status code ${result.status}`;
-          alert(message);
+
           throw Error(message);
         }
         filename = result.headers.get("Content-Disposition")?.split('filename="')[1]?.slice(0, -1) ?? "document";

@@ -4,12 +4,16 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { ApiProvider } from "@kiesraad/api";
 
+import { NotFoundError } from "./component/error";
 // ignore in prod
 import { startMockAPI } from "./msw-mock-api";
 import { routes } from "./routes";
 
 const rootDiv = document.getElementById("root");
-if (!rootDiv) throw new Error("Root div not found");
+
+if (!rootDiv) {
+  throw new NotFoundError("Root div not found");
+}
 
 const root = createRoot(rootDiv);
 

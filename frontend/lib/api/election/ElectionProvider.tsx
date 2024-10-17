@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { NotFoundError } from "app/component/error";
+
 import { Election, PollingStation, useElectionDataRequest } from "@kiesraad/api";
 
 export interface iElectionProviderContext {
@@ -23,8 +25,12 @@ export function ElectionProvider({ children, electionId }: ElectionProviderProps
     return null;
   }
 
-  if (!data || error) {
-    throw new Error();
+  if (!data) {
+    throw new NotFoundError("Verkiezing niet gevonden");
+  }
+
+  if (error) {
+    throw error;
   }
 
   return (

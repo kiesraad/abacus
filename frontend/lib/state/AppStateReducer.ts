@@ -6,6 +6,12 @@ export default function appStateReducer(state: AppState, action: AppStateAction)
       ...state,
       error: action.error,
     };
+  } else {
+    //if (action.type === "CLEAR_ERROR") {
+    return {
+      ...state,
+      error: null,
+    };
   }
 
   return state;

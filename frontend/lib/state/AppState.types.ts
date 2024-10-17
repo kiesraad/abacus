@@ -1,14 +1,6 @@
-export interface ApiUnreachable {
-  message: string;
-  trace: string;
-}
+import { ApiError } from "@kiesraad/api";
 
-export interface ApiError {
-  message: string;
-  trace: string;
-}
-
-export type AppError = ApiUnreachable | ApiError;
+export type AppError = Error | ApiError;
 
 export interface AppState {
   error: AppError | null;

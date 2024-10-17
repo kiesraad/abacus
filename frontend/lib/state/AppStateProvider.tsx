@@ -1,4 +1,4 @@
-import { createContext, useReducer } from "react";
+import { Component, createContext, ErrorInfo, useReducer } from "react";
 
 import { AppState, AppStateAction } from "./AppState.types";
 import appStateReducer from "./AppStateReducer";
@@ -21,11 +21,31 @@ export interface AppStateProviderProps {
   children: React.ReactNode;
 }
 
+interface ErrorBoundryProps {
+  dispatch: React.Dispatch<AppStateAction>;
+  children: React.ReactNode;
+}
+
+class ErrorBoundary extends Component<ErrorBoundryProps> {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error(errorInfo);
+    this.props.dispatch({ type: "SET_ERROR", error });
+  }
+
+  render() {
+    return this.props.children;
+  }
+}
+
 export function AppStateProvider({ children }: AppStateProviderProps): React.ReactElement {
   const [state, dispatch] = useReducer<(state: AppState, action: AppStateAction) => AppState>(
     appStateReducer,
     DEFAULT_APP_STATE,
   );
 
-  return <AppStateContext.Provider value={{ state, dispatch }}>{children}</AppStateContext.Provider>;
+  return (
+    <ErrorBoundary dispatch={dispatch}>
+      <AppStateContext.Provider value={{ state, dispatch }}>{children}</AppStateContext.Provider>
+    </ErrorBoundary>
+  );
 }

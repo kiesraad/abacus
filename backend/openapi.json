@@ -896,8 +896,7 @@
           },
           "recounted": {
             "type": "boolean",
-            "description": "Recounted (\"Is er herteld? - See form for official long description of the checkbox\")",
-            "nullable": true
+            "description": "Recounted (\"Is er herteld? - See form for official long description of the checkbox\")"
           },
           "voters_counts": {
             "$ref": "#/components/schemas/VotersCounts"

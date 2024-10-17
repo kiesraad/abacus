@@ -1,0 +1,14 @@
+.errorContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.errorContainer h2 {
+  font-size: var(--font-size-xl);
+  margin-bottom: 2rem;
+}
+
+.errorContainer code {
+  font-weight: bold;
+}

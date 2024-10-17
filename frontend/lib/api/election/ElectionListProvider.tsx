@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { NotFoundError } from "app/component/error";
+
 import { Election, useElectionListRequest } from "@kiesraad/api";
 
 export interface iElectionListProviderContext {
@@ -20,7 +22,7 @@ export function ElectionListProvider({ children }: ElectionListProviderProps) {
   }
 
   if (!data || !data.elections.length) {
-    return <div>Error no election data</div>;
+    throw new NotFoundError("No elections found");
   }
 
   return (

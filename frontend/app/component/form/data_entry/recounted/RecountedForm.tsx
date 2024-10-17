@@ -30,11 +30,7 @@ export function RecountedForm() {
     void (async (event: React.FormEvent<RecountedFormElement>) => {
       event.preventDefault();
 
-      try {
-        await submit();
-      } catch (e) {
-        console.error("Error saving data entry", e);
-      }
+      await submit();
     })(event);
 
   React.useEffect(() => {

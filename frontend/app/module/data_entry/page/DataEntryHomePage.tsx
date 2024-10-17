@@ -6,7 +6,7 @@ import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
-import { Alert, Button, PageTitle, WorkStationNumber } from "@kiesraad/ui";
+import { Alert, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
 export function DataEntryHomePage() {
   const navigate = useNavigate();
@@ -22,18 +22,14 @@ export function DataEntryHomePage() {
   const showDataEntrySavedAlert = location.hash === "#data-entry-saved";
 
   function closeDataEntrySavedAlert() {
-    navigate({ hash: "" });
-  }
-
-  function finishInput() {
-    navigate("finalise");
+    navigate(location.pathname);
   }
 
   return (
     <>
       <PageTitle title="Kies een stembureau - Abacus" />
       <NavBar>
-        <Link to={"/overview"}>Overzicht</Link>
+        <Link to={"/elections"}>Overzicht</Link>
       </NavBar>
       <header>
         <section>
@@ -56,13 +52,12 @@ export function DataEntryHomePage() {
       {statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
           <h2>Alle stembureaus zijn ingevoerd</h2>
+          <p>Bedankt voor je hulp!</p>
           <p>
-            De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief
-            maken en het proces verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.
+            De resultaten van alle stembureaus kunnen nu opgeteld gaan worden om de uitslag van de {election.name} vast
+            te stellen.
           </p>
-          <Button onClick={finishInput} size="md">
-            Invoerfase afronden
-          </Button>
+          <p>Wacht op instructies van de coördinator.</p>
         </Alert>
       )}
       <main>

@@ -3,7 +3,7 @@ import { Link, Outlet, useParams } from "react-router-dom";
 import { NavBar } from "app/component/navbar/NavBar";
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
-import { AbortDataEntryControl } from "app/module/data_entry/PollingStation/AbortDataEntryControl";
+import { AbortDataEntryControl } from "app/module/data_entry";
 
 import { PollingStationFormController, useElection } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
@@ -27,7 +27,7 @@ export function PollingStationLayout() {
     <PollingStationFormController election={election} pollingStationId={pollingStation.id} entryNumber={1}>
       <PageTitle title={`Invoeren ${pollingStation.number} ${pollingStation.name} - Abacus`} />
       <NavBar>
-        <Link to={"/overview"}>Overzicht</Link>
+        <Link to={"/elections"}>Overzicht</Link>
         <IconChevronRight />
         <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
       </NavBar>

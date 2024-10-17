@@ -1,16 +1,11 @@
 import { PollingStationType, usePollingStationList } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
 
-function pollingStationType(pollingStationType: PollingStationType): string {
-  switch (pollingStationType) {
-    case "Bijzonder":
-      return "Bijzonder";
-    case "Mobiel":
-      return "Mobiel";
-    case "VasteLocatie":
-      return "Vaste locatie";
-  }
-}
+const labelForPollingStationType: { [K in PollingStationType]: string } = {
+  FixedLocation: "Vaste locatie",
+  Special: "Bijzonder",
+  Mobile: "Mobiel",
+};
 
 export function PollingStationListPage() {
   const { pollingStations } = usePollingStationList();
@@ -38,7 +33,7 @@ export function PollingStationListPage() {
                 <tr key={station.id}>
                   <td className={"number"}>{station.number}</td>
                   <td>{station.name}</td>
-                  <td>{pollingStationType(station.polling_station_type)}</td>
+                  <td>{labelForPollingStationType[station.polling_station_type]}</td>
                   <td className="link">
                     <div className="link">
                       <IconChevronRight />

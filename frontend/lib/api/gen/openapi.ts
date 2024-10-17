@@ -176,6 +176,9 @@ export interface PollingStation {
   street: string;
 }
 
+/**
+ * Polling station list response
+ */
 export interface PollingStationListResponse {
   polling_stations: PollingStation[];
 }
@@ -192,7 +195,7 @@ Bijlage 2: uitkomsten per stembureau" from the
 export interface PollingStationResults {
   differences_counts: DifferencesCounts;
   political_group_votes: PoliticalGroupVotes[];
-  recounted?: boolean;
+  recounted?: boolean | null;
   voters_counts: VotersCounts;
   voters_recounts?: VotersRecounts;
   votes_counts: VotesCounts;
@@ -208,7 +211,7 @@ export interface PollingStationStatusEntry {
 /**
  * Type of Polling station
  */
-export type PollingStationType = "VasteLocatie" | "Bijzonder" | "Mobiel";
+export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
 
 /**
  * Request structure for saving data entry of polling station results

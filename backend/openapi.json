@@ -1012,9 +1012,9 @@
         "type": "string",
         "description": "Type of Polling station",
         "enum": [
-          "VasteLocatie",
-          "Bijzonder",
-          "Mobiel"
+          "FixedLocation",
+          "Special",
+          "Mobile"
         ]
       },
       "SaveDataEntryRequest": {

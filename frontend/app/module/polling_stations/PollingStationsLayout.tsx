@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 
-import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { PollingStationListProvider } from "@kiesraad/api";
@@ -16,7 +15,6 @@ export function PollingStationsLayout() {
       <PollingStationListProvider electionId={electionId}>
         <NavBar />
         <Outlet />
-        <Footer />
       </PollingStationListProvider>
     </div>
   );

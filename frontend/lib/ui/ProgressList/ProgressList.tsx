@@ -30,19 +30,32 @@ export type ProgressListItemProps = {
   disabled?: boolean;
   children?: React.ReactNode;
   id?: string;
+  scrollIntoView?: boolean;
 };
 
-ProgressList.Item = function ProgressListItem({ active, status, disabled, children, id }: ProgressListItemProps) {
+ProgressList.Item = function ProgressListItem({
+  active,
+  status,
+  disabled,
+  children,
+  id,
+  scrollIntoView,
+}: ProgressListItemProps) {
   const icon = renderStatusIcon(active ? "active" : status);
   const ref = React.useRef<HTMLLIElement>(null);
 
   React.useEffect(() => {
-    if (active) {
-      ref.current?.scrollIntoView({
+    if (scrollIntoView && active) {
+      const li = ref.current;
+      const ul = ref.current?.parentElement;
+      if (!li || !ul) return;
+      //use scrollTo because scrollIntoView also scrolls the root element
+      ul.scrollTo({
+        top: li.offsetTop - 10,
         behavior: "smooth",
       });
     }
-  }, [active]);
+  }, [scrollIntoView, active]);
   return (
     <li
       ref={ref}

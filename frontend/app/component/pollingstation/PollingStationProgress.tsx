@@ -114,6 +114,7 @@ export function PollingStationProgress() {
               disabled={formSection.index > currentIndex}
               status={menuStatusForFormSection(formSection)}
               active={formState.current === formSection.id}
+              scrollIntoView
             >
               {formState.current !== formSection.id && formSection.index <= currentIndex ? (
                 <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/list/${listId}`}>

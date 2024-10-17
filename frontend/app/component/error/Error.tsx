@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { IconArrowLeft } from "@kiesraad/icon";
 
-import { Button } from "../../../lib/ui/Button/Button";
+import { Button } from "@kiesraad/ui
 import cls from "./Error.module.css";
 import errorImage from "./error.png";
 import { ErrorAction } from "./Error.types";

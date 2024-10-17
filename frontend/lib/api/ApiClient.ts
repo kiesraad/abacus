@@ -23,6 +23,12 @@ export class ApiError extends Error {
     this.code = code;
     this.error = error;
   }
+
+  withContext(message: string): this {
+    this.error = message;
+
+    return this;
+  }
 }
 
 export class ApiClient {
@@ -31,15 +37,19 @@ export class ApiClient {
     if (response.headers.get("Content-Type") === "application/json") {
       try {
         body = (await response.json()) as T | ApiError;
-      } catch (err: unknown) {
-        console.error("Server response parse error:", err);
-        throw new Error(`Server response parse error: ${response.status}`);
+      } catch (e) {
+        console.error("Failed to parse json", e);
+        throw new ApiError(
+          ApiResponseStatus.ServerError,
+          response.status,
+          `Server response parse error: ${response.status}`,
+        );
       }
     } else {
       body = await response.text();
       if (body.length > 0) {
         console.error("Unexpected data from server:", body);
-        throw new Error(`Unexpected data from server: ${body}`);
+        throw new ApiError(ApiResponseStatus.ServerError, response.status, `Unexpected data from server: ${body}`);
       }
     }
 
@@ -51,7 +61,11 @@ export class ApiClient {
     } else if (response.status >= 500 && response.status <= 599) {
       status = ApiResponseStatus.ServerError;
     } else {
-      throw new Error(`Unexpected response status: ${response.status}`);
+      throw new ApiError(
+        ApiResponseStatus.ServerError,
+        response.status,
+        `Unexpected response status: ${response.status}`,
+      );
     }
 
     if (status === ApiResponseStatus.Success) {

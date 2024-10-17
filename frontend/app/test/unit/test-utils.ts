@@ -60,6 +60,10 @@ export const setupTestRouter = () => {
   });
 };
 
-export const expectNotFound = async () => {
-  expect(await screen.findByText(/We kunnen de pagina die je zoekt niet vinden/)).toBeVisible();
+export const expectErrorPage = async () => {
+  expect(await screen.findByText(/Abacus is stuk/)).toBeVisible();
+};
+
+export const expectNotFound = async (message?: string) => {
+  expect(await screen.findByText(new RegExp(message || "Pagina niet gevonden"))).toBeVisible();
 };

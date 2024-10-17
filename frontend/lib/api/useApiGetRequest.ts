@@ -36,7 +36,7 @@ export function useApiGetRequest<T>(path: string): UseApiGetRequestReturn<T> {
       .catch((e: unknown) => {
         setLoading(false);
         if (isSubscribed) {
-          console.error("GET API error", e);
+          throw e;
         }
       });
     return () => {

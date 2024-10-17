@@ -1,13 +1,22 @@
 import { useRouteError } from "react-router-dom";
 
+import { FatalError } from "app/module/FatalError";
 import { NotFound } from "app/module/NotFound";
 
-export function ErrorBoundary() {
-  const error = useRouteError();
+import { ApiError } from "@kiesraad/api";
 
-  if (error) {
-    console.error(error);
+import { NotFoundError } from "./Error.types";
+
+export function ErrorBoundary() {
+  const error = useRouteError() as Error;
+
+  if (error instanceof NotFoundError) {
+    return <NotFound message={error.message} path={error.path} />;
   }
 
-  return <NotFound />;
+  if (error instanceof ApiError) {
+    return <FatalError message={error.message} code={error.code} />;
+  }
+
+  return <FatalError message={error.message} />;
 }

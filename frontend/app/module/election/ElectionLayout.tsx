@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-import { ElectionProvider } from "@kiesraad/api";
+import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 import { useNumericParam } from "@kiesraad/util";
 
 export function ElectionLayout() {
@@ -8,7 +8,9 @@ export function ElectionLayout() {
 
   return (
     <ElectionProvider electionId={electionId}>
-      <Outlet />
+      <ElectionStatusProvider electionId={electionId}>
+        <Outlet />
+      </ElectionStatusProvider>
     </ElectionProvider>
   );
 }

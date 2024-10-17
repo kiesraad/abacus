@@ -1,2 +1,2 @@
-export * from "./CheckboxAndRadio.tsx";
+export * from "./CheckboxAndRadio";
 export * from "./ChoiceList";

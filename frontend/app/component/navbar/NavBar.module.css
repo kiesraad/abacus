@@ -10,34 +10,43 @@
 
   .links {
     display: flex;
-    gap: 0.5rem;
+    &:not(:has(svg)) {
+      gap: 0.5rem;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+      &:hover,
+      &:active {
+        color: inherit !important;
+      }
+    }
+
+    a,
+    span {
+      display: flex;
+      height: 3rem;
+      padding: 0.5rem 0.75rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    span:first-of-type:not(:global(.active)) {
+      padding-left: 0;
+    }
+
+    span:global(.active) {
+      border-bottom: 4px solid var(--accent-orange);
+      padding-bottom: calc(0.5rem - 4px);
+      font-weight: bold;
+    }
   }
 
   .userInfo {
     display: flex;
     align-items: center;
-  }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-    &:hover,
-    &:active {
-      color: inherit !important;
-    }
-  }
-
-  span {
-    display: flex;
-    height: 3rem;
-    padding: 0.5rem 0.75rem;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  span.active {
-    border-bottom: 4px solid var(--accent-orange);
+    gap: 0.25rem;
   }
 
   svg {

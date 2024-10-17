@@ -35,8 +35,9 @@
   border-radius: 1rem;
   border: 2px solid var(--base-white);
   display: inline-flex;
+  gap: 0.5rem;
+  max-width: fit-content;
   align-items: center;
-  gap: 0.25rem;
 }
 
 .correction {

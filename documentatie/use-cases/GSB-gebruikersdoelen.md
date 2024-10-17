@@ -15,12 +15,13 @@ __trigger:__ De coördinator geeft het SB PV en eventueel SB corrigendum PV aan 
 __hoofdscenario__:
 
 1. De invoerder selecteert het stembureau van het PV in de applicatie.
-2. De invoerder vult de resultaten van de telling in.
-3. (tijdens invoer) De applicatie controleert dat de invoer voldoet aan
-   de [validatieregels voor fouten](./GSB-validatieregels-plausibiliteitschecks.md#validatieregels-geven-fouten)
+2. De applicatie controleert dat er geen eerdere invoer voor het stembureau is opgeslagen.
+3. De invoerder vult de resultaten van de telling in.
 4. (tijdens invoer) De applicatie controleert dat de invoer voldoet aan
+   de [validatieregels voor fouten](./GSB-validatieregels-plausibiliteitschecks.md#validatieregels-geven-fouten)
+5. (tijdens invoer) De applicatie controleert dat de invoer voldoet aan
    de [plausibiliteitschecks](./GSB-validatieregels-plausibiliteitschecks.md#plausibiliteitschecks-geven-waarschuwingen).
-5. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
+6. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
 
 __uitbreidingen__:  
 1a. De invoerder kan het stembureau op het PV niet in de applicatie vinden:  
@@ -29,21 +30,30 @@ __uitbreidingen__:
 &emsp; &emsp; 1a2a. Het stembureau is niet aanwezig in de applicatie:  
 &emsp; &emsp; &emsp; 1a2a1. De coördinator voegt het stembureau toe in de applicatie.  
 1b. De tweede invoerder heeft ook de eerste invoer gedaan:  
-1c. De invoerder selecteert het verkeerde stembureau:  
-1d. De invoerder selecteert een stembureau waar iemand anders mee bezig is:
+1c. De invoerder selecteert een ander stembureau dan op het PV staat:  
+1d. De invoerder selecteert een stembureau waar iemand anders mee bezig is:  
+1e. De invoerder selecteert een stembureau waar een andere gebruiker invoer voor heeft opgeslagen:  
+1f. De invoerder selecteert een stembureau waarvan de invoer al definitief is:  
+&emsp; 1f1. De applicatie toont een foutmelding.
 
-2a. De invoerder breekt de invoer af en bewaart de invoer:  
-&emsp; 2a1. Dezelfde invoerder hervat de invoer op een later moment.  
-2b. De invoerder breekt de invoer af en bewaart de invoer niet:  
-&emsp; 2a1. Dezelfde of een andere invoerder begint op een later moment opnieuw met de invoer.
+2a. De applicatie stelt vast dat de invoerder eerdere invoer voor het stembureau heeft opgeslagen:  
+&emsp; 2a1. De applicatie laadt de eerder ingevoerde data.
 
-3a. De invoer voldoet niet aan de validatieregels voor fouten:  
-&emsp; 3a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel.  
-&emsp; 3a2. [De invoerder handelt de fout(en) af.](./GSB-subfuncties.md#de-invoerder-handelt-de-fouten-af)  
-4a. De invoer voldoet niet aan de plausibiliteitschecks:  
-&emsp; 4a1. De applicatie toont een waarschuwing voor elke gefaalde plausibiliteitscheck.  
+4a. De invoer voldoet niet aan de validatieregels voor fouten:  
+&emsp; 4a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel.  
+&emsp; 4a2. [De invoerder handelt de fout(en) af.](./GSB-subfuncties.md#de-invoerder-handelt-de-fouten-af)  
+
+5a. De invoer voldoet niet aan de plausibiliteitschecks:  
+&emsp; 5a1. De applicatie toont een waarschuwing voor elke gefaalde plausibiliteitscheck.  
 &emsp;
-4a2. [De invoerder handelt de waarschuwing(en) af.](./GSB-subfuncties.md#de-invoerder-handelt-de-waarschuwingen-af)
+5a2. [De invoerder handelt de waarschuwing(en) af.](./GSB-subfuncties.md#de-invoerder-handelt-de-waarschuwingen-af)
+
+6a. De invoerder breekt de invoer af en bewaart de invoer:  
+&emsp; 6a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  
+&emsp; 6a2. De applicatie laadt de pagina voor het selecteren van een stembureau.  
+6b. De invoerder breekt de invoer af en bewaart de invoer niet:  
+&emsp; 6b1. De applicatie verwijdert de invoer voor het stembureau.  
+&emsp; 6b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
 
 ## De coördinator lost de verschillen tussen de twee invoeren op
 

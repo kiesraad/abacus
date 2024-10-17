@@ -2,17 +2,16 @@ import { Outlet } from "react-router-dom";
 
 import { Footer } from "app/component/footer/Footer";
 
-import { ElectionStatusProvider, useElection } from "@kiesraad/api";
+import { ElectionListProvider } from "@kiesraad/api";
 import { AppLayout } from "@kiesraad/ui";
 
-export function DataEntryLayout() {
-  const { election } = useElection();
+export function OverviewLayout() {
   return (
-    <ElectionStatusProvider electionId={election.id}>
+    <ElectionListProvider>
       <AppLayout>
         <Outlet />
         <Footer />
       </AppLayout>
-    </ElectionStatusProvider>
+    </ElectionListProvider>
   );
 }

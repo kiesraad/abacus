@@ -21,7 +21,7 @@ test("The first entry badge is visible", () => {
 });
 
 test("The first entry in progress badge is visible", () => {
-  render(<Badge type="first_entry_in_progress" />);
+  render(<Badge type="first_entry_in_progress" showIcon />);
 
   const badgeElement = screen.getByText("1e invoer");
   const badgeElementImg = screen.getByRole("img");

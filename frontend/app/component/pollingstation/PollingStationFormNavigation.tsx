@@ -1,7 +1,7 @@
 import * as React from "react";
 import { BlockerFunction, useBlocker, useNavigate } from "react-router-dom";
 
-import { AbortDataEntryModal } from "app/module/data_entry/PollingStation/AbortDataEntryModal";
+import { AbortDataEntryModal } from "app/module/data_entry";
 
 import {
   AnyFormReference,

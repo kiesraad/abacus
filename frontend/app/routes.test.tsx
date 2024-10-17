@@ -55,7 +55,6 @@ describe("routes", () => {
 
   test("Not found page when polling station is finalised", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
-
     await router.navigate("/elections/1/data-entry/2");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/2");
     render();

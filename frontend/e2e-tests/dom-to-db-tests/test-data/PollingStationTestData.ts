@@ -8,7 +8,7 @@ export const pollingStation33: PollingStation = {
   name: "Op Rolletjes",
   number: 33,
   number_of_voters: undefined,
-  polling_station_type: "Mobiel",
+  polling_station_type: "Mobile",
   street: "Rijksweg A12",
   house_number: "1",
   house_number_addition: undefined,

@@ -43,6 +43,9 @@ export function DevHomePage() {
               <li>
                 <Link to={`/elections/1#coordinator`}>Verkiezing 1</Link>
               </li>
+              <li>
+                <Link to={`/elections/1/polling-stations#coordinator`}>Verkiezing 1 stembureaus</Link>
+              </li>
             </ul>
             <li>
               <Link to={`/users#administratorcoordinator`}>Gebruikers beheren</Link>

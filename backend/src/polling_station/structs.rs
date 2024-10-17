@@ -25,17 +25,17 @@ pub struct PollingStation {
 /// Type of Polling station
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
 pub enum PollingStationType {
-    VasteLocatie,
-    Bijzonder,
-    Mobiel,
+    FixedLocation,
+    Special,
+    Mobile,
 }
 
 impl From<String> for PollingStationType {
     fn from(value: String) -> Self {
         match value.as_str() {
-            "vaste_locatie" => Self::VasteLocatie,
-            "bijzonder" => Self::Bijzonder,
-            "mobiel" => Self::Mobiel,
+            "vaste_locatie" => Self::FixedLocation,
+            "bijzonder" => Self::Special,
+            "mobiel" => Self::Mobile,
             _ => panic!("invalid PollingStationType"),
         }
     }
@@ -69,7 +69,7 @@ pub(crate) mod tests {
             name: "Testplek".to_string(),
             number: 34,
             number_of_voters,
-            polling_station_type: PollingStationType::Bijzonder,
+            polling_station_type: PollingStationType::Special,
             street: "Teststraat".to_string(),
             house_number: "2".to_string(),
             house_number_addition: Some("b".to_string()),

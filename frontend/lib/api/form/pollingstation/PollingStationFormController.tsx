@@ -162,7 +162,6 @@ export function PollingStationFormController({
   const [values, setValues] = React.useState<PollingStationResults>();
   const [formState, setFormState] = React.useState<FormState>();
 
-  // TODO: #277 render custom error page instead of passing error down
   const [apiError, setApiError] = React.useState<ApiError | null>(null);
 
   // the form section to navigate to next
@@ -216,15 +215,12 @@ export function PollingStationFormController({
         };
         void client.postRequest(requestPath, requestBody).then((response) => {
           if (response.status !== ApiResponseStatus.Success) {
-            // TODO: #277 render custom error page
-            console.error("Failed to save data entry", response);
             setApiError(response);
-            throw new Error("Failed to save data entry");
+            return;
           }
         });
       } else {
         setApiError(initialDataRequest.error);
-        throw new Error("Failed to load data entry");
       }
     }
   }, [
@@ -347,12 +343,12 @@ export function PollingStationFormController({
       client_state: clientState,
     } satisfies SaveDataEntryRequest);
     status.current = aborting ? "aborted" : "idle";
+
     if (response.status !== ApiResponseStatus.Success) {
-      // TODO: #277 render custom error page
-      console.error("Failed to save data entry", response);
       setApiError(response);
-      throw new Error("Failed to save data entry");
+      return;
     }
+
     const data = response.data as SaveDataEntryResponse;
     setApiError(null);
 
@@ -370,10 +366,8 @@ export function PollingStationFormController({
     const response = await client.deleteRequest(requestPath);
     // ignore 404, as it means the data entry was never saved or already deleted
     if (response.status !== ApiResponseStatus.Success && response.code !== 404) {
-      // TODO: #277 render custom error page
-      console.error("Failed to delete data entry", response);
       status.current = "idle";
-      throw new Error("Failed to delete data entry");
+      throw response.withContext("Failed to delete data entry");
     }
     status.current = "deleted";
   };
@@ -382,13 +376,12 @@ export function PollingStationFormController({
     status.current = "finalising";
     const response = await client.postRequest(requestPath + "/finalise");
     if (response.status !== ApiResponseStatus.Success) {
-      console.error("Failed to finalise data entry", response);
       status.current = "idle";
       setApiError(response);
-      throw new Error("Failed to finalise data entry");
+    } else {
+      setApiError(null);
+      status.current = "finalised";
     }
-    setApiError(null);
-    status.current = "finalised";
   };
 
   return (

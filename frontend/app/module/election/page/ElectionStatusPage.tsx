@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 
-import { ElectionProgress } from "app/component/election/ElectionProgress";
+import { ElectionStatusProgress } from "app/component/election/ElectionStatusProgress";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
@@ -39,12 +39,7 @@ export function ElectionStatusPage() {
         </Alert>
       )}
       <main>
-        <nav id="progress">
-          <h2>Snelkoppelingen</h2>
-
-          <h2>Voortgang</h2>
-          <ElectionProgress />
-        </nav>
+        <ElectionStatusProgress />
         <article>Placeholder</article>
       </main>
     </>

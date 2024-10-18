@@ -1,7 +1,6 @@
-import { within } from "@testing-library/react";
 import { expect } from "vitest";
 
-import { screen } from "app/test/unit";
+import { screen, within } from "app/test/unit";
 
 export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(fields: Array<string>, feedbackMessage: string) {
   fields.forEach((field) => {

@@ -1,19 +1,19 @@
 import type { Story } from "@ladle/react";
 
-import { ProgressBar } from "./ProgressBar";
+import { ProgressBar } from "@kiesraad/ui";
 
 type Props = {
   title: string;
-  percent: number;
+  percentage: number;
 };
 
-export const DefaultProgressBar: Story<Props> = ({ title, percent }) => (
-  <ProgressBar title={title} percent={percent} id="test" />
+export const DefaultProgressBar: Story<Props> = ({ title, percentage }) => (
+  <ProgressBar id="test" percentagesAndColorClasses={[{ percentage: percentage, class: "default" }]} title={title} />
 );
 
 export default {
   args: {
     title: "1e invoer",
-    percent: 47,
+    percentage: 47,
   },
 };

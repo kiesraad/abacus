@@ -29,16 +29,20 @@ export function ElectionProgress() {
   }, [pollingStations, statuses]);
 
   return (
-    <div>
-      {stats.map((stat) => (
-        <ProgressBar
-          key={stat.id}
-          id={stat.id}
-          title={stat.title}
-          percent={Math.round(stat.percentage * 100)}
-          spacing="small"
-        />
-      ))}
-    </div>
+    <nav id="progress">
+      <div>
+        <h2 className="form_title">Voortgang</h2>
+        {stats.map((stat) => (
+          <ProgressBar
+            key={stat.id}
+            id={stat.id}
+            percentagesAndColorClasses={[{ percentage: Math.round(stat.percentage * 100), class: "default" }]}
+            title={stat.title}
+            spacing="small"
+            showPercentage
+          />
+        ))}
+      </div>
+    </nav>
   );
 }

@@ -26,14 +26,52 @@
 
 .progressbar-outer {
   flex: 1 1 auto;
-  height: 8px;
+  height: 0.5rem;
   background-color: var(--gray-200);
   border-radius: 0.5rem;
+  display: flex;
+  flex-direction: row;
 }
 
 .progressbar-inner {
-  background-color: var(--color-notify);
-  height: 8px;
-  border-radius: 0.5rem;
+  height: 100%;
   width: 50%;
+}
+
+.default-radius {
+  border-radius: 0.5rem;
+}
+.no-radius-right {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+.no-radius-left {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.default {
+  background-color: var(--progress-bar-default);
+}
+
+.errors_and_warnings {
+  background-color: var(--progress-bar-errors-and-warnings);
+}
+
+.unfinished {
+  background-color: var(--progress-bar-unfinished);
+}
+
+.in_progress {
+  background-color: var(--progress-bar-in-progress);
+}
+
+.first_entry_finished {
+  background-color: var(--progress-bar-first-entry-finished);
+}
+
+.definitive {
+  background-color: var(--progress-bar-definitive);
+}
+
+.not_started {
+  background-color: var(--progress-bar-not-started);
 }

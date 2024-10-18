@@ -1,8 +1,8 @@
-import { render as rtlRender, screen } from "@testing-library/react";
+import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { ElectionReportPage } from "app/module/election";
-import { expectNotFound, overrideOnce, Providers, render, setupTestRouter } from "app/test/unit";
+import { expectNotFound, overrideOnce, Providers, render, screen, setupTestRouter } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 

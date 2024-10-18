@@ -8,6 +8,12 @@
     }
   }
 
+  &.default {
+    svg {
+      fill: var(--progress-bar-default);
+    }
+  }
+
   &.error {
     svg {
       fill: var(--color-error-darkest);
@@ -17,6 +23,42 @@
   &.accept {
     svg {
       fill: var(--color-success);
+    }
+  }
+
+  &.errors_and_warnings {
+    svg {
+      fill: var(--progress-bar-errors-and-warnings);
+    }
+  }
+
+  &.unfinished {
+    svg {
+      fill: var(--progress-bar-unfinished);
+    }
+  }
+
+  &.in_progress {
+    svg {
+      fill: var(--progress-bar-in-progress);
+    }
+  }
+
+  &.first_entry_finished {
+    svg {
+      fill: var(--progress-bar-first-entry-finished);
+    }
+  }
+
+  &.definitive {
+    svg {
+      fill: var(--progress-bar-definitive);
+    }
+  }
+
+  &.not_started {
+    svg {
+      fill: var(--progress-bar-not-started);
     }
   }
 

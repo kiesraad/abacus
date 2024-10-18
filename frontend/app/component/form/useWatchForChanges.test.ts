@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
+
+import { renderHook, waitFor } from "app/test/unit";
 
 import { useWatchForChanges } from "./useWatchForChanges";
 

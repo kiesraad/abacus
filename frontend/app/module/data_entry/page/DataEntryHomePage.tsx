@@ -64,10 +64,7 @@ export function DataEntryHomePage() {
         <article id="polling-station-choice-form">
           <PollingStationChoiceForm anotherEntry={showDataEntrySavedAlert} />
         </article>
-        <nav id="progress">
-          <h2 className="form_title">Voortgang</h2>
-          <ElectionProgress />
-        </nav>
+        <ElectionProgress />
       </main>
     </>
   );

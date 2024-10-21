@@ -12,9 +12,9 @@ Voor de vertaling van begrippen uit de wet naar variabelen en functienamen in on
 | Kiesraad | KR | Electoral Council | |
 | Stemlokaal | | Polling Place | Deze zouden we in de code niet moeten gebruiken |
 | Stembureau | SB | Polling Station | |
-| Vaste Locatie | | Fixed Location | Stembureau type |
-| Mobiel | | Mobile | Stembureau type |
-| Bijzonder | | Special | Stembureau type |
+| Vaste Locatie | | Fixed Location | Stembureautype |
+| Mobiel | | Mobile | Stembureautype |
+| Bijzonder | | Special | Stembureautype |
 | Gemeentelijk Stembureau | GSB | Municipal Polling Station | |
 | Hoofdstembureau | HSB | District Polling Station | |
 | Centraal Stembureau | CSB | Central Polling Station | |

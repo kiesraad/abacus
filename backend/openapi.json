@@ -895,10 +895,7 @@
             "description": "Vote counts per list and candidate (5. \"Aantal stemmen per lijst en kandidaat\")"
           },
           "recounted": {
-            "type": [
-              "boolean",
-              "null"
-            ],
+            "type": "boolean",
             "description": "Recounted (\"Is er herteld? - See form for official long description of the checkbox\")"
           },
           "voters_counts": {

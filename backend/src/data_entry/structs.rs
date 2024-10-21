@@ -65,6 +65,8 @@ pub struct PollingStationResultsEntry {
 #[cfg_attr(test, derive(Default))]
 pub struct PollingStationResults {
     /// Recounted ("Is er herteld? - See form for official long description of the checkbox")
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub recounted: Option<bool>,
     /// Voters counts ("1. Aantal toegelaten kiezers")
     pub voters_counts: VotersCounts,

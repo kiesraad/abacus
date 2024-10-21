@@ -8,24 +8,29 @@ export interface Translation {
   role: string;
   status: string;
   "account.title": string;
+  test: string;
 }
 
-const translations: Record<Locale, Translation> = {
+export const translations: Record<Locale, Translation> = {
   [Locale.nl]: {
     election: "Verkiezing",
     role: "Rol",
     status: "Status",
     "account.title": "Je account is ingesteld",
+    test: "Hallo wereld, <link>hier<link> is de uitleg",
   },
   [Locale.en]: {
     election: "Election",
     role: "Role",
     status: "Status",
     "account.title": "Your account is set up",
+    test: "Hello to world, <link>here<link> is the explanation",
   },
 };
 
-export const locale: Locale = Locale.nl;
+export const locale: Locale = Locale.en;
+
+export type TranslationKey = keyof Translation;
 
 export function t(k: keyof Translation, vars?: Record<string, string>): string {
   if (vars) {
@@ -35,3 +40,5 @@ export function t(k: keyof Translation, vars?: Record<string, string>): string {
   }
   return translations[locale][k];
 }
+
+export * from "./react";

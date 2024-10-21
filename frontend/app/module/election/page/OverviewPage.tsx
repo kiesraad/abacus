@@ -1,11 +1,10 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import { NavBar } from "app/component/navbar/NavBar";
-
 import { Election, useElectionList } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
+import { t, tx } from "@kiesraad/i18n";
 import { IconCheckHeart, IconChevronRight } from "@kiesraad/icon";
 import { Alert, Icon, PageTitle, WorkStationNumber } from "@kiesraad/ui";
+import { NavBar } from "app/component/navbar/NavBar";
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -60,6 +59,12 @@ export function OverviewPage() {
       )}
       <main>
         <article>
+          <div style={{ padding: 32, border: "1px solid red" }}>
+            {tx("test", {
+              link: <Link to="https://www.kiesraad.nl" />,
+            })}
+          </div>
+
           <table id="overview" className="overview_table">
             <thead>
               <tr>

@@ -61,12 +61,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route("/:election_id/status", get(election::election_status));
 
-    let app = Router::new()
-        .nest("/api/elections", election_routes)
-        .nest(
-            "/api/polling_stations/:polling_station_id/data_entries",
-            data_entry_routes,
-        );
+    let app = Router::new().nest("/api/elections", election_routes).nest(
+        "/api/polling_stations/:polling_station_id/data_entries",
+        data_entry_routes,
+    );
 
     #[cfg(feature = "memory-serve")]
     let app = {

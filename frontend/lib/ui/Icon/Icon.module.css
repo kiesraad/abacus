@@ -1,7 +1,6 @@
 .icon {
   display: inline-block;
   fill: currentColor;
-  stroke: currentColor;
 
   &.warning {
     svg {

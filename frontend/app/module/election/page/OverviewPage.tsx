@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { Election, useElectionList } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
+import { t, tx } from "@kiesraad/i18n";
 import { IconCheckHeart, IconChevronRight } from "@kiesraad/icon";
 import { Alert, Icon, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
@@ -61,9 +61,13 @@ export function OverviewPage() {
       <main>
         <article>
           <div style={{ padding: 32, border: "1px solid red" }}>
-            {t("test", {
+            {tx("test", {
               wereld: "Les",
-              link: (text) => <Link to="https://www.kiesraad.nl">{text}</Link>,
+              link: (text) => (
+                <Link aria-label={t("elections")} to="https://www.kiesraad.nl">
+                  {text}
+                </Link>
+              ),
             })}
           </div>
 

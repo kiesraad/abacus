@@ -72,7 +72,7 @@ export function OverviewPage() {
             <thead>
               <tr>
                 <th>{t("election")}</th>
-                <th>{t("role")}</th>
+                {isAdministrator && <th>{t("role")}</th>}
                 <th>{t("status")}</th>
                 <th></th>
               </tr>

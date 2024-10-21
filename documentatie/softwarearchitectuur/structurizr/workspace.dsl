@@ -11,22 +11,22 @@ workspace "Abacus" "Software Architecture for Abacus" {
             backend = container "Backend" "Biedt Abacus API" "Rust" {
                 beheer = component "Beheer" "Beheer van verkiezingen, verkiezingsgegevens en de zitting."
                 gebruikers = component "Gebruikers" "Gebruikers en rollen: beheer, authenticatie, autorisatie."
-                verkiezingen = component "Verkiezingsgegevens" "Verkiezingsgegevens incl. politieke groeperingen, kandidatenlijsten en stembureau's."
-                invoeren = component "Invoer" "Invoeren en validatie van telresultaten."
-                telresultaten = component "Telresultaten" "Gecontroleerde telresultaten van stembureau's."
+                verkiezingen = component "Verkiezingsgegevens" "Verkiezingsgegevens incl. politieke groeperingen, kandidatenlijsten en stembureaus."
+                invoeren = component "Invoer" "Invoeren en validatie van tellingen."
+                telresultaten = component "Telresultaten" "Gecontroleerde telresultaten van stembureaus."
                 exporteren = component "Exporteren" "Exporteren van resultaten."
                 eml_nl = component "EML_NL generator" "EML_NL-bestandenexport."
                 pdf = component "PDF generator" "PDF-bestandenexport via Typst."
                 zetelverdeling = component "Zetelverdeling" "Zetelverdeling na invoer van alle telresultaten."
                 statistieken = component "Statistieken" "Statistieken van het uitslagvaststellingsproces."
             }
-            database = container "Database" "SQLite" "Bewaart ingevoerde gegevens" "Database"
+            database = container "Database" "Bewaart ingevoerde gegevens" "SQLite" "Database"
         }
 
         plt = softwareSystem "Platform Teluitslagen" "Bewaart teluitslagen voor uitwisseling met HSB en CSB." "Existing System"
         plu = softwareSystem "Uitwisselingsplatform" "Installatiebestand, verkiezingsdefinitie en kandidatenlijst in EML_NL formaat." "Existing System"
-        t = element "Tellingen" "Tellingen" "Papieren tellingen van de stembureau's." "Papier"
-        pv = element "Proces-verbaal" "Proces-verbaal" "Geprint proces-verbaal van de uitslagziting." "Papier"
+        t = element "Tellingen" "Tellingen" "Papieren tellingen van de stembureaus." "Papier"
+        pv = element "Proces-verbaal" "Proces-verbaal" "Geprint proces-verbaal van de uitslagzitting." "Papier"
 
         # relaties tussen systemen
         afz -> abc "Scan van hash van uitslag" "QR-code"

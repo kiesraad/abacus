@@ -1,10 +1,11 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import { NavBar } from "app/component/navbar/NavBar";
+
 import { Election, useElectionList } from "@kiesraad/api";
-import { t, tx } from "@kiesraad/i18n";
+import { t } from "@kiesraad/i18n";
 import { IconCheckHeart, IconChevronRight } from "@kiesraad/icon";
 import { Alert, Icon, PageTitle, WorkStationNumber } from "@kiesraad/ui";
-import { NavBar } from "app/component/navbar/NavBar";
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ export function OverviewPage() {
       </NavBar>
       <header>
         <section>
-          <h1>{`Verkiezingen${isAdministrator ? " beheren" : ""}`}</h1>
+          <h1>{isAdministrator ? t("elections") : t("manage_elections")}</h1>
         </section>
         {!isAdministrator && (
           <section>
@@ -53,15 +54,16 @@ export function OverviewPage() {
       </header>
       {isNewAccount && (
         <Alert type="success" onClose={closeNewAccountAlert}>
-          <h2>{t("account.title")}</h2>
+          <h2>{t("account.configured")}</h2>
           <p>Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.</p>
         </Alert>
       )}
       <main>
         <article>
           <div style={{ padding: 32, border: "1px solid red" }}>
-            {tx("test", {
-              link: <Link to="https://www.kiesraad.nl" />,
+            {t("test", {
+              wereld: "Les",
+              link: (text) => <Link to="https://www.kiesraad.nl">{text}</Link>,
             })}
           </div>
 

@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { IconDot } from "@kiesraad/icon";
-import { Icon, PercentageAndColorClass, ProgressBar } from "@kiesraad/ui";
+import { Icon, PercentageAndColorClass, Progress, ProgressBar } from "@kiesraad/ui";
 
 type Stat = {
   title: string;
@@ -43,7 +43,7 @@ export function ElectionStatusProgress() {
   const percentagesAndColorClasses: PercentageAndColorClass[] = [];
 
   return (
-    <nav id="progress">
+    <Progress>
       <div className="column">
         <h2>Snelkoppelingen</h2>
         {stats.map((stat, index) => {
@@ -58,8 +58,8 @@ export function ElectionStatusProgress() {
       </div>
       <div className="column">
         <h2>Voortgang</h2>
-        <ProgressBar key="all" id="all" percentagesAndColorClasses={percentagesAndColorClasses} spacing="small" />
+        <ProgressBar key="all" id="all" data={percentagesAndColorClasses} spacing="small" />
       </div>
-    </nav>
+    </Progress>
   );
 }

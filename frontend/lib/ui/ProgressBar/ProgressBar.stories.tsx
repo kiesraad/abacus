@@ -8,7 +8,7 @@ type Props = {
 };
 
 export const DefaultProgressBar: Story<Props> = ({ title, percentage }) => (
-  <ProgressBar id="test" percentagesAndColorClasses={[{ percentage: percentage, class: "default" }]} title={title} />
+  <ProgressBar id="test" data={{ percentage: percentage, class: "default" }} title={title} />
 );
 
 export default {

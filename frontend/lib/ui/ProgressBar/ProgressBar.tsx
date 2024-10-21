@@ -11,7 +11,6 @@ export type ProgressBarColorClass =
   | "definitive"
   | "not_started";
 
-export type RadiusClass = "no-radius" | "default-radius" | "radius-right" | "radius-left";
 export type PercentageAndColorClass = {
   percentage: number;
   class: ProgressBarColorClass;
@@ -19,63 +18,38 @@ export type PercentageAndColorClass = {
 
 export interface ProgressBarProps {
   id: string;
-  percentagesAndColorClasses: PercentageAndColorClass[];
+  data: PercentageAndColorClass | PercentageAndColorClass[];
   title?: string;
   spacing?: "small" | "large";
   showPercentage?: boolean;
 }
-export function ProgressBar({
-  id,
-  percentagesAndColorClasses,
-  title,
-  spacing,
-  showPercentage = false,
-}: ProgressBarProps) {
-  const filteredBars = filterOutZeroPercentageBars(percentagesAndColorClasses);
-  const totalBars = filteredBars.length;
-  function filterOutZeroPercentageBars(bars: PercentageAndColorClass[]): PercentageAndColorClass[] {
-    return bars.filter((bar) => bar.percentage > 0);
-  }
-
-  function getRadiusClassForBarIndex(barIndex: number): RadiusClass {
-    if (totalBars === 1) {
-      return "default-radius";
-    }
-    if (barIndex === 0) {
-      return "radius-left";
-    } else if (barIndex === totalBars - 1) {
-      return "radius-right";
-    } else {
-      return "no-radius";
-    }
-  }
-
+export function ProgressBar({ id, data, title, spacing, showPercentage = false }: ProgressBarProps) {
   return (
     <div className={cn(cls["progressbar-container"], spacing)} id={`progressbar-${id}`}>
       {title && <label>{title}</label>}
-      {percentagesAndColorClasses.length === 1 && percentagesAndColorClasses[0] ? (
+      {!Array.isArray(data) ? (
         <section>
           <div
             className={cls["progressbar-outer"]}
             role="progressbar"
-            aria-valuenow={percentagesAndColorClasses[0].percentage}
+            aria-valuenow={data["percentage"]}
             aria-valuemin={0}
             aria-valuemax={100}
           >
             <div
-              className={cn(cls["progressbar-inner"], cls[percentagesAndColorClasses[0].class], cls["default-radius"])}
-              style={{ width: `${percentagesAndColorClasses[0].percentage}%` }}
+              className={cn(cls["progressbar-inner"], cls[data["class"]])}
+              style={{ width: `${data["percentage"]}%` }}
             />
           </div>
-          {showPercentage && <aside>{percentagesAndColorClasses[0].percentage}%</aside>}
+          {showPercentage && <aside>{data["percentage"]}%</aside>}
         </section>
       ) : (
         <section>
           <div className={cls["progressbar-outer"]} style={{ height: "0.75rem" }}>
-            {filteredBars.map((bar, index) => {
+            {data.map((bar, index) => {
               return (
                 <div
-                  className={cn(cls["progressbar-inner"], cls[bar.class], cls[getRadiusClassForBarIndex(index)])}
+                  className={cn(cls["progressbar-inner"], cls[bar.class])}
                   style={{ width: `${bar.percentage}%` }}
                   key={`inner-bar-${index}`}
                 />

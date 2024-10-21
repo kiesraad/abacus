@@ -1,0 +1,22 @@
+.progress {
+  width: 26.5rem;
+  padding: 2.5rem 5rem;
+  gap: 2.5rem;
+
+  div.column {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    h2 {
+      margin-bottom: 0;
+    }
+
+    span.item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.25rem;
+    }
+  }
+}

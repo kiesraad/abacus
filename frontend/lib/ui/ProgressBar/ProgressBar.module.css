@@ -29,23 +29,13 @@
   height: 0.5rem;
   background-color: var(--gray-200);
   border-radius: 0.5rem;
+  overflow: hidden;
   display: flex;
   flex-direction: row;
 }
 
 .progressbar-inner {
   height: 100%;
-  width: 50%;
-}
-
-.default-radius {
-  border-radius: 0.5rem;
-}
-.radius-right {
-  border-radius: 0 0.5rem 0.5rem 0;
-}
-.radius-left {
-  border-radius: 0.5rem 0 0 0.5rem;
 }
 
 .default {

@@ -7,8 +7,8 @@
     "node": ">=20.11.1"
   },
   "scripts": {
-    "dev": "cross-env API_MODE=mock NODE_ENV=development vite",
-    "dev:server": "cross-env API_MODE=local NODE_ENV=development vite",
+    "dev": "cross-env API_MODE=mock vite",
+    "dev:server": "cross-env API_MODE=local vite",
     "build": "tsc && cross-env API_MODE=local vite build",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
     "lint": "cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

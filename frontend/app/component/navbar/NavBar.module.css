@@ -10,6 +10,7 @@
 
   .links {
     display: flex;
+
     &:not(:has(svg)) {
       gap: 0.5rem;
     }
@@ -17,6 +18,7 @@
     a {
       text-decoration: none;
       color: inherit;
+
       &:hover,
       &:active {
         color: inherit !important;
@@ -32,6 +34,7 @@
       align-items: center;
     }
 
+    a:first-of-type:not(:global(.active)),
     span:first-of-type:not(:global(.active)) {
       padding-left: 0;
     }

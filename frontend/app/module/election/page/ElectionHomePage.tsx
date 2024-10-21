@@ -12,7 +12,9 @@ export function ElectionHomePage() {
   return (
     <>
       <PageTitle title="Details verkiezing - Abacus" />
-      <NavBar />
+      <NavBar>
+        <span>{election.name}</span>
+      </NavBar>
       <header>
         <section>
           <h1>{election.name}</h1>

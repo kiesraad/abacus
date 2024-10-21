@@ -206,10 +206,8 @@ const submitWith422Response = async () => {
 };
 
 const expect422ClientError = async () => {
-  const feedbackServerError = await screen.findByTestId("feedback-server-error");
-  expect(feedbackServerError).toHaveTextContent(
-    "Sorry, er ging iets misFoutcode: 422JSON error or invalid data (Unprocessable Content)",
-  );
+  const feedbackServerError = await screen.findByTestId("error-modal");
+  expect(feedbackServerError).toHaveTextContent("Foutcode: 422JSON error or invalid data (Unprocessable Content)");
 };
 
 const submitWith500Response = async () => {
@@ -220,8 +218,8 @@ const submitWith500Response = async () => {
 };
 
 const expect500ServerError = async () => {
-  const feedbackServerError = await screen.findByTestId("feedback-server-error");
-  expect(feedbackServerError).toHaveTextContent("Sorry, er ging iets mis");
+  const feedbackServerError = await screen.findByTestId("error-modal");
+  expect(feedbackServerError).toHaveTextContent("Foutcode: 500Internal server error");
 };
 
 type FormIdentifier = "recounted" | "voters_and_votes" | "differences" | `candidates_${number}`;

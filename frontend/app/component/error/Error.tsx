@@ -33,7 +33,7 @@ export function Error({ title, error, action = ErrorAction.Back, children }: Err
                   navigate(-1);
                 }}
               >
-                <Icon icon={<IconArrowLeft />} size="sm" color="primary" />
+                <Icon icon={<IconArrowLeft />} color="primary" />
                 Terug naar de vorige pagina
               </Button>
             )}

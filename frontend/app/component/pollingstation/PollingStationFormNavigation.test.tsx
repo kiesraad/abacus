@@ -154,10 +154,8 @@ describe("PollingStationFormNavigation", () => {
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
-    const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(
-      "Sorry, er ging iets misFoutcode: 422JSON error or invalid data (Unprocessable Content)",
-    );
+    const feedbackServerError = await screen.findByTestId("error-modal");
+    expect(feedbackServerError).toHaveTextContent("Foutcode: 422JSON error or invalid data (Unprocessable Content)");
   });
 
   test("500 response results in display of error message", async () => {
@@ -181,8 +179,8 @@ describe("PollingStationFormNavigation", () => {
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
-    const feedbackServerError = await screen.findByTestId("feedback-server-error");
+    const feedbackServerError = await screen.findByTestId("error-modal");
 
-    expect(feedbackServerError).toHaveTextContent("Sorry, er ging iets misFoutcode: 500Internal server error");
+    expect(feedbackServerError).toHaveTextContent("Foutcode: 500Internal server error");
   });
 });

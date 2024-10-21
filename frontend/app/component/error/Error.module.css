@@ -4,8 +4,10 @@
   justify-content: space-between;
 }
 
-.errorContainer h2 {
+.errorContainer h1 {
   font-size: var(--font-size-xl);
+  font-weight: 700;
+  line-height: 1.25;
   margin-bottom: 2rem;
 }
 

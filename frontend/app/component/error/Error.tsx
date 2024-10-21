@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 import { IconArrowLeft } from "@kiesraad/icon";
-import { Button } from "@kiesraad/ui";
+import { Button, Icon } from "@kiesraad/ui";
 
 import cls from "./Error.module.css";
 import errorImage from "./error.png";
@@ -19,7 +19,7 @@ export function Error({ title, action = ErrorAction.Back, children }: ErrorProps
   return (
     <article className={cls.errorContainer}>
       <section>
-        <h2>{title}</h2>
+        <h1>{title}</h1>
         {children}
         {action === ErrorAction.Back && (
           <Button
@@ -29,7 +29,7 @@ export function Error({ title, action = ErrorAction.Back, children }: ErrorProps
               navigate(-1);
             }}
           >
-            <IconArrowLeft />
+            <Icon icon={<IconArrowLeft />} size="sm" color="primary" />
             Terug naar de vorige pagina
           </Button>
         )}

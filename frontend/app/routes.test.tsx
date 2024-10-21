@@ -50,7 +50,7 @@ describe("routes", () => {
     // Navigate to a non-existing page
     await router.navigate("/elections/1/data-entry/9876");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/9876");
-    await expectErrorPage();
+    await expectNotFound("Stembureau niet gevonden");
   });
 
   test("Error page when polling station is finalised", async () => {

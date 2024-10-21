@@ -1,22 +1,26 @@
 .icon {
   display: inline-block;
   fill: currentColor;
+  stroke: currentColor;
 
   &.warning {
     svg {
       fill: var(--color-warning);
+      stroke: var(--color-warning);
     }
   }
 
   &.error {
     svg {
       fill: var(--color-error-darkest);
+      stroke: var(--color-error-darkest);
     }
   }
 
   &.accept {
     svg {
       fill: var(--color-success);
+      stroke: var(--color-success);
     }
   }
 

@@ -9,11 +9,16 @@ export function ErrorModal({ error }: ErrorModalProps) {
   return (
     <Modal title="Sorry, er ging iets mis" onClose={() => {}}>
       <div className="content">
-        {error.code}: {error.error}
+        <p>
+          <strong>
+            Foutcode: <code>{error.code}</code>
+          </strong>
+        </p>
+        <p>{error.error}</p>
+        <Button variant="default" onClick={() => {}}>
+          Melding sluiten
+        </Button>
       </div>
-      <Button variant="default" onClick={() => {}}>
-        Melding sluiten
-      </Button>
     </Modal>
   );
 }

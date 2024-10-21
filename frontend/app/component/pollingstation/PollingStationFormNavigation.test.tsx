@@ -156,7 +156,7 @@ describe("PollingStationFormNavigation", () => {
 
     const feedbackServerError = await screen.findByTestId("feedback-server-error");
     expect(feedbackServerError).toHaveTextContent(
-      "Sorry, er ging iets mis422: JSON error or invalid data (Unprocessable Content)",
+      "Sorry, er ging iets misFoutcode: 422JSON error or invalid data (Unprocessable Content)",
     );
   });
 
@@ -182,6 +182,7 @@ describe("PollingStationFormNavigation", () => {
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
     const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent("Sorry, er ging iets mis500: Internal server error");
+
+    expect(feedbackServerError).toHaveTextContent("Sorry, er ging iets misFoutcode: 500Internal server error");
   });
 });

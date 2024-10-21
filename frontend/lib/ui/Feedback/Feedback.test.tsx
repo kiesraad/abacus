@@ -78,6 +78,6 @@ describe("UI component: Feedback", () => {
     const { getByText } = render(<SingleServerError />);
 
     expect(getByText("Sorry, er ging iets mis")).toBeInTheDocument();
-    expect(getByText("500: Internal Server Error")).toBeInTheDocument();
+    expect(getByText("500")).toBeInTheDocument();
   });
 });

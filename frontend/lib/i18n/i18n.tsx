@@ -6,13 +6,29 @@ import { Translation } from "./i18n.types";
 
 export type RenderCallback = (text: string) => ReactElement;
 
-export function t(k: keyof Translation, vars?: Record<string, RenderCallback | string>): Array<string | ReactElement> {
+export function translate(k: keyof Translation): string {
+  return translations[locale][k];
+}
+
+export function t(k: keyof Translation, vars?: Record<string, string>): string {
+  if (vars) {
+    return Object.entries(vars).reduce(
+      (acc, [key, value]) => (typeof value === "string" ? acc.replace(`$${key}`, value) : acc),
+      translate(k),
+    );
+  }
+
+  return translate(k);
+}
+
+export function tx(k: keyof Translation, vars?: Record<string, RenderCallback | string>): Array<string | ReactElement> {
   if (vars) {
     // replace text elements with variables
-    const text = Object.entries(vars).reduce(
-      (acc, [key, value]) => (typeof value === "string" ? acc.replace(`$${key}`, value) : acc),
-      translations[locale][k],
-    );
+    const stringVars = Object.entries(vars)
+      .filter(([, value]) => typeof value === "string")
+      .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+    const text = t(k, stringVars);
 
     // replace tags for tag callbacks
     return Object.entries(vars).reduce(
@@ -44,5 +60,5 @@ export function t(k: keyof Translation, vars?: Record<string, RenderCallback | s
     );
   }
 
-  return [translations[locale][k]];
+  return [translate(k)];
 }

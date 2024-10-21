@@ -13,7 +13,7 @@ const mapObj = <V0, V>(obj: Record<string, V0>, kf: (t: string) => string, vf: (
 export default defineConfig(({ command }) => {
   const apiHost = process.env.API_HOST ?? "http://localhost:8080";
 
-  const mswEnabled = process.env.API_MODE == "mock";
+  const mswEnabled = process.env.API_MODE === "mock";
   let gitDetails = {
     __GIT_DIRTY__: undefined as string | undefined,
     __GIT_BRANCH__: undefined as string | undefined,

@@ -3,6 +3,8 @@ import { useBlocker, useNavigate } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, Mock, test, vi } from "vitest";
 
+import { defaultFormState, emptyDataEntryRequest } from "app/test/unit/form.ts";
+
 import { usePollingStationFormController } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
@@ -23,48 +25,7 @@ vi.mock("@kiesraad/api", async () => {
 });
 
 describe("PollingStationFormNavigation", () => {
-  const mockFormState = {
-    current: "recounted",
-    active: "recounted",
-    sections: {
-      recounted: {
-        index: 0,
-        id: "recounted",
-        errors: [],
-        warnings: [],
-        acceptWarnings: false,
-        isSaved: false,
-      },
-      voters_votes_counts: {
-        index: 1,
-        id: "voters_votes_counts",
-        errors: [],
-        warnings: [],
-        acceptWarnings: false,
-        isSaved: false,
-      },
-    },
-    isCompleted: false,
-  };
-
-  const mockCurrentForm = {
-    id: "section1",
-    getValues: vi.fn().mockReturnValue({}),
-  };
-
   const mockNavigate = vi.fn();
-
-  const mockController = {
-    status: { current: "idle" },
-    formState: mockFormState,
-    currentForm: mockCurrentForm,
-    error: null,
-    targetFormSection: "voters_votes_counts",
-    apiError: null,
-    values: {},
-    setTemporaryCache: vi.fn(),
-    submitCurrentForm: vi.fn(),
-  };
 
   beforeAll(() => {
     (useBlocker as Mock).mockReturnValue(vi.fn());
@@ -75,19 +36,11 @@ describe("PollingStationFormNavigation", () => {
     vi.clearAllMocks();
   });
 
-  test("It Navigates to targetFormSection", () => {
-    (usePollingStationFormController as Mock).mockReturnValue(mockController);
-
-    render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
-
-    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry/1/voters-and-votes");
-  });
-
   test("It blocks navigation when form has changes", () => {
     (usePollingStationFormController as Mock).mockReturnValue({
       status: { current: "idle" },
       formState: {
-        ...mockFormState,
+        ...defaultFormState,
         current: "voters_votes_counts",
       },
       error: null,
@@ -123,11 +76,11 @@ describe("PollingStationFormNavigation", () => {
     (usePollingStationFormController as Mock).mockReturnValue({
       status: { current: "idle" },
       formState: {
-        ...mockFormState,
+        ...defaultFormState,
         sections: {
-          ...mockFormState.sections,
+          ...defaultFormState.sections,
           recounted: {
-            ...mockFormState.sections.recounted,
+            ...defaultFormState.sections.recounted,
             errors: ["error"],
           },
         },
@@ -144,7 +97,6 @@ describe("PollingStationFormNavigation", () => {
         }),
       },
       setTemporaryCache: vi.fn(),
-      targetFormSection: "recounted",
       values: {
         recounted: true,
       },
@@ -174,7 +126,7 @@ describe("PollingStationFormNavigation", () => {
         }),
       ).toBe(false);
 
-      const title = await screen.findByTestId("modal-blocker-title");
+      const title = await screen.findByTestId("modal-title");
       expect(title).toBeInTheDocument();
     }
   });
@@ -182,9 +134,7 @@ describe("PollingStationFormNavigation", () => {
   test("422 response results in display of error message", async () => {
     (usePollingStationFormController as Mock).mockReturnValue({
       status: { current: "idle" },
-      formState: {
-        ...mockFormState,
-      },
+      formState: defaultFormState,
       apiError: {
         code: 422,
         error: "JSON error or invalid data (Unprocessable Content)",
@@ -197,7 +147,6 @@ describe("PollingStationFormNavigation", () => {
         }),
       },
       setTemporaryCache: vi.fn(),
-      targetFormSection: "recounted",
       values: {
         recounted: true,
       },
@@ -214,9 +163,7 @@ describe("PollingStationFormNavigation", () => {
   test("500 response results in display of error message", async () => {
     (usePollingStationFormController as Mock).mockReturnValue({
       status: { current: "idle" },
-      formState: {
-        ...mockFormState,
-      },
+      formState: defaultFormState,
       apiError: {
         code: 500,
         error: "Internal server error",
@@ -229,10 +176,7 @@ describe("PollingStationFormNavigation", () => {
         }),
       },
       setTemporaryCache: vi.fn(),
-      targetFormSection: "recounted",
-      values: {
-        recounted: true,
-      },
+      values: emptyDataEntryRequest.data,
     });
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);

@@ -13,7 +13,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
   const navigate = useNavigate();
 
   const handleRowClick = (pollingStationId: number) => () => {
-    navigate(`./${pollingStationId}/recounted`);
+    navigate(`./${pollingStationId}`);
   };
 
   return (
@@ -39,7 +39,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
               </td>
               <td>
                 <span>{pollingStation.name}</span>
-                {pollingStationStatusEntry && <Badge type={pollingStationStatusEntry.status} />}
+                {pollingStationStatusEntry && <Badge type={pollingStationStatusEntry.status} showIcon />}
               </td>
               <td width="5rem">
                 <div className="link">

@@ -10,14 +10,19 @@ import {
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs, waitFor } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form";
 
-import { FormState, PollingStationFormController, PollingStationValues } from "@kiesraad/api";
+import {
+  FormState,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  PollingStationFormController,
+  PollingStationResults,
+} from "@kiesraad/api";
 import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const defaultFormState: FormState = {
-  active: "recounted",
   current: "recounted",
+  furthest: "recounted",
   sections: {
     recounted: {
       index: 0,
@@ -52,14 +57,9 @@ const defaultFormState: FormState = {
       warnings: [],
     },
   },
-  unknown: {
-    errors: [],
-    warnings: [],
-  },
-  isCompleted: false,
 };
 
-function renderForm(defaultValues: Partial<PollingStationValues> = {}) {
+function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
   return render(
     <PollingStationFormController
       election={electionMockData}
@@ -100,11 +100,12 @@ describe("Test VotersAndVotesForm", () => {
       const user = userEvent.setup();
 
       renderForm({ recounted: false });
-      const spy = vi.spyOn(global, "fetch");
 
       const pollCards = await screen.findByTestId("poll_card_count");
       await user.type(pollCards, "12345");
       expect(pollCards).toHaveValue("12345");
+
+      const spy = vi.spyOn(global, "fetch");
 
       await user.keyboard("{enter}");
 
@@ -134,6 +135,13 @@ describe("Test VotersAndVotesForm", () => {
       const user = userEvent.setup();
 
       renderForm({ recounted: false });
+
+      const formTitle = await screen.findByRole("heading", {
+        level: 2,
+        name: "Toegelaten kiezers en uitgebrachte stemmen",
+      });
+      expect(formTitle).toHaveFocus();
+      await user.keyboard("{tab}");
 
       const pollCards = await screen.findByTestId("poll_card_count");
       expect(pollCards).toHaveFocus();
@@ -200,6 +208,7 @@ describe("Test VotersAndVotesForm", () => {
       const expectedRequest = {
         data: {
           ...emptyDataEntryRequest.data,
+          recounted: false,
           voters_counts: {
             poll_card_count: 1,
             proxy_certificate_count: 2,
@@ -213,18 +222,19 @@ describe("Test VotersAndVotesForm", () => {
             total_votes_cast_count: 15,
           },
         },
+        client_state: {},
       };
 
       const user = userEvent.setup();
 
       renderForm({ recounted: false });
 
-      const spy = vi.spyOn(global, "fetch");
-
       await userTypeInputs(user, {
         ...expectedRequest.data.voters_counts,
         ...expectedRequest.data.votes_counts,
       });
+
+      const spy = vi.spyOn(global, "fetch");
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -234,12 +244,18 @@ describe("Test VotersAndVotesForm", () => {
 
       expect(url).toEqual("/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
-      expect(body).toEqual(expectedRequest);
+      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+      expect(request_body.data).toEqual(expectedRequest.data);
     });
   });
 
   describe("VotersAndVotesForm errors", () => {
     test("F.201 IncorrectTotal Voters counts", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -256,10 +272,6 @@ describe("Test VotersAndVotesForm", () => {
           warnings: [],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -287,6 +299,11 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("F.202 IncorrectTotal Votes counts", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -303,10 +320,6 @@ describe("Test VotersAndVotesForm", () => {
           warnings: [],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -334,6 +347,11 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("F.203 IncorrectTotal Voters recounts", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [
@@ -350,10 +368,6 @@ describe("Test VotersAndVotesForm", () => {
           warnings: [],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: true });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -388,16 +402,17 @@ describe("Test VotersAndVotesForm", () => {
 
   describe("VotersAndVotesForm warnings", () => {
     test("clicking next without accepting warning results in alert shown and then accept warning", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
           warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -422,7 +437,7 @@ describe("Test VotersAndVotesForm", () => {
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
 
-      const acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+      let acceptFeedbackCheckbox = screen.getByRole("checkbox", {
         name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
       });
       expect(acceptFeedbackCheckbox).toBeInTheDocument();
@@ -444,10 +459,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.getByTestId("blank_votes_count"), "100").toHaveValue("100");
       await user.clear(screen.getByTestId("blank_votes_count"));
 
-      await waitFor(() => {
-        expect(acceptFeedbackCheckbox).toBeInTheDocument();
-        expect(acceptFeedbackCheckbox).not.toBeVisible();
-      });
+      await waitFor(() => expect(acceptFeedbackCheckbox).not.toBeInTheDocument());
 
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
@@ -458,6 +470,9 @@ describe("Test VotersAndVotesForm", () => {
 
       await user.click(submitButton);
 
+      acceptFeedbackCheckbox = screen.getByRole("checkbox", {
+        name: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+      });
       expect(acceptFeedbackCheckbox).toBeVisible();
       expect(acceptFeedbackCheckbox).not.toBeChecked();
       acceptFeedbackCheckbox.click();
@@ -473,16 +488,17 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("W.201 high number of blank votes", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
           warnings: [{ fields: ["data.votes_counts.blank_votes_count"], code: "W201" }],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -508,16 +524,17 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("W.202 high number of invalid votes", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
           warnings: [{ fields: ["data.votes_counts.invalid_votes_count"], code: "W202" }],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -543,6 +560,11 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("W.203 voters counts and votes counts difference above threshold", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -554,10 +576,6 @@ describe("Test VotersAndVotesForm", () => {
           ],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -582,6 +600,11 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("W.204 votes counts and voters recounts difference above threshold", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -596,10 +619,6 @@ describe("Test VotersAndVotesForm", () => {
           ],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: true });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -629,16 +648,17 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("W.205 total votes cast should not be zero", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
           warnings: [{ fields: ["data.votes_counts.total_votes_cast_count"], code: "W205" }],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -664,6 +684,11 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("W.206 total admitted voters and total votes cast should not exceed polling stations number of eligible voters", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -675,10 +700,6 @@ describe("Test VotersAndVotesForm", () => {
           ],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -703,6 +724,11 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("W.207 total votes cast and total admitted voters recount should not exceed polling stations number of eligible voters", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -717,10 +743,6 @@ describe("Test VotersAndVotesForm", () => {
           ],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: true });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -749,6 +771,11 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("W.208 EqualInput voters counts and votes counts", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -760,10 +787,6 @@ describe("Test VotersAndVotesForm", () => {
           ],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: false });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -788,6 +811,11 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("W.209 EqualInput voters recounts and votes counts", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -808,10 +836,6 @@ describe("Test VotersAndVotesForm", () => {
           ],
         },
       });
-
-      const user = userEvent.setup();
-
-      renderForm({ recounted: true });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);

@@ -10,6 +10,7 @@ use clap::Parser;
 use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::SqlitePool;
 use tokio::net::TcpListener;
+use tokio::signal;
 use tower_http::services::{ServeDir, ServeFile};
 
 /// Abacus API server
@@ -57,7 +58,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(&address).await?;
     println!("Starting API server on http://{}", listener.local_addr()?);
-    axum::serve(listener, app.into_make_service()).await?;
+    axum::serve(listener, app.into_make_service())
+        .with_graceful_shutdown(shutdown_signal())
+        .tcp_nodelay(true)
+        .await?;
     Ok(())
 }
 
@@ -84,4 +88,33 @@ async fn create_sqlite_pool(
     }
 
     Ok(pool)
+}
+
+/// Graceful shutdown, useful for Docker containers.
+///
+/// Copied from the
+/// [axum graceful-shutdown example](https://github.com/tokio-rs/axum/blob/6318b57fda6b524b4d3c7909e07946e2b246ebd2/examples/graceful-shutdown/src/main.rs)
+/// (under the MIT license).
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
 }

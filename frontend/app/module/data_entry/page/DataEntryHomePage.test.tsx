@@ -36,10 +36,10 @@ describe("DataEntryHomePage", () => {
 
     // Check if the navigation bar displays the correct information
     const nav = await screen.findByRole("navigation", { name: /primary-navigation/i });
-    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute("href", "/overview");
+    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute("href", "/elections");
   });
 
-  test("Finish input not visible when not finished", async () => {
+  test("Alert not visible when not finished", async () => {
     renderDataEntryHomePage();
 
     // Wait for the page to be loaded
@@ -51,10 +51,10 @@ describe("DataEntryHomePage", () => {
     );
 
     // Test that the message doesn't exist
-    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
+    expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
   });
 
-  test("Finish input visible when finished", async () => {
+  test("Alert visible when finished", async () => {
     renderDataEntryHomePage();
 
     overrideOnce("get", "/api/elections/1/status", 200, {
@@ -119,7 +119,7 @@ describe("DataEntryHomePage", () => {
       expect(screen.queryByText("Welk stembureau ga je invoeren?")).not.toBeInTheDocument();
     });
 
-    // new status is that all polling stations are definitive, so the finish input message should be visible
+    // new status is that all polling stations are definitive, so the alert should be visible
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { id: 1, status: "definitive" },

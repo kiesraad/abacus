@@ -35,7 +35,7 @@ export function InputField({
         </span>
         {disabled ? (
           <div className={`${fieldSize} disabled_input`}>{value}</div>
-        ) : fieldSize == "text-area" ? (
+        ) : fieldSize === "text-area" ? (
           <textarea
             name={name}
             value={value}

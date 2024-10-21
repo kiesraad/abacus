@@ -4,7 +4,7 @@ import { describe, expect, test, vi } from "vitest";
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form";
 
-import { PollingStationFormController } from "@kiesraad/api";
+import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationFormController } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
 import { RecountedForm } from "./RecountedForm";
@@ -21,11 +21,12 @@ describe("Test RecountedForm", () => {
       render(Component);
 
       const user = userEvent.setup();
-      const spy = vi.spyOn(global, "fetch");
 
       const yes = await screen.findByTestId("yes");
       await user.click(yes);
       expect(yes).toBeChecked();
+
+      const spy = vi.spyOn(global, "fetch");
 
       await user.keyboard("{enter}");
 
@@ -56,9 +57,13 @@ describe("Test RecountedForm", () => {
 
       render(Component);
 
+      const formTitle = await screen.findByRole("heading", { level: 2, name: "Is er herteld?" });
+      expect(formTitle).toHaveFocus();
+      await user.keyboard("{tab}");
+
       const yes = await screen.findByTestId("yes");
       const no = await screen.findByTestId("no");
-
+      expect(yes).toHaveFocus();
       expect(yes).not.toBeChecked();
       expect(no).not.toBeChecked();
 
@@ -87,15 +92,17 @@ describe("Test RecountedForm", () => {
             total_admitted_voters_recount: 0,
           },
         },
+        client_state: {},
       };
 
       render(Component);
 
-      const spy = vi.spyOn(global, "fetch");
       const user = userEvent.setup();
 
       const yes = await screen.findByTestId("yes");
       await user.click(yes);
+
+      const spy = vi.spyOn(global, "fetch");
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -105,14 +112,23 @@ describe("Test RecountedForm", () => {
 
       expect(url).toEqual("/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
-      expect(body).toEqual(expectedRequest);
+      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+      expect(request_body.data).toEqual(expectedRequest.data);
     });
   });
 
   describe("RecountedForm errors", () => {
     test("F.101 No radio selected", async () => {
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [] },
+        validation_results: {
+          errors: [
+            {
+              code: "F101",
+              fields: ["data.recounted"],
+            },
+          ],
+          warnings: [],
+        },
       });
 
       const user = userEvent.setup();

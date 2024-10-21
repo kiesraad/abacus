@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "backend",
     "description": "",
@@ -130,6 +130,9 @@
                 },
                 "description": "application/pdf"
               }
+            },
+            "content": {
+              "application/pdf": {}
             }
           },
           "404": {
@@ -212,7 +215,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "get": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Get an in-progress (not finalised) data entry for a polling station",
         "operationId": "polling_station_data_entry_get",
@@ -275,7 +278,7 @@
       },
       "post": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Save or update a data entry for a polling station",
         "operationId": "polling_station_data_entry_save",
@@ -368,7 +371,7 @@
       },
       "delete": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Delete an in-progress (not finalised) data entry for a polling station",
         "operationId": "polling_station_data_entry_delete",
@@ -426,7 +429,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise": {
       "post": {
         "tags": [
-          "polling_station"
+          "data_entry"
         ],
         "summary": "Finalise the data entry for a polling station",
         "operationId": "polling_station_data_entry_finalise",
@@ -515,20 +518,13 @@
         ],
         "properties": {
           "country_code": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "first_name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "gender": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CandidateGender"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/CandidateGender"
           },
           "initials": {
             "type": "string"
@@ -537,8 +533,7 @@
             "type": "string"
           },
           "last_name_prefix": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "locality": {
             "type": "string"
@@ -679,8 +674,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
-            },
-            "nullable": true
+            }
           }
         }
       },
@@ -757,9 +751,13 @@
         "description": "Response structure for getting data entry of polling station results",
         "required": [
           "data",
+          "client_state",
           "validation_results"
         ],
         "properties": {
+          "client_state": {
+            "type": "object"
+          },
           "data": {
             "$ref": "#/components/schemas/PollingStationResults"
           },
@@ -843,8 +841,7 @@
             "type": "string"
           },
           "house_number_addition": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "id": {
             "type": "integer",
@@ -863,8 +860,7 @@
           },
           "number_of_voters": {
             "type": "integer",
-            "format": "int64",
-            "nullable": true
+            "format": "int64"
           },
           "polling_station_type": {
             "$ref": "#/components/schemas/PollingStationType"
@@ -881,7 +877,6 @@
         "type": "object",
         "description": "PollingStationResults, following the fields in Model Na 31-2 Bijage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
         "required": [
-          "recounted",
           "voters_counts",
           "votes_counts",
           "differences_counts",
@@ -889,7 +884,8 @@
         ],
         "properties": {
           "differences_counts": {
-            "$ref": "#/components/schemas/DifferencesCounts"
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
           },
           "political_group_votes": {
             "type": "array",
@@ -899,22 +895,23 @@
             "description": "Vote counts per list and candidate (5. \"Aantal stemmen per lijst en kandidaat\")"
           },
           "recounted": {
-            "type": "boolean",
+            "type": [
+              "boolean",
+              "null"
+            ],
             "description": "Recounted (\"Is er herteld? - See form for official long description of the checkbox\")"
           },
           "voters_counts": {
-            "$ref": "#/components/schemas/VotersCounts"
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"1. Aantal toegelaten kiezers\")"
           },
           "voters_recounts": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/VotersRecounts"
-              }
-            ],
-            "nullable": true
+            "$ref": "#/components/schemas/VotersRecounts",
+            "description": "Voters recounts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")\nWhen filled in, this field should replace `voters_counts` when using the results."
           },
           "votes_counts": {
-            "$ref": "#/components/schemas/VotesCounts"
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"2. Aantal getelde stembiljetten\")"
           }
         }
       },
@@ -956,11 +953,17 @@
         "type": "object",
         "description": "Request structure for saving data entry of polling station results",
         "required": [
-          "data"
+          "data",
+          "client_state"
         ],
         "properties": {
+          "client_state": {
+            "type": "object",
+            "description": "Client state for the data entry (arbitrary JSON)"
+          },
           "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "Data entry for a polling station"
           }
         }
       },
@@ -997,6 +1000,7 @@
       "ValidationResultCode": {
         "type": "string",
         "enum": [
+          "F101",
           "F201",
           "F202",
           "F203",

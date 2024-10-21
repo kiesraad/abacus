@@ -133,6 +133,7 @@ export interface ErrorResponse {
  * Response structure for getting data entry of polling station results
  */
 export interface GetDataEntryResponse {
+  client_state: unknown;
   data: PollingStationResults;
   validation_results: ValidationResults;
 }
@@ -181,7 +182,7 @@ Bijlage 2: uitkomsten per stembureau" from the
 export interface PollingStationResults {
   differences_counts: DifferencesCounts;
   political_group_votes: PoliticalGroupVotes[];
-  recounted: boolean;
+  recounted?: boolean;
   voters_counts: VotersCounts;
   voters_recounts?: VotersRecounts;
   votes_counts: VotesCounts;
@@ -203,6 +204,7 @@ export type PollingStationType = "VasteLocatie" | "Bijzonder" | "Mobiel";
  * Request structure for saving data entry of polling station results
  */
 export interface SaveDataEntryRequest {
+  client_state: unknown;
   data: PollingStationResults;
 }
 
@@ -219,6 +221,7 @@ export interface ValidationResult {
 }
 
 export type ValidationResultCode =
+  | "F101"
   | "F201"
   | "F202"
   | "F203"

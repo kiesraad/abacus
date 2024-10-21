@@ -5,7 +5,7 @@ import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_
 import { overrideOnce, render, screen, within } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
-import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse, electionStatusMockResponse } from "@kiesraad/api-mocks";
 
 function renderPollingStationChoicePage() {
   render(
@@ -128,6 +128,7 @@ describe("Test PollingStationChoiceForm", () => {
 
     test("Selecting a valid, but finalised polling station shows alert", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+      overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
       const user = userEvent.setup();
       render(
         <ElectionProvider electionId={1}>
@@ -169,6 +170,8 @@ describe("Test PollingStationChoiceForm", () => {
   describe("Polling station list", () => {
     test("Display polling station list", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+      overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
+
       const user = userEvent.setup();
       renderPollingStationChoicePage();
 

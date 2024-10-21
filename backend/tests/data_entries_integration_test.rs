@@ -1,13 +1,12 @@
 #![cfg(test)]
 
+use backend::data_entry::{GetDataEntryResponse, SaveDataEntryResponse};
+use backend::validation::ValidationResultCode;
+use backend::ErrorResponse;
 use reqwest::{Response, StatusCode};
 use serde_json::json;
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
-
-use backend::polling_station::{GetDataEntryResponse, SaveDataEntryResponse};
-use backend::validation::ValidationResultCode;
-use backend::ErrorResponse;
 
 use crate::utils::serve_api;
 
@@ -65,7 +64,8 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
             ]
           }
         ]
-      }
+      },
+      "client_state": {"foo": "bar"}
     });
 
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
@@ -209,6 +209,7 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     // check that the data entry is the same
     let get_response: GetDataEntryResponse = response.json().await.unwrap();
     assert_eq!(get_response.data, request_body.data);
+    assert_eq!(get_response.client_state, request_body.client_state);
     assert_eq!(
         get_response.validation_results,
         save_response.validation_results

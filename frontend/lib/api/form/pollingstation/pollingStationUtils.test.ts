@@ -10,17 +10,17 @@ import {
   FormSection,
   formSectionComplete,
   getErrorsAndWarnings,
-  getNextSection,
+  getNextSectionID,
   getPollingStationSummary,
   hasOnlyGlobalValidationResults,
   isFormSectionEmpty,
   isGlobalValidationResult,
-  PollingStationValues,
+  PollingStationResults,
   resetFormSectionState,
   ValidationResult,
 } from "@kiesraad/api";
 
-const defaultValues: PollingStationValues = emptyDataEntryRequest.data;
+const defaultValues: PollingStationResults = emptyDataEntryRequest.data;
 
 describe("PollingStationUtils", () => {
   test("addValidationResultToFormState adds result to correct section", () => {
@@ -98,17 +98,12 @@ describe("PollingStationUtils", () => {
     ).toBe(true);
   });
 
-  test("getNextSection", () => {
+  test("getNextSectionID", () => {
     const formState = structuredClone(defaultFormState);
+    formState.sections.recounted.isSaved = true;
+    formState.sections.recounted.isSubmitted = true;
 
-    const nextSection = getNextSection(formState, {
-      index: 0,
-      id: "recounted",
-      isSaved: false,
-      acceptWarnings: false,
-      errors: [],
-      warnings: [],
-    });
+    const nextSection = getNextSectionID(formState);
 
     expect(nextSection).toBe("voters_votes_counts");
   });
@@ -338,7 +333,7 @@ describe("PollingStationUtils", () => {
     expect(summary.countsAddUp).toBe(true);
     expect(summary.hasBlocks).toBe(false);
     expect(summary.notableFormSections.length).toBe(1);
-    expect(summary.notableFormSections.some((item) => item.formSection.id == "political_group_votes_2"));
+    expect(summary.notableFormSections.some((item) => item.formSection.id === "political_group_votes_2"));
 
     state.sections.differences_counts.acceptWarnings = true;
     state.sections.differences_counts.warnings = [errorWarningMocks.W301];
@@ -349,12 +344,12 @@ describe("PollingStationUtils", () => {
     expect(
       summary.notableFormSections.some(
         (item) =>
-          item.formSection.id == "political_group_votes_2" && item.status === "empty" && item.title === "Lijst 2",
+          item.formSection.id === "political_group_votes_2" && item.status === "empty" && item.title === "Lijst 2",
       ),
     );
     expect(
       summary.notableFormSections.some(
-        (item) => item.formSection.id == "differences_counts" && item.status === "accepted-warnings",
+        (item) => item.formSection.id === "differences_counts" && item.status === "accepted-warnings",
       ),
     );
 
@@ -366,7 +361,7 @@ describe("PollingStationUtils", () => {
     expect(summary.notableFormSections.length).toBe(3);
     expect(
       summary.notableFormSections.some(
-        (item) => item.formSection.id == "voters_votes_counts" && item.status === "errors",
+        (item) => item.formSection.id === "voters_votes_counts" && item.status === "errors",
       ),
     );
 

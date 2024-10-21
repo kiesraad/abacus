@@ -1,6 +1,7 @@
 import { expect, Page } from "@playwright/test";
 import {
   AbortInputModal,
+  CandidatesListPage,
   DifferencesPage,
   PollingStationChoicePage,
   RecountedPage,
@@ -46,12 +47,17 @@ test.describe("resume data entry flow", () => {
   test.describe("resume after saving", () => {
     test("resuming data entry shows previous data", async ({ page }) => {
       const abortInputModal = await fillFirstTwoPagesAndAbort(page);
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.heading).toBeVisible();
 
-      await page.goto("/elections/1/data-entry/1/recounted");
+      await page.goto("/elections/1/data-entry/1");
+
+      const differencesPage = new DifferencesPage(page);
+      await expect(differencesPage.heading).toBeVisible();
+      await differencesPage.navPanel.recounted.click();
 
       const recountedPage = new RecountedPage(page);
       await expect(recountedPage.no).toBeChecked();
@@ -69,6 +75,37 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.blankVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.invalidVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.totalVotesCastCount).toHaveValue("100");
+
+      await votersAndVotesPage.abortInput.click();
+      await expect(abortInputModal.heading).toBeFocused();
+      await abortInputModal.close.click();
+      await expect(votersAndVotesPage.abortInput).toBeFocused();
+    });
+
+    // Reproduce issue where navigating between sections is blocked by modal, even though there are no changes.
+    // https://github.com/kiesraad/abacus/pull/417#pullrequestreview-2347886699
+    test("navigation works after resuming data entry", async ({ page }) => {
+      const abortInputModal = await fillFirstTwoPagesAndAbort(page);
+      await abortInputModal.saveInput.click();
+
+      const pollingStationChoicePage = new PollingStationChoicePage(page);
+      await expect(pollingStationChoicePage.heading).toBeVisible();
+
+      await page.goto("/elections/1/data-entry/1");
+
+      const differencesPage = new DifferencesPage(page);
+      await expect(differencesPage.heading).toBeVisible();
+      await differencesPage.next.click();
+
+      const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+      await expect(candidatesListPage_1.heading).toBeVisible();
+      await candidatesListPage_1.navPanel.votersAndVotes.click();
+
+      const votersAndVotesPage = new VotersAndVotesPage(page);
+      await expect(votersAndVotesPage.heading).toBeVisible();
+      await votersAndVotesPage.navPanel.list(1).click();
+
+      await expect(candidatesListPage_1.heading).toBeVisible();
     });
 
     test("save input from voters and votes page with error", async ({ page, request }) => {
@@ -90,11 +127,12 @@ test.describe("resume data entry flow", () => {
 
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
-
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.heading).toBeVisible();
+      await expect(pollingStationChoicePage.resumeDataEntry).toBeVisible();
 
       const dataEntryResponse = await request.get(`/api/polling_stations/1/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(200);
@@ -129,7 +167,8 @@ test.describe("resume data entry flow", () => {
         },
       });
 
-      // TODO: extend test as part of epic #137 resume data entry
+      await pollingStationChoicePage.selectPollingStationAndClickStart(33);
+      await votersAndVotesPage.heading.waitFor();
     });
 
     test("save input from voters and votes page with warning", async ({ page, request }) => {
@@ -162,7 +201,7 @@ test.describe("resume data entry flow", () => {
 
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
-
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
@@ -201,13 +240,16 @@ test.describe("resume data entry flow", () => {
           ],
         },
       });
-      // TODO: extend test as part of epic #137 resume data entry
+
+      await pollingStationChoicePage.selectPollingStationAndClickStart(33);
+      await votersAndVotesPage.heading.waitFor();
     });
   });
 
   test.describe("resume after deleting", () => {
     test("deleting data entry doesn't show previous data", async ({ page }) => {
       const abortInputModal = await fillFirstTwoPagesAndAbort(page);
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.discardInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
@@ -238,7 +280,7 @@ test.describe("resume data entry flow", () => {
 
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
-
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.discardInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
@@ -278,7 +320,7 @@ test.describe("resume data entry flow", () => {
 
       const abortInputModal = new AbortInputModal(page);
       await abortInputModal.heading.waitFor();
-
+      await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.discardInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);

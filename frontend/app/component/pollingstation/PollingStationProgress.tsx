@@ -27,10 +27,10 @@ export function PollingStationProgress() {
         return "warning";
       }
 
-      if (formSection.id === formState.current) {
+      if (formSection.id === formState.furthest) {
         return "unsaved";
       }
-      const currentSection = formState.sections[formState.current];
+      const currentSection = formState.sections[formState.furthest];
       if (currentSection) {
         //check if section has been left empty
         if (formSection.index < currentSection.index) {
@@ -50,7 +50,7 @@ export function PollingStationProgress() {
   );
 
   const lists = election.political_groups;
-  const currentIndex = formState.sections[formState.current]?.index || 0;
+  const currentIndex = formState.sections[formState.furthest]?.index || 0;
 
   return (
     <ProgressList>
@@ -58,9 +58,9 @@ export function PollingStationProgress() {
         id="list-item-recounted"
         key="recounted"
         status="accept"
-        active={formState.active === "recounted"}
+        active={formState.current === "recounted"}
       >
-        {formState.active !== "recounted" ? (
+        {formState.current !== "recounted" ? (
           <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/recounted`}>
             <span>Is er herteld?</span>
           </Link>
@@ -73,9 +73,9 @@ export function PollingStationProgress() {
         id="list-item-voters-and-votes"
         status={menuStatusForFormSection(formState.sections.voters_votes_counts)}
         disabled={formState.sections.voters_votes_counts.index > currentIndex}
-        active={formState.active === "voters_votes_counts"}
+        active={formState.current === "voters_votes_counts"}
       >
-        {formState.active !== "voters_votes_counts" && formState.sections.voters_votes_counts.index <= currentIndex ? (
+        {formState.current !== "voters_votes_counts" && formState.sections.voters_votes_counts.index <= currentIndex ? (
           <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/voters-and-votes`}>
             <span>Aantal kiezers en stemmen</span>
           </Link>
@@ -88,9 +88,9 @@ export function PollingStationProgress() {
         id="list-item-differences"
         disabled={formState.sections.differences_counts.index > currentIndex}
         status={menuStatusForFormSection(formState.sections.differences_counts)}
-        active={formState.active === "differences_counts"}
+        active={formState.current === "differences_counts"}
       >
-        {formState.active !== "differences_counts" && formState.sections.differences_counts.index <= currentIndex ? (
+        {formState.current !== "differences_counts" && formState.sections.differences_counts.index <= currentIndex ? (
           <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/differences`}>
             <span>Verschillen</span>
           </Link>
@@ -109,9 +109,9 @@ export function PollingStationProgress() {
             id={`list-item-pg-${listId}`}
             disabled={formSection.index > currentIndex}
             status={menuStatusForFormSection(formSection)}
-            active={formState.active === formSection.id}
+            active={formState.current === formSection.id}
           >
-            {formState.active !== formSection.id && formSection.index <= currentIndex ? (
+            {formState.current !== formSection.id && formSection.index <= currentIndex ? (
               <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/list/${listId}`}>
                 <span>
                   Lijst {list.number} - {list.name}
@@ -130,10 +130,10 @@ export function PollingStationProgress() {
         key="save"
         id="list-item-save"
         status={menuStatusForFormSection(formState.sections.save)}
-        active={formState.active === "save"}
-        disabled={!formState.isCompleted}
+        active={formState.current === "save"}
+        disabled={formState.furthest !== "save"}
       >
-        {formState.active !== "save" && formState.isCompleted ? (
+        {formState.current !== "save" && formState.furthest === "save" ? (
           <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/save`}>
             <span>Controleren en opslaan</span>
           </Link>

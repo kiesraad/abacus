@@ -70,7 +70,7 @@
     "vite": "^5.4.8",
     "vite-node": "^2.1.2",
     "vite-plugin-html": "^3.2.2",
-    "vitest": "^2.0.5",
+    "vitest": "^2.1.2",
     "vitest-fail-on-console": "^0.7.1"
   },
   "msw": {

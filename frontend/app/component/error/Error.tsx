@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { IconArrowLeft } from "@kiesraad/icon";
 import { Button, Icon } from "@kiesraad/ui";
+import { isDevelopment } from "@kiesraad/util";
 
 import cls from "./Error.module.css";
 import errorImage from "./error.png";
@@ -42,7 +43,7 @@ export function Error({ title, error, action = ErrorAction.Back, children }: Err
           </aside>
         </article>
       </main>
-      {error && (
+      {error && isDevelopment && (
         <section className={cls.errorStack}>
           <h2>Foutmelding</h2>
           <code>

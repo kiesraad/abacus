@@ -9,8 +9,6 @@ interface FatalErrorProps {
 }
 
 export function FatalError({ message, code, error }: FatalErrorProps) {
-  console.warn(error);
-
   return (
     <div className="app-layout">
       <NavBar />

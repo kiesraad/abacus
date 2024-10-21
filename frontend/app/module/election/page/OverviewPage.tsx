@@ -4,6 +4,7 @@ import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { Election, useElectionList } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { IconCheckHeart, IconChevronRight } from "@kiesraad/icon";
 import { Alert, Icon, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
@@ -54,7 +55,7 @@ export function OverviewPage() {
       </header>
       {isNewAccount && (
         <Alert type="success" onClose={closeNewAccountAlert}>
-          <h2>Je account is ingesteld</h2>
+          <h2>{t("account.title")}</h2>
           <p>Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.</p>
         </Alert>
       )}
@@ -63,9 +64,9 @@ export function OverviewPage() {
           <table id="overview" className="overview_table">
             <thead>
               <tr>
-                <th>Verkiezing</th>
-                {isAdministrator && <th>Rol</th>}
-                <th>Status</th>
+                <th>{t("election")}</th>
+                <th>{t("role")}</th>
+                <th>{t("status")}</th>
                 <th></th>
               </tr>
             </thead>

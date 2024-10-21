@@ -11,7 +11,7 @@ export type ProgressBarColorClass =
   | "definitive"
   | "not_started";
 
-export type RadiusClass = "no-radius" | "default-radius" | "no-radius-right" | "no-radius-left";
+export type RadiusClass = "no-radius" | "default-radius" | "radius-right" | "radius-left";
 export type PercentageAndColorClass = {
   percentage: number;
   class: ProgressBarColorClass;
@@ -42,11 +42,11 @@ export function ProgressBar({
       return "default-radius";
     }
     if (barIndex === 0) {
-      return "no-radius-right";
-    } else if (barIndex > 0 && barIndex < totalBars - 1) {
-      return "no-radius";
+      return "radius-left";
+    } else if (barIndex === totalBars - 1) {
+      return "radius-right";
     } else {
-      return "no-radius-left";
+      return "no-radius";
     }
   }
 
@@ -63,7 +63,7 @@ export function ProgressBar({
             aria-valuemax={100}
           >
             <div
-              className={cn(cls["progressbar-inner"], cls[percentagesAndColorClasses[0].class], "default-radius")}
+              className={cn(cls["progressbar-inner"], cls[percentagesAndColorClasses[0].class], cls["default-radius"])}
               style={{ width: `${percentagesAndColorClasses[0].percentage}%` }}
             />
           </div>

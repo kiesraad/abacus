@@ -18,5 +18,5 @@ export function ErrorBoundary() {
     return <FatalError message={error.message} code={error.code} />;
   }
 
-  return <FatalError message={error.message} />;
+  return <FatalError message={error.message} error={error} />;
 }

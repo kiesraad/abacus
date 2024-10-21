@@ -14,3 +14,19 @@
 .errorContainer code {
   font-weight: bold;
 }
+
+.errorStack {
+  flex: 1 1 auto;
+  padding: 2.5rem 5rem;
+  border-bottom: 1rem solid var(--bg-gray);
+}
+
+.errorStack h2 {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+.errorStack code {
+  font-family: "Courier New", Courier, monospace;
+  line-height: 1.5rem;
+}

@@ -11,16 +11,14 @@ export function NotFound({ message, path }: NotFoundProps) {
   return (
     <div className="app-layout">
       <NavBar />
-      <main>
-        <Error title={message || "Pagina niet gevonden"} action={ErrorAction.Back}>
-          {path && (
-            <p>
-              De pagina <code>{path}</code> is niet gevonden.
-            </p>
-          )}
-          <p>We kunnen de pagina die je zoekt niet vinden. Het kan zijn dat de pagina is verplaatst of verwijderd.</p>
-        </Error>
-      </main>
+      <Error title={message || "Pagina niet gevonden"} action={ErrorAction.Back}>
+        {path && (
+          <p>
+            De pagina <code>{path}</code> is niet gevonden.
+          </p>
+        )}
+        <p>We kunnen de pagina die je zoekt niet vinden. Het kan zijn dat de pagina is verplaatst of verwijderd.</p>
+      </Error>
       <Footer />
     </div>
   );

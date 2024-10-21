@@ -5,20 +5,21 @@ import { NavBar } from "app/component/navbar/NavBar";
 interface FatalErrorProps {
   message: string;
   code?: number;
+  error?: Error;
 }
 
-export function FatalError({ message, code }: FatalErrorProps) {
+export function FatalError({ message, code, error }: FatalErrorProps) {
+  console.warn(error);
+
   return (
     <div className="app-layout">
       <NavBar />
-      <main>
-        <Error title="Abacus is stuk" action={ErrorAction.Back}>
-          <p>
-            <strong>{code || 500} Interne fout</strong>
-          </p>
-          {message && <p>{message}</p>}
-        </Error>
-      </main>
+      <Error title="Abacus is stuk" action={ErrorAction.Back} error={error}>
+        <p>
+          <strong>{code || 500} Interne fout</strong>
+        </p>
+        {message && <p>{message}</p>}
+      </Error>
       <Footer />
     </div>
   );

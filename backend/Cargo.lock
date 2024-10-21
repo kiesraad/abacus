@@ -230,7 +230,6 @@ dependencies = [
  "axum-extra",
  "chrono",
  "clap",
- "comemo",
  "hyper",
  "reqwest",
  "serde",

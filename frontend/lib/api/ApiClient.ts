@@ -39,7 +39,7 @@ export class ApiClient {
         body = (await response.json()) as T | ApiError;
       } catch (e) {
         console.error("Failed to parse json", e);
-        throw new ApiError(
+        return new ApiError(
           ApiResponseStatus.ServerError,
           response.status,
           `Server response parse error: ${response.status}`,
@@ -49,7 +49,7 @@ export class ApiClient {
       body = await response.text();
       if (body.length > 0) {
         console.error("Unexpected data from server:", body);
-        throw new ApiError(ApiResponseStatus.ServerError, response.status, `Unexpected data from server: ${body}`);
+        return new ApiError(ApiResponseStatus.ServerError, response.status, `Unexpected data from server: ${body}`);
       }
     }
 
@@ -61,7 +61,7 @@ export class ApiClient {
     } else if (response.status >= 500 && response.status <= 599) {
       status = ApiResponseStatus.ServerError;
     } else {
-      throw new ApiError(
+      return new ApiError(
         ApiResponseStatus.ServerError,
         response.status,
         `Unexpected response status: ${response.status}`,
@@ -75,11 +75,7 @@ export class ApiClient {
         data: body as T,
       };
     } else {
-      return {
-        status,
-        code: response.status,
-        error: (body as ApiError).error,
-      } as ApiError;
+      return new ApiError(status, response.status, (body as ApiError).error);
     }
   }
 

@@ -15,7 +15,7 @@ import { NotAvailableInMock } from "app/module/NotAvailableInMock";
 import { UsersHomePage } from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
 
-import { ErrorBoundary } from "./component/error/ErrorBoundry";
+import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
 import {
   CandidatesVotesPage,

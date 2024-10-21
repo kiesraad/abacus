@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import { ErrorModal } from "app/component/error/ErrorModal";
+
 import { ApiError } from "@kiesraad/api";
 import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
@@ -29,19 +31,7 @@ export function Feedback({ id, type, data, apiError }: FeedbackProps) {
 
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>
-      {apiError && (
-        <div className="feedback-item">
-          <header>
-            {renderIconForType(type)}
-            <h3 tabIndex={-1} ref={feedbackHeader} className="feedback-header">
-              Sorry, er ging iets mis
-            </h3>
-          </header>
-          <div className="content">
-            {apiError.code}: {apiError.error}
-          </div>
-        </div>
-      )}
+      {apiError && <ErrorModal error={apiError} />}
       {feedbackList.map((feedback, index) => (
         <div key={`feedback-${index}`} className="feedback-item">
           <header>

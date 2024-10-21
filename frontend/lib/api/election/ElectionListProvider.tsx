@@ -15,14 +15,22 @@ export interface ElectionListProviderProps {
 }
 
 export function ElectionListProvider({ children }: ElectionListProviderProps) {
-  const { data, loading } = useElectionListRequest();
+  const { error, data, loading } = useElectionListRequest();
 
   if (loading) {
     return null;
   }
 
+  if (error) {
+    if (error.code === 404) {
+      throw new NotFoundError("Verkiezingen niet gevonden");
+    }
+
+    throw error;
+  }
+
   if (!data || !data.elections.length) {
-    throw new NotFoundError("No elections found");
+    throw new NotFoundError("Verkiezingen niet gevonden");
   }
 
   return (

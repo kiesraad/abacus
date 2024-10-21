@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "backend",
     "description": "",
@@ -130,6 +130,9 @@
                 },
                 "description": "application/pdf"
               }
+            },
+            "content": {
+              "application/pdf": {}
             }
           },
           "404": {
@@ -521,11 +524,7 @@
             "type": "string"
           },
           "gender": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CandidateGender"
-              }
-            ]
+            "$ref": "#/components/schemas/CandidateGender"
           },
           "initials": {
             "type": "string"
@@ -885,7 +884,8 @@
         ],
         "properties": {
           "differences_counts": {
-            "$ref": "#/components/schemas/DifferencesCounts"
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
           },
           "political_group_votes": {
             "type": "array",
@@ -896,21 +896,19 @@
           },
           "recounted": {
             "type": "boolean",
-            "description": "Recounted (\"Is er herteld? - See form for official long description of the checkbox\")",
-            "nullable": true
+            "description": "Recounted (\"Is er herteld? - See form for official long description of the checkbox\")"
           },
           "voters_counts": {
-            "$ref": "#/components/schemas/VotersCounts"
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"1. Aantal toegelaten kiezers\")"
           },
           "voters_recounts": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/VotersRecounts"
-              }
-            ]
+            "$ref": "#/components/schemas/VotersRecounts",
+            "description": "Voters recounts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")\nWhen filled in, this field should replace `voters_counts` when using the results."
           },
           "votes_counts": {
-            "$ref": "#/components/schemas/VotesCounts"
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"2. Aantal getelde stembiljetten\")"
           }
         }
       },
@@ -961,7 +959,8 @@
             "description": "Client state for the data entry (arbitrary JSON)"
           },
           "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "Data entry for a polling station"
           }
         }
       },

@@ -11,7 +11,7 @@ use crate::pdf_gen::generate_pdf;
 use crate::pdf_gen::models::{ModelNa31_2Input, ModelNa31_2Summary, PdfModel};
 use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::{PollingStation, PollingStationStatusEntry};
-use crate::APIError;
+use crate::{APIError, ErrorResponse};
 
 pub(crate) mod repository;
 pub mod structs;

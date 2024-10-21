@@ -47,13 +47,16 @@ ProgressList.Item = function ProgressListItem({
   React.useEffect(() => {
     if (scrollIntoView && active) {
       const li = ref.current;
-      const ul = ref.current?.parentElement;
-      if (!li || !ul) return;
-      //use scrollTo because scrollIntoView also scrolls the root element
-      ul.scrollTo({
-        top: li.offsetTop - 10,
-        behavior: "smooth",
-      });
+      li?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+      // scrollIntoView scrolls the root container as well when using block: "start"
+      // const ul = ref.current?.parentElement;
+      // if (!li || !ul) return;
+
+      // ul.scrollTo({
+      //   top: li.offsetTop - 10,
+      //   behavior: "smooth",
+      // });
     }
   }, [scrollIntoView, active]);
   return (

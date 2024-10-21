@@ -27,6 +27,7 @@
     gap: 0.5rem;
 
     scroll-margin-top: 0.8rem;
+    scroll-margin-bottom: 0.8rem;
 
     &:hover {
       background-color: var(--color-hover);

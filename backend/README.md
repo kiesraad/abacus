@@ -77,6 +77,14 @@ e.g.:
 cargo run -- --reset-database --seed-data
 ```
 
+#### Offline mode
+
+You can use `sqlx` in offline mode, so you don't need an active database connection for the queries to compile.
+`lefthook` is configured to update the queries on commit, but when you need to build in offline mode, make sure to first run:
+```shell
+cargo sqlx prepare
+```
+
 ### OpenAPI
 
 The [utoipa](https://github.com/juhaku/utoipa) crate is used to generate OpenAPI documentation for the REST API.

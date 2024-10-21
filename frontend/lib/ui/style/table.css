@@ -63,7 +63,7 @@ table.polling_stations_table {
 table.polling_stations_table {
   td.number,
   th.number {
-    width: 10rem;
+    width: 6.5rem;
   }
 }
 

@@ -22,7 +22,7 @@ export function PollingStationListPage() {
           <table id="polling_stations" className="polling_stations_table">
             <thead>
               <tr>
-                <th>Nummer</th>
+                <th className="number">Nummer</th>
                 <th>Naam</th>
                 <th>Soort</th>
                 <th></th>
@@ -31,7 +31,7 @@ export function PollingStationListPage() {
             <tbody>
               {pollingStations.map((station) => (
                 <tr key={station.id}>
-                  <td className={"number"}>{station.number}</td>
+                  <td className="number">{station.number}</td>
                   <td>{station.name}</td>
                   <td>{labelForPollingStationType[station.polling_station_type]}</td>
                   <td className="link">

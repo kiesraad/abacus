@@ -2,15 +2,19 @@ FROM debian:bookworm-slim
 
 WORKDIR /abacus
 
+
 RUN groupadd -r abacus --gid=999 
 RUN useradd --no-log-init -r -g abacus --uid=999 abacus
+
+# Creates the /abacus folder owned by the abacus user
+RUN install -o abacus -g abacus -d  /abacus
+
 USER 999
 
-# Copy the binary and database
+# Copy the binary
 COPY --chown=abacus:abacus ./backend/target/release/api /abacus/backend
-COPY --chown=abacus:abacus ./backend/db.sqlite /abacus/db.sqlite
 
 # Run
-CMD ["/abacus/backend"]
+ENTRYPOINT ["/abacus/backend"]
 
 EXPOSE 8080

@@ -83,7 +83,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
     // Ensure the response is what we expect:
-    // polling station 1 is now complete, polling station 2 is still incomplete
+    // polling station 1 is now complete, polling station 2 is still incomplete and set to in progress
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
@@ -104,7 +104,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
     // Ensure the response is what we expect:
-    // polling station 1 is now complete, polling station 2 is still incomplete
+    // polling station 1 is now complete, polling station 2 is still incomplete and set to unfinished
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());

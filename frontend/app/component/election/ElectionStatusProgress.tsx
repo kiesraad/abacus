@@ -1,64 +1,65 @@
 import * as React from "react";
 
-import { useElection, useElectionStatus } from "@kiesraad/api";
+import { PollingStationStatus, PollingStationStatusEntry, useElection, useElectionStatus } from "@kiesraad/api";
 import { IconDot } from "@kiesraad/icon";
-import { Icon, PercentageAndColorClass, Progress, ProgressBar } from "@kiesraad/ui";
+import { Icon, PercentageAndColorClass, Progress, ProgressBar, ProgressBarColorClass } from "@kiesraad/ui";
 
-type Stat = {
-  title: string;
-  total: number;
-  percentageAndColorClass: PercentageAndColorClass;
+const statusCategories = ["in_progress", "unfinished", "definitive"] as const;
+type StatusCategory = (typeof statusCategories)[number];
+
+const categoryTitle: Record<StatusCategory, string> = {
+  in_progress: "Invoer bezig",
+  unfinished: "Niet afgeronde invoer",
+  definitive: "Eerste invoer klaar",
 };
+
+const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
+  in_progress: "in-progress",
+  unfinished: "unfinished",
+  definitive: "definitive",
+};
+
+function statusCount(entries: PollingStationStatusEntry[], status: PollingStationStatus): number {
+  return entries.filter((s) => s.status === status).length;
+}
 
 export function ElectionStatusProgress() {
   const { pollingStations } = useElection();
   const { statuses } = useElectionStatus();
 
-  const stats: Stat[] = React.useMemo(() => {
+  const categoryCounts: Record<StatusCategory, number> = React.useMemo(() => {
+    // TODO: future second_entry_in_progress status should be added to below object
+    return {
+      in_progress: statusCount(statuses, "first_entry"),
+      unfinished: statusCount(statuses, "first_entry_in_progress"),
+      definitive: statusCount(statuses, "definitive"),
+    };
+  }, [statuses]);
+
+  const progressBarData: PercentageAndColorClass[] = React.useMemo(() => {
     const total = pollingStations.length;
-    const totalEntryInProgress = statuses.filter((s) => s.status === "first_entry").length;
-    // TODO: future second_entry_in_progress status should be added to below variable
-    const totalUnfinished = statuses.filter((s) => s.status === "first_entry_in_progress").length;
-    const totalDefinitive = statuses.filter((s) => s.status === "definitive").length;
-
-    return [
-      {
-        title: "Niet afgeronde invoer",
-        total: totalUnfinished,
-        percentageAndColorClass: { percentage: Math.round((totalUnfinished / total) * 100), class: "unfinished" },
-      },
-      {
-        title: "Invoer bezig",
-        total: totalEntryInProgress,
-        percentageAndColorClass: { percentage: Math.round((totalEntryInProgress / total) * 100), class: "in-progress" },
-      },
-      {
-        title: "Eerste invoer klaar", // TODO: Should change to "Eerste en tweede invoer klaar" when second entry is added
-        total: totalDefinitive,
-        percentageAndColorClass: { percentage: Math.round((totalDefinitive / total) * 100), class: "definitive" },
-      },
-    ];
-  }, [pollingStations, statuses]);
-
-  const percentagesAndColorClasses: PercentageAndColorClass[] = [];
+    return statusCategories.map((cat) => ({
+      percentage: Math.round(categoryCounts[cat] / total) * 100,
+      class: categoryColorClass[cat],
+    }));
+  }, [pollingStations, categoryCounts]);
 
   return (
     <Progress>
       <div className="column">
         <h2>Snelkoppelingen</h2>
-        {stats.map((stat, index) => {
-          percentagesAndColorClasses.push(stat.percentageAndColorClass);
+        {statusCategories.map((cat) => {
           return (
-            <span className="item" key={`item-${index}`}>
-              <Icon icon={<IconDot />} size="sm" color={stat.percentageAndColorClass.class} /> {stat.title} (
-              {stat.total})
+            <span className="item" key={`item-${cat}`}>
+              <Icon icon={<IconDot />} size="sm" color={categoryColorClass[cat]} />
+              {categoryTitle[cat]} ({categoryCounts[cat]})
             </span>
           );
         })}
       </div>
       <div className="column">
         <h2>Voortgang</h2>
-        <ProgressBar key="all" id="all" data={percentagesAndColorClasses} spacing="small" />
+        <ProgressBar key="all" id="all" data={progressBarData} spacing="small" />
       </div>
     </Progress>
   );

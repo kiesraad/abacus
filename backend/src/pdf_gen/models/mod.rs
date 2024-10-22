@@ -40,8 +40,6 @@ impl PdfModel {
             Self::ModelNa31_2(input) => serde_json::to_string(input),
         }?;
 
-        dbg!(&data);
-
         Ok(Bytes::from(data.as_bytes()))
     }
 

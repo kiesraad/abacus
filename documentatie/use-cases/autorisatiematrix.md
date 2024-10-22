@@ -4,7 +4,7 @@
 
 Deze matrix beschrijft welke functionaliteiten in de software voor welk type gebruiker beschikbaar zijn.
 De matrix beschrijft de rollen zoals ze voor het Gemeentelijke Stembureau (GSB) / Stembureau Openbaar Lichaam (SOL) worden ingericht.
-Het GSB/SOL verwerkt de tellingen / processen-verbaal van stembureau's, en genereert haar eigen proces-verbaal.
+Het GSB/SOL verwerkt de tellingen / processen-verbaal van stembureaus, en genereert haar eigen proces-verbaal.
 
 ## Rollen
 

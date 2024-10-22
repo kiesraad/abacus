@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\nSELECT p.id AS \"id: u32\",\nCASE\n  WHEN de.polling_station_id IS NOT NULL THEN 'FirstEntryInProgress'\n  WHEN r.polling_station_id IS NOT NULL THEN 'Definitive'\n  ELSE 'FirstEntry' END AS \"status!: _\"\nFROM polling_stations AS p\nLEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id\nLEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id\nWHERE election_id = $1\n",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "status!: _",
+        "ordinal": 1,
+        "type_info": "Null"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "eb00ec6ee5eacc5c747567184c5a417b6ed21333194f1a13ba6df9706f4b5a06"
+}

@@ -27,4 +27,4 @@ Hier vind je de documentatie over Abacus. De documentatie wordt telkens aangevul
 
 ## Bijdragen
 
-Het kan zijn dat sommige informatie niet up to date is i.v.m. wijzigingen in de Kieswet, de Kiesregeling of het Kiesbesluit. Mocht je fouten of onvolledigheden vinden, dan kun je dit doorgeven in een issue.
+Het kan zijn dat sommige informatie niet up-to-date is i.v.m. wijzigingen in de Kieswet, de Kiesregeling of het Kiesbesluit. Mocht je fouten of onvolledigheden vinden, dan kun je dit doorgeven in een issue.

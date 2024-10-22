@@ -39,7 +39,7 @@ bijbehorende van de high-level technologiekeuzes.
 In dit diagram is het Abacus-systeem verder uitgesplitst in verschillende
 containers (frontend, backend, en database).
 
-![Containers](./structurizr/Container.svg)
+![Containers](./structurizr/Container_NL.svg)
 
 - De frontend is de webapplicatie die gebruikt wordt door de gebruikers.
 - De backend is de serverapplicatie die de logica van het systeem bevat.
@@ -51,7 +51,7 @@ Het componentendiagram geeft een overzicht van de interne structuur van de
 backend. Deze componenten zijn de belangrijkste bouwblokken van de backend. Deze
 componenten zijn in de praktijk verschillende modules in de Rust-codebase.
 
-![Componenten](./structurizr/Components.svg)
+![Componenten](./structurizr/Components_NL.svg)
 
 De volgende componenten zijn te onderscheiden:
 
@@ -59,10 +59,10 @@ De volgende componenten zijn te onderscheiden:
   Hieronder valt ook het starten, stoppen, hervatten en sluiten van de zitting.
 - Gebruikers: Gebruikers en rollen: beheer, authenticatie, autorisatie.
 - Verkiezingen: Verkiezingsgegevens incl. politieke groeperingen,
-  kandidatenlijsten en stembureau's.
+  kandidatenlijsten en stembureaus.
 - Invoeren: Invoeren en validatie van telresultaten met dubbele invoer voor het
   vier-ogenprincipe. Eventuele conflicten worden opgelost door de coördinator.
-- Telresultaten: Gecontroleerde (dubbel ingevoerde) telresultaten van stembureau's.
+- Telresultaten: Gecontroleerde (dubbel ingevoerde) telresultaten van stembureaus.
 - Zetelverdeling: Zetelverdeling na invoer van alle telresultaten. Eventuele
   input (loting, overleden kandidaten) wordt aan de beheerder gevraagd.
 - Exporteren: Exporteren van de uitslag als proces-verbaal in PDF-formaat en EML_NL.

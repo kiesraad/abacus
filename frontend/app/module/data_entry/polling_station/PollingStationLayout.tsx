@@ -1,5 +1,6 @@
 import { Link, Outlet, useParams } from "react-router-dom";
 
+import { NotFoundError } from "app/component/error";
 import { NavBar } from "app/component/navbar/NavBar";
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
@@ -16,11 +17,11 @@ export function PollingStationLayout() {
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
 
   if (!pollingStation) {
-    throw Error("Polling station not found");
+    throw new NotFoundError("Stembureau niet gevonden");
   }
 
   if (pollingStationStatus === "definitive") {
-    throw Error("Polling station already finalised");
+    throw new Error("Polling station already finalised");
   }
 
   return (

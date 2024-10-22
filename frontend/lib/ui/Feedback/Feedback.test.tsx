@@ -7,7 +7,6 @@ import {
   MultipleWarnings,
   SingleError,
   SingleErrorCustomAction,
-  SingleServerError,
   SingleWarning,
 } from "./Feedback.stories";
 
@@ -72,12 +71,5 @@ describe("UI component: Feedback", () => {
     expect(
       getByText("Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder."),
     ).toBeInTheDocument();
-  });
-
-  test("Server error has expected children", () => {
-    const { getByText } = render(<SingleServerError />);
-
-    expect(getByText("Sorry, er ging iets mis")).toBeInTheDocument();
-    expect(getByText("500: Internal Server Error")).toBeInTheDocument();
   });
 });

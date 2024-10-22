@@ -3,6 +3,10 @@ assert_lefthook_installed: true
 pre-commit:
   parallel: true
   commands:
+    backend-sqlx-prepare:
+      root: "backend/"
+      glob: "*.rs"
+      run: cargo sqlx prepare
     backend-formatter:
       root: "backend/"
       glob: "*.rs"

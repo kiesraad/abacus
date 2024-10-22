@@ -1,6 +1,5 @@
 use std::error::Error;
 use std::net::{Ipv4Addr, SocketAddr};
-use std::path::PathBuf;
 use std::str::FromStr;
 
 #[cfg(feature = "dev-database")]
@@ -11,15 +10,11 @@ use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::SqlitePool;
 use tokio::net::TcpListener;
 use tokio::signal;
-use tower_http::services::{ServeDir, ServeFile};
+use tracing::info;
 
 /// Abacus API server
 #[derive(Parser, Debug)]
 struct Args {
-    /// Path to the frontend dist directory to serve through the API server
-    #[arg(short, long)]
-    frontend_dist: Option<PathBuf>,
-
     /// Server port, optional
     #[arg(short, long, default_value_t = 8080)]
     port: u16,
@@ -39,25 +34,20 @@ struct Args {
     reset_database: bool,
 }
 
-/// Main entry point for the application, sets up the database and starts the
-/// API server on port 8080.
+/// Main entry point for the application. Sets up the database, and starts the
+/// API server and in-memory file router on port 8080.
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    tracing_subscriber::fmt().init();
+
     let args = Args::parse();
     let pool = create_sqlite_pool(&args).await?;
-    let app = router(pool)?;
 
-    let app = if let Some(fd) = args.frontend_dist {
-        app.fallback_service(
-            ServeDir::new(fd.clone()).fallback(ServeFile::new(fd.join("index.html"))),
-        )
-    } else {
-        app
-    };
+    let app = router(pool)?;
 
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(&address).await?;
-    println!("Starting API server on http://{}", listener.local_addr()?);
+    info!("Starting API server on http://{}", listener.local_addr()?);
     axum::serve(listener, app.into_make_service())
         .with_graceful_shutdown(shutdown_signal())
         .tcp_nodelay(true)
@@ -77,6 +67,7 @@ async fn create_sqlite_pool(
     if args.reset_database {
         // remove the file, ignoring any errors that occurred (such as the file not existing)
         let _ = tokio::fs::remove_file(opts.get_filename()).await;
+        info!("removed database file");
     }
 
     let pool = SqlitePool::connect_with(opts).await?;

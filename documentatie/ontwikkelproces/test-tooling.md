@@ -24,15 +24,19 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 title: Ladle Stories
 ---
 flowchart LR
-    ladle-story(Ladle Story)
+    rtl([React Testing Library])
+    ladle-story-1(Ladle Story)
+    ladle-story-2(Ladle Story)
 
     playwright([Playwright])
     browser([Browser])
-    msw([Mock Service Worker])
+    ladle-dev-server([Ladle dev server])
 
-    playwright --> ladle-story
-    browser --> ladle-story
-    ladle-story ---> msw
+    rtl --> ladle-story-1
+
+    playwright --> ladle-story-2
+    browser --> ladle-story-2
+    ladle-story-2 ---> ladle-dev-server
 ```
 
 ---

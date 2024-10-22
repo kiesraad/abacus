@@ -2,9 +2,9 @@ use std::time::Instant;
 
 use models::PdfModel;
 use tracing::{debug, info, warn};
-use typst::{eval::Tracer, foundations::Smart};
 
 use crate::APIError;
+use typst_pdf::{PdfOptions, PdfStandard, PdfStandards};
 
 use self::world::PdfWorld;
 
@@ -21,29 +21,31 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
     world.set_input_model(model);
 
     let compile_start = Instant::now();
-    let mut tracer = Tracer::new();
-    let result = typst::compile(&world, &mut tracer);
+    let result = typst::compile(&world);
+    let document = result
+        .output
+        .map_err(|err| APIError::PdfGenError(err.to_vec()))?;
     info!("Compile took {} ms", compile_start.elapsed().as_millis());
 
-    let warnings = &tracer.warnings();
-    info!("{} warnings", warnings.len());
-    warnings.iter().for_each(|warning| {
+    info!("{} warnings", result.warnings.len());
+    result.warnings.iter().for_each(|warning| {
         warn!("Warning: {:?}", warning);
     });
 
-    let buffer = match result {
-        Ok(document) => {
-            debug!("Generating PDF...");
-            let pdf_gen_start = Instant::now();
-            let buffer: Vec<u8> = typst_pdf::pdf(&document, Smart::Auto, None);
-            debug!(
-                "PDF generation took {} ms",
-                pdf_gen_start.elapsed().as_millis()
-            );
-            Ok(buffer)
-        }
-        Err(err) => Err(APIError::PdfGenError(err.into_iter().collect())),
-    }?;
+    debug!("Generating PDF...");
+    let pdf_gen_start = Instant::now();
+    let pdf_standards =
+        PdfStandards::new(&[PdfStandard::A_2b]).expect("PDF standards should be valid");
+    let pdf_options = PdfOptions {
+        standards: pdf_standards,
+        ..Default::default()
+    };
+    let buffer = typst_pdf::pdf(&document, &pdf_options)
+        .map_err(|err| APIError::PdfGenError(err.to_vec()))?;
+    debug!(
+        "PDF generation took {} ms",
+        pdf_gen_start.elapsed().as_millis()
+    );
 
     info!("Finished in {} ms", start.elapsed().as_millis());
     Ok(PdfGenResult { buffer })

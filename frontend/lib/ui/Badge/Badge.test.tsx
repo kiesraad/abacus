@@ -31,3 +31,15 @@ test("The first entry in progress badge is visible", () => {
   expect(badgeElement).toBeVisible();
   expect(badgeElementImg).toBeVisible();
 });
+
+test("The first entry unfinished badge is visible", () => {
+  render(<Badge type="first_entry_unfinished" showIcon />);
+
+  const badgeElement = screen.getByText("1e invoer");
+  const badgeElementImg = screen.getByRole("img");
+
+  // Essentially points to the same element, but at least we test
+  // the presence of an icon this way
+  expect(badgeElement).toBeVisible();
+  expect(badgeElementImg).toBeVisible();
+});

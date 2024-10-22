@@ -16,9 +16,9 @@ export class ApiError extends Error {
   constructor(
     public status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError,
     public code: number,
-    public message: string,
+    public message = "Unknown error",
   ) {
-    super(message || "Unknown error");
+    super(message);
   }
 
   withContext(message: string): this {

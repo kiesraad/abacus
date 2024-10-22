@@ -41,7 +41,7 @@ describe("PollingStationListPage", () => {
 
     render(<PollingStationListPage />);
 
-    expect(await screen.findByText("Er zijn nog geen stembureaus ingevoerd")).toBeVisible();
+    expect(await screen.findByText(/Er zijn nog geen stembureaus ingevoerd/)).toBeVisible();
     expect(screen.queryByRole("table")).toBeNull();
   });
 });

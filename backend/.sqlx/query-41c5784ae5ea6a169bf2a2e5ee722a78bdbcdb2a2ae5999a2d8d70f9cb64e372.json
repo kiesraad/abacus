@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO polling_station_results (polling_station_id, data) SELECT polling_station_id, data FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = 1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "41c5784ae5ea6a169bf2a2e5ee722a78bdbcdb2a2ae5999a2d8d70f9cb64e372"
+}

@@ -1,7 +1,9 @@
 use std::time::Instant;
 
-use crate::APIError;
 use models::PdfModel;
+use tracing::{debug, info, warn};
+
+use crate::APIError;
 use typst_pdf::{PdfOptions, PdfStandard, PdfStandards};
 
 use self::world::PdfWorld;
@@ -23,14 +25,14 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
     let document = result
         .output
         .map_err(|err| APIError::PdfGenError(err.to_vec()))?;
-    println!("Compile took {} ms", compile_start.elapsed().as_millis());
+    info!("Compile took {} ms", compile_start.elapsed().as_millis());
 
-    println!("{} warnings", result.warnings.len());
+    info!("{} warnings", result.warnings.len());
     result.warnings.iter().for_each(|warning| {
-        println!("Warning: {:?}", warning);
+        warn!("Warning: {:?}", warning);
     });
 
-    println!("Generating PDF...");
+    debug!("Generating PDF...");
     let pdf_gen_start = Instant::now();
     let pdf_standards =
         PdfStandards::new(&[PdfStandard::A_2b]).expect("PDF standards should be valid");
@@ -40,12 +42,12 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
     };
     let buffer = typst_pdf::pdf(&document, &pdf_options)
         .map_err(|err| APIError::PdfGenError(err.to_vec()))?;
-    println!(
+    debug!(
         "PDF generation took {} ms",
         pdf_gen_start.elapsed().as_millis()
     );
 
-    println!("Finished in {} ms", start.elapsed().as_millis());
+    info!("Finished in {} ms", start.elapsed().as_millis());
     Ok(PdfGenResult { buffer })
 }
 

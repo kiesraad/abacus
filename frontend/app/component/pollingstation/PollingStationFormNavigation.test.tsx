@@ -137,7 +137,7 @@ describe("PollingStationFormNavigation", () => {
       formState: defaultFormState,
       apiError: {
         code: 422,
-        error: "JSON error or invalid data (Unprocessable Content)",
+        message: "JSON error or invalid data (Unprocessable Content)",
       },
       currentForm: {
         id: "recounted",
@@ -164,7 +164,7 @@ describe("PollingStationFormNavigation", () => {
       formState: defaultFormState,
       apiError: {
         code: 500,
-        error: "Internal server error",
+        message: "Internal server error",
       },
       currentForm: {
         id: "recounted",

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 import { IconArrowLeft } from "@kiesraad/icon";
-import { Button, Icon } from "@kiesraad/ui";
+import { Button } from "@kiesraad/ui";
 import { isDevelopment } from "@kiesraad/util";
 
 import cls from "./Error.module.css";
@@ -21,22 +21,24 @@ export function Error({ title, error, action = ErrorAction.Back, children }: Err
   return (
     <>
       <main>
-        <article className={cls.errorContainer}>
+        <article className={cls.error}>
           <section>
             <h1>{title}</h1>
             {children}
-            {action === ErrorAction.Back && (
-              <Button
-                size="lg"
-                variant="secondary"
-                onClick={() => {
-                  navigate(-1);
-                }}
-              >
-                <Icon icon={<IconArrowLeft />} color="primary" />
-                Terug naar de vorige pagina
-              </Button>
-            )}
+            <nav>
+              {action === ErrorAction.Back && (
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  leftIcon={<IconArrowLeft />}
+                  onClick={() => {
+                    navigate(-1);
+                  }}
+                >
+                  Terug naar de vorige pagina
+                </Button>
+              )}
+            </nav>
           </section>
           <aside>
             <img src={errorImage} alt="Error" />
@@ -44,7 +46,7 @@ export function Error({ title, error, action = ErrorAction.Back, children }: Err
         </article>
       </main>
       {error && isDevelopment && (
-        <section className={cls.errorStack}>
+        <section className={cls.stack}>
           <h2>Foutmelding</h2>
           <code>
             <pre>{error.stack}</pre>

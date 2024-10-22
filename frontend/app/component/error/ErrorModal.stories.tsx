@@ -11,7 +11,7 @@ export const ServerErrorModal: Story = () => {
         {
           status: ApiResponseStatus.ServerError,
           code: 500,
-          error: "Internal Server Error",
+          message: "Internal Server Error",
         } as ApiError
       }
     />

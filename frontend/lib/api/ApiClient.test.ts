@@ -29,7 +29,9 @@ describe("ApiClient", () => {
       data: null,
     });
 
-    expect(parsedResponse).toStrictEqual(new ApiError(ApiResponseStatus.ClientError, 422, undefined));
+    expect(parsedResponse).toStrictEqual(
+      new ApiError(ApiResponseStatus.ClientError, 422, "Unexpected response status: 422"),
+    );
   });
 
   test("500 response is parsed as server error", async () => {

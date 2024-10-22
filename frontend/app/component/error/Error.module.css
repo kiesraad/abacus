@@ -1,10 +1,10 @@
-.errorContainer {
+.error {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.errorContainer h1 {
+.error h1 {
   font-size: var(--font-size-xl);
   font-family: var(--font-text);
   font-weight: bold;
@@ -12,27 +12,38 @@
   margin-bottom: 2rem;
 }
 
-.errorContainer code {
+.error h4 {
+  color: var(--text-color-body);
+  font-size: 1rem;
   font-weight: bold;
 }
 
-.errorContainer p {
+.error code {
+  font-weight: bold;
+}
+
+.error p {
+  font-size: 1rem;
   max-width: 38rem;
 }
 
-.errorStack {
+.error nav {
+  margin-top: 2rem;
+}
+
+.stack {
   flex: 1 1 auto;
   padding: 2.5rem 5rem;
   border-bottom: 1rem solid var(--bg-gray);
 }
 
-.errorStack h2 {
+.stack h2 {
   font-size: var(--font-size-lg);
   font-family: var(--font-text);
   font-weight: bold;
 }
 
-.errorStack code {
+.stack code {
   font-family: "Courier New", Courier, monospace;
   line-height: 1.5rem;
 }

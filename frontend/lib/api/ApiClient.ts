@@ -13,70 +13,94 @@ export interface ApiResponse<T> {
 }
 
 export class ApiError extends Error {
-  status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError;
-  code: number;
-  error?: string;
-
-  constructor(status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError, code: number, error?: string) {
-    super(error);
-    this.status = status;
-    this.code = code;
-    this.error = error;
+  constructor(
+    public status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError,
+    public code: number,
+    public message: string,
+  ) {
+    super(message || "Unknown error");
   }
 
   withContext(message: string): this {
-    this.error = message;
+    this.message = message;
 
     return this;
   }
 }
 
+interface ServerError {
+  error: string;
+}
+
 export class ApiClient {
   async responseHandler<T>(response: Response): Promise<ApiResult<T>> {
-    let body;
     if (response.headers.get("Content-Type") === "application/json") {
       try {
-        body = (await response.json()) as T | ApiError;
+        const body = (await response.json()) as T | ServerError;
+
+        if (response.status >= 200 && response.status <= 299) {
+          return {
+            status: ApiResponseStatus.Success,
+            code: response.status,
+            data: body as T,
+          };
+        }
+
+        const isError = typeof body === "object" && null !== body && "error" in body;
+
+        if (response.status >= 400 && response.status <= 499 && isError) {
+          return new ApiError(ApiResponseStatus.ClientError, response.status, body.error);
+        }
+
+        if (response.status >= 500 && response.status <= 599 && isError) {
+          return new ApiError(ApiResponseStatus.ServerError, response.status, body.error);
+        }
+
+        return new ApiError(
+          ApiResponseStatus.ServerError,
+          response.status,
+          `Unexpected response status: ${response.status}`,
+        );
       } catch (e) {
         console.error("Failed to parse json", e);
+
         return new ApiError(
           ApiResponseStatus.ServerError,
           response.status,
           `Server response parse error: ${response.status}`,
         );
       }
-    } else {
-      body = await response.text();
-      if (body.length > 0) {
-        console.error("Unexpected data from server:", body);
-        return new ApiError(ApiResponseStatus.ServerError, response.status, `Unexpected data from server: ${body}`);
-      }
     }
 
-    let status;
+    const body = await response.text();
+
+    if (body.length > 0) {
+      const message = `Unexpected data from server: ${body}`;
+      console.error("Unexpected data from server:", body);
+      return new ApiError(ApiResponseStatus.ServerError, response.status, message);
+    }
+
     if (response.status >= 200 && response.status <= 299) {
-      status = ApiResponseStatus.Success;
-    } else if (response.status >= 400 && response.status <= 499) {
-      status = ApiResponseStatus.ClientError;
-    } else if (response.status >= 500 && response.status <= 599) {
-      status = ApiResponseStatus.ServerError;
-    } else {
-      return new ApiError(
-        ApiResponseStatus.ServerError,
-        response.status,
-        `Unexpected response status: ${response.status}`,
-      );
-    }
-
-    if (status === ApiResponseStatus.Success) {
       return {
-        status,
+        status: ApiResponseStatus.Success,
         code: response.status,
         data: body as T,
       };
-    } else {
-      return new ApiError(status, response.status, (body as ApiError).error);
     }
+
+    if (response.status >= 400 && response.status <= 499) {
+      return new ApiError(ApiResponseStatus.ClientError, response.status, body);
+    }
+
+    if (response.status >= 500 && response.status <= 599) {
+      return new ApiError(ApiResponseStatus.ServerError, response.status, body);
+    }
+
+    return new ApiError(
+      ApiResponseStatus.ServerError,
+      response.status,
+      `Unexpected response status: ${response.status}`,
+    );
   }
 
   async postRequest<T>(path: string, requestBody?: object): Promise<ApiResult<T>> {

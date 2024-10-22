@@ -1,18 +1,18 @@
+import * as Router from "react-router";
+
 import { screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { PollingStationListPage } from "app/module/polling_stations";
 import { overrideOnce, render } from "app/test/unit";
 
-import { PollingStationListProvider, PollingStationListResponse } from "@kiesraad/api";
+import { PollingStationListResponse } from "@kiesraad/api";
 
 describe("PollingStationListPage", () => {
   test("Show polling stations", async () => {
-    render(
-      <PollingStationListProvider electionId={1}>
-        <PollingStationListPage />
-      </PollingStationListProvider>,
-    );
+    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1" });
+
+    render(<PollingStationListPage />);
 
     expect(await screen.findByRole("table")).toBeVisible();
 
@@ -37,13 +37,11 @@ describe("PollingStationListPage", () => {
       polling_stations: [],
     } satisfies PollingStationListResponse);
 
-    render(
-      <PollingStationListProvider electionId={42}>
-        <PollingStationListPage />
-      </PollingStationListProvider>,
-    );
+    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "42" });
 
-    expect(await screen.findByTestId("no-polling-station-data")).toBeVisible();
+    render(<PollingStationListPage />);
+
+    expect(await screen.findByText("Er zijn nog geen stembureaus ingevoerd")).toBeVisible();
     expect(screen.queryByRole("table")).toBeNull();
   });
 });

@@ -1,7 +1,7 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { expectNotFound, overrideOnce, Providers, setupTestRouter } from "app/test/unit";
+import { expectErrorPage, expectNotFound, overrideOnce, Providers, setupTestRouter } from "app/test/unit";
 
 import { electionStatusMockResponse } from "@kiesraad/api-mocks";
 
@@ -34,7 +34,7 @@ describe("routes", () => {
   test("Malformed election ID should result in not found page", async () => {
     await router.navigate("/elections/1asd/data-entry/");
     render();
-    await expectNotFound();
+    await expectErrorPage();
   });
 
   test("Non existing election id results in not found page", async () => {
@@ -42,7 +42,7 @@ describe("routes", () => {
     await router.navigate("/elections/9876/data-entry");
     expect(router.state.location.pathname).toEqual("/elections/9876/data-entry");
     render();
-    await expectNotFound();
+    await expectNotFound("Verkiezing niet gevonden");
   });
 
   test("Non existing polling station id results in not found page", async () => {
@@ -50,14 +50,14 @@ describe("routes", () => {
     // Navigate to a non-existing page
     await router.navigate("/elections/1/data-entry/9876");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/9876");
-    await expectNotFound();
+    await expectNotFound("Stembureau niet gevonden");
   });
 
-  test("Not found page when polling station is finalised", async () => {
+  test("Error page when polling station is finalised", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
     await router.navigate("/elections/1/data-entry/2");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/2");
     render();
-    await expectNotFound();
+    await expectErrorPage();
   });
 });

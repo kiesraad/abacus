@@ -10,7 +10,7 @@ export function CandidatesVotesPage() {
   const { election } = useElection();
 
   if (!listNumber) {
-    throw Error("Missing 'listNumber' parameter");
+    throw new Error("Missing 'listNumber' parameter");
   }
 
   const parsedListNumber = parseIntStrict(listNumber);

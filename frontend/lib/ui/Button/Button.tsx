@@ -9,6 +9,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   isLoading?: boolean;
   variant?: Variant;
   size?: Size;
+  leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   children: React.ReactNode;
 }
@@ -18,6 +19,7 @@ export function Button({
   isLoading,
   variant = "default",
   size = "md",
+  leftIcon,
   rightIcon,
   children,
   ...htmlButtonProps
@@ -28,6 +30,7 @@ export function Button({
       disabled={isDisabled || isLoading}
       {...htmlButtonProps}
     >
+      {leftIcon}
       {children}
       {rightIcon}
     </button>

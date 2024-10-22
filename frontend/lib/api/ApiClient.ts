@@ -12,54 +12,95 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-export type ApiError = {
-  status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError;
-  code: number;
-  error?: string;
-};
+export class ApiError extends Error {
+  constructor(
+    public status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError,
+    public code: number,
+    public message = "Unknown error",
+  ) {
+    super(message);
+  }
+
+  withContext(message: string): this {
+    this.message = message;
+
+    return this;
+  }
+}
+
+interface ServerError {
+  error: string;
+}
 
 export class ApiClient {
   async responseHandler<T>(response: Response): Promise<ApiResult<T>> {
-    let body;
     if (response.headers.get("Content-Type") === "application/json") {
       try {
-        body = (await response.json()) as T | ApiError;
-      } catch (err: unknown) {
-        console.error("Server response parse error:", err);
-        throw new Error(`Server response parse error: ${response.status}`);
-      }
-    } else {
-      body = await response.text();
-      if (body.length > 0) {
-        console.error("Unexpected data from server:", body);
-        throw new Error(`Unexpected data from server: ${body}`);
+        const body = (await response.json()) as T | ServerError;
+
+        if (response.status >= 200 && response.status <= 299) {
+          return {
+            status: ApiResponseStatus.Success,
+            code: response.status,
+            data: body as T,
+          };
+        }
+
+        const isError = typeof body === "object" && null !== body && "error" in body;
+
+        if (response.status >= 400 && response.status <= 499 && isError) {
+          return new ApiError(ApiResponseStatus.ClientError, response.status, body.error);
+        }
+
+        if (response.status >= 500 && response.status <= 599 && isError) {
+          return new ApiError(ApiResponseStatus.ServerError, response.status, body.error);
+        }
+
+        return new ApiError(
+          ApiResponseStatus.ServerError,
+          response.status,
+          `Unexpected response status: ${response.status}`,
+        );
+      } catch (e) {
+        console.error("Failed to parse json", e);
+
+        return new ApiError(
+          ApiResponseStatus.ServerError,
+          response.status,
+          `Server response parse error: ${response.status}`,
+        );
       }
     }
 
-    let status;
+    const body = await response.text();
+
+    if (body.length > 0) {
+      const message = `Unexpected data from server: ${body}`;
+      console.error("Unexpected data from server:", body);
+      return new ApiError(ApiResponseStatus.ServerError, response.status, message);
+    }
+
     if (response.status >= 200 && response.status <= 299) {
-      status = ApiResponseStatus.Success;
-    } else if (response.status >= 400 && response.status <= 499) {
-      status = ApiResponseStatus.ClientError;
-    } else if (response.status >= 500 && response.status <= 599) {
-      status = ApiResponseStatus.ServerError;
-    } else {
-      throw new Error(`Unexpected response status: ${response.status}`);
-    }
-
-    if (status === ApiResponseStatus.Success) {
       return {
-        status,
+        status: ApiResponseStatus.Success,
         code: response.status,
         data: body as T,
       };
-    } else {
-      return {
-        status,
-        code: response.status,
-        error: (body as ApiError).error,
-      };
     }
+
+    if (response.status >= 400 && response.status <= 499) {
+      return new ApiError(ApiResponseStatus.ClientError, response.status, body);
+    }
+
+    if (response.status >= 500 && response.status <= 599) {
+      return new ApiError(ApiResponseStatus.ServerError, response.status, body);
+    }
+
+    return new ApiError(
+      ApiResponseStatus.ServerError,
+      response.status,
+      `Unexpected response status: ${response.status}`,
+    );
   }
 
   async postRequest<T>(path: string, requestBody?: object): Promise<ApiResult<T>> {

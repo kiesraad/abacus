@@ -1,0 +1,49 @@
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.error h1 {
+  font-size: var(--font-size-xl);
+  font-family: var(--font-text);
+  font-weight: bold;
+  line-height: 1.25;
+  margin-bottom: 2rem;
+}
+
+.error h4 {
+  color: var(--text-color-body);
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.error code {
+  font-weight: bold;
+}
+
+.error p {
+  font-size: 1rem;
+  max-width: 38rem;
+}
+
+.error nav {
+  margin-top: 2rem;
+}
+
+.stack {
+  flex: 1 1 auto;
+  padding: 2.5rem 5rem;
+  border-bottom: 1rem solid var(--bg-gray);
+}
+
+.stack h2 {
+  font-size: var(--font-size-lg);
+  font-family: var(--font-text);
+  font-weight: bold;
+}
+
+.stack code {
+  font-family: "Courier New", Courier, monospace;
+  line-height: 1.5rem;
+}

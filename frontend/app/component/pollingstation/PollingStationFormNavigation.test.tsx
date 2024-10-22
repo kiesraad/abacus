@@ -137,7 +137,7 @@ describe("PollingStationFormNavigation", () => {
       formState: defaultFormState,
       apiError: {
         code: 422,
-        error: "JSON error or invalid data (Unprocessable Content)",
+        message: "JSON error or invalid data (Unprocessable Content)",
       },
       currentForm: {
         id: "recounted",
@@ -154,10 +154,8 @@ describe("PollingStationFormNavigation", () => {
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
-    const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent(
-      "Sorry, er ging iets mis422: JSON error or invalid data (Unprocessable Content)",
-    );
+    const feedbackServerError = await screen.findByTestId("error-modal");
+    expect(feedbackServerError).toHaveTextContent("Foutcode: 422JSON error or invalid data (Unprocessable Content)");
   });
 
   test("500 response results in display of error message", async () => {
@@ -166,7 +164,7 @@ describe("PollingStationFormNavigation", () => {
       formState: defaultFormState,
       apiError: {
         code: 500,
-        error: "Internal server error",
+        message: "Internal server error",
       },
       currentForm: {
         id: "recounted",
@@ -181,7 +179,8 @@ describe("PollingStationFormNavigation", () => {
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
-    const feedbackServerError = await screen.findByTestId("feedback-server-error");
-    expect(feedbackServerError).toHaveTextContent("Sorry, er ging iets mis500: Internal server error");
+    const feedbackServerError = await screen.findByTestId("error-modal");
+
+    expect(feedbackServerError).toHaveTextContent("Foutcode: 500Internal server error");
   });
 });

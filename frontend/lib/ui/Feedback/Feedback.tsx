@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 
-import { ApiError } from "@kiesraad/api";
 import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
@@ -11,11 +10,9 @@ interface FeedbackProps {
   id: FeedbackId;
   type: AlertType;
   data?: ClientValidationResultCode[];
-  // TODO: #277 move to error page or modal
-  apiError?: ApiError;
 }
 
-export function Feedback({ id, type, data, apiError }: FeedbackProps) {
+export function Feedback({ id, type, data }: FeedbackProps) {
   const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
   const feedbackList: FeedbackItem[] = [];
   if (data) {
@@ -30,19 +27,6 @@ export function Feedback({ id, type, data, apiError }: FeedbackProps) {
 
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>
-      {apiError && (
-        <div className="feedback-item">
-          <header>
-            {renderIconForType(type)}
-            <h3 tabIndex={-1} ref={feedbackHeader} className="feedback-header">
-              Sorry, er ging iets mis
-            </h3>
-          </header>
-          <div className="content">
-            {apiError.code}: {apiError.error}
-          </div>
-        </div>
-      )}
       {feedbackList.map((feedback, index) => (
         <div key={`feedback-${index}`} className="feedback-item">
           <header>

@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { NotFoundError } from "app/component/error";
+
 import { PollingStationStatusEntry, useElectionStatusRequest } from "@kiesraad/api";
 
 export interface iElectionStatusProviderContext {
@@ -19,8 +21,12 @@ export function ElectionStatusProvider({ children, electionId }: ElectionStatusP
     election_id: electionId,
   });
 
+  if (error && error.code === 404) {
+    throw new NotFoundError("Er ging iets mis bij het ophalen van de verkiezing");
+  }
+
   if (error) {
-    throw new Error("Could not fetch election statuses");
+    throw error;
   }
 
   if (data === null) {

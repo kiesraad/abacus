@@ -2,7 +2,7 @@ import { render as rtlRender, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { ElectionReportPage } from "app/module/election";
-import { expectNotFound, overrideOnce, Providers, render, setupTestRouter } from "app/test/unit";
+import { expectErrorPage, overrideOnce, Providers, render, setupTestRouter } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 
@@ -25,7 +25,7 @@ describe("ElectionReportPage", () => {
 
     rtlRender(<Providers router={router} />);
 
-    await expectNotFound();
+    await expectErrorPage();
   });
 
   test("Shows button", async () => {

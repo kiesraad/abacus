@@ -42,3 +42,6 @@ unsafe_code = "forbid"
 
 [lints.clippy]
 unwrap_used = "warn"
+
+[profile.release]
+overflow-checks = true

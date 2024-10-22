@@ -26,7 +26,7 @@
     }
   }
 
-  &.errors_and_warnings {
+  &.errors-and-warnings {
     svg {
       fill: var(--progress-bar-errors-and-warnings);
     }
@@ -38,13 +38,13 @@
     }
   }
 
-  &.in_progress {
+  &.in-progress {
     svg {
       fill: var(--progress-bar-in-progress);
     }
   }
 
-  &.first_entry_finished {
+  &.first-entry-finished {
     svg {
       fill: var(--progress-bar-first-entry-finished);
     }
@@ -56,7 +56,7 @@
     }
   }
 
-  &.not_started {
+  &.not-started {
     svg {
       fill: var(--progress-bar-not-started);
     }

@@ -30,7 +30,7 @@ export function ElectionStatusProgress() {
       {
         title: "Invoer bezig",
         total: totalEntryInProgress,
-        percentageAndColorClass: { percentage: Math.round((totalEntryInProgress / total) * 100), class: "in_progress" },
+        percentageAndColorClass: { percentage: Math.round((totalEntryInProgress / total) * 100), class: "in-progress" },
       },
       {
         title: "Eerste invoer klaar", // TODO: Should change to "Eerste en tweede invoer klaar" when second entry is added

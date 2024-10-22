@@ -25,12 +25,12 @@ describe("UI Component: ProgressBar", () => {
       <ProgressBar
         id="test"
         data={[
-          { percentage: 5, class: "errors_and_warnings" },
+          { percentage: 5, class: "errors-and-warnings" },
           { percentage: 3, class: "unfinished" },
-          { percentage: 35, class: "in_progress" },
-          { percentage: 30, class: "first_entry_finished" },
+          { percentage: 35, class: "in-progress" },
+          { percentage: 30, class: "first-entry-finished" },
           { percentage: 25, class: "definitive" },
-          { percentage: 2, class: "not_started" },
+          { percentage: 2, class: "not-started" },
         ]}
       />,
     );

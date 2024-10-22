@@ -4,12 +4,12 @@ import cls from "./ProgressBar.module.css";
 
 export type ProgressBarColorClass =
   | "default"
-  | "errors_and_warnings"
+  | "errors-and-warnings"
   | "unfinished"
-  | "in_progress"
-  | "first_entry_finished"
+  | "in-progress"
+  | "first-entry-finished"
   | "definitive"
-  | "not_started";
+  | "not-started";
 
 export type PercentageAndColorClass = {
   percentage: number;

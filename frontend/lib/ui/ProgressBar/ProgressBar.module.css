@@ -42,7 +42,7 @@
   background-color: var(--progress-bar-default);
 }
 
-.errors_and_warnings {
+.errors-and-warnings {
   background-color: var(--progress-bar-errors-and-warnings);
 }
 
@@ -50,11 +50,11 @@
   background-color: var(--progress-bar-unfinished);
 }
 
-.in_progress {
+.in-progress {
   background-color: var(--progress-bar-in-progress);
 }
 
-.first_entry_finished {
+.first-entry-finished {
   background-color: var(--progress-bar-first-entry-finished);
 }
 
@@ -62,6 +62,6 @@
   background-color: var(--progress-bar-definitive);
 }
 
-.not_started {
+.not-started {
   background-color: var(--progress-bar-not-started);
 }

@@ -61,7 +61,8 @@
 }
 
 .first_entry,
-.first_entry_in_progress {
+.first_entry_in_progress,
+.first_entry_unfinished {
   background: var(--color-warning-bg);
   color: var(--color-warning-text);
 }

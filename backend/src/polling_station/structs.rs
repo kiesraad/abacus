@@ -52,6 +52,7 @@ pub struct PollingStationStatusEntry {
 pub enum PollingStationStatus {
     FirstEntry,
     FirstEntryInProgress,
+    FirstEntryUnfinished,
     Definitive,
 }
 

@@ -4,19 +4,21 @@ import { PollingStationStatus, PollingStationStatusEntry, useElection, useElecti
 import { IconDot } from "@kiesraad/icon";
 import { Icon, PercentageAndColorClass, Progress, ProgressBar, ProgressBarColorClass } from "@kiesraad/ui";
 
-const statusCategories = ["in_progress", "unfinished", "definitive"] as const;
+const statusCategories = ["in_progress", "unfinished", "definitive", "not_started"] as const;
 type StatusCategory = (typeof statusCategories)[number];
 
 const categoryTitle: Record<StatusCategory, string> = {
-  in_progress: "Invoer bezig",
   unfinished: "Niet afgeronde invoer",
-  definitive: "Eerste invoer klaar",
+  in_progress: "Invoer bezig",
+  definitive: "Eerste invoer klaar", // TODO: in the future this changes to `Eerste en tweede invoer klaar`
+  not_started: "Werkvoorraad",
 };
 
 const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
-  in_progress: "in-progress",
   unfinished: "unfinished",
+  in_progress: "in-progress",
   definitive: "definitive",
+  not_started: "not-started",
 };
 
 function statusCount(entries: PollingStationStatusEntry[], status: PollingStationStatus): number {
@@ -28,11 +30,13 @@ export function ElectionStatusProgress() {
   const { statuses } = useElectionStatus();
 
   const categoryCounts: Record<StatusCategory, number> = React.useMemo(() => {
-    // TODO: future second_entry_in_progress status should be added to below object
+    // TODO: future `second_entry_unfinished` status should be added to `unfinished`
+    //  future `second_entry_in_progress` status should be added to `in_progress`
     return {
-      in_progress: statusCount(statuses, "first_entry"),
-      unfinished: statusCount(statuses, "first_entry_in_progress"),
+      unfinished: statusCount(statuses, "first_entry_unfinished"),
+      in_progress: statusCount(statuses, "first_entry_in_progress"),
       definitive: statusCount(statuses, "definitive"),
+      not_started: statusCount(statuses, "first_entry"),
     };
   }, [statuses]);
 

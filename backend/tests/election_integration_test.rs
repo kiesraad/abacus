@@ -93,7 +93,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     );
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,
-        PollingStationStatus::FirstEntryInProgress
+        PollingStationStatus::FirstEntryUnfinished
     );
 }
 

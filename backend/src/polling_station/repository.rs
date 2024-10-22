@@ -63,8 +63,9 @@ impl PollingStations {
     }
 
     /// Determines the status of the polling station.
-    /// - When an entry of the polling station is found in the `polling_station_results` table, the status is FirstEntryInProgress
-    /// - When an entry of the polling station is found in the `polling_station_data_entries` table, the status is Definitive
+    /// - When an entry of the polling station is found in the `polling_station_data_entries` table, and the `client_state.continue` value is true the status is FirstEntryInProgress
+    /// - When an entry of the polling station is found in the `polling_station_data_entries` table, and the `client_state.continue` value is false the status is FirstEntryUnfinished
+    /// - When an entry of the polling station is found in the `polling_station_results` table, the status is Definitive
     /// - If no entries are found, it has the FirstEntry status
     ///
     /// The implementation and determination will probably change while we implement more statuses
@@ -77,7 +78,8 @@ impl PollingStations {
             r#"
 SELECT p.id AS "id: u32",
 CASE
-  WHEN de.polling_station_id IS NOT NULL THEN 'FirstEntryInProgress'
+  WHEN de.polling_station_id IS NOT NULL THEN 
+  (CASE WHEN json_extract(de.client_state, '$.continue') = true THEN 'FirstEntryInProgress' ELSE 'FirstEntryUnfinished' END)
   WHEN r.polling_station_id IS NOT NULL THEN 'Definitive'
   ELSE 'FirstEntry' END AS "status!: _"
 FROM polling_stations AS p

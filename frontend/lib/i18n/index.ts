@@ -4,6 +4,7 @@ import { nl } from "./locales/nl";
 
 export * from "./i18n.types";
 export * from "./i18n";
+export * from "./format";
 
 export const locale: Locale = Locale.nl;
 

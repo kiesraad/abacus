@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import cls from "./ProgressBar.module.css";
+import cls from "./Progress.module.css";
 
 export function Progress({ children }: { children: ReactNode }) {
   return (

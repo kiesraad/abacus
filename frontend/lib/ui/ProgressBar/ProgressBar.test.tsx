@@ -19,4 +19,23 @@ describe("UI Component: ProgressBar", () => {
     expect(queryByRole("label")).not.toBeInTheDocument();
     expect(screen.queryByText("50%")).not.toBeInTheDocument();
   });
+
+  test("renders a progress bar with multiple bars", () => {
+    const { queryByRole } = render(
+      <ProgressBar
+        id="test"
+        data={[
+          { percentage: 5, class: "errors_and_warnings" },
+          { percentage: 3, class: "unfinished" },
+          { percentage: 35, class: "in_progress" },
+          { percentage: 30, class: "first_entry_finished" },
+          { percentage: 25, class: "definitive" },
+          { percentage: 2, class: "not_started" },
+        ]}
+      />,
+    );
+
+    expect(queryByRole("label")).not.toBeInTheDocument();
+    expect(screen.queryByText("50%")).not.toBeInTheDocument();
+  });
 });

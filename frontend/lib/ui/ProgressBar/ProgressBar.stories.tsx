@@ -1,19 +1,54 @@
 import type { Story } from "@ladle/react";
 
-import { ProgressBar } from "@kiesraad/ui";
+import { ProgressBar, ProgressBarProps } from "@kiesraad/ui";
 
-type Props = {
-  title: string;
-  percentage: number;
+export const DefaultProgressBar: Story<ProgressBarProps> = ({
+  id = "test",
+  title,
+  data = { percentage: 47, class: "default" },
+  spacing,
+  showPercentage = true,
+}) => <ProgressBar id={id} data={data} title={title} spacing={spacing} showPercentage={showPercentage} />;
+
+DefaultProgressBar.argTypes = {
+  title: {
+    control: { type: "text" },
+    defaultValue: "1e invoer",
+  },
+  spacing: {
+    options: ["small", "large"],
+    control: { type: "select" },
+    defaultValue: "small",
+  },
+  showPercentage: {
+    options: [true, false],
+    control: { type: "boolean" },
+    defaultValue: true,
+  },
 };
 
-export const DefaultProgressBar: Story<Props> = ({ title, percentage }) => (
-  <ProgressBar id="test" data={{ percentage: percentage, class: "default" }} title={title} />
-);
+export const MultiProgressBar: Story<ProgressBarProps> = ({
+  id = "test",
+  title,
+  data = [
+    { percentage: 5, class: "errors_and_warnings" },
+    { percentage: 3, class: "unfinished" },
+    { percentage: 35, class: "in_progress" },
+    { percentage: 30, class: "first_entry_finished" },
+    { percentage: 25, class: "definitive" },
+    { percentage: 2, class: "not_started" },
+  ],
+  spacing,
+}) => <ProgressBar id={id} data={data} title={title} spacing={spacing} />;
 
-export default {
-  args: {
-    title: "1e invoer",
-    percentage: 47,
+MultiProgressBar.argTypes = {
+  title: {
+    control: { type: "text" },
+    defaultValue: "1e invoer",
+  },
+  spacing: {
+    options: ["small", "large"],
+    control: { type: "select" },
+    defaultValue: "small",
   },
 };

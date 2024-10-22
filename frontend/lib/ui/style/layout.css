@@ -33,14 +33,6 @@
     flex: 1 1 auto;
     display: flex;
 
-    > nav {
-      flex: 0 0 26.25rem;
-      padding: 2rem 0 2rem 5rem;
-      background-color: var(--bg-gray);
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-    }
     > article {
       flex: 1 1 auto;
       padding: 2.5rem 5rem;

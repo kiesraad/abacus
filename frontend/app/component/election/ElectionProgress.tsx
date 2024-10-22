@@ -36,7 +36,7 @@ export function ElectionProgress() {
           <ProgressBar
             key={stat.id}
             id={stat.id}
-            data={[{ percentage: Math.round(stat.percentage * 100), class: "default" }]}
+            data={{ percentage: Math.round(stat.percentage * 100), class: "default" }}
             title={stat.title}
             spacing="small"
             showPercentage

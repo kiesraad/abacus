@@ -107,9 +107,9 @@ jobs:
         run: npm ci
       - name: Install Playwright
         run: npx playwright install --with-deps
-      - name: e2e test - lib ui
+      - name: Run UI e2e tests
         run: npm run e2e:lib-ui
-      - name: e2e test - app
+      - name: Run app e2e tests
         run: npm run e2e:app
       - name: Download backend-build
         uses: actions/download-artifact@v4
@@ -118,5 +118,5 @@ jobs:
           path: builds/backend
       - name: make backend build executable
         run: chmod a+x ../builds/backend/api
-      - name: e2e test - d2d
+      - name: Run DOM to Database e2e tests
         run: npm run e2e:d2d

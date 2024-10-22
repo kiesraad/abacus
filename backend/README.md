@@ -21,10 +21,13 @@ Use `cargo run` to run the API on port 8080 (http://localhost:8080).
 
 To let the API server serve the frontend, first compile the frontend using
 `npm run build` in the `frontend` directory. The run the API server with the
-`--frontend-dist` flag pointing to the frontend build directory, e.g.:
+`memory-serve` feature enabled. Also make sure to point the `ASSET_DIR` environment
+variable to the directory where `vite` outputs the assets, e.g. `frontend/dist`.
+In this version of `memory-serve`, the path must be absolute, since `build.rs`
+has no knowledge of the project it is currently built in. Example:
 
 ```shell
-cargo run -- --frontend-dist ../frontend/dist
+ASSET_DIR=$PWD/frontend/dist cargo run --features memory-serve
 ```
 
 ### Linting
@@ -44,8 +47,7 @@ The following dependencies (crates) are used:
 - `axum`: web application framework that focuses on ergonomics and modularity.
 - `hyper`: fast and correct HTTP implementation.
 - `tokio`: runtime for writing asynchronous applications.
-- `tower`: library for building robust networking clients and servers.
-- `tower-http`: Tower middleware and utilities for HTTP clients and servers.
+- `memory-serve`: serves frontend assets from memory, but ad-hoc from disk during development.
 - `utoipa`: library for documenting REST APIs using OpenAPI.
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `serde`: framework for serializing and deserializing data structures.
@@ -73,6 +75,14 @@ e.g.:
 
 ```shell
 cargo run -- --reset-database --seed-data
+```
+
+#### Offline mode
+
+You can use `sqlx` in offline mode, so you don't need an active database connection for the queries to compile.
+`lefthook` is configured to update the queries on commit, but when you need to build in offline mode, make sure to first run:
+```shell
+cargo sqlx prepare
 ```
 
 ### OpenAPI

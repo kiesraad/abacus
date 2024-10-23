@@ -22,7 +22,7 @@ export function StickyNav({ children }: StickyNavProps) {
         const navTop = navEl.getBoundingClientRect().top;
         const mainBottom = mainEl.getBoundingClientRect().bottom;
 
-        const height = Math.min(mainBottom, screenHeight - navTop);
+        const height = Math.min(mainBottom, screenHeight - navTop - 16);
         navEl.style.height = navEl.style.maxHeight = `${height}px`;
       };
 

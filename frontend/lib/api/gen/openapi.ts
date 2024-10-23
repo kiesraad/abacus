@@ -195,7 +195,7 @@ Bijlage 2: uitkomsten per stembureau" from the
 export interface PollingStationResults {
   differences_counts: DifferencesCounts;
   political_group_votes: PoliticalGroupVotes[];
-  recounted?: boolean | null;
+  recounted?: boolean;
   voters_counts: VotersCounts;
   voters_recounts?: VotersRecounts;
   votes_counts: VotesCounts;

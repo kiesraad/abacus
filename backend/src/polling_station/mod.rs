@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 use self::repository::PollingStations;
 pub use self::structs::*;
 use crate::election::repository::Elections;
-use crate::APIError;
+use crate::{APIError, ErrorResponse};
 
 pub mod repository;
 pub mod structs;

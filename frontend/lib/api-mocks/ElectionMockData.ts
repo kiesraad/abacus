@@ -1,3 +1,5 @@
+import { NotFoundError } from "app/component/error/Error.types.ts";
+
 import {
   Candidate,
   Election,
@@ -361,9 +363,11 @@ export const electionListMockResponse: ElectionListResponse = {
 
 export const getElectionMockData = (election_id: number): Required<ElectionDetailsResponse> => {
   const election = electionListMockResponse.elections.find((e) => e.id === election_id);
+
   if (!election) {
-    throw new Error(`Election with id ${election_id} not found`);
+    throw new NotFoundError(`Election with id ${election_id} not found`);
   }
+
   if (election_id === 2) {
     election.political_groups = politicalGroupsMockData.slice(0, 2);
   } else {

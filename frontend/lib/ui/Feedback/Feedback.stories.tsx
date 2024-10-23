@@ -1,6 +1,5 @@
 import type { Story } from "@ladle/react";
 
-import { ApiResponseStatus } from "@kiesraad/api";
 import { AlertType, ClientValidationResultCode, FeedbackId } from "@kiesraad/ui";
 
 import { Feedback } from "./Feedback";
@@ -29,20 +28,6 @@ export const SingleWarning: Story = () => {
 
 export const MultipleWarnings: Story = () => {
   return <Feedback id="feedback-warning" type="warning" data={["W201", "W202"]} />;
-};
-
-export const SingleServerError: Story = () => {
-  return (
-    <Feedback
-      id="feedback-server-error"
-      type="error"
-      apiError={{
-        status: ApiResponseStatus.ServerError,
-        code: 500,
-        error: "Internal Server Error",
-      }}
-    />
-  );
 };
 
 export const CustomizableErrors: Story<Props> = ({ id = "feedback-error", type = "error", data }) => (

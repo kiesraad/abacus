@@ -65,6 +65,8 @@ pub struct PollingStationResultsEntry {
 #[cfg_attr(test, derive(Default))]
 pub struct PollingStationResults {
     /// Recounted ("Is er herteld? - See form for official long description of the checkbox")
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub recounted: Option<bool>,
     /// Voters counts ("1. Aantal toegelaten kiezers")
     pub voters_counts: VotersCounts,
@@ -703,6 +705,21 @@ pub struct DifferencesCounts {
     pub no_explanation_count: Count,
 }
 
+#[cfg(test)]
+impl DifferencesCounts {
+    pub fn zero() -> DifferencesCounts {
+        DifferencesCounts {
+            more_ballots_count: 0,
+            fewer_ballots_count: 0,
+            unreturned_ballots_count: 0,
+            too_few_ballots_handed_out_count: 0,
+            too_many_ballots_handed_out_count: 0,
+            other_explanation_count: 0,
+            no_explanation_count: 0,
+        }
+    }
+}
+
 impl Validate for DifferencesCounts {
     fn validate(
         &self,
@@ -833,6 +850,36 @@ impl PoliticalGroupVotes {
         }
 
         Ok(())
+    }
+
+    /// Create `PoliticalGroupVotes` from test data.
+    #[cfg(test)]
+    pub fn from_test_data(number: u8, total_count: Count, candidate_votes: &[(u8, Count)]) -> Self {
+        PoliticalGroupVotes {
+            number,
+            total: total_count,
+            candidate_votes: candidate_votes
+                .iter()
+                .map(|(number, votes)| CandidateVotes {
+                    number: *number,
+                    votes: *votes,
+                })
+                .collect(),
+        }
+    }
+
+    /// Create `PoliticalGroupVotes` from test data with candidate numbers automatically generated starting from 1.
+    #[cfg(test)]
+    pub fn from_test_data_auto(number: u8, total_count: Count, candidate_votes: &[Count]) -> Self {
+        Self::from_test_data(
+            number,
+            total_count,
+            &candidate_votes
+                .iter()
+                .enumerate()
+                .map(|(i, votes)| (i as u8 + 1, *votes))
+                .collect::<Vec<_>>(),
+        )
     }
 }
 

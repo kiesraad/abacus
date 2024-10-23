@@ -25,7 +25,7 @@
   &:focus,
   &:focus-visible {
     outline: none;
-    border: 2px solid var(--border-color-focus);
+    border: 1px solid var(--border-color-focus);
     background-color: var(--button-color-primary-focus);
     box-shadow: 0 0 0 4px var(--shadow-color-focus);
   }
@@ -43,11 +43,11 @@
 
   svg {
     height: 1rem;
-    fill: black;
+    fill: currentColor;
   }
 
   &.secondary {
-    color: black;
+    color: var(--text-color-body);
     border: 1px solid var(--bg-gray-darkest);
     background: var(--button-color-secondary);
 

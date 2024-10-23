@@ -16,6 +16,7 @@ import { PollingStationListPage, PollingStationsLayout } from "app/module/pollin
 import { UsersHomePage } from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
 
+import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
 import {
   CandidatesVotesPage,
@@ -30,7 +31,7 @@ import { NotFound } from "./module/NotFound";
 import { RootLayout } from "./module/RootLayout";
 
 export const routes = createRoutesFromElements(
-  <Route element={<RootLayout />}>
+  <Route element={<RootLayout />} errorElement={<ErrorBoundary />}>
     <Route index path="/" element={<Navigate to="/elections" replace />} />
     <Route path="*" element={<NotFound />} />
     <Route path="account" element={<LoginLayout />}>
@@ -38,9 +39,9 @@ export const routes = createRoutesFromElements(
       <Route path="login" element={<LoginPage />} />
       <Route path="account/setup" element={<AccountSetupPage />} />
     </Route>
-    <Route path="elections" element={<OverviewLayout />} errorElement={<NotFound />}>
+    <Route path="elections" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />
-      <Route path=":electionId" element={<ElectionLayout />} errorElement={<NotFound />}>
+      <Route path=":electionId" element={<ElectionLayout />}>
         <Route index element={<ElectionHomePage />} />
         <Route
           path="report"

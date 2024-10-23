@@ -12,8 +12,9 @@ import {
   PollingStationResults,
   usePollingStationFormController,
 } from "@kiesraad/api";
-import { Button, Feedback, Modal } from "@kiesraad/ui";
+import { Button, Modal } from "@kiesraad/ui";
 
+import { ErrorModal } from "../error/ErrorModal";
 import { getUrlForFormSectionID } from "./utils";
 
 export interface PollingStationFormNavigationProps {
@@ -148,7 +149,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
           )}
         </>
       )}
-      {apiError && <Feedback id="feedback-server-error" type="error" apiError={apiError} />}
+      {apiError && <ErrorModal error={apiError} />}
     </>
   );
 }

@@ -10,13 +10,13 @@ export function useNumericParam(parameterKey: string): number {
   const param = params[parameterKey];
 
   if (!param) {
-    throw Error(`Parameter ${parameterKey} does not exist`);
+    throw new Error(`Parameter ${parameterKey} does not exist`);
   }
 
   // Matches only if the whole string is numeric
   const parsedParam = parseIntStrict(param);
   if (parsedParam === undefined) {
-    throw Error(`Parameter ${parameterKey} is not numeric`);
+    throw new Error(`Parameter ${parameterKey} is not numeric`);
   }
 
   return parsedParam;

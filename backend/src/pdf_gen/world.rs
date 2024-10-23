@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use comemo::Prehashed;
+use super::models::PdfModel;
+use typst::utils::LazyHash;
 use typst::{
     diag::{FileError, FileResult},
     foundations::{Bytes, Datetime},
@@ -9,13 +10,11 @@ use typst::{
     Library, World,
 };
 
-use super::models::PdfModel;
-
 /// Contains the context for rendering PDFs.
 pub struct PdfWorld {
     sources: Vec<Source>,
-    library: Prehashed<Library>,
-    fontbook: Prehashed<FontBook>,
+    library: LazyHash<Library>,
+    fontbook: LazyHash<FontBook>,
     assets: HashMap<FileId, Bytes>,
     fonts: Vec<Font>,
     main_source: Source,
@@ -35,10 +34,10 @@ impl PdfWorld {
         let assets = load_assets();
         PdfWorld {
             sources,
-            fontbook: Prehashed::new(fontbook),
+            fontbook: LazyHash::new(fontbook),
             fonts,
             assets,
-            library: Prehashed::new(Library::builder().build()),
+            library: LazyHash::new(Library::builder().build()),
             main_source: Source::new(FileId::new(None, VirtualPath::new("empty.typ")), "".into()),
             input_data: (
                 FileId::new(None, VirtualPath::new("input.json")),
@@ -67,16 +66,16 @@ impl PdfWorld {
 }
 
 impl World for PdfWorld {
-    fn library(&self) -> &Prehashed<Library> {
+    fn library(&self) -> &LazyHash<Library> {
         &self.library
     }
 
-    fn book(&self) -> &Prehashed<FontBook> {
+    fn book(&self) -> &LazyHash<FontBook> {
         &self.fontbook
     }
 
-    fn main(&self) -> Source {
-        self.main_source.clone()
+    fn main(&self) -> FileId {
+        self.main_source.id()
     }
 
     fn source(&self, id: FileId) -> FileResult<Source> {

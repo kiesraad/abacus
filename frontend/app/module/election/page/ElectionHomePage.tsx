@@ -25,7 +25,7 @@ export function ElectionHomePage() {
               <Link to={`status#coordinator`}>Status</Link>
             </li>
             <li>
-              <Link to={`polling-stations#coordinator`}>Polling stations configureren</Link>
+              <Link to={`polling-stations#coordinator`}>Stembureaus</Link>
             </li>
           </ul>
           {__API_MSW__ && <MockTest />}

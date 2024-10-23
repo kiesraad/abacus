@@ -1,4 +1,5 @@
-table.overview_table {
+table.overview_table,
+table.polling_stations_table {
   width: 100%;
   line-height: 1.5rem;
   border-spacing: unset;
@@ -56,6 +57,13 @@ table.overview_table {
   td.link {
     width: 3.75rem;
     padding: 1rem 0.75rem;
+  }
+}
+
+table.polling_stations_table {
+  td.number,
+  th.number {
+    width: 6.5rem;
   }
 }
 

@@ -114,7 +114,7 @@ was. Indien er meerdere zittingslocaties waren, vermeld dan per lid de locatie.]
     ..input.polling_stations.map(polling_station => {(
       [#polling_station.number],
       [
-        #if polling_station.polling_station_type == "Mobiel" [
+        #if polling_station.polling_station_type == "Mobile" [
           _(Mobiel stembureau)_
         ] else [
           #polling_station.street #polling_station.house_number #if "house_number_addition" in polling_station and polling_station.house_number_addition != none [

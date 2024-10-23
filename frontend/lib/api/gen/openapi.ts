@@ -18,6 +18,12 @@ export interface ELECTION_DOWNLOAD_RESULTS_REQUEST_PARAMS {
 }
 export type ELECTION_DOWNLOAD_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_results`;
 
+// /api/elections/{election_id}/polling_stations
+export interface POLLING_STATION_LIST_REQUEST_PARAMS {
+  election_id: number;
+}
+export type POLLING_STATION_LIST_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
+
 // /api/elections/{election_id}/status
 export interface ELECTION_STATUS_REQUEST_PARAMS {
   election_id: number;
@@ -171,6 +177,13 @@ export interface PollingStation {
 }
 
 /**
+ * Polling station list response
+ */
+export interface PollingStationListResponse {
+  polling_stations: PollingStation[];
+}
+
+/**
  * PollingStationResults, following the fields in Model Na 31-2 Bijage 2.
 
 See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
@@ -198,7 +211,7 @@ export interface PollingStationStatusEntry {
 /**
  * Type of Polling station
  */
-export type PollingStationType = "VasteLocatie" | "Bijzonder" | "Mobiel";
+export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
 
 /**
  * Request structure for saving data entry of polling station results

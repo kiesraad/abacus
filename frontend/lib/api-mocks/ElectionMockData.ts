@@ -358,6 +358,15 @@ export const electionListMockResponse: ElectionListResponse = {
       election_date: "2024-01-30",
       nomination_date: "2024-01-01",
     },
+    {
+      id: 3,
+      name: "Gemeenteraadsverkiezingen leeg",
+      location: "Spookdorp",
+      number_of_voters: 0,
+      category: "Municipal",
+      election_date: "2032-10-31",
+      nomination_date: "2032-09-01",
+    },
   ],
 };
 
@@ -370,10 +379,13 @@ export const getElectionMockData = (election_id: number): Required<ElectionDetai
 
   if (election_id === 2) {
     election.political_groups = politicalGroupsMockData.slice(0, 2);
+  } else if (election_id === 3) {
+    election.political_groups = [];
   } else {
     election.political_groups = politicalGroupsMockData;
   }
-  return { election: election, polling_stations: getPollingStationMockData(election_id) };
+
+  return { election, polling_stations: getPollingStationMockData(election_id) };
 };
 
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData(1);

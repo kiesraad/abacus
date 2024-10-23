@@ -158,6 +158,60 @@
         }
       }
     },
+    "/api/elections/{election_id}/polling_stations": {
+      "get": {
+        "tags": [
+          "polling_station"
+        ],
+        "summary": "Get a list of all pollingstations for an election",
+        "operationId": "polling_station_list",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Polling station listing successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/elections/{election_id}/status": {
       "get": {
         "tags": [
@@ -873,6 +927,21 @@
           }
         }
       },
+      "PollingStationListResponse": {
+        "type": "object",
+        "description": "Polling station list response",
+        "required": [
+          "polling_stations"
+        ],
+        "properties": {
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStation"
+            }
+          }
+        }
+      },
       "PollingStationResults": {
         "type": "object",
         "description": "PollingStationResults, following the fields in Model Na 31-2 Bijage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
@@ -941,9 +1010,9 @@
         "type": "string",
         "description": "Type of Polling station",
         "enum": [
-          "VasteLocatie",
-          "Bijzonder",
-          "Mobiel"
+          "FixedLocation",
+          "Special",
+          "Mobile"
         ]
       },
       "SaveDataEntryRequest": {

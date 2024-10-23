@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { MenuStatus, renderStatusIcon } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
+import { cn, domtoren } from "@kiesraad/util";
 
 import cls from "./ProgressList.module.css";
 import { ProgressListScroll } from "./ProgressListScroll";
@@ -47,16 +47,9 @@ ProgressList.Item = function ProgressListItem({
   React.useEffect(() => {
     if (scrollIntoView && active) {
       const li = ref.current;
-      li?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-
-      // scrollIntoView scrolls the root container as well when using block: "start"
-      // const ul = ref.current?.parentElement;
-      // if (!li || !ul) return;
-
-      // ul.scrollTo({
-      //   top: li.offsetTop - 10,
-      //   behavior: "smooth",
-      // });
+      if (li) {
+        domtoren(li).scrollIntoView(10);
+      }
     }
   }, [scrollIntoView, active]);
   return (

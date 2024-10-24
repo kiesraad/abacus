@@ -13,7 +13,7 @@ test("The definitive badge is visible", () => {
 });
 
 test("The first entry badge is visible", () => {
-  render(<Badge type="first_entry" />);
+  render(<Badge type="not_started" />);
 
   const badgeElement = screen.getByText("1e invoer");
 

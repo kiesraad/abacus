@@ -39,11 +39,11 @@ describe("ElectionProgress", () => {
       statuses: [
         {
           id: 1,
-          status: "first_entry",
+          status: "not_started",
         },
         {
           id: 2,
-          status: "first_entry",
+          status: "not_started",
         },
         {
           id: 3,

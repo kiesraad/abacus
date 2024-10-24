@@ -16,7 +16,7 @@ describe("ElectionReportPage", () => {
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "first_entry" },
+        { id: 1, status: "not_started" },
         { id: 2, status: "definitive" },
       ],
     });

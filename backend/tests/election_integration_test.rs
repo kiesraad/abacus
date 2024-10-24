@@ -70,8 +70,8 @@ async fn test_election_details_status(pool: SqlitePool) {
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
-    assert_eq!(body.statuses[0].status, PollingStationStatus::FirstEntry);
-    assert_eq!(body.statuses[1].status, PollingStationStatus::FirstEntry);
+    assert_eq!(body.statuses[0].status, PollingStationStatus::NotStarted);
+    assert_eq!(body.statuses[1].status, PollingStationStatus::NotStarted);
 
     // Finalise one and set the other in progress
     shared::create_and_finalise_data_entry(&addr, 1).await;

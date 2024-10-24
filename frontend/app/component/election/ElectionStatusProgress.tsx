@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { PollingStationStatus, PollingStationStatusEntry, useElection, useElectionStatus } from "@kiesraad/api";
+import { PollingStationStatus, PollingStationStatusEntry, useElectionStatus } from "@kiesraad/api";
 import { IconDot } from "@kiesraad/icon";
 import { Icon, PercentageAndColorClass, Progress, ProgressBar, ProgressBarColorClass } from "@kiesraad/ui";
 
@@ -26,7 +26,6 @@ function statusCount(entries: PollingStationStatusEntry[], status: PollingStatio
 }
 
 export function ElectionStatusProgress() {
-  const { pollingStations } = useElection();
   const { statuses } = useElectionStatus();
 
   const categoryCounts: Record<StatusCategory, number> = React.useMemo(() => {
@@ -36,17 +35,17 @@ export function ElectionStatusProgress() {
       unfinished: statusCount(statuses, "first_entry_unfinished"),
       in_progress: statusCount(statuses, "first_entry_in_progress"),
       definitive: statusCount(statuses, "definitive"),
-      not_started: statusCount(statuses, "first_entry"),
+      not_started: statusCount(statuses, "not_started"),
     };
   }, [statuses]);
 
   const progressBarData: PercentageAndColorClass[] = React.useMemo(() => {
-    const total = pollingStations.length;
+    const total = statuses.length;
     return statusCategories.map((cat) => ({
       percentage: Math.round(categoryCounts[cat] / total) * 100,
       class: categoryColorClass[cat],
     }));
-  }, [pollingStations, categoryCounts]);
+  }, [statuses, categoryCounts]);
 
   return (
     <Progress>

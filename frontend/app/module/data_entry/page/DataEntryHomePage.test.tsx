@@ -71,7 +71,7 @@ describe("DataEntryHomePage", () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { id: 1, status: "first_entry_unfinished" },
-        { id: 2, status: "first_entry" },
+        { id: 2, status: "not_started" },
       ],
     });
     renderDataEntryHomePage();
@@ -84,7 +84,7 @@ describe("DataEntryHomePage", () => {
   test("Resume input invisible when none are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "first_entry" },
+        { id: 1, status: "not_started" },
         { id: 2, status: "definitive" },
       ],
     });
@@ -97,8 +97,8 @@ describe("DataEntryHomePage", () => {
   test("Rerender re-fetches election status", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "first_entry" },
-        { id: 2, status: "first_entry" },
+        { id: 1, status: "not_started" },
+        { id: 2, status: "not_started" },
       ],
     } satisfies ElectionStatusResponse);
 

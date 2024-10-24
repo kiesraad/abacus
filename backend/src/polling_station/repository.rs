@@ -66,7 +66,7 @@ impl PollingStations {
     /// - When an entry of the polling station is found in the `polling_station_data_entries` table, and the `client_state.continue` value is true the status is FirstEntryInProgress
     /// - When an entry of the polling station is found in the `polling_station_data_entries` table, and the `client_state.continue` value is false the status is FirstEntryUnfinished
     /// - When an entry of the polling station is found in the `polling_station_results` table, the status is Definitive
-    /// - If no entries are found, it has the FirstEntry status
+    /// - If no entries are found, it has the NotStarted status
     ///
     /// The implementation and determination will probably change while we implement more statuses
     pub async fn status(
@@ -81,7 +81,7 @@ CASE
   WHEN de.polling_station_id IS NOT NULL THEN 
   (CASE WHEN json_extract(de.client_state, '$.continue') = true THEN 'FirstEntryInProgress' ELSE 'FirstEntryUnfinished' END)
   WHEN r.polling_station_id IS NOT NULL THEN 'Definitive'
-  ELSE 'FirstEntry' END AS "status!: _"
+  ELSE 'NotStarted' END AS "status!: _"
 FROM polling_stations AS p
 LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
 LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id

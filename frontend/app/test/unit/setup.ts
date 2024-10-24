@@ -20,6 +20,10 @@ beforeAll(() => {
     onUnhandledRequest: "error",
   });
 
+  // mock scrollIntoView, used in progresslist
+  Element.prototype.scrollIntoView = vi.fn();
+  Element.prototype.scrollTo = vi.fn();
+
   // Workaround for https://github.com/jsdom/jsdom/issues/3294
   HTMLDialogElement.prototype.show = vi.fn(function mock(this: HTMLDialogElement) {
     this.open = true;

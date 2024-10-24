@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { Election, useElectionList } from "@kiesraad/api";
@@ -96,6 +97,7 @@ export function OverviewPage() {
           </table>
         </article>
       </main>
+      <Footer />
     </>
   );
 }

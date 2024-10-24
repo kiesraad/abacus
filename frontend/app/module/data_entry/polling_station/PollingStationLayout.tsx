@@ -8,7 +8,7 @@ import { AbortDataEntryControl } from "app/module/data_entry";
 
 import { PollingStationFormController, useElection } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
-import { Badge, PageTitle, PollingStationNumber, WorkStationNumber } from "@kiesraad/ui";
+import { Badge, PageTitle, PollingStationNumber, StickyNav, WorkStationNumber } from "@kiesraad/ui";
 import { usePollingStationStatus } from "@kiesraad/util";
 
 export function PollingStationLayout() {
@@ -48,9 +48,9 @@ export function PollingStationLayout() {
         </section>
       </header>
       <main>
-        <nav>
+        <StickyNav>
           <PollingStationProgress />
-        </nav>
+        </StickyNav>
         <article>
           <PollingStationFormNavigation pollingStationId={pollingStation.id} election={election} />
           <Outlet />

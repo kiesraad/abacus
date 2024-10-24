@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 
+import { Footer } from "app/component/footer/Footer";
 import { MockTest } from "app/component/MockTest";
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -37,6 +38,7 @@ export function ElectionHomePage() {
           {__API_MSW__ && <MockTest />}
         </article>
       </main>
+      <Footer />
     </>
   );
 }

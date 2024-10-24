@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 
+import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
@@ -44,6 +45,7 @@ export function ElectionStatusPage() {
       <main>
         <article>Placeholder</article>
       </main>
+      <Footer />
     </>
   );
 }

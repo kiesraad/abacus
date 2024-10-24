@@ -13,11 +13,12 @@ export function StickyNav({ children }: StickyNavProps) {
   const ref = React.useRef<HTMLDivElement>(null);
   const location = useLocation();
 
-  const startHeight = React.useRef<number>(0);
+  const startNavTop = React.useRef<number>(0);
 
+  //Reset the stickyNav height when navigating to not battle scrollRestoration
   React.useEffect(() => {
-    if (ref.current && startHeight.current) {
-      ref.current.style.maxHeight = `${startHeight.current}px`;
+    if (ref.current && startNavTop.current) {
+      ref.current.style.maxHeight = `${window.innerHeight - startNavTop.current}px`;
     }
   }, [location]);
 
@@ -25,6 +26,9 @@ export function StickyNav({ children }: StickyNavProps) {
     if (ref.current) {
       const navEl = ref.current;
       const mainEl = domtoren(navEl).closest("main").el();
+
+      //store the top position of the nav element before becoming "sticky"
+      startNavTop.current = navEl.getBoundingClientRect().top;
 
       let screenHeight = window.innerHeight;
 
@@ -37,7 +41,6 @@ export function StickyNav({ children }: StickyNavProps) {
 
       const onResize = () => {
         screenHeight = window.innerHeight;
-        startHeight.current = navEl.clientHeight;
         onScroll();
       };
 

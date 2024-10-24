@@ -22,8 +22,8 @@ export function StickyNav({ children }: StickyNavProps) {
         const navTop = navEl.getBoundingClientRect().top;
         const mainBottom = mainEl.getBoundingClientRect().bottom;
 
-        const height = Math.min(mainBottom, screenHeight - navTop);
-        navEl.style.height = navEl.style.maxHeight = `${height}px`;
+        const height = Math.min(mainBottom - 1, screenHeight - navTop);
+        navEl.style.maxHeight = `${height}px`;
       };
 
       const onResize = () => {

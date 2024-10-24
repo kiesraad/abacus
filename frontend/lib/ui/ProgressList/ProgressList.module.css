@@ -1,8 +1,23 @@
 .progress-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 19.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 19.5rem;
+
+    &:global(.fixed) {
+      flex: 0 0 auto;
+    }
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+  }
 
   li {
     height: 2.75rem;
@@ -10,6 +25,9 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+
+    scroll-margin-top: 0.8rem;
+    scroll-margin-bottom: 0.8rem;
 
     &:hover {
       background-color: var(--color-hover);
@@ -37,6 +55,7 @@
       svg {
         width: 1.5rem; /* needed for Safari to show the svg */
       }
+      overflow: hidden;
     }
 
     label {
@@ -146,5 +165,65 @@
         }
       }
     }
+  }
+}
+
+section.scroll {
+  flex: 0 1 auto;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  ul {
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+
+    scrollbar-width: thin; /* Thin scrollbar */
+    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+  }
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0.5rem;
+    height: 1.8rem; /* Height of the gradient */
+    z-index: 1;
+    pointer-events: none; /* So the gradient doesn't block interaction with the list */
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &::before {
+    top: 0;
+    background: linear-gradient(to bottom, #f9fafb 0%, rgba(249, 250, 251, 0) 100%);
+  }
+  &::after {
+    bottom: 0;
+    background: linear-gradient(to top, #f9fafb 0%, rgba(249, 250, 251, 0) 100%);
+  }
+
+  &:global(.show-top-gradient) {
+    &::before {
+      opacity: 1;
+    }
+  }
+  &:global(.show-bottom-gradient) {
+    &::after {
+      opacity: 1;
+    }
+  }
+
+  &:global(.has-scrolling) {
+    border-top: 1px solid var(--border-color-default);
+    border-bottom: 1px solid var(--border-color-default);
+
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 }

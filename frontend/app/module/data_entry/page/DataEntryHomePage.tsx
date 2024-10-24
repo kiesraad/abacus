@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { ElectionProgress } from "app/component/election/ElectionProgress";
+import { Footer } from "app/component/footer/Footer";
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -66,6 +67,7 @@ export function DataEntryHomePage() {
         </article>
         <ElectionProgress />
       </main>
+      <Footer />
     </>
   );
 }

@@ -8,7 +8,7 @@ import { AbortDataEntryControl } from "app/module/data_entry";
 
 import { PollingStationFormController, useElection } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
-import { Badge, PageTitle, PollingStationNumber, WorkStationNumber } from "@kiesraad/ui";
+import { Badge, PageTitle, PollingStationNumber, StickyNav, WorkStationNumber } from "@kiesraad/ui";
 import { usePollingStationStatus } from "@kiesraad/util";
 
 export function PollingStationLayout() {
@@ -30,7 +30,11 @@ export function PollingStationLayout() {
       <NavBar>
         <Link to={"/elections"}>Overzicht</Link>
         <IconChevronRight />
-        <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
+        <Link to={`/elections/${election.id}/data-entry`}>
+          <span className="bold">{election.location}</span>
+          <span>&mdash;</span>
+          <span>{election.name}</span>
+        </Link>
       </NavBar>
       <header>
         <section>
@@ -44,9 +48,9 @@ export function PollingStationLayout() {
         </section>
       </header>
       <main>
-        <nav>
+        <StickyNav>
           <PollingStationProgress />
-        </nav>
+        </StickyNav>
         <article>
           <PollingStationFormNavigation pollingStationId={pollingStation.id} election={election} />
           <Outlet />

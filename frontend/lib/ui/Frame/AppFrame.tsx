@@ -7,5 +7,9 @@ export interface AppFrameProps {
 //Low in functionality, but it provides an entry point into the UI library loading all styles.
 
 export function AppFrame({ children }: AppFrameProps) {
-  return <div className="app-frame">{children}</div>;
+  return (
+    <div id="appframe" className="app-frame">
+      {children}
+    </div>
+  );
 }

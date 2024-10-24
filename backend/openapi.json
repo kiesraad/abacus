@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "backend",
     "description": "",
@@ -130,10 +130,67 @@
                 },
                 "description": "application/pdf"
               }
+            },
+            "content": {
+              "application/pdf": {}
             }
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/elections/{election_id}/polling_stations": {
+      "get": {
+        "tags": [
+          "polling_station"
+        ],
+        "summary": "Get a list of all pollingstations for an election",
+        "operationId": "polling_station_list",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Polling station listing successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -521,11 +578,7 @@
             "type": "string"
           },
           "gender": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CandidateGender"
-              }
-            ]
+            "$ref": "#/components/schemas/CandidateGender"
           },
           "initials": {
             "type": "string"
@@ -874,6 +927,21 @@
           }
         }
       },
+      "PollingStationListResponse": {
+        "type": "object",
+        "description": "Polling station list response",
+        "required": [
+          "polling_stations"
+        ],
+        "properties": {
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStation"
+            }
+          }
+        }
+      },
       "PollingStationResults": {
         "type": "object",
         "description": "PollingStationResults, following the fields in Model Na 31-2 Bijage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
@@ -885,7 +953,8 @@
         ],
         "properties": {
           "differences_counts": {
-            "$ref": "#/components/schemas/DifferencesCounts"
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
           },
           "political_group_votes": {
             "type": "array",
@@ -899,17 +968,16 @@
             "description": "Recounted (\"Is er herteld? - See form for official long description of the checkbox\")"
           },
           "voters_counts": {
-            "$ref": "#/components/schemas/VotersCounts"
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"1. Aantal toegelaten kiezers\")"
           },
           "voters_recounts": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/VotersRecounts"
-              }
-            ]
+            "$ref": "#/components/schemas/VotersRecounts",
+            "description": "Voters recounts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")\nWhen filled in, this field should replace `voters_counts` when using the results."
           },
           "votes_counts": {
-            "$ref": "#/components/schemas/VotesCounts"
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"2. Aantal getelde stembiljetten\")"
           }
         }
       },
@@ -943,9 +1011,9 @@
         "type": "string",
         "description": "Type of Polling station",
         "enum": [
-          "VasteLocatie",
-          "Bijzonder",
-          "Mobiel"
+          "FixedLocation",
+          "Special",
+          "Mobile"
         ]
       },
       "SaveDataEntryRequest": {
@@ -961,7 +1029,8 @@
             "description": "Client state for the data entry (arbitrary JSON)"
           },
           "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/PollingStationResults",
+            "description": "Data entry for a polling station"
           }
         }
       },

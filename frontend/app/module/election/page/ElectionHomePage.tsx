@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 
+import { Footer } from "app/component/footer/Footer";
 import { MockTest } from "app/component/MockTest";
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -12,7 +13,13 @@ export function ElectionHomePage() {
   return (
     <>
       <PageTitle title="Details verkiezing - Abacus" />
-      <NavBar />
+      <NavBar>
+        <span>
+          <span className="bold">{election.location}</span>
+          <span>&mdash;</span>
+          <span>{election.name}</span>
+        </span>
+      </NavBar>
       <header>
         <section>
           <h1>{election.name}</h1>
@@ -25,12 +32,13 @@ export function ElectionHomePage() {
               <Link to={`status#coordinator`}>Status</Link>
             </li>
             <li>
-              <Link to={`polling-stations#coordinator`}>Polling stations configureren</Link>
+              <Link to={`polling-stations#coordinator`}>Stembureaus</Link>
             </li>
           </ul>
           {__API_MSW__ && <MockTest />}
         </article>
       </main>
+      <Footer />
     </>
   );
 }

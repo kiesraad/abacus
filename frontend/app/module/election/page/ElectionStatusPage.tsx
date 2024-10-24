@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 
 import { ElectionStatusProgress } from "app/component/election/ElectionStatusProgress";
+import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
@@ -19,7 +20,11 @@ export function ElectionStatusPage() {
     <>
       <PageTitle title="Status verkiezing - Abacus" />
       <NavBar>
-        <Link to={`/elections/${election.id}#coordinator`}>{election.name}</Link>
+        <Link to={`/elections/${election.id}#coordinator`}>
+          <span className="bold">{election.location}</span>
+          <span>&mdash;</span>
+          <span>{election.name}</span>
+        </Link>
       </NavBar>
       <header>
         <section>
@@ -42,6 +47,7 @@ export function ElectionStatusPage() {
         <ElectionStatusProgress />
         <article>Placeholder</article>
       </main>
+      <Footer />
     </>
   );
 }

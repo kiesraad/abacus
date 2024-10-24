@@ -20,8 +20,12 @@ interface Database {
 }
 
 const initialData: Database = {
-  elections: [getElectionMockData(1).election, getElectionMockData(2).election],
-  pollingStations: [...getElectionMockData(1).polling_stations, ...getElectionMockData(2).polling_stations],
+  elections: [getElectionMockData(1).election, getElectionMockData(2).election, getElectionMockData(3).election],
+  pollingStations: [
+    ...getElectionMockData(1).polling_stations,
+    ...getElectionMockData(2).polling_stations,
+    ...getElectionMockData(3).polling_stations,
+  ],
   results: [],
   dataEntries: [],
 };

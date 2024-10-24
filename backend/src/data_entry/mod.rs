@@ -13,7 +13,7 @@ use crate::election::Election;
 use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::PollingStation;
 use crate::validation::ValidationResults;
-use crate::APIError;
+use crate::{APIError, ErrorResponse};
 
 pub mod repository;
 pub mod structs;

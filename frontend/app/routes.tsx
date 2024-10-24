@@ -12,6 +12,7 @@ import {
 } from "app/module/election";
 import { LogsHomePage } from "app/module/logs";
 import { NotAvailableInMock } from "app/module/NotAvailableInMock";
+import { PollingStationListPage, PollingStationsLayout } from "app/module/polling_stations";
 import { UsersHomePage } from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
 
@@ -47,6 +48,9 @@ export const routes = createRoutesFromElements(
           element={__API_MSW__ ? <NotAvailableInMock title="Invoerfase afronden - Abacus" /> : <ElectionReportPage />}
         />
         <Route path="status" element={<ElectionStatusPage />} />
+        <Route path="polling-stations" element={<PollingStationsLayout />}>
+          <Route index element={<PollingStationListPage />} />
+        </Route>
         <Route path="data-entry" element={null}>
           <Route index element={<DataEntryHomePage />} />
           <Route path=":pollingStationId" element={<PollingStationLayout />}>

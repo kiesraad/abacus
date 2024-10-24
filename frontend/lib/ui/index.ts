@@ -1,6 +1,7 @@
 import "./style/index.css";
 
 export * from "./Alert/Alert";
+export * from "./AppLayout";
 export * from "./Badge";
 export * from "./BottomBar/BottomBar";
 export * from "./Button/Button";

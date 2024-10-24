@@ -55,7 +55,11 @@ export function ElectionReportPage() {
     <>
       <PageTitle title="Invoerfase afronden - Abacus" />
       <NavBar>
-        <Link to={`/elections/${election.id}#coordinator`}>{election.name}</Link>
+        <Link to={`/elections/${election.id}#coordinator`}>
+          <span className="bold">{election.location}</span>
+          <span>&mdash;</span>
+          <span>{election.name}</span>
+        </Link>
       </NavBar>
       <header>
         <section>

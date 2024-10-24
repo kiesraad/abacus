@@ -30,7 +30,11 @@ export function PollingStationLayout() {
       <NavBar>
         <Link to={"/elections"}>Overzicht</Link>
         <IconChevronRight />
-        <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
+        <Link to={`/elections/${election.id}/data-entry`}>
+          <span className="bold">{election.location}</span>
+          <span>&mdash;</span>
+          <span>{election.name}</span>
+        </Link>
       </NavBar>
       <header>
         <section>

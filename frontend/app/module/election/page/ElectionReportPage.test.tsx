@@ -1,8 +1,8 @@
-import { render as rtlRender, screen } from "@testing-library/react";
+import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { ElectionReportPage } from "app/module/election";
-import { expectErrorPage, overrideOnce, Providers, render, setupTestRouter } from "app/test/unit";
+import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 
@@ -16,7 +16,7 @@ describe("ElectionReportPage", () => {
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "first_entry" },
+        { id: 1, status: "not_started" },
         { id: 2, status: "definitive" },
       ],
     });

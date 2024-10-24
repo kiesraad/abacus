@@ -161,7 +161,7 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
 async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let request_body = shared::example_data_entry();
+    let request_body = shared::example_data_entry(None);
     let invalid_id = 123_456_789;
 
     let url = format!("http://{addr}/api/polling_stations/{invalid_id}/data_entries/1");
@@ -189,7 +189,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
 async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let request_body = shared::example_data_entry();
+    let request_body = shared::example_data_entry(None);
 
     // create a data entry
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
@@ -232,7 +232,7 @@ async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
 async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let request_body = shared::example_data_entry();
+    let request_body = shared::example_data_entry(None);
 
     // create a data entry
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");

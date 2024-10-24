@@ -87,7 +87,7 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
         } else if (Database.dataEntries.some((d) => d.pollingStationId === pollingStationId)) {
           response.statuses.push({ id: pollingStationId, status: "first_entry_in_progress" });
         } else {
-          response.statuses.push({ id: pollingStationId, status: "first_entry" });
+          response.statuses.push({ id: pollingStationId, status: "not_started" });
         }
       }
 

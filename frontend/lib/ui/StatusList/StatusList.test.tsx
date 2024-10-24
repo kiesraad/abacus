@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
+
+import { render, screen } from "app/test/unit";
 
 import { StatusList } from "./StatusList";
 import { DefaultStatusList } from "./StatusList.stories";

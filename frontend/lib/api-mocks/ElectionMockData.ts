@@ -395,7 +395,7 @@ export const electionStatusMockResponse: ElectionStatusResponse = {
   statuses: [
     {
       id: 1,
-      status: "first_entry",
+      status: "not_started",
     },
     {
       id: 2,

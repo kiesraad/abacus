@@ -8,7 +8,7 @@ use backend::data_entry::{
 };
 use hyper::StatusCode;
 
-pub fn example_data_entry() -> SaveDataEntryRequest {
+pub fn example_data_entry(client_state: Option<&str>) -> SaveDataEntryRequest {
     SaveDataEntryRequest {
         data: PollingStationResults {
             recounted: Some(false),
@@ -49,12 +49,16 @@ pub fn example_data_entry() -> SaveDataEntryRequest {
                 ],
             }],
         },
-        client_state: None,
+        client_state: client_state.map(|client_state| serde_json::from_str(client_state).unwrap()),
     }
 }
 
-pub async fn create_and_save_data_entry(addr: &SocketAddr, polling_station_id: u32) {
-    let request_body = example_data_entry();
+pub async fn create_and_save_data_entry(
+    addr: &SocketAddr,
+    polling_station_id: u32,
+    client_state: Option<&str>,
+) {
+    let request_body = example_data_entry(client_state);
     let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/1");
     let response = reqwest::Client::new()
         .post(&url)
@@ -75,7 +79,7 @@ pub async fn create_and_save_data_entry(addr: &SocketAddr, polling_station_id: u
 }
 
 pub async fn create_and_finalise_data_entry(addr: &SocketAddr, polling_station_id: u32) {
-    create_and_save_data_entry(addr, polling_station_id).await;
+    create_and_save_data_entry(addr, polling_station_id, None).await;
 
     // Finalise the data entry
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/finalise");

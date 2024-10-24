@@ -207,8 +207,8 @@ export function PollingStationFormController({
         setFormState(formState);
         setTargetFormSectionID(INITIAL_FORM_SECTION_ID);
 
-        // save initial data entry
-        const clientState = getClientState(formState, false, false);
+        // save initial data entry, continue is set to true to make sure polling station has status FirstEntryInProgress
+        const clientState = getClientState(formState, false, true);
         const requestBody: SaveDataEntryRequest = {
           data: values,
           client_state: clientState,

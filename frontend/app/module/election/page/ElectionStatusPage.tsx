@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 
+import { ElectionStatusProgress } from "app/component/election/ElectionStatusProgress";
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -43,6 +44,7 @@ export function ElectionStatusPage() {
         </Alert>
       )}
       <main>
+        <ElectionStatusProgress />
         <article>Placeholder</article>
       </main>
       <Footer />

@@ -6,7 +6,7 @@ export const AllBadges: Story = () => {
   return (
     <>
       <Badge type="definitive" />
-      <Badge type="first_entry" />
+      <Badge type="not_started" />
       <Badge type="first_entry_in_progress" showIcon />
     </>
   );
@@ -16,8 +16,8 @@ export const CustomizableBadge: Story<BadgeProps> = ({ type, showIcon }) => <Bad
 
 CustomizableBadge.argTypes = {
   type: {
-    options: ["definitive", "first_entry", "first_entry_in_progress"],
-    defaultValue: "first_entry",
+    options: ["definitive", "not_started", "first_entry_in_progress"],
+    defaultValue: "not_started",
     control: { type: "radio" },
   },
   showIcon: {

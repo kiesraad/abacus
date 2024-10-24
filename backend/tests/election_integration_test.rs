@@ -70,12 +70,12 @@ async fn test_election_details_status(pool: SqlitePool) {
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
-    assert_eq!(body.statuses[0].status, PollingStationStatus::FirstEntry);
-    assert_eq!(body.statuses[1].status, PollingStationStatus::FirstEntry);
+    assert_eq!(body.statuses[0].status, PollingStationStatus::NotStarted);
+    assert_eq!(body.statuses[1].status, PollingStationStatus::NotStarted);
 
-    // Finalise one and save the other
+    // Finalise one and set the other in progress
     shared::create_and_finalise_data_entry(&addr, 1).await;
-    shared::create_and_save_data_entry(&addr, 2).await;
+    shared::create_and_save_data_entry(&addr, 2, Some(r#"{"continue": true}"#)).await;
 
     let url = format!("http://{addr}/api/elections/1/status");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
@@ -83,7 +83,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
     // Ensure the response is what we expect:
-    // polling station 1 is now complete, polling station 2 is still incomplete
+    // polling station 1 is now complete, polling station 2 is still incomplete and set to in progress
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
@@ -94,6 +94,27 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,
         PollingStationStatus::FirstEntryInProgress
+    );
+
+    // Abort and save the other data entry
+    shared::create_and_save_data_entry(&addr, 2, Some(r#"{"continue": false}"#)).await;
+
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
+    // Ensure the response is what we expect:
+    // polling station 1 is now complete, polling station 2 is still incomplete and set to unfinished
+    println!("response body: {:?}", &body);
+    assert_eq!(status, StatusCode::OK);
+    assert!(!body.statuses.is_empty());
+    assert_eq!(
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
+        PollingStationStatus::Definitive
+    );
+    assert_eq!(
+        body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,
+        PollingStationStatus::FirstEntryUnfinished
     );
 }
 

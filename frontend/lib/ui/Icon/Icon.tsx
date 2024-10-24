@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Size } from "@kiesraad/ui";
+import { ProgressBarColorClass, Size } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
 import cls from "./Icon.module.css";
@@ -8,7 +8,7 @@ import cls from "./Icon.module.css";
 export interface IconProps {
   icon: React.ReactNode;
   size?: Size;
-  color?: "primary" | "warning" | "error" | "accept";
+  color?: "primary" | "warning" | "error" | "accept" | ProgressBarColorClass;
   spacing?: number;
 }
 

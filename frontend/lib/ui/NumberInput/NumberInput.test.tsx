@@ -1,8 +1,9 @@
-import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { NumberInput } from "./NumberInput";
+import { render, screen } from "app/test/unit";
+
+import { NumberInput } from "@kiesraad/ui";
 
 describe("UI Component: number input", () => {
   test("should render a number input", () => {

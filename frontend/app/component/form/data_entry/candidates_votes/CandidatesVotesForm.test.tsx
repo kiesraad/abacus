@@ -5,7 +5,7 @@ import {
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToNotHaveIcon,
 } from "app/component/form/testHelperFunctions";
-import { getUrlMethodAndBody, overrideOnce, render, screen } from "app/test/unit";
+import { getUrlMethodAndBody, overrideOnce, render, screen, within } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form";
 
 import {
@@ -39,6 +39,75 @@ const candidatesFieldIds = {
 };
 
 describe("Test CandidatesVotesForm", () => {
+  describe("CandidatesVotesForm renders correctly", () => {
+    test("Candidates with first name", async () => {
+      const politicalGroupMockData: PoliticalGroup = {
+        number: 1,
+        name: "Lijst 1 - Vurige Vleugels Partij",
+        candidates: [
+          {
+            number: 1,
+            initials: "E.",
+            first_name: "Eldor",
+            last_name: "Zilverlicht",
+            locality: "Amsterdam",
+          },
+        ],
+      };
+
+      const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
+
+      const Component = (
+        <PollingStationFormController
+          election={electionMockData}
+          pollingStationId={pollingStationMockData.id}
+          entryNumber={1}
+        >
+          <CandidatesVotesForm group={politicalGroupMock} />
+        </PollingStationFormController>
+      );
+
+      render(Component);
+
+      const candidateRow = await screen.findByTestId("row-candidate_votes[0].votes");
+      const candidateName = within(candidateRow).getAllByRole("cell")[2];
+      expect(candidateName).toHaveTextContent(/^Zilverlicht, E\. \(Eldor\)$/);
+    });
+
+    test("Candidates without first names", async () => {
+      const politicalGroupMockData: PoliticalGroup = {
+        number: 1,
+        name: "Lijst 1 - Vurige Vleugels Partij",
+        candidates: [
+          {
+            number: 1,
+            initials: "E.",
+            last_name: "Zilverlicht",
+            locality: "Amsterdam",
+          },
+        ],
+      };
+
+      const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
+
+      const Component = (
+        <PollingStationFormController
+          election={electionMockData}
+          pollingStationId={pollingStationMockData.id}
+          entryNumber={1}
+        >
+          <CandidatesVotesForm group={politicalGroupMock} />
+        </PollingStationFormController>
+      );
+
+      render(Component);
+
+      const candidateRow = await screen.findByTestId("row-candidate_votes[0].votes");
+      const candidateName = within(candidateRow).getAllByRole("cell")[2];
+      expect(candidateName).toHaveTextContent(/^Zilverlicht, E\.$/);
+    });
+  });
+
   describe("CandidatesVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();

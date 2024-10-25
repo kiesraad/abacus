@@ -44,7 +44,7 @@ export function ElectionStatusProgress() {
     // Reverse the categories and make sure not started is at the end of the progress bar
     const [notStarted, ...data] = statusCategories
       .map((cat) => ({
-        percentage: Math.round(categoryCounts[cat] / total) * 100,
+        percentage: total > 0 ? Math.round(categoryCounts[cat] / total) * 100 : 0,
         class: categoryColorClass[cat],
       }))
       .reverse();

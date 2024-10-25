@@ -31,7 +31,7 @@ export function ElectionStatusPage() {
           <h1>Eerste zitting</h1>
         </section>
       </header>
-      {statuses.every((s) => s.status === "definitive") && (
+      {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
           <h2>Alle stembureaus zijn twee keer ingevoerd</h2>
           <p>

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { useElection, useElectionStatus } from "@kiesraad/api";
+import { useElectionStatus } from "@kiesraad/api";
 import { Progress, ProgressBar } from "@kiesraad/ui";
 
 type Stat = {
@@ -11,22 +11,20 @@ type Stat = {
 };
 
 export function ElectionProgress() {
-  const { pollingStations } = useElection();
   const { statuses } = useElectionStatus();
 
   const stats: Stat[] = useMemo(() => {
-    const total = pollingStations.length;
+    const total = statuses.length;
     const totalDefinitive = statuses.filter((s) => s.status === "definitive").length;
-
     return [
       {
         title: "Alles samen",
         id: "definitive",
         total: totalDefinitive,
-        percentage: totalDefinitive / total,
+        percentage: total > 0 ? Math.round(totalDefinitive / total) * 100 : 0,
       },
     ];
-  }, [pollingStations, statuses]);
+  }, [statuses]);
 
   return (
     <Progress>
@@ -36,7 +34,7 @@ export function ElectionProgress() {
           <ProgressBar
             key={stat.id}
             id={stat.id}
-            data={{ percentage: Math.round(stat.percentage * 100), class: "default" }}
+            data={{ percentage: stat.percentage, class: "default" }}
             title={stat.title}
             spacing="small"
             showPercentage

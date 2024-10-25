@@ -143,13 +143,16 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
           {group.candidates.map((candidate, index) => {
             const addSeparator = (index + 1) % 25 === 0 && index + 1 !== group.candidates.length;
             const defaultValue = sectionValues?.candidate_votes[index]?.votes || "";
+            const candidateFullName = candidate.first_name
+              ? `${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`
+              : `${candidate.last_name}, ${candidate.initials}`;
             return (
               <InputGridRow
                 key={`list${group.number}-candidate${index + 1}`}
                 field={`${index + 1}`}
                 name="candidatevotes[]"
                 id={`candidate_votes[${candidate.number - 1}].votes`}
-                title={`${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`}
+                title={candidateFullName}
                 addSeparator={addSeparator}
                 defaultValue={defaultValue}
                 {...defaultProps}

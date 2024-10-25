@@ -30,7 +30,6 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(undefined);
   const electionStatus = useElectionStatus();
-  const [unfinishedAlert, setUnfinishedAlert] = useState<boolean>(true);
 
   const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
     setLoading(false);
@@ -79,15 +78,9 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         return;
       }}
     >
-      {unfinished.length > 0 && unfinishedAlert && (
+      {unfinished.length > 0 && (
         <div className={cls["unfinished-alert"]}>
-          <Alert
-            type="notify"
-            variant="no-icon"
-            onClose={() => {
-              setUnfinishedAlert(false);
-            }}
-          >
+          <Alert type="notify" variant="no-icon">
             <h2>Je hebt nog een openstaande invoer</h2>
             <p>
               Je bent begonnen met het invoeren van onderstaande stembureaus, maar hebt deze nog niet helemaal afgerond:
@@ -151,7 +144,11 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         <h2 className="form_title table_title">Kies het stembureau</h2>
         {(() => {
           if (pollingStations.length === 0) {
-            return <Alert type={"error"}>Geen stembureaus gevonden</Alert>;
+            return (
+              <Alert type={"error"} variant="small">
+                <p>Geen stembureaus gevonden</p>
+              </Alert>
+            );
           } else {
             return <PollingStationsList pollingStations={pollingStations} />;
           }

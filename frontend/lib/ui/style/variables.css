@@ -1,22 +1,22 @@
 @font-face {
   font-family: "SpaceGrotesk";
-  src: url("/font/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf") format("TrueType");
+  src: url("/static/font/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf") format("TrueType");
 }
 
 @font-face {
   font-family: "DMSans";
-  src: url("/font/DM_Sans/DMSans-VariableFont_opsz,wght.ttf") format("TrueType");
+  src: url("/static/font/DM_Sans/DMSans-VariableFont_opsz,wght.ttf") format("TrueType");
   font-weight: 1 1000;
 }
 
 @font-face {
   font-family: "DMSansItalic";
-  src: url("/font/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf") format("TrueType");
+  src: url("/static/font/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf") format("TrueType");
 }
 
 @font-face {
   font-family: "GeistMono";
-  src: url("/font/Geist_Mono/GeistMono-Regular.otf") format("opentype");
+  src: url("/static/font/Geist_Mono/GeistMono-Regular.otf") format("opentype");
   font-feature-settings: "ss09" on;
 }
 

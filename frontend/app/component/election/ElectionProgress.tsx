@@ -6,7 +6,6 @@ import { Progress, ProgressBar } from "@kiesraad/ui";
 type Stat = {
   title: string;
   id: string;
-  total: number;
   percentage: number;
 };
 
@@ -20,8 +19,7 @@ export function ElectionProgress() {
       {
         title: "Alles samen",
         id: "definitive",
-        total: totalDefinitive,
-        percentage: total > 0 ? Math.round(totalDefinitive / total) * 100 : 0,
+        percentage: total > 0 ? Math.round((totalDefinitive / total) * 100) : 0,
       },
     ];
   }, [statuses]);

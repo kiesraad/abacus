@@ -44,7 +44,7 @@ export function ElectionStatusProgress() {
     // Reverse the categories and make sure not started is at the end of the progress bar
     const [notStarted, ...data] = statusCategories
       .map((cat) => ({
-        percentage: total > 0 ? Math.round(categoryCounts[cat] / total) * 100 : 0,
+        percentage: total > 0 ? Math.round((categoryCounts[cat] / total) * 100) : 0,
         class: categoryColorClass[cat],
       }))
       .reverse();
@@ -60,7 +60,7 @@ export function ElectionStatusProgress() {
         <h2>Snelkoppelingen</h2>
         {statusCategories.map((cat) => {
           return (
-            <span className="item" key={`item-${cat}`}>
+            <span className="item" key={`item-${categoryColorClass[cat]}`} id={`item-${categoryColorClass[cat]}`}>
               <Icon icon={<IconDot />} size="sm" color={categoryColorClass[cat]} />
               {categoryTitle[cat]} ({categoryCounts[cat]})
             </span>

@@ -14,7 +14,7 @@ set -x
 echo "Building frontend..."
 
 pushd "frontend" > /dev/null 2>&1
-npm install
+npm ci
 npm run build
 popd > /dev/null 2>&1
 

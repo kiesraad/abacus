@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useMemo } from "react";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { Progress, ProgressBar } from "@kiesraad/ui";
@@ -14,7 +14,7 @@ export function ElectionProgress() {
   const { pollingStations } = useElection();
   const { statuses } = useElectionStatus();
 
-  const stats: Stat[] = React.useMemo(() => {
+  const stats: Stat[] = useMemo(() => {
     const total = pollingStations.length;
     const totalDefinitive = statuses.filter((s) => s.status === "definitive").length;
 

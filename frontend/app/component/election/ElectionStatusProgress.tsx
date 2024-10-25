@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useMemo } from "react";
 
 import { PollingStationStatus, PollingStationStatusEntry, useElectionStatus } from "@kiesraad/api";
 import { IconDot } from "@kiesraad/icon";
@@ -28,7 +28,7 @@ function statusCount(entries: PollingStationStatusEntry[], status: PollingStatio
 export function ElectionStatusProgress() {
   const { statuses } = useElectionStatus();
 
-  const categoryCounts: Record<StatusCategory, number> = React.useMemo(() => {
+  const categoryCounts: Record<StatusCategory, number> = useMemo(() => {
     // TODO: future `second_entry_unfinished` status should be added to `unfinished`
     //  future `second_entry_in_progress` status should be added to `in_progress`
     return {
@@ -39,12 +39,19 @@ export function ElectionStatusProgress() {
     };
   }, [statuses]);
 
-  const progressBarData: PercentageAndColorClass[] = React.useMemo(() => {
+  const progressBarData: PercentageAndColorClass[] = useMemo(() => {
     const total = statuses.length;
-    return statusCategories.map((cat) => ({
-      percentage: Math.round(categoryCounts[cat] / total) * 100,
-      class: categoryColorClass[cat],
-    }));
+    // Reverse the categories and make sure not started is at the end of the progress bar
+    const [notStarted, ...data] = statusCategories
+      .map((cat) => ({
+        percentage: Math.round(categoryCounts[cat] / total) * 100,
+        class: categoryColorClass[cat],
+      }))
+      .reverse();
+    if (notStarted) {
+      data.push(notStarted);
+    }
+    return data;
   }, [statuses, categoryCounts]);
 
   return (

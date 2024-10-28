@@ -53,12 +53,12 @@ Het zelf ontwikkelen van een GUI is voor het beoogde doel vermoedelijk niet prod
 
 ## Gemaakte keuzes frontend
 
-Voor de frontend wordt de keuze beperkt door de browser. Daarom maken we gebruik van HTML, CSS en TypeScript.
+Voor de frontend wordt de keuze beperkt door de browser. Daarom maken we gebruik van HTML, CSS en JavaScript.
 Hierbinnen zijn vele frameworks te kiezen, en daarbij tellen de afwegingen wat betreft zelfgeschreven software mee. Het is belangrijk dat een framework met minder afhankelijkheden gekozen wordt.
 
 ### TypeScript
 
-We maken ook gebruik van TypeScript, een uitgebreidere versie van JavaScript. Dit heeft bij de programmeurs de voorkeur omdat het zorgt dat je minder fouten maakt en betere code kunt schrijven.
+We maken gebruik van TypeScript, een uitgebreidere versie van JavaScript. Dit heeft bij de programmeurs de voorkeur omdat het zorgt dat je minder fouten maakt en betere code kunt schrijven.
 
 ### Library: React
 

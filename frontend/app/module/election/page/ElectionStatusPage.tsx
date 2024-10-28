@@ -4,6 +4,7 @@ import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { Alert, Button, PageTitle } from "@kiesraad/ui";
 
 export function ElectionStatusPage() {
@@ -17,7 +18,7 @@ export function ElectionStatusPage() {
 
   return (
     <>
-      <PageTitle title="Status verkiezing - Abacus" />
+      <PageTitle title={t("election_status.title")} />
       <NavBar>
         <Link to={`/elections/${election.id}#coordinator`}>
           <span className="bold">{election.location}</span>
@@ -27,23 +28,20 @@ export function ElectionStatusPage() {
       </NavBar>
       <header>
         <section>
-          <h1>Eerste zitting</h1>
+          <h1>{t("election_status.first_session")}</h1>
         </section>
       </header>
       {statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
-          <h2>Alle stembureaus zijn twee keer ingevoerd</h2>
-          <p>
-            De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief
-            maken en het proces verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.
-          </p>
+          <h2>{t("election_status.difinitive.title")}</h2>
+          <p>{t("election_status.difititive.message")}</p>
           <Button onClick={finishInput} size="md">
-            Invoerfase afronden
+            {t("election_status.difititive.finish_button")}
           </Button>
         </Alert>
       )}
       <main>
-        <article>Placeholder</article>
+        <article>-</article>
       </main>
       <Footer />
     </>

@@ -1,9 +1,19 @@
 export const en = {
+  test: "test",
+
   election: "Election",
   elections: "Elections",
   manage_elections: "Manage elections",
   role: "Role",
   status: "Status",
+
+  "election_status.title": "Election Status - Abacus",
+  "election_status.first_session": "First Session",
+  "election_status.difinitive.title": "All polling stations have been entered twice",
+  "election_status.difititive.message":
+    "The results from all polling stations in your municipality have been entered correctly. You can now finalize the results and prepare the official report. Only do this if no recounts are needed today.",
+  "election_status.difititive.finish_button": "Complete Entry Phase",
+
   "account.configured": "Your account is configured",
   "feedback.F101.title": "Check the paper report",
   "feedback.F101.content": "Does page 1 indicate that a recount was ordered by the Municipal Election Bureau?",

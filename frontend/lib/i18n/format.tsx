@@ -110,6 +110,7 @@ export function renderAst(input: AST, elements: Record<string, RenderCallback> =
 
         // otherwise, render the tag
         const Element = tag as keyof React.JSX.IntrinsicElements;
+
         return <Element key={i}>{renderAst(children, elements)}</Element>;
       })}
     </>

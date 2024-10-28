@@ -11,39 +11,53 @@ export function translate(k: keyof Translation): string {
   return translations[locale][k];
 }
 
-// translate the given key and replace the variables
+/**
+ * Translate a text and optionally interpolate variables
+ *
+ * @param k translation key
+ * @param vars variables to interpolate
+ * @returns a translated string
+ * @example
+ *
+ * return (
+ *  <div>
+ *    <h1>{t('elections')}</h1>
+ *    <p>{t('elections_count', { count: numberOfElections })}</p>
+ *  </div>
+ * );
+ */
 export function t(k: keyof Translation, vars?: Record<string, string>): string {
   if (vars) {
-    return Object.entries(vars).reduce((acc, [key, value]) => acc.replace(`$${key}`, value), translate(k));
+    return Object.entries(vars).reduce((acc, [key, value]) => acc.replace(`{${key}}`, value), translate(k));
   }
 
   return translate(k);
 }
 
-// translate and render the translation with the given elements
-export function tx(k: keyof Translation, elements?: Record<string, RenderCallback>): ReactElement {
-  const text = translate(k);
-
-  if (elements) {
-    const allowed = [...DEFAULT_ALLOWED_TAGS, ...Object.keys(elements)];
-    return renderAst(parse(text, allowed), elements);
-  }
-
-  return <>{text}</>;
-}
-
-// translate and render the translation with the given variables and elements
-export function ttx(
+/**
+ * Translate a text and optionally interpolate variables and elements
+ *
+ * @param k translation key
+ * @param elements React elements to interpolate
+ * @param vars variables to interpolate
+ * @returns a translated string
+ * @example
+ *
+ * return (
+ *  <div>
+ *    <h1>{t('internal_error')}</h1>
+ *    <p>{t('check_manual_instruction', { link: (title) => <a href="/manual">{title}</a> })}</p>
+ *  </div>
+ * );
+ */
+export function tx(
   k: keyof Translation,
-  vars?: Record<string, string>,
   elements?: Record<string, RenderCallback>,
+  vars?: Record<string, string>,
 ): ReactElement {
   const text = vars ? t(k, vars) : translate(k);
 
-  if (elements) {
-    const allowed = [...DEFAULT_ALLOWED_TAGS, ...Object.keys(elements)];
-    return renderAst(parse(text, allowed), elements);
-  }
+  const allowed = elements ? [...DEFAULT_ALLOWED_TAGS, ...Object.keys(elements)] : DEFAULT_ALLOWED_TAGS;
 
-  return <>{text}</>;
+  return renderAst(parse(text, allowed), elements);
 }

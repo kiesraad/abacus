@@ -6,11 +6,20 @@ export enum Locale {
 }
 
 export interface Translation {
+  test: string;
+
   election: string;
   elections: string;
   manage_elections: string;
   role: string;
   status: string;
+
+  "election_status.title": string;
+  "election_status.first_session": string;
+  "election_status.difinitive.title": string;
+  "election_status.difititive.message": string;
+  "election_status.difititive.finish_button": string;
+
   "account.configured": string;
   "feedback.F101.title": string;
   "feedback.F101.content": string;

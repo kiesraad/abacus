@@ -1,9 +1,19 @@
 export const nl = {
+  test: "test",
+
   election: "Verkiezing",
   elections: "Verkiezingen",
   manage_elections: "Beheer verkiezingen",
   role: "Rol",
   status: "Status",
+
+  "election_status.title": "Status verkiezing - Abacus",
+  "election_status.first_session": "Eerste zitting",
+  "election_status.difinitive.title": "Alle stembureaus zijn twee keer ingevoerd",
+  "election_status.difititive.message":
+    "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
+  "election_status.difititive.finish_button": "Invoerfase afronden",
+
   "account.configured": "Je account is ingesteld",
   "feedback.F101.title": "Controleer het papieren proces-verbaal",
   "feedback.F101.content": "Is op pagina 1 aangegeven dat er in opdracht van het Gemeentelijk Stembureau is herteld?",

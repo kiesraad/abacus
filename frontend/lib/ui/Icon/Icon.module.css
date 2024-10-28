@@ -8,6 +8,12 @@
     }
   }
 
+  &.default {
+    svg {
+      fill: var(--progress-bar-default);
+    }
+  }
+
   &.error {
     svg {
       fill: var(--color-error-darkest);
@@ -17,6 +23,42 @@
   &.accept {
     svg {
       fill: var(--color-success);
+    }
+  }
+
+  &.errors-and-warnings {
+    svg {
+      fill: var(--progress-bar-errors-and-warnings);
+    }
+  }
+
+  &.unfinished {
+    svg {
+      fill: var(--progress-bar-unfinished);
+    }
+  }
+
+  &.in-progress {
+    svg {
+      fill: var(--progress-bar-in-progress);
+    }
+  }
+
+  &.first-entry-finished {
+    svg {
+      fill: var(--progress-bar-first-entry-finished);
+    }
+  }
+
+  &.definitive {
+    svg {
+      fill: var(--progress-bar-definitive);
+    }
+  }
+
+  &.not-started {
+    svg {
+      fill: var(--progress-bar-not-started);
     }
   }
 

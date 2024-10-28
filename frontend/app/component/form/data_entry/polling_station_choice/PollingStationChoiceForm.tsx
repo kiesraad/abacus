@@ -30,7 +30,6 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPollingStation, setCurrentPollingStation] = useState<PollingStation | undefined>(undefined);
   const electionStatus = useElectionStatus();
-  const [inProgressAlert, setInProgressAlert] = useState<boolean>(true);
 
   const debouncedCallback = useDebouncedCallback((pollingStation: PollingStation | undefined) => {
     setLoading(false);
@@ -68,8 +67,8 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     }
   };
 
-  const inProgress = electionStatus.statuses
-    .filter((status) => status.status === "first_entry_in_progress")
+  const unfinished = electionStatus.statuses
+    .filter((status) => status.status === "first_entry_unfinished")
     .map((status) => pollingStations.find((ps) => ps.id === status.id));
 
   return (
@@ -79,20 +78,14 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         return;
       }}
     >
-      {inProgress.length > 0 && inProgressAlert && (
-        <div className={cls["in-progress-alert"]}>
-          <Alert
-            type="notify"
-            variant="no-icon"
-            onClose={() => {
-              setInProgressAlert(false);
-            }}
-          >
+      {unfinished.length > 0 && (
+        <div className={cls["unfinished-alert"]}>
+          <Alert type="notify" variant="no-icon">
             <h2>Je hebt nog een openstaande invoer</h2>
             <p>
               Je bent begonnen met het invoeren van onderstaande stembureaus, maar hebt deze nog niet helemaal afgerond:
             </p>
-            {inProgress.map((pollingStation) => {
+            {unfinished.map((pollingStation) => {
               return pollingStation === undefined ? null : (
                 <PollingStationLink key={pollingStation.id} pollingStation={pollingStation} />
               );
@@ -151,7 +144,11 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         <h2 className="form_title table_title">Kies het stembureau</h2>
         {(() => {
           if (pollingStations.length === 0) {
-            return <Alert type={"error"}>Geen stembureaus gevonden</Alert>;
+            return (
+              <Alert type={"error"} variant="small">
+                <p>Geen stembureaus gevonden</p>
+              </Alert>
+            );
           } else {
             return <PollingStationsList pollingStations={pollingStations} />;
           }

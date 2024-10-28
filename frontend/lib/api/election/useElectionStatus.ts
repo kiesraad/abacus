@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { ElectionStatusProviderContext } from "./ElectionStatusProvider";
+import { ElectionStatusProviderContext } from "./ElectionStatusProviderContext";
 
 export function useElectionStatus() {
   const context = useContext(ElectionStatusProviderContext);

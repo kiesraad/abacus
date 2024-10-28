@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { PollingStationControllerContext } from "./PollingStationFormController";
+import { PollingStationControllerContext } from "./PollingStationControllerContext";
 
 export function usePollingStationFormController() {
   const context = React.useContext(PollingStationControllerContext);

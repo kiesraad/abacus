@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import { parsePollingStationNumber } from "@kiesraad/util";
 
-import { ElectionProviderContext } from "./ElectionProvider";
+import { ElectionProviderContext } from "./ElectionProviderContext";
 
 export function useElection(pollingStationId?: string) {
   const context = React.useContext(ElectionProviderContext);

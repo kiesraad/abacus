@@ -1,12 +1,7 @@
 import * as React from "react";
 
 import { ApiClient } from "./ApiClient";
-
-export interface iApiProviderContext {
-  client: ApiClient;
-}
-
-export const ApiProviderContext = React.createContext<iApiProviderContext | null>(null);
+import { ApiProviderContext } from "./ApiProviderContext";
 
 export interface ApiProviderProps {
   children: React.ReactNode;

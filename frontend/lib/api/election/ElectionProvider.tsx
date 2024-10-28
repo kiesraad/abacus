@@ -2,14 +2,9 @@ import * as React from "react";
 
 import { NotFoundError } from "app/component/error";
 
-import { Election, PollingStation, useElectionDataRequest } from "@kiesraad/api";
+import { Election, useElectionDataRequest } from "@kiesraad/api";
 
-export interface iElectionProviderContext {
-  election: Required<Election>;
-  pollingStations: Required<PollingStation[]>;
-}
-
-export const ElectionProviderContext = React.createContext<iElectionProviderContext | undefined>(undefined);
+import { ElectionProviderContext } from "./ElectionProviderContext";
 
 export interface ElectionProviderProps {
   children: React.ReactNode;

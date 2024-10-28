@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { ApiProviderContext, iApiProviderContext } from "./ApiProvider";
+import { ApiProviderContext, iApiProviderContext } from "./ApiProviderContext";
 
 export function useApi() {
   const context = React.useContext<iApiProviderContext | null>(ApiProviderContext);

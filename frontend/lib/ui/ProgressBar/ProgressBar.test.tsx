@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "app/test/unit";
 
-import { ProgressBar } from "@kiesraad/ui";
+import { PercentageAndColorClass, ProgressBar } from "@kiesraad/ui";
 
 describe("UI Component: ProgressBar", () => {
   test("renders a progress bar with a title and percentage", () => {
@@ -21,21 +21,22 @@ describe("UI Component: ProgressBar", () => {
   });
 
   test("renders a progress bar with multiple bars", () => {
-    const { queryByRole } = render(
-      <ProgressBar
-        id="test"
-        data={[
-          { percentage: 5, class: "errors-and-warnings" },
-          { percentage: 3, class: "unfinished" },
-          { percentage: 35, class: "in-progress" },
-          { percentage: 30, class: "first-entry-finished" },
-          { percentage: 25, class: "definitive" },
-          { percentage: 2, class: "not-started" },
-        ]}
-      />,
-    );
+    const data: PercentageAndColorClass[] = [
+      { percentage: 25, class: "definitive" },
+      { percentage: 30, class: "first-entry-finished" },
+      { percentage: 35, class: "in-progress" },
+      { percentage: 3, class: "unfinished" },
+      { percentage: 5, class: "errors-and-warnings" },
+      { percentage: 2, class: "not-started" },
+    ];
+    const { queryByRole } = render(<ProgressBar id="test" data={data} />);
 
     expect(queryByRole("label")).not.toBeInTheDocument();
     expect(screen.queryByText("50%")).not.toBeInTheDocument();
+    const bars = [...screen.getByTestId("multi-outer-bar").children];
+    bars.forEach((bar, index) => {
+      expect(bar.getAttribute("style")).toEqual(`width: ${data[index]?.percentage}%;`);
+      expect(bar.classList.contains(`${data[index]?.class}`)).toBeTruthy();
+    });
   });
 });

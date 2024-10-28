@@ -36,16 +36,24 @@ describe("ElectionStatusProgress", () => {
 
     render(<ElectionStatusProgress />);
 
-    const inProgress = screen.getByTestId("item-in-progress");
-    const unfinished = screen.getByTestId("item-unfinished");
-    const definitive = screen.getByTestId("item-definitive");
-    const notStarted = screen.getByTestId("item-not-started");
-    const multiProgressBar = screen.getByTestId("progressbar-all");
+    const items = [...screen.getByTestId("shortcuts").children];
+    expect(items[0]).toHaveTextContent("Snelkoppelingen");
+    expect(items[1]).toHaveTextContent("Invoer bezig (1)");
+    expect(items[2]).toHaveTextContent("Niet afgeronde invoer (0)");
+    expect(items[3]).toHaveTextContent("Eerste invoer klaar (1)");
+    expect(items[4]).toHaveTextContent("Werkvoorraad (2)");
 
-    expect(inProgress).toHaveTextContent("Invoer bezig (1)");
-    expect(unfinished).toHaveTextContent("Niet afgeronde invoer (0)");
-    expect(definitive).toHaveTextContent("Eerste invoer klaar (1)");
-    expect(notStarted).toHaveTextContent("Werkvoorraad (2)");
-    expect(multiProgressBar).toBeInTheDocument();
+    expect(screen.getByTestId("progressbar-all")).toBeInTheDocument();
+    const bars = [...screen.getByTestId("multi-outer-bar").children];
+    const expectedData = [
+      { percentage: 25, class: "definitive" },
+      { percentage: 0, class: "unfinished" },
+      { percentage: 25, class: "in-progress" },
+      { percentage: 50, class: "not-started" },
+    ];
+    bars.forEach((bar, index) => {
+      expect(bar.getAttribute("style")).toEqual(`width: ${expectedData[index]?.percentage}%;`);
+      expect(bar.classList.contains(`${expectedData[index]?.class}`)).toBeTruthy();
+    });
   });
 });

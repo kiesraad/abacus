@@ -56,7 +56,7 @@ export function ElectionStatusProgress() {
 
   return (
     <Progress>
-      <div className="column">
+      <div id="shortcuts" className="column">
         <h2>Snelkoppelingen</h2>
         {statusCategories.map((cat) => {
           return (
@@ -67,7 +67,7 @@ export function ElectionStatusProgress() {
           );
         })}
       </div>
-      <div className="column">
+      <div id="progress" className="column">
         <h2>Voortgang</h2>
         <ProgressBar key="all" id="all" data={progressBarData} spacing="small" />
       </div>

@@ -38,30 +38,30 @@
   height: 100%;
 }
 
-.default {
+:global(.default) {
   background-color: var(--progress-bar-default);
 }
 
-.errors-and-warnings {
+:global(.errors-and-warnings) {
   background-color: var(--progress-bar-errors-and-warnings);
 }
 
-.unfinished {
+:global(.unfinished) {
   background-color: var(--progress-bar-unfinished);
 }
 
-.in-progress {
+:global(.in-progress) {
   background-color: var(--progress-bar-in-progress);
 }
 
-.first-entry-finished {
+:global(.first-entry-finished) {
   background-color: var(--progress-bar-first-entry-finished);
 }
 
-.definitive {
+:global(.definitive) {
   background-color: var(--progress-bar-definitive);
 }
 
-.not-started {
+:global(.not-started) {
   background-color: var(--progress-bar-not-started);
 }

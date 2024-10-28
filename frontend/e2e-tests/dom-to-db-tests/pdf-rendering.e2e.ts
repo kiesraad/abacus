@@ -6,7 +6,7 @@ import { stat } from "node:fs/promises";
 import { test } from "./fixtures";
 
 test.describe("pdf rendering", () => {
-  test("it renders a pdf", async ({ page }) => {
+  test("it downloads a pdf", async ({ page }) => {
     await page.goto("/elections/4/status#coordinator");
 
     const electionStatusPage = new ElectionStatus(page);

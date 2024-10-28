@@ -1,10 +1,12 @@
-import { useEffect, useRef } from "react";
+import { ReactElement, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
+import { t, tx } from "@kiesraad/i18n";
 import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
 import cls from "./Feedback.module.css";
-import { ClientValidationResultCode, FeedbackItem, feedbackTypes } from "./Feedback.types";
+import { ClientValidationResultCode, FeedbackItem } from "./Feedback.types";
 
 interface FeedbackProps {
   id: FeedbackId;
@@ -14,12 +16,17 @@ interface FeedbackProps {
 
 export function Feedback({ id, type, data }: FeedbackProps) {
   const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
-  const feedbackList: FeedbackItem[] = [];
-  if (data) {
-    for (const code of data) {
-      feedbackList.push(feedbackTypes[code]);
-    }
-  }
+  const link = (children: ReactElement) => <Link to={`../voters-and-votes`}>{children}</Link>;
+
+  const feedbackList: FeedbackItem[] =
+    data?.map(
+      (code: ClientValidationResultCode): FeedbackItem => ({
+        title: t(`feedback.${code}.title`),
+        code: `${code[0]}.${code.slice(1)}`,
+        content: tx(`feedback.${code}.content`, { link }),
+        action: code == "F101" ? tx(`feedback.F101.action`, {}) : undefined,
+      }),
+    ) || [];
 
   useEffect(() => {
     feedbackHeader.current?.focus();

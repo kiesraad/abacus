@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { ApiError, ApiResponseStatus } from "./ApiClient";
+import { ApiError } from "./ApiError";
+import { ApiResponseStatus } from "./ApiResponseStatus";
 import { useApi } from "./useApi";
 
 export type UseApiGetRequestReturn<T> = {

@@ -1,7 +1,8 @@
-import { ElectionListResponse } from "@kiesraad/api";
+import { ELECTION_LIST_REQUEST_PATH, ElectionListResponse } from "@kiesraad/api";
 
 import { useApiGetRequest } from "./useApiGetRequest";
 
 export function useElectionListRequest() {
-  return useApiGetRequest<ElectionListResponse>("/api/elections");
+  const path: ELECTION_LIST_REQUEST_PATH = "/api/elections";
+  return useApiGetRequest<ElectionListResponse>(path);
 }

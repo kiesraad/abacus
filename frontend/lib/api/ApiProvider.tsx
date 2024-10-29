@@ -8,12 +8,7 @@ export interface ApiProviderProps {
 }
 
 export function ApiProvider({ children }: ApiProviderProps) {
-  const context = React.useMemo(
-    () => ({
-      client: new ApiClient(),
-    }),
-    [],
-  );
+  const client = new ApiClient();
 
-  return <ApiProviderContext.Provider value={context}>{children}</ApiProviderContext.Provider>;
+  return <ApiProviderContext.Provider value={{ client }}>{children}</ApiProviderContext.Provider>;
 }

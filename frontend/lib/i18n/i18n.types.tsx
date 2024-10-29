@@ -2,7 +2,6 @@ export type TranslationKey = keyof Translation;
 
 export enum Locale {
   nl = "nl",
-  en = "en",
 }
 
 export interface Translation {

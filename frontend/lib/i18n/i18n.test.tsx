@@ -1,19 +1,14 @@
 import { renderToString } from "react-dom/server";
 
-import { Locale, setLocale, updateTranslation } from ".";
+import { updateTranslation } from ".";
 import { describe, expect, test } from "vitest";
 
 import { t, tx } from "./i18n";
 
 describe("i18n", () => {
   test("Use translation functions", () => {
-    // simple nl trabnslation
+    // simple translation
     expect(t("election")).toEqual("Verkiezing");
-    setLocale(Locale.en);
-
-    // simple en translation
-    expect(t("election")).toEqual("Election");
-    setLocale(Locale.nl);
 
     // variable interpolation
     updateTranslation("test", "Hello {item}!");

@@ -26,7 +26,9 @@ const expectRecountedForm = async (headingShouldHaveFocus = true) => {
   });
   if (headingShouldHaveFocus) {
     await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 2, name: "Is er herteld?" })).toHaveFocus();
+      expect(
+        screen.getByRole("heading", { level: 2, name: "Is het selectievakje op de eerste pagina aangevinkt?" }),
+      ).toHaveFocus();
     });
   }
 };

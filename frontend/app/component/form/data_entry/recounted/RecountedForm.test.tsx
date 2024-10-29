@@ -57,7 +57,10 @@ describe("Test RecountedForm", () => {
 
       render(Component);
 
-      const formTitle = await screen.findByRole("heading", { level: 2, name: "Is er herteld?" });
+      const formTitle = await screen.findByRole("heading", {
+        level: 2,
+        name: "Is het selectievakje op de eerste pagina aangevinkt?",
+      });
       expect(formTitle).toHaveFocus();
       await user.keyboard("{tab}");
 

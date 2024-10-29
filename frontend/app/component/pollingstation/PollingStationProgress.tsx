@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useCallback } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import {
@@ -12,11 +12,10 @@ import { MenuStatus, ProgressList } from "@kiesraad/ui";
 
 export function PollingStationProgress() {
   const { pollingStationId } = useParams();
-  const { election } = useElection();
-
+  const { election } = useElection(1);
   const { formState, values } = usePollingStationFormController();
 
-  const menuStatusForFormSection = React.useCallback(
+  const menuStatusForFormSection = useCallback(
     (formSection?: FormSection): MenuStatus => {
       if (!formSection) return "idle";
 
@@ -48,6 +47,10 @@ export function PollingStationProgress() {
     },
     [formState, values],
   );
+
+  if (!election) {
+    return null;
+  }
 
   const lists = election.political_groups;
   const currentIndex = formState.sections[formState.furthest]?.index || 0;

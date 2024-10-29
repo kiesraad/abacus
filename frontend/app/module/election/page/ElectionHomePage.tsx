@@ -8,7 +8,11 @@ import { useElection } from "@kiesraad/api";
 import { PageTitle } from "@kiesraad/ui";
 
 export function ElectionHomePage() {
-  const { election } = useElection();
+  const { election } = useElection(1);
+
+  if (!election) {
+    return null;
+  }
 
   return (
     <>

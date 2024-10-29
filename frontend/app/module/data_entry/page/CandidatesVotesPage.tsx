@@ -7,10 +7,14 @@ import { parseIntStrict } from "@kiesraad/util";
 
 export function CandidatesVotesPage() {
   const { listNumber } = useParams();
-  const { election } = useElection();
+  const { election } = useElection(1);
 
   if (!listNumber) {
     throw new Error("Missing 'listNumber' parameter");
+  }
+
+  if (!election) {
+    return null;
   }
 
   const parsedListNumber = parseIntStrict(listNumber);

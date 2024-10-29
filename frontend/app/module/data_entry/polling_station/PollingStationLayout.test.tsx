@@ -5,13 +5,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { PollingStationLayout } from "app/module/data_entry";
 import { overrideOnce, render, screen, within } from "app/test/unit";
 
-import {
-  Election,
-  ElectionListProvider,
-  ElectionProvider,
-  ElectionStatusProvider,
-  PollingStationFormController,
-} from "@kiesraad/api";
+import { Election, ElectionListProvider, ElectionStatusProvider, PollingStationFormController } from "@kiesraad/api";
 import { electionDetailsMockResponse, pollingStationMockData } from "@kiesraad/api-mocks";
 
 describe("PollingStationLayout", () => {
@@ -29,17 +23,15 @@ describe("PollingStationLayout", () => {
   test("Render", async () => {
     render(
       <ElectionListProvider>
-        <ElectionProvider electionId={election.id}>
-          <ElectionStatusProvider electionId={election.id}>
-            <PollingStationFormController
-              election={election}
-              pollingStationId={pollingStationMockData.id}
-              entryNumber={1}
-            >
-              <PollingStationLayout />
-            </PollingStationFormController>
-          </ElectionStatusProvider>
-        </ElectionProvider>
+        <ElectionStatusProvider electionId={election.id}>
+          <PollingStationFormController
+            election={election}
+            pollingStationId={pollingStationMockData.id}
+            entryNumber={1}
+          >
+            <PollingStationLayout />
+          </PollingStationFormController>
+        </ElectionStatusProvider>
       </ElectionListProvider>,
     );
 

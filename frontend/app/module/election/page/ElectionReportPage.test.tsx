@@ -4,7 +4,7 @@ import { describe, expect, test, vi } from "vitest";
 import { ElectionReportPage } from "app/module/election";
 import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "app/test/unit";
 
-import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
+import { ElectionStatusProvider } from "@kiesraad/api";
 
 describe("ElectionReportPage", () => {
   test("Error when election is not ready", async () => {
@@ -37,11 +37,9 @@ describe("ElectionReportPage", () => {
     });
 
     render(
-      <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <ElectionReportPage />
-        </ElectionStatusProvider>
-      </ElectionProvider>,
+      <ElectionStatusProvider electionId={1}>
+        <ElectionReportPage />
+      </ElectionStatusProvider>,
     );
 
     expect(await screen.findByRole("button", { name: "Download proces-verbaal" })).toBeVisible();

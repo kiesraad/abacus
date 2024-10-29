@@ -5,7 +5,11 @@ import { NavBar } from "app/component/navbar/NavBar";
 import { useElection } from "@kiesraad/api";
 
 export function PollingStationsLayout() {
-  const { election } = useElection();
+  const { election } = useElection(1);
+
+  if (!election) {
+    return null;
+  }
 
   return (
     <div className="app-layout">

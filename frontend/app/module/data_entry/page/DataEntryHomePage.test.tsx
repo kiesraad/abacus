@@ -5,18 +5,16 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { overrideOnce, Providers, render, screen, setupTestRouter, waitFor, within } from "app/test/unit";
 
-import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
+import { ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
 
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
 const renderDataEntryHomePage = () =>
   render(
-    <ElectionProvider electionId={1}>
-      <ElectionStatusProvider electionId={1}>
-        <DataEntryHomePage />
-      </ElectionStatusProvider>
-    </ElectionProvider>,
+    <ElectionStatusProvider electionId={1}>
+      <DataEntryHomePage />
+    </ElectionStatusProvider>,
   );
 
 describe("DataEntryHomePage", () => {
@@ -109,11 +107,9 @@ describe("DataEntryHomePage", () => {
 
     // unmount DataEntryHomePage, but keep the providers as-is
     rerender(
-      <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <></>
-        </ElectionStatusProvider>
-      </ElectionProvider>,
+      <ElectionStatusProvider electionId={1}>
+        <></>
+      </ElectionStatusProvider>,
     );
     await waitFor(() => {
       expect(screen.queryByText("Welk stembureau ga je invoeren?")).not.toBeInTheDocument();
@@ -129,11 +125,9 @@ describe("DataEntryHomePage", () => {
 
     // rerender DataEntryHomePage and expect the new status to be fetched
     rerender(
-      <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <DataEntryHomePage />
-        </ElectionStatusProvider>
-      </ElectionProvider>,
+      <ElectionStatusProvider electionId={1}>
+        <DataEntryHomePage />
+      </ElectionStatusProvider>,
     );
     expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
   });

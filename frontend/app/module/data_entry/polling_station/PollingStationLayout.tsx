@@ -13,8 +13,17 @@ import { usePollingStationStatus } from "@kiesraad/util";
 
 export function PollingStationLayout() {
   const { pollingStationId } = useParams();
-  const { election, pollingStation } = useElection(pollingStationId);
+
+  if (!pollingStationId) {
+    throw new NotFoundError("Stembureau niet gevonden");
+  }
+
+  const { election, pollingStation } = useElection(parseInt(pollingStationId, 10));
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
+
+  if (!election) {
+    return null;
+  }
 
   if (!pollingStation) {
     throw new NotFoundError("Stembureau niet gevonden");

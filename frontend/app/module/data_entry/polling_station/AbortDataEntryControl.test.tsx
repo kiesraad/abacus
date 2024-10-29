@@ -10,7 +10,6 @@ import { overrideOnce, render, screen, server } from "app/test/unit";
 import { emptyDataEntryRequest } from "app/test/unit/form";
 
 import {
-  ElectionProvider,
   ErrorResponse,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationFormController,
@@ -22,16 +21,14 @@ const mockNavigate = vi.fn();
 
 const renderAbortDataEntryControl = () => {
   render(
-    <ElectionProvider electionId={1}>
-      <PollingStationFormController
-        election={electionMockData}
-        pollingStationId={pollingStationMockData.id}
-        entryNumber={1}
-      >
-        <AbortDataEntryControl />
-        <VotersAndVotesForm />
-      </PollingStationFormController>
-    </ElectionProvider>,
+    <PollingStationFormController
+      election={electionMockData}
+      pollingStationId={pollingStationMockData.id}
+      entryNumber={1}
+    >
+      <AbortDataEntryControl />
+      <VotersAndVotesForm />
+    </PollingStationFormController>,
   );
 };
 

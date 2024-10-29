@@ -8,9 +8,12 @@ import { AbortDataEntryModal } from "./AbortDataEntryModal";
 
 export function AbortDataEntryControl() {
   const navigate = useNavigate();
-  const { election } = useElection();
-
+  const { election } = useElection(1);
   const [openAbortModal, setOpenAbortModal] = useState(false);
+
+  if (!election) {
+    return null;
+  }
 
   function toggleAbortModal() {
     setOpenAbortModal(!openAbortModal);

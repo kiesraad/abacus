@@ -4,16 +4,14 @@ import { describe, expect, test } from "vitest";
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 import { overrideOnce, render, screen, within } from "app/test/unit";
 
-import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
+import { ElectionStatusProvider } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionStatusMockResponse } from "@kiesraad/api-mocks";
 
 function renderPollingStationChoicePage() {
   render(
-    <ElectionProvider electionId={1}>
-      <ElectionStatusProvider electionId={1}>
-        <PollingStationChoiceForm />
-      </ElectionStatusProvider>
-    </ElectionProvider>,
+    <ElectionStatusProvider electionId={1}>
+      <PollingStationChoiceForm />
+    </ElectionStatusProvider>,
   );
 }
 
@@ -46,11 +44,9 @@ describe("Test PollingStationChoiceForm", () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
       render(
-        <ElectionProvider electionId={1}>
-          <ElectionStatusProvider electionId={1}>
-            <PollingStationChoiceForm anotherEntry />
-          </ElectionStatusProvider>
-        </ElectionProvider>,
+        <ElectionStatusProvider electionId={1}>
+          <PollingStationChoiceForm anotherEntry />
+        </ElectionStatusProvider>,
       );
       expect(await screen.findByRole("heading", { level: 2, name: "Verder met een volgend stembureau?" }));
       const pollingStation = screen.getByTestId("pollingStation");
@@ -131,11 +127,9 @@ describe("Test PollingStationChoiceForm", () => {
       overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
       const user = userEvent.setup();
       render(
-        <ElectionProvider electionId={1}>
-          <ElectionStatusProvider electionId={1}>
-            <PollingStationChoiceForm anotherEntry />
-          </ElectionStatusProvider>
-        </ElectionProvider>,
+        <ElectionStatusProvider electionId={1}>
+          <PollingStationChoiceForm anotherEntry />
+        </ElectionStatusProvider>,
       );
 
       const submitButton = await screen.findByRole("button", { name: "Beginnen" });

@@ -6,7 +6,7 @@ import { useElection, useElectionStatus } from "@kiesraad/api";
 import { Button, PageTitle } from "@kiesraad/ui";
 
 export function ElectionReportPage() {
-  const { election } = useElection();
+  const { election } = useElection(1);
   const { statuses } = useElectionStatus();
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
@@ -15,6 +15,10 @@ export function ElectionReportPage() {
   }
 
   function downloadResults() {
+    if (election === null) {
+      return;
+    }
+
     let filename: string;
     fetch(`/api/elections/${election.id}/download_results`)
       .then((result) => {
@@ -49,6 +53,10 @@ export function ElectionReportPage() {
           console.error(error);
         },
       );
+  }
+
+  if (election === null) {
+    return;
   }
 
   return (

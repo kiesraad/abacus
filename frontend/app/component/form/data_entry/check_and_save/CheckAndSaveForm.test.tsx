@@ -7,7 +7,7 @@ import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/C
 import { overrideOnce, render, screen, server, within } from "app/test/unit";
 import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/test/unit/form";
 
-import { ElectionProvider, FormState, PollingStationFormController, PollingStationResults } from "@kiesraad/api";
+import { FormState, PollingStationFormController, PollingStationResults } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionMockData } from "@kiesraad/api-mocks";
 
 const mockNavigate = vi.fn();
@@ -16,17 +16,15 @@ const defaultValues = emptyDataEntryRequest.data;
 
 function renderForm(defaultFormState: Partial<FormState> = {}, defaultValues?: Partial<PollingStationResults>) {
   return render(
-    <ElectionProvider electionId={1}>
-      <PollingStationFormController
-        election={electionMockData}
-        pollingStationId={1}
-        entryNumber={1}
-        defaultFormState={defaultFormState}
-        defaultValues={defaultValues}
-      >
-        <CheckAndSaveForm />
-      </PollingStationFormController>
-    </ElectionProvider>,
+    <PollingStationFormController
+      election={electionMockData}
+      pollingStationId={1}
+      entryNumber={1}
+      defaultFormState={defaultFormState}
+      defaultValues={defaultValues}
+    >
+      <CheckAndSaveForm />
+    </PollingStationFormController>,
   );
 }
 

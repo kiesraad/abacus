@@ -7,6 +7,5 @@ export * from "./ApiClient";
 export * from "./ApiProvider";
 export * from "./useApi";
 export * from "./useApiGetRequest";
-export * from "./useElectionDataRequest";
 export * from "./useElectionListRequest";
 export * from "./useElectionStatusRequest";

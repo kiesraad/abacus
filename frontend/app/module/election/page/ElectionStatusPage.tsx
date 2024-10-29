@@ -9,11 +9,15 @@ import { Alert, Button, PageTitle } from "@kiesraad/ui";
 
 export function ElectionStatusPage() {
   const navigate = useNavigate();
-  const { election } = useElection();
+  const { election } = useElection(1);
   const { statuses } = useElectionStatus();
 
   function finishInput() {
     navigate("../report#coordinator");
+  }
+
+  if (!election) {
+    return null;
   }
 
   return (

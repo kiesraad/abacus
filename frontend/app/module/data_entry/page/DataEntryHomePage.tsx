@@ -12,13 +12,17 @@ import { Alert, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { election } = useElection();
+  const { election } = useElection(1);
   const { statuses, refetch } = useElectionStatus();
 
   // re-fetch statuses when component mounts
   useEffect(() => {
     refetch();
   }, [refetch]);
+
+  if (!election) {
+    return null;
+  }
 
   const showDataEntrySavedAlert = location.hash === "#data-entry-saved";
 

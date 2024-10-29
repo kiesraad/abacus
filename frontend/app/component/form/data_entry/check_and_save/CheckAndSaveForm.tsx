@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { getUrlForFormSectionID } from "app/component/pollingstation/utils";
@@ -13,16 +14,17 @@ import {
 import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusList } from "@kiesraad/ui";
 
 export function CheckAndSaveForm() {
+  const electionId = 1;
   const navigate = useNavigate();
-  const { election } = useElection();
+  useElection(electionId);
   const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId, values } =
     usePollingStationFormController();
 
-  const getUrlForFormSection = React.useCallback(
+  const getUrlForFormSection = useCallback(
     (id: FormSectionID) => {
-      return getUrlForFormSectionID(election.id, pollingStationId, id);
+      return getUrlForFormSectionID(electionId, pollingStationId, id);
     },
-    [election, pollingStationId],
+    [electionId, pollingStationId],
   );
 
   React.useEffect(() => {
@@ -47,7 +49,7 @@ export function CheckAndSaveForm() {
       if (!finalisationAllowed) return;
 
       await finaliseDataEntry();
-      navigate(`/elections/${election.id}/data-entry#data-entry-saved`);
+      navigate(`/elections/${electionId}/data-entry#data-entry-saved`);
     })(event);
 
   return (

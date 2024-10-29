@@ -3,16 +3,14 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { ElectionStatusPage } from "app/module/election";
 import { overrideOnce, render, screen } from "app/test/unit";
 
-import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
+import { ElectionStatusProvider } from "@kiesraad/api";
 import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
 
 const renderElectionStatusPage = () =>
   render(
-    <ElectionProvider electionId={1}>
-      <ElectionStatusProvider electionId={1}>
-        <ElectionStatusPage />
-      </ElectionStatusProvider>
-    </ElectionProvider>,
+    <ElectionStatusProvider electionId={1}>
+      <ElectionStatusPage />
+    </ElectionStatusProvider>,
   );
 
 describe("ElectionStatusPage", () => {

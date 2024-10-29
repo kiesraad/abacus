@@ -24,7 +24,7 @@ const DEFINITIVE_POLLING_STATION_ALERT: string =
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
 
-  const { pollingStations } = useElection();
+  const { pollingStations } = useElection(1);
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,7 +39,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   useMemo(() => {
     const parsedInt = parsePollingStationNumber(pollingStationNumber);
     setLoading(true);
-    debouncedCallback(pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt));
+    debouncedCallback(pollingStations?.find((pollingStation: PollingStation) => pollingStation.number === parsedInt));
   }, [pollingStationNumber, pollingStations, debouncedCallback]);
 
   const handleSubmit = () => {
@@ -49,7 +49,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     }
 
     const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
-    const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
+    const pollingStation = pollingStations?.find((pollingStation) => pollingStation.number === parsedStationNumber);
     const pollingStationStatusEntry = electionStatus.statuses.find((status) => status.id === pollingStation?.id);
 
     if (pollingStationStatusEntry?.status === "definitive") {
@@ -69,7 +69,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
   const unfinished = electionStatus.statuses
     .filter((status) => status.status === "first_entry_unfinished")
-    .map((status) => pollingStations.find((ps) => ps.id === status.id));
+    .map((status) => pollingStations?.find((ps) => ps.id === status.id));
 
   return (
     <form
@@ -142,17 +142,13 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           </span>
         </summary>
         <h2 className="form_title table_title">Kies het stembureau</h2>
-        {(() => {
-          if (pollingStations.length === 0) {
-            return (
-              <Alert type={"error"} variant="small">
-                <p>Geen stembureaus gevonden</p>
-              </Alert>
-            );
-          } else {
-            return <PollingStationsList pollingStations={pollingStations} />;
-          }
-        })()}
+        {pollingStations && pollingStations.length > 0 ? (
+          <PollingStationsList pollingStations={pollingStations} />
+        ) : (
+          <Alert type={"error"} variant="small">
+            <p>Geen stembureaus gevonden</p>
+          </Alert>
+        )}
       </details>
     </form>
   );

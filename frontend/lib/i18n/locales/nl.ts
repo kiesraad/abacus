@@ -9,10 +9,10 @@ export const nl = {
 
   "election_status.title": "Status verkiezing - Abacus",
   "election_status.first_session": "Eerste zitting",
-  "election_status.difinitive.title": "Alle stembureaus zijn twee keer ingevoerd",
-  "election_status.difititive.message":
+  "election_status.definitive.title": "Alle stembureaus zijn twee keer ingevoerd",
+  "election_status.definitive.message":
     "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
-  "election_status.difititive.finish_button": "Invoerfase afronden",
+  "election_status.definitive.finish_button": "Invoerfase afronden",
 
   "account.configured": "Je account is ingesteld",
   "feedback.F101.title": "Controleer het papieren proces-verbaal",

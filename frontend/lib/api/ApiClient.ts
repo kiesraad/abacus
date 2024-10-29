@@ -22,7 +22,7 @@ export class ApiClient {
       };
     }
 
-    return {};
+    return {} as RequestInit;
   }
 
   // handle a response with a JSON body, and return an error when there is a non-2xx status or a non-JSON body
@@ -114,12 +114,13 @@ export class ApiClient {
       const isJson = response.headers.get("Content-Type") === "application/json";
 
       if (isJson) {
-        return this.handleJsonBody<T>(response);
+        return await this.handleJsonBody<T>(response);
       }
 
-      return this.handleEmptyBody(response);
-    } catch (e) {
-      return new ApiError(ApiResponseStatus.ServerError, 500, `Network error: ${e}`);
+      return await this.handleEmptyBody(response);
+    } catch (e: unknown) {
+      const message = `Network error: ${(e as Error).message}` || "Network error";
+      return new ApiError(ApiResponseStatus.ServerError, 500, message);
     }
   }
 

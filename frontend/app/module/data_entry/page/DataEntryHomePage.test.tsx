@@ -3,7 +3,7 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { overrideOnce, Providers, render, screen, setupTestRouter, waitFor, within } from "app/test/unit";
+import { overrideOnce, Providers, render, screen, setupTestRouter, within } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { electionDetailsMockResponse } from "@kiesraad/api-mocks";

@@ -17,9 +17,10 @@ export function DataEntryHomePage() {
 
   // re-fetch statuses when component mounts
   useEffect(() => {
-    console.log("DataEntryHomePage: refetching statuses");
-    refetch();
-  }, []);
+    refetch().catch((e: unknown) => {
+      throw e;
+    });
+  }, [refetch]);
 
   const showDataEntrySavedAlert = location.hash === "#data-entry-saved";
 

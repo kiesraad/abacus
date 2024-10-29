@@ -10,5 +10,5 @@ export interface ApiProviderProps {
 export function ApiProvider({ children }: ApiProviderProps) {
   const client = new ApiClient();
 
-  return <ApiProviderContext.Provider value={{ client }}>{children}</ApiProviderContext.Provider>;
+  return <ApiProviderContext.Provider value={client}>{children}</ApiProviderContext.Provider>;
 }

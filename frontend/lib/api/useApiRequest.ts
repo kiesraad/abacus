@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { ApiResult } from "./api.types";
 import { ApiError, NetworkError } from "./ApiError";
 import { useApi } from "./useApi";
 
@@ -22,7 +23,7 @@ export type ApiRequestState<T> =
 
 export type UseApiRequestReturn<T> = {
   state: ApiRequestState<T>;
-  refetch: () => void;
+  refetch: (controller?: AbortController) => Promise<ApiResult<T>>;
 };
 
 export function useApiRequest<T>(path: string): UseApiRequestReturn<T> {
@@ -30,11 +31,11 @@ export function useApiRequest<T>(path: string): UseApiRequestReturn<T> {
   const [state, setState] = useState<ApiRequestState<T>>({ status: "loading" });
 
   const fetchData = useCallback(
-    async (controller?: AbortController) => {
+    async (controller?: AbortController): Promise<ApiResult<T>> => {
       const result = await client.getRequest<T>(path, controller);
 
       if (controller instanceof AbortController && controller.signal.aborted) {
-        return;
+        return result;
       }
 
       if (result instanceof ApiError) {
@@ -45,18 +46,17 @@ export function useApiRequest<T>(path: string): UseApiRequestReturn<T> {
         setState({ status: "success", data: result.data });
       }
 
-      return () => {
-        if (controller) {
-          controller.abort();
-        }
-      };
+      return result;
     },
     [client, path],
   );
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchData(controller);
+
+    fetchData(controller).catch((e: unknown) => {
+      throw e;
+    });
 
     return () => {
       controller.abort();

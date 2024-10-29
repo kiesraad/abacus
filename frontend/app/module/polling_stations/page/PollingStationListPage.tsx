@@ -11,11 +11,17 @@ const labelForPollingStationType: { [K in PollingStationType]: string } = {
 
 export function PollingStationListPage() {
   const electionId = useNumericParam("electionId");
-  const { data, loading } = usePollingStationListRequest(electionId);
+  const { state } = usePollingStationListRequest(electionId);
 
-  if (loading) {
+  if (state.status === "loading") {
     return null;
   }
+
+  if (state.status === "api-error" || state.status === "network-error") {
+    throw state.error;
+  }
+
+  const data = state.data;
 
   return (
     <>
@@ -26,7 +32,7 @@ export function PollingStationListPage() {
         </section>
       </header>
       <main>
-        {!data?.polling_stations.length ? (
+        {!data.polling_stations.length ? (
           <article>
             <h2>Hoe wil je stembureaus toevoegen?</h2>
             Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.

@@ -46,7 +46,7 @@ export function t(k: keyof Translation, vars?: Record<string, string>): string {
  * return (
  *  <div>
  *    <h1>{t('internal_error')}</h1>
- *    <p>{t('check_manual_instruction', { link: (title) => <a href="/manual">{title}</a> })}</p>
+ *    <p>{tx('check_manual_instruction', { link: (title) => <a href="/manual">{title}</a> })}</p>
  *  </div>
  * );
  */

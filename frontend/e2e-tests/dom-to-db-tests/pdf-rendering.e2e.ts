@@ -11,10 +11,16 @@ test.describe("pdf rendering", () => {
 
     const electionStatusPage = new ElectionStatus(page);
     await electionStatusPage.finish.click();
-
+    
     const electionReportPage = new ElectionReport(page);
+    const responsePromise = page.waitForResponse('/api/elections/4/download_results');
     const downloadPromise = page.waitForEvent("download");
     await electionReportPage.download.click();
+
+    const response = await responsePromise;
+    expect(response.status()).toBe(200);
+    expect(await response.headerValue("content-type")).toBe("application/pdf")
+
     const download = await downloadPromise;
 
     expect(download.suggestedFilename()).toBe("model-na-31-2.pdf");

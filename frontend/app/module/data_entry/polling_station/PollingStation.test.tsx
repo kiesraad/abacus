@@ -576,7 +576,7 @@ describe("Polling Station data entry integration tests", () => {
         submit,
 
         () => expectPoliticalGroupCandidatesForm(1),
-        () => expectElementContainsIcon("list-item-differences", "bevat een waarschuwing"),
+        () => expectElementContainsIcon("list-item-differences", "opgeslagen"),
 
         () => gotoForm("voters_and_votes"),
         () =>

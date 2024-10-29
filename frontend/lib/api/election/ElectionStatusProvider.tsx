@@ -12,9 +12,7 @@ export interface ElectionStatusProviderProps {
 }
 
 export function ElectionStatusProvider({ children, electionId }: ElectionStatusProviderProps) {
-  const { data, error, refetch } = useElectionStatusRequest({
-    election_id: electionId,
-  });
+  const { data, error, refetch } = useElectionStatusRequest(electionId);
 
   if (error && error.code === 404) {
     throw new NotFoundError("Er ging iets mis bij het ophalen van de verkiezing");

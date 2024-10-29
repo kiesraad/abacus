@@ -12,9 +12,7 @@ export interface ElectionProviderProps {
 }
 
 export function ElectionProvider({ children, electionId }: ElectionProviderProps) {
-  const { data, loading, error } = useElectionDataRequest({
-    election_id: electionId,
-  });
+  const { data, loading, error } = useElectionDataRequest(electionId);
 
   if (loading) {
     return null;

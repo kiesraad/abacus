@@ -9,13 +9,7 @@ import { useElectionDataRequest } from "./useElectionDataRequest";
 describe("Test useElectionDataRequest", () => {
   test("doRequest returns expected data", async () => {
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-    const { result } = renderHook(
-      () =>
-        useElectionDataRequest({
-          election_id: 1,
-        }),
-      { wrapper: Providers },
-    );
+    const { result } = renderHook(() => useElectionDataRequest(1), { wrapper: Providers });
 
     expect(result.current.loading).toBe(true);
     await waitFor(() => {

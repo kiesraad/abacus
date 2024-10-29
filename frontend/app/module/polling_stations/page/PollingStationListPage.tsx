@@ -11,7 +11,7 @@ const labelForPollingStationType: { [K in PollingStationType]: string } = {
 
 export function PollingStationListPage() {
   const electionId = useNumericParam("electionId");
-  const { data, loading } = usePollingStationListRequest({ election_id: electionId });
+  const { data, loading } = usePollingStationListRequest(electionId);
 
   if (loading) {
     return null;

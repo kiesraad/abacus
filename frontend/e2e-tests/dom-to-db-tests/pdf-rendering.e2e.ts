@@ -19,7 +19,7 @@ test.describe("pdf rendering", () => {
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);
-    expect(await response.headerValue("content-type")).toBe("application/pdf")
+    expect(await response.headerValue("content-type")).toBe("application/pdf");
 
     const download = await downloadPromise;
 

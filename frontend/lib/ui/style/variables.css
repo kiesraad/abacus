@@ -1,22 +1,22 @@
 @font-face {
   font-family: "SpaceGrotesk";
-  src: url("/font/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf") format("TrueType");
+  src: url("/static/font/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf") format("TrueType");
 }
 
 @font-face {
   font-family: "DMSans";
-  src: url("/font/DM_Sans/DMSans-VariableFont_opsz,wght.ttf") format("TrueType");
+  src: url("/static/font/DM_Sans/DMSans-VariableFont_opsz,wght.ttf") format("TrueType");
   font-weight: 1 1000;
 }
 
 @font-face {
   font-family: "DMSansItalic";
-  src: url("/font/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf") format("TrueType");
+  src: url("/static/font/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf") format("TrueType");
 }
 
 @font-face {
   font-family: "GeistMono";
-  src: url("/font/Geist_Mono/GeistMono-Regular.otf") format("opentype");
+  src: url("/static/font/Geist_Mono/GeistMono-Regular.otf") format("opentype");
   font-feature-settings: "ss09" on;
 }
 
@@ -149,4 +149,12 @@
   --purple-800: #4a1fb8;
 
   --menu-warning: var(--color-warning-darker);
+
+  --progress-bar-default: var(--color-notify);
+  --progress-bar-errors-and-warnings: var(--color-error-darker);
+  --progress-bar-unfinished: #ff692e;
+  --progress-bar-in-progress: #fac515;
+  --progress-bar-first-entry-finished: #66c61c;
+  --progress-bar-definitive: #099250;
+  --progress-bar-not-started: var(--bg-gray-darkest);
 }

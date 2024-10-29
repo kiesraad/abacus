@@ -24,6 +24,8 @@ import {
   VotersRecounts,
 } from "@kiesraad/api";
 
+import { PollingStationControllerContext } from "./PollingStationControllerContext";
+
 export interface PollingStationFormControllerProps {
   election: Required<Election>;
   pollingStationId: number;
@@ -71,25 +73,10 @@ export type AnyFormReference =
   | FormReferencePoliticalGroupVotes
   | FormReferenceSave;
 
-interface SubmitCurrentFormOptions {
+export interface SubmitCurrentFormOptions {
   acceptWarnings?: boolean;
   aborting?: boolean;
   continueToNextSection?: boolean;
-}
-
-export interface iPollingStationControllerContext {
-  status: React.RefObject<Status>;
-  apiError: ApiError | null;
-  formState: FormState;
-  values: PollingStationResults;
-  setTemporaryCache: (cache: TemporaryCache | null) => boolean;
-  cache: TemporaryCache | null;
-  currentForm: AnyFormReference | null;
-  submitCurrentForm: (params?: SubmitCurrentFormOptions) => Promise<void>;
-  registerCurrentForm: (form: AnyFormReference) => void;
-  deleteDataEntry: () => Promise<void>;
-  finaliseDataEntry: () => Promise<void>;
-  pollingStationId: number;
 }
 
 export type FormSectionID =
@@ -134,10 +121,6 @@ export type TemporaryCache = {
   key: FormSectionID;
   data: unknown;
 };
-
-export const PollingStationControllerContext = React.createContext<iPollingStationControllerContext | undefined>(
-  undefined,
-);
 
 export const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
 
@@ -207,8 +190,8 @@ export function PollingStationFormController({
         setFormState(formState);
         setTargetFormSectionID(INITIAL_FORM_SECTION_ID);
 
-        // save initial data entry
-        const clientState = getClientState(formState, false, false);
+        // save initial data entry, continue is set to true to make sure polling station has status FirstEntryInProgress
+        const clientState = getClientState(formState, false, true);
         const requestBody: SaveDataEntryRequest = {
           data: values,
           client_state: clientState,

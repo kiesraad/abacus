@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 
+import { ElectionStatusProgress } from "app/component/election/ElectionStatusProgress";
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -31,7 +32,7 @@ export function ElectionStatusPage() {
           <h1>{t("election_status.first_session")}</h1>
         </section>
       </header>
-      {statuses.every((s) => s.status === "definitive") && (
+      {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
           <h2>{t("election_status.difinitive.title")}</h2>
           <p>{t("election_status.difititive.message")}</p>
@@ -41,7 +42,8 @@ export function ElectionStatusPage() {
         </Alert>
       )}
       <main>
-        <article>-</article>
+        <ElectionStatusProgress />
+        <article>Placeholder</article>
       </main>
       <Footer />
     </>

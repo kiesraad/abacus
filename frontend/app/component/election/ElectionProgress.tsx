@@ -1,44 +1,44 @@
-import * as React from "react";
+import { useMemo } from "react";
 
-import { useElection, useElectionStatus } from "@kiesraad/api";
-import { ProgressBar } from "@kiesraad/ui";
+import { useElectionStatus } from "@kiesraad/api";
+import { Progress, ProgressBar } from "@kiesraad/ui";
 
 type Stat = {
   title: string;
   id: string;
-  total: number;
   percentage: number;
 };
 
 export function ElectionProgress() {
-  const { pollingStations } = useElection();
   const { statuses } = useElectionStatus();
 
-  const stats: Stat[] = React.useMemo(() => {
-    const total = pollingStations.length;
+  const stats: Stat[] = useMemo(() => {
+    const total = statuses.length;
     const totalDefinitive = statuses.filter((s) => s.status === "definitive").length;
-
     return [
       {
         title: "Alles samen",
         id: "definitive",
-        total: totalDefinitive,
-        percentage: totalDefinitive / total,
+        percentage: total > 0 ? Math.round((totalDefinitive / total) * 100) : 0,
       },
     ];
-  }, [pollingStations, statuses]);
+  }, [statuses]);
 
   return (
-    <div>
-      {stats.map((stat) => (
-        <ProgressBar
-          key={stat.id}
-          id={stat.id}
-          title={stat.title}
-          percent={Math.round(stat.percentage * 100)}
-          spacing="small"
-        />
-      ))}
-    </div>
+    <Progress>
+      <div>
+        <h2 className="form_title">Voortgang</h2>
+        {stats.map((stat) => (
+          <ProgressBar
+            key={stat.id}
+            id={stat.id}
+            data={{ percentage: stat.percentage, class: "default" }}
+            title={stat.title}
+            spacing="small"
+            showPercentage
+          />
+        ))}
+      </div>
+    </Progress>
   );
 }

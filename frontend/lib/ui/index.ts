@@ -17,7 +17,7 @@ export * from "./InputGrid";
 export * from "./KeyboardKeys/KeyboardKeys";
 export * from "./Modal/Modal";
 export * from "./NumberInput/NumberInput";
-export * from "./ProgressBar/ProgressBar";
+export * from "./ProgressBar";
 export * from "./ProgressList/ProgressList";
 export * from "./Spinner/Spinner";
 export * from "./StatusList/StatusList";

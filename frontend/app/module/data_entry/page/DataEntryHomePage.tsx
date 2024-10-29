@@ -50,7 +50,7 @@ export function DataEntryHomePage() {
           </p>
         </Alert>
       )}
-      {statuses.every((s) => s.status === "definitive") && (
+      {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
           <h2>Alle stembureaus zijn ingevoerd</h2>
           <p>Bedankt voor je hulp!</p>
@@ -65,10 +65,7 @@ export function DataEntryHomePage() {
         <article id="polling-station-choice-form">
           <PollingStationChoiceForm anotherEntry={showDataEntrySavedAlert} />
         </article>
-        <nav id="progress">
-          <h2 className="form_title">Voortgang</h2>
-          <ElectionProgress />
-        </nav>
+        <ElectionProgress />
       </main>
       <Footer />
     </>

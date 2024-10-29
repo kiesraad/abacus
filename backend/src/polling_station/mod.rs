@@ -1,4 +1,5 @@
 use axum::extract::{Path, State};
+use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde::{Deserialize, Serialize};
@@ -48,6 +49,37 @@ pub async fn polling_station_list(
     Ok(PollingStationListResponse {
         polling_stations: polling_stations.list(election_id).await?,
     })
+}
+
+/// Get a list of all pollingstations for an election
+#[utoipa::path(
+    post,
+    path = "/api/elections/{election_id}/polling_stations",
+    request_body = NewPollingStationRequest,
+    responses(
+        (status = 201, description = "Polling station created successful", body = PollingStation),
+        (status = 404, description = "Election not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
+)]
+pub async fn polling_station_create(
+    State(polling_stations): State<PollingStations>,
+    State(elections): State<Elections>,
+    Path(election_id): Path<u32>,
+    new_polling_station: NewPollingStationRequest,
+) -> Result<(StatusCode, PollingStation), APIError> {
+    // Check if the election exists, will respond with NOT_FOUND otherwise
+    elections.get(election_id).await?;
+
+    Ok((
+        StatusCode::CREATED,
+        polling_stations
+            .create(election_id, new_polling_station)
+            .await?,
+    ))
 }
 
 #[cfg(test)]

@@ -61,7 +61,8 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route(
             "/:election_id/polling_stations",
-            get(polling_station::polling_station_list),
+            get(polling_station::polling_station_list)
+                .post(polling_station::polling_station_create),
         )
         .route("/:election_id/status", get(election::election_status));
 

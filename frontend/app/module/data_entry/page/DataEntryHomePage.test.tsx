@@ -103,21 +103,19 @@ describe("DataEntryHomePage", () => {
     } satisfies ElectionStatusResponse);
 
     // render and expect the initial status to be fetched
-    const { rerender } = renderDataEntryHomePage();
+    renderDataEntryHomePage();
     expect(await screen.findByText("Welk stembureau ga je invoeren?")).toBeVisible();
     expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
 
     // unmount DataEntryHomePage, but keep the providers as-is
-    rerender(
+    render(
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
           <></>
         </ElectionStatusProvider>
       </ElectionProvider>,
     );
-    await waitFor(() => {
-      expect(screen.queryByText("Welk stembureau ga je invoeren?")).not.toBeInTheDocument();
-    });
+    expect(await screen.findByText("Welk stembureau ga je invoeren?")).toBeVisible();
 
     // new status is that all polling stations are definitive, so the alert should be visible
     overrideOnce("get", "/api/elections/1/status", 200, {
@@ -128,13 +126,8 @@ describe("DataEntryHomePage", () => {
     } satisfies ElectionStatusResponse);
 
     // rerender DataEntryHomePage and expect the new status to be fetched
-    rerender(
-      <ElectionProvider electionId={1}>
-        <ElectionStatusProvider electionId={1}>
-          <DataEntryHomePage />
-        </ElectionStatusProvider>
-      </ElectionProvider>,
-    );
+    renderDataEntryHomePage();
+
     expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
   });
 

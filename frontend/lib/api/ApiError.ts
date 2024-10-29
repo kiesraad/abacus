@@ -15,3 +15,9 @@ export class ApiError extends Error {
     return this;
   }
 }
+
+export class NetworkError extends Error {
+  constructor(public message: string) {
+    super(message);
+  }
+}

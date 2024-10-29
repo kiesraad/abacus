@@ -1,5 +1,5 @@
 import { ApiResult, RequestMethod, ServerError } from "./api.types";
-import { ApiError } from "./ApiError";
+import { ApiError, NetworkError } from "./ApiError";
 import { ApiResponseStatus } from "./ApiResponseStatus";
 
 const MIME_JSON = "application/json";
@@ -56,11 +56,7 @@ export class ApiClient {
     } catch (e) {
       console.error("Error parsing response", e);
 
-      return new ApiError(
-        ApiResponseStatus.ServerError,
-        response.status,
-        `Server response parse error: ${response.status}`,
-      );
+      return new NetworkError((e as Error).message || "Network error");
     }
   }
 
@@ -77,6 +73,8 @@ export class ApiClient {
     }
 
     if (body.length > 0) {
+      console.error("Unexpected data from server:", body);
+
       const message = `Unexpected data from server: ${body}`;
       return new ApiError(ApiResponseStatus.ServerError, response.status, message);
     }
@@ -97,36 +95,46 @@ export class ApiClient {
   }
 
   // perform a HTTP request and handle the response
-  async request<T>(method: RequestMethod, path: string, requestBody?: object): Promise<ApiResult<T>> {
-    const response = await fetch(path, {
-      method,
-      headers: {
-        Accept: "application/json",
-      },
-      ...this.encodeBody(requestBody),
-    });
+  async request<T>(
+    method: RequestMethod,
+    path: string,
+    abort?: AbortController,
+    requestBody?: object,
+  ): Promise<ApiResult<T>> {
+    try {
+      const response = await fetch(path, {
+        method,
+        headers: {
+          Accept: "application/json",
+        },
+        signal: abort?.signal,
+        ...this.encodeBody(requestBody),
+      });
 
-    const isJson = response.headers.get("Content-Type") === "application/json";
+      const isJson = response.headers.get("Content-Type") === "application/json";
 
-    if (isJson) {
-      return this.handleJsonBody<T>(response);
+      if (isJson) {
+        return this.handleJsonBody<T>(response);
+      }
+
+      return this.handleEmptyBody(response);
+    } catch (e) {
+      return new ApiError(ApiResponseStatus.ServerError, 500, `Network error: ${e}`);
     }
-
-    return this.handleEmptyBody(response);
   }
 
   // perform a POST request
-  async postRequest<T>(path: string, requestBody?: object): Promise<ApiResult<T>> {
-    return this.request<T>("POST", path, requestBody);
+  async postRequest<T>(path: string, requestBody?: object, abort?: AbortController): Promise<ApiResult<T>> {
+    return this.request<T>("POST", path, abort, requestBody);
   }
 
   // perform a GET request
-  async getRequest<T>(path: string): Promise<ApiResult<T>> {
-    return this.request<T>("GET", path);
+  async getRequest<T>(path: string, abort?: AbortController): Promise<ApiResult<T>> {
+    return this.request<T>("GET", path, abort);
   }
 
   // perform a DELETE request
-  async deleteRequest<T>(path: string): Promise<ApiResult<T>> {
-    return this.request<T>("DELETE", path);
+  async deleteRequest<T>(path: string, abort?: AbortController): Promise<ApiResult<T>> {
+    return this.request<T>("DELETE", path, abort);
   }
 }

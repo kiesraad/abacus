@@ -1,6 +1,6 @@
 import { Election, ELECTION_DETAILS_REQUEST_PATH, PollingStation } from "@kiesraad/api";
 
-import { useApiGetRequest } from "./useApiGetRequest";
+import { useApiGetRequest } from "./useApiRequest";
 
 export function useElectionDataRequest(electionId: number) {
   const path: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${electionId}`;

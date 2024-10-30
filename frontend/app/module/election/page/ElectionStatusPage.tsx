@@ -34,10 +34,10 @@ export function ElectionStatusPage() {
       </header>
       {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
-          <h2>{t("election_status.difinitive.title")}</h2>
-          <p>{t("election_status.difititive.message")}</p>
+          <h2>{t("election_status.definitive.title")}</h2>
+          <p>{t("election_status.definitive.message")}</p>
           <Button onClick={finishInput} size="md">
-            {t("election_status.difititive.finish_button")}
+            {t("election_status.definitive.finish_button")}
           </Button>
         </Alert>
       )}

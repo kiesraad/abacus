@@ -12,7 +12,10 @@ export class RecountedPage extends DataEntryBasePage {
   constructor(page: Page) {
     super(page);
 
-    this.heading = page.getByRole("heading", { level: 2, name: "Is er herteld?" });
+    this.heading = page.getByRole("heading", {
+      level: 2,
+      name: "Is het selectievakje op de eerste pagina aangevinkt?",
+    });
 
     this.yes = page.getByRole("radio", { name: "Ja, er was een hertelling" });
     this.no = page.getByRole("radio", { name: "Nee, er was geen hertelling" });

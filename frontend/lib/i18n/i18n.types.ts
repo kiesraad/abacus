@@ -15,9 +15,9 @@ export interface Translation {
 
   "election_status.title": string;
   "election_status.first_session": string;
-  "election_status.difinitive.title": string;
-  "election_status.difititive.message": string;
-  "election_status.difititive.finish_button": string;
+  "election_status.definitive.title": string;
+  "election_status.definitive.message": string;
+  "election_status.definitive.finish_button": string;
 
   "account.configured": string;
   "feedback.F101.title": string;

@@ -1,29 +1,31 @@
 services:
-  api:
-    image: ghcr.io/tweedegolf/rust-dev:stable
+  backend:
+    image: ghcr.io/tweedegolf/rust-dev:stable-browser
     ports:
       - "8080:8080"
-    user: "${USER_ID:?USER_ID not set}:${GROUP_ID:?GROUP_ID not set}"
+    # user: "${DOCKER_USER:-${USER_ID:-${UID:-0}}:${GROUP_ID:-${GID:-0}}}"
     environment:
       TZ: "Europe/Amsterdam"
       CARGO_HOME: .cargo
       CARGO_TARGET_DIR: "./target-docker"
+      PLAYWRIGHT_BROWSERS_PATH: "/abacus/.cache/ms-playwright"
     volumes:
-      - "./backend:/app"
-    working_dir: /app
+      - ".:/abacus"
+    working_dir: /abacus/backend
     command: ["cargo", "watch", "--why", "--ignore", ".cargo", "--ignore", "db.sqlite*", "--ignore", "target-docker", "-x", "run --"]
 
   frontend:
-    depends_on: [api]
+    depends_on: [backend]
     image: node:20
     ports:
       - 3000:3000
     volumes:
-      - "./frontend:/app"
-    working_dir: /app
-    user: "${USER_ID:?USER_ID not set}:${GROUP_ID:?GROUP_ID not set}"
+      - ".:/abacus"
+    working_dir: /abacus/frontend
+    # user: "${DOCKER_USER:-${USER_ID:-${UID:-0}}:${GROUP_ID:-${GID:-0}}}"
     environment:
       TZ: "Europe/Amsterdam"
-      API_HOST: http://api:8080
+      API_HOST: http://backend:8080
       VITE_HOST: "0.0.0.0"
-    command: ["npm", "run", "dev:server", "--", "--host"]
+      PLAYWRIGHT_BROWSERS_PATH: "/abacus/.cache/ms-playwright"
+    command: ["npm", "run", "dev:docker"]

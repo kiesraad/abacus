@@ -1,0 +1,41 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/debian
+{
+	"name": "Abacus",
+	"dockerComposeFile": ["../docker-compose.yml"],
+	"service": "backend",
+	"runServices": ["backend", "frontend"],
+	"workspaceFolder": "/abacus",
+
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	// "image": "ghcr.io/tweedegolf/rust-dev:stable-node",
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/michidk/devcontainers-features/typst:1": {}
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [],
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"files.trimTrailingWhitespace": true,
+				"files.insertFinalNewline": true
+			},
+			"extensions": [
+				"rust-lang.rust-analyzer",
+				"tamasfe.even-better-toml",
+				"nvarner.typst-lsp",
+				"tomoki1207.pdf",
+				"qwtel.sqlite-viewer",
+				"ms-azuretools.vscode-docker"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

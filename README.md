@@ -1,7 +1,7 @@
 # Abacus software voor verkiezingsuitslagen en zetelverdeling
 
 ## Wat is Abacus?
-De Kiesraad ontwikkelt nieuwe software voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Het programma telt uitslagen bij elkaar op en berekent de zetelverdeling. Abacus vervangt de module Uitslagvaststelling van het programma Ondersteunende Software Verkiezingen (OSV2020) en zal ingezet worden bij alle verkiezingen in Nederland. 
+De Kiesraad ontwikkelt nieuwe software voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Het programma telt uitslagen bij elkaar op en berekent de zetelverdeling. Abacus vervangt de module Uitslagvaststelling van het programma Ondersteunende Software Verkiezingen (OSV2020) en zal ingezet worden bij alle verkiezingen in Nederland.
 
 <p align="center">
 <img src="/documentatie/img/abacus.svg" alt="Abacus software voor verkiezingsuitslagen en zetelverdeling" height="300px">
@@ -20,7 +20,7 @@ De software wordt ontworpen en gebouwd door de Kiesraad zelf, in nauwe samenspra
 
 Abacus software voor uitslagvaststelling en zetelverdeling biedt een stapsgewijze vervanging voor OSV2020. De eerste software die in productie wordt genomen vervangt de module van OSV2020 voor de uitslagvaststelling en zetelverdeling bij gemeenteraadsverkiezingen. Vanuit deze eerste versie wordt de software doorontwikkeld voor andere rollen en verkiezingen. De software wordt pas in productie genomen als deze aan alle eisen voldoet.
 
-De uitgangspunten bij het ontwerp en de bouw van Abacus zijn gebruiksvriendelijkheid en eenvoud, naast de waarden integriteit, transparantie en controleerbaarheid. De software dient voor het correct invoeren van de resultaten van de stembureaus volgens het vier-ogen principe, voor het maken van de optelling van alle ingevoerde stembureaus en het opstellen van het proces-verbaal met de resultaten. 
+De uitgangspunten bij het ontwerp en de bouw van Abacus zijn gebruiksvriendelijkheid en eenvoud, naast de waarden integriteit, transparantie en controleerbaarheid. De software dient voor het correct invoeren van de resultaten van de stembureaus volgens het vier-ogen principe, voor het maken van de optelling van alle ingevoerde stembureaus en het opstellen van het proces-verbaal met de resultaten.
 
 Meer informatie over het proces en de uitvoering van de verkiezingen in Nederland is te vinden op de website van de Kiesraad onder 'verkiezingen': [kiesraad.nl/verkiezingen](https://www.kiesraad.nl/verkiezingen)
 
@@ -39,7 +39,7 @@ De eerste stap is het bouwen van de uitslagensoftware voor de gemeenteraadsverki
 
 ### Work in progress
 
-We denken nog na over de beste manier om de volgende functionaliteit in te bouwen: 
+We denken nog na over de beste manier om de volgende functionaliteit in te bouwen:
 
 - Afzender- en bestandsverificatie
 - Bestandsuitwisseling
@@ -47,9 +47,9 @@ We denken nog na over de beste manier om de volgende functionaliteit in te bouwe
 
 ## Techniek
 
-De eerste versie van Abacus wordt voor de gemeenteraadsverkiezingen gebouwd als een stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in de programmeertaal Rust, de frontend in TypeScript/React. 
+De eerste versie van Abacus wordt voor de gemeenteraadsverkiezingen gebouwd als een stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in de programmeertaal Rust, de frontend in TypeScript/React.
 
-Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/Overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, Typescript en React](</documentatie/softwarearchitectuur/Overwegingen talen en frameworks.md>). 
+Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/Overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, Typescript en React](</documentatie/softwarearchitectuur/Overwegingen talen en frameworks.md>).
 
 ## Beveiligingsmaatregelen
 
@@ -75,25 +75,29 @@ Lees voor meer informatie het bestand `README.md` in elke directory.
 
 ## Bijdragen
 
-We ontwikkelen Abacus open source omdat dit de transparantie bevordert. We zijn altijd nieuwsgierig naar nieuwe perspectieven of invalshoeken, alle vragen zijn welkom. Voor de duidelijkheid: de Kiesraad heeft concrete plannen en doelstellingen met Acabus, en die zijn leidend. Hierdoor is het goed mogelijk dat een waardevolle bijdrage uit de community toch niet kan worden meegenomen, omdat we anders beloofde dingen niet op tijd waar kunnen maken. Als je iets wilt bijdragen aan de software, neem dan vooraf contact op via e-mail: abacus[@]kiesraad.nl. 
+We ontwikkelen Abacus open source omdat dit de transparantie bevordert. We zijn altijd nieuwsgierig naar nieuwe perspectieven of invalshoeken, alle vragen zijn welkom. Voor de duidelijkheid: de Kiesraad heeft concrete plannen en doelstellingen met Acabus, en die zijn leidend. Hierdoor is het goed mogelijk dat een waardevolle bijdrage uit de community toch niet kan worden meegenomen, omdat we anders beloofde dingen niet op tijd waar kunnen maken. Als je iets wilt bijdragen aan de software, neem dan vooraf contact op via e-mail: abacus[@]kiesraad.nl.
 
-Het team werkt met een planning en epics zoals opgenomen in het projectbord. Alle PR's worden grondig gereviewd, zoals we dat ook met ons eigen werk doen. We zoeken regelmatig nieuwe collega's. 
+Het team werkt met een planning en epics zoals opgenomen in het projectbord. Alle PR's worden grondig gereviewd, zoals we dat ook met ons eigen werk doen. We zoeken regelmatig nieuwe collega's.
 
 Als je een bijdrage aan de broncode wilt leveren vragen we je om vooraf een [contributor licence agreement (CLA)](/CLA.md) te tekenen, met name om het gebruiksrecht op je bijdrage eenduidig te regelen. Stuur de getekende CLA naar abacus[@]kiesraad.nl. Dank alvast!
 
+## Uitvoeren tijdens ontwikkeling
+
+Om het zelf draaien van Abacus tijdens de ontwikkeling zo makkelijk mogelijk te maken kan gebruik worden gemaakt van [docker](https://www.docker.com/). We gebruiken hiervoor *docker compose*. De eenvoudigste manier om hier mee te beginnen is het installeren van Docker Desktop. Na installatie kan Abacus eenvoudig worden opgestart vanaf een command line interface met het commando `docker compose up`. De software zal zichzelf eerst moeten installeren, dit kan afhankelijk van je systeem enkele minuten duren. Nadat de software is opgestart is deze bereikbaar op http://localhost:3000. Mocht je een editor die dev containers ondersteund gebruiken, zoals Visual Studio Code of een editor van Jetbrains, dan kan je direct vanuit de editor Abacus op laten starten, je editor zal hier een melding over geven.
+
 ## Meldingen en security issues
 
-Alle meldingen over onze software zijn welkom. Voor meldingen kun je het team direct bereiken via abacus[@]kiesraad.nl, voor security issues kun je direct contact opnemen met onze CISO Fleur van Leusden via security[@]kiesraad.nl. 
+Alle meldingen over onze software zijn welkom. Voor meldingen kun je het team direct bereiken via abacus[@]kiesraad.nl, voor security issues kun je direct contact opnemen met onze CISO Fleur van Leusden via security[@]kiesraad.nl.
 
 ## Over de Kiesraad
 
 In Nederland mogen we al meer dan honderd jaar via verkiezingen bepalen wie onze volksvertegenwoordigers zijn. Voor onze democratie is het van groot belang om een betrouwbaar, transparant en controleerbaar verkiezingsproces in te richten en in stand te houden. Dat doen we met wetten en regels, maar vooral met mensen, die er samen voor zorgen dat verkiezingen eerlijk verlopen en dat iedere stem meetelt.
 
-De Kiesraad is de onafhankelijke autoriteit in Nederland op het gebied van verkiezingen. De missie van de Kiesraad is dat iedereen de uitslag van de verkiezingen kan vertrouwen. 
+De Kiesraad is de onafhankelijke autoriteit in Nederland op het gebied van verkiezingen. De missie van de Kiesraad is dat iedereen de uitslag van de verkiezingen kan vertrouwen.
 
-De Kiesraad adviseert de regering en het parlement over verkiezingen en het kiesrecht. Dit doen we gevraagd en ongevraagd. We evalueren iedere verkiezing en adviseren de minister over mogelijke verbeteringen. 
+De Kiesraad adviseert de regering en het parlement over verkiezingen en het kiesrecht. Dit doen we gevraagd en ongevraagd. We evalueren iedere verkiezing en adviseren de minister over mogelijke verbeteringen.
 
-In het verkiezingsproces wordt digitalisering ingezet als hulpmiddel. De Kiesraad is verantwoordelijk voor de ontwikkeling en het beheer van de ondersteunende software die gebruikt wordt bij de kandidaatstelling en de vaststelling van de uitslagen van verkiezingen. 
+In het verkiezingsproces wordt digitalisering ingezet als hulpmiddel. De Kiesraad is verantwoordelijk voor de ontwikkeling en het beheer van de ondersteunende software die gebruikt wordt bij de kandidaatstelling en de vaststelling van de uitslagen van verkiezingen.
 
 Als informatie- en expertisecentrum over verkiezingen beheert de Kiesraad een verkiezingsdatabank die de uitslagen van meer dan 700 verkiezingen omvat, teruggaand tot 1848. De Kiesraad is benaderbaar voor iedereen die uitleg wil over het verkiezingsproces.
 

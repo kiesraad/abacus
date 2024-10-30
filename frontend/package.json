@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "cross-env API_MODE=mock vite",
     "dev:server": "cross-env API_MODE=local vite",
+    "dev:docker": "CI=1 npm install && npm run dev:server -- --host",
     "build": "tsc && cross-env API_MODE=local vite build",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
     "lint": "cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

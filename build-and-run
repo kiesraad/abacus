@@ -1,12 +1,13 @@
 #!/bin/bash
 
-if [ -n "$1" ]
-then
-  git checkout "$1"
-fi
-
 # Exit on errors
 set -e
+
+if [ -n "$1" ]
+then
+  git fetch
+  git checkout "$1"
+fi
 
 # Print the commands as they are executed
 set -x

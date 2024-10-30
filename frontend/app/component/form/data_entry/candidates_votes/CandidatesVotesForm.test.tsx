@@ -350,6 +350,7 @@ describe("Test CandidatesVotesForm", () => {
       const feedbackMessage =
         "Controleer het totaal van deze lijst. Overleg met coördinator als het papier niet is ingevuld.";
       expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
+      expect(await screen.findByTestId("total")).toHaveFocus();
       const expectedInvalidFieldIds = [candidatesFieldIds.total];
       const expectedValidFieldIds = [candidatesFieldIds.candidate0, candidatesFieldIds.candidate1];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);

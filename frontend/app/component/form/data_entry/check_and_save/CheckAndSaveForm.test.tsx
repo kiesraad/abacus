@@ -180,7 +180,7 @@ describe("Test CheckAndSaveForm summary", () => {
 
     const differencesItem = screen.getByTestId("section-status-differences_counts");
     expect(differencesItem).toHaveTextContent("heeft geaccepteerde waarschuwingen");
-    expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
+    expect(within(differencesItem).getByRole("img", { name: "opgeslagen" })).toBeInTheDocument();
   });
 
   test("Unaccepted warnings", async () => {

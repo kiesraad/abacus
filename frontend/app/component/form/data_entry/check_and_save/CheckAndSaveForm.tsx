@@ -150,7 +150,7 @@ function menuStatusForFormSectionStatus(status: PollingStationFormSectionStatus)
     case "unaccepted-warnings":
       return "warning";
     case "accepted-warnings":
-      return "warning";
+      return "accept";
     case "errors":
       return "error";
   }

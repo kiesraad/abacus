@@ -169,6 +169,7 @@ export function VotersAndVotesForm() {
         </InputGrid.Header>
         <InputGrid.Body>
           <InputGridRow
+            autoFocusInput
             key="A"
             field="A"
             id="poll_card_count"

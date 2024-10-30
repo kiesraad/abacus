@@ -14,6 +14,7 @@ export interface InputGridRowProps {
   isTotal?: boolean;
   isListTotal?: boolean;
   addSeparator?: boolean;
+  autoFocusInput?: boolean;
 }
 
 export function InputGridRow({
@@ -27,6 +28,7 @@ export function InputGridRow({
   isListTotal,
   id,
   addSeparator,
+  autoFocusInput,
 }: InputGridRowProps) {
   const errors = errorsAndWarnings?.get(id)?.errors;
   const warnings = errorsAndWarnings?.get(id)?.warnings;
@@ -34,7 +36,9 @@ export function InputGridRow({
   const hasWarning = warnings && warnings.length > 0;
 
   const children: [React.ReactElement, React.ReactElement, React.ReactElement] = [
-    <td key={`${id}-1`}>{field}</td>,
+    <td key={`${id}-1`} id={`field-${id}`}>
+      {field}
+    </td>,
     <td key={`${id}-2`} id={`cell-${id}`}>
       <FormField hasError={hasError} hasWarning={hasWarning}>
         <NumberInput
@@ -42,6 +46,9 @@ export function InputGridRow({
           id={id}
           name={name || id}
           defaultValue={defaultValue}
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus={autoFocusInput}
+          aria-labelledby={`field-${id} title-${id}`}
           aria-invalid={hasError || (hasWarning && !warningsAccepted) ? "true" : "false"}
           aria-errormessage={
             hasError ? "feedback-error" : hasWarning && !warningsAccepted ? "feedback-warning" : undefined
@@ -49,7 +56,9 @@ export function InputGridRow({
         />
       </FormField>
     </td>,
-    <td key={`${id}-3`}>{title}</td>,
+    <td key={`${id}-3`} id={`title-${id}`}>
+      {title}
+    </td>,
   ];
   return isListTotal ? (
     <InputGrid.ListTotal id={id}>{children}</InputGrid.ListTotal>

@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import cls from "./Form.module.css";
+
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   title?: string;
   children: React.ReactNode;
@@ -12,7 +14,6 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
 
   const inputList = React.useRef<HTMLInputElement[]>([]);
   const submitButton = React.useRef<HTMLButtonElement | null>(null);
-  const formTitle = React.useRef<HTMLHeadingElement | null>(null);
 
   const moveFocus = React.useCallback((dir: Dir) => {
     let targetIndex = inputList.current.findIndex((input) => document.activeElement === input);
@@ -94,16 +95,9 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
     submitButton.current = innerRef.current?.querySelector("button[type=submit]") as HTMLButtonElement | null;
   }, [children]);
 
-  React.useEffect(() => {
-    // Only focus on form title if current active element is not feedback header,
-    // to prevent feedback header focus from being overwritten
-    if (document.activeElement?.className !== "feedback-header") {
-      formTitle.current?.focus();
-    }
-  }, []);
-
   return (
     <form
+      className={cls.form}
       ref={(node) => {
         if (node) innerRef.current = node;
         if (typeof ref === "function") {
@@ -114,10 +108,10 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
       }}
       {...formProps}
     >
-      <h2 tabIndex={-1} ref={formTitle}>
-        {title}
-      </h2>
-      {children}
+      <fieldset>
+        <legend>{title}</legend>
+        {children}
+      </fieldset>
     </form>
   );
 });

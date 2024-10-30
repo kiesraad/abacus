@@ -102,7 +102,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       const values = getValues();
       if (values.candidate_votes.some((candidate) => candidate.votes > 0) && values.total === 0) {
         setMissingTotalError(true);
-        window.scrollTo(0, document.body.scrollHeight);
+        document.querySelector("#missing-total-error")?.scrollIntoView({ behavior: "smooth" });
       } else if (errors.length === 0 && warnings.length > 0) {
         const acceptWarnings = acceptWarningsRef.current?.checked || false;
 

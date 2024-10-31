@@ -104,7 +104,7 @@ Meer informatie over de verkiezingen en de Kiesraad is te vinden op [www.kiesraa
 Copyright © 2024 Kiesraad.
 Licensed under the EUPL-1.2 or later, except where indicated otherwise:
 
-- Fonts in `frontend/public/font` are licensed under
+- Fonts in `frontend/static/font` and `backend/templates/fonts` are licensed under
   the SIL Open Font License version 1.1 (OFL v1.1).
 - The files `frontend/app/msw-mock-api.ts` and `frontend/app/test/unit/server.ts`
   are licensed under the Mozilla Public License v2.0 (MPL 2.0).

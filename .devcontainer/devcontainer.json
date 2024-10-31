@@ -12,7 +12,8 @@
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		"ghcr.io/michidk/devcontainers-features/typst:1": {}
+		"ghcr.io/michidk/devcontainers-features/typst:1": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

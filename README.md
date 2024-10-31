@@ -85,6 +85,8 @@ Als je een bijdrage aan de broncode wilt leveren vragen we je om vooraf een [con
 
 Om het zelf draaien van Abacus tijdens de ontwikkeling zo makkelijk mogelijk te maken kan gebruik worden gemaakt van [docker](https://www.docker.com/). We gebruiken hiervoor *docker compose*. De eenvoudigste manier om hier mee te beginnen is het installeren van Docker Desktop. Na installatie kan Abacus eenvoudig worden opgestart vanaf een command line interface met het commando `docker compose up`. De software zal zichzelf eerst moeten installeren, dit kan afhankelijk van je systeem enkele minuten duren. Nadat de software is opgestart is deze bereikbaar op http://localhost:3000. Mocht je een editor die dev containers ondersteund gebruiken, zoals Visual Studio Code of een editor van Jetbrains, dan kan je direct vanuit de editor Abacus op laten starten, je editor zal hier een melding over geven.
 
+Mocht je helemaal niets op je systeem willen installeren maar direct vanuit de interface van GitHub een bijdrage aan Abacus willen leveren: je kan hiervoor [GitHub Codespaces](https://docs.github.com/en/codespaces) gebruiken. Je kan hiervoor op de knop
+
 ## Meldingen en security issues
 
 Alle meldingen over onze software zijn welkom. Voor meldingen kun je het team direct bereiken via abacus[@]kiesraad.nl, voor security issues kun je direct contact opnemen met onze CISO Fleur van Leusden via security[@]kiesraad.nl.

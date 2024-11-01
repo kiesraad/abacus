@@ -358,16 +358,27 @@ describe("Test CandidatesVotesForm", () => {
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
 
+      // Add the incorrect total and submit again
+      await user.type(total, "1");
+      await user.click(submitButton);
+
+      expect(screen.queryByTestId("missing-total-error")).not.toBeInTheDocument();
+      expect(spy).toHaveBeenCalledOnce();
+
       // Add the correct total and submit again
+      await user.clear(total);
       await user.type(total, expectedRequest.data.political_group_votes[0]?.total.toString() ?? "0");
       await user.click(submitButton);
 
-      expect(spy).toHaveBeenCalled();
-      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
-      expect(method).toEqual("POST");
-      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
-      expect(request_body.data).toEqual(expectedRequest.data);
+      expect(spy).toHaveBeenCalledTimes(2);
+      const last_call = spy.mock.calls.pop();
+      if (last_call) {
+        const { url, method, body } = getUrlMethodAndBody([last_call]);
+        expect(url).toEqual("/api/polling_stations/1/data_entries/1");
+        expect(method).toEqual("POST");
+        const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+        expect(request_body.data).toEqual(expectedRequest.data);
+      }
     });
   });
 

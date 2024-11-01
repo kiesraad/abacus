@@ -105,13 +105,14 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         document.getElementById("total")?.focus();
       } else if (errors.length === 0 && warnings.length > 0) {
         const acceptWarnings = acceptWarningsRef.current?.checked || false;
-
+        setMissingTotalError(false);
         if (!hasChanges && !acceptWarnings) {
           setWarningsWarning(true);
         } else {
           await submit({ acceptWarnings });
         }
       } else {
+        setMissingTotalError(false);
         await submit();
       }
     })(event);

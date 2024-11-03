@@ -73,6 +73,24 @@ Daarnaast zijn voor de software, de ontwikkeling en het gebruik onder andere de 
 
 Lees voor meer informatie het bestand `README.md` in elke directory.
 
+## Starten met Abacus
+
+De functionaliteit is nog beperkt, maar het is al mogelijk om Abacus zelf te proberen en te testen. De basisflow invoeren-optellen-PDF werkt al. In de [documentatie](https://github.com/kiesraad/abacus/blob/main/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md) en op het [board](https://github.com/orgs/kiesraad/projects/1) zie je waar we mee bezig zijn. 
+
+Er zijn een aantal opties beschikbaar om te zien waar we staan: 
+
+### Frontend
+
+De interface van onze 'main' branch met de actuele broncode is [als website te benaderen](https://kiesraad-abacus.pages.dev/). Het is alleen de interface die tegen een test-backend praat en een deel van de functionaliteit mist. 
+
+### Binary
+
+Op basis van de nieuwste broncode maken we dagelijks een nieuwe versie van de binary die je kunt downloaden. Op dit moment runt de binary op linux/unix systemen. Klik door via de nieuwste link [op deze pagina](https://github.com/kiesraad/abacus/actions/workflows/build-lint-test.yml) en download de laatste backend_build. Pak het bestand uit en start met -rs om een nieuwe database op te bouwen: `./api -rs`. Een versie voor windows is in de maak. 
+
+### Development omgeving: 
+
+Je kunt Abacus ook gewoon zelf compileren. Hiervoor kun je de readme's in de [backend](https://github.com/kiesraad/abacus/blob/main/backend/README.md) en [frontend](https://github.com/kiesraad/abacus/blob/main/frontend/README.md) directory gebruiken. Er is ook een docker schil beschikbaar. 
+
 ## Bijdragen
 
 We ontwikkelen Abacus open source omdat dit de transparantie bevordert. We zijn altijd nieuwsgierig naar nieuwe perspectieven of invalshoeken, alle vragen zijn welkom. Voor de duidelijkheid: de Kiesraad heeft concrete plannen en doelstellingen met Acabus, en die zijn leidend. Hierdoor is het goed mogelijk dat een waardevolle bijdrage uit de community toch niet kan worden meegenomen, omdat we anders beloofde dingen niet op tijd waar kunnen maken. Als je iets wilt bijdragen aan de software, neem dan vooraf contact op via e-mail: abacus[@]kiesraad.nl. 

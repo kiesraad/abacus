@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT data, client_state FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
+  "query": "SELECT data, client_state, timestamp FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
   "describe": {
     "columns": [
       {
@@ -12,6 +12,11 @@
         "name": "client_state",
         "ordinal": 1,
         "type_info": "Blob"
+      },
+      {
+        "name": "timestamp",
+        "ordinal": 2,
+        "type_info": "Integer"
       }
     ],
     "parameters": {
@@ -19,8 +24,9 @@
     },
     "nullable": [
       true,
-      true
+      true,
+      false
     ]
   },
-  "hash": "9fa247a2c763deb964ce9669da9ff871d78c391700b7bc307be2752944afb1fd"
+  "hash": "45527b7d3c6d94d92b5ba617f929851fea6b398457e214296ab3d9a239d8eb67"
 }

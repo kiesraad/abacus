@@ -6,6 +6,7 @@ export interface ResultRecord {
   pollingStationId: number;
   entryNumber: number;
   data: PollingStationResults;
+  timestamp: number;
 }
 
 export interface DataEntryRecord extends ResultRecord {

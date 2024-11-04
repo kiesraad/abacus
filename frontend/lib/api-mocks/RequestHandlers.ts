@@ -139,6 +139,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
       entryNumber: Number(params.entry_number),
       data: json.data,
       clientState: json.client_state as ClientState,
+      timestamp: Number(Date.now() / 1000),
     };
 
     Database.dataEntries = Database.dataEntries.filter(
@@ -175,6 +176,7 @@ export const PollingStationDataEntryGetHandler = http.get<
     data: dataEntryRecord.data,
     client_state: dataEntryRecord.clientState,
     validation_results: validate(dataEntryRecord.data),
+    timestamp: dataEntryRecord.timestamp,
   };
   return HttpResponse.json(response, { status: 200 });
 });
@@ -205,6 +207,7 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
     pollingStationId: dataEntry.pollingStationId,
     entryNumber: dataEntry.entryNumber,
     data: dataEntry.data,
+    timestamp: dataEntry.timestamp,
   });
 
   return HttpResponse.text(null, { status: 200 });

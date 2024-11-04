@@ -123,6 +123,7 @@ pub struct GetDataEntryResponse {
     #[schema(value_type = Object)]
     pub client_state: Option<serde_json::Value>,
     pub validation_results: ValidationResults,
+    pub timestamp: i64,
 }
 
 /// Get an in-progress (not finalised) data entry for a polling station
@@ -149,7 +150,7 @@ pub async fn polling_station_data_entry_get(
     let mut tx = pool.begin().await?;
     let polling_station = polling_stations.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
-    let (data, client_state) = polling_station_data_entries
+    let (data, client_state, timestamp) = polling_station_data_entries
         .get(&mut tx, id, entry_number)
         .await?;
     let data = serde_json::from_slice(&data)?;
@@ -161,6 +162,7 @@ pub async fn polling_station_data_entry_get(
         data,
         client_state,
         validation_results,
+        timestamp,
     }))
 }
 
@@ -227,7 +229,7 @@ pub async fn polling_station_data_entry_finalise(
     // TODO: #129 support for second data entry
     // TODO: #129 validate whether first and second data entries are equal
 
-    let (data, _) = polling_station_data_entries
+    let (data, _, _) = polling_station_data_entries
         .get(&mut tx, id, entry_number)
         .await?;
     let results = serde_json::from_slice::<PollingStationResults>(&data)?;

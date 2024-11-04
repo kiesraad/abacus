@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                r.polling_station_id AS \"polling_station_id: u32\",\n                r.data,\n                r.timestamp AS \"timestamp: i64\"\n            FROM polling_station_results AS r\n            LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id\n            WHERE p.election_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "polling_station_id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "data",
+        "ordinal": 1,
+        "type_info": "Blob"
+      },
+      {
+        "name": "timestamp: i64",
+        "ordinal": 2,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6b324b62017a7b95bb9d3dd3e971b79cb0756ca356e69273a5f99b7b22b0f58e"
+}

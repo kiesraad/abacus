@@ -21,8 +21,8 @@ impl PollingStationDataEntries {
         data: String,
         client_state: String,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data, client_state) VALUES (?, ?, ?, ?)\
-              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET data = excluded.data, client_state = excluded.client_state",
+        sqlx::query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data, client_state, timestamp) VALUES (?, ?, ?, ?, unixepoch())\
+              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET data = excluded.data, client_state = excluded.client_state, timestamp = unixepoch()",
             id, entry_number, data, client_state)
             .execute(&self.0)
             .await?;
@@ -35,16 +35,18 @@ impl PollingStationDataEntries {
         tx: &mut Transaction<'_, Sqlite>,
         id: u32,
         entry_number: u8,
-    ) -> Result<(Vec<u8>, Vec<u8>), sqlx::Error> {
+    ) -> Result<(Vec<u8>, Vec<u8>, i64), sqlx::Error> {
         let res = query!(
-            "SELECT data, client_state FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
+            "SELECT data, client_state, timestamp FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
             id,
             entry_number
         )
             .fetch_one(&mut **tx)
         .await?;
-        if let (Some(data), Some(client_state)) = (res.data, res.client_state) {
-            Ok((data, client_state))
+        if let (Some(data), Some(client_state), timestamp) =
+            (res.data, res.client_state, res.timestamp)
+        {
+            Ok((data, client_state, timestamp))
         } else {
             Err(sqlx::Error::RowNotFound)
         }
@@ -65,6 +67,7 @@ impl PollingStationDataEntries {
         }
     }
 
+    // TODO: Add timestamp unixepoch()
     pub async fn finalise(
         &self,
         tx: &mut Transaction<'_, Sqlite>,
@@ -116,7 +119,8 @@ impl PollingStationResultsEntries {
             r#"
             SELECT
                 r.polling_station_id AS "polling_station_id: u32",
-                r.data
+                r.data,
+                r.timestamp AS "timestamp: i64"
             FROM polling_station_results AS r
             LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
             WHERE p.election_id = $1
@@ -129,6 +133,7 @@ impl PollingStationResultsEntries {
             Ok(PollingStationResultsEntry {
                 polling_station_id: row.polling_station_id,
                 data,
+                timestamp: row.timestamp,
             })
         })
         .fetch_all(&self.0)

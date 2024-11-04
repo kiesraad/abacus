@@ -141,6 +141,7 @@ export interface ErrorResponse {
 export interface GetDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
+  timestamp: number;
   validation_results: ValidationResults;
 }
 
@@ -184,7 +185,7 @@ export interface PollingStationListResponse {
 }
 
 /**
- * PollingStationResults, following the fields in Model Na 31-2 Bijage 2.
+ * PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.
 
 See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
 lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,

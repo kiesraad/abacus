@@ -64,7 +64,7 @@ impl From<String> for PollingStationType {
             "FixedLocation" => Self::FixedLocation,
             "Special" => Self::Special,
             "Mobile" => Self::Mobile,
-            _ => panic!("invalid PollingStationType"),
+            _ => panic!("invalid PollingStationType `{value}`"),
         }
     }
 }

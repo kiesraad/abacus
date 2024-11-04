@@ -23,6 +23,10 @@ Het bouwen van een nieuwe feature begint bij het verzamelen van input. Vele soor
 
 ### Planning en ontwerp
 
+<!-- TODO
+Hier moet een link naar het refinement-document. Wsl tussen 1ste en 2de paragraaf
+ -->
+
 De planning is de fase waarin we de verzamelde input vertalen naar epics en issues. We besluiten of we er iets mee gaan
 doen en zo ja, hoe we dit gaan uitvoeren. De issues zijn niet overdreven specifiek: er is veel ruimte voor eigen inbreng
 en refinement.

@@ -1,9 +1,5 @@
 # GitHub werkwijze
 
-<!-- TODO
-Dit moet puur oppakken van een issue en GitHub worden.
- -->
-
 Dit document beschrijft de werkwijze met GitHub.
 Er zijn meerdere manieren om deze stappen te zetten. 
 

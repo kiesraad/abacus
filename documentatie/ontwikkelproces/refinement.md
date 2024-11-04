@@ -1,11 +1,5 @@
 # Refinement
 
-<!-- TODO
-- andere titel dan "refinement"?
-- link "Issues" -> GitHub-doc
- -->
-
-
 We doen "Just-In-Time Refinement", dus refinement op het "last responsible moment". Dit doen we om te voorkomen dat we tijd en energie steken in refinement, maar dat het resultaat ervan later herzien moet worden, of zelfs helemaal niet nodig blijkt te zijn.
 
 ## Epics
@@ -36,3 +30,5 @@ Als je dat handig vindt, maak ook een issue aan voor de kennisdelingssessie aan 
 De details van een issue kunnen vaak wachten totdat je aan het issue zelf begint. De vragen en overwegingen zijn vrijwel hetzelfde als bij een epic. De scope is alleen kleiner en het detailniveau hoger.
 
 Houd er rekening mee dat het verder uitschrijven van een issue niet alleen handig voor jezelf is, maar ook voor de reviewers van je PR. (In dat opzicht kan een gedeelte van de beschrijving ook in de PR ipv het issue.)
+
+Alle stappen voor het werken aan issue staan beschreven in onze [GitHub werkwijze](/documentatie/ontwikkelproces/GitHub-werkwijze.md).

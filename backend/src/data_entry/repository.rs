@@ -22,7 +22,7 @@ impl PollingStationDataEntries {
         client_state: String,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data, client_state) VALUES (?, ?, ?, ?)\
-              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET data = excluded.data, client_state = excluded.client_state, timestamp = CURRENT_TIMESTAMP",
+              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET data = excluded.data, client_state = excluded.client_state, timestamp = unixepoch()",
             id, entry_number, data, client_state)
             .execute(&self.0)
             .await?;

@@ -21,8 +21,8 @@ impl PollingStationDataEntries {
         data: String,
         client_state: String,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data, client_state, timestamp) VALUES (?, ?, ?, ?, unixepoch())\
-              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET data = excluded.data, client_state = excluded.client_state, timestamp = unixepoch()",
+        sqlx::query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data, client_state) VALUES (?, ?, ?, ?)\
+              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET data = excluded.data, client_state = excluded.client_state, timestamp = CURRENT_TIMESTAMP",
             id, entry_number, data, client_state)
             .execute(&self.0)
             .await?;
@@ -67,7 +67,6 @@ impl PollingStationDataEntries {
         }
     }
 
-    // TODO: Add timestamp unixepoch()
     pub async fn finalise(
         &self,
         tx: &mut Transaction<'_, Sqlite>,

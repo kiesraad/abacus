@@ -4,7 +4,7 @@ CREATE TABLE polling_station_data_entries
     entry_number       INTEGER NOT NULL,
     data               BLOB,
     client_state       BLOB,
-    timestamp          INTEGER NOT NULL,
+    timestamp          INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (entry_number, polling_station_id),
     FOREIGN KEY (polling_station_id) REFERENCES polling_stations (id)

@@ -6,6 +6,7 @@ export const nl = {
   manage_elections: "Beheer verkiezingen",
   role: "Rol",
   status: "Status",
+  loading: "Laden...",
 
   "election_status.title": "Status verkiezing - Abacus",
   "election_status.first_session": "Eerste zitting",

@@ -12,6 +12,7 @@ export interface Translation {
   manage_elections: string;
   role: string;
   status: string;
+  loading: string;
 
   "election_status.title": string;
   "election_status.first_session": string;

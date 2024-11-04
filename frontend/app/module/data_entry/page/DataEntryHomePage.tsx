@@ -17,12 +17,12 @@ export function DataEntryHomePage() {
 
   // re-fetch statuses when component mounts
   useEffect(() => {
-    const aboortController = new AbortController();
+    const abortController = new AbortController();
 
-    void refetch(aboortController);
+    void refetch(abortController);
 
     return () => {
-      aboortController.abort();
+      abortController.abort();
     };
   }, [refetch]);
 

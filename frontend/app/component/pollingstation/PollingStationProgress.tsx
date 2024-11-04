@@ -23,7 +23,7 @@ export function PollingStationProgress() {
       if (formSection.errors.length > 0) {
         return "error";
       }
-      if (formSection.warnings.length > 0) {
+      if (formSection.warnings.length > 0 && !formSection.acceptWarnings) {
         return "warning";
       }
 

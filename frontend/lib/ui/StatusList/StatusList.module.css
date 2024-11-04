@@ -27,6 +27,10 @@
       font-weight: bold;
     }
 
+    &:global(.padding) {
+      padding-top: 0.5rem;
+    }
+
     &:global(.empty) {
       svg {
         fill: var(--menu-empty);

@@ -238,7 +238,7 @@ export type PollingStationSummary = {
   }[];
 };
 
-export function getPollingStationSummary(formState: FormState, values: PollingStationResults): PollingStationSummary {
+export function getPollingStationSummary(formState: FormState): PollingStationSummary {
   const result: PollingStationSummary = {
     countsAddUp: true,
     hasBlocks: false,
@@ -264,12 +264,6 @@ export function getPollingStationSummary(formState: FormState, values: PollingSt
           result.notableFormSections.push({ status: "unaccepted-warnings", formSection: section });
           result.hasBlocks = true;
         }
-      } else if (section.id.startsWith("political_group_votes_") && isFormSectionEmpty(section, values)) {
-        result.notableFormSections.push({
-          status: "empty",
-          formSection: section,
-          title: `Lijst ${section.id.substring(22)}`,
-        });
       }
     });
 

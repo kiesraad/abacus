@@ -49,7 +49,7 @@ We denken nog na over de beste manier om de volgende functionaliteit in te bouwe
 
 De eerste versie van Abacus wordt voor de gemeenteraadsverkiezingen gebouwd als een stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in de programmeertaal Rust, de frontend in TypeScript/React. 
 
-Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/Overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, Typescript en React](</documentatie/softwarearchitectuur/Overwegingen talen en frameworks.md>). 
+Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/Overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, Typescript en React](</documentatie/softwarearchitectuur/overwegingen-talen-en-frameworks.md>). 
 
 ## Beveiligingsmaatregelen
 
@@ -104,7 +104,7 @@ Meer informatie over de verkiezingen en de Kiesraad is te vinden op [www.kiesraa
 Copyright © 2024 Kiesraad.
 Licensed under the EUPL-1.2 or later, except where indicated otherwise:
 
-- Fonts in `frontend/public/font` are licensed under
+- Fonts in `frontend/static/font` and `backend/templates/fonts` are licensed under
   the SIL Open Font License version 1.1 (OFL v1.1).
 - The files `frontend/app/msw-mock-api.ts` and `frontend/app/test/unit/server.ts`
   are licensed under the Mozilla Public License v2.0 (MPL 2.0).

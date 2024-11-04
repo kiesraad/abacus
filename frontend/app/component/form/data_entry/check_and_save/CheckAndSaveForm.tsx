@@ -15,7 +15,7 @@ import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusL
 export function CheckAndSaveForm() {
   const navigate = useNavigate();
   const { election } = useElection();
-  const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId, values } =
+  const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId } =
     usePollingStationFormController();
 
   const getUrlForFormSection = React.useCallback(
@@ -34,8 +34,8 @@ export function CheckAndSaveForm() {
   }, [registerCurrentForm]);
 
   const summary = React.useMemo(() => {
-    return getPollingStationSummary(formState, values);
-  }, [formState, values]);
+    return getPollingStationSummary(formState);
+  }, [formState]);
   const finalisationAllowed = Object.values(formState.sections).every(
     (section) => section.errors.length === 0 && (section.warnings.length === 0 || section.acceptWarnings),
   );
@@ -119,11 +119,11 @@ export function CheckAndSaveForm() {
           </StatusList.Item>
         )}
         {summary.hasBlocks ? (
-          <StatusList.Item status={summary.hasErrors ? "error" : "warning"} id="form-cannot-be-saved" emphasis>
+          <StatusList.Item status={summary.hasErrors ? "error" : "warning"} id="form-cannot-be-saved" emphasis padding>
             Je kan de resultaten van dit stembureau nog niet opslaan
           </StatusList.Item>
         ) : (
-          <StatusList.Item status="accept" id="form-can-be-saved" emphasis>
+          <StatusList.Item status="accept" id="form-can-be-saved" emphasis padding>
             Je kan de resultaten van dit stembureau opslaan
           </StatusList.Item>
         )}
@@ -150,7 +150,7 @@ function menuStatusForFormSectionStatus(status: PollingStationFormSectionStatus)
     case "unaccepted-warnings":
       return "warning";
     case "accepted-warnings":
-      return "warning";
+      return "accept";
     case "errors":
       return "error";
   }

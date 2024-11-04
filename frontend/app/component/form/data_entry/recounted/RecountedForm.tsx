@@ -42,13 +42,19 @@ export function RecountedForm() {
   const hasValidationError = errors.length > 0;
 
   return (
-    <Form onSubmit={handleSubmit} ref={formRef} id="recounted_form" title="Is er herteld?">
+    <Form
+      onSubmit={handleSubmit}
+      ref={formRef}
+      id="recounted_form"
+      title="Is het selectievakje op de eerste pagina aangevinkt?"
+    >
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
       <p className="form-paragraph md">
         Was er een onverklaard verschil tussen het aantal toegelaten kiezers en het aantal uitgebrachte stemmen? Is er
-        op basis daarvan herteld door het gemeentelijk stembureau?
+        op basis daarvan herteld door het gemeentelijk stembureau? Dan is het selectievakje op de eerste pagina van het
+        papieren formulier aangevinkt.
       </p>
       <div className="radio-form">
         <ChoiceList>

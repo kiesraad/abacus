@@ -6,4 +6,8 @@ VALUES (1, 1, 'Op Rolletjes', 33, NULL, 'Mobile', 'Rijksweg A12', '1', NULL, '12
        (4, 3, 'Studio The Rules', 1, NULL, 'Fixedlocation', 'Gerontoplein', '1', NULL, '1337 YQ', 'Juinen'),
        (5, 3, 'Buurtcentrum de Mattenklopper', 2, 1000, 'Special', 'Complexiteitslaan', '2', 'b', '1337 QY',
         'Juinen'),
-       (6, 3, 'Positivo Zaal', 3, NULL, 'FixedLocation', 'Kerkweg', '3', NULL, '1337 QA', 'Juinen');
+       (6, 3, 'Positivo Zaal', 3, NULL, 'FixedLocation', 'Kerkweg', '3', NULL, '1337 QA', 'Juinen'),
+       (7, 4, 'Studio The Rules', 1, NULL, 'FixedLocation', 'Gerontoplein', '1', NULL, '1337 YQ', 'Juinen'),
+       (8, 4, 'Buurtcentrum de Mattenklopper', 2, 1000, 'Special', 'Complexiteitslaan', '2', 'b', '1337 QY',
+        'Juinen'),
+       (9, 4, 'Positivo Zaal', 3, NULL, 'FixedLocation', 'Kerkweg', '3', NULL, '1337 QA', 'Juinen');

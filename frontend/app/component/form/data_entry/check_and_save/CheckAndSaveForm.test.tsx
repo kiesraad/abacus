@@ -157,10 +157,6 @@ describe("Test CheckAndSaveForm summary", () => {
     expect(differencesItem).toHaveTextContent("Controleer waarschuwingen bij");
     expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
 
-    const pg1Item = screen.getByTestId("section-status-political_group_votes_1");
-    expect(pg1Item).toHaveTextContent("Op Lijst 1 zijn geen stemmen ingevoerd");
-    expect(within(pg1Item).getByRole("img", { name: "leeg" })).toBeInTheDocument();
-
     expect(screen.getByTestId("form-cannot-be-saved")).toBeInTheDocument();
   });
 
@@ -180,7 +176,7 @@ describe("Test CheckAndSaveForm summary", () => {
 
     const differencesItem = screen.getByTestId("section-status-differences_counts");
     expect(differencesItem).toHaveTextContent("heeft geaccepteerde waarschuwingen");
-    expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
+    expect(within(differencesItem).getByRole("img", { name: "opgeslagen" })).toBeInTheDocument();
   });
 
   test("Unaccepted warnings", async () => {

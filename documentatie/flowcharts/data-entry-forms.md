@@ -49,7 +49,8 @@ flowchart TD
     submitted -- yes --> errors
     errors -- yes --> styling-error
     errors -- no --> warnings
-    warnings -- yes --> styling-warning
+    warnings -- yes, accepted --> styling-valid
+    warnings -- yes, not accepted --> styling-warning
     warnings -- no --> empty
     empty -- yes --> styling-empty
     empty -- no --> styling-valid

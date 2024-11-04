@@ -788,15 +788,42 @@
           }
         }
       },
+      "ErrorReference": {
+        "type": "string",
+        "enum": [
+          "EntryNumberNotSupported",
+          "EntryNotFound",
+          "PollingStationAlreadyFinalized",
+          "PollingStationDataValidation",
+          "InvalidVoteGroup",
+          "InvalidVoteCandidate",
+          "InvalidData",
+          "EntryNotUnique",
+          "Database",
+          "Internal",
+          "Pdf",
+          "PollingStationRepeated",
+          "PollingStationValidation",
+          "InvalidPoliticalGroup"
+        ]
+      },
       "ErrorResponse": {
         "type": "object",
         "description": "Response structure for errors",
         "required": [
-          "error"
+          "error",
+          "fatal",
+          "reference"
         ],
         "properties": {
           "error": {
             "type": "string"
+          },
+          "fatal": {
+            "type": "boolean"
+          },
+          "reference": {
+            "$ref": "#/components/schemas/ErrorReference"
           }
         }
       },

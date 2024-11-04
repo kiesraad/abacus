@@ -1,31 +1,23 @@
-use std::error::Error;
-
-use crate::data_entry::DataError;
-use axum::extract::rejection::JsonRejection;
 use axum::extract::FromRef;
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
 use axum::routing::{delete, get, post};
-use axum::{Json, Router};
-use hyper::header::InvalidHeaderValue;
+use axum::Router;
 #[cfg(feature = "memory-serve")]
 use memory_serve::MemoryServe;
-use serde::{Deserialize, Serialize};
-use sqlx::Error::RowNotFound;
 use sqlx::SqlitePool;
-use tracing::error;
-use typst::diag::SourceDiagnostic;
-use utoipa::ToSchema;
+use std::error::Error;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod data_entry;
 pub mod election;
+mod error;
 #[cfg(feature = "dev-database")]
 pub mod fixtures;
 pub mod pdf_gen;
 pub mod polling_station;
 pub mod validation;
+
+pub use error::{APIError, ErrorResponse};
 
 #[derive(FromRef, Clone)]
 pub struct AppState {
@@ -100,6 +92,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
 
 #[cfg(feature = "openapi")]
 pub fn create_openapi() -> utoipa::openapi::OpenApi {
+    use error::ErrorResponse;
     use utoipa::OpenApi;
 
     #[derive(OpenApi)]
@@ -153,146 +146,4 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     )]
     struct ApiDoc;
     ApiDoc::openapi()
-}
-
-/// Response structure for errors
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct ErrorResponse {
-    pub error: String,
-}
-
-impl IntoResponse for ErrorResponse {
-    fn into_response(self) -> Response {
-        Json(self).into_response()
-    }
-}
-
-/// Generic error type, converted to an ErrorResponse by the IntoResponse
-/// trait implementation
-#[derive(Debug)]
-pub enum APIError {
-    NotFound(String),
-    Conflict(String),
-    InvalidData(DataError),
-    JsonRejection(JsonRejection),
-    SerdeJsonError(serde_json::Error),
-    SqlxError(sqlx::Error),
-    InvalidHeaderValue,
-    PdfGenError(Vec<SourceDiagnostic>),
-    StdError(Box<dyn Error>),
-    AddError(String),
-}
-
-impl IntoResponse for APIError {
-    fn into_response(self) -> Response {
-        fn to_error(error: String) -> ErrorResponse {
-            ErrorResponse { error }
-        }
-
-        let (status, response) = match self {
-            APIError::NotFound(message) => (StatusCode::NOT_FOUND, to_error(message)),
-            APIError::Conflict(message) => (StatusCode::CONFLICT, to_error(message)),
-            APIError::InvalidData(err) => {
-                error!("Invalid data error: {}", err);
-                (
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                    to_error("Invalid data".to_string()),
-                )
-            }
-            APIError::JsonRejection(rejection) => (
-                StatusCode::UNPROCESSABLE_ENTITY,
-                to_error(rejection.body_text()),
-            ),
-            APIError::SerdeJsonError(err) => {
-                error!("Serde JSON error: {:?}", err);
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".to_string()),
-                )
-            }
-            APIError::SqlxError(RowNotFound) => (
-                StatusCode::NOT_FOUND,
-                to_error("Resource not found".to_string()),
-            ),
-            APIError::SqlxError(err) => {
-                error!("SQLx error: {:?}", err);
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".to_string()),
-                )
-            }
-            APIError::InvalidHeaderValue => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                to_error("Internal server error".to_string()),
-            ),
-            APIError::PdfGenError(err) => {
-                error!("PDF generation error: {:?}", err);
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".into()),
-                )
-            }
-            APIError::StdError(err) => {
-                error!("Error: {:?}", err);
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".to_string()),
-                )
-            }
-            APIError::AddError(err) => {
-                error!("Error while adding totals: {:?}", err);
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".into()),
-                )
-            }
-        };
-
-        (status, response).into_response()
-    }
-}
-
-impl From<JsonRejection> for APIError {
-    fn from(rejection: JsonRejection) -> Self {
-        APIError::JsonRejection(rejection)
-    }
-}
-
-impl From<serde_json::Error> for APIError {
-    fn from(err: serde_json::Error) -> Self {
-        APIError::SerdeJsonError(err)
-    }
-}
-
-impl From<sqlx::Error> for APIError {
-    fn from(err: sqlx::Error) -> Self {
-        APIError::SqlxError(err)
-    }
-}
-
-impl From<DataError> for APIError {
-    fn from(err: DataError) -> Self {
-        APIError::InvalidData(err)
-    }
-}
-
-impl From<InvalidHeaderValue> for APIError {
-    fn from(_: InvalidHeaderValue) -> Self {
-        APIError::InvalidHeaderValue
-    }
-}
-
-impl From<Box<dyn Error>> for APIError {
-    fn from(err: Box<dyn Error>) -> Self {
-        APIError::StdError(err)
-    }
-}
-
-#[derive(Debug, Serialize)]
-pub struct JsonResponse<T>(T);
-
-impl<T: Serialize> IntoResponse for JsonResponse<T> {
-    fn into_response(self) -> Response {
-        Json(self).into_response()
-    }
 }

@@ -4,6 +4,7 @@ use crate::data_entry::{
     CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults, Validate,
     VotersCounts, VotesCounts,
 };
+use crate::error::ErrorReference;
 use crate::polling_station::structs::PollingStation;
 use crate::validation::ValidationResults;
 use crate::{election::Election, APIError};
@@ -75,10 +76,10 @@ impl ModelNa31_2Summary {
         // loop over results and add them to the running total
         for (polling_station, result) in results {
             if touched_polling_stations.contains(&polling_station.number) {
-                return Err(APIError::AddError(format!(
-                    "Polling station {} is repeated",
-                    polling_station.number
-                )));
+                return Err(APIError::AddError(
+                    format!("Polling station {} is repeated", polling_station.number),
+                    ErrorReference::PollingStationRepeated,
+                ));
             }
 
             // validate result and make sure that there are no errors
@@ -90,10 +91,13 @@ impl ModelNa31_2Summary {
                 "data".to_string(),
             )?;
             if validation_results.has_errors() {
-                return Err(APIError::AddError(format!(
-                    "Polling station {} has validation errors",
-                    polling_station.number
-                )));
+                return Err(APIError::AddError(
+                    format!(
+                        "Polling station {} has validation errors",
+                        polling_station.number
+                    ),
+                    ErrorReference::PollingStationValidation,
+                ));
             }
 
             // add voters and votes to the total
@@ -122,10 +126,10 @@ impl ModelNa31_2Summary {
                     .political_group_votes
                     .iter_mut()
                     .find(|pgv| pgv.number == pg.number)
-                    .ok_or(APIError::AddError(format!(
-                        "Could not find political group '{}'",
-                        pg.number
-                    )))?;
+                    .ok_or(APIError::AddError(
+                        format!("Could not find political group '{}'", pg.number),
+                        ErrorReference::InvalidPoliticalGroup,
+                    ))?;
                 pg_total.add(pg)?;
             }
 

@@ -59,6 +59,7 @@ pub async fn polling_station_list(
     responses(
         (status = 201, description = "Polling station created successful", body = PollingStation),
         (status = 404, description = "Election not found", body = ErrorResponse),
+        (status = 409, description = "Polling station already exists", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(

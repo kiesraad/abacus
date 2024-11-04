@@ -115,6 +115,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             data_entry::polling_station_data_entry_delete,
             data_entry::polling_station_data_entry_finalise,
             polling_station::polling_station_list,
+            polling_station::polling_station_create,
         ),
         components(
             schemas(
@@ -142,6 +143,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 polling_station::PollingStationStatus,
                 polling_station::PollingStationStatusEntry,
                 polling_station::PollingStationType,
+                polling_station::NewPollingStationRequest,
                 validation::ValidationResult,
                 validation::ValidationResultCode,
                 validation::ValidationResults,

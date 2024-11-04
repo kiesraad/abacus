@@ -1,6 +1,6 @@
 import { PollingStationType, usePollingStationListRequest } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
-import { PageTitle } from "@kiesraad/ui";
+import { Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
 const labelForPollingStationType: { [K in PollingStationType]: string } = {
@@ -14,7 +14,7 @@ export function PollingStationListPage() {
   const { requestState } = usePollingStationListRequest(electionId);
 
   if (requestState.status === "loading") {
-    return null;
+    return <Loader />;
   }
 
   if (requestState.status === "api-error" || requestState.status === "network-error") {

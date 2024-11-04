@@ -3,6 +3,7 @@ import * as React from "react";
 import { NotFoundError } from "app/component/error";
 
 import { useElectionListRequest } from "@kiesraad/api";
+import { Loader } from "@kiesraad/ui";
 
 import { ElectionListProviderContext } from "./ElectionListProviderContext";
 
@@ -14,7 +15,7 @@ export function ElectionListProvider({ children }: ElectionListProviderProps) {
   const { requestState } = useElectionListRequest();
 
   if (requestState.status === "loading") {
-    return null;
+    return <Loader />;
   }
 
   if (requestState.status === "api-error") {

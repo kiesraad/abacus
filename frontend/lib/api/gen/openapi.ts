@@ -207,6 +207,7 @@ export type PollingStationStatus = "not_started" | "first_entry_in_progress" | "
 export interface PollingStationStatusEntry {
   id: number;
   status: PollingStationStatus;
+  timestamp?: number;
 }
 
 /**

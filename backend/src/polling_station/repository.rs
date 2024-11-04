@@ -81,7 +81,11 @@ CASE
   WHEN de.polling_station_id IS NOT NULL THEN 
   (CASE WHEN json_extract(de.client_state, '$.continue') = true THEN 'FirstEntryInProgress' ELSE 'FirstEntryUnfinished' END)
   WHEN r.polling_station_id IS NOT NULL THEN 'Definitive'
-  ELSE 'NotStarted' END AS "status!: _"
+  ELSE 'NotStarted' END AS "status!: _",
+CASE
+  WHEN de.polling_station_id IS NOT NULL THEN de.timestamp
+  WHEN r.polling_station_id IS NOT NULL THEN r.timestamp
+  ELSE NULL END AS "timestamp!: _"
 FROM polling_stations AS p
 LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
 LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id

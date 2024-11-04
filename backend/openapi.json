@@ -1009,6 +1009,10 @@
           },
           "status": {
             "$ref": "#/components/schemas/PollingStationStatus"
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },

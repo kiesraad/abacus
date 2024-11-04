@@ -242,7 +242,7 @@
         },
         "responses": {
           "201": {
-            "description": "Polling station created successful",
+            "description": "Polling station created successfully",
             "content": {
               "application/json": {
                 "schema": {

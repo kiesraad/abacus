@@ -111,3 +111,8 @@
     }
   }
 }
+
+div:global(#missing-total-error) {
+  padding-left: 6.5rem;
+  padding-top: 1.5rem;
+}

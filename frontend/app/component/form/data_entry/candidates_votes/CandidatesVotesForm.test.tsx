@@ -2,7 +2,9 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import {
+  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
+  expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
 } from "app/component/form/testHelperFunctions";
 import { getUrlMethodAndBody, overrideOnce, render, screen, within } from "app/test/unit";
@@ -339,17 +341,44 @@ describe("Test CandidatesVotesForm", () => {
         expectedRequest.data.political_group_votes[0]?.candidate_votes[1]?.votes.toString() ?? "0",
       );
 
-      await user.type(total, expectedRequest.data.political_group_votes[0]?.total.toString() ?? "0");
-
+      // First submit before adding a total
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      expect(spy).toHaveBeenCalled();
-      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
-      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
-      expect(method).toEqual("POST");
-      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
-      expect(request_body.data).toEqual(expectedRequest.data);
+      // Check if missing total error alert is shown
+      expect(spy).not.toHaveBeenCalled();
+      const feedbackMessage =
+        "Controleer het totaal van deze lijst. Overleg met coördinator als het papier niet is ingevuld.";
+      expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
+      expect(await screen.findByTestId("total")).toHaveFocus();
+      const expectedInvalidFieldIds = [candidatesFieldIds.total];
+      const expectedValidFieldIds = [candidatesFieldIds.candidate0, candidatesFieldIds.candidate1];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
+
+      // Add the incorrect total and submit again
+      await user.type(total, "1");
+      await user.click(submitButton);
+
+      expect(screen.queryByTestId("missing-total-error")).not.toBeInTheDocument();
+      expect(spy).toHaveBeenCalledOnce();
+
+      // Add the correct total and submit again
+      await user.clear(total);
+      await user.type(total, expectedRequest.data.political_group_votes[0]?.total.toString() ?? "0");
+      await user.click(submitButton);
+
+      expect(spy).toHaveBeenCalledTimes(2);
+      const last_call = spy.mock.calls.pop();
+      if (last_call) {
+        const { url, method, body } = getUrlMethodAndBody([last_call]);
+        expect(url).toEqual("/api/polling_stations/1/data_entries/1");
+        expect(method).toEqual("POST");
+        const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+        expect(request_body.data).toEqual(expectedRequest.data);
+      }
     });
   });
 

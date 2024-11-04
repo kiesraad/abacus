@@ -16,24 +16,38 @@ export function Table({ id, children }: TableProps) {
   );
 }
 
-Table.Header = ({ children }: { children: React.ReactNode[] }) => (
-  <thead>
-    <tr>{children}</tr>
-  </thead>
-);
+Table.Header = Header;
+Table.Column = Column;
+Table.Body = Body;
+Table.Row = Row;
+Table.LinkRow = LinkRow;
+Table.Cell = Cell;
 
-Table.Column = ({ children, number, width }: { children: React.ReactNode; number?: boolean; width?: string }) => (
-  <th className={number ? cls["number"] : undefined} style={width ? { width } : undefined}>
-    {children}
-  </th>
-);
+function Header({ children }: { children: React.ReactNode[] }) {
+  return (
+    <thead>
+      <tr>{children}</tr>
+    </thead>
+  );
+}
 
-Table.Body = ({ children }: { children: React.ReactNode[] }) => <tbody>{children}</tbody>;
+function Column({ children, number, width }: { children: React.ReactNode; number?: boolean; width?: string }) {
+  return (
+    <th className={number ? cls["number"] : undefined} style={width ? { width } : undefined}>
+      {children}
+    </th>
+  );
+}
 
-Table.Row = ({ children }: { children: React.ReactNode[] }) => <tr>{children}</tr>;
+function Body({ children }: { children: React.ReactNode[] }) {
+  return <tbody>{children}</tbody>;
+}
 
-Table.LinkRow = ({ children, to }: { children: React.ReactNode[]; to: string }) => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+function Row({ children }: { children: React.ReactNode[] }) {
+  return <tr>{children}</tr>;
+}
+
+function LinkRow({ children, to }: { children: React.ReactNode[]; to: string }) {
   const navigate = useNavigate();
 
   function handleClick() {
@@ -45,8 +59,8 @@ Table.LinkRow = ({ children, to }: { children: React.ReactNode[]; to: string }) 
       {children}
     </tr>
   );
-};
+}
 
-Table.Cell = ({ children, number }: { children?: React.ReactNode; number?: boolean }) => (
-  <td className={number ? cls["number"] : undefined}>{children}</td>
-);
+function Cell({ children, number }: { children?: React.ReactNode; number?: boolean }) {
+  return <td className={number ? cls["number"] : undefined}>{children}</td>;
+}

@@ -163,7 +163,7 @@
         "tags": [
           "polling_station"
         ],
-        "summary": "Get a list of all pollingstations for an election",
+        "summary": "Get a list of all [PollingStation]s for an election",
         "operationId": "polling_station_list",
         "parameters": [
           {
@@ -215,7 +215,7 @@
         "tags": [
           "polling_station"
         ],
-        "summary": "Get a list of all pollingstations for an election",
+        "summary": "Create a new [PollingStation]",
         "operationId": "polling_station_create",
         "parameters": [
           {
@@ -894,7 +894,7 @@
       },
       "NewPollingStationRequest": {
         "type": "object",
-        "description": "Polling station of a certain [Election]",
+        "description": "Polling station of a certain [crate::election::Election]",
         "required": [
           "name",
           "number",
@@ -995,7 +995,7 @@
       },
       "PollingStation": {
         "type": "object",
-        "description": "Polling station of a certain [Election]",
+        "description": "Polling station of a certain [crate::election::Election]",
         "required": [
           "id",
           "election_id",

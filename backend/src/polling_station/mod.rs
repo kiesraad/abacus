@@ -25,7 +25,7 @@ impl IntoResponse for PollingStationListResponse {
     }
 }
 
-/// Get a list of all pollingstations for an election
+/// Get a list of all [PollingStation]s for an election
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}/polling_stations",
@@ -51,7 +51,7 @@ pub async fn polling_station_list(
     })
 }
 
-/// Get a list of all pollingstations for an election
+/// Create a new [PollingStation]
 #[utoipa::path(
     post,
     path = "/api/elections/{election_id}/polling_stations",

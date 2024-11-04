@@ -9,7 +9,7 @@ use utoipa::ToSchema;
 
 use crate::APIError;
 
-/// Polling station of a certain [Election]
+/// Polling station of a certain [crate::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
 pub struct PollingStation {
     pub id: u32,
@@ -35,7 +35,7 @@ impl IntoResponse for PollingStation {
     }
 }
 
-/// Polling station of a certain [Election]
+/// Polling station of a certain [crate::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 pub struct NewPollingStationRequest {

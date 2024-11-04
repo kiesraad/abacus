@@ -163,8 +163,7 @@ export function PollingStationFormController({
     return true;
   }, []);
 
-  const { state } = useApiRequest<GetDataEntryResponse>(requestPath);
-  const initialDataRequest = state;
+  const { requestState: initialDataRequest } = useApiRequest<GetDataEntryResponse>(requestPath);
 
   React.useEffect(() => {
     if (initialDataRequest.status === "success") {

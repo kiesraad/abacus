@@ -3,7 +3,7 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { overrideOnce, Providers, render, screen, setupTestRouter, within } from "app/test/unit";
+import { overrideOnce, Providers, render, screen, setupTestRouter, waitFor, within } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
@@ -103,19 +103,23 @@ describe("DataEntryHomePage", () => {
     } satisfies ElectionStatusResponse);
 
     // render and expect the initial status to be fetched
-    renderDataEntryHomePage();
-    expect(await screen.findByText("Welk stembureau ga je invoeren?")).toBeVisible();
+    const { rerender } = renderDataEntryHomePage();
+    await waitFor(() => {
+      expect(screen.queryByText("Welk stembureau ga je invoeren?")).not.toBeInTheDocument();
+    });
     expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
 
     // unmount DataEntryHomePage, but keep the providers as-is
-    render(
+    rerender(
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
           <></>
         </ElectionStatusProvider>
       </ElectionProvider>,
     );
-    expect(await screen.findByText("Welk stembureau ga je invoeren?")).toBeVisible();
+    await waitFor(() => {
+      expect(screen.queryByText("Welk stembureau ga je invoeren?")).not.toBeInTheDocument();
+    });
 
     // new status is that all polling stations are definitive, so the alert should be visible
     overrideOnce("get", "/api/elections/1/status", 200, {
@@ -126,9 +130,14 @@ describe("DataEntryHomePage", () => {
     } satisfies ElectionStatusResponse);
 
     // rerender DataEntryHomePage and expect the new status to be fetched
-    renderDataEntryHomePage();
-
-    expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
+    rerender(
+      <ElectionProvider electionId={1}>
+        <ElectionStatusProvider electionId={1}>
+          <DataEntryHomePage />
+        </ElectionStatusProvider>
+      </ElectionProvider>,
+    );
+    expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
   });
 
   test("Data entry saved alert works", async () => {

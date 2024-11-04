@@ -12,26 +12,26 @@ export interface ElectionStatusProviderProps {
 }
 
 export function ElectionStatusProvider({ children, electionId }: ElectionStatusProviderProps) {
-  const { state, refetch } = useElectionStatusRequest(electionId);
+  const { requestState, refetch } = useElectionStatusRequest(electionId);
 
-  if (state.status === "loading") {
+  if (requestState.status === "loading") {
     return null;
   }
 
-  if (state.status === "api-error") {
-    if (state.error.code === 404) {
+  if (requestState.status === "api-error") {
+    if (requestState.error.code === 404) {
       throw new NotFoundError("Er ging iets mis bij het ophalen van de verkiezing");
     }
 
-    throw state.error;
+    throw requestState.error;
   }
 
-  if (state.status === "network-error") {
-    throw state.error;
+  if (requestState.status === "network-error") {
+    throw requestState.error;
   }
 
   return (
-    <ElectionStatusProviderContext.Provider value={{ statuses: state.data.statuses, refetch }}>
+    <ElectionStatusProviderContext.Provider value={{ statuses: requestState.data.statuses, refetch }}>
       {children}
     </ElectionStatusProviderContext.Provider>
   );

@@ -11,12 +11,14 @@ describe("Test useElectionListRequest", () => {
     overrideOnce("get", "/api/elections", 200, electionListMockResponse);
     const { result } = renderHook(() => useElectionListRequest(), { wrapper: Providers });
 
-    expect(result.current.state.status).toBe("loading");
+    expect(result.current.requestState.status).toBe("loading");
 
     await waitFor(() => {
-      expect(result.current.state.status).toBe("success");
+      expect(result.current.requestState.status).toBe("success");
     });
 
-    expect(result.current.state.status === "success" && result.current.state.data).toEqual(electionListMockResponse);
+    expect(result.current.requestState.status === "success" && result.current.requestState.data).toEqual(
+      electionListMockResponse,
+    );
   });
 });

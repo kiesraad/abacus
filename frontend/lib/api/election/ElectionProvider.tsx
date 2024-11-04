@@ -12,29 +12,29 @@ export interface ElectionProviderProps {
 }
 
 export function ElectionProvider({ children, electionId }: ElectionProviderProps) {
-  const { state } = useElectionDataRequest(electionId);
+  const { requestState } = useElectionDataRequest(electionId);
 
-  if (state.status === "loading") {
+  if (requestState.status === "loading") {
     return null;
   }
 
-  if (state.status === "api-error") {
-    if (state.error.code === 404) {
+  if (requestState.status === "api-error") {
+    if (requestState.error.code === 404) {
       throw new NotFoundError("Verkiezing niet gevonden");
     }
 
-    throw state.error;
+    throw requestState.error;
   }
 
-  if (state.status === "network-error") {
-    throw state.error;
+  if (requestState.status === "network-error") {
+    throw requestState.error;
   }
 
   return (
     <ElectionProviderContext.Provider
       value={{
-        election: state.data.election as Required<Election>,
-        pollingStations: state.data.polling_stations,
+        election: requestState.data.election as Required<Election>,
+        pollingStations: requestState.data.polling_stations,
       }}
     >
       {children}

@@ -11,30 +11,30 @@ export interface ElectionListProviderProps {
 }
 
 export function ElectionListProvider({ children }: ElectionListProviderProps) {
-  const { state } = useElectionListRequest();
+  const { requestState } = useElectionListRequest();
 
-  if (state.status === "loading") {
+  if (requestState.status === "loading") {
     return null;
   }
 
-  if (state.status === "api-error") {
-    if (state.error.code === 404) {
+  if (requestState.status === "api-error") {
+    if (requestState.error.code === 404) {
       throw new NotFoundError("Verkiezingen niet gevonden");
     }
 
-    throw state.error;
+    throw requestState.error;
   }
 
-  if (state.status === "network-error") {
-    throw state.error;
+  if (requestState.status === "network-error") {
+    throw requestState.error;
   }
 
-  if (!state.data.elections.length) {
+  if (!requestState.data.elections.length) {
     throw new NotFoundError("Verkiezingen niet gevonden");
   }
 
   return (
-    <ElectionListProviderContext.Provider value={{ electionList: state.data.elections }}>
+    <ElectionListProviderContext.Provider value={{ electionList: requestState.data.elections }}>
       {children}
     </ElectionListProviderContext.Provider>
   );

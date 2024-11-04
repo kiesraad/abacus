@@ -22,13 +22,13 @@ export type ApiRequestState<T> =
     };
 
 export type UseApiRequestReturn<T> = {
-  state: ApiRequestState<T>;
+  requestState: ApiRequestState<T>;
   refetch: (controller?: AbortController) => Promise<ApiResult<T>>;
 };
 
 export function useApiRequest<T>(path: string): UseApiRequestReturn<T> {
   const client = useApi();
-  const [state, setState] = useState<ApiRequestState<T>>({ status: "loading" });
+  const [requestState, setRequestState] = useState<ApiRequestState<T>>({ status: "loading" });
 
   const fetchData = useCallback(
     async (controller?: AbortController): Promise<ApiResult<T>> => {
@@ -39,11 +39,11 @@ export function useApiRequest<T>(path: string): UseApiRequestReturn<T> {
       }
 
       if (result instanceof ApiError) {
-        setState({ status: "api-error", error: result });
+        setRequestState({ status: "api-error", error: result });
       } else if (result instanceof NetworkError) {
-        setState({ status: "network-error", error: result });
+        setRequestState({ status: "network-error", error: result });
       } else {
-        setState({ status: "success", data: result.data });
+        setRequestState({ status: "success", data: result.data });
       }
 
       return result;
@@ -54,9 +54,7 @@ export function useApiRequest<T>(path: string): UseApiRequestReturn<T> {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetchData(controller).catch((e: unknown) => {
-      throw e;
-    });
+    void fetchData(controller);
 
     return () => {
       controller.abort();
@@ -64,7 +62,7 @@ export function useApiRequest<T>(path: string): UseApiRequestReturn<T> {
   }, [fetchData]);
 
   return {
-    state,
+    requestState,
     refetch: fetchData,
   };
 }

@@ -11,7 +11,7 @@ const HEADER_CONTENT_TYPE = "Content-Type";
  */
 export class ApiClient {
   // encode an optional JSON body
-  encodeBody(requestBody?: object): RequestInit {
+  setRequestBodyAndHeaders(requestBody?: object): RequestInit {
     if (requestBody) {
       return {
         headers: {
@@ -105,10 +105,10 @@ export class ApiClient {
       const response = await fetch(path, {
         method,
         headers: {
-          Accept: "application/json",
+          Accept: MIME_JSON,
         },
         signal: abort?.signal,
-        ...this.encodeBody(requestBody),
+        ...this.setRequestBodyAndHeaders(requestBody),
       });
 
       const isJson = response.headers.get("Content-Type") === "application/json";

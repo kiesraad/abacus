@@ -17,9 +17,13 @@ export function DataEntryHomePage() {
 
   // re-fetch statuses when component mounts
   useEffect(() => {
-    refetch().catch((e: unknown) => {
-      throw e;
-    });
+    const aboortController = new AbortController();
+
+    void refetch(aboortController);
+
+    return () => {
+      aboortController.abort();
+    };
   }, [refetch]);
 
   const showDataEntrySavedAlert = location.hash === "#data-entry-saved";

@@ -11,17 +11,17 @@ const labelForPollingStationType: { [K in PollingStationType]: string } = {
 
 export function PollingStationListPage() {
   const electionId = useNumericParam("electionId");
-  const { state } = usePollingStationListRequest(electionId);
+  const { requestState } = usePollingStationListRequest(electionId);
 
-  if (state.status === "loading") {
+  if (requestState.status === "loading") {
     return null;
   }
 
-  if (state.status === "api-error" || state.status === "network-error") {
-    throw state.error;
+  if (requestState.status === "api-error" || requestState.status === "network-error") {
+    throw requestState.error;
   }
 
-  const data = state.data;
+  const data = requestState.data;
 
   return (
     <>

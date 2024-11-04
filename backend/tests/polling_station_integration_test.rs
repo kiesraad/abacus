@@ -89,13 +89,6 @@ async fn test_polling_station_non_unique(pool: SqlitePool) {
 
     let status = response.status();
     assert_eq!(status, StatusCode::CONFLICT, "Unexpected response status");
-
-    let body: PollingStation = response.json().await.unwrap();
-
-    println!("response body: {:?}", &body);
-    assert_eq!(body.election_id, election_id);
-    assert!(body.name == "New Polling Station");
-    assert!(body.polling_station_type == PollingStationType::FixedLocation);
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]

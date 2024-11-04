@@ -186,65 +186,71 @@ pub enum APIError {
 
 impl IntoResponse for APIError {
     fn into_response(self) -> Response {
-        fn to_error(error: String) -> ErrorResponse {
-            ErrorResponse { error }
+        fn to_error(error: &str) -> ErrorResponse {
+            ErrorResponse {
+                error: error.to_string(),
+            }
         }
 
         let (status, response) = match self {
-            APIError::NotFound(message) => (StatusCode::NOT_FOUND, to_error(message)),
-            APIError::Conflict(message) => (StatusCode::CONFLICT, to_error(message)),
+            APIError::NotFound(message) => (StatusCode::NOT_FOUND, to_error(&message)),
+            APIError::Conflict(message) => (StatusCode::CONFLICT, to_error(&message)),
             APIError::InvalidData(err) => {
                 error!("Invalid data error: {}", err);
-                (
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                    to_error("Invalid data".to_string()),
-                )
+                (StatusCode::UNPROCESSABLE_ENTITY, to_error("Invalid data"))
             }
             APIError::JsonRejection(rejection) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
-                to_error(rejection.body_text()),
+                to_error(&rejection.body_text()),
             ),
             APIError::SerdeJsonError(err) => {
                 error!("Serde JSON error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".to_string()),
+                    to_error("Internal server error"),
                 )
             }
-            APIError::SqlxError(RowNotFound) => (
-                StatusCode::NOT_FOUND,
-                to_error("Resource not found".to_string()),
-            ),
+            APIError::SqlxError(RowNotFound) => {
+                (StatusCode::NOT_FOUND, to_error("Resource not found"))
+            }
             APIError::SqlxError(err) => {
                 error!("SQLx error: {:?}", err);
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".to_string()),
-                )
+                if err
+                    .into_database_error()
+                    .map(|e| e.is_unique_violation())
+                    .unwrap_or_default()
+                {
+                    (StatusCode::CONFLICT, to_error("Resource already exists"))
+                } else {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        to_error("Internal server error"),
+                    )
+                }
             }
             APIError::InvalidHeaderValue => (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                to_error("Internal server error".to_string()),
+                to_error("Internal server error"),
             ),
             APIError::PdfGenError(err) => {
                 error!("PDF generation error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".into()),
+                    to_error("Internal server error"),
                 )
             }
             APIError::StdError(err) => {
                 error!("Error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".to_string()),
+                    to_error("Internal server error"),
                 )
             }
             APIError::AddError(err) => {
                 error!("Error while adding totals: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".into()),
+                    to_error("Internal server error"),
                 )
             }
         };

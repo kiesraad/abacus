@@ -5,7 +5,6 @@ import { getBaseUrl, getUrlForFormSectionID } from "app/component/pollingstation
 
 import {
   ApiError,
-  ApiResponseStatus,
   buildFormState,
   Election,
   getClientState,
@@ -13,13 +12,14 @@ import {
   getInitialFormState,
   getInitialValues,
   getNextSectionID,
+  NetworkError,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   PollingStationResults,
   SaveDataEntryRequest,
   SaveDataEntryResponse,
   updateFormStateAfterSubmit,
   useApi,
-  useApiGetRequest,
+  useApiRequest,
   ValidationResult,
   VotersRecounts,
 } from "@kiesraad/api";
@@ -138,7 +138,7 @@ export function PollingStationFormController({
   defaultCurrentForm = null,
 }: PollingStationFormControllerProps) {
   const requestPath: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
-  const { client } = useApi();
+  const client = useApi();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -163,9 +163,10 @@ export function PollingStationFormController({
     return true;
   }, []);
 
-  const initialDataRequest = useApiGetRequest<GetDataEntryResponse>(requestPath);
+  const { requestState: initialDataRequest } = useApiRequest<GetDataEntryResponse>(requestPath);
+
   React.useEffect(() => {
-    if (initialDataRequest.data) {
+    if (initialDataRequest.status === "success") {
       const responseData = initialDataRequest.data;
       setValues(responseData.data);
 
@@ -181,7 +182,7 @@ export function PollingStationFormController({
         setFormState(getInitialFormState(election));
         setTargetFormSectionID(INITIAL_FORM_SECTION_ID);
       }
-    } else if (initialDataRequest.error) {
+    } else if (initialDataRequest.status === "api-error") {
       if (initialDataRequest.error.code === 404) {
         // data entry not found, set initial values
         const values = getInitialValues(election, defaultValues);
@@ -197,7 +198,7 @@ export function PollingStationFormController({
           client_state: clientState,
         };
         void client.postRequest(requestPath, requestBody).then((response) => {
-          if (response.status !== ApiResponseStatus.Success) {
+          if (response instanceof ApiError) {
             setApiError(response);
             return;
           }
@@ -206,16 +207,7 @@ export function PollingStationFormController({
         setApiError(initialDataRequest.error);
       }
     }
-  }, [
-    defaultValues,
-    defaultFormState,
-    election,
-    pollingStationId,
-    initialDataRequest.data,
-    initialDataRequest.error,
-    client,
-    requestPath,
-  ]);
+  }, [defaultValues, defaultFormState, election, pollingStationId, initialDataRequest, client, requestPath]);
 
   // check if the targetFormSectionID has changed and navigate to the url for that section
   React.useEffect(() => {
@@ -327,9 +319,13 @@ export function PollingStationFormController({
     } satisfies SaveDataEntryRequest);
     status.current = aborting ? "aborted" : "idle";
 
-    if (response.status !== ApiResponseStatus.Success) {
+    if (response instanceof ApiError) {
       setApiError(response);
       return;
+    }
+
+    if (response instanceof NetworkError) {
+      throw response;
     }
 
     const data = response.data as SaveDataEntryResponse;
@@ -347,20 +343,34 @@ export function PollingStationFormController({
   const deleteDataEntry = async () => {
     status.current = "deleting";
     const response = await client.deleteRequest(requestPath);
-    // ignore 404, as it means the data entry was never saved or already deleted
-    if (response.status !== ApiResponseStatus.Success && response.code !== 404) {
-      status.current = "idle";
-      throw response.withContext("Failed to delete data entry");
+
+    if (response instanceof ApiError) {
+      // ignore 404, as it means the data entry was never saved or already deleted
+      if (response.code !== 404) {
+        status.current = "idle";
+        throw response.withContext("Failed to delete data entry");
+      }
+
+      setApiError(response);
+      return;
     }
+
+    if (response instanceof NetworkError) {
+      throw response;
+    }
+
     status.current = "deleted";
   };
 
   const finaliseDataEntry = async () => {
     status.current = "finalising";
     const response = await client.postRequest(requestPath + "/finalise");
-    if (response.status !== ApiResponseStatus.Success) {
+
+    if (response instanceof ApiError) {
       status.current = "idle";
       setApiError(response);
+    } else if (response instanceof NetworkError) {
+      throw response;
     } else {
       setApiError(null);
       status.current = "finalised";

@@ -10,6 +10,9 @@ import { NotFoundError } from "./Error.types";
 export function ErrorBoundary() {
   const error = useRouteError() as Error;
 
+  // debug print the error to the console
+  console.error(error);
+
   if (error instanceof NotFoundError) {
     return <NotFound message={error.message} path={error.path} />;
   }

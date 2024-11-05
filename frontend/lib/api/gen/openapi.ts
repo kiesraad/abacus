@@ -128,11 +128,30 @@ export interface ElectionStatusResponse {
   statuses: PollingStationStatusEntry[];
 }
 
+export type ErrorReference =
+  | "EntryNumberNotSupported"
+  | "EntryNotFound"
+  | "PollingStationAlreadyFinalized"
+  | "PollingStationDataValidation"
+  | "InvalidVoteGroup"
+  | "InvalidVoteCandidate"
+  | "InvalidData"
+  | "InvalidJson"
+  | "EntryNotUnique"
+  | "DatabaseError"
+  | "InternalServerError"
+  | "PdfGenerationError"
+  | "PollingStationRepeated"
+  | "PollingStationValidationErrors"
+  | "InvalidPoliticalGroup";
+
 /**
  * Response structure for errors
  */
 export interface ErrorResponse {
   error: string;
+  fatal: boolean;
+  reference: ErrorReference;
 }
 
 /**

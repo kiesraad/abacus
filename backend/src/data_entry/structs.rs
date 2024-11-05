@@ -1,4 +1,5 @@
 use crate::election::Election;
+use crate::error::ErrorReference;
 use crate::polling_station::structs::PollingStation;
 use crate::validation::{
     above_percentage_threshold, ValidationResult, ValidationResultCode, ValidationResults,
@@ -830,10 +831,13 @@ pub struct PoliticalGroupVotes {
 impl PoliticalGroupVotes {
     pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
         if self.number != other.number {
-            return Err(APIError::AddError(format!(
-                "Attempted to add votes of group '{}' to '{}'",
-                other.number, self.number
-            )));
+            return Err(APIError::AddError(
+                format!(
+                    "Attempted to add votes of group '{}' to '{}'",
+                    other.number, self.number
+                ),
+                ErrorReference::InvalidVoteGroup,
+            ));
         }
 
         self.total += other.total;
@@ -844,7 +848,10 @@ impl PoliticalGroupVotes {
                 .iter_mut()
                 .find(|c| c.number == cv.number)
             else {
-                return Err(APIError::AddError(format!("Attempted to add candidate '{}' votes in group '{}', but no such candidate exists", cv.number, self.number)));
+                return Err(APIError::AddError(
+                    format!("Attempted to add candidate '{}' votes in group '{}', but no such candidate exists", cv.number, self.number),
+                    ErrorReference::InvalidVoteCandidate,
+                ));
             };
             found_can.votes += cv.votes;
         }

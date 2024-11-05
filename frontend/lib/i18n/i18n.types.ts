@@ -9,9 +9,38 @@ export interface Translation {
 
   election: string;
   elections: string;
+  number: string;
+  vote_count: string;
+  candidate: string;
+  list: string;
   manage_elections: string;
   role: string;
   status: string;
+  progress: string;
+  shortcuts: string;
+  all_together: string;
+  server: string;
+  version: string;
+
+  totals_list: string;
+
+  error: string;
+  history_back: string;
+  stack_trace: string;
+  something_went_wrong: string;
+  error_code: string;
+  close_message: string;
+  next: string;
+
+  "candidates_votes.check_totals": string;
+  "candidates_votes.check_paper_report": string;
+  "candidates_votes.confirm_counts": string;
+  "candidates_votes.goto_totals": string;
+
+  "status.unfinished": string;
+  "status.in_progress": string;
+  "status.definitive": string;
+  "status.not_started": string;
 
   "election_status.title": string;
   "election_status.first_session": string;

@@ -3,9 +3,39 @@ export const nl = {
 
   election: "Verkiezing",
   elections: "Verkiezingen",
+  list: "Lijst",
+  number: "Nummer",
+  vote_count: "Aantal stemmen",
+  candidate: "Kandidaat",
   manage_elections: "Beheer verkiezingen",
   role: "Rol",
   status: "Status",
+  progress: "Voortgang",
+  shortcuts: "Snelkoppelingen",
+  all_together: "Alles samen",
+  server: "Server",
+  version: "Versie",
+  totals_list: "Totaal lijst {group_number}",
+  next: "Volgende",
+
+  error: "Fout",
+  history_back: "Terug naar de vorige pagina",
+  stack_trace: "Fout details",
+  something_went_wrong: "Er is iets misgegaan",
+  error_code: "Foutcode",
+  close_message: "Melding sluiten",
+
+  "candidates_votes.check_totals":
+    "Controleer het totaal van deze lijst. Overleg met coördinator als het papier niet is ingevuld.",
+  "candidates_votes.check_paper_report":
+    "Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.",
+  "candidates_votes.confirm_counts": "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+  "candidates_votes.goto_totals": "Snel naar totaal van de lijst",
+
+  "status.unfinished": "Niet afgeronde invoer",
+  "status.in_progress": "Invoer bezig",
+  "status.definitive": "Eerste invoer klaar",
+  "status.not_started": "Werkvoorraad",
 
   "election_status.title": "Status verkiezing - Abacus",
   "election_status.first_session": "Eerste zitting",

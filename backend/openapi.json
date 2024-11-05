@@ -834,7 +834,8 @@
         "required": [
           "data",
           "client_state",
-          "validation_results"
+          "validation_results",
+          "updated_at"
         ],
         "properties": {
           "client_state": {
@@ -842,6 +843,10 @@
           },
           "data": {
             "$ref": "#/components/schemas/PollingStationResults"
+          },
+          "updated_at": {
+            "type": "integer",
+            "format": "int64"
           },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
@@ -972,7 +977,7 @@
       },
       "PollingStationResults": {
         "type": "object",
-        "description": "PollingStationResults, following the fields in Model Na 31-2 Bijage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
+        "description": "PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
         "required": [
           "voters_counts",
           "votes_counts",
@@ -1025,6 +1030,10 @@
           "status"
         ],
         "properties": {
+          "finished_at": {
+            "type": "integer",
+            "format": "int64"
+          },
           "id": {
             "type": "integer",
             "format": "int32",

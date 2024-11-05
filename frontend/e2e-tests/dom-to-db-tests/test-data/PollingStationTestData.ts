@@ -62,4 +62,5 @@ export const emptyDataEntryResponse: GetDataEntryResponse = {
     warnings: [],
   },
   client_state: {},
+  updated_at: Number(Date.now() / 1000),
 };

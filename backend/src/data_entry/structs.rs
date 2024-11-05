@@ -53,9 +53,10 @@ fn difference_admitted_voters_count_and_votes_cast_count_above_threshold(
 pub struct PollingStationResultsEntry {
     pub polling_station_id: u32,
     pub data: PollingStationResults,
+    pub created_at: i64,
 }
 
-/// PollingStationResults, following the fields in Model Na 31-2 Bijage 2.
+/// PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.
 ///
 /// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
 /// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,

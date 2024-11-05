@@ -45,6 +45,9 @@ impl From<String> for PollingStationType {
 pub struct PollingStationStatusEntry {
     pub id: u32,
     pub status: PollingStationStatus,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub finished_at: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq, Clone)]

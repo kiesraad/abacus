@@ -20,7 +20,7 @@ export const nl = {
   check_and_save: "Controleren en opslaan",
   error: "Fout",
   history_back: "Terug naar de vorige pagina",
-  stack_trace: "Fout details",
+  stack_trace: "Foutmelding",
   something_went_wrong: "Sorry, er ging iets mis",
   error_code: "Foutcode",
   close_message: "Melding sluiten",

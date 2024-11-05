@@ -1676,8 +1676,8 @@ dependencies = [
 
 [[package]]
 name = "memory-serve"
-version = "0.6.0"
-source = "git+https://github.com/tweedegolf/memory-serve.git?branch=no-proc-macro#7fad903403a87d7ae26ef3de8b5d535c454e2cd0"
+version = "1.0.0"
+source = "git+https://github.com/tweedegolf/memory-serve.git?branch=no-proc-macro#0f7dade6946faa734fcb4ce80205b16b675161f1"
 dependencies = [
  "axum",
  "brotli",
@@ -3978,7 +3978,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]

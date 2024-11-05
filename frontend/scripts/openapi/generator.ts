@@ -38,52 +38,56 @@ export async function generate(openApiString: string): Promise<string> {
 
 function addPath(path: string, v: PathsObject | undefined) {
   if (!v) return "";
+
   const result: string[] = [`// ${path}`];
-  let requestPath = path;
-  if (v.post || v.get) {
-    const request = (v.post || v.get) as OperationObject;
+  for (const method in v) {
+    result.push(addRequest(path, v[method] as OperationObject));
+  }
 
-    assert(typeof request.operationId === "string");
-    let id: string = request.operationId;
-    id = id.toUpperCase();
+  return result.join("\n");
+}
 
-    if (request.parameters) {
-      result.push(`export interface ${id}_REQUEST_PARAMS {`);
-      request.parameters.forEach((p) => {
-        if ("$ref" in p) {
-          result.push(`// ${p.$ref.substring(p.$ref.lastIndexOf("/") + 1)}`);
-        } else {
-          const paramType = tsType(p.schema);
-          requestPath = requestPath.replace(`{${p.name}}`, `\${${paramType}}`);
-          result.push(`${p.name}: ${paramType};`);
-        }
-      });
-      result.push("}");
-    } else {
-      // From ESLint: An empty interface declaration allows any non-nullish value, including literals like `0` and `""`.
-      // More information: https://www.totaltypescript.com/the-empty-object-type-in-typescript
-      result.push(`export type ${id}_REQUEST_PARAMS = Record<string, never>;`);
-    }
-    result.push(`export type ${id}_REQUEST_PATH = \`${requestPath}\`;`);
+function addRequest(requestPath: string, request: OperationObject) {
+  const result: string[] = [];
+  assert(typeof request.operationId === "string");
+  let id: string = request.operationId;
+  id = id.toUpperCase();
 
-    if (request.requestBody) {
-      if ("$ref" in request.requestBody) {
-        result.push(
-          `export type ${id}_REQUEST_BODY = ${request.requestBody.$ref.substring(request.requestBody.$ref.lastIndexOf("/") + 1)};`,
-        );
+  if (request.parameters) {
+    result.push(`export interface ${id}_REQUEST_PARAMS {`);
+    request.parameters.forEach((p) => {
+      if ("$ref" in p) {
+        result.push(`// ${p.$ref.substring(p.$ref.lastIndexOf("/") + 1)}`);
       } else {
-        const media = request.requestBody.content["application/json"];
-        if (media?.schema) {
-          if ("$ref" in media.schema) {
-            result.push(
-              `export type ${id}_REQUEST_BODY = ${media.schema.$ref.substring(media.schema.$ref.lastIndexOf("/") + 1)};`,
-            );
-          }
+        const paramType = tsType(p.schema);
+        requestPath = requestPath.replace(`{${p.name}}`, `\${${paramType}}`);
+        result.push(`${p.name}: ${paramType};`);
+      }
+    });
+    result.push("}");
+  } else {
+    // From ESLint: An empty interface declaration allows any non-nullish value, including literals like `0` and `""`.
+    // More information: https://www.totaltypescript.com/the-empty-object-type-in-typescript
+    result.push(`export type ${id}_REQUEST_PARAMS = Record<string, never>;`);
+  }
+  result.push(`export type ${id}_REQUEST_PATH = \`${requestPath}\`;`);
+
+  if (request.requestBody) {
+    if ("$ref" in request.requestBody) {
+      result.push(
+        `export type ${id}_REQUEST_BODY = ${request.requestBody.$ref.substring(request.requestBody.$ref.lastIndexOf("/") + 1)};`,
+      );
+    } else {
+      const media = request.requestBody.content["application/json"];
+      if (media?.schema) {
+        if ("$ref" in media.schema) {
+          result.push(
+            `export type ${id}_REQUEST_BODY = ${media.schema.$ref.substring(media.schema.$ref.lastIndexOf("/") + 1)};`,
+          );
         }
       }
     }
   }
-
   return result.join("\n");
 }
 

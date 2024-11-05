@@ -1,10 +1,7 @@
 import assert from "assert";
-import path from "path";
-import { format, resolveConfig } from "prettier";
+import { format, resolveConfig, resolveConfigFile } from "prettier";
 
 import { OpenAPIV3, OperationObject, PathsObject, ReferenceObject, SchemaObject } from "./openapi";
-
-const PROJECT_ROOT = path.join(__dirname, "../..");
 
 export async function generate(openApiString: string): Promise<string> {
   const spec = JSON.parse(openApiString) as OpenAPIV3;
@@ -32,8 +29,10 @@ export async function generate(openApiString: string): Promise<string> {
 
   let s = result.join("\n");
 
-  const localOptions = await resolveConfig(PROJECT_ROOT);
+  const configPath = await resolveConfigFile();
+  const localOptions = await resolveConfig(configPath || "./");
   const options = localOptions ?? {};
+
   s = await format(s, { parser: "typescript", ...options });
 
   return s;

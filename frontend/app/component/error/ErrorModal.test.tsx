@@ -8,7 +8,7 @@ describe("Component: ErrorModal", () => {
   test("Server error has expected children", () => {
     const { getByText } = render(<ServerErrorModal />);
 
-    expect(getByText("Er is iets misgegaan")).toBeInTheDocument();
+    expect(getByText("Sorry, er ging iets mis")).toBeInTheDocument();
     expect(getByText("500")).toBeInTheDocument();
   });
 });

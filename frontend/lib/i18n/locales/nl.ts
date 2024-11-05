@@ -21,7 +21,7 @@ export const nl = {
   error: "Fout",
   history_back: "Terug naar de vorige pagina",
   stack_trace: "Fout details",
-  something_went_wrong: "Er is iets misgegaan",
+  something_went_wrong: "Sorry, er ging iets mis",
   error_code: "Foutcode",
   close_message: "Melding sluiten",
 

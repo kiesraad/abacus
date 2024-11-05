@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import { describe, expect, test } from "vitest";
 
@@ -12,10 +12,10 @@ const CURRENT_SPEC_PATH = `${FRONTEND_ROOT}/lib/api/gen/openapi.ts`;
 
 describe("openapi spec", () => {
   test("openapi spec is up to date", async () => {
-    const openAPIJSONString = fs.readFileSync(OPEN_API_JSON_PATH, "utf8");
+    const openAPIJSONString = await fs.readFile(OPEN_API_JSON_PATH, "utf8");
 
     const latestSpecString = await generate(openAPIJSONString);
-    const currentSpecString = fs.readFileSync(CURRENT_SPEC_PATH, "utf8");
+    const currentSpecString = await fs.readFile(CURRENT_SPEC_PATH, "utf8");
 
     expect(currentSpecString).toBe(latestSpecString);
   });

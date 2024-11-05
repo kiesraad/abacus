@@ -155,7 +155,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
   } catch (e) {
     if (e instanceof SyntaxError) {
       return HttpResponse.json(
-        { error: "Invalid JSON", reference: "InvalidData", fatal: false } satisfies ErrorResponse,
+        { error: "Invalid JSON", reference: "InvalidData", fatal: true } satisfies ErrorResponse,
         { status: 422 },
       );
     } else {

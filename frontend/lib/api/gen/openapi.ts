@@ -136,6 +136,7 @@ export type ErrorReference =
   | "InvalidVoteGroup"
   | "InvalidVoteCandidate"
   | "InvalidData"
+  | "InvalidJson"
   | "EntryNotUnique"
   | "DatabaseError"
   | "InternalServerError"

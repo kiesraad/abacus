@@ -798,6 +798,7 @@
           "InvalidVoteGroup",
           "InvalidVoteCandidate",
           "InvalidData",
+          "InvalidJson",
           "EntryNotUnique",
           "DatabaseError",
           "InternalServerError",

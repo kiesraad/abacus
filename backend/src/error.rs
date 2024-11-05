@@ -21,6 +21,7 @@ pub enum ErrorReference {
     InvalidVoteGroup,
     InvalidVoteCandidate,
     InvalidData,
+    InvalidJson,
     EntryNotUnique,
     DatabaseError,
     InternalServerError,
@@ -90,7 +91,7 @@ impl IntoResponse for APIError {
             }
             APIError::JsonRejection(rejection) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
-                to_error(rejection.body_text(), ErrorReference::InvalidData, false),
+                to_error(rejection.body_text(), ErrorReference::InvalidJson, true),
             ),
             APIError::SerdeJsonError(err) => {
                 error!("Serde JSON error: {:?}", err);
@@ -98,7 +99,7 @@ impl IntoResponse for APIError {
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error(
                         "Internal server error".to_string(),
-                        ErrorReference::InvalidData,
+                        ErrorReference::InvalidJson,
                         true,
                     ),
                 )

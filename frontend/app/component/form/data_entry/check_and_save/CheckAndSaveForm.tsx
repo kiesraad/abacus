@@ -56,15 +56,11 @@ export function CheckAndSaveForm() {
     <Form onSubmit={handleSubmit} id="check_save_form" title={t("check_and_save")}>
       <section className="md" id="save-form-summary-text">
         {!summary.hasBlocks && summary.countsAddUp && (
-          <p className="md">
-            {t("check_and_save.counts_add_up")} {t("check_and_save.no_warnings")}
-          </p>
+          <p className="md">{t("check_and_save.counts_add_up.no_warnings")}</p>
         )}
         {summary.hasBlocks && summary.countsAddUp && (
           <>
-            <p className="md">
-              {t("check_and_save.counts_add_up")} {t("check_and_save.warnings")}
-            </p>
+            <p className="md">{t("check_and_save.counts_add_up.warnings")}</p>
             <p className="md">{t("check_and_save.check_warnings")}</p>
           </>
         )}

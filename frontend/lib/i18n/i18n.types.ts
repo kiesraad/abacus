@@ -37,7 +37,8 @@ export interface Translation {
   "candidates_votes.confirm_counts": string;
   "candidates_votes.goto_totals": string;
 
-  "check_and_save.counts_add_up": string;
+  "check_and_save.counts_add_up.warnings": string;
+  "check_and_save.counts_add_up.no_warnings": string;
   "check_and_save.counts_do_not_add_up": string;
   "check_and_save.no_warnings": string;
   "check_and_save.warnings": string;

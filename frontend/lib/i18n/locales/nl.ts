@@ -33,17 +33,19 @@ export const nl = {
   "candidates_votes.confirm_counts": "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
   "candidates_votes.goto_totals": "Snel naar totaal van de lijst",
 
-  "check_and_save.counts_add_up":
-    "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen.",
+  "check_and_save.counts_add_up.warnings":
+    "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn waarschuwingen die moeten worden gecontroleerd.",
+  "check_and_save.counts_add_up.no_warnings":
+    "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
   "check_and_save.counts_do_not_add_up":
     "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar tegen. Je kan de resultaten daarom niet opslaan.",
-  "check_and_save.no_warnings": "Er zijn geen blokkerende fouten of waarschuwingen.",
-  "check_and_save.warnings": "Er zijn waarschuwingen die moeten worden gecontroleerd.",
-  "check_and_save.check_warnings": "Controleer de openstaande waarschuwingen.",
+  "check_and_save.no_warnings": "Er zijn geen blokkerende fouten of waarschuwingen",
+  "check_and_save.warnings": "Er zijn waarschuwingen die moeten worden gecontroleerd",
+  "check_and_save.check_warnings": "Controleer de openstaande waarschuwingen",
   "check_and_save.fix_the_errors": "Los de blokkerende fouten op. Lukt dat niet? Overleg dan met de coördinator.",
   "check_and_save.counts_add_up_title": "Alle optellingen kloppen",
-  "check_and_save.can_not_save": "Je kan de resultaten van dit stembureau nog niet opslaan.",
-  "check_and_save.can_save": "Je kan de resultaten van dit stembureau opslaan.",
+  "check_and_save.can_not_save": "Je kan de resultaten van dit stembureau nog niet opslaan",
+  "check_and_save.can_save": "Je kan de resultaten van dit stembureau opslaan",
 
   "check_and_save.notable_form_sections.empty": "Op <link>{link_title}</link> zijn geen stemmen ingevoerd",
   "check_and_save.notable_form_sections.accepted-warnings":

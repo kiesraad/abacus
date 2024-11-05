@@ -92,21 +92,27 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     }
   }, [isSaved, errors, warnings]);
 
+  const [missingTotalError, setMissingTotalError] = React.useState(false);
   const [warningsWarning, setWarningsWarning] = React.useState(false);
 
   const handleSubmit = (event: React.FormEvent<CandidatesVotesFormElement>) =>
     void (async (event: React.FormEvent<CandidatesVotesFormElement>) => {
       event.preventDefault();
 
-      if (errors.length === 0 && warnings.length > 0) {
+      const values = getValues();
+      if (values.candidate_votes.some((candidate) => candidate.votes > 0) && values.total === 0) {
+        setMissingTotalError(true);
+        document.getElementById("total")?.focus();
+      } else if (errors.length === 0 && warnings.length > 0) {
         const acceptWarnings = acceptWarningsRef.current?.checked || false;
-
+        setMissingTotalError(false);
         if (!hasChanges && !acceptWarnings) {
           setWarningsWarning(true);
         } else {
           await submit({ acceptWarnings });
         }
       } else {
+        setMissingTotalError(false);
         await submit();
       }
     })(event);
@@ -168,9 +174,17 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             defaultValue={sectionValues?.total || ""}
             isListTotal
             {...defaultProps}
+            error={missingTotalError ? "missing-total-error" : undefined}
           />
         </InputGrid.Body>
       </InputGrid>
+      {missingTotalError && (
+        <div id="missing-total-error">
+          <Alert type="error" variant="small">
+            <p>Controleer het totaal van deze lijst. Overleg met coördinator als het papier niet is ingevuld.</p>
+          </Alert>
+        </div>
+      )}
       <BottomBar type="input-grid">
         {warningsWarning && (
           <BottomBar.Row>

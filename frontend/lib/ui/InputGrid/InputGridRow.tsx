@@ -13,6 +13,7 @@ export interface InputGridRowProps {
   defaultValue?: string | number;
   isTotal?: boolean;
   isListTotal?: boolean;
+  error?: string;
   addSeparator?: boolean;
 }
 
@@ -26,6 +27,7 @@ export function InputGridRow({
   isTotal,
   isListTotal,
   id,
+  error,
   addSeparator,
 }: InputGridRowProps) {
   const errors = errorsAndWarnings?.get(id)?.errors;
@@ -36,15 +38,21 @@ export function InputGridRow({
   const children: [React.ReactElement, React.ReactElement, React.ReactElement] = [
     <td key={`${id}-1`}>{field}</td>,
     <td key={`${id}-2`} id={`cell-${id}`}>
-      <FormField hasError={hasError} hasWarning={hasWarning}>
+      <FormField hasError={!!error || hasError} hasWarning={hasWarning}>
         <NumberInput
           key={id}
           id={id}
           name={name || id}
           defaultValue={defaultValue}
-          aria-invalid={hasError || (hasWarning && !warningsAccepted) ? "true" : "false"}
+          aria-invalid={!!error || hasError || (hasWarning && !warningsAccepted) ? "true" : "false"}
           aria-errormessage={
-            hasError ? "feedback-error" : hasWarning && !warningsAccepted ? "feedback-warning" : undefined
+            error
+              ? error
+              : hasError
+                ? "feedback-error"
+                : hasWarning && !warningsAccepted
+                  ? "feedback-warning"
+                  : undefined
           }
         />
       </FormField>

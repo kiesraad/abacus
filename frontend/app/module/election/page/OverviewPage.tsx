@@ -45,7 +45,7 @@ export function OverviewPage() {
       </NavBar>
       <header>
         <section>
-          <h1>{isAdministrator ? t("elections") : t("manage_elections")}</h1>
+          <h1>{isAdministrator ? t("manage_elections") : t("elections")}</h1>
         </section>
         {!isAdministrator && (
           <section>

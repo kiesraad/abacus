@@ -47,6 +47,11 @@ export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
 }
 export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
 export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = SaveDataEntryRequest;
+export interface POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS {
+  polling_station_id: number;
+  entry_number: number;
+}
+export type POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
 export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
@@ -138,11 +143,30 @@ export interface ElectionStatusResponse {
   statuses: PollingStationStatusEntry[];
 }
 
+export type ErrorReference =
+  | "EntryNumberNotSupported"
+  | "EntryNotFound"
+  | "PollingStationAlreadyFinalized"
+  | "PollingStationDataValidation"
+  | "InvalidVoteGroup"
+  | "InvalidVoteCandidate"
+  | "InvalidData"
+  | "InvalidJson"
+  | "EntryNotUnique"
+  | "DatabaseError"
+  | "InternalServerError"
+  | "PdfGenerationError"
+  | "PollingStationRepeated"
+  | "PollingStationValidationErrors"
+  | "InvalidPoliticalGroup";
+
 /**
  * Response structure for errors
  */
 export interface ErrorResponse {
   error: string;
+  fatal: boolean;
+  reference: ErrorReference;
 }
 
 /**
@@ -151,6 +175,7 @@ export interface ErrorResponse {
 export interface GetDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
+  updated_at: number;
   validation_results: ValidationResults;
 }
 
@@ -209,7 +234,7 @@ export interface PollingStationListResponse {
 }
 
 /**
- * PollingStationResults, following the fields in Model Na 31-2 Bijage 2.
+ * PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.
 
 See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
 lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
@@ -229,6 +254,7 @@ export interface PollingStationResults {
 export type PollingStationStatus = "not_started" | "first_entry_in_progress" | "first_entry_unfinished" | "definitive";
 
 export interface PollingStationStatusEntry {
+  finished_at?: number;
   id: number;
   status: PollingStationStatus;
 }

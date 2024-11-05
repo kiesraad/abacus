@@ -2,14 +2,19 @@ import { ClientState, Election, PollingStation, PollingStationResults } from "@k
 
 import { getElectionMockData } from "./ElectionMockData.ts";
 
-export interface ResultRecord {
+export interface Record {
   pollingStationId: number;
   entryNumber: number;
   data: PollingStationResults;
 }
 
-export interface DataEntryRecord extends ResultRecord {
+export interface ResultRecord extends Record {
+  created_at: number;
+}
+
+export interface DataEntryRecord extends Record {
   clientState: ClientState;
+  updated_at: number;
 }
 
 interface Database {

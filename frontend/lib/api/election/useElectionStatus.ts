@@ -4,8 +4,10 @@ import { ElectionStatusProviderContext } from "./ElectionStatusProviderContext";
 
 export function useElectionStatus() {
   const context = useContext(ElectionStatusProviderContext);
-  if (context === undefined) {
+
+  if (!context) {
     throw new Error("useElectionStatus must be used within an ElectionStatusProvider");
   }
+
   return context;
 }

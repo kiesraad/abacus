@@ -1,4 +1,4 @@
-import { ErrorsAndWarnings } from "lib/api/api";
+import { ErrorsAndWarnings } from "lib/api/api.types";
 
 import { Election, PollingStationResults, ValidationResult, ValidationResults } from "@kiesraad/api";
 import { ValidationResultType } from "@kiesraad/ui";

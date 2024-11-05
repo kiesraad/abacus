@@ -20,15 +20,13 @@ const startPollingStationInput = async () => {
   expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1");
 };
 
-const expectRecountedForm = async (headingShouldHaveFocus = true) => {
+const expectRecountedForm = async (inputShouldHaveFocus = true) => {
   await waitFor(() => {
     expect(screen.getByTestId("recounted_form")).toBeInTheDocument();
   });
-  if (headingShouldHaveFocus) {
+  if (inputShouldHaveFocus) {
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { level: 2, name: "Is het selectievakje op de eerste pagina aangevinkt?" }),
-      ).toHaveFocus();
+      expect(screen.getByTestId("yes")).toHaveFocus();
     });
   }
 };
@@ -47,15 +45,13 @@ const fillRecountedFormYes = async () => {
   });
 };
 
-const expectVotersAndVotesForm = async (headingShouldHaveFocus = true) => {
+const expectVotersAndVotesForm = async (inputShouldHaveFocus = true) => {
   await waitFor(() => {
     expect(screen.getByTestId("voters_and_votes_form")).toBeInTheDocument();
   });
-  if (headingShouldHaveFocus) {
+  if (inputShouldHaveFocus) {
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { level: 2, name: "Toegelaten kiezers en uitgebrachte stemmen" }),
-      ).toHaveFocus();
+      expect(screen.getByTestId("poll_card_count")).toHaveFocus();
     });
   }
 };
@@ -77,18 +73,13 @@ const fillVotersAndVotesForm = async (values?: Record<string, number>) => {
   await userTypeInputs(user, userValues);
 };
 
-const expectDifferencesForm = async (headingShouldHaveFocus = true) => {
+const expectDifferencesForm = async (inputShouldHaveFocus = true) => {
   await waitFor(() => {
     expect(screen.getByTestId("differences_form")).toBeInTheDocument();
   });
-  if (headingShouldHaveFocus) {
+  if (inputShouldHaveFocus) {
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", {
-          level: 2,
-          name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
-        }),
-      ).toHaveFocus();
+      expect(screen.getByTestId("more_ballots_count")).toHaveFocus();
     });
   }
 };
@@ -107,13 +98,13 @@ const fillDifferencesForm = async (values?: Record<string, number>) => {
   await userTypeInputs(user, userValues);
 };
 
-const expectPoliticalGroupCandidatesForm = async (pgNumber: number, headingShouldHaveFocus = true) => {
+const expectPoliticalGroupCandidatesForm = async (pgNumber: number, inputShouldHaveFocus = true) => {
   await waitFor(() => {
     expect(screen.getByTestId(`candidates_form_${pgNumber}`)).toBeInTheDocument();
   });
-  if (headingShouldHaveFocus) {
+  if (inputShouldHaveFocus) {
     await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 2 })).toHaveFocus();
+      expect(screen.getByTestId(`candidate_votes[0].votes`)).toHaveFocus();
     });
   }
 };
@@ -126,13 +117,13 @@ const fillPoliticalGroupCandidatesVotesForm = async () => {
   });
 };
 
-const expectCheckAndSavePage = async (headingShouldHaveFocus = true) => {
+const expectCheckAndSavePage = async (bodyShouldHaveFocus = true) => {
   await waitFor(() => {
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/save");
   });
-  if (headingShouldHaveFocus) {
+  if (bodyShouldHaveFocus) {
     await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 2, name: "Controleren en opslaan" })).toHaveFocus();
+      expect(document.body).toHaveFocus();
     });
   }
 };
@@ -226,28 +217,28 @@ const expect500ServerError = async () => {
 
 type FormIdentifier = "recounted" | "voters_and_votes" | "differences" | `candidates_${number}`;
 
-const gotoForm = async (id: FormIdentifier, headingShouldHaveFocus = true) => {
+const gotoForm = async (id: FormIdentifier, inputShouldHaveFocus = true) => {
   if (id.startsWith("candidates_")) {
     const bits = id.split("_");
     if (bits.length === 2 && bits[1]) {
       const pgNumber = parseInt(bits[1]);
       await userEvent.click(screen.getByRole("link", { name: `Lijst ${pgNumber}` }));
-      await expectPoliticalGroupCandidatesForm(pgNumber, headingShouldHaveFocus);
+      await expectPoliticalGroupCandidatesForm(pgNumber, inputShouldHaveFocus);
       return;
     }
   }
   switch (id) {
     case "recounted":
       await userEvent.click(screen.getByRole("link", { name: "Is er herteld?" }));
-      await expectRecountedForm(headingShouldHaveFocus);
+      await expectRecountedForm(inputShouldHaveFocus);
       break;
     case "voters_and_votes":
       await userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
-      await expectVotersAndVotesForm(headingShouldHaveFocus);
+      await expectVotersAndVotesForm(inputShouldHaveFocus);
       break;
     case "differences":
       await userEvent.click(screen.getByRole("link", { name: "Verschillen" }));
-      await expectDifferencesForm(headingShouldHaveFocus);
+      await expectDifferencesForm(inputShouldHaveFocus);
       break;
   }
 };

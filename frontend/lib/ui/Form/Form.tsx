@@ -65,7 +65,7 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
           }
           break;
         case "Enter":
-          if (event.target instanceof HTMLInputElement || event.target instanceof HTMLHeadingElement) {
+          if (event.target instanceof HTMLInputElement || event.target instanceof HTMLBodyElement) {
             event.preventDefault();
             if (event.shiftKey || document.activeElement === submitButton.current) {
               //ref.current.submit fails in testing environment (jsdom)

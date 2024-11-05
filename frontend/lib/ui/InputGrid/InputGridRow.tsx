@@ -46,7 +46,6 @@ export function InputGridRow({
           id={id}
           name={name || id}
           defaultValue={defaultValue}
-          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus={autoFocusInput}
           aria-labelledby={`field-${id} title-${id}`}
           aria-invalid={hasError || (hasWarning && !warningsAccepted) ? "true" : "false"}

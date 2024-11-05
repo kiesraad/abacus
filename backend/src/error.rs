@@ -185,7 +185,7 @@ impl From<sqlx::Error> for APIError {
                     ErrorReference::EntryNotUnique,
                 ),
                 sqlx::error::ErrorKind::ForeignKeyViolation => {
-                    APIError::InvalidData(DataError::new("Invalid accociated item"))
+                    APIError::InvalidData(DataError::new("Invalid associated item"))
                 }
                 sqlx::error::ErrorKind::NotNullViolation => {
                     APIError::InvalidData(DataError::new("Missing field"))

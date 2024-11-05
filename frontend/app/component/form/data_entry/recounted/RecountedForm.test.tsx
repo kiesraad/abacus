@@ -1,3 +1,4 @@
+import { waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
@@ -61,7 +62,7 @@ describe("Test RecountedForm", () => {
         level: 2,
         name: "Is het selectievakje op de eerste pagina aangevinkt?",
       });
-      expect(formTitle).toHaveFocus();
+      await waitFor(() => expect(formTitle).toHaveFocus());
       await user.keyboard("{tab}");
 
       const yes = await screen.findByTestId("yes");

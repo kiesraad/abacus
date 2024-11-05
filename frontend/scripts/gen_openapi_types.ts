@@ -6,7 +6,6 @@ import { generate } from "./openapi/generator";
 const PROJECT_ROOT = path.join(__dirname, "..");
 const TARGET_PATH = `${PROJECT_ROOT}/lib/api/gen`;
 const FILE_NAME = "openapi.ts";
-//const PRETTIER_CONFIG = path.join(PROJECT_ROOT, "/.prettierrc.cjs");
 
 async function run() {
   const fileString = fs.readFileSync("../backend/openapi.json", "utf8");

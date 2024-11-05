@@ -1,4 +1,4 @@
-import { Link, Outlet, useParams } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
 import { NotFoundError } from "app/component/error";
 import { NavBar } from "app/component/navbar/NavBar";
@@ -9,10 +9,10 @@ import { AbortDataEntryControl } from "app/module/data_entry";
 import { PollingStationFormController, useElection } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
 import { Badge, PageTitle, PollingStationNumber, StickyNav, WorkStationNumber } from "@kiesraad/ui";
-import { usePollingStationStatus } from "@kiesraad/util";
+import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";
 
 export function PollingStationLayout() {
-  const { pollingStationId } = useParams();
+  const pollingStationId = useNumericParam("pollingStationId");
   const { election, pollingStation } = useElection(pollingStationId);
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
 

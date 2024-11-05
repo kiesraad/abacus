@@ -3,6 +3,7 @@ import * as React from "react";
 import { NotFoundError } from "app/component/error";
 
 import { useElectionListRequest } from "@kiesraad/api";
+import { Loader } from "@kiesraad/ui";
 
 import { ElectionListProviderContext } from "./ElectionListProviderContext";
 
@@ -11,26 +12,30 @@ export interface ElectionListProviderProps {
 }
 
 export function ElectionListProvider({ children }: ElectionListProviderProps) {
-  const { error, data, loading } = useElectionListRequest();
+  const { requestState } = useElectionListRequest();
 
-  if (loading) {
-    return null;
+  if (requestState.status === "loading") {
+    return <Loader />;
   }
 
-  if (error) {
-    if (error.code === 404) {
+  if (requestState.status === "api-error") {
+    if (requestState.error.code === 404) {
       throw new NotFoundError("Verkiezingen niet gevonden");
     }
 
-    throw error;
+    throw requestState.error;
   }
 
-  if (!data || !data.elections.length) {
+  if (requestState.status === "network-error") {
+    throw requestState.error;
+  }
+
+  if (!requestState.data.elections.length) {
     throw new NotFoundError("Verkiezingen niet gevonden");
   }
 
   return (
-    <ElectionListProviderContext.Provider value={{ electionList: data.elections }}>
+    <ElectionListProviderContext.Provider value={{ electionList: requestState.data.elections }}>
       {children}
     </ElectionListProviderContext.Provider>
   );

@@ -7,4 +7,4 @@ export interface iElectionProviderContext {
   pollingStations: Required<PollingStation[]>;
 }
 
-export const ElectionProviderContext = createContext<iElectionProviderContext | undefined>(undefined);
+export const ElectionProviderContext = createContext<iElectionProviderContext | null>(null);

@@ -1,6 +1,6 @@
 import { PollingStationType, usePollingStationListRequest } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
-import { PageTitle } from "@kiesraad/ui";
+import { Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
 const labelForPollingStationType: { [K in PollingStationType]: string } = {
@@ -11,11 +11,17 @@ const labelForPollingStationType: { [K in PollingStationType]: string } = {
 
 export function PollingStationListPage() {
   const electionId = useNumericParam("electionId");
-  const { data, loading } = usePollingStationListRequest({ election_id: electionId });
+  const { requestState } = usePollingStationListRequest(electionId);
 
-  if (loading) {
-    return null;
+  if (requestState.status === "loading") {
+    return <Loader />;
   }
+
+  if (requestState.status === "api-error" || requestState.status === "network-error") {
+    throw requestState.error;
+  }
+
+  const data = requestState.data;
 
   return (
     <>
@@ -26,7 +32,7 @@ export function PollingStationListPage() {
         </section>
       </header>
       <main>
-        {!data?.polling_stations.length ? (
+        {!data.polling_stations.length ? (
           <article>
             <h2>Hoe wil je stembureaus toevoegen?</h2>
             Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.

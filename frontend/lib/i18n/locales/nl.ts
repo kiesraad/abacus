@@ -25,6 +25,7 @@ export const nl = {
   error_code: "Foutcode",
   close_message: "Melding sluiten",
   save: "Opslaan",
+  loading: "Laden...",
 
   "candidates_votes.check_totals":
     "Controleer het totaal van deze lijst. Overleg met coördinator als het papier niet is ingevuld.",

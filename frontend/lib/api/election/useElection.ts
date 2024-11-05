@@ -1,18 +1,17 @@
-import * as React from "react";
-import { useMemo } from "react";
-
-import { parsePollingStationNumber } from "@kiesraad/util";
+import { useContext } from "react";
 
 import { ElectionProviderContext } from "./ElectionProviderContext";
 
-export function useElection(pollingStationId?: string) {
-  const context = React.useContext(ElectionProviderContext);
-  if (context === undefined) {
+// fetch the current election and polling stations from the context
+export function useElection(pollingStationId?: number) {
+  const context = useContext(ElectionProviderContext);
+
+  if (!context) {
     throw new Error("useElection must be used within an ElectionProvider");
   }
-  const pollingStation = useMemo(() => {
-    const parsedStationId = parsePollingStationNumber(pollingStationId ?? "0");
-    return context.pollingStations.find((ps) => ps.id === parsedStationId);
-  }, [pollingStationId, context.pollingStations]);
-  return { ...context, pollingStation };
+
+  const { election, pollingStations } = context;
+  const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
+
+  return { election, pollingStations, pollingStation };
 }

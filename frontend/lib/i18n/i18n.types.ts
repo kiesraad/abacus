@@ -31,6 +31,7 @@ export interface Translation {
   close_message: string;
   next: string;
   save: string;
+  loading: string;
 
   "candidates_votes.check_totals": string;
   "candidates_votes.check_paper_report": string;

@@ -15,6 +15,7 @@ export * from "./IconButton/IconButton";
 export * from "./InputField/InputField";
 export * from "./InputGrid";
 export * from "./KeyboardKeys/KeyboardKeys";
+export * from "./Loader/Loader";
 export * from "./Modal/Modal";
 export * from "./NumberInput/NumberInput";
 export * from "./ProgressBar";

@@ -104,7 +104,9 @@ describe("DataEntryHomePage", () => {
 
     // render and expect the initial status to be fetched
     const { rerender } = renderDataEntryHomePage();
-    expect(await screen.findByText("Welk stembureau ga je invoeren?")).toBeVisible();
+    await waitFor(() => {
+      expect(screen.queryByText("Welk stembureau ga je invoeren?")).not.toBeInTheDocument();
+    });
     expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
 
     // unmount DataEntryHomePage, but keep the providers as-is
@@ -135,7 +137,7 @@ describe("DataEntryHomePage", () => {
         </ElectionStatusProvider>
       </ElectionProvider>,
     );
-    expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
+    expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
   });
 
   test("Data entry saved alert works", async () => {

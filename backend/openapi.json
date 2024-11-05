@@ -909,10 +909,7 @@
             "type": "string"
           },
           "house_number_addition": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "locality": {
             "type": "string"
@@ -925,10 +922,7 @@
             "format": "int64"
           },
           "number_of_voters": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "polling_station_type": {

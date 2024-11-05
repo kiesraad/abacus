@@ -163,7 +163,7 @@
         "tags": [
           "polling_station"
         ],
-        "summary": "Get a list of all pollingstations for an election",
+        "summary": "Get a list of all [PollingStation]s for an election",
         "operationId": "polling_station_list",
         "parameters": [
           {
@@ -191,6 +191,78 @@
           },
           "404": {
             "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "polling_station"
+        ],
+        "summary": "Create a new [PollingStation]",
+        "operationId": "polling_station_create",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewPollingStationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Polling station created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Polling station already exists",
             "content": {
               "application/json": {
                 "schema": {
@@ -853,6 +925,50 @@
           }
         }
       },
+      "NewPollingStationRequest": {
+        "type": "object",
+        "description": "Polling station of a certain [crate::election::Election]",
+        "required": [
+          "name",
+          "number",
+          "polling_station_type",
+          "street",
+          "house_number",
+          "postal_code",
+          "locality"
+        ],
+        "properties": {
+          "house_number": {
+            "type": "string"
+          },
+          "house_number_addition": {
+            "type": "string"
+          },
+          "locality": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "polling_station_type": {
+            "$ref": "#/components/schemas/PollingStationType"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          }
+        }
+      },
       "PoliticalGroup": {
         "type": "object",
         "description": "Political group with its candidates",
@@ -906,7 +1022,7 @@
       },
       "PollingStation": {
         "type": "object",
-        "description": "Polling station of a certain [Election]",
+        "description": "Polling station of a certain [crate::election::Election]",
         "required": [
           "id",
           "election_id",

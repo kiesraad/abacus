@@ -22,7 +22,11 @@ export class ApiClient {
       };
     }
 
-    return {} as RequestInit;
+    return {
+      headers: {
+        [HEADER_ACCEPT]: MIME_JSON,
+      },
+    };
   }
 
   // handle a response with a JSON body, and return an error when there is a non-2xx status or a non-JSON body
@@ -104,14 +108,11 @@ export class ApiClient {
     try {
       const response = await fetch(path, {
         method,
-        headers: {
-          Accept: MIME_JSON,
-        },
         signal: abort?.signal,
         ...this.setRequestBodyAndHeaders(requestBody),
       });
 
-      const isJson = response.headers.get("Content-Type") === "application/json";
+      const isJson = response.headers.get(HEADER_CONTENT_TYPE) === MIME_JSON;
 
       if (isJson) {
         return await this.handleJsonBody<T>(response);

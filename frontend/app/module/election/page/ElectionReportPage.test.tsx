@@ -44,6 +44,7 @@ describe("ElectionReportPage", () => {
       </ElectionProvider>,
     );
 
+    expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" }));
     expect(await screen.findByRole("button", { name: "Download proces-verbaal" })).toBeVisible();
   });
 });

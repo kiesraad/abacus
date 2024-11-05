@@ -77,11 +77,11 @@ export function ElectionReportPage() {
       <main>
         <article>
           <h2 className="form_title">{t("election_report.finish_data_entry_phase")}</h2>
-          <p className="md ul-larger-padding">
+          <div className="md ul-larger-padding">
             {t("election_report.about_to_stop_data_entry")}
             {tx("election_report.data_entry_finish_steps_explanation")}
             {t("election_report.for_recount_new_session_needed")}
-          </p>
+          </div>
           <Button onClick={downloadResults}>{t("election_report.download_report")}</Button>
         </article>
       </main>

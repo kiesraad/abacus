@@ -23,6 +23,11 @@ export interface POLLING_STATION_LIST_REQUEST_PARAMS {
   election_id: number;
 }
 export type POLLING_STATION_LIST_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
+export interface POLLING_STATION_CREATE_REQUEST_PARAMS {
+  election_id: number;
+}
+export type POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
+export type POLLING_STATION_CREATE_REQUEST_BODY = NewPollingStationRequest;
 
 // /api/elections/{election_id}/status
 export interface ELECTION_STATUS_REQUEST_PARAMS {
@@ -31,6 +36,11 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
+export interface POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS {
+  polling_station_id: number;
+  entry_number: number;
+}
+export type POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
 export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: number;
   entry_number: number;
@@ -145,6 +155,21 @@ export interface GetDataEntryResponse {
 }
 
 /**
+ * Polling station of a certain [crate::election::Election]
+ */
+export interface NewPollingStationRequest {
+  house_number: string;
+  house_number_addition?: string;
+  locality: string;
+  name: string;
+  number: number;
+  number_of_voters?: number;
+  polling_station_type: PollingStationType;
+  postal_code: string;
+  street: string;
+}
+
+/**
  * Political group with its candidates
  */
 export interface PoliticalGroup {
@@ -160,7 +185,7 @@ export interface PoliticalGroupVotes {
 }
 
 /**
- * Polling station of a certain [Election]
+ * Polling station of a certain [crate::election::Election]
  */
 export interface PollingStation {
   election_id: number;

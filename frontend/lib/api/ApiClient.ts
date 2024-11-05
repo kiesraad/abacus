@@ -1,92 +1,68 @@
-export type ApiResult<T> = ApiResponse<T> | ApiError;
+import { ApiResult, RequestMethod, ServerError } from "./api.types";
+import { ApiError, NetworkError } from "./ApiError";
+import { ApiResponseStatus } from "./ApiResponseStatus";
 
-export enum ApiResponseStatus {
-  Success,
-  ClientError,
-  ServerError,
-}
+const MIME_JSON = "application/json";
+const HEADER_ACCEPT = "Accept";
+const HEADER_CONTENT_TYPE = "Content-Type";
 
-export interface ApiResponse<T> {
-  status: ApiResponseStatus.Success;
-  code: number;
-  data: T;
-}
-
-export class ApiError extends Error {
-  constructor(
-    public status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError,
-    public code: number,
-    public message = "Unknown error",
-  ) {
-    super(message);
-  }
-
-  withContext(message: string): this {
-    this.message = message;
-
-    return this;
-  }
-}
-
-interface ServerError {
-  error: string;
-}
-
+/**
+ * Abstraction over the browser fetch API to handle JSON responses and errors.
+ */
 export class ApiClient {
-  async responseHandler<T>(response: Response): Promise<ApiResult<T>> {
-    if (response.headers.get("Content-Type") === "application/json") {
-      try {
-        const body = (await response.json()) as T | ServerError;
-
-        if (response.status >= 200 && response.status <= 299) {
-          return {
-            status: ApiResponseStatus.Success,
-            code: response.status,
-            data: body as T,
-          };
-        }
-
-        const isError = typeof body === "object" && null !== body && "error" in body;
-
-        if (response.status >= 400 && response.status <= 499 && isError) {
-          return new ApiError(ApiResponseStatus.ClientError, response.status, body.error);
-        }
-
-        if (response.status >= 500 && response.status <= 599 && isError) {
-          return new ApiError(ApiResponseStatus.ServerError, response.status, body.error);
-        }
-
-        return new ApiError(
-          ApiResponseStatus.ServerError,
-          response.status,
-          `Unexpected response status: ${response.status}`,
-        );
-      } catch (e) {
-        console.error("Failed to parse json", e);
-
-        return new ApiError(
-          ApiResponseStatus.ServerError,
-          response.status,
-          `Server response parse error: ${response.status}`,
-        );
-      }
-    }
-
-    const body = await response.text();
-
-    if (body.length > 0) {
-      const message = `Unexpected data from server: ${body}`;
-      console.error("Unexpected data from server:", body);
-      return new ApiError(ApiResponseStatus.ServerError, response.status, message);
-    }
-
-    if (response.status >= 200 && response.status <= 299) {
+  // encode an optional JSON body
+  setRequestBodyAndHeaders(requestBody?: object): RequestInit {
+    if (requestBody) {
       return {
-        status: ApiResponseStatus.Success,
-        code: response.status,
-        data: body as T,
+        headers: {
+          [HEADER_ACCEPT]: MIME_JSON,
+          [HEADER_CONTENT_TYPE]: MIME_JSON,
+        },
+        body: JSON.stringify(requestBody),
       };
     }
+
+    return {} as RequestInit;
+  }
+
+  // handle a response with a JSON body, and return an error when there is a non-2xx status or a non-JSON body
+  async handleJsonBody<T>(response: Response): Promise<ApiResult<T>> {
+    try {
+      const body = (await response.json()) as T | ServerError;
+
+      if (response.ok) {
+        return {
+          status: ApiResponseStatus.Success,
+          code: response.status,
+          data: body as T,
+        };
+      }
+
+      const isError = typeof body === "object" && null !== body && "error" in body;
+
+      if (response.status >= 400 && response.status <= 499 && isError) {
+        return new ApiError(ApiResponseStatus.ClientError, response.status, body.error);
+      }
+
+      if (response.status >= 500 && response.status <= 599 && isError) {
+        return new ApiError(ApiResponseStatus.ServerError, response.status, body.error);
+      }
+
+      return new ApiError(
+        ApiResponseStatus.ServerError,
+        response.status,
+        `Unexpected response status: ${response.status}`,
+      );
+    } catch (e) {
+      console.error("Error parsing response", e);
+
+      return new NetworkError((e as Error).message || "Network error");
+    }
+  }
+
+  // handle a response without a body, and return an error when there is a non-2xx status or a non-empty body
+  async handleEmptyBody<T>(response: Response): Promise<ApiResult<T>> {
+    const body = await response.text();
 
     if (response.status >= 400 && response.status <= 499) {
       return new ApiError(ApiResponseStatus.ClientError, response.status, body);
@@ -96,6 +72,21 @@ export class ApiClient {
       return new ApiError(ApiResponseStatus.ServerError, response.status, body);
     }
 
+    if (body.length > 0) {
+      console.error("Unexpected data from server:", body);
+
+      const message = `Unexpected data from server: ${body}`;
+      return new ApiError(ApiResponseStatus.ServerError, response.status, message);
+    }
+
+    if (response.ok) {
+      return {
+        status: ApiResponseStatus.Success,
+        code: response.status,
+        data: body as T,
+      };
+    }
+
     return new ApiError(
       ApiResponseStatus.ServerError,
       response.status,
@@ -103,37 +94,48 @@ export class ApiClient {
     );
   }
 
-  async postRequest<T>(path: string, requestBody?: object): Promise<ApiResult<T>> {
-    let requestInit: RequestInit = {
-      method: "POST",
-    };
-    if (requestBody) {
-      requestInit = {
-        ...requestInit,
+  // perform a HTTP request and handle the response
+  async request<T>(
+    method: RequestMethod,
+    path: string,
+    abort?: AbortController,
+    requestBody?: object,
+  ): Promise<ApiResult<T>> {
+    try {
+      const response = await fetch(path, {
+        method,
         headers: {
-          "Content-Type": "application/json",
+          Accept: MIME_JSON,
         },
-        body: JSON.stringify(requestBody),
-      };
+        signal: abort?.signal,
+        ...this.setRequestBodyAndHeaders(requestBody),
+      });
+
+      const isJson = response.headers.get("Content-Type") === "application/json";
+
+      if (isJson) {
+        return await this.handleJsonBody<T>(response);
+      }
+
+      return await this.handleEmptyBody(response);
+    } catch (e: unknown) {
+      const message = `Network error: ${(e as Error).message}` || "Network error";
+      return new ApiError(ApiResponseStatus.ServerError, 500, message);
     }
-    const response = await fetch(path, requestInit);
-
-    return this.responseHandler<T>(response);
   }
 
-  async getRequest<T>(path: string): Promise<ApiResult<T>> {
-    const response = await fetch(path, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    return this.responseHandler<T>(response);
+  // perform a POST request
+  async postRequest<T>(path: string, requestBody?: object, abort?: AbortController): Promise<ApiResult<T>> {
+    return this.request<T>("POST", path, abort, requestBody);
   }
 
-  async deleteRequest<T>(path: string): Promise<ApiResult<T>> {
-    const response = await fetch(path, { method: "DELETE" });
-    return this.responseHandler<T>(response);
+  // perform a GET request
+  async getRequest<T>(path: string, abort?: AbortController): Promise<ApiResult<T>> {
+    return this.request<T>("GET", path, abort);
+  }
+
+  // perform a DELETE request
+  async deleteRequest<T>(path: string, abort?: AbortController): Promise<ApiResult<T>> {
+    return this.request<T>("DELETE", path, abort);
   }
 }

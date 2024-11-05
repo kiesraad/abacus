@@ -3,6 +3,7 @@ import * as React from "react";
 import { NotFoundError } from "app/component/error";
 
 import { useElectionStatusRequest } from "@kiesraad/api";
+import { Loader } from "@kiesraad/ui";
 
 import { ElectionStatusProviderContext } from "./ElectionStatusProviderContext";
 
@@ -12,24 +13,26 @@ export interface ElectionStatusProviderProps {
 }
 
 export function ElectionStatusProvider({ children, electionId }: ElectionStatusProviderProps) {
-  const { data, error, refetch } = useElectionStatusRequest({
-    election_id: electionId,
-  });
+  const { requestState, refetch } = useElectionStatusRequest(electionId);
 
-  if (error && error.code === 404) {
-    throw new NotFoundError("Er ging iets mis bij het ophalen van de verkiezing");
+  if (requestState.status === "loading") {
+    return <Loader />;
   }
 
-  if (error) {
-    throw error;
+  if (requestState.status === "api-error") {
+    if (requestState.error.code === 404) {
+      throw new NotFoundError("Er ging iets mis bij het ophalen van de verkiezing");
+    }
+
+    throw requestState.error;
   }
 
-  if (data === null) {
-    return null;
+  if (requestState.status === "network-error") {
+    throw requestState.error;
   }
 
   return (
-    <ElectionStatusProviderContext.Provider value={{ statuses: data.statuses, refetch }}>
+    <ElectionStatusProviderContext.Provider value={{ statuses: requestState.data.statuses, refetch }}>
       {children}
     </ElectionStatusProviderContext.Provider>
   );

@@ -1,0 +1,27 @@
+.loader {
+  font-size: var(--font-size-body);
+  font-family: var(--font-text);
+  padding: 1rem;
+}
+
+@keyframes load {
+  0% {
+    max-width: 0;
+  }
+
+  100% {
+    max-width: 100%;
+  }
+}
+
+.loader::before {
+  content: " ";
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  height: 2px;
+  width: 100%;
+  background-color: var(--base-brand-blue);
+  animation: 10s cubic-bezier(0.05, 1.13, 0.25, 0.9) 0s 1 load;
+}

@@ -50,7 +50,7 @@ export function DataEntryHomePage() {
         <Alert type="success" onClose={closeDataEntrySavedAlert}>
           <h2>Je invoer is opgeslagen</h2>
           <p>
-            Geef het papieren proces verbaal terug aan de coördinator.
+            Geef het papieren proces-verbaal terug aan de coördinator.
             <br />
             Een andere invoerder doet straks de tweede invoer.
           </p>

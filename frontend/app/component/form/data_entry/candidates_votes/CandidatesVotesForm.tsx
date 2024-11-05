@@ -181,7 +181,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       {missingTotalError && (
         <div id="missing-total-error">
           <Alert type="error" variant="small">
-            <p>Controleer het totaal van deze lijst. Overleg met coördinator als het papier niet is ingevuld.</p>
+            <p>Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld</p>
           </Alert>
         </div>
       )}

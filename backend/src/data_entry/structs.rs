@@ -52,7 +52,7 @@ fn difference_admitted_voters_count_and_votes_cast_count_above_threshold(
 pub struct PollingStationResultsEntry {
     pub polling_station_id: u32,
     pub data: PollingStationResults,
-    pub timestamp: i64,
+    pub created_at: i64,
 }
 
 /// PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.

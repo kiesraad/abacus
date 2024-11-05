@@ -47,7 +47,7 @@ pub struct PollingStationStatusEntry {
     pub status: PollingStationStatus,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub timestamp: Option<i64>,
+    pub finished_at: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq, Clone)]

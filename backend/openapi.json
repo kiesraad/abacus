@@ -807,7 +807,7 @@
           "data",
           "client_state",
           "validation_results",
-          "timestamp"
+          "updated_at"
         ],
         "properties": {
           "client_state": {
@@ -816,7 +816,7 @@
           "data": {
             "$ref": "#/components/schemas/PollingStationResults"
           },
-          "timestamp": {
+          "updated_at": {
             "type": "integer",
             "format": "int64"
           },
@@ -1002,6 +1002,10 @@
           "status"
         ],
         "properties": {
+          "finished_at": {
+            "type": "integer",
+            "format": "int64"
+          },
           "id": {
             "type": "integer",
             "format": "int32",
@@ -1009,10 +1013,6 @@
           },
           "status": {
             "$ref": "#/components/schemas/PollingStationStatus"
-          },
-          "timestamp": {
-            "type": "integer",
-            "format": "int64"
           }
         }
       },

@@ -141,7 +141,7 @@ export interface ErrorResponse {
 export interface GetDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
-  timestamp: number;
+  updated_at: number;
   validation_results: ValidationResults;
 }
 
@@ -205,9 +205,9 @@ export interface PollingStationResults {
 export type PollingStationStatus = "not_started" | "first_entry_in_progress" | "first_entry_unfinished" | "definitive";
 
 export interface PollingStationStatusEntry {
+  finished_at?: number;
   id: number;
   status: PollingStationStatus;
-  timestamp?: number;
 }
 
 /**

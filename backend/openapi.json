@@ -799,11 +799,11 @@
           "InvalidVoteCandidate",
           "InvalidData",
           "EntryNotUnique",
-          "Database",
-          "Internal",
-          "Pdf",
+          "DatabaseError",
+          "InternalServerError",
+          "PdfGenerationError",
           "PollingStationRepeated",
-          "PollingStationValidation",
+          "PollingStationValidationErrors",
           "InvalidPoliticalGroup"
         ]
       },

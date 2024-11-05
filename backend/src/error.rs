@@ -22,11 +22,11 @@ pub enum ErrorReference {
     InvalidVoteCandidate,
     InvalidData,
     EntryNotUnique,
-    Database,
-    Internal,
-    Pdf,
+    DatabaseError,
+    InternalServerError,
+    PdfGenerationError,
     PollingStationRepeated,
-    PollingStationValidation,
+    PollingStationValidationErrors,
     InvalidPoliticalGroup,
 }
 
@@ -117,7 +117,7 @@ impl IntoResponse for APIError {
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error(
                         "Internal server error".to_string(),
-                        ErrorReference::Database,
+                        ErrorReference::DatabaseError,
                         true,
                     ),
                 )
@@ -126,7 +126,7 @@ impl IntoResponse for APIError {
                 StatusCode::INTERNAL_SERVER_ERROR,
                 to_error(
                     "Internal server error".to_string(),
-                    ErrorReference::Internal,
+                    ErrorReference::InternalServerError,
                     true,
                 ),
             ),
@@ -134,7 +134,11 @@ impl IntoResponse for APIError {
                 error!("Pdf generation error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".into(), ErrorReference::Pdf, false),
+                    to_error(
+                        "Internal server error".into(),
+                        ErrorReference::PdfGenerationError,
+                        false,
+                    ),
                 )
             }
             APIError::StdError(err) => {
@@ -143,7 +147,7 @@ impl IntoResponse for APIError {
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error(
                         "Internal server error".to_string(),
-                        ErrorReference::Internal,
+                        ErrorReference::InternalServerError,
                         true,
                     ),
                 )

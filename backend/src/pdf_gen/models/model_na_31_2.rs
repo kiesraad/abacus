@@ -96,7 +96,7 @@ impl ModelNa31_2Summary {
                         "Polling station {} has validation errors",
                         polling_station.number
                     ),
-                    ErrorReference::PollingStationValidation,
+                    ErrorReference::PollingStationValidationErrors,
                 ));
             }
 

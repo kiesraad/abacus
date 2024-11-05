@@ -129,6 +129,8 @@ export const PollingStationDataEntrySaveHandler = http.post<
       return HttpResponse.json(
         {
           error: "Cannot save data entry for a polling station that has already been finalised",
+          reference: "PollingStationAlreadyFinalized",
+          fatal: false,
         } satisfies ErrorResponse,
         { status: 409 },
       );
@@ -152,10 +154,16 @@ export const PollingStationDataEntrySaveHandler = http.post<
     return HttpResponse.json(response, { status: 200 });
   } catch (e) {
     if (e instanceof SyntaxError) {
-      return HttpResponse.json({ error: "Invalid JSON" } satisfies ErrorResponse, { status: 422 });
+      return HttpResponse.json(
+        { error: "Invalid JSON", reference: "InvalidData", fatal: false } satisfies ErrorResponse,
+        { status: 422 },
+      );
     } else {
       console.error("Mock request error:", e);
-      return HttpResponse.json({ error: "Internal Server Error" } satisfies ErrorResponse, { status: 500 });
+      return HttpResponse.json(
+        { error: "Internal Server Error", reference: "InternalServerError", fatal: true } satisfies ErrorResponse,
+        { status: 500 },
+      );
     }
   }
 });

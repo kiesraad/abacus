@@ -26,9 +26,9 @@ export function translate(k: keyof Translation): string {
  *  </div>
  * );
  */
-export function t(k: keyof Translation, vars?: Record<string, string>): string {
+export function t(k: keyof Translation, vars?: Record<string, string | number>): string {
   if (vars) {
-    return Object.entries(vars).reduce((acc, [key, value]) => acc.replace(`{${key}}`, value), translate(k));
+    return Object.entries(vars).reduce((acc, [key, value]) => acc.replace(`{${key}}`, value.toString()), translate(k));
   }
 
   return translate(k);
@@ -53,7 +53,7 @@ export function t(k: keyof Translation, vars?: Record<string, string>): string {
 export function tx(
   k: keyof Translation,
   elements?: Record<string, RenderCallback>,
-  vars?: Record<string, string>,
+  vars?: Record<string, string | number>,
 ): ReactElement {
   const text = vars ? t(k, vars) : translate(k);
 

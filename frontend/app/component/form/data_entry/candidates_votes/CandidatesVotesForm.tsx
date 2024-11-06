@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { CandidateVotes, getErrorsAndWarnings, PoliticalGroup, usePoliticalGroup } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import {
   Alert,
   BottomBar,
@@ -131,7 +132,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       onSubmit={handleSubmit}
       ref={formRef}
       id={`candidates_form_${group.number}`}
-      title={`Lijst ${group.number} - ${group.name}`}
+      title={`${t("list")} ${group.number} - ${group.name}`}
     >
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
@@ -141,9 +142,9 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       )}
       <InputGrid key={`list${group.number}`} zebra>
         <InputGrid.Header>
-          <th>Nummer</th>
-          <th>Aantal stemmen</th>
-          <th>Kandidaat</th>
+          <th>{t("number")}</th>
+          <th>{t("vote_count")}</th>
+          <th>{t("candidate")}</th>
         </InputGrid.Header>
         <InputGrid.Body>
           {group.candidates.map((candidate, index) => {
@@ -170,7 +171,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             field={``}
             name="total"
             id="total"
-            title={`Totaal lijst ${group.number}`}
+            title={t("totals_list", { group_number: group.number })}
             defaultValue={sectionValues?.total || ""}
             isListTotal
             {...defaultProps}
@@ -181,7 +182,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       {missingTotalError && (
         <div id="missing-total-error">
           <Alert type="error" variant="small">
-            <p>Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld</p>
+            <p>{t("candidates_votes.check_totals")}</p>
           </Alert>
         </div>
       )}
@@ -189,7 +190,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         {warningsWarning && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
-              <p>Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.</p>
+              <p>{t("candidates_votes.check_paper_report")}</p>
             </Alert>
           </BottomBar.Row>
         )}
@@ -200,19 +201,19 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
               defaultChecked={acceptWarnings}
               hasError={warningsWarning}
               ref={acceptWarningsRef}
-              label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
+              label={t("candidates_votes.confirm_counts")}
             />
           </BottomBar.Row>
         )}
         <BottomBar.Row>
           <KeyboardKeys.HintText>
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Down]} />
-            Snel naar totaal van de lijst
+            {t("candidates_votes.goto_totals")}
           </KeyboardKeys.HintText>
         </BottomBar.Row>
         <BottomBar.Row>
           <Button type="submit" size="lg" disabled={status.current === "saving"}>
-            Volgende
+            {t("next")}
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>

@@ -341,11 +341,40 @@ describe("Test CandidatesVotesForm", () => {
         expectedRequest.data.political_group_votes[0]?.candidate_votes[1]?.votes.toString() ?? "0",
       );
 
+      await user.type(total, expectedRequest.data.political_group_votes[0]?.total.toString() ?? "0");
+
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(spy).toHaveBeenCalled();
+      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
+      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
+      expect(method).toEqual("POST");
+      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+      expect(request_body.data).toEqual(expectedRequest.data);
+    });
+  });
+
+  describe("CandidatesVotesForm client-side errors", () => {
+    test("Show error when list total is empty", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      const candidateVotes0 = await screen.findByTestId("candidate_votes[0].votes");
+      const candidateVotes1 = screen.getByTestId("candidate_votes[1].votes");
+      const total = screen.getByTestId("total");
+
+      const spy = vi.spyOn(global, "fetch");
+
+      await user.type(candidateVotes0, "10");
+
+      await user.type(candidateVotes1, "20");
+
       // First submit before adding a total
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      // Check if missing total error alert is shown
       expect(spy).not.toHaveBeenCalled();
       const feedbackMessage =
         "Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld";
@@ -358,27 +387,12 @@ describe("Test CandidatesVotesForm", () => {
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
 
-      // Add the incorrect total and submit again
+      // Add the total and submit again
       await user.type(total, "1");
       await user.click(submitButton);
 
       expect(screen.queryByTestId("missing-total-error")).not.toBeInTheDocument();
       expect(spy).toHaveBeenCalledOnce();
-
-      // Add the correct total and submit again
-      await user.clear(total);
-      await user.type(total, expectedRequest.data.political_group_votes[0]?.total.toString() ?? "0");
-      await user.click(submitButton);
-
-      expect(spy).toHaveBeenCalledTimes(2);
-      const last_call = spy.mock.calls.pop();
-      if (last_call) {
-        const { url, method, body } = getUrlMethodAndBody([last_call]);
-        expect(url).toEqual("/api/polling_stations/1/data_entries/1");
-        expect(method).toEqual("POST");
-        const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
-        expect(request_body.data).toEqual(expectedRequest.data);
-      }
     });
   });
 

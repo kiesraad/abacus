@@ -1,7 +1,7 @@
 # Abacus software voor verkiezingsuitslagen en zetelverdeling
 
 ## Wat is Abacus?
-De Kiesraad ontwikkelt nieuwe software voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Het programma telt uitslagen bij elkaar op en berekent de zetelverdeling. Abacus vervangt de module Uitslagvaststelling van het programma Ondersteunende Software Verkiezingen (OSV2020) en zal ingezet worden bij alle verkiezingen in Nederland. 
+De Kiesraad ontwikkelt nieuwe software voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Het programma telt uitslagen bij elkaar op en berekent de zetelverdeling. Abacus vervangt de module Uitslagvaststelling van het programma Ondersteunende Software Verkiezingen (OSV2020) en zal ingezet worden bij alle verkiezingen in Nederland.
 
 <p align="center">
 <img src="/documentatie/img/abacus.svg" alt="Abacus software voor verkiezingsuitslagen en zetelverdeling" height="300px">
@@ -72,6 +72,24 @@ Daarnaast zijn voor de software, de ontwikkeling en het gebruik onder andere de 
 - [Ontwerp user interface (Figma)](https://www.figma.com/design/xHDfsv69Nhmk3IrWC0303B/Public---Kiesraad---Abacus-optelsoftware?node-id=3190-28385&t=VnghjibSJMqrQepm-1)
 
 Lees voor meer informatie het bestand `README.md` in elke directory.
+
+## Starten met Abacus
+
+De functionaliteit is nog beperkt, maar het is al mogelijk om Abacus zelf te proberen en te testen. De basisflow invoeren-optellen-PDF werkt al. In de [documentatie](https://github.com/kiesraad/abacus/blob/main/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md) en op het [board](https://github.com/orgs/kiesraad/projects/1) zie je waar we mee bezig zijn. 
+
+Er zijn een aantal opties beschikbaar om te zien waar we staan. Abacus wordt gemaakt om offline te gebruiken, de 'Binary' optie staat het dichtst bij de toepassing.
+
+### Frontend
+
+De interface van onze 'main' branch met de actuele broncode is [als website te benaderen](https://kiesraad-abacus.pages.dev/). Het is alleen de interface die tegen een test-backend praat en een deel van de functionaliteit mist. 
+
+### Binary
+
+Op basis van de nieuwste broncode maken we dagelijks een nieuwe versie van de binary die je kunt downloaden. Deze binary werkt op Ubuntu 22.04 en nieuwer. Klik door via de nieuwste link [op deze pagina](https://github.com/kiesraad/abacus/actions/workflows/build-lint-test.yml) en download de laatste backend_build. Pak het bestand uit en start met -rs om een nieuwe database op te bouwen: `./api -rs`. Een versie voor Windows is in de maak. 
+
+### Development omgeving: 
+
+Je kunt Abacus ook gewoon zelf compileren. Hiervoor kun je de README bestanden in de [backend](https://github.com/kiesraad/abacus/blob/main/backend/README.md) en [frontend](https://github.com/kiesraad/abacus/blob/main/frontend/README.md) directory gebruiken. Er is ook een Docker schil beschikbaar. 
 
 ## Bijdragen
 

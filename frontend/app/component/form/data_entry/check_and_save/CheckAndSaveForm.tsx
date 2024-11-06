@@ -1,4 +1,5 @@
 import * as React from "react";
+import { ReactElement } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { getUrlForFormSectionID } from "app/component/pollingstation/utils";
@@ -10,6 +11,7 @@ import {
   useElection,
   usePollingStationFormController,
 } from "@kiesraad/api";
+import { t, tx } from "@kiesraad/i18n";
 import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusList } from "@kiesraad/ui";
 
 export function CheckAndSaveForm() {
@@ -51,57 +53,38 @@ export function CheckAndSaveForm() {
     })(event);
 
   return (
-    <Form onSubmit={handleSubmit} id="check_save_form" title="Controleren en opslaan">
+    <Form onSubmit={handleSubmit} id="check_save_form" title={t("check_and_save")}>
       <section className="md" id="save-form-summary-text">
         {!summary.hasBlocks && summary.countsAddUp && (
-          <p className="md">
-            De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen
-            blokkerende fouten of waarschuwingen.
-          </p>
+          <p className="md">{t("check_and_save.counts_add_up.no_warnings")}</p>
         )}
         {summary.hasBlocks && summary.countsAddUp && (
           <>
-            <p className="md">
-              De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn
-              waarschuwingen die moeten worden gecontroleerd.
-            </p>
-
-            <p className="md">Controleer de openstaande waarschuwingen</p>
+            <p className="md">{t("check_and_save.counts_add_up.warnings")}</p>
+            <p className="md">{t("check_and_save.check_warnings")}</p>
           </>
         )}
-
         {summary.hasBlocks && !summary.countsAddUp && (
           <>
-            <p className="md">
-              De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar tegen. Je kan de resultaten
-              daarom niet opslaan.
-            </p>
-            <p className="md">Los de blokkerende fouten op. Lukt dat niet? Overleg dan met de coördinator. </p>
+            <p className="md">{t("check_and_save.counts_do_not_add_up")}</p>
+            <p className="md">{t("check_and_save.fix_the_errors")}</p>
           </>
         )}
       </section>
 
       <StatusList id="save-form-summary-list">
-        {summary.countsAddUp && <StatusList.Item status="accept">Alle optellingen kloppen</StatusList.Item>}
+        {summary.countsAddUp && (
+          <StatusList.Item status="accept">{t("check_and_save.counts_add_up_title")}</StatusList.Item>
+        )}
 
         {summary.notableFormSections.map((section) => {
-          const link = (
-            <Link to={getUrlForFormSection(section.formSection.id)}>{section.title || section.formSection.title}</Link>
+          const link = (title: ReactElement) => <Link to={getUrlForFormSection(section.formSection.id)}>{title}</Link>;
+          const content = tx(
+            `check_and_save.notable_form_sections.${section.status}`,
+            { link },
+            { link_title: section.title || section.formSection.title || "" },
           );
-          let content = <></>;
-          switch (section.status) {
-            case "empty":
-              content = <>Op {link} zijn geen stemmen ingevoerd</>;
-              break;
-            case "accepted-warnings":
-              content = <>{link} heeft geaccepteerde waarschuwingen</>;
-              break;
-            case "unaccepted-warnings":
-              content = <>Controleer waarschuwingen bij {link}</>;
-              break;
-            case "errors":
-              content = <>{link} heeft blokkerende fouten</>;
-          }
+
           return (
             <StatusList.Item
               key={section.formSection.id}
@@ -115,16 +98,16 @@ export function CheckAndSaveForm() {
 
         {!summary.hasBlocks && !summary.hasWarnings && (
           <StatusList.Item status="accept" id="no-blocking-errors-or-warnings">
-            Er zijn geen blokkerende fouten of waarschuwingen
+            {t("check_and_save.no_warnings")}
           </StatusList.Item>
         )}
         {summary.hasBlocks ? (
           <StatusList.Item status={summary.hasErrors ? "error" : "warning"} id="form-cannot-be-saved" emphasis padding>
-            Je kan de resultaten van dit stembureau nog niet opslaan
+            {t("check_and_save.can_not_save")}
           </StatusList.Item>
         ) : (
           <StatusList.Item status="accept" id="form-can-be-saved" emphasis padding>
-            Je kan de resultaten van dit stembureau opslaan
+            {t("check_and_save.can_save")}
           </StatusList.Item>
         )}
       </StatusList>
@@ -133,7 +116,7 @@ export function CheckAndSaveForm() {
         <BottomBar type="form">
           <BottomBar.Row>
             <Button type="submit" size="lg" disabled={status.current === "finalising"}>
-              Opslaan
+              {t("save")}
             </Button>
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
           </BottomBar.Row>

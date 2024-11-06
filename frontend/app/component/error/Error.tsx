@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
+import { t } from "@kiesraad/i18n";
 import { IconArrowLeft } from "@kiesraad/icon";
 import { Button } from "@kiesraad/ui";
 import { isDevelopment } from "@kiesraad/util";
@@ -35,19 +36,19 @@ export function Error({ title, error, action = ErrorAction.Back, children }: Err
                     navigate(-1);
                   }}
                 >
-                  Terug naar de vorige pagina
+                  {t("history_back")}
                 </Button>
               )}
             </nav>
           </section>
           <aside>
-            <img src={errorImage} alt="Error" />
+            <img src={errorImage} alt={t("error")} />
           </aside>
         </article>
       </main>
       {error && isDevelopment && (
         <section className={cls.stack}>
-          <h2>Foutmelding</h2>
+          <h2>{t("stack_trace")}</h2>
           <code>
             <pre>{error.stack}</pre>
           </code>

@@ -85,7 +85,7 @@ De interface van onze 'main' branch met de actuele broncode is [als website te b
 
 ### Binary
 
-Op basis van de nieuwste broncode maken we dagelijks een nieuwe versie van de binary die je kunt downloaden. Op dit moment runt de binary op linux/unix systemen. Klik door via de nieuwste link [op deze pagina](https://github.com/kiesraad/abacus/actions/workflows/build-lint-test.yml) en download de laatste backend_build. Pak het bestand uit en start met -rs om een nieuwe database op te bouwen: `./api -rs`. Een versie voor windows is in de maak. 
+Op basis van de nieuwste broncode maken we dagelijks een nieuwe versie van de binary die je kunt downloaden. Deze binary werkt op Ubuntu 22.04 en nieuwer. Klik door via de nieuwste link [op deze pagina](https://github.com/kiesraad/abacus/actions/workflows/build-lint-test.yml) en download de laatste backend_build. Pak het bestand uit en start met -rs om een nieuwe database op te bouwen: `./api -rs`. Een versie voor Windows is in de maak. 
 
 ### Development omgeving: 
 

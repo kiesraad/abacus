@@ -89,7 +89,7 @@ Op basis van de nieuwste broncode maken we dagelijks een nieuwe versie van de bi
 
 ### Development omgeving: 
 
-Je kunt Abacus ook gewoon zelf compileren. Hiervoor kun je de readme's in de [backend](https://github.com/kiesraad/abacus/blob/main/backend/README.md) en [frontend](https://github.com/kiesraad/abacus/blob/main/frontend/README.md) directory gebruiken. Er is ook een docker schil beschikbaar. 
+Je kunt Abacus ook gewoon zelf compileren. Hiervoor kun je de README bestanden in de [backend](https://github.com/kiesraad/abacus/blob/main/backend/README.md) en [frontend](https://github.com/kiesraad/abacus/blob/main/frontend/README.md) directory gebruiken. Er is ook een Docker schil beschikbaar. 
 
 ## Bijdragen
 

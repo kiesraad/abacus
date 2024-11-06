@@ -28,7 +28,7 @@ export const nl = {
   loading: "Laden...",
 
   "candidates_votes.check_totals":
-    "Controleer het totaal van deze lijst. Overleg met coördinator als het papier niet is ingevuld.",
+    "Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld",
   "candidates_votes.check_paper_report":
     "Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.",
   "candidates_votes.confirm_counts": "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",

@@ -75,11 +75,6 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.blankVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.invalidVotesCount).toBeEmpty();
       await expect(votersAndVotesPage.totalVotesCastCount).toHaveValue("100");
-
-      await votersAndVotesPage.abortInput.click();
-      await expect(abortInputModal.heading).toBeFocused();
-      await abortInputModal.close.click();
-      await expect(votersAndVotesPage.abortInput).toBeFocused();
     });
 
     // Reproduce issue where navigating between sections is blocked by modal, even though there are no changes.

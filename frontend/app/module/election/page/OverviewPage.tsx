@@ -1,12 +1,14 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, To, useLocation, useNavigate } from "react-router-dom";
 
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { Election, useElectionList } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { IconCheckHeart, IconChevronRight } from "@kiesraad/icon";
-import { Alert, Icon, PageTitle, WorkStationNumber } from "@kiesraad/ui";
+import { IconCheckHeart } from "@kiesraad/icon";
+import { Alert, Icon, PageTitle, Table, WorkStationNumber } from "@kiesraad/ui";
+
+import cls from "./OverviewPage.module.css";
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -16,15 +18,13 @@ export function OverviewPage() {
   const isNewAccount = location.hash === "#new-account";
   const isAdministrator = location.hash.includes("administrator");
 
-  const handleRowClick = (election: Election) => {
-    return () => {
-      if (isAdministrator) {
-        navigate(`/elections/${election.id}#coordinator`);
-      } else {
-        navigate(`/elections/${election.id}/data-entry`);
-      }
-    };
-  };
+  function electionLink(election: Election): To {
+    if (isAdministrator) {
+      return `/elections/${election.id}#coordinator`;
+    } else {
+      return `/elections/${election.id}/data-entry`;
+    }
+  }
 
   function closeNewAccountAlert() {
     navigate(location.pathname);
@@ -61,22 +61,19 @@ export function OverviewPage() {
       )}
       <main>
         <article>
-          <table id="overview" className="overview_table">
-            <thead>
-              <tr>
-                <th>{t("election")}</th>
-                {isAdministrator && <th>{t("role")}</th>}
-                <th>{t("status")}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table id="overview">
+            <Table.Header>
+              <Table.Column>{t("election")}</Table.Column>
+              {isAdministrator && <Table.Column>{t("role")}</Table.Column>}
+              <Table.Column>{t("status")}</Table.Column>
+            </Table.Header>
+            <Table.Body>
               {electionList.map((election) => (
-                <tr onClick={handleRowClick(election)} key={election.id}>
-                  <td>{election.name}</td>
-                  {isAdministrator && <td></td>}
-                  <td>
-                    <div className="flex_overview">
+                <Table.LinkRow key={election.id} to={electionLink(election)}>
+                  <Table.Cell>{election.name}</Table.Cell>
+                  {isAdministrator && <Table.Cell></Table.Cell>}
+                  <Table.Cell>
+                    <div className={cls["flex-overview"]}>
                       <Icon icon={<IconCheckHeart />} color="accept" />
                       <span>{isAdministrator ? "Invoerders bezig" : "Invoer gestart"}</span>
                       {/* TODO <IconHourglass />
@@ -86,16 +83,11 @@ export function OverviewPage() {
                       <IconCheckVerified />
                       <span>Steminvoer voltooid</span> */}
                     </div>
-                  </td>
-                  <td className="link">
-                    <div className="link">
-                      <IconChevronRight />
-                    </div>
-                  </td>
-                </tr>
+                  </Table.Cell>
+                </Table.LinkRow>
               ))}
-            </tbody>
-          </table>
+            </Table.Body>
+          </Table>
         </article>
       </main>
       <Footer />

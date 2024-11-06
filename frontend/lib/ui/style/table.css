@@ -1,4 +1,3 @@
-table.overview_table,
 table.polling_stations_table {
   width: 100%;
   line-height: 1.5rem;
@@ -28,15 +27,6 @@ table.polling_stations_table {
   }
   td:last-of-type {
     text-align: center;
-  }
-  div.flex_overview {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    svg {
-      min-width: 1.5rem;
-      height: 1.5rem;
-    }
   }
   .align-center {
     text-align: center;

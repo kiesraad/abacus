@@ -119,7 +119,7 @@ export interface ClientState {
 //store unvalidated data
 export type TemporaryCache = {
   key: FormSectionID;
-  data: unknown;
+  data: Partial<PollingStationResults>;
 };
 
 export const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
@@ -156,9 +156,9 @@ export function PollingStationFormController({
   // reference to the current form on screen
   const currentForm = React.useRef<AnyFormReference | null>(defaultCurrentForm);
 
+  // cache for data on the furthest form section that the user has not submitted yet
   const temporaryCache = React.useRef<TemporaryCache | null>(null);
   const setTemporaryCache = React.useCallback((cache: TemporaryCache | null) => {
-    //OPTIONAL: allow only cache for unvalidated data
     temporaryCache.current = cache;
     return true;
   }, []);
@@ -304,6 +304,13 @@ export function PollingStationFormController({
             ...ref.getValues(),
           };
           break;
+      }
+      if (aborting && temporaryCache.current) {
+        // if we are aborting, we need to restore the values of the section we are aborting
+        newValues = {
+          ...newValues,
+          ...temporaryCache.current.data,
+        };
       }
       setValues(newValues);
     }

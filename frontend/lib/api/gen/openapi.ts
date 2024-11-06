@@ -23,6 +23,11 @@ export interface POLLING_STATION_LIST_REQUEST_PARAMS {
   election_id: number;
 }
 export type POLLING_STATION_LIST_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
+export interface POLLING_STATION_CREATE_REQUEST_PARAMS {
+  election_id: number;
+}
+export type POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
+export type POLLING_STATION_CREATE_REQUEST_BODY = NewPollingStationRequest;
 
 // /api/elections/{election_id}/status
 export interface ELECTION_STATUS_REQUEST_PARAMS {
@@ -31,12 +36,22 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
+export interface POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS {
+  polling_station_id: number;
+  entry_number: number;
+}
+export type POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
 export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: number;
   entry_number: number;
 }
 export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
 export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = SaveDataEntryRequest;
+export interface POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS {
+  polling_station_id: number;
+  entry_number: number;
+}
+export type POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
 export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
@@ -160,7 +175,23 @@ export interface ErrorResponse {
 export interface GetDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
+  updated_at: number;
   validation_results: ValidationResults;
+}
+
+/**
+ * Polling station of a certain [crate::election::Election]
+ */
+export interface NewPollingStationRequest {
+  house_number: string;
+  house_number_addition?: string;
+  locality: string;
+  name: string;
+  number: number;
+  number_of_voters?: number;
+  polling_station_type: PollingStationType;
+  postal_code: string;
+  street: string;
 }
 
 /**
@@ -179,7 +210,7 @@ export interface PoliticalGroupVotes {
 }
 
 /**
- * Polling station of a certain [Election]
+ * Polling station of a certain [crate::election::Election]
  */
 export interface PollingStation {
   election_id: number;
@@ -203,7 +234,7 @@ export interface PollingStationListResponse {
 }
 
 /**
- * PollingStationResults, following the fields in Model Na 31-2 Bijage 2.
+ * PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.
 
 See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
 lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
@@ -223,6 +254,7 @@ export interface PollingStationResults {
 export type PollingStationStatus = "not_started" | "first_entry_in_progress" | "first_entry_unfinished" | "definitive";
 
 export interface PollingStationStatusEntry {
+  finished_at?: number;
   id: number;
   status: PollingStationStatus;
 }

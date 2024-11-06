@@ -73,16 +73,16 @@ flowchart TD
     render-submitted-data([render with submitted data])
 
     show-error([show error])
-    hide-checkbox-accepted(["hide checkbox \n warnings accepted"])
+    hide-checkbox-accepted(["hide checkbox <br/> warnings accepted"])
     show-warning([show warning])
-    show-checked-accepted(["show checked checkbox \n warnings accepted"])
-    show-unchecked-accepted(["show unchecked checkbox \n warnings accepted"])
+    show-checked-accepted(["show checked checkbox <br/> warnings accepted"])
+    show-unchecked-accepted(["show unchecked checkbox <br/> warnings accepted"])
 
     page-submitted{page submitted?}
     error-cur-page{error for current page?}
     warning-cur-page{warning for current page?}
     cached-input-available{cached input available?}
-    input-changed{"input changed \n since submit?"}
+    input-changed{"input changed <br/> since submit?"}
     warning-accepted{"warning(s) accepted?"}
 
     %% flow
@@ -120,9 +120,9 @@ flowchart TD
     flow-start([start])
     go-to-prev-page([go to previous page])
 
-    error-any-prev-page{"error for any \n previous page?"}
-    error-cur-page{"error for \n current page?"}
-    warning-cur-page{"warning for \n current page?"}
+    error-any-prev-page{"error for any <br/> previous page?"}
+    error-cur-page{"error for <br/> current page?"}
+    warning-cur-page{"warning for <br/> current page?"}
     warnings-accepted{"warning(s) accepted?"}
     user-addresses-error{user addresses error}
 
@@ -187,7 +187,7 @@ flowchart TD
     inside-outside{navigating inside form?}
     on-furthest-page{on furthest page?}
     user-made-changes{user made changes?}
-    save-changes{"modal: \n save changes?"}
+    save-changes{"modal: <br/> save changes?"}
     call-save-api(call save api)
     cache-input(cache input)
     reset-changes(reset changes)
@@ -222,7 +222,7 @@ flowchart TD
     remain-on-page([remain on current page])
 
     %% steps
-    modal{"modal: \n save or delete?"}
+    modal{"modal: <br/> save or delete?"}
     call-save-api(call save api)
     call-delete-api(call delete api)
 

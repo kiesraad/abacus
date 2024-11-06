@@ -22,7 +22,7 @@ Tijdens de kick-off worden de issues binnen de epic aangemaakt. Net zoals epics 
 
 Als sommige zaken nog onvoldoende duidelijk zijn, of als er implementatiebeslissingen genomen moeten worden, overweeg het gebruik van een [spike solution](http://www.extremeprogramming.org/rules/spike.html) (bouwen om te leren, daarna weggooien), een prototype, en/of diagrammen (bijv een flow chart).
 
-Als je dat handig vindt, maak ook een issue aan voor de kennisdelingssessie aan het einde van een epic.
+Zodra een epic is afgerond, houden de epic owners een kennisdelingssessie. Als je dat handig vindt, kun je hier ook een issue voor aanmaken binnen de epic.
 
 
 ## Issues

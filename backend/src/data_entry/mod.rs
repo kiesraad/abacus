@@ -10,10 +10,10 @@ pub use self::structs::*;
 use crate::data_entry::repository::PollingStationDataEntries;
 use crate::election::repository::Elections;
 use crate::election::Election;
+use crate::error::{APIError, ErrorReference, ErrorResponse};
 use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::PollingStation;
 use crate::validation::ValidationResults;
-use crate::{APIError, ErrorResponse};
 
 pub mod repository;
 pub mod structs;
@@ -69,6 +69,7 @@ pub async fn polling_station_data_entry_save(
     if entry_number != 1 {
         return Err(APIError::NotFound(
             "Only the first data entry is supported".to_string(),
+            ErrorReference::EntryNumberNotSupported,
         ));
     }
 
@@ -76,6 +77,7 @@ pub async fn polling_station_data_entry_save(
         return Err(APIError::Conflict(
             "Cannot save data entry for a polling station that has already been finalised"
                 .to_string(),
+            ErrorReference::PollingStationAlreadyFinalized,
         ));
     }
 
@@ -123,6 +125,7 @@ pub struct GetDataEntryResponse {
     #[schema(value_type = Object)]
     pub client_state: Option<serde_json::Value>,
     pub validation_results: ValidationResults,
+    pub updated_at: i64,
 }
 
 /// Get an in-progress (not finalised) data entry for a polling station
@@ -149,7 +152,7 @@ pub async fn polling_station_data_entry_get(
     let mut tx = pool.begin().await?;
     let polling_station = polling_stations.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
-    let (data, client_state) = polling_station_data_entries
+    let (data, client_state, updated_at) = polling_station_data_entries
         .get(&mut tx, id, entry_number)
         .await?;
     let data = serde_json::from_slice(&data)?;
@@ -161,6 +164,7 @@ pub async fn polling_station_data_entry_get(
         data,
         client_state,
         validation_results,
+        updated_at,
     }))
 }
 
@@ -186,6 +190,7 @@ pub async fn polling_station_data_entry_delete(
     if entry_number != 1 {
         return Err(APIError::NotFound(
             "Only the first data entry is supported".to_string(),
+            ErrorReference::EntryNumberNotSupported,
         ));
     }
 
@@ -227,7 +232,7 @@ pub async fn polling_station_data_entry_finalise(
     // TODO: #129 support for second data entry
     // TODO: #129 validate whether first and second data entries are equal
 
-    let (data, _) = polling_station_data_entries
+    let (data, _, _) = polling_station_data_entries
         .get(&mut tx, id, entry_number)
         .await?;
     let results = serde_json::from_slice::<PollingStationResults>(&data)?;
@@ -243,6 +248,7 @@ pub async fn polling_station_data_entry_finalise(
     if validation_results.has_errors() {
         return Err(APIError::Conflict(
             "Cannot finalise data entry with validation errors".to_string(),
+            ErrorReference::PollingStationDataValidation,
         ));
     }
 

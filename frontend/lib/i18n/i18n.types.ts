@@ -9,9 +9,55 @@ export interface Translation {
 
   election: string;
   elections: string;
+  number: string;
+  vote_count: string;
+  candidate: string;
+  list: string;
   manage_elections: string;
   role: string;
   status: string;
+  progress: string;
+  shortcuts: string;
+  all_together: string;
+  server: string;
+  version: string;
+  check_and_save: string;
+  totals_list: string;
+  error: string;
+  history_back: string;
+  stack_trace: string;
+  something_went_wrong: string;
+  error_code: string;
+  close_message: string;
+  next: string;
+  save: string;
+  loading: string;
+
+  "candidates_votes.check_totals": string;
+  "candidates_votes.check_paper_report": string;
+  "candidates_votes.confirm_counts": string;
+  "candidates_votes.goto_totals": string;
+
+  "check_and_save.counts_add_up.warnings": string;
+  "check_and_save.counts_add_up.no_warnings": string;
+  "check_and_save.counts_do_not_add_up": string;
+  "check_and_save.no_warnings": string;
+  "check_and_save.warnings": string;
+  "check_and_save.check_warnings": string;
+  "check_and_save.fix_the_errors": string;
+  "check_and_save.counts_add_up_title": string;
+  "check_and_save.can_not_save": string;
+  "check_and_save.can_save": string;
+
+  "check_and_save.notable_form_sections.empty": string;
+  "check_and_save.notable_form_sections.accepted-warnings": string;
+  "check_and_save.notable_form_sections.unaccepted-warnings": string;
+  "check_and_save.notable_form_sections.errors": string;
+
+  "status.unfinished": string;
+  "status.in_progress": string;
+  "status.definitive": string;
+  "status.not_started": string;
 
   "election_status.title": string;
   "election_status.first_session": string;

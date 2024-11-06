@@ -1,4 +1,5 @@
 use crate::election::Election;
+use crate::error::ErrorReference;
 use crate::polling_station::structs::PollingStation;
 use crate::validation::{
     above_percentage_threshold, ValidationResult, ValidationResultCode, ValidationResults,
@@ -52,9 +53,10 @@ fn difference_admitted_voters_count_and_votes_cast_count_above_threshold(
 pub struct PollingStationResultsEntry {
     pub polling_station_id: u32,
     pub data: PollingStationResults,
+    pub created_at: i64,
 }
 
-/// PollingStationResults, following the fields in Model Na 31-2 Bijage 2.
+/// PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.
 ///
 /// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
 /// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
@@ -830,10 +832,13 @@ pub struct PoliticalGroupVotes {
 impl PoliticalGroupVotes {
     pub fn add(&mut self, other: &Self) -> Result<(), APIError> {
         if self.number != other.number {
-            return Err(APIError::AddError(format!(
-                "Attempted to add votes of group '{}' to '{}'",
-                other.number, self.number
-            )));
+            return Err(APIError::AddError(
+                format!(
+                    "Attempted to add votes of group '{}' to '{}'",
+                    other.number, self.number
+                ),
+                ErrorReference::InvalidVoteGroup,
+            ));
         }
 
         self.total += other.total;
@@ -844,7 +849,10 @@ impl PoliticalGroupVotes {
                 .iter_mut()
                 .find(|c| c.number == cv.number)
             else {
-                return Err(APIError::AddError(format!("Attempted to add candidate '{}' votes in group '{}', but no such candidate exists", cv.number, self.number)));
+                return Err(APIError::AddError(
+                    format!("Attempted to add candidate '{}' votes in group '{}', but no such candidate exists", cv.number, self.number),
+                    ErrorReference::InvalidVoteCandidate,
+                ));
             };
             found_can.votes += cv.votes;
         }

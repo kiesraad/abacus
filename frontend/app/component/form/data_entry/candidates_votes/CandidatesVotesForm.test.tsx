@@ -2,7 +2,9 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import {
+  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
+  expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
 } from "app/component/form/testHelperFunctions";
 import { getUrlMethodAndBody, overrideOnce, render, screen, within } from "app/test/unit";
@@ -348,6 +350,47 @@ describe("Test CandidatesVotesForm", () => {
       expect(method).toEqual("POST");
       const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
       expect(request_body.data).toEqual(expectedRequest.data);
+    });
+  });
+
+  describe("CandidatesVotesForm client-side errors", () => {
+    test("Show error when list total is empty", async () => {
+      const user = userEvent.setup();
+
+      renderForm({ recounted: false });
+
+      const candidateVotes0 = await screen.findByTestId("candidate_votes[0].votes");
+      const candidateVotes1 = screen.getByTestId("candidate_votes[1].votes");
+      const total = screen.getByTestId("total");
+
+      const spy = vi.spyOn(global, "fetch");
+
+      await user.type(candidateVotes0, "10");
+
+      await user.type(candidateVotes1, "20");
+
+      // First submit before adding a total
+      const submitButton = screen.getByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(spy).not.toHaveBeenCalled();
+      const feedbackMessage =
+        "Controleer het totaal van deze lijst. Overleg met coördinator als het papier niet is ingevuld.";
+      expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
+      expect(await screen.findByTestId("total")).toHaveFocus();
+      const expectedInvalidFieldIds = [candidatesFieldIds.total];
+      const expectedValidFieldIds = [candidatesFieldIds.candidate0, candidatesFieldIds.candidate1];
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
+
+      // Add the total and submit again
+      await user.type(total, "1");
+      await user.click(submitButton);
+
+      expect(screen.queryByTestId("missing-total-error")).not.toBeInTheDocument();
+      expect(spy).toHaveBeenCalledOnce();
     });
   });
 

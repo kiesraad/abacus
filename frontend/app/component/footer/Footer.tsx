@@ -1,3 +1,5 @@
+import { t } from "@kiesraad/i18n";
+
 export function Footer() {
   const gitBranch = __GIT_BRANCH__;
   let gitBranchShort = __GIT_BRANCH__;
@@ -23,8 +25,8 @@ export function Footer() {
         )}
       </section>
       <section>
-        <strong>Server</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"} &nbsp;&nbsp;
-        <strong>Versie</strong>{" "}
+        <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"} &nbsp;&nbsp;
+        <strong>{t("version")}</strong>{" "}
         {gitCommit ? (
           gitDirty ? (
             <>{gitCommit}-dirty</>

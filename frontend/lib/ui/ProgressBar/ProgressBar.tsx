@@ -26,12 +26,13 @@ export interface ProgressBarProps {
 export function ProgressBar({ id, data, title, spacing, showPercentage = false }: ProgressBarProps) {
   return (
     <div className={cn(cls["progressbar-container"], spacing)} id={`progressbar-${id}`}>
-      {title && <label>{title}</label>}
+      {title && <label id="progressbar-label">{title}</label>}
       {!Array.isArray(data) ? (
         <section>
           <div
             className={cls["progressbar-outer"]}
             role="progressbar"
+            aria-labelledby="progressbar-label"
             aria-valuenow={data["percentage"]}
             aria-valuemin={0}
             aria-valuemax={100}

@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import cls from "./AppFrame.module.css";
+
 export interface AppFrameProps {
   children: React.ReactNode;
 }
@@ -8,7 +10,7 @@ export interface AppFrameProps {
 
 export function AppFrame({ children }: AppFrameProps) {
   return (
-    <div id="appframe" className="app-frame">
+    <div id="appframe" className={cls["app-frame"]}>
       {children}
     </div>
   );

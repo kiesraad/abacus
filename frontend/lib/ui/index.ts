@@ -1,6 +1,7 @@
 import "./style/index.css";
 
 export * from "./Alert/Alert";
+export * from "./AppFrame/AppFrame";
 export * from "./AppLayout";
 export * from "./Badge";
 export * from "./BottomBar/BottomBar";
@@ -9,7 +10,6 @@ export * from "./CheckboxAndRadio";
 export * from "./Feedback";
 export * from "./Form/Form";
 export * from "./FormField/FormField";
-export * from "./Frame/AppFrame";
 export * from "./Icon/Icon";
 export * from "./IconButton/IconButton";
 export * from "./InputField/InputField";

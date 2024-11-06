@@ -223,7 +223,7 @@ flowchart TD
 
     %% steps
     modal{"modal: <br/> save or delete?"}
-    call-save-api(call save api)
+    call-save-api(call save api, <br/> include cached data)
     call-delete-api(call delete api)
 
     %% flow

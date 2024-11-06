@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT data, client_state, updated_at FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "data",
+        "ordinal": 0,
+        "type_info": "Blob"
+      },
+      {
+        "name": "client_state",
+        "ordinal": 1,
+        "type_info": "Blob"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 2,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "a547a2a3781a3ae6836065b775583c745c28532143cc627e52b202842610894d"
+}

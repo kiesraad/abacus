@@ -58,13 +58,12 @@ jobs:
         run: cargo --verbose --locked clippy --all-targets --no-default-features -- -D warnings
       - name: Run tests
         run: cargo --verbose --locked test
-      # Release build includes the frontend through the memory-serve crate
       - name: Build
-        run: cargo --verbose --locked build --release --features memory-serve
+        run: cargo --verbose --locked build --features memory-serve
       - uses: actions/upload-artifact@v4
         with:
           name: backend-build
-          path: backend/target/release/api
+          path: backend/target/debug/api
   frontend:
     name: Frontend
     runs-on: ubuntu-latest

@@ -20,6 +20,16 @@
     font-size: 1.125rem;
   }
 
+  /* Vertical center child inline-blocks */
+  td > * {
+    vertical-align: middle;
+  }
+
+  /* Gap between children */
+  td > * + * {
+    margin-left: 0.5rem;
+  }
+
   td.number {
     text-align: right;
     font-weight: bold;

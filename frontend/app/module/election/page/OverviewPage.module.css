@@ -1,9 +1,0 @@
-.flex-overview {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  svg {
-    min-width: 1.5rem;
-    height: 1.5rem;
-  }
-}

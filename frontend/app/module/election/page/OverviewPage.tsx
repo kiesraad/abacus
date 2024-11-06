@@ -8,8 +8,6 @@ import { t } from "@kiesraad/i18n";
 import { IconCheckHeart } from "@kiesraad/icon";
 import { Alert, Icon, PageTitle, Table, WorkStationNumber } from "@kiesraad/ui";
 
-import cls from "./OverviewPage.module.css";
-
 export function OverviewPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -73,16 +71,14 @@ export function OverviewPage() {
                   <Table.Cell>{election.name}</Table.Cell>
                   {isAdministrator && <Table.Cell></Table.Cell>}
                   <Table.Cell>
-                    <div className={cls["flex-overview"]}>
-                      <Icon icon={<IconCheckHeart />} color="accept" />
-                      <span>{isAdministrator ? "Invoerders bezig" : "Invoer gestart"}</span>
-                      {/* TODO <IconHourglass />
+                    <Icon icon={<IconCheckHeart />} color="accept" />
+                    <span>{isAdministrator ? "Invoerders bezig" : "Invoer gestart"}</span>
+                    {/* TODO <IconHourglass />
                       <span>Invoer opgeschort</span>
                       <IconClock />
                       <span>Wachten op coördinator</span>
                       <IconCheckVerified />
                       <span>Steminvoer voltooid</span> */}
-                    </div>
                   </Table.Cell>
                 </Table.LinkRow>
               ))}

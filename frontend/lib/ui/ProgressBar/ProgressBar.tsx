@@ -36,10 +36,7 @@ export function ProgressBar({ id, data, title, spacing, showPercentage = false }
             aria-valuemin={0}
             aria-valuemax={100}
           >
-            <div
-              className={cn(cls["progressbar-inner"], cls[data["class"]])}
-              style={{ width: `${data["percentage"]}%` }}
-            />
+            <div className={cn(cls["progressbar-inner"], data["class"])} style={{ width: `${data["percentage"]}%` }} />
           </div>
           {showPercentage && <aside>{data["percentage"]}%</aside>}
         </section>

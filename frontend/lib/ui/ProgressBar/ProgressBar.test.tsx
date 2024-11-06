@@ -11,6 +11,13 @@ describe("UI Component: ProgressBar", () => {
     );
     expect(getByText("Progress")).toBeInTheDocument();
     expect(getByText("50%")).toBeInTheDocument();
+
+    const innerBars = screen.getByRole("progressbar").children;
+    expect(innerBars.length).toEqual(1);
+    for (const bar of innerBars) {
+      expect(bar.getAttribute("style")).toEqual("width: 50%;");
+      expect(bar.classList.contains("default")).toBeTruthy();
+    }
   });
 
   test("renders a progress bar without a title and percentage", () => {

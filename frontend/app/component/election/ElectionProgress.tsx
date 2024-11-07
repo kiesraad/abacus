@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { useElectionStatus } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { Progress, ProgressBar } from "@kiesraad/ui";
 
 type Stat = {
@@ -17,7 +18,7 @@ export function ElectionProgress() {
     const totalDefinitive = statuses.filter((s) => s.status === "definitive").length;
     return [
       {
-        title: "Alles samen",
+        title: t("all_together"),
         id: "definitive",
         percentage: total > 0 ? Math.round((totalDefinitive / total) * 100) : 0,
       },
@@ -27,7 +28,7 @@ export function ElectionProgress() {
   return (
     <Progress>
       <div>
-        <h2 className="form_title">Voortgang</h2>
+        <h2 className="form_title">{t("progress")}</h2>
         {stats.map((stat) => (
           <ProgressBar
             key={stat.id}

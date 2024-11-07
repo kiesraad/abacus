@@ -107,7 +107,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         handleSubmit={handleSubmit}
       />
       <p className="md">
-        Klopt de naam van het stembureau met de naam op je papieren proces verbaal?
+        Klopt de naam van het stembureau met de naam op je papieren proces-verbaal?
         <br />
         Dan kan je beginnen. Klopt de naam niet? Overleg met de coördinator.
       </p>

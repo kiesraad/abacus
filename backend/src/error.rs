@@ -63,9 +63,9 @@ pub enum APIError {
 
 impl IntoResponse for APIError {
     fn into_response(self) -> Response {
-        fn to_error(error: String, reference: ErrorReference, fatal: bool) -> ErrorResponse {
+        fn to_error(error: &str, reference: ErrorReference, fatal: bool) -> ErrorResponse {
             ErrorResponse {
-                error,
+                error: error.to_string(),
                 reference,
                 fatal,
             }
@@ -73,60 +73,44 @@ impl IntoResponse for APIError {
 
         let (status, response) = match self {
             APIError::NotFound(message, reference) => {
-                (StatusCode::NOT_FOUND, to_error(message, reference, true))
+                (StatusCode::NOT_FOUND, to_error(&message, reference, true))
             }
             APIError::Conflict(message, reference) => {
-                (StatusCode::CONFLICT, to_error(message, reference, false))
+                (StatusCode::CONFLICT, to_error(&message, reference, false))
             }
             APIError::InvalidData(err) => {
                 error!("Invalid data error: {}", err);
                 (
                     StatusCode::UNPROCESSABLE_ENTITY,
-                    to_error(
-                        "Invalid data".to_string(),
-                        ErrorReference::InvalidData,
-                        false,
-                    ),
+                    to_error("Invalid data", ErrorReference::InvalidData, false),
                 )
             }
             APIError::JsonRejection(rejection) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
-                to_error(rejection.body_text(), ErrorReference::InvalidJson, true),
+                to_error(&rejection.body_text(), ErrorReference::InvalidJson, true),
             ),
             APIError::SerdeJsonError(err) => {
                 error!("Serde JSON error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error(
-                        "Internal server error".to_string(),
-                        ErrorReference::InvalidJson,
-                        true,
-                    ),
+                    to_error("Internal server error", ErrorReference::InvalidJson, true),
                 )
             }
             APIError::SqlxError(RowNotFound) => (
                 StatusCode::NOT_FOUND,
-                to_error(
-                    "Resource not found".to_string(),
-                    ErrorReference::EntryNotFound,
-                    true,
-                ),
+                to_error("Resource not found", ErrorReference::EntryNotFound, true),
             ),
             APIError::SqlxError(err) => {
                 error!("SQLx error: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error(
-                        "Internal server error".to_string(),
-                        ErrorReference::DatabaseError,
-                        true,
-                    ),
+                    to_error("Internal server error", ErrorReference::DatabaseError, true),
                 )
             }
             APIError::InvalidHeaderValue => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 to_error(
-                    "Internal server error".to_string(),
+                    "Internal server error",
                     ErrorReference::InternalServerError,
                     true,
                 ),
@@ -136,7 +120,7 @@ impl IntoResponse for APIError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error(
-                        "Internal server error".into(),
+                        "Internal server error",
                         ErrorReference::PdfGenerationError,
                         false,
                     ),
@@ -147,7 +131,7 @@ impl IntoResponse for APIError {
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     to_error(
-                        "Internal server error".to_string(),
+                        "Internal server error",
                         ErrorReference::InternalServerError,
                         true,
                     ),
@@ -157,7 +141,7 @@ impl IntoResponse for APIError {
                 error!("Error while adding totals: {:?}", err);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    to_error("Internal server error".into(), reference, false),
+                    to_error("Internal server error", reference, false),
                 )
             }
         };

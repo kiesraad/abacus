@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                id AS \"id: u32\",\n                election_id AS \"election_id: u32\",\n                name,\n                number,\n                number_of_voters,\n                polling_station_type,\n                street,\n                house_number,\n                house_number_addition,\n                postal_code,\n                locality\n            FROM polling_stations\n            WHERE election_id = $1\n        ",
+  "query": "\n            INSERT INTO polling_stations (\n              election_id,\n              name,\n              number,\n              number_of_voters,\n              polling_station_type,\n              street,\n              house_number,\n              house_number_addition,\n              postal_code,\n              locality\n            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n              id AS \"id: u32\",\n              election_id AS \"election_id: u32\",\n              name,\n              number,\n              number_of_voters,\n              polling_station_type,\n              street,\n              house_number,\n              house_number_addition,\n              postal_code,\n              locality\n            ",
   "describe": {
     "columns": [
       {
@@ -60,7 +60,7 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 10
     },
     "nullable": [
       false,
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "6c4ca8837760eec1f4d06d0401052004a291644f3a5855eeedbab3684825ca34"
+  "hash": "d310391af7ddd380045db7fd80e54f499a9c75a99e336742f1c33a0bcca78c46"
 }

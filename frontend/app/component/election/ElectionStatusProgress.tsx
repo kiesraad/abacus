@@ -1,18 +1,12 @@
 import { useMemo } from "react";
 
 import { PollingStationStatus, PollingStationStatusEntry, useElectionStatus } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { IconDot } from "@kiesraad/icon";
 import { Icon, PercentageAndColorClass, Progress, ProgressBar, ProgressBarColorClass } from "@kiesraad/ui";
 
 const statusCategories = ["in_progress", "unfinished", "definitive", "not_started"] as const;
 type StatusCategory = (typeof statusCategories)[number];
-
-const categoryTitle: Record<StatusCategory, string> = {
-  unfinished: "Niet afgeronde invoer",
-  in_progress: "Invoer bezig",
-  definitive: "Eerste invoer klaar", // TODO: in the future this changes to `Eerste en tweede invoer klaar`
-  not_started: "Werkvoorraad",
-};
 
 const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
   unfinished: "unfinished",
@@ -57,18 +51,18 @@ export function ElectionStatusProgress() {
   return (
     <Progress>
       <div id="shortcuts" className="column">
-        <h2>Snelkoppelingen</h2>
+        <h2>{t("shortcuts")}</h2>
         {statusCategories.map((cat) => {
           return (
             <span className="item" key={`item-${categoryColorClass[cat]}`} id={`item-${categoryColorClass[cat]}`}>
               <Icon icon={<IconDot />} size="sm" color={categoryColorClass[cat]} />
-              {categoryTitle[cat]} ({categoryCounts[cat]})
+              {t(`status.${cat}`)} ({categoryCounts[cat]})
             </span>
           );
         })}
       </div>
       <div id="progress" className="column">
-        <h2>Voortgang</h2>
+        <h2>{t("progress")}</h2>
         <ProgressBar key="all" id="all" data={progressBarData} spacing="small" />
       </div>
     </Progress>

@@ -4,7 +4,6 @@
   padding: 2rem 2rem 2rem 5rem;
   position: relative;
   display: flex;
-  width: fit-content;
   gap: 1rem;
 
   a:visited {
@@ -108,7 +107,8 @@
   &:global(.small) {
     padding: 1rem 1.5rem;
     align-items: center;
-    max-width: 48rem;
+    max-width: 50rem;
+    width: fit-content;
     aside {
       display: flex;
       padding: 0;

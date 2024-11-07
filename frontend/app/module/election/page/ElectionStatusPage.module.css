@@ -1,0 +1,29 @@
+.status-main {
+  padding: 2.5rem 5rem 2.5rem 5rem;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.status-title {
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+
+  h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    margin: 0;
+  }
+}
+
+.status-section {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+
+  nav {
+    padding: 0 !important;
+  }
+}

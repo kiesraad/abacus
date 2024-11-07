@@ -6,7 +6,11 @@ import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
+import { IconPlus } from "@kiesraad/icon";
 import { Alert, Button, PageTitle } from "@kiesraad/ui";
+import { cn } from "@kiesraad/util";
+
+import cls from "./ElectionStatusPage.module.css";
 
 export function ElectionStatusPage() {
   const navigate = useNavigate();
@@ -41,9 +45,18 @@ export function ElectionStatusPage() {
           </Button>
         </Alert>
       )}
-      <main>
-        <ElectionStatusProgress />
-        <article>Placeholder</article>
+      <main className={cn(cls["status-main"])}>
+        <div className={cn(cls["status-title"])}>
+          <h2 id="status-title">Statusoverzicht steminvoer</h2>
+          {/* TODO: Add button onClick to Create Polling Station page */}
+          <Button size="md" variant="secondary" leftIcon={<IconPlus />}>
+            Stembureau toevoegen
+          </Button>
+        </div>
+        <div className={cn(cls["status-section"])}>
+          <ElectionStatusProgress />
+          <article>Placeholder</article>
+        </div>
       </main>
       <Footer />
     </>

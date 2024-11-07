@@ -1,5 +1,7 @@
 nav.progress {
   padding: 2.5rem 5rem !important;
+  display: flex;
+  flex-direction: column;
   gap: 2.5rem;
 
   div:global(.column) {

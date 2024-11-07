@@ -35,11 +35,4 @@
     padding-top: 0.375rem;
     padding-right: 1rem;
   }
-
-  &.submit {
-    height: 3.625rem;
-    width: inherit;
-    font-size: var(--font-size-md);
-    border-left: 4px solid var(--color-error-darkest);
-  }
 }

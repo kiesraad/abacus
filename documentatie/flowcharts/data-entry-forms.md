@@ -2,10 +2,11 @@
 
 This page describes the navigation and rendering logic of the data entry forms through the following flow charts:
 
-- __Render navigation menu__: styling of the different items in the left-hand navigation menu
-- __Render form__: rendering of the different forms for data entry
-- __Click "Volgende"__: what should happen when the user clicks the "Volgende" ("Next") button
-- __Navigate away from page__: what should happen when the user navigates away from the page in any other way than clicking the "Volgende" button
+- [__Render navigation menu__](#render-navigation-menu): styling of the different items in the left-hand navigation menu
+- [__Render form__](#render-form): rendering of the different forms for data entry
+- [__Click "Volgende"__](#click-volgende): what should happen when the user clicks the "Volgende" ("Next") button
+- [__Navigate away from page__](#navigate-away-from-page): what should happen when the user navigates away from the page in any other way than clicking the "Volgende" button
+- [__Abort data entry ("Invoer afbreken")__](#abort-data-entry-invoer-afbreken): what should happen when the user clicks "Invoer afbreken" at the top of the screen
 
 An important thing to keep in mind when reading these diagrams is that a user can only proceed to the next form by clicking "Volgende" after they have resolved all errors (if any) and accepted all warnings (if any).
 

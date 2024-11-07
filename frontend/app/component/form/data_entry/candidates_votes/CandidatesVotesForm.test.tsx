@@ -377,7 +377,7 @@ describe("Test CandidatesVotesForm", () => {
 
       expect(spy).not.toHaveBeenCalled();
       const feedbackMessage =
-        "Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld";
+        "Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld.";
       expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
       expect(await screen.findByTestId("total")).toHaveFocus();
       const expectedInvalidFieldIds = [candidatesFieldIds.total];

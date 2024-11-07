@@ -6,6 +6,9 @@ import { useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconLock } from "@kiesraad/icon";
 import { Button, Icon, PageTitle } from "@kiesraad/ui";
+import { cn } from "@kiesraad/util";
+
+import cls from "./ElectionReportPage.module.css";
 
 export function ElectionReportPage() {
   const { election } = useElection();
@@ -77,7 +80,7 @@ export function ElectionReportPage() {
       <main>
         <article>
           <h2 className="form_title">{t("election_report.finish_data_entry_phase")}</h2>
-          <div className="md ul-larger-padding">
+          <div className={cn(cls["report-info-section"])}>
             {t("election_report.about_to_stop_data_entry")}
             {tx("election_report.data_entry_finish_steps_explanation")}
             {t("election_report.for_recount_new_session_needed")}

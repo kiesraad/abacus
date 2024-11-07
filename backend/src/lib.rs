@@ -69,6 +69,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             MemoryServe::new()
                 .index_file(Some("/index.html"))
                 .fallback(Some("/index.html"))
+                .fallback_status(axum::http::StatusCode::OK)
                 .into_router(),
         )
     };

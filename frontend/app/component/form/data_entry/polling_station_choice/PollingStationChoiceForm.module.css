@@ -1,7 +1,3 @@
-.unfinished-alert {
-  margin-bottom: 2rem;
-}
-
 .message {
   padding: 1rem 1.5rem;
   background-color: var(--bg-gray-darker);
@@ -56,7 +52,7 @@
     }
   }
 
-  h2:global(.form_title) {
+  .form-title {
     padding-top: 1.25rem;
     margin-bottom: 1rem;
   }

@@ -1,14 +1,23 @@
-.flex {
-  display: flex;
-  justify-content: flex-start;
-  gap: 2rem;
-  .flex-3 {
-    > * {
-      flex: 1 1 auto;
-    }
-  }
+.mt-0 {
+  margin-top: 0;
 }
 
-.mb {
-  margin-bottom: 1rem;
+.mt-md {
+  margin-top: var(--space-md);
+}
+
+.mt-lg {
+  margin-top: var(--space-lg);
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.mb-md {
+  margin-bottom: var(--space-md);
+}
+
+.mb-lg {
+  margin-bottom: var(--space-lg);
 }

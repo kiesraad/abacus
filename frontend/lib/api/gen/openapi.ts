@@ -27,13 +27,28 @@ export interface POLLING_STATION_CREATE_REQUEST_PARAMS {
   election_id: number;
 }
 export type POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
-export type POLLING_STATION_CREATE_REQUEST_BODY = NewPollingStationRequest;
+export type POLLING_STATION_CREATE_REQUEST_BODY = PollingStationRequest;
 
 // /api/elections/{election_id}/status
 export interface ELECTION_STATUS_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
+
+// /api/polling_stations/{polling_station_id}
+export interface POLLING_STATION_GET_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_GET_REQUEST_PATH = `/api/polling_stations/${number}`;
+export interface POLLING_STATION_UPDATE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${number}`;
+export type POLLING_STATION_UPDATE_REQUEST_BODY = PollingStationRequest;
+export interface POLLING_STATION_DELETE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_DELETE_REQUEST_PATH = `/api/polling_stations/${number}`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS {
@@ -180,21 +195,6 @@ export interface GetDataEntryResponse {
 }
 
 /**
- * Polling station of a certain [crate::election::Election]
- */
-export interface NewPollingStationRequest {
-  house_number: string;
-  house_number_addition?: string;
-  locality: string;
-  name: string;
-  number: number;
-  number_of_voters?: number;
-  polling_station_type: PollingStationType;
-  postal_code: string;
-  street: string;
-}
-
-/**
  * Political group with its candidates
  */
 export interface PoliticalGroup {
@@ -231,6 +231,21 @@ export interface PollingStation {
  */
 export interface PollingStationListResponse {
   polling_stations: PollingStation[];
+}
+
+/**
+ * Polling station of a certain [crate::election::Election]
+ */
+export interface PollingStationRequest {
+  house_number: string;
+  house_number_addition?: string;
+  locality: string;
+  name: string;
+  number: number;
+  number_of_voters?: number;
+  polling_station_type: PollingStationType;
+  postal_code: string;
+  street: string;
 }
 
 /**

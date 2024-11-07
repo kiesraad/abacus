@@ -27,3 +27,11 @@
     padding: 0 !important;
   }
 }
+
+.status-article {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  flex: 1 0 0;
+}

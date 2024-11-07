@@ -82,6 +82,10 @@ a {
   font-weight: bold;
 }
 
+.normal {
+  font-weight: normal;
+}
+
 p.form-paragraph {
   width: 37.5rem;
   margin-top: 1rem;

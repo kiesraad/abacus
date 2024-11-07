@@ -9,6 +9,8 @@ export interface Translation {
 
   election: string;
   elections: string;
+  polling_station: string;
+  polling_stations: string;
   number: string;
   vote_count: string;
   candidate: string;
@@ -64,6 +66,8 @@ export interface Translation {
   "election_status.definitive.title": string;
   "election_status.definitive.message": string;
   "election_status.definitive.finish_button": string;
+  "election_status.main_title": string;
+  "election_status.add_polling_station": string;
 
   "account.configured": string;
   "feedback.F101.title": string;

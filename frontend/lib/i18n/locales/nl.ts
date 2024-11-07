@@ -3,6 +3,8 @@ export const nl = {
 
   election: "Verkiezing",
   elections: "Verkiezingen",
+  polling_station: "Stembureau",
+  polling_stations: "Stembureaus",
   list: "Lijst",
   number: "Nummer",
   vote_count: "Aantal stemmen",
@@ -65,6 +67,8 @@ export const nl = {
   "election_status.definitive.message":
     "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
   "election_status.definitive.finish_button": "Invoerfase afronden",
+  "election_status.main_title": "Statusoverzicht steminvoer",
+  "election_status.add_polling_station": "Stembureau toevoegen",
 
   "account.configured": "Je account is ingesteld",
   "feedback.F101.title": "Controleer het papieren proces-verbaal",

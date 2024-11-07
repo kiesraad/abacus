@@ -8,16 +8,12 @@ nav.progress {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-
-    h2 {
-      margin-bottom: 0;
-    }
-
-    span:global(.item) {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 0.25rem;
-    }
   }
+}
+
+span:global(.item) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
 }

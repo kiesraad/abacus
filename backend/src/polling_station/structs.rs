@@ -38,7 +38,7 @@ impl IntoResponse for PollingStation {
 /// Polling station of a certain [crate::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
-pub struct NewPollingStationRequest {
+pub struct PollingStationRequest {
     pub name: String,
     pub number: i64,
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -234,7 +234,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPollingStationRequest"
+                "$ref": "#/components/schemas/PollingStationRequest"
               }
             }
           },
@@ -317,6 +317,160 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/polling_stations/{polling_station_id}": {
+      "get": {
+        "tags": [
+          "polling_station"
+        ],
+        "summary": "Get a [PollingStation]",
+        "operationId": "polling_station_get",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Polling station found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Polling station not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "polling_station"
+        ],
+        "summary": "Update a [PollingStation]",
+        "operationId": "polling_station_update",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PollingStationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Polling station updated successfully"
+          },
+          "404": {
+            "description": "Polling station not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "polling_station"
+        ],
+        "summary": "Delete a [PollingStation]",
+        "operationId": "polling_station_delete",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Polling station deleted successfully"
+          },
+          "404": {
+            "description": "Polling station not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -925,50 +1079,6 @@
           }
         }
       },
-      "NewPollingStationRequest": {
-        "type": "object",
-        "description": "Polling station of a certain [crate::election::Election]",
-        "required": [
-          "name",
-          "number",
-          "polling_station_type",
-          "street",
-          "house_number",
-          "postal_code",
-          "locality"
-        ],
-        "properties": {
-          "house_number": {
-            "type": "string"
-          },
-          "house_number_addition": {
-            "type": "string"
-          },
-          "locality": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "number": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "polling_station_type": {
-            "$ref": "#/components/schemas/PollingStationType"
-          },
-          "postal_code": {
-            "type": "string"
-          },
-          "street": {
-            "type": "string"
-          }
-        }
-      },
       "PoliticalGroup": {
         "type": "object",
         "description": "Political group with its candidates",
@@ -1088,6 +1198,50 @@
             "items": {
               "$ref": "#/components/schemas/PollingStation"
             }
+          }
+        }
+      },
+      "PollingStationRequest": {
+        "type": "object",
+        "description": "Polling station of a certain [crate::election::Election]",
+        "required": [
+          "name",
+          "number",
+          "polling_station_type",
+          "street",
+          "house_number",
+          "postal_code",
+          "locality"
+        ],
+        "properties": {
+          "house_number": {
+            "type": "string"
+          },
+          "house_number_addition": {
+            "type": "string"
+          },
+          "locality": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "polling_station_type": {
+            "$ref": "#/components/schemas/PollingStationType"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
           }
         }
       },

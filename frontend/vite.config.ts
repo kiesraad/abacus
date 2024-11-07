@@ -42,6 +42,13 @@ export default defineConfig(({ command }) => {
         },
       },
     },
+    css: {
+      modules: {
+        // Only dashes in class names will be converted to camelCase,
+        // the original class name will not to be removed from the locals
+        localsConvention: "dashes",
+      },
+    },
     define: {
       __API_MSW__: JSON.stringify(mswEnabled),
       __APP_VERSION__: JSON.stringify(pkgjson.version),

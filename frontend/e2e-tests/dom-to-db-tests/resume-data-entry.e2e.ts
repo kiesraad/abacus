@@ -280,6 +280,43 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.voterCardCount).toBeEmpty();
       await expect(votersAndVotesPage.totalAdmittedVotersCount).toHaveValue("42");
     });
+
+    test("save unsubmitted input when changing recounted works", async ({ page }) => {
+      await page.goto("/elections/1/data-entry/1/recounted");
+
+      const recountedPage = new RecountedPage(page);
+      await recountedPage.checkYesAndClickNext();
+
+      const votersAndVotesPage = new VotersAndVotesPage(page);
+      await votersAndVotesPage.heading.waitFor();
+      await votersAndVotesPage.inputVotersCounts({
+        poll_card_count: 42,
+        proxy_certificate_count: 0,
+        voter_card_count: 0,
+        total_admitted_voters_count: 42,
+      });
+      await votersAndVotesPage.inputVotersRecounts({
+        poll_card_recount: 100,
+        proxy_certificate_recount: 0,
+        total_admitted_voters_recount: 0,
+        voter_card_recount: 100,
+      });
+
+      await votersAndVotesPage.navPanel.recounted.click();
+      await recountedPage.heading.waitFor();
+      await recountedPage.no.click();
+      await recountedPage.abortInput.click();
+
+      const abortInputModal = new AbortInputModal(page);
+      const responsePromise = page.waitForResponse("/api/polling_stations/1/data_entries/1");
+      await abortInputModal.saveInput.click();
+
+      const response = await responsePromise;
+      expect(response.status()).toBe(200);
+
+      const pollingStationChoicePage = new PollingStationChoicePage(page);
+      await pollingStationChoicePage.heading.waitFor();
+    });
   });
 
   test.describe("resume after deleting", () => {

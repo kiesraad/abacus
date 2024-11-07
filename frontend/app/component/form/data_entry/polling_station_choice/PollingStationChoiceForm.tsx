@@ -6,9 +6,9 @@ import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
 
+import cls from "./PollingStationChoiceForm.module.css";
 import { PollingStationLink } from "./PollingStationLink";
 import { PollingStationSelector } from "./PollingStationSelector";
-import cls from "./PollingStationSelector.module.css";
 import { PollingStationsList } from "./PollingStationsList";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
@@ -133,27 +133,29 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
-      <details>
-        <summary>
-          Weet je het nummer niet?
-          <br />
-          <span id="openPollingStationList" className="underlined pointer">
-            Bekijk de lijst met alle stembureaus
-          </span>
-        </summary>
-        <h2 className="form_title table_title">Kies het stembureau</h2>
-        {(() => {
-          if (pollingStations.length === 0) {
-            return (
-              <Alert type={"error"} variant="small">
-                <p>Geen stembureaus gevonden</p>
-              </Alert>
-            );
-          } else {
-            return <PollingStationsList pollingStations={pollingStations} />;
-          }
-        })()}
-      </details>
+      <div className={cls["polling-station-list"]}>
+        <details>
+          <summary>
+            Weet je het nummer niet?
+            <br />
+            <span id="openPollingStationList" className={cn(cls.underlined, cls.pointer)}>
+              Bekijk de lijst met alle stembureaus
+            </span>
+          </summary>
+          <h2 className="form_title">Kies het stembureau</h2>
+          {(() => {
+            if (pollingStations.length === 0) {
+              return (
+                <Alert type={"error"} variant="small">
+                  <p>Geen stembureaus gevonden</p>
+                </Alert>
+              );
+            } else {
+              return <PollingStationsList pollingStations={pollingStations} />;
+            }
+          })()}
+        </details>
+      </div>
     </form>
   );
 }

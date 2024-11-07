@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { To, useNavigate } from "react-router-dom";
 
 import cls from "./Table.module.css";
 
@@ -47,7 +47,7 @@ function Row({ children }: { children: React.ReactNode[] }) {
   return <tr>{children}</tr>;
 }
 
-function LinkRow({ children, to }: { children: React.ReactNode[]; to: string }) {
+function LinkRow({ children, to }: { children: React.ReactNode[]; to: To }) {
   const navigate = useNavigate();
 
   function handleClick() {

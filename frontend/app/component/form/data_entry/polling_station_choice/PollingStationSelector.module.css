@@ -12,10 +12,6 @@
   font-feature-settings: "ss09" on;
 }
 
-.unfinished-alert {
-  margin-bottom: 2rem;
-}
-
 .message {
   padding: 1rem 1.5rem;
   background-color: var(--bg-gray-darker);

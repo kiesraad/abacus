@@ -79,7 +79,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       }}
     >
       {unfinished.length > 0 && (
-        <div className={cls["unfinished-alert"]}>
+        <div className="mb-lg">
           <Alert type="notify" variant="no-icon">
             <h2>Je hebt nog een openstaande invoer</h2>
             <p>
@@ -93,7 +93,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           </Alert>
         </div>
       )}
-      <h2 className="form_title">
+      <h2 className="mb-lg">
         {anotherEntry ? "Verder met een volgend stembureau?" : "Welk stembureau ga je invoeren?"}
       </h2>
       <PollingStationSelector
@@ -141,7 +141,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
             Bekijk de lijst met alle stembureaus
           </span>
         </summary>
-        <h2 className="form_title table_title">Kies het stembureau</h2>
+        <h2 className="table_title">Kies het stembureau</h2>
         {(() => {
           if (pollingStations.length === 0) {
             return (

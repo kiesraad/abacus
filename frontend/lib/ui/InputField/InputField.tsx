@@ -28,7 +28,7 @@ export function InputField({
   ...InputFieldProps
 }: InputFieldProps) {
   return (
-    <div className={`${cls.inputfield} ${margin ? "margin" : ""}`}>
+    <div className={`${cls.inputfield} ${margin ? "mb-lg" : ""}`}>
       <label className={`${fieldSize} ${fieldWidth} ${error ? "error" : ""}`}>
         <span className="label">
           {label} {subtext && <span className="subtext">{subtext}</span>}

@@ -25,29 +25,29 @@ export interface ProgressBarProps {
 }
 export function ProgressBar({ id, data, title, spacing, showPercentage = false }: ProgressBarProps) {
   return (
-    <div className={cn(cls["progressbar-container"], spacing)} id={`progressbar-${id}`}>
+    <div className={cn(cls.progressbarContainer, spacing)} id={`progressbar-${id}`}>
       {title && <label id="progressbar-label">{title}</label>}
       {!Array.isArray(data) ? (
         <section>
           <div
-            className={cls["progressbar-outer"]}
+            className={cls.progressbarOuter}
             role="progressbar"
             aria-labelledby="progressbar-label"
-            aria-valuenow={data["percentage"]}
+            aria-valuenow={data.percentage}
             aria-valuemin={0}
             aria-valuemax={100}
           >
-            <div className={cn(cls["progressbar-inner"], data["class"])} style={{ width: `${data["percentage"]}%` }} />
+            <div className={cn(cls.progressbarInner, data.class)} style={{ width: `${data.percentage}%` }} />
           </div>
-          {showPercentage && <aside>{data["percentage"]}%</aside>}
+          {showPercentage && <aside>{data.percentage}%</aside>}
         </section>
       ) : (
         <section>
-          <div id="multi-outer-bar" className={cls["progressbar-outer"]} style={{ height: "0.75rem" }}>
+          <div id="multi-outer-bar" className={cls.progressbarOuter} style={{ height: "0.75rem" }}>
             {data.map((bar, index) => {
               return (
                 <div
-                  className={cn(cls["progressbar-inner"], bar.class)}
+                  className={cn(cls.progressbarInner, bar.class)}
                   style={{ width: `${bar.percentage}%` }}
                   key={`inner-bar-${index}`}
                 />

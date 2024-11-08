@@ -25,7 +25,6 @@ import {
   ProgressBarColorClass,
   Table,
 } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
 
 import cls from "./ElectionStatusPage.module.css";
 
@@ -190,15 +189,15 @@ export function ElectionStatusPage() {
           </Button>
         </Alert>
       )}
-      <main className={cn(cls["status-main"])}>
-        <div className={cn(cls["status-title"])}>
+      <main className={cls.statusMain}>
+        <div className={cls.statusTitle}>
           <h2 id="status-title">{t("election_status.main_title")}</h2>
           {/* TODO: Add button onClick to Create Polling Station page */}
           <Button size="md" variant="secondary" leftIcon={<IconPlus />}>
             {t("election_status.add_polling_station")}
           </Button>
         </div>
-        <div className={cn(cls["status-section"])}>
+        <div className={cls.statusSection}>
           <Progress>
             <div id="shortcuts" className="column">
               <h2 className="mb-0">{t("shortcuts")}</h2>
@@ -220,7 +219,7 @@ export function ElectionStatusPage() {
               <ProgressBar key="all" id="all" data={progressBarData} spacing="small" />
             </div>
           </Progress>
-          <article className={cn(cls.statusArticle)}>
+          <article className={cls.statusArticle}>
             {statusCategories
               .filter((cat) => categoryCounts[cat] !== 0)
               .map((cat) => {

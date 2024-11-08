@@ -2,6 +2,7 @@ import { Error, ErrorAction } from "app/component/error";
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
+import { AppLayout } from "@kiesraad/ui";
 import { isDevelopment } from "@kiesraad/util";
 
 interface FatalErrorProps {
@@ -12,7 +13,7 @@ interface FatalErrorProps {
 
 export function FatalError({ message, code, error }: FatalErrorProps) {
   return (
-    <div className="app-layout">
+    <AppLayout>
       <NavBar />
       <Error title="Abacus is stuk" action={ErrorAction.Back} error={error}>
         <p>
@@ -32,6 +33,6 @@ export function FatalError({ message, code, error }: FatalErrorProps) {
         )}
       </Error>
       <Footer />
-    </div>
+    </AppLayout>
   );
 }

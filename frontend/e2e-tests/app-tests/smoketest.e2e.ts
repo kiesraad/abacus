@@ -3,7 +3,7 @@ import { RecountedPage } from "e2e-tests/page-objects/data_entry/RecountedPgObj"
 
 test("smoke test", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  const appFrame = page.locator("css=#root .app-frame");
+  const appFrame = page.getByTestId("app-frame");
   await expect(appFrame).toContainText("Abacus");
 });
 

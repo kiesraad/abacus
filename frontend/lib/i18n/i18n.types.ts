@@ -64,6 +64,13 @@ export interface Translation {
   "election_status.definitive.title": string;
   "election_status.definitive.message": string;
   "election_status.definitive.finish_button": string;
+  "election_status.finish_first_session_data_entry_status": string;
+
+  "election_report.finish_data_entry_phase": string;
+  "election_report.about_to_stop_data_entry": string;
+  "election_report.data_entry_finish_steps_explanation": string;
+  "election_report.for_recount_new_session_needed": string;
+  "election_report.download_report": string;
 
   "account.configured": string;
   "feedback.F101.title": string;

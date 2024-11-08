@@ -3,12 +3,13 @@ import { Link, Outlet } from "react-router-dom";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection } from "@kiesraad/api";
+import { AppLayout } from "@kiesraad/ui";
 
 export function PollingStationsLayout() {
   const { election } = useElection();
 
   return (
-    <div className="app-layout">
+    <AppLayout>
       <NavBar>
         <Link to={`/elections/${election.id}#coordinator`}>
           <span className="bold">{election.location}</span>
@@ -17,6 +18,6 @@ export function PollingStationsLayout() {
         </Link>
       </NavBar>
       <Outlet />
-    </div>
+    </AppLayout>
   );
 }

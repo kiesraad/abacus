@@ -13,11 +13,14 @@
   th {
     text-align: left;
     height: 2.75rem;
+    font-size: var(--font-size-xs);
+    line-height: 1.125rem;
   }
 
   td {
     height: 3.5rem;
-    font-size: 1.125rem;
+    font-size: var(--font-size-sm);
+    line-height: 1.25rem;
   }
 
   /* Vertical center child inline-blocks */
@@ -34,6 +37,8 @@
     text-align: right;
     font-weight: bold;
     width: 6.5rem;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
   }
 
   tr.background-styling {

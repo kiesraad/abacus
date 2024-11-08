@@ -11,7 +11,7 @@
 
     aside {
       flex: 0 0 2rem;
-      font-size: 0.875rem;
+      font-size: var(--font-size-sm);
     }
   }
 

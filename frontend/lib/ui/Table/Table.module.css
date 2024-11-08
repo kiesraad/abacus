@@ -36,6 +36,10 @@
     width: 6.5rem;
   }
 
+  tr.background-styling {
+    background-color: var(--bg-gray);
+  }
+
   tr.row-link {
     cursor: pointer;
 

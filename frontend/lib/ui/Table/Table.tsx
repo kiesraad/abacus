@@ -23,10 +23,10 @@ Table.Row = Row;
 Table.LinkRow = LinkRow;
 Table.Cell = Cell;
 
-function Header({ children }: { children: React.ReactNode[] }) {
+function Header({ children, backgroundStyling }: { children: React.ReactNode[]; backgroundStyling?: boolean }) {
   return (
     <thead>
-      <tr>{children}</tr>
+      <tr className={backgroundStyling ? cls.backgroundStyling : undefined}>{children}</tr>
     </thead>
   );
 }

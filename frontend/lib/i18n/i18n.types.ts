@@ -34,6 +34,8 @@ export interface Translation {
   next: string;
   save: string;
   loading: string;
+  typist: string;
+  finished_at: string;
 
   "candidates_votes.check_totals": string;
   "candidates_votes.check_paper_report": string;

@@ -1,14 +1,21 @@
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
-import { PollingStationStatus, PollingStationStatusEntry, useElection, useElectionStatus } from "@kiesraad/api";
+import {
+  PollingStation,
+  PollingStationStatus,
+  PollingStationStatusEntry,
+  useElection,
+  useElectionStatus,
+} from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconDot, IconPlus } from "@kiesraad/icon";
 import {
   Alert,
+  Badge,
   Button,
   Icon,
   PageTitle,
@@ -22,13 +29,15 @@ import { cn } from "@kiesraad/util";
 
 import cls from "./ElectionStatusPage.module.css";
 
+interface PollingStationWithStatus extends PollingStation, PollingStationStatusEntry {}
+
 const statusCategories = ["unfinished", "in_progress", "definitive", "not_started"] as const;
 type StatusCategory = (typeof statusCategories)[number];
 
 const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
   unfinished: "unfinished",
-  definitive: "definitive",
   in_progress: "in-progress",
+  definitive: "definitive",
   not_started: "not-started",
 };
 
@@ -36,10 +45,82 @@ const mapCategoryToStatus: Record<StatusCategory, PollingStationStatus> = {
   // TODO: future `second_entry_unfinished` status should be added to `unfinished`
   //  future `second_entry_in_progress` status should be added to `in_progress`
   unfinished: "first_entry_unfinished",
-  definitive: "definitive",
   in_progress: "first_entry_in_progress",
+  definitive: "definitive",
   not_started: "not_started",
 };
+
+function getTableHeaderForCategory(category: StatusCategory): ReactNode {
+  function CategoryHeader({ children }: { children?: ReactNode[] }) {
+    return (
+      <Table.Header key={category} backgroundStyling>
+        <Table.Column key={`${category}-number`} number>
+          {t("number")}
+        </Table.Column>
+        <Table.Column key={`${category}-name`}>{t("polling_station")}</Table.Column>
+        {children}
+      </Table.Header>
+    );
+  }
+  const typistColumn = <Table.Column key={`${category}-typist`}>{t("typist")}</Table.Column>;
+  const finishedAtColumn = <Table.Column key={`${category}-time`}>{t("finished_at")}</Table.Column>;
+  const progressColumn = <Table.Column key={`${category}-progress`}>{t("progress")}</Table.Column>;
+  // TODO: Needs to be updated when second entry is implemented
+  if (category === "unfinished") {
+    return <CategoryHeader>{[typistColumn]}</CategoryHeader>;
+  } else if (category === "in_progress") {
+    return <CategoryHeader>{[typistColumn, progressColumn]}</CategoryHeader>;
+  } else if (category === "definitive") {
+    return <CategoryHeader>{[typistColumn, finishedAtColumn]}</CategoryHeader>;
+  } else {
+    return <CategoryHeader></CategoryHeader>;
+  }
+}
+
+function getTableRowForCategory(category: StatusCategory, polling_station: PollingStationWithStatus): ReactNode {
+  // TODO: future `errors_and_warnings` status should be added to showBadge array
+  const showBadge = ["first_entry_unfinished", "first_entry_in_progress"];
+  function CategoryPollingStationRow({ children }: { children?: ReactNode[] }) {
+    return (
+      <Table.Row>
+        <Table.Cell key={`${polling_station.id}-number`} number>
+          {polling_station.number}
+        </Table.Cell>
+        <Table.Cell key={`${polling_station.id}-name`}>
+          <span>{polling_station.name}</span>
+          {showBadge.includes(polling_station.status) && <Badge type={polling_station.status} />}
+        </Table.Cell>
+        {children}
+      </Table.Row>
+    );
+  }
+  // TODO: Add typist information once user accounts are implemented
+  const typistCell = <Table.Cell key={`${polling_station.id}-typist`}></Table.Cell>;
+  const finishedAtCell = (
+    <Table.Cell key={`${polling_station.id}-time`}>
+      {polling_station.finished_at
+        ? new Date(polling_station.finished_at * 1000).toLocaleTimeString("nl-NL", {
+            timeStyle: "short",
+            hour12: false,
+          })
+        : ""}
+    </Table.Cell>
+  );
+  // TODO: Add polling station progress bar in #463
+  const progressCell = <Table.Cell key={`${polling_station.id}-progress`}></Table.Cell>;
+  // TODO: Needs to be updated when second entry is implemented
+  if (category === "unfinished") {
+    return <CategoryPollingStationRow key={polling_station.id}>{[typistCell]}</CategoryPollingStationRow>;
+  } else if (category === "in_progress") {
+    return <CategoryPollingStationRow key={polling_station.id}>{[typistCell, progressCell]}</CategoryPollingStationRow>;
+  } else if (category === "definitive") {
+    return (
+      <CategoryPollingStationRow key={polling_station.id}>{[typistCell, finishedAtCell]}</CategoryPollingStationRow>
+    );
+  } else {
+    return <CategoryPollingStationRow key={polling_station.id}></CategoryPollingStationRow>;
+  }
+}
 
 function statusCount(entries: PollingStationStatusEntry[], status: PollingStationStatus): number {
   return entries.filter((s) => s.status === status).length;
@@ -82,7 +163,7 @@ export function ElectionStatusPage() {
 
   const pollingStationsWithStatuses = pollingStations.map((ps) => {
     const status = statuses.find((element) => element.id === ps.id);
-    return { ...ps, ...status };
+    return { ...ps, ...status } as PollingStationWithStatus;
   });
 
   return (
@@ -140,34 +221,28 @@ export function ElectionStatusPage() {
             </div>
           </Progress>
           <article className={cn(cls.statusArticle)}>
-            {statusCategories.map((cat) => {
-              return (
-                <div key={`item-table-${categoryColorClass[cat]}`}>
-                  <span className="item">
-                    <Icon icon={<IconDot />} size="md" color={categoryColorClass[cat]} />
-                    <h2 className="mb-0">
-                      {t(`status.${cat}`)} <span className="normal">({categoryCounts[cat]})</span>
-                    </h2>
-                  </span>
-                  <Table id={cat} key={cat}>
-                    <Table.Header>
-                      <Table.Column>{t("number")}</Table.Column>
-                      <Table.Column>{t("polling_station")}</Table.Column>
-                    </Table.Header>
-                    <Table.Body>
-                      {pollingStationsWithStatuses
-                        .filter((ps) => ps.status === mapCategoryToStatus[cat])
-                        .map((ps) => (
-                          <Table.Row key={ps.id}>
-                            <Table.Cell>{ps.number}</Table.Cell>
-                            <Table.Cell>{ps.name}</Table.Cell>
-                          </Table.Row>
-                        ))}
-                    </Table.Body>
-                  </Table>
-                </div>
-              );
-            })}
+            {statusCategories
+              .filter((cat) => categoryCounts[cat] !== 0)
+              .map((cat) => {
+                return (
+                  <div key={`item-table-${categoryColorClass[cat]}`}>
+                    <span className="item">
+                      <Icon icon={<IconDot />} size="md" color={categoryColorClass[cat]} />
+                      <h2 className="mb-0">
+                        {t(`status.${cat}`)} <span className="normal">({categoryCounts[cat]})</span>
+                      </h2>
+                    </span>
+                    <Table id={cat} key={cat}>
+                      {getTableHeaderForCategory(cat)}
+                      <Table.Body key={cat}>
+                        {pollingStationsWithStatuses
+                          .filter((ps) => ps.status === mapCategoryToStatus[cat])
+                          .map((ps) => getTableRowForCategory(cat, ps))}
+                      </Table.Body>
+                    </Table>
+                  </div>
+                );
+              })}
           </article>
         </div>
       </main>

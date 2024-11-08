@@ -28,6 +28,8 @@ export const nl = {
   close_message: "Melding sluiten",
   save: "Opslaan",
   loading: "Laden...",
+  typist: "Invoerder",
+  finished_at: "Afgerond om",
 
   "candidates_votes.check_totals":
     "Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld.",

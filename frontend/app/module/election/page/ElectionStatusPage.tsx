@@ -40,7 +40,7 @@ const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
   not_started: "not-started",
 };
 
-const mapCategoryToStatus: Record<StatusCategory, PollingStationStatus> = {
+const categoryToStatus: Record<StatusCategory, PollingStationStatus> = {
   // TODO: future `second_entry_unfinished` status should be added to `unfinished`
   //  future `second_entry_in_progress` status should be added to `in_progress`
   unfinished: "first_entry_unfinished",
@@ -165,6 +165,8 @@ export function ElectionStatusPage() {
     return { ...ps, ...status } as PollingStationWithStatus;
   });
 
+  const tableCategories = statusCategories.filter((cat) => categoryCounts[cat] !== 0);
+
   return (
     <>
       <PageTitle title={t("election_status.title")} />
@@ -220,28 +222,26 @@ export function ElectionStatusPage() {
             </div>
           </Progress>
           <article className={cls.statusArticle}>
-            {statusCategories
-              .filter((cat) => categoryCounts[cat] !== 0)
-              .map((cat) => {
-                return (
-                  <div key={`item-table-${categoryColorClass[cat]}`}>
-                    <span className="item">
-                      <Icon icon={<IconDot />} size="md" color={categoryColorClass[cat]} />
-                      <h2 className="mb-0">
-                        {t(`status.${cat}`)} <span className="normal">({categoryCounts[cat]})</span>
-                      </h2>
-                    </span>
-                    <Table id={cat} key={cat}>
-                      {getTableHeaderForCategory(cat)}
-                      <Table.Body key={cat}>
-                        {pollingStationsWithStatuses
-                          .filter((ps) => ps.status === mapCategoryToStatus[cat])
-                          .map((ps) => getTableRowForCategory(cat, ps))}
-                      </Table.Body>
-                    </Table>
-                  </div>
-                );
-              })}
+            {tableCategories.map((cat) => {
+              return (
+                <div key={`item-table-${categoryColorClass[cat]}`}>
+                  <span className="item">
+                    <Icon icon={<IconDot />} size="md" color={categoryColorClass[cat]} />
+                    <h2 className="mb-0">
+                      {t(`status.${cat}`)} <span className="normal">({categoryCounts[cat]})</span>
+                    </h2>
+                  </span>
+                  <Table id={cat} key={cat}>
+                    {getTableHeaderForCategory(cat)}
+                    <Table.Body key={cat}>
+                      {pollingStationsWithStatuses
+                        .filter((ps) => ps.status === categoryToStatus[cat])
+                        .map((ps) => getTableRowForCategory(cat, ps))}
+                    </Table.Body>
+                  </Table>
+                </div>
+              );
+            })}
           </article>
         </div>
       </main>

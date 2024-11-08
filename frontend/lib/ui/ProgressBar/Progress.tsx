@@ -4,8 +4,10 @@ import cls from "./Progress.module.css";
 
 export function Progress({ children }: { children: ReactNode }) {
   return (
-    <nav id="progress-section" className={cls.progress}>
-      {children}
-    </nav>
+    <div className={cls.progress}>
+      <nav id="progress-section" className={cls.progress}>
+        {children}
+      </nav>
+    </div>
   );
 }

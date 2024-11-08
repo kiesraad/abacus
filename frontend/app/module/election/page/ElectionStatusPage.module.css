@@ -1,5 +1,4 @@
 .status-main {
-  padding: 2.5rem 5rem 2.5rem 5rem;
   flex-direction: column;
   gap: 1.5rem;
 }
@@ -23,9 +22,9 @@
   flex-direction: row;
   gap: 2rem;
 
-  nav {
-    padding: 0 !important;
-    width: 19.5rem;
+  div:has(> nav) {
+    margin: 0;
+    flex: 0 0 19.5rem;
   }
 }
 
@@ -34,7 +33,7 @@
   display: flex;
   flex-direction: column;
   gap: 3rem;
-  flex: 1 0 0;
+  flex: 1;
   background-color: var(--base-white);
   border-radius: 0.5rem;
 

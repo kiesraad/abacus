@@ -22,7 +22,7 @@ test.describe("full data entry flow", () => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
-    await expect(pollingStationChoicePage.heading).toBeVisible();
+    await expect(pollingStationChoicePage.fieldset).toBeVisible();
     const pollingStation = pollingStation33;
     await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());
     await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation.name);
@@ -86,7 +86,7 @@ test.describe("full data entry flow", () => {
     }
 
     await checkAndSavePage.save.click();
-    await pollingStationChoicePage.headingNextPollingStation.waitFor();
+    await pollingStationChoicePage.fieldsetNextPollingStation.waitFor();
     await pollingStationChoicePage.dataEntrySuccess.waitFor();
   });
 
@@ -94,7 +94,7 @@ test.describe("full data entry flow", () => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
-    await expect(pollingStationChoicePage.heading).toBeVisible();
+    await expect(pollingStationChoicePage.fieldset).toBeVisible();
     const pollingStation = pollingStation33;
     await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
 
@@ -152,7 +152,7 @@ test.describe("full data entry flow", () => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
-    await expect(pollingStationChoicePage.heading).toBeVisible();
+    await expect(pollingStationChoicePage.fieldset).toBeVisible();
     const pollingStation = pollingStation33;
     await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
 
@@ -218,7 +218,7 @@ test.describe("full data entry flow", () => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
-    await expect(pollingStationChoicePage.heading).toBeVisible();
+    await expect(pollingStationChoicePage.fieldset).toBeVisible();
     const pollingStation = pollingStation33;
     await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
 
@@ -361,7 +361,7 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
     const pollingStationChoicePage = new PollingStationChoicePage(page);
-    await pollingStationChoicePage.headingNextPollingStation.waitFor();
+    await pollingStationChoicePage.fieldsetNextPollingStation.waitFor();
     await pollingStationChoicePage.dataEntrySuccess.waitFor();
   });
 });

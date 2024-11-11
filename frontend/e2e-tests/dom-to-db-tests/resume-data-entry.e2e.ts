@@ -51,7 +51,7 @@ test.describe("resume data entry flow", () => {
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
-      await expect(pollingStationChoicePage.heading).toBeVisible();
+      await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
       await page.goto("/elections/1/data-entry/1");
 
@@ -84,7 +84,7 @@ test.describe("resume data entry flow", () => {
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
-      await expect(pollingStationChoicePage.heading).toBeVisible();
+      await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
       await page.goto("/elections/1/data-entry/1");
 
@@ -126,7 +126,7 @@ test.describe("resume data entry flow", () => {
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
-      await expect(pollingStationChoicePage.heading).toBeVisible();
+      await expect(pollingStationChoicePage.fieldset).toBeVisible();
       await expect(pollingStationChoicePage.resumeDataEntry).toBeVisible();
 
       const dataEntryResponse = await request.get(`/api/polling_stations/1/data_entries/1`);
@@ -200,7 +200,7 @@ test.describe("resume data entry flow", () => {
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
-      await expect(pollingStationChoicePage.heading).toBeVisible();
+      await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
       const dataEntryResponse = await request.get(`/api/polling_stations/1/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(200);
@@ -247,7 +247,7 @@ test.describe("resume data entry flow", () => {
       await recountedPage.checkNoAndClickNext();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
-      await votersAndVotesPage.heading.waitFor();
+      await votersAndVotesPage.fieldset.waitFor();
       const voters: VotersCounts = {
         poll_card_count: 42,
         proxy_certificate_count: 0,
@@ -257,7 +257,7 @@ test.describe("resume data entry flow", () => {
       await votersAndVotesPage.inputVotersCounts(voters);
 
       await votersAndVotesPage.navPanel.recounted.click();
-      await recountedPage.heading.waitFor();
+      await recountedPage.fieldset.waitFor();
 
       await recountedPage.abortInput.click();
       const abortInputModal = new AbortInputModal(page);
@@ -266,10 +266,10 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await pollingStationChoicePage.selectPollingStationAndClickStart(33);
 
-      await recountedPage.heading.waitFor();
+      await recountedPage.fieldset.waitFor();
       await recountedPage.navPanel.votersAndVotes.click();
 
-      await votersAndVotesPage.heading.waitFor();
+      await votersAndVotesPage.fieldset.waitFor();
       await expect(votersAndVotesPage.pollCardCount).toHaveValue("42");
       await expect(votersAndVotesPage.proxyCertificateCount).toBeEmpty();
       await expect(votersAndVotesPage.voterCardCount).toBeEmpty();
@@ -283,7 +283,7 @@ test.describe("resume data entry flow", () => {
       await recountedPage.checkYesAndClickNext();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
-      await votersAndVotesPage.heading.waitFor();
+      await votersAndVotesPage.fieldset.waitFor();
       await votersAndVotesPage.inputVotersCounts({
         poll_card_count: 42,
         proxy_certificate_count: 0,
@@ -298,7 +298,7 @@ test.describe("resume data entry flow", () => {
       });
 
       await votersAndVotesPage.navPanel.recounted.click();
-      await recountedPage.heading.waitFor();
+      await recountedPage.fieldset.waitFor();
       await recountedPage.no.click();
       await recountedPage.abortInput.click();
 
@@ -310,7 +310,7 @@ test.describe("resume data entry flow", () => {
       expect(response.status()).toBe(200);
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
-      await pollingStationChoicePage.heading.waitFor();
+      await pollingStationChoicePage.fieldset.waitFor();
     });
   });
 
@@ -321,7 +321,7 @@ test.describe("resume data entry flow", () => {
       await abortInputModal.discardInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
-      await expect(pollingStationChoicePage.heading).toBeVisible();
+      await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
       await page.goto("/elections/1/data-entry/1/recounted");
 
@@ -352,7 +352,7 @@ test.describe("resume data entry flow", () => {
       await abortInputModal.discardInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
-      await expect(pollingStationChoicePage.heading).toBeVisible();
+      await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
       const dataEntryResponse = await request.get(`/api/polling_stations/1/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(404);
@@ -392,7 +392,7 @@ test.describe("resume data entry flow", () => {
       await abortInputModal.discardInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
-      await expect(pollingStationChoicePage.heading).toBeVisible();
+      await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
       const dataEntryResponse = await request.get(`/api/polling_stations/1/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(404);

@@ -1,7 +1,5 @@
 import * as React from "react";
 
-import cls from "./Form.module.css";
-
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   title?: string;
   children: React.ReactNode;
@@ -97,7 +95,6 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
 
   return (
     <form
-      className={cls.form}
       ref={(node) => {
         if (node) innerRef.current = node;
         if (typeof ref === "function") {
@@ -109,7 +106,7 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
       {...formProps}
     >
       <fieldset>
-        <legend>{title}</legend>
+        <legend className="h2">{title}</legend>
         {children}
       </fieldset>
     </form>

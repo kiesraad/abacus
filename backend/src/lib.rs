@@ -76,7 +76,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     #[cfg(feature = "memory-serve")]
     let app = {
         app.merge(
-            MemoryServe::new()
+            MemoryServe::from_env()
                 .index_file(Some("/index.html"))
                 .fallback(Some("/index.html"))
                 .fallback_status(axum::http::StatusCode::OK)

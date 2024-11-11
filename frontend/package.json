@@ -28,7 +28,7 @@
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.27.0"
+    "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
     "@ladle/react": "^4.1.2",
@@ -51,7 +51,7 @@
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-playwright": "^2.0.0",
+    "eslint-plugin-playwright": "^2.0.1",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
@@ -59,8 +59,8 @@
     "jsdom": "^25.0.1",
     "lefthook": "^1.8.2",
     "lint-staged": "^15.2.10",
-    "msw": "^2.6.0",
-    "postcss": "^8.4.47",
+    "msw": "^2.6.4",
+    "postcss": "^8.4.48",
     "postcss-import": "^16.1.0",
     "postcss-nesting": "^13.0.1",
     "postcss-pseudo-classes": "^0.4.0",

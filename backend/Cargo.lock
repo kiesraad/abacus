@@ -1676,16 +1676,38 @@ dependencies = [
 
 [[package]]
 name = "memory-serve"
-version = "1.0.0"
-source = "git+https://github.com/tweedegolf/memory-serve.git?branch=no-proc-macro#9078c4ec4dd4b71d2ff15b1642c27f99102c3fda"
+version = "1.0.0-beta.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "91d8c9333232caa4939f4100112e95772f7d4d514fee6782158517467c696699"
 dependencies = [
  "axum",
  "brotli",
  "flate2",
- "mime_guess",
+ "memory-serve-core",
+ "memory-serve-macros",
  "sha256",
  "tracing",
+]
+
+[[package]]
+name = "memory-serve-core"
+version = "1.0.0-beta.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9fd1820b04d6757e80f8d1c05c3e69bc7ba6cde7089a72f130e8218073cdf171"
+dependencies = [
+ "brotli",
+ "mime_guess",
+ "sha256",
  "walkdir",
+]
+
+[[package]]
+name = "memory-serve-macros"
+version = "1.0.0-beta.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f787c2ba670f8f10f9f02c1f6231cedf8d92bb40bf90e745a05f11aa620c7c2c"
+dependencies = [
+ "memory-serve-core",
 ]
 
 [[package]]
@@ -3181,9 +3203,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.41.0"
+version = "1.41.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "145f3413504347a2be84393cc8a7d2fb4d863b375909ea59f2158261aa258bbb"
+checksum = "22cfb5bee7a6a52939ca9224d6ac897bb669134078daa8735560897f69de4d33"
 dependencies = [
  "backtrace",
  "bytes",

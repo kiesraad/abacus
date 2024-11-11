@@ -31,7 +31,7 @@ describe("PollingStationFormController", () => {
       type: "recounted",
       getValues: () => {
         return {
-          recounted: true,
+          recounted: false,
         };
       },
     });
@@ -40,7 +40,7 @@ describe("PollingStationFormController", () => {
     await result.current.submitCurrentForm();
 
     await waitFor(() => {
-      expect(result.current.values.recounted).toEqual(true);
+      expect(result.current.values.recounted).toEqual(false);
       expect(result.current.formState.furthest).toBe("voters_votes_counts");
     });
 
@@ -73,6 +73,7 @@ describe("PollingStationFormController", () => {
     await result.current.submitCurrentForm();
 
     await waitFor(() => {
+      // expect error F.201
       expect(result.current.formState.sections.voters_votes_counts.errors.length).toBe(1);
     });
 

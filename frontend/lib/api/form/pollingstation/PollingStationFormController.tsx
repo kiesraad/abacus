@@ -21,7 +21,6 @@ import {
   useApi,
   useApiRequest,
   ValidationResult,
-  VotersRecounts,
 } from "@kiesraad/api";
 
 import { PollingStationControllerContext } from "./PollingStationControllerContext";
@@ -119,7 +118,7 @@ export interface ClientState {
 //store unvalidated data
 export type TemporaryCache = {
   key: FormSectionID;
-  data: unknown;
+  data: Partial<PollingStationResults>;
 };
 
 export const INITIAL_FORM_SECTION_ID: FormSectionID = "recounted";
@@ -156,9 +155,9 @@ export function PollingStationFormController({
   // reference to the current form on screen
   const currentForm = React.useRef<AnyFormReference | null>(defaultCurrentForm);
 
+  // cache for data on the furthest form section that the user has not submitted yet
   const temporaryCache = React.useRef<TemporaryCache | null>(null);
   const setTemporaryCache = React.useCallback((cache: TemporaryCache | null) => {
-    //OPTIONAL: allow only cache for unvalidated data
     temporaryCache.current = cache;
     return true;
   }, []);
@@ -261,50 +260,44 @@ export function PollingStationFormController({
     let newValues: PollingStationResults = structuredClone(values);
     if (currentForm.current) {
       const ref: AnyFormReference = currentForm.current;
-
-      switch (ref.type) {
-        case "political_group_votes":
-          newValues = {
-            ...values,
-            political_group_votes: values.political_group_votes.map((pg) => {
-              if (pg.number === ref.number) {
-                return ref.getValues();
-              }
-              return pg;
-            }),
-          };
-          break;
-        case "recounted": {
-          const formValues = ref.getValues();
-          let voters_recounts: VotersRecounts | undefined = undefined;
-          if (formValues.recounted) {
-            if (values.voters_recounts) {
-              voters_recounts = values.voters_recounts;
-            } else {
-              voters_recounts = {
-                poll_card_recount: 0,
-                proxy_certificate_recount: 0,
-                voter_card_recount: 0,
-                total_admitted_voters_recount: 0,
-              };
+      if (ref.type === "political_group_votes") {
+        newValues = {
+          ...values,
+          political_group_votes: values.political_group_votes.map((pg) => {
+            if (pg.number === ref.number) {
+              return ref.getValues();
             }
-          }
-          newValues = {
-            ...values,
-            ...formValues,
-            voters_recounts,
-          };
-          break;
-        }
-        case "voters_and_votes":
-        case "differences":
-        default:
-          newValues = {
-            ...values,
-            ...ref.getValues(),
-          };
-          break;
+            return pg;
+          }),
+        };
+      } else {
+        newValues = {
+          ...values,
+          ...ref.getValues(),
+        };
       }
+
+      if (aborting && temporaryCache.current) {
+        // if we are aborting, we need to restore the values of the section we are aborting
+        newValues = {
+          ...newValues,
+          ...temporaryCache.current.data,
+        };
+      }
+
+      if (!newValues.recounted) {
+        // reset voters_recounts if not recounted
+        newValues.voters_recounts = undefined;
+      } else if (!newValues.voters_recounts) {
+        // create voters_recounts if recounted and not yet set
+        newValues.voters_recounts = {
+          poll_card_recount: 0,
+          proxy_certificate_recount: 0,
+          voter_card_recount: 0,
+          total_admitted_voters_recount: 0,
+        };
+      }
+
       setValues(newValues);
     }
 

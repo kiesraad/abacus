@@ -241,7 +241,7 @@ export function VotersAndVotesForm() {
         {recounted && (
           <>
             <InputGrid.SectionTitleHeader>
-              <h2 id="recounted_title" ref={recountTitleRef}>
+              <h2 className="mt-lg" ref={recountTitleRef}>
                 Toegelaten kiezers na hertelling door gemeentelijk stembureau
               </h2>
               <th>Veld</th>

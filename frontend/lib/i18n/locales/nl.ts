@@ -28,7 +28,7 @@ export const nl = {
   loading: "Laden...",
 
   "candidates_votes.check_totals":
-    "Controleer het totaal van deze lijst. Overleg met coördinator als het papier niet is ingevuld.",
+    "Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld",
   "candidates_votes.check_paper_report":
     "Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.",
   "candidates_votes.confirm_counts": "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
@@ -63,8 +63,17 @@ export const nl = {
   "election_status.first_session": "Eerste zitting",
   "election_status.definitive.title": "Alle stembureaus zijn twee keer ingevoerd",
   "election_status.definitive.message":
-    "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
+    "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
   "election_status.definitive.finish_button": "Invoerfase afronden",
+  "election_status.finish_first_session_data_entry_status": "<strong>Steminvoer afronden</strong> (eerste zitting)",
+
+  "election_report.finish_data_entry_phase": "Invoerfase afronden?",
+  "election_report.about_to_stop_data_entry": "Je staat op het punt het invoeren van stemmen te stoppen.",
+  "election_report.data_entry_finish_steps_explanation":
+    "<ul><li>In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële telbestanden downloaden.</li><li>Zolang het concept proces-verbaal nog niet is ondertekend en gedeeld met het centraal stembureau, kan je nog terug naar de steminvoer.</li></ul>",
+  "election_report.for_recount_new_session_needed":
+    "Als er na het afronden van de zitting nog stemmen herteld worden, moet dan in een nieuwe zitting van het gemeentelijke stembureau.",
+  "election_report.download_report": "Download proces-verbaal",
 
   "account.configured": "Je account is ingesteld",
   "feedback.F101.title": "Controleer het papieren proces-verbaal",

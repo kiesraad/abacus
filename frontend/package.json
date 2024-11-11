@@ -56,7 +56,6 @@
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
-    "identity-obj-proxy": "^3.0.0",
     "jsdom": "^25.0.1",
     "lefthook": "^1.8.2",
     "lint-staged": "^15.2.10",

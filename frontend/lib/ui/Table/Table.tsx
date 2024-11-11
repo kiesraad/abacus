@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { To, useNavigate } from "react-router-dom";
 
 import cls from "./Table.module.css";
 
@@ -10,7 +10,7 @@ export interface TableProps {
 
 export function Table({ id, children }: TableProps) {
   return (
-    <table id={id} className={cls["table"]}>
+    <table id={id} className={cls.table}>
       {children}
     </table>
   );
@@ -33,7 +33,7 @@ function Header({ children }: { children: React.ReactNode[] }) {
 
 function Column({ children, number, width }: { children: React.ReactNode; number?: boolean; width?: string }) {
   return (
-    <th className={number ? cls["number"] : undefined} style={width ? { width } : undefined}>
+    <th className={number ? cls.number : undefined} style={width ? { width } : undefined}>
       {children}
     </th>
   );
@@ -47,7 +47,7 @@ function Row({ children }: { children: React.ReactNode[] }) {
   return <tr>{children}</tr>;
 }
 
-function LinkRow({ children, to }: { children: React.ReactNode[]; to: string }) {
+function LinkRow({ children, to }: { children: React.ReactNode[]; to: To }) {
   const navigate = useNavigate();
 
   function handleClick() {
@@ -55,12 +55,12 @@ function LinkRow({ children, to }: { children: React.ReactNode[]; to: string }) 
   }
 
   return (
-    <tr className={cls["row-link"]} onClick={handleClick}>
+    <tr className={cls.rowLink} onClick={handleClick}>
       {children}
     </tr>
   );
 }
 
 function Cell({ children, number }: { children?: React.ReactNode; number?: boolean }) {
-  return <td className={number ? cls["number"] : undefined}>{children}</td>;
+  return <td className={number ? cls.number : undefined}>{children}</td>;
 }

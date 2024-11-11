@@ -1,7 +1,6 @@
+/* CSS style-guide can be found at /documentatie/style-guide/css.md */
 @import "reset.css";
 @import "variables.css";
 @import "typography.css";
-@import "layout.css";
 @import "core.css";
 @import "util.css";
-@import "table.css";

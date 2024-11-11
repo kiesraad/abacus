@@ -2,10 +2,11 @@
 
 This page describes the navigation and rendering logic of the data entry forms through the following flow charts:
 
-- __Render navigation menu__: styling of the different items in the left-hand navigation menu
-- __Render form__: rendering of the different forms for data entry
-- __Click "Volgende"__: what should happen when the user clicks the "Volgende" ("Next") button
-- __Navigate away from page__: what should happen when the user navigates away from the page in any other way than clicking the "Volgende" button
+- [__Render navigation menu__](#render-navigation-menu): styling of the different items in the left-hand navigation menu
+- [__Render form__](#render-form): rendering of the different forms for data entry
+- [__Click "Volgende"__](#click-volgende): what should happen when the user clicks the "Volgende" ("Next") button
+- [__Navigate away from page__](#navigate-away-from-page): what should happen when the user navigates away from the page in any other way than clicking the "Volgende" button
+- [__Abort data entry ("Invoer afbreken")__](#abort-data-entry-invoer-afbreken): what should happen when the user clicks "Invoer afbreken" at the top of the screen
 
 An important thing to keep in mind when reading these diagrams is that a user can only proceed to the next form by clicking "Volgende" after they have resolved all errors (if any) and accepted all warnings (if any).
 
@@ -73,16 +74,16 @@ flowchart TD
     render-submitted-data([render with submitted data])
 
     show-error([show error])
-    hide-checkbox-accepted(["hide checkbox \n warnings accepted"])
+    hide-checkbox-accepted(["hide checkbox <br/> warnings accepted"])
     show-warning([show warning])
-    show-checked-accepted(["show checked checkbox \n warnings accepted"])
-    show-unchecked-accepted(["show unchecked checkbox \n warnings accepted"])
+    show-checked-accepted(["show checked checkbox <br/> warnings accepted"])
+    show-unchecked-accepted(["show unchecked checkbox <br/> warnings accepted"])
 
     page-submitted{page submitted?}
     error-cur-page{error for current page?}
     warning-cur-page{warning for current page?}
     cached-input-available{cached input available?}
-    input-changed{"input changed \n since submit?"}
+    input-changed{"input changed <br/> since submit?"}
     warning-accepted{"warning(s) accepted?"}
 
     %% flow
@@ -120,9 +121,9 @@ flowchart TD
     flow-start([start])
     go-to-prev-page([go to previous page])
 
-    error-any-prev-page{"error for any \n previous page?"}
-    error-cur-page{"error for \n current page?"}
-    warning-cur-page{"warning for \n current page?"}
+    error-any-prev-page{"error for any <br/> previous page?"}
+    error-cur-page{"error for <br/> current page?"}
+    warning-cur-page{"warning for <br/> current page?"}
     warnings-accepted{"warning(s) accepted?"}
     user-addresses-error{user addresses error}
 
@@ -187,7 +188,7 @@ flowchart TD
     inside-outside{navigating inside form?}
     on-furthest-page{on furthest page?}
     user-made-changes{user made changes?}
-    save-changes{"modal: \n save changes?"}
+    save-changes{"modal: <br/> save changes?"}
     call-save-api(call save api)
     cache-input(cache input)
     reset-changes(reset changes)
@@ -222,8 +223,8 @@ flowchart TD
     remain-on-page([remain on current page])
 
     %% steps
-    modal{"modal: \n save or delete?"}
-    call-save-api(call save api)
+    modal{"modal: <br/> save or delete?"}
+    call-save-api(call save api, <br/> include cached data)
     call-delete-api(call delete api)
 
     %% flow

@@ -1,7 +1,4 @@
 .inputfield {
-  &:global(.margin) {
-    margin-bottom: 2rem;
-  }
   label {
     display: flex;
     flex-direction: column;

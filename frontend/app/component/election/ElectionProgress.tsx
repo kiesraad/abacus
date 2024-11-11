@@ -28,7 +28,7 @@ export function ElectionProgress() {
   return (
     <Progress>
       <div>
-        <h2 className="form_title">{t("progress")}</h2>
+        <h2 className="mb-lg">{t("progress")}</h2>
         {stats.map((stat) => (
           <ProgressBar
             key={stat.id}

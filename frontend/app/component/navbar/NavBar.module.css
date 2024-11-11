@@ -1,4 +1,4 @@
-.navBar {
+.nav-bar {
   flex: 0 0 2.75rem;
   padding: 0 5rem;
   background-color: var(--base-brand-blue);
@@ -47,7 +47,7 @@
     }
   }
 
-  .userInfo {
+  .user-info {
     display: flex;
     align-items: center;
     gap: 0.25rem;

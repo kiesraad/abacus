@@ -44,6 +44,13 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             post(data_entry::polling_station_data_entry_finalise),
         );
 
+    let polling_station_routes = Router::new().route(
+        "/:polling_station_id",
+        get(polling_station::polling_station_get)
+            .put(polling_station::polling_station_update)
+            .delete(polling_station::polling_station_delete),
+    );
+
     let election_routes = Router::new()
         .route("/", get(election::election_list))
         .route("/:election_id", get(election::election_details))
@@ -58,10 +65,13 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route("/:election_id/status", get(election::election_status));
 
-    let app = Router::new().nest("/api/elections", election_routes).nest(
-        "/api/polling_stations/:polling_station_id/data_entries",
-        data_entry_routes,
-    );
+    let app = Router::new()
+        .nest("/api/elections", election_routes)
+        .nest("/api/polling_stations", polling_station_routes)
+        .nest(
+            "/api/polling_stations/:polling_station_id/data_entries",
+            data_entry_routes,
+        );
 
     #[cfg(feature = "memory-serve")]
     let app = {
@@ -69,6 +79,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             MemoryServe::new()
                 .index_file(Some("/index.html"))
                 .fallback(Some("/index.html"))
+                .fallback_status(axum::http::StatusCode::OK)
                 .into_router(),
         )
     };
@@ -109,6 +120,9 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             data_entry::polling_station_data_entry_finalise,
             polling_station::polling_station_list,
             polling_station::polling_station_create,
+            polling_station::polling_station_get,
+            polling_station::polling_station_update,
+            polling_station::polling_station_delete,
         ),
         components(
             schemas(
@@ -136,7 +150,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 polling_station::PollingStationStatus,
                 polling_station::PollingStationStatusEntry,
                 polling_station::PollingStationType,
-                polling_station::NewPollingStationRequest,
+                polling_station::PollingStationRequest,
                 validation::ValidationResult,
                 validation::ValidationResultCode,
                 validation::ValidationResults,

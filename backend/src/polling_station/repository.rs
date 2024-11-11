@@ -1,8 +1,8 @@
 use axum::extract::FromRef;
-use sqlx::{query_as, SqlitePool};
+use sqlx::{query, query_as, SqlitePool};
 
 use crate::polling_station::structs::{
-    NewPollingStationRequest, PollingStation, PollingStationStatusEntry,
+    PollingStation, PollingStationRequest, PollingStationStatusEntry,
 };
 use crate::AppState;
 
@@ -70,7 +70,7 @@ impl PollingStations {
     pub async fn create(
         &self,
         election_id: u32,
-        new_polling_station: NewPollingStationRequest,
+        new_polling_station: PollingStationRequest,
     ) -> Result<PollingStation, sqlx::Error> {
         query_as!(
             PollingStation,
@@ -115,6 +115,59 @@ impl PollingStations {
         .await
     }
 
+    /// Update a single polling station for an election
+    pub async fn update(
+        &self,
+        polling_station_id: u32,
+        polling_station_update: PollingStationRequest,
+    ) -> Result<bool, sqlx::Error> {
+        let rows_affected = query!(
+            r#"
+            UPDATE polling_stations
+            SET
+              name = ?,
+              number = ?,
+              number_of_voters = ?,
+              polling_station_type = ?,
+              street = ?,
+              house_number = ?,
+              house_number_addition = ?,
+              postal_code = ?,
+              locality = ?
+            WHERE
+              id = ?
+            "#,
+            polling_station_update.name,
+            polling_station_update.number,
+            polling_station_update.number_of_voters,
+            polling_station_update.polling_station_type,
+            polling_station_update.street,
+            polling_station_update.house_number,
+            polling_station_update.house_number_addition,
+            polling_station_update.postal_code,
+            polling_station_update.locality,
+            polling_station_id,
+        )
+        .execute(&self.0)
+        .await?
+        .rows_affected();
+
+        Ok(rows_affected > 0)
+    }
+
+    /// Delete a single polling station for an election
+    pub async fn delete(&self, polling_station_id: u32) -> Result<bool, sqlx::Error> {
+        let rows_affected = query!(
+            r#"DELETE FROM polling_stations WHERE id = ?"#,
+            polling_station_id,
+        )
+        .execute(&self.0)
+        .await?
+        .rows_affected();
+
+        Ok(rows_affected > 0)
+    }
+
     /// Determines the status of the polling station.
     /// - When an entry of the polling station is found in the `polling_station_data_entries` table, and the `client_state.continue` value is true the status is FirstEntryInProgress
     /// - When an entry of the polling station is found in the `polling_station_data_entries` table, and the `client_state.continue` value is false the status is FirstEntryUnfinished
@@ -146,8 +199,8 @@ WHERE election_id = $1
 "#,
             election_id
         )
-        .fetch_all(&self.0)
-        .await
+            .fetch_all(&self.0)
+            .await
     }
 }
 

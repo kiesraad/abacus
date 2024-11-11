@@ -170,8 +170,21 @@ export function PollingStationFormController({
       setValues(responseData.data);
 
       if (responseData.client_state) {
+        // save data entry, continue is set to true to make sure polling station changes status to FirstEntryInProgress
+        const clientState = { ...responseData.client_state, continue: true } as ClientState;
+        const requestBody: SaveDataEntryRequest = {
+          data: responseData.data,
+          client_state: clientState,
+        };
+        void client.postRequest(requestPath, requestBody).then((response) => {
+          if (response instanceof ApiError) {
+            setApiError(response);
+            return;
+          }
+        });
+
         const { formState, targetFormSectionID } = buildFormState(
-          responseData.client_state as ClientState,
+          clientState,
           responseData.validation_results,
           election,
         );

@@ -33,6 +33,10 @@ export interface Translation {
   save: string;
   loading: string;
 
+  "error.not_found": string;
+  "error.election_not_found": string;
+  "error.elections_not_found": string;
+
   "candidates_votes.check_totals": string;
   "candidates_votes.check_paper_report": string;
   "candidates_votes.confirm_counts": string;

@@ -1,10 +1,8 @@
 import * as React from "react";
 
-import { NotFoundError } from "app/component/error";
-
 import { Election, useElectionDataRequest } from "@kiesraad/api";
-import { Loader } from "@kiesraad/ui";
 
+import RequestStateHandler from "../RequestStateHandler";
 import { ElectionProviderContext } from "./ElectionProviderContext";
 
 export interface ElectionProviderProps {
@@ -15,30 +13,20 @@ export interface ElectionProviderProps {
 export function ElectionProvider({ children, electionId }: ElectionProviderProps) {
   const { requestState } = useElectionDataRequest(electionId);
 
-  if (requestState.status === "loading") {
-    return <Loader />;
-  }
-
-  if (requestState.status === "api-error") {
-    if (requestState.error.code === 404) {
-      throw new NotFoundError("Verkiezing niet gevonden");
-    }
-
-    throw requestState.error;
-  }
-
-  if (requestState.status === "network-error") {
-    throw requestState.error;
-  }
-
   return (
-    <ElectionProviderContext.Provider
-      value={{
-        election: requestState.data.election as Required<Election>,
-        pollingStations: requestState.data.polling_stations,
-      }}
-    >
-      {children}
-    </ElectionProviderContext.Provider>
+    <RequestStateHandler
+      requestState={requestState}
+      notFoundMessage="error.election_not_found"
+      renderOnSuccess={(data) => (
+        <ElectionProviderContext.Provider
+          value={{
+            election: data.election as Required<Election>,
+            pollingStations: data.polling_stations,
+          }}
+        >
+          {children}
+        </ElectionProviderContext.Provider>
+      )}
+    />
   );
 }

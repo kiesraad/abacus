@@ -27,6 +27,10 @@ export const nl = {
   save: "Opslaan",
   loading: "Laden...",
 
+  "error.not_found": "Pagina niet gevonden",
+  "error.election_not_found": "Verkiezing niet gevonden",
+  "error.elections_not_found": "Verkiezingen niet gevonden",
+
   "candidates_votes.check_totals":
     "Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld",
   "candidates_votes.check_paper_report":

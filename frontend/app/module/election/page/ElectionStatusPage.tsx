@@ -12,12 +12,12 @@ import {
   useElectionStatus,
 } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { IconDot, IconPlus } from "@kiesraad/icon";
+import { IconPlus } from "@kiesraad/icon";
 import {
   Alert,
   Badge,
   Button,
-  Icon,
+  Circle,
   PageTitle,
   PercentageAndColorClass,
   Progress,
@@ -194,10 +194,12 @@ export function ElectionStatusPage() {
       <main className={cls.statusMain}>
         <div className={cls.statusTitle}>
           <h2 id="status-title">{t("election_status.main_title")}</h2>
-          {/* TODO: Add button onClick to Create Polling Station page */}
-          <Button size="md" variant="secondary" leftIcon={<IconPlus />}>
-            {t("election_status.add_polling_station")}
-          </Button>
+          <div className={cls.buttons}>
+            {/* TODO: Add button onClick to Create Polling Station page */}
+            <Button size="md" variant="secondary" leftIcon={<IconPlus />}>
+              {t("election_status.add_polling_station")}
+            </Button>
+          </div>
         </div>
         <div className={cls.statusSection}>
           <Progress>
@@ -210,14 +212,14 @@ export function ElectionStatusPage() {
                     key={`item-progress-${categoryColorClass[cat]}`}
                     id={`item-progress-${categoryColorClass[cat]}`}
                   >
-                    <Icon icon={<IconDot />} size="sm" color={categoryColorClass[cat]} />
+                    <Circle size="xxs" color={categoryColorClass[cat]} />
                     {t(`status.${cat}`)} ({categoryCounts[cat]})
                   </span>
                 );
               })}
             </div>
             <div id="progress" className="column">
-              <h2>{t("progress")}</h2>
+              <h2 className="mb-0">{t("progress")}</h2>
               <ProgressBar key="all" id="all" data={progressBarData} spacing="small" />
             </div>
           </Progress>
@@ -226,7 +228,7 @@ export function ElectionStatusPage() {
               return (
                 <div key={`item-table-${categoryColorClass[cat]}`}>
                   <span className="item">
-                    <Icon icon={<IconDot />} size="md" color={categoryColorClass[cat]} />
+                    <Circle size="xs" color={categoryColorClass[cat]} />
                     <h2 className="mb-0">
                       {t(`status.${cat}`)} <span className="normal">({categoryCounts[cat]})</span>
                     </h2>

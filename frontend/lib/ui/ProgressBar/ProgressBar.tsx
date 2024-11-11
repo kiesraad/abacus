@@ -47,7 +47,7 @@ export function ProgressBar({ id, data, title, spacing, showPercentage = false }
             {data.map((bar, index) => {
               return (
                 <div
-                  className={cn(cls.progressbarInner, bar.class)}
+                  className={cn(cls.progressbarInner, bar.class, bar.percentage === 0 ? "hidden" : undefined)}
                   style={{ width: `${bar.percentage}%` }}
                   key={`inner-bar-${index}`}
                 />

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { usePollingStationFormController } from "@kiesraad/api";
+import { ApiError, ApiResult, usePollingStationFormController } from "@kiesraad/api";
 import { Button, Modal } from "@kiesraad/ui";
 
 export interface AbortDataEntryModalProps {
@@ -20,8 +20,14 @@ export function AbortDataEntryModal({ onCancel, onSave, onDelete }: AbortDataEnt
       try {
         setSaving(true);
         const acceptWarnings = controller.currentForm?.getAcceptWarnings?.() ?? false;
-        await controller.submitCurrentForm({ acceptWarnings, aborting: true, continueToNextSection: false });
-        onSave();
+        const response: ApiResult<unknown> = await controller.submitCurrentForm({
+          acceptWarnings,
+          aborting: true,
+          continueToNextSection: false,
+        });
+        if (!(response instanceof ApiError)) {
+          onSave();
+        }
       } finally {
         setSaving(false);
       }

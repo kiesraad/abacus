@@ -5,6 +5,7 @@ import { getBaseUrl, getUrlForFormSectionID } from "app/component/pollingstation
 
 import {
   ApiError,
+  ApiResult,
   buildFormState,
   Election,
   getClientState,
@@ -256,7 +257,7 @@ export function PollingStationFormController({
     acceptWarnings = false,
     aborting = false,
     continueToNextSection = true,
-  }: SubmitCurrentFormOptions = {}) => {
+  }: SubmitCurrentFormOptions = {}): Promise<ApiResult<SaveDataEntryResponse>> => {
     // React state is fixed within one render, so we update our own copy instead of using setValues directly
     let newValues: PollingStationResults = structuredClone(values);
     if (currentForm.current) {
@@ -313,7 +314,7 @@ export function PollingStationFormController({
 
     // send data to server
     status.current = "saving";
-    const response = await client.postRequest(requestPath, {
+    const response: ApiResult<SaveDataEntryResponse> = await client.postRequest(requestPath, {
       data: newValues,
       client_state: clientState,
     } satisfies SaveDataEntryRequest);
@@ -321,14 +322,14 @@ export function PollingStationFormController({
 
     if (response instanceof ApiError) {
       setApiError(response);
-      return;
+      return response;
     }
 
     if (response instanceof NetworkError) {
       throw response;
     }
 
-    const data = response.data as SaveDataEntryResponse;
+    const data = response.data;
     setApiError(null);
 
     const newFormState = structuredClone(formState);
@@ -338,6 +339,8 @@ export function PollingStationFormController({
     if (continueToNextSection) {
       setTargetFormSectionID(getNextSectionID(newFormState));
     }
+
+    return response;
   };
 
   const deleteDataEntry = async () => {

@@ -92,7 +92,7 @@ describe("Test CheckAndSaveForm", () => {
     renderForm(formState);
 
     // Wait for the page to be loaded and check that the save button is not visible
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" }));
+    expect(await screen.findByRole("group", { name: "Controleren en opslaan" }));
     expect(screen.queryByRole("button", { name: "Opslaan" })).not.toBeInTheDocument();
 
     expect(screen.getByTestId("section-status-voters_votes_counts")).toHaveTextContent("heeft blokkerende fouten");
@@ -110,7 +110,7 @@ describe("Test CheckAndSaveForm", () => {
     renderForm(formState);
 
     // Wait for the page to be loaded and check that the save button is not visible
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" }));
+    expect(await screen.findByRole("group", { name: "Controleren en opslaan" }));
     expect(screen.queryByRole("button", { name: "Opslaan" })).not.toBeInTheDocument();
 
     expect(screen.getByTestId("section-status-voters_votes_counts")).toHaveTextContent("Controleer waarschuwingen bij");

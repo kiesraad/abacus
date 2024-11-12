@@ -62,6 +62,7 @@ export function RecountedForm() {
             id="yes"
             value="yes"
             name="recounted"
+            autoFocus
             defaultChecked={sectionValues.recounted === true}
             label="Ja, er was een hertelling"
           />

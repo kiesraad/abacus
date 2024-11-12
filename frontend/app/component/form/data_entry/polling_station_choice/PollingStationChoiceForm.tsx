@@ -93,46 +93,48 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           </Alert>
         </div>
       )}
-      <h2 className="mb-lg">
-        {anotherEntry ? "Verder met een volgend stembureau?" : "Welk stembureau ga je invoeren?"}
-      </h2>
-      <PollingStationSelector
-        pollingStationNumber={pollingStationNumber}
-        setPollingStationNumber={setPollingStationNumber}
-        loading={loading}
-        setLoading={setLoading}
-        currentPollingStation={currentPollingStation}
-        setCurrentPollingStation={setCurrentPollingStation}
-        setAlert={setAlert}
-        handleSubmit={handleSubmit}
-      />
-      <p className="md">
-        Klopt de naam van het stembureau met de naam op je papieren proces-verbaal?
-        <br />
-        Dan kan je beginnen. Klopt de naam niet? Overleg met de coördinator.
-      </p>
-      {alert && (
-        <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
-          <span className={cls.icon}>
-            <Icon icon={<IconError aria-label={"bevat een fout"} />} color="error" />
-          </span>
-          <span>{alert}</span>
-        </div>
-      )}
-      <BottomBar type="form">
-        <BottomBar.Row>
-          <Button
-            type="button"
-            size="lg"
-            onClick={() => {
-              handleSubmit();
-            }}
-          >
-            Beginnen
-          </Button>
-          <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
-        </BottomBar.Row>
-      </BottomBar>
+      <fieldset>
+        <legend className="h2 mb-lg">
+          {anotherEntry ? "Verder met een volgend stembureau?" : "Welk stembureau ga je invoeren?"}
+        </legend>
+        <PollingStationSelector
+          pollingStationNumber={pollingStationNumber}
+          setPollingStationNumber={setPollingStationNumber}
+          loading={loading}
+          setLoading={setLoading}
+          currentPollingStation={currentPollingStation}
+          setCurrentPollingStation={setCurrentPollingStation}
+          setAlert={setAlert}
+          handleSubmit={handleSubmit}
+        />
+        <p className="md">
+          Klopt de naam van het stembureau met de naam op je papieren proces-verbaal?
+          <br />
+          Dan kan je beginnen. Klopt de naam niet? Overleg met de coördinator.
+        </p>
+        {alert && (
+          <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
+            <span className={cls.icon}>
+              <Icon icon={<IconError aria-label={"bevat een fout"} />} color="error" />
+            </span>
+            <span>{alert}</span>
+          </div>
+        )}
+        <BottomBar type="form">
+          <BottomBar.Row>
+            <Button
+              type="button"
+              size="lg"
+              onClick={() => {
+                handleSubmit();
+              }}
+            >
+              Beginnen
+            </Button>
+            <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
+          </BottomBar.Row>
+        </BottomBar>
+      </fieldset>
       <div className={cls.pollingStationList}>
         <details>
           <summary>

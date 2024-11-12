@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import { PollingStationType, usePollingStationListRequest } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
 import { Loader, PageTitle } from "@kiesraad/ui";
@@ -32,6 +34,7 @@ export function PollingStationListPage() {
         </section>
       </header>
       <main>
+        <Link to="create">Voeg toe</Link>
         {!data.polling_stations.length ? (
           <article>
             <h2>Hoe wil je stembureaus toevoegen?</h2>

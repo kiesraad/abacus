@@ -36,6 +36,7 @@ Er zijn meerdere manieren om deze stappen te zetten.
     - Een [draft pull request] maken is mogelijk ook als je nog niet klaar bent, maar wel feedback wilt.
       Geef in dat geval duidelijk aan (bijv. in de description of een comment) waarop je feedback wilt
       en wat er nog moet gebeuren om de pull request af te maken.
+    - Voor richtlijnen over schrijven en reviewen van PRs, zie ["Pull Requests (PRs)"].
 
 - Merge de pull request:
     - Zorg dat alle opmerkingen (conversations) opgelost zijn.
@@ -46,3 +47,4 @@ Er zijn meerdere manieren om deze stappen te zetten.
 [draft pull request]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests
 [Lefthook]: https://github.com/evilmartians/lefthook
 [merge queue]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/merging-a-pull-request-with-a-merge-queue
+["Pull Requests (PRs)"]: /documentatie/ontwikkelproces/pull-requests.md

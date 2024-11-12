@@ -53,7 +53,7 @@ export function CheckAndSaveForm() {
     })(event);
 
   return (
-    <Form onSubmit={handleSubmit} id="check_save_form" title={t("check_and_save")}>
+    <Form onSubmit={handleSubmit} id="check_save_form" title={t("check_and_save.title")}>
       <section className="md" id="save-form-summary-text">
         {!summary.hasBlocks && summary.countsAddUp && (
           <p className="md">{t("check_and_save.counts_add_up.no_warnings")}</p>

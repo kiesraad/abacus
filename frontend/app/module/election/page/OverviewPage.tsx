@@ -53,7 +53,7 @@ export function OverviewPage() {
       </header>
       {isNewAccount && (
         <Alert type="success" onClose={closeNewAccountAlert}>
-          <h2>{t("account.configured")}</h2>
+          <h2>{t("account_configured")}</h2>
           <p>Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.</p>
         </Alert>
       )}
@@ -63,7 +63,7 @@ export function OverviewPage() {
             <Table.Header>
               <Table.Column>{t("election")}</Table.Column>
               {isAdministrator && <Table.Column>{t("role")}</Table.Column>}
-              <Table.Column>{t("status")}</Table.Column>
+              <Table.Column>{t("election_status.label")}</Table.Column>
             </Table.Header>
             <Table.Body>
               {electionList.map((election) => (

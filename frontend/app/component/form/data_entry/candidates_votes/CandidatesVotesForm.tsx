@@ -155,6 +155,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
               : `${candidate.last_name}, ${candidate.initials}`;
             return (
               <InputGridRow
+                autoFocusInput={index === 0}
                 key={`list${group.number}-candidate${index + 1}`}
                 field={`${index + 1}`}
                 name="candidatevotes[]"

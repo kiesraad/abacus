@@ -151,11 +151,9 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const formTitle = await screen.findByRole("heading", { level: 2, name: "Lijst 1 - Vurige Vleugels Partij" });
-      expect(formTitle).toHaveFocus();
-      await user.keyboard("{tab}");
-
       const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
+      expect(candidate1.closest("fieldset")).toHaveAccessibleName("Lijst 1 - Vurige Vleugels Partij");
+      expect(candidate1).toHaveAccessibleName("1 Zilverlicht, E. (Eldor)");
       expect(candidate1).toHaveFocus();
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12345");

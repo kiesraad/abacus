@@ -136,15 +136,11 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const formTitle = await screen.findByRole("heading", {
-        level: 2,
-        name: "Toegelaten kiezers en uitgebrachte stemmen",
-      });
-      expect(formTitle).toHaveFocus();
-      await user.keyboard("{tab}");
-
       const pollCards = await screen.findByTestId("poll_card_count");
+      expect(pollCards.closest("fieldset")).toHaveAccessibleName("Toegelaten kiezers en uitgebrachte stemmen");
+      expect(pollCards).toHaveAccessibleName("A Stempassen");
       expect(pollCards).toHaveFocus();
+
       await user.type(pollCards, "12345");
       expect(pollCards).toHaveValue("12345");
 

@@ -3,8 +3,8 @@ import { type Locator, type Page } from "@playwright/test";
 export class PollingStationChoicePage {
   protected readonly page: Page;
 
-  readonly heading: Locator;
-  readonly headingNextPollingStation: Locator;
+  readonly fieldset: Locator;
+  readonly fieldsetNextPollingStation: Locator;
   readonly pollingStationNumber: Locator;
   readonly pollingStationFeedback: Locator;
   protected readonly start: Locator; // use clickStart() instead
@@ -14,13 +14,11 @@ export class PollingStationChoicePage {
   constructor(page: Page) {
     this.page = page;
 
-    this.heading = page.getByRole("heading", {
-      level: 2,
+    this.fieldset = page.getByRole("group", {
       name: "Welk stembureau ga je invoeren?",
     });
 
-    this.headingNextPollingStation = page.getByRole("heading", {
-      level: 2,
+    this.fieldsetNextPollingStation = page.getByRole("group", {
       name: "Verder met een volgend stembureau?",
     });
 

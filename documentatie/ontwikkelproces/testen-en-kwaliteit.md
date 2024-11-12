@@ -27,6 +27,8 @@
   - Vermijden van "normalization of deviance": "dit kan voor één keer" wordt "dit kan wel eens een keer" en vervolgens "dit kan wel"
   - Vermijden van "failure demand" (extra werk omdat het de eerste keer niet goed genoeg was): managen van je backlog/bevindingenregister kost uiteindelijk vrijwel altijd meer tijd en energie dan gelijk oplossen
 
+Voor de praktische uitwerking van de policy, zie ["Uitwerking zero bug policy"](/documentatie/ontwikkelproces/zero-bug-policy.md)
+
 ### Vroege feedback en end-to-end feedback
 
 - Vroege feedback:

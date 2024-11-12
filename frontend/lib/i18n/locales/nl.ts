@@ -3,17 +3,77 @@ export const nl = {
 
   election: "Verkiezing",
   elections: "Verkiezingen",
+  list: "Lijst",
+  number: "Nummer",
+  vote_count: "Aantal stemmen",
+  candidate: "Kandidaat",
   manage_elections: "Beheer verkiezingen",
   role: "Rol",
   status: "Status",
+  progress: "Voortgang",
+  shortcuts: "Snelkoppelingen",
+  all_together: "Alles samen",
+  server: "Server",
+  version: "Versie",
+  totals_list: "Totaal lijst {group_number}",
+  next: "Volgende",
+  check_and_save: "Controleren en opslaan",
+  error: "Fout",
+  history_back: "Terug naar de vorige pagina",
+  stack_trace: "Foutmelding",
+  something_went_wrong: "Sorry, er ging iets mis",
+  error_code: "Foutcode",
+  close_message: "Melding sluiten",
+  save: "Opslaan",
   loading: "Laden...",
+
+  "candidates_votes.check_totals":
+    "Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld",
+  "candidates_votes.check_paper_report":
+    "Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.",
+  "candidates_votes.confirm_counts": "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+  "candidates_votes.goto_totals": "Snel naar totaal van de lijst",
+
+  "check_and_save.counts_add_up.warnings":
+    "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn waarschuwingen die moeten worden gecontroleerd.",
+  "check_and_save.counts_add_up.no_warnings":
+    "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
+  "check_and_save.counts_do_not_add_up":
+    "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar tegen. Je kan de resultaten daarom niet opslaan.",
+  "check_and_save.no_warnings": "Er zijn geen blokkerende fouten of waarschuwingen",
+  "check_and_save.warnings": "Er zijn waarschuwingen die moeten worden gecontroleerd",
+  "check_and_save.check_warnings": "Controleer de openstaande waarschuwingen",
+  "check_and_save.fix_the_errors": "Los de blokkerende fouten op. Lukt dat niet? Overleg dan met de coördinator.",
+  "check_and_save.counts_add_up_title": "Alle optellingen kloppen",
+  "check_and_save.can_not_save": "Je kan de resultaten van dit stembureau nog niet opslaan",
+  "check_and_save.can_save": "Je kan de resultaten van dit stembureau opslaan",
+
+  "check_and_save.notable_form_sections.empty": "Op <link>{link_title}</link> zijn geen stemmen ingevoerd",
+  "check_and_save.notable_form_sections.accepted-warnings":
+    "<link>{link_title}</link> heeft geaccepteerde waarschuwingen",
+  "check_and_save.notable_form_sections.unaccepted-warnings": "Controleer waarschuwingen bij <link>{link_title}</link>",
+  "check_and_save.notable_form_sections.errors": "<link>{link_title}</link> heeft blokkerende fouten",
+
+  "status.unfinished": "Niet afgeronde invoer",
+  "status.in_progress": "Invoer bezig",
+  "status.definitive": "Eerste invoer klaar",
+  "status.not_started": "Werkvoorraad",
 
   "election_status.title": "Status verkiezing - Abacus",
   "election_status.first_session": "Eerste zitting",
   "election_status.definitive.title": "Alle stembureaus zijn twee keer ingevoerd",
   "election_status.definitive.message":
-    "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
+    "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
   "election_status.definitive.finish_button": "Invoerfase afronden",
+  "election_status.finish_first_session_data_entry_status": "<strong>Steminvoer afronden</strong> (eerste zitting)",
+
+  "election_report.finish_data_entry_phase": "Invoerfase afronden?",
+  "election_report.about_to_stop_data_entry": "Je staat op het punt het invoeren van stemmen te stoppen.",
+  "election_report.data_entry_finish_steps_explanation":
+    "<ul><li>In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële telbestanden downloaden.</li><li>Zolang het concept proces-verbaal nog niet is ondertekend en gedeeld met het centraal stembureau, kan je nog terug naar de steminvoer.</li></ul>",
+  "election_report.for_recount_new_session_needed":
+    "Als er na het afronden van de zitting nog stemmen herteld worden, moet dan in een nieuwe zitting van het gemeentelijke stembureau.",
+  "election_report.download_report": "Download proces-verbaal",
 
   "account.configured": "Je account is ingesteld",
   "feedback.F101.title": "Controleer het papieren proces-verbaal",

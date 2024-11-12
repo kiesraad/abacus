@@ -1,12 +1,44 @@
+use axum::{
+    extract::FromRequest,
+    response::{IntoResponse, Response},
+    Json,
+};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-/// Polling station of a certain [Election]
+use crate::APIError;
+
+/// Polling station of a certain [crate::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
 pub struct PollingStation {
     pub id: u32,
     pub election_id: u32,
+    pub name: String,
+    pub number: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub number_of_voters: Option<i64>,
+    pub polling_station_type: PollingStationType,
+    pub street: String,
+    pub house_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub house_number_addition: Option<String>,
+    pub postal_code: String,
+    pub locality: String,
+}
+
+impl IntoResponse for PollingStation {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
+}
+
+/// Polling station of a certain [crate::election::Election]
+#[derive(Serialize, Deserialize, ToSchema, Debug, FromRequest)]
+#[from_request(via(axum::Json), rejection(APIError))]
+pub struct PollingStationRequest {
     pub name: String,
     pub number: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,10 +65,10 @@ pub enum PollingStationType {
 impl From<String> for PollingStationType {
     fn from(value: String) -> Self {
         match value.as_str() {
-            "vaste_locatie" => Self::FixedLocation,
-            "bijzonder" => Self::Special,
-            "mobiel" => Self::Mobile,
-            _ => panic!("invalid PollingStationType"),
+            "FixedLocation" => Self::FixedLocation,
+            "Special" => Self::Special,
+            "Mobile" => Self::Mobile,
+            _ => panic!("invalid PollingStationType `{value}`"),
         }
     }
 }

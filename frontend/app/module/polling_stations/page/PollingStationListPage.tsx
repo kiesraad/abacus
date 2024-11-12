@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { PollingStationType, usePollingStationListRequest } from "@kiesraad/api";
-import { IconChevronRight } from "@kiesraad/icon";
-import { Loader, PageTitle } from "@kiesraad/ui";
+import { Loader, PageTitle, Table } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
 const labelForPollingStationType: { [K in PollingStationType]: string } = {
@@ -43,30 +42,22 @@ export function PollingStationListPage() {
           </article>
         ) : (
           <article>
-            <table id="polling_stations" className="polling_stations_table">
-              <thead>
-                <tr>
-                  <th className="number">Nummer</th>
-                  <th>Naam</th>
-                  <th>Soort</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table id="polling_stations">
+              <Table.Header>
+                <Table.Column number>Nummer</Table.Column>
+                <Table.Column>Naam</Table.Column>
+                <Table.Column>Soort</Table.Column>
+              </Table.Header>
+              <Table.Body>
                 {data.polling_stations.map((station) => (
-                  <tr key={station.id}>
-                    <td className="number">{station.number}</td>
-                    <td>{station.name}</td>
-                    <td>{labelForPollingStationType[station.polling_station_type]}</td>
-                    <td className="link">
-                      <div className="link">
-                        <IconChevronRight />
-                      </div>
-                    </td>
-                  </tr>
+                  <Table.LinkRow key={station.id} to={`#todo-${station.id}`}>
+                    <Table.Cell number>{station.number}</Table.Cell>
+                    <Table.Cell>{station.name}</Table.Cell>
+                    <Table.Cell>{labelForPollingStationType[station.polling_station_type]}</Table.Cell>
+                  </Table.LinkRow>
                 ))}
-              </tbody>
-            </table>
+              </Table.Body>
+            </Table>
           </article>
         )}
       </main>

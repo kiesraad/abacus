@@ -20,7 +20,7 @@ export function AccountSetupForm() {
 
   return (
     <form className="no_footer" onSubmit={handleSubmit}>
-      <h2 className="form_title">Personaliseer je account</h2>
+      <h2 className="mb-lg">Personaliseer je account</h2>
       <InputField
         name="username"
         label="Gebruikersnaam"

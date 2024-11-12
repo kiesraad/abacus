@@ -9,7 +9,8 @@ on:
 env:
   CARGO_TERM_COLOR: always
   ASSET_DIR: ${{ github.workspace }}/frontend/dist
-  
+  SQLX_OFFLINE: "true"
+
 jobs:
   backend:
     name: Backend
@@ -46,10 +47,6 @@ jobs:
             ./backend/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
-      - name: Install sqlx-cli
-        run: cargo install sqlx-cli --no-default-features --features sqlite
-      - name: Create database and run migrations
-        run: sqlx database setup
       - name: Check rustfmt
         run: cargo --verbose --locked fmt --all -- --check
       - name: Check Clippy with all features
@@ -58,13 +55,12 @@ jobs:
         run: cargo --verbose --locked clippy --all-targets --no-default-features -- -D warnings
       - name: Run tests
         run: cargo --verbose --locked test
-      # Release build includes the frontend through the memory-serve crate
       - name: Build
-        run: cargo --verbose --locked build --release --features memory-serve
+        run: cargo --verbose --locked build --features memory-serve
       - uses: actions/upload-artifact@v4
         with:
           name: backend-build
-          path: backend/target/release/api
+          path: backend/target/debug/api
   frontend:
     name: Frontend
     runs-on: ubuntu-latest

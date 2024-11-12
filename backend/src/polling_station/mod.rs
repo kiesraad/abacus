@@ -1,4 +1,5 @@
 use axum::extract::{Path, State};
+use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde::{Deserialize, Serialize};
@@ -24,7 +25,7 @@ impl IntoResponse for PollingStationListResponse {
     }
 }
 
-/// Get a list of all pollingstations for an election
+/// Get a list of all [PollingStation]s for an election
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}/polling_stations",
@@ -48,6 +49,116 @@ pub async fn polling_station_list(
     Ok(PollingStationListResponse {
         polling_stations: polling_stations.list(election_id).await?,
     })
+}
+
+/// Create a new [PollingStation]
+#[utoipa::path(
+    post,
+    path = "/api/elections/{election_id}/polling_stations",
+    request_body = PollingStationRequest,
+    responses(
+        (status = 201, description = "Polling station created successfully", body = PollingStation),
+        (status = 404, description = "Election not found", body = ErrorResponse),
+        (status = 409, description = "Polling station already exists", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
+)]
+pub async fn polling_station_create(
+    State(polling_stations): State<PollingStations>,
+    State(elections): State<Elections>,
+    Path(election_id): Path<u32>,
+    new_polling_station: PollingStationRequest,
+) -> Result<(StatusCode, PollingStation), APIError> {
+    // Check if the election exists, will respond with NOT_FOUND otherwise
+    elections.get(election_id).await?;
+
+    Ok((
+        StatusCode::CREATED,
+        polling_stations
+            .create(election_id, new_polling_station)
+            .await?,
+    ))
+}
+
+/// Get a [PollingStation]
+#[utoipa::path(
+    get,
+    path = "/api/polling_stations/{polling_station_id}",
+    responses(
+        (status = 200, description = "Polling station found", body = PollingStation),
+        (status = 404, description = "Polling station not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+pub async fn polling_station_get(
+    State(polling_stations): State<PollingStations>,
+    Path(polling_station_id): Path<u32>,
+) -> Result<(StatusCode, PollingStation), APIError> {
+    Ok((
+        StatusCode::OK,
+        polling_stations.get(polling_station_id).await?,
+    ))
+}
+
+/// Update a [PollingStation]
+#[utoipa::path(
+    put,
+    path = "/api/polling_stations/{polling_station_id}",
+    request_body = PollingStationRequest,
+    responses(
+        (status = 200, description = "Polling station updated successfully"),
+        (status = 404, description = "Polling station not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+pub async fn polling_station_update(
+    State(polling_stations): State<PollingStations>,
+    Path(polling_station_id): Path<u32>,
+    polling_station_update: PollingStationRequest,
+) -> Result<StatusCode, APIError> {
+    let updated = polling_stations
+        .update(polling_station_id, polling_station_update)
+        .await?;
+
+    if updated {
+        Ok(StatusCode::OK)
+    } else {
+        Ok(StatusCode::NOT_FOUND)
+    }
+}
+/// Delete a [PollingStation]
+#[utoipa::path(
+    delete,
+    path = "/api/polling_stations/{polling_station_id}",
+    responses(
+        (status = 200, description = "Polling station deleted successfully"),
+        (status = 404, description = "Polling station not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+pub async fn polling_station_delete(
+    State(polling_stations): State<PollingStations>,
+    Path(polling_station_id): Path<u32>,
+) -> Result<StatusCode, APIError> {
+    let deleted = polling_stations.delete(polling_station_id).await?;
+
+    if deleted {
+        Ok(StatusCode::OK)
+    } else {
+        Ok(StatusCode::NOT_FOUND)
+    }
 }
 
 #[cfg(test)]

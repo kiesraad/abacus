@@ -24,7 +24,7 @@ chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
 clap = { version = "4.5", default-features = false, features = ["derive", "std", "help"] }
 hyper = { version = "1", features = ["full"] }
 tokio = { version = "1", features = ["full"] }
-memory-serve = { git = "https://github.com/tweedegolf/memory-serve.git", branch = "no-proc-macro", optional = true }
+memory-serve = { version = "1.0.0-beta.0", features = ["force-embed"], optional = true }
 utoipa = { version = "5.2", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "8.0.3", features = ["axum"], optional = true }
 serde = { version = "1.0", features = ["derive"] }

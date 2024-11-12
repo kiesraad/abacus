@@ -62,8 +62,10 @@ Additionally, the following development dependencies are used:
 
 ### Database
 
-SQLite is used as the database. An empty database is created as `db.sqlite` when the application is
-started. The database schema is created and updated using migrations managed by `sqlx`.
+SQLite is used as the database through the [SQLx](https://github.com/launchbadge/sqlx) Rust crate.  
+
+An empty database is created as `db.sqlite` when the application is started.
+The database schema is created and updated using migrations managed by SQLx.
 
 When migrations are out of sync (e.g. `VersionMismatch` occurs when starting the API server),
 the database can be reset using `sqlx database reset` or by running the API server with the
@@ -77,13 +79,13 @@ e.g.:
 cargo run -- --reset-database --seed-data
 ```
 
-#### Offline mode
+#### SQLx offline mode
 
-You can use `sqlx` in offline mode, so you don't need an active database connection for the queries to compile.
-`lefthook` is configured to update the queries on commit, but when you need to build in offline mode, make sure to first run:
-```shell
-cargo sqlx prepare
-```
+You can use SQLx in offline mode so that you don't need an active database connection for compile-time query checks. 
+To compile in offline mode, set the `SQLX_OFFLINE` environment variable to `true`, e.g. `env SQLX_OFFLINE=true cargo build`.
+
+The SQLx offline mode uses query metadata in the `.sqlx` directory.
+Lefthook is configured to update the query metadata on commit, but you can also run `cargo sqlx prepare -- --all-targets --all-features` manually.
 
 ### OpenAPI
 

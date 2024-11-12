@@ -6,9 +6,9 @@ import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
 
+import cls from "./PollingStationChoiceForm.module.css";
 import { PollingStationLink } from "./PollingStationLink";
 import { PollingStationSelector } from "./PollingStationSelector";
-import cls from "./PollingStationSelector.module.css";
 import { PollingStationsList } from "./PollingStationsList";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
@@ -79,7 +79,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       }}
     >
       {unfinished.length > 0 && (
-        <div className={cls["unfinished-alert"]}>
+        <div className="mb-lg">
           <Alert type="notify" variant="no-icon">
             <h2>Je hebt nog een openstaande invoer</h2>
             <p>
@@ -93,7 +93,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           </Alert>
         </div>
       )}
-      <h2 className="form_title">
+      <h2 className="mb-lg">
         {anotherEntry ? "Verder met een volgend stembureau?" : "Welk stembureau ga je invoeren?"}
       </h2>
       <PollingStationSelector
@@ -107,7 +107,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         handleSubmit={handleSubmit}
       />
       <p className="md">
-        Klopt de naam van het stembureau met de naam op je papieren proces verbaal?
+        Klopt de naam van het stembureau met de naam op je papieren proces-verbaal?
         <br />
         Dan kan je beginnen. Klopt de naam niet? Overleg met de coördinator.
       </p>
@@ -133,27 +133,29 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>
       </BottomBar>
-      <details>
-        <summary>
-          Weet je het nummer niet?
-          <br />
-          <span id="openPollingStationList" className="underlined pointer">
-            Bekijk de lijst met alle stembureaus
-          </span>
-        </summary>
-        <h2 className="form_title table_title">Kies het stembureau</h2>
-        {(() => {
-          if (pollingStations.length === 0) {
-            return (
-              <Alert type={"error"} variant="small">
-                <p>Geen stembureaus gevonden</p>
-              </Alert>
-            );
-          } else {
-            return <PollingStationsList pollingStations={pollingStations} />;
-          }
-        })()}
-      </details>
+      <div className={cls.pollingStationList}>
+        <details>
+          <summary>
+            Weet je het nummer niet?
+            <br />
+            <span id="openPollingStationList" className={cn(cls.underlined, cls.pointer)}>
+              Bekijk de lijst met alle stembureaus
+            </span>
+          </summary>
+          <h2 className={cls.formTitle}>Kies het stembureau</h2>
+          {(() => {
+            if (pollingStations.length === 0) {
+              return (
+                <Alert type={"error"} variant="small">
+                  <p>Geen stembureaus gevonden</p>
+                </Alert>
+              );
+            } else {
+              return <PollingStationsList pollingStations={pollingStations} />;
+            }
+          })()}
+        </details>
+      </div>
     </form>
   );
 }

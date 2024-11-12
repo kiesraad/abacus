@@ -23,5 +23,5 @@ echo "Building and running backend..."
 
 pushd "backend" > /dev/null 2>&1
 cargo sqlx database reset -y
-ASSET_DIR="$PWD/../frontend/dist" cargo run --release --features memory-serve -- -s
+ASSET_DIR="$PWD/../frontend/dist" cargo run --features memory-serve -- -s
 popd > /dev/null 2>&1

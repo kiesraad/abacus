@@ -1,7 +1,9 @@
 use axum::extract::FromRef;
-use sqlx::{query_as, SqlitePool};
+use sqlx::{query, query_as, SqlitePool};
 
-use crate::polling_station::structs::{PollingStation, PollingStationStatusEntry};
+use crate::polling_station::structs::{
+    PollingStation, PollingStationRequest, PollingStationStatusEntry,
+};
 use crate::AppState;
 
 pub struct PollingStations(SqlitePool);
@@ -12,6 +14,7 @@ impl PollingStations {
         Self(pool)
     }
 
+    /// List all polling stations from an election
     pub async fn list(&self, election_id: u32) -> Result<Vec<PollingStation>, sqlx::Error> {
         query_as!(
             PollingStation,
@@ -30,13 +33,14 @@ impl PollingStations {
                 locality
             FROM polling_stations
             WHERE election_id = $1
-        "#,
+            "#,
             election_id
         )
         .fetch_all(&self.0)
         .await
     }
 
+    /// Get a single polling from an election
     pub async fn get(&self, id: u32) -> Result<PollingStation, sqlx::Error> {
         query_as!(
             PollingStation,
@@ -55,11 +59,113 @@ impl PollingStations {
                 locality
             FROM polling_stations
             WHERE id = $1
-        "#,
+            "#,
             id
         )
         .fetch_one(&self.0)
         .await
+    }
+
+    /// Create a single polling station for an election
+    pub async fn create(
+        &self,
+        election_id: u32,
+        new_polling_station: PollingStationRequest,
+    ) -> Result<PollingStation, sqlx::Error> {
+        query_as!(
+            PollingStation,
+            r#"
+            INSERT INTO polling_stations (
+              election_id,
+              name,
+              number,
+              number_of_voters,
+              polling_station_type,
+              street,
+              house_number,
+              house_number_addition,
+              postal_code,
+              locality
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            RETURNING
+              id AS "id: u32",
+              election_id AS "election_id: u32",
+              name,
+              number,
+              number_of_voters,
+              polling_station_type,
+              street,
+              house_number,
+              house_number_addition,
+              postal_code,
+              locality
+            "#,
+            election_id,
+            new_polling_station.name,
+            new_polling_station.number,
+            new_polling_station.number_of_voters,
+            new_polling_station.polling_station_type,
+            new_polling_station.street,
+            new_polling_station.house_number,
+            new_polling_station.house_number_addition,
+            new_polling_station.postal_code,
+            new_polling_station.locality,
+        )
+        .fetch_one(&self.0)
+        .await
+    }
+
+    /// Update a single polling station for an election
+    pub async fn update(
+        &self,
+        polling_station_id: u32,
+        polling_station_update: PollingStationRequest,
+    ) -> Result<bool, sqlx::Error> {
+        let rows_affected = query!(
+            r#"
+            UPDATE polling_stations
+            SET
+              name = ?,
+              number = ?,
+              number_of_voters = ?,
+              polling_station_type = ?,
+              street = ?,
+              house_number = ?,
+              house_number_addition = ?,
+              postal_code = ?,
+              locality = ?
+            WHERE
+              id = ?
+            "#,
+            polling_station_update.name,
+            polling_station_update.number,
+            polling_station_update.number_of_voters,
+            polling_station_update.polling_station_type,
+            polling_station_update.street,
+            polling_station_update.house_number,
+            polling_station_update.house_number_addition,
+            polling_station_update.postal_code,
+            polling_station_update.locality,
+            polling_station_id,
+        )
+        .execute(&self.0)
+        .await?
+        .rows_affected();
+
+        Ok(rows_affected > 0)
+    }
+
+    /// Delete a single polling station for an election
+    pub async fn delete(&self, polling_station_id: u32) -> Result<bool, sqlx::Error> {
+        let rows_affected = query!(
+            r#"DELETE FROM polling_stations WHERE id = ?"#,
+            polling_station_id,
+        )
+        .execute(&self.0)
+        .await?
+        .rows_affected();
+
+        Ok(rows_affected > 0)
     }
 
     /// Determines the status of the polling station.
@@ -93,8 +199,8 @@ WHERE election_id = $1
 "#,
             election_id
         )
-        .fetch_all(&self.0)
-        .await
+            .fetch_all(&self.0)
+            .await
     }
 }
 

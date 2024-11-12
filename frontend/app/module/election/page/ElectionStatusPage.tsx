@@ -53,9 +53,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
   function CategoryHeader({ children }: { children?: ReactNode[] }) {
     return (
       <Table.Header key={category} backgroundStyling>
-        <Table.Column key={`${category}-number`} number>
-          {t("number")}
-        </Table.Column>
+        <Table.Column key={`${category}-number`}>{t("number")}</Table.Column>
         <Table.Column key={`${category}-name`}>{t("polling_station")}</Table.Column>
         {children}
       </Table.Header>
@@ -82,10 +80,10 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
   function CategoryPollingStationRow({ children }: { children?: ReactNode[] }) {
     return (
       <Table.Row>
-        <Table.Cell key={`${polling_station.id}-number`} number>
+        <Table.Cell key={`${polling_station.id}-number`} number fontSizeClass="fs-body">
           {polling_station.number}
         </Table.Cell>
-        <Table.Cell key={`${polling_station.id}-name`}>
+        <Table.Cell key={`${polling_station.id}-name`} fontSizeClass="fs-sm">
           <span>{polling_station.name}</span>
           {showBadge.includes(polling_station.status) && <Badge type={polling_station.status} />}
         </Table.Cell>
@@ -94,9 +92,9 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
     );
   }
   // TODO: Add typist information once user accounts are implemented
-  const typistCell = <Table.Cell key={`${polling_station.id}-typist`}></Table.Cell>;
+  const typistCell = <Table.Cell key={`${polling_station.id}-typist`} fontSizeClass="fs-sm"></Table.Cell>;
   const finishedAtCell = (
-    <Table.Cell key={`${polling_station.id}-time`}>
+    <Table.Cell key={`${polling_station.id}-time`} fontSizeClass="fs-sm">
       {polling_station.finished_at
         ? new Date(polling_station.finished_at * 1000).toLocaleTimeString("nl-NL", {
             timeStyle: "short",
@@ -106,7 +104,7 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
     </Table.Cell>
   );
   // TODO: Add polling station progress bar in #463
-  const progressCell = <Table.Cell key={`${polling_station.id}-progress`}></Table.Cell>;
+  const progressCell = <Table.Cell key={`${polling_station.id}-progress`} fontSizeClass="fs-sm"></Table.Cell>;
   // TODO: Needs to be updated when second entry is implemented
   if (category === "unfinished") {
     return <CategoryPollingStationRow key={polling_station.id}>{[typistCell]}</CategoryPollingStationRow>;

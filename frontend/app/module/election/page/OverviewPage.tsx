@@ -68,9 +68,9 @@ export function OverviewPage() {
             <Table.Body>
               {electionList.map((election) => (
                 <Table.LinkRow key={election.id} to={electionLink(election)}>
-                  <Table.Cell>{election.name}</Table.Cell>
-                  {isAdministrator && <Table.Cell></Table.Cell>}
-                  <Table.Cell>
+                  <Table.Cell fontSizeClass="fs-body">{election.name}</Table.Cell>
+                  {isAdministrator && <Table.Cell fontSizeClass="fs-md"></Table.Cell>}
+                  <Table.Cell fontSizeClass="fs-md">
                     <Icon icon={<IconCheckHeart />} color="accept" />
                     <span>{isAdministrator ? "Invoerders bezig" : "Invoer gestart"}</span>
                     {/* TODO <IconHourglass />

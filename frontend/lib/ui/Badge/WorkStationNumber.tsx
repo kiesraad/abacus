@@ -1,5 +1,5 @@
-import classes from "./badge.module.css";
+import cls from "./Badge.module.css";
 
 export function WorkStationNumber({ children }: React.PropsWithChildren) {
-  return <div className={classes.workstation}>{children}</div>;
+  return <div className={cls.workstation}>{children}</div>;
 }

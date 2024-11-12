@@ -64,7 +64,11 @@ export interface Translation {
   "election_status.definitive.title": string;
   "election_status.definitive.message": string;
   "election_status.definitive.finish_button": string;
-  "election_status.finish_first_session_data_entry_status": string;
+  "election_status.first_session.coordinator.data_entry_in_progress": string;
+  "election_status.first_session.typist.data_entry_in_progress": string;
+  "election_status.first_session.coordinator.finish_data_entry": string;
+  "election_status.first_session.coordinator.data_entry_finished": string;
+  "election_status.first_session.typist.data_entry_finished": string;
 
   "election_report.finish_data_entry_phase": string;
   "election_report.about_to_stop_data_entry": string;

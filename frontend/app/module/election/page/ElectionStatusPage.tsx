@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 
 import { ElectionStatusProgress } from "app/component/election/ElectionStatusProgress";
+import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon.tsx";
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -30,6 +31,9 @@ export function ElectionStatusPage() {
       <header>
         <section>
           <h1>{t("election_status.first_session")}</h1>
+        </section>
+        <section>
+          <div className="election_status">{ElectionStatusWithIcon(election.status, true, true)}</div>
         </section>
       </header>
       {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (

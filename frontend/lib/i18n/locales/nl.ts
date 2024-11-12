@@ -65,7 +65,11 @@ export const nl = {
   "election_status.definitive.message":
     "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
   "election_status.definitive.finish_button": "Invoerfase afronden",
-  "election_status.finish_first_session_data_entry_status": "<strong>Steminvoer afronden</strong> (eerste zitting)",
+  "election_status.first_session.coordinator.data_entry_in_progress": "Steminvoer bezig",
+  "election_status.first_session.typist.data_entry_in_progress": "Invoer gestart",
+  "election_status.first_session.coordinator.finish_data_entry": "Steminvoer afronden",
+  "election_status.first_session.coordinator.data_entry_finished": "Steminvoer afgerond",
+  "election_status.first_session.typist.data_entry_finished": "Steminvoer voltooid",
 
   "election_report.finish_data_entry_phase": "Invoerfase afronden?",
   "election_report.about_to_stop_data_entry": "Je staat op het punt het invoeren van stemmen te stoppen.",

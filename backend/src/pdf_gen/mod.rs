@@ -56,12 +56,12 @@ mod tests {
     use chrono::Utc;
     use models::{ModelNa31_2Input, ModelNa31_2Summary};
 
+    use super::*;
+    use crate::election::ElectionStatus;
     use crate::{
         election::{tests::election_fixture, Election, ElectionCategory},
         polling_station::{PollingStation, PollingStationType},
     };
-
-    use super::*;
 
     pub fn polling_stations_fixture(
         election: &Election,
@@ -106,6 +106,7 @@ mod tests {
                 category: ElectionCategory::Municipal,
                 election_date: Utc::now().date_naive(),
                 nomination_date: Utc::now().date_naive(),
+                status: ElectionStatus::DataEntryFinished,
                 political_groups: None,
             },
             polling_stations: vec![],

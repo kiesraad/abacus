@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 
+import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon.tsx";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
-import { IconLock } from "@kiesraad/icon";
-import { Button, Icon, PageTitle } from "@kiesraad/ui";
+import { Button, PageTitle } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
 import cls from "./ElectionReportPage.module.css";
@@ -71,10 +71,7 @@ export function ElectionReportPage() {
           <h1>{t("election_status.first_session")}</h1>
         </section>
         <section>
-          <div className="election_status">
-            <span>{tx("election_status.finish_first_session_data_entry_status")}</span>{" "}
-            <Icon size="md" color="error" icon={<IconLock />} />
-          </div>
+          <div className="election_status">{ElectionStatusWithIcon("FinishDataEntry", true, true)}</div>
         </section>
       </header>
       <main>

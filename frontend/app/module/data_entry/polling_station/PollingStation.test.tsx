@@ -194,7 +194,7 @@ const expectPollingStationChoicePage = async () => {
 const submitWith422Response = async () => {
   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
     error: "JSON error or invalid data (Unprocessable Content)",
-    fata: true,
+    fatal: true,
     reference: "InvalidJson",
   });
   await submit();

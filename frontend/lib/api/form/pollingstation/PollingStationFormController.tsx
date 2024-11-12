@@ -318,14 +318,14 @@ export function PollingStationFormController({
     } satisfies SaveDataEntryRequest);
     status.current = aborting ? "aborted" : "idle";
 
-    // check for a fatal error -> render fuill page error
-    if (isFatalError(response)) {
-      throw response;
-    }
-
     if (response instanceof ApiError) {
       setApiError(response);
       return response;
+    }
+
+    // check for a fatal error and render full page error
+    if (isFatalError(response)) {
+      throw response;
     }
 
     const data = response.data;

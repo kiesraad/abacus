@@ -55,7 +55,7 @@ pub async fn polling_station_list(
 #[utoipa::path(
     post,
     path = "/api/elections/{election_id}/polling_stations",
-    request_body = NewPollingStationRequest,
+    request_body = PollingStationRequest,
     responses(
         (status = 201, description = "Polling station created successfully", body = PollingStation),
         (status = 404, description = "Election not found", body = ErrorResponse),
@@ -70,7 +70,7 @@ pub async fn polling_station_create(
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
     Path(election_id): Path<u32>,
-    new_polling_station: NewPollingStationRequest,
+    new_polling_station: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     // Check if the election exists, will respond with NOT_FOUND otherwise
     elections.get(election_id).await?;
@@ -81,6 +81,84 @@ pub async fn polling_station_create(
             .create(election_id, new_polling_station)
             .await?,
     ))
+}
+
+/// Get a [PollingStation]
+#[utoipa::path(
+    get,
+    path = "/api/polling_stations/{polling_station_id}",
+    responses(
+        (status = 200, description = "Polling station found", body = PollingStation),
+        (status = 404, description = "Polling station not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+pub async fn polling_station_get(
+    State(polling_stations): State<PollingStations>,
+    Path(polling_station_id): Path<u32>,
+) -> Result<(StatusCode, PollingStation), APIError> {
+    Ok((
+        StatusCode::OK,
+        polling_stations.get(polling_station_id).await?,
+    ))
+}
+
+/// Update a [PollingStation]
+#[utoipa::path(
+    put,
+    path = "/api/polling_stations/{polling_station_id}",
+    request_body = PollingStationRequest,
+    responses(
+        (status = 200, description = "Polling station updated successfully"),
+        (status = 404, description = "Polling station not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+pub async fn polling_station_update(
+    State(polling_stations): State<PollingStations>,
+    Path(polling_station_id): Path<u32>,
+    polling_station_update: PollingStationRequest,
+) -> Result<StatusCode, APIError> {
+    let updated = polling_stations
+        .update(polling_station_id, polling_station_update)
+        .await?;
+
+    if updated {
+        Ok(StatusCode::OK)
+    } else {
+        Ok(StatusCode::NOT_FOUND)
+    }
+}
+/// Delete a [PollingStation]
+#[utoipa::path(
+    delete,
+    path = "/api/polling_stations/{polling_station_id}",
+    responses(
+        (status = 200, description = "Polling station deleted successfully"),
+        (status = 404, description = "Polling station not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+pub async fn polling_station_delete(
+    State(polling_stations): State<PollingStations>,
+    Path(polling_station_id): Path<u32>,
+) -> Result<StatusCode, APIError> {
+    let deleted = polling_stations.delete(polling_station_id).await?;
+
+    if deleted {
+        Ok(StatusCode::OK)
+    } else {
+        Ok(StatusCode::NOT_FOUND)
+    }
 }
 
 #[cfg(test)]

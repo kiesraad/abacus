@@ -24,7 +24,7 @@ export interface VotersRecounts {
 }
 
 export class VotersAndVotesPage extends DataEntryBasePage {
-  readonly heading: Locator;
+  readonly fieldset: Locator;
   readonly headingRecount: Locator;
   readonly pollCardCount: Locator;
   readonly proxyCertificateCount: Locator;
@@ -44,8 +44,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
   constructor(page: Page) {
     super(page);
 
-    this.heading = page.getByRole("heading", {
-      level: 2,
+    this.fieldset = page.getByRole("group", {
       name: "Toegelaten kiezers en uitgebrachte stemmen",
     });
 

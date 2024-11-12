@@ -12,7 +12,6 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
 
   const inputList = React.useRef<HTMLInputElement[]>([]);
   const submitButton = React.useRef<HTMLButtonElement | null>(null);
-  const formTitle = React.useRef<HTMLHeadingElement | null>(null);
 
   const moveFocus = React.useCallback((dir: Dir) => {
     let targetIndex = inputList.current.findIndex((input) => document.activeElement === input);
@@ -64,7 +63,7 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
           }
           break;
         case "Enter":
-          if (event.target instanceof HTMLInputElement || event.target instanceof HTMLHeadingElement) {
+          if (event.target instanceof HTMLInputElement || event.target instanceof HTMLBodyElement) {
             event.preventDefault();
             if (event.shiftKey || document.activeElement === submitButton.current) {
               //ref.current.submit fails in testing environment (jsdom)
@@ -94,14 +93,6 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
     submitButton.current = innerRef.current?.querySelector("button[type=submit]") as HTMLButtonElement | null;
   }, [children]);
 
-  React.useEffect(() => {
-    // Only focus on form title if current active element is not feedback header,
-    // to prevent feedback header focus from being overwritten
-    if (document.activeElement?.className !== "feedback-header") {
-      formTitle.current?.focus();
-    }
-  }, []);
-
   return (
     <form
       ref={(node) => {
@@ -114,10 +105,10 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
       }}
       {...formProps}
     >
-      <h2 tabIndex={-1} ref={formTitle}>
-        {title}
-      </h2>
-      {children}
+      <fieldset>
+        <legend className="h2">{title}</legend>
+        {children}
+      </fieldset>
     </form>
   );
 });

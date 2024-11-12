@@ -1,6 +1,6 @@
-import { translations } from "@kiesraad/i18n";
+import fs from "fs";
 
-const fs = require("fs");
+import { translations } from "@kiesraad/i18n";
 
 // create a translations directory if none exsists
 if (!fs.existsSync("./translations")) {

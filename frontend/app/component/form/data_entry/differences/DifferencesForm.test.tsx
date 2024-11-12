@@ -84,14 +84,11 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      const formTitle = await screen.findByRole("heading", {
-        level: 2,
-        name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
-      });
-      expect(formTitle).toHaveFocus();
-      await user.keyboard("{tab}");
-
       const moreBallotsCount = await screen.findByTestId("more_ballots_count");
+      expect(moreBallotsCount.closest("fieldset")).toHaveAccessibleName(
+        "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
+      );
+      expect(moreBallotsCount).toHaveAccessibleName("I Stembiljetten méér geteld");
       expect(moreBallotsCount).toHaveFocus();
       await user.type(moreBallotsCount, "12345");
       expect(moreBallotsCount).toHaveValue("12345");

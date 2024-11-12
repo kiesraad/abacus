@@ -85,10 +85,13 @@ pub struct PollingStationStatusEntry {
 #[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum PollingStationStatus {
-    NotStarted,           // First entry has not started yet
-    FirstEntryInProgress, // First entry is currently in progress
-    FirstEntryUnfinished, // First entry has been aborted and the data has been saved
-    Definitive, // First entry is finished (TODO: will become `First and second entry are finished`)
+    NotStarted,            // First entry has not started yet
+    FirstEntryInProgress,  // First entry is currently in progress
+    FirstEntryUnfinished,  // First entry has been aborted and the data has been saved
+    SecondEntry,           // Ready for second entry
+    SecondEntryInProgress, // Second entry is currently in progress
+    SecondEntryUnfinished, // Second entry has been aborted and the data has been saved
+    Definitive,            // First and second entry are finished
 }
 
 #[cfg(test)]

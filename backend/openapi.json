@@ -1290,6 +1290,9 @@
           "not_started",
           "first_entry_in_progress",
           "first_entry_unfinished",
+          "second_entry",
+          "second_entry_in_progress",
+          "second_entry_unfinished",
           "definitive"
         ]
       },

@@ -110,7 +110,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert!(!body.statuses.is_empty());
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
-        PollingStationStatus::Definitive
+        PollingStationStatus::SecondEntry
     );
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,

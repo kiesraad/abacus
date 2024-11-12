@@ -23,6 +23,7 @@
     "start:msw": "cross-env API_MODE=mock vite",
     "gen:icons": "node scripts/gen_icons.js",
     "gen:openapi": "vite-node ./scripts/gen_openapi_types.ts",
+    "gen:po": "vite-node scripts/gen_po.js",
     "serve": "npm run build:msw && npx serve dist"
   },
   "dependencies": {

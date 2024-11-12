@@ -2,14 +2,14 @@ Het bouwen en runnen van het project kan op verschillende manieren met elk versc
 
 ## Docker compose
 
-Bedoeld voor development, start de backend in watch mode, assets worden geserved door `vite` en maakt dus gebruik van Hot Module Reloading:
+Bedoeld voor development, start de backend in watch mode, assets worden geserved door `vite` en maken dus gebruik van Hot Module Reloading:
 
 ```sh
 docker compose up
 ```
 
 ## `pull-and-run`
-Bash script, bedoeld om snel een productie build te bouwen en runnen. Maakt geen gebruik van Docker, waardoor het wel nodig is om `npm` en `cargo` geïnstalleerd te hebben. Je kan een git branch als argument mee geven, zodat je snel de productie build kan een bepaalde branch kan runnen. Als je het argument weg laat, wordt de huidige branch gebouwd.
+Bash script, bedoeld om snel een productiebuild te bouwen en runnen. Maakt geen gebruik van Docker, waardoor het wel nodig is om `npm` en `cargo` geïnstalleerd te hebben. Je kan een git-branch als argument mee geven, zodat je snel de productiebuild kan een bepaalde branch kan runnen. Als je het argument weg laat, wordt de huidige branch gebouwd.
 ```sh
 # Huidige branch runnen
 ./pull-and-run
@@ -24,7 +24,7 @@ Je kan natuurlijk altijd handmatig `cargo run` en `npm run dev` in twee verschil
 
 ## Build artifact
 
-Deze methode lijkt het meest op het draaien van een productie build.
+Deze methode lijkt het meest op het draaien van een productiebuild.
 
 ![instructions1](https://github.com/user-attachments/assets/9efb524e-9256-43eb-9d98-141e049c8ba9)
 ![instructions2](https://github.com/user-attachments/assets/b8389384-98fa-42c1-905f-81db7e301942)

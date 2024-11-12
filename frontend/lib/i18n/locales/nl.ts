@@ -71,6 +71,7 @@ export const nl = {
   "election_status.definitive.finish_button": "Invoerfase afronden",
   "election_status.main_title": "Statusoverzicht steminvoer",
   "election_status.add_polling_station": "Stembureau toevoegen",
+  "election_status.no_polling_stations": "Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.",
   "election_status.finish_first_session_data_entry_status": "<strong>Steminvoer afronden</strong> (eerste zitting)",
 
   "election_report.finish_data_entry_phase": "Invoerfase afronden?",

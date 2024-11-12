@@ -222,26 +222,30 @@ export function ElectionStatusPage() {
             </div>
           </Progress>
           <article className={cls.statusArticle}>
-            {tableCategories.map((cat) => {
-              return (
-                <div key={`item-table-${categoryColorClass[cat]}`}>
-                  <span className="item">
-                    <Circle size="xs" color={categoryColorClass[cat]} />
-                    <h2 className="mb-0">
-                      {t(`status.${cat}`)} <span className="normal">({categoryCounts[cat]})</span>
-                    </h2>
-                  </span>
-                  <Table id={cat} key={cat}>
-                    {getTableHeaderForCategory(cat)}
-                    <Table.Body key={cat}>
-                      {pollingStationsWithStatuses
-                        .filter((ps) => ps.status === categoryToStatus[cat])
-                        .map((ps) => getTableRowForCategory(cat, ps))}
-                    </Table.Body>
-                  </Table>
-                </div>
-              );
-            })}
+            {pollingStations.length === 0 ? (
+              <p>{t("election_status.no_polling_stations")}</p>
+            ) : (
+              tableCategories.map((cat) => {
+                return (
+                  <div key={`item-table-${categoryColorClass[cat]}`}>
+                    <span className="item">
+                      <Circle size="xs" color={categoryColorClass[cat]} />
+                      <h2 className="mb-0">
+                        {t(`status.${cat}`)} <span className="normal">({categoryCounts[cat]})</span>
+                      </h2>
+                    </span>
+                    <Table id={cat} key={cat}>
+                      {getTableHeaderForCategory(cat)}
+                      <Table.Body key={cat}>
+                        {pollingStationsWithStatuses
+                          .filter((ps) => ps.status === categoryToStatus[cat])
+                          .map((ps) => getTableRowForCategory(cat, ps))}
+                      </Table.Body>
+                    </Table>
+                  </div>
+                );
+              })
+            )}
           </article>
         </div>
       </main>

@@ -70,6 +70,7 @@ export interface Translation {
   "election_status.definitive.finish_button": string;
   "election_status.main_title": string;
   "election_status.add_polling_station": string;
+  "election_status.no_polling_stations": string;
   "election_status.finish_first_session_data_entry_status": string;
 
   "election_report.finish_data_entry_phase": string;

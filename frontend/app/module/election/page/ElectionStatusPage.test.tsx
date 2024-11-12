@@ -4,7 +4,7 @@ import { ElectionStatusPage } from "app/module/election";
 import { overrideOnce, render, screen } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
-import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse, getElectionMockData } from "@kiesraad/api-mocks";
 
 const renderElectionStatusPage = () =>
   render(
@@ -108,5 +108,13 @@ describe("ElectionStatusPage", () => {
     });
 
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
+  });
+
+  test("No polling stations text visible instead of tables", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(3));
+
+    renderElectionStatusPage();
+
+    expect(await screen.findByText("Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.")).toBeVisible();
   });
 });

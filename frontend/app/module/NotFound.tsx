@@ -2,7 +2,7 @@ import { Error, ErrorAction } from "app/component/error";
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
-import { t, TranslationPath } from "@kiesraad/i18n";
+import { t, TranslationPath, tx } from "@kiesraad/i18n";
 import { AppLayout } from "@kiesraad/ui";
 
 export interface NotFoundProps {
@@ -15,12 +15,8 @@ export function NotFound({ message, path }: NotFoundProps) {
     <AppLayout>
       <NavBar />
       <Error title={t(message)} action={ErrorAction.Back}>
-        {path && (
-          <p>
-            De pagina <code>{path}</code> is niet gevonden.
-          </p>
-        )}
-        <p>We kunnen de pagina die je zoekt niet vinden. Het kan zijn dat de pagina is verplaatst of verwijderd.</p>
+        {path && <p>{tx("error.page_not_found", undefined, { path })}</p>}
+        <p>{t("error.not_found_feedback")}</p>
       </Error>
       <Footer />
     </AppLayout>

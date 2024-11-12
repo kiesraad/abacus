@@ -92,14 +92,14 @@ export class ApiClient {
     }
 
     if (response.status >= 500 && response.status <= 599) {
-      return new ApiError(ApiResponseStatus.ServerError, response.status, body, true, "InvalidData");
+      return new ApiError(ApiResponseStatus.ServerError, response.status, body, true, "InternalServerError");
     }
 
     if (body.length > 0) {
       console.error("Unexpected data from server:", body);
 
       const message = `Unexpected data from server: ${body}`;
-      return new ApiError(ApiResponseStatus.ServerError, response.status, message, true, "InvalidData");
+      return new ApiError(ApiResponseStatus.ServerError, response.status, message, true, "InternalServerError");
     }
 
     if (response.ok) {
@@ -141,8 +141,13 @@ export class ApiClient {
 
       return await this.handleEmptyBody(response);
     } catch (e: unknown) {
+      if (e === "Component unmounted") {
+        // ignore cancel by unmounted component
+        return new NetworkError(e);
+      }
+
       const message = (e as Error).message || "Network error";
-      console.error(message);
+      console.error(e);
       return new NetworkError(message);
     }
   }

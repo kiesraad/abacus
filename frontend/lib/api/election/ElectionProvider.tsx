@@ -17,6 +17,7 @@ export function ElectionProvider({ children, electionId }: ElectionProviderProps
     <RequestStateHandler
       requestState={requestState}
       notFoundMessage="error.election_not_found"
+      isFoundCheck={(data) => typeof data.election === "object"}
       renderOnSuccess={(data) => (
         <ElectionProviderContext.Provider
           value={{

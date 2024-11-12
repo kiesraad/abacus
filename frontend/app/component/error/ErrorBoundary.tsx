@@ -3,9 +3,7 @@ import { useRouteError } from "react-router-dom";
 import { FatalError } from "app/module/FatalError";
 import { NotFound } from "app/module/NotFound";
 
-import { ApiError } from "@kiesraad/api";
-
-import { NotFoundError } from "./Error.types";
+import { ApiError, NotFoundError } from "@kiesraad/api";
 
 export function ErrorBoundary() {
   const error = useRouteError() as Error;

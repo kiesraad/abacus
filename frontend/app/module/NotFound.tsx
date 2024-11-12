@@ -5,15 +5,15 @@ import { NavBar } from "app/component/navbar/NavBar";
 import { AppLayout } from "@kiesraad/ui";
 
 export interface NotFoundProps {
-  message?: string;
-  path?: string;
+  message: string;
+  path: string;
 }
 
 export function NotFound({ message, path }: NotFoundProps) {
   return (
     <AppLayout>
       <NavBar />
-      <Error title={message || "Pagina niet gevonden"} action={ErrorAction.Back}>
+      <Error title={message} action={ErrorAction.Back}>
         {path && (
           <p>
             De pagina <code>{path}</code> is niet gevonden.

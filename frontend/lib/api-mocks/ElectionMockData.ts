@@ -1,11 +1,10 @@
-import { NotFoundError } from "app/component/error/Error.types.ts";
-
 import {
   Candidate,
   Election,
   ElectionDetailsResponse,
   ElectionListResponse,
   ElectionStatusResponse,
+  NotFoundError,
   PoliticalGroup,
 } from "@kiesraad/api";
 

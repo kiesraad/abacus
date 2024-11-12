@@ -203,6 +203,8 @@ const expectPollingStationChoicePage = async () => {
 const submitWith422Response = async () => {
   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
     error: "JSON error or invalid data (Unprocessable Content)",
+    fata: true,
+    reference: "InvalidJson",
   });
   await submit();
 };
@@ -215,6 +217,8 @@ const expect422ClientError = async () => {
 const submitWith500Response = async () => {
   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
     error: "Internal server error",
+    fatal: true,
+    reference: "InternalServerError",
   });
   await submit();
 };

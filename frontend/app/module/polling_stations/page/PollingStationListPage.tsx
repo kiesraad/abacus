@@ -16,7 +16,7 @@ export function PollingStationListPage() {
     return <Loader />;
   }
 
-  if (requestState.status === "api-error" || requestState.status === "network-error") {
+  if ("error" in requestState) {
     throw requestState.error;
   }
 

@@ -22,7 +22,7 @@ export function DataEntryHomePage() {
     void refetch(abortController);
 
     return () => {
-      abortController.abort();
+      abortController.abort("Component unmounted");
     };
   }, [refetch]);
 

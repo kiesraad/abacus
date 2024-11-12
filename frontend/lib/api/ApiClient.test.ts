@@ -37,7 +37,11 @@ describe("ApiClient", () => {
   });
 
   test("500 response is parsed as server error", async () => {
-    const responseBody = { error: "foo" };
+    const responseBody = {
+      error: "foo",
+      fatal: true,
+      reference: "InternalServerError",
+    };
     overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, responseBody);
 
     const client = new ApiClient();

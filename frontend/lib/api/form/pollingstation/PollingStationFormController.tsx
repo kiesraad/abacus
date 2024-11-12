@@ -13,6 +13,7 @@ import {
   getInitialFormState,
   getInitialValues,
   getNextSectionID,
+  isFatalError,
   NetworkError,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   PollingStationResults,
@@ -183,30 +184,34 @@ export function PollingStationFormController({
         setFormState(getInitialFormState(election));
         setTargetFormSectionID(INITIAL_FORM_SECTION_ID);
       }
-    } else if (initialDataRequest.status === "api-error") {
-      if (initialDataRequest.error.code === 404) {
-        // data entry not found, set initial values
-        const values = getInitialValues(election, defaultValues);
-        const formState = getInitialFormState(election, defaultFormState);
-        setValues(values);
-        setFormState(formState);
-        setTargetFormSectionID(INITIAL_FORM_SECTION_ID);
+    } else if (initialDataRequest.status === "not-found-error") {
+      // data entry not found, set initial values
+      const values = getInitialValues(election, defaultValues);
+      const formState = getInitialFormState(election, defaultFormState);
+      setValues(values);
+      setFormState(formState);
+      setTargetFormSectionID(INITIAL_FORM_SECTION_ID);
 
-        // save initial data entry, continue is set to true to make sure polling station has status FirstEntryInProgress
-        const clientState = getClientState(formState, false, true);
-        const requestBody: SaveDataEntryRequest = {
-          data: values,
-          client_state: clientState,
-        };
-        void client.postRequest(requestPath, requestBody).then((response) => {
-          if (response instanceof ApiError) {
-            setApiError(response);
-            return;
-          }
-        });
-      } else {
-        setApiError(initialDataRequest.error);
+      // save initial data entry, continue is set to true to make sure polling station has status FirstEntryInProgress
+      const clientState = getClientState(formState, false, true);
+      const requestBody: SaveDataEntryRequest = {
+        data: values,
+        client_state: clientState,
+      };
+      void client.postRequest(requestPath, requestBody).then((response) => {
+        if (response instanceof ApiError) {
+          setApiError(response);
+          return;
+        }
+      });
+    } else if (initialDataRequest.status === "api-error") {
+      if (initialDataRequest.error.fatal) {
+        throw initialDataRequest.error;
       }
+
+      setApiError(initialDataRequest.error);
+    } else if (initialDataRequest.status === "network-error") {
+      throw initialDataRequest.error;
     }
   }, [defaultValues, defaultFormState, election, pollingStationId, initialDataRequest, client, requestPath]);
 
@@ -320,13 +325,14 @@ export function PollingStationFormController({
     } satisfies SaveDataEntryRequest);
     status.current = aborting ? "aborted" : "idle";
 
+    // check for a fatal error -> render fuill page error
+    if (isFatalError(response)) {
+      throw response;
+    }
+
     if (response instanceof ApiError) {
       setApiError(response);
       return response;
-    }
-
-    if (response instanceof NetworkError) {
-      throw response;
     }
 
     const data = response.data;
@@ -347,19 +353,14 @@ export function PollingStationFormController({
     status.current = "deleting";
     const response = await client.deleteRequest(requestPath);
 
-    if (response instanceof ApiError) {
-      // ignore 404, as it means the data entry was never saved or already deleted
-      if (response.code !== 404) {
-        status.current = "idle";
-        throw response.withContext("Failed to delete data entry");
-      }
-
-      setApiError(response);
-      return;
+    if (isFatalError(response)) {
+      status.current = "idle";
+      throw response;
     }
 
-    if (response instanceof NetworkError) {
-      throw response;
+    if (response instanceof ApiError) {
+      setApiError(response);
+      return;
     }
 
     status.current = "deleted";

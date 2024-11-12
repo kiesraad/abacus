@@ -2,9 +2,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import { ApiProvider } from "@kiesraad/api";
+import { ApiProvider, NotFoundError } from "@kiesraad/api";
 
-import { NotFoundError } from "./component/error";
 // ignore in prod
 import { startMockAPI } from "./msw-mock-api";
 import { routes } from "./routes";
@@ -12,7 +11,7 @@ import { routes } from "./routes";
 const rootDiv = document.getElementById("root");
 
 if (!rootDiv) {
-  throw new NotFoundError("Root div not found");
+  throw new NotFoundError();
 }
 
 const root = createRoot(rootDiv);

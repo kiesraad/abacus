@@ -1,7 +1,7 @@
 import { type ErrorResponse } from "@kiesraad/api";
 
 import { ApiResult, RequestMethod, ServerError } from "./api.types";
-import { ApiError, NetworkError } from "./ApiError";
+import { ApiError, NetworkError, NotFoundError } from "./ApiError";
 import { ApiResponseStatus } from "./ApiResponseStatus";
 
 const MIME_JSON = "application/json";
@@ -52,6 +52,10 @@ export class ApiClient {
 
       const isError = isErrorResponse(body);
 
+      if (response.status === 404 && isError) {
+        return new NotFoundError(body.reference);
+      }
+
       if (response.status >= 400 && response.status <= 499 && isError) {
         return new ApiError(ApiResponseStatus.ClientError, response.status, body.error, body.fatal, body.reference);
       }
@@ -77,6 +81,10 @@ export class ApiClient {
   // handle a response without a body, and return an error when there is a non-2xx status or a non-empty body
   async handleEmptyBody<T>(response: Response): Promise<ApiResult<T>> {
     const body = await response.text();
+
+    if (response.status === 404) {
+      return new NotFoundError("error.not_found");
+    }
 
     if (response.status >= 400 && response.status <= 499) {
       return new ApiError(ApiResponseStatus.ClientError, response.status, body, true, "InvalidData");

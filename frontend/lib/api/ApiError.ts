@@ -1,3 +1,4 @@
+import { ApiResult } from "./api.types";
 import { ApiResponseStatus } from "./ApiResponseStatus";
 import { ErrorReference } from "./gen/openapi";
 
@@ -11,16 +12,29 @@ export class ApiError extends Error {
   ) {
     super(message);
   }
-
-  withContext(message: string): this {
-    this.message = message;
-
-    return this;
-  }
 }
 
 export class NetworkError extends Error {
   constructor(public message: string) {
     super(message);
   }
+}
+
+export class NotFoundError extends Error {
+  path: string;
+
+  constructor(message?: string) {
+    super(message || "error.not_found");
+    this.path = window.location.pathname;
+  }
+
+  withMessage(message: string): this {
+    this.message = message;
+
+    return this;
+  }
+}
+
+export function isFatalError(error: ApiResult<unknown>): error is ApiError | NetworkError | NotFoundError {
+  return (error instanceof ApiError && error.fatal) || error instanceof NetworkError || error instanceof NotFoundError;
 }

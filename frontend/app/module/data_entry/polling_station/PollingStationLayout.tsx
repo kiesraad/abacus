@@ -1,12 +1,11 @@
 import { Link, Outlet } from "react-router-dom";
 
-import { NotFoundError } from "app/component/error";
 import { NavBar } from "app/component/navbar/NavBar";
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 import { AbortDataEntryControl } from "app/module/data_entry";
 
-import { PollingStationFormController, useElection } from "@kiesraad/api";
+import { NotFoundError, PollingStationFormController, useElection } from "@kiesraad/api";
 import { IconChevronRight } from "@kiesraad/icon";
 import { Badge, PageTitle, PollingStationNumber, StickyNav, WorkStationNumber } from "@kiesraad/ui";
 import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { ApiResult } from "./api.types";
-import { ApiError, NetworkError } from "./ApiError";
+import { ApiError, NetworkError, NotFoundError } from "./ApiError";
 import { useApi } from "./useApi";
 
 export type ApiRequestState<T> =
@@ -11,6 +11,10 @@ export type ApiRequestState<T> =
   | {
       status: "api-error";
       error: ApiError;
+    }
+  | {
+      status: "not-found-error";
+      error: NotFoundError;
     }
   | {
       status: "network-error";
@@ -40,6 +44,8 @@ export function useApiRequest<T>(path: string): UseApiRequestReturn<T> {
 
       if (result instanceof ApiError) {
         setRequestState({ status: "api-error", error: result });
+      } else if (result instanceof NotFoundError) {
+        setRequestState({ status: "not-found-error", error: result });
       } else if (result instanceof NetworkError) {
         setRequestState({ status: "network-error", error: result });
       } else {
@@ -57,7 +63,7 @@ export function useApiRequest<T>(path: string): UseApiRequestReturn<T> {
     void fetchData(controller);
 
     return () => {
-      controller.abort();
+      controller.abort("Component unmounted");
     };
   }, [fetchData]);
 

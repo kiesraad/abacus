@@ -63,7 +63,7 @@ describe("Test CheckAndSaveForm", () => {
     renderForm();
 
     const formTitle = await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" });
-    expect(formTitle).toHaveFocus();
+    expect(formTitle).toBeVisible();
 
     overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, null);
 

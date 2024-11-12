@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 
 import { ElectionStatusProgress } from "app/component/election/ElectionStatusProgress";
-import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon.tsx";
+import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 

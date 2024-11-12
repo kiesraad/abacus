@@ -1,6 +1,6 @@
 import { Link, To, useLocation, useNavigate } from "react-router-dom";
 
-import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon.tsx";
+import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 

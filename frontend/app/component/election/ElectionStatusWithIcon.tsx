@@ -3,7 +3,7 @@ import { t } from "@kiesraad/i18n";
 import { IconCheckHeart, IconCheckVerified, IconLock } from "@kiesraad/icon";
 import { Icon } from "@kiesraad/ui";
 
-function getIconForElectionStatus(status: ElectionStatus): React.JSX.Element {
+function getIconForElectionStatus(status: ElectionStatus) {
   switch (status) {
     case "DataEntryInProgress":
       return <Icon size="md" color="accept" icon={<IconCheckHeart />} />;
@@ -11,8 +11,6 @@ function getIconForElectionStatus(status: ElectionStatus): React.JSX.Element {
       return <Icon size="md" color="error" icon={<IconLock />} />;
     case "DataEntryFinished":
       return <Icon size="md" color="default" icon={<IconCheckVerified />} />;
-    default:
-      return <></>;
   }
 }
 
@@ -27,6 +25,7 @@ export function ElectionStatusWithIcon(status: ElectionStatus, header: boolean, 
       break;
     case "DataEntryFinished":
       statusLabel = t(`election_status.${isAdministrator ? "coordinator" : "typist"}.data_entry_finished`);
+      break;
   }
   if (header) {
     return (

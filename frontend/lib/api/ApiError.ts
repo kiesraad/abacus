@@ -1,3 +1,5 @@
+import { TranslationPath } from "@kiesraad/i18n";
+
 import { ApiResult } from "./api.types";
 import { ApiResponseStatus } from "./ApiResponseStatus";
 import { ErrorReference } from "./gen/openapi";
@@ -22,13 +24,15 @@ export class NetworkError extends Error {
 
 export class NotFoundError extends Error {
   path: string;
+  message: TranslationPath;
 
-  constructor(message?: string) {
+  constructor(message?: TranslationPath) {
     super(message || "error.not_found");
+    this.message = message || "error.not_found";
     this.path = window.location.pathname;
   }
 
-  withMessage(message: string): this {
+  withMessage(message: TranslationPath): this {
     this.message = message;
 
     return this;

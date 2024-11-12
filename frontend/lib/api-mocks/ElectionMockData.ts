@@ -373,7 +373,7 @@ export const getElectionMockData = (election_id: number): Required<ElectionDetai
   const election = electionListMockResponse.elections.find((e) => e.id === election_id);
 
   if (!election) {
-    throw new NotFoundError(`Election with id ${election_id} not found`);
+    throw new NotFoundError("error.election_not_found");
   }
 
   if (election_id === 2) {

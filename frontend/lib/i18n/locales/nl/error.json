@@ -1,0 +1,8 @@
+{
+  "label": "Fout",
+  "not_found": "Pagina niet gevonden",
+  "election_not_found": "Verkiezing niet gevonden",
+  "elections_not_found": "Verkiezingen niet gevonden",
+  "polling_station_not_found": "Stembureau niet gevonden",
+  "polling_station_already_definitive": "De invoer voor dit stembureau is al definitief"
+}

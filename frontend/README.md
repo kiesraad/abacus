@@ -121,3 +121,23 @@ npm run gen:icons
 ```
 
 This results in `/frontend/lib/icon/gen.tsx`.
+
+#### gen_po
+
+Generate `.po` translation files from the current json translations in `/frontend/lib/i18n/loclales/<locale>/*.json`:
+
+```sh
+npm run gen:po
+```
+
+This results in `/frontend/translations/<locale>.po`.
+
+#### gen_translation-json
+
+Generate json translation files from `.po` translation files in `/frontend/translations/<locale>.po`:
+
+```sh
+npm run gen:translation-json
+```
+
+This results in `/frontend/lib/i18n/loclales/<locale>/*.json`.

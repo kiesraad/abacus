@@ -16,11 +16,11 @@ export function PollingStationLayout() {
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
 
   if (!pollingStation) {
-    throw new NotFoundError("Stembureau niet gevonden");
+    throw new NotFoundError("error.polling_station_not_found");
   }
 
   if (pollingStationStatus === "definitive") {
-    throw new Error("Polling station already finalised");
+    throw new Error("error.polling_station_already_definitive");
   }
 
   return (

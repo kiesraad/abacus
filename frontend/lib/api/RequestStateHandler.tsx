@@ -1,4 +1,4 @@
-import { Translation } from "@kiesraad/i18n";
+import { TranslationPath } from "@kiesraad/i18n";
 import { Loader } from "@kiesraad/ui";
 
 import { NotFoundError } from "./ApiError";
@@ -7,7 +7,7 @@ import { ApiRequestState } from "./useApiRequest";
 interface RequestStateHandlerrops<T> {
   requestState: ApiRequestState<T>;
   renderOnSuccess: (data: T) => React.ReactNode;
-  notFoundMessage?: keyof Translation;
+  notFoundMessage?: TranslationPath;
   isFoundCheck?: (data: T) => boolean;
 }
 

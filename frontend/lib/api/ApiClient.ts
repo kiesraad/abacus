@@ -1,4 +1,5 @@
 import { type ErrorResponse } from "@kiesraad/api";
+import { TranslationPath } from "@kiesraad/i18n";
 
 import { ApiResult, RequestMethod, ServerError } from "./api.types";
 import { ApiError, NetworkError, NotFoundError } from "./ApiError";
@@ -53,7 +54,7 @@ export class ApiClient {
       const isError = isErrorResponse(body);
 
       if (response.status === 404 && isError) {
-        return new NotFoundError(body.reference);
+        return new NotFoundError(`error.${body.reference}` as TranslationPath);
       }
 
       if (response.status >= 400 && response.status <= 499 && isError) {

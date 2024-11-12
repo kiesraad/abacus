@@ -42,7 +42,7 @@ export function Error({ title, error, action = ErrorAction.Back, children }: Err
             </nav>
           </section>
           <aside>
-            <img src={errorImage} alt={t("error")} />
+            <img src={errorImage} alt={t("error.label")} />
           </aside>
         </article>
       </main>

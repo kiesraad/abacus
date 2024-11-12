@@ -1,5 +1,5 @@
 import { Locale, Translation } from "./i18n.types";
-import { nl } from "./locales/nl";
+import nl from "./locales/nl/nl";
 
 export * from "./i18n.types";
 export * from "./i18n";
@@ -14,7 +14,3 @@ export function setLocale(l: Locale) {
 export const translations: Record<Locale, Translation> = {
   [Locale.nl]: nl,
 };
-
-export function updateTranslation(key: keyof Translation, value: string) {
-  translations[locale][key] = value;
-}

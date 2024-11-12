@@ -1,0 +1,19 @@
+{
+  "label": "Status",
+  "title": "Status verkiezing - Abacus",
+  "first_session": "Eerste zitting",
+  "definitive": {
+    "title": "Alle stembureaus zijn twee keer ingevoerd",
+    "message": "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
+    "finish_button": "Invoerfase afronden"
+  },
+  "coordinator": {
+    "data_entry_in_progress": "Steminvoer bezig",
+    "finish_data_entry": "Steminvoer afronden",
+    "data_entry_finished": "Steminvoer afgerond"
+  },
+  "typist": {
+    "data_entry_in_progress": "Invoer gestart",
+    "data_entry_finished": "Steminvoer voltooid"
+  }
+}

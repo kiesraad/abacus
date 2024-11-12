@@ -144,6 +144,7 @@ export function DifferencesForm() {
         </InputGrid.Header>
         <InputGrid.Body>
           <InputGridRow
+            autoFocusInput
             key="I"
             field="I"
             id="more_ballots_count"

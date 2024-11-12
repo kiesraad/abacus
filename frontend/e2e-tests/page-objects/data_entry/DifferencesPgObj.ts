@@ -18,7 +18,7 @@ export interface FewerBallotsFields {
 }
 
 export class DifferencesPage extends DataEntryBasePage {
-  readonly heading: Locator;
+  readonly fieldset: Locator;
   readonly next: Locator;
 
   readonly moreBallotsCount: Locator;
@@ -32,8 +32,7 @@ export class DifferencesPage extends DataEntryBasePage {
   constructor(page: Page) {
     super(page);
 
-    this.heading = page.getByRole("heading", {
-      level: 2,
+    this.fieldset = page.getByRole("group", {
       name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
     });
 

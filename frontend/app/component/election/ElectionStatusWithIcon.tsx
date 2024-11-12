@@ -1,6 +1,20 @@
 import { ElectionStatus } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { getIconForElectionStatus } from "@kiesraad/ui";
+import { IconCheckHeart, IconCheckVerified, IconLock } from "@kiesraad/icon";
+import { Icon } from "@kiesraad/ui";
+
+function getIconForElectionStatus(status: ElectionStatus): React.JSX.Element {
+  switch (status) {
+    case "DataEntryInProgress":
+      return <Icon size="md" color="accept" icon={<IconCheckHeart />} />;
+    case "FinishDataEntry":
+      return <Icon size="md" color="error" icon={<IconLock />} />;
+    case "DataEntryFinished":
+      return <Icon size="md" color="default" icon={<IconCheckVerified />} />;
+    default:
+      return <></>;
+  }
+}
 
 export function ElectionStatusWithIcon(status: ElectionStatus, header: boolean, isAdministrator: boolean) {
   let statusLabel;

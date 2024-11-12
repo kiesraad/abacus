@@ -1,18 +1,14 @@
-import { ElectionStatus } from "@kiesraad/api";
 import {
   IconArrowNarrowRight,
-  IconCheckHeart,
   IconCheckmark,
-  IconCheckVerified,
   IconError,
   IconInfo,
-  IconLock,
   IconMinus,
   IconPencil,
   IconThumbsUp,
   IconWarning,
 } from "@kiesraad/icon";
-import { AlertType, Icon, MenuStatus } from "@kiesraad/ui";
+import { AlertType, MenuStatus } from "@kiesraad/ui";
 
 export function renderIconForType(type: AlertType) {
   switch (type) {
@@ -41,19 +37,6 @@ export function renderStatusIcon(status: MenuStatus): React.JSX.Element {
       return <IconPencil aria-label={"nog niet afgerond"} />; // "Niet opgeslagen wijzigingen"
     case "error":
       return <IconError aria-label={"bevat een fout"} />; // "Ingevoerd, met openstaande fouten"
-    default:
-      return <></>;
-  }
-}
-
-export function getIconForElectionStatus(status: ElectionStatus): React.JSX.Element {
-  switch (status) {
-    case "DataEntryInProgress":
-      return <Icon size="md" color="accept" icon={<IconCheckHeart />} />;
-    case "FinishDataEntry":
-      return <Icon size="md" color="error" icon={<IconLock />} />;
-    case "DataEntryFinished":
-      return <Icon size="md" color="default" icon={<IconCheckVerified />} />;
     default:
       return <></>;
   }

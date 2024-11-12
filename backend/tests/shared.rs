@@ -78,7 +78,7 @@ pub async fn create_and_save_data_entry(
     assert_eq!(validation_results.validation_results.warnings.len(), 0);
 }
 
-pub async fn create_and_finalise_data_entry(addr: &SocketAddr, polling_station_id: u32) {
+pub async fn create_and_finalise_data_first_entry(addr: &SocketAddr, polling_station_id: u32) {
     create_and_save_data_entry(addr, polling_station_id, None).await;
 
     // Finalise the data entry

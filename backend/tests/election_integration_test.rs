@@ -74,7 +74,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(body.statuses[1].status, PollingStationStatus::NotStarted);
 
     // Finalise one and set the other in progress
-    shared::create_and_finalise_data_entry(&addr, 1).await;
+    shared::create_and_finalise_data_first_entry(&addr, 1).await;
     shared::create_and_save_data_entry(&addr, 2, Some(r#"{"continue": true}"#)).await;
 
     let url = format!("http://{addr}/api/elections/1/status");

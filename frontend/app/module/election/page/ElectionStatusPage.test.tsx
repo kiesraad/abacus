@@ -46,14 +46,17 @@ describe("ElectionStatusPage", () => {
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" }));
+    expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" }));
 
     const items = [...screen.getByTestId("shortcuts").children];
-    expect(items[0]).toHaveTextContent("Snelkoppelingen");
+    expect(items[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Snelkoppelingen" }));
     expect(items[1]).toHaveTextContent("Niet afgeronde invoer (1)");
     expect(items[2]).toHaveTextContent("Invoer bezig (1)");
     expect(items[3]).toHaveTextContent("Eerste invoer klaar (0)");
     expect(items[4]).toHaveTextContent("Werkvoorraad (2)");
 
+    const progress = [...screen.getByTestId("progress").children];
+    expect(progress[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Voortgang" }));
     expect(screen.getByTestId("progressbar-all")).toBeInTheDocument();
     const bars = [...screen.getByTestId("multi-outer-bar").children];
     const expectedData = [
@@ -68,7 +71,8 @@ describe("ElectionStatusPage", () => {
     });
 
     const tables = [...screen.getByRole("article").children];
-    expect(tables[0]).toHaveTextContent("Niet afgeronde invoer (1)");
+    expect(screen.getAllByRole("row").length).toEqual(7);
+    expect(tables[0]).toContain(screen.getByRole("heading", { level: 3, name: "Niet afgeronde invoer (1)" }));
     expect(tables[0]).toHaveTextContent(/Nummer/);
     expect(tables[0]).toHaveTextContent(/Stembureau/);
     expect(tables[0]).toHaveTextContent(/Invoerder/);
@@ -76,7 +80,7 @@ describe("ElectionStatusPage", () => {
     expect(tables[0]).toHaveTextContent(/Testschool/);
     expect(tables[0]).toHaveTextContent(/1e invoer/);
 
-    expect(tables[1]).toHaveTextContent("Invoer bezig (1)");
+    expect(tables[1]).toContain(screen.getByRole("heading", { level: 3, name: "Invoer bezig (1)" }));
     expect(tables[1]).toHaveTextContent(/Nummer/);
     expect(tables[1]).toHaveTextContent(/Stembureau/);
     expect(tables[1]).toHaveTextContent(/Invoerder/);
@@ -85,7 +89,7 @@ describe("ElectionStatusPage", () => {
     expect(tables[1]).toHaveTextContent(/Testbuurthuis/);
     expect(tables[1]).toHaveTextContent(/1e invoer/);
 
-    expect(tables[2]).toHaveTextContent("Werkvoorraad (2)");
+    expect(tables[2]).toContain(screen.getByRole("heading", { level: 3, name: "Werkvoorraad (2)" }));
     expect(tables[2]).toHaveTextContent(/Nummer/);
     expect(tables[2]).toHaveTextContent(/Stembureau/);
     expect(tables[2]).toHaveTextContent(/33/);

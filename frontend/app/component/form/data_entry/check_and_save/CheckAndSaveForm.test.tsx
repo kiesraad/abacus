@@ -62,7 +62,7 @@ describe("Test CheckAndSaveForm", () => {
   test("Shift+Enter submits form", async () => {
     renderForm();
 
-    expect(document.body).toHaveFocus();
+    expect(await screen.findByRole("group", { name: "Controleren en opslaan" }));
 
     overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, null);
 

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionStatusPage } from "app/module/election";
-import { overrideOnce, render, screen } from "app/test/unit";
+import { overrideOnce, render, screen, within } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 import { electionDetailsMockResponse, getElectionMockData } from "@kiesraad/api-mocks";
@@ -70,32 +70,44 @@ describe("ElectionStatusPage", () => {
       expect(bar.classList.contains(`${expectedData[index]?.class}`)).toBeTruthy();
     });
 
-    const tables = [...screen.getByRole("article").children];
-    expect(screen.getAllByRole("row").length).toEqual(7);
+    const tablesRoot = screen.getByRole("article");
+    expect(within(tablesRoot).getAllByRole("heading", { level: 3 }).length).toBe(3);
+    expect(within(tablesRoot).getAllByRole("table").length).toBe(3);
+
+    const tables = [...tablesRoot.children];
+
     expect(tables[0]).toContain(screen.getByRole("heading", { level: 3, name: "Niet afgeronde invoer (1)" }));
-    expect(tables[0]).toHaveTextContent(/Nummer/);
-    expect(tables[0]).toHaveTextContent(/Stembureau/);
-    expect(tables[0]).toHaveTextContent(/Invoerder/);
-    expect(tables[0]).toHaveTextContent(/35/);
-    expect(tables[0]).toHaveTextContent(/Testschool/);
-    expect(tables[0]).toHaveTextContent(/1e invoer/);
+    const unfinishedTable = within(tables[0] as HTMLElement).getByTestId("unfinished");
+    const unfinishedRows = within(unfinishedTable).getAllByRole("row");
+    expect(unfinishedRows.length).toBe(2);
+    expect(unfinishedRows[0]).toHaveTextContent(/Nummer/);
+    expect(unfinishedRows[0]).toHaveTextContent(/Stembureau/);
+    expect(unfinishedRows[0]).toHaveTextContent(/Invoerder/);
+    expect(unfinishedRows[1]).toHaveTextContent(/35/);
+    expect(unfinishedRows[1]).toHaveTextContent(/Testschool/);
+    expect(unfinishedRows[1]).toHaveTextContent(/1e invoer/);
 
     expect(tables[1]).toContain(screen.getByRole("heading", { level: 3, name: "Invoer bezig (1)" }));
-    expect(tables[1]).toHaveTextContent(/Nummer/);
-    expect(tables[1]).toHaveTextContent(/Stembureau/);
-    expect(tables[1]).toHaveTextContent(/Invoerder/);
-    expect(tables[1]).toHaveTextContent(/Voortgang/);
-    expect(tables[1]).toHaveTextContent(/36/);
-    expect(tables[1]).toHaveTextContent(/Testbuurthuis/);
-    expect(tables[1]).toHaveTextContent(/1e invoer/);
+    const inProgressTable = within(tables[1] as HTMLElement).getByTestId("in_progress");
+    const inProgressRows = within(inProgressTable).getAllByRole("row");
+    expect(inProgressRows.length).toBe(2);
+    expect(inProgressRows[0]).toHaveTextContent(/Nummer/);
+    expect(inProgressRows[0]).toHaveTextContent(/Stembureau/);
+    expect(inProgressRows[0]).toHaveTextContent(/Invoerder/);
+    expect(inProgressRows[1]).toHaveTextContent(/36/);
+    expect(inProgressRows[1]).toHaveTextContent(/Testbuurthuis/);
+    expect(inProgressRows[1]).toHaveTextContent(/1e invoer/);
 
     expect(tables[2]).toContain(screen.getByRole("heading", { level: 3, name: "Werkvoorraad (2)" }));
-    expect(tables[2]).toHaveTextContent(/Nummer/);
-    expect(tables[2]).toHaveTextContent(/Stembureau/);
-    expect(tables[2]).toHaveTextContent(/33/);
-    expect(tables[2]).toHaveTextContent(/Op Rolletjes/);
-    expect(tables[2]).toHaveTextContent(/34/);
-    expect(tables[2]).toHaveTextContent(/Testplek/);
+    const notStartedTable = within(tables[2] as HTMLElement).getByTestId("not_started");
+    const notStartedRows = within(notStartedTable).getAllByRole("row");
+    expect(notStartedRows.length).toBe(3);
+    expect(notStartedRows[0]).toHaveTextContent(/Nummer/);
+    expect(notStartedRows[0]).toHaveTextContent(/Stembureau/);
+    expect(notStartedRows[1]).toHaveTextContent(/33/);
+    expect(notStartedRows[1]).toHaveTextContent(/Op Rolletjes/);
+    expect(notStartedRows[2]).toHaveTextContent(/34/);
+    expect(notStartedRows[2]).toHaveTextContent(/Testplek/);
 
     // Test that the data entry finished message doesn't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();

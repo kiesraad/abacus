@@ -20,14 +20,23 @@ const root = createRoot(rootDiv);
 function render() {
   const router = createBrowserRouter(routes, {
     future: {
+      v7_fetcherPersist: true,
       v7_normalizeFormMethod: true,
+      v7_partialHydration: true,
+      v7_relativeSplatPath: true,
+      v7_skipActionErrorRevalidation: true,
     },
   });
 
   root.render(
     <StrictMode>
       <ApiProvider>
-        <RouterProvider router={router} />
+        <RouterProvider
+          router={router}
+          future={{
+            v7_startTransition: true,
+          }}
+        />
       </ApiProvider>
     </StrictMode>,
   );

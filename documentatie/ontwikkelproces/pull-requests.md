@@ -37,7 +37,7 @@ Exploratief testen met frontend en backend is onderdeel van de review (tenzij wi
 
 Als je alleen een gedeelte van de PR reviewt (bijv. alleen frontend), geef dat duidelijk aan in je commentaar.
 
-Resolven van comments gebeurt door de persoon die de comment geplaatst heeft, tenzij de comment overduidelijk resolved is of de commenter langere tijd afwezig is.
+Resolven van comments gebeurt door de persoon die de comment geplaatst heeft, tenzij de comment overduidelijk opgelost is of de commenter langere tijd afwezig is.
 
 Als je wijzingen wil zien, gebruik je de "Request changes" optie. We vertrouwen elkaar in het oppakken of negeren van wijzigingsverzoeken van reviewers.
 

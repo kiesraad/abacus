@@ -120,7 +120,7 @@ export class ApiClient {
 
       return await this.handleEmptyBody(response);
     } catch (e: unknown) {
-      const message = `Network error: ${(e as Error).message}` || "Network error";
+      const message = (e as Error).message ? `Network error: ${(e as Error).message}` : "Network error";
       return new ApiError(ApiResponseStatus.ServerError, 500, message);
     }
   }

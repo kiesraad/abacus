@@ -1,3 +1,4 @@
+/* Margin */
 .mt-0 {
   margin-top: 0;
 }
@@ -20,4 +21,21 @@
 
 .mb-lg {
   margin-bottom: var(--space-lg);
+}
+
+/* Font size */
+.fs-xs {
+  font-size: var(--font-size-xs);
+}
+
+.fs-sm {
+  font-size: var(--font-size-sm);
+}
+
+.fs-md {
+  font-size: var(--font-size-md);
+}
+
+.fs-body {
+  font-size: var(--font-size-body);
 }

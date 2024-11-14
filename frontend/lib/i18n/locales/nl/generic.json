@@ -3,6 +3,8 @@
   "test": "test",
   "election": "Verkiezing",
   "elections": "Verkiezingen",
+  "polling_station": "Stembureau",
+  "polling_stations": "Stembureaus",
   "election_status": "Status",
   "list": "Lijst",
   "number": "Nummer",
@@ -11,7 +13,6 @@
   "manage_elections": "Beheer verkiezingen",
   "role": "Rol",
   "progress": "Voortgang",
-  "shortcuts": "Snelkoppelingen",
   "all_together": "Alles samen",
   "server": "Server",
   "version": "Versie",
@@ -25,5 +26,7 @@
   "close_message": "Melding sluiten",
   "save": "Opslaan",
   "loading": "Laden...",
-  "account_configured": "Je account is ingesteld"
+  "account_configured": "Je account is ingesteld",
+  "typist": "Invoerder",
+  "finished_at": "Afgerond om"
 }

@@ -1,102 +1,80 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
 import { ElectionStatusWithIcon } from "./ElectionStatusWithIcon";
 
 describe("ElectionStatusWithIcon", () => {
-  test("renders the correct header coordinator status for DataEntryInProgress", () => {
-    const { getByText, getByRole } = render(ElectionStatusWithIcon("DataEntryInProgress", true, true));
+  test("renders all election statuses correctly", () => {
+    const { rerender } = render(ElectionStatusWithIcon("DataEntryInProgress", true, true));
 
-    expect(getByText("Steminvoer bezig")).toBeVisible();
-    expect(getByText("(eerste zitting)")).toBeVisible();
-    expect(getByRole("img")).toBeVisible();
-  });
+    expect(screen.getByText("Steminvoer bezig")).toBeVisible();
+    expect(screen.getByText("(eerste zitting)")).toBeVisible();
+    expect(screen.getByRole("img")).toBeVisible();
 
-  test("renders the correct header coordinator status for FinishDataEntry", () => {
-    const { getByText, getByRole } = render(ElectionStatusWithIcon("FinishDataEntry", true, true));
+    rerender(ElectionStatusWithIcon("FinishDataEntry", true, true));
 
-    expect(getByText("Steminvoer afronden")).toBeVisible();
-    expect(getByText("(eerste zitting)")).toBeVisible();
-    expect(getByRole("img")).toBeVisible();
-  });
+    expect(screen.getByText("Steminvoer afronden")).toBeVisible();
+    expect(screen.getByText("(eerste zitting)")).toBeVisible();
+    expect(screen.getByRole("img")).toBeVisible();
 
-  test("renders the correct header coordinator status for DataEntryFinished", () => {
-    const { getByText, getByRole } = render(ElectionStatusWithIcon("DataEntryFinished", true, true));
+    rerender(ElectionStatusWithIcon("DataEntryFinished", true, true));
 
-    expect(getByText("Steminvoer afgerond")).toBeVisible();
-    expect(getByText("(eerste zitting)")).toBeVisible();
-    expect(getByRole("img")).toBeVisible();
-  });
+    expect(screen.getByText("Steminvoer afgerond")).toBeVisible();
+    expect(screen.getByText("(eerste zitting)")).toBeVisible();
+    expect(screen.getByRole("img")).toBeVisible();
 
-  test("renders the correct header typist status for DataEntryInProgress", () => {
-    const { getByText, getByRole } = render(ElectionStatusWithIcon("DataEntryInProgress", true, false));
+    rerender(ElectionStatusWithIcon("DataEntryInProgress", true, false));
 
-    expect(getByText("Invoer gestart")).toBeVisible();
-    expect(getByText("(eerste zitting)")).toBeVisible();
-    expect(getByRole("img")).toBeVisible();
-  });
+    expect(screen.getByText("Invoer gestart")).toBeVisible();
+    expect(screen.getByText("(eerste zitting)")).toBeVisible();
+    expect(screen.getByRole("img")).toBeVisible();
 
-  test("renders the correct header typist status for FinishDataEntry", () => {
-    const { getByText, getByRole } = render(ElectionStatusWithIcon("FinishDataEntry", true, false));
+    rerender(ElectionStatusWithIcon("FinishDataEntry", true, false));
 
-    expect(getByText("Steminvoer afronden")).toBeVisible();
-    expect(getByText("(eerste zitting)")).toBeVisible();
-    expect(getByRole("img")).toBeVisible();
-  });
+    expect(screen.getByText("Steminvoer afronden")).toBeVisible();
+    expect(screen.getByText("(eerste zitting)")).toBeVisible();
+    expect(screen.getByRole("img")).toBeVisible();
 
-  test("renders the correct header typist status for DataEntryFinished", () => {
-    const { getByText, getByRole } = render(ElectionStatusWithIcon("DataEntryFinished", true, false));
+    rerender(ElectionStatusWithIcon("DataEntryFinished", true, false));
 
-    expect(getByText("Steminvoer voltooid")).toBeVisible();
-    expect(getByText("(eerste zitting)")).toBeVisible();
-    expect(getByRole("img")).toBeVisible();
-  });
+    expect(screen.getByText("Steminvoer voltooid")).toBeVisible();
+    expect(screen.getByText("(eerste zitting)")).toBeVisible();
+    expect(screen.getByRole("img")).toBeVisible();
 
-  test("renders the correct table coordinator status for DataEntryInProgress", () => {
-    const { getByText, queryByText, getByRole } = render(ElectionStatusWithIcon("DataEntryInProgress", false, true));
+    rerender(ElectionStatusWithIcon("DataEntryInProgress", false, true));
 
-    expect(getByText("Steminvoer bezig")).toBeVisible();
-    expect(queryByText("(eerste zitting)")).not.toBeInTheDocument();
-    expect(getByRole("img")).toBeVisible();
-  });
+    expect(screen.getByText("Steminvoer bezig")).toBeVisible();
+    expect(screen.queryByText("(eerste zitting)")).not.toBeInTheDocument();
+    expect(screen.getByRole("img")).toBeVisible();
 
-  test("renders the correct table coordinator status for FinishDataEntry", () => {
-    const { getByText, queryByText, getByRole } = render(ElectionStatusWithIcon("FinishDataEntry", false, true));
+    rerender(ElectionStatusWithIcon("FinishDataEntry", false, true));
 
-    expect(getByText("Steminvoer afronden")).toBeVisible();
-    expect(queryByText("(eerste zitting)")).not.toBeInTheDocument();
-    expect(getByRole("img")).toBeVisible();
-  });
+    expect(screen.getByText("Steminvoer afronden")).toBeVisible();
+    expect(screen.queryByText("(eerste zitting)")).not.toBeInTheDocument();
+    expect(screen.getByRole("img")).toBeVisible();
 
-  test("renders the correct table coordinator status for DataEntryFinished", () => {
-    const { getByText, queryByText, getByRole } = render(ElectionStatusWithIcon("DataEntryFinished", false, true));
+    rerender(ElectionStatusWithIcon("DataEntryFinished", false, true));
 
-    expect(getByText("Steminvoer afgerond")).toBeVisible();
-    expect(queryByText("(eerste zitting)")).not.toBeInTheDocument();
-    expect(getByRole("img")).toBeVisible();
-  });
+    expect(screen.getByText("Steminvoer afgerond")).toBeVisible();
+    expect(screen.queryByText("(eerste zitting)")).not.toBeInTheDocument();
+    expect(screen.getByRole("img")).toBeVisible();
 
-  test("renders the correct table typist status for DataEntryInProgress", () => {
-    const { getByText, queryByText, getByRole } = render(ElectionStatusWithIcon("DataEntryInProgress", false, false));
+    rerender(ElectionStatusWithIcon("DataEntryInProgress", false, false));
 
-    expect(getByText("Invoer gestart")).toBeVisible();
-    expect(queryByText("(eerste zitting)")).not.toBeInTheDocument();
-    expect(getByRole("img")).toBeVisible();
-  });
+    expect(screen.getByText("Invoer gestart")).toBeVisible();
+    expect(screen.queryByText("(eerste zitting)")).not.toBeInTheDocument();
+    expect(screen.getByRole("img")).toBeVisible();
 
-  test("renders the correct table typist status for FinishDataEntry", () => {
-    const { getByText, queryByText, getByRole } = render(ElectionStatusWithIcon("FinishDataEntry", false, false));
+    rerender(ElectionStatusWithIcon("FinishDataEntry", false, false));
 
-    expect(getByText("Steminvoer afronden")).toBeVisible();
-    expect(queryByText("(eerste zitting)")).not.toBeInTheDocument();
-    expect(getByRole("img")).toBeVisible();
-  });
+    expect(screen.getByText("Steminvoer afronden")).toBeVisible();
+    expect(screen.queryByText("(eerste zitting)")).not.toBeInTheDocument();
+    expect(screen.getByRole("img")).toBeVisible();
 
-  test("renders the correct table typist status for DataEntryFinished", () => {
-    const { getByText, queryByText, getByRole } = render(ElectionStatusWithIcon("DataEntryFinished", false, false));
+    rerender(ElectionStatusWithIcon("DataEntryFinished", false, false));
 
-    expect(getByText("Steminvoer voltooid")).toBeVisible();
-    expect(queryByText("(eerste zitting)")).not.toBeInTheDocument();
-    expect(getByRole("img")).toBeVisible();
+    expect(screen.getByText("Steminvoer voltooid")).toBeVisible();
+    expect(screen.queryByText("(eerste zitting)")).not.toBeInTheDocument();
+    expect(screen.getByRole("img")).toBeVisible();
   });
 });

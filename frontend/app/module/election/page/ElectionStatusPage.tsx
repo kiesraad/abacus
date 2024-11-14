@@ -36,15 +36,17 @@ export function ElectionStatusPage() {
           <div className="election_status">{ElectionStatusWithIcon(election.status, true, true)}</div>
         </section>
       </header>
-      {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
-        <Alert type="success">
-          <h2>{t("election_status.definitive.title")}</h2>
-          <p>{t("election_status.definitive.message")}</p>
-          <Button onClick={finishInput} size="md">
-            {t("election_status.definitive.finish_button")}
-          </Button>
-        </Alert>
-      )}
+      {election.status !== "DataEntryFinished" &&
+        statuses.length > 0 &&
+        statuses.every((s) => s.status === "definitive") && (
+          <Alert type="success">
+            <h2>{t("election_status.definitive.title")}</h2>
+            <p>{t("election_status.definitive.message")}</p>
+            <Button onClick={finishInput} size="md">
+              {t("election_status.definitive.finish_button")}
+            </Button>
+          </Alert>
+        )}
       <main>
         <ElectionStatusProgress />
         <article>Placeholder</article>

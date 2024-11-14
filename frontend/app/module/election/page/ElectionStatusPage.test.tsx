@@ -4,7 +4,7 @@ import { ElectionStatusPage } from "app/module/election";
 import { overrideOnce, render, screen } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
-import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse, getElectionMockData } from "@kiesraad/api-mocks";
 
 const renderElectionStatusPage = () =>
   render(
@@ -31,8 +31,6 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Finish input visible when finished", async () => {
-    renderElectionStatusPage();
-
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { id: 1, status: "definitive" },
@@ -40,6 +38,28 @@ describe("ElectionStatusPage", () => {
       ],
     });
 
+    renderElectionStatusPage();
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" }));
+
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
+  });
+
+  test("Finish input not visible when election is finished", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(4));
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [
+        { id: 1, status: "definitive" },
+        { id: 2, status: "definitive" },
+      ],
+    });
+
+    renderElectionStatusPage();
+
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" }));
+
+    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
   });
 });

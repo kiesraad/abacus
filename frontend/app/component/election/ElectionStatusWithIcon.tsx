@@ -1,14 +1,12 @@
 import { ElectionStatus } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { IconCheckHeart, IconCheckVerified, IconLock } from "@kiesraad/icon";
+import { IconCheckHeart, IconCheckVerified } from "@kiesraad/icon";
 import { Icon } from "@kiesraad/ui";
 
 function getIconForElectionStatus(status: ElectionStatus) {
   switch (status) {
     case "DataEntryInProgress":
       return <Icon size="md" color="accept" icon={<IconCheckHeart />} />;
-    case "FinishDataEntry":
-      return <Icon size="md" color="error" icon={<IconLock />} />;
     case "DataEntryFinished":
       return <Icon size="md" color="default" icon={<IconCheckVerified />} />;
   }
@@ -19,9 +17,6 @@ export function ElectionStatusWithIcon(status: ElectionStatus, header: boolean, 
   switch (status) {
     case "DataEntryInProgress":
       statusLabel = t(`election_status.${isAdministrator ? "coordinator" : "typist"}.data_entry_in_progress`);
-      break;
-    case "FinishDataEntry":
-      statusLabel = t("election_status.coordinator.finish_data_entry");
       break;
     case "DataEntryFinished":
       statusLabel = t(`election_status.${isAdministrator ? "coordinator" : "typist"}.data_entry_finished`);

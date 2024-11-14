@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 
-import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
@@ -68,10 +67,7 @@ export function ElectionReportPage() {
       </NavBar>
       <header>
         <section>
-          <h1>{t("election_status.first_session")}</h1>
-        </section>
-        <section>
-          <div className="election_status">{ElectionStatusWithIcon("FinishDataEntry", true, true)}</div>
+          <h1>{t("election_status.finish_data_entry_first_session")}</h1>
         </section>
       </header>
       <main>

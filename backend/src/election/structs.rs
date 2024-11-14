@@ -32,7 +32,6 @@ pub enum ElectionCategory {
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
 pub enum ElectionStatus {
     DataEntryInProgress,
-    FinishDataEntry,
     DataEntryFinished,
 }
 

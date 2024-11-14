@@ -1008,7 +1008,6 @@
         "description": "Election status (limited for now)",
         "enum": [
           "DataEntryInProgress",
-          "FinishDataEntry",
           "DataEntryFinished"
         ]
       },

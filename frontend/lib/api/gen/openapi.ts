@@ -155,7 +155,7 @@ export interface ElectionListResponse {
 /**
  * Election status (limited for now)
  */
-export type ElectionStatus = "DataEntryInProgress" | "FinishDataEntry" | "DataEntryFinished";
+export type ElectionStatus = "DataEntryInProgress" | "DataEntryFinished";
 
 /**
  * Election polling stations data entry statuses response

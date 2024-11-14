@@ -1,10 +1,10 @@
-import { beforeEach, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { ElectionStatusPage } from "app/module/election";
 import { overrideOnce, render, screen, within } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
-import { electionDetailsMockResponse, getElectionMockData } from "@kiesraad/api-mocks";
+import { getElectionMockData } from "@kiesraad/api-mocks";
 
 const renderElectionStatusPage = () =>
   render(
@@ -16,12 +16,8 @@ const renderElectionStatusPage = () =>
   );
 
 describe("ElectionStatusPage", () => {
-  beforeEach(() => {
-    overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-  });
-
-  test("Renders page correctly and does not show finish input", async () => {
-    renderElectionStatusPage();
+  test("Render status of polling station data entries correctly", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(1));
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
@@ -43,6 +39,8 @@ describe("ElectionStatusPage", () => {
         },
       ],
     });
+
+    renderElectionStatusPage();
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" }));
@@ -106,12 +104,53 @@ describe("ElectionStatusPage", () => {
     expect(notStartedRows[1]).toHaveTextContent(/Op Rolletjes/);
     expect(notStartedRows[2]).toHaveTextContent(/34/);
     expect(notStartedRows[2]).toHaveTextContent(/Testplek/);
+  });
 
+  test("Show no polling stations text instead of tables", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(3));
+
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [],
+    });
+
+    renderElectionStatusPage();
+
+    expect(await screen.findByText("Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.")).toBeVisible();
+  });
+
+  test("Finish input not visible when data entry is in progress", () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(1));
+
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [
+        {
+          id: 1,
+          status: "not_started",
+        },
+        {
+          id: 2,
+          status: "not_started",
+        },
+        {
+          id: 3,
+          status: "first_entry_unfinished",
+        },
+        {
+          id: 4,
+          status: "first_entry_in_progress",
+        },
+      ],
+    });
+
+    renderElectionStatusPage();
     // Test that the data entry finished message doesn't exist
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
   });
 
   test("Finish input visible when data entry has finished", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(1));
+
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { id: 1, status: "definitive" },
@@ -125,6 +164,7 @@ describe("ElectionStatusPage", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" }));
 
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Invoerfase afronden" })).toBeVisible();
   });
 
   test("Finish input not visible when election is finished", async () => {
@@ -142,13 +182,6 @@ describe("ElectionStatusPage", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" }));
 
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
-  });
-
-  test("No polling stations text visible instead of tables", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(3));
-
-    renderElectionStatusPage();
-
-    expect(await screen.findByText("Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.")).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
   });
 });

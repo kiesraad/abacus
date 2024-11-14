@@ -234,8 +234,6 @@ pub async fn polling_station_data_entry_finalise(
 
     let mut tx = pool.begin().await?;
 
-    // TODO: #129 support for second data entry
-
     // TODO: #129 validate whether first and second data entries are equal
 
     let (data, _, _) = polling_station_data_entries
@@ -334,31 +332,35 @@ mod tests {
     async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
         let mut request_body = example_data_entry();
 
-        async fn save(pool: SqlitePool, request_body: SaveDataEntryRequest) -> Response {
+        async fn save(
+            pool: SqlitePool,
+            request_body: SaveDataEntryRequest,
+            entry_number: u8,
+        ) -> Response {
             polling_station_data_entry_save(
                 State(PollingStationDataEntries::new(pool.clone())),
                 State(PollingStations::new(pool.clone())),
                 State(Elections::new(pool.clone())),
-                Path((1, 1)),
+                Path((1, entry_number)),
                 request_body.clone(),
             )
             .await
             .into_response()
         }
 
-        async fn finalise_first_entry(pool: SqlitePool) -> Response {
+        async fn finalise_entry(pool: SqlitePool, entry_number: u8) -> Response {
             polling_station_data_entry_finalise(
                 State(pool.clone()),
                 State(PollingStationDataEntries::new(pool.clone())),
                 State(PollingStations::new(pool.clone())),
                 State(Elections::new(pool.clone())),
-                Path((1, 1)),
+                Path((1, entry_number)),
             )
             .await
             .into_response()
         }
 
-        let response = save(pool.clone(), request_body.clone()).await;
+        let response = save(pool.clone(), request_body.clone(), 1).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check if a row was created
@@ -369,15 +371,15 @@ mod tests {
         assert_eq!(row_count.count, 1);
 
         // Check that we cannot finalise with errors
-        let response = save(pool.clone(), request_body.clone()).await;
+        let response = save(pool.clone(), request_body.clone(), 1).await;
         assert_eq!(response.status(), StatusCode::OK);
-        let response = finalise_first_entry(pool.clone()).await;
+        let response = finalise_entry(pool.clone(), 1).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
 
         // Test updating the data entry
         let poll_card_count = 98;
         request_body.data.voters_counts.poll_card_count = poll_card_count; // correct value
-        let response = save(pool.clone(), request_body.clone()).await;
+        let response = save(pool.clone(), request_body.clone(), 1).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check if there is still only one row
@@ -396,9 +398,9 @@ mod tests {
         assert_eq!(data.voters_counts.poll_card_count, poll_card_count);
 
         // Finalise data entry after correcting the error
-        let response = save(pool.clone(), request_body.clone()).await;
+        let response = save(pool.clone(), request_body.clone(), 1).await;
         assert_eq!(response.status(), StatusCode::OK);
-        let response = finalise_first_entry(pool.clone()).await;
+        let response = finalise_entry(pool.clone(), 1).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check if the first data entry was finalised:
@@ -416,11 +418,17 @@ mod tests {
             .unwrap();
         assert_eq!(row_count.count, 0);
 
-        // TODO: Save second data entry
-        // TODO: Finalise the whole thing
+        // Save and finalise second data entry
+        let response = save(pool.clone(), request_body.clone(), 2).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let response = finalise_entry(pool.clone(), 2).await;
+        assert_eq!(response.status(), StatusCode::OK);
 
         // Check that we can't save a new data entry after finalising
-        let response = save(pool.clone(), request_body.clone()).await;
+        let response = save(pool.clone(), request_body.clone(), 1).await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let response = save(pool.clone(), request_body.clone(), 2).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
     }
 

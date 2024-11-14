@@ -155,7 +155,7 @@
 
   --menu-warning: var(--color-warning-darker);
 
-  --progress-bar-default: var(--color-notify);
+  --progress-bar-default: #366fca;
   --progress-bar-errors-and-warnings: var(--color-error-darker);
   --progress-bar-unfinished: #ff692e;
   --progress-bar-in-progress: #fac515;

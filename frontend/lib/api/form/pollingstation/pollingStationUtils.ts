@@ -393,6 +393,13 @@ export function getClientState(formState: FormState, acceptWarnings: boolean, co
   return clientState;
 }
 
+export function getDataEntryProgress(formState: FormState) {
+  const sections = Object.keys(formState.sections);
+  const totalSections = sections.length;
+  const indexFurthest = sections.indexOf(formState.furthest) + 1;
+  return Math.round((indexFurthest / totalSections) * 100);
+}
+
 export function buildFormState(
   clientState: ClientState,
   validationResults: ValidationResults,

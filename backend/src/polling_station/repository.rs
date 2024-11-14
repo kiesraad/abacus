@@ -189,6 +189,10 @@ CASE
   WHEN r.polling_station_id IS NOT NULL THEN 'Definitive'
   ELSE 'NotStarted' END AS "status!: _",
 CASE
+  WHEN de.polling_station_id IS NULL THEN NULL
+  ELSE de.progress
+END AS "data_entry_progress: u8",
+CASE
   WHEN de.polling_station_id IS NOT NULL THEN de.updated_at
   WHEN r.polling_station_id IS NOT NULL THEN r.created_at
   ELSE NULL END AS "finished_at!: _"

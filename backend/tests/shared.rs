@@ -10,6 +10,7 @@ use hyper::StatusCode;
 
 pub fn example_data_entry(client_state: Option<&str>) -> SaveDataEntryRequest {
     SaveDataEntryRequest {
+        progress: 100,
         data: PollingStationResults {
             recounted: Some(false),
             voters_counts: VotersCounts {

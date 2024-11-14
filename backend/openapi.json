@@ -1058,6 +1058,7 @@
         "type": "object",
         "description": "Response structure for getting data entry of polling station results",
         "required": [
+          "progress",
           "data",
           "client_state",
           "validation_results",
@@ -1069,6 +1070,11 @@
           },
           "data": {
             "$ref": "#/components/schemas/PollingStationResults"
+          },
+          "progress": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           },
           "updated_at": {
             "type": "integer",
@@ -1300,6 +1306,12 @@
           "status"
         ],
         "properties": {
+          "data_entry_progress": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Data entry progress between 0 and 100",
+            "minimum": 0
+          },
           "finished_at": {
             "type": "integer",
             "format": "int64"
@@ -1327,6 +1339,7 @@
         "type": "object",
         "description": "Request structure for saving data entry of polling station results",
         "required": [
+          "progress",
           "data",
           "client_state"
         ],
@@ -1338,6 +1351,12 @@
           "data": {
             "$ref": "#/components/schemas/PollingStationResults",
             "description": "Data entry for a polling station"
+          },
+          "progress": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Data entry progress between 0 and 100",
+            "minimum": 0
           }
         }
       },

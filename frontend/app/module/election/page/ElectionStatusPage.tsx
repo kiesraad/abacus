@@ -59,8 +59,13 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
       </Table.Header>
     );
   }
+
   const finishedAtColumn = <Table.Column key={`${category}-time`}>{t("finished_at")}</Table.Column>;
-  const progressColumn = <Table.Column key={`${category}-progress`}>{t("progress")}</Table.Column>;
+  const progressColumn = (
+    <Table.Column key={`${category}-progress`} width="12rem">
+      {t("progress")}
+    </Table.Column>
+  );
   // TODO: Needs to be updated when second entry is implemented
   if (category === "unfinished") {
     return <CategoryHeader />;
@@ -76,6 +81,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
 function getTableRowForCategory(category: StatusCategory, polling_station: PollingStationWithStatus): ReactNode {
   // TODO: future `errors_and_warnings` status should be added to showBadge array
   const showBadge = ["first_entry_unfinished", "first_entry_in_progress"];
+
   function CategoryPollingStationRow({ children }: { children?: ReactNode[] }) {
     return (
       <Table.Row>
@@ -90,6 +96,7 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
       </Table.Row>
     );
   }
+
   const finishedAtCell = (
     <Table.Cell key={`${polling_station.id}-time`} fontSizeClass="fs-sm">
       {polling_station.finished_at
@@ -100,8 +107,15 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
         : ""}
     </Table.Cell>
   );
-  // TODO: Add polling station progress bar in #463
-  const progressCell = <Table.Cell key={`${polling_station.id}-progress`} fontSizeClass="fs-sm"></Table.Cell>;
+  const progressCell = (
+    <Table.Cell key={`${polling_station.id}-progress`} fontSizeClass="fs-sm">
+      <ProgressBar
+        id={`${polling_station.id}-progressbar`}
+        data={{ percentage: polling_station.data_entry_progress ?? 0, class: "default" }}
+        showPercentage
+      />
+    </Table.Cell>
+  );
   // TODO: Needs to be updated when second entry is implemented and when user accounts are implemented
   if (category === "unfinished") {
     return <CategoryPollingStationRow key={polling_station.id} />;

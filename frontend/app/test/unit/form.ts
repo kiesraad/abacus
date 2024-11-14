@@ -2,6 +2,7 @@ import { FormState, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, ValidationResu
 import { electionMockData } from "@kiesraad/api-mocks";
 
 export const emptyDataEntryRequest: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = {
+  progress: 0,
   data: {
     voters_counts: {
       poll_card_count: 0,

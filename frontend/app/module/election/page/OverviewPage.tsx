@@ -68,9 +68,11 @@ export function OverviewPage() {
             <Table.Body>
               {electionList.map((election) => (
                 <Table.LinkRow key={election.id} to={electionLink(election)}>
-                  <Table.Cell>{election.name}</Table.Cell>
-                  {isAdministrator && <Table.Cell></Table.Cell>}
-                  <Table.Cell>{ElectionStatusWithIcon(election.status, false, isAdministrator)}</Table.Cell>
+                  <Table.Cell fontSizeClass="fs-body">{election.name}</Table.Cell>
+                  {isAdministrator && <Table.Cell fontSizeClass="fs-md"></Table.Cell>}
+                  <Table.Cell fontSizeClass="fs-md">
+                    {ElectionStatusWithIcon(election.status, false, isAdministrator)}
+                  </Table.Cell>
                 </Table.LinkRow>
               ))}
             </Table.Body>

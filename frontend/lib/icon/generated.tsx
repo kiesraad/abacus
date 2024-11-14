@@ -27,7 +27,14 @@ export const IconArrowLeft = (props: React.SVGAttributes<SVGElement>) => (
 );
 
 export const IconArrowNarrowDown = (props: React.SVGAttributes<SVGElement>) => (
-  <svg data-icon="IconArrowNarrowDown" {...props} viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img">
+  <svg
+    data-icon="IconArrowNarrowDown"
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    viewBox="0 0 16 16"
+    role="img"
+  >
     <path d="M7.902 2.187 C 7.759 2.219,7.643 2.304,7.573 2.428 L 7.507 2.547 7.500 7.333 L 7.493 12.119 5.900 10.529 C 5.024 9.654,4.266 8.918,4.215 8.893 C 3.995 8.782,3.696 8.874,3.577 9.089 C 3.501 9.228,3.493 9.417,3.560 9.549 C 3.620 9.669,7.607 13.664,7.754 13.752 C 7.910 13.844,8.090 13.844,8.246 13.752 C 8.393 13.664,12.380 9.669,12.440 9.549 C 12.647 9.137,12.183 8.688,11.772 8.902 C 11.709 8.934,11.026 9.598,10.093 10.532 L 8.520 12.107 8.507 7.327 L 8.493 2.547 8.423 2.426 C 8.315 2.244,8.096 2.143,7.902 2.187" />
   </svg>
 );
@@ -46,7 +53,14 @@ export const IconArrowNarrowRight = (props: React.SVGAttributes<SVGElement>) => 
 );
 
 export const IconArrowNarrowUp = (props: React.SVGAttributes<SVGElement>) => (
-  <svg data-icon="IconArrowNarrowUp" {...props} viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img">
+  <svg
+    data-icon="IconArrowNarrowUp"
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    viewBox="0 0 16 16"
+    role="img"
+  >
     <path d="M7.907 2.186 C 7.863 2.196,7.791 2.224,7.747 2.247 C 7.631 2.309,3.614 6.342,3.559 6.451 C 3.358 6.855,3.813 7.309,4.215 7.107 C 4.266 7.082,5.024 6.346,5.900 5.471 L 7.493 3.881 7.500 8.667 L 7.507 13.453 7.577 13.574 C 7.771 13.903,8.237 13.900,8.427 13.569 L 8.493 13.453 8.500 8.667 L 8.507 3.881 10.100 5.471 C 10.976 6.346,11.734 7.082,11.785 7.107 C 12.188 7.309,12.642 6.854,12.440 6.451 C 12.381 6.332,8.393 2.336,8.253 2.255 C 8.128 2.182,8.018 2.160,7.907 2.186" />
   </svg>
 );
@@ -91,7 +105,16 @@ export const IconCheckVerified = (props: React.SVGAttributes<SVGElement>) => (
 );
 
 export const IconCheckmark = (props: React.SVGAttributes<SVGElement>) => (
-  <svg data-icon="IconCheckmark" {...props} x="0px" y="0px" viewBox="0 0 24 24" role="img">
+  <svg
+    data-icon="IconCheckmark"
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    x="0px"
+    y="0px"
+    viewBox="0 0 24 24"
+    role="img"
+  >
     <path
       d="M9,18c-0.3,0-0.5-0.1-0.7-0.3l-5-5c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0L9,15.6L19.3,5.3c0.4-0.4,1-0.4,1.4,0s0.4,1,0,1.4
 	l-11,11C9.5,17.9,9.3,18,9,18z"
@@ -145,7 +168,16 @@ export const IconCornerDownLeft = (props: React.SVGAttributes<SVGElement>) => (
 );
 
 export const IconCross = (props: React.SVGAttributes<SVGElement>) => (
-  <svg data-icon="IconCross" {...props} x="0px" y="0px" viewBox="0 0 20 20" role="img">
+  <svg
+    data-icon="IconCross"
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    x="0px"
+    y="0px"
+    viewBox="0 0 20 20"
+    role="img"
+  >
     <g>
       <path d="M15,5L5,15 M5,5l10,10" />
       <path
@@ -158,7 +190,7 @@ export const IconCross = (props: React.SVGAttributes<SVGElement>) => (
 );
 
 export const IconDot = (props: React.SVGAttributes<SVGElement>) => (
-  <svg data-icon="IconDot" {...props} viewBox="0 0 24 24" role="img" xmlns="http://www.w3.org/2000/svg">
+  <svg data-icon="IconDot" {...props} xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" role="img">
     <path d="M11.9999 18.6667C15.6818 18.6667 18.6666 15.6819 18.6666 12C18.6666 8.31811 15.6818 5.33334 11.9999 5.33334C8.31802 5.33334 5.33325 8.31811 5.33325 12C5.33325 15.6819 8.31802 18.6667 11.9999 18.6667Z" />
   </svg>
 );
@@ -183,7 +215,7 @@ export const IconHourglass = (props: React.SVGAttributes<SVGElement>) => (
 );
 
 export const IconInfo = (props: React.SVGAttributes<SVGElement>) => (
-  <svg data-icon="IconInfo" {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img">
+  <svg data-icon="IconInfo" {...props} xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" role="img">
     <path d="M12,23c-6.1,0-11-4.9-11-11S5.9,1,12,1s11,4.9,11,11-4.9,11-11,11ZM12,3C7,3,3,7,3,12s4,9,9,9,9-4,9-9S17,3,12,3ZM12,17c-.6,0-1-.4-1-1v-4c0-.6.4-1,1-1s1,.4,1,1v4c0,.6-.4,1-1,1ZM12,9c-.6,0-1-.4-1-1s.4-1,1-1h0c.6,0,1,.4,1,1s-.4,1-1,1Z" />
   </svg>
 );
@@ -195,19 +227,39 @@ export const IconLock = (props: React.SVGAttributes<SVGElement>) => (
 );
 
 export const IconMinus = (props: React.SVGAttributes<SVGElement>) => (
-  <svg role="img" data-icon="IconMinus" {...props} viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+  <svg data-icon="IconMinus" {...props} xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 14 14" role="img">
     <path d="M2.730 6.023 C 2.454 6.069,2.147 6.301,2.023 6.559 C 1.898 6.817,1.891 7.154,2.005 7.408 C 2.071 7.557,2.224 7.732,2.378 7.835 C 2.650 8.017,2.334 8.006,7.082 7.998 L 11.305 7.992 11.437 7.938 C 11.696 7.834,11.920 7.609,12.019 7.356 C 12.092 7.167,12.093 6.834,12.020 6.646 C 11.951 6.470,11.831 6.318,11.662 6.193 C 11.387 5.991,11.817 6.009,7.070 6.005 C 4.629 6.003,2.804 6.011,2.730 6.023 " />
   </svg>
 );
 
 export const IconPencil = (props: React.SVGAttributes<SVGElement>) => (
-  <svg data-icon="IconPencil" {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img">
+  <svg
+    data-icon="IconPencil"
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    viewBox="0 0 24 24"
+    role="img"
+  >
     <path d="M5.84,19.65c-.26,0-.52-.1-.71-.29-.21-.21-.32-.52-.29-.82l.25-2.26c.03-.31.06-.51.13-.74.07-.2.16-.39.27-.57.13-.2.28-.35.5-.56l6.79-6.79s0,0,.01-.01c0,0,0,0,.01-.01l1.99-1.99c1.12-1.12,2.96-1.13,4.08,0s1.12,2.96,0,4.08l-8.8,8.8c-.22.22-.36.36-.56.5-.18.12-.37.21-.57.27-.22.07-.42.09-.71.13l-2.28.25s-.07,0-.11,0ZM13.51,9.73l-6.1,6.1c-.12.12-.19.18-.24.25-.06.16-.06.25-.08.42l-.11,1.02,1.01-.11c.18-.02.27-.02.34-.04.15-.08.21-.15.33-.28l6.1-6.1-1.25-1.25ZM14.92,8.31l1.25,1.25,1.29-1.29c.34-.35.34-.91,0-1.25s-.91-.35-1.25,0l-1.29,1.29Z" />
   </svg>
 );
 
+export const IconPlus = (props: React.SVGAttributes<SVGElement>) => (
+  <svg data-icon="IconPlus" {...props} xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 20 20" role="img">
+    <path d="M9.768 3.37a.905.905 0 0 0-.564.58c-.026.092-.037.915-.037 2.674v2.541l-2.609.009c-2.914.01-2.715-.006-2.969.248a.716.716 0 0 0-.237.578c0 .252.062.403.237.578.254.254.055.238 2.969.248l2.607.009.009 2.607c.01 2.914-.006 2.715.248 2.969a.716.716 0 0 0 .578.237.716.716 0 0 0 .578-.237c.254-.254.238-.055.248-2.969l.009-2.607 2.607-.009c2.914-.01 2.715.006 2.969-.248a.716.716 0 0 0 .237-.578.716.716 0 0 0-.237-.578c-.254-.254-.055-.238-2.969-.248l-2.607-.009-.009-2.607c-.009-2.443-.013-2.616-.07-2.73a1.046 1.046 0 0 0-.412-.412.997.997 0 0 0-.576-.046" />
+  </svg>
+);
+
 export const IconThumbsUp = (props: React.SVGAttributes<SVGElement>) => (
-  <svg data-icon="IconThumbsUp" {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img">
+  <svg
+    data-icon="IconThumbsUp"
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    viewBox="0 0 24 24"
+    role="img"
+  >
     <path d="M17.4,23H4c-1.7,0-3-1.3-3-3v-7c0-1.7,1.3-3,3-3h2.4l3.5-7.9c.3-.7.9-1.1,1.7-1.1,1.9,0,3.5,1.6,3.5,3.5v3.5h3.5c1.2,0,2.3.5,3,1.4s1.1,2.1.9,3.2l-1.1,7c-.3,2-2,3.4-4,3.4ZM8,21h9.4c1,0,1.8-.7,2-1.7l1.1-7c0-.6,0-1.2-.5-1.6-.4-.4-.9-.7-1.5-.7h-3.5c-1.1,0-2-.9-2-2v-3.5c0-.8-.6-1.4-1.4-1.5l-3.5,7.8c0,.1-.1.2-.2.3v9.9ZM4,12c-.6,0-1,.4-1,1v7c0,.6.4,1,1,1h2v-9h-2Z" />
   </svg>
 );
@@ -219,7 +271,16 @@ export const IconUser = (props: React.SVGAttributes<SVGElement>) => (
 );
 
 export const IconWarning = (props: React.SVGAttributes<SVGElement>) => (
-  <svg data-icon="IconWarning" {...props} x="0px" y="0px" viewBox="0 0 24 24" role="img">
+  <svg
+    data-icon="IconWarning"
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    x="0px"
+    y="0px"
+    viewBox="0 0 24 24"
+    role="img"
+  >
     <path
       d="M20.2,21.5H3.8c-1.1,0-1.7,0-2.2-0.4c-0.5-0.3-0.8-0.8-0.8-1.4c-0.1-0.6,0.2-1.2,0.8-2.1L9.8,3.4l0,0l0.9,0.5L9.8,3.4
 	c0.5-0.9,0.8-1.5,1.4-1.7c0.5-0.2,1.1-0.2,1.6,0c0.6,0.3,0.9,0.8,1.4,1.7l8.2,14.2c0.5,0.9,0.8,1.5,0.8,2.1

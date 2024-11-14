@@ -27,7 +27,7 @@
 .badge {
   text-align: center;
   font-family: var(--font-text);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-style: normal;
   font-weight: bold;
   line-height: 1.25rem;

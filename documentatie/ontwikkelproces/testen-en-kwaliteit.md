@@ -74,7 +74,7 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
   - Voor CI (continous integration, zie hieronder) moet dit strict gezien minder dan 1 dag zijn. Dat is in de praktijk erg lastig, vandaar de 1-3 dagen.
 - één ticket/taak mag in meerdere PR's gebouwd worden.
 - Pair/ensemble programming telt als review.
-- Vraag vroeg om feedback wanneer nodig: [editing over proof-reading](https://buttondown.email/hillelwayne/archive/code-review-vs-code-proofreading/) (Hillel Wayne)
+- Vraag vroeg om feedback: [editing over proof-reading](https://buttondown.email/hillelwayne/archive/code-review-vs-code-proofreading/) (Hillel Wayne)
 - Zoveel mogelijk afvangen d.m.v. linting en static code analysis, zodat menselijke code review kan focussen op architectuur e.d.
 
 #### Handmatige tests en automatische tests

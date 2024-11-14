@@ -36,7 +36,7 @@ Er zijn meerdere manieren om deze stappen te zetten.
     - Een [draft pull request] maken is mogelijk ook als je nog niet klaar bent, maar wel feedback wilt.
       Geef in dat geval duidelijk aan (bijv. in de description of een comment) waarop je feedback wilt
       en wat er nog moet gebeuren om de pull request af te maken.
-    - Voor richtlijnen over schrijven en reviewen van PRs, zie ["Pull Requests (PRs)"].
+    - Voor richtlijnen over het schrijven en reviewen van PRs, zie ["Pull Requests (PRs)"].
 
 - Merge de pull request:
     - Zorg dat alle opmerkingen (conversations) opgelost zijn.

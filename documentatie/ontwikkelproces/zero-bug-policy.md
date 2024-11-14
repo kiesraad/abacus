@@ -6,9 +6,9 @@ Een bug is iets wat de waarde van onze applicatie in gevaar brengt. Dit is dus e
 
 We hanteren een *zero bug policy* om te vermijden dat we een lijst van toekomstige verbeteringen bij gaan houden voor werk dat eigenlijk al af is.
 
-Als we dat heel streng toepassen op elk pull request (PR), dan blijven onze PRs openstaan tot alle puntjes op alle i's staan. We optimaliseren dan voor kwaliteit in de PR-branch te koste van meer risico bij code-integratie (mergen naar main). De truc is dus om de balans te bewaren tussen PRs binnen 1-3 dagen mergen en geen bochten afsnijden qua kwaliteit.
+Als we dat heel streng toepassen op elk pull request (PR), dan blijven onze PRs openstaan tot alle puntjes op alle i's staan. We optimaliseren dan voor kwaliteit in de PR-branch ten koste van meer risico bij code-integratie (mergen naar main). De truc is dus om de balans te bewaren tussen PRs binnen 1-3 dagen mergen en geen bochten afsnijden qua kwaliteit.
 
-Daarom passen we zero bug policy trapsgewijs toe over epics, issues en PRs heen:
+Daarom passen we de zero bug policy trapsgewijs toe over epics, issues en PRs heen:
 
 - We leveren op per epic, dus hier is de zero bug policy volledig van toepassing. Als een epic af is, dan is het ok dat we die voor altijd zo laten, rekening houdend met de scope van de epic en onze iteratieve/incrementele manier van werken.
 - Een epic wordt gesplitst in meerdere issues, een issue kan gebouwd worden over meerdere PRs.

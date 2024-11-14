@@ -59,16 +59,15 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
       </Table.Header>
     );
   }
-  const typistColumn = <Table.Column key={`${category}-typist`}>{t("typist")}</Table.Column>;
   const finishedAtColumn = <Table.Column key={`${category}-time`}>{t("finished_at")}</Table.Column>;
   const progressColumn = <Table.Column key={`${category}-progress`}>{t("progress")}</Table.Column>;
   // TODO: Needs to be updated when second entry is implemented
   if (category === "unfinished") {
-    return <CategoryHeader>{[typistColumn]}</CategoryHeader>;
+    return <CategoryHeader />;
   } else if (category === "in_progress") {
-    return <CategoryHeader>{[typistColumn, progressColumn]}</CategoryHeader>;
+    return <CategoryHeader>{[progressColumn]}</CategoryHeader>;
   } else if (category === "definitive") {
-    return <CategoryHeader>{[typistColumn, finishedAtColumn]}</CategoryHeader>;
+    return <CategoryHeader>{[finishedAtColumn]}</CategoryHeader>;
   } else {
     return <CategoryHeader></CategoryHeader>;
   }
@@ -91,8 +90,6 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
       </Table.Row>
     );
   }
-  // TODO: Add typist information once user accounts are implemented
-  const typistCell = <Table.Cell key={`${polling_station.id}-typist`} fontSizeClass="fs-sm"></Table.Cell>;
   const finishedAtCell = (
     <Table.Cell key={`${polling_station.id}-time`} fontSizeClass="fs-sm">
       {polling_station.finished_at
@@ -105,15 +102,13 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
   );
   // TODO: Add polling station progress bar in #463
   const progressCell = <Table.Cell key={`${polling_station.id}-progress`} fontSizeClass="fs-sm"></Table.Cell>;
-  // TODO: Needs to be updated when second entry is implemented
+  // TODO: Needs to be updated when second entry is implemented and when user accounts are implemented
   if (category === "unfinished") {
-    return <CategoryPollingStationRow key={polling_station.id}>{[typistCell]}</CategoryPollingStationRow>;
+    return <CategoryPollingStationRow key={polling_station.id} />;
   } else if (category === "in_progress") {
-    return <CategoryPollingStationRow key={polling_station.id}>{[typistCell, progressCell]}</CategoryPollingStationRow>;
+    return <CategoryPollingStationRow key={polling_station.id}>{[progressCell]}</CategoryPollingStationRow>;
   } else if (category === "definitive") {
-    return (
-      <CategoryPollingStationRow key={polling_station.id}>{[typistCell, finishedAtCell]}</CategoryPollingStationRow>
-    );
+    return <CategoryPollingStationRow key={polling_station.id}>{[finishedAtCell]}</CategoryPollingStationRow>;
   } else {
     return <CategoryPollingStationRow key={polling_station.id}></CategoryPollingStationRow>;
   }
@@ -201,8 +196,8 @@ export function ElectionStatusPage() {
         </div>
         <div className={cls.statusSection}>
           <Progress>
-            <div id="shortcuts" className="column">
-              <h3 className="mb-0 h2">{t("shortcuts")}</h3>
+            <div id="polling-stations-per-status" className="column">
+              <h3 className="mb-0 h2">{t("election_status.polling_stations_per_status")}</h3>
               {statusCategories.map((cat) => {
                 return (
                   <span

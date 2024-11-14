@@ -48,8 +48,8 @@ describe("ElectionStatusPage", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" }));
     expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" }));
 
-    const items = [...screen.getByTestId("shortcuts").children];
-    expect(items[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Snelkoppelingen" }));
+    const items = [...screen.getByTestId("polling-stations-per-status").children];
+    expect(items[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Stembureaus per status" }));
     expect(items[1]).toHaveTextContent("Niet afgeronde invoer (1)");
     expect(items[2]).toHaveTextContent("Invoer bezig (1)");
     expect(items[3]).toHaveTextContent("Eerste invoer klaar (0)");
@@ -82,7 +82,6 @@ describe("ElectionStatusPage", () => {
     expect(unfinishedRows.length).toBe(2);
     expect(unfinishedRows[0]).toHaveTextContent(/Nummer/);
     expect(unfinishedRows[0]).toHaveTextContent(/Stembureau/);
-    expect(unfinishedRows[0]).toHaveTextContent(/Invoerder/);
     expect(unfinishedRows[1]).toHaveTextContent(/35/);
     expect(unfinishedRows[1]).toHaveTextContent(/Testschool/);
     expect(unfinishedRows[1]).toHaveTextContent(/1e invoer/);
@@ -93,7 +92,6 @@ describe("ElectionStatusPage", () => {
     expect(inProgressRows.length).toBe(2);
     expect(inProgressRows[0]).toHaveTextContent(/Nummer/);
     expect(inProgressRows[0]).toHaveTextContent(/Stembureau/);
-    expect(inProgressRows[0]).toHaveTextContent(/Invoerder/);
     expect(inProgressRows[1]).toHaveTextContent(/36/);
     expect(inProgressRows[1]).toHaveTextContent(/Testbuurthuis/);
     expect(inProgressRows[1]).toHaveTextContent(/1e invoer/);

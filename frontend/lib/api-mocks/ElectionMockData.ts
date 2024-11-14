@@ -372,6 +372,16 @@ export const electionListMockResponse: ElectionListResponse = {
     },
     {
       id: 4,
+      name: "Gemeenteraadsverkiezingen ingevuld",
+      location: "Heemdamseburg",
+      number_of_voters: 100,
+      category: "Municipal",
+      election_date: "2020-01-30",
+      nomination_date: "2020-01-01",
+      status: "DataEntryInProgress",
+    },
+    {
+      id: 5,
       name: "Gemeenteraadsverkiezingen afgerond",
       location: "Heemdamseburg",
       number_of_voters: 100,

@@ -47,7 +47,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Finish input not visible when election is finished", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(4));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(5));
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { id: 1, status: "definitive" },

@@ -404,11 +404,11 @@ mod tests {
         // Check if the first data entry was finalised:
         // and that a second entry was created
         // TODO: We should test the "finalised_at" field and entry numbers
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+        let row = query!("SELECT * FROM polling_station_data_entries")
             .fetch_one(&pool)
             .await
             .unwrap();
-        assert_eq!(row_count.count, 2);
+        assert!(row.finalised_at.is_some());
         // ...and is _not_ added to polling_station_results
         let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")
             .fetch_one(&pool)

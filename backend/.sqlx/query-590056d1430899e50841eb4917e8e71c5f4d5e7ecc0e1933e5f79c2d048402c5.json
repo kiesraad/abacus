@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO polling_station_data_entries\n              (polling_station_id, entry_number, data, client_state)\n            VALUES (?, ?, ?, ?)\n            ON CONFLICT(polling_station_id, entry_number) DO\n            UPDATE SET\n              data = excluded.data,\n              client_state = excluded.client_state,\n              updated_at = unixepoch()\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "590056d1430899e50841eb4917e8e71c5f4d5e7ecc0e1933e5f79c2d048402c5"
+}

@@ -66,14 +66,14 @@ async fn test_election_details_status(pool: SqlitePool) {
     let status = response.status();
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
-    // Ensure the response is what we expect
+    // Ensure the statuses are "NotStarted"
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
     assert_eq!(body.statuses[0].status, PollingStationStatus::NotStarted);
     assert_eq!(body.statuses[1].status, PollingStationStatus::NotStarted);
 
-    // Finalise one and set the other in progress
+    // Finalise the first entry of one and set the other in progress
     shared::create_and_finalise_data_first_entry(&addr, 1).await;
     shared::create_and_save_data_entry(&addr, 2, Some(r#"{"continue": true}"#)).await;
 
@@ -87,9 +87,10 @@ async fn test_election_details_status(pool: SqlitePool) {
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
+    dbg!(&body.statuses);
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
-        PollingStationStatus::Definitive
+        PollingStationStatus::SecondEntry
     );
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,

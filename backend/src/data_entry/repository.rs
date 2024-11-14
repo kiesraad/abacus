@@ -96,16 +96,6 @@ impl PollingStationDataEntries {
         .execute(&mut **tx)
         .await?;
 
-        query!(
-            r#"
-            INSERT INTO polling_station_data_entries
-              (polling_station_id, entry_number, data, client_state)
-            VALUES (?, 2, NULL, NULL)
-            "#,
-            id
-        )
-        .execute(&mut **tx)
-        .await?;
         Ok(())
     }
 

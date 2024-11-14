@@ -182,25 +182,50 @@ impl PollingStations {
         query_as!(
             PollingStationStatusEntry,
             r#"
-SELECT p.id AS "id: u32",
-CASE
-  WHEN de.polling_station_id IS NOT NULL THEN 
-  (CASE WHEN json_extract(de.client_state, '$.continue') = true THEN 'FirstEntryInProgress' ELSE 'FirstEntryUnfinished' END)
-  WHEN r.polling_station_id IS NOT NULL THEN 'Definitive'
-  ELSE 'NotStarted' END AS "status!: _",
-CASE
-  WHEN de.polling_station_id IS NOT NULL THEN de.updated_at
-  WHEN r.polling_station_id IS NOT NULL THEN r.created_at
-  ELSE NULL END AS "finished_at!: _"
+SELECT
+  p.id AS "id: u32",
+
+  CASE
+    WHEN de.polling_station_id IS NOT NULL THEN
+        (CASE
+           WHEN de.entry_number = 1 THEN
+             (CASE WHEN de.finalised_at IS NOT NULL THEN "SecondEntry" ELSE
+               (CASE WHEN json_extract(de.client_state, '$.continue') = true
+                 THEN 'FirstEntryInProgress'
+                 ELSE 'FirstEntryUnfinished' END) END)
+             
+
+           WHEN de.entry_number = 2 THEN
+             (CASE WHEN json_extract(de.client_state, '$.continue') = true
+                THEN 'SecondEntryInProgress'
+                ELSE 'SecondEntryUnfinished' END)
+        END)
+      
+    WHEN r.polling_station_id IS NOT NULL THEN
+      'Definitive'
+    ELSE 'NotStarted'
+    END AS "status!: _",
+
+  CASE
+    WHEN de.polling_station_id IS NOT NULL THEN de.updated_at
+    WHEN r.polling_station_id IS NOT NULL THEN r.created_at
+    ELSE NULL
+    END AS "finished_at!: _"
+
 FROM polling_stations AS p
-LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
 LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
+LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
 WHERE election_id = $1
+  AND de.polling_station_id IS NULL OR de.entry_number IN
+    (SELECT MAX(entry_number)
+     FROM polling_station_data_entries
+     WHERE polling_station_id = p.id
+     GROUP BY polling_station_id);
 "#,
             election_id
         )
-            .fetch_all(&self.0)
-            .await
+        .fetch_all(&self.0)
+        .await
     }
 }
 

@@ -84,7 +84,7 @@
       }
     }
     :global(.error) & {
-      border: solid var(--color-error-focus);
+      border: solid var(--color-error-darker);
       background-image: url("../../icon/svg/error.svg");
       background-size: 1.5rem 1.5rem;
       background-repeat: no-repeat;

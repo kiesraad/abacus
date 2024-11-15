@@ -15,7 +15,7 @@
   &:global(.has-warning) {
     aside {
       svg {
-        fill: var(--color-warning-darker);
+        fill: var(--color-warning);
       }
     }
   }

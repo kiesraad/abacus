@@ -6,7 +6,7 @@ import { Footer } from "app/component/footer/Footer";
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 import { NavBar } from "app/component/navbar/NavBar";
 
-import { useElection, useElectionStatus } from "@kiesraad/api";
+import { DEFAULT_CANCEL_REASON, useElection, useElectionStatus } from "@kiesraad/api";
 import { Alert, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
 export function DataEntryHomePage() {
@@ -22,7 +22,7 @@ export function DataEntryHomePage() {
     void refetch(abortController);
 
     return () => {
-      abortController.abort("Component unmounted");
+      abortController.abort(DEFAULT_CANCEL_REASON);
     };
   }, [refetch]);
 

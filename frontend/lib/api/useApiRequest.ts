@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { ApiResult } from "./api.types";
+import { DEFAULT_CANCEL_REASON } from "./ApiClient";
 import { ApiError, NetworkError, NotFoundError } from "./ApiError";
 import { useApi } from "./useApi";
 
@@ -63,7 +64,7 @@ export function useApiRequest<T>(path: string): UseApiRequestReturn<T> {
     void fetchData(controller);
 
     return () => {
-      controller.abort("Component unmounted");
+      controller.abort(DEFAULT_CANCEL_REASON);
     };
   }, [fetchData]);
 

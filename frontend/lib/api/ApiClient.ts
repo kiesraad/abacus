@@ -9,6 +9,8 @@ const MIME_JSON = "application/json";
 const HEADER_ACCEPT = "Accept";
 const HEADER_CONTENT_TYPE = "Content-Type";
 
+export const DEFAULT_CANCEL_REASON = "Component unmounted";
+
 function isErrorResponse(object: unknown): object is ErrorResponse {
   return (
     typeof object === "object" && object !== null && "error" in object && "fatal" in object && "reference" in object
@@ -144,7 +146,7 @@ export class ApiClient {
 
       return await this.handleEmptyBody(response);
     } catch (e: unknown) {
-      if (e === "Component unmounted") {
+      if (e === DEFAULT_CANCEL_REASON) {
         // ignore cancel by unmounted component
         return new NetworkError(e);
       }

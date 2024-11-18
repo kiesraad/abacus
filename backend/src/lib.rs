@@ -8,6 +8,7 @@ use std::error::Error;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
+pub mod apportionment;
 pub mod data_entry;
 pub mod election;
 mod error;

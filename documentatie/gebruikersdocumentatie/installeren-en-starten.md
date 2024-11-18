@@ -27,16 +27,10 @@ Deze methode lijkt het meest op het draaien van een productiebuild en is ook het
 De download bevat een ZIP-bestand met de binary. Deze binary bevat ook alle frontend-assets. Pak deze binary uit en start hem als volgt:
 
 ```sh
-./path/to/binary/api
-```
-
-Je kunt ook eerst de database resetten en laden met fixtures. Gebruik hiervoor de volgende argumenten:
-
-```sh
 ./path/to/binary/api --reset-database --seed-data
 ```
 
-De kortere versie hiervan is:
+De argumenten zorgen ervoor dat de database wordt gereset en wordt geladen met fixtures. De kortere versie van deze opdracht is:
 
 ```sh
 ./path/to/binary/api -rs
@@ -47,6 +41,7 @@ Zie ook de help:
 ```sh
 ./path/to/binary/api --help
 ```
+Het is natuurlijk ook mogelijk om Abacus zonder argumenten te starten, maar als je dat doet bevat de app geen data en zie je op de pagina het bericht *'Verkiezingen niet gevonden'*.
 
 Wanneer de API draait, klik je op de link van de API-server (<http://0.0.0.0:8080>) om naar de browser te gaan en Abacus te gebruiken.
 

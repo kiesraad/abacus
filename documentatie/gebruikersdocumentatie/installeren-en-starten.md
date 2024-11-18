@@ -5,7 +5,11 @@ Hieronder vind je instructies voor de verschillende methodes.
 
 ## Linux en macOS
 
-De onderstaande methodes werken waarschijnlijk op alle gangbare (recente) Linux-distributies en macOS, en zijn getest op Ubuntu (22.04 en hoger) en Debian (12/bookworm).
+De onderstaande methodes werken waarschijnlijk op alle gangbare (recente) Linux-distributies en macOS, en zijn getest op Ubuntu (22.04 en hoger) en Debian (12/bookworm). 
+
+## Windows
+
+Methode 3 en 4 werken ook in Windows. Op dit moment kun je nog geen installatiebestand voor Windows downloaden, maar we zijn hiermee bezig. Zodra deze optie er is vind je hier meer info.
 
 ### Methode 1: build artifact downloaden en starten
 
@@ -85,7 +89,3 @@ Deze optie is bedoeld voor development, je start de backend in watch mode. Asset
 ```sh
 docker compose up
 ```
-
-## Windows 10/11
-
-Op dit moment kun je nog geen installatiebestand voor Windows downloaden, maar we zijn hiermee bezig. Zodra deze optie er is vind je hier meer info.

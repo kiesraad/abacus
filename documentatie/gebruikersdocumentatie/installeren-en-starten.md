@@ -15,7 +15,7 @@ Deze methode lijkt het meest op het draaien van een productiebuild en is ook het
 2. Klik aan de linkerkant op [Build, lint & test](https://github.com/kiesraad/abacus/actions/workflows/build-lint-test.yml)
 3. Klik aan de rechterkant op *Branch* om op een branch te filteren
 4. Selecteer de meest recente action
-5. Download het bestand *backend-build*
+5. Download het bestand *backend-build*. Let op: de download is alleen zichtbaar als je bent ingelogd in GitHub.
 
 ![instructions1](https://github.com/user-attachments/assets/9efb524e-9256-43eb-9d98-141e049c8ba9)
 ![instructions2](https://github.com/user-attachments/assets/b8389384-98fa-42c1-905f-81db7e301942)

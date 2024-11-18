@@ -20,7 +20,7 @@ Deze methode lijkt het meest op het draaien van een productiebuild en is ook het
 ![instructions1](https://github.com/user-attachments/assets/9efb524e-9256-43eb-9d98-141e049c8ba9)
 ![instructions2](https://github.com/user-attachments/assets/b8389384-98fa-42c1-905f-81db7e301942)
 
-De download bevat een ZIP-bestand met de binary. Deze binary bevat ook al alle frontend-assets. Pak deze binary uit en start hem als volgt:
+De download bevat een ZIP-bestand met de binary. Deze binary bevat ook alle frontend-assets. Pak deze binary uit en start hem als volgt:
 
 ```sh
 ./path/to/binary/api

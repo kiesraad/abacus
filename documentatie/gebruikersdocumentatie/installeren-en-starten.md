@@ -17,8 +17,8 @@ Deze methode lijkt het meest op het draaien van een productiebuild en is ook het
 4. Selecteer de meest recente action
 5. Download het bestand *backend-build*. Let op: de download is alleen zichtbaar als je bent ingelogd in GitHub.
 
-![instructions1](https://github.com/user-attachments/assets/9efb524e-9256-43eb-9d98-141e049c8ba9)
-![instructions2](https://github.com/user-attachments/assets/b8389384-98fa-42c1-905f-81db7e301942)
+![instructions1](/documentatie/gebruikersdocumentatie/img/build-artifact-1.png)
+![instructions2](/documentatie/gebruikersdocumentatie/img/build-artifact-2.png)
 
 De download bevat een ZIP-bestand met de binary. Deze binary bevat ook alle frontend-assets. Pak deze binary uit en start hem als volgt:
 

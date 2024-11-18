@@ -76,7 +76,7 @@ cargo install sqlx-cli
 
 ### Methode 3: handmatig starten
 
-Je kunt natuurlijk altijd handmatig `cargo run` en `npm run dev` in twee verschillende terminals starten. Hiervoor gelden dezelfde vereisten als bij methode 2.
+Je kunt natuurlijk altijd handmatig `cargo run` vanuit de backend-map en `npm run dev` vanuit de frontend-map in twee verschillende terminals starten. Hiervoor gelden dezelfde vereisten als bij methode 2.
 
 ### Methode 4: Docker compose
 

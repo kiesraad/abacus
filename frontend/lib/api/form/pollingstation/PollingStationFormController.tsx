@@ -261,7 +261,7 @@ export function PollingStationFormController({
     acceptWarnings = false,
     aborting = false,
     continueToNextSection = true,
-  }: SubmitCurrentFormOptions = {}): Promise<ApiResult<SaveDataEntryResponse>> => {
+  }: SubmitCurrentFormOptions = {}): Promise<ApiResult<SaveDataEntryResponse, ApiError>> => {
     // React state is fixed within one render, so we update our own copy instead of using setValues directly
     let newValues: PollingStationResults = structuredClone(values);
     if (currentForm.current) {

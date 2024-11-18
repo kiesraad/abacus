@@ -10,6 +10,7 @@ export class ApiError extends Error {
     public code: number,
     public message = "Unknown error",
     public fatal: boolean = true,
+    // Error reference used to show the corresponding error message to the end-user
     public reference: ErrorReference = "InternalServerError",
   ) {
     super(message);

@@ -18,7 +18,7 @@ export interface iPollingStationControllerContext {
   setTemporaryCache: (cache: TemporaryCache | null) => boolean;
   cache: TemporaryCache | null;
   currentForm: AnyFormReference | null;
-  submitCurrentForm: (params?: SubmitCurrentFormOptions) => Promise<ApiResult<SaveDataEntryResponse>>;
+  submitCurrentForm: (params?: SubmitCurrentFormOptions) => Promise<ApiResult<SaveDataEntryResponse, ApiError>>;
   registerCurrentForm: (form: AnyFormReference) => void;
   deleteDataEntry: () => Promise<void>;
   finaliseDataEntry: () => Promise<void>;

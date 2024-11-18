@@ -7,16 +7,14 @@ import { isDevelopment } from "@kiesraad/util";
 
 import cls from "./Error.module.css";
 import errorImage from "./error.png";
-import { ErrorAction } from "./Error.types";
 
 interface ErrorProps {
   title: string;
   children: React.ReactNode;
-  action: ErrorAction;
   error?: Error;
 }
 
-export function Error({ title, error, action = ErrorAction.Back, children }: ErrorProps) {
+export function Error({ title, error, children }: ErrorProps) {
   const navigate = useNavigate();
 
   return (
@@ -27,18 +25,16 @@ export function Error({ title, error, action = ErrorAction.Back, children }: Err
             <h1>{title}</h1>
             {children}
             <nav>
-              {action === ErrorAction.Back && (
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  leftIcon={<IconArrowLeft />}
-                  onClick={() => {
-                    navigate(-1);
-                  }}
-                >
-                  {t("history_back")}
-                </Button>
-              )}
+              <Button
+                size="lg"
+                variant="secondary"
+                leftIcon={<IconArrowLeft />}
+                onClick={() => {
+                  navigate(-1);
+                }}
+              >
+                {t("history_back")}
+              </Button>
             </nav>
           </section>
           <aside>

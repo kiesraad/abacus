@@ -1,7 +1,7 @@
 import { useRouteError } from "react-router-dom";
 
-import { FatalError } from "app/module/FatalError";
-import { NotFound } from "app/module/NotFound";
+import { FatalErrorPage } from "app/module/FatalErrorPage";
+import { NotFoundPage } from "app/module/NotFoundPage";
 
 import { ApiError, NetworkError, NotFoundError } from "@kiesraad/api";
 
@@ -12,16 +12,16 @@ export function ErrorBoundary() {
   console.error(error);
 
   if (error instanceof NotFoundError) {
-    return <NotFound message={error.message} path={error.path} />;
+    return <NotFoundPage message={error.message} path={error.path} />;
   }
 
   if (error instanceof NetworkError) {
-    return <FatalError message={error.message} />;
+    return <FatalErrorPage message={error.message} />;
   }
 
   if (error instanceof ApiError) {
-    return <FatalError message={error.message} reference={error.reference} code={error.code} />;
+    return <FatalErrorPage message={error.message} reference={error.reference} code={error.code} />;
   }
 
-  return <FatalError message={error.message} error={error} />;
+  return <FatalErrorPage message={error.message} error={error} />;
 }

@@ -1,4 +1,4 @@
-import { Error, ErrorAction } from "app/component/error";
+import { Error } from "app/component/error";
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -7,18 +7,18 @@ import { t, tx } from "@kiesraad/i18n";
 import { AppLayout } from "@kiesraad/ui";
 import { isDevelopment } from "@kiesraad/util";
 
-interface FatalErrorProps {
+interface FatalErrorPageProps {
   message: string;
   reference?: ErrorReference;
   code?: number;
   error?: Error;
 }
 
-export function FatalError({ message, code, reference, error }: FatalErrorProps) {
+export function FatalErrorPage({ message, code, reference, error }: FatalErrorPageProps) {
   return (
     <AppLayout>
       <NavBar />
-      <Error title="Abacus is stuk" action={ErrorAction.Back} error={error}>
+      <Error title="Abacus is stuk" error={error}>
         {(code || reference) && (
           <p>
             {code && <strong>{code}</strong>}

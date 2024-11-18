@@ -53,6 +53,9 @@ export class ApiClient {
 
       const isError = isErrorResponse(body);
 
+      // NOTE: the reference field references the error we should show to the user,
+      // be prefix it by `error.` to namaspace the translation message
+
       if (response.status === 404 && isError) {
         return new NotFoundError(`error.${body.reference}` as TranslationPath);
       }

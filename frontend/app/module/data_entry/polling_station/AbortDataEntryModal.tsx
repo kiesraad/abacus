@@ -20,7 +20,7 @@ export function AbortDataEntryModal({ onCancel, onSave, onDelete }: AbortDataEnt
       try {
         setSaving(true);
         const acceptWarnings = controller.currentForm?.getAcceptWarnings?.() ?? false;
-        const response: ApiResult<unknown> = await controller.submitCurrentForm({
+        const response: ApiResult<unknown, ApiError> = await controller.submitCurrentForm({
           acceptWarnings,
           aborting: true,
           continueToNextSection: false,

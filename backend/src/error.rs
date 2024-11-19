@@ -12,6 +12,7 @@ use tracing::error;
 use typst::diag::SourceDiagnostic;
 use utoipa::ToSchema;
 
+/// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub enum ErrorReference {
     EntryNumberNotSupported,

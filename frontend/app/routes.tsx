@@ -27,13 +27,13 @@ import {
   VotersAndVotesPage,
 } from "./module/data_entry";
 import { DevHomePage } from "./module/DevHomePage";
-import { NotFound } from "./module/NotFound";
+import { NotFoundPage } from "./module/NotFoundPage";
 import { RootLayout } from "./module/RootLayout";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />} errorElement={<ErrorBoundary />}>
     <Route index path="/" element={<Navigate to="/elections" replace />} />
-    <Route path="*" element={<NotFound />} />
+    <Route path="*" element={<NotFoundPage message="error.not_found" path={window.location.pathname} />} />
     <Route path="account" element={<LoginLayout />}>
       <Route index element={<UserHomePage />} />
       <Route path="login" element={<LoginPage />} />

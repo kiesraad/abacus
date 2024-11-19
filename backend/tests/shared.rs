@@ -81,11 +81,15 @@ pub async fn create_and_save_data_entry(
     assert_eq!(validation_results.validation_results.warnings.len(), 0);
 }
 
-pub async fn create_and_finalise_data_first_entry(addr: &SocketAddr, polling_station_id: u32) {
-    create_and_save_data_entry(addr, polling_station_id, 1, None).await;
+pub async fn create_and_finalise_data_entry(
+    addr: &SocketAddr,
+    polling_station_id: u32,
+    entry_number: u32,
+) {
+    create_and_save_data_entry(addr, polling_station_id, entry_number, None).await;
 
     // Finalise the data entry
-    let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/finalise");
+    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise");
     let response = reqwest::Client::new().post(&url).send().await.unwrap();
 
     // Ensure the response is what we expect

@@ -74,7 +74,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(body.statuses[1].status, PollingStationStatus::NotStarted);
 
     // Finalise the first entry of one and set the other in progress
-    shared::create_and_finalise_data_first_entry(&addr, 1).await;
+    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
     shared::create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": true}"#)).await;
 
     let url = format!("http://{addr}/api/elections/1/status");
@@ -129,6 +129,20 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
         PollingStationStatus::SecondEntryUnfinished
+    );
+
+    // polling station 2 should now be definitive
+    shared::create_and_finalise_data_entry(&addr, 1, 2).await;
+
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(!body.statuses.is_empty());
+    assert_eq!(
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
+        PollingStationStatus::Definitive
     );
 }
 

@@ -56,10 +56,13 @@ pub fn example_data_entry(client_state: Option<&str>) -> SaveDataEntryRequest {
 pub async fn create_and_save_data_entry(
     addr: &SocketAddr,
     polling_station_id: u32,
+    entry_number: u32,
     client_state: Option<&str>,
 ) {
     let request_body = example_data_entry(client_state);
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/1");
+    let url = format!(
+        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}"
+    );
     let response = reqwest::Client::new()
         .post(&url)
         .json(&request_body)
@@ -79,7 +82,7 @@ pub async fn create_and_save_data_entry(
 }
 
 pub async fn create_and_finalise_data_first_entry(addr: &SocketAddr, polling_station_id: u32) {
-    create_and_save_data_entry(addr, polling_station_id, None).await;
+    create_and_save_data_entry(addr, polling_station_id, 1, None).await;
 
     // Finalise the data entry
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/finalise");

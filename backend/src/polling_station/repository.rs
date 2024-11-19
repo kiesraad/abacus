@@ -185,6 +185,7 @@ impl PollingStations {
 SELECT
   p.id AS "id: u32",
 
+  -- status
   CASE
     WHEN de.polling_station_id IS NOT NULL THEN
         (CASE
@@ -192,9 +193,9 @@ SELECT
              (CASE WHEN de.finalised_at IS NOT NULL THEN "SecondEntry" ELSE
                (CASE WHEN json_extract(de.client_state, '$.continue') = true
                  THEN 'FirstEntryInProgress'
-                 ELSE 'FirstEntryUnfinished' END) END)
+                 ELSE 'FirstEntryUnfinished' END)
+             END)
              
-
            WHEN de.entry_number = 2 THEN
              (CASE WHEN json_extract(de.client_state, '$.continue') = true
                 THEN 'SecondEntryInProgress'
@@ -206,6 +207,7 @@ SELECT
     ELSE 'NotStarted'
     END AS "status!: _",
 
+  -- finished_at
   CASE
     WHEN de.polling_station_id IS NOT NULL THEN de.updated_at
     WHEN r.polling_station_id IS NOT NULL THEN r.created_at

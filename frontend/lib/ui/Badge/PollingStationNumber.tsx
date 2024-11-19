@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import classes from "./badge.module.css";
+import cls from "./Badge.module.css";
 
 export function PollingStationNumber({ children }: React.PropsWithChildren) {
-  return <div className={classes.pollingstation}>{children}</div>;
+  return <div className={cls.pollingstation}>{children}</div>;
 }

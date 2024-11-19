@@ -7,5 +7,9 @@
     "message": "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
     "finish_button": "Invoerfase afronden"
   },
+  "main_title": "Statusoverzicht steminvoer",
+  "add_polling_station": "Stembureau toevoegen",
+  "polling_stations_per_status": "Stembureaus per status",
+  "no_polling_stations": "Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.",
   "finish_first_session_data_entry_status": "<strong>Steminvoer afronden</strong> (eerste zitting)"
 }

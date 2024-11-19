@@ -23,17 +23,17 @@ Table.Row = Row;
 Table.LinkRow = LinkRow;
 Table.Cell = Cell;
 
-function Header({ children }: { children: React.ReactNode[] }) {
+function Header({ children, backgroundStyling }: { children: React.ReactNode[]; backgroundStyling?: boolean }) {
   return (
     <thead>
-      <tr>{children}</tr>
+      <tr className={backgroundStyling ? cls.backgroundStyling : undefined}>{children}</tr>
     </thead>
   );
 }
 
-function Column({ children, number, width }: { children: React.ReactNode; number?: boolean; width?: string }) {
+function Column({ children, width }: { children: React.ReactNode; width?: string }) {
   return (
-    <th className={number ? cls.number : undefined} style={width ? { width } : undefined}>
+    <th className="fs-xs" style={width ? { width } : undefined}>
       {children}
     </th>
   );
@@ -61,6 +61,14 @@ function LinkRow({ children, to }: { children: React.ReactNode[]; to: To }) {
   );
 }
 
-function Cell({ children, number }: { children?: React.ReactNode; number?: boolean }) {
-  return <td className={number ? cls.number : undefined}>{children}</td>;
+function Cell({
+  children,
+  number,
+  fontSizeClass,
+}: {
+  children?: React.ReactNode;
+  number?: boolean;
+  fontSizeClass: string;
+}) {
+  return <td className={`${number ? `${cls.number} ` : ""}${fontSizeClass}`}>{children}</td>;
 }

@@ -26,11 +26,18 @@
   > main {
     flex: 1 1 auto;
     display: flex;
+    padding: 2.5rem 5rem 0 5rem;
+    gap: 1.5rem;
     background-color: var(--bg-gray);
+
+    &:has(+ footer) {
+      padding-bottom: 2.5rem;
+    }
+
     > nav {
       overflow: hidden;
-      flex: 0 0 26.25rem;
-      padding: 2rem 0 2rem 5rem;
+      flex: 0 0 19.5rem;
+      padding: 0;
       background-color: var(--bg-gray);
       display: flex;
       flex-direction: column;
@@ -38,7 +45,6 @@
     }
     > article {
       flex: 1 1 auto;
-      padding: 2.5rem 5rem;
       background-color: var(--bg-gray);
       &.no_footer {
         padding-bottom: 0;
@@ -48,10 +54,6 @@
         display: flex;
         flex-direction: column;
       }
-    }
-
-    article#polling-station-choice-form {
-      padding-right: 0;
     }
   }
 
@@ -70,7 +72,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 2rem 5rem;
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
     line-height: 1.25rem;
     a {
       color: var(--color-help-text);

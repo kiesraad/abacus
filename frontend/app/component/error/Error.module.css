@@ -14,7 +14,7 @@
 
 .error h4 {
   color: var(--text-color-body);
-  font-size: 1rem;
+  font-size: var(--font-size-md);
   font-weight: bold;
 }
 
@@ -23,7 +23,7 @@
 }
 
 .error p {
-  font-size: 1rem;
+  font-size: var(--font-size-md);
   max-width: 38rem;
 }
 

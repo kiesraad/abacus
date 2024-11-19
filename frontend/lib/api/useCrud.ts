@@ -22,7 +22,7 @@ export function useCrud<T>(throwErrors: boolean): UseCrudReturn<T> {
   const client = useApi();
   const [requestState, setRequestState] = useState<ApiRequestState<T>>({ status: "loading" });
 
-  // Create a new resource
+  // Get a resource
   const get = useCallback(
     async (path: string, controller?: AbortController) => {
       const result = await client.getRequest<T>(path, controller);

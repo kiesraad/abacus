@@ -151,8 +151,8 @@
   --progress-bar-default: var(--color-notify);
   --progress-bar-errors-and-warnings: var(--color-error-darker);
   --progress-bar-unfinished: var(--color-warning);
-  --progress-bar-in-progress: #d19c26;
+  --progress-bar-in-progress: #efc943;
   --progress-bar-first-entry-finished: #66c61c;
   --progress-bar-definitive: var(--color-success);
-  --progress-bar-not-started: var(--gray);
+  --progress-bar-not-started: #d0d5dd;
 }

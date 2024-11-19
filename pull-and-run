@@ -7,7 +7,7 @@ if [ -n "$1" ]
 then
   git fetch
   git checkout "$1"
-  git pull --no-ff
+  git pull --ff-only
 fi
 
 # Print the commands as they are executed

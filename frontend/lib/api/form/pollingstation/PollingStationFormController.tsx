@@ -164,7 +164,7 @@ export function PollingStationFormController({
     return true;
   }, []);
 
-  const { requestState: initialDataRequest } = useApiRequest<GetDataEntryResponse>(requestPath);
+  const { requestState: initialDataRequest } = useApiRequest<GetDataEntryResponse>(requestPath, false);
 
   React.useEffect(() => {
     if (initialDataRequest.status === "success") {
@@ -204,12 +204,8 @@ export function PollingStationFormController({
         }
       });
     } else if (initialDataRequest.status === "api-error") {
-      if (initialDataRequest.error.fatal) {
-        throw initialDataRequest.error;
-      }
-
       setApiError(initialDataRequest.error);
-    } else if (initialDataRequest.status === "network-error") {
+    } else if (initialDataRequest.status === "network-error" || initialDataRequest.status === "fatal-api-error") {
       throw initialDataRequest.error;
     }
   }, [defaultValues, defaultFormState, election, pollingStationId, initialDataRequest, client, requestPath]);

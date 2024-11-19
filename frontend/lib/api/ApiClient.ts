@@ -2,7 +2,7 @@ import { type ErrorResponse } from "@kiesraad/api";
 import { TranslationPath } from "@kiesraad/i18n";
 
 import { ApiResult, RequestMethod, ServerError } from "./api.types";
-import { ApiError, NetworkError, NotFoundError } from "./ApiError";
+import { ApiError, FatalApiError, NetworkError, NotFoundError } from "./ApiError";
 import { ApiResponseStatus } from "./ApiResponseStatus";
 
 const MIME_JSON = "application/json";
@@ -63,18 +63,25 @@ export class ApiClient {
       }
 
       if (response.status >= 400 && response.status <= 499 && isError) {
-        return new ApiError(ApiResponseStatus.ClientError, response.status, body.error, body.fatal, body.reference);
+        if (body.fatal) {
+          return new FatalApiError(ApiResponseStatus.ClientError, response.status, body.error, body.reference);
+        }
+
+        return new ApiError(ApiResponseStatus.ClientError, response.status, body.error, body.reference);
       }
 
       if (response.status >= 500 && response.status <= 599 && isError) {
-        return new ApiError(ApiResponseStatus.ServerError, response.status, body.error, body.fatal, body.reference);
+        if (body.fatal) {
+          return new FatalApiError(ApiResponseStatus.ServerError, response.status, body.error, body.reference);
+        }
+
+        return new ApiError(ApiResponseStatus.ServerError, response.status, body.error, body.reference);
       }
 
-      return new ApiError(
+      return new FatalApiError(
         ApiResponseStatus.ServerError,
         response.status,
         `Unexpected response status: ${response.status}`,
-        true,
         "InvalidData",
       );
     } catch (e) {
@@ -93,18 +100,18 @@ export class ApiClient {
     }
 
     if (response.status >= 400 && response.status <= 499) {
-      return new ApiError(ApiResponseStatus.ClientError, response.status, body, true, "InvalidData");
+      return new FatalApiError(ApiResponseStatus.ClientError, response.status, body, "InvalidData");
     }
 
     if (response.status >= 500 && response.status <= 599) {
-      return new ApiError(ApiResponseStatus.ServerError, response.status, body, true, "InternalServerError");
+      return new FatalApiError(ApiResponseStatus.ServerError, response.status, body, "InternalServerError");
     }
 
     if (body.length > 0) {
       console.error("Unexpected data from server:", body);
 
       const message = `Unexpected data from server: ${body}`;
-      return new ApiError(ApiResponseStatus.ServerError, response.status, message, true, "InternalServerError");
+      return new FatalApiError(ApiResponseStatus.ServerError, response.status, message, "InternalServerError");
     }
 
     if (response.ok) {
@@ -115,11 +122,10 @@ export class ApiClient {
       };
     }
 
-    return new ApiError(
+    return new FatalApiError(
       ApiResponseStatus.ServerError,
       response.status,
       `Unexpected response status: ${response.status}`,
-      true,
       "InvalidData",
     );
   }

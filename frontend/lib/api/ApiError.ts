@@ -4,12 +4,12 @@ import { ApiResult } from "./api.types";
 import { ApiResponseStatus } from "./ApiResponseStatus";
 import { ErrorReference } from "./gen/openapi";
 
+// Error that should allow the user to retry the request
 export class ApiError extends Error {
   constructor(
     public status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError,
     public code: number,
     public message = "Unknown error",
-    public fatal: boolean = true,
     // Error reference used to show the corresponding error message to the end-user
     public reference: ErrorReference = "InternalServerError",
   ) {
@@ -17,12 +17,26 @@ export class ApiError extends Error {
   }
 }
 
+// Error that should not allow the user to retry the request
+export class FatalApiError extends Error {
+  constructor(
+    public status: ApiResponseStatus.ClientError | ApiResponseStatus.ServerError,
+    public code: number,
+    public message = "Unknown error",
+    public reference: ErrorReference = "InternalServerError",
+  ) {
+    super(message);
+  }
+}
+
+// Problem connecting with the backend
 export class NetworkError extends Error {
   constructor(public message: string) {
     super(message);
   }
 }
 
+// Resource not found
 export class NotFoundError extends Error {
   path: string;
   message: TranslationPath;
@@ -40,6 +54,6 @@ export class NotFoundError extends Error {
   }
 }
 
-export function isFatalError(error: ApiResult<unknown>): error is ApiError | NetworkError | NotFoundError {
-  return (error instanceof ApiError && error.fatal) || error instanceof NetworkError || error instanceof NotFoundError;
+export function isFatalError(error: ApiResult<unknown>): error is FatalApiError | NetworkError | NotFoundError {
+  return (error instanceof FatalApiError && error instanceof NetworkError) || error instanceof NotFoundError;
 }

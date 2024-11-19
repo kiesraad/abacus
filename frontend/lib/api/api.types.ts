@@ -1,4 +1,11 @@
-import { ApiError, ApiResponseStatus, NetworkError, NotFoundError, type ValidationResultCode } from "@kiesraad/api";
+import {
+  ApiError,
+  ApiResponseStatus,
+  FatalApiError,
+  NetworkError,
+  NotFoundError,
+  type ValidationResultCode,
+} from "@kiesraad/api";
 
 export type ResultCode = ValidationResultCode | "REFORMAT_WARNING";
 
@@ -13,7 +20,7 @@ export type ErrorsAndWarnings = {
   warnings: FieldValidationResult[];
 };
 
-export type ApiResult<T, E = ApiError | NotFoundError | NetworkError> = ApiResponse<T> | E;
+export type ApiResult<T, E = ApiError | FatalApiError | NotFoundError | NetworkError> = ApiResponse<T> | E;
 
 export interface ServerError {
   error: string;

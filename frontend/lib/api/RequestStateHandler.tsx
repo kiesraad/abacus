@@ -29,7 +29,11 @@ export default function RequestStateHandler<T>({
     throw requestState.error;
   }
 
-  if (requestState.status === "api-error" || requestState.status === "network-error") {
+  if (
+    requestState.status === "api-error" ||
+    requestState.status === "network-error" ||
+    requestState.status === "fatal-api-error"
+  ) {
     throw requestState.error;
   }
 

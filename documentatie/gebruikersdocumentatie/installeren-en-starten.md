@@ -64,7 +64,7 @@ En zo start je een specifieke branch:
 ./pull-and-run name-of-branch
 ```
 
-Wanneer de API draait, klik je op de link van de API-server (<http://0.0.0.0:8080>) om naar de browser te gaan en Abacus te gebruiken.
+Wanneer Abacus draait, klik je op de link (<http://0.0.0.0:8080>) om naar de browser te gaan en Abacus te gebruiken.
 
 Let op: mogelijk zie je een foutmelding die aangeeft dat de package `sqlx` ontbreekt. Installeer deze package dan eerst en probeer het vervolgens opnieuw:
 

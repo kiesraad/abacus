@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { ElectionStatusPage } from "app/module/election";
 import { overrideOnce, render, screen, within } from "app/test/unit";
 
-import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
+import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { electionDetailsMockResponse, getElectionMockData } from "@kiesraad/api-mocks";
 
 const renderElectionStatusPage = () =>
@@ -36,13 +36,15 @@ describe("ElectionStatusPage", () => {
         {
           id: 3,
           status: "first_entry_unfinished",
+          data_entry_progress: 60,
         },
         {
           id: 4,
           status: "first_entry_in_progress",
+          data_entry_progress: 40,
         },
       ],
-    });
+    } satisfies ElectionStatusResponse);
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" }));
@@ -92,9 +94,12 @@ describe("ElectionStatusPage", () => {
     expect(inProgressRows.length).toBe(2);
     expect(inProgressRows[0]).toHaveTextContent(/Nummer/);
     expect(inProgressRows[0]).toHaveTextContent(/Stembureau/);
+    expect(inProgressRows[0]).toHaveTextContent(/Voortgang/);
+
     expect(inProgressRows[1]).toHaveTextContent(/36/);
     expect(inProgressRows[1]).toHaveTextContent(/Testbuurthuis/);
     expect(inProgressRows[1]).toHaveTextContent(/1e invoer/);
+    expect(within(inProgressRows[1] as HTMLElement).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "40");
 
     expect(tables[2]).toContain(screen.getByRole("heading", { level: 3, name: "Werkvoorraad (2)" }));
     const notStartedTable = within(tables[2] as HTMLElement).getByTestId("not_started");

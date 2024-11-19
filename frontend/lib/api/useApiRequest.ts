@@ -24,7 +24,7 @@ export type ApiRequestState<T> =
     }
   | {
       status: "fatal-api-error";
-      error: ApiError;
+      error: FatalApiError;
     }
   | {
       status: "not-found-error";

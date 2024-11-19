@@ -5,7 +5,7 @@ edition = "2021"
 license = "EUPL-1.2"
 rust-version = "1.75"
 
-default-run = "api"
+default-run = "abacus"
 
 [features]
 default = ["openapi", "dev-database"]

@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 import { overrideOnce } from "app/test/unit";
 
 import { ApiClient } from "./ApiClient";
-import { ApiError } from "./ApiError";
+import { FatalApiError } from "./ApiError";
 import { ApiResponseStatus } from "./ApiResponseStatus";
 
 describe("ApiClient", () => {
@@ -32,7 +32,7 @@ describe("ApiClient", () => {
     });
 
     expect(parsedResponse).toStrictEqual(
-      new ApiError(ApiResponseStatus.ClientError, 422, "Unexpected response status: 422"),
+      new FatalApiError(ApiResponseStatus.ClientError, 422, "Unexpected response status: 422"),
     );
   });
 
@@ -49,7 +49,7 @@ describe("ApiClient", () => {
       data: null,
     });
 
-    expect(parsedResponse).toStrictEqual(new ApiError(ApiResponseStatus.ServerError, 500, responseBody.error));
+    expect(parsedResponse).toStrictEqual(new FatalApiError(ApiResponseStatus.ServerError, 500, responseBody.error));
   });
 
   test("318 response returns an error", async () => {
@@ -61,7 +61,7 @@ describe("ApiClient", () => {
     const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", { data: null });
 
     expect(parsedResponse).toStrictEqual(
-      new ApiError(ApiResponseStatus.ServerError, responseStatus, `Unexpected response status: ${responseStatus}`),
+      new FatalApiError(ApiResponseStatus.ServerError, responseStatus, `Unexpected response status: ${responseStatus}`),
     );
   });
 
@@ -89,7 +89,7 @@ describe("ApiClient", () => {
     const parsedResponse = await client.getRequest("/api/test/1");
 
     expect(parsedResponse).toStrictEqual(
-      new ApiError(ApiResponseStatus.ClientError, 200, "Unexpected data from server: invalid"),
+      new FatalApiError(ApiResponseStatus.ClientError, 200, "Unexpected data from server: invalid"),
     );
 
     expect(console.error).toHaveBeenCalledWith("Unexpected data from server:", expect.any(String));

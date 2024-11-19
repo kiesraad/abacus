@@ -40,7 +40,7 @@ export interface UseApiRequestReturn<T> {
   refetch: (controller?: AbortController) => Promise<ApiResult<T>>;
 }
 
-export interface UseLimitedApiRequestState<T> extends UseApiRequestReturn<T> {
+export interface UseLimitedApiRequestReturn<T> extends UseApiRequestReturn<T> {
   requestState: LimitedApiRequestState<T>;
 }
 
@@ -83,7 +83,7 @@ export function handleApiResult<T>(
 }
 
 // Call the api and return the current status of the request, optionally throws an error when the request fails
-export function useApiRequest<T>(path: string, throwErrors: true): UseLimitedApiRequestState<T>;
+export function useApiRequest<T>(path: string, throwErrors: true): UseLimitedApiRequestReturn<T>;
 export function useApiRequest<T>(path: string, throwErrors: false): UseApiRequestReturn<T>;
 export function useApiRequest<T>(path: string, throwErrors: boolean): UseApiRequestReturn<T> {
   const client = useApi();

@@ -158,6 +158,9 @@ export interface ElectionStatusResponse {
   statuses: PollingStationStatusEntry[];
 }
 
+/**
+ * Error reference used to show the corresponding error message to the end-user
+ */
 export type ErrorReference =
   | "EntryNumberNotSupported"
   | "EntryNotFound"

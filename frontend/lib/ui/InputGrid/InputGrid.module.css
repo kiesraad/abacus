@@ -75,7 +75,7 @@
       }
     }
 
-    &:global(.focused) {
+    &:focus-within {
       td {
         background-color: var(--bg-highlight);
         color: var(--base-black);

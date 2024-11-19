@@ -70,7 +70,7 @@ export function InputGridRow({
   return isListTotal ? (
     <InputGrid.ListTotal id={id}>{children}</InputGrid.ListTotal>
   ) : (
-    <InputGrid.Row isTotal={isTotal} addSeparator={addSeparator} id={id} isFocused={autoFocusInput}>
+    <InputGrid.Row isTotal={isTotal} addSeparator={addSeparator} id={id}>
       {children}
     </InputGrid.Row>
   );

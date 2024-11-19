@@ -5,7 +5,7 @@ edition = "2021"
 license = "EUPL-1.2"
 rust-version = "1.75"
 
-default-run = "api"
+default-run = "abacus"
 
 [features]
 default = ["openapi", "dev-database"]
@@ -19,7 +19,7 @@ required-features = ["openapi"]
 
 [dependencies]
 axum = { version = "0.7", features = ["macros", "tracing"] }
-axum-extra = { version = "0.9.4", default-features = false, features = ["attachment"] }
+axum-extra = { version = "0.9.6", default-features = false, features = ["attachment"] }
 chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
 clap = { version = "4.5", default-features = false, features = ["derive", "std", "help"] }
 hyper = { version = "1", features = ["full"] }

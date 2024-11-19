@@ -11,7 +11,7 @@
     "dev:server": "cross-env API_MODE=local vite",
     "build": "tsc && cross-env API_MODE=local vite build",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
-    "lint": "cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "cross-env ESLINT_ENV=production ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettier": "prettier --ignore-unknown --write .",
     "preview": "vite preview",
     "test": "vitest",
@@ -23,6 +23,8 @@
     "start:msw": "cross-env API_MODE=mock vite",
     "gen:icons": "node scripts/gen_icons.js",
     "gen:openapi": "vite-node ./scripts/gen_openapi_types.ts",
+    "gen:po": "vite-node scripts/gen_po.js",
+    "gen:translation-json": "vite-node scripts/gen_translation-json.js",
     "serve": "npm run build:msw && npx serve dist"
   },
   "dependencies": {
@@ -46,7 +48,7 @@
     "@vitejs/plugin-react-swc": "^3.7.1",
     "autoprefixer": "^10.4.20",
     "cross-env": "^7.0.3",
-    "eslint": "^8.57.1",
+    "eslint": "^9.14.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.31.0",

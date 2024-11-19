@@ -1,7 +1,9 @@
 .button {
+  --button-border-width: 1px;
+
   color: var(--base-white);
   border-radius: var(--rounded-default);
-  border: 1px solid var(--button-color-primary);
+  border: var(--button-border-width) solid var(--button-color-primary);
   background: var(--button-color-primary);
 
   font-size: var(--font-size-body);
@@ -11,7 +13,7 @@
   box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
 
   display: inline-flex;
-  padding: 1rem 1.75rem;
+  padding: calc(1rem - var(--button-border-width)) calc(1.75rem - var(--button-border-width));
   justify-content: center;
   align-items: center;
   gap: 0.75rem;
@@ -19,36 +21,36 @@
 
   &:hover {
     background-color: var(--button-color-primary-hover);
-    border: 1px solid var(--button-color-primary-hover);
+    border-color: var(--button-color-primary-hover);
   }
 
   &:focus,
   &:focus-visible {
     outline: none;
-    border: 1px solid var(--border-color-focus);
+    border-color: var(--border-color-focus);
     background-color: var(--button-color-primary-focus);
     box-shadow: 0 0 0 4px var(--shadow-color-focus);
   }
 
   &:active {
     background-color: var(--button-color-primary-active);
-    border: 1px solid var(--button-color-primary-active);
+    border-color: var(--button-color-primary-active);
   }
 
   &:disabled {
     background: var(--button-color-bg-disabled);
-    border: 1px solid var(--button-color-bg-disabled);
+    border-color: var(--button-color-bg-disabled);
     color: var(--button-color-disabled);
   }
 
   svg {
-    height: 1rem;
+    height: 1.25rem;
     fill: currentColor;
   }
 
   &.secondary {
     color: var(--text-color-body);
-    border: 1px solid var(--bg-gray-darkest);
+    border-color: var(--bg-gray-darkest);
     background: var(--button-color-secondary);
 
     &:hover {
@@ -58,32 +60,33 @@
     &:focus,
     &:focus-visible {
       outline: none;
-      border: 2px solid var(--border-color-focus);
+      --button-border-width: 2px;
+      border-color: var(--border-color-focus);
       background-color: var(--button-color-secondary-focus);
       box-shadow: 0 0 0 4px var(--shadow-color-focus);
     }
 
     &:active {
-      border: 1px solid var(--border-color-default);
+      border-color: var(--border-color-default);
       background-color: var(--button-color-secondary-active);
     }
 
     &:disabled {
       background: var(--button-color-bg-disabled);
-      border: 1px solid var(--button-color-bg-disabled);
+      border-color: var(--button-color-bg-disabled);
       color: var(--button-color-disabled);
     }
   }
 
   &.alert {
-    border: 1px solid var(--color-error);
+    border-color: var(--color-error);
     background: var(--color-error);
     color: var(--base-white);
   }
 
   &.ghost {
     background: transparent;
-    border: 1px solid transparent;
+    border-color: transparent;
     color: var(--button-color-primary);
 
     &:hover {
@@ -94,19 +97,19 @@
   &.xs {
     font-size: var(--font-size-sm);
     line-height: 1.25rem;
-    padding: 0.5rem 0.875rem;
+    padding: calc(0.5rem - var(--button-border-width)) calc(0.875rem - var(--button-border-width));
   }
 
   &.sm {
     font-size: var(--font-size-sm);
     line-height: 1.25rem;
-    padding: 0.625rem 1rem;
+    padding: calc(0.625rem - var(--button-border-width)) calc(1rem - var(--button-border-width));
   }
 
   &.md {
     font-size: var(--font-size-md);
     line-height: 1.5rem;
-    padding: 0.75rem 1.25rem;
+    padding: calc(0.75rem - var(--button-border-width)) calc(1.25rem - var(--button-border-width));
   }
 
   &.lg {

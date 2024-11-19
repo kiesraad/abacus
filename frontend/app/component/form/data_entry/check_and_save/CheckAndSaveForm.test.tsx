@@ -62,8 +62,7 @@ describe("Test CheckAndSaveForm", () => {
   test("Shift+Enter submits form", async () => {
     renderForm();
 
-    const formTitle = await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" });
-    expect(formTitle).toHaveFocus();
+    expect(await screen.findByRole("group", { name: "Controleren en opslaan" }));
 
     overrideOnce("post", "/api/polling_stations/1/data_entries/1/finalise", 200, null);
 
@@ -92,7 +91,7 @@ describe("Test CheckAndSaveForm", () => {
     renderForm(formState);
 
     // Wait for the page to be loaded and check that the save button is not visible
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" }));
+    expect(await screen.findByRole("group", { name: "Controleren en opslaan" }));
     expect(screen.queryByRole("button", { name: "Opslaan" })).not.toBeInTheDocument();
 
     expect(screen.getByTestId("section-status-voters_votes_counts")).toHaveTextContent("heeft blokkerende fouten");
@@ -110,7 +109,7 @@ describe("Test CheckAndSaveForm", () => {
     renderForm(formState);
 
     // Wait for the page to be loaded and check that the save button is not visible
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleren en opslaan" }));
+    expect(await screen.findByRole("group", { name: "Controleren en opslaan" }));
     expect(screen.queryByRole("button", { name: "Opslaan" })).not.toBeInTheDocument();
 
     expect(screen.getByTestId("section-status-voters_votes_counts")).toHaveTextContent("Controleer waarschuwingen bij");

@@ -45,6 +45,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
       if (
         status.current === "deleted" ||
         status.current === "finalised" ||
+        status.current === "aborted" ||
         currentLocation.pathname === nextLocation.pathname ||
         !currentForm
       ) {
@@ -52,7 +53,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
       }
 
       //check if nextLocation is outside the data entry flow
-      if (status.current !== "aborted" && !isPartOfDataEntryFlow(nextLocation.pathname)) {
+      if (!isPartOfDataEntryFlow(nextLocation.pathname)) {
         return true;
       }
 

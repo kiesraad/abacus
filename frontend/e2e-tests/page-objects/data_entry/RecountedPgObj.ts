@@ -3,7 +3,7 @@ import { type Locator, type Page } from "@playwright/test";
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export class RecountedPage extends DataEntryBasePage {
-  readonly heading: Locator;
+  readonly fieldset: Locator;
 
   readonly no: Locator;
   readonly next: Locator;
@@ -12,8 +12,7 @@ export class RecountedPage extends DataEntryBasePage {
   constructor(page: Page) {
     super(page);
 
-    this.heading = page.getByRole("heading", {
-      level: 2,
+    this.fieldset = page.getByRole("group", {
       name: "Is het selectievakje op de eerste pagina aangevinkt?",
     });
 

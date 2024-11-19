@@ -3,8 +3,8 @@ import { ReactElement } from "react";
 import { type PollingStationStatus } from "@kiesraad/api";
 import { IconPencil } from "@kiesraad/icon";
 
-import { Icon } from "../Icon/Icon";
-import classes from "./badge.module.css";
+import { Icon } from "../Icon";
+import cls from "./Badge.module.css";
 
 const typeToLabel: { [S in PollingStationStatus]: { label: string; icon?: ReactElement } } = {
   not_started: { label: "1e invoer" },
@@ -24,7 +24,7 @@ export interface BadgeProps {
 export function Badge({ type, showIcon = false }: BadgeProps) {
   const { label, icon } = typeToLabel[type];
   return (
-    <div className={`${classes[type]} ${classes.badge}`}>
+    <div className={`${cls[type]} ${cls.badge}`}>
       {label}
       {showIcon && icon}
     </div>

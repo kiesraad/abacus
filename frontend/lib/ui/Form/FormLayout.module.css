@@ -1,0 +1,26 @@
+.form-layout {
+}
+.form-section {
+  padding-bottom: var(--space-md);
+}
+
+.form-row {
+  display: flex;
+  gap: var(--space-md-lg);
+}
+
+.form-field {
+  margin-bottom: var(--space-lg);
+}
+
+.root-fieldset {
+  border: none;
+  padding: 0;
+}
+
+.form-alert {
+  overflow: hidden;
+  margin-top: -2.5rem;
+  width: 100vw;
+  transform: translateX(-5rem);
+}

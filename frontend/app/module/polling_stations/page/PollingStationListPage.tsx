@@ -1,14 +1,8 @@
 import { Link } from "react-router-dom";
 
-import { PollingStationType, usePollingStationListRequest } from "@kiesraad/api";
+import { labelForPollingStationType, usePollingStationListRequest } from "@kiesraad/api";
 import { Loader, PageTitle, Table } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
-
-const labelForPollingStationType: { [K in PollingStationType]: string } = {
-  FixedLocation: "Vaste locatie",
-  Special: "Bijzonder",
-  Mobile: "Mobiel",
-};
 
 export function PollingStationListPage() {
   const electionId = useNumericParam("electionId");

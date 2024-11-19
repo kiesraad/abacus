@@ -126,8 +126,21 @@ export class ApiClient {
   }
 
   // perform a POST request
-  async postRequest<T>(path: string, requestBody?: object, abort?: AbortController): Promise<ApiResult<T>> {
-    return this.request<T>("POST", path, abort, requestBody);
+  async postRequest<RESPONSE>(
+    path: string,
+    requestBody?: object,
+    abort?: AbortController,
+  ): Promise<ApiResult<RESPONSE>> {
+    return this.request<RESPONSE>("POST", path, abort, requestBody);
+  }
+
+  // perform a PUT request
+  async putRequest<RESPONSE>(
+    path: string,
+    requestBody?: object,
+    abort?: AbortController,
+  ): Promise<ApiResult<RESPONSE>> {
+    return this.request<RESPONSE>("PUT", path, abort, requestBody);
   }
 
   // perform a GET request

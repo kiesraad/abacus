@@ -13,7 +13,7 @@ export function PollingStationCreatePage() {
       </header>
       <main>
         <article>
-          <PollingStationForm />
+          <PollingStationForm electionId={1} />
         </article>
       </main>
     </>

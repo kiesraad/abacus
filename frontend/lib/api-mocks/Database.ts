@@ -40,3 +40,7 @@ export let Database: Database = structuredClone(initialData);
 export function resetDatabase(): void {
   Database = structuredClone(initialData);
 }
+
+export function pollingStationID() {
+  return Database.pollingStations.length + 1;
+}

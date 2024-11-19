@@ -56,9 +56,11 @@ export function InputField({
           />
         )}
       </label>
-      <span id={`${name}-hint_or_error`} className={error ? "error" : "hint"}>
-        {error || hint || <>&nbsp;</>}
-      </span>
+      {(error || hint) && (
+        <span id={`${name}-hint_or_error`} className={error ? "error" : "hint"}>
+          {error || hint || <>&nbsp;</>}
+        </span>
+      )}
     </div>
   );
 }

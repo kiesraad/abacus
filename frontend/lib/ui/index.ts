@@ -8,7 +8,7 @@ export * from "./BottomBar/BottomBar";
 export * from "./Button/Button";
 export * from "./CheckboxAndRadio";
 export * from "./Feedback";
-export * from "./Form/Form";
+export * from "./Form";
 export * from "./FormField/FormField";
 export * from "./Icon/Icon";
 export * from "./IconButton/IconButton";

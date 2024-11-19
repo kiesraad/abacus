@@ -26,7 +26,7 @@ export interface ServerError {
   error: string;
 }
 
-export type RequestMethod = "GET" | "POST" | "DELETE";
+export type RequestMethod = "GET" | "POST" | "PUT" | "DELETE";
 
 export interface ApiResponse<T> {
   status: ApiResponseStatus.Success;

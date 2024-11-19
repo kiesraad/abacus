@@ -168,6 +168,11 @@ export class ApiClient {
     return this.request<T>("POST", path, abort, requestBody);
   }
 
+  // perform a PUT request
+  async putRequest<T>(path: string, requestBody?: object, abort?: AbortController): Promise<ApiResult<T>> {
+    return this.request<T>("PUT", path, abort, requestBody);
+  }
+
   // perform a GET request
   async getRequest<T>(path: string, abort?: AbortController): Promise<ApiResult<T>> {
     return this.request<T>("GET", path, abort);

@@ -62,7 +62,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
 
   const finishedAtColumn = <Table.Column key={`${category}-time`}>{t("finished_at")}</Table.Column>;
   const progressColumn = (
-    <Table.Column key={`${category}-progress`} width="12rem">
+    <Table.Column key={`${category}-progress`} width="13rem">
       {t("progress")}
     </Table.Column>
   );

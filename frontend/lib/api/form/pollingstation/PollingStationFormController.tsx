@@ -14,7 +14,6 @@ import {
   getInitialValues,
   getNextSectionID,
   isFatalError,
-  NetworkError,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   PollingStationResults,
   SaveDataEntryRequest,
@@ -371,11 +370,11 @@ export function PollingStationFormController({
     status.current = "finalising";
     const response = await client.postRequest(requestPath + "/finalise");
 
-    if (response instanceof ApiError) {
+    if (isFatalError(response)) {
+      throw response;
+    } else if (response instanceof ApiError) {
       status.current = "idle";
       setApiError(response);
-    } else if (response instanceof NetworkError) {
-      throw response;
     } else {
       setApiError(null);
       status.current = "finalised";

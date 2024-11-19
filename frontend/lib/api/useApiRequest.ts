@@ -94,11 +94,7 @@ export function useApiRequest<T>(path: string, throwErrors: boolean): UseApiRequ
     async (controller?: AbortController): Promise<ApiResult<T>> => {
       const result = await client.getRequest<T>(path, controller);
 
-      if (controller instanceof AbortController && controller.signal.aborted) {
-        return result;
-      }
-
-      return handleApiResult(result, setRequestState, throwErrors);
+      return handleApiResult(result, setRequestState, throwErrors, controller);
     },
     [client, path, throwErrors],
   );

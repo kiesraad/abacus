@@ -3,7 +3,7 @@ import { useRouteError } from "react-router-dom";
 import { FatalErrorPage } from "app/module/FatalErrorPage";
 import { NotFoundPage } from "app/module/NotFoundPage";
 
-import { ApiError, NetworkError, NotFoundError } from "@kiesraad/api";
+import { ApiError, FatalApiError, NetworkError, NotFoundError } from "@kiesraad/api";
 
 export function ErrorBoundary() {
   const error = useRouteError() as Error;
@@ -19,7 +19,7 @@ export function ErrorBoundary() {
     return <FatalErrorPage message={error.message} />;
   }
 
-  if (error instanceof ApiError) {
+  if (error instanceof ApiError || error instanceof FatalApiError) {
     return <FatalErrorPage message={error.message} reference={error.reference} code={error.code} />;
   }
 

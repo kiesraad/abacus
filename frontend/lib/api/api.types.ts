@@ -20,7 +20,9 @@ export type ErrorsAndWarnings = {
   warnings: FieldValidationResult[];
 };
 
-export type ApiResult<T, E = ApiError | FatalApiError | NotFoundError | NetworkError> = ApiResponse<T> | E;
+export type AnyApiError = ApiError | FatalApiError | NetworkError | NotFoundError;
+
+export type ApiResult<T, E = AnyApiError> = ApiResponse<T> | E;
 
 export interface ServerError {
   error: string;

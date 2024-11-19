@@ -161,12 +161,15 @@ export interface ElectionStatusResponse {
 export type ErrorReference =
   | "EntryNumberNotSupported"
   | "EntryNotFound"
-  | "PollingStationAlreadyFinalized"
+  | "PollingStationAlreadyFinalised"
+  | "PollingStationFirstEntryAlreadyFinished"
+  | "PollingStationFirstEntryNotFinished"
   | "PollingStationDataValidation"
   | "InvalidVoteGroup"
   | "InvalidVoteCandidate"
   | "InvalidData"
   | "InvalidJson"
+  | "InvalidDataEntryNumber"
   | "EntryNotUnique"
   | "DatabaseError"
   | "InternalServerError"
@@ -266,7 +269,14 @@ export interface PollingStationResults {
   votes_counts: VotesCounts;
 }
 
-export type PollingStationStatus = "not_started" | "first_entry_in_progress" | "first_entry_unfinished" | "definitive";
+export type PollingStationStatus =
+  | "not_started"
+  | "first_entry_in_progress"
+  | "first_entry_unfinished"
+  | "second_entry"
+  | "second_entry_in_progress"
+  | "second_entry_unfinished"
+  | "definitive";
 
 export interface PollingStationStatusEntry {
   finished_at?: number;

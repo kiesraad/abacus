@@ -14,10 +14,10 @@
   "no_polling_stations": "Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.",
   "coordinator": {
     "data_entry_in_progress": "Steminvoer bezig",
-    "data_entry_finished": "Steminvoer afgerond"
+    "data_entry_finished": "Steminvoer klaar"
   },
   "typist": {
-    "data_entry_in_progress": "Invoer gestart",
-    "data_entry_finished": "Steminvoer voltooid"
+    "data_entry_in_progress": "Steminvoer bezig",
+    "data_entry_finished": "Steminvoer klaar"
   }
 }

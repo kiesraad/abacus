@@ -7,9 +7,9 @@ import {
   ApiError,
   ApiResult,
   buildFormState,
+  calculateDataEntryProgress,
   Election,
   getClientState,
-  getDataEntryProgress,
   GetDataEntryResponse,
   getInitialFormState,
   getInitialValues,
@@ -319,7 +319,7 @@ export function PollingStationFormController({
 
     // prepare data to send to server
     const clientState = getClientState(formState, acceptWarnings, continueToNextSection);
-    const progress = getDataEntryProgress(formState);
+    const progress = calculateDataEntryProgress(formState);
 
     // send data to server
     status.current = "saving";

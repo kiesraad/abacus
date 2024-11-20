@@ -53,11 +53,11 @@
   --button-color-secondary: var(--base-white);
   --button-color-secondary-hover: var(--bg-gray);
   --button-color-secondary-focus: var(--base-white);
-  --button-color-secondary-active: var(--gray-200);
+  --button-color-secondary-active: var(--color-hover);
   --button-color-disabled: #b3b3b3;
   --button-color-bg-disabled: #f2f2f2;
 
-  --checkbox-radio-color-border: #98a2b3;
+  --checkbox-radio-color-border: var(--gray);
   --checkbox-radio-color-bg-default: var(--base-white);
   --checkbox-radio-color-bg-active: var(--bg-gray);
   --checkbox-radio-color-bg-hover: var(--bg-gray-darker);
@@ -77,39 +77,32 @@
   --button-icon-ghost-color-bg-hover: var(--bg-gray-darker);
 
   --shadow-color-focus: #d1e0ff;
-  --border-color-default: #d0d5dd;
-  --border-color-focus: #528bff;
+  --border-color-default: var(--bg-gray-darkest);
+  --border-color-focus: #155eef;
 
-  --color-error: #f04438;
-  --color-error-border: #fda29b;
-  --color-error-darker: #d92d20;
-  --color-error-darkest: #b42318;
-  --color-error-bg: #fee4e2;
-  --color-error-hover: #fecdca;
-  --color-error-focus: #f97066;
-  --color-error-icon: #d03651;
+  --color-error: #e35f77;
+  --color-error-darker: #d03651;
+  --color-error-darkest: #b02d45;
+  --color-error-bg: #fbe9ed;
+  --color-error-hover: #f6cad2;
 
   --color-warning: #f79009;
-  --color-warning-border: #fec84b;
-  --color-warning-darker: #dc6803;
-  --color-warning-bg: #fef0c7;
+  --color-warning-darker: #d4690b;
+  --color-warning-bg: #fef4d7;
   --color-warning-hover: #fedf89;
-  --color-warning-focus: #fdb022;
-  --color-warning-text: #93370d;
 
-  --color-notify: #2e90fa;
-  --color-notify-bg: #e0f2fe;
-  --color-notify-hover: #b9e6fe;
-  --color-notify-focus: #36bffa;
+  --color-notify: #366fca;
+  --color-notify-bg: #e7eef9;
+  --color-notify-hover: #c5d6f1;
 
-  --color-success: #12b76a;
-  --color-success-bg: #d1fadf;
-  --color-success-hover: #a6f4c5;
-  --color-success-focus: #32d583;
+  --color-success: #248052;
+  --color-success-bg: #e7f3ee;
+  --color-success-hover: #b8ddca;
 
   --color-help-text: #475467;
   --color-hover: #eaecf0;
 
+  --gray: #98a2b3;
   --bg-gray: #f9fafb;
   --bg-gray-darker: #f2f4f7;
   --bg-gray-darkest: #d0d5dd;
@@ -118,48 +111,48 @@
   --base-black: #000000;
   --base-brand-blue: #113051;
   --base-dark-blue: #00305b;
-  --base-light-grey: #f0f0f0;
-  --base-red: #e3032e;
   --base-white: #ffffff;
 
-  --accent-blue: #5d81b8;
-  --accent-lime: #dddb00;
-  --accent-orange: #e87c59;
-  --accent-light-blue: #c9d8e9;
-  --accent-light-lime: #dddda6;
-  --accent-light-orange: #e9dace;
-  --accent-dark-blue: #00305b;
-  --accent-dark-green: #3d6315;
-  --accent-dark-red: #8f131e;
-  --accent-dark-grey: #878787;
+  --accent-orange: #ef8050;
 
-  --blue-light-100: #e0f2fe;
-  --blue-light-800: #065986;
-  --menu-updates: #004eeb;
-  --link-default: #155eef;
+  --link-default: var(--border-color-focus);
   --link-hover: #004eeb;
   --link-active: #0040c1;
   --link-visited: #6927da;
 
-  --gray-200: #eaecf0;
   --menu-empty: #667085;
-  --menu-unsaved: #475467;
-  --menu-active: #101828;
+  --menu-unsaved: var(--color-notify);
+  --menu-active: var(--text-color-header);
+  --menu-accept: var(--color-success);
+  --menu-warning: var(--color-warning);
+  --menu-error: var(--color-error-darker);
 
-  --green-100: #d3f8df;
-  --menu-accept: #16b364;
-  --green-800: #095c37;
-
-  --purple-100: #ebe9fe;
-  --purple-800: #4a1fb8;
-
-  --menu-warning: var(--color-warning-darker);
+  --badge-polling-station: var(--base-white);
+  --badge-polling-station-bg: #4a75ba;
+  --badge-workstation: var(--base-brand-blue);
+  --badge-workstation-bg: var(--bg-gray-darker);
+  --badge-first-entry: #93370d;
+  --badge-first-entry-bg: #fef0c7;
+  --badge-second-entry: #095c37;
+  --badge-second-entry-bg: #d3f8df;
+  --badge-extra-entry: var(--badge-second-entry);
+  --badge-extra-entry-bg: var(--badge-second-entry-bg);
+  --badge-correction: #065986;
+  --badge-correction-bg: var(--color-notify-bg);
+  --badge-objections: #4a1fb8;
+  --badge-objections-bg: #ebe9fe;
+  --badge-difference: var(--base-white);
+  --badge-difference-bg: #d92d20;
+  --badge-typist-busy: var(--link-active);
+  --badge-typist-busy-bg: var(--shadow-color-focus);
+  --badge-definitive: var(--base-white);
+  --badge-definitive-bg: var(--base-dark-blue);
 
   --progress-bar-default: var(--color-notify);
   --progress-bar-errors-and-warnings: var(--color-error-darker);
-  --progress-bar-unfinished: #ff692e;
-  --progress-bar-in-progress: #fac515;
+  --progress-bar-unfinished: var(--color-warning);
+  --progress-bar-in-progress: #efc943;
   --progress-bar-first-entry-finished: #66c61c;
-  --progress-bar-definitive: #099250;
-  --progress-bar-not-started: var(--bg-gray-darkest);
+  --progress-bar-definitive: var(--color-success);
+  --progress-bar-not-started: #d0d5dd;
 }

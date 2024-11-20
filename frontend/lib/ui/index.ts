@@ -10,7 +10,7 @@ export * from "./CheckboxAndRadio";
 export * from "./Feedback";
 export * from "./Form";
 export * from "./FormField/FormField";
-export * from "./Icon/Icon";
+export * from "./Icon";
 export * from "./IconButton/IconButton";
 export * from "./InputField/InputField";
 export * from "./InputGrid";

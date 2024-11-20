@@ -41,7 +41,7 @@ export function usePollingStationCreate(): UsePollingStationMutationReturn {
         if (response instanceof ApiError || response instanceof NetworkError) {
           setError(response.message);
         } else {
-          setData(response.data);
+          setData(null);
         }
 
         setLoading(false);

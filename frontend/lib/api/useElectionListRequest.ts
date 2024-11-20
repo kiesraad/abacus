@@ -4,5 +4,5 @@ import { useApiRequest } from "./useApiRequest";
 
 export function useElectionListRequest() {
   const path: ELECTION_LIST_REQUEST_PATH = "/api/elections";
-  return useApiRequest<ElectionListResponse>(path);
+  return useApiRequest<ElectionListResponse>(path, false);
 }

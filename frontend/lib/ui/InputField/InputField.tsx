@@ -25,6 +25,7 @@ export function InputField({
   error = "",
   disabled = false,
   margin = true,
+  autoFocus,
   ...InputFieldProps
 }: InputFieldProps) {
   return (
@@ -40,6 +41,7 @@ export function InputField({
             name={name}
             value={value}
             autoComplete="off"
+            autoFocus={autoFocus}
             aria-invalid={error ? "true" : "false"}
             aria-errormessage={error ? `${name}-hint_or_error` : undefined}
             rows={7}
@@ -50,6 +52,7 @@ export function InputField({
             value={value}
             type={type}
             autoComplete="off"
+            autoFocus={autoFocus}
             aria-invalid={error ? "true" : "false"}
             aria-errormessage={error ? `${name}-hint_or_error` : undefined}
             {...InputFieldProps}

@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# translation files (.po files) are generated
+translations
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

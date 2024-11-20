@@ -39,6 +39,7 @@ export function PollingStationSelector({
         fieldWidth="narrow"
         margin={false}
         maxLength={6}
+        autoFocus={true}
         onChange={(e) => {
           setAlert(undefined);
           setPollingStationNumber(e.target.value);

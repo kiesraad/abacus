@@ -1,4 +1,3 @@
-import { waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
@@ -57,13 +56,6 @@ describe("Test RecountedForm", () => {
       const user = userEvent.setup();
 
       render(Component);
-
-      const formTitle = await screen.findByRole("heading", {
-        level: 2,
-        name: "Is het selectievakje op de eerste pagina aangevinkt?",
-      });
-      await waitFor(() => expect(formTitle).toHaveFocus());
-      await user.keyboard("{tab}");
 
       const yes = await screen.findByTestId("yes");
       const no = await screen.findByTestId("no");

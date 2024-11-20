@@ -11,7 +11,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
   return (
     <Table id="polling_station_list">
       <Table.Header>
-        <Table.Column number>Nummer</Table.Column>
+        <Table.Column>Nummer</Table.Column>
         <Table.Column>Stembureau</Table.Column>
       </Table.Header>
       <Table.Body>
@@ -23,8 +23,10 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
 
           return (
             <Table.LinkRow key={pollingStation.number} to={`./${pollingStation.id}`}>
-              <Table.Cell number>{pollingStation.number}</Table.Cell>
-              <Table.Cell>
+              <Table.Cell number fontSizeClass="fs-body">
+                {pollingStation.number}
+              </Table.Cell>
+              <Table.Cell fontSizeClass="fs-md">
                 <span>{pollingStation.name}</span>
                 {status && <Badge type={status} showIcon />}
               </Table.Cell>

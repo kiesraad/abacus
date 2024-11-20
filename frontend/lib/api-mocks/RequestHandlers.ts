@@ -10,7 +10,9 @@ import {
   POLLING_STATION_CREATE_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS,
+  POLLING_STATION_GET_REQUEST_PARAMS,
   POLLING_STATION_LIST_REQUEST_PARAMS,
+  POLLING_STATION_UPDATE_REQUEST_PARAMS,
   PollingStation,
   PollingStationListResponse,
   PollingStationRequest,
@@ -254,6 +256,46 @@ export const PollingStationCreateHandler = http.post<ParamsToString<POLLING_STAT
   },
 );
 
+export const PollingStationUpdateHandler = http.put<ParamsToString<POLLING_STATION_UPDATE_REQUEST_PARAMS>>(
+  "/api/polling_stations/:polling_station_id",
+  async ({ request, params }) => {
+    const pollingStationId = parseInt(params.polling_station_id, 10);
+
+    const json = (await request.json()) as PollingStationRequest;
+
+    //check if exists
+    const ps = Database.pollingStations.find((ps) => ps.id === pollingStationId);
+    if (ps) {
+      const updatedPollingStation: PollingStation = {
+        ...ps,
+        ...json,
+      };
+
+      Database.pollingStations = Database.pollingStations.map((ps) =>
+        ps.id === pollingStationId ? updatedPollingStation : ps,
+      );
+
+      return HttpResponse.json(updatedPollingStation, { status: 200 });
+    }
+
+    return HttpResponse.text("Not Found", { status: 404 });
+  },
+);
+
+export const PollingStationGetHandler = http.get<ParamsToString<POLLING_STATION_GET_REQUEST_PARAMS>>(
+  "/api/polling_stations/:polling_station_id",
+  ({ params }) => {
+    const pollingStationId = parseInt(params.polling_station_id, 10);
+
+    //check if exists
+    const ps = Database.pollingStations.find((ps) => ps.id === pollingStationId);
+    if (ps) {
+      return HttpResponse.json(ps, { status: 200 });
+    }
+    return HttpResponse.text("Not Found", { status: 404 });
+  },
+);
+
 export const handlers: HttpHandler[] = [
   pingHandler,
   ElectionListRequestHandler,
@@ -265,4 +307,6 @@ export const handlers: HttpHandler[] = [
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
   PollingStationCreateHandler,
+  PollingStationGetHandler,
+  PollingStationUpdateHandler,
 ];

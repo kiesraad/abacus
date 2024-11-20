@@ -1,11 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import { labelForPollingStationType, usePollingStationListRequest } from "@kiesraad/api";
-import { Loader, PageTitle, Table } from "@kiesraad/ui";
+import { Alert, Loader, PageTitle, Table } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationListPage() {
   const electionId = useNumericParam("electionId");
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const { requestState } = usePollingStationListRequest(electionId);
 
   if (requestState.status === "loading") {
@@ -18,6 +20,17 @@ export function PollingStationListPage() {
 
   const data = requestState.data;
 
+  const updatedId = searchParams.get("updated");
+  const updatedPollingStation = updatedId ? data.polling_stations.find((ps) => ps.id === parseInt(updatedId)) : null;
+
+  const createdId = searchParams.get("created");
+  const createdPollingStation = createdId ? data.polling_stations.find((ps) => ps.id === parseInt(createdId)) : null;
+
+  const closeAlert = () => {
+    setSearchParams("");
+  };
+
+  //TODO: Table needs highlight option
   return (
     <>
       <PageTitle title="Stembureaus - Abacus" />
@@ -26,6 +39,17 @@ export function PollingStationListPage() {
           <h1>Stembureaus</h1>
         </section>
       </header>
+      {updatedPollingStation && (
+        <Alert type="success" onClose={closeAlert}>
+          <p>Wijzigingen {updatedPollingStation.name} opgeslagen.</p>
+        </Alert>
+      )}
+
+      {createdPollingStation && (
+        <Alert type="success" onClose={closeAlert}>
+          <p>{createdPollingStation.name} toegevoegd.</p>
+        </Alert>
+      )}
       <main>
         <Link to="create">Voeg toe</Link>
         {!data.polling_stations.length ? (
@@ -44,7 +68,7 @@ export function PollingStationListPage() {
               </Table.Header>
               <Table.Body>
                 {data.polling_stations.map((station) => (
-                  <Table.LinkRow key={station.id} to={`#todo-${station.id}`}>
+                  <Table.LinkRow key={station.id} to={`update/${station.id}`}>
                     <Table.Cell number fontSizeClass="fs-body">
                       {station.number}
                     </Table.Cell>

@@ -1,4 +1,5 @@
 .form-layout {
+  padding-bottom: var(--space-lg);
 }
 .form-section {
   padding-bottom: var(--space-md);

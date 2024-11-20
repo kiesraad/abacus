@@ -9,7 +9,7 @@ RUN useradd --no-log-init -r -g abacus --uid=999 abacus
 RUN install -o abacus -g abacus -d  /abacus
 
 # Copy the binary
-COPY ./backend/target/release/api /usr/local/bin/abacus
+COPY ./backend/target/release/abacus /usr/local/bin/abacus
 
 USER 999
 

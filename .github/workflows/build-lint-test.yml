@@ -60,8 +60,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: backend-build
-          path: backend/target/debug/api
-
+          path: backend/target/debug/abacus
+  
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
@@ -152,6 +152,6 @@ jobs:
           name: backend-build
           path: builds/backend
       - name: make backend build executable
-        run: chmod a+x ../builds/backend/api
+        run: chmod a+x ../builds/backend/abacus
       - name: Run DOM to Database e2e tests
         run: npm run e2e:d2d -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}

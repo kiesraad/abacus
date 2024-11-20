@@ -194,6 +194,8 @@ const expectPollingStationChoicePage = async () => {
 const submitWith422Response = async () => {
   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
     error: "JSON error or invalid data (Unprocessable Content)",
+    fatal: false,
+    reference: "InvalidJson",
   });
   await submit();
 };
@@ -206,6 +208,8 @@ const expect422ClientError = async () => {
 const submitWith500Response = async () => {
   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
     error: "Internal server error",
+    fatal: false,
+    reference: "InternalServerError",
   });
   await submit();
 };
@@ -615,34 +619,22 @@ describe("Polling Station data entry integration tests", () => {
       vi.spyOn(console, "error").mockImplementation(() => {});
       render();
 
-      const formFillingSteps = [
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submitWith422Response,
-        expect422ClientError,
-      ];
-
-      for (const step of formFillingSteps) {
-        await step();
-      }
+      await startPollingStationInput();
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submitWith422Response();
+      await expect422ClientError();
     });
 
     test("5xx response results in error shown", async () => {
       vi.spyOn(console, "error").mockImplementation(() => {});
       render();
 
-      const formFillingSteps = [
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submitWith500Response,
-        expect500ServerError,
-      ];
-
-      for (const step of formFillingSteps) {
-        await step();
-      }
+      await startPollingStationInput();
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submitWith500Response();
+      await expect500ServerError();
     });
   });
 });

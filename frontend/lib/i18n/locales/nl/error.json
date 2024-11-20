@@ -1,0 +1,31 @@
+{
+  "label": "Fout",
+  "not_found": "Pagina niet gevonden",
+  "election_not_found": "Verkiezing niet gevonden",
+  "elections_not_found": "Verkiezingen niet gevonden",
+  "polling_station_not_found": "Stembureau niet gevonden",
+  "polling_station_already_definitive": "De invoer voor dit stembureau is al definitief",
+  "page_not_found": "De pagina <code>{path}</code> is niet gevonden.",
+  "not_found_feedback": "We kunnen de pagina die je zoekt niet vinden. Het kan zijn dat de pagina is verplaatst of verwijderd.",
+  "instruction": {
+    "title": "Komt het probleem terug?",
+    "content": "Neem contact op met de ontwikkelaars of rapporteer een bug via <link>https://github.com/kiesraad/abacus</link>"
+  },
+  "api_error": {
+    "EntryNumberNotSupported": "Ongeldige invoer voor dit stembureau",
+    "EntryNotFound": "De invoer is niet gevonden",
+    "PollingStationAlreadyFinalized": "De invoer voor dit stembureau is al definitief",
+    "PollingStationDataValidation": "De invoer voor dit stembureau is niet geldig",
+    "InvalidVoteGroup": "De politieke partij van de stem is niet geldig",
+    "InvalidVoteCandidate": "De kandidaat van de stem is niet geldig",
+    "InvalidData": "De invoer is niet geldig",
+    "InvalidJson": "De JSON is niet geldig",
+    "EntryNotUnique": "Deze invoer bestaat al",
+    "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
+    "InternalServerError": "Er is een interne fout opgetreden",
+    "PdfGenerationError": "Er is een fout opgetreden bij het genereren van de PDF",
+    "PollingStationRepeated": "Het stembureau is al ingevoerd",
+    "PollingStationValidationErrors": "Er zijn fouten opgetreden bij het valideren van het stembureau",
+    "InvalidPoliticalGroup": "De politieke partij is niet geldig"
+  }
+}

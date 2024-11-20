@@ -31,7 +31,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "chrono"] }
 tower = "0.5"
-tower-http = { version = "0.6.1", features = ["fs"] }
+tower-http = { version = "0.6.2", features = ["fs"] }
 tracing-subscriber = "0.3.18"
 tracing = "0.1.40"
 typst = "0.12.0"

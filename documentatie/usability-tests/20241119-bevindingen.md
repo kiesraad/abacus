@@ -39,7 +39,7 @@
 ### Gegevensinvoer - algemene bevindingen
 #### Toetsenbord- en muisgebruik
 - Ook deze groep merkt de hints over hoe het toetsenbord te gebruiken niet spontaan op. Sommigen vragen wel of er een mogelijkheid is om snel naar de onderkant van een lijst te gaan. Eenmaal gewezen op de betreffende toetsen-combinaties worden deze gebruikt
-  - Overweeg de [onboarding](https://github.com/kiesraad/abacus/issues/597) meer prioriteit te geven. Of een papieren cheat-sheet te ontwikkelen met uitleg over de keyboard-shortcuts #597
+  - Overweeg de [onboarding](https://github.com/kiesraad/abacus/issues/597) meer prioriteit te geven. Of een papieren cheat-sheet te ontwikkelen met uitleg over de keyboard-shortcuts.
 - Sommige gebruikers gebruiken herhaaldelijk pijltje naar beneden om naar de onderkant van het formulier te komen. Soms drukken ze net te vaak, en zitten ze weer aan de bovenkant van het formulier. Dat haalt ze uit hun flow, opnieuw naar de onderkant van het formulier navigeren kost relatief veel extra tijd.
   - Zorg dat [het pijltje naar beneden op het laatste veld niks doet](https://github.com/kiesraad/abacus/issues/624)  
 

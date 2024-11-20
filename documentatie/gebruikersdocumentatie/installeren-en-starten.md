@@ -5,21 +5,20 @@ Hieronder vind je instructies voor de verschillende methodes.
 
 ## Linux en macOS
 
-De onderstaande methodes werken waarschijnlijk op alle gangbare (recente) Linux-distributies en macOS, en zijn getest op Ubuntu (22.04 en hoger) en Debian (12/bookworm). 
+De onderstaande methodes werken waarschijnlijk op alle gangbare (recente) Linux-distributies en zijn getest op Ubuntu (22.04 en hoger) en Debian (12/bookworm). Methode 1 werkt niet op macOS omdat we geen macOS-specifieke builds maken, maar de andere methodes werken wel.
 
 ## Windows
 
-Methode 3 en 4 werken ook in Windows. Op dit moment kun je nog geen installatiebestand voor Windows downloaden, maar we zijn hiermee bezig. Zodra deze optie er is vind je hier meer info.
+De methodes 3 en 4 werken ook in Windows. Op dit moment kun je nog geen installatiebestand voor Windows downloaden, maar we zijn hiermee bezig. Zodra deze optie er is vind je hier meer info.
 
 ### Methode 1: build artifact downloaden en starten
 
 Deze methode lijkt het meest op het draaien van een productiebuild en is ook het meest eenvoudig. Voer de volgende stappen uit:
 
-1. Ga in de Abacus-repository naar [Actions](https://github.com/kiesraad/abacus/actions)
-2. Klik aan de linkerkant op [Build, lint & test](https://github.com/kiesraad/abacus/actions/workflows/build-lint-test.yml)
-3. Klik aan de rechterkant op *Branch* om op een branch te filteren
-4. Selecteer de meest recente action
-5. Download het bestand *backend-build*. Let op: de download is alleen zichtbaar als je bent ingelogd in GitHub.
+1. Ga in de Abacus-repository naar [Actions](https://github.com/kiesraad/abacus/actions).
+2. Klik aan de linkerkant op [Build, lint & test](https://github.com/kiesraad/abacus/actions/workflows/build-lint-test.yml).
+3. Klik op de eerste workflow waarbij de tweede kolom leeg is.
+4. Download het bestand *backend-build*. Let op: de download is alleen zichtbaar als je bent ingelogd in GitHub.
 
 ![instructions1](/documentatie/gebruikersdocumentatie/img/build-artifact-1.png)
 ![instructions2](/documentatie/gebruikersdocumentatie/img/build-artifact-2.png)
@@ -47,8 +46,12 @@ Wanneer de API draait, klik je op de link van de API-server (<http://0.0.0.0:808
 
 ### Methode 2: script `pull-and-run` uitvoeren
 
-Dit is een Bash-script dat is bedoeld om snel een productiebuild te bouwen en starten. Het staat in de hoofdmap van de repository. Dit script maakt geen gebruik van Docker, waardoor het wel nodig is om `npm` en `cargo` geïnstalleerd te hebben.
-Instructies voor de installatie van `npm` vind je op [npm Docs](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) en instructies voor de installatie van Rust en `cargo` vind je op de [website van Rust](https://doc.rust-lang.org/cargo/getting-started/installation.html).
+*Let op: voor deze methode moet je de repository klonen of downloaden.*
+
+Dit is een Bash-script dat is bedoeld om snel een productiebuild te bouwen en starten. Het staat in de hoofdmap van de repository. Het script maakt geen gebruik van Docker, waardoor het wel nodig is om `npm` en `cargo` geïnstalleerd te hebben.
+
+- `npm` is onderdeel van Node.js en dit kun je installeren door de instructies te volgen op de [website van Node.js](https://nodejs.org/en/download/package-manager).
+- `cargo` is onderdeel van Rust en installatie-instructies hiervoor vind je op de [website van Rust](https://www.rust-lang.org/learn/get-started).
 
 Je kunt een git-branch als argument meegeven, zodat je snel de productiebuild van een bepaalde branch kunt starten. Als je het argument weglaat, wordt de huidige branch gebouwd.
 

@@ -1311,6 +1311,7 @@
             "type": "integer",
             "format": "int32",
             "description": "Data entry progress between 0 and 100",
+            "maximum": 100,
             "minimum": 0
           },
           "finished_at": {
@@ -1357,6 +1358,7 @@
             "type": "integer",
             "format": "int32",
             "description": "Data entry progress between 0 and 100",
+            "maximum": 100,
             "minimum": 0
           }
         }

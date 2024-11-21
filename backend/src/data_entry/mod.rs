@@ -23,6 +23,7 @@ pub mod structs;
 #[from_request(via(axum::Json), rejection(APIError))]
 pub struct SaveDataEntryRequest {
     /// Data entry progress between 0 and 100
+    #[schema(maximum = 100)]
     pub progress: u8,
     /// Data entry for a polling station
     pub data: PollingStationResults,

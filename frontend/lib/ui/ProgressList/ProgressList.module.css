@@ -93,14 +93,6 @@
       }
     }
 
-    &:global(.updates) {
-      aside {
-        svg {
-          fill: var(--menu-updates);
-        }
-      }
-    }
-
     &:global(.empty) {
       aside {
         svg {
@@ -136,7 +128,7 @@
     &:global(.unsaved) {
       aside {
         svg {
-          fill: var(--menu-updates);
+          fill: var(--menu-unsaved);
         }
       }
     }
@@ -199,11 +191,11 @@ section.scroll {
 
   &::before {
     top: 0;
-    background: linear-gradient(to bottom, #f9fafb 0%, rgba(249, 250, 251, 0) 100%);
+    background: linear-gradient(to bottom, var(--bg-gray) 0%, rgba(249, 250, 251, 0) 100%);
   }
   &::after {
     bottom: 0;
-    background: linear-gradient(to top, #f9fafb 0%, rgba(249, 250, 251, 0) 100%);
+    background: linear-gradient(to top, var(--bg-gray) 0%, rgba(249, 250, 251, 0) 100%);
   }
 
   &:global(.show-top-gradient) {

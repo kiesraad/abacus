@@ -11,7 +11,7 @@
 
     aside {
       flex: 0 0 2rem;
-      font-size: 0.875rem;
+      font-size: var(--font-size-sm);
     }
   }
 
@@ -27,11 +27,12 @@
 .progressbar-outer {
   flex: 1 1 auto;
   height: 0.5rem;
-  background-color: var(--gray-200);
+  background-color: var(--color-hover);
   border-radius: 0.5rem;
   overflow: hidden;
   display: flex;
   flex-direction: row;
+  gap: 1px;
 }
 
 .progressbar-inner {

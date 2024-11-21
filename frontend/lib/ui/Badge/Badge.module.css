@@ -6,8 +6,8 @@
   font-weight: 500;
   line-height: 2rem;
   padding: 0.5rem 1rem;
-  background: var(--accent-blue);
-  color: var(--base-white);
+  background: var(--badge-polling-station-bg);
+  color: var(--badge-polling-station);
 }
 
 .workstation {
@@ -20,14 +20,14 @@
   letter-spacing: -0.045rem;
   padding: 1.125rem 1.3125rem;
   border-radius: var(--rounded-default);
-  background: var(--bg-gray-darker);
-  color: var(--base-brand-blue);
+  background: var(--badge-workstation-bg);
+  color: var(--badge-workstation);
 }
 
 .badge {
   text-align: center;
   font-family: var(--font-text);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-style: normal;
   font-weight: bold;
   line-height: 1.25rem;
@@ -41,38 +41,43 @@
 }
 
 .correction {
-  background: var(--blue-light-100);
-  color: var(--blue-light-800);
+  background: var(--badge-correction-bg);
+  color: var(--badge-correction);
 }
 
 .definitive {
-  background: var(--base-brand-blue);
-  color: var(--base-white);
+  background: var(--badge-definitive-bg);
+  color: var(--badge-definitive);
 }
 
 .difference {
-  background: var(--color-error-darker);
-  color: var(--base-white);
+  background: var(--badge-difference-bg);
+  color: var(--badge-difference);
 }
 
 .extra_entry {
-  background: var(--green-100);
-  color: var(--green-800);
+  background: var(--badge-extra-entry-bg);
+  color: var(--badge-extra-entry);
 }
 
 .not_started,
 .first_entry_in_progress,
 .first_entry_unfinished {
-  background: var(--color-warning-bg);
-  color: var(--color-warning-text);
+  background: var(--badge-first-entry-bg);
+  color: var(--badge-first-entry);
 }
 
 .objections {
-  background: var(--purple-100);
-  color: var(--purple-800);
+  background: var(--badge-objections-bg);
+  color: var(--badge-objections);
 }
 
 .second_entry {
-  background: var(--green-100);
-  color: var(--green-800);
+  background: var(--badge-second-entry-bg);
+  color: var(--badge-second-entry);
+}
+
+.typist_busy {
+  background: var(--badge-typist-busy-bg);
+  color: var(--badge-typist-busy);
 }

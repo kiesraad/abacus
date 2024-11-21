@@ -8,8 +8,6 @@ export function Footer() {
   }
   const gitCommit = __GIT_COMMIT__;
   const gitDirty = __GIT_DIRTY__;
-  let mode = (import.meta.env.MODE as string | undefined) || "unknown";
-  mode = (mode[0]?.toUpperCase() ?? "") + mode.slice(1);
 
   return (
     <footer>
@@ -25,18 +23,18 @@ export function Footer() {
         )}
       </section>
       <section>
-        <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"} &nbsp;&nbsp;
-        <strong>{t("version")}</strong>{" "}
-        {gitCommit ? (
-          gitDirty ? (
-            <>{gitCommit}-dirty</>
-          ) : (
-            <a href={"https://github.com/kiesraad/abacus/commit/" + gitCommit} target="_blank">
-              {gitCommit}
-            </a>
-          )
-        ) : (
-          mode
+        <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"} &nbsp;&nbsp;{" "}
+        {gitCommit && (
+          <>
+            <strong>{t("version")}</strong>{" "}
+            {gitDirty ? (
+              <>{gitCommit}-dirty</>
+            ) : (
+              <a href={"https://github.com/kiesraad/abacus/commit/" + gitCommit} target="_blank">
+                {gitCommit}
+              </a>
+            )}
+          </>
         )}
       </section>
     </footer>

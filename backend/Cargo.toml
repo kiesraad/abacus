@@ -5,7 +5,7 @@ edition = "2021"
 license = "EUPL-1.2"
 rust-version = "1.75"
 
-default-run = "api"
+default-run = "abacus"
 
 [features]
 default = ["openapi", "dev-database"]
@@ -19,7 +19,7 @@ required-features = ["openapi"]
 
 [dependencies]
 axum = { version = "0.7", features = ["macros", "tracing"] }
-axum-extra = { version = "0.9.4", default-features = false, features = ["attachment"] }
+axum-extra = { version = "0.9.6", default-features = false, features = ["attachment"] }
 chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
 clap = { version = "4.5", default-features = false, features = ["derive", "std", "help"] }
 hyper = { version = "1", features = ["full"] }
@@ -31,7 +31,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "chrono"] }
 tower = "0.5"
-tower-http = { version = "0.6.1", features = ["fs"] }
+tower-http = { version = "0.6.2", features = ["fs"] }
 tracing-subscriber = "0.3.18"
 tracing = "0.1.40"
 typst = "0.12.0"

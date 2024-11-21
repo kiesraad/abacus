@@ -16,7 +16,7 @@ export function PollingStationListPage() {
     return <Loader />;
   }
 
-  if (requestState.status === "api-error" || requestState.status === "network-error") {
+  if ("error" in requestState) {
     throw requestState.error;
   }
 
@@ -41,16 +41,20 @@ export function PollingStationListPage() {
           <article>
             <Table id="polling_stations">
               <Table.Header>
-                <Table.Column number>Nummer</Table.Column>
+                <Table.Column>Nummer</Table.Column>
                 <Table.Column>Naam</Table.Column>
                 <Table.Column>Soort</Table.Column>
               </Table.Header>
               <Table.Body>
                 {data.polling_stations.map((station) => (
                   <Table.LinkRow key={station.id} to={`#todo-${station.id}`}>
-                    <Table.Cell number>{station.number}</Table.Cell>
-                    <Table.Cell>{station.name}</Table.Cell>
-                    <Table.Cell>{labelForPollingStationType[station.polling_station_type]}</Table.Cell>
+                    <Table.Cell number fontSizeClass="fs-body">
+                      {station.number}
+                    </Table.Cell>
+                    <Table.Cell fontSizeClass="fs-md">{station.name}</Table.Cell>
+                    <Table.Cell fontSizeClass="fs-md">
+                      {labelForPollingStationType[station.polling_station_type]}
+                    </Table.Cell>
                   </Table.LinkRow>
                 ))}
               </Table.Body>

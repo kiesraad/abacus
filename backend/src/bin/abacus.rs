@@ -12,7 +12,7 @@ use tokio::net::TcpListener;
 use tokio::signal;
 use tracing::info;
 
-/// Abacus API server
+/// Abacus API and asset server
 #[derive(Parser, Debug)]
 struct Args {
     /// Server port, optional

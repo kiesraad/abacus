@@ -11,7 +11,7 @@
   }
 
   &.error {
-    background-color: var(--color-error-icon);
+    background-color: var(--color-error-darker);
   }
 
   &.accept {

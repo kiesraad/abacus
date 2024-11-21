@@ -1,13 +1,14 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { labelForPollingStationType, usePollingStationListRequest } from "@kiesraad/api";
-import { Alert, Loader, PageTitle, Table } from "@kiesraad/ui";
+import { IconPlus } from "@kiesraad/icon";
+import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationListPage() {
   const electionId = useNumericParam("electionId");
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const navigate = useNavigate();
   const { requestState } = usePollingStationListRequest(electionId);
 
   if (requestState.status === "loading") {
@@ -31,6 +32,7 @@ export function PollingStationListPage() {
   };
 
   //TODO: Table needs highlight option
+  //TODO: Alert has some layout glitches
   return (
     <>
       <PageTitle title="Stembureaus - Abacus" />
@@ -51,7 +53,6 @@ export function PollingStationListPage() {
         </Alert>
       )}
       <main>
-        <Link to="create">Voeg toe</Link>
         {!data.polling_stations.length ? (
           <article>
             <h2>Hoe wil je stembureaus toevoegen?</h2>
@@ -60,6 +61,21 @@ export function PollingStationListPage() {
           </article>
         ) : (
           <article>
+            <Toolbar>
+              <Toolbar.Section pos="end">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<IconPlus />}
+                  onClick={() => {
+                    navigate("create");
+                  }}
+                >
+                  Stembureau toevoegen
+                </Button>
+              </Toolbar.Section>
+            </Toolbar>
+
             <Table id="polling_stations">
               <Table.Header>
                 <Table.Column>Nummer</Table.Column>

@@ -28,7 +28,7 @@ describe("PollingStationForm create", () => {
 
     const user = userEvent.setup();
 
-    const { id, election_id, ...inputs } = testPollingStation;
+    const { id, election_id, polling_station_type, ...inputs } = testPollingStation;
 
     // mainly to stop eslint from complaining about unused variables
     expect(id).toBe(1);
@@ -36,6 +36,9 @@ describe("PollingStationForm create", () => {
 
     await userTypeInputs(user, inputs);
 
-    await userEvent.click(screen.getByRole("button", { name: "submit" }));
+    const pollingStationType = screen.getByTestId(`polling_station_type-${polling_station_type}`);
+    await userEvent.click(pollingStationType);
+
+    await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
   });
 });

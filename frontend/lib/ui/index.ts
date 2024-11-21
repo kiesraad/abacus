@@ -25,3 +25,4 @@ export * from "./StatusList/StatusList";
 export * from "./Table/Table";
 export * from "./ui.types.d";
 export * from "./util";
+export * from "./Toolbar/Toolbar";

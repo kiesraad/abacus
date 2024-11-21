@@ -71,12 +71,24 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
       <Form ref={formRef} onSubmit={handleSubmit}>
         <FormLayout>
           <FormLayout.Section title="Algemene gegevens">
-            <input type="hidden" name="election_id" defaultValue={electionId} />
-            <input type="hidden" name="id" defaultValue={pollingStation?.id} />
+            <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />
+            <input type="hidden" id="id" name="id" defaultValue={pollingStation?.id} />
+
+            {/* props that are not in design but are in the model */}
+            <div className="hidden">
+              <input type="text" id="street" name="street" defaultValue={pollingStation?.street} />
+              <input type="text" id="house_number" name="house_number" defaultValue={pollingStation?.house_number} />
+            </div>
 
             <FormLayout.Row>
-              <InputField name="number" label="Nummer" fieldWidth="narrow" defaultValue={pollingStation?.number} />
-              <InputField name="name" label="Naam" defaultValue={pollingStation?.name} />
+              <InputField
+                id="number"
+                name="number"
+                label="Nummer"
+                fieldWidth="narrow"
+                defaultValue={pollingStation?.number}
+              />
+              <InputField id="name" name="name" label="Naam" defaultValue={pollingStation?.name} />
             </FormLayout.Row>
 
             <FormLayout.Field>
@@ -85,7 +97,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
                 {labelForPollingStationType.entries.map((entry) => (
                   <ChoiceList.Radio
                     key={entry.key}
-                    id={`"polling_station_type"-${entry.key}`}
+                    id={`polling_station_type-${entry.key}`}
                     name={"polling_station_type"}
                     value={entry.value}
                     defaultChecked={pollingStation?.polling_station_type === entry.key}
@@ -96,6 +108,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
             </FormLayout.Field>
 
             <InputField
+              id="number_of_voters"
               name="number_of_voters"
               label="Aantal kiesgerechtigden"
               subtext="Optioneel"
@@ -107,17 +120,20 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
             <InputField name="street" label="Straatnaam en huisnummer" defaultValue={pollingStation?.street} />
             <FormLayout.Row>
               <InputField
+                id="postal_code"
                 name="postal_code"
                 fieldWidth="narrow"
                 label="Postcode"
                 defaultValue={pollingStation?.postal_code}
               />
-              <InputField name="locality" label="Plaats" defaultValue={pollingStation?.locality} />
+              <InputField id="locality" name="locality" label="Plaats" defaultValue={pollingStation?.locality} />
             </FormLayout.Row>
           </FormLayout.Section>
 
           <FormLayout.Controls>
-            <Button type="submit">Opslaan en toevoegen</Button>
+            <Button type="submit" name="submit">
+              Opslaan en toevoegen
+            </Button>
           </FormLayout.Controls>
         </FormLayout>
       </Form>

@@ -67,10 +67,7 @@ jobs:
   
   frontend:
     name: Frontend
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
@@ -92,7 +89,7 @@ jobs:
         run: npm run build
       - uses: actions/upload-artifact@v4
         with:
-          name: frontend-build-${{ matrix.os }}
+          name: frontend-build
           path: frontend/dist
 
   playwright-ui:

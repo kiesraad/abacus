@@ -71,7 +71,10 @@ export function OverviewPage() {
                   <Table.Cell fontSizeClass="fs-body">{election.name}</Table.Cell>
                   {isAdministrator && <Table.Cell fontSizeClass="fs-md"></Table.Cell>}
                   <Table.Cell fontSizeClass="fs-md">
-                    {ElectionStatusWithIcon(election.status, false, isAdministrator)}
+                    <ElectionStatusWithIcon
+                      status={election.status}
+                      userRole={isAdministrator ? "coordinator" : "typist"}
+                    />
                   </Table.Cell>
                 </Table.LinkRow>
               ))}

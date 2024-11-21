@@ -1,56 +1,31 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { ElectionStatusWithIcon } from "./ElectionStatusWithIcon";
+import { ElectionStatus } from "@kiesraad/api";
+
+import { ElectionStatusWithIcon, HeaderElectionStatusWithIcon } from "./ElectionStatusWithIcon";
+
+type Scenario = [ElectionStatus, "coordinator" | "typist", string, string];
+
+const testScenarios: Scenario[] = [
+  ["DataEntryInProgress", "coordinator", "IconCheckHeart", "Steminvoer bezig"],
+  ["DataEntryFinished", "coordinator", "IconCheckVerified", "Steminvoer klaar"],
+  ["DataEntryInProgress", "typist", "IconCheckHeart", "Steminvoer bezig"],
+  ["DataEntryFinished", "typist", "IconCheckVerified", "Steminvoer klaar"],
+];
 
 describe("ElectionStatusWithIcon", () => {
-  test("renders all election statuses correctly", () => {
-    const { rerender } = render(ElectionStatusWithIcon("DataEntryInProgress", true, true));
+  test.each(testScenarios)("Status with icon for %s with role %s", (state, role, icon, label) => {
+    render(<ElectionStatusWithIcon status={state} userRole={role} />);
+    expect(screen.getByText(label)).toBeVisible();
+    expect(screen.getByRole("img")).toHaveAttribute("data-icon", icon);
+  });
+});
 
-    expect(screen.getByText("Steminvoer bezig")).toBeVisible();
-    expect(screen.getByText("(eerste zitting)")).toBeVisible();
-    expect(screen.getByRole("img")).toHaveAttribute("data-icon", "IconCheckHeart");
-
-    rerender(ElectionStatusWithIcon("DataEntryFinished", true, true));
-
-    expect(screen.getByText("Steminvoer afgerond")).toBeVisible();
-    expect(screen.getByText("(eerste zitting)")).toBeVisible();
-    expect(screen.getByRole("img")).toHaveAttribute("data-icon", "IconCheckVerified");
-
-    rerender(ElectionStatusWithIcon("DataEntryInProgress", true, false));
-
-    expect(screen.getByText("Invoer gestart")).toBeVisible();
-    expect(screen.getByText("(eerste zitting)")).toBeVisible();
-    expect(screen.getByRole("img")).toHaveAttribute("data-icon", "IconCheckHeart");
-
-    rerender(ElectionStatusWithIcon("DataEntryFinished", true, false));
-
-    expect(screen.getByText("Steminvoer voltooid")).toBeVisible();
-    expect(screen.getByText("(eerste zitting)")).toBeVisible();
-    expect(screen.getByRole("img")).toHaveAttribute("data-icon", "IconCheckVerified");
-
-    rerender(ElectionStatusWithIcon("DataEntryInProgress", false, true));
-
-    expect(screen.getByText("Steminvoer bezig")).toBeVisible();
-    expect(screen.queryByText("(eerste zitting)")).not.toBeInTheDocument();
-    expect(screen.getByRole("img")).toHaveAttribute("data-icon", "IconCheckHeart");
-
-    rerender(ElectionStatusWithIcon("DataEntryFinished", false, true));
-
-    expect(screen.getByText("Steminvoer afgerond")).toBeVisible();
-    expect(screen.queryByText("(eerste zitting)")).not.toBeInTheDocument();
-    expect(screen.getByRole("img")).toHaveAttribute("data-icon", "IconCheckVerified");
-
-    rerender(ElectionStatusWithIcon("DataEntryInProgress", false, false));
-
-    expect(screen.getByText("Invoer gestart")).toBeVisible();
-    expect(screen.queryByText("(eerste zitting)")).not.toBeInTheDocument();
-    expect(screen.getByRole("img")).toHaveAttribute("data-icon", "IconCheckHeart");
-
-    rerender(ElectionStatusWithIcon("DataEntryFinished", false, false));
-
-    expect(screen.getByText("Steminvoer voltooid")).toBeVisible();
-    expect(screen.queryByText("(eerste zitting)")).not.toBeInTheDocument();
-    expect(screen.getByRole("img")).toHaveAttribute("data-icon", "IconCheckVerified");
+describe("HeaderElectionStatusWithIcon", () => {
+  test.each(testScenarios)("Status with icon for %s with role %s", (state, role, icon, label) => {
+    render(<HeaderElectionStatusWithIcon status={state} userRole={role} />);
+    expect(screen.getByText(label)).toBeVisible();
+    expect(screen.getByRole("img")).toHaveAttribute("data-icon", icon);
   });
 });

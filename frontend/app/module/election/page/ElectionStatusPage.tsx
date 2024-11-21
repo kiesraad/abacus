@@ -1,7 +1,7 @@
 import { ReactNode, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
+import { HeaderElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -60,6 +60,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
       </Table.Header>
     );
   }
+
   const finishedAtColumn = <Table.Column key={`${category}-time`}>{t("finished_at")}</Table.Column>;
   const progressColumn = <Table.Column key={`${category}-progress`}>{t("progress")}</Table.Column>;
   // TODO: Needs to be updated when second entry is implemented
@@ -77,6 +78,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
 function getTableRowForCategory(category: StatusCategory, polling_station: PollingStationWithStatus): ReactNode {
   // TODO: future `errors_and_warnings` status should be added to showBadge array
   const showBadge = ["first_entry_unfinished", "first_entry_in_progress"];
+
   function CategoryPollingStationRow({ children }: { children?: ReactNode[] }) {
     return (
       <Table.Row>
@@ -91,6 +93,7 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
       </Table.Row>
     );
   }
+
   const finishedAtCell = (
     <Table.Cell key={`${polling_station.id}-time`} fontSizeClass="fs-sm">
       {polling_station.finished_at
@@ -176,7 +179,9 @@ export function ElectionStatusPage() {
           <h1>{t("election_status.first_session")}</h1>
         </section>
         <section>
-          <div className="election_status">{ElectionStatusWithIcon(election.status, true, true)}</div>
+          <div className="election_status">
+            <HeaderElectionStatusWithIcon status={election.status} userRole="coordinator" />
+          </div>
         </section>
       </header>
       {election.status !== "DataEntryFinished" &&

@@ -22,7 +22,6 @@ import {
 import { Database, DataEntryRecord, pollingStationID } from "./Database.ts";
 import { validate } from "./DataEntry.ts";
 import { electionListMockResponse, getElectionMockData } from "./ElectionMockData";
-import { getPollingStationMockData } from "./PollingStationMockData";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -112,7 +111,7 @@ export const PollingStationListRequestHandler = http.get<ParamsToString<POLLING_
       return HttpResponse.json({}, { status: 404 });
     }
 
-    const pollingStations = getPollingStationMockData(electionId);
+    const pollingStations = Database.pollingStations.filter((ps) => ps.election_id === electionId);
     return HttpResponse.json({ polling_stations: pollingStations } satisfies PollingStationListResponse, {
       status: 200,
     });
@@ -278,7 +277,14 @@ export const PollingStationUpdateHandler = http.put<ParamsToString<POLLING_STATI
       return HttpResponse.json(updatedPollingStation, { status: 200 });
     }
 
-    return HttpResponse.text("Not Found", { status: 404 });
+    return HttpResponse.json(
+      {
+        error: "Not Found",
+        fatal: false,
+        reference: "EntryNotFound",
+      } satisfies ErrorResponse,
+      { status: 404 },
+    );
   },
 );
 

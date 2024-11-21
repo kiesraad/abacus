@@ -2,10 +2,7 @@ import * as React from "react";
 
 import { deformatNumber, formatNumber, validateNumberString } from "@kiesraad/util";
 
-export interface NumberInputProps
-  extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
-  id: string;
-}
+export type NumberInputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 export function NumberInput({ id, ...inputProps }: NumberInputProps) {
   const props = {

@@ -7,7 +7,8 @@ import {
   PollingStationType,
   usePollingStationMutation,
 } from "@kiesraad/api";
-import { Button, ChoiceList, Form, FormLayout, InputField } from "@kiesraad/ui";
+import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@kiesraad/ui";
+import { deformatNumber } from "@kiesraad/util";
 
 export interface PollingStationFormProps {
   electionId: number;
@@ -29,14 +30,13 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
 
   const handleSubmit = (event: React.FormEvent<Form>) => {
     event.preventDefault();
-
     const elements = event.currentTarget.elements;
     const requestObj: PollingStationRequest = {
       number: parseInt(elements.number.value),
       house_number: "",
       locality: elements.locality.value,
       name: elements.name.value,
-      number_of_voters: elements.number_of_voters?.value ? parseInt(elements.number_of_voters.value) : undefined,
+      number_of_voters: elements.number_of_voters?.value ? deformatNumber(elements.number_of_voters.value) : undefined,
       polling_station_type: elements.polling_station_type.value as PollingStationType,
       postal_code: elements.postal_code.value,
       street: elements.street.value,
@@ -55,26 +55,21 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
     }
   }, [requestState, onSaved]);
 
-  //TODO: useCrud is default loading, even for mutations
-  //NOTE: difference between global and local errors, now I dont get any errors, even validation
-
   return (
     <div>
-      {/* {requestState.status === "error" && (
+      {requestState.status === "api-error" && (
         <FormLayout.Alert>
-          <Alert type="error">{error}</Alert>
+          <Alert type="error">{requestState.error.message}</Alert>
         </FormLayout.Alert>
-      )} */}
-      {/** placeholdef for validation and error handling */}
-      {/* {fieldErrors.id && <div>{fieldErrors.id}</div>} */}
+      )}
 
       <Form ref={formRef} onSubmit={handleSubmit}>
-        <FormLayout>
+        <FormLayout disabled={requestState.status === "loading"}>
           <FormLayout.Section title="Algemene gegevens">
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />
             <input type="hidden" id="id" name="id" defaultValue={pollingStation?.id} />
 
-            {/* props that are not in design but are in the model */}
+            {/* props that are not in design but are in the pollingstation model */}
             <div className="hidden">
               <input type="text" id="street" name="street" defaultValue={pollingStation?.street} />
               <input type="text" id="house_number" name="house_number" defaultValue={pollingStation?.house_number} />
@@ -99,7 +94,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
                     key={entry.key}
                     id={`polling_station_type-${entry.key}`}
                     name={"polling_station_type"}
-                    value={entry.value}
+                    defaultValue={entry.key}
                     defaultChecked={pollingStation?.polling_station_type === entry.key}
                     label={entry.value}
                   />
@@ -112,7 +107,9 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
               name="number_of_voters"
               label="Aantal kiesgerechtigden"
               subtext="Optioneel"
+              fieldWidth="narrow"
               defaultValue={pollingStation?.number_of_voters}
+              numberInput
             />
           </FormLayout.Section>
 

@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   gap: 1em;
+  padding-bottom: 2rem;
 }
 
 .input {
@@ -13,6 +14,7 @@
 }
 
 .message {
+  margin-top: 2rem;
   padding: 1rem 1.5rem;
   background-color: var(--bg-gray-darker);
   height: 4.5rem;

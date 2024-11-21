@@ -26,9 +26,9 @@ export function PollingStationUpdatePage() {
       </header>
       <main>
         <article>
-          {requestState.status === "loading" ? (
-            <Loader />
-          ) : (
+          {requestState.status === "loading" && <Loader />}
+
+          {requestState.status === "success" && (
             <PollingStationForm electionId={1} pollingStation={requestState.data} onSaved={onSave} />
           )}
         </article>

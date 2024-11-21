@@ -12,10 +12,6 @@ import { callAsync } from "@kiesraad/util";
 
 import { useCrud } from "../useCrud";
 
-// type FieldErrors = Partial<{
-//   [key in keyof PollingStation]: string;
-// }>;
-
 export type PollingStationSubmitCreate = (electionId: number, obj: POLLING_STATION_CREATE_REQUEST_BODY) => void;
 export type PollingStationSubmitUpdate = (pollingStationId: number, obj: POLLING_STATION_UPDATE_REQUEST_BODY) => void;
 

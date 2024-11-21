@@ -148,7 +148,7 @@
   --badge-definitive: var(--base-white);
   --badge-definitive-bg: var(--base-dark-blue);
 
-  --progress-bar-default: var(--color-notify);
+  --progress-bar-default: #366fca;
   --progress-bar-errors-and-warnings: var(--color-error-darker);
   --progress-bar-unfinished: var(--color-warning);
   --progress-bar-in-progress: #efc943;

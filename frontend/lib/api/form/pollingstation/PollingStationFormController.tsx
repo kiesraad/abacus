@@ -7,6 +7,7 @@ import {
   ApiError,
   ApiResult,
   buildFormState,
+  calculateDataEntryProgress,
   Election,
   getClientState,
   GetDataEntryResponse,
@@ -173,6 +174,7 @@ export function PollingStationFormController({
       if (responseData.client_state) {
         // save data entry, continue is set to true to make sure polling station status changes to InProgress
         const requestBody: SaveDataEntryRequest = {
+          progress: responseData.progress,
           data: responseData.data,
           client_state: { ...responseData.client_state, continue: true },
         };
@@ -205,6 +207,7 @@ export function PollingStationFormController({
       // save initial data entry, continue is set to true to make sure polling station has status FirstEntryInProgress
       const clientState = getClientState(formState, false, true);
       const requestBody: SaveDataEntryRequest = {
+        progress: 0,
         data: values,
         client_state: clientState,
       };
@@ -316,10 +319,12 @@ export function PollingStationFormController({
 
     // prepare data to send to server
     const clientState = getClientState(formState, acceptWarnings, continueToNextSection);
+    const progress = calculateDataEntryProgress(formState);
 
     // send data to server
     status.current = "saving";
     const response: ApiResult<SaveDataEntryResponse> = await client.postRequest(requestPath, {
+      progress,
       data: newValues,
       client_state: clientState,
     } satisfies SaveDataEntryRequest);

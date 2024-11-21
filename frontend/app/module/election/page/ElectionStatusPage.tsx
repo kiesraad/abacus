@@ -62,7 +62,11 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
   }
 
   const finishedAtColumn = <Table.Column key={`${category}-time`}>{t("finished_at")}</Table.Column>;
-  const progressColumn = <Table.Column key={`${category}-progress`}>{t("progress")}</Table.Column>;
+  const progressColumn = (
+    <Table.Column key={`${category}-progress`} width="13rem">
+      {t("progress")}
+    </Table.Column>
+  );
   // TODO: Needs to be updated when second entry is implemented
   if (category === "unfinished") {
     return <CategoryHeader />;
@@ -104,8 +108,15 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
         : ""}
     </Table.Cell>
   );
-  // TODO: Add polling station progress bar in #463
-  const progressCell = <Table.Cell key={`${polling_station.id}-progress`} fontSizeClass="fs-sm"></Table.Cell>;
+  const progressCell = (
+    <Table.Cell key={`${polling_station.id}-progress`} fontSizeClass="fs-sm">
+      <ProgressBar
+        id={`${polling_station.id}-progressbar`}
+        data={{ percentage: polling_station.data_entry_progress ?? 0, class: "default" }}
+        showPercentage
+      />
+    </Table.Cell>
+  );
   // TODO: Needs to be updated when second entry is implemented and when user accounts are implemented
   if (category === "unfinished") {
     return <CategoryPollingStationRow key={polling_station.id} />;

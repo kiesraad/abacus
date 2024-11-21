@@ -71,7 +71,9 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
     assert_eq!(body.statuses[0].status, PollingStationStatus::NotStarted);
+    assert_eq!(body.statuses[0].data_entry_progress, None);
     assert_eq!(body.statuses[1].status, PollingStationStatus::NotStarted);
+    assert_eq!(body.statuses[1].data_entry_progress, None);
 
     // Finalise one and set the other in progress
     shared::create_and_finalise_data_entry(&addr, 1).await;
@@ -87,14 +89,18 @@ async fn test_election_details_status(pool: SqlitePool) {
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
+    let statuses = [
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap(),
+        body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
+    ];
+
+    assert_eq!(statuses[0].status, PollingStationStatus::Definitive);
+    assert_eq!(statuses[0].data_entry_progress, None);
     assert_eq!(
-        body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
-        PollingStationStatus::Definitive
-    );
-    assert_eq!(
-        body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,
+        statuses[1].status,
         PollingStationStatus::FirstEntryInProgress
     );
+    assert_eq!(statuses[1].data_entry_progress, Some(60));
 
     // Abort and save the other data entry
     shared::create_and_save_data_entry(&addr, 2, Some(r#"{"continue": false}"#)).await;
@@ -108,14 +114,18 @@ async fn test_election_details_status(pool: SqlitePool) {
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
+    let statuses = [
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap(),
+        body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
+    ];
+
+    assert_eq!(statuses[0].status, PollingStationStatus::Definitive);
+    assert_eq!(statuses[0].data_entry_progress, None);
     assert_eq!(
-        body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
-        PollingStationStatus::Definitive
-    );
-    assert_eq!(
-        body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,
+        statuses[1].status,
         PollingStationStatus::FirstEntryUnfinished
     );
+    assert_eq!(statuses[1].data_entry_progress, Some(60));
 }
 
 #[sqlx::test(fixtures("../fixtures/elections.sql"))]

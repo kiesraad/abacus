@@ -20,8 +20,8 @@ Deze methode lijkt het meest op het draaien van een productiebuild en is ook het
 3. Klik op de eerste workflow waarbij de tweede kolom leeg is.
 4. Download het bestand *backend-build*. Let op: de download is alleen zichtbaar als je bent ingelogd in GitHub.
 
-![instructions1](/documentatie/gebruikersdocumentatie/img/build-artifact-1.png)
-![instructions2](/documentatie/gebruikersdocumentatie/img/build-artifact-2.png)
+![instructies1](/documentatie/gebruikersdocumentatie/img/build-artifact-1.png)
+![instructies2](/documentatie/gebruikersdocumentatie/img/build-artifact-2.png)
 
 De download bevat een ZIP-bestand met de binary. Deze binary bevat ook alle frontend-assets. Pak deze binary uit en start hem als volgt:
 
@@ -78,7 +78,9 @@ cargo install sqlx-cli
 
 ### Methode 3: handmatig starten
 
-Je kunt natuurlijk altijd handmatig `cargo run` vanuit de backend-map en `npm run dev` vanuit de frontend-map in twee verschillende terminals starten. Hiervoor gelden dezelfde vereisten als bij methode 2.
+*Let op: voor deze methode moet je de repository klonen of downloaden.*
+
+In plaats van het script kun je ook handmatig `cargo run` vanuit de backend-map en `npm run dev` vanuit de frontend-map in twee verschillende terminals starten. Hiervoor gelden dezelfde vereisten als bij methode 2.
 
 ### Methode 4: Docker compose
 

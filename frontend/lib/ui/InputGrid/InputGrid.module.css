@@ -51,7 +51,7 @@
           text-align: right;
           width: 100%;
           height: 4.5rem;
-          border: 3px solid transparent;
+          border: 2px solid transparent;
           padding: 1rem 1.5rem;
           font-size: var(--font-size-body);
           font-style: normal;
@@ -59,7 +59,7 @@
           &:focus,
           &:focus-visible {
             outline: none;
-            border: 3px solid var(--border-color-focus);
+            border-color: var(--border-color-focus);
           }
         }
       }
@@ -75,7 +75,7 @@
       }
     }
 
-    &:global(.focused) {
+    &:focus-within {
       td {
         background-color: var(--bg-highlight);
         color: var(--base-black);

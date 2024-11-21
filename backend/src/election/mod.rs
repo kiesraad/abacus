@@ -8,9 +8,10 @@ use self::repository::Elections;
 pub use self::structs::*;
 use crate::data_entry::repository::PollingStationResultsEntries;
 use crate::pdf_gen::generate_pdf;
-use crate::pdf_gen::models::{ModelNa31_2Input, ModelNa31_2Summary, PdfModel};
+use crate::pdf_gen::models::{ModelNa31_2Input, PdfModel};
 use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::{PollingStation, PollingStationStatusEntry};
+use crate::summary::ElectionSummary;
 use crate::{APIError, ErrorResponse};
 
 pub(crate) mod repository;
@@ -132,7 +133,7 @@ pub async fn election_download_results(
     let results = polling_station_results_entries_repo
         .list_with_polling_stations(polling_stations_repo, election.id)
         .await?;
-    let summary = ModelNa31_2Summary::from_results(&election, &results)?;
+    let summary = ElectionSummary::from_results(&election, &results)?;
 
     let model = PdfModel::ModelNa31_2(ModelNa31_2Input {
         polling_stations,

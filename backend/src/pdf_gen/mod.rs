@@ -52,13 +52,14 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use chrono::Utc;
-    use models::{ModelNa31_2Input, ModelNa31_2Summary};
+    use models::ModelNa31_2Input;
 
     use crate::{
         election::{tests::election_fixture, Election, ElectionCategory},
         polling_station::{PollingStation, PollingStationType},
+        summary::ElectionSummary,
     };
 
     use super::*;
@@ -109,7 +110,7 @@ mod tests {
                 political_groups: None,
             },
             polling_stations: vec![],
-            summary: ModelNa31_2Summary::zero(),
+            summary: ElectionSummary::zero(),
         }))
         .unwrap();
 
@@ -122,7 +123,7 @@ mod tests {
         let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
             polling_stations: polling_stations_fixture(&election, &[100, 200, 300]),
             election,
-            summary: ModelNa31_2Summary::zero(),
+            summary: ElectionSummary::zero(),
         }))
         .unwrap();
 

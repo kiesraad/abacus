@@ -166,6 +166,7 @@ jobs:
           name: backend-build-${{ matrix.os }}
           path: builds/backend
       - name: make backend build executable
-        run: chmod a+x ../builds/backend/${{ runner.os == 'Windows' && 'abacus.exe' || 'abacus' }}
+        run: chmod a+x ../builds/backend/abacus
+        if: runner.os != 'Windows'
       - name: Run DOM to Database e2e tests
         run: npm run e2e:d2d -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}

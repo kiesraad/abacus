@@ -14,7 +14,10 @@ env:
 jobs:
   backend:
     name: Backend
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: ./backend
@@ -59,12 +62,15 @@ jobs:
         run: cargo --verbose --locked build --features memory-serve
       - uses: actions/upload-artifact@v4
         with:
-          name: backend-build
-          path: backend/target/debug/abacus
+          name: backend-build-${{ matrix.os }}
+          path: ${{ runner.os == 'Windows' && 'backend/target/debug/abacus.exe' || 'backend/target/debug/abacus' }}
   
   frontend:
     name: Frontend
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: frontend
@@ -86,12 +92,15 @@ jobs:
         run: npm run build
       - uses: actions/upload-artifact@v4
         with:
-          name: frontend-build
+          name: frontend-build-${{ matrix.os }}
           path: frontend/dist
 
   playwright-ui:
     name: Playwright UI tests
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: frontend
@@ -109,7 +118,10 @@ jobs:
         run: npm run e2e:lib-ui
   playwright-app:
     name: Playwright app tests
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: frontend
@@ -126,13 +138,15 @@ jobs:
       - name: Run app e2e tests
         run: npm run e2e:app
   playwright-d2d:
-    name: Playwright d2d tests (${{ matrix.shard }}/${{ strategy.job-total }})
+    name: Playwright d2d tests (${{ matrix.os }}, ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
     needs:
       - backend # frontend is included in backend build
     strategy:
       matrix:
-        shard: [1, 2, 3]
-    runs-on: ubuntu-latest
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        shardIndex: [1, 2, 3]
+        shardTotal: [3]
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: frontend
@@ -149,9 +163,9 @@ jobs:
       - name: Download backend-build
         uses: actions/download-artifact@v4
         with:
-          name: backend-build
+          name: backend-build-${{ matrix.os }}
           path: builds/backend
       - name: make backend build executable
-        run: chmod a+x ../builds/backend/abacus
+        run: chmod a+x ../builds/backend/${{ runner.os == 'Windows' && 'abacus.exe' || 'abacus' }}
       - name: Run DOM to Database e2e tests
-        run: npm run e2e:d2d -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        run: npm run e2e:d2d -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}

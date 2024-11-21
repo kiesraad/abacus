@@ -9,7 +9,7 @@ De onderstaande methodes werken waarschijnlijk op alle gangbare (recente) Linux-
 
 ## Windows
 
-De methodes 3 en 4 werken ook in Windows. Op dit moment kun je nog geen installatiebestand voor Windows downloaden, maar we zijn hiermee bezig. Zodra deze optie er is vind je hier meer info.
+De methodes 3 en 4 werken ook in Windows, maar op dit moment is dit meer bedoeld voor developers. Via methode 3 kun je Abacus in Windows zelf gebruiken, en met methode 4 (Docker Desktop) draait Abacus op een virtual machine met Linux. Je kunt nu nog geen installatiebestand voor Windows downloaden, maar we zijn hiermee bezig. Zodra deze optie er is vind je hier meer info.
 
 ### Methode 1: build artifact downloaden en starten
 

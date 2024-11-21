@@ -61,6 +61,7 @@ jobs:
         with:
           name: backend-build
           path: backend/target/debug/abacus
+  
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
@@ -87,10 +88,9 @@ jobs:
         with:
           name: frontend-build
           path: frontend/dist
-  playwright:
-    name: Playwright
-    needs:
-      - backend # frontend is included in backend build
+
+  playwright-ui:
+    name: Playwright UI tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -101,14 +101,51 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install npm dependencies
+      - name: Install dependencies
         run: npm ci
-      - name: Install Playwright
+      - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run UI e2e tests
         run: npm run e2e:lib-ui
+  playwright-app:
+    name: Playwright app tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
       - name: Run app e2e tests
         run: npm run e2e:app
+  playwright-d2d:
+    name: Playwright d2d tests (${{ matrix.shard }}/${{ strategy.job-total }})
+    needs:
+      - backend # frontend is included in backend build
+    strategy:
+      matrix:
+        shard: [1, 2, 3]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
       - name: Download backend-build
         uses: actions/download-artifact@v4
         with:
@@ -117,4 +154,4 @@ jobs:
       - name: make backend build executable
         run: chmod a+x ../builds/backend/abacus
       - name: Run DOM to Database e2e tests
-        run: npm run e2e:d2d
+        run: npm run e2e:d2d -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}

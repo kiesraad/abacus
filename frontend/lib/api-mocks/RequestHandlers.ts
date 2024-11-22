@@ -85,13 +85,15 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
       const pollingStationIds = Database.pollingStations
         .filter((ps) => ps.election_id === Number(params.election_id))
         .map((ps) => ps.id);
-      for (const pollingStationId of pollingStationIds) {
-        if (Database.results.some((r) => r.pollingStationId === pollingStationId)) {
-          response.statuses.push({ id: pollingStationId, status: "definitive" });
-        } else if (Database.dataEntries.some((d) => d.pollingStationId === pollingStationId)) {
-          response.statuses.push({ id: pollingStationId, status: "first_entry_in_progress" });
+
+      for (const id of pollingStationIds) {
+        if (Database.results.some((r) => r.pollingStationId === id)) {
+          response.statuses.push({ id, status: "definitive" });
+        } else if (Database.dataEntries.some((d) => d.pollingStationId === id)) {
+          const dataEntry = Database.dataEntries.find((d) => d.pollingStationId === id);
+          response.statuses.push({ id, status: "first_entry_in_progress", data_entry_progress: dataEntry?.progress });
         } else {
-          response.statuses.push({ id: pollingStationId, status: "not_started" });
+          response.statuses.push({ id, status: "not_started" });
         }
       }
 
@@ -143,6 +145,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
     const dataEntry: DataEntryRecord = {
       pollingStationId: Number(params.polling_station_id),
       entryNumber: Number(params.entry_number),
+      progress: json.progress,
       data: json.data,
       clientState: json.client_state as ClientState,
       updated_at: Number(Date.now() / 1000),
@@ -185,6 +188,7 @@ export const PollingStationDataEntryGetHandler = http.get<
   if (!dataEntryRecord) return HttpResponse.text(null, { status: 404 });
 
   const response: GetDataEntryResponse = {
+    progress: dataEntryRecord.progress,
     data: dataEntryRecord.data,
     client_state: dataEntryRecord.clientState,
     validation_results: validate(dataEntryRecord.data),

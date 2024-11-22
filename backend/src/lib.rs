@@ -15,6 +15,7 @@ mod error;
 pub mod fixtures;
 pub mod pdf_gen;
 pub mod polling_station;
+pub mod summary;
 pub mod validation;
 
 pub use error::{APIError, ErrorResponse};

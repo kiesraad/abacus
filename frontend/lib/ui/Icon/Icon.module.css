@@ -16,7 +16,7 @@
 
   &.error {
     svg {
-      fill: var(--color-error-icon);
+      fill: var(--color-error-darker);
     }
   }
 

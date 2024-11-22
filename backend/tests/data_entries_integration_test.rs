@@ -65,6 +65,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
           }
         ]
       },
+      "progress": 60,
       "client_state": {"foo": "bar"}
     });
 

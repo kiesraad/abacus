@@ -17,6 +17,7 @@ export const pollingStation33: PollingStation = {
 };
 
 export const emptyDataEntryResponse: GetDataEntryResponse = {
+  progress: 0,
   data: {
     recounted: false,
     voters_counts: {

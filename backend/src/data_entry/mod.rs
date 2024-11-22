@@ -191,19 +191,19 @@ pub async fn polling_station_data_entry_delete(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     Path((id, entry_number)): Path<(u32, u8)>,
 ) -> Result<StatusCode, APIError> {
-    // only the first data entry is supported for now
-    if entry_number != 1 {
-        return Err(APIError::NotFound(
-            "Only the first data entry is supported".to_string(),
+    // only a first or second data entry is supported
+    match entry_number {
+        1 | 2 => {
+            polling_station_data_entries
+                .delete(id, entry_number)
+                .await?;
+            Ok(StatusCode::NO_CONTENT)
+        }
+        _ => Err(APIError::NotFound(
+            "Only the first or second data entry is supported".to_string(),
             ErrorReference::EntryNumberNotSupported,
-        ));
+        )),
     }
-
-    polling_station_data_entries
-        .delete(id, entry_number)
-        .await?;
-
-    Ok(StatusCode::NO_CONTENT)
 }
 
 /// Finalise the data entry for a polling station

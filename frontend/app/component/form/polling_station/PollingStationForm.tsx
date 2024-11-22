@@ -107,7 +107,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
               name="number_of_voters"
               label="Aantal kiesgerechtigden"
               subtext="Optioneel"
-              fieldWidth="narrow"
+              fieldWidth="narrow-field"
               defaultValue={pollingStation?.number_of_voters}
               numberInput
             />

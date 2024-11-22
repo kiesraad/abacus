@@ -34,7 +34,7 @@ describe("PollingStationForm create", () => {
     expect(id).toBe(1);
     expect(election_id).toBe(1);
 
-    await userTypeInputs(user, inputs);
+    await userTypeInputs(user, inputs, true);
 
     const pollingStationType = screen.getByTestId(`polling_station_type-${polling_station_type}`);
     await userEvent.click(pollingStationType);

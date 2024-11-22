@@ -37,7 +37,7 @@ describe("PollingStationCreatePage", () => {
 
     expect(await screen.findByTestId("polling-station-form")).toBeVisible();
 
-    expect(screen.getByTestId("number")).toHaveValue("1");
+    expect(screen.getByTestId("number")).toHaveValue(1);
     expect(screen.getByTestId("name")).toHaveValue("test");
   });
 });

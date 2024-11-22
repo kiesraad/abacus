@@ -33,13 +33,13 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
     const elements = event.currentTarget.elements;
     const requestObj: PollingStationRequest = {
       number: parseInt(elements.number.value),
-      house_number: "",
       locality: elements.locality.value,
       name: elements.name.value,
       number_of_voters: elements.number_of_voters?.value ? deformatNumber(elements.number_of_voters.value) : undefined,
       polling_station_type: elements.polling_station_type.value as PollingStationType,
       postal_code: elements.postal_code.value,
       street: elements.street.value,
+      house_number: elements.house_number.value,
     };
 
     if (pollingStation) {
@@ -63,7 +63,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
         </FormLayout.Alert>
       )}
 
-      <Form ref={formRef} onSubmit={handleSubmit}>
+      <Form ref={formRef} onSubmit={handleSubmit} id="polling-station-form">
         <FormLayout disabled={requestState.status === "loading"}>
           <FormLayout.Section title="Algemene gegevens">
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />
@@ -71,7 +71,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
 
             {/* props that are not in design but are in the pollingstation model */}
             <div className="hidden">
-              <input type="text" id="street" name="street" defaultValue={pollingStation?.street} />
               <input type="text" id="house_number" name="house_number" defaultValue={pollingStation?.house_number} />
             </div>
 
@@ -114,7 +113,12 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
           </FormLayout.Section>
 
           <FormLayout.Section title="Adres van het stembureau">
-            <InputField name="street" label="Straatnaam en huisnummer" defaultValue={pollingStation?.street} />
+            <InputField
+              id="street"
+              name="street"
+              label="Straatnaam en huisnummer"
+              defaultValue={pollingStation?.street}
+            />
             <FormLayout.Row>
               <InputField
                 id="postal_code"

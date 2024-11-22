@@ -7,6 +7,7 @@ import { Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationUpdatePage() {
+  const electionId = useNumericParam("electionId");
   const pollingStationId = useNumericParam("pollingStationId");
   const navigate = useNavigate();
 
@@ -29,7 +30,7 @@ export function PollingStationUpdatePage() {
           {requestState.status === "loading" && <Loader />}
 
           {requestState.status === "success" && (
-            <PollingStationForm electionId={1} pollingStation={requestState.data} onSaved={onSave} />
+            <PollingStationForm electionId={electionId} pollingStation={requestState.data} onSaved={onSave} />
           )}
         </article>
       </main>

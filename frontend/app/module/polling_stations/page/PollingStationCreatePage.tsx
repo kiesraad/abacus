@@ -4,8 +4,10 @@ import { PollingStationForm } from "app/component/form/polling_station/PollingSt
 
 import { PollingStation } from "@kiesraad/api";
 import { PageTitle } from "@kiesraad/ui";
+import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationCreatePage() {
+  const electionId = useNumericParam("electionId");
   const navigate = useNavigate();
   const onSave = (ps: PollingStation) => {
     navigate(`../?created=${ps.id}`);
@@ -21,7 +23,7 @@ export function PollingStationCreatePage() {
       </header>
       <main>
         <article>
-          <PollingStationForm electionId={1} onSaved={onSave} />
+          <PollingStationForm electionId={electionId} onSaved={onSave} />
         </article>
       </main>
     </>

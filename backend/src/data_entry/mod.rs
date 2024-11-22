@@ -405,13 +405,14 @@ mod tests {
 
         // Check if the first data entry was finalised:
         // and that a second entry was created
-        // TODO: We should test the "finalised_at" field and entry numbers
         let row = query!("SELECT * FROM polling_station_data_entries")
             .fetch_one(&pool)
             .await
             .unwrap();
         assert!(row.finalised_at.is_some());
-        // ...and is _not_ added to polling_station_results
+        assert_eq!(row.entry_number, 1);
+
+        // Check that nothing is yet added to polling_station_results
         let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")
             .fetch_one(&pool)
             .await
@@ -424,6 +425,13 @@ mod tests {
 
         let response = finalise_entry(pool.clone(), 2).await;
         assert_eq!(response.status(), StatusCode::OK);
+
+        // Check that nothing is yet added to polling_station_results
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 1);
 
         // Check that we can't save a new data entry after finalising
         let response = save(pool.clone(), request_body.clone(), 1).await;

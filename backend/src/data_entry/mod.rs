@@ -70,12 +70,12 @@ pub async fn polling_station_data_entry_save(
         1 if polling_station_data_entries.exists_second_entry(id).await? => return Err(APIError::Conflict(
             "Cannot save a first data entry for a polling station that already has a second entry"
                 .to_string(),
-            ErrorReference::PollingStationFirstEntryAlreadyFinished,
+            ErrorReference::PollingStationFirstEntryAlreadyFinalised,
         )),
         2 if !polling_station_data_entries.exists_first_entry_finalised(id).await? => return Err(APIError::Conflict(
             "Cannot save a second data entry for a polling station that doesn't have a finalised first entry"
                 .to_string(),
-            ErrorReference::PollingStationFirstEntryNotFinished,
+            ErrorReference::PollingStationFirstEntryNotFinalised,
         )),
         _ => if polling_station_data_entries.exists_finalised(id).await? {
             return Err(APIError::Conflict(

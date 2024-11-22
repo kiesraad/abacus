@@ -44,6 +44,9 @@ export function DevHomePage() {
                 <Link to={`/elections/1#coordinator`}>Verkiezing 1</Link>
               </li>
               <li>
+                <Link to={`/elections/1/status#coordinator`}>Statusoverzicht steminvoer Verkiezing 1</Link>
+              </li>
+              <li>
                 <Link to={`/elections/1/polling-stations#coordinator`}>Stembureaus Verkiezing 1</Link>
               </li>
               <li>

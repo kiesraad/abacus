@@ -29,10 +29,23 @@ export function ElectionHomePage() {
         <article>
           <ul>
             <li>
-              <Link to={`status#coordinator`}>Status</Link>
+              Coördinator:
+              <ul>
+                <li>
+                  <Link to={`status#coordinator`}>Statusoverzicht steminvoer</Link>
+                </li>
+                <li>
+                  <Link to={`polling-stations#coordinator`}>Stembureaus</Link>
+                </li>
+              </ul>
             </li>
             <li>
-              <Link to={`polling-stations#coordinator`}>Stembureaus</Link>
+              Invoerder:
+              <ul>
+                <li>
+                  <Link to={`data-entry`}>Stembureau invoeren</Link>
+                </li>
+              </ul>
             </li>
           </ul>
           {__API_MSW__ && <MockTest />}

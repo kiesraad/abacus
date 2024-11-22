@@ -158,12 +158,14 @@ export interface ElectionStatusResponse {
   statuses: PollingStationStatusEntry[];
 }
 
+/**
+ * Error reference used to show the corresponding error message to the end-user
+ */
 export type ErrorReference =
   | "EntryNumberNotSupported"
   | "EntryNotFound"
-  | "PollingStationAlreadyFinalised"
-  | "PollingStationFirstEntryAlreadyFinished"
-  | "PollingStationFirstEntryNotFinished"
+  | "PollingStationFirstEntryAlreadyFinalised"
+  | "PollingStationFirstEntryNotFinalised"
   | "PollingStationDataValidation"
   | "InvalidVoteGroup"
   | "InvalidVoteCandidate"
@@ -193,6 +195,7 @@ export interface ErrorResponse {
 export interface GetDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
+  progress: number;
   updated_at: number;
   validation_results: ValidationResults;
 }
@@ -279,6 +282,7 @@ export type PollingStationStatus =
   | "definitive";
 
 export interface PollingStationStatusEntry {
+  data_entry_progress?: number;
   finished_at?: number;
   id: number;
   status: PollingStationStatus;
@@ -295,6 +299,7 @@ export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
 export interface SaveDataEntryRequest {
   client_state: unknown;
   data: PollingStationResults;
+  progress: number;
 }
 
 /**

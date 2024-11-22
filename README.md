@@ -1,5 +1,9 @@
 # Abacus software voor verkiezingsuitslagen en zetelverdeling
 
+## Snelle links
+
+Installatie: [Abacus installeren en starten](documentatie/gebruikersdocumentatie/installeren-en-starten.md)
+
 ## Wat is Abacus?
 De Kiesraad ontwikkelt nieuwe software voor de berekening van de uitslag van de verkiezingen: Abacus, software voor verkiezingsuitslagen en zetelverdeling. Het programma telt uitslagen bij elkaar op en berekent de zetelverdeling. Abacus vervangt de module Uitslagvaststelling van het programma Ondersteunende Software Verkiezingen (OSV2020) en zal ingezet worden bij alle verkiezingen in Nederland.
 

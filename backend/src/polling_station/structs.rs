@@ -79,6 +79,11 @@ pub struct PollingStationStatusEntry {
     pub status: PollingStationStatus,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
+    #[schema(maximum = 100)]
+    /// Data entry progress between 0 and 100
+    pub data_entry_progress: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub finished_at: Option<i64>,
 }
 

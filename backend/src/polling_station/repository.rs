@@ -207,6 +207,12 @@ SELECT
     ELSE 'NotStarted'
     END AS "status!: _",
 
+  -- progress
+  CASE
+    WHEN de.polling_station_id IS NULL THEN NULL
+    ELSE de.progress
+  END AS "data_entry_progress: u8",
+
   -- finished_at
   CASE
     WHEN de.polling_station_id IS NOT NULL THEN de.updated_at

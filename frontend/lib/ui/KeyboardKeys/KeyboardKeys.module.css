@@ -9,7 +9,7 @@
     align-items: center;
     gap: 0.125rem;
     border-radius: 0.25rem;
-    background: var(--gray-200);
+    background: var(--color-hover);
     font-family: inherit;
 
     svg {

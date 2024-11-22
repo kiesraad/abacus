@@ -22,6 +22,9 @@ pub mod structs;
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 pub struct SaveDataEntryRequest {
+    /// Data entry progress between 0 and 100
+    #[schema(maximum = 100)]
+    pub progress: u8,
     /// Data entry for a polling station
     pub data: PollingStationResults,
     #[schema(value_type = Object)]
@@ -106,7 +109,13 @@ pub async fn polling_station_data_entry_save(
 
     // Save the data entry or update it if it already exists
     polling_station_data_entries
-        .upsert(id, entry_number, data, client_state)
+        .upsert(
+            id,
+            entry_number,
+            data_entry_request.progress,
+            data,
+            client_state,
+        )
         .await?;
 
     Ok(SaveDataEntryResponse { validation_results })
@@ -136,6 +145,7 @@ fn validate_polling_station_results(
 /// Response structure for getting data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct GetDataEntryResponse {
+    pub progress: u8,
     pub data: PollingStationResults,
     #[schema(value_type = Object)]
     pub client_state: Option<serde_json::Value>,
@@ -167,7 +177,7 @@ pub async fn polling_station_data_entry_get(
     let mut tx = pool.begin().await?;
     let polling_station = polling_stations.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
-    let (data, client_state, updated_at) = polling_station_data_entries
+    let (progress, data, client_state, updated_at) = polling_station_data_entries
         .get(&mut tx, id, entry_number)
         .await?;
     let data = serde_json::from_slice(&data)?;
@@ -176,6 +186,7 @@ pub async fn polling_station_data_entry_get(
 
     let validation_results = validate_polling_station_results(&data, &polling_station, &election)?;
     Ok(Json(GetDataEntryResponse {
+        progress,
         data,
         client_state,
         validation_results,
@@ -246,7 +257,7 @@ pub async fn polling_station_data_entry_finalise(
 
     // TODO: #129 validate whether first and second data entries are equal
 
-    let (data, _, _) = polling_station_data_entries
+    let (_, data, _, _) = polling_station_data_entries
         .get(&mut tx, id, entry_number)
         .await?;
     let results = serde_json::from_slice::<PollingStationResults>(&data)?;
@@ -297,6 +308,7 @@ mod tests {
 
     fn example_data_entry() -> SaveDataEntryRequest {
         SaveDataEntryRequest {
+            progress: 100,
             data: PollingStationResults {
                 recounted: Some(false),
                 voters_counts: VotersCounts {
@@ -451,10 +463,10 @@ mod tests {
         */
 
         // Check that we can't save a new data entry after finalising
+        /* TODO: Enable this assert once the frontend supports second entry
         let response = save(pool.clone(), request_body.clone(), 1).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
 
-        /* TODO: Enable this assert once the frontend supports second entry
         let response = save(pool.clone(), request_body.clone(), 2).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         */

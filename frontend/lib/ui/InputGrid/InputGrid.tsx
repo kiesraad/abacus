@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn, domtoren } from "@kiesraad/util";
+import { cn } from "@kiesraad/util";
 
 import cls from "./InputGrid.module.css";
 
@@ -11,40 +11,6 @@ export interface InputGridProps {
 
 export function InputGrid({ zebra, children }: InputGridProps) {
   const ref = React.useRef<HTMLTableElement>(null);
-
-  const handleFocus = React.useCallback((event: FocusEvent) => {
-    // Handle focus event
-    if (event.target) {
-      const el = event.target as HTMLElement;
-      const trEl = domtoren(el).closest("tr").el() as HTMLTableRowElement;
-      domtoren(trEl).addClass("focused");
-    }
-  }, []);
-
-  const handleBlur = React.useCallback((event: FocusEvent) => {
-    if (event.target) {
-      const el = event.target as HTMLElement;
-      const trEl = domtoren(el).closest("tr").el() as HTMLTableRowElement;
-      domtoren(trEl).removeClass("focused");
-    }
-  }, []);
-
-  React.useEffect(() => {
-    const tableEl = ref.current;
-    if (tableEl) {
-      tableEl.querySelectorAll("input").forEach((input) => {
-        input.addEventListener("focus", handleFocus);
-        input.addEventListener("blur", handleBlur);
-      });
-
-      return () => {
-        tableEl.querySelectorAll("input").forEach((input) => {
-          input.removeEventListener("focus", handleFocus);
-          input.removeEventListener("blur", handleBlur);
-        });
-      };
-    }
-  }, [handleBlur, handleFocus]);
 
   return (
     <table role="none" ref={ref} className={cn(cls["input-grid"], { zebra: zebra })}>

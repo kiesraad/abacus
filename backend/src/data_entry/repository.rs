@@ -18,22 +18,25 @@ impl PollingStationDataEntries {
         &self,
         id: u32,
         entry_number: u8,
+        progress: u8,
         data: String,
         client_state: String,
     ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             r#"
             INSERT INTO polling_station_data_entries
-              (polling_station_id, entry_number, data, client_state)
-            VALUES (?, ?, ?, ?)
+              (polling_station_id, entry_number, progress, data, client_state)
+            VALUES (?, ?, ?, ?, ?)
             ON CONFLICT(polling_station_id, entry_number) DO
             UPDATE SET
+              progress = excluded.progress,
               data = excluded.data,
               client_state = excluded.client_state,
               updated_at = unixepoch()
             "#,
             id,
             entry_number,
+            progress,
             data,
             client_state
         )
@@ -48,18 +51,18 @@ impl PollingStationDataEntries {
         tx: &mut Transaction<'_, Sqlite>,
         id: u32,
         entry_number: u8,
-    ) -> Result<(Vec<u8>, Vec<u8>, i64), sqlx::Error> {
+    ) -> Result<(u8, Vec<u8>, Vec<u8>, i64), sqlx::Error> {
         let res = query!(
-            "SELECT data, client_state, updated_at FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
+            r#"SELECT progress AS "progress: u8", data, client_state, updated_at FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?"#,
             id,
             entry_number
         )
             .fetch_one(&mut **tx)
-        .await?;
-        if let (Some(data), Some(client_state), updated_at) =
-            (res.data, res.client_state, res.updated_at)
+            .await?;
+        if let (progress, Some(data), Some(client_state), updated_at) =
+            (res.progress, res.data, res.client_state, res.updated_at)
         {
-            Ok((data, client_state, updated_at))
+            Ok((progress, data, client_state, updated_at))
         } else {
             Err(sqlx::Error::RowNotFound)
         }
@@ -71,8 +74,8 @@ impl PollingStationDataEntries {
             id,
             entry_number
         )
-        .execute(&self.0)
-        .await?;
+            .execute(&self.0)
+            .await?;
         if res.rows_affected() == 0 {
             Err(sqlx::Error::RowNotFound)
         } else {
@@ -109,8 +112,8 @@ impl PollingStationDataEntries {
             "INSERT INTO polling_station_results (polling_station_id, data) SELECT polling_station_id, data FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = 1",
             id,
         )
-        .execute(&mut **tx)
-        .await?;
+            .execute(&mut **tx)
+            .await?;
 
         // Deletes all entries from a polling station
         query!(

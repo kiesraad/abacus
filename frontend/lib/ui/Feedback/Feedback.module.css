@@ -1,5 +1,5 @@
 .feedback {
-  border: 2px solid #ccc;
+  border: 1px solid;
   border-radius: var(--rounded-default);
   padding: 1.5rem;
   display: flex;
@@ -50,17 +50,17 @@
   }
 
   &.error {
-    border-color: var(--color-error-border);
+    border-color: var(--color-error-darker);
     background-color: var(--color-error-bg);
     svg {
-      fill: var(--color-error-darkest);
+      fill: var(--color-error-darker);
     }
   }
   &.warning {
-    border-color: var(--color-warning-border);
+    border-color: var(--color-warning);
     background-color: var(--color-warning-bg);
     svg {
-      fill: var(--color-warning-darker);
+      fill: var(--color-warning);
     }
   }
   &.notify {

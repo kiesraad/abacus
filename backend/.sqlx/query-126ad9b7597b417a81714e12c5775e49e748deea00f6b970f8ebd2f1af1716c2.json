@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT EXISTS(\n              SELECT 1 FROM polling_station_data_entries\n              WHERE polling_station_id = ?\n                AND entry_number = 1\n                AND finalised_at IS NOT NULL)\n            AS `exists`",
+  "describe": {
+    "columns": [
+      {
+        "name": "exists",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "126ad9b7597b417a81714e12c5775e49e748deea00f6b970f8ebd2f1af1716c2"
+}

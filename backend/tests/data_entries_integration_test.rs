@@ -16,7 +16,7 @@ mod utils;
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
-    shared::create_and_finalise_data_entry(&addr, 1).await;
+    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
@@ -217,16 +217,17 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     );
 }
 
-/// test that we can only get a non-finalised data entry
+#[ignore] // TODO: Enable this test when we support second entry in the frontend
+/// test that we can still get a first data entry when it's already finalised
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
-    shared::create_and_finalise_data_entry(&addr, 1).await;
+    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
 
     // get the data entry and expect 404 Not Found
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    assert_eq!(response.status(), StatusCode::OK);
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]

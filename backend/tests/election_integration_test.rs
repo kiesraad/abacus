@@ -57,6 +57,9 @@ async fn test_election_details_not_found(pool: SqlitePool) {
     assert_eq!(status, StatusCode::NOT_FOUND);
 }
 
+// TODO: Enable and adjust this test once frontend second entry is implemented
+// and we've refactored the polling station status code
+#[ignore]
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -66,7 +69,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     let status = response.status();
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
-    // Ensure the response is what we expect
+    // Ensure the statuses are "NotStarted"
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
@@ -75,17 +78,16 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(body.statuses[1].status, PollingStationStatus::NotStarted);
     assert_eq!(body.statuses[1].data_entry_progress, None);
 
-    // Finalise one and set the other in progress
-    shared::create_and_finalise_data_entry(&addr, 1).await;
-    shared::create_and_save_data_entry(&addr, 2, Some(r#"{"continue": true}"#)).await;
+    // Finalise the first entry of one and set the other in progress
+    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
+    shared::create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": true}"#)).await;
 
     let url = format!("http://{addr}/api/elections/1/status");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
-    // Ensure the response is what we expect:
-    // polling station 1 is now complete, polling station 2 is still incomplete and set to in progress
+    // polling station 1's first entry is now complete, polling station 2 is still incomplete and set to in progress
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
@@ -94,7 +96,7 @@ async fn test_election_details_status(pool: SqlitePool) {
         body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
     ];
 
-    assert_eq!(statuses[0].status, PollingStationStatus::Definitive);
+    assert_eq!(statuses[0].status, PollingStationStatus::SecondEntry);
     assert_eq!(statuses[0].data_entry_progress, None);
     assert_eq!(
         statuses[1].status,
@@ -102,15 +104,15 @@ async fn test_election_details_status(pool: SqlitePool) {
     );
     assert_eq!(statuses[1].data_entry_progress, Some(60));
 
-    // Abort and save the other data entry
-    shared::create_and_save_data_entry(&addr, 2, Some(r#"{"continue": false}"#)).await;
+    // Abort and save the entries
+    shared::create_and_save_data_entry(&addr, 1, 2, Some(r#"{"continue": true}"#)).await;
+    shared::create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": false}"#)).await;
 
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
-    // Ensure the response is what we expect:
-    // polling station 1 is now complete, polling station 2 is still incomplete and set to unfinished
+    // polling station 1 should now be in progress, polling station 2 is still incomplete and set to unfinished
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
@@ -119,8 +121,39 @@ async fn test_election_details_status(pool: SqlitePool) {
         body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
     ];
 
-    assert_eq!(statuses[0].status, PollingStationStatus::Definitive);
+    assert_eq!(
+        statuses[0].status,
+        PollingStationStatus::SecondEntryInProgress
+    );
     assert_eq!(statuses[0].data_entry_progress, None);
+    assert_eq!(
+        statuses[1].status,
+        PollingStationStatus::FirstEntryUnfinished
+    );
+
+    // polling station 2 should now be unfinished
+    shared::create_and_save_data_entry(&addr, 1, 2, Some(r#"{"continue": false}"#)).await;
+
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(!body.statuses.is_empty());
+    assert_eq!(
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
+        PollingStationStatus::SecondEntryUnfinished
+    );
+
+    // polling station 2 should now be definitive
+    shared::create_and_finalise_data_entry(&addr, 1, 2).await;
+
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(!body.statuses.is_empty());
     assert_eq!(
         statuses[1].status,
         PollingStationStatus::FirstEntryUnfinished

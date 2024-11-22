@@ -77,6 +77,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
             <FormLayout.Row>
               <InputField
                 id="number"
+                type="number"
                 name="number"
                 label="Nummer"
                 fieldWidth="narrow"

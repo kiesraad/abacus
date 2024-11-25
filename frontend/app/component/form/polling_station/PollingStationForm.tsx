@@ -7,6 +7,7 @@ import {
   PollingStationType,
   usePollingStationMutation,
 } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@kiesraad/ui";
 import { deformatNumber } from "@kiesraad/util";
 
@@ -65,7 +66,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
 
       <Form ref={formRef} onSubmit={handleSubmit} id="polling-station-form">
         <FormLayout disabled={requestState.status === "loading"}>
-          <FormLayout.Section title="Algemene gegevens">
+          <FormLayout.Section title={t("general_details")}>
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />
             <input type="hidden" id="id" name="id" defaultValue={pollingStation?.id} />
 
@@ -79,16 +80,16 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
                 id="number"
                 type="number"
                 name="number"
-                label="Nummer"
+                label={t("number")}
                 fieldWidth="narrow"
                 defaultValue={pollingStation?.number}
               />
-              <InputField id="name" name="name" label="Naam" defaultValue={pollingStation?.name} />
+              <InputField id="name" name="name" label={t("name")} defaultValue={pollingStation?.name} />
             </FormLayout.Row>
 
             <FormLayout.Field>
               <ChoiceList>
-                <ChoiceList.Title>Soort stembureau</ChoiceList.Title>
+                <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
                 {labelForPollingStationType.entries.map((entry) => (
                   <ChoiceList.Radio
                     key={entry.key}
@@ -105,19 +106,19 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
             <InputField
               id="number_of_voters"
               name="number_of_voters"
-              label="Aantal kiesgerechtigden"
-              subtext="Optioneel"
+              label={t("election_status.number_of_voters")}
+              subtext={t("optional")}
               fieldWidth="narrow-field"
               defaultValue={pollingStation?.number_of_voters}
               numberInput
             />
           </FormLayout.Section>
 
-          <FormLayout.Section title="Adres van het stembureau">
+          <FormLayout.Section title={t("polling_station.title.address")}>
             <InputField
               id="street"
               name="street"
-              label="Straatnaam en huisnummer"
+              label={t("polling_station.street_and_number")}
               defaultValue={pollingStation?.street}
             />
             <FormLayout.Row>
@@ -125,16 +126,21 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
                 id="postal_code"
                 name="postal_code"
                 fieldWidth="narrow"
-                label="Postcode"
+                label={t("polling_station.zipcode")}
                 defaultValue={pollingStation?.postal_code}
               />
-              <InputField id="locality" name="locality" label="Plaats" defaultValue={pollingStation?.locality} />
+              <InputField
+                id="locality"
+                name="locality"
+                label={t("polling_station.locality")}
+                defaultValue={pollingStation?.locality}
+              />
             </FormLayout.Row>
           </FormLayout.Section>
 
           <FormLayout.Controls>
             <Button type="submit" name="submit">
-              Opslaan en toevoegen
+              {pollingStation ? t("polling_station.form.save_update") : t("polling_station.form.save_create")}
             </Button>
           </FormLayout.Controls>
         </FormLayout>

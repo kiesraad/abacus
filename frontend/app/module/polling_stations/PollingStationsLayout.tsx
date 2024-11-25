@@ -1,5 +1,6 @@
 import { Link, Outlet } from "react-router-dom";
 
+import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection } from "@kiesraad/api";
@@ -18,6 +19,7 @@ export function PollingStationsLayout() {
         </Link>
       </NavBar>
       <Outlet />
+      <Footer />
     </AppLayout>
   );
 }

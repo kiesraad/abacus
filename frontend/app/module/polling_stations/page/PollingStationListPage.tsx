@@ -1,6 +1,7 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { labelForPollingStationType, usePollingStationListRequest } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { IconPlus } from "@kiesraad/icon";
 import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
@@ -38,7 +39,7 @@ export function PollingStationListPage() {
       <PageTitle title="Stembureaus - Abacus" />
       <header>
         <section>
-          <h1>Stembureaus</h1>
+          <h1>{t("polling_station.title.plural")}</h1>
         </section>
       </header>
       {updatedPollingStation && (
@@ -71,16 +72,16 @@ export function PollingStationListPage() {
                     navigate("create");
                   }}
                 >
-                  Stembureau toevoegen
+                  {t("polling_station.form.create")}
                 </Button>
               </Toolbar.Section>
             </Toolbar>
 
             <Table id="polling_stations">
               <Table.Header>
-                <Table.Column>Nummer</Table.Column>
-                <Table.Column>Naam</Table.Column>
-                <Table.Column>Soort</Table.Column>
+                <Table.Column>{t("number")}</Table.Column>
+                <Table.Column>{t("name")}</Table.Column>
+                <Table.Column>{t("type")}</Table.Column>
               </Table.Header>
               <Table.Body>
                 {data.polling_stations.map((station) => (

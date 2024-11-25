@@ -3,8 +3,6 @@
   "test": "test",
   "election": "Verkiezing",
   "elections": "Verkiezingen",
-  "polling_station": "Stembureau",
-  "polling_stations": "Stembureaus",
   "election_status": "Status",
   "list": "Lijst",
   "number": "Nummer",
@@ -27,5 +25,9 @@
   "loading": "Laden...",
   "account_configured": "Je account is ingesteld",
   "typist": "Invoerder",
-  "finished_at": "Afgerond om"
+  "finished_at": "Afgerond om",
+  "general_details": "Algemene gegevens",
+  "name": "Naam",
+  "optional": "Optioneel",
+  "type": "Soort"
 }

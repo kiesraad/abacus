@@ -5,10 +5,12 @@ import election_status from "./election_status.json";
 import error from "./error.json";
 import feedback from "./feedback.json";
 import generic from "./generic.json";
+import polling_station from "./polling_station.json";
 import status from "./status.json";
 
 const nl = {
   ...generic,
+  polling_station,
   error,
   status,
   candidates_votes,

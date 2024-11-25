@@ -22,6 +22,7 @@
 .form-alert {
   overflow: hidden;
   margin-top: -2.5rem;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   transform: translateX(-5rem);
 }

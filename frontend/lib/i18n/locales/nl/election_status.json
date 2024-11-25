@@ -11,5 +11,6 @@
   "add_polling_station": "Stembureau toevoegen",
   "polling_stations_per_status": "Stembureaus per status",
   "no_polling_stations": "Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.",
-  "finish_first_session_data_entry_status": "<strong>Steminvoer afronden</strong> (eerste zitting)"
+  "finish_first_session_data_entry_status": "<strong>Steminvoer afronden</strong> (eerste zitting)",
+  "number_of_voters": "Aantal kiesgerechtigden"
 }

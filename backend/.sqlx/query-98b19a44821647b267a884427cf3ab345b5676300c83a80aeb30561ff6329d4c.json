@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\nSELECT\n  p.id AS \"id: u32\",\n  p.status AS \"status: PollingStationStatus\",\n\n  CASE\n    WHEN de.polling_station_id IS NULL THEN NULL\n    ELSE de.progress\n  END AS \"data_entry_progress: u8\",\n\n  p.finished_at AS \"finished_at!: _\"\n\nFROM polling_stations AS p\nLEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id\nLEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id\nWHERE election_id = $1",
+  "query": "\nSELECT\n  p.id AS \"id: u32\",\n  p.status AS \"status: PollingStationStatus\",\n\n  CASE\n    WHEN de.polling_station_id IS NULL THEN NULL\n    ELSE de.progress\n  END AS \"data_entry_progress: u8\",\n\n  p.finished_at AS \"finished_at!: _\"\n\nFROM polling_stations AS p\nLEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id\nWHERE election_id = $1",
   "describe": {
     "columns": [
       {
@@ -34,5 +34,5 @@
       true
     ]
   },
-  "hash": "96fb61c54fe479f0a8c999a6c8cfc8afa8b6cf4ac33db4d23493dadff4186ba6"
+  "hash": "98b19a44821647b267a884427cf3ab345b5676300c83a80aeb30561ff6329d4c"
 }

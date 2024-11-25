@@ -168,17 +168,12 @@ impl PollingStations {
         Ok(rows_affected > 0)
     }
 
-    /// Determines the status of the polling station.
-    /// - When an entry of the polling station is found in the `polling_station_data_entries` table, and the `client_state.continue` value is true the status is FirstEntryInProgress
-    /// - When an entry of the polling station is found in the `polling_station_data_entries` table, and the `client_state.continue` value is false the status is FirstEntryUnfinished
-    /// - When an entry of the polling station is found in the `polling_station_results` table, the status is Definitive
-    /// - If no entries are found, it has the NotStarted status
-    ///
-    /// The implementation and determination will probably change while we implement more statuses
+    /// Determines the status of the polling stations of an election.
     pub async fn status(
         &self,
-        election_id: u32,
-    ) -> Result<Vec<PollingStationStatusEntry>, sqlx::Error> {
+        polling_station_id: u32,
+    ) -> Result<PollingStationStatusEntry, sqlx::Error> {
+        // TODO: Make sure we always select the latest data entry in the LEFT JOIN
         query_as!(
             PollingStationStatusEntry,
             r#"
@@ -195,7 +190,35 @@ SELECT
 
 FROM polling_stations AS p
 LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
-LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
+WHERE p.id = $1"#,
+            polling_station_id
+        )
+        .fetch_one(&self.0)
+        .await
+    }
+
+    /// Determines the status of the polling stations of an election.
+    pub async fn statuses(
+        &self,
+        election_id: u32,
+    ) -> Result<Vec<PollingStationStatusEntry>, sqlx::Error> {
+        // TODO: Make sure we always select the latest data entry in the LEFT JOIN
+        query_as!(
+            PollingStationStatusEntry,
+            r#"
+SELECT
+  p.id AS "id: u32",
+  p.status AS "status: PollingStationStatus",
+
+  CASE
+    WHEN de.polling_station_id IS NULL THEN NULL
+    ELSE de.progress
+  END AS "data_entry_progress: u8",
+
+  p.finished_at AS "finished_at!: _"
+
+FROM polling_stations AS p
+LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
 WHERE election_id = $1"#,
             election_id
         )

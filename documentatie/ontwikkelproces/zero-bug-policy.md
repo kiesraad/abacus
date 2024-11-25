@@ -13,4 +13,4 @@ Daarom passen we de zero bug policy trapsgewijs toe over epics, issues en PRs he
 - We leveren op per epic, dus hier is de zero bug policy volledig van toepassing. Als een epic af is, dan is het ok dat we die voor altijd zo laten, rekening houdend met de scope van de epic en onze iteratieve/incrementele manier van werken.
 - Een epic wordt gesplitst in meerdere issues, een issue kan gebouwd worden over meerdere PRs.
 - Of een bug gefixt moet worden binnen de PR, het issue, of de epic, is dus een 'judgment call' op basis van de ernst van de bug.
-- Als je een bug niet binnen de PR zelf oplost, neem die beslissing dan in samenspraak. Te vaak horen "dat lossen we later op", zelfs als dat binnen de epic is, kan ontmoedigend werken.
+- Als je een bug niet binnen de PR zelf oplost, neem die beslissing dan in samenspraak met degene die de bug gevonden heeft. Te vaak horen "dat lossen we later op", zelfs als dat binnen de epic is, kan ontmoedigend werken.

@@ -1,0 +1,69 @@
+use std::{fmt::Display, ops::Deref};
+
+use serde::{Deserialize, Serialize};
+use sqlx::Sqlite;
+
+use super::SaveDataEntryRequest;
+
+pub struct DataEntry {
+    pub id: u32,
+    pub entry_number: EntryNumber,
+    pub data: SaveDataEntryRequest,
+}
+
+#[derive(Debug, Copy, Clone, Serialize)]
+pub struct EntryNumber(u8);
+
+#[derive(Debug)]
+pub struct InvalidEntryNumberError(u8);
+
+impl Display for InvalidEntryNumberError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "invalid entry number `{}`", self.0)
+    }
+}
+
+impl TryFrom<u8> for EntryNumber {
+    type Error = InvalidEntryNumberError;
+
+    fn try_from(n: u8) -> Result<Self, Self::Error> {
+        match n {
+            1 | 2 => Ok(Self(n)),
+            _ => Err(InvalidEntryNumberError(n)),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for EntryNumber {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let n = u8::deserialize(deserializer)?;
+
+        Self::try_from(n).map_err(serde::de::Error::custom)
+    }
+}
+
+impl Deref for EntryNumber {
+    type Target = u8;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<'q> sqlx::Encode<'q, Sqlite> for EntryNumber {
+    fn encode_by_ref(
+        &self,
+        buf: &mut <Sqlite as sqlx::Database>::ArgumentBuffer<'q>,
+    ) -> Result<sqlx::encode::IsNull, sqlx::error::BoxDynError> {
+        self.0.encode(buf)
+    }
+}
+
+impl sqlx::Type<Sqlite> for EntryNumber {
+    fn type_info() -> <Sqlite as sqlx::Database>::TypeInfo {
+        u8::type_info()
+    }
+}

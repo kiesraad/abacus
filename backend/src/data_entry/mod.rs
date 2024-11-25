@@ -2,6 +2,7 @@ use axum::extract::{FromRequest, Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
+use entry_number::EntryNumber;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use utoipa::ToSchema;
@@ -15,6 +16,7 @@ use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::PollingStation;
 use crate::validation::ValidationResults;
 
+pub mod entry_number;
 pub mod repository;
 pub mod structs;
 
@@ -62,43 +64,46 @@ impl IntoResponse for SaveDataEntryResponse {
     ),
 )]
 pub async fn polling_station_data_entry_save(
+    Path((id, entry_number)): Path<(u32, EntryNumber)>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
     State(elections): State<Elections>,
-    Path((id, entry_number)): Path<(u32, u8)>,
     data_entry_request: SaveDataEntryRequest,
 ) -> Result<SaveDataEntryResponse, APIError> {
+    //dbg!(&entry_number);
     // Check if it is valid to save the data entry
-    match entry_number {
-        1 => {
-            if polling_station_data_entries.exists_second_entry(id).await? {
-                return Err(APIError::Conflict(
-                    "Cannot save a first data entry for a polling station that already has a second entry"
+    // TODO: Enable or remove
+    /*
+        match entry_number {
+            1 => {
+                if polling_station_data_entries.exists_second_entry(id).await? {
+                    return Err(APIError::Conflict(
+                        "Cannot save a first data entry for a polling station that already has a second entry"
+                            .to_string(),
+                        ErrorReference::PollingStationFirstEntryAlreadyFinalised,
+                    ));
+                }
+            }
+            2 => {
+                if !polling_station_data_entries
+                    .exists_first_entry_finalised(id)
+                    .await?
+                {
+                    return Err(APIError::Conflict(
+                    "Cannot save a second data entry for a polling station that doesn't have a finalised first entry"
                         .to_string(),
-                    ErrorReference::PollingStationFirstEntryAlreadyFinalised,
+                    ErrorReference::PollingStationFirstEntryNotFinalised,
+                ));
+                }
+            }
+            _ => {
+                return Err(APIError::NotFound(
+                    "Only the first or second data entry is supported".to_string(),
+                    ErrorReference::EntryNumberNotSupported,
                 ));
             }
-        }
-        2 => {
-            if !polling_station_data_entries
-                .exists_first_entry_finalised(id)
-                .await?
-            {
-                return Err(APIError::Conflict(
-                "Cannot save a second data entry for a polling station that doesn't have a finalised first entry"
-                    .to_string(),
-                ErrorReference::PollingStationFirstEntryNotFinalised,
-            ));
-            }
-        }
-        _ => {
-            return Err(APIError::NotFound(
-                "Only the first or second data entry is supported".to_string(),
-                ErrorReference::EntryNumberNotSupported,
-            ));
-        }
-    };
-
+        };
+    */
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
 
@@ -362,10 +367,10 @@ mod tests {
             entry_number: u8,
         ) -> Response {
             polling_station_data_entry_save(
+                Path((1, EntryNumber::try_from(entry_number).unwrap())),
                 State(PollingStationDataEntries::new(pool.clone())),
                 State(PollingStations::new(pool.clone())),
                 State(Elections::new(pool.clone())),
-                Path((1, entry_number)),
                 request_body.clone(),
             )
             .await
@@ -476,10 +481,10 @@ mod tests {
     async fn test_polling_station_data_entry_delete(pool: SqlitePool) {
         // create data entry
         let response = polling_station_data_entry_save(
+            Path((1, EntryNumber::try_from(1).unwrap())),
             State(PollingStationDataEntries::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
             State(Elections::new(pool.clone())),
-            Path((1, 1)),
             example_data_entry(),
         )
         .await

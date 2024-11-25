@@ -1,6 +1,7 @@
 use axum::extract::FromRef;
 use sqlx::{query, Sqlite, SqlitePool, Transaction};
 
+use super::entry_number::EntryNumber;
 use super::{PollingStation, PollingStationResults, PollingStationResultsEntry};
 use crate::polling_station::repository::PollingStations;
 use crate::AppState;
@@ -17,7 +18,7 @@ impl PollingStationDataEntries {
     pub async fn upsert(
         &self,
         id: u32,
-        entry_number: u8,
+        entry_number: EntryNumber,
         progress: u8,
         data: String,
         client_state: String,

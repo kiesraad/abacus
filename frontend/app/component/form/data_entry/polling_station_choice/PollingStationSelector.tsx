@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 
 import { PollingStation } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Badge, Icon, InputField, Spinner } from "@kiesraad/ui";
 import { cn, removeLeadingZeros, usePollingStationStatus } from "@kiesraad/util";
@@ -35,7 +36,7 @@ export function PollingStationSelector({
         className={cls.input}
         name="number"
         value={pollingStationNumber}
-        label="Voer het nummer in:"
+        label={t("polling_station_choice.insert_number")}
         fieldWidth="narrow"
         margin={false}
         maxLength={6}
@@ -58,7 +59,7 @@ export function PollingStationSelector({
                 <span className={cls.icon}>
                   <Icon icon={<Spinner size="md" />} />
                 </span>
-                <span>aan het zoeken …</span>
+                <span>{t("polling_station_choice.searching")} &hellip;</span>
               </div>
             );
           } else if (currentPollingStation) {
@@ -72,9 +73,13 @@ export function PollingStationSelector({
             return (
               <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.error)}>
                 <span className={cls.icon}>
-                  <Icon icon={<IconError aria-label={"bevat een fout"} />} color="error" />
+                  <Icon icon={<IconError aria-label={t("polling_station_choice.contains_error")} />} color="error" />
                 </span>
-                <span>Geen stembureau gevonden met nummer {removeLeadingZeros(pollingStationNumber)}</span>
+                <span>
+                  {t("polling_station_choice.no_polling_station_found", {
+                    nr: removeLeadingZeros(pollingStationNumber),
+                  })}
+                </span>
               </div>
             );
           }

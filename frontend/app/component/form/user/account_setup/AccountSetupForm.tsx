@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
+import { t } from "@kiesraad/i18n";
 import { BottomBar, Button, InputField } from "@kiesraad/ui";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -20,32 +21,21 @@ export function AccountSetupForm() {
 
   return (
     <form className="no_footer" onSubmit={handleSubmit}>
-      <h2 className="mb-lg">Personaliseer je account</h2>
+      <h2 className="mb-lg">{t("user.personalize_account")}</h2>
       <InputField
         name="username"
-        label="Gebruikersnaam"
-        hint="Je kan deze niet aanpassen. Log volgende keer weer met deze gebruikersnaam in."
-        value="Gebruiker01"
+        label={t("user.username_hint")}
+        hint={t("user.username_hint")}
+        value={t("user.username_default")}
         disabled
       />
-      <InputField
-        name="name"
-        label="Jouw naam"
-        subtext="(roepnaam + achternaam)"
-        hint="Bijvoorbeeld Karel van Tellingen. Je naam wordt opgenomen in het verslag van deze
-        invoersessie."
-      />
-      <InputField
-        name="new_password1"
-        label="Kies nieuw wachtwoord"
-        hint="Je hebt dit wachtwoord nodig als je na een pauze opnieuw wilt inloggen. Gebruik minimaal 8 letters en 2 cijfers."
-        type="password"
-      />
-      <InputField name="new_password2" label="Herhaal wachtwoord" type="password" margin={false} />
+      <InputField name="name" label={t("user.name")} subtext={t("user.name_subtext")} hint={t("user.name_hint")} />
+      <InputField name="new_password1" label={t("user.password")} hint={t("user.password_hint")} type="password" />
+      <InputField name="new_password2" label={t("user.password_repeat")} type="password" margin={false} />
       <BottomBar type="footer">
         <BottomBar.Row>
           <Button type="submit" size="lg">
-            Opslaan
+            {t("save")}
           </Button>
         </BottomBar.Row>
       </BottomBar>

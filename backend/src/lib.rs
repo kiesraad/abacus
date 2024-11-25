@@ -10,6 +10,7 @@ use utoipa_swagger_ui::SwaggerUi;
 
 pub mod data_entry;
 pub mod election;
+pub mod eml;
 mod error;
 #[cfg(feature = "dev-database")]
 pub mod fixtures;

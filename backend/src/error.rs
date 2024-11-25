@@ -55,6 +55,7 @@ impl IntoResponse for ErrorResponse {
 /// trait implementation
 #[derive(Debug)]
 pub enum APIError {
+    BadRequest(String, ErrorReference),
     NotFound(String, ErrorReference),
     Conflict(String, ErrorReference),
     InvalidData(DataError),
@@ -79,6 +80,9 @@ impl IntoResponse for APIError {
         }
 
         let (status, response) = match self {
+            APIError::BadRequest(message, reference) => {
+                (StatusCode::BAD_REQUEST, to_error(&message, reference, true))
+            }
             APIError::NotFound(message, reference) => {
                 (StatusCode::NOT_FOUND, to_error(&message, reference, true))
             }

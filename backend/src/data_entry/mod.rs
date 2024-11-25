@@ -64,13 +64,14 @@ impl IntoResponse for SaveDataEntryResponse {
     ),
 )]
 pub async fn polling_station_data_entry_save(
+    Path((id, entry_number)): Path<(u32, EntryNumber)>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_station_results_entries): State<PollingStationResultsEntries>,
     State(polling_stations_repo): State<PollingStations>,
     State(elections): State<Elections>,
-    Path((id, entry_number)): Path<(u32, EntryNumber)>,
     data_entry_request: SaveDataEntryRequest,
 ) -> Result<SaveDataEntryResponse, APIError> {
+    //dbg!(&entry_number);
     // Check if it is valid to save the data entry
     // TODO: #657 execute all checks in this function in a single SQL transaction
     if polling_station_results_entries.exists(id).await? {
@@ -90,36 +91,19 @@ pub async fn polling_station_data_entry_save(
                 return Err(APIError::Conflict(
                     "Cannot save a first data entry for a polling station that already has a finalised first entry"
                         .to_string(),
-                    ErrorReference::PollingStationFirstEntryAlreadyFinalised,
-                ));
-            }
-        }
-        EntryNumber::SecondEntry => {
-            if !polling_station_data_entries
-                .exists_finalised_entry(id, 1)
-                .await?
-            {
-                return Err(APIError::Conflict(
-                    "Cannot save a second data entry for a polling station that doesn't have a finalised first entry"
-                        .to_string(),
                     ErrorReference::PollingStationFirstEntryNotFinalised,
                 ));
+                }
             }
-
-            if polling_station_data_entries
-                .exists_finalised_entry(id, 2)
-                .await?
-            {
-                return Err(APIError::Conflict(
-                    "Cannot save a second data entry for a polling station that already has a finalised second entry"
-                        .to_string(),
-                    ErrorReference::PollingStationSecondEntryAlreadyFinalised,
+            _ => {
+                return Err(APIError::NotFound(
+                    "Only the first or second data entry is supported".to_string(),
+                    ErrorReference::EntryNumberNotSupported,
                 ));
             }
-        }
-    };
+        };
 
-    let polling_station = polling_stations_repo.get(id).await?;
+let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
 
     let validation_results =
@@ -364,11 +348,11 @@ mod tests {
         entry_number: u8,
     ) -> Response {
         polling_station_data_entry_save(
+            Path((1, EntryNumber::try_from(entry_number).unwrap())),
             State(PollingStationDataEntries::new(pool.clone())),
             State(PollingStationResultsEntries::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
             State(Elections::new(pool.clone())),
-            Path((1, EntryNumber::try_from(entry_number).unwrap())),
             request_body.clone(),
         )
         .await

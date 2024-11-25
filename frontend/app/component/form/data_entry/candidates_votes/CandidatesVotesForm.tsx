@@ -176,7 +176,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             defaultValue={sectionValues?.total || ""}
             isListTotal
             {...defaultProps}
-            error={missingTotalError ? "missing-total-error" : undefined}
+            errorMessageId={missingTotalError ? "missing-total-error" : undefined}
           />
         </InputGrid.Body>
       </InputGrid>

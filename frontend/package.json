@@ -30,7 +30,7 @@
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.27.0"
+    "react-router-dom": "^7.0.1"
   },
   "devDependencies": {
     "@ladle/react": "^4.1.2",
@@ -40,7 +40,7 @@
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@types/node": "^20.17.6",
+    "@types/node": "^20.17.7",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
@@ -61,13 +61,13 @@
     "jsdom": "^25.0.1",
     "lefthook": "^1.8.4",
     "lint-staged": "^15.2.10",
-    "msw": "^2.6.5",
+    "msw": "^2.6.6",
     "postcss": "^8.4.49",
     "postcss-import": "^16.1.0",
     "postcss-nesting": "^13.0.1",
     "postcss-pseudo-classes": "^0.4.0",
     "prettier": "^3.3.2",
-    "typescript": "^5.6.3",
+    "typescript": "^5.7.2",
     "vite": "^5.4.11",
     "vite-node": "^2.1.5",
     "vite-plugin-html": "^3.2.2",

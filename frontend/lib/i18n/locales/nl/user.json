@@ -11,5 +11,11 @@
   "password_hint": "Je hebt dit wachtwoord nodig als je na een pauze opnieuw wilt inloggen. Gebruik minimaal 8 letters en 2 cijfers.",
   "password_login_hint": "Eerder ingelogd? Vul het wachtwoord in dat je zelf hebt ingesteld. Nog niet eerder ingelogd? Gebruik het wachtwoord dat je van de coördinator hebt gekregen.",
   "password_repeat": "Herhaal wachtwoord",
-  "login": "Inloggen"
+  "login": "Inloggen",
+  "login_success": "Inloggen gelukt",
+  "account": "Account",
+  "account_setup": "Account instellen",
+  "phrases": {
+    "setting_up_account": "We gaan je account instellen voor gebruik. Vul onderstaande gegevens in om verder te gaan."
+  }
 }

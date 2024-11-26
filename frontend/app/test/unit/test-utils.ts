@@ -43,14 +43,12 @@ export function getUrlMethodAndBody(call: [input: string | URL | Request, init?:
   return { url, method, body };
 }
 
-export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: string | number }, skipCheck?: boolean) {
+export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: string | number }) {
   for (const [key, value] of Object.entries(inputs)) {
     const input = await screen.findByTestId(key);
     await user.clear(input);
     await user.type(input, value.toString());
-    if (!skipCheck) {
-      expect(input).toHaveValue(value.toString());
-    }
+    expect(input).toHaveValue(value.toString());
   }
 }
 

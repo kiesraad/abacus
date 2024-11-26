@@ -6,6 +6,7 @@
     "address": "Adres van het stembureau"
   },
   "street_and_number": "Straatnaam en huisnummer",
+  "house_number": "Huisnummer",
   "zipcode": "Postcode",
   "locality": "Plaats",
   "form": {

@@ -70,19 +70,14 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />
             <input type="hidden" id="id" name="id" defaultValue={pollingStation?.id} />
 
-            {/* props that are not in design but are in the pollingstation model */}
-            <div className="hidden">
-              <input type="text" id="house_number" name="house_number" defaultValue={pollingStation?.house_number} />
-            </div>
-
             <FormLayout.Row>
               <InputField
                 id="number"
-                type="number"
                 name="number"
                 label={t("number")}
                 fieldWidth="narrow"
                 defaultValue={pollingStation?.number}
+                pattern="[0-9]*"
               />
               <InputField id="name" name="name" label={t("name")} defaultValue={pollingStation?.name} />
             </FormLayout.Row>
@@ -115,12 +110,20 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
           </FormLayout.Section>
 
           <FormLayout.Section title={t("polling_station.title.address")}>
-            <InputField
-              id="street"
-              name="street"
-              label={t("polling_station.street_and_number")}
-              defaultValue={pollingStation?.street}
-            />
+            <FormLayout.Row>
+              <InputField
+                id="street"
+                name="street"
+                label={t("polling_station.street_and_number")}
+                defaultValue={pollingStation?.street}
+              />
+              <InputField
+                id="house_number"
+                name="house_number"
+                label={t("polling_station.house_number")}
+                defaultValue={pollingStation?.house_number}
+              />
+            </FormLayout.Row>
             <FormLayout.Row>
               <InputField
                 id="postal_code"

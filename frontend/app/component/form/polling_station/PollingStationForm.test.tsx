@@ -1,17 +1,39 @@
-import { userEvent } from "@testing-library/user-event";
+import { UserEvent, userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { render, screen, userTypeInputs, waitFor } from "app/test/unit";
+import { render, screen, waitFor } from "app/test/unit";
 
 import { PollingStation } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
 
 import { PollingStationForm } from "./PollingStationForm";
 
+async function fillForm(user: UserEvent, testPollingStation: PollingStation | Omit<PollingStation, "id">) {
+  await user.type(await screen.findByRole("textbox", { name: "Nummer" }), testPollingStation.number.toString());
+  await user.type(await screen.findByRole("textbox", { name: "Naam" }), testPollingStation.name.toString());
+  await user.type(
+    await screen.findByRole("textbox", { name: "Straatnaam en huisnummer" }),
+    testPollingStation.street.toString(),
+  );
+  await user.type(
+    await screen.findByRole("textbox", { name: "Huisnummer" }),
+    testPollingStation.house_number.toString(),
+  );
+  await user.type(await screen.findByRole("textbox", { name: "Postcode" }), testPollingStation.postal_code.toString());
+  await user.type(await screen.findByRole("textbox", { name: "Plaats" }), testPollingStation.locality.toString());
+  await user.type(
+    screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" }),
+    String(testPollingStation.number_of_voters?.toString()),
+  );
+
+  const pollingStationType = screen.getByRole("radio", { name: "Vaste locatie" });
+  await userEvent.click(pollingStationType);
+
+  await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+}
+
 describe("PollingStationForm create", () => {
   test("PollingStationForm create", async () => {
-    const testPollingStation: PollingStation = {
-      id: 1,
+    const testPollingStation: Omit<PollingStation, "id"> = {
       election_id: 1,
       number: 1,
       name: "test",
@@ -28,19 +50,13 @@ describe("PollingStationForm create", () => {
     render(<PollingStationForm electionId={1} onSaved={onSaved} />);
 
     const user = userEvent.setup();
+    await fillForm(user, testPollingStation);
 
-    const { id, election_id, polling_station_type, ...inputs } = testPollingStation;
+    await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
-    // mainly to stop eslint from complaining about unused variables
-    expect(id).toBe(1);
-    expect(election_id).toBe(1);
-
-    await userTypeInputs(user, inputs, true);
-
-    const pollingStationType = screen.getByTestId(`polling_station_type-${polling_station_type}`);
-    await userEvent.click(pollingStationType);
-
-    await userEvent.click(screen.getByRole("button", { name: t("polling_station.form.save_create") }));
+    await waitFor(() => {
+      expect(onSaved).toHaveBeenCalledWith(expect.objectContaining(testPollingStation));
+    });
   });
   test("PollingStationForm update", async () => {
     const testPollingStation: PollingStation = {
@@ -62,11 +78,11 @@ describe("PollingStationForm create", () => {
 
     const user = userEvent.setup();
 
-    const input = screen.getByTestId("name");
+    const input = await screen.findByRole("textbox", { name: "Naam" });
     await user.clear(input);
     await user.type(input, "test2");
 
-    await userEvent.click(screen.getByRole("button", { name: t("polling_station.form.save_update") }));
+    await userEvent.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
 
     await waitFor(() => {
       expect(onSaved).toHaveBeenCalledWith({ ...testPollingStation, name: "test2" });

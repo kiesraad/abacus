@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { CandidatesVotesForm } from "app/component/form/data_entry/candidates_votes/CandidatesVotesForm";
 
 import { useElection } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { parseIntStrict } from "@kiesraad/util";
 
 export function CandidatesVotesPage() {
@@ -17,7 +18,7 @@ export function CandidatesVotesPage() {
   const group = election.political_groups.find((group) => group.number === parsedListNumber);
 
   if (!group) {
-    return <div>Geen lijst gevonden voor {listNumber}</div>;
+    return <div>{t("data_entry.list.not-found", { listNumber })}</div>;
   }
 
   return <CandidatesVotesForm group={group} key={group.number} />;

@@ -1,5 +1,6 @@
 import candidates_votes from "./candidates_votes.json";
 import check_and_save from "./check_and_save.json";
+import data_entry from "./data_entry.json";
 import differences from "./differences.json";
 import election_report from "./election_report.json";
 import election_status from "./election_status.json";
@@ -17,6 +18,7 @@ const nl = {
   ...generic,
   candidates_votes,
   check_and_save,
+  data_entry,
   differences,
   election_report,
   election_status,

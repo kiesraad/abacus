@@ -1,0 +1,17 @@
+{
+  "entry_saved": "Je invoer is opgeslagen",
+  "pick_polling_sation": "Kies een stembureau",
+  "success": {
+    "return_paper": "Geef het papieren proces-verbaal terug aan de coördinator.",
+    "second_entry_info": "Een andere invoerder doet straks de tweede invoer."
+  },
+  "completed": {
+    "all_entries_completed": "Alle stembureaus zijn ingevoerd",
+    "thank_you": "Bedankt voor je hulp!",
+    "info": "De resultaten van alle stembureaus kunnen nu opgeteld gaan worden om de uitslag van de {election.name} vast te stellen.",
+    "wait_for_instructions": "Wacht op instructies van de coördinator."
+  },
+  "list": {
+    "not-found": "Geen lijst gevonden voor {listNumber}"
+  }
+}

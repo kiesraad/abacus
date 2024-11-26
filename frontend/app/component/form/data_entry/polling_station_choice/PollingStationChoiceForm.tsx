@@ -142,7 +142,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           <h2 className={cls.formTitle}>{t("polling_station_choice.choose_polling_station")}</h2>
           {pollingStations.length === 0 ? (
             <Alert type={"error"} variant="small">
-              <p>{t("polling_station_choice.no_polling_station_found")}</p>
+              <p>{t("polling_station_choice.no_polling_stations_found")}</p>
             </Alert>
           ) : (
             <PollingStationsList pollingStations={pollingStations} />

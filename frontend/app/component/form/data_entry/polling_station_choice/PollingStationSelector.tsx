@@ -76,7 +76,7 @@ export function PollingStationSelector({
                   <Icon icon={<IconError aria-label={t("polling_station_choice.contains_error")} />} color="error" />
                 </span>
                 <span>
-                  {t("polling_station_choice.no_polling_station_found", {
+                  {t("polling_station_choice.no_polling_station_found_with_number", {
                     nr: removeLeadingZeros(pollingStationNumber),
                   })}
                 </span>

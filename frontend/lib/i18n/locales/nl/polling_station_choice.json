@@ -11,5 +11,6 @@
   "no_polling_stations_found": "Geen stembureaus gevonden",
   "insert_number": "Voer het nummer in:",
   "searching": "aan het zoeken",
-  "no_polling_station_found": "Geen stembureau gevonden met nummer {nr}"
+  "no_polling_stations_found": "Geen stembureaus gevonden",
+  "no_polling_station_found_with_number": "Geen stembureau gevonden met nummer {nr}"
 }

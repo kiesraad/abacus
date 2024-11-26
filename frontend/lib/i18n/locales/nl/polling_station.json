@@ -1,0 +1,9 @@
+{
+  "title": "Stembureau",
+  "unsaved_changes_title": "Let op: niet opgeslagen wijzigingen",
+  "unsaved_changes_message": "Je hebt in <strong>{name}</strong> wijzigingen gemaakt die nog niet zijn opgeslagen.",
+  "current_form": "het huidige formulier",
+  "save_changes": "Wil je deze wijzigingen bewaren?",
+  "recounted_question": "Is er herteld?",
+  "voters_and_vote_count": "Aantal kiezers en stemmen"
+}

@@ -347,6 +347,7 @@ export const electionListMockResponse: ElectionListResponse = {
       category: "Municipal",
       election_date: "2024-11-30",
       nomination_date: "2024-11-01",
+      status: "DataEntryInProgress",
     },
     {
       id: 2,
@@ -356,6 +357,7 @@ export const electionListMockResponse: ElectionListResponse = {
       category: "Municipal",
       election_date: "2024-01-30",
       nomination_date: "2024-01-01",
+      status: "DataEntryInProgress",
     },
     {
       id: 3,
@@ -365,6 +367,27 @@ export const electionListMockResponse: ElectionListResponse = {
       category: "Municipal",
       election_date: "2032-10-31",
       nomination_date: "2032-09-01",
+      status: "DataEntryInProgress",
+    },
+    {
+      id: 4,
+      name: "Gemeenteraadsverkiezingen ingevuld",
+      location: "Heemdamseburg",
+      number_of_voters: 100,
+      category: "Municipal",
+      election_date: "2020-01-30",
+      nomination_date: "2020-01-01",
+      status: "DataEntryInProgress",
+    },
+    {
+      id: 5,
+      name: "Gemeenteraadsverkiezingen afgerond",
+      location: "Heemdamseburg",
+      number_of_voters: 100,
+      category: "Municipal",
+      election_date: "2020-01-30",
+      nomination_date: "2020-01-01",
+      status: "DataEntryFinished",
     },
   ],
 };

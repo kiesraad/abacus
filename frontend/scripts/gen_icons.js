@@ -8,19 +8,19 @@ async function run() {
 
   listing.forEach((file) => {
     if (!file.endsWith(".svg")) return;
+
+    const iconComponent = `Icon${ucfirst(file.replace(".svg", ""))}`;
     let content = fs.readFileSync(`./lib/icon/svg/${file}`, "utf8");
     // replace kebab-case with camelCase in attribute names
     // regex captures two or more groups of letters seperated by dashes, if followed by an equal sign
     content = content.replace(/[A-Za-z]+(-[A-Za-z]+)+(?==)/g, kebabToCamelCase);
-    content = content.replace(/^<svg /, "<svg {...props} ");
+    content = content.replace(/^<svg /, `<svg data-icon="${iconComponent}" {...props} `);
     //check for role="img" and add it if not present
     if (!content.includes("role=")) {
       content = content.replace(/^<svg /, '<svg role="img" ');
     }
 
-    result.push(
-      `export const Icon${ucfirst(file.replace(".svg", ""))} = (props:React.SVGAttributes<SVGElement>) => (${content});\n`,
-    );
+    result.push(`export const ${iconComponent} = (props:React.SVGAttributes<SVGElement>) => (${content});\n`);
   });
 
   let s = result.join("\n");

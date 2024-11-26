@@ -12,6 +12,7 @@ import {
   PollingStationResults,
   usePollingStationFormController,
 } from "@kiesraad/api";
+import { t, tx } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
 import { ErrorModal } from "../error/ErrorModal";
@@ -122,19 +123,24 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
             />
           ) : (
             <Modal
-              title="Let op: niet opgeslagen wijzigingen"
+              title={t("polling_station.unsaved_changes_title")}
               onClose={() => {
                 blocker.reset();
               }}
             >
               <p>
-                Je hebt in <strong>{formState.sections[formState.current]?.title || "het huidige formulier"}</strong>{" "}
-                wijzigingen gemaakt die nog niet zijn opgeslagen.
+                {tx(
+                  "polling_station.unsaved_changes_message",
+                  {},
+                  {
+                    name: formState.sections[formState.current]?.title || t("polling_station.current_form"),
+                  },
+                )}
               </p>
-              <p>Wil je deze wijzigingen bewaren?</p>
+              <p>{t("polling_station.save_changes")}</p>
               <nav>
                 <Button size="lg" onClick={onSave}>
-                  Wijzigingen opslaan
+                  {t("save_changes")}
                 </Button>
                 <Button
                   size="lg"
@@ -143,7 +149,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
                     blocker.proceed();
                   }}
                 >
-                  Niet bewaren
+                  {t("do_not_save")}
                 </Button>
               </nav>
             </Modal>

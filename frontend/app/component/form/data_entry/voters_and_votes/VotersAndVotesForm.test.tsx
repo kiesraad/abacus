@@ -101,7 +101,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const pollCards = await screen.findByTestId("poll_card_count");
+      const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       await user.type(pollCards, "12345");
       expect(pollCards).toHaveValue("12345");
 
@@ -118,7 +118,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm({ recounted: false });
       const spy = vi.spyOn(global, "fetch");
 
-      const pollCards = await screen.findByTestId("poll_card_count");
+      const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       await user.type(pollCards, "12345");
       expect(pollCards).toHaveValue("12345");
 
@@ -136,7 +136,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const pollCards = await screen.findByTestId("poll_card_count");
+      const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       expect(pollCards.closest("fieldset")).toHaveAccessibleName("Toegelaten kiezers en uitgebrachte stemmen");
       expect(pollCards).toHaveAccessibleName("A Stempassen");
       expect(pollCards).toHaveFocus();
@@ -146,35 +146,35 @@ describe("Test VotersAndVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const proxyCertificates = screen.getByTestId("proxy_certificate_count");
+      const proxyCertificates = screen.getByRole("textbox", { name: "B Volmachtbewijzen" });
       expect(proxyCertificates).toHaveFocus();
       await user.paste("6789");
       expect(proxyCertificates).toHaveValue("6789");
 
       await user.keyboard("{enter}");
 
-      const voterCards = screen.getByTestId("voter_card_count");
+      const voterCards = screen.getByRole("textbox", { name: "C Kiezerspassen" });
       expect(voterCards).toHaveFocus();
       await user.type(voterCards, "123");
       expect(voterCards).toHaveValue("123");
 
       await user.keyboard("{enter}");
 
-      const totalAdmittedVoters = screen.getByTestId("total_admitted_voters_count");
+      const totalAdmittedVoters = screen.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
       expect(totalAdmittedVoters).toHaveFocus();
       await user.paste("4242");
       expect(totalAdmittedVoters).toHaveValue("4242");
 
       await user.keyboard("{enter}");
 
-      const votesOnCandidates = screen.getByTestId("votes_candidates_count");
+      const votesOnCandidates = screen.getByRole("textbox", { name: "E Stemmen op kandidaten" });
       expect(votesOnCandidates).toHaveFocus();
       await user.type(votesOnCandidates, "12");
       expect(votesOnCandidates).toHaveValue("12");
 
       await user.keyboard("{enter}");
 
-      const blankVotes = screen.getByTestId("blank_votes_count");
+      const blankVotes = screen.getByRole("textbox", { name: "F Blanco stemmen" });
       expect(blankVotes).toHaveFocus();
       // Test if maxLength on field works
       await user.type(blankVotes, "1234567890");
@@ -182,14 +182,14 @@ describe("Test VotersAndVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const invalidVotes = screen.getByTestId("invalid_votes_count");
+      const invalidVotes = screen.getByRole("textbox", { name: "G Ongeldige stemmen" });
       expect(invalidVotes).toHaveFocus();
       await user.type(invalidVotes, "3");
       expect(invalidVotes).toHaveValue("3");
 
       await user.keyboard("{enter}");
 
-      const totalVotesCast = screen.getByTestId("total_votes_cast_count");
+      const totalVotesCast = screen.getByRole("textbox", { name: "H Totaal uitgebrachte stemmen" });
       expect(totalVotesCast).toHaveFocus();
       await user.type(totalVotesCast, "555");
       expect(totalVotesCast).toHaveValue("555");

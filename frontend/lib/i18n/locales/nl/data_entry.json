@@ -1,5 +1,13 @@
 {
+  "title": "Invoeren",
   "entry_saved": "Je invoer is opgeslagen",
+  "abort": {
+    "action": "Invoer afbreken",
+    "title": "Wat wil je doen met je invoer?",
+    "description": "<p>Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de invoer die je al hebt gedaan bewaren.</p><p>Twijfel je? Overleg dan met de coördinator.</p>",
+    "save_input": "Invoer bewaren",
+    "discard_input": "Niet bewaren"
+  },
   "pick_polling_sation": "Kies een stembureau",
   "success": {
     "return_paper": "Geef het papieren proces-verbaal terug aan de coördinator.",

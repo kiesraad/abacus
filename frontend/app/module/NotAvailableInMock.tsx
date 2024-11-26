@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 import { NavBar } from "app/component/navbar/NavBar";
 
+import { t, tx } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
 
 interface NotAvailableInMockProps {
@@ -13,12 +14,13 @@ export function NotAvailableInMock({ title }: NotAvailableInMockProps) {
     <>
       {title && <PageTitle title={title} />}
       <NavBar>
-        <Link to={"/overview"}>Overzicht</Link>
+        <Link to={"/overview"}>{t("overview")}</Link>
       </NavBar>
       <main>
         <article>
-          Deze pagina is helaas niet beschikbaar in deze demo-versie. Ga naar het{" "}
-          <a href={"/overview"}>overzicht met verkiezingen</a> om andere functionaliteit uit te proberen.
+          {tx("messages.not-available-in-mock", {
+            link: (content) => <a href={"/overview"}>{content}</a>,
+          })}
         </article>
       </main>
     </>

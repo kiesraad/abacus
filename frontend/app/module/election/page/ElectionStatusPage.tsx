@@ -55,7 +55,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
     return (
       <Table.Header key={category} backgroundStyling>
         <Table.Column key={`${category}-number`}>{t("number")}</Table.Column>
-        <Table.Column key={`${category}-name`}>{t("polling_station")}</Table.Column>
+        <Table.Column key={`${category}-name`}>{t("polling_station.title")}</Table.Column>
         {children}
       </Table.Header>
     );

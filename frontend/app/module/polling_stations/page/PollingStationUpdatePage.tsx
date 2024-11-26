@@ -13,7 +13,7 @@ export function PollingStationUpdatePage() {
 
   const { requestState } = usePollingStationGet(pollingStationId);
 
-  const onSave = (ps: PollingStation) => {
+  const handleSaved = (ps: PollingStation) => {
     navigate(`../?updated=${ps.id}`);
   };
 
@@ -30,7 +30,7 @@ export function PollingStationUpdatePage() {
           {requestState.status === "loading" && <Loader />}
 
           {requestState.status === "success" && (
-            <PollingStationForm electionId={electionId} pollingStation={requestState.data} onSaved={onSave} />
+            <PollingStationForm electionId={electionId} pollingStation={requestState.data} onSaved={handleSaved} />
           )}
         </article>
       </main>

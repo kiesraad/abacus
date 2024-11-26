@@ -8,7 +8,6 @@ import {
   POLLING_STATION_UPDATE_REQUEST_PATH,
   PollingStation,
 } from "@kiesraad/api";
-import { callAsync } from "@kiesraad/util";
 
 import { useCrud } from "../useCrud";
 
@@ -28,7 +27,7 @@ export function usePollingStationMutation(): UsePollingStationMutationReturn {
     (electionId, obj) => {
       const path: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${electionId}/polling_stations`;
 
-      callAsync(crudCreate, path, obj);
+      void crudCreate(path, obj);
     },
     [crudCreate],
   );
@@ -37,7 +36,7 @@ export function usePollingStationMutation(): UsePollingStationMutationReturn {
     (pollingStationId, obj) => {
       const path: POLLING_STATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}`;
 
-      callAsync(crudUpdate, path, obj);
+      void crudUpdate(path, obj);
     },
     [crudUpdate],
   );

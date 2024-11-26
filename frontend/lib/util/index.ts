@@ -9,4 +9,3 @@ export * from "./fields";
 export * from "./strings";
 export * from "./format";
 export * from "./env";
-export * from "./async";

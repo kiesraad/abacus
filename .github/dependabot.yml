@@ -29,5 +29,6 @@ updates:
         # ESLint major upgrades usually have breaking changes, #213 for ESLint 9
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-router-dom"
+        # Update to 6.28 needs feature flags to be set to opt-in for version 7 features, to avoid warnings.
         # Update to 7 has a potential problem to be solved, see issue #621
-        update-types: ["version-update:semver-major"]
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]

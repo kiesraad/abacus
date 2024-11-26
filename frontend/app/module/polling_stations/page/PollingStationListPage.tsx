@@ -1,7 +1,9 @@
 import { PollingStationType, usePollingStationListRequest } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { Loader, PageTitle, Table } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
+//TODO: Translated in Crud PR
 const labelForPollingStationType: { [K in PollingStationType]: string } = {
   FixedLocation: "Vaste locatie",
   Special: "Bijzonder",
@@ -24,26 +26,26 @@ export function PollingStationListPage() {
 
   return (
     <>
-      <PageTitle title="Stembureaus - Abacus" />
+      <PageTitle title={`${t("polling_stations")} - Abacus`} />
       <header>
         <section>
-          <h1>Stembureaus</h1>
+          <h1>{t("election.name_plural")}</h1>
         </section>
       </header>
       <main>
         {!data.polling_stations.length ? (
           <article>
-            <h2>Hoe wil je stembureaus toevoegen?</h2>
-            Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.
+            <h2>{t("polling_station.add_choice")}?</h2>
+            {t("polling_station.empty")}
             {/* TODO Create polling station: issue #431 */}
           </article>
         ) : (
           <article>
             <Table id="polling_stations">
               <Table.Header>
-                <Table.Column>Nummer</Table.Column>
-                <Table.Column>Naam</Table.Column>
-                <Table.Column>Soort</Table.Column>
+                <Table.Column>{t("number")}</Table.Column>
+                <Table.Column>{t("name")}</Table.Column>
+                <Table.Column>{t("kind")}</Table.Column>
               </Table.Header>
               <Table.Body>
                 {data.polling_stations.map((station) => (

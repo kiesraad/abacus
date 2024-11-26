@@ -67,7 +67,7 @@ pub trait EMLDocument: Sized + DeserializeOwned + Serialize {
     }
 
     fn to_xml_string(&self) -> Result<String, SeError> {
-        let mut buff = String::new();
+        let mut buff = String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         self.to_xml_with_writer(&mut buff)?;
         Ok(buff)
     }

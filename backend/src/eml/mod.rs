@@ -85,6 +85,8 @@ util::gen_wrap_list!(mod contests as contest: Contest => Contests);
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ElectionIdentifier {
+    #[serde(rename = "@Id")]
+    id: String,
     election_name: String,
     election_category: String,
     #[serde(
@@ -262,7 +264,7 @@ mod tests {
             transaction_id: "1".into(),
             managing_authority: Some(ManagingAuthority {
                 authority_identifier: AuthorityIdentifier {
-                    id: Some("1".into()),
+                    id: Some("HSB1".into()),
                     name: "Test Authority".into(),
                 },
                 authority_address: AuthorityAddress {},
@@ -271,6 +273,7 @@ mod tests {
                 event_identifier: EventIdentifier::default(),
                 election: Election {
                     election_identifier: ElectionIdentifier {
+                        id: "GR2022".into(),
                         election_name: "Municipal Election".into(),
                         election_category: "GR".into(),
                         election_subcategory: Some("GR1".into()),
@@ -315,7 +318,7 @@ mod tests {
                         },
                         reporting_unit_votes: vec![ReportingUnitVotes {
                             reporting_unit_identifier: ReportingUnitIdentifier {
-                                id: Some("1".into()),
+                                id: Some("HSB1::1234".into()),
                                 name: "Op rolletjes".into(),
                             },
                             selections: vec![

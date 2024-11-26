@@ -15,6 +15,7 @@ pub struct Election {
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
+    pub status: ElectionStatus,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     #[sqlx(default, json)]
@@ -25,6 +26,13 @@ pub struct Election {
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
 pub enum ElectionCategory {
     Municipal,
+}
+
+/// Election status (limited for now)
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
+pub enum ElectionStatus {
+    DataEntryInProgress,
+    DataEntryFinished,
 }
 
 /// Political group with its candidates
@@ -106,6 +114,7 @@ pub(crate) mod tests {
             category: ElectionCategory::Municipal,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
+            status: ElectionStatus::DataEntryInProgress,
             political_groups: Some(political_groups),
         }
     }

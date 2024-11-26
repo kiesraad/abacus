@@ -4,8 +4,7 @@ import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
-import { IconLock } from "@kiesraad/icon";
-import { Button, Icon, PageTitle } from "@kiesraad/ui";
+import { Button, PageTitle } from "@kiesraad/ui";
 
 import cls from "./ElectionReportPage.module.css";
 
@@ -67,13 +66,7 @@ export function ElectionReportPage() {
       </NavBar>
       <header>
         <section>
-          <h1>{t("election_status.first_session")}</h1>
-        </section>
-        <section>
-          <div className="election_status">
-            <span>{tx("election_status.finish_first_session_data_entry_status")}</span>{" "}
-            <Icon size="md" color="error" icon={<IconLock />} />
-          </div>
+          <h1>{t("election_status.finish_data_entry_first_session")}</h1>
         </section>
       </header>
       <main>

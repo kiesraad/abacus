@@ -1,6 +1,7 @@
 import { ReactNode, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { HeaderElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -188,16 +189,23 @@ export function ElectionStatusPage() {
         <section>
           <h1>{t("election_status.first_session")}</h1>
         </section>
+        <section>
+          <div className="election_status">
+            <HeaderElectionStatusWithIcon status={election.status} userRole="coordinator" />
+          </div>
+        </section>
       </header>
-      {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
-        <Alert type="success">
-          <h2>{t("election_status.definitive.title")}</h2>
-          <p>{t("election_status.definitive.message")}</p>
-          <Button onClick={finishInput} size="md">
-            {t("election_status.definitive.finish_button")}
-          </Button>
-        </Alert>
-      )}
+      {election.status !== "DataEntryFinished" &&
+        statuses.length > 0 &&
+        statuses.every((s) => s.status === "definitive") && (
+          <Alert type="success">
+            <h2>{t("election_status.definitive.title")}</h2>
+            <p>{t("election_status.definitive.message")}</p>
+            <Button onClick={finishInput} size="md">
+              {t("election_status.definitive.finish_button")}
+            </Button>
+          </Alert>
+        )}
       <main className={cls.statusMain}>
         <div className={cls.statusTitle}>
           <h2 id="status-title">{t("election_status.main_title")}</h2>

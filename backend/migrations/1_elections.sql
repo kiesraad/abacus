@@ -7,5 +7,6 @@ CREATE TABLE elections
     category         TEXT                              NOT NULL,
     election_date    TEXT                              NOT NULL,
     nomination_date  TEXT                              NOT NULL,
+    status           TEXT                              NOT NULL,
     political_groups TEXT                              NOT NULL
 );

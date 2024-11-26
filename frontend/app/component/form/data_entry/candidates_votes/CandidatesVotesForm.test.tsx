@@ -11,6 +11,7 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, within } from "app/t
 import { emptyDataEntryRequest } from "app/test/unit/form";
 
 import {
+  Candidate,
   Election,
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
@@ -39,6 +40,12 @@ const candidatesFieldIds = {
   candidate1: "candidate_votes[1].votes",
   total: "total",
 };
+
+function candidateName(candidate: Candidate) {
+  return candidate.first_name
+    ? `${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`
+    : `${candidate.last_name}, ${candidate.initials}`;
+}
 
 describe("Test CandidatesVotesForm", () => {
   describe("CandidatesVotesForm renders correctly", () => {
@@ -116,7 +123,9 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
+      const candidate1 = await screen.findByRole("textbox", {
+        name: `1 ${candidateName(politicalGroupMockData.candidates[0] as Candidate)}`,
+      });
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12345");
 
@@ -133,7 +142,9 @@ describe("Test CandidatesVotesForm", () => {
       renderForm({ recounted: false });
       const spy = vi.spyOn(global, "fetch");
 
-      const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
+      const candidate1 = await screen.findByRole("textbox", {
+        name: `1 ${candidateName(politicalGroupMockData.candidates[0] as Candidate)}`,
+      });
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12345");
 
@@ -151,7 +162,9 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const candidate1 = await screen.findByTestId("candidate_votes[0].votes");
+      const candidate1 = await screen.findByRole("textbox", {
+        name: `1 ${candidateName(politicalGroupMockData.candidates[0] as Candidate)}`,
+      });
       expect(candidate1.closest("fieldset")).toHaveAccessibleName("Lijst 1 - Vurige Vleugels Partij");
       expect(candidate1).toHaveAccessibleName("1 Zilverlicht, E. (Eldor)");
       expect(candidate1).toHaveFocus();
@@ -160,35 +173,45 @@ describe("Test CandidatesVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const candidate2 = screen.getByTestId("candidate_votes[1].votes");
+      const candidate2 = screen.getByRole("textbox", {
+        name: `2 ${candidateName(politicalGroupMockData.candidates[1] as Candidate)}`,
+      });
       expect(candidate2).toHaveFocus();
       await user.type(candidate2, "6789");
       expect(candidate2).toHaveValue("6789");
 
       await user.keyboard("{enter}");
 
-      const candidate3 = screen.getByTestId("candidate_votes[2].votes");
+      const candidate3 = screen.getByRole("textbox", {
+        name: `3 ${candidateName(politicalGroupMockData.candidates[2] as Candidate)}`,
+      });
       expect(candidate3).toHaveFocus();
       await user.type(candidate3, "123");
       expect(candidate3).toHaveValue("123");
 
       await user.keyboard("{enter}");
 
-      const candidate4 = screen.getByTestId("candidate_votes[3].votes");
+      const candidate4 = screen.getByRole("textbox", {
+        name: `4 ${candidateName(politicalGroupMockData.candidates[3] as Candidate)}`,
+      });
       expect(candidate4).toHaveFocus();
       await user.paste("4242");
       expect(candidate4).toHaveValue("4242");
 
       await user.keyboard("{enter}");
 
-      const candidate5 = screen.getByTestId("candidate_votes[4].votes");
+      const candidate5 = screen.getByRole("textbox", {
+        name: `5 ${candidateName(politicalGroupMockData.candidates[4] as Candidate)}`,
+      });
       expect(candidate5).toHaveFocus();
       await user.type(candidate5, "12");
       expect(candidate5).toHaveValue("12");
 
       await user.keyboard("{enter}");
 
-      const candidate6 = screen.getByTestId("candidate_votes[5].votes");
+      const candidate6 = screen.getByRole("textbox", {
+        name: `6 ${candidateName(politicalGroupMockData.candidates[5] as Candidate)}`,
+      });
       expect(candidate6).toHaveFocus();
       // Test if maxLength on field works
       await user.type(candidate6, "1234567890");
@@ -196,14 +219,16 @@ describe("Test CandidatesVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const candidate7 = screen.getByTestId("candidate_votes[6].votes");
+      const candidate7 = screen.getByRole("textbox", {
+        name: `7 ${candidateName(politicalGroupMockData.candidates[6] as Candidate)}`,
+      });
       expect(candidate7).toHaveFocus();
       await user.type(candidate7, "3");
       expect(candidate7).toHaveValue("3");
 
       await user.keyboard("{enter}");
 
-      const total = screen.getByTestId("total");
+      const total = screen.getByRole("textbox", { name: "Totaal lijst 1" });
       await user.click(total);
       expect(total).toHaveFocus();
       await user.type(total, "555");
@@ -323,9 +348,13 @@ describe("Test CandidatesVotesForm", () => {
 
       render(Component);
 
-      const candidateVotes0 = await screen.findByTestId("candidate_votes[0].votes");
-      const candidateVotes1 = screen.getByTestId("candidate_votes[1].votes");
-      const total = screen.getByTestId("total");
+      const candidateVotes0 = await screen.findByRole("textbox", {
+        name: `1 ${candidateName(politicalGroupMockData.candidates[0] as Candidate)}`,
+      });
+      const candidateVotes1 = screen.getByRole("textbox", {
+        name: `2 ${candidateName(politicalGroupMockData.candidates[1] as Candidate)}`,
+      });
+      const total = screen.getByRole("textbox", { name: "Totaal lijst 1" });
 
       const spy = vi.spyOn(global, "fetch");
 
@@ -359,9 +388,13 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const candidateVotes0 = await screen.findByTestId("candidate_votes[0].votes");
-      const candidateVotes1 = screen.getByTestId("candidate_votes[1].votes");
-      const total = screen.getByTestId("total");
+      const candidateVotes0 = await screen.findByRole("textbox", {
+        name: `1 ${candidateName(politicalGroupMockData.candidates[0] as Candidate)}`,
+      });
+      const candidateVotes1 = screen.getByRole("textbox", {
+        name: `2 ${candidateName(politicalGroupMockData.candidates[1] as Candidate)}`,
+      });
+      const total = screen.getByRole("textbox", { name: "Totaal lijst 1" });
 
       const spy = vi.spyOn(global, "fetch");
 
@@ -377,7 +410,7 @@ describe("Test CandidatesVotesForm", () => {
       const feedbackMessage =
         "Controleer het totaal van de lijst. Overleg met de coördinator als op het papier niets is ingevuld.";
       expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
-      expect(await screen.findByTestId("total")).toHaveFocus();
+      expect(await screen.findByRole("textbox", { name: "Totaal lijst 1" })).toHaveFocus();
       const expectedInvalidFieldIds = [candidatesFieldIds.total];
       const expectedValidFieldIds = [candidatesFieldIds.candidate0, candidatesFieldIds.candidate1];
       expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);

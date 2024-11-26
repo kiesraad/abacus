@@ -148,7 +148,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           {(() => {
             if (pollingStations.length === 0) {
               return (
-                <Alert type={"error"} variant="small">
+                <Alert type="error" variant="small">
                   <p>Geen stembureaus gevonden</p>
                 </Alert>
               );

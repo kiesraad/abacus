@@ -1,5 +1,5 @@
-INSERT INTO elections (id, name, location, number_of_voters, category, election_date, nomination_date, political_groups)
-VALUES (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', '2024-11-30', '2024-11-1',
+INSERT INTO elections (id, name, location, number_of_voters, category, election_date, nomination_date, status, political_groups)
+VALUES (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', '2024-11-30', '2024-11-1', 'DataEntryInProgress',
         '[
           {
             "number": 1,
@@ -24,7 +24,7 @@ VALUES (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', '2024-11-30'
             ]
           }
         ]'),
-       (2, 'Municipal Re-election', 'Heemdamseburg', 100, 'Municipal', '2024-12-31', '2024-12-1',
+       (2, 'Municipal Re-election', 'Heemdamseburg', 100, 'Municipal', '2024-12-31', '2024-12-1', 'DataEntryInProgress',
         '[
           {
             "number": 1,
@@ -49,7 +49,7 @@ VALUES (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', '2024-11-30'
             ]
           }
         ]'),
-       (3, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', '2024-11-30', '2024-11-1', '[
+       (3, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', '2024-11-30', '2024-11-1', 'DataEntryInProgress','[
          {
            "number": 1,
            "name": "Lijst Hekking",
@@ -827,7 +827,54 @@ VALUES (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', '2024-11-30'
            ]
          }
        ]'),
-       (4, 'Filled Election', 'Heemdamseburg', 100, 'Municipal', '2024-11-30', '2024-11-1',
+       (4, 'Filled Election', 'Heemdamseburg', 100, 'Municipal', '2024-11-30', '2024-11-1', 'DataEntryInProgress',
+        '[
+          {
+            "number": 1,
+            "name": "Political Group A",
+            "candidates": [
+              {
+                "number": 1,
+                "initials": "A.",
+                "first_name": "Alice",
+                "last_name": "Foo",
+                "locality": "Amsterdam",
+                "gender": "Female"
+              },
+              {
+                "number": 2,
+                "initials": "C.",
+                "first_name": "Charlie",
+                "last_name": "Doe",
+                "locality": "Rotterdam",
+                "gender": null
+              }
+            ]
+          },
+          {
+            "number": 2,
+            "name": "Political Group B",
+            "candidates": [
+              {
+                "number": 1,
+                "initials": "T.",
+                "first_name": "Test",
+                "last_name": "Test",
+                "locality": "Amsterdam",
+                "gender": "Female"
+              },
+              {
+                "number": 2,
+                "initials": "B.",
+                "first_name": "Bar",
+                "last_name": "Foo",
+                "locality": "Rotterdam",
+                "gender": null
+              }
+            ]
+          }
+        ]'),
+       (5, 'Finished Election', 'Heemdamseburg', 100, 'Municipal', '2024-11-30', '2024-11-1', 'DataEntryFinished',
         '[
           {
             "number": 1,

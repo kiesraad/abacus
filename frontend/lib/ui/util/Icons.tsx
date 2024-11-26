@@ -23,7 +23,7 @@ export function renderIconForType(type: AlertType) {
   }
 }
 
-export function renderStatusIcon(status: MenuStatus): React.JSX.Element {
+export function renderStatusIcon(status: MenuStatus) {
   switch (status) {
     case "active":
       return <IconArrowNarrowRight aria-label={"je bent hier"} />; // "Actief"

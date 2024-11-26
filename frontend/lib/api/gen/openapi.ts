@@ -127,6 +127,7 @@ export interface Election {
   nomination_date: string;
   number_of_voters: number;
   political_groups?: PoliticalGroup[];
+  status: ElectionStatus;
 }
 
 /**
@@ -150,6 +151,11 @@ Does not include the candidate list (political groups) to keep the response size
 export interface ElectionListResponse {
   elections: Election[];
 }
+
+/**
+ * Election status (limited for now)
+ */
+export type ElectionStatus = "DataEntryInProgress" | "DataEntryFinished";
 
 /**
  * Election polling stations data entry statuses response

@@ -15,13 +15,9 @@ pub struct EMLBase {
     pub id: String,
     #[serde(rename = "@SchemaVersion")]
     pub schema_version: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub canonicalization_method: Option<CanonicalizationMethod>,
 
     #[serde(default, skip_serializing_if = "Option::is_none", rename = "@xmlns")]
     pub xmlns: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none", rename = "@xmlns:ds")]
-    pub xmlns_ds: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none", rename = "@xmlns:kr")]
     pub xmlns_kr: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none", rename = "@xmlns:rg")]
@@ -51,11 +47,7 @@ impl EMLBase {
         EMLBase {
             id: id.into(),
             schema_version: "5".into(),
-            canonicalization_method: Some(CanonicalizationMethod {
-                algorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments".into(),
-            }),
             xmlns: Some("urn:oasis:names:tc:evs:schema:eml".into()),
-            xmlns_ds: Some("http://www.w3.org/2000/09/xmldsig#".into()),
             xmlns_kr: Some("http://www.kiesraad.nl/extensions".into()),
             xmlns_rg: Some("http://www.kiesraad.nl/reportgenerator".into()),
             xmlns_xal: Some("urn:oasis:names:tc:ciq:xsdschema:xAL:2.0".into()),
@@ -92,13 +84,6 @@ pub trait EMLDocument: Sized + DeserializeOwned + Serialize {
         };
         Serialize::serialize(&self, serializer)
     }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct CanonicalizationMethod {
-    #[serde(rename = "@Algorithm")]
-    algorithm: String,
 }
 
 #[cfg(test)]

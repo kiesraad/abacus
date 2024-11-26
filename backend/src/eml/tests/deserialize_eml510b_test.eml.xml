@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<EML Id="510b" SchemaVersion="5" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:rg="http://www.kiesraad.nl/reportgenerator" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+<EML Id="510b" SchemaVersion="5" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:rg="http://www.kiesraad.nl/reportgenerator" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <TransactionId>1</TransactionId>
     <ManagingAuthority>
         <AuthorityIdentifier Id="1">Test Authority</AuthorityIdentifier>

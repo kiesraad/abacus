@@ -134,7 +134,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm({ recounted: true });
 
       const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       expect(pollCards.closest("fieldset")).toHaveAccessibleName("Toegelaten kiezers en uitgebrachte stemmen");
@@ -194,13 +194,41 @@ describe("Test VotersAndVotesForm", () => {
       await user.type(totalVotesCast, "555");
       expect(totalVotesCast).toHaveValue("555");
 
+      await user.keyboard("{enter}");
+
+      const pollCardsRecount = screen.getByRole("textbox", { name: "A.2 Stempassen" });
+      expect(pollCardsRecount).toHaveFocus();
+      await user.type(pollCardsRecount, "700");
+      expect(pollCardsRecount).toHaveValue("700");
+
+      await user.keyboard("{enter}");
+
+      const proxyCertificatesRecount = screen.getByRole("textbox", { name: "B.2 Volmachtbewijzen" });
+      expect(proxyCertificatesRecount).toHaveFocus();
+      await user.type(proxyCertificatesRecount, "140");
+      expect(proxyCertificatesRecount).toHaveValue("140");
+
+      await user.keyboard("{enter}");
+
+      const voterCardsRecount = screen.getByRole("textbox", { name: "C.2 Kiezerspassen" });
+      expect(voterCardsRecount).toHaveFocus();
+      await user.type(voterCardsRecount, "160");
+      expect(voterCardsRecount).toHaveValue("160");
+
+      await user.keyboard("{enter}");
+
+      const totalAdmittedVotersRecount = screen.getByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" });
+      expect(totalAdmittedVotersRecount).toHaveFocus();
+      await user.type(totalAdmittedVotersRecount, "1000");
+      expect(totalAdmittedVotersRecount).toHaveValue("1000");
+
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
     });
   });
 
   describe("VotersAndVotesForm API request and response", () => {
-    test("VotersAndVotesForm request body is equal to the form data", async () => {
+    test("VotersAndVotesForm without recount: request body is equal to the form data", async () => {
       const expectedRequest = {
         data: {
           ...emptyDataEntryRequest.data,
@@ -228,6 +256,57 @@ describe("Test VotersAndVotesForm", () => {
       await userTypeInputs(user, {
         ...expectedRequest.data.voters_counts,
         ...expectedRequest.data.votes_counts,
+      });
+
+      const spy = vi.spyOn(global, "fetch");
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(spy).toHaveBeenCalled();
+      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
+
+      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
+      expect(method).toEqual("POST");
+      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+      expect(request_body.data).toEqual(expectedRequest.data);
+    });
+
+    test("VotersAndVotesForm with recount: request body is equal to the form data", async () => {
+      const expectedRequest = {
+        data: {
+          ...emptyDataEntryRequest.data,
+          recounted: true,
+          voters_counts: {
+            poll_card_count: 1,
+            proxy_certificate_count: 2,
+            voter_card_count: 3,
+            total_admitted_voters_count: 6,
+          },
+          voters_recounts: {
+            poll_card_recount: 7,
+            proxy_certificate_recount: 8,
+            voter_card_recount: 9,
+            total_admitted_voters_recount: 24,
+          },
+          votes_counts: {
+            votes_candidates_count: 4,
+            blank_votes_count: 5,
+            invalid_votes_count: 6,
+            total_votes_cast_count: 15,
+          },
+        },
+        client_state: {},
+      };
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      await userTypeInputs(user, {
+        ...expectedRequest.data.voters_counts,
+        ...expectedRequest.data.votes_counts,
+        ...expectedRequest.data.voters_recounts,
       });
 
       const spy = vi.spyOn(global, "fetch");

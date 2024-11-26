@@ -27,6 +27,8 @@
   - Vermijden van "normalization of deviance": "dit kan voor één keer" wordt "dit kan wel eens een keer" en vervolgens "dit kan wel"
   - Vermijden van "failure demand" (extra werk omdat het de eerste keer niet goed genoeg was): managen van je backlog/bevindingenregister kost uiteindelijk vrijwel altijd meer tijd en energie dan gelijk oplossen
 
+Voor de praktische uitwerking van de policy, zie ["Uitwerking zero bug policy"](/documentatie/ontwikkelproces/zero-bug-policy.md).
+
 ### Vroege feedback en end-to-end feedback
 
 - Vroege feedback:
@@ -72,8 +74,8 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
   - Voor CI (continous integration, zie hieronder) moet dit strict gezien minder dan 1 dag zijn. Dat is in de praktijk erg lastig, vandaar de 1-3 dagen.
 - één ticket/taak mag in meerdere PR's gebouwd worden.
 - Pair/ensemble programming telt als review.
-- Vraag vroeg feedback op je design wanneer nodig: [editing over proof-reading](https://buttondown.email/hillelwayne/archive/code-review-vs-code-proofreading/) (Hillel Wayne)
-- Zoveel mogelijk afvangen d.m.v. linting en static code analysis, zodat menselijke code review kan focussen op design e.d.
+- Vraag vroeg om feedback: [editing over proof-reading](https://buttondown.email/hillelwayne/archive/code-review-vs-code-proofreading/) (Hillel Wayne)
+- Zoveel mogelijk afvangen d.m.v. linting en static code analysis, zodat menselijke code review kan focussen op architectuur e.d.
 
 #### Handmatige tests en automatische tests
 

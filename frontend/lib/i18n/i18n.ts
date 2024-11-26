@@ -31,7 +31,7 @@ export function translate(path: TranslationPath): string {
  *
  * return (
  *  <div>
- *    <h1>{t('elections')}</h1>
+ *    <h1>{t("elections")}</h1>
  *    <p>{t('elections_count', { count: numberOfElections })}</p>
  *  </div>
  * );
@@ -55,7 +55,7 @@ export function t(k: TranslationPath, vars?: Record<string, string | number>): s
  *
  * return (
  *  <div>
- *    <h1>{t('internal_error')}</h1>
+ *    <h1>{t("internal_error")}</h1>
  *    <p>{tx('check_manual_instruction', { link: (title) => <a href="/manual">{title}</a> })}</p>
  *  </div>
  * );

@@ -1,12 +1,12 @@
 import { Link, To, useLocation, useNavigate } from "react-router-dom";
 
+import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { Election, useElectionList } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { IconCheckHeart } from "@kiesraad/icon";
-import { Alert, Icon, PageTitle, Table, WorkStationNumber } from "@kiesraad/ui";
+import { Alert, PageTitle, Table, WorkStationNumber } from "@kiesraad/ui";
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -71,14 +71,10 @@ export function OverviewPage() {
                   <Table.Cell fontSizeClass="fs-body">{election.name}</Table.Cell>
                   {isAdministrator && <Table.Cell fontSizeClass="fs-md"></Table.Cell>}
                   <Table.Cell fontSizeClass="fs-md">
-                    <Icon icon={<IconCheckHeart />} color="accept" />
-                    <span>{isAdministrator ? "Invoerders bezig" : "Invoer gestart"}</span>
-                    {/* TODO <IconHourglass />
-                      <span>Invoer opgeschort</span>
-                      <IconClock />
-                      <span>Wachten op coördinator</span>
-                      <IconCheckVerified />
-                      <span>Steminvoer voltooid</span> */}
+                    <ElectionStatusWithIcon
+                      status={election.status}
+                      userRole={isAdministrator ? "coordinator" : "typist"}
+                    />
                   </Table.Cell>
                 </Table.LinkRow>
               ))}

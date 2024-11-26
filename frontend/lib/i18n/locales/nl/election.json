@@ -1,0 +1,11 @@
+{
+  "name": "Verkiezing",
+  "name_plural": "Verkiezingen",
+  "title": {
+    "details": "Details verkiezing",
+    "finish_data_entry": "Invoerfase afronden"
+  },
+  "status": "Status",
+  "polling_stations": "Stembureaus",
+  "start_when_count_list_received": "Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren."
+}

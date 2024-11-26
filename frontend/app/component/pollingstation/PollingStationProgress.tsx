@@ -8,6 +8,7 @@ import {
   useElection,
   usePollingStationFormController,
 } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { MenuStatus, ProgressList } from "@kiesraad/ui";
 
 export function PollingStationProgress() {
@@ -63,10 +64,10 @@ export function PollingStationProgress() {
         >
           {formState.current !== "recounted" ? (
             <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/recounted`}>
-              <span>Is er herteld?</span>
+              <span>{t("polling_station.recounted_question")}</span>
             </Link>
           ) : (
-            <span>Is er herteld?</span>
+            <span>{t("polling_station.recounted_question")}</span>
           )}
         </ProgressList.Item>
         <ProgressList.Item
@@ -79,10 +80,10 @@ export function PollingStationProgress() {
           {formState.current !== "voters_votes_counts" &&
           formState.sections.voters_votes_counts.index <= currentIndex ? (
             <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/voters-and-votes`}>
-              <span>Aantal kiezers en stemmen</span>
+              <span>{t("polling_station.voters_and_vote_count")}</span>
             </Link>
           ) : (
-            <span>Aantal kiezers en stemmen</span>
+            <span>{t("polling_station.voters_and_vote_count")}</span>
           )}
         </ProgressList.Item>
         <ProgressList.Item
@@ -94,10 +95,10 @@ export function PollingStationProgress() {
         >
           {formState.current !== "differences_counts" && formState.sections.differences_counts.index <= currentIndex ? (
             <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/differences`}>
-              <span>Verschillen</span>
+              <span>{t("differences.title")}</span>
             </Link>
           ) : (
-            <span>Verschillen</span>
+            <span>{t("differences.title")}</span>
           )}
         </ProgressList.Item>
       </ProgressList.Fixed>
@@ -119,12 +120,12 @@ export function PollingStationProgress() {
               {formState.current !== formSection.id && formSection.index <= currentIndex ? (
                 <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/list/${listId}`}>
                   <span>
-                    Lijst {list.number} - {list.name}
+                    {t("list")} {list.number} - {list.name}
                   </span>
                 </Link>
               ) : (
                 <span>
-                  Lijst {list.number} - {list.name}
+                  {t("list")} {list.number} - {list.name}
                 </span>
               )}
             </ProgressList.Item>
@@ -141,10 +142,10 @@ export function PollingStationProgress() {
         >
           {formState.current !== "save" && formState.furthest === "save" ? (
             <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/save`}>
-              <span>Controleren en opslaan</span>
+              <span>{t("check_and_save.title")}</span>
             </Link>
           ) : (
-            <span>Controleren en opslaan</span>
+            <span>{t("check_and_save.title")}</span>
           )}
         </ProgressList.Item>
       </ProgressList.Fixed>

@@ -49,8 +49,15 @@ impl IntoResponse for SaveDataEntryResponse {
 
 #[derive(Debug)]
 enum MyState {
-    // Entry number is always 1
-    NotStarted { polling_station_id: u32 },
+    NotStarted {
+        polling_station_id: u32,
+    },
+    FirstEntryInProgress {
+        polling_station_id: u32,
+        progress: u8,
+        data: PollingStationResults,
+        client_state: Option<serde_json::Value>,
+    },
 }
 
 impl MyState {

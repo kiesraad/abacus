@@ -35,9 +35,10 @@ describe("PollingStationCreatePage", () => {
 
     render(<PollingStationUpdatePage />);
 
-    expect(await screen.findByTestId("polling-station-form")).toBeVisible();
+    const form = await screen.findByTestId("polling-station-form");
+    expect(form).toBeVisible();
 
-    expect(screen.getByTestId("number")).toHaveValue(1);
-    expect(screen.getByTestId("name")).toHaveValue("test");
+    expect(screen.getByRole("textbox", { name: "Nummer" })).toHaveValue("1");
+    expect(screen.getByRole("textbox", { name: "Naam" })).toHaveValue("test");
   });
 });

@@ -10,10 +10,7 @@ import { PollingStationForm } from "./PollingStationForm";
 async function fillForm(user: UserEvent, testPollingStation: PollingStation | Omit<PollingStation, "id">) {
   await user.type(await screen.findByRole("textbox", { name: "Nummer" }), testPollingStation.number.toString());
   await user.type(await screen.findByRole("textbox", { name: "Naam" }), testPollingStation.name.toString());
-  await user.type(
-    await screen.findByRole("textbox", { name: "Straatnaam en huisnummer" }),
-    testPollingStation.street.toString(),
-  );
+  await user.type(await screen.findByRole("textbox", { name: "Straatnaam" }), testPollingStation.street.toString());
   await user.type(
     await screen.findByRole("textbox", { name: "Huisnummer" }),
     testPollingStation.house_number.toString(),
@@ -46,7 +43,6 @@ describe("PollingStationForm create", () => {
     };
 
     const onSaved = vi.fn();
-
     render(<PollingStationForm electionId={1} onSaved={onSaved} />);
 
     const user = userEvent.setup();

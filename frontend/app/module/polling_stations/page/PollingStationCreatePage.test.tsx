@@ -8,11 +8,12 @@ import { render } from "app/test/unit";
 import { PollingStationCreatePage } from "./PollingStationCreatePage";
 
 describe("PollingStationCreatePage", () => {
-  test("Shows form", () => {
+  test("Shows form", async () => {
     vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1" });
 
     render(<PollingStationCreatePage />);
 
-    expect(screen.getByTestId("polling-station-form")).toBeVisible();
+    const form = await screen.findByTestId("polling-station-form");
+    expect(form).toBeVisible();
   });
 });

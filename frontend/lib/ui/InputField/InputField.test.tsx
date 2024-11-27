@@ -8,7 +8,7 @@ import { NarrowInputField, TextAreaInputField, WideInputField } from "./InputFie
 test("The wide input fields are rendered", () => {
   render(<WideInputField />);
 
-  const smallElement = screen.getByRole("textbox", { name: "Default Small Wide with subtext" });
+  const smallElement = screen.getByRole("textbox", { name: "Default Small Wide" });
 
   smallElement.click();
   expect(smallElement).toBeEnabled();
@@ -42,7 +42,7 @@ test("The narrow input fields are rendered", async () => {
   await userEvent.keyboard("1234567891");
   expect(smallElement).toHaveValue("123456789");
 
-  const mediumElement = screen.getByRole("textbox", { name: "Default Medium Narrow with subtext" });
+  const mediumElement = screen.getByRole("textbox", { name: "Default Medium Narrow" });
 
   mediumElement.click();
   expect(mediumElement).toBeEnabled();

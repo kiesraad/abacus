@@ -135,7 +135,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
       return HttpResponse.json(
         {
           error: "Cannot save data entry for a polling station that has already been finalised",
-          reference: "PollingStationAlreadyFinalized",
+          reference: "PollingStationFirstEntryAlreadyFinalised",
           fatal: false,
         } satisfies ErrorResponse,
         { status: 409 },

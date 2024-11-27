@@ -8,12 +8,12 @@ export interface InputGridRowProps {
   field: string;
   title: string;
   errorsAndWarnings?: Map<string, ErrorsAndWarnings>;
-  warningsAccepted: boolean;
+  warningsAccepted?: boolean;
   name?: string;
   defaultValue?: string | number;
   isTotal?: boolean;
   isListTotal?: boolean;
-  error?: string;
+  errorMessageId?: string;
   addSeparator?: boolean;
   autoFocusInput?: boolean;
 }
@@ -28,7 +28,7 @@ export function InputGridRow({
   isTotal,
   isListTotal,
   id,
-  error,
+  errorMessageId,
   addSeparator,
   autoFocusInput,
 }: InputGridRowProps) {
@@ -42,7 +42,7 @@ export function InputGridRow({
       {field}
     </td>,
     <td key={`${id}-2`} id={`cell-${id}`}>
-      <FormField hasError={!!error || hasError} hasWarning={hasWarning}>
+      <FormField hasError={!!errorMessageId || hasError} hasWarning={hasWarning}>
         <NumberInput
           key={id}
           id={id}
@@ -50,10 +50,10 @@ export function InputGridRow({
           defaultValue={defaultValue}
           autoFocus={autoFocusInput}
           aria-labelledby={`field-${id} title-${id}`}
-          aria-invalid={!!error || hasError || (hasWarning && !warningsAccepted) ? "true" : "false"}
+          aria-invalid={!!errorMessageId || hasError || (hasWarning && !warningsAccepted) ? "true" : "false"}
           aria-errormessage={
-            error
-              ? error
+            errorMessageId
+              ? errorMessageId
               : hasError
                 ? "feedback-error"
                 : hasWarning && !warningsAccepted

@@ -920,7 +920,8 @@
           "number_of_voters",
           "category",
           "election_date",
-          "nomination_date"
+          "nomination_date",
+          "status"
         ],
         "properties": {
           "category": {
@@ -955,6 +956,9 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
+          },
+          "status": {
+            "$ref": "#/components/schemas/ElectionStatus"
           }
         }
       },
@@ -999,6 +1003,14 @@
           }
         }
       },
+      "ElectionStatus": {
+        "type": "string",
+        "description": "Election status (limited for now)",
+        "enum": [
+          "DataEntryInProgress",
+          "DataEntryFinished"
+        ]
+      },
       "ElectionStatusResponse": {
         "type": "object",
         "description": "Election polling stations data entry statuses response",
@@ -1020,12 +1032,14 @@
         "enum": [
           "EntryNumberNotSupported",
           "EntryNotFound",
-          "PollingStationAlreadyFinalized",
+          "PollingStationFirstEntryAlreadyFinalised",
+          "PollingStationFirstEntryNotFinalised",
           "PollingStationDataValidation",
           "InvalidVoteGroup",
           "InvalidVoteCandidate",
           "InvalidData",
           "InvalidJson",
+          "InvalidDataEntryNumber",
           "EntryNotUnique",
           "DatabaseError",
           "InternalServerError",
@@ -1297,6 +1311,9 @@
           "not_started",
           "first_entry_in_progress",
           "first_entry_unfinished",
+          "second_entry",
+          "second_entry_in_progress",
+          "second_entry_unfinished",
           "definitive"
         ]
       },

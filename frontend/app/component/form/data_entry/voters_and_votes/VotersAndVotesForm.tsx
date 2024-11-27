@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { getErrorsAndWarnings, useVotersAndVotes, VotersAndVotesValues } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import {
   Alert,
   BottomBar,
@@ -149,12 +150,7 @@ export function VotersAndVotesForm() {
   };
 
   return (
-    <Form
-      onSubmit={handleSubmit}
-      ref={formRef}
-      id="voters_and_votes_form"
-      title="Toegelaten kiezers en uitgebrachte stemmen"
-    >
+    <Form onSubmit={handleSubmit} ref={formRef} id="voters_and_votes_form" title={t("voters_and_votes.form_title")}>
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
@@ -163,9 +159,9 @@ export function VotersAndVotesForm() {
       )}
       <InputGrid key="voters-and-votes">
         <InputGrid.Header>
-          <th>Veld</th>
-          <th>Geteld aantal</th>
-          <th>Omschrijving</th>
+          <th>{t("field")}</th>
+          <th>{t("counted_number")}</th>
+          <th>{t("description")}</th>
         </InputGrid.Header>
         <InputGrid.Body>
           <InputGridRow
@@ -173,7 +169,7 @@ export function VotersAndVotesForm() {
             key="A"
             field="A"
             id="poll_card_count"
-            title="Stempassen"
+            title={t("voters_and_votes.poll_card_count")}
             defaultValue={sectionValues.voters_counts.poll_card_count}
             {...defaultProps}
           />
@@ -181,7 +177,7 @@ export function VotersAndVotesForm() {
             key="B"
             field="B"
             id="proxy_certificate_count"
-            title="Volmachtbewijzen"
+            title={t("voters_and_votes.proxy_certificate_count")}
             defaultValue={sectionValues.voters_counts.proxy_certificate_count}
             {...defaultProps}
           />
@@ -189,7 +185,7 @@ export function VotersAndVotesForm() {
             key="C"
             field="C"
             id="voter_card_count"
-            title="Kiezerspassen"
+            title={t("voters_and_votes.voter_card_count")}
             defaultValue={sectionValues.voters_counts.voter_card_count}
             {...defaultProps}
           />
@@ -197,7 +193,7 @@ export function VotersAndVotesForm() {
             key="D"
             field="D"
             id="total_admitted_voters_count"
-            title="Totaal toegelaten kiezers"
+            title={t("voters_and_votes.total_admitted_voters_count")}
             defaultValue={sectionValues.voters_counts.total_admitted_voters_count}
             isTotal
             addSeparator
@@ -208,7 +204,7 @@ export function VotersAndVotesForm() {
             key="E"
             field="E"
             id="votes_candidates_count"
-            title="Stemmen op kandidaten"
+            title={t("voters_and_votes.votes_candidates_count")}
             defaultValue={sectionValues.votes_counts.votes_candidates_count}
             {...defaultProps}
           />
@@ -216,7 +212,7 @@ export function VotersAndVotesForm() {
             key="F"
             field="F"
             id="blank_votes_count"
-            title="Blanco stemmen"
+            title={t("voters_and_votes.blank_votes_count")}
             defaultValue={sectionValues.votes_counts.blank_votes_count}
             {...defaultProps}
           />
@@ -224,7 +220,7 @@ export function VotersAndVotesForm() {
             key="G"
             field="G"
             id="invalid_votes_count"
-            title="Ongeldige stemmen"
+            title={t("voters_and_votes.invalid_votes_count")}
             defaultValue={sectionValues.votes_counts.invalid_votes_count}
             {...defaultProps}
           />
@@ -232,7 +228,7 @@ export function VotersAndVotesForm() {
             key="H"
             field="H"
             id="total_votes_cast_count"
-            title="Totaal uitgebrachte stemmen"
+            title={t("voters_and_votes.total_votes_cast_count")}
             defaultValue={sectionValues.votes_counts.total_votes_cast_count}
             isTotal
             {...defaultProps}
@@ -242,18 +238,18 @@ export function VotersAndVotesForm() {
           <>
             <InputGrid.SectionTitleHeader>
               <h2 className="mt-lg" ref={recountTitleRef}>
-                Toegelaten kiezers na hertelling door gemeentelijk stembureau
+                {t("voters_and_votes.admitted_voters_after_recount")}
               </h2>
-              <th>Veld</th>
-              <th>Geteld aantal</th>
-              <th>Omschrijving</th>
+              <th>{t("field")}</th>
+              <th>{t("counted_number")}</th>
+              <th>{t("description")}</th>
             </InputGrid.SectionTitleHeader>
             <InputGrid.Body>
               <InputGridRow
                 key="A.2"
                 field="A.2"
                 id="poll_card_recount"
-                title="Stempassen"
+                title={t("voters_and_votes.poll_card_recount")}
                 defaultValue={sectionValues.voters_recounts?.poll_card_recount}
                 {...defaultProps}
               />
@@ -261,7 +257,7 @@ export function VotersAndVotesForm() {
                 key="B.2"
                 field="B.2"
                 id="proxy_certificate_recount"
-                title="Volmachtbewijzen"
+                title={t("voters_and_votes.proxy_certificate_recount")}
                 defaultValue={sectionValues.voters_recounts?.proxy_certificate_recount}
                 {...defaultProps}
               />
@@ -269,7 +265,7 @@ export function VotersAndVotesForm() {
                 key="C.2"
                 field="C.2"
                 id="voter_card_recount"
-                title="Kiezerspassen"
+                title={t("voters_and_votes.voter_card_recount")}
                 defaultValue={sectionValues.voters_recounts?.voter_card_recount}
                 {...defaultProps}
               />
@@ -277,7 +273,7 @@ export function VotersAndVotesForm() {
                 key="D.2"
                 field="D.2"
                 id="total_admitted_voters_recount"
-                title="Totaal toegelaten kiezers"
+                title={t("voters_and_votes.total_admitted_voters_recount")}
                 defaultValue={sectionValues.voters_recounts?.total_admitted_voters_recount}
                 isTotal
                 {...defaultProps}
@@ -291,7 +287,7 @@ export function VotersAndVotesForm() {
         {warningsWarning && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
-              <p>Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.</p>
+              <p>{t("voters_and_votes.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>
         )}
@@ -302,13 +298,13 @@ export function VotersAndVotesForm() {
               defaultChecked={acceptWarnings}
               hasError={warningsWarning}
               ref={acceptWarningsRef}
-              label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
+              label={t("voters_and_votes.form_accept_warnings")}
             />
           </BottomBar.Row>
         )}
         <BottomBar.Row>
           <Button type="submit" size="lg" disabled={status.current === "saving"}>
-            Volgende
+            {t("next")}
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>

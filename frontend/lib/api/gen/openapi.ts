@@ -127,6 +127,7 @@ export interface Election {
   nomination_date: string;
   number_of_voters: number;
   political_groups?: PoliticalGroup[];
+  status: ElectionStatus;
 }
 
 /**
@@ -152,6 +153,11 @@ export interface ElectionListResponse {
 }
 
 /**
+ * Election status (limited for now)
+ */
+export type ElectionStatus = "DataEntryInProgress" | "DataEntryFinished";
+
+/**
  * Election polling stations data entry statuses response
  */
 export interface ElectionStatusResponse {
@@ -164,12 +170,14 @@ export interface ElectionStatusResponse {
 export type ErrorReference =
   | "EntryNumberNotSupported"
   | "EntryNotFound"
-  | "PollingStationAlreadyFinalized"
+  | "PollingStationFirstEntryAlreadyFinalised"
+  | "PollingStationFirstEntryNotFinalised"
   | "PollingStationDataValidation"
   | "InvalidVoteGroup"
   | "InvalidVoteCandidate"
   | "InvalidData"
   | "InvalidJson"
+  | "InvalidDataEntryNumber"
   | "EntryNotUnique"
   | "DatabaseError"
   | "InternalServerError"
@@ -270,7 +278,14 @@ export interface PollingStationResults {
   votes_counts: VotesCounts;
 }
 
-export type PollingStationStatus = "not_started" | "first_entry_in_progress" | "first_entry_unfinished" | "definitive";
+export type PollingStationStatus =
+  | "not_started"
+  | "first_entry_in_progress"
+  | "first_entry_unfinished"
+  | "second_entry"
+  | "second_entry_in_progress"
+  | "second_entry_unfinished"
+  | "definitive";
 
 export interface PollingStationStatusEntry {
   data_entry_progress?: number;

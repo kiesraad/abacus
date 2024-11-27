@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { t } from "@kiesraad/i18n";
 import { IconUser } from "@kiesraad/icon";
 
 import styles from "./NavBar.module.css";
@@ -7,16 +8,18 @@ import styles from "./NavBar.module.css";
 export function NavBar({ children }: { children?: React.ReactNode }) {
   const isAdministrator = location.hash.includes("administrator");
   const isCoordinator = location.hash.includes("coordinator");
+
   const role = [];
+
   if (isAdministrator || isCoordinator) {
     if (isAdministrator) {
-      role.push("Beheerder");
+      role.push(t("administrator"));
     }
     if (isCoordinator) {
-      role.push("Coördinator");
+      role.push(t("coordinator"));
     }
   } else {
-    role.push("Invoerder");
+    role.push(t("typist"));
   }
 
   return (

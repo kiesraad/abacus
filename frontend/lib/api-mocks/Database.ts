@@ -1,6 +1,6 @@
 import { ClientState, Election, getInitialValues, PollingStation, PollingStationResults } from "@kiesraad/api";
 
-import { getElectionMockData } from "./ElectionMockData.ts";
+import { electionListMockResponse, getElectionMockData } from "./ElectionMockData.ts";
 
 export interface Record {
   pollingStationId: number;
@@ -25,13 +25,11 @@ interface Database {
   dataEntries: DataEntryRecord[];
 }
 
+const electionMockData = electionListMockResponse.elections.map(({ id }) => getElectionMockData(id));
+
 const initialData: Database = {
-  elections: [getElectionMockData(1).election, getElectionMockData(2).election, getElectionMockData(3).election],
-  pollingStations: [
-    ...getElectionMockData(1).polling_stations,
-    ...getElectionMockData(2).polling_stations,
-    ...getElectionMockData(3).polling_stations,
-  ],
+  elections: electionMockData.map((e) => e.election),
+  pollingStations: electionMockData.reduce<PollingStation[]>((stations, e) => [...stations, ...e.polling_stations], []),
   results: [
     {
       pollingStationId: 4,

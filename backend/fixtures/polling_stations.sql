@@ -10,4 +10,5 @@ VALUES (1, 1, 'Op Rolletjes', 33, NULL, 'Mobile', 'Rijksweg A12', '1', NULL, '12
        (7, 4, 'Studio The Rules', 1, NULL, 'FixedLocation', 'Gerontoplein', '1', NULL, '1337 YQ', 'Juinen'),
        (8, 4, 'Buurtcentrum de Mattenklopper', 2, 1000, 'Special', 'Complexiteitslaan', '2', 'b', '1337 QY',
         'Juinen'),
-       (9, 4, 'Positivo Zaal', 3, NULL, 'FixedLocation', 'Kerkweg', '3', NULL, '1337 QA', 'Juinen');
+       (9, 4, 'Positivo Zaal', 3, NULL, 'FixedLocation', 'Kerkweg', '3', NULL, '1337 QA', 'Juinen'),
+       (10, 5, 'Buurthuis de Snelste', 103, NULL, 'FixedLocation', 'Kiespolder', '1', 'a', '1884 IT', 'Kiespolder');

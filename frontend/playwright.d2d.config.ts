@@ -5,7 +5,8 @@ import commonConfig from "./playwright.common.config";
 function returnWebserverCommand(): string {
   if (process.env.CI) {
     // CI: use existing backend build, reset and seed database
-    return `../builds/backend/abacus --reset-database --seed-data --port 8081`;
+    const binary = process.platform === "win32" ? "..\\builds\\backend\\abacus.exe" : "../builds/backend/abacus";
+    return `${binary} --reset-database --seed-data --port 8081`;
   } else if (process.env.LOCAL_CI) {
     // LOCAL CI: build frontend, then build and run backend with database reset and seed playwright-specific database
     return `npm run build &&

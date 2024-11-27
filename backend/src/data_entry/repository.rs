@@ -22,11 +22,26 @@ impl PollingStationDataEntries {
         data: String,
         client_state: String,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, progress, data, client_state) VALUES (?, ?, ?, ?, ?)\
-              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET progress = excluded.progress, data = excluded.data, client_state = excluded.client_state, updated_at = unixepoch()",
-            id, entry_number, progress, data, client_state)
-            .execute(&self.0)
-            .await?;
+        sqlx::query!(
+            r#"
+            INSERT INTO polling_station_data_entries
+              (polling_station_id, entry_number, progress, data, client_state)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(polling_station_id, entry_number) DO
+            UPDATE SET
+              progress = excluded.progress,
+              data = excluded.data,
+              client_state = excluded.client_state,
+              updated_at = unixepoch()
+            "#,
+            id,
+            entry_number,
+            progress,
+            data,
+            client_state
+        )
+        .execute(&self.0)
+        .await?;
 
         Ok(())
     }
@@ -68,12 +83,31 @@ impl PollingStationDataEntries {
         }
     }
 
-    pub async fn finalise(
+    pub async fn finalise_first_entry(
         &self,
         tx: &mut Transaction<'_, Sqlite>,
         id: u32,
     ) -> Result<(), sqlx::Error> {
         // future: support second data entry
+        query!(
+            r#"
+            UPDATE polling_station_data_entries
+            SET finalised_at = unixepoch()
+            WHERE polling_station_id = ? AND entry_number = 1"#,
+            id,
+        )
+        .execute(&mut **tx)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn finalise(
+        &self,
+        tx: &mut Transaction<'_, Sqlite>,
+        id: u32,
+    ) -> Result<(), sqlx::Error> {
+        // Copies first data entry to results
         query!(
             "INSERT INTO polling_station_results (polling_station_id, data) SELECT polling_station_id, data FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = 1",
             id,
@@ -81,6 +115,7 @@ impl PollingStationDataEntries {
             .execute(&mut **tx)
             .await?;
 
+        // Deletes all entries from a polling station
         query!(
             "DELETE FROM polling_station_data_entries WHERE polling_station_id = ?",
             id
@@ -93,11 +128,46 @@ impl PollingStationDataEntries {
 
     pub async fn exists_finalised(&self, id: u32) -> Result<bool, sqlx::Error> {
         let res = query!(
-            "SELECT EXISTS(SELECT 1 FROM polling_station_results WHERE polling_station_id = ?) AS `exists`",
+            r#"
+            SELECT EXISTS(
+              SELECT 1 FROM polling_station_results
+              WHERE polling_station_id = ?)
+            AS `exists`"#,
             id
         )
-            .fetch_one(&self.0)
-            .await?;
+        .fetch_one(&self.0)
+        .await?;
+        Ok(res.exists == 1)
+    }
+
+    pub async fn exists_first_entry_finalised(&self, id: u32) -> Result<bool, sqlx::Error> {
+        let res = query!(
+            r#"
+            SELECT EXISTS(
+              SELECT 1 FROM polling_station_data_entries
+              WHERE polling_station_id = ?
+                AND entry_number = 1
+                AND finalised_at IS NOT NULL)
+            AS `exists`"#,
+            id
+        )
+        .fetch_one(&self.0)
+        .await?;
+        Ok(res.exists == 1)
+    }
+
+    pub async fn exists_second_entry(&self, id: u32) -> Result<bool, sqlx::Error> {
+        let res = query!(
+            r#"
+            SELECT EXISTS(
+              SELECT 1 FROM polling_station_data_entries
+              WHERE polling_station_id = ?
+                AND entry_number = 2)
+            AS `exists`"#,
+            id
+        )
+        .fetch_one(&self.0)
+        .await?;
         Ok(res.exists == 1)
     }
 }

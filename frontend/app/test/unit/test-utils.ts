@@ -21,6 +21,22 @@ export { customRender as render };
 export { router } from "./router";
 /* eslint-enable import/export */
 
+export const setupTestRouter = () => {
+  return createMemoryRouter(routes, {
+    future: {
+      v7_normalizeFormMethod: true,
+    },
+  });
+};
+
+export const expectErrorPage = async () => {
+  expect(await screen.findByText(/Abacus is stuk/)).toBeVisible();
+};
+
+export const expectNotFound = async (message?: string) => {
+  expect(await screen.findByText(new RegExp(message || "Pagina niet gevonden"))).toBeVisible();
+};
+
 export function getUrlMethodAndBody(call: [input: string | URL | Request, init?: RequestInit | undefined][]) {
   let url;
   let method;
@@ -62,19 +78,3 @@ export function getCandidateFullNamesFromMockData(politicalGroupMockData: Politi
   });
   return candidateNames;
 }
-
-export const setupTestRouter = () => {
-  return createMemoryRouter(routes, {
-    future: {
-      v7_normalizeFormMethod: true,
-    },
-  });
-};
-
-export const expectErrorPage = async () => {
-  expect(await screen.findByText(/Abacus is stuk/)).toBeVisible();
-};
-
-export const expectNotFound = async (message?: string) => {
-  expect(await screen.findByText(new RegExp(message || "Pagina niet gevonden"))).toBeVisible();
-};

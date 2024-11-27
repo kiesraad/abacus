@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <EML Id="510b" SchemaVersion="5" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:rg="http://www.kiesraad.nl/reportgenerator" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <TransactionId>1</TransactionId>
     <ManagingAuthority>

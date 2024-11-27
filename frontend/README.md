@@ -17,7 +17,7 @@ npm install
 Install Playwright dependencies:
 
 ```sh
-npx playwright install --with-deps
+npx playwright install --with-deps --no-shell
 ```
 
 ### Running

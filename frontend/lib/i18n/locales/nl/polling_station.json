@@ -5,6 +5,7 @@
     "type": "Soort stembureau",
     "address": "Adres van het stembureau"
   },
+  "number_of_voters": "Aantal kiesgerechtigden",
   "street": "Straatnaam",
   "street_and_number": "Straatnaam en huisnummer",
   "house_number": "Huisnummer",

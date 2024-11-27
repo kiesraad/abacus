@@ -106,7 +106,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
             <InputField
               id="number_of_voters"
               name="number_of_voters"
-              label={t("election_status.number_of_voters")}
+              label={t("polling_station.number_of_voters")}
               subtext={t("optional")}
               fieldWidth="narrow-field"
               defaultValue={pollingStation?.number_of_voters}

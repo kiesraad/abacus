@@ -40,7 +40,6 @@ export function InputField({
     autoFocus,
     "aria-invalid": error ? "true" : "false",
     "aria-errormessage": error ? `${name}-hint_or_error` : undefined,
-    "aria-label": label,
     ...InputFieldProps,
   };
 

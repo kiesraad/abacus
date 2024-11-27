@@ -18,7 +18,7 @@ async function fillForm(user: UserEvent, testPollingStation: PollingStation | Om
   await user.type(await screen.findByRole("textbox", { name: "Postcode" }), testPollingStation.postal_code.toString());
   await user.type(await screen.findByRole("textbox", { name: "Plaats" }), testPollingStation.locality.toString());
   await user.type(
-    screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" }),
+    screen.getByRole("textbox", { name: "Aantal kiesgerechtigden Optioneel" }),
     String(testPollingStation.number_of_voters?.toString()),
   );
 

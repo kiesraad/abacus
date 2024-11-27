@@ -219,7 +219,7 @@ export function ElectionStatusPage() {
         <div className={cls.statusSection}>
           <Progress>
             <div id="polling-stations-per-status" className="column">
-              <h3 className="mb-0 h2">{t("election_status.polling_stations_per_status")}</h3>
+              <h3 className="mb-0 heading-lg">{t("election_status.polling_stations_per_status")}</h3>
               {statusCategories.map((cat) => {
                 return (
                   <span
@@ -234,7 +234,7 @@ export function ElectionStatusPage() {
               })}
             </div>
             <div id="progress" className="column">
-              <h3 className="mb-0 h2">{t("progress")}</h3>
+              <h3 className="mb-0 heading-lg">{t("progress")}</h3>
               <ProgressBar key="all" id="all" data={progressBarData} spacing="small" />
             </div>
           </Progress>
@@ -247,7 +247,7 @@ export function ElectionStatusPage() {
                   <div key={`item-table-${categoryColorClass[cat]}`}>
                     <span className="item">
                       <Circle size="xs" color={categoryColorClass[cat]} />
-                      <h3 className="mb-0 h2">
+                      <h3 className="mb-0 heading-lg">
                         {t(`status.${cat}`)} <span className="normal">({categoryCounts[cat]})</span>
                       </h3>
                     </span>

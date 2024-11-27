@@ -106,7 +106,7 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, child
       {...formProps}
     >
       <fieldset>
-        <legend className="h2">{title}</legend>
+        <legend className="heading-lg">{title}</legend>
         {children}
       </fieldset>
     </form>

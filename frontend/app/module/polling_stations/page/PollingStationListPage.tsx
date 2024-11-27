@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { labelForPollingStationType, usePollingStationListRequest } from "@kiesraad/api";
+import { usePollingStationListRequest } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconPlus } from "@kiesraad/icon";
 import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
@@ -32,6 +32,11 @@ export function PollingStationListPage() {
     setSearchParams("");
   };
 
+  const labelForPollingStationType = {
+    FixedLocation: t("polling_station.type.FixedLocation"),
+    Special: t("polling_station.type.Special"),
+    Mobile: t("polling_station.type.Mobile"),
+  };
   //TODO: Table needs highlight option
   //TODO: Alert has some layout glitches
   return (

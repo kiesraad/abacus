@@ -5,6 +5,7 @@
     "type": "Soort stembureau",
     "address": "Adres van het stembureau"
   },
+  "street": "Straatnaam",
   "street_and_number": "Straatnaam en huisnummer",
   "house_number": "Huisnummer",
   "zipcode": "Postcode",

@@ -1,12 +1,6 @@
 import * as React from "react";
 
-import {
-  labelForPollingStationType,
-  PollingStation,
-  PollingStationRequest,
-  PollingStationType,
-  usePollingStationMutation,
-} from "@kiesraad/api";
+import { PollingStation, PollingStationRequest, PollingStationType, usePollingStationMutation } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@kiesraad/ui";
 import { deformatNumber } from "@kiesraad/util";
@@ -85,16 +79,27 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
             <FormLayout.Field>
               <ChoiceList>
                 <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
-                {labelForPollingStationType.entries.map((entry) => (
-                  <ChoiceList.Radio
-                    key={entry.key}
-                    id={`polling_station_type-${entry.key}`}
-                    name={"polling_station_type"}
-                    defaultValue={entry.key}
-                    defaultChecked={pollingStation?.polling_station_type === entry.key}
-                    label={entry.value}
-                  />
-                ))}
+                <ChoiceList.Radio
+                  id={`polling_station_type-FixedLocation`}
+                  name={"polling_station_type"}
+                  defaultValue={"FixedLocation"}
+                  defaultChecked={pollingStation?.polling_station_type === "FixedLocation"}
+                  label={t("polling_station.type.FixedLocation")}
+                />
+                <ChoiceList.Radio
+                  id={`polling_station_type-Special`}
+                  name={"polling_station_type"}
+                  defaultValue={"Special"}
+                  defaultChecked={pollingStation?.polling_station_type === "Special"}
+                  label={t("polling_station.type.Special")}
+                />
+                <ChoiceList.Radio
+                  id={`polling_station_type-Mobile`}
+                  name={"polling_station_type"}
+                  defaultValue={"Mobile"}
+                  defaultChecked={pollingStation?.polling_station_type === "Mobile"}
+                  label={t("polling_station.type.Mobile")}
+                />
               </ChoiceList>
             </FormLayout.Field>
 
@@ -114,12 +119,13 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
               <InputField
                 id="street"
                 name="street"
-                label={t("polling_station.street_and_number")}
+                label={t("polling_station.street")}
                 defaultValue={pollingStation?.street}
               />
               <InputField
                 id="house_number"
                 name="house_number"
+                fieldWidth="narrow"
                 label={t("polling_station.house_number")}
                 defaultValue={pollingStation?.house_number}
               />

@@ -28,6 +28,7 @@
     flex-direction: column;
     gap: 1rem;
     max-width: 48rem;
+    word-break: break-word;
 
     h2 {
       margin-bottom: 0;

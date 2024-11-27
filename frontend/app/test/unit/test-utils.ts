@@ -7,6 +7,8 @@ import { expect } from "vitest";
 
 import { routes } from "app/routes";
 
+import { PoliticalGroup } from "@kiesraad/api";
+
 import { Providers } from "./Providers";
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
@@ -50,6 +52,15 @@ export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: s
     await user.type(input, value.toString());
     expect(input).toHaveValue(value.toString());
   }
+}
+
+export function getCandidateFullNamesFromMockData(politicalGroupMockData: PoliticalGroup): string[] {
+  const candidateNames = politicalGroupMockData.candidates.map((candidate) => {
+    return candidate.first_name
+      ? `${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`
+      : `${candidate.last_name}, ${candidate.initials}`;
+  });
+  return candidateNames;
 }
 
 export const setupTestRouter = () => {

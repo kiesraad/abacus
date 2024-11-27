@@ -167,35 +167,35 @@ describe("Test CandidatesVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const candidate2 = await screen.findByRole("textbox", { name: `2 ${candidateNames[1]}` });
+      const candidate2 = screen.getByRole("textbox", { name: `2 ${candidateNames[1]}` });
       expect(candidate2).toHaveFocus();
       await user.type(candidate2, "6789");
       expect(candidate2).toHaveValue("6789");
 
       await user.keyboard("{enter}");
 
-      const candidate3 = await screen.findByRole("textbox", { name: `3 ${candidateNames[2]}` });
+      const candidate3 = screen.getByRole("textbox", { name: `3 ${candidateNames[2]}` });
       expect(candidate3).toHaveFocus();
       await user.type(candidate3, "123");
       expect(candidate3).toHaveValue("123");
 
       await user.keyboard("{enter}");
 
-      const candidate4 = await screen.findByRole("textbox", { name: `4 ${candidateNames[3]}` });
+      const candidate4 = screen.getByRole("textbox", { name: `4 ${candidateNames[3]}` });
       expect(candidate4).toHaveFocus();
       await user.paste("4242");
       expect(candidate4).toHaveValue("4242");
 
       await user.keyboard("{enter}");
 
-      const candidate5 = await screen.findByRole("textbox", { name: `5 ${candidateNames[4]}` });
+      const candidate5 = screen.getByRole("textbox", { name: `5 ${candidateNames[4]}` });
       expect(candidate5).toHaveFocus();
       await user.type(candidate5, "12");
       expect(candidate5).toHaveValue("12");
 
       await user.keyboard("{enter}");
 
-      const candidate6 = await screen.findByRole("textbox", { name: `6 ${candidateNames[5]}` });
+      const candidate6 = screen.getByRole("textbox", { name: `6 ${candidateNames[5]}` });
       expect(candidate6).toHaveFocus();
       // Test if maxLength on field works
       await user.type(candidate6, "1234567890");
@@ -203,7 +203,7 @@ describe("Test CandidatesVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const candidate7 = await screen.findByRole("textbox", { name: `7 ${candidateNames[6]}` });
+      const candidate7 = screen.getByRole("textbox", { name: `7 ${candidateNames[6]}` });
       expect(candidate7).toHaveFocus();
       await user.type(candidate7, "3");
       expect(candidate7).toHaveValue("3");
@@ -334,7 +334,7 @@ describe("Test CandidatesVotesForm", () => {
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
       const candidate1 = await screen.findByRole("textbox", { name: `1 ${candidateNames[0]}` });
-      const candidate2 = await screen.findByRole("textbox", { name: `2 ${candidateNames[1]}` });
+      const candidate2 = screen.getByRole("textbox", { name: `2 ${candidateNames[1]}` });
       const total = screen.getByRole("textbox", { name: "Totaal lijst 1" });
 
       const spy = vi.spyOn(global, "fetch");
@@ -372,7 +372,7 @@ describe("Test CandidatesVotesForm", () => {
       const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
 
       const candidate1 = await screen.findByRole("textbox", { name: `1 ${candidateNames[0]}` });
-      const candidate2 = await screen.findByRole("textbox", { name: `2 ${candidateNames[1]}` });
+      const candidate2 = screen.getByRole("textbox", { name: `2 ${candidateNames[1]}` });
       const total = screen.getByRole("textbox", { name: "Totaal lijst 1" });
 
       const spy = vi.spyOn(global, "fetch");

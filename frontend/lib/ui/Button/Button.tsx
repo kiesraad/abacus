@@ -1,13 +1,13 @@
 import * as React from "react";
 
-import { Size, Variant } from "@kiesraad/ui";
+import { ButtonVariant, Size } from "@kiesraad/ui";
 
 import cls from "./Button.module.css";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isDisabled?: boolean;
   isLoading?: boolean;
-  variant?: Variant;
+  variant?: ButtonVariant;
   size?: Size;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;

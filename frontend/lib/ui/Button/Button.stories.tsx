@@ -1,65 +1,44 @@
-import type { Story } from "@ladle/react";
+import type { Story, StoryDefault } from "@ladle/react";
 
-import { Size, Variant } from "@kiesraad/ui";
+import { ButtonVariant, Size } from "@kiesraad/ui";
 
 import { Button } from "./Button";
 
 type Props = {
-  label: string;
   text: string;
-  variant: Variant;
   size: Size;
-};
-
-export const DefaultButton: Story<Props> = ({ label, text, variant, size }) => (
-  <Button size={size} variant={variant} aria-label={label}>
-    {text}
-  </Button>
-);
-
-export const EnabledButton: Story<{
-  text: string;
-  label: string;
-}> = ({ label, text }) => (
-  <Button type="button" aria-label={label}>
-    {text}
-  </Button>
-);
-
-EnabledButton.args = {
-  text: "Click me!",
-  label: "enabled-button",
-};
-
-export const DisabledButton: Story<{
-  text: string;
-  label: string;
   disabled: boolean;
-}> = ({ label, disabled, text }) => (
-  <Button type="button" aria-label={label} disabled={disabled}>
-    {text}
-  </Button>
-);
-
-DisabledButton.args = {
-  text: "I'm disabled!",
-  label: "disabled-button",
-  disabled: true,
 };
+
+const buttonVariants: ButtonVariant[] = ["default", "secondary", "tertiary", "alert", "ghost"];
+
+export const Buttons: Story<Props> = ({ text, size, disabled }) => (
+  <>
+    {buttonVariants.map((variant) => (
+      <div key={variant} className="mb-lg">
+        <h2>{variant}</h2>
+        <Button id={"button-variant-" + variant} size={size} variant={variant} disabled={disabled}>
+          {text}
+        </Button>
+      </div>
+    ))}
+    <aside>
+      <i>Disabled and different sizes can be seen using the Controls below</i>
+    </aside>
+  </>
+);
 
 export default {
   args: {
-    label: "Invoer",
     text: "Invoer",
   },
   argTypes: {
-    variant: {
-      options: ["default", "secondary", "ghost", "alert"],
+    size: {
+      options: ["xs", "sm", "md", "lg", "xl"],
       control: { type: "radio" },
     },
-    size: {
-      options: ["xs", "sm", "md", "lg"],
-      control: { type: "radio" },
+    disabled: {
+      control: { type: "boolean" },
     },
   },
-};
+} satisfies StoryDefault<Props>;

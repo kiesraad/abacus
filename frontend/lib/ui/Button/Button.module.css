@@ -78,6 +78,46 @@
     }
   }
 
+  &.tertiary {
+    --button-border-width: 0px;
+    border: none;
+    background: transparent;
+    color: var(--color-error-darkest);
+
+    &:not(:hover, :active) {
+      box-shadow: none;
+    }
+
+    &:hover {
+      background: #fef9fa;
+    }
+
+    &:focus,
+    &:focus-visible {
+      box-shadow: none;
+      outline: none;
+      --button-border-width: 2px;
+      border: var(--button-border-width) solid var(--border-color-focus);
+    }
+
+    &:active {
+      background-color: var(--color-error-bg);
+    }
+
+    &:disabled {
+      box-shadow: none;
+      background: var(--button-color-bg-disabled);
+      border-color: var(--button-color-bg-disabled);
+      color: var(--button-color-disabled);
+    }
+  }
+
+  &:disabled {
+    background: var(--button-color-bg-disabled);
+    border-color: var(--button-color-bg-disabled);
+    color: var(--button-color-disabled);
+  }
+
   &.alert {
     border-color: var(--color-error);
     background: var(--color-error);

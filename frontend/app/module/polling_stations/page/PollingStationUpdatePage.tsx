@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { PollingStationForm } from "app/component/form/polling_station/PollingStationForm";
 
-import { PollingStation, usePollingStationGet } from "@kiesraad/api";
+import { usePollingStationGet } from "@kiesraad/api";
 import { Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
@@ -13,8 +13,8 @@ export function PollingStationUpdatePage() {
 
   const { requestState } = usePollingStationGet(pollingStationId);
 
-  const handleSaved = (ps: PollingStation) => {
-    navigate(`../?updated=${ps.id}`);
+  const handleSaved = () => {
+    navigate(`../?updated=${pollingStationId}`);
   };
 
   const handleCancel = () => {

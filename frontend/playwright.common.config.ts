@@ -26,6 +26,7 @@ const commonConfig: PlaywrightTestConfig = defineConfig({
           permissions: ["clipboard-read", "clipboard-write"],
         },
         ...devices["Desktop Chrome"],
+        channel: "chromium",
       },
     },
     {

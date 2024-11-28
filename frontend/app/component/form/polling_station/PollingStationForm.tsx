@@ -9,6 +9,7 @@ export interface PollingStationFormProps {
   electionId: number;
   pollingStation?: PollingStation;
   onSaved?: (pollingStation: PollingStation) => void;
+  onCancel?: () => void;
 }
 
 export type FormElements = {
@@ -19,7 +20,7 @@ interface Form extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
-export function PollingStationForm({ electionId, pollingStation, onSaved }: PollingStationFormProps) {
+export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
   const formRef = React.useRef<Form>(null);
   const { create, update, requestState } = usePollingStationMutation();
 
@@ -35,6 +36,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
       postal_code: elements.postal_code.value,
       street: elements.street.value,
       house_number: elements.house_number.value,
+      house_number_addition: elements.house_number_addition?.value || undefined,
     };
 
     if (pollingStation) {
@@ -57,7 +59,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
           <Alert type="error">{requestState.error.message}</Alert>
         </FormLayout.Alert>
       )}
-
       <Form ref={formRef} onSubmit={handleSubmit} id="polling-station-form">
         <FormLayout disabled={requestState.status === "loading"}>
           <FormLayout.Section title={t("general_details")}>
@@ -129,6 +130,13 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
                 label={t("polling_station.house_number")}
                 defaultValue={pollingStation?.house_number}
               />
+              <InputField
+                id="house_number_addition"
+                name="house_number_addition"
+                fieldWidth="narrow"
+                label={t("polling_station.house_number_addition")}
+                defaultValue={pollingStation?.house_number_addition}
+              />
             </FormLayout.Row>
             <FormLayout.Row>
               <InputField
@@ -151,6 +159,11 @@ export function PollingStationForm({ electionId, pollingStation, onSaved }: Poll
             <Button type="submit" name="submit">
               {pollingStation ? t("polling_station.form.save_update") : t("polling_station.form.save_create")}
             </Button>
+            {pollingStation && onCancel && (
+              <Button variant="secondary" name="cancel" onClick={onCancel}>
+                {t("cancel")}
+              </Button>
+            )}
           </FormLayout.Controls>
         </FormLayout>
       </Form>

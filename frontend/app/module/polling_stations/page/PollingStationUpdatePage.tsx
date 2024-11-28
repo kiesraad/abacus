@@ -17,6 +17,10 @@ export function PollingStationUpdatePage() {
     navigate(`../?updated=${ps.id}`);
   };
 
+  const handleCancel = () => {
+    navigate("..");
+  };
+
   return (
     <>
       <PageTitle title="Stembureaus - Abacus" />
@@ -30,7 +34,12 @@ export function PollingStationUpdatePage() {
           {requestState.status === "loading" && <Loader />}
 
           {requestState.status === "success" && (
-            <PollingStationForm electionId={electionId} pollingStation={requestState.data} onSaved={handleSaved} />
+            <PollingStationForm
+              electionId={electionId}
+              pollingStation={requestState.data}
+              onSaved={handleSaved}
+              onCancel={handleCancel}
+            />
           )}
         </article>
       </main>

@@ -22,7 +22,11 @@
 .form-alert {
   overflow: hidden;
   margin-top: -2.5rem;
-  width: 100%;
-  max-width: 100%;
-  transform: translateX(-5rem);
+  margin-left: -5rem;
+  margin-right: -5rem;
+}
+
+.form-controls {
+  display: flex;
+  gap: var(--space-md);
 }

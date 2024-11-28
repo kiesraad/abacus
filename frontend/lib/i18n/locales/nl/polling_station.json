@@ -9,6 +9,7 @@
   "street": "Straatnaam",
   "street_and_number": "Straatnaam en huisnummer",
   "house_number": "Huisnummer",
+  "house_number_addition": "Toevoeging",
   "zipcode": "Postcode",
   "locality": "Plaats",
   "form": {

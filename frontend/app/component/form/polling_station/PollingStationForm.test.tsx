@@ -15,6 +15,12 @@ async function fillForm(user: UserEvent, testPollingStation: PollingStation | Om
     await screen.findByRole("textbox", { name: "Huisnummer" }),
     testPollingStation.house_number.toString(),
   );
+  if (testPollingStation.house_number_addition) {
+    await user.type(
+      await screen.findByRole("textbox", { name: "Toevoeging" }),
+      testPollingStation.house_number_addition.toString(),
+    );
+  }
   await user.type(await screen.findByRole("textbox", { name: "Postcode" }), testPollingStation.postal_code.toString());
   await user.type(await screen.findByRole("textbox", { name: "Plaats" }), testPollingStation.locality.toString());
   await user.type(

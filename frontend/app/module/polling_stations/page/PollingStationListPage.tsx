@@ -49,13 +49,19 @@ export function PollingStationListPage() {
       </header>
       {updatedPollingStation && (
         <Alert type="success" onClose={closeAlert}>
-          <p>Wijzigingen {updatedPollingStation.name} opgeslagen.</p>
+          <strong>
+            Wijzigingen {t("polling_station.title.singular")} {updatedPollingStation.number} (
+            {updatedPollingStation.name}) {t("saved")}{" "}
+          </strong>
         </Alert>
       )}
 
       {createdPollingStation && (
         <Alert type="success" onClose={closeAlert}>
-          <p>{createdPollingStation.name} toegevoegd.</p>
+          <strong>
+            {t("polling_station.title.singular")} {createdPollingStation.number} ({createdPollingStation.name}){" "}
+            {t("added")}
+          </strong>
         </Alert>
       )}
       <main>

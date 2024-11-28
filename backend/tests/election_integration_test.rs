@@ -161,6 +161,36 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[1].data_entry_progress, Some(60));
 }
 
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+async fn test_election_details_status_no_other_election_statuses(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    // Save data entry for election 1, polling station 1
+    shared::create_and_save_data_entry(&addr, 1, 1, Some(r#"{"continue": true}"#)).await;
+
+    // Save data entry for election 2, polling station 3
+    shared::create_and_save_data_entry(&addr, 3, 1, Some(r#"{"continue": true}"#)).await;
+
+    // Get statuses for election 2
+    let url = format!("http://{addr}/api/elections/2/status");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
+    assert_eq!(
+        body.statuses.len(),
+        1,
+        "there can be only one {:?}",
+        body.statuses
+    );
+    assert_eq!(body.statuses[0].id, 3);
+    assert_eq!(
+        body.statuses[0].status,
+        PollingStationStatus::FirstEntryInProgress
+    );
+}
+
 #[sqlx::test(fixtures("../fixtures/elections.sql"))]
 async fn test_election_pdf_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;

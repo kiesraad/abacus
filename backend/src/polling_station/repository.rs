@@ -224,11 +224,11 @@ FROM polling_stations AS p
 LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
 LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
 WHERE election_id = $1
-  AND de.polling_station_id IS NULL OR de.entry_number IN
+  AND (de.polling_station_id IS NULL OR de.entry_number IN
     (SELECT MAX(entry_number)
      FROM polling_station_data_entries
      WHERE polling_station_id = p.id
-     GROUP BY polling_station_id);
+     GROUP BY polling_station_id));
 "#,
             election_id
         )

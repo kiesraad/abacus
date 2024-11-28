@@ -69,7 +69,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   };
 
   const unfinished = electionStatus.statuses
-    .filter((status) => status.status === "first_entry_unfinished")
+    .filter((status) => status.status === "first_entry_unfinished" || status.status === "first_entry_in_progress")
     .map((status) => pollingStations.find((ps) => ps.id === status.id));
 
   return (

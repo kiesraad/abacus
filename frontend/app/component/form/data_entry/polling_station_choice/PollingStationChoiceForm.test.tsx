@@ -4,7 +4,7 @@ import { describe, expect, test } from "vitest";
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 import { overrideOnce, render, screen, within } from "app/test/unit";
 
-import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
+import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionStatusMockResponse } from "@kiesraad/api-mocks";
 
 function renderPollingStationChoicePage() {
@@ -203,6 +203,27 @@ describe("Test PollingStationChoiceForm", () => {
 
       // Check if the error message is visible
       expect(screen.getByText("Geen stembureaus gevonden")).toBeVisible();
+    });
+  });
+
+  describe("Polling station in progress", () => {
+    test("Show polling stations as 'in progress'", async () => {
+      overrideOnce("get", "api/elections/1/status", 200, {
+        statuses: [
+          { id: 1, status: "not_started" },
+          { id: 2, status: "first_entry_in_progress", data_entry_progress: 42 },
+          { id: 3, status: "first_entry_unfinished", data_entry_progress: 42 },
+          { id: 4, status: "definitive" },
+        ],
+      } satisfies ElectionStatusResponse);
+
+      renderPollingStationChoicePage();
+
+      const alert = await screen.findByRole("alert");
+      expect(await within(alert).findByRole("heading", { name: "Je hebt nog een openstaande invoer" })).toBeVisible();
+
+      const pollingStations = await within(alert).findAllByRole("link");
+      expect(pollingStations.map((ps) => ps.textContent)).toEqual(["34 - Testplek", "35 - Testschool"]);
     });
   });
 });

@@ -110,7 +110,7 @@ jobs:
           echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_ENV
           echo "TAG=$TAG" >> $GITHUB_ENV
         working-directory: backend
-      - name: Create relase directory
+      - name: Create release directory
         run: mkdir -p release
       - name: Download abacus
         uses: actions/download-artifact@v4
@@ -135,6 +135,7 @@ jobs:
         with:
           body: This is an alpha release of Abacus, commit ${{ github.sha }} on ${{ env.BUILD_DATE }}
           tag_name: ${{ env.TAG }}
+          prerelease: true
           target_commitish: "${{ github.sha }}"
           files: release/*
           token: ${{ secrets.GITHUB_TOKEN }}

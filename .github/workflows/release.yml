@@ -98,6 +98,9 @@ jobs:
       - build
       - playwright-d2d
     runs-on: ubuntu-latest
+    permissions:
+      # contents write permission is needed to push the tag
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Determine release tag

@@ -112,12 +112,6 @@
     }
   }
 
-  &:disabled {
-    background: var(--button-color-bg-disabled);
-    border-color: var(--button-color-bg-disabled);
-    color: var(--button-color-disabled);
-  }
-
   &.alert {
     border-color: var(--color-error);
     background: var(--color-error);

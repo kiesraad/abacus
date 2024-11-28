@@ -1,0 +1,142 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  # Run every Sunday at 12:00 UTC
+  schedule:
+    - cron: '0 12 * * 0'
+
+env:
+  CARGO_TERM_COLOR: always
+  ASSET_DIR: ${{ github.workspace }}/frontend/dist
+  SQLX_OFFLINE: "true"
+
+jobs:
+  build:
+    name: Build
+    strategy:
+      matrix:
+        target: 
+          - os: ubuntu-latest
+            name: x86_64-unknown-linux-musl
+            binary: backend/target/x86_64-unknown-linux-musl/release/abacus
+          - os: macos-latest
+            name: aarch64-apple-darwin
+            binary: backend/target/aarch64-apple-darwin/release/abacus
+          - os: windows-latest
+            name: x86_64-pc-windows-msvc
+            binary: backend/target/x86_64-pc-windows-msvc/release/abacus.exe
+    runs-on: ${{ matrix.target.os }}
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./frontend
+      - name: Build
+        run: npm run build
+        working-directory: ./frontend
+      - name: Setup Rust
+        run: rustup update stable && rustup default stable
+      - name: Install target
+        run: rustup target add ${{ matrix.target.name }}
+      - name: Install musl
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+        if: matrix.target.os == 'ubuntu-latest'
+      - name: Run tests
+        run: cargo --locked test --release
+      - name: Build
+        run: cargo --locked build --release --features memory-serve --target=${{ matrix.target.name }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: abacus-${{ matrix.target.os }}
+          path: ${{ matrix.target.binary }}
+
+  playwright-d2d:
+    name: Playwright d2d tests (${{ matrix.os }}, ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
+    needs:
+      - build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        shardIndex: [1, 2, 3]
+        shardTotal: [3]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps --no-shell
+      - name: Download abacus
+        uses: actions/download-artifact@v4
+        with:
+          name: abacus-${{ matrix.os }}
+          path: builds/backend
+      - name: make backend build executable
+        run: chmod a+x ../builds/backend/abacus
+        if: runner.os != 'Windows'
+      - name: Run DOM to Database e2e tests
+        run: npm run e2e:d2d -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+  release:
+    name: Release
+    needs:
+      - build
+      - playwright-d2d
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Determine release tag
+        run: |
+          VERSION=$(sed -n '/version\s*=\s*"\([^"]*\)"/{s//\1/p;q}' Cargo.toml)
+          BUILD_DATE=$(date -u +'%Y-%m-%d')
+          BUILD_DATE_SHORT=$(date -u +'%Y%m%d')
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          TAG="v${VERSION}-alpha.${BUILD_DATE_SHORT}.${SHA_SHORT}"
+          echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_ENV
+        working-directory: backend
+      - name: Create release directory
+        run: mkdir -p release
+      - name: Download abacus
+        uses: actions/download-artifact@v4
+        with:
+          path: release/
+      - name: Rename binary
+        run: |
+          mv abacus-ubuntu-latest/abacus abacus-linux-${{ env.TAG}}
+          mv abacus-macos-latest/abacus abacus-macos-${{ env.TAG}}
+          mv abacus-windows-latest/abacus.exe abacus-${{ env.TAG}}.exe
+          rmdir abacus-ubuntu-latest abacus-macos-latest abacus-windows-latest
+        working-directory: release
+      - name: Create a SHA256SUMS file
+        run: sha256sum -b * > SHA256SUMS
+        working-directory: release
+      - name: Create git tag
+        run: git tag $TAG
+      - name: Push git tag
+        run: git push origin $TAG
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: This is an alpha release of Abacus, commit ${{ github.sha }} on ${{ env.BUILD_DATE }}
+          tag_name: ${{ env.TAG }}
+          prerelease: true
+          target_commitish: "${{ github.sha }}"
+          files: release/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Version ${{ env.TAG }}

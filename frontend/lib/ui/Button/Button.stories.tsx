@@ -17,7 +17,16 @@ export const Buttons: Story<Props> = ({ text, size, disabled }) => (
     {buttonVariants.map((variant) => (
       <div key={variant} className="mb-lg">
         <h2>{variant}</h2>
-        <Button id={"button-variant-" + variant} size={size} variant={variant} disabled={disabled}>
+        <Button
+          id={"button-variant-" + variant}
+          size={size}
+          variant={variant}
+          disabled={disabled}
+          onClick={(e) => {
+            // for assertions: set a data-has-been-clicked attribute
+            e.currentTarget.dataset.hasBeenClicked = "true";
+          }}
+        >
           {text}
         </Button>
       </div>

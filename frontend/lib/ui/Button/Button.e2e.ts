@@ -1,33 +1,36 @@
 import { expect, test } from "@playwright/test";
 
-test("default button is visible", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=button--default-button");
+test("buttons are visible and enabled", async ({ page }) => {
+  await page.goto("http://localhost:61000/?story=button--buttons");
 
-  const button = page.getByRole("button", {
-    name: "Invoer",
-  });
+  const buttons = await page
+    .getByRole("button", {
+      name: "Invoer",
+    })
+    .all();
 
-  await expect(button).toBeVisible();
-  await expect(button).toBeEnabled();
+  for (const button of buttons) {
+    await expect(button).toBeVisible();
+    await expect(button).toBeEnabled();
+    await button.click();
+    await expect(button).toHaveAttribute("data-has-been-clicked");
+  }
 });
 
-test("click enabled button", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=button--enabled-button");
+test("click disabled button does nothing", async ({ page }) => {
+  await page.goto("http://localhost:61000/?story=button--buttons&arg-disabled=true");
 
-  const button = page.getByRole("button", {
-    name: "enabled-button",
-  });
+  const buttons = await page
+    .getByRole("button", {
+      name: "Invoer",
+    })
+    .all();
 
-  await expect(button).toBeEnabled();
-  await button.click();
-});
-
-test("click disabled button", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=button--disabled-button");
-
-  const button = page.getByRole("button", {
-    name: "disabled-button",
-  });
-
-  await expect(button).toBeDisabled();
+  for (const button of buttons) {
+    await expect(button).toBeVisible();
+    await expect(button).toBeDisabled();
+    // eslint-disable-next-line playwright/no-force-option
+    await button.click({ force: true });
+    await expect(button).not.toHaveAttribute("data-has-been-clicked");
+  }
 });

@@ -12,8 +12,9 @@ test("The default button is enabled", async () => {
   });
 
   for (const button of buttons) {
-    button.click();
     expect(button).toBeEnabled();
+    button.click();
+    expect(button).toHaveAttribute("data-has-been-clicked");
   }
 });
 
@@ -26,5 +27,7 @@ test("The disabled button is disabled", async () => {
 
   for (const button of buttons) {
     expect(button).toBeDisabled();
+    button.click();
+    expect(button).not.toHaveAttribute("data-has-been-clicked");
   }
 });

@@ -19,6 +19,8 @@ pub enum ErrorReference {
     EntryNotFound,
     PollingStationFirstEntryAlreadyFinalised,
     PollingStationFirstEntryNotFinalised,
+    PollingStationSecondEntryAlreadyFinalised,
+    PollingStationResultsAlreadyFinalised,
     PollingStationDataValidation,
     InvalidVoteGroup,
     InvalidVoteCandidate,

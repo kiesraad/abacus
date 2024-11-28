@@ -172,6 +172,8 @@ export type ErrorReference =
   | "EntryNotFound"
   | "PollingStationFirstEntryAlreadyFinalised"
   | "PollingStationFirstEntryNotFinalised"
+  | "PollingStationSecondEntryAlreadyFinalised"
+  | "PollingStationResultsAlreadyFinalised"
   | "PollingStationDataValidation"
   | "InvalidVoteGroup"
   | "InvalidVoteCandidate"

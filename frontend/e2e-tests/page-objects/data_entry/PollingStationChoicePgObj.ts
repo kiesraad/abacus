@@ -7,6 +7,7 @@ export class PollingStationChoicePage {
   readonly fieldsetNextPollingStation: Locator;
   readonly pollingStationNumber: Locator;
   readonly pollingStationFeedback: Locator;
+  readonly pollingStationSubmitFeedback: Locator;
   protected readonly start: Locator; // use clickStart() instead
   readonly dataEntrySuccess: Locator;
   readonly resumeDataEntry: Locator;
@@ -24,6 +25,7 @@ export class PollingStationChoicePage {
 
     this.pollingStationNumber = page.getByRole("textbox", { name: "Voer het nummer in: " });
     this.pollingStationFeedback = page.getByTestId("pollingStationSelectorFeedback");
+    this.pollingStationSubmitFeedback = page.getByTestId("pollingStationSubmitFeedback");
     this.start = page.getByRole("button", { name: "Beginnen" });
 
     this.dataEntrySuccess = page.getByRole("heading", {

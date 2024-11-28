@@ -57,9 +57,6 @@ async fn test_election_details_not_found(pool: SqlitePool) {
     assert_eq!(status, StatusCode::NOT_FOUND);
 }
 
-// TODO: Enable and adjust this test once frontend second entry is implemented
-// and we've refactored the polling station status code
-#[ignore]
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;

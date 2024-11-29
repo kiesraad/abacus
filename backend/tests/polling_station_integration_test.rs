@@ -178,7 +178,11 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
 
     let status = response.status();
-    assert_eq!(status, StatusCode::NOT_FOUND, "Unexpected response status");
+    assert_eq!(
+        status,
+        StatusCode::UNPROCESSABLE_ENTITY,
+        "Unexpected response status"
+    );
     let body: ErrorResponse = response.json().await.unwrap();
     assert_eq!(body.error, "Invalid data");
 }

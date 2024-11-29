@@ -92,7 +92,7 @@ impl PollingStationDataEntries {
         query!(
             r#"
             UPDATE polling_station_data_entries
-            SET finalised_at = unixepoch()
+            SET finalised_at = unixepoch(), progress = 100
             WHERE polling_station_id = ? AND entry_number = 1"#,
             id,
         )

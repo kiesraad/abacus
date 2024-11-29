@@ -51,7 +51,7 @@ const expectVotersAndVotesForm = async (inputShouldHaveFocus = true) => {
   });
   if (inputShouldHaveFocus) {
     await waitFor(() => {
-      expect(screen.getByTestId("poll_card_count")).toHaveFocus();
+      expect(screen.getByRole("textbox", { name: "A Stempassen" })).toHaveFocus();
     });
   }
 };
@@ -79,7 +79,7 @@ const expectDifferencesForm = async (inputShouldHaveFocus = true) => {
   });
   if (inputShouldHaveFocus) {
     await waitFor(() => {
-      expect(screen.getByTestId("more_ballots_count")).toHaveFocus();
+      expect(screen.getByRole("textbox", { name: "I Stembiljetten méér geteld" })).toHaveFocus();
     });
   }
 };

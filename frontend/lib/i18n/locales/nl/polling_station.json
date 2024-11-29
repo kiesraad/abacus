@@ -3,7 +3,11 @@
     "singular": "Stembureau",
     "plural": "Stembureaus",
     "type": "Soort stembureau",
-    "address": "Adres van het stembureau"
+    "address": "Adres van het stembureau",
+    "how_to_add": "Hoe wil je stembureaus toevoegen?"
+  },
+  "message": {
+    "no_polling_stations": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen."
   },
   "number_of_voters": "Aantal kiesgerechtigden",
   "street": "Straatnaam",

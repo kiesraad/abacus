@@ -67,9 +67,24 @@ export function PollingStationListPage() {
       <main>
         {!data.polling_stations.length ? (
           <article>
-            <h2>Hoe wil je stembureaus toevoegen?</h2>
-            Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.
-            {/* TODO Create polling station: issue #431 */}
+            <h2>{t("polling_station.title.how_to_add")}</h2>
+            <p>{t("polling_station.message.no_polling_stations")}</p>
+            <p>&nbsp;</p>
+
+            <Toolbar>
+              <Toolbar.Section pos="start">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<IconPlus />}
+                  onClick={() => {
+                    navigate("create");
+                  }}
+                >
+                  {t("manual_input")}
+                </Button>
+              </Toolbar.Section>
+            </Toolbar>
           </article>
         ) : (
           <article>

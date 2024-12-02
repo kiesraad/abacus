@@ -6,11 +6,9 @@ export function fieldNameFromPath(path: string): string {
     const [, , subsection, field] = bits;
     return `${subsection}.${field}`;
   } else {
+    result = bits[bits.length - 1] || "";
     if (bits.length >= 2 && bits[bits.length - 2] === "voters_recounts") {
-      result = bits[bits.length - 1] || "";
       result = result.replace("_count", "_recount");
-    } else {
-      result = bits[bits.length - 1] || "";
     }
   }
   return result || path;

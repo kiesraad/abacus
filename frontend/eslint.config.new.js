@@ -19,8 +19,10 @@ export default [
     },
   },
   {
-    files: ["**/*.{ts,tsx}"], // not js
     ignores: ["**/dist", "**/.eslintrc.cjs", "!**/.ladle/"],
+  },
+  {
+    files: ["**/*.{ts,tsx}"], // not js
     // ...reactRecommended,  // uncomment or remove?
     plugins: {
       "@typescript-eslint": typescriptEslint,

@@ -21,7 +21,7 @@ export function IconButton({
   isDisabled,
   isLoading,
   isRound = false,
-  variant = "default",
+  variant = "primary",
   size = "md",
   ...htmlButtonProps
 }: IconButtonProps) {

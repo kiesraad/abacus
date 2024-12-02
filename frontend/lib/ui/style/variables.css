@@ -71,10 +71,10 @@
   --checkbox-radio-svg-size: 0.875rem;
 
   --button-icon-modal-close-color-svg: var(--menu-empty);
-  --button-icon-ghost-color-svg: var(--base-black);
-  --button-icon-ghost-color-border-focus: var(--checkbox-radio-color-border);
-  --button-icon-ghost-color-bg-focus: var(--bg-gray-darker);
-  --button-icon-ghost-color-bg-hover: var(--bg-gray-darker);
+  --button-icon-tertiary-color-svg: var(--base-black);
+  --button-icon-tertiary-color-border-focus: var(--checkbox-radio-color-border);
+  --button-icon-tertiary-color-bg-focus: var(--bg-gray-darker);
+  --button-icon-tertiary-color-bg-hover: var(--bg-gray-darker);
 
   --shadow-color-focus: #d1e0ff;
   --border-color-default: var(--bg-gray-darkest);

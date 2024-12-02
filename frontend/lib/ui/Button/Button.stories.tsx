@@ -10,7 +10,13 @@ type Props = {
   disabled: boolean;
 };
 
-const buttonVariants: ButtonVariant[] = ["default", "secondary", "tertiary", "alert", "ghost"];
+const buttonVariants: ButtonVariant[] = [
+  "primary",
+  "primary-destructive",
+  "secondary",
+  "tertiary",
+  "tertiary-destructive",
+];
 
 export const Buttons: Story<Props> = ({ text, size, disabled }) => (
   <>

@@ -43,7 +43,7 @@ export default {
   },
   argTypes: {
     variant: {
-      options: ["default", "secondary", "ghost", "alert"],
+      options: ["primary", "primary-destructive", "secondary", "tertiary", "tertiary-destructive"],
       control: { type: "radio" },
     },
     size: {

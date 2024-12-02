@@ -109,11 +109,7 @@ impl ElectionSummary {
             }
 
             // add voters and votes to the total, using the voters recount if available
-            if let Some(voters_recounts) = &result.voters_recounts {
-                totals.voters_counts += voters_recounts;
-            } else {
-                totals.voters_counts += &result.voters_counts;
-            }
+            totals.voters_counts += result.latest_voters_counts();
             totals.votes_counts += &result.votes_counts;
 
             // add any differences noted to the total

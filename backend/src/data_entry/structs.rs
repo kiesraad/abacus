@@ -146,6 +146,13 @@ pub struct PollingStationResults {
     pub political_group_votes: Vec<PoliticalGroupVotes>,
 }
 
+impl PollingStationResults {
+    /// This returns the recounts if those are available, otherwise it returns the normal voters counts
+    pub fn latest_voters_counts(&self) -> &VotersCounts {
+        self.voters_recounts.as_ref().unwrap_or(&self.voters_counts)
+    }
+}
+
 impl Validate for PollingStationResults {
     fn validate(
         &self,

@@ -1,5 +1,6 @@
 import pluginJs from "@eslint/js";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import importPlugin from "eslint-plugin-import";
 import pluginReact from "eslint-plugin-react";
 import reactPlugin from "eslint-plugin-react";
 import react from "eslint-plugin-react";
@@ -27,6 +28,8 @@ export default [
     languageOptions: { globals: globals.browser },
     ...reactPlugin.configs.flat.recommended,
     ...reactPlugin.configs.flat["jsx-runtime"],
+    ...importPlugin.flatConfigs.recommended,
+    ...importPlugin.flatConfigs.typescript,
   },
   pluginJs.configs.recommended, // should this bere here?
   ...tseslint.configs.recommended, // should this bere here?

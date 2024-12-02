@@ -27,6 +27,7 @@ const FIXTURES: &[Fixture] = load_fixtures!([
     "reset",
     "elections",
     "polling_stations",
+    "polling_station_data_entries",
     "polling_station_results"
 ]);
 

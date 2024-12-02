@@ -306,7 +306,10 @@ describe("Test VotersAndVotesForm", () => {
       await userTypeInputs(user, {
         ...expectedRequest.data.voters_counts,
         ...expectedRequest.data.votes_counts,
-        ...expectedRequest.data.voters_recounts,
+        poll_card_recount: expectedRequest.data.voters_recounts.poll_card_count,
+        proxy_certificate_recount: expectedRequest.data.voters_recounts.proxy_certificate_count,
+        voter_card_recount: expectedRequest.data.voters_recounts.voter_card_count,
+        total_admitted_voters_recount: expectedRequest.data.voters_recounts.total_admitted_voters_count,
       });
 
       const spy = vi.spyOn(global, "fetch");
@@ -809,10 +812,7 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.total_votes_cast_count",
-                "data.voters_recounts.total_admitted_voters_recount",
-              ],
+              fields: ["data.votes_counts.total_votes_cast_count", "data.voters_recounts.total_admitted_voters_count"],
               code: "W207",
             },
           ],

@@ -96,7 +96,7 @@ impl ElectionSummary {
                 election,
                 polling_station,
                 &mut validation_results,
-                "data".into(),
+                &"data".into(),
             )?;
             if validation_results.has_errors() {
                 return Err(APIError::AddError(

@@ -131,7 +131,7 @@ fn validate_polling_station_results(
         election,
         polling_station,
         &mut validation_results,
-        "data".into(),
+        &"data".into(),
     )?;
     validation_results
         .errors
@@ -267,7 +267,7 @@ pub async fn polling_station_data_entry_finalise(
         &election,
         &polling_station,
         &mut validation_results,
-        "data".into(),
+        &"data".into(),
     )?;
 
     if validation_results.has_errors() {

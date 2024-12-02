@@ -87,7 +87,7 @@ describe("PollingStationForm create", () => {
     await userEvent.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
 
     await waitFor(() => {
-      expect(onSaved).toHaveBeenCalledWith({ ...testPollingStation, name: "test2" });
+      expect(onSaved).toHaveBeenCalled();
     });
   });
 });

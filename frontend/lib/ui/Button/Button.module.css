@@ -98,14 +98,14 @@
     --button-border-width: 0px;
     border: none;
     background: transparent;
-    color: var(--color-error-darkest);
+    color: var(--red-700);
 
     &:not(:hover, :active) {
       box-shadow: none;
     }
 
     &:hover {
-      background: #fef9fa;
+      background: var(--red-50);
     }
 
     &:focus,
@@ -117,8 +117,8 @@
     }
 
     &:active {
-      border-color: var(--color-error-bg);
-      background-color: var(--color-error-bg);
+      border-color: var(--red-100);
+      background-color: var(--red-100);
     }
 
     &:disabled {

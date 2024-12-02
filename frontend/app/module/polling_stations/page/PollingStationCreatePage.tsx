@@ -9,6 +9,7 @@ import { useNumericParam } from "@kiesraad/util";
 export function PollingStationCreatePage() {
   const electionId = useNumericParam("electionId");
   const navigate = useNavigate();
+
   const handleSaved = (ps: PollingStation) => {
     navigate(`../?created=${ps.id}`);
   };

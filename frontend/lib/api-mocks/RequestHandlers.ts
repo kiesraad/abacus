@@ -278,7 +278,7 @@ export const PollingStationUpdateHandler = http.put<ParamsToString<POLLING_STATI
         ps.id === pollingStationId ? updatedPollingStation : ps,
       );
 
-      return HttpResponse.json(updatedPollingStation, { status: 200 });
+      return HttpResponse.text("", { status: 200 });
     }
 
     return HttpResponse.json(

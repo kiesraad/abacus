@@ -10,7 +10,7 @@ export function WorkstationsHomePage() {
     <>
       <PageTitle title="Invoerstations - Abacus" />
       <NavBar>
-        <Link to={"/elections#administrator"}>{t("election.name_plural")}</Link>
+        <Link to={"/elections#administrator"}>{t("election.elections")}</Link>
         <Link to={"/users#administratorcoordinator"}>{t("users")}</Link>
         <span className="active">{t("polling_stations")}</span>
         <Link to={"/logs#administratorcoordinator"}>{t("logs")}</Link>

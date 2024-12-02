@@ -18,7 +18,7 @@ export function CandidatesVotesPage() {
   const group = election.political_groups.find((group) => group.number === parsedListNumber);
 
   if (!group) {
-    return <div>{t("data_entry.list.not-found", { listNumber })}</div>;
+    return <div>{t("data_entry.list.not_found", { listNumber })}</div>;
   }
 
   return <CandidatesVotesForm group={group} key={group.number} />;

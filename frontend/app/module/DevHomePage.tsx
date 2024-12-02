@@ -24,10 +24,10 @@ export function DevHomePage() {
               <Link to={`/account`}>{t("user.account")}</Link>
             </li>
           </ul>
-          <strong>{t("data_entry_clerc")}</strong>
+          <strong>{t("typist")}</strong>
           <ul>
             <li>
-              <Link to={"/elections"}>{t("election.name_plural")}</Link>
+              <Link to={"/elections"}>{t("election.elections")}</Link>
             </li>
             <ul>
               <li>

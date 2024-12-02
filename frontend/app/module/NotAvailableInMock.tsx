@@ -18,7 +18,7 @@ export function NotAvailableInMock({ title }: NotAvailableInMockProps) {
       </NavBar>
       <main>
         <article>
-          {tx("messages.not-available-in-mock", {
+          {tx("messages.not_available_in_mock", {
             link: (content) => <a href={"/overview"}>{content}</a>,
           })}
         </article>

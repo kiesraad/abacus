@@ -29,7 +29,7 @@ export function PollingStationListPage() {
       <PageTitle title={`${t("polling_stations")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("election.name_plural")}</h1>
+          <h1>{t("election.elections")}</h1>
         </section>
       </header>
       <main>

@@ -36,14 +36,14 @@ export function OverviewPage() {
         {isAdministrator && (
           <>
             <Link to={"/users#administratorcoordinator"}>{t("users")}</Link>
-            <Link to={"/workstations#administrator"}>{t("data_entry_stations")}</Link>
+            <Link to={"/workstations#administrator"}>{t("workstations.workstations")}</Link>
             <Link to={"/logs#administratorcoordinator"}>{t("logs")}</Link>
           </>
         )}
       </NavBar>
       <header>
         <section>
-          <h1>{isAdministrator ? t("manage_elections") : t("election.name_plural")}</h1>
+          <h1>{isAdministrator ? t("manage_elections") : t("election.elections")}</h1>
         </section>
         {!isAdministrator && (
           <section>
@@ -61,7 +61,7 @@ export function OverviewPage() {
         <article>
           <Table id="overview">
             <Table.Header>
-              <Table.Column>{t("election.name")}</Table.Column>
+              <Table.Column>{t("election.election")}</Table.Column>
               {isAdministrator && <Table.Column>{t("role")}</Table.Column>}
               <Table.Column>{t("election_status.label")}</Table.Column>
             </Table.Header>

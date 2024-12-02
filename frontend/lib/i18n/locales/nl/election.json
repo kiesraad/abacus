@@ -1,6 +1,6 @@
 {
-  "name": "Verkiezing",
-  "name_plural": "Verkiezingen",
+  "election": "Verkiezing",
+  "elections": "Verkiezingen",
   "title": {
     "details": "Details verkiezing",
     "finish_data_entry": "Invoerfase afronden"

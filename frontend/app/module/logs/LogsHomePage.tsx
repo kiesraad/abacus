@@ -10,9 +10,9 @@ export function LogsHomePage() {
     <>
       <PageTitle title="Activiteitenlog - Abacus" />
       <NavBar>
-        <Link to={"/elections#administrator"}>{t("election.name_plural")}</Link>
+        <Link to={"/elections#administrator"}>{t("election.elections")}</Link>
         <Link to={"/users#administratorcoordinator"}>{t("users")}</Link>
-        <Link to={"/workstations#administrator"}>{t("data_entry_stations")}</Link>
+        <Link to={"/workstations#administrator"}>{t("workstations.workstations")}</Link>
         <span className="active">{t("logs")}</span>
       </NavBar>
       <header>

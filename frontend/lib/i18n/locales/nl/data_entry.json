@@ -20,6 +20,6 @@
     "wait_for_instructions": "Wacht op instructies van de coördinator."
   },
   "list": {
-    "not-found": "Geen lijst gevonden voor {listNumber}"
+    "not_found": "Geen lijst gevonden voor {listNumber}"
   }
 }

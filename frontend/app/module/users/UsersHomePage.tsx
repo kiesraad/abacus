@@ -10,9 +10,9 @@ export function UsersHomePage() {
     <>
       <PageTitle title="Gebruikersbeheer - Abacus" />
       <NavBar>
-        <Link to={"/elections#administrator"}>{t("election.name_plural")}</Link>
+        <Link to={"/elections#administrator"}>{t("election.elections")}</Link>
         <span className="active">{t("users")}</span>
-        <Link to={"/workstations#administrator"}>{t("polling_stations")}</Link>
+        <Link to={"/workstations#administrator"}>{t("workstations.workstations")}</Link>
         <Link to={"/logs#administratorcoordinator"}>{t("logs")}</Link>
       </NavBar>
       <header>

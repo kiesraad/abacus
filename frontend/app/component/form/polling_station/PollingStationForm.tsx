@@ -36,7 +36,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
       postal_code: elements.postal_code.value,
       street: elements.street.value,
       house_number: elements.house_number.value,
-      house_number_addition: elements.house_number_addition?.value || undefined,
+      house_number_addition: elements.house_number_addition?.value,
     };
 
     if (pollingStation) {

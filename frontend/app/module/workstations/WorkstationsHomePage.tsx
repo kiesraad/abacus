@@ -12,7 +12,7 @@ export function WorkstationsHomePage() {
       <NavBar>
         <Link to={"/elections#administrator"}>{t("election.elections")}</Link>
         <Link to={"/users#administratorcoordinator"}>{t("users")}</Link>
-        <span className="active">{t("polling_stations")}</span>
+        <span className="active">{t("workstations.workstations")}</span>
         <Link to={"/logs#administratorcoordinator"}>{t("logs")}</Link>
       </NavBar>
       <header>

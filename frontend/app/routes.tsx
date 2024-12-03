@@ -28,6 +28,8 @@ import {
 } from "./module/data_entry";
 import { DevHomePage } from "./module/DevHomePage";
 import { NotFoundPage } from "./module/NotFoundPage";
+import { PollingStationCreatePage } from "./module/polling_stations/page/PollingStationCreatePage";
+import { PollingStationUpdatePage } from "./module/polling_stations/page/PollingStationUpdatePage";
 import { RootLayout } from "./module/RootLayout";
 
 export const routes = createRoutesFromElements(
@@ -50,6 +52,8 @@ export const routes = createRoutesFromElements(
         <Route path="status" element={<ElectionStatusPage />} />
         <Route path="polling-stations" element={<PollingStationsLayout />}>
           <Route index element={<PollingStationListPage />} />
+          <Route path="create" element={<PollingStationCreatePage />} />
+          <Route path="update/:pollingStationId" element={<PollingStationUpdatePage />} />
         </Route>
         <Route path="data-entry" element={null}>
           <Route index element={<DataEntryHomePage />} />

@@ -55,7 +55,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
     return (
       <Table.Header key={category} backgroundStyling>
         <Table.Column key={`${category}-number`}>{t("number")}</Table.Column>
-        <Table.Column key={`${category}-name`}>{t("polling_station.title")}</Table.Column>
+        <Table.Column key={`${category}-name`}>{t("polling_station.title.singular")}</Table.Column>
         {children}
       </Table.Header>
     );
@@ -210,8 +210,14 @@ export function ElectionStatusPage() {
         <div className={cls.statusTitle}>
           <h2 id="status-title">{t("election_status.main_title")}</h2>
           <div className={cls.buttons}>
-            {/* TODO: Add button onClick to Create Polling Station page */}
-            <Button size="md" variant="secondary" leftIcon={<IconPlus />}>
+            <Button
+              size="md"
+              variant="secondary"
+              leftIcon={<IconPlus />}
+              onClick={() => {
+                navigate(`/elections/${election.id}/polling-stations`);
+              }}
+            >
               {t("election_status.add_polling_station")}
             </Button>
           </div>

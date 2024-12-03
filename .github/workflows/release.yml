@@ -167,4 +167,4 @@ jobs:
           curl -s \
           -H "Authorization: Bearer ${{ secrets.ABACUS_TEST_API_KEY }}" \
           -T ./abacus \
-          https://abacus-test.nl/etes/api/v1/executable/${{ github.sha }}
+          https://abacus-test.nl/etes/api/v1/executable/${{ github.sha }}/${{ github.sha }}

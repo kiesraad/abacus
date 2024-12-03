@@ -50,8 +50,10 @@ export function PollingStationListPage() {
       {updatedPollingStation && (
         <Alert type="success" onClose={closeAlert}>
           <strong>
-            Wijzigingen {t("polling_station.title.singular")} {updatedPollingStation.number} (
-            {updatedPollingStation.name}) {t("saved")}{" "}
+            {t("polling_station.message.polling_station_updated", {
+              number: updatedPollingStation.number,
+              name: updatedPollingStation.name,
+            })}
           </strong>
         </Alert>
       )}
@@ -59,8 +61,10 @@ export function PollingStationListPage() {
       {createdPollingStation && (
         <Alert type="success" onClose={closeAlert}>
           <strong>
-            {t("polling_station.title.singular")} {createdPollingStation.number} ({createdPollingStation.name}){" "}
-            {t("added")}
+            {t("polling_station.message.polling_station_created", {
+              number: createdPollingStation.number,
+              name: createdPollingStation.name,
+            })}
           </strong>
         </Alert>
       )}
@@ -68,8 +72,7 @@ export function PollingStationListPage() {
         {!data.polling_stations.length ? (
           <article>
             <h2>{t("polling_station.title.how_to_add")}</h2>
-            <p>{t("polling_station.message.no_polling_stations")}</p>
-            <p>&nbsp;</p>
+            <p className="mb-lg">{t("polling_station.message.no_polling_stations")}</p>
 
             <Toolbar>
               <Toolbar.Section pos="start">

@@ -8,7 +8,7 @@
   },
   "message": {
     "no_polling_stations": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
-    "polling_station_updated": "Wijzigingen sembureau {number} ({name}) opgeslagen.",
+    "polling_station_updated": "Wijzigingen stembureau {number} ({name}) opgeslagen.",
     "polling_station_created": "Stembureau {number} ({name}) toegevoegd."
   },
   "number_of_voters": "Aantal kiesgerechtigden",

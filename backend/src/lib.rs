@@ -137,7 +137,6 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 data_entry::PoliticalGroupVotes,
                 data_entry::PollingStationResults,
                 data_entry::VotersCounts,
-                data_entry::VotersRecounts,
                 data_entry::VotesCounts,
                 election::Election,
                 election::ElectionCategory,

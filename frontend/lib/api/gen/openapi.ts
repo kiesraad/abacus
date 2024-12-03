@@ -274,7 +274,7 @@ export interface PollingStationResults {
   political_group_votes: PoliticalGroupVotes[];
   recounted?: boolean;
   voters_counts: VotersCounts;
-  voters_recounts?: VotersRecounts;
+  voters_recounts?: VotersCounts;
   votes_counts: VotesCounts;
 }
 
@@ -357,16 +357,6 @@ export interface VotersCounts {
   proxy_certificate_count: number;
   total_admitted_voters_count: number;
   voter_card_count: number;
-}
-
-/**
- * Recounted voters counts, this replaces the original voters counts in the polling station results.
- */
-export interface VotersRecounts {
-  poll_card_recount: number;
-  proxy_certificate_recount: number;
-  total_admitted_voters_recount: number;
-  voter_card_recount: number;
 }
 
 /**

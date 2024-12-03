@@ -250,6 +250,7 @@ describe("Test CandidatesVotesForm", () => {
         location: "Heemdamseburg",
         number_of_voters: 100,
         category: "Municipal",
+        subcategory: "MunicipalLarge",
         election_date: "2024-11-30",
         nomination_date: "2024-11-01",
         status: "DataEntryInProgress",

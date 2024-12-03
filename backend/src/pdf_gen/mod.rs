@@ -57,7 +57,7 @@ pub(crate) mod tests {
     use models::ModelNa31_2Input;
 
     use super::*;
-    use crate::election::ElectionStatus;
+    use crate::election::{ElectionStatus, ElectionSubcategory};
     use crate::{
         election::{tests::election_fixture, Election, ElectionCategory},
         polling_station::{PollingStation, PollingStationType},
@@ -105,6 +105,7 @@ pub(crate) mod tests {
                 location: "Heemdamseburg".to_string(),
                 number_of_voters: 100,
                 category: ElectionCategory::Municipal,
+                subcategory: ElectionSubcategory::MunicipalSmall,
                 election_date: Utc::now().date_naive(),
                 nomination_date: Utc::now().date_naive(),
                 status: ElectionStatus::DataEntryFinished,

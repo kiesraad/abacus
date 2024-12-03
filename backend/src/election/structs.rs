@@ -11,6 +11,7 @@ pub struct Election {
     pub location: String,
     pub number_of_voters: u32,
     pub category: ElectionCategory,
+    pub subcategory: ElectionSubcategory,
     #[schema(value_type = String, format = "date")]
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
@@ -26,6 +27,29 @@ pub struct Election {
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
 pub enum ElectionCategory {
     Municipal,
+}
+
+impl ElectionCategory {
+    pub fn to_eml_code(&self) -> &'static str {
+        match self {
+            ElectionCategory::Municipal => "GR",
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
+pub enum ElectionSubcategory {
+    MunicipalSmall,
+    MunicipalLarge,
+}
+
+impl ElectionSubcategory {
+    pub fn to_eml_code(&self) -> &'static str {
+        match self {
+            ElectionSubcategory::MunicipalSmall => "GR1",
+            ElectionSubcategory::MunicipalLarge => "GR2",
+        }
+    }
 }
 
 /// Election status (limited for now)
@@ -112,6 +136,7 @@ pub(crate) mod tests {
             location: "Test".to_string(),
             number_of_voters: 100,
             category: ElectionCategory::Municipal,
+            subcategory: ElectionSubcategory::MunicipalSmall,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             status: ElectionStatus::DataEntryInProgress,

@@ -2,35 +2,32 @@ import { expect, test } from "vitest";
 
 import { render, screen } from "app/test/unit";
 
-import { DefaultButton, DisabledButton, EnabledButton } from "./Button.stories";
+import { Buttons } from "./Button.stories";
 
-test("The default button is enabled", () => {
-  render(<DefaultButton label="Click me" variant="default" size="md" text="Click me" />);
+test("The default button is enabled", async () => {
+  render(<Buttons size="md" text="Click me" disabled={false} />);
 
-  const buttonElement = screen.getByRole("button", {
+  const buttons = await screen.findAllByRole("button", {
     name: "Click me",
   });
 
-  buttonElement.click();
-  expect(buttonElement).toBeEnabled();
+  for (const button of buttons) {
+    expect(button).toBeEnabled();
+    button.click();
+    expect(button).toHaveAttribute("data-has-been-clicked");
+  }
 });
 
-test("The enabled button is enabled", () => {
-  render(<EnabledButton text="Click me!" label="enabled-button" />);
+test("The disabled button is disabled", async () => {
+  render(<Buttons size="md" text="Click me" disabled={true} />);
 
-  const buttonElement = screen.getByRole("button", {
-    name: "enabled-button",
+  const buttons = await screen.findAllByRole("button", {
+    name: "Click me",
   });
 
-  expect(buttonElement).toBeEnabled();
-});
-
-test("The disabled button is disabled", () => {
-  render(<DisabledButton text="Try and click me!" label="disabled-button" disabled={true} />);
-
-  const buttonElement = screen.getByRole("button", {
-    name: "disabled-button",
-  });
-
-  expect(buttonElement).toBeDisabled();
+  for (const button of buttons) {
+    expect(button).toBeDisabled();
+    button.click();
+    expect(button).not.toHaveAttribute("data-has-been-clicked");
+  }
 });

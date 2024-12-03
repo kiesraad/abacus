@@ -46,21 +46,21 @@
     }
   }
 
-  &.ghost {
+  &.tertiary {
     background: transparent;
     border: none;
     box-shadow: none;
     svg {
-      fill: var(--button-icon-ghost-color-svg);
+      fill: var(--button-icon-tertiary-color-svg);
     }
     &:focus,
     &:focus-visible {
-      border: 2px solid var(--button-icon-ghost-color-border-focus);
-      background: var(--button-icon-ghost-color-bg-focus);
+      border: 2px solid var(--button-icon-tertiary-color-border-focus);
+      background: var(--button-icon-tertiary-color-bg-focus);
       padding: calc(0.5rem - 2px);
     }
     &:hover {
-      background: var(--button-icon-ghost-color-bg-hover);
+      background: var(--button-icon-tertiary-color-bg-hover);
     }
   }
 

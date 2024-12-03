@@ -36,6 +36,8 @@ jobs:
         run: npm ci
       - name: Build with MSW
         run: npm run build:msw
+      - name: Build Ladle
+        run: npm run build:ladle
       - name: Deploy
         id: deploy
         uses: cloudflare/wrangler-action@v3

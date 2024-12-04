@@ -45,17 +45,23 @@ Use `cargo test` to run the tests. The tests are also run in a GitHub Actions wo
 The following dependencies (crates) are used:
 
 - `axum`: web application framework that focuses on ergonomics and modularity.
+- `axum-extra`: extra utilities for `axum`.
+- `chrono`: date and time library.
+- `clap`: library for command-line argument parsing.
 - `hyper`: fast and correct HTTP implementation.
-- `tokio`: runtime for writing asynchronous applications.
 - `memory-serve`: serves frontend assets from memory, but ad-hoc from disk during development.
 - `utoipa`: library for documenting REST APIs using OpenAPI.
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `serde`: framework for serializing and deserializing data structures.
 - `serde_json`: JSON support for Serde.
 - `sqlx`: async SQL library featuring compile-time checked queries.
-- `chrono`: date and time library.
-- `clap`: library for command-line argument parsing.
-- `quick-xml`: reading and writing EML_NL XML files.
+- `tokio`: runtime for writing asynchronous applications.
+- `tower`: a library of modular and reusable components for building robust networking clients and servers.
+- `tower-http`: Tower middleware and utilities for HTTP clients and servers.
+- `tracing`: a framework for instrumenting Rust programs to collect structured, event-based diagnostic information.
+- `tracing-subscriber`: utilities for implementing and composing `tracing` subscribers.
+- `typst`: a new markup-based typesetting system that is powerful and easy to learn.
+- `typst-pdf`: a PDF exporter for Typst.
 
 Additionally, the following development dependencies are used:
 

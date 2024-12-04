@@ -6,10 +6,16 @@ import { Button, Modal } from "@kiesraad/ui";
 export interface PollingStationDeleteModalProps {
   pollingStationId: number;
   onDeleted: () => void;
+  onError: () => void;
   onCancel: () => void;
 }
 
-export function PollingStationDeleteModal({ pollingStationId, onDeleted, onCancel }: PollingStationDeleteModalProps) {
+export function PollingStationDeleteModal({
+  pollingStationId,
+  onDeleted,
+  onCancel,
+  onError,
+}: PollingStationDeleteModalProps) {
   const { remove, requestState } = usePollingStationMutation();
 
   function handleDelete() {
@@ -19,8 +25,10 @@ export function PollingStationDeleteModal({ pollingStationId, onDeleted, onCance
   React.useEffect(() => {
     if (requestState.status === "success") {
       onDeleted();
+    } else if (requestState.status === "api-error") {
+      onError();
     }
-  }, [requestState, onDeleted]);
+  }, [requestState, onDeleted, onError]);
 
   const deleting = requestState.status === "loading";
 

@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -6,7 +7,7 @@ import { PollingStationDeleteModal } from "app/module/polling_stations/page/Poll
 
 import { usePollingStationGet } from "@kiesraad/api";
 import { IconTrash } from "@kiesraad/icon";
-import { Button, Loader, PageTitle } from "@kiesraad/ui";
+import { Alert, Button, Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationUpdatePage() {
@@ -19,6 +20,12 @@ export function PollingStationUpdatePage() {
 
   function toggleShowDeleteModal() {
     setShowDeleteModal(!showDeleteModal);
+  }
+
+  const [error, setError] = useState<[string, string] | undefined>(undefined);
+
+  function closeError() {
+    setError(undefined);
   }
 
   const handleSaved = () => {
@@ -35,6 +42,20 @@ export function PollingStationUpdatePage() {
     navigate(`../?deleted=${encodeURIComponent(pollingStation)}`);
   }
 
+  function handleDeleteError() {
+    setShowDeleteModal(false);
+    setError([
+      "Stembureau kan niet verwijderd worden",
+      "Het stembureau kan niet meer verwijderd worden. De invoerfase is al gestart.",
+    ]);
+  }
+
+  React.useEffect(() => {
+    if (error) {
+      window.scrollTo(0, 0);
+    }
+  }, [error]);
+
   return (
     <>
       <PageTitle title="Stembureaus - Abacus" />
@@ -43,6 +64,14 @@ export function PollingStationUpdatePage() {
           <h1>Stembureau wijzigen</h1>
         </section>
       </header>
+
+      {error && (
+        <Alert type="error" onClose={closeError}>
+          <h2>{error[0]}</h2>
+          <p>{error[1]}</p>
+        </Alert>
+      )}
+
       <main>
         <article>
           {requestState.status === "loading" && <Loader />}
@@ -68,6 +97,7 @@ export function PollingStationUpdatePage() {
                 <PollingStationDeleteModal
                   pollingStationId={pollingStationId}
                   onCancel={toggleShowDeleteModal}
+                  onError={handleDeleteError}
                   onDeleted={handleDeleted}
                 />
               )}

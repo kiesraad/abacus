@@ -15,7 +15,7 @@ impl Elections {
 
     pub async fn list(&self) -> Result<Vec<Election>, Error> {
         let elections: Vec<Election> = query_as(
-            "SELECT id, name, location, number_of_voters, category, subcategory, election_date, nomination_date, status FROM elections",
+            "SELECT id, name, location, number_of_voters, category, number_of_seats, election_date, nomination_date, status FROM elections",
         )
         .fetch_all(&self.0)
         .await?;

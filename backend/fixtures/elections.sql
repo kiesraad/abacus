@@ -1,5 +1,5 @@
-INSERT INTO elections (id, name, location, number_of_voters, category, subcategory, election_date, nomination_date, status, political_groups)
-VALUES (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', 'MunicipalSmall', '2024-11-30', '2024-11-1', 'DataEntryInProgress',
+INSERT INTO elections (id, name, location, number_of_voters, category, number_of_seats, election_date, nomination_date, status, political_groups)
+VALUES (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', 29, '2024-11-30', '2024-11-1', 'DataEntryInProgress',
         '[
           {
             "number": 1,
@@ -24,7 +24,7 @@ VALUES (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', 'MunicipalSm
             ]
           }
         ]'),
-       (2, 'Municipal Re-election', 'Heemdamseburg', 100, 'Municipal', 'MunicipalSmall', '2024-12-31', '2024-12-1', 'DataEntryInProgress',
+       (2, 'Municipal Re-election', 'Heemdamseburg', 100, 'Municipal', 29, '2024-12-31', '2024-12-1', 'DataEntryInProgress',
         '[
           {
             "number": 1,
@@ -49,7 +49,7 @@ VALUES (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', 'MunicipalSm
             ]
           }
         ]'),
-       (3, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 'MunicipalSmall', '2024-11-30', '2024-11-1', 'DataEntryInProgress','[
+       (3, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '2024-11-1', 'DataEntryInProgress','[
          {
            "number": 1,
            "name": "Lijst Hekking",
@@ -827,7 +827,7 @@ VALUES (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', 'MunicipalSm
            ]
          }
        ]'),
-       (4, 'Filled Election', 'Heemdamseburg', 100, 'Municipal', 'MunicipalSmall', '2024-11-30', '2024-11-1', 'DataEntryInProgress',
+       (4, 'Filled Election', 'Heemdamseburg', 100, 'Municipal', 29, '2024-11-30', '2024-11-1', 'DataEntryInProgress',
         '[
           {
             "number": 1,
@@ -874,7 +874,7 @@ VALUES (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', 'MunicipalSm
             ]
           }
         ]'),
-       (5, 'Finished Election', 'Heemdamseburg', 100, 'Municipal', 'MunicipalSmall', '2024-11-30', '2024-11-1', 'DataEntryFinished',
+       (5, 'Finished Election', 'Heemdamseburg', 100, 'Municipal', 29, '2024-11-30', '2024-11-1', 'DataEntryFinished',
         '[
           {
             "number": 1,

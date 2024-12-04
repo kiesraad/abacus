@@ -58,7 +58,7 @@ impl EML510 {
                 ), // TODO: set election id from election definition instead of this generated id
                 election_name: election.name.clone(),
                 election_category: election.category.to_eml_code().into(),
-                election_subcategory: Some(election.subcategory.to_eml_code().into()),
+                election_subcategory: election_subcategory(election),
                 election_domain: None, // TODO: set election domain from election definition
                 election_date: election.election_date.format("%Y-%m-%d").to_string(),
             },
@@ -86,6 +86,13 @@ impl EML510 {
 }
 
 impl base::EMLDocument for EML510 {}
+
+fn election_subcategory(election: &crate::election::Election) -> Option<String> {
+    match (&election.category, election.number_of_seats) {
+        (crate::election::ElectionCategory::Municipal, ..19) => Some("GR1".into()),
+        (crate::election::ElectionCategory::Municipal, 19..) => Some("GR2".into()),
+    }
+}
 
 /// Managing authority for the EML document
 #[derive(Debug, Clone, Serialize, Deserialize)]

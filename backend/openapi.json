@@ -977,7 +977,7 @@
           "location",
           "number_of_voters",
           "category",
-          "subcategory",
+          "number_of_seats",
           "election_date",
           "nomination_date",
           "status"
@@ -1005,6 +1005,11 @@
             "type": "string",
             "format": "date"
           },
+          "number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
           "number_of_voters": {
             "type": "integer",
             "format": "int32",
@@ -1018,9 +1023,6 @@
           },
           "status": {
             "$ref": "#/components/schemas/ElectionStatus"
-          },
-          "subcategory": {
-            "$ref": "#/components/schemas/ElectionSubcategory"
           }
         }
       },
@@ -1087,13 +1089,6 @@
             }
           }
         }
-      },
-      "ElectionSubcategory": {
-        "type": "string",
-        "enum": [
-          "MunicipalSmall",
-          "MunicipalLarge"
-        ]
       },
       "ErrorReference": {
         "type": "string",

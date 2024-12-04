@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { usePollingStationMutation } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
 export interface PollingStationDeleteModalProps {
@@ -33,14 +34,14 @@ export function PollingStationDeleteModal({
   const deleting = requestState.status === "loading";
 
   return (
-    <Modal title="Stembureau verwijderen" onClose={onCancel}>
-      <p>Weet je zeker dat je dit stembureau wilt verwijderen? Deze actie kan niet worden teruggedraaid.</p>
+    <Modal title={t("polling_station.delete")} onClose={onCancel}>
+      <p>{t("polling_station.delete_are_you_sure")}</p>
       <nav>
         <Button variant="primary-destructive" size="lg" onClick={handleDelete} disabled={deleting}>
-          Verwijder stembureau
+          {t("delete")}
         </Button>
         <Button variant="secondary" size="lg" onClick={onCancel} disabled={deleting}>
-          Annuleren
+          {t("cancel")}
         </Button>
       </nav>
     </Modal>

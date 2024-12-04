@@ -6,6 +6,7 @@ import { PollingStationForm } from "app/component/form/polling_station/PollingSt
 import { PollingStationDeleteModal } from "app/module/polling_stations/page/PollingStationDeleteModal";
 
 import { usePollingStationGet } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { IconTrash } from "@kiesraad/icon";
 import { Alert, Button, Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
@@ -44,10 +45,7 @@ export function PollingStationUpdatePage() {
 
   function handleDeleteError() {
     setShowDeleteModal(false);
-    setError([
-      "Stembureau kan niet verwijderd worden",
-      "Het stembureau kan niet meer verwijderd worden. De invoerfase is al gestart.",
-    ]);
+    setError([t("polling_station.message.delete_error_title"), t("polling_station.message.delete_error")]);
   }
 
   React.useEffect(() => {
@@ -91,7 +89,7 @@ export function PollingStationUpdatePage() {
                 leftIcon={<IconTrash />}
                 onClick={toggleShowDeleteModal}
               >
-                Stembureau verwijderen
+                {t("polling_station.delete")}
               </Button>
               {showDeleteModal && (
                 <PollingStationDeleteModal

@@ -31,8 +31,8 @@ export function PollingStationUpdatePage() {
 
   function handleDeleted() {
     toggleShowDeleteModal();
-    // TODO show message
-    navigate("..");
+    const pollingStation = "data" in requestState ? `${requestState.data.number} (${requestState.data.name})` : "";
+    navigate(`../?deleted=${encodeURIComponent(pollingStation)}`);
   }
 
   return (

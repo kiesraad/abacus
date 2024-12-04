@@ -351,7 +351,10 @@ impl ReportingUnitVotes {
         ReportingUnitVotes {
             reporting_unit_identifier: ReportingUnitIdentifier {
                 id: format!("{authority_id}::SB{}", polling_station.number),
-                name: polling_station.name.clone(),
+                name: format!(
+                    "{} (postcode: {})",
+                    polling_station.name, polling_station.postal_code
+                ),
             },
             selections: Selection::from_political_group_votes(
                 election,

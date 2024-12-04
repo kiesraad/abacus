@@ -245,6 +245,7 @@ pub struct TotalVotes {
     cast: u64,
     total_counted: u64,
     rejected_votes: Vec<RejectedVotes>,
+    #[serde(default)]
     uncounted_votes: Vec<UncountedVotes>,
 }
 

@@ -491,12 +491,17 @@ mod tests {
         let response = finalise(pool.clone(), 2).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check that polling_station_results contains the finalised result
+        // Check that polling_station_results contains the finalised result and that the data entries are deleted
         let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")
             .fetch_one(&pool)
             .await
             .unwrap();
         assert_eq!(row_count.count, 1);
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 0);
 
         // Check that we can't save a new data entry after finalising
         let response = save(pool.clone(), request_body.clone(), 1).await;
@@ -537,7 +542,7 @@ mod tests {
     }
 
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
-    async fn test_data_entry_delete_finalised(pool: SqlitePool) {
+    async fn test_data_entry_delete_finalised_not_possible(pool: SqlitePool) {
         for entry_number in 1..=2 {
             // create and finalise data entry
             let request_body = example_data_entry();
@@ -550,6 +555,17 @@ mod tests {
             for entry_number in 1..=2 {
                 let response = delete(pool.clone(), entry_number).await;
                 assert_eq!(response.status(), StatusCode::NOT_FOUND);
+            }
+
+            // after the first data entry, check if it is still in the database
+            // (after the second data entry, the results are finalised so we do not expect rows)
+            if entry_number == 1 {
+                let row_count =
+                    query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+                        .fetch_one(&pool)
+                        .await
+                        .unwrap();
+                assert_eq!(row_count.count, 1);
             }
         }
     }

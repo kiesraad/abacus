@@ -1,0 +1,165 @@
+# Het verkiezingsproces en Abacus
+
+Om te begrijpen wat Abacus is en hoe het wordt gebruikt, heb je eerst wat context nodig. Hier lees je alles over wat de Kiesraad is en doet, hoe het verkiezingsproces verloopt en op welk moment en welke wijze Abacus in dit proces zal worden gebruikt.
+
+Vind je het handiger om een video te bekijken, kijk dan naar de presentatie [Abacus: Software for Secure and Transparent Voting Results](https://youtu.be/qhYd_LNS2nQ) die we in november 2024 hebben gegeven op Wiccon (in het Engels).
+
+## De Kiesraad
+
+De Kiesraad is een onafhankelijk adviesorgaan met 7 leden en staat voor een eerlijk, transparant en controleerbaar verkiezingsproces. De Raad is gevestigd in Den Haag. Het bureau Kiesraad bestaat inmiddels uit meer dan 40 medewerkers.
+
+De taken van de Kiesraad zijn:
+
+- Fungeren als centraal stembureau tijdens landelijke verkiezingen. Dit betekent dat de resultaten uit het hele land worden verzameld en bij elkaar worden opgeteld, waarna de zetelverdeling wordt berekend.
+- De overheid en het parlement adviseren over het verkiezingsproces en de Kieswet. Dit doet de Kiesraad gevraagd en ongevraagd.
+- Ondersteuning bieden aan gemeentes, politieke partijen en iedereen die actief is in het verkiezingsproces.
+- De benodigde hulpmiddelen leveren voor het uitvoeren van verkiezingen, zoals modellen en processen, maar ook technologie en software. Hieronder valt de software voor het optellen van stemmen en de zetelverdeling.
+
+Het wettelijke kader voor de verkiezingen is de Kieswet met het bijbehorende Kiesbesluit en de
+Kiesregeling. Dit kader verandert als gevolg van wetgeving die is ingezet om de ontwikkeling van
+nieuwe verkiezingssoftware te ondersteunen.
+
+Meer informatie over de Kiesraad en de Kieswet vind je op [de website van de Kiesraad](https://www.kiesraad.nl/).
+
+## Het verkiezingsproces
+
+Zoals iedereen weet stemmen we in Nederland op papier. In het stembureau gelden strikte regels om het stemgeheim te bewaren.
+
+![Stemmen in stemhokjes](/documentatie/gebruikersdocumentatie/img/stemhokjes.jpg)
+
+Na het sluiten van de stembussen worden alle stemmen met de hand geteld, waarbij een vier-ogenprincipe wordt gehanteerd. De meeste gemeentes hebben hier een speciaal telsysteem voor.
+
+![Het papieren telproces](/documentatie/gebruikersdocumentatie/img/telproces.jpg)
+</p>
+
+Wanneer alle stemmen geteld zijn, vult de leider van het stembureau alle uitkomsten in op een proces-verbaal. Het totaal aantal toegelaten kiezers (met stempas, volmacht en kiezerspas), het aantal uitgebrachte stemmen en het eventuele verschil daartussen worden eerst ingevuld. Vervolgens worden alle stemmen per kandidaat ingevuld[^1]. Dat ziet er als volgt uit:
+
+![Een proces-verbaal](/documentatie/gebruikersdocumentatie/img/pv.png)
+
+Dan wordt alles naar een centrale plek in de gemeente gebracht (meestal het gemeentehuis), waar het gemeentelijk stembureau de werkzaamheden overneemt.
+
+[^1]: Het proces waarbij alle stemmen op kandidaatniveau direct in het stembureau worden geteld heet *decentrale stemopneming*. In sommige gemeentes tellen de stembureaus alleen de stemmen op lijstniveau, waarna de stemmen per kandidaat pas bij het gemeentelijk stembureau worden geteld. Dit heet *centrale stemopneming*.
+
+### Gemeentelijk stembureau, hoofdstembureau, centraal stembureau
+
+Hieronder zie je hoe het gehele proces van het optellen van stemmen verloopt.
+
+![Stembureau, GSB, HSB, CSB](/documentatie/gebruikersdocumentatie/img/eml_flow_nl.drawio.png)
+
+- **Blok 1:** Zoals hierboven is uitgelegd, worden de stemmen geteld in het stembureau. Dit leidt tot een proces-verbaal.
+- **Blok 2:** Alle processen-verbaal van de stembureaus worden op het gemeentelijk stembureau ingevoerd, waarbij de software de resultaten controleert en eventuele fouten en waarschuwingen weergeeft. Wanneer deze opgelost zijn, kan de invoer worden afgerond en genereert de software een EML_NL-bestand[^2] en een proces-verbaal van het gemeentelijk stembureau.
+- **Blok 3:** Het proces van blok 2 herhaalt zich bij de hoofdstembureaus van de kieskringen. Hier worden de processen-verbaal van de gemeentelijke stembureaus ingevoerd, gecontroleerd en afgerond. Het resultaat is een EML_NL-bestand en een proces-verbaal van het hoofdstembureau.
+- **Blok 4:** Op het centraal stembureau worden de processen-verbaal van de gemeentelijke stembureaus nogmaals ingevoerd ter controle. Tot slot worden de processen-verbaal van de hoofdstembureaus ingevoerd, gecontroleerd en afgerond. Dit leidt tot een EML_NL-bestand en een proces-verbaal van het centraal stembureau. Aan de hand van deze gegevens wordt de zetelverdeling berekend.
+
+In deze blokken staat software centraal, en hier komt Abacus dan ook aan bod.
+
+[^2]: EML staat voor Election Markup Language. Het bestandsformaat EML_NL is hierop gebaseerd en aangepast voor Nederlandse verkiezingen.
+
+### Papier is leidend
+
+In het verkiezingsproces is papier leidend. Dat zorgt voor controleerbaarheid en transparantie,
+en dit zijn belangrijke waarborgen voor de integriteit van het verkiezingsproces. Het doel is dat alleen de
+uitgebrachte stemmen van invloed zijn op de zetelverdeling en dat dit voor iedereen controleerbaar
+is. De software wordt gebruikt ter ondersteuning van het papieren proces.
+
+### Controleprotocol optellingen
+
+Het controleprotocol optellingen is de afsluiting van het papieren proces. Buiten de software om
+wordt de optelling gecontroleerd, door middels een steekproef een deel met de hand na te rekenen.
+Hiermee wordt gecontroleerd op invoerfouten en andere wijzigingen die de uitslag kunnen beïnvloeden. Dit protocol is dus een extra waarborg voor de papieren documenten van de stembureaus en de resultaten van het gemeentelijk stembureau.
+
+### Controleprotocol opmerkelijke uitslagen
+
+De controle op bijzonderheden in de uitslagen, zoals een hoog aantal blanco stemmen of mogelijke
+verwisseling van kandidaten, wordt gedaan aan de hand van data-analyse. Hiervoor heeft de
+Kiesraad analysetools gebouwd die op [GitHub](https://github.com/kiesraad/HCP) beschikbaar zijn. Om de gemeentes te ondersteunen
+worden deze tools zoveel als mogelijk ook in Abacus opgenomen. Dat voorkomt verrassingen en
+helpt om kleine fouten in een vroeg stadium op te sporen.
+
+## De rol van Abacus
+
+Het doel van Abacus is om de papieren processen-verbaal te digitaliseren en te helpen met de controle op de optellingen, zodat we tel- en schrijffouten kunnen detecteren en voorkomen. De software wordt ontwikkeld ter vervanging van het onderdeel Uitslagvaststelling (U) van OSV2020. Hierbij hebben we een aantal doelen gesteld:
+
+- De integriteit, transparantie en controleerbaarheid van het gehele proces ondersteunen.
+- Gebruiksvriendelijke interface en technologie implementeren.
+- Volledig open source ontwikkelen.
+- De oplossing zelf ontwikkelen en beheren.
+
+Abacus wordt in de eerste instantie ontwikkeld voor de Gemeenteraadsverkiezingen in maart 2026. Meer informatie over de functionaliteit die we gaan bouwen vind je in [Functionaliteit voor Abacus 1.0](/documentatie/functionaliteit/versie-1.0-gr2026.md).
+
+### Gebruiksvriendelijkheid
+
+Omdat het verkiezingsproces snel verloopt en er niet al te vaak verkiezingen zijn, maken de gebruikers slechts korte tijd gebruik van verkiezingssoftware. Daarom is het van groot belang dat Abacus zo gebruiksvriendelijk mogelijk is. Hiervoor implementeren we de volgende maatregelen:
+
+- We doen regelmatige gebruikerstests met echte gebruikers.
+- De invoer wordt niet allemaal op één pagina gedaan zoals in de huidige software, maar in kleinere secties met een validatiecheck na elke invoer.
+- Je kunt de invoer pauzeren en later doorgaan.
+- De software wordt geoptimaliseerd voor gebruik met een toetsenbord en is eenvoudig aan te leren.
+- De software geeft duidelijk aan hoe onjuiste of inconsistente invoer kan worden opgelost.
+- We bieden duidelijke documentatie en instructiemateriaal.
+
+Dit is een voorbeeld van de gebruikersinterface:
+
+![Interface](/documentatie/gebruikersdocumentatie/img/abacus-interface.png)
+
+### Functionaliteit
+
+In de afbeelding hieronder zie je hoe Abacus werkt op het gemeentelijk stembureau. Voor landelijke verkiezingen wordt dit proces herhaald op het hoofdstembureau en centraal stembureau, zoals hierboven beschreven.
+
+**LET OP: dit is een concept en is nog in ontwikkeling.**
+
+![Uitslagvaststelling](/documentatie/gebruikersdocumentatie/img/proces%20uitslagvaststelling.png)
+
+- IMPORT: gebruikers kunnen kandidaten en verkiezingsbestanden in EML-formaat importeren in Abacus.
+- INVOER: gebruikers kunnen verkiezingsresultaten invoeren, inclusief verklaringen over ontbrekende stembiljetten/stempassen en klachten van kiezers.
+Abacus telt de resultaten op en controleert ze.
+De data-analyse leidt tot waarschuwingen voor kleine afwijkingen en foutmeldingen voor grote afwijkingen en inconsistente resultaten.
+- ONDERTEKENING: de data wordt ondertekend met een handtekening van de voorzitter van het gemeentelijk stembureau.
+- EXPORT: de verkiezingsresultaten worden geëxporteerd als EML_NL-bestand en als PDF-bestand.
+
+### Technische keuzes en architectuur
+
+De software wordt gebruikt via de webbrowser, en dit doen we met HTML, CSS en JavaScript. Hiervoor gebruiken we TypeScript, een meer uitgebreide versie van JavaScript met typing. Voor de gebruikersinterface gebruiken we de populaire library React.
+
+Voor de backend gebruiken we Rust, een high-level programmeertaal waarmee je efficiënt kunt programmeren. Ook heeft deze taal een 'strict type system' waardoor minder bugs ontstaan. Ook is dit een populaire, open-source programmeertaal met een grote community.
+
+Voor de database gebruiken we SQLite. Deze library is populair, lichtgewicht en gebruiksvriendelijk, en bovendien is installatie van SQLite niet vereist.
+
+Voor meer informatie over onze keuzes en de onderbouwingen hiervan lees je het document [Overwegingen talen en frameworks](/documentatie/softwarearchitectuur/overwegingen-talen-en-frameworks.md).
+
+Voor de architectuur kun je beginnen bij het [Overzicht van de softwarearchitectuur](/documentatie/softwarearchitectuur/Overzicht.md).
+
+De UI/UX designs vind je in onze [Figma](https://www.figma.com/design/xHDfsv69Nhmk3IrWC0303B/Public---Kiesraad---Abacus-optelsoftware?node-id=3190-28385&t=VnghjibSJMqrQepm-1).
+
+### Security
+
+Security is een van de belangrijkste pijlers voor Abacus, om een zo hoog mogelijke betrouwbaarheid van de verkiezingsuitslagen te kunnen garanderen. Dit doen we op de volgende manieren:
+
+- Invoer volgens het vier-ogenprincipe: elk proces-verbaal wordt twee keer ingevoerd door verschillende gebruikers.
+- Afzenderverificatie: we willen garanderen dat alle bestanden die door Abacus zijn gegenereerd van de juiste afzender komen en dat ze niet bedoeld of onbedoeld gewijzigd zijn. We werken nog aan de methode hiervoor.
+- Air-gapped: Abacus wordt air-gapped en lokaal gedraaid.
+- We doen interne code-reviews en we laten ook externe code-reviews uitvoeren.
+- Ook zal er externe pentesting worden uitgevoerd.
+- We controleren telkens of de functionaliteit (nog steeds) aan de wettelijke vereisten voldoet.
+
+### Werkwijze
+
+Ons team werkt volgens deze principes:
+
+- We werken geheel open source op deze openbare GitHub-repository. Ook de pull requests zijn openbaar.
+- We hebben een volledige CI/CD pipeline met tests en linting voor de frontend en backend.
+- Er zijn altijd minimaal 2 reviews en approvals nodig per pull request.
+- Nieuwe code wordt altijd getest. De nieuwe tests in Playwright, de React Testing Library en Cargo moeten in dezelfde PR zitten als de nieuwe functionaliteit.
+- De UI/UX designs op basis waarvan we nieuwe functionaliteit bouwen zijn ook openbaar op Figma.
+- Op ons [board](https://github.com/orgs/kiesraad/projects/1) zie je waar we mee bezig zijn. Hier kun je ook de epics bekijken.
+
+Voor meer informatie over onze werkwijzen kun je de volgende links bekijken:
+
+- Onze [werkwijze op GitHub](/documentatie/ontwikkelproces/GitHub-werkwijze.md)
+- Ons [proces voor ontwikkeling en releases](/documentatie/ontwikkelproces/proces-ontwikkeling-en-releases.md)
+- Onze [methode voor refinement](/documentatie/ontwikkelproces/refinement.md)
+- De [tools](/documentatie/ontwikkelproces/test-tooling.md) die we gebruiken voor tests en hoe we omgaan met [testen en kwaliteit](/documentatie/ontwikkelproces/testen-en-kwaliteit.md)
+
+## Feedback
+
+Jullie feedback en bijdragen zijn meer dan welkom! Vragen en suggesties kun je sturen naar abacus[@]kiesraad.nl. Zie de [readme](/README.md) op de hoofdpagina van deze repository voor meer informatie over hoe je kunt bijdragen.

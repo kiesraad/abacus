@@ -96,7 +96,7 @@ impl ElectionSummary {
                 election,
                 polling_station,
                 &mut validation_results,
-                "data".to_string(),
+                &"data".into(),
             )?;
             if validation_results.has_errors() {
                 return Err(APIError::AddError(
@@ -109,11 +109,7 @@ impl ElectionSummary {
             }
 
             // add voters and votes to the total, using the voters recount if available
-            if let Some(voters_recounts) = &result.voters_recounts {
-                totals.voters_counts += voters_recounts;
-            } else {
-                totals.voters_counts += &result.voters_counts;
-            }
+            totals.voters_counts += result.latest_voters_counts();
             totals.votes_counts += &result.votes_counts;
 
             // add any differences noted to the total
@@ -231,7 +227,6 @@ impl SumCount {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::data_entry::VotersRecounts;
     use crate::election::tests::election_fixture;
     use crate::pdf_gen::tests::polling_stations_fixture;
 
@@ -407,11 +402,11 @@ mod tests {
             voter_card_count: 0,
             total_admitted_voters_count: 50,
         };
-        ps2_results.voters_recounts = Some(VotersRecounts {
-            poll_card_recount: 48,
-            proxy_certificate_recount: 1,
-            voter_card_recount: 1,
-            total_admitted_voters_recount: 50,
+        ps2_results.voters_recounts = Some(VotersCounts {
+            poll_card_count: 48,
+            proxy_certificate_count: 1,
+            voter_card_count: 1,
+            total_admitted_voters_count: 50,
         });
 
         let results = vec![(ps[0].clone(), ps1_results), (ps[1].clone(), ps2_results)];

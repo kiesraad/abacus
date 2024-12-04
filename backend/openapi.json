@@ -1296,7 +1296,7 @@
             "description": "Voters counts (\"1. Aantal toegelaten kiezers\")"
           },
           "voters_recounts": {
-            "$ref": "#/components/schemas/VotersRecounts",
+            "$ref": "#/components/schemas/VotersCounts",
             "description": "Voters recounts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")\nWhen filled in, this field should replace `voters_counts` when using the results."
           },
           "votes_counts": {
@@ -1487,42 +1487,6 @@
             "minimum": 0
           },
           "voter_card_count": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Number of valid voter cards (\"Aantal geldige kiezerspassen\")",
-            "minimum": 0
-          }
-        }
-      },
-      "VotersRecounts": {
-        "type": "object",
-        "description": "Recounted voters counts, this replaces the original voters counts in the polling station results.",
-        "required": [
-          "poll_card_recount",
-          "proxy_certificate_recount",
-          "voter_card_recount",
-          "total_admitted_voters_recount"
-        ],
-        "properties": {
-          "poll_card_recount": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Number of valid poll cards (\"Aantal geldige stempassen\")",
-            "minimum": 0
-          },
-          "proxy_certificate_recount": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Number of valid proxy certificates (\"Aantal geldige volmachtbewijzen\")",
-            "minimum": 0
-          },
-          "total_admitted_voters_recount": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Total number of admitted voters (\"Totaal aantal toegelaten kiezers\")",
-            "minimum": 0
-          },
-          "voter_card_recount": {
             "type": "integer",
             "format": "int32",
             "description": "Number of valid voter cards (\"Aantal geldige kiezerspassen\")",

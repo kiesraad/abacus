@@ -6,7 +6,7 @@ import { DefaultIconButton, DisabledIconButton } from "./IconButton.stories";
 
 describe("UI component: IconButton", () => {
   test("The default icon button is enabled", () => {
-    const { getByTitle } = render(<DefaultIconButton label="Click me" variant="default" size="md" isRound={false} />);
+    const { getByTitle } = render(<DefaultIconButton label="Click me" variant="primary" size="md" isRound={false} />);
 
     const buttonElement = getByTitle("Icon Button");
 
@@ -16,7 +16,7 @@ describe("UI component: IconButton", () => {
 
   test("The enabled icon button is enabled", () => {
     const { getByTitle } = render(
-      <DefaultIconButton label="enabled-button" variant="ghost" size="md" isRound={true} />,
+      <DefaultIconButton label="enabled-button" variant="tertiary" size="md" isRound={true} />,
     );
 
     const buttonElement = getByTitle("Icon Button");

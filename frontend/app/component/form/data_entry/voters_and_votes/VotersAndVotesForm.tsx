@@ -81,10 +81,10 @@ export function VotersAndVotesForm() {
     const recountForm = recountTitleRef.current;
     if (recountForm) {
       values.voters_recounts = {
-        poll_card_recount: deformatNumber(elements.poll_card_recount.value),
-        proxy_certificate_recount: deformatNumber(elements.proxy_certificate_recount.value),
-        voter_card_recount: deformatNumber(elements.voter_card_recount.value),
-        total_admitted_voters_recount: deformatNumber(elements.total_admitted_voters_recount.value),
+        poll_card_count: deformatNumber(elements.poll_card_recount.value),
+        proxy_certificate_count: deformatNumber(elements.proxy_certificate_recount.value),
+        voter_card_count: deformatNumber(elements.voter_card_recount.value),
+        total_admitted_voters_count: deformatNumber(elements.total_admitted_voters_recount.value),
       };
     }
     return values;
@@ -250,7 +250,7 @@ export function VotersAndVotesForm() {
                 field="A.2"
                 id="poll_card_recount"
                 title={t("voters_and_votes.poll_card_recount")}
-                defaultValue={sectionValues.voters_recounts?.poll_card_recount}
+                defaultValue={sectionValues.voters_recounts?.poll_card_count}
                 {...defaultProps}
               />
               <InputGridRow
@@ -258,7 +258,7 @@ export function VotersAndVotesForm() {
                 field="B.2"
                 id="proxy_certificate_recount"
                 title={t("voters_and_votes.proxy_certificate_recount")}
-                defaultValue={sectionValues.voters_recounts?.proxy_certificate_recount}
+                defaultValue={sectionValues.voters_recounts?.proxy_certificate_count}
                 {...defaultProps}
               />
               <InputGridRow
@@ -266,7 +266,7 @@ export function VotersAndVotesForm() {
                 field="C.2"
                 id="voter_card_recount"
                 title={t("voters_and_votes.voter_card_recount")}
-                defaultValue={sectionValues.voters_recounts?.voter_card_recount}
+                defaultValue={sectionValues.voters_recounts?.voter_card_count}
                 {...defaultProps}
               />
               <InputGridRow
@@ -274,7 +274,7 @@ export function VotersAndVotesForm() {
                 field="D.2"
                 id="total_admitted_voters_recount"
                 title={t("voters_and_votes.total_admitted_voters_recount")}
-                defaultValue={sectionValues.voters_recounts?.total_admitted_voters_recount}
+                defaultValue={sectionValues.voters_recounts?.total_admitted_voters_count}
                 isTotal
                 {...defaultProps}
               />

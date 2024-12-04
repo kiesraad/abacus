@@ -10,6 +10,7 @@ use utoipa_swagger_ui::SwaggerUi;
 
 pub mod data_entry;
 pub mod election;
+pub mod eml;
 mod error;
 #[cfg(feature = "dev-database")]
 pub mod fixtures;
@@ -136,7 +137,6 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 data_entry::PoliticalGroupVotes,
                 data_entry::PollingStationResults,
                 data_entry::VotersCounts,
-                data_entry::VotersRecounts,
                 data_entry::VotesCounts,
                 election::Election,
                 election::ElectionCategory,

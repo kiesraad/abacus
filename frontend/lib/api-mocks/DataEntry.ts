@@ -45,21 +45,19 @@ export function validate(data: PollingStationResults): ValidationResults {
   if (voters_recounts) {
     // if recounted = true
     //SECTION voters_recounts
-    total_voters_counts = voters_recounts.total_admitted_voters_recount;
+    total_voters_counts = voters_recounts.total_admitted_voters_count;
 
     // F.203 A.2 + B.2 + C.2 = D.2
     if (
-      voters_recounts.poll_card_recount +
-        voters_recounts.proxy_certificate_recount +
-        voters_recounts.voter_card_recount !==
-      voters_recounts.total_admitted_voters_recount
+      voters_recounts.poll_card_count + voters_recounts.proxy_certificate_count + voters_recounts.voter_card_count !==
+      voters_recounts.total_admitted_voters_count
     ) {
       validation_results.errors.push({
         fields: [
-          "data.voters_recounts.poll_card_recount",
-          "data.voters_recounts.proxy_certificate_recount",
-          "data.voters_recounts.voter_card_recount",
-          "data.voters_recounts.total_admitted_voters_recount",
+          "data.voters_recounts.poll_card_count",
+          "data.voters_recounts.proxy_certificate_count",
+          "data.voters_recounts.voter_card_count",
+          "data.voters_recounts.total_admitted_voters_count",
         ],
         code: "F203",
       });

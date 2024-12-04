@@ -1,13 +1,13 @@
 import type { Story } from "@ladle/react";
 
 import { IconCross } from "@kiesraad/icon";
-import { Size, Variant } from "@kiesraad/ui";
+import { ButtonVariant, Size } from "@kiesraad/ui";
 
 import { IconButton } from "./IconButton";
 
 type Props = {
   label: string;
-  variant: Variant;
+  variant: ButtonVariant;
   size: Size;
   isRound: boolean;
 };
@@ -43,7 +43,7 @@ export default {
   },
   argTypes: {
     variant: {
-      options: ["default", "secondary", "ghost", "alert"],
+      options: ["primary", "primary-destructive", "secondary", "tertiary", "tertiary-destructive"],
       control: { type: "radio" },
     },
     size: {

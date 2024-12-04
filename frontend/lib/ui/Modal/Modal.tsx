@@ -39,7 +39,7 @@ export function Modal({ title, onClose, children }: ModalProps): ReactNode {
             icon={<IconCross />}
             title="Annuleren"
             size="lg"
-            variant="ghost"
+            variant="tertiary"
           />
         )}
         <div className={cls["modal-body"]}>

@@ -20,6 +20,7 @@
     height: 3.5rem;
     padding: 1rem 1.5rem;
     line-height: 1.25rem;
+    word-break: break-word;
   }
 
   /* Vertical center child inline-blocks */

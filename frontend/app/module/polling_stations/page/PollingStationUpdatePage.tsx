@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { PollingStationForm } from "app/component/form/polling_station/PollingStationForm";
+import { PollingStationDeleteModal } from "app/module/polling_stations/page/PollingStationDeleteModal";
 
 import { usePollingStationGet } from "@kiesraad/api";
-import { Loader, PageTitle } from "@kiesraad/ui";
+import { IconTrash } from "@kiesraad/icon";
+import { Button, Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationUpdatePage() {
@@ -12,6 +15,11 @@ export function PollingStationUpdatePage() {
   const navigate = useNavigate();
 
   const { requestState } = usePollingStationGet(pollingStationId);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  function toggleShowDeleteModal() {
+    setShowDeleteModal(!showDeleteModal);
+  }
 
   const handleSaved = () => {
     navigate(`../?updated=${pollingStationId}`);
@@ -20,6 +28,12 @@ export function PollingStationUpdatePage() {
   const handleCancel = () => {
     navigate("..");
   };
+
+  function handleDeleted() {
+    toggleShowDeleteModal();
+    // TODO show message
+    navigate("..");
+  }
 
   return (
     <>
@@ -34,12 +48,30 @@ export function PollingStationUpdatePage() {
           {requestState.status === "loading" && <Loader />}
 
           {requestState.status === "success" && (
-            <PollingStationForm
-              electionId={electionId}
-              pollingStation={requestState.data}
-              onSaved={handleSaved}
-              onCancel={handleCancel}
-            />
+            <>
+              <PollingStationForm
+                electionId={electionId}
+                pollingStation={requestState.data}
+                onSaved={handleSaved}
+                onCancel={handleCancel}
+              />
+
+              <Button
+                type="button"
+                variant="tertiary-destructive"
+                leftIcon={<IconTrash />}
+                onClick={toggleShowDeleteModal}
+              >
+                Stembureau verwijderen
+              </Button>
+              {showDeleteModal && (
+                <PollingStationDeleteModal
+                  pollingStationId={pollingStationId}
+                  onCancel={toggleShowDeleteModal}
+                  onDeleted={handleDeleted}
+                />
+              )}
+            </>
           )}
         </article>
       </main>

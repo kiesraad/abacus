@@ -33,7 +33,7 @@ impl EML510 {
         results: &[(PollingStation, PollingStationResults)],
         summary: &ElectionSummary,
     ) -> EML510 {
-        let authority_id = "CSB".to_string(); // TODO: replace with actual authority id from election definition (i.e. data from election tree)
+        let authority_id = "0000".to_string(); // TODO: replace with actual authority id from election definition (i.e. data from election tree)
         let total_votes = TotalVotes::from_summary(election, summary);
         let reporting_unit_votes = results
             .iter()
@@ -296,7 +296,7 @@ impl ReportingUnitVotes {
     ) -> ReportingUnitVotes {
         ReportingUnitVotes {
             reporting_unit_identifier: ReportingUnitIdentifier {
-                id: format!("{authority_id}::{}", polling_station.number),
+                id: format!("{authority_id}::SB{}", polling_station.number),
                 name: polling_station.name.clone(),
             },
             selections: Selection::from_political_group_votes(

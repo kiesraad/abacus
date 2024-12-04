@@ -70,7 +70,7 @@ impl EML510 {
         };
         EML510 {
             base: EMLBase::new("510b"),
-            transaction_id: "TODO".into(), // TODO: set transaction id from election definition
+            transaction_id: "1".into(), // TODO: set transaction id from election definition
             managing_authority: ManagingAuthority {
                 authority_identifier: AuthorityIdentifier {
                     id: authority_id,

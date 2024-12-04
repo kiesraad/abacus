@@ -284,10 +284,10 @@ describe("Test VotersAndVotesForm", () => {
             total_admitted_voters_count: 6,
           },
           voters_recounts: {
-            poll_card_recount: 7,
-            proxy_certificate_recount: 8,
-            voter_card_recount: 9,
-            total_admitted_voters_recount: 24,
+            poll_card_count: 7,
+            proxy_certificate_count: 8,
+            voter_card_count: 9,
+            total_admitted_voters_count: 24,
           },
           votes_counts: {
             votes_candidates_count: 4,
@@ -306,7 +306,10 @@ describe("Test VotersAndVotesForm", () => {
       await userTypeInputs(user, {
         ...expectedRequest.data.voters_counts,
         ...expectedRequest.data.votes_counts,
-        ...expectedRequest.data.voters_recounts,
+        poll_card_recount: expectedRequest.data.voters_recounts.poll_card_count,
+        proxy_certificate_recount: expectedRequest.data.voters_recounts.proxy_certificate_count,
+        voter_card_recount: expectedRequest.data.voters_recounts.voter_card_count,
+        total_admitted_voters_recount: expectedRequest.data.voters_recounts.total_admitted_voters_count,
       });
 
       const spy = vi.spyOn(global, "fetch");
@@ -432,10 +435,10 @@ describe("Test VotersAndVotesForm", () => {
           errors: [
             {
               fields: [
-                "data.voters_recounts.total_admitted_voters_recount",
-                "data.voters_recounts.poll_card_recount",
-                "data.voters_recounts.proxy_certificate_recount",
-                "data.voters_recounts.voter_card_recount",
+                "data.voters_recounts.total_admitted_voters_count",
+                "data.voters_recounts.poll_card_count",
+                "data.voters_recounts.proxy_certificate_count",
+                "data.voters_recounts.voter_card_count",
               ],
               code: "F203",
             },
@@ -809,10 +812,7 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.total_votes_cast_count",
-                "data.voters_recounts.total_admitted_voters_recount",
-              ],
+              fields: ["data.votes_counts.total_votes_cast_count", "data.voters_recounts.total_admitted_voters_count"],
               code: "W207",
             },
           ],
@@ -901,10 +901,10 @@ describe("Test VotersAndVotesForm", () => {
                 "data.votes_counts.blank_votes_count",
                 "data.votes_counts.invalid_votes_count",
                 "data.votes_counts.total_votes_cast_count",
-                "data.voters_recounts.poll_card_recount",
-                "data.voters_recounts.proxy_certificate_recount",
-                "data.voters_recounts.voter_card_recount",
-                "data.voters_recounts.total_admitted_voters_recount",
+                "data.voters_recounts.poll_card_count",
+                "data.voters_recounts.proxy_certificate_count",
+                "data.voters_recounts.voter_card_count",
+                "data.voters_recounts.total_admitted_voters_count",
               ],
               code: "W209",
             },

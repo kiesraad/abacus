@@ -13,6 +13,10 @@ export type LimitedApiRequestState<T> =
   | {
       status: "success";
       data: T;
+    }
+  | {
+      status: "api-error";
+      error: ApiError;
     };
 
 // All possible states, including errors
@@ -57,12 +61,7 @@ export function handleApiResult<T>(
   }
 
   if (throwErrors) {
-    if (
-      result instanceof ApiError ||
-      result instanceof FatalApiError ||
-      result instanceof NetworkError ||
-      result instanceof NotFoundError
-    ) {
+    if (result instanceof FatalApiError || result instanceof NetworkError || result instanceof NotFoundError) {
       throw result;
     }
   }

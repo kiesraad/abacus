@@ -55,6 +55,7 @@ The following dependencies (crates) are used:
 - `sqlx`: async SQL library featuring compile-time checked queries.
 - `chrono`: date and time library.
 - `clap`: library for command-line argument parsing.
+- `quick-xml`: reading and writing EML_NL XML files.
 
 Additionally, the following development dependencies are used:
 
@@ -62,7 +63,7 @@ Additionally, the following development dependencies are used:
 
 ### Database
 
-SQLite is used as the database through the [SQLx](https://github.com/launchbadge/sqlx) Rust crate.  
+SQLite is used as the database through the [SQLx](https://github.com/launchbadge/sqlx) Rust crate.
 
 An empty database is created as `db.sqlite` when the application is started.
 The database schema is created and updated using migrations managed by SQLx.
@@ -81,7 +82,7 @@ cargo run -- --reset-database --seed-data
 
 #### SQLx offline mode
 
-You can use SQLx in offline mode so that you don't need an active database connection for compile-time query checks. 
+You can use SQLx in offline mode so that you don't need an active database connection for compile-time query checks.
 To compile in offline mode, set the `SQLX_OFFLINE` environment variable to `true`, e.g. `env SQLX_OFFLINE=true cargo build`.
 
 The SQLx offline mode uses query metadata in the `.sqlx` directory.

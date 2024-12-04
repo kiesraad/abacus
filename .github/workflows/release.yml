@@ -123,7 +123,7 @@ jobs:
         run: |
           mv abacus-ubuntu-latest/abacus abacus-linux-${{ env.TAG}}
           mv abacus-macos-latest/abacus abacus-macos-${{ env.TAG}}
-          mv abacus-windows-latest/abacus.exe abacus-${{ env.TAG}}.exe
+          mv abacus-windows-latest/abacus.exe abacus-windows-${{ env.TAG}}.exe
           rmdir abacus-ubuntu-latest abacus-macos-latest abacus-windows-latest
         working-directory: release
       - name: Create a SHA256SUMS file

@@ -3,12 +3,18 @@ import { useCallback, useState } from "react";
 import { useApi } from "./useApi";
 import { ApiRequestState, handleApiResult, LimitedApiRequestState } from "./useApiRequest";
 
+export type CrudRequestState<T> =
+  | {
+      status: "idle";
+    }
+  | ApiRequestState<T>;
+
 export interface UseCrudReturn<T> {
   get: (path: string, controller?: AbortController) => Promise<void>;
   create: (path: string, requestBody: object, controller?: AbortController) => Promise<void>;
   update: (path: string, requestBody: object, controller?: AbortController) => Promise<void>;
   remove: (path: string, controller?: AbortController) => Promise<void>;
-  requestState: ApiRequestState<T>;
+  requestState: CrudRequestState<T>;
 }
 
 export interface UseLimitedCrudReturn<T> extends UseCrudReturn<T> {
@@ -20,11 +26,12 @@ export function useCrud<T>(throwErrors: true): UseLimitedCrudReturn<T>;
 export function useCrud<T>(throwErrors: false): UseCrudReturn<T>;
 export function useCrud<T>(throwErrors: boolean): UseCrudReturn<T> {
   const client = useApi();
-  const [requestState, setRequestState] = useState<ApiRequestState<T>>({ status: "loading" });
+  const [requestState, setRequestState] = useState<CrudRequestState<T>>({ status: "idle" });
 
   // Get a resource
   const get = useCallback(
     async (path: string, controller?: AbortController) => {
+      setRequestState({ status: "loading" });
       const result = await client.getRequest<T>(path, controller);
 
       void handleApiResult(result, setRequestState, throwErrors, controller);
@@ -35,6 +42,7 @@ export function useCrud<T>(throwErrors: boolean): UseCrudReturn<T> {
   // Create a new resource
   const create = useCallback(
     async (path: string, requestBody: object, controller?: AbortController) => {
+      setRequestState({ status: "loading" });
       const result = await client.postRequest<T>(path, requestBody, controller);
 
       void handleApiResult(result, setRequestState, throwErrors, controller);
@@ -45,6 +53,7 @@ export function useCrud<T>(throwErrors: boolean): UseCrudReturn<T> {
   // Update an existing resource
   const update = useCallback(
     async (path: string, requestBody: object, controller?: AbortController) => {
+      setRequestState({ status: "loading" });
       const result = await client.putRequest<T>(path, requestBody, controller);
 
       void handleApiResult(result, setRequestState, throwErrors, controller);
@@ -55,6 +64,7 @@ export function useCrud<T>(throwErrors: boolean): UseCrudReturn<T> {
   // Remove an existing resource
   const remove = useCallback(
     async (path: string, controller?: AbortController) => {
+      setRequestState({ status: "loading" });
       const result = await client.deleteRequest<T>(path, controller);
 
       void handleApiResult(result, setRequestState, throwErrors, controller);

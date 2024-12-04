@@ -1,3 +1,5 @@
+use std::fmt;
+
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -64,6 +66,67 @@ pub fn above_percentage_threshold(value: u32, total: u32, percentage: u8) -> boo
     } else {
         let threshold = (total as u64 * percentage as u64).div_ceil(100);
         value as u64 >= threshold
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FieldPath {
+    components: Vec<String>,
+}
+
+impl FieldPath {
+    pub fn new(field: impl Into<String>) -> Self {
+        Self {
+            components: vec![field.into()],
+        }
+    }
+
+    pub fn field(&self, field: impl Into<String>) -> Self {
+        let mut path = self.clone();
+        path.components.push(field.into());
+        path
+    }
+
+    pub fn index(&self, index: usize) -> Self {
+        let mut path = self.clone();
+        path.components
+            .last_mut()
+            .expect("FieldPath constructed with no components")
+            .push_str(&format!("[{}]", index));
+        path
+    }
+
+    pub fn last(&self) -> &str {
+        self.components
+            .last()
+            .expect("FieldPath constructed with no components")
+    }
+}
+
+impl fmt::Display for FieldPath {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for (i, component) in self.components.iter().enumerate() {
+            if i > 0 {
+                write!(f, ".")?;
+            }
+            write!(f, "{}", component)?;
+        }
+
+        Ok(())
+    }
+}
+
+impl From<&str> for FieldPath {
+    fn from(s: &str) -> Self {
+        Self {
+            components: s.split(".").map(|s| s.to_owned()).collect(),
+        }
+    }
+}
+
+impl From<String> for FieldPath {
+    fn from(s: String) -> Self {
+        Self::from(&s[..])
     }
 }
 

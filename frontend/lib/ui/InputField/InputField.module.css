@@ -12,6 +12,14 @@
     &:global(.wide) ~ span {
       width: 32rem;
     }
+
+    &:global(.narrow-field) {
+      width: 32rem;
+
+      input {
+        width: 10rem;
+      }
+    }
   }
 
   span {
@@ -62,6 +70,18 @@
       border-width: 2px;
     }
   }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
   input,
   textarea {
     border: solid var(--bg-gray-darkest);
@@ -92,6 +112,7 @@
       padding-right: 3rem;
     }
   }
+
   textarea {
     align-items: flex-start;
     resize: none;

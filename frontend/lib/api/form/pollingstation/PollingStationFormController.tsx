@@ -307,10 +307,10 @@ export function PollingStationFormController({
       } else if (!newValues.voters_recounts) {
         // create voters_recounts if recounted and not yet set
         newValues.voters_recounts = {
-          poll_card_recount: 0,
-          proxy_certificate_recount: 0,
-          voter_card_recount: 0,
-          total_admitted_voters_recount: 0,
+          poll_card_count: 0,
+          proxy_certificate_count: 0,
+          voter_card_count: 0,
+          total_admitted_voters_count: 0,
         };
       }
 

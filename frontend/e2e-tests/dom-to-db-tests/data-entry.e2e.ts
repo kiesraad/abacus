@@ -10,7 +10,6 @@ import {
   RecountedPage,
   VotersAndVotesPage,
   VotersCounts,
-  VotersRecounts,
   VotesCounts,
 } from "e2e-tests/page-objects/data_entry";
 
@@ -134,14 +133,14 @@ test.describe("full data entry flow", () => {
       total_votes_cast_count: 1125,
     };
     await votersAndVotesPage.inputVotesCounts(votes);
-    const votersRecounts: VotersRecounts = {
-      poll_card_recount: 987,
-      proxy_certificate_recount: 103,
-      voter_card_recount: 35,
-      total_admitted_voters_recount: 1125,
+    const votersRecounts: VotersCounts = {
+      poll_card_count: 987,
+      proxy_certificate_count: 103,
+      voter_card_count: 35,
+      total_admitted_voters_count: 1125,
     };
     await votersAndVotesPage.inputVotersRecounts(votersRecounts);
-    await expect(votersAndVotesPage.pollCardRecount).toHaveValue(formatNumber(votersRecounts.poll_card_recount));
+    await expect(votersAndVotesPage.pollCardRecount).toHaveValue(formatNumber(votersRecounts.poll_card_count));
     await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
@@ -261,11 +260,11 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotesCounts(votes);
 
-    const votersRecounts: VotersRecounts = {
-      poll_card_recount: 1020,
-      proxy_certificate_recount: 50,
-      voter_card_recount: 75,
-      total_admitted_voters_recount: 1145,
+    const votersRecounts: VotersCounts = {
+      poll_card_count: 1020,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 1145,
     };
     await votersAndVotesPage.inputVotersRecounts(votersRecounts);
     await votersAndVotesPage.next.click();

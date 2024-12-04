@@ -291,10 +291,10 @@ test.describe("resume data entry flow", () => {
         total_admitted_voters_count: 42,
       });
       await votersAndVotesPage.inputVotersRecounts({
-        poll_card_recount: 100,
-        proxy_certificate_recount: 0,
-        total_admitted_voters_recount: 0,
-        voter_card_recount: 100,
+        poll_card_count: 100,
+        proxy_certificate_count: 0,
+        total_admitted_voters_count: 0,
+        voter_card_count: 100,
       });
 
       await votersAndVotesPage.navPanel.recounted.click();

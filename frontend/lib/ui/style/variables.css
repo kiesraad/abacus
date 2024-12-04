@@ -37,12 +37,68 @@
 
   /* SPACING */
   --space-md: 1rem;
+  --space-md-lg: 1.5rem;
   --space-lg: 2rem;
 
   /* CORNERS */
   --rounded-default: 0.5rem;
 
   /* COLORS */
+  --blue-900: #1b3764;
+  --blue-800: #254b89;
+  --blue-700: #2e5eaa;
+  --blue-600: #366fca;
+  --blue-500: #5c8bd6;
+  --blue-400: #82a6e0;
+  --blue-300: #a4bee8;
+  --blue-200: #c5d6f1;
+  --blue-100: #e7eef9;
+  --blue-50: #f8fafd;
+
+  --green-900: #113b26;
+  --green-800: #195738;
+  --green-700: #206c46;
+  --green-600: #248052;
+  --green-500: #329d68;
+  --green-400: #64b58c;
+  --green-300: #8fc9ac;
+  --green-200: #b8ddca;
+  --green-100: #e7f3ee;
+  --green-50: #f6fbf9;
+
+  --yellow-900: #402d0d;
+  --yellow-800: #644714;
+  --yellow-700: #7c5919;
+  --yellow-600: #926a1c;
+  --yellow-500: #b18322;
+  --yellow-400: #d19c26;
+  --yellow-300: #efc943;
+  --yellow-200: #f5de89;
+  --yellow-100: #fff4d6;
+  --yellow-50: #fdfaf2;
+
+  --orange-900: #521f09;
+  --orange-800: #7a2e0e;
+  --orange-700: #b54708;
+  --orange-600: #d4690b;
+  --orange-500: #f79009;
+  --orange-400: #fdb022;
+  --orange-300: #fec84b;
+  --orange-200: #fedf89;
+  --orange-100: #fef4d7;
+  --orange-50: #fdfaf2;
+
+  --red-900: #661a27;
+  --red-800: #8e2437;
+  --red-700: #b02d45;
+  --red-600: #d03651;
+  --red-500: #e35f77;
+  --red-400: #ea889a;
+  --red-300: #f0aab7;
+  --red-200: #f6cad2;
+  --red-100: #fbe9ed;
+  --red-50: #fef9fa;
+
   --text-color-header: #101828;
   --text-color-body: #344054;
 
@@ -71,10 +127,10 @@
   --checkbox-radio-svg-size: 0.875rem;
 
   --button-icon-modal-close-color-svg: var(--menu-empty);
-  --button-icon-ghost-color-svg: var(--base-black);
-  --button-icon-ghost-color-border-focus: var(--checkbox-radio-color-border);
-  --button-icon-ghost-color-bg-focus: var(--bg-gray-darker);
-  --button-icon-ghost-color-bg-hover: var(--bg-gray-darker);
+  --button-icon-tertiary-color-svg: var(--base-black);
+  --button-icon-tertiary-color-border-focus: var(--checkbox-radio-color-border);
+  --button-icon-tertiary-color-bg-focus: var(--bg-gray-darker);
+  --button-icon-tertiary-color-bg-hover: var(--bg-gray-darker);
 
   --shadow-color-focus: #d1e0ff;
   --border-color-default: var(--bg-gray-darkest);

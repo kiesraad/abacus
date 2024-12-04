@@ -14,7 +14,7 @@ use crate::election::Election;
 use crate::error::{APIError, ErrorReference, ErrorResponse};
 use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::PollingStation;
-use crate::polling_station::PollingStationStatus;
+use crate::polling_station::{PollingStationStatus, PollingStationStatusEntry};
 use crate::validation::ValidationResults;
 
 pub mod entry_number;
@@ -61,20 +61,34 @@ enum MyState {
 }
 
 impl MyState {
-    pub async fn new(
-        polling_station_id: u32,
+    pub async fn from_polling_station_id(
         polling_stations_repo: &PollingStations,
+        polling_station_id: u32,
     ) -> Result<Self, APIError> {
-        let status = polling_stations_repo.status(polling_station_id).await?;
-        match status.status {
+        let status_entry = polling_stations_repo.status(polling_station_id).await?;
+        Self::from_entry(status_entry)
+    }
+
+    pub fn from_entry(status_entry: PollingStationStatusEntry) -> Result<Self, APIError> {
+        match status_entry.status {
             PollingStationStatus::NotStarted => Ok(Self::NotStarted {
-                polling_station_id: status.id,
+                polling_station_id: status_entry.id,
+            }),
+            PollingStationStatus::FirstEntryInProgress => Ok(Self::FirstEntryInProgress {
+                polling_station_id: status_entry.id,
+                progress: todo!(),
+                data: todo!(),
+                client_state: todo!(),
             }),
             _ => Err(APIError::Conflict(
                 "invalid operation".to_string(),
                 ErrorReference::InvalidData,
             )),
         }
+    }
+
+    pub fn to_state(&self) -> Self {
+        todo!("apply rules from commented match in controller");
     }
 }
 
@@ -102,7 +116,7 @@ pub async fn polling_station_data_entry_save(
     State(elections): State<Elections>,
     data_entry_request: SaveDataEntryRequest,
 ) -> Result<SaveDataEntryResponse, APIError> {
-    let asdf = MyState::new(id, &polling_stations_repo).await?;
+    let asdf = MyState::from_polling_station_id(&polling_stations_repo, id).await?;
     dbg!(&asdf);
     // Check if it is valid to save the data entry
     // TODO: Enable or remove

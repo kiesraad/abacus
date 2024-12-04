@@ -245,6 +245,7 @@ pub struct TotalVotes {
     cast: u64,
     total_counted: u64,
     rejected_votes: Vec<RejectedVotes>,
+    uncounted_votes: Vec<UncountedVotes>,
 }
 
 impl TotalVotes {
@@ -267,6 +268,58 @@ impl TotalVotes {
                 RejectedVotes::new(
                     RejectedVotesReason::Invalid,
                     summary.votes_counts.invalid_votes_count as u64,
+                ),
+            ],
+            uncounted_votes: vec![
+                UncountedVotes::new(
+                    UncountedVotesReason::PollCardCount,
+                    summary.voters_counts.poll_card_count as u64,
+                ),
+                UncountedVotes::new(
+                    UncountedVotesReason::ProxyCertificateCount,
+                    summary.voters_counts.proxy_certificate_count as u64,
+                ),
+                UncountedVotes::new(
+                    UncountedVotesReason::VoterCardCount,
+                    summary.voters_counts.voter_card_count as u64,
+                ),
+                UncountedVotes::new(
+                    UncountedVotesReason::TotalAdmittedVotersCount,
+                    summary.voters_counts.total_admitted_voters_count as u64,
+                ),
+                UncountedVotes::new(
+                    UncountedVotesReason::MoreBallotsCount,
+                    summary.differences_counts.more_ballots_count.count as u64,
+                ),
+                UncountedVotes::new(
+                    UncountedVotesReason::FewerBallotsCount,
+                    summary.differences_counts.fewer_ballots_count.count as u64,
+                ),
+                UncountedVotes::new(
+                    UncountedVotesReason::UnreturnedBallotsCount,
+                    summary.differences_counts.unreturned_ballots_count.count as u64,
+                ),
+                UncountedVotes::new(
+                    UncountedVotesReason::TooFewBallotsHandedOutCount,
+                    summary
+                        .differences_counts
+                        .too_few_ballots_handed_out_count
+                        .count as u64,
+                ),
+                UncountedVotes::new(
+                    UncountedVotesReason::TooManyBallotsHandedOutCount,
+                    summary
+                        .differences_counts
+                        .too_many_ballots_handed_out_count
+                        .count as u64,
+                ),
+                UncountedVotes::new(
+                    UncountedVotesReason::OtherExplanationCount,
+                    summary.differences_counts.other_explanation_count.count as u64,
+                ),
+                UncountedVotes::new(
+                    UncountedVotesReason::NoExplanationCount,
+                    summary.differences_counts.no_explanation_count.count as u64,
                 ),
             ],
         }
@@ -605,6 +658,7 @@ mod tests {
                                 RejectedVotes::new(RejectedVotesReason::Invalid, 0),
                                 RejectedVotes::new(RejectedVotesReason::Blank, 0),
                             ],
+                            uncounted_votes: vec![],
                         },
                         reporting_unit_votes: vec![ReportingUnitVotes {
                             reporting_unit_identifier: ReportingUnitIdentifier {

@@ -107,33 +107,29 @@ __uitbreidingen__:
 - OSV richt de server ook gelijk als client in. Willen wij dit ook?
 - Afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
 
-## GSB richt de applicatie in
+
+## De coördinator maakt de stembureaus aan.
 
 __niveau:__ gebruikersdoel, zee, 🌊
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__
-
-- [GSB installeert de applicatie.](#gsb-installeert-de-applicatie)
-- Het GSB maakt de kandidatenlijst beschikbaar.
-- De Kiesraad maakt de verkiezingsdefinitie beschikbaar.
-
 __hoofdscenario__:
 
-1. De beheerder leest de verkiezingsdefinitie in.
-2. De beheerder leest de kandidatenlijst in.
-3. De beheerder maakt de stembureaus aan.
-4. De beheerder maakt de gebruikers aan.
+1. De coördinator importeert de lijst van stembureaus.
+2. De applicatie controleert dat de stembureaus aan de validaties voldoen.
+3. De coördinator stelt vast dat de lijst volledig en correct is.
 
 __uitbreidingen__:  
-1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
 
-2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
+1a. Er is geen te importeren bestand met stembureaus:
+&emsp; 1a1. [De coördinator voert de stembureaus handmatig in.](./GSB-subfuncties.md#de-coördinator-bewerkt-de-stembureaus)
 
-3a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:  
-3b. De lijst met stembureaus moet aangevuld of aangepast worden:  
-3c. Er is geen lijst met stembureaus:
+2a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
+
+3a. De lijst met stembureaus moet aangepast worden:
+&emsp; 3a1. [De coördinator past de stembureaus aan.](./GSB-subfuncties.md#de-coördinator-bewerkt-de-stembureaus)
+
 
 ### Open punten
 

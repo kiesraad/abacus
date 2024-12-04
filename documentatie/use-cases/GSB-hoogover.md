@@ -7,7 +7,7 @@ __niveau:__ hoog-over, vlieger, 🪁
 __precondities:__
 
 - [GSB installeert de applicatie](./GSB-gebruikersdoelen.md#gsb-installeert-de-applicatie)
-- [GSB richt de applicatie in](./GSB-gebruikersdoelen.md#gsb-richt-de-applicatie-in)
+- [GSB richt de applicatie in](#de-beheerder-en-de-coördinator-richten-de-applicatie-in)
 
 ### Hoofdscenario en uitbreidingen
 
@@ -65,7 +65,7 @@ __niveau:__ hoog-over, vlieger, 🪁
 __precondities:__
 
 - [GSB installeert de applicatie](./GSB-gebruikersdoelen.md#gsb-installeert-de-applicatie)
-- [GSB richt de applicatie in](./GSB-gebruikersdoelen.md#gsb-richt-de-applicatie-in)
+- [GSB richt de applicatie in](#de-beheerder-en-de-coördinator-richten-de-applicatie-in)
 - [Het GSB voert de PV's in de applicatie in](#het-gsb-voert-de-pvs-en-eventuele-sb-corrigendas-dso-in-de-applicatie-in)
 
 ### Hoofdscenario en uitbreidingen
@@ -84,3 +84,32 @@ __uitbreidingen__:
 ### Open punten
 
 - Hoe worden de gecorrigeerde tellingen ingevoerd? Volledige invoer van oorspronkelijk PV en corrigendum? Alleen invoer van de aantallen uit het corrigendum?
+
+
+## De beheerder en de coördinator richten de applicatie in
+
+__niveau:__ hoog-over, vlieger, 🪁
+
+__precondities:__
+
+- Het GSB heeft de kandidatenlijst beschikbaar gemaakt.
+- De Kiesraad heeft de verkiezingsdefinitie beschikbaar gemaakt.
+
+### Hoofdscenario en uitbreidingen
+
+__trigger:__
+
+- [GSB installeert de applicatie.](./GSB-gebruikersdoelen.md#gsb-installeert-de-applicatie)
+
+__hoofdscenario__:
+
+1. De beheerder leest de verkiezingsdefinitie in.
+2. De coördinator leest de kandidatenlijst in.
+3. [De coördinator maakt de stembureaus aan.](./GSB-gebruikersdoelen.md#de-coördinator-maakt-de-stembureaus-aan)
+4. De beheerder maakt de gebruikers aan.
+
+__uitbreidingen__:  
+1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
+
+2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
+

@@ -85,8 +85,8 @@ async function fillDataEntryNoRecountNoDifferences(page: Page) {
   await checkAndSavePage.save.click();
 
   const pollingStationChoicePage = new PollingStationChoicePage(page);
-  await pollingStationChoicePage.fieldsetNextPollingStation.waitFor();
-  await pollingStationChoicePage.dataEntrySuccess.waitFor();
+  await expect(pollingStationChoicePage.fieldsetNextPollingStation).toBeVisible();
+  await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
 }
 
 test.describe("full data entry flow", () => {
@@ -101,6 +101,12 @@ test.describe("full data entry flow", () => {
     await pollingStationChoicePage.clickStart();
 
     await fillDataEntryNoRecountNoDifferences(page);
+
+    await expect(pollingStationChoicePage.alert.first()).toHaveText(
+      "Je invoer is opgeslagen" +
+        "Geef het papieren proces-verbaal terug aan de coördinator." +
+        "Een andere invoerder doet straks de tweede invoer.",
+    );
   });
 
   test("recount, no differences", async ({ page }) => {
@@ -401,6 +407,11 @@ test.describe("second data entry", () => {
 
     // fill in exactly like first data entry
     await fillDataEntryNoRecountNoDifferences(page);
+
+    await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
+    await expect(pollingStationChoicePage.alert.first()).toHaveText(
+      "Je invoer is opgeslagen" + "Geef het papieren proces-verbaal terug aan de coördinator.",
+    );
 
     await expect(pollingStationChoicePage.fieldsetNextPollingStation).toBeVisible();
     await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());

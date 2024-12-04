@@ -9,6 +9,7 @@ export class PollingStationChoicePage {
   readonly pollingStationFeedback: Locator;
   readonly pollingStationSubmitFeedback: Locator;
   protected readonly start: Locator; // use clickStart() instead
+  readonly alert: Locator;
   readonly dataEntrySuccess: Locator;
   readonly resumeDataEntry: Locator;
 
@@ -28,6 +29,7 @@ export class PollingStationChoicePage {
     this.pollingStationSubmitFeedback = page.getByTestId("pollingStationSubmitFeedback");
     this.start = page.getByRole("button", { name: "Beginnen" });
 
+    this.alert = page.getByRole("alert");
     this.dataEntrySuccess = page.getByRole("heading", {
       level: 2,
       name: "Je invoer is opgeslagen",

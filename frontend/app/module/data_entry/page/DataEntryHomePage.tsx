@@ -26,7 +26,9 @@ export function DataEntryHomePage() {
     };
   }, [refetch]);
 
-  const showDataEntrySavedAlert = location.hash === "#data-entry-saved";
+  const showFirstDataEntrySavedAlert = location.hash === "#data-entry-saved-1";
+  const showSecondDataEntrySavedAlert = location.hash === "#data-entry-saved-2";
+  const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
 
   function closeDataEntrySavedAlert() {
     navigate(location.pathname);
@@ -46,13 +48,17 @@ export function DataEntryHomePage() {
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
-      {showDataEntrySavedAlert && (
+      {dataEntryDone && (
         <Alert type="success" onClose={closeDataEntrySavedAlert}>
           <h2>Je invoer is opgeslagen</h2>
           <p>
             Geef het papieren proces-verbaal terug aan de coördinator.
-            <br />
-            Een andere invoerder doet straks de tweede invoer.
+            {showFirstDataEntrySavedAlert && (
+              <>
+                <br />
+                Een andere invoerder doet straks de tweede invoer.
+              </>
+            )}
           </p>
         </Alert>
       )}
@@ -69,7 +75,7 @@ export function DataEntryHomePage() {
       )}
       <main>
         <article id="polling-station-choice-form">
-          <PollingStationChoiceForm anotherEntry={showDataEntrySavedAlert} />
+          <PollingStationChoiceForm anotherEntry={dataEntryDone} />
         </article>
         <ElectionProgress />
       </main>

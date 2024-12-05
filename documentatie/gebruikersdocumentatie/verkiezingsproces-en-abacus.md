@@ -145,7 +145,7 @@ Security is een van de belangrijkste pijlers voor Abacus, om een zo hoog mogelij
 Ons team werkt volgens deze principes:
 
 - We werken geheel open source op deze openbare GitHub-repository. Ook de pull requests zijn openbaar.
-- We hebben een volledige CI/CD pipeline met tests en linting voor de frontend en backend.
+- We hebben een volledige continuous integration pipeline met tests en linting voor de frontend en backend.
 - Er zijn altijd minimaal 2 reviews en approvals nodig per pull request.
 - Nieuwe code wordt altijd getest. De nieuwe tests moeten in dezelfde PR zitten als de nieuwe functionaliteit.
 - De UI/UX designs op basis waarvan we nieuwe functionaliteit bouwen zijn ook openbaar op Figma.

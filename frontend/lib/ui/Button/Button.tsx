@@ -14,7 +14,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   children: React.ReactNode;
 }
 
-//TODO: add react router Link variabt
+//TODO: add react router Link variant
 export function Button({
   isDisabled,
   isLoading,

@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { NumberInput } from "../NumberInput/NumberInput";
+import { NumberInput } from "@kiesraad/ui";
+
 import cls from "./InputField.module.css";
 
 export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {

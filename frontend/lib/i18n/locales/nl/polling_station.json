@@ -34,6 +34,8 @@
   "unsaved_changes_title": "Let op: niet opgeslagen wijzigingen",
   "unsaved_changes_message": "Je hebt in <strong>{name}</strong> wijzigingen gemaakt die nog niet zijn opgeslagen.",
   "current_form": "het huidige formulier",
+  "create": "Stembureau toevoegen",
+  "update": "Stembureau wijzigen",
   "delete": "Stembureau verwijderen",
   "delete_are_you_sure": "Weet je zeker dat je dit stembureau wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
   "save_changes": "Wil je deze wijzigingen bewaren?",

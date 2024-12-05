@@ -55,10 +55,10 @@ export function PollingStationUpdatePage() {
 
   return (
     <>
-      <PageTitle title="Stembureaus - Abacus" />
+      <PageTitle title={`${t("polling_stations")} - Abacus`} />
       <header>
         <section>
-          <h1>Stembureau wijzigen</h1>
+          <h1>{t("polling_station.update")}</h1>
         </section>
       </header>
 

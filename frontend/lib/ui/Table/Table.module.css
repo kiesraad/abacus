@@ -59,4 +59,5 @@
   font-size: var(--font-size-body);
   font-weight: bold;
   width: 6.5rem;
+  line-height: 1.75rem;
 }

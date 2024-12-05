@@ -102,7 +102,7 @@ test.describe("full data entry flow", () => {
 
     await fillDataEntryNoRecountNoDifferences(page);
 
-    await expect(pollingStationChoicePage.alert.first()).toHaveText(
+    await expect(pollingStationChoicePage.alertInputSaved).toHaveText(
       [
         "Je invoer is opgeslagen",
         "Geef het papieren proces-verbaal terug aan de coördinator.",
@@ -411,7 +411,7 @@ test.describe("second data entry", () => {
     await fillDataEntryNoRecountNoDifferences(page);
 
     await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
-    await expect(pollingStationChoicePage.alert.first()).toHaveText(
+    await expect(pollingStationChoicePage.alertInputSaved).toHaveText(
       ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
 

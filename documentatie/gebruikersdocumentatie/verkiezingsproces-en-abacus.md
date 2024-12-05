@@ -1,12 +1,12 @@
 # Het verkiezingsproces en Abacus
 
-Om te begrijpen wat Abacus is en hoe het wordt gebruikt, heb je eerst wat context nodig. Hier lees je alles over wat de Kiesraad is en doet, hoe het verkiezingsproces verloopt en op welk moment en welke wijze Abacus in dit proces zal worden gebruikt.
+Om te begrijpen wat Abacus is en hoe het wordt gebruikt, heb je eerst wat context nodig. Hier lees je alles over wat de Kiesraad is en doet, hoe het verkiezingsproces verloopt en op welk moment en op welke wijze Abacus in dit proces zal worden gebruikt.
 
-Vind je het handiger om een video te bekijken, kijk dan naar de presentatie [Abacus: Software for Secure and Transparent Voting Results](https://youtu.be/qhYd_LNS2nQ) die we in november 2024 hebben gegeven op Wiccon (in het Engels).
+Vind je het handiger om een video te bekijken, kijk dan naar de presentatie [Abacus: Software for Secure and Transparent Voting Results](https://youtu.be/qhYd_LNS2nQ) die we in november 2024 hebben gegeven op WICCON (in het Engels).
 
 ## De Kiesraad
 
-De Kiesraad is een onafhankelijk adviesorgaan met 7 leden en staat voor een eerlijk, transparant en controleerbaar verkiezingsproces. De Raad is gevestigd in Den Haag. Het bureau Kiesraad bestaat inmiddels uit meer dan 40 medewerkers.
+De Kiesraad is een onafhankelijk adviesorgaan met 7 leden en staat voor een eerlijk, transparant en controleerbaar verkiezingsproces. De Raad is gevestigd in Den Haag. Het bureau van de Kiesraad bestaat inmiddels uit meer dan 40 medewerkers.
 
 De taken van de Kiesraad zijn:
 
@@ -15,14 +15,16 @@ De taken van de Kiesraad zijn:
 - Ondersteuning bieden aan gemeentes, politieke partijen en iedereen die actief is in het verkiezingsproces.
 - De benodigde hulpmiddelen leveren voor het uitvoeren van verkiezingen, zoals modellen en processen, maar ook technologie en software. Hieronder valt de software voor het optellen van stemmen en de zetelverdeling.
 
-Het wettelijke kader voor de verkiezingen is de Kieswet met het bijbehorende Kiesbesluit en de
-Kiesregeling. Dit kader verandert als gevolg van wetgeving die is ingezet om de ontwikkeling van
-nieuwe verkiezingssoftware te ondersteunen.
+Het wettelijke kader voor de verkiezingen is de Kieswet met het bijbehorende Kiesbesluit en de Kiesregeling. Dit kader verandert als gevolg van wetgeving die is ingezet om de ontwikkeling van nieuwe verkiezingssoftware te ondersteunen. Klik op de onderstaande links voor meer informatie:
 
-Meer informatie over de Kiesraad en de Kieswet vind je op [de website van de Kiesraad](https://www.kiesraad.nl/).
+- [Kieswet](https://wetten.overheid.nl/BWBR0004627/)
+- [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/)
+- [Kiesbesluit](https://wetten.overheid.nl/BWBR0004632/)
+- [Website van de Kiesraad](https://www.kiesraad.nl/).
 
 ## Het verkiezingsproces
 
+In Nederland stemmen we op papier. In het stembureau gelden strikte regels om het stemgeheim te bewaren.
 Zoals iedereen weet stemmen we in Nederland op papier. In het stembureau gelden strikte regels om het stemgeheim te bewaren.
 
 ![Stemmen in stemhokjes](/documentatie/gebruikersdocumentatie/img/stemhokjes.jpg)
@@ -30,37 +32,32 @@ Zoals iedereen weet stemmen we in Nederland op papier. In het stembureau gelden 
 Na het sluiten van de stembussen worden alle stemmen met de hand geteld, waarbij een vier-ogenprincipe wordt gehanteerd. De meeste gemeentes hebben hier een speciaal telsysteem voor.
 
 ![Het papieren telproces](/documentatie/gebruikersdocumentatie/img/telproces.jpg)
-</p>
 
-Wanneer alle stemmen geteld zijn, vult de leider van het stembureau alle uitkomsten in op een proces-verbaal. Het totaal aantal toegelaten kiezers (met stempas, volmacht en kiezerspas), het aantal uitgebrachte stemmen en het eventuele verschil daartussen worden eerst ingevuld. Vervolgens worden alle stemmen per kandidaat ingevuld[^1]. Dat ziet er als volgt uit:
+Wanneer alle stemmen geteld zijn, vult de voorzitter van het stembureau alle uitkomsten in op een proces-verbaal. Het totaal aantal toegelaten kiezers (met stempas, volmacht en kiezerspas), het aantal uitgebrachte stemmen en het eventuele verschil daartussen worden eerst ingevuld. Vervolgens worden alle stemmen per kandidaat ingevuld[^1]. Dat ziet er als volgt uit:
 
 ![Een proces-verbaal](/documentatie/gebruikersdocumentatie/img/pv.png)
 
 Dan wordt alles naar een centrale plek in de gemeente gebracht (meestal het gemeentehuis), waar het gemeentelijk stembureau de werkzaamheden overneemt.
 
-[^1]: Het proces waarbij alle stemmen op kandidaatniveau direct in het stembureau worden geteld heet *decentrale stemopneming*. In sommige gemeentes tellen de stembureaus alleen de stemmen op lijstniveau, waarna de stemmen per kandidaat pas bij het gemeentelijk stembureau worden geteld. Dit heet *centrale stemopneming*.
+[^1]: Het proces waarbij alle stemmen per kandidaat direct in het stembureau worden geteld heet *decentrale stemopneming*. In sommige gemeentes tellen de stembureaus alleen de stemmen per lijst, waarna de stemmen per kandidaat op bij het gemeentelijk stembureau worden geteld. Dit heet *centrale stemopneming*.
 
 ### Gemeentelijk stembureau, hoofdstembureau, centraal stembureau
-
-Hieronder zie je hoe het gehele proces van het optellen van stemmen verloopt.
+Hieronder zie je hoe het gehele proces van het optellen van stemmen verloopt voor landelijke verkiezingen. Andere verkiezingen zijn over het algemeen eenvoudiger.
 
 ![Stembureau, GSB, HSB, CSB](/documentatie/gebruikersdocumentatie/img/eml_flow_nl.drawio.png)
 
-- **Blok 1:** Zoals hierboven is uitgelegd, worden de stemmen geteld in het stembureau. Dit leidt tot een proces-verbaal.
-- **Blok 2:** Alle processen-verbaal van de stembureaus worden op het gemeentelijk stembureau ingevoerd, waarbij de software de resultaten controleert en eventuele fouten en waarschuwingen weergeeft. Wanneer deze opgelost zijn, kan de invoer worden afgerond en genereert de software een EML_NL-bestand[^2] en een proces-verbaal van het gemeentelijk stembureau.
+- **Blok 2:** Alle processen-verbaal van de stembureaus worden op het gemeentelijk stembureau ingevoerd, waarbij de software de resultaten controleert en eventuele fouten en waarschuwingen weergeeft. Wanneer deze opgelost zijn, kan de invoer worden afgerond en genereert de software het proces-verbaal en het EML_NL-bestand[^2] van het gemeentelijk stembureau.
+- **Blok 3:** Het proces van blok 2 herhaalt zich bij de hoofdstembureaus van de kieskringen. Hier worden de processen-verbaal van de gemeentelijke stembureaus ingevoerd, gecontroleerd en afgerond. De software maakt het proces-verbaal en het EML_NL-bestand van het hoofdstembureau.
 - **Blok 3:** Het proces van blok 2 herhaalt zich bij de hoofdstembureaus van de kieskringen. Hier worden de processen-verbaal van de gemeentelijke stembureaus ingevoerd, gecontroleerd en afgerond. Het resultaat is een EML_NL-bestand en een proces-verbaal van het hoofdstembureau.
 - **Blok 4:** Op het centraal stembureau worden de processen-verbaal van de gemeentelijke stembureaus nogmaals ingevoerd ter controle. Tot slot worden de processen-verbaal van de hoofdstembureaus ingevoerd, gecontroleerd en afgerond. Dit leidt tot een EML_NL-bestand en een proces-verbaal van het centraal stembureau. Aan de hand van deze gegevens wordt de zetelverdeling berekend.
 
-In deze blokken staat software centraal, en hier komt Abacus dan ook aan bod.
+In deze blokken biedt software ondersteuning, en hier komt Abacus dan ook aan bod.
 
-[^2]: EML staat voor Election Markup Language. Het bestandsformaat EML_NL is hierop gebaseerd en aangepast voor Nederlandse verkiezingen.
+[^2]: EML staat voor Election Markup Language. Het bestandsformaat [EML_NL](https://www.kiesraad.nl/verkiezingen/osv-en-eml/eml-standaard) is hierop gebaseerd en aangepast voor Nederlandse verkiezingen.
 
 ### Papier is leidend
 
-In het verkiezingsproces is papier leidend. Dat zorgt voor controleerbaarheid en transparantie,
-en dit zijn belangrijke waarborgen voor de integriteit van het verkiezingsproces. Het doel is dat alleen de
-uitgebrachte stemmen van invloed zijn op de zetelverdeling en dat dit voor iedereen controleerbaar
-is. De software wordt gebruikt ter ondersteuning van het papieren proces.
+In het verkiezingsproces is papier leidend. Dat zorgt voor controleerbaarheid en transparantie, en dit zijn belangrijke waarborgen voor de integriteit van het verkiezingsproces. De software wordt gebruikt ter ondersteuning van het papieren proces.
 
 ### Controleprotocol optellingen
 
@@ -73,8 +70,8 @@ Hiermee wordt gecontroleerd op invoerfouten en andere wijzigingen die de uitslag
 De controle op bijzonderheden in de uitslagen, zoals een hoog aantal blanco stemmen of mogelijke
 verwisseling van kandidaten, wordt gedaan aan de hand van data-analyse. Hiervoor heeft de
 Kiesraad analysetools gebouwd die op [GitHub](https://github.com/kiesraad/HCP) beschikbaar zijn. Om de gemeentes te ondersteunen
-worden deze tools zoveel als mogelijk ook in Abacus opgenomen. Dat voorkomt verrassingen en
-helpt om kleine fouten in een vroeg stadium op te sporen.
+worden deze controles zoveel als mogelijk ook in Abacus opgenomen. Dat voorkomt verrassingen en
+helpt om fouten in een vroeg stadium op te sporen.
 
 ## De rol van Abacus
 
@@ -92,7 +89,7 @@ Abacus wordt in de eerste instantie ontwikkeld voor de Gemeenteraadsverkiezingen
 Omdat het verkiezingsproces snel verloopt en er niet al te vaak verkiezingen zijn, maken de gebruikers slechts korte tijd gebruik van verkiezingssoftware. Daarom is het van groot belang dat Abacus zo gebruiksvriendelijk mogelijk is. Hiervoor implementeren we de volgende maatregelen:
 
 - We doen regelmatige gebruikerstests met echte gebruikers.
-- De invoer wordt niet allemaal op één pagina gedaan zoals in de huidige software, maar in kleinere secties met een validatiecheck na elke invoer.
+- De invoer wordt in kleinere secties gedaan met een validatiecheck na elke invoer.
 - Je kunt de invoer pauzeren en later doorgaan.
 - De software wordt geoptimaliseerd voor gebruik met een toetsenbord en is eenvoudig aan te leren.
 - De software geeft duidelijk aan hoe onjuiste of inconsistente invoer kan worden opgelost.
@@ -110,12 +107,11 @@ In de afbeelding hieronder zie je hoe Abacus werkt op het gemeentelijk stemburea
 
 ![Uitslagvaststelling](/documentatie/gebruikersdocumentatie/img/proces%20uitslagvaststelling.png)
 
-- IMPORT: gebruikers kunnen kandidaten en verkiezingsbestanden in EML-formaat importeren in Abacus.
-- INVOER: gebruikers kunnen verkiezingsresultaten invoeren, inclusief verklaringen over ontbrekende stembiljetten/stempassen en klachten van kiezers.
+- Bovenaan staat IMPORT: gebruikers kunnen kandidaten en verkiezingsdefinities in EML-formaat importeren in Abacus.
+- Links staat INVOER: gebruikers kunnen verkiezingsresultaten invoeren, inclusief verklaringen over ontbrekende stembiljetten/stempassen en klachten van kiezers.
 Abacus telt de resultaten op en controleert ze.
-De data-analyse leidt tot waarschuwingen voor kleine afwijkingen en foutmeldingen voor grote afwijkingen en inconsistente resultaten.
-- ONDERTEKENING: de data wordt ondertekend met een handtekening van de voorzitter van het gemeentelijk stembureau.
-- EXPORT: de verkiezingsresultaten worden geëxporteerd als EML_NL-bestand en als PDF-bestand.
+- Rechts staat ONDERTEKENING: de data wordt ondertekend met een handtekening van de voorzitter van het gemeentelijk stembureau.
+- Onderaan staat EXPORT: de verkiezingsresultaten worden geëxporteerd als EML_NL-bestand en als PDF-bestand.
 
 ### Technische keuzes en architectuur
 
@@ -149,7 +145,7 @@ Ons team werkt volgens deze principes:
 - We werken geheel open source op deze openbare GitHub-repository. Ook de pull requests zijn openbaar.
 - We hebben een volledige CI/CD pipeline met tests en linting voor de frontend en backend.
 - Er zijn altijd minimaal 2 reviews en approvals nodig per pull request.
-- Nieuwe code wordt altijd getest. De nieuwe tests in Playwright, de React Testing Library en Cargo moeten in dezelfde PR zitten als de nieuwe functionaliteit.
+- Nieuwe code wordt altijd getest. De nieuwe tests moeten in dezelfde PR zitten als de nieuwe functionaliteit.
 - De UI/UX designs op basis waarvan we nieuwe functionaliteit bouwen zijn ook openbaar op Figma.
 - Op ons [board](https://github.com/orgs/kiesraad/projects/1) zie je waar we mee bezig zijn. Hier kun je ook de epics bekijken.
 

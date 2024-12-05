@@ -79,10 +79,35 @@ pub trait EMLDocument: Sized + DeserializeOwned + Serialize {
         let serializer = {
             let mut s = Serializer::with_root(writer, Some("EML"))
                 .expect("Constructing a new XML Serializer cannot fail");
-            s.indent(' ', 4);
+            s.indent(' ', 2);
             s
         };
         Serialize::serialize(&self, serializer)
+    }
+}
+
+pub fn eml_document_hash(input: &str, chunked: bool) -> String {
+    use sha2::Digest;
+    let mut bytes = vec![0u8; sha2::Sha256::output_size() * 2];
+    let digest = sha2::Sha256::digest(input.as_bytes());
+
+    // This can never fail unless `Sha256::output_size()` would give a wrong value
+    const_hex::encode_to_slice_upper(digest, &mut bytes)
+        .expect("Hashing output has unexpected length");
+
+    if chunked {
+        let mut iter = bytes.into_iter();
+        let chunks_iter = std::iter::from_fn(move || {
+            let chunk = iter.by_ref().take(4);
+            if chunk.len() > 0 {
+                Some(chunk.map(char::from).collect::<String>())
+            } else {
+                None
+            }
+        });
+        chunks_iter.collect::<Vec<_>>().join(" ")
+    } else {
+        bytes.into_iter().map(char::from).collect::<String>()
     }
 }
 

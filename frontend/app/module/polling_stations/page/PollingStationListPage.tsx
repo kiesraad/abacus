@@ -112,16 +112,12 @@ export function PollingStationListPage() {
                 <Table.Column>{t("name")}</Table.Column>
                 <Table.Column>{t("type")}</Table.Column>
               </Table.Header>
-              <Table.Body>
+              <Table.Body className="fs-md">
                 {data.polling_stations.map((station) => (
                   <Table.LinkRow key={station.id} to={`update/${station.id}`}>
-                    <Table.Cell number fontSizeClass="fs-body">
-                      {station.number}
-                    </Table.Cell>
-                    <Table.Cell fontSizeClass="fs-md">{station.name}</Table.Cell>
-                    <Table.Cell fontSizeClass="fs-md">
-                      {labelForPollingStationType[station.polling_station_type]}
-                    </Table.Cell>
+                    <Table.Cell className="table-number">{station.number}</Table.Cell>
+                    <Table.Cell className="break-word">{station.name}</Table.Cell>
+                    <Table.Cell>{labelForPollingStationType[station.polling_station_type]}</Table.Cell>
                   </Table.LinkRow>
                 ))}
               </Table.Body>

@@ -3,6 +3,11 @@
   line-height: 1.5rem;
   border-spacing: unset;
   color: var(--color-help-text);
+  font-size: var(--font-size-body);
+
+  thead {
+    font-size: var(--font-size-xs);
+  }
 
   th,
   td {
@@ -20,7 +25,6 @@
     height: 3.5rem;
     padding: 1rem 1.5rem;
     line-height: 1.25rem;
-    word-break: break-word;
   }
 
   /* Vertical center child inline-blocks */
@@ -31,17 +35,6 @@
   /* Gap between children */
   td > * + * {
     margin-left: 0.5rem;
-  }
-
-  td.number {
-    text-align: right;
-    font-weight: bold;
-    width: 6.5rem;
-    line-height: 1.75rem;
-  }
-
-  tr.background-styling {
-    background-color: var(--bg-gray);
   }
 
   tr.row-link {
@@ -59,4 +52,11 @@
       background-repeat: no-repeat;
     }
   }
+}
+
+:global(.table-number) {
+  text-align: right;
+  font-size: var(--font-size-body);
+  font-weight: bold;
+  width: 6.5rem;
 }

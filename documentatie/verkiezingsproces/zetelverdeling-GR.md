@@ -2,7 +2,7 @@
 
 In dit document staat beschreven hoe de zetelverdeling en de aanwijzing van gekozen kandidaten werkt bij gemeenteraadsverkiezingen.
 
-## Verschillen in proces obv aantal raadszetels
+## Verschillen in proces o.b.v. aantal raadszetels
 
 Op drie punten zijn er verschillen in het proces op basis van het aantal raadszetels waar de verkiezing over gaat:
 
@@ -37,7 +37,7 @@ Het resultaat van delingen is een breuk, niet een decimaal.
 
 - Selecteer alle lijsten met \>= 75% van de kiesdeler aan stemmen
 - Overschot = stemtotaal van lijst - (kiesdeler * aantal zetels van de lijst)
-- Ken restzetels toe obv overschotten van hoog naar laag, dus maximaal één zetel per partij
+- Ken restzetels toe o.b.v. overschotten van hoog naar laag, dus maximaal één zetel per partij
 - Bij gelijke overschotten van lijsten en minder restzetels dan lijsten met gelijk overschot: loting in zitting CSB
 
 #### Stelsel grootste gemiddelden
@@ -47,7 +47,7 @@ Het resultaat van delingen is een breuk, niet een decimaal.
   - Gemiddelde is hier het gemiddeld aantal stemmen per toegewezen zetel
   - Voor het berekenen van dit gemiddelde wordt het aantal zetels van een lijst genomen inc. de eventueel toegewezen restzetel
 - Ken de eerste restzetel toe aan de lijst met het hoogste gemiddelde
-- Herbereken het gemiddelde van de lijst die de restzetel kreeg (dus + 2 ipv + 1)
+- Herbereken het gemiddelde van de lijst die de restzetel kreeg (dus + 2 i.p.v. + 1)
 - Ken alle volgende restzetels op dezelfde wijze toe
 - Een lijst kan dus meerdere restzetels toegekend krijgen
   - Bij \>= 19 zetels altijd (er is maar één ronde)
@@ -58,7 +58,7 @@ Het resultaat van delingen is een breuk, niet een decimaal.
 
 - Als een lijst wel volstrekte meerderheid aan stemmen heeft, maar niet volstrekte meerderheid aan zetels, dan een extra zetel
 - Een volstrekte meerderheid van stemmen en zetels wordt berekend als 50% + 1 (bij even totaal) of 50% + ½ (bij oneven totaal)
-  - N.B.: de formele beschrijving vermeldt alleen 50% + 1, die moet nog aangepast worden
+  - N.B. de formele beschrijving vermeldt alleen 50% + 1, die moet nog aangepast worden
 - De zetel wordt afgenomen van de lijst waaraan de laatste restzetel is toegekend
   - Als twee of meer lijsten voor hetzelfde gemiddelde of overschot de laatste restzetels hebben gekregen, dan wordt in de zitting van het CSB door loting bepaald welke van die partijen een zetel af moet geven
   - Sectie 2.4.6 van "Determination of the Election Results" toont aan dat de laatste restzetel nooit van de partij met volstrekte meerderheid aan stemmen kan komen
@@ -80,12 +80,12 @@ Overleden kandidaten worden buiten beschouwing gelaten. (art P19a)
   - \>= 19 raadszetels: 25% van kiesdeler
   - < 19 raadszetels: 50% van kiesdeler
 - Selecteer kandidaten die voorkeursdrempel gehaald hebben
-- Ken zetels toe op volgorde van aantal behaalde stemmen (tot aantal behaalde zetels vd lijst)
+- Ken zetels toe op volgorde van aantal behaalde stemmen (tot aantal behaalde zetels van de lijst)
 - Bij gelijke aantallen stemmen maar minder zetels: loting in zitting CSB
 
 ### 2. Aanwijzing van de overige gekozen kandidaten (art P 17)
 
-- Resterende zetels toegekend obv volgorde in de lijst
+- Resterende zetels toegekend o.b.v. volgorde in de lijst
 
 ### 3. Rangschikking van de kandidaten op de kandidatenlijsten (art P 19)
 

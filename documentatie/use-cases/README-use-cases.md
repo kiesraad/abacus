@@ -40,7 +40,7 @@ Waarom deze werkwijze nuttig kan zijn:
 
 ## Use case template
 
-De meest minimale versie van een use case bestaat uit scope, niveau en beschrijving. De onderstaande lijst met minimale en optionele velden is dus niet definitief en kan aangepast worden. We kunnen ook velden toevoegen, zoals "verkiezingen" (voor welke verkiezingen geldt deze use case?) of input/output-bestanden (EML's, PV's, CSV's, ...)
+De meest minimale versie van een use case bestaat uit scope, niveau en beschrijving. De onderstaande lijst met minimale en optionele velden is dus niet definitief en kan aangepast worden. We kunnen ook velden toevoegen, zoals "verkiezingen" (voor welke verkiezingen geldt deze use case?) of input/output-bestanden (EMLs, PV's, CSV's, ...)
 
 ### Minimale velden
 
@@ -50,7 +50,7 @@ __Niveau:__
 - Hoog-over (vlieger) 🪁
 - Gebruikersdoel (zee) 🌊
   - 1 persoon, 1 sessie (ca. 2-20 minuten)
-  - Dit is het deale niveau voor use cases.
+  - Dit is het ideale niveau voor use cases.
 - Subfunctie (vis) 🐟
   - Schrijf deze alleen wanneer dit echt nodig is.
 - Te laag (schelp) 🐚

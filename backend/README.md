@@ -50,8 +50,7 @@ The following dependencies (crates) are used:
 - `clap`: library for command-line argument parsing.
 - `hyper`: fast and correct HTTP implementation.
 - `memory-serve`: serves frontend assets from memory, but ad-hoc from disk during development.
-- `utoipa`: library for documenting REST APIs using OpenAPI.
-- `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
+- `quick-xml`: reading and writing EML_NL XML files.
 - `serde`: framework for serializing and deserializing data structures.
 - `serde_json`: JSON support for Serde.
 - `sqlx`: async SQL library featuring compile-time checked queries.
@@ -62,6 +61,8 @@ The following dependencies (crates) are used:
 - `tracing-subscriber`: utilities for implementing and composing `tracing` subscribers.
 - `typst`: a new markup-based typesetting system that is powerful and easy to learn.
 - `typst-pdf`: a PDF exporter for Typst.
+- `utoipa`: library for documenting REST APIs using OpenAPI.
+- `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 
 Additionally, the following development dependencies are used:
 

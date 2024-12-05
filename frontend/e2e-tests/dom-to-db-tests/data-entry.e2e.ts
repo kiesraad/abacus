@@ -103,9 +103,11 @@ test.describe("full data entry flow", () => {
     await fillDataEntryNoRecountNoDifferences(page);
 
     await expect(pollingStationChoicePage.alert.first()).toHaveText(
-      "Je invoer is opgeslagen" +
-        "Geef het papieren proces-verbaal terug aan de coördinator." +
+      [
+        "Je invoer is opgeslagen",
+        "Geef het papieren proces-verbaal terug aan de coördinator.",
         "Een andere invoerder doet straks de tweede invoer.",
+      ].join(""),
     );
   });
 
@@ -410,7 +412,7 @@ test.describe("second data entry", () => {
 
     await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
     await expect(pollingStationChoicePage.alert.first()).toHaveText(
-      "Je invoer is opgeslagen" + "Geef het papieren proces-verbaal terug aan de coördinator.",
+      ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
 
     await expect(pollingStationChoicePage.fieldsetNextPollingStation).toBeVisible();

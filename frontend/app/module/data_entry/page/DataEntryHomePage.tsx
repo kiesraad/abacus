@@ -7,6 +7,7 @@ import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { DEFAULT_CANCEL_REASON, useElection, useElectionStatus } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { Alert, PageTitle, WorkStationNumber } from "@kiesraad/ui";
 
 export function DataEntryHomePage() {
@@ -34,9 +35,9 @@ export function DataEntryHomePage() {
 
   return (
     <>
-      <PageTitle title="Kies een stembureau - Abacus" />
+      <PageTitle title={`${t("data_entry.pick_polling_sation")} - Abacus`} />
       <NavBar>
-        <Link to={"/elections"}>Overzicht</Link>
+        <Link to={"/elections"}>{t("overview")}</Link>
       </NavBar>
       <header>
         <section>
@@ -48,23 +49,20 @@ export function DataEntryHomePage() {
       </header>
       {showDataEntrySavedAlert && (
         <Alert type="success" onClose={closeDataEntrySavedAlert}>
-          <h2>Je invoer is opgeslagen</h2>
+          <h2>{t("data_entry.entry_saved")}</h2>
           <p>
-            Geef het papieren proces-verbaal terug aan de coördinator.
+            {t("data_entry.success.return_paper")}
             <br />
-            Een andere invoerder doet straks de tweede invoer.
+            {t("data_entry.success.second_entry_info")}
           </p>
         </Alert>
       )}
       {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">
-          <h2>Alle stembureaus zijn ingevoerd</h2>
-          <p>Bedankt voor je hulp!</p>
-          <p>
-            De resultaten van alle stembureaus kunnen nu opgeteld gaan worden om de uitslag van de {election.name} vast
-            te stellen.
-          </p>
-          <p>Wacht op instructies van de coördinator.</p>
+          <h2>{t("data_entry.completed.all_entries_completed")}</h2>
+          <p>{t("data_entry.completed.thank_you")}</p>
+          <p>{t("data_entry.completed.info")}</p>
+          <p>{t("data_entry.completed.wait_for_instructions")}</p>
         </Alert>
       )}
       <main>

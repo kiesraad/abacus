@@ -92,22 +92,26 @@ pub fn eml_document_hash(input: &str, chunked: bool) -> String {
     let digest = sha2::Sha256::digest(input.as_bytes());
 
     // This can never fail unless `Sha256::output_size()` would give a wrong value
-    const_hex::encode_to_slice_upper(digest, &mut bytes)
-        .expect("Hashing output has unexpected length");
+    hex::encode_to_slice(digest, &mut bytes).expect("Hashing output has unexpected length");
+
+    fn to_upper_char(c: u8) -> char {
+        let c = char::from(c);
+        c.to_ascii_uppercase()
+    }
 
     if chunked {
         let mut iter = bytes.into_iter();
         let chunks_iter = std::iter::from_fn(move || {
             let chunk = iter.by_ref().take(4);
             if chunk.len() > 0 {
-                Some(chunk.map(char::from).collect::<String>())
+                Some(chunk.map(to_upper_char).collect::<String>())
             } else {
                 None
             }
         });
         chunks_iter.collect::<Vec<_>>().join(" ")
     } else {
-        bytes.into_iter().map(char::from).collect::<String>()
+        bytes.into_iter().map(to_upper_char).collect::<String>()
     }
 }
 

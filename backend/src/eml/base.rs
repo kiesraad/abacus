@@ -143,4 +143,19 @@ mod tests {
         assert_eq!(doc.base.id, "test-id");
         assert_eq!(doc.base.schema_version, "5");
     }
+
+    #[test]
+    fn test_eml_document_hash() {
+        let input = "test";
+        let hash = eml_document_hash(input, false);
+        assert_eq!(
+            hash,
+            "9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08"
+        );
+        let hash = eml_document_hash(input, true);
+        assert_eq!(
+            hash,
+            "9F86 D081 884C 7D65 9A2F EAA0 C55A D015 A3BF 4F1B 2B0B 822C D15D 6C15 B0F0 0A08"
+        );
+    }
 }

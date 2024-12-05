@@ -215,3 +215,24 @@ async fn test_election_pdf_download(pool: SqlitePool) {
     // But the header should also contain ".pdf"
     assert!(content_disposition_string.contains(".pdf"));
 }
+
+#[sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("elections", "polling_stations", "polling_station_results")
+))]
+async fn test_election_xml_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/4/download_xml_results");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let content_type = response.headers().get("Content-Type");
+
+    // Ensure the response is what we expect
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "text/xml");
+
+    let body = response.text().await.unwrap();
+    assert!(body.contains("<Election>"));
+    assert!(body.contains("<ValidVotes>125</ValidVotes>"));
+}

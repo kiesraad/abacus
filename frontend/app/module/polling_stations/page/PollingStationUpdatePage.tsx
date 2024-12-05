@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { PollingStationForm } from "app/component/form/polling_station/PollingStationForm";
@@ -17,13 +16,13 @@ export function PollingStationUpdatePage() {
   const navigate = useNavigate();
 
   const { requestState } = usePollingStationGet(pollingStationId);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
   function toggleShowDeleteModal() {
     setShowDeleteModal(!showDeleteModal);
   }
 
-  const [error, setError] = useState<[string, string] | undefined>(undefined);
+  const [error, setError] = React.useState<[string, string] | undefined>(undefined);
 
   function closeError() {
     setError(undefined);

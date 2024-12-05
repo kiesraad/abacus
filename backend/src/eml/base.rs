@@ -94,24 +94,19 @@ pub fn eml_document_hash(input: &str, chunked: bool) -> String {
     // This can never fail unless `Sha256::output_size()` would give a wrong value
     hex::encode_to_slice(digest, &mut bytes).expect("Hashing output has unexpected length");
 
-    fn to_upper_char(c: u8) -> char {
-        let c = char::from(c);
-        c.to_ascii_uppercase()
-    }
-
     if chunked {
         let mut iter = bytes.into_iter();
         let chunks_iter = std::iter::from_fn(move || {
             let chunk = iter.by_ref().take(4);
             if chunk.len() > 0 {
-                Some(chunk.map(to_upper_char).collect::<String>())
+                Some(chunk.map(char::from).collect::<String>())
             } else {
                 None
             }
         });
         chunks_iter.collect::<Vec<_>>().join(" ")
     } else {
-        bytes.into_iter().map(to_upper_char).collect::<String>()
+        bytes.into_iter().map(char::from).collect::<String>()
     }
 }
 
@@ -154,12 +149,12 @@ mod tests {
         let hash = eml_document_hash(input, false);
         assert_eq!(
             hash,
-            "9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08"
+            "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
         );
         let hash = eml_document_hash(input, true);
         assert_eq!(
             hash,
-            "9F86 D081 884C 7D65 9A2F EAA0 C55A D015 A3BF 4F1B 2B0B 822C D15D 6C15 B0F0 0A08"
+            "9f86 d081 884c 7d65 9a2f eaa0 c55a d015 a3bf 4f1b 2b0b 822c d15d 6c15 b0f0 0a08"
         );
     }
 }

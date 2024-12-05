@@ -3,7 +3,7 @@
 #let input = json("inputs/model-na-31-2.json")
 
 #show: doc => conf(input, doc, footer: [
-  Datum: #input.creation_date_time, SHA-256-Hashcode: \
+  #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
   #input.hash
 ])
 

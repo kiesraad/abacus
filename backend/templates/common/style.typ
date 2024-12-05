@@ -11,9 +11,9 @@
       columns: (1fr, auto),
       gutter: 3pt,
       [#footer],
-      [
+      align(end + top, [
         pagina #counter(page).display("1 / 1", both: true)
-      ]
+      ]),
     )),
   )
 

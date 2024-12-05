@@ -113,9 +113,9 @@ pub(crate) mod tests {
             },
             polling_stations: vec![],
             summary: ElectionSummary::zero(),
-            hash: "ED36 60EB 017A 0D3A D3EF 72B1 6865 F991 A36A 9F92 72D9 1516 39CD 422B 4756 D161"
+            hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
                 .to_string(),
-            creation_date_time: "04-12-2024 12:08:55".to_string(),
+            creation_date_time: "04-12-2024 12:08".to_string(),
         }))
         .unwrap();
 
@@ -129,9 +129,9 @@ pub(crate) mod tests {
             polling_stations: polling_stations_fixture(&election, &[100, 200, 300]),
             election,
             summary: ElectionSummary::zero(),
-            hash: "ED36 60EB 017A 0D3A D3EF 72B1 6865 F991 A36A 9F92 72D9 1516 39CD 422B 4756 D161"
+            hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
                 .to_string(),
-            creation_date_time: "04-12-2024 12:08:55".to_string(),
+            creation_date_time: "04-12-2024 12:08".to_string(),
         }))
         .unwrap();
 

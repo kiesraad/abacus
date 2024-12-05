@@ -146,7 +146,7 @@ pub async fn election_download_results(
         summary,
         election,
         hash,
-        creation_date_time: creation_date_time.format("%d-%m-%Y %H:%M:%S").to_string(),
+        creation_date_time: creation_date_time.format("%d-%m-%Y %H:%M").to_string(),
     });
     let mut filename: String = model.as_filename().to_string();
     filename.push_str(".pdf");

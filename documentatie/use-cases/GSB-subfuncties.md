@@ -67,6 +67,6 @@ __hoofdscenario__:
 2. De applicatie controleert dat de bewerking aan de validaties voldoet.
 
 __uitbreidingen__:
-2a. (bij verwijderen) er is al invoer of een resultaat voor het stembureau:
+2a. (bij verwijderen) Er is al invoer of een resultaat voor het stembureau:
 &emsp; 2a1. De applicatie geeft aan dat het stembureau niet verwijderd kan worden.
 

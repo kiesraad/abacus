@@ -115,6 +115,8 @@ Abacus telt de resultaten op en controleert ze.
 
 ### Technische keuzes en architectuur
 
+Abacus zal worden gedraaid op een gesloten netwerk zonder internettoegang. De backend draait op één machine en kan via de webbrowser (frontend) worden benaderd vanaf andere computers op het netwerk.
+
 De software wordt gebruikt via de webbrowser, en dit doen we met HTML, CSS en JavaScript. Hiervoor gebruiken we TypeScript, een meer uitgebreide versie van JavaScript met typing. Voor de gebruikersinterface gebruiken we de populaire library React.
 
 Voor de backend gebruiken we Rust, een high-level programmeertaal waarmee je efficiënt kunt programmeren. Ook heeft deze taal een 'strict type system' waardoor minder bugs ontstaan. Ook is dit een populaire, open-source programmeertaal met een grote community.

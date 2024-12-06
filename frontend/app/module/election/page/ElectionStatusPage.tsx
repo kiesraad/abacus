@@ -77,7 +77,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
     case "definitive":
       return <CategoryHeader>{[finishedAtColumn]}</CategoryHeader>;
     default:
-      return <CategoryHeader></CategoryHeader>;
+      return <CategoryHeader />;
   }
 }
 
@@ -134,7 +134,7 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
     case "definitive":
       return <CategoryPollingStationRow key={polling_station.id}>{[finishedAtCell]}</CategoryPollingStationRow>;
     default:
-      return <CategoryPollingStationRow key={polling_station.id}></CategoryPollingStationRow>;
+      return <CategoryPollingStationRow key={polling_station.id} />;
   }
 }
 

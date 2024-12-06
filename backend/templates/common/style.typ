@@ -1,4 +1,4 @@
-#let conf(input, doc) = [
+#let conf(input, doc, footer: none) = [
   #set text(
     font: "DM Sans",
     size: 9pt
@@ -7,6 +7,14 @@
     paper: "a4",
     margin: (x: 2.0cm, y: 1.5cm),
     numbering: "1 / 1",
+    footer: context(grid(
+      columns: (1fr, auto),
+      gutter: 3pt,
+      [#footer],
+      align(end + top, [
+        pagina #counter(page).display("1 / 1", both: true)
+      ]),
+    )),
   )
 
   #set heading(numbering: "1a. ")

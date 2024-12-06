@@ -1,5 +1,5 @@
 pub use base::*;
-use chrono::{Datelike, Local};
+use chrono::Datelike;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -32,6 +32,7 @@ impl EML510 {
         election: &crate::election::Election,
         results: &[(PollingStation, PollingStationResults)],
         summary: &ElectionSummary,
+        creation_date_time: &chrono::DateTime<chrono::Local>,
     ) -> EML510 {
         let authority_id = "0000".to_string(); // TODO: replace with actual authority id from election definition (i.e. data from election tree)
         let total_votes = TotalVotes::from_summary(election, summary);
@@ -79,7 +80,8 @@ impl EML510 {
                 },
                 authority_address: AuthorityAddress {},
             },
-            creation_date_time: Local::now().to_rfc3339(),
+            creation_date_time: creation_date_time
+                .to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
             count,
         }
     }

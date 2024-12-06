@@ -62,7 +62,7 @@ describe("PollingStationForm", () => {
       });
     });
 
-    test.only("Validation", async () => {
+    test("Validation", async () => {
       const testObj: Omit<PollingStation, "id"> = {
         election_id: 1,
         number: 42,
@@ -78,7 +78,8 @@ describe("PollingStationForm", () => {
       const onSaved = vi.fn();
       render(<PollingStationForm electionId={1} onSaved={onSaved} />);
 
-      await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+      const user = userEvent.setup();
+      await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
       const numberInput = screen.getByRole("textbox", { name: "Nummer" });
       const nameInput = screen.getByRole("textbox", { name: "Naam" });
@@ -90,7 +91,6 @@ describe("PollingStationForm", () => {
       const localityInput = screen.getByRole("textbox", { name: "Plaats" });
       const typeInputOption = screen.getByRole("radio", { name: "Vaste locatie" });
 
-      const user = userEvent.setup();
       await user.click(typeInputOption);
 
       await waitFor(() => {
@@ -111,7 +111,7 @@ describe("PollingStationForm", () => {
       await user.type(localityInput, testObj.locality);
       await user.type(numberOfVotersInput, testObj.number_of_voters?.toString() || "");
 
-      await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+      await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
       await waitFor(() => {
         expect(numberInput).toHaveAttribute("aria-invalid", "true");
@@ -124,24 +124,25 @@ describe("PollingStationForm", () => {
         expect(houseNumberAdditionInput).toHaveAttribute("aria-invalid", "false");
       });
 
-      // TODO: this part doesnt work
-      // overrideOnce("post", `/api/elections/1/polling-stations`, 409, {
-      //   error: "Polling station already exists",
-      //   fatal: false,
-      //   reference: "EntryNotUnique",
-      // } satisfies ErrorResponse);
+      overrideOnce("post", `/api/elections/1/polling_stations`, 409, {
+        error: "Polling station already exists",
+        fatal: false,
+        reference: "EntryNotUnique",
+      } satisfies ErrorResponse);
 
-      // await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+      await user.type(numberInput, "1");
+      await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
-      // await waitFor(() => {
-      //   expect(screen.getByTestId("testt")).toBeInTheDocument();
-      //   expect(alert).toHaveTextContent("Er bestaat al een stembureau met nummer 1.");
-      // });
+      await waitFor(() => {
+        expect(screen.getByRole("alert")).toHaveTextContent(
+          ["Er bestaat al een stembureau met nummer 1.", "Het nummer van het stembureau moet uniek zijn."].join(""),
+        );
+      });
 
       await user.clear(numberInput);
       await user.type(numberInput, testObj.number.toString());
 
-      await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+      await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
       await waitFor(() => {
         expect(onSaved).toHaveBeenCalledWith(expect.objectContaining(testObj));

@@ -30,7 +30,7 @@ export function OverviewPage() {
 
   return (
     <>
-      <PageTitle title={`${t("overview")} - Abacus`} />
+      <PageTitle title={`${t("election.title.overview")} - Abacus`} />
       <NavBar>
         <span className={isAdministrator ? "active" : ""}>
           {isAdministrator ? t("election.title.plural") : t("overview")}

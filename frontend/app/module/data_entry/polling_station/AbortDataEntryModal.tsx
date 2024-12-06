@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { ApiError, ApiResult, usePollingStationFormController } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
+import { t, tx } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
 export interface AbortDataEntryModalProps {
@@ -47,7 +47,7 @@ export function AbortDataEntryModal({ onCancel, onSave, onDelete }: AbortDataEnt
 
   return (
     <Modal title={t("data_entry.abort.title")} onClose={onCancel}>
-      {t("data_entry.abort.description")}
+      {tx("data_entry.abort.description")}
       <nav>
         <Button size="lg" onClick={onAbortModalSave} disabled={saving}>
           {t("data_entry.abort.save_input")}

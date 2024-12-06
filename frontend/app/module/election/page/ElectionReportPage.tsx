@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
+import { t, tx } from "@kiesraad/i18n";
 import { Button, PageTitle } from "@kiesraad/ui";
 
 import cls from "./ElectionReportPage.module.css";
@@ -74,7 +74,7 @@ export function ElectionReportPage() {
           <h2 className="form_title">{t("election_report.finish_data_entry_phase")}</h2>
           <div className={cls.reportInfoSection}>
             {t("election_report.about_to_stop_data_entry")}
-            {t("election_report.data_entry_finish_steps_explanation")}
+            {tx("election_report.data_entry_finish_steps_explanation")}
             {t("election_report.for_recount_new_session_needed")}
           </div>
           <Button onClick={downloadResults}>{t("election_report.download_report")}</Button>

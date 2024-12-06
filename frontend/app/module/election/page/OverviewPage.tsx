@@ -64,14 +64,14 @@ export function OverviewPage() {
           <Table id="overview">
             <Table.Header>
               <Table.Column>{t("election.title.singular")}</Table.Column>
-              <Table.Column>{t(`election.polling_station.${isAdministrator ? "level" : "location"}`)}</Table.Column>
+              <Table.Column>{t(`election.${!isAdministrator ? "location" : "level_polling_station"}`)}</Table.Column>
               <Table.Column>{t("election_status.label")}</Table.Column>
             </Table.Header>
             <Table.Body>
               {electionList.map((election) => (
                 <Table.LinkRow key={election.id} to={electionLink(election)}>
                   <Table.Cell fontSizeClass="fs-body">{election.name}</Table.Cell>
-                  <Table.Cell fontSizeClass="fs-md">{election.location}</Table.Cell>
+                  <Table.Cell fontSizeClass="fs-md">{!isAdministrator ? election.location : ""}</Table.Cell>
                   <Table.Cell fontSizeClass="fs-md">
                     <ElectionStatusWithIcon
                       status={election.status}

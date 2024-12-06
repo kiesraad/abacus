@@ -55,7 +55,7 @@ export function DevHomePage() {
               </li>
               <li>
                 <Link to={`/elections/3/polling-stations#coordinator`}>
-                  {t("polling_station.title.plural")} {t("election.title.singular")} 3 (leeg)
+                  {t("polling_station.title.plural")} {t("election.title.singular")} 3 ({t("empty")})
                 </Link>
               </li>
             </ul>

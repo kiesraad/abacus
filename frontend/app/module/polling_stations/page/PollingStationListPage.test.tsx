@@ -6,13 +6,17 @@ import { describe, expect, test, vi } from "vitest";
 import { PollingStationListPage } from "app/module/polling_stations";
 import { overrideOnce, render } from "app/test/unit";
 
-import { PollingStationListResponse } from "@kiesraad/api";
+import { ElectionProvider, PollingStationListResponse } from "@kiesraad/api";
 
 describe("PollingStationListPage", () => {
   test("Show polling stations", async () => {
     vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1" });
 
-    render(<PollingStationListPage />);
+    render(
+      <ElectionProvider electionId={1}>
+        <PollingStationListPage />
+      </ElectionProvider>,
+    );
 
     expect(await screen.findByRole("table")).toBeVisible();
 
@@ -41,13 +45,17 @@ describe("PollingStationListPage", () => {
   });
 
   test("Show no polling stations message", async () => {
-    overrideOnce("get", "/api/elections/42/polling_stations", 200, {
+    overrideOnce("get", "/api/elections/1/polling_stations", 200, {
       polling_stations: [],
     } satisfies PollingStationListResponse);
 
-    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "42" });
+    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1" });
 
-    render(<PollingStationListPage />);
+    render(
+      <ElectionProvider electionId={1}>
+        <PollingStationListPage />
+      </ElectionProvider>,
+    );
 
     expect(await screen.findByText(/Er zijn nog geen stembureaus ingevoerd/)).toBeVisible();
     expect(screen.queryByRole("table")).toBeNull();

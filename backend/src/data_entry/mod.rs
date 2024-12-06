@@ -473,7 +473,6 @@ mod tests {
             .fetch_all(&pool)
             .await
             .unwrap();
-        println!("{:?}", rows);
         assert_eq!(rows.len(), 2);
         let first_entry = rows.iter().find(|row| row.entry_number == 1).unwrap();
         let second_entry = rows.iter().find(|row| row.entry_number == 2).unwrap();

@@ -145,8 +145,13 @@ describe("Test PollingStationChoiceForm", () => {
       // Test if the polling station name is shown
       await user.type(pollingStation, "34");
 
-      // Click submit again and see that the alert appeared again
+      // Click submit and see that the alert appears
       await user.click(submitButton);
+
+      // Test if the warning message is shown correctly
+      expect(screen.getByTestId("pollingStationSelectorFeedback").textContent).toBe(
+        "Stembureau 34 (Testplek) is al twee keer ingevoerd",
+      );
 
       expect(
         within(screen.getByTestId("pollingStationSubmitFeedback")).getByText(

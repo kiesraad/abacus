@@ -34,32 +34,121 @@ async function fillForm(user: UserEvent, testPollingStation: PollingStation | Om
   await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 }
 
-describe("PollingStationForm create", () => {
-  test("PollingStationForm create", async () => {
-    const testPollingStation: Omit<PollingStation, "id"> = {
-      election_id: 1,
-      number: 1,
-      name: "test",
-      street: "test",
-      postal_code: "1234",
-      locality: "test",
-      polling_station_type: "FixedLocation",
-      number_of_voters: 1,
-      house_number: "test",
-    };
+describe("PollingStationForm", () => {
+  describe("PollingStationForm create", () => {
+    test("Succesful create", async () => {
+      const testPollingStation: Omit<PollingStation, "id"> = {
+        election_id: 1,
+        number: 1,
+        name: "test",
+        street: "test",
+        postal_code: "1234",
+        locality: "test",
+        polling_station_type: "FixedLocation",
+        number_of_voters: 1,
+        house_number: "test",
+      };
 
-    const onSaved = vi.fn();
-    render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+      const onSaved = vi.fn();
+      render(<PollingStationForm electionId={1} onSaved={onSaved} />);
 
-    const user = userEvent.setup();
-    await fillForm(user, testPollingStation);
+      const user = userEvent.setup();
+      await fillForm(user, testPollingStation);
 
-    await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+      await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
-    await waitFor(() => {
-      expect(onSaved).toHaveBeenCalledWith(expect.objectContaining(testPollingStation));
+      await waitFor(() => {
+        expect(onSaved).toHaveBeenCalledWith(expect.objectContaining(testPollingStation));
+      });
+    });
+
+    test.only("Validation", async () => {
+      const testObj: Omit<PollingStation, "id"> = {
+        election_id: 1,
+        number: 42,
+        name: "test",
+        street: "test",
+        postal_code: "1234",
+        locality: "test",
+        polling_station_type: "FixedLocation",
+        number_of_voters: 1,
+        house_number: "test",
+      };
+
+      const onSaved = vi.fn();
+      render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+
+      await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+      const numberInput = screen.getByRole("textbox", { name: "Nummer" });
+      const nameInput = screen.getByRole("textbox", { name: "Naam" });
+      const numberOfVotersInput = screen.getByRole("textbox", { name: "Aantal kiesgerechtigden Optioneel" });
+      const streetInput = screen.getByRole("textbox", { name: "Straatnaam" });
+      const houseNumberInput = screen.getByRole("textbox", { name: "Huisnummer" });
+      const houseNumberAdditionInput = screen.getByRole("textbox", { name: "Toevoeging" });
+      const postalCodeInput = screen.getByRole("textbox", { name: "Postcode" });
+      const localityInput = screen.getByRole("textbox", { name: "Plaats" });
+      const typeInputOption = screen.getByRole("radio", { name: "Vaste locatie" });
+
+      const user = userEvent.setup();
+      await user.click(typeInputOption);
+
+      await waitFor(() => {
+        expect(numberInput).toHaveAttribute("aria-invalid", "true");
+        expect(nameInput).toHaveAttribute("aria-invalid", "true");
+        expect(streetInput).toHaveAttribute("aria-invalid", "true");
+        expect(houseNumberInput).toHaveAttribute("aria-invalid", "true");
+        expect(postalCodeInput).toHaveAttribute("aria-invalid", "true");
+        expect(localityInput).toHaveAttribute("aria-invalid", "true");
+        expect(numberOfVotersInput).toHaveAttribute("aria-invalid", "false");
+        expect(houseNumberAdditionInput).toHaveAttribute("aria-invalid", "false");
+      });
+
+      await user.type(nameInput, testObj.name);
+      await user.type(streetInput, testObj.street);
+      await user.type(houseNumberInput, testObj.house_number);
+      await user.type(postalCodeInput, testObj.postal_code);
+      await user.type(localityInput, testObj.locality);
+      await user.type(numberOfVotersInput, testObj.number_of_voters?.toString() || "");
+
+      await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+      await waitFor(() => {
+        expect(numberInput).toHaveAttribute("aria-invalid", "true");
+        expect(nameInput).toHaveAttribute("aria-invalid", "false");
+        expect(streetInput).toHaveAttribute("aria-invalid", "false");
+        expect(houseNumberInput).toHaveAttribute("aria-invalid", "false");
+        expect(postalCodeInput).toHaveAttribute("aria-invalid", "false");
+        expect(localityInput).toHaveAttribute("aria-invalid", "false");
+        expect(numberOfVotersInput).toHaveAttribute("aria-invalid", "false");
+        expect(houseNumberAdditionInput).toHaveAttribute("aria-invalid", "false");
+      });
+
+      // TODO: this part doesnt work
+      // overrideOnce("post", `/api/elections/1/polling-stations`, 409, {
+      //   error: "Polling station already exists",
+      //   fatal: false,
+      //   reference: "EntryNotUnique",
+      // } satisfies ErrorResponse);
+
+      // await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+      // await waitFor(() => {
+      //   expect(screen.getByTestId("testt")).toBeInTheDocument();
+      //   expect(alert).toHaveTextContent("Er bestaat al een stembureau met nummer 1.");
+      // });
+
+      await user.clear(numberInput);
+      await user.type(numberInput, testObj.number.toString());
+
+      await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+      await waitFor(() => {
+        expect(onSaved).toHaveBeenCalledWith(expect.objectContaining(testObj));
+      });
     });
   });
+
   test("PollingStationForm update", async () => {
     const testPollingStation: PollingStation = {
       id: 1,

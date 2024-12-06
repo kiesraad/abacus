@@ -13,6 +13,7 @@ export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElem
   error?: string;
   margin?: boolean;
   numberInput?: boolean;
+  hideErrorMessage?: boolean;
 }
 
 export function InputField({
@@ -29,6 +30,7 @@ export function InputField({
   margin = true,
   autoFocus,
   numberInput,
+  hideErrorMessage,
   ...InputFieldProps
 }: InputFieldProps) {
   let inputEl: React.ReactNode;
@@ -69,7 +71,7 @@ export function InputField({
         </span>
         {disabled ? <div className={`${fieldSize} disabled_input`}>{value}</div> : inputEl}
       </label>
-      {(error || hint) && (
+      {!hideErrorMessage && (error || hint) && (
         <span id={`${name}-hint_or_error`} className={error ? "error" : "hint"}>
           {error || hint || <>&nbsp;</>}
         </span>

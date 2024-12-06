@@ -41,5 +41,15 @@
   "totals_list": "Totaal lijst {group_number}",
   "typist": "Invoerder",
   "version": "Versie",
-  "vote_count": "Aantal stemmen"
+  "vote_count": "Aantal stemmen",
+  "form": {
+    "errors": {
+      "FORM_VALIDATION_RESULT_REQUIRED": "Dit veld is verplicht",
+      "FORM_VALIDATION_RESULT_MIN_LENGTH": "Waarde is te kort",
+      "FORM_VALIDATION_RESULT_MAX_LENGTH": "Waarde is te lang",
+      "FORM_VALIDATION_RESULT_INVALID_TYPE": "Niet het juiste type",
+      "FORM_VALIDATION_RESULT_MIN": "Waarde is te laag",
+      "FORM_VALIDATION_RESULT_MAX": "Waarde is te hoog"
+    }
+  }
 }

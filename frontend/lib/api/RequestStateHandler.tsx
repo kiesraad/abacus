@@ -1,12 +1,14 @@
+import { ReactNode } from "react";
+
 import { TranslationPath } from "@kiesraad/i18n";
 import { Loader } from "@kiesraad/ui";
 
 import { NotFoundError } from "./ApiError";
 import { ApiRequestState } from "./useApiRequest";
 
-interface RequestStateHandlerrops<T> {
+interface RequestStateHandlerProps<T> {
   requestState: ApiRequestState<T>;
-  renderOnSuccess: (data: T) => React.ReactNode;
+  renderOnSuccess: (data: T) => ReactNode;
   notFoundMessage?: TranslationPath;
   isFoundCheck?: (data: T) => boolean;
 }
@@ -16,7 +18,7 @@ export default function RequestStateHandler<T>({
   renderOnSuccess,
   notFoundMessage,
   isFoundCheck,
-}: RequestStateHandlerrops<T>) {
+}: RequestStateHandlerProps<T>) {
   if (requestState.status === "loading") {
     return <Loader />;
   }

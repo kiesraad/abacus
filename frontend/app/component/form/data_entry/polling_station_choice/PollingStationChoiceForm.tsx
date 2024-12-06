@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
-import { t, tx } from "@kiesraad/i18n";
+import { t } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
@@ -106,11 +106,11 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           setAlert={setAlert}
           handleSubmit={handleSubmit}
         />
-        <p className="md">{tx("polling_station_choice.name_correct_warning")}</p>
+        <p className="md">{t("polling_station_choice.name_correct_warning")}</p>
         {alert && (
           <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
             <span className={cls.icon}>
-              <Icon icon={<IconError aria-label={t("polling_station_choice.contains_error")} />} color="error" />
+              <Icon icon={<IconError aria-label={t("contains_error")} />} color="error" />
             </span>
             <span>{alert}</span>
           </div>

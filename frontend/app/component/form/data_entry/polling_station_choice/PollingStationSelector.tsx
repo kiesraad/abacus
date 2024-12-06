@@ -73,7 +73,7 @@ export function PollingStationSelector({
             return (
               <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.error)}>
                 <span className={cls.icon}>
-                  <Icon icon={<IconError aria-label={t("polling_station_choice.contains_error")} />} color="error" />
+                  <Icon icon={<IconError aria-label={t("contains_error")} />} color="error" />
                 </span>
                 <span>
                   {t("polling_station_choice.no_polling_station_found_with_number", {

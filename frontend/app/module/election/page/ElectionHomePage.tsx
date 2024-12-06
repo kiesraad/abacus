@@ -33,7 +33,7 @@ export function ElectionHomePage() {
               <Link to={`status#coordinator`}>{t("election.status")}</Link>
             </li>
             <li>
-              <Link to={`polling-stations#coordinator`}>{t("election.polling_stations")}</Link>
+              <Link to={`polling-stations#coordinator`}>{t("polling_station.title.plural")}</Link>
             </li>
           </ul>
           {__API_MSW__ && <MockTest />}

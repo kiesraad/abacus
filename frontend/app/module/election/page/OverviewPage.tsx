@@ -30,9 +30,11 @@ export function OverviewPage() {
 
   return (
     <>
-      <PageTitle title="Overzicht verkiezingen - Abacus" />
+      <PageTitle title={`${t("overview")} - Abacus`} />
       <NavBar>
-        <span className={isAdministrator ? "active" : ""}>{isAdministrator ? "Verkiezingen" : "Overzicht"}</span>
+        <span className={isAdministrator ? "active" : ""}>
+          {isAdministrator ? t("election.title.plural") : t("overview")}
+        </span>
         {isAdministrator && (
           <>
             <Link to={"/users#administratorcoordinator"}>{t("users")}</Link>
@@ -43,7 +45,7 @@ export function OverviewPage() {
       </NavBar>
       <header>
         <section>
-          <h1>{isAdministrator ? t("manage_elections") : t("election.elections")}</h1>
+          <h1>{t(`election.${isAdministrator ? "manage" : "title.plural"}`)}</h1>
         </section>
         {!isAdministrator && (
           <section>
@@ -61,15 +63,15 @@ export function OverviewPage() {
         <article>
           <Table id="overview">
             <Table.Header>
-              <Table.Column>{t("election.election")}</Table.Column>
-              {isAdministrator && <Table.Column>{t("role")}</Table.Column>}
+              <Table.Column>{t("election.title.singular")}</Table.Column>
+              <Table.Column>{t(`election.polling_station.${isAdministrator ? "level" : "location"}`)}</Table.Column>
               <Table.Column>{t("election_status.label")}</Table.Column>
             </Table.Header>
             <Table.Body>
               {electionList.map((election) => (
                 <Table.LinkRow key={election.id} to={electionLink(election)}>
                   <Table.Cell fontSizeClass="fs-body">{election.name}</Table.Cell>
-                  {isAdministrator && <Table.Cell fontSizeClass="fs-md"></Table.Cell>}
+                  <Table.Cell fontSizeClass="fs-md">{election.location}</Table.Cell>
                   <Table.Cell fontSizeClass="fs-md">
                     <ElectionStatusWithIcon
                       status={election.status}

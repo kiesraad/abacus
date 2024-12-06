@@ -17,6 +17,8 @@ dev-database = []
 name = "gen-openapi"
 required-features = ["openapi"]
 
+# Note: if you add a dependency here, please update the README.md for the backend as well.
+
 [dependencies]
 axum = { version = "0.7", features = ["macros", "tracing"] }
 axum-extra = { version = "0.9.6", default-features = false, features = ["attachment"] }

@@ -8,9 +8,9 @@ import { PageTitle } from "@kiesraad/ui";
 export function WorkstationsHomePage() {
   return (
     <>
-      <PageTitle title="Invoerstations - Abacus" />
+      <PageTitle title={`${t("workstations.entry_stations")} - Abacus`} />
       <NavBar>
-        <Link to={"/elections#administrator"}>{t("election.elections")}</Link>
+        <Link to={"/elections#administrator"}>{t("election.title.plural")}</Link>
         <Link to={"/users#administratorcoordinator"}>{t("users")}</Link>
         <span className="active">{t("workstations.workstations")}</span>
         <Link to={"/logs#administratorcoordinator"}>{t("logs")}</Link>

@@ -1,3 +1,4 @@
+import { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { t } from "@kiesraad/i18n";
@@ -14,7 +15,7 @@ interface AccountSetupFormElement extends HTMLFormElement {
 
 export function AccountSetupForm() {
   const navigate = useNavigate();
-  function handleSubmit(event: React.FormEvent<AccountSetupFormElement>) {
+  function handleSubmit(event: FormEvent<AccountSetupFormElement>) {
     event.preventDefault();
     navigate("/elections#new-account");
   }

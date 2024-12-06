@@ -1,3 +1,4 @@
+import { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { t } from "@kiesraad/i18n";
@@ -15,7 +16,7 @@ interface LoginFormElement extends HTMLFormElement {
 export function LoginForm() {
   const navigate = useNavigate();
 
-  function handleSubmit(event: React.FormEvent<LoginFormElement>) {
+  function handleSubmit(event: FormEvent<LoginFormElement>) {
     event.preventDefault();
     navigate("../account/setup");
   }

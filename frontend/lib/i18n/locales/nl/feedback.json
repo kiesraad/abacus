@@ -87,5 +87,11 @@
   "W302": {
     "title": "Controleer ingevulde verschillen",
     "content": "De invoer bij J, K, L, M, N of O klopt niet.\nCheck of je het papieren proces-verbaal goed hebt overgenomen."
-  }
+  },
+  "errors": "foutmeldingen",
+  "warnings": "waarschuwingen",
+  "multiple_action_title": "Voor alle {type} geldt het volgende:",
+  "made_a_mistake": "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+  "error_remains": "Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.",
+  "warning_remains": "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder."
 }

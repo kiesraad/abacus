@@ -29,7 +29,7 @@ Zoals iedereen weet stemmen we in Nederland op papier. In het stembureau gelden 
 
 ![Stemmen in stemhokjes](/documentatie/gebruikersdocumentatie/img/stemhokjes.jpg)
 
-Na het sluiten van de stembussen worden alle stemmen met de hand geteld, waarbij een vier-ogenprincipe wordt gehanteerd. De meeste gemeentes hebben hier een speciaal telsysteem voor.
+Na het sluiten van de stembussen worden alle stemmen met de hand geteld, waarbij een vier-ogenprincipe wordt gehanteerd. De stemmen worden op lijst gesorteerd waarna de stemmen per kandidaat worden geteld.
 
 ![Het papieren telproces](/documentatie/gebruikersdocumentatie/img/telproces.jpg)
 
@@ -46,10 +46,10 @@ Hieronder zie je hoe het gehele proces van het optellen van stemmen verloopt voo
 
 ![Stembureau, GSB, HSB, CSB](/documentatie/gebruikersdocumentatie/img/eml_flow_nl.drawio.png)
 
-- **Blok 2:** Alle processen-verbaal van de stembureaus worden op het gemeentelijk stembureau ingevoerd, waarbij de software de resultaten controleert en eventuele fouten en waarschuwingen weergeeft. Wanneer deze opgelost zijn, kan de invoer worden afgerond en genereert de software het proces-verbaal en het EML_NL-bestand[^2] van het gemeentelijk stembureau.
+- **Blok 2: GSB** Alle processen-verbaal van de stembureaus worden op het gemeentelijk stembureau ingevoerd, waarbij de software de resultaten controleert en eventuele fouten en waarschuwingen weergeeft. Wanneer deze opgelost zijn, kan de invoer worden afgerond en genereert de software het proces-verbaal en het EML_NL-bestand[^2] van het gemeentelijk stembureau.
+- **Blok 3: HSB** Het proces van blok 2 herhaalt zich bij de hoofdstembureaus van de kieskringen. Hier worden de processen-verbaal van de gemeentelijke stembureaus ingevoerd, gecontroleerd en afgerond. De software maakt het proces-verbaal en het EML_NL-bestand van het hoofdstembureau.
 - **Blok 3:** Het proces van blok 2 herhaalt zich bij de hoofdstembureaus van de kieskringen. Hier worden de processen-verbaal van de gemeentelijke stembureaus ingevoerd, gecontroleerd en afgerond. De software maakt het proces-verbaal en het EML_NL-bestand van het hoofdstembureau.
-- **Blok 3:** Het proces van blok 2 herhaalt zich bij de hoofdstembureaus van de kieskringen. Hier worden de processen-verbaal van de gemeentelijke stembureaus ingevoerd, gecontroleerd en afgerond. De software maakt het proces-verbaal en het EML_NL-bestand van het hoofdstembureau.
-- **Blok 4:** Op het centraal stembureau worden de processen-verbaal van de gemeentelijke stembureaus nogmaals ingevoerd ter controle. Tot slot worden de processen-verbaal van de hoofdstembureaus ingevoerd, gecontroleerd en afgerond. Dit leidt tot een EML_NL-bestand en een proces-verbaal van het centraal stembureau. Aan de hand van deze gegevens wordt de zetelverdeling berekend.
+- **Blok 4:** Op het centraal stembureau worden de processen-verbaal van de hoofdstembureaus ingevoerd, gecontroleerd en afgerond. De software maakt het proces-verbaal en het EML_NL-bestand van het centraal stembureau. Aan de hand van deze gegevens wordt de zetelverdeling berekend.
 
 In deze blokken biedt software ondersteuning, en hier komt Abacus dan ook aan bod.
 
@@ -86,7 +86,7 @@ Abacus wordt in de eerste instantie ontwikkeld voor de Gemeenteraadsverkiezingen
 
 ### Gebruiksvriendelijkheid
 
-Omdat het verkiezingsproces snel verloopt en er niet al te vaak verkiezingen zijn, maken de gebruikers slechts korte tijd gebruik van verkiezingssoftware. Daarom is het van groot belang dat Abacus zo gebruiksvriendelijk mogelijk is. Hiervoor implementeren we de volgende maatregelen:
+Omdat er niet al te vaak verkiezingen zijn, maken de gebruikers slechts korte tijd gebruik van verkiezingssoftware. Daarom is het van groot belang dat Abacus zo gebruiksvriendelijk mogelijk is. Daarom proberen we de invoer zo intuitief mogelijk te maken:
 
 - We doen regelmatige gebruikerstests met echte gebruikers.
 - De invoer wordt in kleinere secties gedaan met een validatiecheck na elke invoer.
@@ -117,9 +117,9 @@ Abacus telt de resultaten op en controleert ze.
 
 Abacus zal worden gedraaid op een gesloten netwerk zonder internettoegang. De backend draait op één machine en kan via de webbrowser (frontend) worden benaderd vanaf andere computers op het netwerk.
 
-De software wordt gebruikt via de webbrowser, en dit doen we met HTML, CSS en JavaScript. Hiervoor gebruiken we TypeScript, een meer uitgebreide versie van JavaScript met typing. Voor de gebruikersinterface gebruiken we de populaire library React.
+Voor de frontend gebruiken we TypeScript, een meer uitgebreide versie van JavaScript met typing. Voor de gebruikersinterface gebruiken we de populaire library React.
 
-Voor de backend gebruiken we Rust, een high-level programmeertaal waarmee je efficiënt kunt programmeren. Ook heeft deze taal een 'strict type system' waardoor minder bugs ontstaan. Ook is dit een populaire, open-source programmeertaal met een grote community.
+Voor de backend gebruiken we Rust, een high-level programmeertaal waarmee je efficiënt kunt programmeren. Het unieke eigendomssysteem van Rust voorkomt geheugenfouten, en de taal heeft een 'strict type system' waardoor minder bugs ontstaan. Ook is dit een populaire, open-source programmeertaal met een grote community.
 
 Voor de database gebruiken we SQLite. Deze library is populair, lichtgewicht en gebruiksvriendelijk, en bovendien is installatie van SQLite niet vereist.
 
@@ -144,8 +144,8 @@ Security is een van de belangrijkste pijlers voor Abacus, om een zo hoog mogelij
 
 Ons team werkt volgens deze principes:
 
-- We werken geheel open source op deze openbare GitHub-repository. Ook de pull requests zijn openbaar.
-- We hebben een volledige continuous integration pipeline met tests en linting voor de frontend en backend.
+- De software is beschikbaar onder de EU PL 1.2 licentie en we werken op deze openbare GitHub-repository. Ook de pull requests zijn openbaar.
+- We hebben een continuous integration pipeline met tests en linting voor de frontend en backend.
 - Er zijn altijd minimaal 2 reviews en approvals nodig per pull request.
 - Nieuwe code wordt altijd getest. De nieuwe tests moeten in dezelfde PR zitten als de nieuwe functionaliteit.
 - De UI/UX designs op basis waarvan we nieuwe functionaliteit bouwen zijn ook openbaar op Figma.
@@ -160,4 +160,4 @@ Voor meer informatie over onze werkwijzen kun je de volgende links bekijken:
 
 ## Feedback
 
-Jullie feedback en bijdragen zijn meer dan welkom! Vragen en suggesties kun je sturen naar abacus[@]kiesraad.nl. Zie de [readme](/README.md) op de hoofdpagina van deze repository voor meer informatie over hoe je kunt bijdragen.
+Feedback is meer dan welkom! Heb je iets gezien of gewoon een vraag, stuur dan een mail naar abacus[@]kiesraad.nl. Zie de [readme](/README.md) op de hoofdpagina van deze repository voor meer informatie over hoe je kunt bijdragen.

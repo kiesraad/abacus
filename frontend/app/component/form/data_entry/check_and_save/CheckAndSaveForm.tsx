@@ -12,9 +12,12 @@ import {
   usePollingStationFormController,
 } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
-import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusList } from "@kiesraad/ui";
+import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusList, useKeyboard } from "@kiesraad/ui";
 
 export function CheckAndSaveForm() {
+  const formRef = React.useRef<HTMLFormElement>(null);
+  useKeyboard(formRef);
+
   const navigate = useNavigate();
   const { election } = useElection();
   const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId } =
@@ -53,7 +56,7 @@ export function CheckAndSaveForm() {
     })(event);
 
   return (
-    <Form onSubmit={handleSubmit} id="check_save_form" title={t("check_and_save.title")}>
+    <Form onSubmit={handleSubmit} id="check_save_form" title={t("check_and_save.title")} ref={formRef}>
       <section className="md" id="save-form-summary-text">
         {!summary.hasBlocks && summary.countsAddUp && (
           <p className="md">{t("check_and_save.counts_add_up.no_warnings")}</p>

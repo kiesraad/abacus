@@ -13,6 +13,7 @@ import {
   InputGridRow,
   KeyboardKey,
   KeyboardKeys,
+  useKeyboard,
 } from "@kiesraad/ui";
 import { deformatNumber } from "@kiesraad/util";
 
@@ -35,6 +36,8 @@ interface DifferencesFormElement extends HTMLFormElement {
 export function DifferencesForm() {
   const formRef = React.useRef<DifferencesFormElement>(null);
   const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
+
+  useKeyboard(formRef);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;

@@ -21,7 +21,11 @@
   "form": {
     "create": "Stembureau toevoegen",
     "save_create": "Opslaan en toevoegen",
-    "save_update": "Wijzigingen opslaan"
+    "save_update": "Wijzigingen opslaan",
+    "not_unique": {
+      "title": "Er bestaat al een stembureau met nummer {number}.",
+      "description": "Het nummer van het stembureau moet uniek zijn."
+    }
   },
   "type": {
     "FixedLocation": "Vaste locatie",

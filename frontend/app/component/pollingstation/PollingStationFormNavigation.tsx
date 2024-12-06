@@ -24,21 +24,22 @@ export interface PollingStationFormNavigationProps {
 }
 
 export function PollingStationFormNavigation({ pollingStationId, election }: PollingStationFormNavigationProps) {
-  const { status, formState, apiError, currentForm, values, setTemporaryCache, submitCurrentForm } =
+  const { status, formState, apiError, currentForm, values, setTemporaryCache, submitCurrentForm, entryNumber } =
     usePollingStationFormController();
 
   const navigate = useNavigate();
 
   const isPartOfDataEntryFlow = React.useCallback(
-    (pathname: string) => pathname.startsWith(`/elections/${election.id}/data-entry/${pollingStationId}/`),
-    [election, pollingStationId],
+    (pathname: string) =>
+      pathname.startsWith(`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}`),
+    [election, pollingStationId, entryNumber],
   );
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionID) => {
-      return getUrlForFormSectionID(election.id, pollingStationId, id);
+      return getUrlForFormSectionID(election.id, pollingStationId, entryNumber, id);
     },
-    [election, pollingStationId],
+    [election, pollingStationId, entryNumber],
   );
 
   const shouldBlock = React.useCallback<BlockerFunction>(

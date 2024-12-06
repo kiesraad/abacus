@@ -48,15 +48,15 @@ describe("routes", () => {
   test("Non existing polling station id results in not found page", async () => {
     render();
     // Navigate to a non-existing page
-    await router.navigate("/elections/1/data-entry/9876");
-    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/9876");
+    await router.navigate("/elections/1/data-entry/9876/1");
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/9876/1");
     await expectNotFound("Stembureau niet gevonden");
   });
 
   test("Error page when polling station is finalised", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
-    await router.navigate("/elections/1/data-entry/2");
-    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/2");
+    await router.navigate("/elections/1/data-entry/2/1");
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/2/1");
     render();
     await expectErrorPage();
   });

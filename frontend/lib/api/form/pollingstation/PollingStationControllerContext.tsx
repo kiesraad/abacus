@@ -23,6 +23,7 @@ export interface iPollingStationControllerContext {
   deleteDataEntry: () => Promise<void>;
   finaliseDataEntry: () => Promise<void>;
   pollingStationId: number;
+  entryNumber: number;
 }
 
 export const PollingStationControllerContext = createContext<iPollingStationControllerContext | undefined>(undefined);

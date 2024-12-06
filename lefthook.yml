@@ -7,6 +7,7 @@ pre-commit:
       root: "backend/"
       glob: "*.rs"
       run: cargo sqlx prepare -- --all-targets --all-features
+      stage_fixed: true
     backend-formatter:
       root: "backend/"
       glob: "*.rs"

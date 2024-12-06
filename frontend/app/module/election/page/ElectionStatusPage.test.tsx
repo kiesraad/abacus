@@ -53,7 +53,8 @@ describe("ElectionStatusPage", () => {
     expect(items[1]).toHaveTextContent("Niet afgeronde invoer (1)");
     expect(items[2]).toHaveTextContent("Invoer bezig (1)");
     expect(items[3]).toHaveTextContent("Eerste invoer klaar (0)");
-    expect(items[4]).toHaveTextContent("Werkvoorraad (2)");
+    expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (0)");
+    expect(items[5]).toHaveTextContent("Werkvoorraad (2)");
 
     const progress = [...screen.getByTestId("progress").children];
     expect(progress[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Voortgang" }));
@@ -61,13 +62,16 @@ describe("ElectionStatusPage", () => {
     const bars = [...screen.getByTestId("multi-outer-bar").children];
     const expectedData = [
       { percentage: 0, class: "definitive" },
+      { percentage: 0, class: "first-entry-finished" },
       { percentage: 25, class: "in-progress" },
       { percentage: 25, class: "unfinished" },
       { percentage: 50, class: "not-started" },
     ];
     bars.forEach((bar, index) => {
-      expect(bar.getAttribute("style")).toEqual(`width: ${expectedData[index]?.percentage}%;`);
-      expect(bar.classList.contains(`${expectedData[index]?.class}`)).toBeTruthy();
+      expect(bar.classList, `class for index ${index}`).toContain(`${expectedData[index]?.class}`);
+      expect(bar.getAttribute("style"), `style for index ${index}`).toEqual(
+        `width: ${expectedData[index]?.percentage}%;`,
+      );
     });
 
     const tablesRoot = screen.getByRole("article");

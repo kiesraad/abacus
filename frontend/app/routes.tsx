@@ -57,7 +57,7 @@ export const routes = createRoutesFromElements(
         </Route>
         <Route path="data-entry" element={null}>
           <Route index element={<DataEntryHomePage />} />
-          <Route path=":pollingStationId" element={<PollingStationLayout />}>
+          <Route path=":pollingStationId/:entryNumber" element={<PollingStationLayout />}>
             {/* The PollingStationFormController will navigate to the correct section. */}
             <Route index element={null} />
             <Route path="recounted" element={<RecountedPage />} />

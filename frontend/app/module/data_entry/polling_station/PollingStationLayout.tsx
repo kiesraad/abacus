@@ -13,6 +13,7 @@ import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";
 
 export function PollingStationLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
+  const entryNumber = useNumericParam("entryNumber");
   const { election, pollingStation } = useElection(pollingStationId);
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
 
@@ -25,7 +26,7 @@ export function PollingStationLayout() {
   }
 
   return (
-    <PollingStationFormController election={election} pollingStationId={pollingStation.id} entryNumber={1}>
+    <PollingStationFormController election={election} pollingStationId={pollingStation.id} entryNumber={entryNumber}>
       <PageTitle title={`${t("data_entry.title")} ${pollingStation.number} ${pollingStation.name} - Abacus`} />
       <NavBar>
         <Link to={"/elections"}>{t("overview")}</Link>

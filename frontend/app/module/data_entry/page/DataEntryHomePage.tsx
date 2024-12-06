@@ -27,7 +27,9 @@ export function DataEntryHomePage() {
     };
   }, [refetch]);
 
-  const showDataEntrySavedAlert = location.hash === "#data-entry-saved";
+  const showFirstDataEntrySavedAlert = location.hash === "#data-entry-saved-1";
+  const showSecondDataEntrySavedAlert = location.hash === "#data-entry-saved-2";
+  const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
 
   function closeDataEntrySavedAlert() {
     navigate(location.pathname);
@@ -47,13 +49,17 @@ export function DataEntryHomePage() {
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
-      {showDataEntrySavedAlert && (
+      {dataEntryDone && (
         <Alert type="success" onClose={closeDataEntrySavedAlert}>
           <h2>{t("data_entry.entry_saved")}</h2>
           <p>
             {t("data_entry.success.return_paper")}
-            <br />
-            {t("data_entry.success.second_entry_info")}
+            {showFirstDataEntrySavedAlert && (
+              <>
+                <br />
+                {t("data_entry.success.second_entry_info")}
+              </>
+            )}
           </p>
         </Alert>
       )}
@@ -67,7 +73,7 @@ export function DataEntryHomePage() {
       )}
       <main>
         <article id="polling-station-choice-form">
-          <PollingStationChoiceForm anotherEntry={showDataEntrySavedAlert} />
+          <PollingStationChoiceForm anotherEntry={dataEntryDone} />
         </article>
         <ElectionProgress />
       </main>

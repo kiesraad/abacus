@@ -23,6 +23,7 @@ describe("PollingStationLayout", () => {
     vi.spyOn(Router, "useParams").mockReturnValue({
       electionId: election.id.toString(),
       pollingStationId: pollingStationMockData.id.toString(),
+      entryNumber: "1",
     });
   });
 

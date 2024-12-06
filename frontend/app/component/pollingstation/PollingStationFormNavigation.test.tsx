@@ -100,11 +100,12 @@ describe("PollingStationFormNavigation", () => {
       values: {
         recounted: true,
       },
+      entryNumber: 1,
     });
 
     (useBlocker as Mock).mockReturnValue({
       state: "blocked",
-      location: { pathname: "/elections/1/data-entry/1/" },
+      location: { pathname: "/elections/1/data-entry/1/1" },
     });
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
@@ -121,8 +122,8 @@ describe("PollingStationFormNavigation", () => {
 
       expect(
         blocker({
-          currentLocation: { pathname: "/elections/1/data-entry/1/voters-and-votes" },
-          nextLocation: { pathname: "/elections/1/data-entry/1/differences" },
+          currentLocation: { pathname: "/elections/1/data-entry/1/1/voters-and-votes" },
+          nextLocation: { pathname: "/elections/1/data-entry/1/1/differences" },
         }),
       ).toBe(false);
 

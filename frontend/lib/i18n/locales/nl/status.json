@@ -1,6 +1,7 @@
 {
   "unfinished": "Niet afgeronde invoer",
   "in_progress": "Invoer bezig",
-  "definitive": "Eerste invoer klaar",
+  "first_entry_finished": "Eerste invoer klaar",
+  "definitive": "Eerste en tweede invoer klaar",
   "not_started": "Werkvoorraad"
 }

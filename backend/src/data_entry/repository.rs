@@ -70,7 +70,7 @@ impl PollingStationDataEntries {
 
     pub async fn delete(&self, id: u32, entry_number: u8) -> Result<(), sqlx::Error> {
         let res = query!(
-            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
+            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ? AND finalised_at IS NULL",
             id,
             entry_number
         )
@@ -92,7 +92,7 @@ impl PollingStationDataEntries {
         query!(
             r#"
             UPDATE polling_station_data_entries
-            SET finalised_at = unixepoch()
+            SET finalised_at = unixepoch(), progress = 100
             WHERE polling_station_id = ? AND entry_number = 1"#,
             id,
         )
@@ -126,45 +126,37 @@ impl PollingStationDataEntries {
         Ok(())
     }
 
-    pub async fn exists_finalised(&self, id: u32) -> Result<bool, sqlx::Error> {
+    pub async fn exists_entry(&self, id: u32, entry_number: u8) -> Result<bool, sqlx::Error> {
         let res = query!(
             r#"
             SELECT EXISTS(
-              SELECT 1 FROM polling_station_results
-              WHERE polling_station_id = ?)
+              SELECT 1 FROM polling_station_data_entries
+              WHERE polling_station_id = ?
+                AND entry_number = ?)
             AS `exists`"#,
-            id
+            id,
+            entry_number
         )
         .fetch_one(&self.0)
         .await?;
         Ok(res.exists == 1)
     }
 
-    pub async fn exists_first_entry_finalised(&self, id: u32) -> Result<bool, sqlx::Error> {
+    pub async fn exists_finalised_entry(
+        &self,
+        id: u32,
+        entry_number: u8,
+    ) -> Result<bool, sqlx::Error> {
         let res = query!(
             r#"
             SELECT EXISTS(
               SELECT 1 FROM polling_station_data_entries
               WHERE polling_station_id = ?
-                AND entry_number = 1
+                AND entry_number = ?
                 AND finalised_at IS NOT NULL)
             AS `exists`"#,
-            id
-        )
-        .fetch_one(&self.0)
-        .await?;
-        Ok(res.exists == 1)
-    }
-
-    pub async fn exists_second_entry(&self, id: u32) -> Result<bool, sqlx::Error> {
-        let res = query!(
-            r#"
-            SELECT EXISTS(
-              SELECT 1 FROM polling_station_data_entries
-              WHERE polling_station_id = ?
-                AND entry_number = 2)
-            AS `exists`"#,
-            id
+            id,
+            entry_number
         )
         .fetch_one(&self.0)
         .await?;
@@ -231,6 +223,21 @@ impl PollingStationResultsEntries {
                 Ok((polling_station, entry.data))
             })
             .collect::<Result<_, sqlx::Error>>() // this collect causes the iterator to fail early if there was any error
+    }
+
+    /// Check if a polling station has results
+    pub async fn exists(&self, id: u32) -> Result<bool, sqlx::Error> {
+        let res = query!(
+            r#"
+            SELECT EXISTS(
+              SELECT 1 FROM polling_station_results
+              WHERE polling_station_id = ?)
+            AS `exists`"#,
+            id
+        )
+        .fetch_one(&self.0)
+        .await?;
+        Ok(res.exists == 1)
     }
 }
 

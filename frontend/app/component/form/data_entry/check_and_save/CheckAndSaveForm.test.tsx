@@ -56,7 +56,7 @@ describe("Test CheckAndSaveForm", () => {
     expect(request_url).toBe("http://localhost:3000/api/polling_stations/1/data_entries/1/finalise");
 
     // check that the user is navigated back to the data entry page
-    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry#data-entry-saved");
+    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry#data-entry-saved-1");
   });
 
   test("Shift+Enter submits form", async () => {

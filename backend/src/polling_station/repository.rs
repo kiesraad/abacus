@@ -210,8 +210,9 @@ SELECT
   -- progress
   CASE
     WHEN de.polling_station_id IS NULL THEN NULL
+    WHEN de.finalised_at IS NOT NULL THEN NULL
     ELSE de.progress
-  END AS "data_entry_progress: u8",
+    END AS "data_entry_progress: u8",
 
   -- finished_at
   CASE

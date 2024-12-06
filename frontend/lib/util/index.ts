@@ -4,6 +4,7 @@ export * from "./hook/usePreventFormEnterSubmit";
 export * from "./hook/usePollingStationStatus";
 export * from "./classnames";
 export * from "./compare";
+export * from "./data-entry";
 export * from "./domtoren";
 export * from "./fields";
 export * from "./strings";

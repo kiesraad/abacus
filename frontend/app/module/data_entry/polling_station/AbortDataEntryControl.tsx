@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useElection } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { Button } from "@kiesraad/ui";
 
 import { AbortDataEntryModal } from "./AbortDataEntryModal";
@@ -19,7 +20,7 @@ export function AbortDataEntryControl() {
   return (
     <>
       <Button variant="secondary" size="sm" onClick={toggleAbortModal}>
-        Invoer afbreken
+        {t("data_entry.abort.action")}
       </Button>
       {openAbortModal && (
         <AbortDataEntryModal

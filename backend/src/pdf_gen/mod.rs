@@ -105,6 +105,7 @@ pub(crate) mod tests {
                 location: "Heemdamseburg".to_string(),
                 number_of_voters: 100,
                 category: ElectionCategory::Municipal,
+                number_of_seats: 29,
                 election_date: Utc::now().date_naive(),
                 nomination_date: Utc::now().date_naive(),
                 status: ElectionStatus::DataEntryFinished,

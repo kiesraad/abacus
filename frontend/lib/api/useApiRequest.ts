@@ -55,7 +55,7 @@ export function handleApiResult<T>(
   throwErrors: boolean,
   controller?: AbortController,
 ): ApiResult<T> {
-  // Do not update state if the request was aborted (mainly caused by a unmounted component)
+  // Do not update state if the request was aborted (mainly caused by an unmounted component)
   if (controller instanceof AbortController && controller.signal.aborted) {
     return result;
   }

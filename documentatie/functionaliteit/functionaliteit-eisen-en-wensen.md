@@ -1,6 +1,6 @@
 # Functionaliteit van Abacus: eisen en wensen
 
-De nieuwe uitslagensoftware Abacus zal in meerdere stappen worden ontwikkeld. Eerst wordt de software ontwikkeld voor voor de gemeenteraadsverkiezingen, en daarna wordt de functionaliteit uitgebreid naar de andere verkiezingen.
+De nieuwe uitslagensoftware Abacus zal in meerdere stappen worden ontwikkeld. Eerst wordt de software ontwikkeld voor de gemeenteraadsverkiezingen, en daarna wordt de functionaliteit uitgebreid naar de andere verkiezingen.
 
 De allereerste stap is het maken van een bruikbare demoversie.
 

@@ -20,7 +20,7 @@ __hoofdscenario__:
 __uitbreidingen__:  
 3a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
 
-4a. Het GSB stelt verschillen vast dmv het controleprotocol (handmatige controle optellingen software):  
+4a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
 &emsp; 4a1. Het GSB controleert de resultaten van het controleprotocol.  
 &emsp; 4a2. Het GSB vindt een fout en corrigeert de resultaten van het controleprotocol.  
 &emsp;&emsp; 4a2a. Het GSB vindt geen fout en bevestigt een verschil tussen de controles en de resultaten van de applicatie:  
@@ -32,7 +32,7 @@ __niveau:__ hoog-over, wolk, ☁️
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ één of meer stembureaus moeten herteld worden nav verzoek CSB
+__trigger:__ één of meer stembureaus moeten herteld worden n.a.v. verzoek CSB
 
 __hoofdscenario__:  
 
@@ -48,7 +48,7 @@ __uitbreidingen__:
 
 ### Open punten
 
-- Hoe ziet de trigger voor hertelling er precies uit voor gemeenteraadskverkiezingen? Het GSB (dus de gemeente) stelt de telling op gemeente-niveau vast, het CSB (ook de gemeente) controleert die telling en verzoekt als nodig om onderzoek en/of hertelling?
+- Hoe ziet de trigger voor hertelling er precies uit voor gemeenteraadsverkiezingen? Het GSB (dus de gemeente) stelt de telling op gemeente-niveau vast, het CSB (ook de gemeente) controleert die telling en verzoekt als nodig om onderzoek en/of hertelling?
 
 ---
 

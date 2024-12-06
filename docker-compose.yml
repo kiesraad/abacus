@@ -5,6 +5,7 @@ services:
       - "8080:8080"
     user: "${USER_ID:?USER_ID not set}:${GROUP_ID:?GROUP_ID not set}"
     environment:
+      RUST_LOG: debug
       TZ: "Europe/Amsterdam"
       CARGO_HOME: .cargo
       CARGO_TARGET_DIR: "./target-docker"

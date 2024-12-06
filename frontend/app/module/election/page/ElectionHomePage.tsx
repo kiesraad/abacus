@@ -5,6 +5,7 @@ import { MockTest } from "app/component/MockTest";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
 
 export function ElectionHomePage() {
@@ -12,7 +13,7 @@ export function ElectionHomePage() {
 
   return (
     <>
-      <PageTitle title="Details verkiezing - Abacus" />
+      <PageTitle title={`${t("election.title.details")} - Abacus`} />
       <NavBar>
         <span>
           <span className="bold">{election.location}</span>
@@ -29,13 +30,13 @@ export function ElectionHomePage() {
         <article>
           <ul>
             <li>
-              Coördinator:
+              {t("coordinator")}:
               <ul>
                 <li>
-                  <Link to={`status#coordinator`}>Statusoverzicht steminvoer</Link>
+                  <Link to={`status#coordinator`}>{t("election.status")}</Link>
                 </li>
                 <li>
-                  <Link to={`polling-stations#coordinator`}>Stembureaus</Link>
+                  <Link to={`polling-stations#coordinator`}>{t("election.polling_stations")}</Link>
                 </li>
               </ul>
             </li>
@@ -43,7 +44,7 @@ export function ElectionHomePage() {
               Invoerder:
               <ul>
                 <li>
-                  <Link to={`data-entry`}>Stembureau invoeren</Link>
+                  <Link to={`data-entry`}>{t("data_entry.title")}</Link>
                 </li>
               </ul>
             </li>

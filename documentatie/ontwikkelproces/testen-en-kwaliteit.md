@@ -46,7 +46,7 @@ Voor de praktische uitwerking van de policy, zie ["Uitwerking zero bug policy"](
 We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op de waarborgen uit het verkiezingsproces:
 
 - Betrouwbaarheid: kun je de software in de meeste situaties vertrouwen?
-- Bruikbaarheid: is de software makkelijk te gebruiken? (voor alle bedoelde gebruikers, dus ook installatie, controleerbaar door burger, etc)
+- Bruikbaarheid: is de software makkelijk te gebruiken? (voor alle bedoelde gebruikers, dus ook installatie, controleerbaar door burger, etc.)
 - Beveiliging: biedt de software voldoende bescherming tegen ongewenst gebruik?
 - Testbaarheid: is het eenvoudig om de software te testen en controleren?
 - Onderhoudbaarheid: kan de software eenvoudig worden onderhouden en aangepast?
@@ -84,8 +84,8 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 
 #### Continuous Integration / Continous Delivery (CI/CD)
 
-- CI: risico's migiteren bij het integreren van code door dit continu te doen.
-  - Ideaal: elke developer intregreert eigen code minstens één keer per dag met de gedeelde branch.
+- CI: risico's mitigeren bij het integreren van code door dit continu te doen.
+  - Ideaal: elke developer integreert eigen code minstens één keer per dag met de gedeelde branch.
 - CD: risico's mitigeren bij het opleveren van een installeerbaar product door dit continu te doen.
   - De pipeline resulteert in een installeerbare en werkende applicatie.
 - Dus er is een CI/CD-pipeline nodig met quality gates (nog niet alle gates zijn geïmplementeerd):
@@ -119,7 +119,7 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 - Frequentie: te bepalen
 - Doel:
   - Feedback ophalen van externe stakeholders, bijv. gemeentes
-  - Feedback ophalen van externe geïnteresseerden, bijv. betrokken burgers maar ook de community van experts (programmeren, testen)
+  - Feedback ophalen van externe geïnteresseerden, bijv. betrokken burgers, maar ook de community van experts (programmeren, testen)
 - Faciliteren door:
   - Het uitvoeren van kleinschalige gebruikerstests
   - Het organiseren van sessies om feedback op te halen

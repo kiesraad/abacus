@@ -39,3 +39,18 @@
 .fs-body {
   font-size: var(--font-size-body);
 }
+
+/* Color */
+.bg-gray {
+  background-color: var(--bg-gray);
+}
+
+/* Width */
+.w-13 {
+  width: 13rem;
+}
+
+/* Text wrap, transformations etc. */
+.break-word {
+  word-break: break-word;
+}

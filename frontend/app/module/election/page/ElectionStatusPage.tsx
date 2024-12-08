@@ -53,7 +53,7 @@ const categoryToStatus: Record<StatusCategory, PollingStationStatus> = {
 function getTableHeaderForCategory(category: StatusCategory): ReactNode {
   function CategoryHeader({ children }: { children?: ReactNode[] }) {
     return (
-      <Table.Header key={category} backgroundStyling>
+      <Table.Header key={category} className="bg-gray">
         <Table.Column key={`${category}-number`}>{t("number")}</Table.Column>
         <Table.Column key={`${category}-name`}>{t("polling_station.title.singular")}</Table.Column>
         {children}
@@ -63,7 +63,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
 
   const finishedAtColumn = <Table.Column key={`${category}-time`}>{t("finished_at")}</Table.Column>;
   const progressColumn = (
-    <Table.Column key={`${category}-progress`} width="13rem">
+    <Table.Column key={`${category}-progress`} className="w-13">
       {t("progress")}
     </Table.Column>
   );
@@ -86,10 +86,10 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
   function CategoryPollingStationRow({ children }: { children?: ReactNode[] }) {
     return (
       <Table.Row>
-        <Table.Cell key={`${polling_station.id}-number`} number fontSizeClass="fs-body">
+        <Table.Cell key={`${polling_station.id}-number`} className="table-number">
           {polling_station.number}
         </Table.Cell>
-        <Table.Cell key={`${polling_station.id}-name`} fontSizeClass="fs-sm">
+        <Table.Cell key={`${polling_station.id}-name`}>
           <span>{polling_station.name}</span>
           {showBadge.includes(polling_station.status) && <Badge type={polling_station.status} />}
         </Table.Cell>
@@ -99,7 +99,7 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
   }
 
   const finishedAtCell = (
-    <Table.Cell key={`${polling_station.id}-time`} fontSizeClass="fs-sm">
+    <Table.Cell key={`${polling_station.id}-time`}>
       {polling_station.finished_at
         ? new Date(polling_station.finished_at * 1000).toLocaleTimeString("nl-NL", {
             timeStyle: "short",
@@ -109,7 +109,7 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
     </Table.Cell>
   );
   const progressCell = (
-    <Table.Cell key={`${polling_station.id}-progress`} fontSizeClass="fs-sm">
+    <Table.Cell key={`${polling_station.id}-progress`}>
       <ProgressBar
         id={`${polling_station.id}-progressbar`}
         data={{ percentage: polling_station.data_entry_progress ?? 0, class: "default" }}
@@ -259,7 +259,7 @@ export function ElectionStatusPage() {
                     </span>
                     <Table id={cat} key={cat}>
                       {getTableHeaderForCategory(cat)}
-                      <Table.Body key={cat}>
+                      <Table.Body key={cat} className="fs-sm">
                         {pollingStationsWithStatuses
                           .filter((ps) => ps.status === categoryToStatus[cat])
                           .map((ps) => getTableRowForCategory(cat, ps))}

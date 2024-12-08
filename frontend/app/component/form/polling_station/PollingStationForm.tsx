@@ -127,6 +127,8 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               />
             </FormLayout.Row>
 
+            {/* TODO: Choicelist (required) error handling */}
+            {/* error={validationResult.polling_station_type ? t(`form.errors.${validationResult.polling_station_type}`) : undefined} */}
             <FormLayout.Field>
               <ChoiceList>
                 <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>

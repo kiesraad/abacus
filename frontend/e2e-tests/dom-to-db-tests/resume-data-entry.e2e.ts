@@ -15,7 +15,7 @@ import { emptyDataEntryResponse } from "./test-data/PollingStationTestData";
 
 test.describe("resume data entry flow", () => {
   const fillFirstTwoPagesAndAbort = async (page: Page) => {
-    await page.goto("/elections/1/data-entry/1/recounted");
+    await page.goto("/elections/1/data-entry/1/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -53,7 +53,7 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
-      await page.goto("/elections/1/data-entry/1");
+      await page.goto("/elections/1/data-entry/1/1");
 
       const differencesPage = new DifferencesPage(page);
       await expect(differencesPage.fieldset).toBeVisible();
@@ -86,7 +86,7 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
-      await page.goto("/elections/1/data-entry/1");
+      await page.goto("/elections/1/data-entry/1/1");
 
       const differencesPage = new DifferencesPage(page);
       await expect(differencesPage.fieldset).toBeVisible();
@@ -104,7 +104,7 @@ test.describe("resume data entry flow", () => {
     });
 
     test("save input from voters and votes page with error", async ({ page, request }) => {
-      await page.goto("/elections/1/data-entry/1/recounted");
+      await page.goto("/elections/1/data-entry/1/1/recounted");
 
       const recountedPage = new RecountedPage(page);
       await recountedPage.fieldset.waitFor();
@@ -167,7 +167,7 @@ test.describe("resume data entry flow", () => {
     });
 
     test("save input from voters and votes page with warning", async ({ page, request }) => {
-      await page.goto("/elections/1/data-entry/1/recounted");
+      await page.goto("/elections/1/data-entry/1/1/recounted");
 
       const recountedPage = new RecountedPage(page);
       await recountedPage.fieldset.waitFor();
@@ -241,7 +241,7 @@ test.describe("resume data entry flow", () => {
     });
 
     test("resuming with unsubmitted input (cached data) shows that data", async ({ page }) => {
-      await page.goto("/elections/1/data-entry/1/recounted");
+      await page.goto("/elections/1/data-entry/1/1/recounted");
 
       const recountedPage = new RecountedPage(page);
       await recountedPage.checkNoAndClickNext();
@@ -277,7 +277,7 @@ test.describe("resume data entry flow", () => {
     });
 
     test("save unsubmitted input when changing recounted works", async ({ page }) => {
-      await page.goto("/elections/1/data-entry/1/recounted");
+      await page.goto("/elections/1/data-entry/1/1/recounted");
 
       const recountedPage = new RecountedPage(page);
       await recountedPage.checkYesAndClickNext();
@@ -323,7 +323,7 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
-      await page.goto("/elections/1/data-entry/1/recounted");
+      await page.goto("/elections/1/data-entry/1/1/recounted");
 
       // recounted page should have no option selected
       const recountedPage = new RecountedPage(page);
@@ -332,7 +332,7 @@ test.describe("resume data entry flow", () => {
     });
 
     test("discard input from voters and votes page with error", async ({ page, request }) => {
-      await page.goto("/elections/1/data-entry/1/recounted");
+      await page.goto("/elections/1/data-entry/1/1/recounted");
 
       const recountedPage = new RecountedPage(page);
       await recountedPage.fieldset.waitFor();
@@ -359,7 +359,7 @@ test.describe("resume data entry flow", () => {
     });
 
     test("discard input from voters and votes page with warning", async ({ page, request }) => {
-      await page.goto("/elections/1/data-entry/1/recounted");
+      await page.goto("/elections/1/data-entry/1/1/recounted");
 
       const recountedPage = new RecountedPage(page);
       await recountedPage.fieldset.waitFor();

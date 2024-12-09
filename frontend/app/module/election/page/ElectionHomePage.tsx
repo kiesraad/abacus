@@ -30,10 +30,23 @@ export function ElectionHomePage() {
         <article>
           <ul>
             <li>
-              <Link to={`status#coordinator`}>{t("election.status")}</Link>
+              {t("coordinator")}:
+              <ul>
+                <li>
+                  <Link to={`status#coordinator`}>{t("election.status")}</Link>
+                </li>
+                <li>
+                  <Link to={`polling-stations#coordinator`}>{t("election.polling_stations")}</Link>
+                </li>
+              </ul>
             </li>
             <li>
-              <Link to={`polling-stations#coordinator`}>{t("election.polling_stations")}</Link>
+              {t("typist")}:
+              <ul>
+                <li>
+                  <Link to={`data-entry`}>{t("data_entry.title")}</Link>
+                </li>
+              </ul>
             </li>
           </ul>
           {__API_MSW__ && <MockTest />}

@@ -41,7 +41,7 @@ export function ElectionHomePage() {
               </ul>
             </li>
             <li>
-              Invoerder:
+              {t("typist")}:
               <ul>
                 <li>
                   <Link to={`data-entry`}>{t("data_entry.title")}</Link>

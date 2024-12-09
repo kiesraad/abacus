@@ -61,7 +61,7 @@ export const routes = createRoutesFromElements(
         <Route path="polling-stations" element={<PollingStationsLayout />}>
           <Route index element={<PollingStationListPage />} />
           <Route path="create" element={<PollingStationCreatePage />} />
-          <Route path="update/:pollingStationId" element={<PollingStationUpdatePage />} />
+          <Route path=":pollingStationId/update" element={<PollingStationUpdatePage />} />
         </Route>
         <Route path="data-entry" element={null}>
           <Route index element={<DataEntryHomePage />} />

@@ -245,7 +245,6 @@ dependencies = [
  "axum-extra",
  "chrono",
  "clap",
- "hex",
  "hyper",
  "memory-serve",
  "quick-xml 0.37.1",

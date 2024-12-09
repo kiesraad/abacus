@@ -21,7 +21,7 @@ import {
   SaveDataEntryResponse,
   updateFormStateAfterSubmit,
   useApi,
-  useApiRequest,
+  useApiRequestWithErrors,
   ValidationResult,
 } from "@kiesraad/api";
 
@@ -164,7 +164,7 @@ export function PollingStationFormController({
     return true;
   }, []);
 
-  const { requestState: initialDataRequest } = useApiRequest<GetDataEntryResponse>(requestPath, false);
+  const { requestState: initialDataRequest } = useApiRequestWithErrors<GetDataEntryResponse>(requestPath);
 
   React.useEffect(() => {
     if (initialDataRequest.status === "success") {

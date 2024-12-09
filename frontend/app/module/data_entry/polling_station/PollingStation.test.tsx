@@ -16,8 +16,8 @@ const submit = async () => {
 };
 
 const startPollingStationInput = async () => {
-  await router.navigate("/elections/1/data-entry/1");
-  expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1");
+  await router.navigate("/elections/1/data-entry/1/1");
+  expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/1");
 };
 
 const expectRecountedForm = async (inputShouldHaveFocus = true) => {
@@ -119,7 +119,7 @@ const fillPoliticalGroupCandidatesVotesForm = async () => {
 
 const expectCheckAndSavePage = async (bodyShouldHaveFocus = true) => {
   await waitFor(() => {
-    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/save");
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/1/save");
   });
   if (bodyShouldHaveFocus) {
     await waitFor(() => {

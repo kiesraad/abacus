@@ -67,7 +67,7 @@ export function DataEntryHomePage() {
         <Alert type="success">
           <h2>{t("data_entry.completed.all_entries_completed")}</h2>
           <p>{t("data_entry.completed.thank_you")}</p>
-          <p>{t("data_entry.completed.info")}</p>
+          <p>{t("data_entry.completed.info", { electionName: election.name })}</p>
           <p>{t("data_entry.completed.wait_for_instructions")}</p>
         </Alert>
       )}

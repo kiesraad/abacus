@@ -49,6 +49,11 @@ export function DevHomePage() {
                 <Link to={`/elections/1#coordinator`}>{t("election.title.singular")} 1</Link>
               </li>
               <li>
+                <Link to={`/elections/1/status#coordinator`}>
+                  {t("election_status.main_title")} {t("election.title.singular")} 1
+                </Link>
+              </li>
+              <li>
                 <Link to={`/elections/1/polling-stations#coordinator`}>
                   {t("polling_station.title.plural")} {t("election.title.singular")} 1
                 </Link>

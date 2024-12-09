@@ -15,8 +15,10 @@
   "api_error": {
     "EntryNumberNotSupported": "Ongeldige invoer voor dit stembureau",
     "EntryNotFound": "De invoer is niet gevonden",
-    "PollingStationFirstEntryAlreadyFinalised": "De invoer voor dit stembureau is al definitief",
+    "PollingStationFirstEntryAlreadyFinalised": "De eerste invoer voor dit stembureau is al definitief",
     "PollingStationFirstEntryNotFinalised": "De eerste invoer voor dit stembureau is nog niet definitief",
+    "PollingStationSecondEntryAlreadyFinalised": "De tweede invoer voor dit stembureau is al definitief",
+    "PollingStationResultsAlreadyFinalised": "De invoer voor dit stembureau is al definitief",
     "PollingStationDataValidation": "De invoer voor dit stembureau is niet geldig",
     "InvalidVoteGroup": "De politieke partij van de stem is niet geldig",
     "InvalidVoteCandidate": "De kandidaat van de stem is niet geldig",

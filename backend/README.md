@@ -56,6 +56,7 @@ The following dependencies (crates) are used:
 - `chrono`: date and time library.
 - `clap`: library for command-line argument parsing.
 - `quick-xml`: reading and writing EML_NL XML files.
+- `sha2`: generating a hash of the EML_NL XML files for inclusion in the PDF.
 
 Additionally, the following development dependencies are used:
 

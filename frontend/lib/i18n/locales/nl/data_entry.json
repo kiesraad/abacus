@@ -8,7 +8,7 @@
     "save_input": "Invoer bewaren",
     "discard_input": "Niet bewaren"
   },
-  "pick_polling_sation": "Kies een stembureau",
+  "pick_polling_station": "Kies een stembureau",
   "success": {
     "return_paper": "Geef het papieren proces-verbaal terug aan de coördinator.",
     "second_entry_info": "Een andere invoerder doet straks de tweede invoer."
@@ -21,5 +21,7 @@
   },
   "list": {
     "not_found": "Geen lijst gevonden voor {listNumber}"
-  }
+  },
+  "first_entry": "1e invoer",
+  "second_entry": "2e invoer"
 }

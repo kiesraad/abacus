@@ -37,7 +37,7 @@ export function DataEntryHomePage() {
 
   return (
     <>
-      <PageTitle title={`${t("data_entry.pick_polling_sation")} - Abacus`} />
+      <PageTitle title={`${t("data_entry.pick_polling_station")} - Abacus`} />
       <NavBar>
         <Link to={"/elections"}>{t("overview")}</Link>
       </NavBar>

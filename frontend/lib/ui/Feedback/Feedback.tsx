@@ -49,20 +49,18 @@ export function Feedback({ id, type, data }: FeedbackProps) {
       {feedbackList.length > 0 && (
         <div className="feedback-action">
           {feedbackList.length > 1 ? (
-            <h3>Voor alle {type === "error" ? "foutmeldingen" : "waarschuwingen"} geldt het volgende:</h3>
+            <h3>
+              {t("feedback.multiple_action_title", {
+                type: type === "error" ? t("feedback.errors") : t("feedback.warnings"),
+              })}
+            </h3>
           ) : (
             <></>
           )}
           {feedbackList.length > 1 || !feedbackList[0]?.action ? (
             <ul>
-              <li>Heb je iets niet goed overgenomen? Herstel de fout en ga verder.</li>
-              {type === "error" ? (
-                <li>
-                  Heb je alles goed overgenomen, en blijft de fout? Dan mag je niet verder. Overleg met de coördinator.
-                </li>
-              ) : (
-                <li>Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.</li>
-              )}
+              <li>{t("feedback.made_a_mistake")}</li>
+              {type === "error" ? <li>{t("feedback.error_remains")}</li> : <li>{t("feedback.warning_remains")}</li>}
             </ul>
           ) : (
             feedbackList[0].action

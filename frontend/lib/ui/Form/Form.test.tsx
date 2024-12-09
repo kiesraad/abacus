@@ -1,3 +1,5 @@
+import { FormEvent } from "react";
+
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
@@ -51,7 +53,7 @@ describe("UI Component: Form", () => {
   });
 
   test("Enter submits when submit button has focus", async () => {
-    const onSubmit = vi.fn((e: React.FormEvent) => {
+    const onSubmit = vi.fn((e: FormEvent) => {
       e.preventDefault();
     });
 
@@ -88,7 +90,7 @@ describe("UI Component: Form", () => {
   });
 
   test("Move focus", async () => {
-    const onSubmit = vi.fn((e: React.FormEvent) => {
+    const onSubmit = vi.fn((e: FormEvent) => {
       e.preventDefault();
     });
 

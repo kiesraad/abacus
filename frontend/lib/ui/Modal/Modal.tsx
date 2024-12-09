@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useRef } from "react";
 
+import { t } from "@kiesraad/i18n";
 import { IconCross } from "@kiesraad/icon";
 import { IconButton } from "@kiesraad/ui";
 
@@ -37,7 +38,7 @@ export function Modal({ title, onClose, children }: ModalProps): ReactNode {
               onClose();
             }}
             icon={<IconCross />}
-            title="Annuleren"
+            title={t("cancel")}
             size="lg"
             variant="tertiary"
           />

@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { t } from "@kiesraad/i18n";
@@ -10,7 +11,7 @@ import errorImage from "./error.png";
 
 interface ErrorProps {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
   error?: Error;
 }
 

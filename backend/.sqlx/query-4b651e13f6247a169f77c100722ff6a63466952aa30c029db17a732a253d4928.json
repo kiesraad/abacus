@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                session_key,\n                user_id as \"user_id: u32\",\n                expires_at,\n                created_at\n            FROM sessions WHERE session_key = ?\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "session_key",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_id: u32",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "expires_at",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 3,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "4b651e13f6247a169f77c100722ff6a63466952aa30c029db17a732a253d4928"
+}

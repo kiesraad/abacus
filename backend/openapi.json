@@ -1110,7 +1110,9 @@
           "PdfGenerationError",
           "PollingStationRepeated",
           "PollingStationValidationErrors",
-          "InvalidPoliticalGroup"
+          "InvalidPoliticalGroup",
+          "InvalidUsernamePassword",
+          "InvalidSession"
         ]
       },
       "ErrorResponse": {

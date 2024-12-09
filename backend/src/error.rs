@@ -1,5 +1,6 @@
 use std::error::Error;
 
+use crate::authentication::AuthenticationError;
 use crate::data_entry::DataError;
 use axum::extract::rejection::JsonRejection;
 use axum::http::StatusCode;
@@ -35,6 +36,8 @@ pub enum ErrorReference {
     PollingStationRepeated,
     PollingStationValidationErrors,
     InvalidPoliticalGroup,
+    InvalidUsernamePassword,
+    InvalidSession,
 }
 
 /// Response structure for errors
@@ -66,6 +69,7 @@ pub enum APIError {
     StdError(Box<dyn Error>),
     AddError(String, ErrorReference),
     XmlError(quick_xml::se::SeError),
+    Authentication(AuthenticationError),
 }
 
 impl IntoResponse for APIError {
@@ -162,6 +166,38 @@ impl IntoResponse for APIError {
                     ),
                 )
             }
+            APIError::Authentication(err) => {
+                error!("Authentication error: {:?}", err);
+
+                match err {
+                    // client errors
+                    AuthenticationError::UserNotFound | AuthenticationError::InvalidPassword => (
+                        StatusCode::UNAUTHORIZED,
+                        to_error(
+                            "Invalid username and/or password",
+                            ErrorReference::InvalidUsernamePassword,
+                            false,
+                        ),
+                    ),
+                    AuthenticationError::SessionKeyNotFound
+                    | AuthenticationError::NoSessionCookie => (
+                        StatusCode::UNAUTHORIZED,
+                        to_error("Invalid session key", ErrorReference::InvalidSession, false),
+                    ),
+                    // server errors
+                    AuthenticationError::Database(_)
+                    | AuthenticationError::HashPassword(_)
+                    | AuthenticationError::BackwardTimeTravel
+                    | AuthenticationError::InvalidSessionDuration => (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        to_error(
+                            "Internal server error",
+                            ErrorReference::InternalServerError,
+                            false,
+                        ),
+                    ),
+                }
+            }
         };
 
         (status, response).into_response()
@@ -219,6 +255,12 @@ impl From<InvalidHeaderValue> for APIError {
 impl From<SeError> for APIError {
     fn from(err: SeError) -> Self {
         APIError::XmlError(err)
+    }
+}
+
+impl From<AuthenticationError> for APIError {
+    fn from(err: AuthenticationError) -> Self {
+        APIError::Authentication(err)
     }
 }
 

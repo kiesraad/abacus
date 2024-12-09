@@ -53,3 +53,20 @@ __uitbreidingen__:
 
 - De eerste stap van invoer is aangeven of er herteld is vanwege een verschil tussen aantal toegelaten kiezers en aantal uitgebrachte stemmen. Hoe verhoudt de invoer van die stap zich tot het oplossen van waarschuwingen over aantallen toegelaten kiezers en uitgebrachte stemmen?
 - Als de coördinator het PV terugstuurt in het proces, naar welk punt dan precies?
+
+
+## De coördinator bewerkt de stembureaus
+
+__niveau:__ subfunctie, vis, 🐟
+
+### Hoofdscenario en uitbreidingen
+
+__hoofdscenario__:
+
+1. De coördinator voegt stembureaus toe, past stembureaus aan en verwijdert stembureaus waar nodig.
+2. De applicatie controleert dat de bewerking aan de validaties voldoet.
+
+__uitbreidingen__:
+2a. (bij verwijderen) Er is al invoer of een resultaat voor het stembureau:
+&emsp; 2a1. De applicatie geeft aan dat het stembureau niet verwijderd kan worden.
+

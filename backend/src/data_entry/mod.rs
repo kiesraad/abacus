@@ -2,6 +2,7 @@ use axum::extract::{FromRequest, Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
+use entry_number::EntryNumber;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use utoipa::ToSchema;
@@ -15,6 +16,7 @@ use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::PollingStation;
 use crate::validation::ValidationResults;
 
+mod entry_number;
 pub mod repository;
 pub mod structs;
 
@@ -65,12 +67,12 @@ pub async fn polling_station_data_entry_save(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
     State(elections): State<Elections>,
-    Path((id, entry_number)): Path<(u32, u8)>,
+    Path((id, entry_number)): Path<(u32, EntryNumber)>,
     data_entry_request: SaveDataEntryRequest,
 ) -> Result<SaveDataEntryResponse, APIError> {
     // Check if it is valid to save the data entry
     match entry_number {
-        1 => {
+        EntryNumber::FirstEntry => {
             if polling_station_data_entries.exists_second_entry(id).await? {
                 return Err(APIError::Conflict(
                     "Cannot save a first data entry for a polling station that already has a second entry"
@@ -79,7 +81,7 @@ pub async fn polling_station_data_entry_save(
                 ));
             }
         }
-        2 => {
+        EntryNumber::SecondEntry => {
             if !polling_station_data_entries
                 .exists_first_entry_finalised(id)
                 .await?
@@ -90,12 +92,6 @@ pub async fn polling_station_data_entry_save(
                 ErrorReference::PollingStationFirstEntryNotFinalised,
             ));
             }
-        }
-        _ => {
-            return Err(APIError::NotFound(
-                "Only the first or second data entry is supported".to_string(),
-                ErrorReference::EntryNumberNotSupported,
-            ));
         }
     };
 
@@ -172,7 +168,7 @@ pub async fn polling_station_data_entry_get(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
-    Path((id, entry_number)): Path<(u32, u8)>,
+    Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<Json<GetDataEntryResponse>, APIError> {
     let mut tx = pool.begin().await?;
     let polling_station = polling_stations.get(id).await?;
@@ -210,21 +206,13 @@ pub async fn polling_station_data_entry_get(
 )]
 pub async fn polling_station_data_entry_delete(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
-    Path((id, entry_number)): Path<(u32, u8)>,
+    Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<StatusCode, APIError> {
-    // only a first or second data entry is supported
-    match entry_number {
-        1 | 2 => {
-            polling_station_data_entries
-                .delete(id, entry_number)
-                .await?;
-            Ok(StatusCode::NO_CONTENT)
-        }
-        _ => Err(APIError::NotFound(
-            "Only the first or second data entry is supported".to_string(),
-            ErrorReference::EntryNumberNotSupported,
-        )),
-    }
+    polling_station_data_entries
+        .delete(id, entry_number)
+        .await?;
+
+    Ok(StatusCode::NO_CONTENT)
 }
 
 /// Finalise the data entry for a polling station
@@ -248,7 +236,7 @@ pub async fn polling_station_data_entry_finalise(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
     State(elections): State<Elections>,
-    Path((id, entry_number)): Path<(u32, u8)>,
+    Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<(), APIError> {
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
@@ -277,22 +265,9 @@ pub async fn polling_station_data_entry_finalise(
         ));
     }
 
-    match entry_number {
-        /* TODO: Enable this, once the frontend supports second data entry
-        1 => {
-            polling_station_data_entries
-                .finalise_first_entry(&mut tx, id)
-                .await?
-                }
-        */
-        1 | 2 => polling_station_data_entries.finalise(&mut tx, id).await?,
-        _ => {
-            return Err(APIError::Conflict(
-                "Invalid data entry number".to_string(),
-                ErrorReference::PollingStationDataValidation,
-            ))
-        }
-    }
+    // TODO: Once the frontend supports second data entry, we should add a check here for the EntryNumber
+    // and call the correct `finalise` method accordingly
+    polling_station_data_entries.finalise(&mut tx, id).await?;
 
     tx.commit().await?;
 
@@ -365,7 +340,7 @@ mod tests {
                 State(PollingStationDataEntries::new(pool.clone())),
                 State(PollingStations::new(pool.clone())),
                 State(Elections::new(pool.clone())),
-                Path((1, entry_number)),
+                Path((1, EntryNumber::try_from(entry_number).unwrap())),
                 request_body.clone(),
             )
             .await
@@ -378,7 +353,7 @@ mod tests {
                 State(PollingStationDataEntries::new(pool.clone())),
                 State(PollingStations::new(pool.clone())),
                 State(Elections::new(pool.clone())),
-                Path((1, entry_number)),
+                Path((1, EntryNumber::try_from(entry_number).unwrap())),
             )
             .await
             .into_response()
@@ -479,7 +454,7 @@ mod tests {
             State(PollingStationDataEntries::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
             State(Elections::new(pool.clone())),
-            Path((1, 1)),
+            Path((1, EntryNumber::try_from(1).unwrap())),
             example_data_entry(),
         )
         .await
@@ -490,7 +465,7 @@ mod tests {
         // delete data entry
         let response = polling_station_data_entry_delete(
             State(PollingStationDataEntries::new(pool.clone())),
-            Path((1, 1)),
+            Path((1, EntryNumber::try_from(1).unwrap())),
         )
         .await
         .into_response();
@@ -506,7 +481,7 @@ mod tests {
         // check that deleting a non-existing data entry returns 404
         let response = polling_station_data_entry_delete(
             State(PollingStationDataEntries::new(pool.clone())),
-            Path((1, 1)),
+            Path((1, EntryNumber::try_from(1).unwrap())),
         )
         .await
         .into_response();

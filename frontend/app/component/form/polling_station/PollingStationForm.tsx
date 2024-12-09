@@ -21,7 +21,6 @@ interface Form extends HTMLFormElement {
 }
 
 export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
-  const formRef = React.useRef<Form>(null);
   const { create, update, requestState } = usePollingStationMutation();
 
   const handleSubmit = (event: React.FormEvent<Form>) => {
@@ -59,7 +58,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
           <Alert type="error">{requestState.error.message}</Alert>
         </FormLayout.Alert>
       )}
-      <Form ref={formRef} onSubmit={handleSubmit} id="polling-station-form">
+      <Form onSubmit={handleSubmit} id="polling-station-form">
         <FormLayout disabled={requestState.status === "loading"}>
           <FormLayout.Section title={t("general_details")}>
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />

@@ -23,10 +23,8 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
 
           return (
             <Table.LinkRow key={pollingStation.number} to={`./${pollingStation.id}`}>
-              <Table.Cell number fontSizeClass="fs-body">
-                {pollingStation.number}
-              </Table.Cell>
-              <Table.Cell fontSizeClass="fs-md">
+              <Table.Cell className="table-number">{pollingStation.number}</Table.Cell>
+              <Table.Cell>
                 <span>{pollingStation.name}</span>
                 {status && <Badge type={status} showIcon />}
               </Table.Cell>

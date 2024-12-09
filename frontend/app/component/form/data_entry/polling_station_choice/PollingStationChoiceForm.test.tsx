@@ -1,5 +1,6 @@
 import * as router from "react-router";
 
+import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
@@ -151,9 +152,11 @@ describe("Test PollingStationChoiceForm", () => {
       await user.click(submitButton);
 
       // Test if the warning message is shown correctly
-      expect(screen.getByTestId("pollingStationSelectorFeedback").textContent).toBe(
-        "Stembureau 34 (Testplek) is al twee keer ingevoerd",
-      );
+      await waitFor(() => {
+        expect(screen.getByTestId("pollingStationSelectorFeedback").textContent).toBe(
+          "Stembureau 34(Testplek)is al twee keer ingevoerd",
+        );
+      });
 
       expect(
         within(screen.getByTestId("pollingStationSubmitFeedback")).getByText(

@@ -22,17 +22,24 @@ export function AccountSetupForm() {
 
   return (
     <form className="no_footer" onSubmit={handleSubmit}>
-      <h2 className="mb-lg">{t("user.personalize_account")}</h2>
-      <InputField
-        name="username"
-        label={t("user.username_hint")}
-        hint={t("user.username_hint")}
-        value={t("user.username_default")}
-        disabled
-      />
-      <InputField name="name" label={t("user.name")} subtext={t("user.name_subtext")} hint={t("user.name_hint")} />
-      <InputField name="new_password1" label={t("user.password")} hint={t("user.password_hint")} type="password" />
-      <InputField name="new_password2" label={t("user.password_repeat")} type="password" margin={false} />
+      <div>
+        <h2 className="mb-lg">{t("user.personalize_account")}</h2>
+        <InputField
+          name="username"
+          label={t("user.username")}
+          hint={t("user.username_hint")}
+          value={t("user.username_default")}
+          disabled
+        />
+        <InputField name="name" label={t("user.name")} subtext={t("user.name_subtext")} hint={t("user.name_hint")} />
+        <InputField
+          name="new_password1"
+          label={t("user.password_new")}
+          hint={t("user.password_hint")}
+          type="password"
+        />
+        <InputField name="new_password2" label={t("user.password_repeat")} type="password" />
+      </div>
       <BottomBar type="footer">
         <BottomBar.Row>
           <Button type="submit" size="lg">

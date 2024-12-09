@@ -23,8 +23,10 @@ export function LoginForm() {
 
   return (
     <form className="no_footer" onSubmit={handleSubmit}>
-      <InputField name="username" label={t("user.username")} hint={t("user.username_login_hint")} />
-      <InputField name="password" label={t("user.password")} hint={t("user.password_login_hint")} type="password" />
+      <div>
+        <InputField name="username" label={t("user.username")} hint={t("user.username_login_hint")} />
+        <InputField name="password" label={t("user.password")} hint={t("user.password_login_hint")} type="password" />
+      </div>
       <BottomBar type="footer">
         <BottomBar.Row>
           <Button type="submit" size="lg">

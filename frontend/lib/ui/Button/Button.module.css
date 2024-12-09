@@ -49,8 +49,8 @@
   }
 
   &.primary-destructive {
-    border-color: var(--color-error);
-    background: var(--color-error);
+    border-color: var(--red-600);
+    background: var(--red-600);
     color: var(--base-white);
   }
 

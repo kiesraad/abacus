@@ -28,6 +28,8 @@ export function PollingStationListPage() {
   const createdId = searchParams.get("created");
   const createdPollingStation = createdId ? data.polling_stations.find((ps) => ps.id === parseInt(createdId)) : null;
 
+  const deletedPollingStation = searchParams.get("deleted");
+
   const closeAlert = () => {
     setSearchParams("");
   };
@@ -65,6 +67,14 @@ export function PollingStationListPage() {
               number: createdPollingStation.number,
               name: createdPollingStation.name,
             })}
+          </strong>
+        </Alert>
+      )}
+
+      {deletedPollingStation && (
+        <Alert type="success" onClose={closeAlert}>
+          <strong>
+            {t("polling_station.message.polling_station_deleted", { pollingStation: deletedPollingStation })}
           </strong>
         </Alert>
       )}

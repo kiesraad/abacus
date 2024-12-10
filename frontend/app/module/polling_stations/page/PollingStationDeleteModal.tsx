@@ -1,6 +1,4 @@
-import * as React from "react";
-
-import { usePollingStationMutation } from "@kiesraad/api";
+import { isSuccess, useCrud } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
@@ -17,19 +15,17 @@ export function PollingStationDeleteModal({
   onCancel,
   onError,
 }: PollingStationDeleteModalProps) {
-  const { remove, requestState } = usePollingStationMutation();
+  const { remove, requestState } = useCrud(`/api/polling_stations/${pollingStationId}`);
 
   function handleDelete() {
-    remove(pollingStationId);
+    void remove().then((result) => {
+      if (isSuccess(result)) {
+        onDeleted();
+      } else {
+        onError();
+      }
+    });
   }
-
-  React.useEffect(() => {
-    if (requestState.status === "success") {
-      onDeleted();
-    } else if (requestState.status === "api-error") {
-      onError();
-    }
-  }, [requestState, onDeleted, onError]);
 
   const deleting = requestState.status === "loading";
 

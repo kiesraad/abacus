@@ -88,6 +88,7 @@ pub trait EMLDocument: Sized + DeserializeOwned + Serialize {
 
 pub fn eml_document_hash(input: &str, chunked: bool) -> String {
     use sha2::Digest;
+    use std::fmt::Write;
     let digest = sha2::Sha256::digest(input.as_bytes());
 
     let mut res = String::new();
@@ -95,7 +96,7 @@ pub fn eml_document_hash(input: &str, chunked: bool) -> String {
         if chunked && idx > 0 && idx % 2 == 0 {
             res.push(' ');
         }
-        res.push_str(&format!("{:02x}", b));
+        write!(&mut res, "{:02x}", b).expect("Writing to a string cannot fail");
     }
     res
 }

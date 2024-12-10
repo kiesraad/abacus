@@ -18,9 +18,8 @@ export interface PollingStationChoiceFormProps {
   anotherEntry?: boolean;
 }
 
-const INVALID_POLLING_STATION_ALERT: string = "Voer een geldig nummer van een stembureau in om te beginnen";
-const DEFINITIVE_POLLING_STATION_ALERT: string =
-  "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden";
+const INVALID_POLLING_STATION_ALERT: string = t("polling_station_choice.enter_a_valid_number_to_start");
+const DEFINITIVE_POLLING_STATION_ALERT: string = t("polling_station_choice.polling_station_entry_not_possible");
 
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();

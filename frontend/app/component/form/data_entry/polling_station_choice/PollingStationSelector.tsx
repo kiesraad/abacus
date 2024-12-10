@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 
 import { PollingStation } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { IconError } from "@kiesraad/icon";
+import { IconError, IconWarning } from "@kiesraad/icon";
 import { Badge, Icon, InputField, Spinner } from "@kiesraad/ui";
 import { cn, removeLeadingZeros, usePollingStationStatus } from "@kiesraad/util";
 
@@ -63,12 +63,25 @@ export function PollingStationSelector({
               </div>
             );
           } else if (currentPollingStation) {
-            return (
-              <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.success)}>
-                <span className="bold">{currentPollingStation.name}</span>
-                {currentPollingStationStatus && <Badge type={currentPollingStationStatus} showIcon />}
-              </div>
-            );
+            if (currentPollingStationStatus === "definitive") {
+              return (
+                <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.warning)}>
+                  <span className={cls.icon}>
+                    <Icon icon={<IconWarning aria-label={t("contains_warning")} />} color="warning" />
+                  </span>
+                  {t("polling_station.title.singular")} {currentPollingStation.number}
+                  <span className="bold">({currentPollingStation.name})</span>
+                  {t("polling_station_choice.has_already_been_filled_twice")}
+                </div>
+              );
+            } else {
+              return (
+                <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.success)}>
+                  <span className="bold">{currentPollingStation.name}</span>
+                  {currentPollingStationStatus && <Badge type={currentPollingStationStatus} showIcon />}
+                </div>
+              );
+            }
           } else {
             return (
               <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.error)}>

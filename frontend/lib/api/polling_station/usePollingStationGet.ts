@@ -1,7 +1,8 @@
-import { PollingStation } from "../gen/openapi";
-import { useApiRequest, UseLimitedApiRequestReturn } from "../useApiRequest";
+import { useApiRequest, UseApiRequestReturn } from "@kiesraad/api";
 
-export function usePollingStationGet(pollingStationId: number): UseLimitedApiRequestReturn<PollingStation> {
+import { PollingStation } from "../gen/openapi";
+
+export function usePollingStationGet(pollingStationId: number): UseApiRequestReturn<PollingStation> {
   const path = `/api/polling_stations/${pollingStationId}`;
-  return useApiRequest<PollingStation>(path, true);
+  return useApiRequest<PollingStation>(path);
 }

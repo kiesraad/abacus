@@ -20,7 +20,7 @@ export function PollingStationCreatePage() {
 
   return (
     <>
-      <PageTitle title="Stembureaus - Abacus" />
+      <PageTitle title={`${t("polling_stations")} - Abacus`} />
       <NavBar>
         <Link to={`/elections/${election.id}#coordinator`}>
           <span className="bold">{election.location}</span>
@@ -34,7 +34,7 @@ export function PollingStationCreatePage() {
       </NavBar>
       <header>
         <section>
-          <h1>Stembureau toevoegen</h1>
+          <h1>{t("polling_station.create")}</h1>
         </section>
       </header>
       <main>

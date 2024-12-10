@@ -4,6 +4,7 @@ import {
   LimitedApiRequestState,
   POLLING_STATION_CREATE_REQUEST_BODY,
   POLLING_STATION_CREATE_REQUEST_PATH,
+  POLLING_STATION_DELETE_REQUEST_PATH,
   POLLING_STATION_UPDATE_REQUEST_BODY,
   POLLING_STATION_UPDATE_REQUEST_PATH,
   PollingStation,
@@ -13,15 +14,17 @@ import { useCrud } from "../useCrud";
 
 export type PollingStationSubmitCreate = (electionId: number, obj: POLLING_STATION_CREATE_REQUEST_BODY) => void;
 export type PollingStationSubmitUpdate = (pollingStationId: number, obj: POLLING_STATION_UPDATE_REQUEST_BODY) => void;
+export type PollingStationSubmitRemove = (pollingStationId: number) => void;
 
 export type UsePollingStationMutationReturn = {
   create: PollingStationSubmitCreate;
   update: PollingStationSubmitUpdate;
+  remove: PollingStationSubmitRemove;
   requestState: LimitedApiRequestState<PollingStation>;
 };
 
 export function usePollingStationMutation(): UsePollingStationMutationReturn {
-  const { requestState, create: crudCreate, update: crudUpdate } = useCrud<PollingStation>(true);
+  const { requestState, create: crudCreate, update: crudUpdate, remove: crudRemove } = useCrud<PollingStation>(true);
 
   const create: PollingStationSubmitCreate = React.useCallback(
     (electionId, obj) => {
@@ -41,5 +44,14 @@ export function usePollingStationMutation(): UsePollingStationMutationReturn {
     [crudUpdate],
   );
 
-  return { create, update, requestState };
+  const remove: PollingStationSubmitRemove = React.useCallback(
+    (pollingStationId) => {
+      const path: POLLING_STATION_DELETE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}`;
+
+      void crudRemove(path);
+    },
+    [crudRemove],
+  );
+
+  return { create, update, remove, requestState };
 }

@@ -96,7 +96,7 @@ pub fn eml_document_hash(input: &str, chunked: bool) -> String {
         if chunked && idx > 0 && idx % 2 == 0 {
             res.push(' ');
         }
-        write!(&mut res, "{:02x}", b).unwrap();
+        write!(&mut res, "{:02x}", b).expect("Writing to a string cannot fail");
     }
     res
 }

@@ -64,7 +64,9 @@ export function OverviewPage() {
           <Table id="overview">
             <Table.Header>
               <Table.Column>{t("election.title.singular")}</Table.Column>
-              <Table.Column>{!isAdministrator ? t("election.location") : t("election.level_polling_station")}</Table.Column>
+              <Table.Column>
+                {!isAdministrator ? t("election.location") : t("election.level_polling_station")}
+              </Table.Column>
               <Table.Column>{t("election_status.label")}</Table.Column>
             </Table.Header>
             <Table.Body>

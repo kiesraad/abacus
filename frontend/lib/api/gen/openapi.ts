@@ -82,6 +82,15 @@ export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
 export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
+// /api/user/login
+export type LOGIN_REQUEST_PARAMS = Record<string, never>;
+export type LOGIN_REQUEST_PATH = `/api/user/login`;
+export type LOGIN_REQUEST_BODY = Credentials;
+
+// /api/user/logout
+export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
+export type LOGOUT_REQUEST_PATH = `/api/user/logout`;
+
 /** TYPES **/
 
 /**
@@ -106,6 +115,11 @@ export type CandidateGender = "Male" | "Female" | "X";
 export interface CandidateVotes {
   number: number;
   votes: number;
+}
+
+export interface Credentials {
+  password: string;
+  username: string;
 }
 
 /**
@@ -193,7 +207,9 @@ export type ErrorReference =
   | "PdfGenerationError"
   | "PollingStationRepeated"
   | "PollingStationValidationErrors"
-  | "InvalidPoliticalGroup";
+  | "InvalidPoliticalGroup"
+  | "InvalidUsernamePassword"
+  | "InvalidSession";
 
 /**
  * Response structure for errors
@@ -213,6 +229,11 @@ export interface GetDataEntryResponse {
   progress: number;
   updated_at: number;
   validation_results: ValidationResults;
+}
+
+export interface LoginResponse {
+  user_id: number;
+  username: string;
 }
 
 /**

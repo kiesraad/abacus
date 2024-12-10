@@ -1,14 +1,14 @@
 use std::time::Duration;
 
 mod error;
-mod handlers;
+pub mod handlers;
 mod password;
 mod session;
 mod user;
 mod util;
 
 pub use error::AuthenticationError;
-pub use handlers::{login, logout};
+pub use handlers::{login, logout, Credentials, LoginResponse};
 
 /// Session life time, for both cookie and database
 pub const SESSION_LIFE_TIME: Duration = Duration::from_secs(60 * 60 * 2);

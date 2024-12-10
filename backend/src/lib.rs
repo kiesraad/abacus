@@ -8,7 +8,7 @@ use std::error::Error;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
-mod authentication;
+pub mod authentication;
 pub mod data_entry;
 pub mod election;
 pub mod eml;
@@ -77,7 +77,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/logout", post(authentication::logout));
 
     let app = Router::new()
-        .nest("/ali/user", user_router)
+        .nest("/api/user", user_router)
         .nest("/api/elections", election_routes)
         .nest("/api/polling_stations", polling_station_routes)
         .nest(
@@ -122,6 +122,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[derive(OpenApi)]
     #[openapi(
         paths(
+            authentication::handlers::login,
+            authentication::handlers::logout,
             election::election_list,
             election::election_details,
             election::election_status,
@@ -140,6 +142,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         components(
             schemas(
                 ErrorResponse,
+                authentication::Credentials,
+                authentication::LoginResponse,
                 data_entry::CandidateVotes,
                 data_entry::SaveDataEntryRequest,
                 data_entry::SaveDataEntryResponse,

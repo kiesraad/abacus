@@ -3,8 +3,9 @@ use axum_extra::extract::CookieJar;
 use cookie::{Cookie, SameSite};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
-use crate::APIError;
+use crate::{APIError, ErrorResponse};
 
 use super::{
     session::Sessions,
@@ -12,13 +13,13 @@ use super::{
     SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct Credentials {
     username: String,
     password: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct LoginResponse {
     user_id: u32,
     username: String,
@@ -42,7 +43,16 @@ fn set_default_cookie_properties(cookie: &mut Cookie) {
 }
 
 /// Login endpoint, authenticates a user and creates a new session + session cookie
-/// #[axum::debug_handler]
+#[utoipa::path(
+    post,
+    path = "/api/user/login",
+    request_body = Credentials,
+    responses(
+        (status = 200, description = "The logged in user id and user name", body = LoginResponse),
+        (status = 401, description = "Invalid credentials", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
 pub async fn login(
     State(users): State<Users>,
     State(sessions): State<Sessions>,
@@ -69,6 +79,14 @@ pub async fn login(
 }
 
 /// Logout endpoint, deletes the session cookie
+#[utoipa::path(
+    post,
+    path = "/api/user/logout",
+    responses(
+        (status = 200, description = "Successful logout, or user was already logged out"),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
 pub async fn logout(
     State(sessions): State<Sessions>,
     jar: CookieJar,

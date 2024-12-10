@@ -57,7 +57,6 @@ export function handleApiResult<T>(
   result: ApiResult<T>,
   setRequestState: (state: ApiRequestState<T>) => void,
   controller?: AbortController,
-  onSaved?: (data: T) => void,
 ): ApiResult<T> {
   // Do not update state if the request was aborted (mainly caused by an unmounted component)
   if (controller instanceof AbortController && controller.signal.aborted) {
@@ -74,7 +73,6 @@ export function handleApiResult<T>(
     setRequestState({ status: "network-error", error: result });
   } else {
     setRequestState({ status: "success", data: result.data });
-    onSaved?.(result.data);
   }
 
   return result;

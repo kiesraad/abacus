@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { ApiResult } from "./api.types";
 import { useApi } from "./useApi";
 import {
   ApiRequestState,
@@ -15,10 +16,10 @@ export type CrudRequestState<T> =
   | ApiRequestState<T>;
 
 export interface UseCrudReturn<T> {
-  get: (controller?: AbortController) => Promise<void>;
-  create: (requestBody: object, controller?: AbortController) => Promise<void>;
-  update: (requestBody: object, controller?: AbortController) => Promise<void>;
-  remove: (controller?: AbortController) => Promise<void>;
+  get: (controller?: AbortController) => Promise<ApiResult<T>>;
+  create: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
+  update: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
+  remove: (controller?: AbortController) => Promise<ApiResult<T>>;
   requestState: CrudRequestState<T>;
 }
 
@@ -36,7 +37,7 @@ export type ApiPaths =
     };
 
 // Call the api and return the current status of the request, optionally throws an error when the request fails
-export function useCrud<T>(path: ApiPaths, onSaved?: (data: T) => void): UseCrudReturn<T> {
+export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
   const client = useApi();
   const [requestState, setRequestState] = useState<CrudRequestState<T>>({ status: "idle" });
   const paths = typeof path === "string" ? { get: path, create: path, update: path, remove: path } : path;
@@ -57,7 +58,7 @@ export function useCrud<T>(path: ApiPaths, onSaved?: (data: T) => void): UseCrud
     setRequestState({ status: "loading" });
     const result = await client.getRequest<T>(paths.get, controller);
 
-    void handleApiResult(result, setRequestState, controller, onSaved);
+    return handleApiResult(result, setRequestState, controller);
   };
 
   // Create a new resource
@@ -69,7 +70,7 @@ export function useCrud<T>(path: ApiPaths, onSaved?: (data: T) => void): UseCrud
     setRequestState({ status: "loading" });
     const result = await client.postRequest<T>(paths.create, requestBody, controller);
 
-    void handleApiResult(result, setRequestState, controller, onSaved);
+    return handleApiResult(result, setRequestState, controller);
   };
 
   // Update an existing resource
@@ -81,7 +82,7 @@ export function useCrud<T>(path: ApiPaths, onSaved?: (data: T) => void): UseCrud
     setRequestState({ status: "loading" });
     const result = await client.putRequest<T>(paths.update, requestBody, controller);
 
-    void handleApiResult(result, setRequestState, controller, onSaved);
+    return handleApiResult(result, setRequestState, controller);
   };
 
   // Remove an existing resource
@@ -93,7 +94,7 @@ export function useCrud<T>(path: ApiPaths, onSaved?: (data: T) => void): UseCrud
     setRequestState({ status: "loading" });
     const result = await client.deleteRequest<T>(paths.remove, controller);
 
-    void handleApiResult(result, setRequestState, controller, onSaved);
+    return handleApiResult(result, setRequestState, controller);
   };
 
   return {

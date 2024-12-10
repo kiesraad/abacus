@@ -1,6 +1,6 @@
 import { TranslationPath } from "@kiesraad/i18n";
 
-import { ApiResult } from "./api.types";
+import { ApiResponse, ApiResult } from "./api.types";
 import { ApiResponseStatus } from "./ApiResponseStatus";
 import { ErrorReference } from "./gen/openapi";
 
@@ -54,6 +54,15 @@ export class NotFoundError extends FatalError {
 
     return this;
   }
+}
+
+export function isSucceess<T>(result: ApiResult<T>): result is ApiResponse<T> {
+  return !(
+    result instanceof ApiError ||
+    result instanceof FatalApiError ||
+    result instanceof NotFoundError ||
+    result instanceof NetworkError
+  );
 }
 
 export function isFatalError(error: ApiResult<unknown>): error is FatalError {

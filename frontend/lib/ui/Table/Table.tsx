@@ -1,6 +1,8 @@
 import * as React from "react";
 import { To, useNavigate } from "react-router-dom";
 
+import { cn } from "@kiesraad/util";
+
 import cls from "./Table.module.css";
 
 export interface TableProps {
@@ -22,6 +24,7 @@ Table.Body = Body;
 Table.Row = Row;
 Table.LinkRow = LinkRow;
 Table.Cell = Cell;
+Table.NumberCell = NumberCell;
 
 function Header({ children, className }: { children: React.ReactNode[]; className?: string }) {
   return (
@@ -59,4 +62,8 @@ function LinkRow({ children, to }: { children: React.ReactNode[]; to: To }) {
 
 function Cell({ children, className }: { children?: React.ReactNode; className?: string }) {
   return <td className={className}>{children}</td>;
+}
+
+function NumberCell({ children, className }: { children?: React.ReactNode; className?: string }) {
+  return <td className={cn(cls.numberCell, className)}>{children}</td>;
 }

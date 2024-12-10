@@ -37,6 +37,14 @@
     margin-left: 0.5rem;
   }
 
+  td.number-cell {
+    text-align: right;
+    font-size: var(--font-size-body);
+    font-weight: bold;
+    width: 6.5rem;
+    line-height: 1.75rem;
+  }
+
   tr.row-link {
     cursor: pointer;
 
@@ -52,12 +60,4 @@
       background-repeat: no-repeat;
     }
   }
-}
-
-:global(.table-number) {
-  text-align: right;
-  font-size: var(--font-size-body);
-  font-weight: bold;
-  width: 6.5rem;
-  line-height: 1.75rem;
 }

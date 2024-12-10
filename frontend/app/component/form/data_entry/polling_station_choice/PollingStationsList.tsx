@@ -23,7 +23,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
 
           return (
             <Table.LinkRow key={pollingStation.number} to={`./${pollingStation.id}`}>
-              <Table.Cell className="table-number">{pollingStation.number}</Table.Cell>
+              <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
               <Table.Cell>
                 <span>{pollingStation.name}</span>
                 {status && <Badge type={status} showIcon />}

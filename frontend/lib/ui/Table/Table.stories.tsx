@@ -23,7 +23,7 @@ export const BasicTable: Story = () => (
         <Table.Body>
           {data.map((row) => (
             <Table.Row key={row[0]}>
-              <Table.Cell className="table-number">{row[0]}</Table.Cell>
+              <Table.NumberCell>{row[0]}</Table.NumberCell>
               <Table.Cell>{row[1]}</Table.Cell>
               <Table.Cell>{row[2]}</Table.Cell>
             </Table.Row>
@@ -40,14 +40,14 @@ export const BasicTable: Story = () => (
         </Table.Header>
         <Table.Body className="fs-sm">
           <Table.Row>
-            <Table.Cell className="table-number">33</Table.Cell>
+            <Table.NumberCell className="bg-gray">33</Table.NumberCell>
             <Table.Cell>
               <span>Op rolletjes</span>
               <Badge type="first_entry_in_progress" />
             </Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.Cell className="table-number">34</Table.Cell>
+            <Table.NumberCell className="bg-gray">34</Table.NumberCell>
             <Table.Cell>
               <span>Testplek</span>
               <Badge type="not_started" />
@@ -70,7 +70,7 @@ export const LinkTable: Story = () => {
       <Table.Body className="fs-md">
         {data.map((row) => (
           <Table.LinkRow key={row[0]} to={`#row${row[0]}`}>
-            <Table.Cell className="table-number">{row[0]}</Table.Cell>
+            <Table.NumberCell>{row[0]}</Table.NumberCell>
             <Table.Cell>{row[1]}</Table.Cell>
             <Table.Cell>{row[2]}</Table.Cell>
           </Table.LinkRow>
@@ -90,7 +90,7 @@ export const IconBadgeTable: Story = () => (
     <Table.Body>
       {data.map((row) => (
         <Table.LinkRow key={row[0]} to={`#row${row[0]}`}>
-          <Table.Cell className="table-number">{row[0]}</Table.Cell>
+          <Table.NumberCell>{row[0]}</Table.NumberCell>
           <Table.Cell>
             <Icon icon={<IconCheckHeart />} color="accept" />
             <span>{row[1]}</span>

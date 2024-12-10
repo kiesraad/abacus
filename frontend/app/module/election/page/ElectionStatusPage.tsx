@@ -86,9 +86,7 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
   function CategoryPollingStationRow({ children }: { children?: ReactNode[] }) {
     return (
       <Table.Row>
-        <Table.Cell key={`${polling_station.id}-number`} className="table-number">
-          {polling_station.number}
-        </Table.Cell>
+        <Table.NumberCell key={`${polling_station.id}-number`}>{polling_station.number}</Table.NumberCell>
         <Table.Cell key={`${polling_station.id}-name`}>
           <span>{polling_station.name}</span>
           {showBadge.includes(polling_station.status) && <Badge type={polling_station.status} />}

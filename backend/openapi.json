@@ -1106,6 +1106,7 @@
           "InvalidData",
           "InvalidJson",
           "InvalidDataEntryNumber",
+          "InvalidStateTransition",
           "EntryNotUnique",
           "DatabaseError",
           "InternalServerError",

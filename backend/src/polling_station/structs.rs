@@ -7,7 +7,9 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::APIError;
+use crate::{error::ErrorReference, APIError};
+
+use super::repository::PollingStations;
 
 /// Polling station of a certain [crate::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
@@ -87,7 +89,7 @@ pub struct PollingStationStatusEntry {
     pub finished_at: Option<i64>,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum PollingStationStatus {
     NotStarted,            // First entry has not started yet
@@ -97,6 +99,15 @@ pub enum PollingStationStatus {
     SecondEntryInProgress, // Second entry is currently in progress
     SecondEntryUnfinished, // Second entry has been aborted and the data has been saved
     Definitive,            // First and second entry are finished
+}
+
+impl PollingStationStatus {
+    pub async fn from_polling_station_id(
+        repo: PollingStations,
+        polling_station_id: u32,
+    ) -> Result<Self, APIError> {
+        Ok(repo.status(polling_station_id).await?.status)
+    }
 }
 
 #[cfg(test)]

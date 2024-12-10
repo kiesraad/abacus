@@ -99,7 +99,7 @@ pub async fn election_status(
     State(polling_station_repo): State<PollingStations>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
-    let statuses = polling_station_repo.status(id).await?;
+    let statuses = polling_station_repo.statuses(id).await?;
     Ok(Json(ElectionStatusResponse { statuses }))
 }
 

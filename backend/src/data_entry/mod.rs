@@ -71,7 +71,6 @@ pub async fn polling_station_data_entry_save(
     State(elections): State<Elections>,
     data_entry_request: SaveDataEntryRequest,
 ) -> Result<SaveDataEntryResponse, APIError> {
-    //dbg!(&entry_number);
     // Check if it is valid to save the data entry
     // TODO: #657 execute all checks in this function in a single SQL transaction
     if polling_station_results_entries.exists(id).await? {
@@ -93,17 +92,17 @@ pub async fn polling_station_data_entry_save(
                         .to_string(),
                     ErrorReference::PollingStationFirstEntryNotFinalised,
                 ));
-                }
             }
-            _ => {
-                return Err(APIError::NotFound(
-                    "Only the first or second data entry is supported".to_string(),
-                    ErrorReference::EntryNumberNotSupported,
-                ));
-            }
-        };
+        }
+        _ => {
+            return Err(APIError::NotFound(
+                "Only the first or second data entry is supported".to_string(),
+                ErrorReference::EntryNumberNotSupported,
+            ));
+        }
+    };
 
-let polling_station = polling_stations_repo.get(id).await?;
+    let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
 
     let validation_results =
@@ -246,6 +245,8 @@ pub async fn polling_station_data_entry_finalise(
     State(elections): State<Elections>,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<(), APIError> {
+    let current_status = polling_stations_repo.status(id);
+
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
 

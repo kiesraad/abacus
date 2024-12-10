@@ -28,6 +28,7 @@ pub enum ErrorReference {
     InvalidData,
     InvalidJson,
     InvalidDataEntryNumber,
+    InvalidStateTransition,
     EntryNotUnique,
     DatabaseError,
     InternalServerError,

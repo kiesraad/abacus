@@ -417,8 +417,9 @@ test.describe("second data entry", () => {
 
     await expect(pollingStationChoicePage.fieldsetNextPollingStation).toBeVisible();
     await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation.name);
-    await expect(pollingStationChoicePage.pollingStationFeedback).toContainText("Definitief");
+    await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(
+      "Stembureau 33(Op Rolletjes)is al twee keer ingevoerd",
+    );
     await pollingStationChoicePage.clickStart();
     await expect(pollingStationChoicePage.pollingStationSubmitFeedback).toContainText(
       "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",

@@ -257,4 +257,16 @@ async fn test_election_zip_download(pool: SqlitePool) {
         &content_disposition_string[21..],
         "\"election_result_GR2024_Heemdamseburg.zip\""
     );
+
+    let bytes = response.bytes().await.unwrap();
+    let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();
+    {
+        let xml_file = archive.by_name("Telling_GR2024_Heemdamseburg.xml").unwrap();
+        assert!(xml_file.size() > 0);
+    }
+
+    {
+        let pdf_file = archive.by_name("PV_GR2024_Heemdamseburg.pdf").unwrap();
+        assert!(pdf_file.size() > 0);
+    }
 }

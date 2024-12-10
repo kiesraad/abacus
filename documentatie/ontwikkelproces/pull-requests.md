@@ -26,6 +26,7 @@ Let minstens op:
 - scope van de wijzigingen
 - kwaliteit van de code
 - consistentie met omliggende code
+- imports en de resulterende afhankelijkheden
 - edge cases
 - test coverage
 - documentatie (README, diagrammen, use cases)

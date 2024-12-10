@@ -78,7 +78,7 @@ pub async fn login(
     // Check the username + password combination
     let user = users.authenticate(&username, &password).await?;
 
-    // Remove old sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
+    // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
     sessions.delete_expired_sessions().await?;
 
     // Create a new session and cookie

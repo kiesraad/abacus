@@ -66,6 +66,7 @@ The following dependencies (crates) are used:
 Additionally, the following development dependencies are used:
 
 - `reqwest`: HTTP client for testing the API.
+- `http-body-util`: trait used to extract a response body in some tests.
 
 ### Database
 

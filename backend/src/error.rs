@@ -13,6 +13,7 @@ use sqlx::Error::RowNotFound;
 use tracing::error;
 use typst::diag::SourceDiagnostic;
 use utoipa::ToSchema;
+use zip::result::ZipError;
 
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -70,6 +71,7 @@ pub enum APIError {
     AddError(String, ErrorReference),
     XmlError(quick_xml::se::SeError),
     Authentication(AuthenticationError),
+    ZipError(ZipError),
 }
 
 impl IntoResponse for APIError {
@@ -198,6 +200,17 @@ impl IntoResponse for APIError {
                     ),
                 }
             }
+            APIError::ZipError(err) => {
+                error!("Error with zip file: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error(
+                        "Internal server error",
+                        ErrorReference::InternalServerError,
+                        false,
+                    ),
+                )
+            }
         };
 
         (status, response).into_response()
@@ -261,6 +274,12 @@ impl From<SeError> for APIError {
 impl From<AuthenticationError> for APIError {
     fn from(err: AuthenticationError) -> Self {
         APIError::Authentication(err)
+    }
+}
+
+impl From<ZipError> for APIError {
+    fn from(err: ZipError) -> Self {
+        APIError::ZipError(err)
     }
 }
 

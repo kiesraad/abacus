@@ -13,7 +13,7 @@ test.describe("pdf rendering", () => {
     await electionStatusPage.finish.click();
 
     const electionReportPage = new ElectionReport(page);
-    const responsePromise = page.waitForResponse("/api/elections/4/download_results");
+    const responsePromise = page.waitForResponse("/api/elections/4/download_pdf_results");
     const downloadPromise = page.waitForEvent("download");
     await electionReportPage.download.click();
 

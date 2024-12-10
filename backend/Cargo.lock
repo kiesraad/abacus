@@ -280,6 +280,7 @@ dependencies = [
  "typst-pdf",
  "utoipa",
  "utoipa-swagger-ui",
+ "zip",
 ]
 
 [[package]]
@@ -4476,6 +4477,7 @@ dependencies = [
  "indexmap",
  "memchr",
  "thiserror 2.0.4",
+ "time",
  "zopfli",
 ]
 

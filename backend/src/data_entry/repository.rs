@@ -1,6 +1,7 @@
 use axum::extract::FromRef;
 use sqlx::{query, Sqlite, SqlitePool, Transaction};
 
+use super::entry_number::EntryNumber;
 use super::{PollingStation, PollingStationResults, PollingStationResultsEntry};
 use crate::polling_station::repository::PollingStations;
 use crate::AppState;
@@ -17,7 +18,7 @@ impl PollingStationDataEntries {
     pub async fn upsert(
         &self,
         id: u32,
-        entry_number: u8,
+        entry_number: EntryNumber,
         progress: u8,
         data: String,
         client_state: String,
@@ -50,7 +51,7 @@ impl PollingStationDataEntries {
         &self,
         tx: &mut Transaction<'_, Sqlite>,
         id: u32,
-        entry_number: u8,
+        entry_number: EntryNumber,
     ) -> Result<(u8, Vec<u8>, Vec<u8>, i64), sqlx::Error> {
         let res = query!(
             r#"SELECT progress AS "progress: u8", data, client_state, updated_at FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?"#,
@@ -68,7 +69,7 @@ impl PollingStationDataEntries {
         }
     }
 
-    pub async fn delete(&self, id: u32, entry_number: u8) -> Result<(), sqlx::Error> {
+    pub async fn delete(&self, id: u32, entry_number: EntryNumber) -> Result<(), sqlx::Error> {
         let res = query!(
             "DELETE FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ? AND finalised_at IS NULL",
             id,

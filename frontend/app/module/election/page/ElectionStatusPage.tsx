@@ -103,14 +103,26 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
     );
   }
 
+  function formatFinishedAt(date: Date) {
+    const today = new Date();
+    if (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    ) {
+      return `${t("today")} ${date.toLocaleTimeString("nl-NL", { timeStyle: "short" })}`;
+    } else {
+      return date.toLocaleString("nl-NL", {
+        weekday: "long", //TODO: this is not i18n equipped due to the set Dutch locale
+        hour: "numeric",
+        minute: "numeric",
+      });
+    }
+  }
+
   const finishedAtCell = (
     <Table.Cell key={`${polling_station.id}-time`}>
-      {polling_station.finished_at
-        ? new Date(polling_station.finished_at * 1000).toLocaleTimeString("nl-NL", {
-            timeStyle: "short",
-            hour12: false,
-          })
-        : ""}
+      {polling_station.finished_at ? formatFinishedAt(new Date(polling_station.finished_at * 1000)) : ""}
     </Table.Cell>
   );
   const progressCell = (

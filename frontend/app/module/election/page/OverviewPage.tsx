@@ -45,7 +45,7 @@ export function OverviewPage() {
       </NavBar>
       <header>
         <section>
-          <h1>{t(`election.${isAdministrator ? "manage" : "title.plural"}`)}</h1>
+          <h1>{isAdministrator ? t("election.manage") : t("election.title.plural")}</h1>
         </section>
         {!isAdministrator && (
           <section>
@@ -64,7 +64,7 @@ export function OverviewPage() {
           <Table id="overview">
             <Table.Header>
               <Table.Column>{t("election.title.singular")}</Table.Column>
-              <Table.Column>{t(`election.${!isAdministrator ? "location" : "level_polling_station"}`)}</Table.Column>
+              <Table.Column>{!isAdministrator ? t("election.location") : t("election.level_polling_station")}</Table.Column>
               <Table.Column>{t("election_status.label")}</Table.Column>
             </Table.Header>
             <Table.Body>

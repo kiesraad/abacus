@@ -5,7 +5,7 @@ use rand::{distributions::Alphanumeric, Rng};
 use super::error::AuthenticationError;
 
 /// Create a new session key, a secure random alphanumeric string of 24 characters
-/// Which correspons to ~ 142 bits of entropy
+/// Which corresponds to ~142 bits of entropy
 pub(super) fn create_new_session_key() -> String {
     rand::thread_rng()
         .sample_iter(&Alphanumeric)

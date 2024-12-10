@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { isSucceess, PollingStation, PollingStationRequest, PollingStationType, useCrud } from "@kiesraad/api";
+import { isSuccess, PollingStation, PollingStationRequest, PollingStationType, useCrud } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@kiesraad/ui";
 import { deformatNumber } from "@kiesraad/util";
@@ -44,13 +44,13 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
 
     if (pollingStation) {
       void update(requestObj).then((result) => {
-        if (isSucceess(result)) {
+        if (isSuccess(result)) {
           onSaved?.(result.data);
         }
       });
     } else {
       void create(requestObj).then((result) => {
-        if (isSucceess(result)) {
+        if (isSuccess(result)) {
           onSaved?.(result.data);
         }
       });

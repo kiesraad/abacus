@@ -6,12 +6,14 @@ import { PollingStationProgress } from "app/component/pollingstation/PollingStat
 import { AbortDataEntryControl } from "app/module/data_entry";
 
 import { NotFoundError, PollingStationFormController, useElection } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
 import { Badge, PageTitle, PollingStationNumber, StickyNav, WorkStationNumber } from "@kiesraad/ui";
 import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";
 
 export function PollingStationLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
+  const entryNumber = useNumericParam("entryNumber");
   const { election, pollingStation } = useElection(pollingStationId);
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
 
@@ -24,10 +26,10 @@ export function PollingStationLayout() {
   }
 
   return (
-    <PollingStationFormController election={election} pollingStationId={pollingStation.id} entryNumber={1}>
-      <PageTitle title={`Invoeren ${pollingStation.number} ${pollingStation.name} - Abacus`} />
+    <PollingStationFormController election={election} pollingStationId={pollingStation.id} entryNumber={entryNumber}>
+      <PageTitle title={`${t("data_entry.title")} ${pollingStation.number} ${pollingStation.name} - Abacus`} />
       <NavBar>
-        <Link to={"/elections"}>Overzicht</Link>
+        <Link to={"/elections"}>{t("overview")}</Link>
         <IconChevronRight />
         <Link to={`/elections/${election.id}/data-entry`}>
           <span className="bold">{election.location}</span>

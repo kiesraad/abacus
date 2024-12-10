@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { MockTest } from "app/component/MockTest";
 import { NavBar } from "app/component/navbar/NavBar";
 
+import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
 
 export function DevHomePage() {
@@ -17,16 +18,16 @@ export function DevHomePage() {
       </header>
       <main>
         <article>
-          <strong>Account</strong>
+          <strong>{t("user.account")}</strong>
           <ul>
             <li>
-              <Link to={`/account`}>Account</Link>
+              <Link to={`/account`}>{t("user.account")}</Link>
             </li>
           </ul>
-          <strong>Invoerder</strong>
+          <strong>{t("typist")}</strong>
           <ul>
             <li>
-              <Link to={"/elections"}>Verkiezingen</Link>
+              <Link to={"/elections"}>{t("election.elections")}</Link>
             </li>
             <ul>
               <li>
@@ -42,6 +43,9 @@ export function DevHomePage() {
             <ul>
               <li>
                 <Link to={`/elections/1#coordinator`}>Verkiezing 1</Link>
+              </li>
+              <li>
+                <Link to={`/elections/1/status#coordinator`}>Statusoverzicht steminvoer Verkiezing 1</Link>
               </li>
               <li>
                 <Link to={`/elections/1/polling-stations#coordinator`}>Stembureaus Verkiezing 1</Link>

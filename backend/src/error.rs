@@ -6,6 +6,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use hyper::header::InvalidHeaderValue;
+use quick_xml::SeError;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use tracing::error;
@@ -19,6 +20,8 @@ pub enum ErrorReference {
     EntryNotFound,
     PollingStationFirstEntryAlreadyFinalised,
     PollingStationFirstEntryNotFinalised,
+    PollingStationSecondEntryAlreadyFinalised,
+    PollingStationResultsAlreadyFinalised,
     PollingStationDataValidation,
     InvalidVoteGroup,
     InvalidVoteCandidate,
@@ -62,6 +65,7 @@ pub enum APIError {
     PdfGenError(Vec<SourceDiagnostic>),
     StdError(Box<dyn Error>),
     AddError(String, ErrorReference),
+    XmlError(quick_xml::se::SeError),
 }
 
 impl IntoResponse for APIError {
@@ -147,6 +151,17 @@ impl IntoResponse for APIError {
                     to_error("Internal server error", reference, false),
                 )
             }
+            APIError::XmlError(err) => {
+                error!("Could not serialize XML: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error(
+                        "Internal server error",
+                        ErrorReference::InternalServerError,
+                        false,
+                    ),
+                )
+            }
         };
 
         (status, response).into_response()
@@ -198,6 +213,12 @@ impl From<DataError> for APIError {
 impl From<InvalidHeaderValue> for APIError {
     fn from(_: InvalidHeaderValue) -> Self {
         APIError::InvalidHeaderValue
+    }
+}
+
+impl From<SeError> for APIError {
+    fn from(err: SeError) -> Self {
+        APIError::XmlError(err)
     }
 }
 

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 import { NavBar } from "app/component/navbar/NavBar";
 
+import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
 
 export function UsersHomePage() {
@@ -9,14 +10,14 @@ export function UsersHomePage() {
     <>
       <PageTitle title="Gebruikersbeheer - Abacus" />
       <NavBar>
-        <Link to={"/elections#administrator"}>Verkiezingen</Link>
-        <span className="active">Gebruikers</span>
-        <Link to={"/workstations#administrator"}>Invoerstations</Link>
-        <Link to={"/logs#administratorcoordinator"}>Logs</Link>
+        <Link to={"/elections#administrator"}>{t("election.elections")}</Link>
+        <span className="active">{t("users")}</span>
+        <Link to={"/workstations#administrator"}>{t("workstations.workstations")}</Link>
+        <Link to={"/logs#administratorcoordinator"}>{t("logs")}</Link>
       </NavBar>
       <header>
         <section>
-          <h1>Gebruikers beheren</h1>
+          <h1>{t("user.manage")}</h1>
         </section>
       </header>
       <main>

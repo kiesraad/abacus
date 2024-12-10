@@ -53,11 +53,11 @@ export const routes = createRoutesFromElements(
         <Route path="polling-stations" element={<PollingStationsLayout />}>
           <Route index element={<PollingStationListPage />} />
           <Route path="create" element={<PollingStationCreatePage />} />
-          <Route path="update/:pollingStationId" element={<PollingStationUpdatePage />} />
+          <Route path=":pollingStationId/update" element={<PollingStationUpdatePage />} />
         </Route>
         <Route path="data-entry" element={null}>
           <Route index element={<DataEntryHomePage />} />
-          <Route path=":pollingStationId" element={<PollingStationLayout />}>
+          <Route path=":pollingStationId/:entryNumber" element={<PollingStationLayout />}>
             {/* The PollingStationFormController will navigate to the correct section. */}
             <Route index element={null} />
             <Route path="recounted" element={<RecountedPage />} />

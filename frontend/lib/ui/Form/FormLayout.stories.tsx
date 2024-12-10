@@ -1,8 +1,7 @@
 import type { Story } from "@ladle/react";
 
-import { Button } from "../Button/Button";
-import { ChoiceList } from "../CheckboxAndRadio";
-import { InputField } from "../InputField/InputField";
+import { Button, ChoiceList, InputField } from "@kiesraad/ui";
+
 import { FormLayout } from "./FormLayout";
 
 export const DefaultFormLayout: Story = () => (
@@ -29,7 +28,7 @@ export const DefaultFormLayout: Story = () => (
             <ChoiceList.Radio id="option3" label="Option 3" />
           </ChoiceList>
         </FormLayout.Field>
-        <InputField name="inp4" label="Input 6" />
+        <InputField name="inp5" label="Input 5" />
       </FormLayout.Section>
       <FormLayout.Controls>
         <Button>Submit</Button>

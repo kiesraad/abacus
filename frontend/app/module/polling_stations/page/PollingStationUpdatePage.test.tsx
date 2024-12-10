@@ -7,7 +7,7 @@ import { describe, expect, test, vi } from "vitest";
 
 import { overrideOnce, render, server } from "app/test/unit";
 
-import { PollingStation } from "@kiesraad/api";
+import { ElectionProvider, PollingStation } from "@kiesraad/api";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
@@ -30,7 +30,11 @@ describe("PollingStationCreatePage", () => {
 
     overrideOnce("get", `/api/polling_stations/${testPollingStation.id}`, 200, testPollingStation);
 
-    render(<PollingStationUpdatePage />);
+    render(
+      <ElectionProvider electionId={1}>
+        <PollingStationUpdatePage />
+      </ElectionProvider>,
+    );
 
     const form = await screen.findByTestId("polling-station-form");
     expect(form).toBeVisible();
@@ -46,7 +50,11 @@ describe("PollingStationCreatePage", () => {
 
     overrideOnce("get", `/api/polling_stations/${testPollingStation.id}`, 200, testPollingStation);
 
-    render(<PollingStationUpdatePage />);
+    render(
+      <ElectionProvider electionId={1}>
+        <PollingStationUpdatePage />
+      </ElectionProvider>,
+    );
 
     const saveButton = await screen.findByRole("button", { name: "Wijzigingen opslaan" });
     saveButton.click();

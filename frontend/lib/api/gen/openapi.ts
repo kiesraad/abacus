@@ -18,6 +18,12 @@ export interface ELECTION_DOWNLOAD_RESULTS_REQUEST_PARAMS {
 }
 export type ELECTION_DOWNLOAD_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_results`;
 
+// /api/elections/{election_id}/download_xml_results
+export interface ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_xml_results`;
+
 // /api/elections/{election_id}/polling_stations
 export interface POLLING_STATION_LIST_REQUEST_PARAMS {
   election_id: number;
@@ -125,6 +131,7 @@ export interface Election {
   location: string;
   name: string;
   nomination_date: string;
+  number_of_seats: number;
   number_of_voters: number;
   political_groups?: PoliticalGroup[];
   status: ElectionStatus;
@@ -172,6 +179,8 @@ export type ErrorReference =
   | "EntryNotFound"
   | "PollingStationFirstEntryAlreadyFinalised"
   | "PollingStationFirstEntryNotFinalised"
+  | "PollingStationSecondEntryAlreadyFinalised"
+  | "PollingStationResultsAlreadyFinalised"
   | "PollingStationDataValidation"
   | "InvalidVoteGroup"
   | "InvalidVoteCandidate"

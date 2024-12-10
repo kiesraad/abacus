@@ -1,5 +1,6 @@
 import { PollingStation, useElectionStatus } from "@kiesraad/api";
 import { Badge, Table } from "@kiesraad/ui";
+import { getUrlForDataEntry } from "@kiesraad/util";
 
 export interface PollingStationsListProps {
   pollingStations: PollingStation[];
@@ -22,7 +23,10 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
           }
 
           return (
-            <Table.LinkRow key={pollingStation.number} to={`./${pollingStation.id}`}>
+            <Table.LinkRow
+              key={pollingStation.number}
+              to={getUrlForDataEntry(pollingStation.election_id, pollingStation.id, status)}
+            >
               <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
               <Table.Cell>
                 <span>{pollingStation.name}</span>

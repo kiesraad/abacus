@@ -1,6 +1,8 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
-import { usePollingStationListRequest } from "@kiesraad/api";
+import { NavBar } from "app/component/navbar/NavBar.tsx";
+
+import { useElection, usePollingStationListRequest } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconPlus } from "@kiesraad/icon";
 import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
@@ -8,6 +10,7 @@ import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationListPage() {
   const electionId = useNumericParam("electionId");
+  const { election } = useElection();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { requestState } = usePollingStationListRequest(electionId);
@@ -42,6 +45,13 @@ export function PollingStationListPage() {
   return (
     <>
       <PageTitle title={`${t("polling_stations")} - Abacus`} />
+      <NavBar>
+        <Link to={`/elections/${election.id}#coordinator`}>
+          <span className="bold">{election.location}</span>
+          <span>&mdash;</span>
+          <span>{election.name}</span>
+        </Link>
+      </NavBar>
       <header>
         <section>
           <h1>{t("polling_station.title.plural")}</h1>
@@ -114,7 +124,7 @@ export function PollingStationListPage() {
               </Table.Header>
               <Table.Body className="fs-md">
                 {data.polling_stations.map((station) => (
-                  <Table.LinkRow key={station.id} to={`update/${station.id}`}>
+                  <Table.LinkRow key={station.id} to={`${station.id}/update`}>
                     <Table.NumberCell>{station.number}</Table.NumberCell>
                     <Table.Cell className="break-word">{station.name}</Table.Cell>
                     <Table.Cell>{labelForPollingStationType[station.polling_station_type]}</Table.Cell>

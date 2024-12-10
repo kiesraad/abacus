@@ -4,9 +4,28 @@ import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
-import { Button, PageTitle } from "@kiesraad/ui";
+import { Button, FormLayout, PageTitle } from "@kiesraad/ui";
 
 import cls from "./ElectionReportPage.module.css";
+
+function offerDownload(blob: Blob, filename: string) {
+  const file = new File([blob], filename);
+  const fileUrl = window.URL.createObjectURL(file);
+  const anchorElement = document.createElement("a");
+
+  anchorElement.href = fileUrl;
+  anchorElement.download = filename;
+  anchorElement.hidden = true;
+
+  document.body.appendChild(anchorElement);
+
+  anchorElement.click();
+  anchorElement.remove();
+
+  setTimeout(() => {
+    window.URL.revokeObjectURL(fileUrl);
+  }, 30000);
+}
 
 export function ElectionReportPage() {
   const { election } = useElection();
@@ -17,7 +36,7 @@ export function ElectionReportPage() {
     throw new Error("Election not ready for finalisation");
   }
 
-  function downloadResults() {
+  function downloadPdfResults() {
     let filename: string;
     fetch(`/api/elections/${election.id}/download_pdf_results`)
       .then((result) => {
@@ -31,22 +50,29 @@ export function ElectionReportPage() {
       })
       .then(
         (blob) => {
-          const file = new File([blob], filename);
-          const fileUrl = window.URL.createObjectURL(file);
-          const anchorElement = document.createElement("a");
+          offerDownload(blob, filename);
+        },
+        (error: unknown) => {
+          console.error(error);
+        },
+      );
+  }
 
-          anchorElement.href = fileUrl;
-          anchorElement.download = filename;
-          anchorElement.hidden = true;
+  function downloadZipResults() {
+    let filename: string;
+    fetch(`/api/elections/${election.id}/download_zip_results`)
+      .then((result) => {
+        if (result.status !== 200) {
+          const message = `Failed to download zip: status code ${result.status}`;
 
-          document.body.appendChild(anchorElement);
-
-          anchorElement.click();
-          anchorElement.remove();
-
-          setTimeout(() => {
-            window.URL.revokeObjectURL(fileUrl);
-          }, 30000);
+          throw new Error(message);
+        }
+        filename = result.headers.get("Content-Disposition")?.split('filename="')[1]?.slice(0, -1) ?? "document";
+        return result.blob();
+      })
+      .then(
+        (blob) => {
+          offerDownload(blob, filename);
         },
         (error: unknown) => {
           console.error(error);
@@ -77,7 +103,12 @@ export function ElectionReportPage() {
             {tx("election_report.data_entry_finish_steps_explanation")}
             {t("election_report.for_recount_new_session_needed")}
           </div>
-          <Button onClick={downloadResults}>{t("election_report.download_report")}</Button>
+          <FormLayout.Controls>
+            <Button onClick={downloadZipResults}>{t("election_report.download_zip")}</Button>
+            <Button variant="secondary" onClick={downloadPdfResults}>
+              {t("election_report.download_report")}
+            </Button>
+          </FormLayout.Controls>
         </article>
       </main>
     </>

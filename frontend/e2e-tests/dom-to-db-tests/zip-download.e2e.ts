@@ -5,25 +5,25 @@ import { stat } from "node:fs/promises";
 
 import { test } from "./fixtures";
 
-test.describe("pdf rendering", () => {
-  test("it downloads a pdf", async ({ page }) => {
+test.describe("election results zip", () => {
+  test("it downloads a zip", async ({ page }) => {
     await page.goto("/elections/4/status#coordinator");
 
     const electionStatusPage = new ElectionStatus(page);
     await electionStatusPage.finish.click();
 
     const electionReportPage = new ElectionReport(page);
-    const responsePromise = page.waitForResponse("/api/elections/4/download_pdf_results");
+    const responsePromise = page.waitForResponse("/api/elections/4/download_zip_results");
     const downloadPromise = page.waitForEvent("download");
-    await electionReportPage.downloadPdf.click();
+    await electionReportPage.downloadZip.click();
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);
-    expect(await response.headerValue("content-type")).toBe("application/pdf");
+    expect(await response.headerValue("content-type")).toBe("application/x-zip");
 
     const download = await downloadPromise;
 
-    expect(download.suggestedFilename()).toBe("Model_Na31-2_GR2024_Heemdamseburg.pdf");
+    expect(download.suggestedFilename()).toBe("election_result_GR2024_Heemdamseburg.zip");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 });

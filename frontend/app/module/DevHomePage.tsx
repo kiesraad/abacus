@@ -27,41 +27,51 @@ export function DevHomePage() {
           <strong>{t("typist")}</strong>
           <ul>
             <li>
-              <Link to={"/elections"}>{t("election.elections")}</Link>
+              <Link to={"/elections"}>{t("election.title.plural")}</Link>
             </li>
             <ul>
               <li>
-                <Link to={`/elections/1/data-entry`}>Verkiezing 1 invoeren</Link>
+                <Link to={`/elections/1/data-entry`}>
+                  {t("data_entry.title")} {t("election.title.singular")} 1
+                </Link>
               </li>
             </ul>
           </ul>
-          <strong>Beheerder / Coördinator</strong>
+          <strong>
+            {t("administrator")} / {t("coordinator")}
+          </strong>
           <ul>
             <li>
-              <Link to={"/elections#administrator"}>Verkiezingen beheren</Link>
+              <Link to={"/elections#administrator"}>{t("election.manage")}</Link>
             </li>
             <ul>
               <li>
-                <Link to={`/elections/1#coordinator`}>Verkiezing 1</Link>
+                <Link to={`/elections/1#coordinator`}>{t("election.title.singular")} 1</Link>
               </li>
               <li>
-                <Link to={`/elections/1/status#coordinator`}>Statusoverzicht steminvoer Verkiezing 1</Link>
+                <Link to={`/elections/1/status#coordinator`}>
+                  {t("election_status.main_title")} {t("election.title.singular")} 1
+                </Link>
               </li>
               <li>
-                <Link to={`/elections/1/polling-stations#coordinator`}>Stembureaus Verkiezing 1</Link>
+                <Link to={`/elections/1/polling-stations#coordinator`}>
+                  {t("polling_station.title.plural")} {t("election.title.singular")} 1
+                </Link>
               </li>
               <li>
-                <Link to={`/elections/3/polling-stations#coordinator`}>Stembureaus Verkiezing 3 (leeg)</Link>
+                <Link to={`/elections/3/polling-stations#coordinator`}>
+                  {t("polling_station.title.plural")} {t("election.title.singular")} 3 ({t("empty")})
+                </Link>
               </li>
             </ul>
             <li>
-              <Link to={`/users#administratorcoordinator`}>Gebruikers beheren</Link>
+              <Link to={`/users#administratorcoordinator`}>{t("user.manage")}</Link>
             </li>
             <li>
-              <Link to={`/workstations#administrator`}>Werkplekken beheren</Link>
+              <Link to={`/workstations#administrator`}>{t("workstations.manage")}</Link>
             </li>
             <li>
-              <Link to={`/logs#administratorcoordinator`}>Activiteitenlog</Link>
+              <Link to={`/logs#administratorcoordinator`}>{t("activity_log")}</Link>
             </li>
           </ul>
 

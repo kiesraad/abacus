@@ -182,7 +182,7 @@ export function ElectionStatusPage() {
 
   return (
     <>
-      <PageTitle title={t("election_status.title")} />
+      <PageTitle title={`${t("election_status.title")} - Abacus`} />
       <NavBar>
         <Link to={`/elections/${election.id}#coordinator`}>
           <span className="bold">{election.location}</span>

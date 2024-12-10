@@ -49,10 +49,11 @@
       &.no_footer {
         padding-bottom: 0;
       }
-      > form.no_footer {
+      > form:global(.no_footer) {
         height: 100%;
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
       }
     }
   }

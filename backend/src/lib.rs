@@ -8,6 +8,7 @@ use std::error::Error;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
+pub mod authentication;
 pub mod data_entry;
 pub mod election;
 pub mod eml;
@@ -71,7 +72,12 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route("/:election_id/status", get(election::election_status));
 
+    let user_router = Router::new()
+        .route("/login", post(authentication::login))
+        .route("/logout", post(authentication::logout));
+
     let app = Router::new()
+        .nest("/api/user", user_router)
         .nest("/api/elections", election_routes)
         .nest("/api/polling_stations", polling_station_routes)
         .nest(
@@ -116,6 +122,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[derive(OpenApi)]
     #[openapi(
         paths(
+            authentication::login,
+            authentication::logout,
             election::election_list,
             election::election_details,
             election::election_status,
@@ -134,6 +142,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         components(
             schemas(
                 ErrorResponse,
+                authentication::Credentials,
+                authentication::LoginResponse,
                 data_entry::CandidateVotes,
                 data_entry::SaveDataEntryRequest,
                 data_entry::SaveDataEntryResponse,
@@ -163,6 +173,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             ),
         ),
         tags(
+            (name = "authentication", description = "Authentication and user API"),
             (name = "election", description = "Election API"),
             (name = "polling_station", description = "Polling station API"),
         )

@@ -23,7 +23,7 @@ test.describe("pdf rendering", () => {
 
     const download = await downloadPromise;
 
-    expect(download.suggestedFilename()).toBe("model-na-31-2.pdf");
+    expect(download.suggestedFilename()).toBe("PV_GR2024_Heemdamseburg.pdf");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 });

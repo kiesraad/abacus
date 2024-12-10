@@ -27,10 +27,8 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
               key={pollingStation.number}
               to={getUrlForDataEntry(pollingStation.election_id, pollingStation.id, status)}
             >
-              <Table.Cell number fontSizeClass="fs-body">
-                {pollingStation.number}
-              </Table.Cell>
-              <Table.Cell fontSizeClass="fs-md">
+              <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
+              <Table.Cell>
                 <span>{pollingStation.name}</span>
                 {status && <Badge type={status} showIcon />}
               </Table.Cell>

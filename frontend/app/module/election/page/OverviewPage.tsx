@@ -65,12 +65,12 @@ export function OverviewPage() {
               {isAdministrator && <Table.Column>{t("role")}</Table.Column>}
               <Table.Column>{t("election_status.label")}</Table.Column>
             </Table.Header>
-            <Table.Body>
+            <Table.Body className="fs-md">
               {electionList.map((election) => (
                 <Table.LinkRow key={election.id} to={electionLink(election)}>
-                  <Table.Cell fontSizeClass="fs-body">{election.name}</Table.Cell>
-                  {isAdministrator && <Table.Cell fontSizeClass="fs-md"></Table.Cell>}
-                  <Table.Cell fontSizeClass="fs-md">
+                  <Table.Cell className="fs-body">{election.name}</Table.Cell>
+                  {isAdministrator && <Table.Cell></Table.Cell>}
+                  <Table.Cell>
                     <ElectionStatusWithIcon
                       status={election.status}
                       userRole={isAdministrator ? "coordinator" : "typist"}

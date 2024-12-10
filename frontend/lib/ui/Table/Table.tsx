@@ -1,6 +1,8 @@
 import * as React from "react";
 import { To, useNavigate } from "react-router-dom";
 
+import { cn } from "@kiesraad/util";
+
 import cls from "./Table.module.css";
 
 export interface TableProps {
@@ -22,25 +24,22 @@ Table.Body = Body;
 Table.Row = Row;
 Table.LinkRow = LinkRow;
 Table.Cell = Cell;
+Table.NumberCell = NumberCell;
 
-function Header({ children, backgroundStyling }: { children: React.ReactNode[]; backgroundStyling?: boolean }) {
+function Header({ children, className }: { children: React.ReactNode[]; className?: string }) {
   return (
     <thead>
-      <tr className={backgroundStyling ? cls.backgroundStyling : undefined}>{children}</tr>
+      <tr className={className}>{children}</tr>
     </thead>
   );
 }
 
-function Column({ children, width }: { children: React.ReactNode; width?: string }) {
-  return (
-    <th className="fs-xs" style={width ? { width } : undefined}>
-      {children}
-    </th>
-  );
+function Column({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <th className={className}>{children}</th>;
 }
 
-function Body({ children }: { children: React.ReactNode[] }) {
-  return <tbody>{children}</tbody>;
+function Body({ children, className }: { children: React.ReactNode[]; className?: string }) {
+  return <tbody className={className}>{children}</tbody>;
 }
 
 function Row({ children }: { children: React.ReactNode[] }) {
@@ -61,14 +60,10 @@ function LinkRow({ children, to }: { children: React.ReactNode[]; to: To }) {
   );
 }
 
-function Cell({
-  children,
-  number,
-  fontSizeClass,
-}: {
-  children?: React.ReactNode;
-  number?: boolean;
-  fontSizeClass: string;
-}) {
-  return <td className={`${number ? `${cls.number} ` : ""}${fontSizeClass}`}>{children}</td>;
+function Cell({ children, className }: { children?: React.ReactNode; className?: string }) {
+  return <td className={className}>{children}</td>;
+}
+
+function NumberCell({ children, className }: { children?: React.ReactNode; className?: string }) {
+  return <td className={cn(cls.numberCell, className)}>{children}</td>;
 }

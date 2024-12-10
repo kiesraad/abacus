@@ -13,13 +13,13 @@ use super::{
     SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
 };
 
-#[derive(Debug, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Credentials {
     username: String,
     password: String,
 }
 
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct LoginResponse {
     user_id: u32,
     username: String,
@@ -109,4 +109,153 @@ pub async fn logout(
     let updated_jar = jar.remove(cookie);
 
     Ok((updated_jar, StatusCode::OK))
+}
+
+#[cfg(test)]
+mod tests {
+    use axum::{body::Body, http::Request, routing::post, Router};
+    use http_body_util::BodyExt;
+    use hyper::{header::CONTENT_TYPE, Method};
+    use sqlx::SqlitePool;
+    use tower::ServiceExt;
+
+    use super::{login, logout};
+    use crate::{
+        authentication::{Credentials, LoginResponse},
+        AppState,
+    };
+
+    fn create_app(pool: SqlitePool) -> Router {
+        let state = AppState { pool };
+
+        Router::new()
+            .route("/api/user/login", post(login))
+            .route("/api/user/logout", post(logout))
+            .with_state(state)
+    }
+
+    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    async fn test_login_success(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/login")
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        serde_json::to_vec(&Credentials {
+                            username: "user".to_string(),
+                            password: "password".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: LoginResponse = serde_json::from_slice(&body).unwrap();
+
+        assert_eq!(result.user_id, 1);
+        assert_eq!(result.username, "user");
+    }
+
+    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    async fn test_login_error(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/login")
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        serde_json::to_vec(&Credentials {
+                            username: "user".to_string(),
+                            password: "wrong".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 401);
+    }
+
+    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    async fn test_logout(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/login")
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        serde_json::to_vec(&Credentials {
+                            username: "user".to_string(),
+                            password: "password".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+
+        let cookie = response
+            .headers()
+            .get("set-cookie")
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: LoginResponse = serde_json::from_slice(&body).unwrap();
+
+        assert_eq!(result.user_id, 1);
+        assert_eq!(result.username, "user");
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/logout")
+                    .header("cookie", &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+
+        // Logout again, should return 200
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/logout")
+                    .header("cookie", &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+    }
 }

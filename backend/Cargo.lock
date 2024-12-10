@@ -260,6 +260,7 @@ dependencies = [
  "chrono",
  "clap",
  "cookie",
+ "http-body-util",
  "hyper",
  "memory-serve",
  "password-hash",

@@ -122,8 +122,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[derive(OpenApi)]
     #[openapi(
         paths(
-            authentication::handlers::login,
-            authentication::handlers::logout,
+            authentication::login,
+            authentication::logout,
             election::election_list,
             election::election_details,
             election::election_status,
@@ -173,6 +173,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             ),
         ),
         tags(
+            (name = "authentication", description = "Authentication and user API"),
             (name = "election", description = "Election API"),
             (name = "polling_station", description = "Polling station API"),
         )

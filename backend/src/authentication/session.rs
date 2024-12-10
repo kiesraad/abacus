@@ -43,6 +43,7 @@ impl Session {
     }
 
     /// Get the session key
+    #[cfg(test)]
     pub(super) fn session_key(&self) -> &str {
         &self.session_key
     }
@@ -127,7 +128,7 @@ impl Sessions {
     }
 
     /// Delete all sessions that have expired
-    pub async fn delete_old_sessions(&self) -> Result<(), AuthenticationError> {
+    pub async fn delete_expired_sessions(&self) -> Result<(), AuthenticationError> {
         sqlx::query("DELETE FROM sessions WHERE expires_at <= ?")
             .bind(get_current_time()? as i64)
             .execute(&self.0)
@@ -186,7 +187,7 @@ mod test {
 
         let session = sessions.create(1, Duration::from_secs(0)).await.unwrap();
 
-        sessions.delete_old_sessions().await.unwrap();
+        sessions.delete_expired_sessions().await.unwrap();
 
         let session_from_db = sessions.get_by_key(session.session_key()).await.unwrap();
 

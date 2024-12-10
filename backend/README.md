@@ -45,7 +45,7 @@ Use `cargo test` to run the tests. The tests are also run in a GitHub Actions wo
 The following dependencies (crates) are used:
 
 - `axum`: web application framework that focuses on ergonomics and modularity.
-- `axum_extra`: handling for attachements and cookies in axum.
+- `axum_extra`: handling for attachments and cookies in axum.
 - `cookie`: dependency of axum_extra, for encoding and parsing cookies.
 - `hyper`: fast and correct HTTP implementation.
 - `tokio`: runtime for writing asynchronous applications.

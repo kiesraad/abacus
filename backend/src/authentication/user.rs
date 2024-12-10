@@ -68,7 +68,7 @@ impl Users {
         Self(pool)
     }
 
-    /// Authenticate a user by their username and password, returns a user instace on success or an error
+    /// Authenticate a user by their username and password, returns a user instance on success or an error
     pub async fn authenticate(
         &self,
         username: &str,
@@ -192,7 +192,7 @@ mod tests {
         error::AuthenticationError, session::Sessions, user::Users, util::get_current_time,
     };
 
-    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    #[sqlx::test]
     async fn test_create_user(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
@@ -210,7 +210,7 @@ mod tests {
         assert_eq!(user, fetched_user);
     }
 
-    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    #[sqlx::test]
     async fn test_authenticate_user(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
@@ -241,7 +241,7 @@ mod tests {
         ));
     }
 
-    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    #[sqlx::test]
     async fn test_from_session_key(pool: SqlitePool) {
         let users = Users::new(pool.clone());
         let sessions = Sessions::new(pool.clone());

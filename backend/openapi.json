@@ -845,7 +845,7 @@
     "/api/user/login": {
       "post": {
         "tags": [
-          "authentication::handlers"
+          "authentication"
         ],
         "summary": "Login endpoint, authenticates a user and creates a new session + session cookie",
         "operationId": "login",
@@ -896,7 +896,7 @@
     "/api/user/logout": {
       "post": {
         "tags": [
-          "authentication::handlers"
+          "authentication"
         ],
         "summary": "Logout endpoint, deletes the session cookie",
         "operationId": "logout",
@@ -1708,6 +1708,10 @@
     }
   },
   "tags": [
+    {
+      "name": "authentication",
+      "description": "Authentication and user API"
+    },
     {
       "name": "election",
       "description": "Election API"

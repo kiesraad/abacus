@@ -1,7 +1,13 @@
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 
+import { ApiResult } from "./api.types";
 import { useApi } from "./useApi";
-import { ApiRequestState, handleApiResult, LimitedApiRequestState } from "./useApiRequest";
+import {
+  ApiRequestState,
+  ApiRequestStateWithoutFatalErrors,
+  fatalRequestState,
+  handleApiResult,
+} from "./useApiRequest";
 
 export type CrudRequestState<T> =
   | {
@@ -10,67 +16,86 @@ export type CrudRequestState<T> =
   | ApiRequestState<T>;
 
 export interface UseCrudReturn<T> {
-  get: (path: string, controller?: AbortController) => Promise<void>;
-  create: (path: string, requestBody: object, controller?: AbortController) => Promise<void>;
-  update: (path: string, requestBody: object, controller?: AbortController) => Promise<void>;
-  remove: (path: string, controller?: AbortController) => Promise<void>;
+  get: (controller?: AbortController) => Promise<ApiResult<T>>;
+  create: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
+  update: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
+  remove: (controller?: AbortController) => Promise<ApiResult<T>>;
   requestState: CrudRequestState<T>;
 }
 
 export interface UseLimitedCrudReturn<T> extends UseCrudReturn<T> {
-  requestState: LimitedApiRequestState<T>;
+  requestState: ApiRequestStateWithoutFatalErrors<T>;
 }
 
+export type ApiPaths =
+  | string
+  | {
+      get?: string;
+      create?: string;
+      update?: string;
+      remove?: string;
+    };
+
 // Call the api and return the current status of the request, optionally throws an error when the request fails
-export function useCrud<T>(throwErrors: true): UseLimitedCrudReturn<T>;
-export function useCrud<T>(throwErrors: false): UseCrudReturn<T>;
-export function useCrud<T>(throwErrors: boolean): UseCrudReturn<T> {
+export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
   const client = useApi();
   const [requestState, setRequestState] = useState<CrudRequestState<T>>({ status: "idle" });
+  const paths = typeof path === "string" ? { get: path, create: path, update: path, remove: path } : path;
+
+  // throw fatal errors
+  useEffect(() => {
+    if (fatalRequestState(requestState)) {
+      throw requestState.error;
+    }
+  }, [requestState]);
 
   // Get a resource
-  const get = useCallback(
-    async (path: string, controller?: AbortController) => {
-      setRequestState({ status: "loading" });
-      const result = await client.getRequest<T>(path, controller);
+  const get = async (controller?: AbortController) => {
+    if (!paths.get) {
+      throw new Error("No get path provided for get request");
+    }
 
-      void handleApiResult(result, setRequestState, throwErrors, controller);
-    },
-    [client, throwErrors],
-  );
+    setRequestState({ status: "loading" });
+    const result = await client.getRequest<T>(paths.get, controller);
+
+    return handleApiResult(result, setRequestState, controller);
+  };
 
   // Create a new resource
-  const create = useCallback(
-    async (path: string, requestBody: object, controller?: AbortController) => {
-      setRequestState({ status: "loading" });
-      const result = await client.postRequest<T>(path, requestBody, controller);
+  const create = async (requestBody: object, controller?: AbortController) => {
+    if (!paths.create) {
+      throw new Error("No get path provided for create request");
+    }
 
-      void handleApiResult(result, setRequestState, throwErrors, controller);
-    },
-    [client, throwErrors],
-  );
+    setRequestState({ status: "loading" });
+    const result = await client.postRequest<T>(paths.create, requestBody, controller);
+
+    return handleApiResult(result, setRequestState, controller);
+  };
 
   // Update an existing resource
-  const update = useCallback(
-    async (path: string, requestBody: object, controller?: AbortController) => {
-      setRequestState({ status: "loading" });
-      const result = await client.putRequest<T>(path, requestBody, controller);
+  const update = async (requestBody: object, controller?: AbortController) => {
+    if (!paths.update) {
+      throw new Error("No get path provided for update request");
+    }
 
-      void handleApiResult(result, setRequestState, throwErrors, controller);
-    },
-    [client, throwErrors],
-  );
+    setRequestState({ status: "loading" });
+    const result = await client.putRequest<T>(paths.update, requestBody, controller);
+
+    return handleApiResult(result, setRequestState, controller);
+  };
 
   // Remove an existing resource
-  const remove = useCallback(
-    async (path: string, controller?: AbortController) => {
-      setRequestState({ status: "loading" });
-      const result = await client.deleteRequest<T>(path, controller);
+  const remove = async (controller?: AbortController) => {
+    if (!paths.remove) {
+      throw new Error("No get path provided for remove request");
+    }
 
-      void handleApiResult(result, setRequestState, throwErrors, controller);
-    },
-    [client, throwErrors],
-  );
+    setRequestState({ status: "loading" });
+    const result = await client.deleteRequest<T>(paths.remove, controller);
+
+    return handleApiResult(result, setRequestState, controller);
+  };
 
   return {
     get,

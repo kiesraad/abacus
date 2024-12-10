@@ -28,6 +28,7 @@ describe("ElectionStatusPage", () => {
         {
           id: 2,
           status: "second_entry",
+          finished_at: new Date().getTime() / 1000,
         },
         {
           id: 3,
@@ -109,8 +110,10 @@ describe("ElectionStatusPage", () => {
     expect(firstEntryFinishedRows.length).toBe(2);
     expect(firstEntryFinishedRows[0]).toHaveTextContent(/Nummer/);
     expect(firstEntryFinishedRows[0]).toHaveTextContent(/Stembureau/);
+    expect(firstEntryFinishedRows[0]).toHaveTextContent(/Afgerond op/);
     expect(firstEntryFinishedRows[1]).toHaveTextContent(/34/);
     expect(firstEntryFinishedRows[1]).toHaveTextContent(/Testplek/);
+    expect(firstEntryFinishedRows[1]).toHaveTextContent(/vandaag/);
 
     expect(tables[3]).toContain(screen.getByRole("heading", { level: 3, name: "Werkvoorraad (1)" }));
     const notStartedTable = within(tables[3] as HTMLElement).getByTestId("not_started");

@@ -74,7 +74,11 @@ describe("PollingStationCreatePage", () => {
 
       overrideOnce("get", `/api/polling_stations/${testPollingStation.id}`, 200, testPollingStation);
 
-      render(<PollingStationUpdatePage />);
+      render(
+        <ElectionProvider electionId={1}>
+          <PollingStationUpdatePage />
+        </ElectionProvider>,
+      );
 
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
       await user.click(deleteButton);
@@ -118,7 +122,11 @@ describe("PollingStationCreatePage", () => {
         reference: "InvalidData",
       });
 
-      render(<PollingStationUpdatePage />);
+      render(
+        <ElectionProvider electionId={1}>
+          <PollingStationUpdatePage />
+        </ElectionProvider>,
+      );
 
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
       await user.click(deleteButton);

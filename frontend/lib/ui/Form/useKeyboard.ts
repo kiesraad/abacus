@@ -8,7 +8,16 @@ export function useKeyboard(innerRef: React.MutableRefObject<HTMLFormElement | n
   const submitButton = React.useRef<HTMLButtonElement | null>(null);
 
   const moveFocus = React.useCallback((dir: Dir) => {
-    let targetIndex = inputList.current.findIndex((input) => document.activeElement === input);
+    const elements: HTMLElement[] = [...inputList.current];
+    if (submitButton.current) {
+      elements.push(submitButton.current);
+    }
+
+    let targetIndex = elements.findIndex((element) => document.activeElement === element);
+    if (targetIndex === -1) {
+      return;
+    }
+
     switch (dir) {
       case "up":
         targetIndex -= 1;
@@ -23,19 +32,19 @@ export function useKeyboard(innerRef: React.MutableRefObject<HTMLFormElement | n
         targetIndex = inputList.current.length - 1;
         break;
     }
-    if (targetIndex < 0) {
-      targetIndex = inputList.current.length - 1;
-    } else if (targetIndex >= inputList.current.length) {
-      submitButton.current?.focus();
+
+    if (targetIndex < 0 || targetIndex >= elements.length) {
       return;
     }
 
-    const next = inputList.current[targetIndex];
-    if (next) {
-      next.focus();
-      setTimeout(() => {
-        next.select();
-      }, 1);
+    const element = elements[targetIndex];
+    if (element) {
+      element.focus();
+      if (element instanceof HTMLInputElement) {
+        setTimeout(() => {
+          element.select();
+        }, 1);
+      }
     }
   }, []);
 

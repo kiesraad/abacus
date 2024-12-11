@@ -122,11 +122,126 @@ describe("useKeyboard", () => {
     await userEvent.keyboard("{enter}");
 
     expect(submitButton).toHaveFocus();
+  });
+
+  test("Move to first and last input", async () => {
+    const onSubmit = vi.fn();
+
+    render(
+      <FormWithUseKeyboard onSubmit={onSubmit}>
+        <input id="inp1" defaultValue="fizz1" />
+        <input id="inp2" defaultValue="fizz2" />
+        <input id="inp3" defaultValue="fizz3" />
+        <button id="test-submit-button" type="submit">
+          Submit
+        </button>
+      </FormWithUseKeyboard>,
+    );
+
+    const firstInput = screen.getByTestId("inp1");
+    const thirdInput = screen.getByTestId("inp3");
+
+    thirdInput.focus();
+    expect(thirdInput).toHaveFocus();
 
     await userEvent.keyboard("{Shift>}{arrowup}{/Shift}");
     expect(firstInput).toHaveFocus();
 
     await userEvent.keyboard("{Shift>}{arrowdown}{/Shift}");
     expect(thirdInput).toHaveFocus();
+  });
+
+  test("Move to first and last input when there is no button", async () => {
+    const onSubmit = vi.fn();
+
+    render(
+      <FormWithUseKeyboard onSubmit={onSubmit}>
+        <input id="inp1" defaultValue="fizz1" />
+        <input id="inp2" defaultValue="fizz2" />
+        <input id="inp3" defaultValue="fizz3" />
+      </FormWithUseKeyboard>,
+    );
+
+    const firstInput = screen.getByTestId("inp1");
+    const thirdInput = screen.getByTestId("inp3");
+
+    thirdInput.focus();
+    expect(thirdInput).toHaveFocus();
+
+    await userEvent.keyboard("{Shift>}{arrowup}{/Shift}");
+    expect(firstInput).toHaveFocus();
+
+    await userEvent.keyboard("{Shift>}{arrowdown}{/Shift}");
+    expect(thirdInput).toHaveFocus();
+  });
+
+  test("Stay at the first input when moving up", async () => {
+    const onSubmit = vi.fn();
+    render(
+      <FormWithUseKeyboard onSubmit={onSubmit}>
+        <input id="inp1" defaultValue="fizz1" />
+        <input id="inp2" defaultValue="fizz2" />
+        <input id="inp3" defaultValue="fizz3" />
+      </FormWithUseKeyboard>,
+    );
+
+    const firstInput = screen.getByTestId("inp1");
+    const secondInput = screen.getByTestId("inp2");
+
+    secondInput.focus();
+    expect(secondInput).toHaveFocus();
+
+    await userEvent.keyboard("{arrowup}");
+    expect(firstInput).toHaveFocus();
+
+    await userEvent.keyboard("{arrowup}");
+    expect(firstInput).toHaveFocus();
+  });
+
+  test("Stay at the last input when moving down", async () => {
+    const onSubmit = vi.fn();
+    render(
+      <FormWithUseKeyboard onSubmit={onSubmit}>
+        <input id="inp1" defaultValue="fizz1" />
+        <input id="inp2" defaultValue="fizz2" />
+      </FormWithUseKeyboard>,
+    );
+
+    const firstInput = screen.getByTestId("inp1");
+    const secondInput = screen.getByTestId("inp2");
+
+    firstInput.focus();
+    expect(firstInput).toHaveFocus();
+
+    await userEvent.keyboard("{arrowdown}");
+    expect(secondInput).toHaveFocus();
+
+    await userEvent.keyboard("{arrowdown}");
+    expect(secondInput).toHaveFocus();
+  });
+
+  test("Stay at the submit button when moving down", async () => {
+    const onSubmit = vi.fn();
+    render(
+      <FormWithUseKeyboard onSubmit={onSubmit}>
+        <input id="inp1" defaultValue="fizz1" />
+        <input id="inp2" defaultValue="fizz2" />
+        <button id="test-submit-button" type="submit">
+          Submit
+        </button>
+      </FormWithUseKeyboard>,
+    );
+
+    const secondInput = screen.getByTestId("inp2");
+    const submitButton = screen.getByTestId("test-submit-button");
+
+    secondInput.focus();
+    expect(secondInput).toHaveFocus();
+
+    await userEvent.keyboard("{arrowdown}");
+    expect(submitButton).toHaveFocus();
+
+    await userEvent.keyboard("{arrowdown}");
+    expect(submitButton).toHaveFocus();
   });
 });

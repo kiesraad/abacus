@@ -161,7 +161,7 @@ describe("DataEntryHomePage", () => {
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
     // Set the hash to show the alert and expect it to be visible
-    await router.navigate({ hash: "data-entry-saved" });
+    await router.navigate({ hash: "data-entry-saved-1" });
     expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
 
     // Close the alert and expect it to be hidden

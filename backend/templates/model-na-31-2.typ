@@ -1,8 +1,11 @@
 #import "common/style.typ": conf, title, mono
-#import "common/scripts.typ": alertbox, block_with_checkbox, date_input, time_input, letterbox_main, summary_table, text_input, format_date, TODO
+#import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2.json")
 
-#show: doc => conf(input, doc)
+#show: doc => conf(input, doc, footer: [
+  #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
+  #input.hash
+])
 
 #let is_municipality = (municipal, public_body) => if input.election.category == "Municipal" [#municipal] else [#public_body]
 

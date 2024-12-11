@@ -56,7 +56,7 @@ export function ElectionReportPage() {
 
   return (
     <>
-      <PageTitle title="Invoerfase afronden - Abacus" />
+      <PageTitle title={`${t("election.title.finish_data_entry")} - Abacus`} />
       <NavBar>
         <Link to={`/elections/${election.id}#coordinator`}>
           <span className="bold">{election.location}</span>

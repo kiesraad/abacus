@@ -7,7 +7,7 @@ De diagrammen worden in `workspace.dsl` gedefinieerd en zijn met de [Structurizr
 Lite] tool te visualiseren. Hiermee is ook de layout aan te passen (dit is
 alleen bij het componentendiagram nodig). Nadat de layout is aangepast, kunnen
 de diagrammen worden geëxporteerd naar verschillende formaten. De geëxporteerde
-diagrammen zijn in in SVG-formaat aan deze map toegevoegd.
+diagrammen zijn in SVG-formaat aan deze map toegevoegd.
 
 Om Structurizr Lite te gebruiken, kan Docker worden gebruikt:
 

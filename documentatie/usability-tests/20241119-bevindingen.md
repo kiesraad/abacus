@@ -13,7 +13,7 @@
 ## Observaties (nieuw ten opzichte van vorige testmoment)
 
 ### Proces
-- De geinterviewde verkiezingsleider had de wens om ook bij blokkerende fouten de invoer af te laten kunnen maken. Doel: alle fouten in een proces-verbaal vinden, zodat die met een goede opsomming terug kan naar de teltafel. "Als er 1 fout in een proces-verbaal zit, is de kans groot dat er meer zijn". Het proces-verbaal al bij de eerste fout terugsturen geeft risico dat alleen die fout wordt opgelost, en dan gaat het proces-verbaal pingpongen tussen teltafel en invoerders, en dat kost veel tijd (want moet telkens ingepakt voor transport naar andere afdeling)
+- De geïnterviewde verkiezingsleider had de wens om ook bij blokkerende fouten de invoer af te laten kunnen maken. Doel: alle fouten in een proces-verbaal vinden, zodat die met een goede opsomming terug kan naar de teltafel. "Als er 1 fout in een proces-verbaal zit, is de kans groot dat er meer zijn". Het proces-verbaal al bij de eerste fout terugsturen geeft risico dat alleen die fout wordt opgelost, en dan gaat het proces-verbaal pingpongen tussen teltafel en invoerders, en dat kost veel tijd (want moet telkens ingepakt voor transport naar andere afdeling)
 
 ### Stembureau kiezen
 - De link 'bekijk de lijst met alle stembureaus' is wat verwarrend. Het is niet duidelijk dat het gaat om alle stembureaus waarvoor nog invoer gedaan moet worden.
@@ -34,7 +34,7 @@
 - De [focus op het eerste invoerveld van het formulier zetten](https://github.com/kiesraad/abacus/issues/503) leidt tot minder muisgebruik dan tijdens vorige tests
 
 #### Stap: Controleren en opslaan
-- Het [niet meer tonen van leeg gelaten lijsten](https://github.com/kiesraad/abacus/issues/501) en het [vervangen van het waarschuwingsicoon door een groene vink bij geaccepteerde waarschuwingen](https://github.com/kiesraad/abacus/issues/502) heeft het gewenste efffect. Gebruikers ervaren geen issues meer bij deze stap.
+- Het [niet meer tonen van leeg gelaten lijsten](https://github.com/kiesraad/abacus/issues/501) en het [vervangen van het waarschuwingsicoon door een groene vink bij geaccepteerde waarschuwingen](https://github.com/kiesraad/abacus/issues/502) heeft het gewenste effect. Gebruikers ervaren geen issues meer bij deze stap.
 
 ### Gegevensinvoer - algemene bevindingen
 #### Toetsenbord- en muisgebruik

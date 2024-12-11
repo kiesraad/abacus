@@ -20,14 +20,14 @@ export function CheckAndSaveForm() {
 
   const navigate = useNavigate();
   const { election } = useElection();
-  const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId } =
+  const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId, entryNumber } =
     usePollingStationFormController();
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionID) => {
-      return getUrlForFormSectionID(election.id, pollingStationId, id);
+      return getUrlForFormSectionID(election.id, pollingStationId, entryNumber, id);
     },
-    [election, pollingStationId],
+    [election, pollingStationId, entryNumber],
   );
 
   React.useEffect(() => {
@@ -52,7 +52,7 @@ export function CheckAndSaveForm() {
       if (!finalisationAllowed) return;
 
       await finaliseDataEntry();
-      navigate(`/elections/${election.id}/data-entry#data-entry-saved`);
+      navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
     })(event);
 
   return (

@@ -4,12 +4,21 @@
   "username_hint": "Je kan deze niet aanpassen. Log volgende keer weer met deze gebruikersnaam in.",
   "username_login_hint": "De naam op het briefje dat je van de coördinator hebt gekregen.",
   "username_default": "Gebruiker01",
+  "manage": "Gebruikers beheren",
+  "management": "Gebruikersbeheer",
   "name": "Jouw naam",
   "name_subtext": "(roepnaam + achternaam)",
   "name_hint": "Bijvoorbeeld Karel van Tellingen. Je naam wordt opgenomen in het verslag van deze invoersessie.",
-  "password": "Kies nieuw wachtwoord",
+  "password": "Wachtwoord",
   "password_hint": "Je hebt dit wachtwoord nodig als je na een pauze opnieuw wilt inloggen. Gebruik minimaal 8 letters en 2 cijfers.",
   "password_login_hint": "Eerder ingelogd? Vul het wachtwoord in dat je zelf hebt ingesteld. Nog niet eerder ingelogd? Gebruik het wachtwoord dat je van de coördinator hebt gekregen.",
+  "password_new": "Kies nieuw wachtwoord",
   "password_repeat": "Herhaal wachtwoord",
-  "login": "Inloggen"
+  "login": "Inloggen",
+  "login_success": "Inloggen gelukt",
+  "account": "Account",
+  "account_setup": "Account instellen",
+  "phrases": {
+    "setting_up_account": "We gaan je account instellen voor gebruik. Vul onderstaande gegevens in om verder te gaan."
+  }
 }

@@ -1,21 +1,22 @@
 import { Link } from "react-router-dom";
 
+import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
 
 export function UserHomePage() {
   return (
     <>
-      <PageTitle title="Account - Abacus" />
+      <PageTitle title={`${t("user.account")} - Abacus`} />
       <header>
         <section>
-          <h1>Account</h1>
+          <h1>{t("user.account")}</h1>
         </section>
       </header>
       <main>
         <article>
           <ul>
             <li>
-              <Link to={`login`}>Inloggen</Link>
+              <Link to={`login`}>{t("user.login")}</Link>
             </li>
           </ul>
         </article>

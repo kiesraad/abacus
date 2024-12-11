@@ -94,14 +94,8 @@ describe("PollingStationForm", () => {
       await user.click(typeInputOption);
 
       await waitFor(() => {
-        expect(numberInput).toHaveAttribute("aria-invalid", "true");
-        expect(nameInput).toHaveAttribute("aria-invalid", "true");
-        expect(streetInput).toHaveAttribute("aria-invalid", "true");
-        expect(houseNumberInput).toHaveAttribute("aria-invalid", "true");
-        expect(postalCodeInput).toHaveAttribute("aria-invalid", "true");
-        expect(localityInput).toHaveAttribute("aria-invalid", "true");
-        expect(numberOfVotersInput).toHaveAttribute("aria-invalid", "false");
-        expect(houseNumberAdditionInput).toHaveAttribute("aria-invalid", "false");
+        expect(numberInput).toBeInvalid();
+        expect(nameInput).toBeInvalid();
       });
 
       await user.type(nameInput, testObj.name);

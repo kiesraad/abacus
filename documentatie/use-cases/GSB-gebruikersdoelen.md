@@ -121,19 +121,22 @@ __precondities:__
 
 __hoofdscenario__:
 
-1. De coördinator importeert het EML-NL bestand met de stembureaus.
-2. De applicatie stelt vast dat de stembureaus aan de validaties voldoen.
-3. De coördinator stelt vast dat de stembureaus in de applicatie volledig en correct zijn, door ze te vergelijken met de door de gemeente vooraf gepubliceerde lijst.
+1. De coördinator selecteert de verkiezing.
+2. De coördinator importeert het EML-NL bestand met de stembureaus.
+3. De applicatie stelt vast dat de stembureaus aan de validaties voldoen.
+4. De coördinator stelt vast dat de stembureaus in de applicatie volledig en correct zijn, door ze te vergelijken met de door de gemeente vooraf gepubliceerde lijst.
 
 __uitbreidingen__:  
 
-1a. Er is geen te importeren bestand met stembureaus:
-&emsp; 1a1. [De coördinator voert de stembureaus handmatig in.](./GSB-subfuncties.md#de-coördinator-bewerkt-de-stembureaus)
+1a. De coördinator selecteert een andere verkiezing dan van het bestand en de lijst met stembureaus:
 
-2a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
+2a. Er is geen te importeren bestand met stembureaus:
+&emsp; 2a1. [De coördinator voert de stembureaus handmatig in.](./GSB-subfuncties.md#de-coördinator-bewerkt-de-stembureaus)
 
-3a. De lijst met stembureaus moet aangepast worden:
-&emsp; 3a1. [De coördinator past de stembureaus aan.](./GSB-subfuncties.md#de-coördinator-bewerkt-de-stembureaus)
+3a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
+
+4a. De lijst met stembureaus moet aangepast worden:
+&emsp; 4a1. [De coördinator past de stembureaus aan.](./GSB-subfuncties.md#de-coördinator-bewerkt-de-stembureaus)
 
 
 ### Open punten

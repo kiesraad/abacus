@@ -57,9 +57,6 @@ async fn test_election_details_not_found(pool: SqlitePool) {
     assert_eq!(status, StatusCode::NOT_FOUND);
 }
 
-// TODO: Enable and adjust this test once frontend second entry is implemented
-// and we've refactored the polling station status code
-#[ignore]
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -125,11 +122,12 @@ async fn test_election_details_status(pool: SqlitePool) {
         statuses[0].status,
         PollingStationStatus::SecondEntryInProgress
     );
-    assert_eq!(statuses[0].data_entry_progress, None);
+    assert_eq!(statuses[0].data_entry_progress, Some(60));
     assert_eq!(
         statuses[1].status,
         PollingStationStatus::FirstEntryUnfinished
     );
+    assert_eq!(statuses[1].data_entry_progress, Some(60));
 
     // polling station 2 should now be unfinished
     shared::create_and_save_data_entry(&addr, 1, 2, Some(r#"{"continue": false}"#)).await;
@@ -214,4 +212,25 @@ async fn test_election_pdf_download(pool: SqlitePool) {
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
     // But the header should also contain ".pdf"
     assert!(content_disposition_string.contains(".pdf"));
+}
+
+#[sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("elections", "polling_stations", "polling_station_results")
+))]
+async fn test_election_xml_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/4/download_xml_results");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let content_type = response.headers().get("Content-Type");
+
+    // Ensure the response is what we expect
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "text/xml");
+
+    let body = response.text().await.unwrap();
+    assert!(body.contains("<Election>"));
+    assert!(body.contains("<ValidVotes>125</ValidVotes>"));
 }

@@ -45,6 +45,8 @@ Use `cargo test` to run the tests. The tests are also run in a GitHub Actions wo
 The following dependencies (crates) are used:
 
 - `axum`: web application framework that focuses on ergonomics and modularity.
+- `axum_extra`: handling for attachments and cookies in axum.
+- `cookie`: dependency of axum_extra, for encoding and parsing cookies.
 - `hyper`: fast and correct HTTP implementation.
 - `tokio`: runtime for writing asynchronous applications.
 - `memory-serve`: serves frontend assets from memory, but ad-hoc from disk during development.
@@ -56,10 +58,15 @@ The following dependencies (crates) are used:
 - `chrono`: date and time library.
 - `clap`: library for command-line argument parsing.
 - `quick-xml`: reading and writing EML_NL XML files.
+- `sha2`: generating a hash of the EML_NL XML files for inclusion in the PDF.
+- `rand`: create a random session key.
+- `password_hash`: password hashing interfaces.
+- `argon2`: password hashing implementation (Argon2id).
 
 Additionally, the following development dependencies are used:
 
 - `reqwest`: HTTP client for testing the API.
+- `http-body-util`: trait used to extract a response body in some tests.
 
 ### Database
 

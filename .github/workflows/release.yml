@@ -143,3 +143,28 @@ jobs:
           files: release/*
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Version ${{ env.TAG }}
+
+
+  deploy:
+    name: Deploy to abacus-test.nl
+    needs:
+      - build
+      - release
+    environment:
+      name: release
+      url: https://${{ github.sha }}.abacus-test.nl
+    permissions:
+      contents: read
+      deployments: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download abacus
+        uses: actions/download-artifact@v4
+        with:
+          name: abacus-ubuntu-latest
+      - name: Upload binary to test server
+        run: |
+          curl -s \
+          -H "Authorization: Bearer ${{ secrets.ABACUS_TEST_API_KEY }}" \
+          -T ./abacus \
+          https://abacus-test.nl/etes/api/v1/executable/${{ github.sha }}/${{ github.sha }}

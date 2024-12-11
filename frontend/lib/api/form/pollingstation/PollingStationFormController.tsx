@@ -21,7 +21,7 @@ import {
   SaveDataEntryResponse,
   updateFormStateAfterSubmit,
   useApi,
-  useApiRequest,
+  useApiRequestWithErrors,
   ValidationResult,
 } from "@kiesraad/api";
 
@@ -164,7 +164,7 @@ export function PollingStationFormController({
     return true;
   }, []);
 
-  const { requestState: initialDataRequest } = useApiRequest<GetDataEntryResponse>(requestPath, false);
+  const { requestState: initialDataRequest } = useApiRequestWithErrors<GetDataEntryResponse>(requestPath);
 
   React.useEffect(() => {
     if (initialDataRequest.status === "success") {
@@ -227,14 +227,14 @@ export function PollingStationFormController({
   // check if the targetFormSectionID has changed and navigate to the url for that section
   React.useEffect(() => {
     if (!targetFormSectionID) return;
-    const url = getUrlForFormSectionID(election.id, pollingStationId, targetFormSectionID);
-    if (location.pathname === getBaseUrl(election.id, pollingStationId)) {
+    const url = getUrlForFormSectionID(election.id, pollingStationId, entryNumber, targetFormSectionID);
+    if (location.pathname === getBaseUrl(election.id, pollingStationId, entryNumber)) {
       navigate(url, { replace: true });
     } else if (location.pathname !== url) {
       navigate(url);
     }
     setTargetFormSectionID(null);
-  }, [targetFormSectionID, navigate, election.id, pollingStationId, location.pathname]);
+  }, [targetFormSectionID, navigate, election.id, pollingStationId, entryNumber, location.pathname]);
 
   const registerCurrentForm = React.useCallback(
     (form: AnyFormReference) => {
@@ -401,6 +401,7 @@ export function PollingStationFormController({
         deleteDataEntry,
         finaliseDataEntry,
         pollingStationId,
+        entryNumber,
       }}
     >
       {children}

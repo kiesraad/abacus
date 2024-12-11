@@ -117,9 +117,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps  --no-shell
+        run: npx playwright install --with-deps --no-shell
       - name: Run UI e2e tests
         run: npm run e2e:lib-ui
+
   playwright-app:
     name: Playwright app tests
     strategy:
@@ -141,6 +142,7 @@ jobs:
         run: npx playwright install --with-deps --no-shell
       - name: Run app e2e tests
         run: npm run e2e:app
+
   playwright-d2d:
     name: Playwright d2d tests (${{ matrix.os }}, ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
     needs:
@@ -174,3 +176,26 @@ jobs:
         if: runner.os != 'Windows'
       - name: Run DOM to Database e2e tests
         run: npm run e2e:d2d -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+  deploy:
+    name: Deploy to abacus-test.nl
+    needs:
+      - backend
+    environment:
+      name: test
+      url: https://${{ github.sha }}.abacus-test.nl
+    permissions:
+      contents: read
+      deployments: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download abacus
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-build-ubuntu-latest
+      - name: Upload binary to test server
+        run: |
+          curl -s \
+          -H "Authorization: Bearer ${{ secrets.ABACUS_TEST_API_KEY }}" \
+          -T ./abacus \
+          https://abacus-test.nl/etes/api/v1/executable/${{ github.event.pull_request.head.sha || github.sha }}/${{ github.sha }}

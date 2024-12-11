@@ -105,6 +105,7 @@ pub(crate) mod tests {
                 location: "Heemdamseburg".to_string(),
                 number_of_voters: 100,
                 category: ElectionCategory::Municipal,
+                number_of_seats: 29,
                 election_date: Utc::now().date_naive(),
                 nomination_date: Utc::now().date_naive(),
                 status: ElectionStatus::DataEntryFinished,
@@ -112,6 +113,9 @@ pub(crate) mod tests {
             },
             polling_stations: vec![],
             summary: ElectionSummary::zero(),
+            hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
+                .to_string(),
+            creation_date_time: "04-12-2024 12:08".to_string(),
         }))
         .unwrap();
 
@@ -125,6 +129,9 @@ pub(crate) mod tests {
             polling_stations: polling_stations_fixture(&election, &[100, 200, 300]),
             election,
             summary: ElectionSummary::zero(),
+            hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
+                .to_string(),
+            creation_date_time: "04-12-2024 12:08".to_string(),
         }))
         .unwrap();
 

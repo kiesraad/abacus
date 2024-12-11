@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { PollingStation, PollingStationRequest, usePollingStationMutation } from "@kiesraad/api";
+import { isSuccess, PollingStation, PollingStationRequest, useCrud } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, Button, ChoiceList, Form, FormFields, FormLayout, InputField, useForm } from "@kiesraad/ui";
 
@@ -33,8 +33,12 @@ const formFields: FormFields<PollingStationRequest> = {
 
 export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
   const formRef = React.useRef<Form>(null);
-  const { create, update, requestState } = usePollingStationMutation();
+
   const { process, validationResult } = useForm<PollingStationRequest>(formFields);
+  const { requestState, create, update } = useCrud<PollingStation>({
+    create: `/api/elections/${electionId}/polling_stations`,
+    update: pollingStation ? `/api/polling_stations/${pollingStation.id}` : undefined,
+  });
 
   const handleSubmit = (event: React.FormEvent<Form>) => {
     event.preventDefault();
@@ -45,20 +49,19 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
       return;
     }
     if (pollingStation) {
-      update(pollingStation.id, requestObject);
+      void update(requestObject).then((result) => {
+        if (isSuccess(result)) {
+          onSaved?.(result.data);
+        }
+      });
     } else {
-      create(electionId, requestObject);
+      void create(requestObject).then((result) => {
+        if (isSuccess(result)) {
+          onSaved?.(result.data);
+        }
+      });
     }
   };
-
-  React.useEffect(() => {
-    if (requestState.status === "api-error") {
-      window.scrollTo(0, 0);
-    }
-    if (requestState.status === "success") {
-      onSaved?.(requestState.data);
-    }
-  }, [requestState, onSaved]);
 
   return (
     <div>

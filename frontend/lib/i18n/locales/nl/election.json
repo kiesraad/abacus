@@ -1,0 +1,14 @@
+{
+  "manage": "Beheer verkiezingen",
+  "title": {
+    "singular": "Verkiezing",
+    "plural": "Verkiezingen",
+    "details": "Details verkiezing",
+    "overview": "Overzicht verkiezingen",
+    "finish_data_entry": "Invoerfase afronden"
+  },
+  "level_polling_station": "Niveau stembureau",
+  "location": "Gebied",
+  "status": "Status",
+  "start_when_count_list_received": "Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren."
+}

@@ -114,7 +114,6 @@ __niveau:__ gebruikersdoel, zee, 🌊
 
 __precondities:__
 
-- De coördinator heeft het EML-NL bestand met de stembureaus.
 - De coördinator heeft de lijst met gepubliceerde stembureaus.
 - De invoer is nog niet gestart.
 

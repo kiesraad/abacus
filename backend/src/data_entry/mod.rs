@@ -7,18 +7,19 @@ use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
-pub use self::structs::*;
 use crate::data_entry::repository::{PollingStationDataEntries, PollingStationResultsEntries};
 use crate::election::repository::Elections;
-use crate::election::Election;
 use crate::error::{APIError, ErrorReference, ErrorResponse};
 use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::PollingStation;
-use crate::validation::ValidationResults;
+
+pub use self::structs::*;
+pub use self::validation::*;
 
 mod entry_number;
 pub mod repository;
-pub mod structs;
+mod structs;
+mod validation;
 
 /// Request structure for saving data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRequest)]
@@ -139,27 +140,6 @@ pub async fn polling_station_data_entry_save(
         .await?;
 
     Ok(SaveDataEntryResponse { validation_results })
-}
-
-fn validate_polling_station_results(
-    polling_station_results: &PollingStationResults,
-    polling_station: &PollingStation,
-    election: &Election,
-) -> Result<ValidationResults, APIError> {
-    let mut validation_results = ValidationResults::default();
-    polling_station_results.validate(
-        election,
-        polling_station,
-        &mut validation_results,
-        &"data".into(),
-    )?;
-    validation_results
-        .errors
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    validation_results
-        .warnings
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    Ok(validation_results)
 }
 
 /// Response structure for getting data entry of polling station results

@@ -8,7 +8,6 @@ use utoipa::ToSchema;
 
 use crate::data_entry::repository::{PollingStationDataEntries, PollingStationResultsEntries};
 use crate::election::repository::Elections;
-use crate::election::Election;
 use crate::error::{APIError, ErrorReference, ErrorResponse};
 use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::PollingStation;
@@ -145,27 +144,6 @@ pub async fn polling_station_data_entry_save(
         .await?;
 
     Ok(SaveDataEntryResponse { validation_results })
-}
-
-fn validate_polling_station_results(
-    polling_station_results: &PollingStationResults,
-    polling_station: &PollingStation,
-    election: &Election,
-) -> Result<ValidationResults, APIError> {
-    let mut validation_results = ValidationResults::default();
-    polling_station_results.validate(
-        election,
-        polling_station,
-        &mut validation_results,
-        &"data".into(),
-    )?;
-    validation_results
-        .errors
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    validation_results
-        .warnings
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    Ok(validation_results)
 }
 
 /// Response structure for getting data entry of polling station results

@@ -147,4 +147,6 @@ __uitbreidingen__:
   genereren.
 - Bij gelijktijdige verkiezingen (gemeenteraad en stadsdeel bijvoorbeeld) zou het mooi zijn om de stembureaus van één
   naar een andere verkiezing te kopiëren. Minder mooi alternatief is eerst exporteren en dan importeren.
-- Zodra invoer gestart is, mag het niet mogelijk zijn om stembureaus aan te passen of te verwijderen.
+- Zodra invoer gestart is, mag het niet mogelijk zijn om stembureaus aan te passen of te verwijderen. Verwijderen wordt nu
+  afgedwongen dmv foreign keys in de database. Checks voor aanpassen en checks obv van de fases van de verkiezing in de
+  applicatie moeten nog uitgewerkt worden.

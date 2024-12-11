@@ -116,7 +116,7 @@ __niveau:__ gebruikersdoel, zee, 🌊
 
 __hoofdscenario__:
 
-1. De coördinator importeert de lijst van stembureaus.
+1. De coördinator importeert de lijst met stembureaus.
 2. De applicatie stelt vast dat de stembureaus aan de validaties voldoen.
 3. De coördinator stelt vast dat de lijst volledig en correct is, door de lijst in Abacus te vergelijken met de door de gemeente vooraf gepubliceerde lijst.
 

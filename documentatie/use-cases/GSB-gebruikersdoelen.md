@@ -112,13 +112,18 @@ __uitbreidingen__:
 
 __niveau:__ gebruikersdoel, zee, 🌊
 
+__precondities:__
+
+- De coördinator heeft het EML-NL bestand met de stembureaus.
+- De coördinator heeft de lijst met gepubliceerde stembureaus.
+
 ### Hoofdscenario en uitbreidingen
 
 __hoofdscenario__:
 
-1. De coördinator importeert de lijst met stembureaus.
+1. De coördinator importeert het EML-NL bestand met de stembureaus.
 2. De applicatie stelt vast dat de stembureaus aan de validaties voldoen.
-3. De coördinator stelt vast dat de lijst volledig en correct is, door de lijst in Abacus te vergelijken met de door de gemeente vooraf gepubliceerde lijst.
+3. De coördinator stelt vast dat de stembureaus in de applicatie volledig en correct zijn, door ze te vergelijken met de door de gemeente vooraf gepubliceerde lijst.
 
 __uitbreidingen__:  
 
@@ -137,6 +142,8 @@ __uitbreidingen__:
   bestand. We weten niet hoe vaak welke van deze twee manieren of een combinatie van de twee gebruikt worden. Een
   stembureau-bestand kan door OSV geëxporteerd worden, maar er zouden ook andere tools bestaan die zo'n bestand kunnen
   genereren.
+- Bij gelijktijdige verkiezingen (gemeenteraad en stadsdeel bijvoorbeeld) zou het mooi zijn om de stembureaus van één
+  naar een andere verkiezing te kopiëren. Minder mooi alternatief is eerst exporteren en dan importeren.
 - Bij het invoeren/beheren van stembureaus toont de applicatie een waarschuwing als het aantal kiesgerechtigden niet is
   ingevuld. De gebruiker heeft twee opties: (1) aantal kiesgerechtigden invullen, (2) aangeven dat aantal
   kiesgerechtigden bewust leeg wordt gelaten.

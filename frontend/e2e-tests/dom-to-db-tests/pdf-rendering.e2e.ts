@@ -13,7 +13,7 @@ test.describe("pdf rendering", () => {
     await electionStatusPage.finish.click();
 
     const electionReportPage = new ElectionReport(page);
-    const responsePromise = page.waitForResponse("/api/elections/4/download_results");
+    const responsePromise = page.waitForResponse("/api/elections/4/download_pdf_results");
     const downloadPromise = page.waitForEvent("download");
     await electionReportPage.download.click();
 
@@ -23,7 +23,7 @@ test.describe("pdf rendering", () => {
 
     const download = await downloadPromise;
 
-    expect(download.suggestedFilename()).toBe("model-na-31-2.pdf");
+    expect(download.suggestedFilename()).toBe("Model_Na31-2_GR2024_Heemdamseburg.pdf");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 });

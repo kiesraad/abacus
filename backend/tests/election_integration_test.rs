@@ -193,7 +193,7 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
 async fn test_election_pdf_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/1/download_results");
+    let url = format!("http://{addr}/api/elections/1/download_pdf_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let content_disposition = response.headers().get("Content-Disposition");
@@ -233,4 +233,44 @@ async fn test_election_xml_download(pool: SqlitePool) {
     let body = response.text().await.unwrap();
     assert!(body.contains("<Election>"));
     assert!(body.contains("<ValidVotes>125</ValidVotes>"));
+}
+
+#[sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("elections", "polling_stations", "polling_station_results")
+))]
+async fn test_election_zip_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/4/download_zip_results");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let content_disposition = response.headers().get("Content-Disposition");
+    let content_type = response.headers().get("Content-Type");
+
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "application/zip");
+
+    let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
+    assert_eq!(&content_disposition_string[..21], "attachment; filename=");
+    assert_eq!(
+        &content_disposition_string[21..],
+        "\"election_result_GR2024_Heemdamseburg.zip\""
+    );
+
+    let bytes = response.bytes().await.unwrap();
+    let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();
+    {
+        let xml_file = archive
+            .by_name("Telling_GR2024_Heemdamseburg.eml.xml")
+            .unwrap();
+        assert!(xml_file.size() > 0);
+    }
+
+    {
+        let pdf_file = archive
+            .by_name("Model_Na31-2_GR2024_Heemdamseburg.pdf")
+            .unwrap();
+        assert!(pdf_file.size() > 0);
+    }
 }

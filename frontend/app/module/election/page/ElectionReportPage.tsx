@@ -19,7 +19,7 @@ export function ElectionReportPage() {
 
   function downloadResults() {
     let filename: string;
-    fetch(`/api/elections/${election.id}/download_results`)
+    fetch(`/api/elections/${election.id}/download_pdf_results`)
       .then((result) => {
         if (result.status !== 200) {
           const message = `Failed to download PDF: status code ${result.status}`;

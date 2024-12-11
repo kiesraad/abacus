@@ -62,6 +62,7 @@ The following dependencies (crates) are used:
 - `rand`: create a random session key.
 - `password_hash`: password hashing interfaces.
 - `argon2`: password hashing implementation (Argon2id).
+- `zip`: creating a zip of the EML_NL and PDF PV.
 
 Additionally, the following development dependencies are used:
 

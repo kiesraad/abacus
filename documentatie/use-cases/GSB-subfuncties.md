@@ -64,7 +64,7 @@ __niveau:__ subfunctie, vis, 🐟
 __hoofdscenario__:
 
 1. De coördinator voegt stembureaus toe, past stembureaus aan en verwijdert stembureaus waar nodig.
-2. De applicatie controleert dat de bewerking aan de validaties voldoet.
+2. De applicatie stelt vast dat de bewerking aan de validaties voldoet.
 
 __uitbreidingen__:
 2a. (bij verwijderen) Er is al invoer of een resultaat voor het stembureau:

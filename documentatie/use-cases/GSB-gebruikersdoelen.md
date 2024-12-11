@@ -15,11 +15,11 @@ __trigger:__ De coördinator geeft het SB PV en eventueel SB corrigendum PV aan 
 __hoofdscenario__:
 
 1. De invoerder selecteert het stembureau van het PV in de applicatie.
-2. De applicatie controleert dat er geen eerdere invoer voor het stembureau is opgeslagen.
+2. De applicatie stelt vast dat er geen eerdere invoer voor het stembureau is opgeslagen.
 3. De invoerder vult de resultaten van de telling in.
-4. (tijdens invoer) De applicatie controleert dat de invoer voldoet aan
+4. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
    de [validatieregels voor fouten](./GSB-validatieregels-plausibiliteitschecks.md#validatieregels-geven-fouten)
-5. (tijdens invoer) De applicatie controleert dat de invoer voldoet aan
+5. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
    de [plausibiliteitschecks](./GSB-validatieregels-plausibiliteitschecks.md#plausibiliteitschecks-geven-waarschuwingen).
 6. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
 
@@ -117,7 +117,7 @@ __niveau:__ gebruikersdoel, zee, 🌊
 __hoofdscenario__:
 
 1. De coördinator importeert de lijst van stembureaus.
-2. De applicatie controleert dat de stembureaus aan de validaties voldoen.
+2. De applicatie stelt vast dat de stembureaus aan de validaties voldoen.
 3. De coördinator stelt vast dat de lijst volledig en correct is, door de lijst in Abacus te vergelijken met de door de gemeente vooraf gepubliceerde lijst.
 
 __uitbreidingen__:  

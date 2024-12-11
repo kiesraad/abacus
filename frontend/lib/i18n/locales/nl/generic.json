@@ -44,7 +44,7 @@
   "vote_count": "Aantal stemmen",
   "form": {
     "errors": {
-      "FORM_VALIDATION_RESULT_REQUIRED": "Dit veld is verplicht",
+      "FORM_VALIDATION_RESULT_REQUIRED": "Dit veld mag niet leeg zijn",
       "FORM_VALIDATION_RESULT_MIN_LENGTH": "Waarde is te kort",
       "FORM_VALIDATION_RESULT_MAX_LENGTH": "Waarde is te lang",
       "FORM_VALIDATION_RESULT_INVALID_TYPE": "Niet het juiste type",

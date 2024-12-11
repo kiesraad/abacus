@@ -19,7 +19,7 @@ test.describe("election results zip", () => {
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);
-    expect(await response.headerValue("content-type")).toBe("application/x-zip");
+    expect(await response.headerValue("content-type")).toBe("application/zip");
 
     const download = await downloadPromise;
 

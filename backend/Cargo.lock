@@ -4470,6 +4470,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "99d52293fc86ea7cf13971b3bb81eb21683636e7ae24c729cdaf1b7c4157a352"
 dependencies = [
  "arbitrary",
+ "chrono",
  "crc32fast",
  "crossbeam-utils",
  "displaydoc",
@@ -4477,7 +4478,6 @@ dependencies = [
  "indexmap",
  "memchr",
  "thiserror 2.0.4",
- "time",
  "zopfli",
 ]
 

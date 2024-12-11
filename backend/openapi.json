@@ -234,7 +234,7 @@
               }
             },
             "content": {
-              "application/x-zip": {}
+              "application/zip": {}
             }
           },
           "404": {

@@ -194,7 +194,7 @@ impl ResultsInput {
         (
             status = 200,
             description = "ZIP",
-            content_type = "application/x-zip",
+            content_type = "application/zip",
             headers(
                 ("Content-Disposition", description = "attachment; filename=\"filename.zip\"")
             )
@@ -234,6 +234,13 @@ pub async fn election_download_zip_results(
     let mut zip = zip::ZipWriter::new(&mut cursor);
     let options = SimpleFileOptions::default()
         .compression_method(zip::CompressionMethod::DEFLATE)
+        // zip file format does not support dates beyond 2107 or inserted leap (i.e. 61th) second
+        .last_modified_time(
+            chrono::Local::now()
+                .naive_local()
+                .try_into()
+                .expect("Timestamp outside of zip range"),
+        )
         .unix_permissions(0o644);
     zip.start_file(xml_filename, options)?;
     zip.write_all(xml_string.as_bytes()).map_err(ZipError::Io)?;
@@ -243,7 +250,7 @@ pub async fn election_download_zip_results(
 
     Ok(Attachment::new(buf)
         .filename(zip_filename)
-        .content_type("application/x-zip"))
+        .content_type("application/zip"))
 }
 
 /// Download a generated PDF with election results

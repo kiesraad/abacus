@@ -249,7 +249,7 @@ async fn test_election_zip_download(pool: SqlitePool) {
     let content_type = response.headers().get("Content-Type");
 
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(content_type.unwrap(), "application/x-zip");
+    assert_eq!(content_type.unwrap(), "application/zip");
 
     let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");

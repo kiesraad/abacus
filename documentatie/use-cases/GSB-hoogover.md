@@ -20,7 +20,7 @@ __hoofdscenario__:
 3. De coördinator sluit de invoer af.
 4. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
 5. De applicatie stelt vast dat er geen stembureaus met (geaccepteerde) waarschuwingen zijn.
-5. De applicatie genereert de PVs en emls etc.
+5. De applicatie genereert de PVs en EMLs etc.
 
 __uitbreidingen__:  
 4a. De applicatie stelt vast dat niet voor niet alle stembureaus resultaten zijn ingevoerd:
@@ -51,7 +51,7 @@ __hoofdscenario__:
 
 __uitbreidingen__:  
 5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
-&emsp; 5a1. De coördinator beoordeeldt de geaccepteerde waarschuwingen.
+&emsp; 5a1. De coördinator beoordeeld de geaccepteerde waarschuwingen.
 
 6a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 6a1. [De coördinator lost de verschillen tussen de twee invoeren op.](./GSB-gebruikersdoelen.md#de-coördinator-lost-de-verschillen-tussen-de-twee-invoeren-op)
@@ -76,7 +76,7 @@ __hoofdscenario__:
 
 1. (voor elk corrigendum) De coördinator stelt invoer open voor het stembureau met corrigendum.
 2. (voor elk corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in)
-3. De coördinator genereert de PVs en emls etc.
+3. De coördinator genereert de PVs en EMLs etc.
 
 __uitbreidingen__:  
 ...

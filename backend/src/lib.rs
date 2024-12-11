@@ -17,7 +17,6 @@ pub mod fixtures;
 pub mod pdf_gen;
 pub mod polling_station;
 pub mod summary;
-pub mod validation;
 
 pub use error::{APIError, ErrorResponse};
 
@@ -143,6 +142,9 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 data_entry::PollingStationResults,
                 data_entry::VotersCounts,
                 data_entry::VotesCounts,
+                data_entry::ValidationResult,
+                data_entry::ValidationResultCode,
+                data_entry::ValidationResults,
                 election::Election,
                 election::ElectionCategory,
                 election::PoliticalGroup,
@@ -157,9 +159,6 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 polling_station::PollingStationStatusEntry,
                 polling_station::PollingStationType,
                 polling_station::PollingStationRequest,
-                validation::ValidationResult,
-                validation::ValidationResultCode,
-                validation::ValidationResults,
             ),
         ),
         tags(

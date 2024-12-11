@@ -6,17 +6,19 @@ use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
-pub use self::structs::*;
 use crate::data_entry::repository::{PollingStationDataEntries, PollingStationResultsEntries};
 use crate::election::repository::Elections;
 use crate::election::Election;
 use crate::error::{APIError, ErrorReference, ErrorResponse};
 use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::PollingStation;
-use crate::validation::ValidationResults;
+
+pub use self::structs::*;
+pub use self::validation::*;
 
 pub mod repository;
-pub mod structs;
+mod structs;
+mod validation;
 
 /// Request structure for saving data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRequest)]

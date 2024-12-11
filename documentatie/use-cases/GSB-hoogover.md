@@ -112,4 +112,3 @@ __uitbreidingen__:
 1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
 
 2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
-

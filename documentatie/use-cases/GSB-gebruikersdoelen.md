@@ -116,6 +116,7 @@ __precondities:__
 
 - De coördinator heeft het EML-NL bestand met de stembureaus.
 - De coördinator heeft de lijst met gepubliceerde stembureaus.
+- De invoer is nog niet gestart.
 
 ### Hoofdscenario en uitbreidingen
 
@@ -130,12 +131,12 @@ __uitbreidingen__:
 
 1a. De coördinator selecteert een andere verkiezing dan van het bestand en de lijst met stembureaus:
 
-2a. Er is geen te importeren bestand met stembureaus:
+2a. Er is geen te importeren bestand met stembureaus:  
 &emsp; 2a1. [De coördinator voert de stembureaus handmatig in.](./GSB-subfuncties.md#de-coördinator-bewerkt-de-stembureaus)
 
 3a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
 
-4a. De lijst met stembureaus moet aangepast worden:
+4a. De lijst met stembureaus moet aangepast worden:  
 &emsp; 4a1. [De coördinator past de stembureaus aan.](./GSB-subfuncties.md#de-coördinator-bewerkt-de-stembureaus)
 
 
@@ -147,3 +148,4 @@ __uitbreidingen__:
   genereren.
 - Bij gelijktijdige verkiezingen (gemeenteraad en stadsdeel bijvoorbeeld) zou het mooi zijn om de stembureaus van één
   naar een andere verkiezing te kopiëren. Minder mooi alternatief is eerst exporteren en dan importeren.
+- Zodra invoer gestart is, mag het niet mogelijk zijn om stembureaus aan te passen of te verwijderen.

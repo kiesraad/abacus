@@ -261,12 +261,16 @@ async fn test_election_zip_download(pool: SqlitePool) {
     let bytes = response.bytes().await.unwrap();
     let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();
     {
-        let xml_file = archive.by_name("Telling_GR2024_Heemdamseburg.xml").unwrap();
+        let xml_file = archive
+            .by_name("Telling_GR2024_Heemdamseburg.eml.xml")
+            .unwrap();
         assert!(xml_file.size() > 0);
     }
 
     {
-        let pdf_file = archive.by_name("PV_GR2024_Heemdamseburg.pdf").unwrap();
+        let pdf_file = archive
+            .by_name("Model_Na31-2_GR2024_Heemdamseburg.pdf")
+            .unwrap();
         assert!(pdf_file.size() > 0);
     }
 }

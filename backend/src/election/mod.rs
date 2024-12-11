@@ -148,7 +148,7 @@ impl ResultsInput {
     fn xml_filename(&self) -> String {
         use chrono::Datelike;
         format!(
-            "Telling_{}{}_{}.xml",
+            "Telling_{}{}_{}.eml.xml",
             self.election.category.to_eml_code(),
             self.election.election_date.year(),
             self.election.location.replace(" ", "_"),
@@ -158,7 +158,7 @@ impl ResultsInput {
     fn pdf_filename(&self) -> String {
         use chrono::Datelike;
         format!(
-            "PV_{}{}_{}.pdf",
+            "Model_Na31-2_{}{}_{}.pdf",
             self.election.category.to_eml_code(),
             self.election.election_date.year(),
             self.election.location.replace(" ", "_"),
@@ -239,7 +239,7 @@ pub async fn election_download_zip_results(
             chrono::Local::now()
                 .naive_local()
                 .try_into()
-                .expect("Timestamp outside of zip range"),
+                .expect("Timestamp should be inside zip timestamp range"),
         )
         .unix_permissions(0o644);
     zip.start_file(xml_filename, options)?;

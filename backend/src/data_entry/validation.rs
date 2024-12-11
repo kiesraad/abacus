@@ -164,16 +164,25 @@ pub trait Validate {
     ) -> Result<(), DataError>;
 }
 
-/// Check if the difference between the total admitted voters count and the total votes cast count
-/// is above the threshold, meaning 2% or more or 15 or more, which should result in a warning.
-fn difference_admitted_voters_count_and_votes_cast_count_above_threshold(
-    admitted_voters: u32,
-    votes_cast: u32,
-) -> bool {
-    let float_admitted_voters: f64 = f64::from(admitted_voters);
-    let float_votes_cast: f64 = f64::from(votes_cast);
-    f64::abs(float_admitted_voters - float_votes_cast) / float_votes_cast >= 0.02
-        || f64::abs(float_admitted_voters - float_votes_cast) >= 15.0
+pub fn validate_polling_station_results(
+    polling_station_results: &PollingStationResults,
+    polling_station: &PollingStation,
+    election: &Election,
+) -> Result<ValidationResults, DataError> {
+    let mut validation_results = ValidationResults::default();
+    polling_station_results.validate(
+        election,
+        polling_station,
+        &mut validation_results,
+        &"data".into(),
+    )?;
+    validation_results
+        .errors
+        .sort_by(|a, b| a.code.cmp(&b.code));
+    validation_results
+        .warnings
+        .sort_by(|a, b| a.code.cmp(&b.code));
+    Ok(validation_results)
 }
 
 impl Validate for PollingStationResults {
@@ -844,6 +853,18 @@ impl Validate for PoliticalGroupVotes {
         }
         Ok(())
     }
+}
+
+/// Check if the difference between the total admitted voters count and the total votes cast count
+/// is above the threshold, meaning 2% or more or 15 or more, which should result in a warning.
+fn difference_admitted_voters_count_and_votes_cast_count_above_threshold(
+    admitted_voters: u32,
+    votes_cast: u32,
+) -> bool {
+    let float_admitted_voters: f64 = f64::from(admitted_voters);
+    let float_votes_cast: f64 = f64::from(votes_cast);
+    f64::abs(float_admitted_voters - float_votes_cast) / float_votes_cast >= 0.02
+        || f64::abs(float_admitted_voters - float_votes_cast) >= 15.0
 }
 
 impl Validate for CandidateVotes {

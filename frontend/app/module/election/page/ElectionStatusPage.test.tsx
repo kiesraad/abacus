@@ -27,7 +27,8 @@ describe("ElectionStatusPage", () => {
         },
         {
           id: 2,
-          status: "not_started",
+          status: "second_entry",
+          finished_at: new Date().getTime() / 1000,
         },
         {
           id: 3,
@@ -52,9 +53,9 @@ describe("ElectionStatusPage", () => {
     expect(items[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Stembureaus per status" }));
     expect(items[1]).toHaveTextContent("Niet afgeronde invoer (1)");
     expect(items[2]).toHaveTextContent("Invoer bezig (1)");
-    expect(items[3]).toHaveTextContent("Eerste invoer klaar (0)");
+    expect(items[3]).toHaveTextContent("Eerste invoer klaar (1)");
     expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (0)");
-    expect(items[5]).toHaveTextContent("Werkvoorraad (2)");
+    expect(items[5]).toHaveTextContent("Werkvoorraad (1)");
 
     const progress = [...screen.getByTestId("progress").children];
     expect(progress[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Voortgang" }));
@@ -62,10 +63,10 @@ describe("ElectionStatusPage", () => {
     const bars = [...screen.getByTestId("multi-outer-bar").children];
     const expectedData = [
       { percentage: 0, class: "definitive" },
-      { percentage: 0, class: "first-entry-finished" },
+      { percentage: 25, class: "first-entry-finished" },
       { percentage: 25, class: "in-progress" },
       { percentage: 25, class: "unfinished" },
-      { percentage: 50, class: "not-started" },
+      { percentage: 25, class: "not-started" },
     ];
     bars.forEach((bar, index) => {
       expect(bar.classList, `class for index ${index}`).toContain(`${expectedData[index]?.class}`);
@@ -75,8 +76,8 @@ describe("ElectionStatusPage", () => {
     });
 
     const tablesRoot = screen.getByRole("article");
-    expect(within(tablesRoot).getAllByRole("heading", { level: 3 }).length).toBe(3);
-    expect(within(tablesRoot).getAllByRole("table").length).toBe(3);
+    expect(within(tablesRoot).getAllByRole("heading", { level: 3 }).length).toBe(4);
+    expect(within(tablesRoot).getAllByRole("table").length).toBe(4);
 
     const tables = [...tablesRoot.children];
 
@@ -103,16 +104,25 @@ describe("ElectionStatusPage", () => {
     expect(inProgressRows[1]).toHaveTextContent(/1e invoer/);
     expect(within(inProgressRows[1] as HTMLElement).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "40");
 
-    expect(tables[2]).toContain(screen.getByRole("heading", { level: 3, name: "Werkvoorraad (2)" }));
-    const notStartedTable = within(tables[2] as HTMLElement).getByTestId("not_started");
+    expect(tables[2]).toContain(screen.getByRole("heading", { level: 3, name: "Eerste invoer klaar (1)" }));
+    const firstEntryFinishedTable = within(tables[2] as HTMLElement).getByTestId("first_entry_finished");
+    const firstEntryFinishedRows = within(firstEntryFinishedTable).getAllByRole("row");
+    expect(firstEntryFinishedRows.length).toBe(2);
+    expect(firstEntryFinishedRows[0]).toHaveTextContent(/Nummer/);
+    expect(firstEntryFinishedRows[0]).toHaveTextContent(/Stembureau/);
+    expect(firstEntryFinishedRows[0]).toHaveTextContent(/Afgerond op/);
+    expect(firstEntryFinishedRows[1]).toHaveTextContent(/34/);
+    expect(firstEntryFinishedRows[1]).toHaveTextContent(/Testplek/);
+    expect(firstEntryFinishedRows[1]).toHaveTextContent(/vandaag/);
+
+    expect(tables[3]).toContain(screen.getByRole("heading", { level: 3, name: "Werkvoorraad (1)" }));
+    const notStartedTable = within(tables[3] as HTMLElement).getByTestId("not_started");
     const notStartedRows = within(notStartedTable).getAllByRole("row");
-    expect(notStartedRows.length).toBe(3);
+    expect(notStartedRows.length).toBe(2);
     expect(notStartedRows[0]).toHaveTextContent(/Nummer/);
     expect(notStartedRows[0]).toHaveTextContent(/Stembureau/);
     expect(notStartedRows[1]).toHaveTextContent(/33/);
     expect(notStartedRows[1]).toHaveTextContent(/Op Rolletjes/);
-    expect(notStartedRows[2]).toHaveTextContent(/34/);
-    expect(notStartedRows[2]).toHaveTextContent(/Testplek/);
   });
 
   test("Show no polling stations text instead of tables", async () => {

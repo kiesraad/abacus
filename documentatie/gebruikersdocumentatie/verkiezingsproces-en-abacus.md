@@ -64,7 +64,7 @@ In het verkiezingsproces is papier leidend. Dat zorgt voor controleerbaarheid en
 
 Het controleprotocol optellingen is de afsluiting van het papieren proces. Buiten de software om
 wordt de optelling gecontroleerd, door middels een steekproef drie willekeurig gekozen lijsten met de hand na te rekenen.
-Hiermee wordt gecontroleerd op invoerfouten en andere wijzigingen die de uitslag kunnen beïnvloeden. Dit protocol is dus een waarborg om te zorgen dat het papieren spoor en het digitale spoor met elkaar kloppen.
+Hiermee wordt gecontroleerd op invoerfouten en andere wijzigingen die de uitslag kunnen beïnvloeden. Dit protocol is dus een waarborg om te controleren of het papieren spoor en het digitale spoor met elkaar kloppen.
 
 ### Controleprotocol opmerkelijke uitslagen
 

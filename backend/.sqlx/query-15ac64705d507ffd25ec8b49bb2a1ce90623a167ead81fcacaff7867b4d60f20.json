@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE polling_station_data_entries\n            SET finalised_at = unixepoch(), progress = 100\n            WHERE polling_station_id = ? AND entry_number = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "15ac64705d507ffd25ec8b49bb2a1ce90623a167ead81fcacaff7867b4d60f20"
+}

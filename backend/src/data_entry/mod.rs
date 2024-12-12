@@ -247,37 +247,35 @@ pub async fn polling_station_data_entry_finalise(
 
     let mut tx = pool.begin().await?;
 
-    // TODO: #633 validate whether first and second data entries are equal.
-    //       Currently the first data entry is copied to the results table,
-    //       without comparison to the second data entry
-
     let (_, data, _, _) = polling_station_data_entries
         .get(&mut tx, id, entry_number)
         .await?;
     let results = serde_json::from_slice::<PollingStationResults>(&data)?;
 
-    let mut validation_results = ValidationResults::default();
-    results.validate(
-        &election,
-        &polling_station,
-        &mut validation_results,
-        &"data".into(),
-    )?;
-
-    if validation_results.has_errors() {
+    // check that this data entry does not have errors
+    if validate_polling_station_results(&results, &polling_station, &election)?.has_errors() {
         return Err(APIError::Conflict(
             "Cannot finalise data entry with validation errors".to_string(),
             ErrorReference::PollingStationDataValidation,
         ));
     }
 
-    match entry_number {
-        EntryNumber::FirstEntry => {
-            polling_station_data_entries
-                .finalise_first_entry(&mut tx, id)
-                .await?
+    // finalise data entry, but do not create a result yet
+    polling_station_data_entries
+        .finalise_data_entry(&mut tx, id, entry_number)
+        .await?;
+
+    if entry_number == EntryNumber::SecondEntry {
+        // get first data entry from database
+        let (_, first_data, _, _) = polling_station_data_entries
+            .get(&mut tx, id, EntryNumber::FirstEntry)
+            .await?;
+        let first_results = serde_json::from_slice::<PollingStationResults>(&first_data)?;
+
+        // only convert to result the first and second data entries are equal
+        if first_results == results {
+            polling_station_data_entries.to_result(&mut tx, id).await?
         }
-        EntryNumber::SecondEntry => polling_station_data_entries.finalise(&mut tx, id).await?,
     }
 
     tx.commit().await?;
@@ -377,7 +375,7 @@ mod tests {
     }
 
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
-    async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
+    async fn test_create_data_entry(pool: SqlitePool) {
         let mut request_body = example_data_entry();
         request_body.data.voters_counts.poll_card_count = 100; // incorrect value
 
@@ -390,15 +388,24 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(row_count.count, 1);
+    }
 
-        // Check that we cannot finalise with errors
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
+    async fn test_cannot_finalise_with_errors(pool: SqlitePool) {
+        let mut request_body = example_data_entry();
+        request_body.data.voters_counts.poll_card_count = 100; // incorrect value
+
         let response = save(pool.clone(), request_body.clone(), 1).await;
         assert_eq!(response.status(), StatusCode::OK);
+
         let response = finalise(pool.clone(), 1).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
+    }
 
-        // Test updating the data entry to correct the error
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
+    async fn test_update_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();
+
         let response = save(pool.clone(), request_body.clone(), 1).await;
         assert_eq!(response.status(), StatusCode::OK);
 
@@ -419,8 +426,23 @@ mod tests {
             data.voters_counts.poll_card_count,
             request_body.data.voters_counts.poll_card_count
         );
+    }
 
-        // Finalise data entry after correcting the error
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
+    async fn test_finalise_data_entry(pool: SqlitePool) {
+        let request_body = example_data_entry();
+
+        let response = save(pool.clone(), request_body.clone(), 1).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), 1).await;
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
+    async fn test_save_second_data_entry(pool: SqlitePool) {
+        let request_body = example_data_entry();
+
+        // Save a first data entry and finalise it
         let response = save(pool.clone(), request_body.clone(), 1).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone(), 1).await;
@@ -447,8 +469,21 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(row_count.count, 0);
+    }
 
-        // Finalise second data entry
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
+    async fn test_finalise_second_data_entry(pool: SqlitePool) {
+        let request_body = example_data_entry();
+
+        // Save and finalise the first data entry
+        let response = save(pool.clone(), request_body.clone(), 1).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), 1).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // Save and finalise the second data entry
+        let response = save(pool.clone(), request_body.clone(), 2).await;
+        assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone(), 2).await;
         assert_eq!(response.status(), StatusCode::OK);
 
@@ -469,6 +504,41 @@ mod tests {
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let response = save(pool.clone(), request_body.clone(), 2).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
+    }
+
+    // test creating first and different second data entry
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
+    async fn test_first_second_data_entry_different(pool: SqlitePool) {
+        let request_body = example_data_entry();
+
+        // Save and finalise the first data entry
+        let response = save(pool.clone(), request_body.clone(), 1).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), 1).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // Save and finalise a different second data entry
+        let mut request_body = example_data_entry();
+        request_body.data.voters_counts.poll_card_count = 99;
+        request_body.data.voters_counts.proxy_certificate_count = 0;
+        let response = save(pool.clone(), request_body.clone(), 2).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), 2).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // Check that the finalised first and second data entries are still in the database
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries WHERE finalised_at IS NOT NULL")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 2);
+
+        // Check that no result has been created
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 0);
     }
 
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]

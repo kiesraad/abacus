@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::Sqlite;
 use std::fmt::Display;
 
-#[derive(Debug, Copy, Clone, Serialize)]
+#[derive(Debug, Copy, Clone, Serialize, PartialEq, Eq)]
 pub enum EntryNumber {
     FirstEntry,
     SecondEntry,

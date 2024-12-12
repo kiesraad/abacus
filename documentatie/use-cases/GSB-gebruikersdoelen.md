@@ -124,7 +124,7 @@ __hoofdscenario__:
 1. De coördinator selecteert de verkiezing.
 2. De coördinator importeert het EML-NL bestand met de stembureaus.
 3. De applicatie stelt vast dat de stembureaus aan de validatieregels voldoen.
-4. De coördinator stelt vast dat de stembureaus in de applicatie volledig en correct zijn, door ze te vergelijken met de door de gemeente vooraf gepubliceerde lijst.
+4. De coördinator stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 
 __uitbreidingen__:  
 

@@ -13,6 +13,7 @@ import {
   InputGridRow,
   KeyboardKey,
   KeyboardKeys,
+  useFormKeyboardNavigation,
 } from "@kiesraad/ui";
 import { deformatNumber } from "@kiesraad/util";
 
@@ -41,6 +42,8 @@ export function VotersAndVotesForm() {
   const formRef = React.useRef<VotersAndVotesFormElement>(null);
   const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
   const recountTitleRef = React.useRef<HTMLHeadingElement>(null);
+
+  useFormKeyboardNavigation(formRef);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;

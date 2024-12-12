@@ -1,7 +1,6 @@
 #![cfg(test)]
 
-use backend::data_entry::{GetDataEntryResponse, SaveDataEntryResponse};
-use backend::validation::ValidationResultCode;
+use backend::data_entry::{GetDataEntryResponse, SaveDataEntryResponse, ValidationResultCode};
 use backend::ErrorResponse;
 use reqwest::{Response, StatusCode};
 use serde_json::json;

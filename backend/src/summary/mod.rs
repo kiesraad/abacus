@@ -3,12 +3,11 @@ use serde::{Deserialize, Serialize};
 use crate::{
     data_entry::{
         CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-        Validate, VotersCounts, VotesCounts,
+        Validate, ValidationResults, VotersCounts, VotesCounts,
     },
     election::Election,
     error::ErrorReference,
     polling_station::PollingStation,
-    validation::ValidationResults,
     APIError,
 };
 

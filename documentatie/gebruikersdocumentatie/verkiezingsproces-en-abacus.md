@@ -52,7 +52,7 @@ Hieronder zie je hoe het gehele proces van het optellen van stemmen verloopt voo
 - **Blok 3: HSB** - Het proces van blok 2 herhaalt zich bij de hoofdstembureaus van de kieskringen. Hier worden de processen-verbaal van de gemeentelijke stembureaus ingevoerd, gecontroleerd en afgerond. De software maakt het proces-verbaal en het EML_NL-bestand van het hoofdstembureau.
 - **Blok 4: CSB** - Op het centraal stembureau worden de processen-verbaal van de hoofdstembureaus ingevoerd, gecontroleerd en afgerond. De software maakt het proces-verbaal en het EML_NL-bestand van het centraal stembureau. Aan de hand van deze gegevens wordt de zetelverdeling berekend.
 
-In deze blokken biedt software ondersteuning, en hier komt Abacus dan ook aan bod.
+In blok 2, 3 en 4 biedt software ondersteuning, en hier komt Abacus dan ook aan bod.
 
 [^2]: EML staat voor Election Markup Language. Het bestandsformaat [EML_NL](https://www.kiesraad.nl/verkiezingen/osv-en-eml/eml-standaard) is hierop gebaseerd en aangepast voor Nederlandse verkiezingen.
 

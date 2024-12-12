@@ -112,7 +112,7 @@ In de afbeelding hieronder zie je hoe Abacus werkt op het gemeentelijk stemburea
 - Links staat INVOER: gebruikers kunnen verkiezingsresultaten invoeren, inclusief verklaringen over ontbrekende stembiljetten/stempassen en klachten van kiezers.
 Abacus telt de resultaten op en controleert ze.
 - Rechts staat ONDERTEKENING: de data wordt ondertekend met een handtekening van de voorzitter van het gemeentelijk stembureau.
-- Onderaan staat EXPORT: de verkiezingsresultaten worden geëxporteerd als EML_NL-bestand en als PDF-bestand.
+- Onderaan staat EXPORT: de verkiezingsresultaten worden geëxporteerd als EML_NL-bestand en als PDF-bestand. De bestanden kunnen van de server gehaald worden voor verdere verspreiding.
 
 ### Technische keuzes en architectuur
 
@@ -132,10 +132,10 @@ De UI/UX designs vind je in onze [Figma](https://www.figma.com/design/xHDfsv69Nh
 
 ### Security
 
-Security is een van de belangrijkste pijlers voor Abacus, om een zo hoog mogelijke betrouwbaarheid van de verkiezingsuitslagen te kunnen garanderen. Dit doen we op de volgende manieren:
+Veiligheid is een van de belangrijkste pijlers voor Abacus, om een zo hoog mogelijke betrouwbaarheid van de verkiezingsuitslagen te kunnen garanderen. Dit doen we op de volgende manieren:
 
 - Invoer volgens het vier-ogenprincipe: elk proces-verbaal wordt twee keer ingevoerd door verschillende gebruikers.
-- Afzenderverificatie: hiermee wordt gegarandeerd dat alle bestanden die door Abacus zijn gegenereerd van de juiste afzender komen en dat ze niet bedoeld of onbedoeld gewijzigd zijn. We werken nog aan de methode hiervoor.
+- Afzenderverificatie: hiermee wordt gegarandeerd dat bestanden met verkiezingsuitslagen die met Abacus zijn gemaakt, afkomstig zijn van het juiste stembureau en dat ze niet bedoeld of onbedoeld gewijzigd zijn.
 - Air-gapped: Abacus wordt air-gapped en lokaal gedraaid.
 - Er worden interne code-reviews gedaan en we laten ook externe code-reviews uitvoeren.
 - Ook zal er externe pentesting worden uitgevoerd.
@@ -147,8 +147,8 @@ Ons team werkt volgens deze principes:
 
 - De software is beschikbaar onder de EU PL 1.2-licentie en het team werkt op deze openbare GitHub-repository. Ook de pull requests zijn openbaar.
 - We hebben een continuous integration pipeline met tests en linting voor de frontend en backend.
-- Er zijn altijd minimaal 2 reviews en approvals nodig per pull request.
-- Nieuwe code wordt altijd getest. De nieuwe tests moeten in dezelfde PR zitten als de nieuwe functionaliteit.
+- Als een teamlid code wijzigt, moeten minimaal 2 andere teamleden die wijzigingen reviewen en goedkeuren voordat de wijziging wordt overgenomen.
+- Als we nieuwe code toevoegen, maken we meteen tests die de werking van die code controleren. De nieuwe tests moeten in dezelfde PR zitten als de nieuwe functionaliteit.
 - De UI/UX designs op basis waarvan nieuwe functionaliteit wordt gebouwd zijn ook openbaar op Figma.
 - Op ons [board](https://github.com/orgs/kiesraad/projects/1) zie je waar het team mee bezig is. Hier kun je ook de epics bekijken.
 

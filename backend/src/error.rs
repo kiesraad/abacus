@@ -1,11 +1,13 @@
 use std::error::Error;
 
+use crate::authentication::AuthenticationError;
 use crate::data_entry::DataError;
 use axum::extract::rejection::JsonRejection;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use hyper::header::InvalidHeaderValue;
+use quick_xml::SeError;
 use serde::{Deserialize, Serialize};
 use sqlx::Error::RowNotFound;
 use tracing::error;
@@ -19,6 +21,8 @@ pub enum ErrorReference {
     EntryNotFound,
     PollingStationFirstEntryAlreadyFinalised,
     PollingStationFirstEntryNotFinalised,
+    PollingStationSecondEntryAlreadyFinalised,
+    PollingStationResultsAlreadyFinalised,
     PollingStationDataValidation,
     InvalidVoteGroup,
     InvalidVoteCandidate,
@@ -32,6 +36,8 @@ pub enum ErrorReference {
     PollingStationRepeated,
     PollingStationValidationErrors,
     InvalidPoliticalGroup,
+    InvalidUsernamePassword,
+    InvalidSession,
 }
 
 /// Response structure for errors
@@ -62,6 +68,8 @@ pub enum APIError {
     PdfGenError(Vec<SourceDiagnostic>),
     StdError(Box<dyn Error>),
     AddError(String, ErrorReference),
+    XmlError(quick_xml::se::SeError),
+    Authentication(AuthenticationError),
 }
 
 impl IntoResponse for APIError {
@@ -147,6 +155,49 @@ impl IntoResponse for APIError {
                     to_error("Internal server error", reference, false),
                 )
             }
+            APIError::XmlError(err) => {
+                error!("Could not serialize XML: {:?}", err);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error(
+                        "Internal server error",
+                        ErrorReference::InternalServerError,
+                        false,
+                    ),
+                )
+            }
+            APIError::Authentication(err) => {
+                error!("Authentication error: {:?}", err);
+
+                match err {
+                    // client errors
+                    AuthenticationError::UserNotFound | AuthenticationError::InvalidPassword => (
+                        StatusCode::UNAUTHORIZED,
+                        to_error(
+                            "Invalid username and/or password",
+                            ErrorReference::InvalidUsernamePassword,
+                            false,
+                        ),
+                    ),
+                    AuthenticationError::SessionKeyNotFound
+                    | AuthenticationError::NoSessionCookie => (
+                        StatusCode::UNAUTHORIZED,
+                        to_error("Invalid session key", ErrorReference::InvalidSession, false),
+                    ),
+                    // server errors
+                    AuthenticationError::Database(_)
+                    | AuthenticationError::HashPassword(_)
+                    | AuthenticationError::BackwardTimeTravel
+                    | AuthenticationError::InvalidSessionDuration => (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        to_error(
+                            "Internal server error",
+                            ErrorReference::InternalServerError,
+                            false,
+                        ),
+                    ),
+                }
+            }
         };
 
         (status, response).into_response()
@@ -198,6 +249,18 @@ impl From<DataError> for APIError {
 impl From<InvalidHeaderValue> for APIError {
     fn from(_: InvalidHeaderValue) -> Self {
         APIError::InvalidHeaderValue
+    }
+}
+
+impl From<SeError> for APIError {
+    fn from(err: SeError) -> Self {
+        APIError::XmlError(err)
+    }
+}
+
+impl From<AuthenticationError> for APIError {
+    fn from(err: AuthenticationError) -> Self {
+        APIError::Authentication(err)
     }
 }
 

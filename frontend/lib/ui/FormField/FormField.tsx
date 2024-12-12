@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { t } from "@kiesraad/i18n";
 import { IconError, IconWarning } from "@kiesraad/icon";
 import { cn } from "@kiesraad/util";
 
@@ -15,9 +16,9 @@ export interface FormFieldProps {
 export function FormField({ id, children, hasError, hasWarning }: FormFieldProps) {
   let icon: React.ReactNode | null = null;
   if (hasError) {
-    icon = <IconError aria-label={"bevat een fout"} />;
+    icon = <IconError aria-label={t("contains_error")} />;
   } else if (hasWarning) {
-    icon = <IconWarning aria-label={"bevat een waarschuwing"} />;
+    icon = <IconWarning aria-label={t("contains_warning")} />;
   }
 
   return (

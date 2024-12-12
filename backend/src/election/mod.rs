@@ -7,6 +7,8 @@ use utoipa::ToSchema;
 use self::repository::Elections;
 pub use self::structs::*;
 use crate::data_entry::repository::PollingStationResultsEntries;
+use crate::eml::axum::Eml;
+use crate::eml::{eml_document_hash, EMLDocument, EML510};
 use crate::pdf_gen::generate_pdf;
 use crate::pdf_gen::models::{ModelNa31_2Input, PdfModel};
 use crate::polling_station::repository::PollingStations;
@@ -134,11 +136,17 @@ pub async fn election_download_results(
         .list_with_polling_stations(polling_stations_repo, election.id)
         .await?;
     let summary = ElectionSummary::from_results(&election, &results)?;
+    let creation_date_time = chrono::Local::now();
+    let xml = EML510::from_results(&election, &results, &summary, &creation_date_time);
+    let xml_string = xml.to_xml_string()?;
+    let hash = eml_document_hash(&xml_string, true);
 
     let model = PdfModel::ModelNa31_2(ModelNa31_2Input {
         polling_stations,
         summary,
         election,
+        hash,
+        creation_date_time: creation_date_time.format("%d-%m-%Y %H:%M").to_string(),
     });
     let mut filename: String = model.as_filename().to_string();
     filename.push_str(".pdf");
@@ -147,4 +155,39 @@ pub async fn election_download_results(
     Ok(Attachment::new(content.buffer)
         .filename(filename)
         .content_type("application/pdf"))
+}
+
+/// Download a generated EML_NL 510 XML file with election results
+#[utoipa::path(
+    get,
+    path = "/api/elections/{election_id}/download_xml_results",
+    responses(
+        (
+            status = 200,
+            description = "XML",
+            content_type="text/xml",
+            headers(
+                ("Content-Type", description = "text/xml"),
+            )
+        ),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
+)]
+pub async fn election_download_xml_results(
+    State(elections_repo): State<Elections>,
+    State(polling_stations_repo): State<PollingStations>,
+    State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
+    Path(id): Path<u32>,
+) -> Result<Eml<EML510>, APIError> {
+    let election = elections_repo.get(id).await?;
+    let results = polling_station_results_entries_repo
+        .list_with_polling_stations(polling_stations_repo, election.id)
+        .await?;
+    let summary = ElectionSummary::from_results(&election, &results)?;
+    let xml = EML510::from_results(&election, &results, &summary, &chrono::Local::now());
+    Ok(Eml(xml))
 }

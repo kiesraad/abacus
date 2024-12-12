@@ -16,11 +16,11 @@ __trigger:__ Het geplande tijdstip om invoer te starten breekt aan.
 __hoofdscenario__:  
 
 1. De coördinator stelt invoer open.
-2. (voor elk SB PV evt met corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in)
+2. (voor elk SB PV evt. met corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in)
 3. De coördinator sluit de invoer af.
 4. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
 5. De applicatie stelt vast dat er geen stembureaus met (geaccepteerde) waarschuwingen zijn.
-5. De applicatie genereert de PVs en EMLs etc.
+6. De applicatie genereert de PVs en EMLs etc.
 
 __uitbreidingen__:  
 4a. De applicatie stelt vast dat niet voor niet alle stembureaus resultaten zijn ingevoerd:
@@ -37,13 +37,13 @@ __niveau:__ hoog-over, vlieger, 🪁
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ De coördinator ontvangt een SB PV evt met corrigendum.
+__trigger:__ De coördinator ontvangt een SB PV evt. met corrigendum.
 
 __hoofdscenario__:
 
-1. De coördinator geeft het SB PV evt met corrigendum aan de eerste invoerder.
+1. De coördinator geeft het SB PV evt. met corrigendum aan de eerste invoerder.
 2. [De eerste invoerder voert de resultaten van de telling in.](./GSB-gebruikersdoelen.md#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
-3. De coördinator geeft het SB PV evt met corrigendum aan de tweede invoerder.
+3. De coördinator geeft het SB PV evt. met corrigendum aan de tweede invoerder.
 4. [De tweede invoerder voert de resultaten van de telling in.](./GSB-gebruikersdoelen.md#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
 5. (na eerste en/of tweede invoer) De applicatie stelt vast dat de invoer geen (geaccepteerde) waarschuwingen bevat.
 6. De applicatie stelt vast dat beide invoeren gelijk zijn.

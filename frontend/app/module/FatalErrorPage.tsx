@@ -18,7 +18,7 @@ export function FatalErrorPage({ message, code, reference, error }: FatalErrorPa
   return (
     <AppLayout>
       <NavBar />
-      <Error title="Abacus is stuk" error={error}>
+      <Error title={t("error.title")} error={error}>
         {(code || reference) && (
           <p>
             {code && <strong>{code}</strong>}

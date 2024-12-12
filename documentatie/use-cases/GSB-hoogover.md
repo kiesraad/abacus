@@ -105,7 +105,7 @@ __hoofdscenario__:
 
 1. De beheerder leest de verkiezingsdefinitie in.
 2. De coördinator leest de kandidatenlijst in.
-3. [De coördinator maakt de stembureaus aan.](./GSB-gebruikersdoelen.md#de-coördinator-maakt-de-stembureaus-aan)
+3. [De coördinator coördinator zet de stembureaus in de applicatie.](./GSB-gebruikersdoelen.md#de-coördinator-zet-de-stembureaus-in-de-applicatie)
 4. De beheerder maakt de gebruikers aan.
 
 __uitbreidingen__:  

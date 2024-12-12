@@ -108,7 +108,7 @@ __uitbreidingen__:
 - Afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
 
 
-## De coördinator maakt de stembureaus aan.
+## De coördinator zet de stembureaus in de applicatie.
 
 __niveau:__ gebruikersdoel, zee, 🌊
 

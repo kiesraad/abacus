@@ -105,18 +105,25 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
 
   function formatFinishedAt(date: Date) {
     const today = new Date();
+    const timeString = date.toLocaleTimeString(t("date_locale"), { hour: "numeric", minute: "numeric" });
     if (
       date.getDate() === today.getDate() &&
       date.getMonth() === today.getMonth() &&
       date.getFullYear() === today.getFullYear()
     ) {
-      return `${t("today")} ${date.toLocaleTimeString("nl-NL", { timeStyle: "short" })}`;
-    } else {
-      return date.toLocaleString("nl-NL", {
-        weekday: "long", //TODO: this is not i18n equipped due to the set Dutch locale
+      // Today
+      return `${t("today")} ${timeString}`;
+    } else if (Math.round(Math.abs(Number(today) - Number(date)) / (24 * 60 * 60 * 1000)) < 7) {
+      // Within the past 6 days
+      return date.toLocaleString(t("date_locale"), {
+        weekday: "long",
         hour: "numeric",
         minute: "numeric",
       });
+    } else {
+      // More than 6 days ago
+      const dateString = date.toLocaleDateString(t("date_locale"), { day: "numeric", month: "short" });
+      return `${dateString} ${timeString}`;
     }
   }
 

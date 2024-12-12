@@ -1,13 +1,26 @@
 import type { Story } from "@ladle/react";
 
+import type { PollingStationStatus } from "@kiesraad/api";
+
 import { Badge, BadgeProps } from "./Badge";
+
+const badgeTypes: PollingStationStatus[] = [
+  "not_started",
+  "first_entry_in_progress",
+  "first_entry_unfinished",
+  "second_entry",
+  "second_entry_in_progress",
+  "second_entry_unfinished",
+  "first_second_entry_different",
+  "definitive",
+];
 
 export const AllBadges: Story = () => {
   return (
     <>
-      <Badge type="definitive" />
-      <Badge type="not_started" />
-      <Badge type="first_entry_in_progress" showIcon />
+      {badgeTypes.map((type) => (
+        <Badge key={type} type={type} showIcon />
+      ))}
     </>
   );
 };
@@ -16,7 +29,7 @@ export const CustomizableBadge: Story<BadgeProps> = ({ type, showIcon }) => <Bad
 
 CustomizableBadge.argTypes = {
   type: {
-    options: ["definitive", "not_started", "first_entry_in_progress"],
+    options: badgeTypes,
     defaultValue: "not_started",
     control: { type: "radio" },
   },

@@ -79,6 +79,11 @@
   color: var(--badge-second-entry);
 }
 
+.first_second_entry_different {
+  background: var(--badge-difference-bg);
+  color: var(--badge-difference);
+}
+
 .typist_busy {
   background: var(--badge-typist-busy-bg);
   color: var(--badge-typist-busy);

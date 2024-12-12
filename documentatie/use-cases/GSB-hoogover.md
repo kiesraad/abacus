@@ -51,7 +51,7 @@ __hoofdscenario__:
 
 __uitbreidingen__:  
 5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
-&emsp; 5a1. De coördinator beoordeeld de geaccepteerde waarschuwingen.
+&emsp; 5a1. De coördinator beoordeelt de geaccepteerde waarschuwingen.
 
 6a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 6a1. [De coördinator lost de verschillen tussen de twee invoeren op.](./GSB-gebruikersdoelen.md#de-coördinator-lost-de-verschillen-tussen-de-twee-invoeren-op)

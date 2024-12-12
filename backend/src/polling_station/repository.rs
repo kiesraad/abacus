@@ -177,10 +177,18 @@ impl PollingStations {
             PollingStationStatusEntry,
             r#"
 SELECT
-  polling_station_id AS "polling_station_id: u32",
-  status AS "status: _"
-FROM polling_station_status_entries
-WHERE polling_station_id = $1"#,
+  psse.polling_station_id AS "polling_station_id: u32",
+  psse.status AS "status: _",
+
+  CASE
+    WHEN de.polling_station_id IS NULL THEN NULL
+    WHEN de.finalised_at IS NOT NULL THEN NULL
+    ELSE de.progress
+    END AS "data_entry_progress: u8"
+
+FROM polling_station_status_entries AS psse
+LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = psse.polling_station_id
+WHERE psse.polling_station_id = $1"#,
             polling_station_id
         )
         .fetch_optional(&self.0)
@@ -192,20 +200,19 @@ WHERE polling_station_id = $1"#,
             let default_state = serde_json::to_value(PollingStationStatus::default())
                 .expect("should always be serializable to JSON");
 
-            Ok(query_as!(
-                PollingStationStatusEntry,
+            // TODO: Should we use a transaction here?
+            query!(
                 r#"
 INSERT INTO polling_station_status_entries(polling_station_id, status)
 VALUES ($1, $2)
-RETURNING
-  polling_station_id AS "polling_station_id: u32",
-  status AS "status: _"
 "#,
                 polling_station_id,
                 default_state,
             )
-            .fetch_one(&self.0)
-            .await?)
+            .execute(&self.0)
+            .await?;
+
+            self.status(polling_station_id).await
         }
     }
 
@@ -238,10 +245,18 @@ WHERE polling_station_id = $1"#,
             PollingStationStatusEntry,
             r#"
 SELECT
-  polling_station_id AS "polling_station_id: u32",
-  status AS "status: _"
-FROM polling_station_status_entries
-WHERE polling_station_id = $1"#,
+  psse.polling_station_id AS "polling_station_id: u32",
+  psse.status AS "status: _",
+
+  CASE
+    WHEN de.polling_station_id IS NULL THEN NULL
+    WHEN de.finalised_at IS NOT NULL THEN NULL
+    ELSE de.progress
+    END AS "data_entry_progress: u8"
+
+FROM polling_station_status_entries AS psse
+LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = psse.polling_station_id
+WHERE psse.polling_station_id = $1"#,
             polling_station_id
         )
         .fetch_one(&self.0)
@@ -259,31 +274,28 @@ WHERE polling_station_id = $1"#,
         &self,
         election_id: u32,
     ) -> Result<Vec<PollingStationStatusEntry>, sqlx::Error> {
-        todo!();
-        /*
-                query_as!(
-                    PollingStationStatusEntry,
-                    r#"
-        SELECT
-          p.id AS "id: u32",
+        query_as!(
+            PollingStationStatusEntry,
+            r#"
+SELECT
+  psse.polling_station_id AS "polling_station_id: u32",
+  psse.status AS "status: _",
 
-          CASE
-            WHEN de.polling_station_id IS NULL THEN NULL
-            WHEN de.finalised_at IS NOT NULL THEN NULL
-            ELSE de.progress
-            END AS "data_entry_progress: u8",
+  CASE
+    WHEN de.polling_station_id IS NULL THEN NULL
+    WHEN de.finalised_at IS NOT NULL THEN NULL
+    ELSE de.progress
+    END AS "data_entry_progress: u8"
 
-          p.finished_at AS "finished_at!: _"
-
-        FROM polling_stations AS p
-        LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
-        LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
-        WHERE election_id = $1"#,
-                    election_id
-                )
-                .fetch_all(&self.0)
-                .await
-        */
+FROM polling_stations AS p
+LEFT JOIN polling_station_status_entries AS psse ON psse.polling_station_id = p.id
+LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
+WHERE election_id = $1
+"#,
+            election_id
+        )
+        .fetch_all(&self.0)
+        .await
     }
 }
 

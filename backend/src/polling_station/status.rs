@@ -42,6 +42,8 @@ pub struct PollingStationStatusEntry {
     pub polling_station_id: u32,
     #[schema(value_type = PollingStationStatus)]
     pub status: Json<PollingStationStatus>,
+
+    pub data_entry_progress: Option<u8>,
 }
 
 impl PollingStationStatusEntry {
@@ -49,6 +51,7 @@ impl PollingStationStatusEntry {
         Self {
             polling_station_id,
             status: Json(PollingStationStatus::default()),
+            data_entry_progress: None,
         }
     }
 }

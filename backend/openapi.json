@@ -1497,6 +1497,14 @@
           "status"
         ],
         "properties": {
+          "data_entry_progress": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
           "polling_station_id": {
             "type": "integer",
             "format": "int32",

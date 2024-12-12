@@ -13,7 +13,9 @@ use crate::election::repository::Elections;
 use crate::election::Election;
 use crate::error::{APIError, ErrorReference, ErrorResponse};
 use crate::polling_station::repository::PollingStations;
-use crate::polling_station::status::{PollingStationStatus, PollingStationStatusEntry};
+use crate::polling_station::status::{
+    PollingStationStatus, PollingStationStatusEntry, PollingStationTransitionError,
+};
 use crate::polling_station::structs::PollingStation;
 use crate::validation::ValidationResults;
 
@@ -47,6 +49,13 @@ impl IntoResponse for SaveDataEntryResponse {
     }
 }
 
+fn to_api_error(err: PollingStationTransitionError) -> APIError {
+    APIError::Conflict(
+        err.to_string(),
+        ErrorReference::PollingStationStatusTransition,
+    )
+}
+
 /// Save or update a data entry for a polling station
 #[utoipa::path(
     post,
@@ -72,32 +81,22 @@ pub async fn polling_station_data_entry_save(
     State(elections): State<Elections>,
     data_entry_request: SaveDataEntryRequest,
 ) -> Result<SaveDataEntryResponse, APIError> {
-    // TODO: Repo method that gets either existing row, or creates a new row with state NotStarted
-    // Note that there will always be only one row per polling station (not one for every entry right now)
     let polling_station_status_entry: PollingStationStatusEntry =
         polling_stations_repo.get_or_create_status(id).await?;
 
     let new_state: PollingStationStatus = match polling_station_status_entry.status.0 {
-        PollingStationStatus::NotStarted => {
-            polling_station_status_entry
-                .status
-                .clone()
-                .claim_first_entry(data_entry_request.clone())
-                // TODO:
-                .map_err(|err| {
-                    APIError::Conflict(
-                        err.to_string(),
-                        ErrorReference::PollingStationStatusTransition,
-                    )
-                })?
-        }
+        PollingStationStatus::NotStarted => polling_station_status_entry
+            .status
+            .clone()
+            .claim_first_entry(data_entry_request.clone())
+            .map_err(to_api_error),
         PollingStationStatus::FirstEntryInProgress(_) => todo!(),
         PollingStationStatus::FirstEntryUnfinished => todo!(),
         PollingStationStatus::SecondEntry => todo!(),
         PollingStationStatus::SecondEntryInProgress => todo!(),
         PollingStationStatus::SecondEntryUnfinished => todo!(),
         PollingStationStatus::Definitive => todo!(),
-    };
+    }?;
 
     polling_stations_repo.update_status(id, new_state).await?;
 

@@ -13,6 +13,7 @@ use crate::election::repository::Elections;
 use crate::election::Election;
 use crate::error::{APIError, ErrorReference, ErrorResponse};
 use crate::polling_station::repository::PollingStations;
+use crate::polling_station::status::{PollingStationStatus, PollingStationStatusEntry};
 use crate::polling_station::structs::PollingStation;
 use crate::validation::ValidationResults;
 
@@ -71,6 +72,35 @@ pub async fn polling_station_data_entry_save(
     State(elections): State<Elections>,
     data_entry_request: SaveDataEntryRequest,
 ) -> Result<SaveDataEntryResponse, APIError> {
+    // TODO: Repo method that gets either existing row, or creates a new row with state NotStarted
+    // Note that there will always be only one row per polling station (not one for every entry right now)
+    let polling_station_status_entry: PollingStationStatusEntry =
+        polling_stations_repo.get_or_create_status(id).await?;
+
+    let new_state: PollingStationStatus = match polling_station_status_entry.status.0 {
+        PollingStationStatus::NotStarted => {
+            polling_station_status_entry
+                .status
+                .clone()
+                .claim_first_entry(data_entry_request.clone())
+                // TODO:
+                .map_err(|err| {
+                    APIError::Conflict(
+                        err.to_string(),
+                        ErrorReference::PollingStationStatusTransition,
+                    )
+                })?
+        }
+        PollingStationStatus::FirstEntryInProgress(_) => todo!(),
+        PollingStationStatus::FirstEntryUnfinished => todo!(),
+        PollingStationStatus::SecondEntry => todo!(),
+        PollingStationStatus::SecondEntryInProgress => todo!(),
+        PollingStationStatus::SecondEntryUnfinished => todo!(),
+        PollingStationStatus::Definitive => todo!(),
+    };
+
+    polling_stations_repo.update_status(id, new_state).await?;
+
     // Check if it is valid to save the data entry
     // TODO: #657 execute all checks in this function in a single SQL transaction
     if polling_station_results_entries.exists(id).await? {
@@ -245,8 +275,6 @@ pub async fn polling_station_data_entry_finalise(
     State(elections): State<Elections>,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<(), APIError> {
-    let current_status = polling_stations_repo.status(id);
-
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
 

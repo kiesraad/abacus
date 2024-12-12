@@ -23,6 +23,7 @@ pub enum ErrorReference {
     PollingStationSecondEntryAlreadyFinalised,
     PollingStationResultsAlreadyFinalised,
     PollingStationDataValidation,
+    PollingStationStatusTransition,
     InvalidVoteGroup,
     InvalidVoteCandidate,
     InvalidData,

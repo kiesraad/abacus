@@ -11,7 +11,6 @@ CREATE TABLE polling_stations
     house_number_addition TEXT,
     postal_code           TEXT                              NOT NULL,
     locality              TEXT                              NOT NULL,
-    status                TEXT                              NOT NULL DEFAULT 'NotStarted',
     finished_at           INTEGER,                                      
 
     FOREIGN KEY (election_id) REFERENCES elections (id),

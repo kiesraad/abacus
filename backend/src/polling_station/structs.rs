@@ -7,9 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::{error::ErrorReference, APIError};
-
-use super::repository::PollingStations;
+use crate::APIError;
 
 /// Polling station of a certain [crate::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
@@ -72,41 +70,6 @@ impl From<String> for PollingStationType {
             "Mobile" => Self::Mobile,
             _ => panic!("invalid PollingStationType `{value}`"),
         }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct PollingStationStatusEntry {
-    pub id: u32,
-    pub status: PollingStationStatus,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    #[schema(maximum = 100)]
-    /// Data entry progress between 0 and 100
-    pub data_entry_progress: Option<u8>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub finished_at: Option<i64>,
-}
-
-#[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq)]
-#[serde(rename_all = "snake_case")]
-pub enum PollingStationStatus {
-    NotStarted,            // First entry has not started yet
-    FirstEntryInProgress,  // First entry is currently in progress
-    FirstEntryUnfinished,  // First entry has been aborted and the data has been saved
-    SecondEntry,           // Ready for second entry
-    SecondEntryInProgress, // Second entry is currently in progress
-    SecondEntryUnfinished, // Second entry has been aborted and the data has been saved
-    Definitive,            // First and second entry are finished
-}
-
-impl PollingStationStatus {
-    pub async fn from_polling_station_id(
-        repo: PollingStations,
-        polling_station_id: u32,
-    ) -> Result<Self, APIError> {
-        Ok(repo.status(polling_station_id).await?.status)
     }
 }
 

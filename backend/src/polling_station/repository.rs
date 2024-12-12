@@ -1,10 +1,10 @@
 use axum::extract::FromRef;
 use sqlx::{query, query_as, SqlitePool};
 
-use crate::polling_station::structs::{
-    PollingStation, PollingStationRequest, PollingStationStatus, PollingStationStatusEntry,
-};
+use crate::polling_station::structs::{PollingStation, PollingStationRequest};
 use crate::AppState;
+
+use super::status::{PollingStationStatus, PollingStationStatusEntry};
 
 pub struct PollingStations(SqlitePool);
 
@@ -168,6 +168,67 @@ impl PollingStations {
         Ok(rows_affected > 0)
     }
 
+    /// Get or create a polling station status entry
+    pub async fn get_or_create_status(
+        &self,
+        polling_station_id: u32,
+    ) -> Result<PollingStationStatusEntry, sqlx::Error> {
+        let result = query_as!(
+            PollingStationStatusEntry,
+            r#"
+SELECT
+  polling_station_id AS "polling_station_id: u32",
+  status AS "status: _"
+FROM polling_station_status_entries
+WHERE polling_station_id = $1"#,
+            polling_station_id
+        )
+        .fetch_optional(&self.0)
+        .await?;
+
+        if let Some(r) = result {
+            Ok(r)
+        } else {
+            let default_state = serde_json::to_value(PollingStationStatus::default())
+                .expect("should always be serializable to JSON");
+
+            Ok(query_as!(
+                PollingStationStatusEntry,
+                r#"
+INSERT INTO polling_station_status_entries(polling_station_id, status)
+VALUES ($1, $2)
+RETURNING
+  polling_station_id AS "polling_station_id: u32",
+  status AS "status: _"
+"#,
+                polling_station_id,
+                default_state,
+            )
+            .fetch_one(&self.0)
+            .await?)
+        }
+    }
+
+    pub async fn update_status(
+        &self,
+        polling_station_id: u32,
+        state: PollingStationStatus,
+    ) -> Result<(), sqlx::Error> {
+        let state = serde_json::to_value(state).expect("should always be serializable to JSON");
+
+        query!(
+            r#"
+UPDATE polling_station_status_entries
+SET status = $2
+WHERE polling_station_id = $1"#,
+            polling_station_id,
+            state,
+        )
+        .execute(&self.0)
+        .await?;
+        Ok(())
+    }
+
     /// Gets the status of a single polling station.
     pub async fn status(
         &self,
@@ -177,21 +238,10 @@ impl PollingStations {
             PollingStationStatusEntry,
             r#"
 SELECT
-  p.id AS "id: u32",
-  p.status AS "status: PollingStationStatus",
-
-  CASE
-    WHEN de.polling_station_id IS NULL THEN NULL
-    WHEN de.finalised_at IS NOT NULL THEN NULL
-    ELSE de.progress
-    END AS "data_entry_progress: u8",
-
-  p.finished_at AS "finished_at!: _"
-
-FROM polling_stations AS p
-LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
-LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
-WHERE p.id = $1"#,
+  polling_station_id AS "polling_station_id: u32",
+  status AS "status: _"
+FROM polling_station_status_entries
+WHERE polling_station_id = $1"#,
             polling_station_id
         )
         .fetch_one(&self.0)
@@ -209,29 +259,31 @@ WHERE p.id = $1"#,
         &self,
         election_id: u32,
     ) -> Result<Vec<PollingStationStatusEntry>, sqlx::Error> {
-        query_as!(
-            PollingStationStatusEntry,
-            r#"
-SELECT
-  p.id AS "id: u32",
-  p.status AS "status: PollingStationStatus",
+        todo!();
+        /*
+                query_as!(
+                    PollingStationStatusEntry,
+                    r#"
+        SELECT
+          p.id AS "id: u32",
 
-  CASE
-    WHEN de.polling_station_id IS NULL THEN NULL
-    WHEN de.finalised_at IS NOT NULL THEN NULL
-    ELSE de.progress
-    END AS "data_entry_progress: u8",
+          CASE
+            WHEN de.polling_station_id IS NULL THEN NULL
+            WHEN de.finalised_at IS NOT NULL THEN NULL
+            ELSE de.progress
+            END AS "data_entry_progress: u8",
 
-  p.finished_at AS "finished_at!: _"
+          p.finished_at AS "finished_at!: _"
 
-FROM polling_stations AS p
-LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
-LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
-WHERE election_id = $1"#,
-            election_id
-        )
-        .fetch_all(&self.0)
-        .await
+        FROM polling_stations AS p
+        LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
+        LEFT JOIN polling_station_results AS r ON r.polling_station_id = p.id
+        WHERE election_id = $1"#,
+                    election_id
+                )
+                .fetch_all(&self.0)
+                .await
+        */
     }
 }
 

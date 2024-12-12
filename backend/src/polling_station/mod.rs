@@ -11,6 +11,7 @@ use crate::election::repository::Elections;
 use crate::{APIError, ErrorResponse};
 
 pub mod repository;
+pub mod status;
 pub mod structs;
 
 /// Polling station list response

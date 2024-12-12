@@ -5,7 +5,7 @@ use sqlx::SqlitePool;
 
 use crate::utils::serve_api;
 use backend::election::{ElectionDetailsResponse, ElectionListResponse, ElectionStatusResponse};
-use backend::polling_station::PollingStationStatus;
+use backend::polling_station::status::PollingStationStatus;
 
 mod shared;
 mod utils;
@@ -70,9 +70,9 @@ async fn test_election_details_status(pool: SqlitePool) {
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
-    assert_eq!(body.statuses[0].status, PollingStationStatus::NotStarted);
+    assert_eq!(body.statuses[0].status.0, PollingStationStatus::NotStarted);
     assert_eq!(body.statuses[0].data_entry_progress, None);
-    assert_eq!(body.statuses[1].status, PollingStationStatus::NotStarted);
+    assert_eq!(body.statuses[1].status.0, PollingStationStatus::NotStarted);
     assert_eq!(body.statuses[1].data_entry_progress, None);
 
     // Finalise the first entry of one and set the other in progress
@@ -89,8 +89,14 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
     let statuses = [
-        body.statuses.iter().find(|ps| ps.id == 1).unwrap(),
-        body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
+        body.statuses
+            .iter()
+            .find(|ps| ps.polling_station_id == 1)
+            .unwrap(),
+        body.statuses
+            .iter()
+            .find(|ps| ps.polling_station_id == 2)
+            .unwrap(),
     ];
 
     assert_eq!(statuses[0].status, PollingStationStatus::SecondEntry);
@@ -114,8 +120,14 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
     let statuses = [
-        body.statuses.iter().find(|ps| ps.id == 1).unwrap(),
-        body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
+        body.statuses
+            .iter()
+            .find(|ps| ps.polling_station_id == 1)
+            .unwrap(),
+        body.statuses
+            .iter()
+            .find(|ps| ps.polling_station_id == 2)
+            .unwrap(),
     ];
 
     assert_eq!(

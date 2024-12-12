@@ -1101,6 +1101,7 @@
           "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationResultsAlreadyFinalised",
           "PollingStationDataValidation",
+          "PollingStationStatusTransition",
           "InvalidVoteGroup",
           "InvalidVoteCandidate",
           "InvalidData",
@@ -1133,6 +1134,17 @@
           },
           "reference": {
             "$ref": "#/components/schemas/ErrorReference"
+          }
+        }
+      },
+      "FirstEntryInProgress": {
+        "type": "object",
+        "required": [
+          "state"
+        ],
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/SaveDataEntryRequest"
           }
         }
       },
@@ -1373,36 +1385,119 @@
         }
       },
       "PollingStationStatus": {
-        "type": "string",
-        "enum": [
-          "not_started",
-          "first_entry_in_progress",
-          "first_entry_unfinished",
-          "second_entry",
-          "second_entry_in_progress",
-          "second_entry_unfinished",
-          "definitive"
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "NotStarted"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/FirstEntryInProgress"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "FirstEntryInProgress"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "FirstEntryUnfinished"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "SecondEntry"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "SecondEntryInProgress"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "SecondEntryUnfinished"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "Definitive"
+                ]
+              }
+            }
+          }
         ]
       },
       "PollingStationStatusEntry": {
         "type": "object",
         "required": [
-          "id",
+          "polling_station_id",
           "status"
         ],
         "properties": {
-          "data_entry_progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Data entry progress between 0 and 100",
-            "maximum": 100,
-            "minimum": 0
-          },
-          "finished_at": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "id": {
+          "polling_station_id": {
             "type": "integer",
             "format": "int32",
             "minimum": 0

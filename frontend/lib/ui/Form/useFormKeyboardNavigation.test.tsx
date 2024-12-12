@@ -5,13 +5,13 @@ import { describe, expect, test, vi } from "vitest";
 
 import { render, screen } from "app/test/unit";
 
-import { useKeyboard } from "@kiesraad/ui";
+import { useFormKeyboardNavigation } from "@kiesraad/ui";
 
 import { Form } from "./Form";
 
-export const FormWithUseKeyboard = ({ onSubmit, children }: { onSubmit: FormEventHandler; children: ReactNode }) => {
+export const FormWithNavigation = ({ onSubmit, children }: { onSubmit: FormEventHandler; children: ReactNode }) => {
   const ref = useRef(null);
-  useKeyboard(ref);
+  useFormKeyboardNavigation(ref);
 
   return (
     <Form onSubmit={onSubmit} id="test-form" ref={ref}>
@@ -25,9 +25,9 @@ describe("useKeyboard", () => {
     const onSubmit = vi.fn();
 
     render(
-      <FormWithUseKeyboard onSubmit={onSubmit}>
+      <FormWithNavigation onSubmit={onSubmit}>
         <input id="test-input" />
-      </FormWithUseKeyboard>,
+      </FormWithNavigation>,
     );
     const user = userEvent.setup();
     await user.type(screen.getByTestId("test-input"), "hello world");
@@ -41,9 +41,9 @@ describe("useKeyboard", () => {
     const onSubmit = vi.fn();
 
     render(
-      <FormWithUseKeyboard onSubmit={onSubmit}>
+      <FormWithNavigation onSubmit={onSubmit}>
         <input id="test-input" defaultValue="fizz" />
-      </FormWithUseKeyboard>,
+      </FormWithNavigation>,
     );
     const user = userEvent.setup();
 
@@ -60,12 +60,12 @@ describe("useKeyboard", () => {
     });
 
     render(
-      <FormWithUseKeyboard onSubmit={onSubmit}>
+      <FormWithNavigation onSubmit={onSubmit}>
         <input id="test-input" defaultValue="fizz" />
         <button id="test-submit-button" type="submit">
           Submit
         </button>
-      </FormWithUseKeyboard>,
+      </FormWithNavigation>,
     );
     const user = userEvent.setup();
 
@@ -85,14 +85,14 @@ describe("useKeyboard", () => {
     });
 
     render(
-      <FormWithUseKeyboard onSubmit={onSubmit}>
+      <FormWithNavigation onSubmit={onSubmit}>
         <input id="inp1" defaultValue="fizz1" />
         <input id="inp2" defaultValue="fizz2" />
         <input id="inp3" defaultValue="fizz3" />
         <button id="test-submit-button" type="submit">
           Submit
         </button>
-      </FormWithUseKeyboard>,
+      </FormWithNavigation>,
     );
 
     const firstInput = screen.getByTestId("inp1");
@@ -128,14 +128,14 @@ describe("useKeyboard", () => {
     const onSubmit = vi.fn();
 
     render(
-      <FormWithUseKeyboard onSubmit={onSubmit}>
+      <FormWithNavigation onSubmit={onSubmit}>
         <input id="inp1" defaultValue="fizz1" />
         <input id="inp2" defaultValue="fizz2" />
         <input id="inp3" defaultValue="fizz3" />
         <button id="test-submit-button" type="submit">
           Submit
         </button>
-      </FormWithUseKeyboard>,
+      </FormWithNavigation>,
     );
 
     const firstInput = screen.getByTestId("inp1");
@@ -155,11 +155,11 @@ describe("useKeyboard", () => {
     const onSubmit = vi.fn();
 
     render(
-      <FormWithUseKeyboard onSubmit={onSubmit}>
+      <FormWithNavigation onSubmit={onSubmit}>
         <input id="inp1" defaultValue="fizz1" />
         <input id="inp2" defaultValue="fizz2" />
         <input id="inp3" defaultValue="fizz3" />
-      </FormWithUseKeyboard>,
+      </FormWithNavigation>,
     );
 
     const firstInput = screen.getByTestId("inp1");
@@ -178,11 +178,11 @@ describe("useKeyboard", () => {
   test("Stay at the first input when moving up", async () => {
     const onSubmit = vi.fn();
     render(
-      <FormWithUseKeyboard onSubmit={onSubmit}>
+      <FormWithNavigation onSubmit={onSubmit}>
         <input id="inp1" defaultValue="fizz1" />
         <input id="inp2" defaultValue="fizz2" />
         <input id="inp3" defaultValue="fizz3" />
-      </FormWithUseKeyboard>,
+      </FormWithNavigation>,
     );
 
     const firstInput = screen.getByTestId("inp1");
@@ -201,10 +201,10 @@ describe("useKeyboard", () => {
   test("Stay at the last input when moving down", async () => {
     const onSubmit = vi.fn();
     render(
-      <FormWithUseKeyboard onSubmit={onSubmit}>
+      <FormWithNavigation onSubmit={onSubmit}>
         <input id="inp1" defaultValue="fizz1" />
         <input id="inp2" defaultValue="fizz2" />
-      </FormWithUseKeyboard>,
+      </FormWithNavigation>,
     );
 
     const firstInput = screen.getByTestId("inp1");
@@ -223,13 +223,13 @@ describe("useKeyboard", () => {
   test("Stay at the submit button when moving down", async () => {
     const onSubmit = vi.fn();
     render(
-      <FormWithUseKeyboard onSubmit={onSubmit}>
+      <FormWithNavigation onSubmit={onSubmit}>
         <input id="inp1" defaultValue="fizz1" />
         <input id="inp2" defaultValue="fizz2" />
         <button id="test-submit-button" type="submit">
           Submit
         </button>
-      </FormWithUseKeyboard>,
+      </FormWithNavigation>,
     );
 
     const secondInput = screen.getByTestId("inp2");

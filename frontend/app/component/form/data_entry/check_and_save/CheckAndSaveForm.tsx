@@ -12,11 +12,20 @@ import {
   usePollingStationFormController,
 } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
-import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusList, useKeyboard } from "@kiesraad/ui";
+import {
+  BottomBar,
+  Button,
+  Form,
+  KeyboardKey,
+  KeyboardKeys,
+  MenuStatus,
+  StatusList,
+  useFormKeyboardNavigation,
+} from "@kiesraad/ui";
 
 export function CheckAndSaveForm() {
   const formRef = React.useRef<HTMLFormElement>(null);
-  useKeyboard(formRef);
+  useFormKeyboardNavigation(formRef);
 
   const navigate = useNavigate();
   const { election } = useElection();

@@ -15,11 +15,11 @@ __trigger:__ De coördinator geeft het SB PV en eventueel SB corrigendum PV aan 
 __hoofdscenario__:
 
 1. De invoerder selecteert het stembureau van het PV in de applicatie.
-2. De applicatie controleert dat er geen eerdere invoer voor het stembureau is opgeslagen.
+2. De applicatie stelt vast dat er geen eerdere invoer voor het stembureau is opgeslagen.
 3. De invoerder vult de resultaten van de telling in.
-4. (tijdens invoer) De applicatie controleert dat de invoer voldoet aan
+4. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
    de [validatieregels voor fouten](./GSB-validatieregels-plausibiliteitschecks.md#validatieregels-geven-fouten)
-5. (tijdens invoer) De applicatie controleert dat de invoer voldoet aan
+5. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
    de [plausibiliteitschecks](./GSB-validatieregels-plausibiliteitschecks.md#plausibiliteitschecks-geven-waarschuwingen).
 6. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
 
@@ -107,33 +107,37 @@ __uitbreidingen__:
 - OSV richt de server ook gelijk als client in. Willen wij dit ook?
 - Afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
 
-## GSB richt de applicatie in
+
+## De coördinator zet de stembureaus in de applicatie.
 
 __niveau:__ gebruikersdoel, zee, 🌊
 
+__precondities:__
+
+- De coördinator heeft de lijst met gepubliceerde stembureaus.
+- De invoer is nog niet gestart.
+
 ### Hoofdscenario en uitbreidingen
-
-__trigger:__
-
-- [GSB installeert de applicatie.](#gsb-installeert-de-applicatie)
-- Het GSB maakt de kandidatenlijst beschikbaar.
-- De Kiesraad maakt de verkiezingsdefinitie beschikbaar.
 
 __hoofdscenario__:
 
-1. De beheerder leest de verkiezingsdefinitie in.
-2. De beheerder leest de kandidatenlijst in.
-3. De beheerder maakt de stembureaus aan.
-4. De beheerder maakt de gebruikers aan.
+1. De coördinator selecteert de verkiezing.
+2. De coördinator importeert het EML-NL bestand met de stembureaus.
+3. De applicatie stelt vast dat de stembureaus aan de validatieregels voldoen.
+4. De coördinator stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 
 __uitbreidingen__:  
-1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
 
-2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
+1a. De coördinator selecteert een andere verkiezing dan van het bestand en de lijst met stembureaus:
 
-3a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:  
-3b. De lijst met stembureaus moet aangevuld of aangepast worden:  
-3c. Er is geen lijst met stembureaus:
+2a. Er is geen te importeren bestand met stembureaus:  
+&emsp; 2a1. [De coördinator voert de stembureaus handmatig in.](./GSB-subfuncties.md#de-coördinator-bewerkt-de-stembureaus)
+
+3a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
+
+4a. De lijst met stembureaus moet aangepast worden:  
+&emsp; 4a1. [De coördinator past de stembureaus aan.](./GSB-subfuncties.md#de-coördinator-bewerkt-de-stembureaus)
+
 
 ### Open punten
 
@@ -141,6 +145,8 @@ __uitbreidingen__:
   bestand. We weten niet hoe vaak welke van deze twee manieren of een combinatie van de twee gebruikt worden. Een
   stembureau-bestand kan door OSV geëxporteerd worden, maar er zouden ook andere tools bestaan die zo'n bestand kunnen
   genereren.
-- Bij het invoeren/beheren van stembureaus toont de applicatie een waarschuwing als het aantal kiesgerechtigden niet is
-  ingevuld. De gebruiker heeft twee opties: (1) aantal kiesgerechtigden invullen, (2) aangeven dat aantal
-  kiesgerechtigden bewust leeg wordt gelaten.
+- Bij gelijktijdige verkiezingen (gemeenteraad en stadsdeel bijvoorbeeld) zou het mooi zijn om de stembureaus van één
+  naar een andere verkiezing te kopiëren. Minder mooi alternatief is eerst exporteren en dan importeren.
+- Zodra invoer gestart is, mag het niet mogelijk zijn om stembureaus aan te passen of te verwijderen. Verwijderen wordt nu
+  afgedwongen dmv foreign keys in de database. Checks voor aanpassen en checks obv van de fases van de verkiezing in de
+  applicatie moeten nog uitgewerkt worden.

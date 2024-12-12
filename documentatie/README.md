@@ -2,7 +2,7 @@
 
 Hier vind je de documentatie over Abacus. De documentatie wordt telkens aangevuld en bijgewerkt.
 
-## Inhoudsopgave
+## Ontwikkeling
 
 - Functionaliteit:
   - [Eisen en wensen voor functionaliteit](/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md)
@@ -20,6 +20,11 @@ Hier vind je de documentatie over Abacus. De documentatie wordt telkens aangevul
   - [Verloop van verkiezingen](/documentatie/verkiezingsproces/verloop-verkiezingen.md)
   - [Wie doet welke stembureaus](/documentatie/verkiezingsproces/wie-doet-welke-stembureaus.md)
   - [Zetelverdeling voor gemeenteraadsverkiezingen](/documentatie/verkiezingsproces/zetelverdeling-GR.md)
+
+## Gebruikersdocumentatie
+
+- [Verkiezingsproces en Abacus](/documentatie/gebruikersdocumentatie/verkiezingsproces-en-abacus.md)
+- [Installeren en starten](/documentatie/gebruikersdocumentatie/installeren-en-starten.md)
 
 ## Externe documentatie
 

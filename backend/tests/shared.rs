@@ -3,13 +3,13 @@
 use std::net::SocketAddr;
 
 use backend::data_entry::{
-    CandidateVotes, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-    SaveDataEntryRequest, SaveDataEntryResponse, VotersCounts, VotesCounts,
+    CandidateVotes, DataEntry, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
+    SaveDataEntryResponse, VotersCounts, VotesCounts,
 };
 use hyper::StatusCode;
 
-pub fn example_data_entry(client_state: Option<&str>) -> SaveDataEntryRequest {
-    SaveDataEntryRequest {
+pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
+    DataEntry {
         progress: 60,
         data: PollingStationResults {
             recounted: Some(false),

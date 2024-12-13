@@ -14,16 +14,11 @@ use std::fmt;
 use std::ops::AddAssign;
 use utoipa::ToSchema;
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
-pub struct DataEntry {
+#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Default)]
+pub struct PollingStationDataEntry {
     pub id: u32,
-    pub progress: u8,
     #[schema(value_type = PollingStationStatus)]
-    pub status: Json<PollingStationStatus>,
-    #[schema(value_type = PollingStationResults)]
-    pub data: Option<Json<PollingStationResults>>,
-    #[schema(value_type = Object)]
-    pub client_state: Option<serde_json::Value>,
+    pub state: Json<PollingStationStatus>,
     pub updated_at: i64,
 }
 

@@ -17,14 +17,14 @@ use crate::polling_station::status::{PollingStationStatus, PollingStationTransit
 use crate::polling_station::structs::PollingStation;
 use crate::validation::ValidationResults;
 
-mod entry_number;
+pub mod entry_number;
 pub mod repository;
 pub mod structs;
 
 /// Request structure for saving data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
-pub struct SaveDataEntryRequest {
+pub struct DataEntry {
     /// Data entry progress between 0 and 100
     #[schema(maximum = 100)]
     pub progress: u8,
@@ -54,11 +54,35 @@ fn to_api_error(err: PollingStationTransitionError) -> APIError {
     )
 }
 
+pub async fn polling_station_data_entry_claim(
+    Path(id): Path<u32>,
+    State(polling_station_data_entries): State<PollingStationDataEntries>,
+    data_entry_request: DataEntry,
+) -> Result<(), APIError> {
+    let polling_station_data_entry: PollingStationStatus = polling_station_data_entries
+        .get_or_new(id, &data_entry_request)
+        .await?;
+
+    let new_state = polling_station_data_entry
+        .claim_entry(data_entry_request)
+        .map_err(|err| {
+            APIError::Conflict(
+                err.to_string(),
+                ErrorReference::PollingStationStatusTransition,
+            )
+        })?;
+
+    dbg!(new_state);
+
+    // TODO: Return something
+    Ok(())
+}
+
 /// Save or update a data entry for a polling station
 #[utoipa::path(
     post,
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
-    request_body = SaveDataEntryRequest,
+    request_body = DataEntry,
     responses(
         (status = 200, description = "Data entry saved successfully", body = SaveDataEntryResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
@@ -72,26 +96,27 @@ fn to_api_error(err: PollingStationTransitionError) -> APIError {
     ),
 )]
 pub async fn polling_station_data_entry_save(
-    Path((id, entry_number)): Path<(u32, EntryNumber)>,
+    Path(id): Path<u32>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
     State(elections): State<Elections>,
-    data_entry_request: SaveDataEntryRequest,
+    data_entry_request: DataEntry,
 ) -> Result<SaveDataEntryResponse, APIError> {
     // TODO: #657 execute all checks in this function in a single SQL transaction
 
-    let polling_station_status_entry: PollingStationStatus =
-        polling_station_data_entries.get_or_create(id).await?;
+    let polling_station_status_entry = polling_station_data_entries
+        .get_or_new(id, &data_entry_request)
+        .await?;
 
     let new_state: PollingStationStatus = match polling_station_status_entry {
-        PollingStationStatus::NotStarted => polling_station_status_entry
-            .clone()
-            .claim_first_entry(data_entry_request.clone())
+        PollingStationStatus::FirstEntryNotStarted => polling_station_status_entry
+            .claim_entry(data_entry_request.clone())
             .map_err(to_api_error),
         PollingStationStatus::FirstEntryInProgress(_) => todo!(),
-        PollingStationStatus::SecondEntry => todo!(),
-        PollingStationStatus::SecondEntryInProgress => todo!(),
-        PollingStationStatus::Definitive => {
+        PollingStationStatus::SecondEntryNotStarted(_) => todo!(),
+        PollingStationStatus::SecondEntryInProgress(_) => todo!(),
+        PollingStationStatus::EntriesNotEqual(_) => todo!(),
+        PollingStationStatus::EntryResult(_) => {
             return Err(APIError::Conflict(
                 "Cannot save a data entry for a polling station that already has finalised results"
                     .to_string(),
@@ -105,8 +130,8 @@ pub async fn polling_station_data_entry_save(
 
     let validation_results =
         validate_polling_station_results(&data_entry_request.data, &polling_station, &election)?;
-    let data = serde_json::to_string(&data_entry_request.data)?;
-    let client_state = serde_json::to_string(&data_entry_request.client_state)?;
+    //let data = serde_json::to_string(&data_entry_request.data)?;
+    //let client_state = serde_json::to_string(&data_entry_request.client_state)?;
 
     polling_station_data_entries
         .update_status(id, new_state)
@@ -178,25 +203,31 @@ pub async fn polling_station_data_entry_get(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
-    Path((id, entry_number)): Path<(u32, EntryNumber)>,
+    Path(id): Path<u32>,
 ) -> Result<Json<GetDataEntryResponse>, APIError> {
     let mut tx = pool.begin().await?;
     let polling_station = polling_stations.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
-    let (progress, data, client_state, updated_at) = polling_station_data_entries
-        .get(&mut tx, id, entry_number)
-        .await?;
-    let data = serde_json::from_slice(&data)?;
+    let polling_station_data_entry = polling_station_data_entries.get(&mut tx, id).await?;
 
-    let client_state = serde_json::from_slice(&client_state)?;
+    let data = polling_station_data_entry
+        .state
+        .get_data()
+        .ok_or(APIError::NotFound(
+            "".to_string(),
+            // TODO: Create better reference
+            ErrorReference::EntryNotFound,
+        ))?;
+
+    let client_state = polling_station_data_entry.state.get_client_state();
 
     let validation_results = validate_polling_station_results(&data, &polling_station, &election)?;
     Ok(Json(GetDataEntryResponse {
-        progress,
+        progress: polling_station_data_entry.state.get_progress(),
         data,
         client_state,
         validation_results,
-        updated_at,
+        updated_at: polling_station_data_entry.updated_at,
     }))
 }
 
@@ -216,11 +247,9 @@ pub async fn polling_station_data_entry_get(
 )]
 pub async fn polling_station_data_entry_delete(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
-    Path((id, entry_number)): Path<(u32, EntryNumber)>,
+    Path(id): Path<u32>,
 ) -> Result<StatusCode, APIError> {
-    polling_station_data_entries
-        .delete(id, entry_number)
-        .await?;
+    polling_station_data_entries.delete(id).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }
@@ -257,10 +286,21 @@ pub async fn polling_station_data_entry_finalise(
     //       Currently the first data entry is copied to the results table,
     //       without comparison to the second data entry
 
-    let (_, data, _, _) = polling_station_data_entries
-        .get(&mut tx, id, entry_number)
-        .await?;
-    let results = serde_json::from_slice::<PollingStationResults>(&data)?;
+    let data = polling_station_data_entries
+        .get(&mut tx, id)
+        .await?
+        .state
+        .get_data();
+    let results = polling_station_data_entries
+        .get(&mut tx, id)
+        .await?
+        .state
+        .get_data()
+        .ok_or(APIError::NotFound(
+            "".to_string(),
+            // TODO: Create better reference
+            ErrorReference::EntryNotFound,
+        ))?;
 
     let mut validation_results = ValidationResults::default();
     results.validate(
@@ -283,7 +323,7 @@ pub async fn polling_station_data_entry_finalise(
                 .finalise_first_entry(&mut tx, id)
                 .await?
         }
-        EntryNumber::SecondEntry => polling_station_data_entries.finalise(&mut tx, id).await?,
+        EntryNumber::SecondEntry => todo!(), //polling_station_data_entries.finalise(&mut tx, id).await?,
     }
 
     tx.commit().await?;
@@ -298,8 +338,8 @@ mod tests {
 
     use super::*;
 
-    fn example_data_entry() -> SaveDataEntryRequest {
-        SaveDataEntryRequest {
+    fn example_data_entry() -> DataEntry {
+        DataEntry {
             progress: 100,
             data: PollingStationResults {
                 recounted: Some(false),
@@ -344,11 +384,7 @@ mod tests {
         }
     }
 
-    async fn save(
-        pool: SqlitePool,
-        request_body: SaveDataEntryRequest,
-        entry_number: u8,
-    ) -> Response {
+    async fn save(pool: SqlitePool, request_body: DataEntry, entry_number: u8) -> Response {
         polling_station_data_entry_save(
             Path((1, EntryNumber::try_from(entry_number).unwrap())),
             State(PollingStationDataEntries::new(pool.clone())),

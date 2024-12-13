@@ -1,7 +1,7 @@
 use axum::extract::FromRef;
 use sqlx::{query, query_as, SqlitePool};
 
-use crate::data_entry::{DataEntry, PollingStationResults};
+use crate::data_entry::PollingStationDataEntry;
 use crate::polling_station::structs::{PollingStation, PollingStationRequest};
 use crate::AppState;
 
@@ -223,16 +223,16 @@ impl PollingStations {
     /// - If no entries are found, it has the NotStarted status
     ///
     /// The implementation and determination will probably change while we implement more statuses
-    pub async fn statuses(&self, election_id: u32) -> Result<Vec<DataEntry>, sqlx::Error> {
+    pub async fn statuses(
+        &self,
+        election_id: u32,
+    ) -> Result<Vec<PollingStationDataEntry>, sqlx::Error> {
         query_as!(
-            DataEntry,
+            PollingStationDataEntry,
             r#"
 SELECT
   id AS "id: u32",
-  de.status AS "status: _",
-  de.progress AS "progress: u8",
-  de.client_state AS "client_state: _",
-  de.data AS "data: _",
+  de.state AS "state: _",
   updated_at
 FROM polling_stations AS p
 LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id

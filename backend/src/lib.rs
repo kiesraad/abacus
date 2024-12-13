@@ -1,5 +1,5 @@
 use axum::extract::FromRef;
-use axum::routing::{delete, get, post};
+use axum::routing::{get, post};
 use axum::Router;
 #[cfg(feature = "memory-serve")]
 use memory_serve::MemoryServe;
@@ -29,22 +29,17 @@ pub struct AppState {
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let data_entry_routes = Router::new()
+        .route("/", get(data_entry::polling_station_data_entry_get))
         .route(
-            "/:entry_number",
-            post(data_entry::polling_station_data_entry_save),
-        )
-        .route(
-            "/:entry_number",
-            get(data_entry::polling_station_data_entry_get),
-        )
-        .route(
-            "/:entry_number",
-            delete(data_entry::polling_station_data_entry_delete),
-        )
-        .route(
-            "/:entry_number/finalise",
+            "/finalise",
             post(data_entry::polling_station_data_entry_finalise),
-        );
+        )
+        .route("/claim", post(data_entry::polling_station_data_entry_claim))
+        .route(
+            "/delete",
+            post(data_entry::polling_station_data_entry_delete),
+        )
+        .route("/save", post(data_entry::polling_station_data_entry_save));
 
     let polling_station_routes = Router::new().route(
         "/:polling_station_id",
@@ -134,8 +129,9 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         components(
             schemas(
                 ErrorResponse,
+                data_entry::DataEntry,
                 data_entry::CandidateVotes,
-                data_entry::SaveDataEntryRequest,
+                data_entry::DataEntry,
                 data_entry::SaveDataEntryResponse,
                 data_entry::GetDataEntryResponse,
                 data_entry::DifferencesCounts,
@@ -154,7 +150,6 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 polling_station::PollingStation,
                 polling_station::PollingStationListResponse,
                 polling_station::status::PollingStationStatus,
-                polling_station::status::PollingStationStatusEntry,
                 polling_station::PollingStationType,
                 polling_station::PollingStationRequest,
                 validation::ValidationResult,

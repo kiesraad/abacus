@@ -22,7 +22,7 @@ export function ElectionProgress() {
     return [
       {
         title: t("status.first_entry_finished"),
-        id: "first_entry_finished",
+        id: "first-entry-finished",
         percentage: total > 0 ? Math.round((totalFirstEntry / total) * 100) : 0,
       },
       {

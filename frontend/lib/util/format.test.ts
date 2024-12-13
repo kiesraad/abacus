@@ -19,11 +19,12 @@ describe("Format util", () => {
     expect(deformatNumber(expected)).equals(parseInt(input, 10));
   });
 
-  const today = new Date(new Date().setHours(10, 20));
-  let yesterday = new Date(today);
-  yesterday = new Date(yesterday.setDate(today.getDate() - 1));
-  let one_week_ago = new Date(today);
-  one_week_ago = new Date(one_week_ago.setDate(today.getDate() - 7));
+  const today = new Date();
+  today.setHours(10, 20);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const one_week_ago = new Date(today);
+  one_week_ago.setDate(today.getDate() - 7);
   test.each([
     [today, `${t("today")} 10:20`],
     [yesterday, `${yesterday.toLocaleString(t("date_locale"), { weekday: "long" })} 10:20`],

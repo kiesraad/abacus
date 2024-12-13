@@ -1,19 +1,3 @@
-/*
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct PollingStationStatusEntry {
-    pub id: u32,
-    pub status: PollingStationStatus,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    #[schema(maximum = 100)]
-    /// Data entry progress between 0 and 100
-    pub data_entry_progress: Option<u8>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub finished_at: Option<i64>,
-    }
- */
-
 use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
@@ -205,6 +189,13 @@ impl PollingStationStatus {
             }
             PollingStationStatus::EntriesNotEqual(state) => state.second_entry.client_state.clone(),
             PollingStationStatus::EntryResult(state) => state.finalised_entry.client_state.clone(),
+            _ => None,
+        }
+    }
+
+    pub fn get_result(&self) -> Option<EntryResult> {
+        match self {
+            PollingStationStatus::EntryResult(entry_result) => Some(entry_result.clone()),
             _ => None,
         }
     }

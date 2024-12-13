@@ -166,63 +166,7 @@ impl PollingStations {
 
         Ok(rows_affected > 0)
     }
-    /*
-        /// Get or create a polling station status entry
-        pub async fn get_or_create_status(
-            &self,
-            polling_station_id: u32,
-        ) -> Result<PollingStationStatusEntry, sqlx::Error> {
-            let result = query_as!(
-                PollingStationStatusEntry,
-                r#"
-    SELECT
-      psse.polling_station_id AS "polling_station_id: u32",
-      psse.status AS "status: _",
 
-      CASE
-        WHEN de.polling_station_id IS NULL THEN NULL
-        WHEN de.finalised_at IS NOT NULL THEN NULL
-        ELSE de.progress
-        END AS "data_entry_progress: u8"
-
-    FROM polling_station_status_entries AS psse
-    LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = psse.polling_station_id
-    WHERE psse.polling_station_id = $1"#,
-                polling_station_id
-            )
-            .fetch_optional(&self.0)
-            .await?;
-
-            if let Some(r) = result {
-                Ok(r)
-            } else {
-                let default_state = serde_json::to_value(PollingStationStatus::default())
-                    .expect("should always be serializable to JSON");
-
-                // TODO: Should we use a transaction here?
-                query!(
-                    r#"
-    INSERT INTO polling_station_status_entries(polling_station_id, status)
-    VALUES ($1, $2)
-    "#,
-                    polling_station_id,
-                    default_state,
-                )
-                .execute(&self.0)
-                .await?;
-
-                self.status(polling_station_id).await
-            }
-        }
-    */
-
-    /// Determines the status of the polling station.
-    /// - When an entry of the polling station is found in the `polling_station_data_entries` table, and the `client_state.continue` value is true the status is FirstEntryInProgress
-    /// - When an entry of the polling station is found in the `polling_station_data_entries` table, and the `client_state.continue` value is false the status is FirstEntryUnfinished
-    /// - When an entry of the polling station is found in the `polling_station_results` table, the status is Definitive
-    /// - If no entries are found, it has the NotStarted status
-    ///
-    /// The implementation and determination will probably change while we implement more statuses
     pub async fn statuses(
         &self,
         election_id: u32,

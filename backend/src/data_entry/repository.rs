@@ -1,12 +1,10 @@
 use axum::extract::FromRef;
 use sqlx::{query, query_as, SqlitePool};
 
-use super::{
-    PollingStation, PollingStationDataEntry, PollingStationResults, PollingStationResultsEntry,
-};
+use super::{PollingStation, PollingStationDataEntry, PollingStationResults};
 use crate::data_entry::DataEntry;
 use crate::polling_station::repository::PollingStations;
-use crate::polling_station::status::{FirstEntryInProgress, PollingStationStatus};
+use crate::polling_station::status::{EntryResult, FirstEntryInProgress, PollingStationStatus};
 use crate::AppState;
 
 pub struct PollingStationDataEntries(SqlitePool);
@@ -110,44 +108,37 @@ WHERE polling_station_id = ?
 
         Ok(())
     }
-}
 
-pub struct PollingStationResultsEntries(SqlitePool);
-
-impl PollingStationResultsEntries {
-    #[cfg(test)]
-    pub fn new(pool: SqlitePool) -> Self {
-        Self(pool)
-    }
-
-    /// Get a list of polling station results for an election
-    pub async fn list(
+    pub async fn list_results(
         &self,
         election_id: u32,
-    ) -> Result<Vec<PollingStationResultsEntry>, sqlx::Error> {
-        query!(
+    ) -> Result<Vec<(u32, EntryResult)>, sqlx::Error> {
+        let results: Vec<PollingStationDataEntry> = query_as!(
+            PollingStationDataEntry,
             r#"
-            SELECT
-                r.polling_station_id AS "polling_station_id: u32",
-                r.data,
-                r.created_at AS "created_at: i64"
-            FROM polling_station_results AS r
-            LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
-            WHERE p.election_id = $1
-        "#,
+SELECT
+  p.id AS "id: u32",
+  de.state AS "state: _",
+  de.updated_at
+FROM polling_station_data_entries AS de
+LEFT JOIN polling_stations AS p ON de.polling_station_id = p.id
+WHERE p.election_id = $1
+                "#,
             election_id
         )
-        .try_map(|row| {
-            let data = serde_json::from_slice(&row.data)
-                .map_err(|err| sqlx::Error::Decode(Box::new(err)))?;
-            Ok(PollingStationResultsEntry {
-                polling_station_id: row.polling_station_id,
-                data,
-                created_at: row.created_at,
-            })
-        })
         .fetch_all(&self.0)
-        .await
+        .await?;
+
+        Ok(results
+            .iter()
+            .filter_map(|result| {
+                if let Some(entry_result) = result.state.get_result() {
+                    Some((result.id, entry_result))
+                } else {
+                    None
+                }
+            })
+            .collect())
     }
 
     /// Get a list of polling stations with their results for an election
@@ -157,7 +148,7 @@ impl PollingStationResultsEntries {
         election_id: u32,
     ) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
         // first get the list of results and polling stations related to an election
-        let list = self.list(election_id).await?;
+        let list = self.list_results(election_id).await?;
         let polling_stations = polling_stations_repo.list(election_id).await?;
 
         // find the corresponding polling station for each entry, or fail if any polling station could not be found
@@ -165,37 +156,16 @@ impl PollingStationResultsEntries {
             .map(|entry| {
                 let polling_station = polling_stations
                     .iter()
-                    .find(|p| p.id == entry.polling_station_id)
+                    .find(|p| p.id == entry.0)
                     .cloned()
                     .ok_or(sqlx::Error::RowNotFound)?;
-                Ok((polling_station, entry.data))
+                Ok((polling_station, entry.1.finalised_entry.data))
             })
             .collect::<Result<_, sqlx::Error>>() // this collect causes the iterator to fail early if there was any error
-    }
-
-    /// Check if a polling station has results
-    pub async fn exists(&self, id: u32) -> Result<bool, sqlx::Error> {
-        let res = query!(
-            r#"
-            SELECT EXISTS(
-              SELECT 1 FROM polling_station_results
-              WHERE polling_station_id = ?)
-            AS `exists`"#,
-            id
-        )
-        .fetch_one(&self.0)
-        .await?;
-        Ok(res.exists == 1)
     }
 }
 
 impl FromRef<AppState> for PollingStationDataEntries {
-    fn from_ref(input: &AppState) -> Self {
-        Self(input.pool.clone())
-    }
-}
-
-impl FromRef<AppState> for PollingStationResultsEntries {
     fn from_ref(input: &AppState) -> Self {
         Self(input.pool.clone())
     }

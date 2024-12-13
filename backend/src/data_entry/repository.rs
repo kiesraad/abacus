@@ -14,39 +14,6 @@ impl PollingStationDataEntries {
         Self(pool)
     }
 
-    /// Saves the data entry or updates it if it already exists
-    pub async fn upsert(
-        &self,
-        id: u32,
-        entry_number: EntryNumber,
-        progress: u8,
-        data: String,
-        client_state: String,
-    ) -> Result<(), sqlx::Error> {
-        sqlx::query!(
-            r#"
-            INSERT INTO polling_station_data_entries
-              (polling_station_id, entry_number, progress, data, client_state)
-            VALUES (?, ?, ?, ?, ?)
-            ON CONFLICT(polling_station_id, entry_number) DO
-            UPDATE SET
-              progress = excluded.progress,
-              data = excluded.data,
-              client_state = excluded.client_state,
-              updated_at = unixepoch()
-            "#,
-            id,
-            entry_number,
-            progress,
-            data,
-            client_state
-        )
-        .execute(&self.0)
-        .await?;
-
-        Ok(())
-    }
-
     pub async fn get(
         &self,
         tx: &mut Transaction<'_, Sqlite>,
@@ -54,9 +21,8 @@ impl PollingStationDataEntries {
         entry_number: EntryNumber,
     ) -> Result<(u8, Vec<u8>, Vec<u8>, i64), sqlx::Error> {
         let res = query!(
-            r#"SELECT progress AS "progress: u8", data, client_state, updated_at FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?"#,
+            r#"SELECT progress AS "progress: u8", data, client_state, updated_at FROM polling_station_data_entries WHERE polling_station_id = ?"#,
             id,
-            entry_number
         )
             .fetch_one(&mut **tx)
             .await?;
@@ -71,9 +37,8 @@ impl PollingStationDataEntries {
 
     pub async fn delete(&self, id: u32, entry_number: EntryNumber) -> Result<(), sqlx::Error> {
         let res = query!(
-            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ? AND finalised_at IS NULL",
+            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ? AND finalised_at IS NULL",
             id,
-            entry_number
         )
             .execute(&self.0)
             .await?;
@@ -89,12 +54,11 @@ impl PollingStationDataEntries {
         tx: &mut Transaction<'_, Sqlite>,
         id: u32,
     ) -> Result<(), sqlx::Error> {
-        // future: support second data entry
         query!(
             r#"
             UPDATE polling_station_data_entries
             SET finalised_at = unixepoch(), progress = 100
-            WHERE polling_station_id = ? AND entry_number = 1"#,
+            WHERE polling_station_id = ?"#,
             id,
         )
         .execute(&mut **tx)
@@ -110,7 +74,7 @@ impl PollingStationDataEntries {
     ) -> Result<(), sqlx::Error> {
         // Copies first data entry to results
         query!(
-            "INSERT INTO polling_station_results (polling_station_id, data) SELECT polling_station_id, data FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = 1",
+            "INSERT INTO polling_station_results (polling_station_id, data) SELECT polling_station_id, data FROM polling_station_data_entries WHERE polling_station_id = ?",
             id,
         )
             .execute(&mut **tx)
@@ -132,11 +96,9 @@ impl PollingStationDataEntries {
             r#"
             SELECT EXISTS(
               SELECT 1 FROM polling_station_data_entries
-              WHERE polling_station_id = ?
-                AND entry_number = ?)
+              WHERE polling_station_id = ?)
             AS `exists`"#,
             id,
-            entry_number
         )
         .fetch_one(&self.0)
         .await?;
@@ -153,11 +115,9 @@ impl PollingStationDataEntries {
             SELECT EXISTS(
               SELECT 1 FROM polling_station_data_entries
               WHERE polling_station_id = ?
-                AND entry_number = ?
                 AND finalised_at IS NOT NULL)
             AS `exists`"#,
             id,
-            entry_number
         )
         .fetch_one(&self.0)
         .await?;

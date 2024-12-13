@@ -8,14 +8,12 @@ use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
 pub use self::structs::*;
-use crate::data_entry::repository::{PollingStationDataEntries, PollingStationResultsEntries};
+use crate::data_entry::repository::PollingStationDataEntries;
 use crate::election::repository::Elections;
 use crate::election::Election;
 use crate::error::{APIError, ErrorReference, ErrorResponse};
 use crate::polling_station::repository::PollingStations;
-use crate::polling_station::status::{
-    PollingStationStatus, PollingStationStatusEntry, PollingStationTransitionError,
-};
+use crate::polling_station::status::{PollingStationStatus, PollingStationTransitionError};
 use crate::polling_station::structs::PollingStation;
 use crate::validation::ValidationResults;
 
@@ -76,60 +74,31 @@ fn to_api_error(err: PollingStationTransitionError) -> APIError {
 pub async fn polling_station_data_entry_save(
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
-    State(polling_station_results_entries): State<PollingStationResultsEntries>,
     State(polling_stations_repo): State<PollingStations>,
     State(elections): State<Elections>,
     data_entry_request: SaveDataEntryRequest,
 ) -> Result<SaveDataEntryResponse, APIError> {
-    let polling_station_status_entry: PollingStationStatusEntry =
-        polling_stations_repo.get_or_create_status(id).await?;
+    // TODO: #657 execute all checks in this function in a single SQL transaction
 
-    let new_state: PollingStationStatus = match polling_station_status_entry.status.0 {
+    let polling_station_status_entry: PollingStationStatus =
+        polling_station_data_entries.get_or_create(id).await?;
+
+    let new_state: PollingStationStatus = match polling_station_status_entry {
         PollingStationStatus::NotStarted => polling_station_status_entry
-            .status
             .clone()
             .claim_first_entry(data_entry_request.clone())
             .map_err(to_api_error),
         PollingStationStatus::FirstEntryInProgress(_) => todo!(),
-        PollingStationStatus::FirstEntryUnfinished => todo!(),
         PollingStationStatus::SecondEntry => todo!(),
         PollingStationStatus::SecondEntryInProgress => todo!(),
-        PollingStationStatus::SecondEntryUnfinished => todo!(),
-        PollingStationStatus::Definitive => todo!(),
-    }?;
-
-    polling_stations_repo.update_status(id, new_state).await?;
-
-    // Check if it is valid to save the data entry
-    // TODO: #657 execute all checks in this function in a single SQL transaction
-    if polling_station_results_entries.exists(id).await? {
-        return Err(APIError::Conflict(
-            "Cannot save a data entry for a polling station that already has finalised results"
-                .to_string(),
-            ErrorReference::PollingStationResultsAlreadyFinalised,
-        ));
-    }
-
-    match entry_number {
-        EntryNumber::FirstEntry => {
-            if polling_station_data_entries
-                .exists_finalised_entry(id, 1)
-                .await?
-            {
-                return Err(APIError::Conflict(
-                    "Cannot save a first data entry for a polling station that already has a finalised first entry"
-                        .to_string(),
-                    ErrorReference::PollingStationFirstEntryNotFinalised,
-                ));
-            }
-        }
-        _ => {
-            return Err(APIError::NotFound(
-                "Only the first or second data entry is supported".to_string(),
-                ErrorReference::EntryNumberNotSupported,
+        PollingStationStatus::Definitive => {
+            return Err(APIError::Conflict(
+                "Cannot save a data entry for a polling station that already has finalised results"
+                    .to_string(),
+                ErrorReference::PollingStationResultsAlreadyFinalised,
             ));
         }
-    };
+    }?;
 
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
@@ -139,17 +108,22 @@ pub async fn polling_station_data_entry_save(
     let data = serde_json::to_string(&data_entry_request.data)?;
     let client_state = serde_json::to_string(&data_entry_request.client_state)?;
 
-    // Save the data entry or update it if it already exists
     polling_station_data_entries
-        .upsert(
-            id,
-            entry_number,
-            data_entry_request.progress,
-            data,
-            client_state,
-        )
+        .update_status(id, new_state)
         .await?;
 
+    // Save the data entry or update it if it already exists
+    /*
+        polling_station_data_entries
+            .upsert(
+                id,
+                entry_number,
+                data_entry_request.progress,
+                data,
+                client_state,
+            )
+            .await?;
+    */
     Ok(SaveDataEntryResponse { validation_results })
 }
 

@@ -12,7 +12,6 @@ use crate::eml::{eml_document_hash, EMLDocument, EML510};
 use crate::pdf_gen::generate_pdf;
 use crate::pdf_gen::models::{ModelNa31_2Input, PdfModel};
 use crate::polling_station::repository::PollingStations;
-use crate::polling_station::status::PollingStationStatusEntry;
 use crate::polling_station::structs::PollingStation;
 use crate::summary::ElectionSummary;
 use crate::{APIError, ErrorResponse};

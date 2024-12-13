@@ -1,11 +1,12 @@
 #![cfg(test)]
 
 use hyper::StatusCode;
+use shared::example_data_entry;
 use sqlx::SqlitePool;
 
 use crate::utils::serve_api;
 use backend::election::{ElectionDetailsResponse, ElectionListResponse, ElectionStatusResponse};
-use backend::polling_station::status::PollingStationStatus;
+use backend::polling_station::status::{FirstEntryInProgress, PollingStationStatus};
 
 mod shared;
 mod utils;
@@ -101,13 +102,12 @@ async fn test_election_details_status(pool: SqlitePool) {
 
     assert_eq!(statuses[0].status.0, PollingStationStatus::SecondEntry);
     assert_eq!(statuses[0].data_entry_progress, None);
-    // TODO: Re-enable this once we know how to test
-    /*
-        assert_eq!(
-            statuses[1].status.0,
-            PollingStationStatus::FirstEntryInProgress
-        );
-    */
+    assert_eq!(
+        statuses[1].status.0,
+        PollingStationStatus::FirstEntryInProgress(FirstEntryInProgress {
+            state: example_data_entry(None)
+        })
+    );
     assert_eq!(statuses[1].data_entry_progress, Some(60));
 
     // Abort and save the entries
@@ -172,13 +172,12 @@ async fn test_election_details_status(pool: SqlitePool) {
 
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
-    // TODO: Re-enable this once we know how to test
-    /*
-        assert_eq!(
-            statuses[1].status,
-            PollingStationStatus::FirstEntryUnfinished
-        );
-    */
+    assert_eq!(
+        statuses[1].status.0,
+        PollingStationStatus::FirstEntryInProgress(FirstEntryInProgress {
+            state: example_data_entry(None)
+        })
+    );
     assert_eq!(statuses[1].data_entry_progress, Some(60));
 }
 
@@ -206,13 +205,12 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
         body.statuses
     );
     assert_eq!(body.statuses[0].polling_station_id, 3);
-    // TODO: Re-enable this once we know how to test
-    /*
-        assert_eq!(
-            body.statuses[0].status.0,
-            PollingStationStatus::FirstEntryInProgress
-        );
-    */
+    assert_eq!(
+        body.statuses[0].status.0,
+        PollingStationStatus::FirstEntryInProgress(FirstEntryInProgress {
+            state: example_data_entry(Some(r#"{"continue": true}"#))
+        })
+    );
 }
 
 #[sqlx::test(fixtures("../fixtures/elections.sql"))]

@@ -14,47 +14,13 @@ pub struct PollingStationStatusEntry {
     }
  */
 
-/*
-#[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq)]
-#[serde(rename_all = "snake_case")]
-pub enum PollingStationStatus {
-    NotStarted,            // First entry has not started yet
-    FirstEntryInProgress,  // First entry is currently in progress
-    FirstEntryUnfinished,  // First entry has been aborted and the data has been saved
-    SecondEntry,           // Ready for second entry
-    SecondEntryInProgress, // Second entry is currently in progress
-    SecondEntryUnfinished, // Second entry has been aborted and the data has been saved
-    Definitive,            // First and second entry are finished
-}
- */
-
 use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
-use sqlx::{types::Json, FromRow, Type};
+use sqlx::Type;
 use utoipa::ToSchema;
 
 use crate::data_entry::SaveDataEntryRequest;
-
-// TODO: Create table
-#[derive(Debug, Serialize, Deserialize, FromRow, ToSchema)]
-pub struct PollingStationStatusEntry {
-    pub polling_station_id: u32,
-    #[schema(value_type = PollingStationStatus)]
-    pub status: Json<PollingStationStatus>,
-
-    pub data_entry_progress: Option<u8>,
-}
-
-impl PollingStationStatusEntry {
-    pub fn new(polling_station_id: u32) -> Self {
-        Self {
-            polling_station_id,
-            status: Json(PollingStationStatus::default()),
-            data_entry_progress: None,
-        }
-    }
-}
 
 #[derive(Debug)]
 pub enum PollingStationTransitionError {
@@ -66,10 +32,8 @@ pub enum PollingStationTransitionError {
 pub enum PollingStationStatus {
     NotStarted, // First entry has not started yet
     FirstEntryInProgress(FirstEntryInProgress),
-    FirstEntryUnfinished,
     SecondEntry,
     SecondEntryInProgress,
-    SecondEntryUnfinished,
     Definitive, // First and second entry are finished
 }
 
@@ -78,20 +42,14 @@ pub struct NotStarted;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash, ToSchema, Type)]
 pub struct FirstEntryInProgress {
-    state: SaveDataEntryRequest,
+    pub state: SaveDataEntryRequest,
 }
-
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
-pub struct FirstEntryUnfinished;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
 pub struct SecondEntry;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
 pub struct SecondEntryInProgress;
-
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
-pub struct SecondEntryUnfinished;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
 pub struct Definitive;

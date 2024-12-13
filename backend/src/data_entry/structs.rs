@@ -1,5 +1,6 @@
 use crate::election::Election;
 use crate::error::ErrorReference;
+use crate::polling_station::status::PollingStationStatus;
 use crate::polling_station::structs::PollingStation;
 use crate::validation::{
     above_percentage_threshold, FieldPath, ValidationResult, ValidationResultCode,
@@ -7,9 +8,24 @@ use crate::validation::{
 };
 use crate::APIError;
 use serde::{Deserialize, Serialize};
+use sqlx::types::Json;
+use sqlx::FromRow;
 use std::fmt;
 use std::ops::AddAssign;
 use utoipa::ToSchema;
+
+#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow)]
+pub struct DataEntry {
+    pub id: u32,
+    pub progress: u8,
+    #[schema(value_type = PollingStationStatus)]
+    pub status: Json<PollingStationStatus>,
+    #[schema(value_type = PollingStationResults)]
+    pub data: Option<Json<PollingStationResults>>,
+    #[schema(value_type = Object)]
+    pub client_state: Option<serde_json::Value>,
+    pub updated_at: i64,
+}
 
 #[derive(Debug)]
 pub struct DataError {

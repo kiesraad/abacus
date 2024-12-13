@@ -68,28 +68,28 @@ pub struct EntryResult {
 }
 
 impl PollingStationStatus {
-    pub fn claim_entry(self, state: DataEntry) -> Result<Self, PollingStationTransitionError> {
+    pub fn claim_entry(self, state: &DataEntry) -> Result<Self, PollingStationTransitionError> {
         match self {
             PollingStationStatus::FirstEntryNotStarted => {
                 Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
-                    first_entry_state: state,
+                    first_entry_state: state.clone(),
                 }))
             }
             PollingStationStatus::SecondEntryNotStarted(SecondEntryNotStarted {
                 finalised_first_entry,
             }) => Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
-                second_entry_state: state,
+                second_entry_state: state.clone(),
             })),
             _ => Err(PollingStationTransitionError::Invalid),
         }
     }
 
-    pub fn save_entry(self, state: DataEntry) -> Result<Self, PollingStationTransitionError> {
+    pub fn save_entry(self, state: &DataEntry) -> Result<Self, PollingStationTransitionError> {
         match self {
             PollingStationStatus::FirstEntryInProgress(_) => {
                 Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
-                    first_entry_state: state,
+                    first_entry_state: state.clone(),
                 }))
             }
             PollingStationStatus::SecondEntryInProgress(SecondEntryInProgress {
@@ -97,17 +97,17 @@ impl PollingStationStatus {
                 ..
             }) => Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
-                second_entry_state: state,
+                second_entry_state: state.clone(),
             })),
             _ => Err(PollingStationTransitionError::Invalid),
         }
     }
 
-    pub fn finalise_entry(self, state: DataEntry) -> Result<Self, PollingStationTransitionError> {
+    pub fn finalise_entry(self) -> Result<Self, PollingStationTransitionError> {
         match self {
-            PollingStationStatus::FirstEntryInProgress(_) => {
+            PollingStationStatus::FirstEntryInProgress(state) => {
                 Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
-                    finalised_first_entry: state,
+                    finalised_first_entry: state.first_entry_state,
                 }))
             }
             PollingStationStatus::SecondEntryInProgress(SecondEntryInProgress {

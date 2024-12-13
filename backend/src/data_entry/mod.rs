@@ -2,9 +2,7 @@ use axum::extract::{FromRequest, Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
-use entry_number::EntryNumber;
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
 pub use self::structs::*;
@@ -56,26 +54,28 @@ fn to_api_error(err: PollingStationTransitionError) -> APIError {
 
 pub async fn polling_station_data_entry_claim(
     Path(id): Path<u32>,
+    State(polling_stations_repo): State<PollingStations>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(elections): State<Elections>,
     data_entry_request: DataEntry,
-) -> Result<(), APIError> {
+) -> Result<SaveDataEntryResponse, APIError> {
     let polling_station_data_entry: PollingStationStatus = polling_station_data_entries
         .get_or_new(id, &data_entry_request)
         .await?;
 
     let new_state = polling_station_data_entry
-        .claim_entry(data_entry_request)
-        .map_err(|err| {
-            APIError::Conflict(
-                err.to_string(),
-                ErrorReference::PollingStationStatusTransition,
-            )
-        })?;
+        .claim_entry(&data_entry_request)
+        .map_err(to_api_error)?;
 
-    dbg!(new_state);
+    let polling_station = polling_stations_repo.get(id).await?;
+    let election = elections.get(polling_station.election_id).await?;
 
-    // TODO: Return something
-    Ok(())
+    let validation_results =
+        validate_polling_station_results(&data_entry_request.data, &polling_station, &election)?;
+
+    polling_station_data_entries.upsert(id, new_state).await?;
+
+    Ok(SaveDataEntryResponse { validation_results })
 }
 
 /// Save or update a data entry for a polling station
@@ -108,47 +108,24 @@ pub async fn polling_station_data_entry_save(
         .get_or_new(id, &data_entry_request)
         .await?;
 
-    let new_state: PollingStationStatus = match polling_station_status_entry {
-        PollingStationStatus::FirstEntryNotStarted => polling_station_status_entry
-            .claim_entry(data_entry_request.clone())
-            .map_err(to_api_error),
-        PollingStationStatus::FirstEntryInProgress(_) => todo!(),
-        PollingStationStatus::SecondEntryNotStarted(_) => todo!(),
-        PollingStationStatus::SecondEntryInProgress(_) => todo!(),
-        PollingStationStatus::EntriesNotEqual(_) => todo!(),
-        PollingStationStatus::EntryResult(_) => {
-            return Err(APIError::Conflict(
-                "Cannot save a data entry for a polling station that already has finalised results"
-                    .to_string(),
-                ErrorReference::PollingStationResultsAlreadyFinalised,
-            ));
-        }
-    }?;
+    let new_state: PollingStationStatus = polling_station_status_entry
+        .save_entry(&data_entry_request)
+        .map_err(to_api_error)?;
 
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
 
     let validation_results =
         validate_polling_station_results(&data_entry_request.data, &polling_station, &election)?;
-    //let data = serde_json::to_string(&data_entry_request.data)?;
-    //let client_state = serde_json::to_string(&data_entry_request.client_state)?;
 
-    polling_station_data_entries
-        .update_status(id, new_state)
-        .await?;
-
-    // Save the data entry or update it if it already exists
     /*
         polling_station_data_entries
-            .upsert(
-                id,
-                entry_number,
-                data_entry_request.progress,
-                data,
-                client_state,
-            )
+            .update_status(id, new_state)
             .await?;
     */
+    // Save the data entry or update it if it already exists
+    polling_station_data_entries.upsert(id, new_state).await?;
+
     Ok(SaveDataEntryResponse { validation_results })
 }
 
@@ -199,23 +176,21 @@ pub struct GetDataEntryResponse {
     ),
 )]
 pub async fn polling_station_data_entry_get(
-    State(pool): State<SqlitePool>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
     Path(id): Path<u32>,
 ) -> Result<Json<GetDataEntryResponse>, APIError> {
-    let mut tx = pool.begin().await?;
     let polling_station = polling_stations.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
-    let polling_station_data_entry = polling_station_data_entries.get(&mut tx, id).await?;
+    let polling_station_data_entry = polling_station_data_entries.get(id).await?;
 
     let data = polling_station_data_entry
         .state
         .get_data()
         .ok_or(APIError::NotFound(
-            "".to_string(),
-            // TODO: Create better reference
+            "Entry data not found".to_string(),
+            // TODO: Create better error reference and text
             ErrorReference::EntryNotFound,
         ))?;
 
@@ -271,62 +246,18 @@ pub async fn polling_station_data_entry_delete(
     ),
 )]
 pub async fn polling_station_data_entry_finalise(
-    State(pool): State<SqlitePool>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
-    State(polling_stations_repo): State<PollingStations>,
-    State(elections): State<Elections>,
-    Path((id, entry_number)): Path<(u32, EntryNumber)>,
+    Path(id): Path<u32>,
 ) -> Result<(), APIError> {
-    let polling_station = polling_stations_repo.get(id).await?;
-    let election = elections.get(polling_station.election_id).await?;
+    let polling_station_data_entry = polling_station_data_entries.get(id).await?;
 
-    let mut tx = pool.begin().await?;
-
-    // TODO: #633 validate whether first and second data entries are equal.
-    //       Currently the first data entry is copied to the results table,
-    //       without comparison to the second data entry
-
-    let data = polling_station_data_entries
-        .get(&mut tx, id)
-        .await?
+    let new_state = polling_station_data_entry
         .state
-        .get_data();
-    let results = polling_station_data_entries
-        .get(&mut tx, id)
-        .await?
-        .state
-        .get_data()
-        .ok_or(APIError::NotFound(
-            "".to_string(),
-            // TODO: Create better reference
-            ErrorReference::EntryNotFound,
-        ))?;
+        .0
+        .finalise_entry()
+        .map_err(to_api_error)?;
 
-    let mut validation_results = ValidationResults::default();
-    results.validate(
-        &election,
-        &polling_station,
-        &mut validation_results,
-        &"data".into(),
-    )?;
-
-    if validation_results.has_errors() {
-        return Err(APIError::Conflict(
-            "Cannot finalise data entry with validation errors".to_string(),
-            ErrorReference::PollingStationDataValidation,
-        ));
-    }
-
-    match entry_number {
-        EntryNumber::FirstEntry => {
-            polling_station_data_entries
-                .finalise_first_entry(&mut tx, id)
-                .await?
-        }
-        EntryNumber::SecondEntry => todo!(), //polling_station_data_entries.finalise(&mut tx, id).await?,
-    }
-
-    tx.commit().await?;
+    polling_station_data_entries.upsert(id, new_state).await?;
 
     Ok(())
 }

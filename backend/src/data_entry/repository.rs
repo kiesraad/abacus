@@ -1,5 +1,5 @@
 use axum::extract::FromRef;
-use sqlx::{query, query_as, Sqlite, SqlitePool, Transaction};
+use sqlx::{query, query_as, SqlitePool};
 
 use super::{
     PollingStation, PollingStationDataEntry, PollingStationResults, PollingStationResultsEntry,
@@ -17,17 +17,35 @@ impl PollingStationDataEntries {
         Self(pool)
     }
 
-    pub async fn get(
-        &self,
-        tx: &mut Transaction<'_, Sqlite>,
-        id: u32,
-    ) -> Result<PollingStationDataEntry, sqlx::Error> {
+    /// Saves the data entry or updates it if it already exists
+    pub async fn upsert(&self, id: u32, state: PollingStationStatus) -> Result<(), sqlx::Error> {
+        let state = serde_json::to_value(state).expect("should be serializable to JSON");
+        sqlx::query!(
+            r#"
+            INSERT INTO polling_station_data_entries
+              (polling_station_id, state)
+            VALUES (?, ?)
+            ON CONFLICT(polling_station_id) DO
+            UPDATE SET
+              state = excluded.state,
+              updated_at = unixepoch()
+            "#,
+            id,
+            state
+        )
+        .execute(&self.0)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn get(&self, id: u32) -> Result<PollingStationDataEntry, sqlx::Error> {
         query_as!(
             PollingStationDataEntry,
             r#"SELECT polling_station_id AS "id: u32", state AS "state: _", updated_at FROM polling_station_data_entries WHERE polling_station_id = ?"#,
             id,
         )
-            .fetch_one(&mut **tx)
+            .fetch_one(&self.0)
             .await
     }
 
@@ -88,24 +106,6 @@ WHERE polling_station_id = ?
             polling_station_id
         )
         .fetch_all(&self.0)
-        .await?;
-
-        Ok(())
-    }
-
-    pub async fn finalise_first_entry(
-        &self,
-        tx: &mut Transaction<'_, Sqlite>,
-        id: u32,
-    ) -> Result<(), sqlx::Error> {
-        query!(
-            r#"
-            UPDATE polling_station_data_entries
-            SET finalised_at = unixepoch()
-            WHERE polling_station_id = ?"#,
-            id,
-        )
-        .execute(&mut **tx)
         .await?;
 
         Ok(())

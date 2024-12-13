@@ -1,13 +1,13 @@
 # Invoer tweede zitting
 
-## Het GSB voert de corrigendum PV's in de applicatie in
+## Het GSB voert de corrigendum PV's in de applicatie in (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
 
 __Precondities:__
 
-- [De beheerder en de coördinator richten de applicatie in](./Installatie-en-inrichting-applicatie.md#de-beheerder-en-de-coördinator-richten-de-applicatie-in)
-- [Het GSB voert de PV's en eventuele SB corrigenda's (DSO) in de applicatie in](./Invoer-eerste-zitting.md#het-gsb-voert-de-pvs-en-eventuele-sb-corrigendas-dso-in-de-applicatie-in)
+- [De beheerder en de coördinator richten de applicatie in](./Installatie-en-inrichting-applicatie.md#de-beheerder-en-de-coördinator-richten-de-applicatie-in-vlieger)
+- [Het GSB voert de PV's en eventuele SB corrigenda's (DSO) in de applicatie in](./Invoer-eerste-zitting.md#het-gsb-voert-de-pvs-en-eventuele-sb-corrigendas-dso-in-de-applicatie-in-vlieger)
 
 ### Hoofdscenario en uitbreidingen
 

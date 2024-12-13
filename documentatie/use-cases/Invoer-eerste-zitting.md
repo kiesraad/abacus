@@ -1,12 +1,12 @@
 # Invoer eerste zitting
 
-## Het GSB voert de PV's en eventuele SB corrigenda's (DSO) in de applicatie in
+## Het GSB voert de PV's en eventuele SB corrigenda's (DSO) in de applicatie in (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
 
 __Precondities:__
 
-- [De beheerder en de coördinator richten de applicatie in](./Installatie-en-inrichting-applicatie.md#de-beheerder-en-de-coördinator-richten-de-applicatie-in)
+- [De beheerder en de coördinator richten de applicatie in](./Installatie-en-inrichting-applicatie.md#de-beheerder-en-de-coördinator-richten-de-applicatie-in-vlieger)
 
 ### Hoofdscenario en uitbreidingen
 
@@ -15,7 +15,7 @@ __Trigger:__ Het geplande tijdstip om invoer te starten breekt aan.
 __Hoofdscenario:__  
 
 1. De coördinator stelt invoer open.
-2. (voor elk SB PV evt. met corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in)
+2. (voor elk SB PV evt. met corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in-vlieger)
 3. De coördinator sluit de invoer af.
 4. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
 5. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
@@ -32,7 +32,7 @@ __Uitbreidingen:__
 - Welke controles willen we nog nadat de invoer is afgesloten? Of zijn die controles onderdeel van het afsluiten?
 
 
-## De invoerders vullen de resultaten van de tellingen in
+## De invoerders vullen de resultaten van de tellingen in (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
 
@@ -44,9 +44,9 @@ __Hoofdscenario:__
 
 1. De coördinator geeft het SB PV evt. met corrigendum aan de eerste invoerder.
 2. (tijdens invoer) De coördinator monitort de voortgang op het statusoverzicht van de steminvoer.
-3. [De eerste invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
+3. [De eerste invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in-zee)
 4. De coördinator geeft het SB PV evt. met corrigendum aan de tweede invoerder.
-5. [De tweede invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
+5. [De tweede invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in-zee)
 6. (na eerste en/of tweede invoer) De applicatie stelt vast dat de invoer geen waarschuwingen bevat.
 7. De applicatie stelt vast dat beide invoeren gelijk zijn.
 8. De applicatie slaat het definitieve resultaat van het stembureau op.
@@ -56,10 +56,10 @@ __Uitbreidingen:__
 &emsp; 6a1. De coördinator beoordeelt de geaccepteerde waarschuwingen.
 
 7a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
-&emsp; 7a1. [De coördinator lost de verschillen tussen de twee invoeren op.](#de-coördinator-lost-de-verschillen-tussen-de-twee-invoeren-op)
+&emsp; 7a1. [De coördinator lost de verschillen tussen de twee invoeren op.](#de-coördinator-lost-de-verschillen-tussen-de-twee-invoeren-op-zee)
 
 
-## De eerste of tweede invoerder voert de resultaten van de telling in
+## De eerste of tweede invoerder voert de resultaten van de telling in (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
@@ -100,12 +100,12 @@ __Uitbreidingen:__
 
 4a. De invoer voldoet niet aan de validatieregels voor fouten:  
 &emsp; 4a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel.  
-&emsp; 4a2. [De invoerder handelt de fout(en) af.](#de-invoerder-handelt-de-fouten-af)  
+&emsp; 4a2. [De invoerder handelt de fout(en) af.](#de-invoerder-handelt-de-fouten-af-vis)  
 
 5a. De invoer voldoet niet aan de plausibiliteitschecks:  
 &emsp; 5a1. De applicatie toont een waarschuwing voor elke gefaalde plausibiliteitscheck.  
 &emsp;
-5a2. [De invoerder handelt de waarschuwing(en) af.](#de-invoerder-handelt-de-waarschuwingen-af)
+5a2. [De invoerder handelt de waarschuwing(en) af.](#de-invoerder-handelt-de-waarschuwingen-af-vis)
 
 6a. De invoerder breekt de invoer af en bewaart de invoer:  
 &emsp; 6a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  
@@ -115,7 +115,7 @@ __Uitbreidingen:__
 &emsp; 6b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
 
 
-## De coördinator lost de verschillen tussen de twee invoeren op
+## De coördinator lost de verschillen tussen de twee invoeren op (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
@@ -140,7 +140,7 @@ __Uitbreidingen:__
   binnen de Kieswet / het Kiesbesluit ruimte voor andere oplossingen?
 
 
-## De invoerder handelt de fout(en) af
+## De invoerder handelt de fout(en) af (vis)
 
 __Niveau:__ subfunctie, vis, 🐟
 
@@ -169,7 +169,7 @@ __Uitbreidingen:__
 - Als de coördinator het PV terugstuurt in het proces, naar welk punt dan precies?
 
 
-## De invoerder handelt de waarschuwing(en) af
+## De invoerder handelt de waarschuwing(en) af (vis)
 
 __Niveau:__ subfunctie, vis, 🐟
 

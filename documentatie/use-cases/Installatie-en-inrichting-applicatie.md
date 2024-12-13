@@ -1,6 +1,6 @@
 # Installatie en inrichting van de applicatie
 
-## De beheerder en de coördinator richten de applicatie in
+## De beheerder en de coördinator richten de applicatie in (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
 
@@ -13,10 +13,10 @@ __Precondities:__
 
 __Trigger:__
 
-1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie)
+1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
 2. De beheerder leest de verkiezingsdefinitie in.
 3. De coördinator leest de kandidatenlijst in.
-4. [De coördinator coördinator zet de stembureaus in de applicatie.](#de-coördinator-zet-de-stembureaus-in-de-applicatie)
+4. [De coördinator coördinator zet de stembureaus in de applicatie.](#de-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
 5. De beheerder maakt de gebruikers aan.
 
 __Uitbreidingen:__  
@@ -25,7 +25,7 @@ __Uitbreidingen:__
 2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
 
 
-## De beheerder installeert de applicatie
+## De beheerder installeert de applicatie (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
@@ -54,7 +54,7 @@ __Uitbreidingen:__
 - Afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
 
 
-## De coördinator zet de stembureaus in de applicatie
+## De coördinator zet de stembureaus in de applicatie (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 

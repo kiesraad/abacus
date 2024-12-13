@@ -128,7 +128,7 @@ Velden markeren: geen (laat alleen error zien op de pagina)
 
 ## Plausibiliteitschecks geven waarschuwingen
 
-Plausbiliteitschecks vragen de gebruiker de invoer extra te controleren. Ze resulteren in een niet-blokkerende waarschuwing. De waarschuwing wordt getoond als de check evalueert naar `FALSE`.
+Plausibiliteitschecks vragen de gebruiker de invoer extra te controleren. Ze resulteren in een niet-blokkerende waarschuwing. De waarschuwing wordt getoond als de check evalueert naar `FALSE`.
 
 De foutmelding die wordt getoond bestaat uit dezelfde onderdelen als bij de validatieregels. Het handelingsperspectief voor alle plausibiliteitschecks is als volgt:
 

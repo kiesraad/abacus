@@ -2,17 +2,17 @@
 
 ## Het GSB voert de PV's en eventuele SB corrigenda's (DSO) in de applicatie in
 
-__niveau:__ hoog-over, vlieger, 🪁
+__Niveau:__ hoog-over, vlieger, 🪁
 
-__precondities:__
+__Precondities:__
 
 - [De beheerder en de coördinator richten de applicatie in](./Installatie-en-inrichting-applicatie.md#de-beheerder-en-de-coördinator-richten-de-applicatie-in)
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ Het geplande tijdstip om invoer te starten breekt aan.
+__Trigger:__ Het geplande tijdstip om invoer te starten breekt aan.
 
-__hoofdscenario__:  
+__Hoofdscenario:__  
 
 1. De coördinator stelt invoer open.
 2. (voor elk SB PV evt. met corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in)
@@ -21,7 +21,7 @@ __hoofdscenario__:
 5. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
 6. De applicatie genereert de PVs en EMLs etc.
 
-__uitbreidingen__:  
+__Uitbreidingen:__  
 4a. De applicatie stelt vast dat niet voor niet alle stembureaus resultaten zijn ingevoerd:
 
 5a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
@@ -34,13 +34,13 @@ __uitbreidingen__:
 
 ## De invoerders vullen de resultaten van de tellingen in
 
-__niveau:__ hoog-over, vlieger, 🪁
+__Niveau:__ hoog-over, vlieger, 🪁
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ De coördinator ontvangt een SB PV evt. met corrigendum.
+__Trigger:__ De coördinator ontvangt een SB PV evt. met corrigendum.
 
-__hoofdscenario__:
+__Hoofdscenario:__
 
 1. De coördinator geeft het SB PV evt. met corrigendum aan de eerste invoerder.
 2. (tijdens invoer) De coördinator monitort de voortgang op het statusoverzicht van de steminvoer.
@@ -51,7 +51,7 @@ __hoofdscenario__:
 7. De applicatie stelt vast dat beide invoeren gelijk zijn.
 8. De applicatie slaat het definitieve resultaat van het stembureau op.
 
-__uitbreidingen__:  
+__Uitbreidingen:__  
 6a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
 &emsp; 6a1. De coördinator beoordeelt de geaccepteerde waarschuwingen.
 
@@ -59,22 +59,19 @@ __uitbreidingen__:
 &emsp; 7a1. [De coördinator lost de verschillen tussen de twee invoeren op.](#de-coördinator-lost-de-verschillen-tussen-de-twee-invoeren-op)
 
 
----
-
-
 ## De eerste of tweede invoerder voert de resultaten van de telling in
 
-__niveau:__ gebruikersdoel, zee, 🌊
+__Niveau:__ gebruikersdoel, zee, 🌊
 
-__precondities:__
+__Precondities:__
 
 - De invoerder is ingelogd in de applicatie.
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ De coördinator geeft het SB PV en eventueel SB corrigendum PV aan de invoerder.
+__Trigger:__ De coördinator geeft het SB PV en eventueel SB corrigendum PV aan de invoerder.
 
-__hoofdscenario__:
+__Hoofdscenario:__
 
 1. De invoerder selecteert het stembureau van het PV in de applicatie.
 2. De applicatie stelt vast dat er geen eerdere invoer voor het stembureau is opgeslagen.
@@ -85,7 +82,7 @@ __hoofdscenario__:
    de [plausibiliteitschecks](./Validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
 6. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
 
-__uitbreidingen__:  
+__Uitbreidingen:__  
 1a. De invoerder kan het stembureau op het PV niet in de applicatie vinden:  
 &emsp; 1a1. De invoerder verwittigt de coördinator.  
 &emsp; 1a2. De coördinator en de invoerder vinden alsnog het stembureau.  
@@ -120,19 +117,19 @@ __uitbreidingen__:
 
 ## De coördinator lost de verschillen tussen de twee invoeren op
 
-__niveau:__ gebruikersdoel, zee, 🌊
+__Niveau:__ gebruikersdoel, zee, 🌊
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ De applicatie stelt vast dat beide invoeren niet gelijk zijn.
+__Trigger:__ De applicatie stelt vast dat beide invoeren niet gelijk zijn.
 
-__hoofdscenario__:
+__Hoofdscenario:__
 
 1. De coördinator bekijkt de verschillen tussen de twee invoeren.
 2. De coördinator stelt vast dat één van de twee invoeren correct is.
 3. De coördinator accepteert de correcte invoer.
 
-__uitbreidingen__:  
+__Uitbreidingen:__  
 2a. Geen van beide invoeren is correct:  
 &emsp; 2a1. De coördinator verwijdert beide invoeren.  
 &emsp; 2a2. De coördinator laat het stembureau opnieuw invoeren door twee invoerders.
@@ -143,27 +140,24 @@ __uitbreidingen__:
   binnen de Kieswet / het Kiesbesluit ruimte voor andere oplossingen?
 
 
----
-
-
 ## De invoerder handelt de fout(en) af
 
-__niveau:__ subfunctie, vis, 🐟
+__Niveau:__ subfunctie, vis, 🐟
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ De controles geven een foutmelding vanwege de [validatieregels voor fouten](./Validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten).
+__Trigger:__ De controles geven een foutmelding vanwege de [validatieregels voor fouten](./Validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten).
 
 *Foutmelding*: De ingevoerde waardes kunnen niet correct zijn. Bijvoorbeeld: het totaal van de stemmen op een lijst komt niet overeen met de som van de stemmen van de kandidaten op die lijst.
 
-__hoofdscenario__:  
+__Hoofdscenario:__  
 Voor elke foutmelding:  
 
 1. De invoerder controleert de foutmelding.
 2. De invoerder constateert dat hij/zij een fout heeft gemaakt in de invoer.
 3. De invoerder corrigeert de fout in de invoer.
 
-__uitbreidingen__:  
+__Uitbreidingen:__  
 2a. De invoerder stelt een fout op het PV vast en kan de foutmelding niet oplossen:  
 &emsp; 2a1. De invoerder meldt de fout op het PV bij de coördinator.  
 &emsp; 2a2. De coördinator stuurt het PV terug in het proces.  
@@ -177,22 +171,22 @@ __uitbreidingen__:
 
 ## De invoerder handelt de waarschuwing(en) af
 
-__niveau:__ subfunctie, vis, 🐟
+__Niveau:__ subfunctie, vis, 🐟
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ De controles geven een waarschuwing vanwege de [plausibiliteitschecks](./Validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
+__Trigger:__ De controles geven een waarschuwing vanwege de [plausibiliteitschecks](./Validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
 
 *Waarschuwing*: De ingevoerde waardes zijn mogelijk niet correct. Bijvoorbeeld: er is een groot aantal blanco stemmen of de tweede invoer klopt niet met de eerste invoer.
 
-__hoofdscenario__:  
+__Hoofdscenario:__  
 Voor elke waarschuwing:  
 
 1. De invoerder controleert de waarschuwing.
 2. De invoerder constateert dat de invoer klopt met het PV.
 3. De invoerder accepteert de waarschuwing in de applicatie.
 
-__uitbreidingen__:  
+__Uitbreidingen:__  
 2a. De invoerder constateert dat hij/zij een fout heeft gemaakt in de invoer.  
 &emsp; 2a1. De invoerder corrigeert de fout in de invoer.  
 

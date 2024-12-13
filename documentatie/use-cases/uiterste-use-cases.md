@@ -2,13 +2,13 @@
 
 ## Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
 
-_niveau:__ hoog-over, wolk, ☁️
+_Niveau:__ hoog-over, wolk, ☁️
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ dag na de verkiezingen
+__Trigger:__ dag na de verkiezingen
 
-__hoofdscenario__:  
+__Hoofdscenario:__  
 
 1. Het GSB opent de zitting.
 2. (voor elk stembureau) Het GSB stelt de uitslag van een stembureau vast.
@@ -17,7 +17,7 @@ __hoofdscenario__:
 5. Het GSB sluit de zitting.
 6. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
 
-__uitbreidingen__:  
+__Uitbreidingen:__  
 3a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
 
 4a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
@@ -29,13 +29,13 @@ __uitbreidingen__:
 
 ## Gemeentelijk stembureau (GSB) stelt uitslag vast in tweede zitting (corrigenda)
 
-__niveau:__ hoog-over, wolk, ☁️
+__Niveau:__ hoog-over, wolk, ☁️
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ één of meer stembureaus moeten herteld worden n.a.v. verzoek CSB
+__Trigger:__ één of meer stembureaus moeten herteld worden n.a.v. verzoek CSB
 
-__hoofdscenario__:  
+__Hoofdscenario:__  
 
 1. Het GSB opent de zitting.
 2. (voor elk te hertellen stembureau) Het GSB stelt de uitslag van een stembureau opnieuw vast.
@@ -43,7 +43,7 @@ __hoofdscenario__:
 4. Het GSB sluit de zitting.
 5. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
 
-__uitbreidingen__:
+__Uitbreidingen:__
 2a. Er zijn hertelde stembureaus met ongewijzigde uitslag:  
 2b. Er zijn alleen hertelde stembureaus met ongewijzigde uitslag:  
 
@@ -54,11 +54,11 @@ __uitbreidingen__:
 
 ## Centraal stembureau (CSB) stelt verkiezingsuitslag vast
 
-__niveau:__ hoog-over, wolk, ☁️
+__Niveau:__ hoog-over, wolk, ☁️
 
 ### Hoofdscenario en uitbreidingen
 
-__hoofdscenario__:  
+__Hoofdscenario:__  
 
 1. De applicatie berekent de zetelverdeling.  
 2. De applicatie wijst de zetels toe.  

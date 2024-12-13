@@ -2,16 +2,16 @@
 
 ## De beheerder en de coördinator richten de applicatie in
 
-__niveau:__ hoog-over, vlieger, 🪁
+__Niveau:__ hoog-over, vlieger, 🪁
 
-__precondities:__
+__Precondities:__
 
 - Het GSB heeft de kandidatenlijst beschikbaar gemaakt.
 - De Kiesraad heeft de verkiezingsdefinitie beschikbaar gemaakt.
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__
+__Trigger:__
 
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie)
 2. De beheerder leest de verkiezingsdefinitie in.
@@ -19,7 +19,7 @@ __trigger:__
 4. [De coördinator coördinator zet de stembureaus in de applicatie.](#de-coördinator-zet-de-stembureaus-in-de-applicatie)
 5. De beheerder maakt de gebruikers aan.
 
-__uitbreidingen__:  
+__Uitbreidingen:__  
 1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
 
 2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
@@ -27,20 +27,20 @@ __uitbreidingen__:
 
 ## De beheerder installeert de applicatie
 
-__niveau:__ gebruikersdoel, zee, 🌊
+__Niveau:__ gebruikersdoel, zee, 🌊
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ De Kiesraad maakt de applicatie beschikbaar.
+__Trigger:__ De Kiesraad maakt de applicatie beschikbaar.
 
-__hoofdscenario__:
+__Hoofdscenario:__
 
 1. De beheerder bereidt één server voor.
 2. De beheerder installeert de applicatie.
 3. (voor elke client) De beheerder bereidt de client-machine voor.
 4. (voor elke client) De beheerder zorgt dat de client met de server kan verbinden.
 
-__uitbreidingen__:  
+__Uitbreidingen:__  
 1a. De beheerder bereidt één of meerdere reserve-servers voor:
 
 2a. De installatie van de applicatie geeft een foutmelding:
@@ -56,23 +56,23 @@ __uitbreidingen__:
 
 ## De coördinator zet de stembureaus in de applicatie
 
-__niveau:__ gebruikersdoel, zee, 🌊
+__Niveau:__ gebruikersdoel, zee, 🌊
 
-__precondities:__
+__Precondities:__
 
 - De coördinator heeft de lijst met gepubliceerde stembureaus.
 - De invoer is nog niet gestart.
 
 ### Hoofdscenario en uitbreidingen
 
-__hoofdscenario__:
+__Hoofdscenario:__
 
 1. De coördinator selecteert de verkiezing.
 2. De coördinator importeert het EML-NL bestand met de stembureaus.
 3. De applicatie stelt vast dat de stembureaus aan de validatieregels voldoen.
 4. De coördinator stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 
-__uitbreidingen__:  
+__Uitbreidingen:__  
 
 1a. De coördinator selecteert een andere verkiezing dan van het bestand en de lijst met stembureaus:
 
@@ -93,5 +93,5 @@ __uitbreidingen__:
 - Bij gelijktijdige verkiezingen (gemeenteraad en stadsdeel bijvoorbeeld) zou het mooi zijn om de stembureaus van één
   naar een andere verkiezing te kopiëren. Minder mooi alternatief is eerst exporteren en dan importeren.
 - Zodra invoer gestart is, mag het niet mogelijk zijn om stembureaus aan te passen of te verwijderen. Verwijderen wordt nu
-  afgedwongen dmv foreign keys in de database. Checks voor aanpassen en checks obv van de fases van de verkiezing in de
+  afgedwongen d.m.v. foreign keys in de database. Checks voor aanpassen en checks o.b.v. van de fases van de verkiezing in de
   applicatie moeten nog uitgewerkt worden.

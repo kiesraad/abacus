@@ -175,6 +175,39 @@ describe("useKeyboard", () => {
     expect(thirdInput).toHaveFocus();
   });
 
+  test("Move to first input and checkbox", async () => {
+    const onSubmit = vi.fn();
+
+    render(
+      <FormWithNavigation onSubmit={onSubmit}>
+        <input id="inp1" defaultValue="fizz1" />
+        <input id="inp2" defaultValue="fizz2" />
+        <input id="inp3" defaultValue="fizz3" />
+        <div>
+          <input type="checkbox" id="checkbox" />
+          <div>
+            <label htmlFor="checkbox">"buzzme"</label>
+          </div>
+        </div>
+        <button id="test-submit-button" type="submit">
+          Submit
+        </button>
+      </FormWithNavigation>,
+    );
+
+    const firstInput = screen.getByTestId("inp1");
+    const checkbox = screen.getByTestId("checkbox");
+
+    checkbox.focus();
+    expect(checkbox).toHaveFocus();
+
+    await userEvent.keyboard("{Shift>}{arrowup}{/Shift}");
+    expect(firstInput).toHaveFocus();
+
+    await userEvent.keyboard("{Shift>}{arrowdown}{/Shift}");
+    expect(checkbox).toHaveFocus();
+  });
+
   test("Stay at the first input when moving up", async () => {
     const onSubmit = vi.fn();
     render(

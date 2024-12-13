@@ -15,10 +15,18 @@ export function ElectionProgress() {
 
   const stats: Stat[] = useMemo(() => {
     const total = statuses.length;
+    const totalFirstEntry = statuses.filter((s) =>
+      ["second_entry", "second_entry_unfinished", "second_entry_in_progress", "definitive"].includes(s.status),
+    ).length;
     const totalDefinitive = statuses.filter((s) => s.status === "definitive").length;
     return [
       {
-        title: t("all_together"),
+        title: t("status.first_entry_finished"),
+        id: "first_entry_finished",
+        percentage: total > 0 ? Math.round((totalFirstEntry / total) * 100) : 0,
+      },
+      {
+        title: t("status.definitive"),
         id: "definitive",
         percentage: total > 0 ? Math.round((totalDefinitive / total) * 100) : 0,
       },

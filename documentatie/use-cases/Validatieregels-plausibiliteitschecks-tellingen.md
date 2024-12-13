@@ -1,4 +1,4 @@
-# Use cases GSB - validatieregels en plausibiliteitschecks
+# Validatieregels en plausibiliteitschecks voor invoer tellingen
 
 ## Validatieregels geven fouten
 

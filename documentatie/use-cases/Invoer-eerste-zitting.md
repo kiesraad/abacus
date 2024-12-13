@@ -18,17 +18,18 @@ __hoofdscenario__:
 2. (voor elk SB PV evt. met corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in)
 3. De coördinator sluit de invoer af.
 4. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
-5. De applicatie stelt vast dat er geen stembureaus met (geaccepteerde) waarschuwingen zijn.
+5. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
 6. De applicatie genereert de PVs en EMLs etc.
 
 __uitbreidingen__:  
 4a. De applicatie stelt vast dat niet voor niet alle stembureaus resultaten zijn ingevoerd:
 
-5a. De applicatie stelt vast dat er stembureaus met waarschuwingen zijn:
+5a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
 
 ### Open punten
 
 - Moet de applicatie een preview van het gegenereerde PV tonen, zodat de coördinator die kan controleren?
+- Welke controles willen we nog nadat de invoer is afgesloten? Of zijn die controles onderdeel van het afsluiten?
 
 
 ## De invoerders vullen de resultaten van de tellingen in
@@ -42,19 +43,20 @@ __trigger:__ De coördinator ontvangt een SB PV evt. met corrigendum.
 __hoofdscenario__:
 
 1. De coördinator geeft het SB PV evt. met corrigendum aan de eerste invoerder.
-2. [De eerste invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
-3. De coördinator geeft het SB PV evt. met corrigendum aan de tweede invoerder.
-4. [De tweede invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
-5. (na eerste en/of tweede invoer) De applicatie stelt vast dat de invoer geen (geaccepteerde) waarschuwingen bevat.
-6. De applicatie stelt vast dat beide invoeren gelijk zijn.
-7. De applicatie slaat het definitieve resultaat van het stembureau op.
+2. (tijdens invoer) De coördinator monitort de voortgang op het statusoverzicht van de steminvoer.
+3. [De eerste invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
+4. De coördinator geeft het SB PV evt. met corrigendum aan de tweede invoerder.
+5. [De tweede invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
+6. (na eerste en/of tweede invoer) De applicatie stelt vast dat de invoer geen waarschuwingen bevat.
+7. De applicatie stelt vast dat beide invoeren gelijk zijn.
+8. De applicatie slaat het definitieve resultaat van het stembureau op.
 
 __uitbreidingen__:  
-5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
-&emsp; 5a1. De coördinator beoordeelt de geaccepteerde waarschuwingen.
+6a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
+&emsp; 6a1. De coördinator beoordeelt de geaccepteerde waarschuwingen.
 
-6a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
-&emsp; 6a1. [De coördinator lost de verschillen tussen de twee invoeren op.](#de-coördinator-lost-de-verschillen-tussen-de-twee-invoeren-op)
+7a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
+&emsp; 7a1. [De coördinator lost de verschillen tussen de twee invoeren op.](#de-coördinator-lost-de-verschillen-tussen-de-twee-invoeren-op)
 
 
 ---

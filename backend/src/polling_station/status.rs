@@ -114,7 +114,7 @@ impl PollingStationStatus {
         }
     }
 
-    pub fn abort(self) -> Result<Self, PollingStationTransitionError> {
+    pub fn delete(self) -> Result<Self, PollingStationTransitionError> {
         match self {
             PollingStationStatus::FirstEntryInProgress(_) => {
                 Ok(PollingStationStatus::FirstEntryNotStarted)

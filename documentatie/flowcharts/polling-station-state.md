@@ -18,6 +18,6 @@ is_equal --> FirstSecondEntryNotEqual: equal? no
 SecondEntryInProgress --> is_equal: finalise
 SecondEntryInProgress --> SecondEntry: delete
 #FirstSecondEntryNotEqual --> FirstSecondEntryNotEqual: save
-#Implemented in FirstSecondEntryNotEqual --> NotStarted: delete
+# Will be Implemented in #130: FirstSecondEntryNotEqual --> NotStarted: delete
 FirstSecondEntryNotEqual --> Result: resolve
 ```

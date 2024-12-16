@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { ApiError, ApiResult, usePollingStationFormController } from "@kiesraad/api";
+import { t, tx } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
 export interface AbortDataEntryModalProps {
@@ -45,18 +46,14 @@ export function AbortDataEntryModal({ onCancel, onSave, onDelete }: AbortDataEnt
     })();
 
   return (
-    <Modal title="Wat wil je doen met je invoer?" onClose={onCancel}>
-      <p>
-        Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de invoer die je al hebt gedaan
-        bewaren.
-      </p>
-      <p>Twijfel je? Overleg dan met de coördinator.</p>
+    <Modal title={t("data_entry.abort.title")} onClose={onCancel}>
+      {tx("data_entry.abort.description")}
       <nav>
         <Button size="lg" onClick={onAbortModalSave} disabled={saving}>
-          Invoer bewaren
+          {t("data_entry.abort.save_input")}
         </Button>
         <Button size="lg" variant="secondary" onClick={onAbortModalDelete} disabled={deleting}>
-          Niet bewaren
+          {t("data_entry.abort.discard_input")}
         </Button>
       </nav>
     </Modal>

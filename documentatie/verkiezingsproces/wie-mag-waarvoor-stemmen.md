@@ -4,22 +4,22 @@ Doel van dit document is een overzicht te hebben waar stemmen vandaag komen voor
 
 Voor alle verkiezingen geldt dat iemand 18 jaar of ouder moet zijn en niet uitgesloten van kiesrecht.
 
-| Verkiezing                 | Niveau          | Nationaliteit            | in Nederland    | in Caribisch Nederland | in Aruba, Curaçao, Sint Maarten | in buitenland |
-| -------------------------- | --------------- | ------------------------ | --------------- | -----------------------| ------------------------------  | ---------- |
-| Tweede kamer               | Landelijk       | Nederlands               | ja              | ja                     | als bep. voorwaardes en geregistreerd | als geregistreerd |
-| Europees Parlement         | EU              | Nederlands               | ja              | ja                     | als geregistreerd               | als geregistreerd en verklaring niet in ander EU-land stemmen |
-|                            |                 | andere EU-lidstaat       | verklaring Y-32 | verklaring Y-32        | ???                             | nee |
-| Provinciale Staten         | Provincies      | Nederlands               | ja              | nvt                    | nvt                             | nee |
-| Waterschappen              | Waterschappen   | nvt                      | ja              | nvt                    | nvt                             | nee |
-| Kiescolleges Eerste Kamer  | Kiescolleges    | Nederlands               | nvt             | nvt                    | ja                              | als geregistreerd  |
-| Eilandsraden               | Eilandsraden    | Nederlands               | nvt             | ja                     | nvt                             | nee |
-|                            |                 | niet-Nederlands          | nvt             | 5+ jr legaal verblijf  | nvt                             | nee |
-| Gemeenteraad / Herindeling | Gemeentes       | Nederlands               | ja              | nvt, eilandsraad?  | niet mandaat Kiesraad           | nee |
-|                            |                 | andere EU-lidstaat       | ja              | nvt, eilandsraad?  | niet mandaat Kiesraad           | nee |
-|                            |                 | niet-EU, 5+ jr legaal verblijf | ja        | nvt, eilandsraad?  | niet mandaat Kiesraad            | nee |
-|                            |                 | niet-EU, int. volkenrechtelijke org. | ja  | nvt, eilandsraad? | niet mandaat Kiesraad           | nee |
+| Verkiezing                 | Niveau        | Nationaliteit                        | in Nederland    | in Caribisch Nederland | in Aruba, Curaçao, Sint Maarten       | in buitenland                                                 |
+|----------------------------|---------------|--------------------------------------|-----------------|------------------------|---------------------------------------|---------------------------------------------------------------|
+| Tweede kamer               | Landelijk     | Nederlands                           | ja              | ja                     | als bep. voorwaarden en geregistreerd | als geregistreerd                                             |
+| Europees Parlement         | EU            | Nederlands                           | ja              | ja                     | als geregistreerd                     | als geregistreerd en verklaring niet in ander EU-land stemmen |
+|                            |               | andere EU-lidstaat                   | verklaring Y-32 | verklaring Y-32        | ???                                   | nee                                                           |
+| Provinciale Staten         | Provincies    | Nederlands                           | ja              | nvt                    | nvt                                   | nee                                                           |
+| Waterschappen              | Waterschappen | nvt                                  | ja              | nvt                    | nvt                                   | nee                                                           |
+| Kiescolleges Eerste Kamer  | Kiescolleges  | Nederlands                           | nvt             | nvt                    | ja                                    | als geregistreerd                                             |
+| Eilandsraden               | Eilandsraden  | Nederlands                           | nvt             | ja                     | nvt                                   | nee                                                           |
+|                            |               | niet-Nederlands                      | nvt             | 5+ jr legaal verblijf  | nvt                                   | nee                                                           |
+| Gemeenteraad / Herindeling | Gemeentes     | Nederlands                           | ja              | nvt, eilandsraad?      | niet mandaat Kiesraad                 | nee                                                           |
+|                            |               | andere EU-lidstaat                   | ja              | nvt, eilandsraad?      | niet mandaat Kiesraad                 | nee                                                           |
+|                            |               | niet-EU, 5+ jr legaal verblijf       | ja              | nvt, eilandsraad?      | niet mandaat Kiesraad                 | nee                                                           |
+|                            |               | niet-EU, int. volkenrechtelijke org. | ja              | nvt, eilandsraad?      | niet mandaat Kiesraad                 | nee                                                           |
 
-Voorwaardes stemmen Tweede Kamer voor inwoners van Aruba, Curaçao, Sint Maarten:
+Voorwaarden stemmen Tweede Kamer voor inwoners van Aruba, Curaçao, Sint Maarten:
 
 - U heeft 10 jaar in Nederland gewoond, OF
 - U bent werkzaam in Nederlandse openbare dienst, OF

@@ -1,7 +1,6 @@
 #![cfg(test)]
 
-use backend::data_entry::{GetDataEntryResponse, SaveDataEntryResponse};
-use backend::validation::ValidationResultCode;
+use backend::data_entry::{GetDataEntryResponse, SaveDataEntryResponse, ValidationResultCode};
 use backend::ErrorResponse;
 use reqwest::{Response, StatusCode};
 use serde_json::json;
@@ -217,8 +216,6 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     );
 }
 
-#[ignore] // TODO: Enable this test when we support second entry in the frontend
-/// test that we can still get a first data entry when it's already finalised
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;

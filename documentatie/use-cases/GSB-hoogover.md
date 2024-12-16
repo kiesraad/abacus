@@ -7,7 +7,7 @@ __niveau:__ hoog-over, vlieger, 🪁
 __precondities:__
 
 - [GSB installeert de applicatie](./GSB-gebruikersdoelen.md#gsb-installeert-de-applicatie)
-- [GSB richt de applicatie in](./GSB-gebruikersdoelen.md#gsb-richt-de-applicatie-in)
+- [GSB richt de applicatie in](#de-beheerder-en-de-coördinator-richten-de-applicatie-in)
 
 ### Hoofdscenario en uitbreidingen
 
@@ -16,11 +16,11 @@ __trigger:__ Het geplande tijdstip om invoer te starten breekt aan.
 __hoofdscenario__:  
 
 1. De coördinator stelt invoer open.
-2. (voor elk SB PV evt met corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in)
+2. (voor elk SB PV evt. met corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in)
 3. De coördinator sluit de invoer af.
 4. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
 5. De applicatie stelt vast dat er geen stembureaus met (geaccepteerde) waarschuwingen zijn.
-5. De applicatie genereert de PVs en emls etc.
+6. De applicatie genereert de PVs en EMLs etc.
 
 __uitbreidingen__:  
 4a. De applicatie stelt vast dat niet voor niet alle stembureaus resultaten zijn ingevoerd:
@@ -37,13 +37,13 @@ __niveau:__ hoog-over, vlieger, 🪁
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__ De coördinator ontvangt een SB PV evt met corrigendum.
+__trigger:__ De coördinator ontvangt een SB PV evt. met corrigendum.
 
 __hoofdscenario__:
 
-1. De coördinator geeft het SB PV evt met corrigendum aan de eerste invoerder.
+1. De coördinator geeft het SB PV evt. met corrigendum aan de eerste invoerder.
 2. [De eerste invoerder voert de resultaten van de telling in.](./GSB-gebruikersdoelen.md#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
-3. De coördinator geeft het SB PV evt met corrigendum aan de tweede invoerder.
+3. De coördinator geeft het SB PV evt. met corrigendum aan de tweede invoerder.
 4. [De tweede invoerder voert de resultaten van de telling in.](./GSB-gebruikersdoelen.md#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in)
 5. (na eerste en/of tweede invoer) De applicatie stelt vast dat de invoer geen (geaccepteerde) waarschuwingen bevat.
 6. De applicatie stelt vast dat beide invoeren gelijk zijn.
@@ -51,7 +51,7 @@ __hoofdscenario__:
 
 __uitbreidingen__:  
 5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
-&emsp; 5a1. De coördinator beoordeeldt de geaccepteerde waarschuwingen.
+&emsp; 5a1. De coördinator beoordeelt de geaccepteerde waarschuwingen.
 
 6a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 6a1. [De coördinator lost de verschillen tussen de twee invoeren op.](./GSB-gebruikersdoelen.md#de-coördinator-lost-de-verschillen-tussen-de-twee-invoeren-op)
@@ -65,7 +65,7 @@ __niveau:__ hoog-over, vlieger, 🪁
 __precondities:__
 
 - [GSB installeert de applicatie](./GSB-gebruikersdoelen.md#gsb-installeert-de-applicatie)
-- [GSB richt de applicatie in](./GSB-gebruikersdoelen.md#gsb-richt-de-applicatie-in)
+- [GSB richt de applicatie in](#de-beheerder-en-de-coördinator-richten-de-applicatie-in)
 - [Het GSB voert de PV's in de applicatie in](#het-gsb-voert-de-pvs-en-eventuele-sb-corrigendas-dso-in-de-applicatie-in)
 
 ### Hoofdscenario en uitbreidingen
@@ -76,7 +76,7 @@ __hoofdscenario__:
 
 1. (voor elk corrigendum) De coördinator stelt invoer open voor het stembureau met corrigendum.
 2. (voor elk corrigendum) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in)
-3. De coördinator genereert de PVs en emls etc.
+3. De coördinator genereert de PVs en EMLs etc.
 
 __uitbreidingen__:  
 ...
@@ -84,3 +84,31 @@ __uitbreidingen__:
 ### Open punten
 
 - Hoe worden de gecorrigeerde tellingen ingevoerd? Volledige invoer van oorspronkelijk PV en corrigendum? Alleen invoer van de aantallen uit het corrigendum?
+
+
+## De beheerder en de coördinator richten de applicatie in
+
+__niveau:__ hoog-over, vlieger, 🪁
+
+__precondities:__
+
+- Het GSB heeft de kandidatenlijst beschikbaar gemaakt.
+- De Kiesraad heeft de verkiezingsdefinitie beschikbaar gemaakt.
+
+### Hoofdscenario en uitbreidingen
+
+__trigger:__
+
+- [GSB installeert de applicatie.](./GSB-gebruikersdoelen.md#gsb-installeert-de-applicatie)
+
+__hoofdscenario__:
+
+1. De beheerder leest de verkiezingsdefinitie in.
+2. De coördinator leest de kandidatenlijst in.
+3. [De coördinator coördinator zet de stembureaus in de applicatie.](./GSB-gebruikersdoelen.md#de-coördinator-zet-de-stembureaus-in-de-applicatie)
+4. De beheerder maakt de gebruikers aan.
+
+__uitbreidingen__:  
+1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
+
+2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:

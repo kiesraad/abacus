@@ -12,19 +12,31 @@ import {
   usePollingStationFormController,
 } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
-import { BottomBar, Button, Form, KeyboardKey, KeyboardKeys, MenuStatus, StatusList } from "@kiesraad/ui";
+import {
+  BottomBar,
+  Button,
+  Form,
+  KeyboardKey,
+  KeyboardKeys,
+  MenuStatus,
+  StatusList,
+  useFormKeyboardNavigation,
+} from "@kiesraad/ui";
 
 export function CheckAndSaveForm() {
+  const formRef = React.useRef<HTMLFormElement>(null);
+  useFormKeyboardNavigation(formRef);
+
   const navigate = useNavigate();
   const { election } = useElection();
-  const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId } =
+  const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId, entryNumber } =
     usePollingStationFormController();
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionID) => {
-      return getUrlForFormSectionID(election.id, pollingStationId, id);
+      return getUrlForFormSectionID(election.id, pollingStationId, entryNumber, id);
     },
-    [election, pollingStationId],
+    [election, pollingStationId, entryNumber],
   );
 
   React.useEffect(() => {
@@ -49,11 +61,11 @@ export function CheckAndSaveForm() {
       if (!finalisationAllowed) return;
 
       await finaliseDataEntry();
-      navigate(`/elections/${election.id}/data-entry#data-entry-saved`);
+      navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
     })(event);
 
   return (
-    <Form onSubmit={handleSubmit} id="check_save_form" title={t("check_and_save.title")}>
+    <Form onSubmit={handleSubmit} id="check_save_form" title={t("check_and_save.title")} ref={formRef}>
       <section className="md" id="save-form-summary-text">
         {!summary.hasBlocks && summary.countsAddUp && (
           <p className="md">{t("check_and_save.counts_add_up.no_warnings")}</p>

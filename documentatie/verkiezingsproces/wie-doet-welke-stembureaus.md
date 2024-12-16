@@ -4,19 +4,19 @@ In de onderstaande tabel is aangegeven welke partijen of instanties fungeren als
 
 ## Tabel
 
-| Verkiezingen               | Kieskringen      | Stemlokaal        | Briefstembureau     | GSB            | HSB           | CSB            |
-| -------------------------- | ---------------- | ----------------- | ------------------ | -------------- | ------------- | -------------- |
-| Tweede kamer               | 1-20             | gemeentes         | Den Haag, ACStM[^1]    | gemeente       | kieskring     | Kiesraad       |
-| Europees Parlement         | 1 (heel NL)      | gemeentes         | Den Haag, ACStM    | gemeente       | 20 HSBs       | Kiesraad       |
-| Provinciale Staten         | 1-19             | gemeentes         | nvt                | gemeente       | als meerdere kieskringen in één provincie | 1 gemeente per provincie |
-| Waterschappen              | per waterschap   | gemeentes         | nvt                | gemeente       | nvt           | 1 gemeente per waterschap |
-| Kiescolleges Eerste Kamer  | per openbaar lichaam | openbare lichamen | nvt            | nvt            | nvt           | per eiland     |
-|                            | buitenland       | nvt               | ja                 | nvt            | nvt           | Zuid-Holland   |
-| Eerste Kamer               | per provincie    | statenvergadering | nvt                | nvt            | nvt           | Kiesraad       |
-|                            | per openbaar lichaam | vergaderingen kiescolleges eilanden  |    |     |               |                |
-|                            | buitenland       | vergadering kiescollege niet-ingezetenen |    |     |               |                |
-| Eilandsraden               | per eiland       | openbare lichamen | nvt                | nvt            | nvt           | per eiland     |
-| Gemeenteraad / Herindeling | per gemeente     | gemeentes         | nvt                | gemeente       | nvt           | per gemeente   |
+| Verkiezingen               | Kieskringen          | Stemlokaal                               | Briefstembureau     | GSB      | HSB                                       | CSB                       |
+|----------------------------|----------------------|------------------------------------------|---------------------|----------|-------------------------------------------|---------------------------|
+| Tweede kamer               | 1-20                 | gemeentes                                | Den Haag, ACStM[^1] | gemeente | kieskring                                 | Kiesraad                  |
+| Europees Parlement         | 1 (heel NL)          | gemeentes                                | Den Haag, ACStM     | gemeente | 20 HSBs                                   | Kiesraad                  |
+| Provinciale Staten         | 1-19                 | gemeentes                                | nvt                 | gemeente | als meerdere kieskringen in één provincie | 1 gemeente per provincie  |
+| Waterschappen              | per waterschap       | gemeentes                                | nvt                 | gemeente | nvt                                       | 1 gemeente per waterschap |
+| Kiescolleges Eerste Kamer  | per openbaar lichaam | openbare lichamen                        | nvt                 | nvt      | nvt                                       | per eiland                |
+|                            | buitenland           | nvt                                      | ja                  | nvt      | nvt                                       | Zuid-Holland              |
+| Eerste Kamer               | per provincie        | statenvergadering                        | nvt                 | nvt      | nvt                                       | Kiesraad                  |
+|                            | per openbaar lichaam | vergaderingen kiescolleges eilanden      |                     |          |                                           |                           |
+|                            | buitenland           | vergadering kiescollege niet-ingezetenen |                     |          |                                           |                           |
+| Eilandsraden               | per eiland           | openbare lichamen                        | nvt                 | nvt      | nvt                                       | per eiland                |
+| Gemeenteraad / Herindeling | per gemeente         | gemeentes                                | nvt                 | gemeente | nvt                                       | per gemeente              |
 
 [^1]: ACStM: Aruba, Curaçao en Sint Maarten
 
@@ -37,7 +37,7 @@ Bij Europees Parlementsverkiezingen is er geen Europees stembureau, want elk lan
 ### Provinciale Staten
 
 - In de Kieswet, Afdeling II artikel E.1.2, staat "Provinciale Staten kunnen voor de verkiezing van de leden van provinciale staten deze kieskringen in meer kieskringen verdelen."[^4]
-- Bij Proviciale Statenverkiezingen vallen 8 van de 12 kieskringen samen met een provincie.
+- Bij Provinciale Statenverkiezingen vallen 8 van de 12 kieskringen samen met een provincie.
 
 [^4]: [Afdeling II Artikel E.1 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=E&paragraaf=1&artikel=E_1&z=2023-06-20&g=2023-06-20)
 

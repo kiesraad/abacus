@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 
 use self::repository::Elections;
 pub use self::structs::*;
-use crate::data_entry::repository::PollingStationDataEntries;
+use crate::data_entry::repository::PollingStationResultsEntries;
 use crate::data_entry::PollingStationDataEntry;
 use crate::eml::axum::Eml;
 use crate::eml::{eml_document_hash, EMLDocument, EML510};
@@ -128,12 +128,12 @@ pub async fn election_status(
 pub async fn election_download_results(
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
-    State(polling_station_data_entries_repo): State<PollingStationDataEntries>,
+    State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     Path(id): Path<u32>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
     let election = elections_repo.get(id).await?;
     let polling_stations = polling_stations_repo.list(election.id).await?;
-    let results = polling_station_data_entries_repo
+    let results = polling_station_results_entries_repo
         .list_with_polling_stations(polling_stations_repo, election.id)
         .await?;
     let summary = ElectionSummary::from_results(&election, &results)?;
@@ -181,11 +181,11 @@ pub async fn election_download_results(
 pub async fn election_download_xml_results(
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
-    State(polling_station_data_entries_repo): State<PollingStationDataEntries>,
+    State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     Path(id): Path<u32>,
 ) -> Result<Eml<EML510>, APIError> {
     let election = elections_repo.get(id).await?;
-    let results = polling_station_data_entries_repo
+    let results = polling_station_results_entries_repo
         .list_with_polling_stations(polling_stations_repo, election.id)
         .await?;
     let summary = ElectionSummary::from_results(&election, &results)?;

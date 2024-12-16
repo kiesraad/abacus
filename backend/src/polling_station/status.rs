@@ -192,13 +192,6 @@ impl PollingStationStatus {
             _ => None,
         }
     }
-
-    pub fn get_result(&self) -> Option<EntryResult> {
-        match self {
-            PollingStationStatus::EntryResult(entry_result) => Some(entry_result.clone()),
-            _ => None,
-        }
-    }
 }
 
 impl Display for PollingStationTransitionError {

@@ -47,26 +47,32 @@ export function processForm<RequestObject>(
     const error = validateFormValue(field, value);
     if (error) {
       validationResult[fieldName] = error;
-      continue;
+    } else {
+      requestObject[fieldName] = value as RequestObject[typeof fieldName];
     }
-    requestObject[fieldName] = value as unknown as RequestObject[typeof fieldName];
   }
 
   const isEmpty = Object.values(validationResult).every((value) => value === undefined);
   return { requestObject, validationResult, isValid: isEmpty };
 }
 
-export function getFormFieldValue(field: AnyFormField, input: HTMLInputElement): string | number {
+type FieldValue<F extends AnyFormField> = F extends FormFieldNumber
+  ? number
+  : F extends FormFieldString
+    ? string
+    : never;
+
+export function getFormFieldValue<F extends AnyFormField>(field: F, input: HTMLInputElement): FieldValue<F> {
   const value = input.value;
   if (value) {
     if (field.type === "number") {
       const parsedValue = field.isFormatted ? deformatNumber(value) : parseInt(value);
-      return parsedValue;
+      return parsedValue as FieldValue<F>;
     } else {
-      return value;
+      return value as FieldValue<F>;
     }
   } else {
-    return "";
+    return "" as FieldValue<F>;
   }
 }
 

@@ -21,12 +21,12 @@ export function ElectionProgress() {
     const totalDefinitive = statuses.filter((s) => s.status === "definitive").length;
     return [
       {
-        title: t("status.first_entry_finished"),
+        title: t("status.first_entry_finished_short"),
         id: "first-entry-finished",
         percentage: total > 0 ? Math.round((totalFirstEntry / total) * 100) : 0,
       },
       {
-        title: t("status.definitive"),
+        title: t("status.definitive_short"),
         id: "definitive",
         percentage: total > 0 ? Math.round((totalDefinitive / total) * 100) : 0,
       },

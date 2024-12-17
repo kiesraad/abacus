@@ -38,12 +38,12 @@ describe("ElectionProgress", () => {
 
     const firstEntryFinishedBar = screen.getByTestId("progressbar-first-entry-finished");
     expect(firstEntryFinishedBar).toBeInTheDocument();
-    expect(firstEntryFinishedBar).toHaveTextContent("Eerste invoer klaar");
+    expect(firstEntryFinishedBar).toHaveTextContent("1e invoer klaar");
     expect(firstEntryFinishedBar).toHaveTextContent("50%");
 
     const definitiveBar = screen.getByTestId("progressbar-definitive");
     expect(definitiveBar).toBeInTheDocument();
-    expect(definitiveBar).toHaveTextContent("Eerste en tweede invoer klaar");
+    expect(definitiveBar).toHaveTextContent("1e en 2e invoer klaar");
     expect(definitiveBar).toHaveTextContent("25%");
   });
 });

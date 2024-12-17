@@ -41,7 +41,7 @@ describe("ElectionProgress", () => {
     expect(firstEntryFinishedBar).toHaveTextContent("1e invoer klaar");
     expect(firstEntryFinishedBar).toHaveTextContent("50%");
 
-    const definitiveBar = screen.getByTestId("progressbar-definitive");
+    const definitiveBar = screen.getByTestId("progressbar-first-and-second-entry-finished");
     expect(definitiveBar).toBeInTheDocument();
     expect(definitiveBar).toHaveTextContent("1e en 2e invoer klaar");
     expect(definitiveBar).toHaveTextContent("25%");

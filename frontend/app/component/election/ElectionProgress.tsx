@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { useElectionStatus } from "@kiesraad/api";
+import { PollingStationStatus, useElectionStatus } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Progress, ProgressBar } from "@kiesraad/ui";
 
@@ -15,14 +15,20 @@ export function ElectionProgress() {
 
   const stats: Stat[] = useMemo(() => {
     const total = statuses.length;
+    const firstAndSecondEntryFinished: PollingStationStatus[] = [
+      // TODO: Add FirstSecondEntryDifferent in #745
+      "definitive",
+    ];
     const firstEntryFinished: PollingStationStatus[] = [
       "second_entry",
       "second_entry_unfinished",
       "second_entry_in_progress",
-      "definitive",
-    ];
+    ].concat(firstAndSecondEntryFinished) as PollingStationStatus[];
     const totalFirstEntry = statuses.filter((s) => firstEntryFinished.includes(s.status)).length;
-    const totalDefinitive = statuses.filter((s) => s.status === "definitive").length;
+
+    const totalFirstAndSecondEntryFinished = statuses.filter((s) =>
+      firstAndSecondEntryFinished.includes(s.status),
+    ).length;
     return [
       {
         title: t("status.first_entry_finished_short"),
@@ -30,9 +36,9 @@ export function ElectionProgress() {
         percentage: total > 0 ? Math.round((totalFirstEntry / total) * 100) : 0,
       },
       {
-        title: t("status.definitive_short"),
-        id: "definitive",
-        percentage: total > 0 ? Math.round((totalDefinitive / total) * 100) : 0,
+        title: t("status.first_and_second_entry_finished"),
+        id: "first-and-second-entry-finished",
+        percentage: total > 0 ? Math.round((totalFirstAndSecondEntryFinished / total) * 100) : 0,
       },
     ];
   }, [statuses]);

@@ -19,7 +19,9 @@ export const AllBadges: Story = () => {
   return (
     <>
       {badgeTypes.map((type) => (
-        <Badge key={type} type={type} showIcon />
+        <div id={type} key={type}>
+          <Badge type={type} showIcon />
+        </div>
       ))}
     </>
   );

@@ -15,8 +15,8 @@ __Trigger:__
 
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
 2. De beheerder leest de verkiezingsdefinitie in.
-3. De coördinator leest de kandidatenlijst in.
-4. [De beheerder of de coördinator zet de stembureaus in de applicatie.](#de-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
+3. De beheerder leest de kandidatenlijst in.
+4. [De beheerder of de coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
 5. De beheerder maakt de gebruikers aan.
 
 __Uitbreidingen:__  
@@ -35,7 +35,7 @@ __Trigger:__ De Kiesraad maakt de applicatie beschikbaar.
 
 __Hoofdscenario:__
 
-1. De beheerder bereidt één server voor.
+1. De beheerder bereidt één computer als Abacus server voor.
 2. De beheerder installeert de applicatie.
 3. (voor elke client) De beheerder bereidt de client-machine voor.
 4. (voor elke client) De beheerder zorgt dat de client met de server kan verbinden.
@@ -49,7 +49,7 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- Hoe vaak wordt de server ook als client gebruikt? Bijvoorbeeld door de coördinator.
+- Het is te verwachten dat de server ook als client gebruikt wordt door de coördinator.
 - OSV richt de server ook gelijk als client in. Willen wij dit ook?
 - Afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
 

@@ -1,5 +1,6 @@
 use std::error::Error;
 
+use crate::data_entry::status::DataEntryTransitionError;
 use crate::data_entry::DataError;
 use axum::extract::rejection::JsonRejection;
 use axum::http::StatusCode;
@@ -225,6 +226,15 @@ impl From<InvalidHeaderValue> for APIError {
 impl From<SeError> for APIError {
     fn from(err: SeError) -> Self {
         APIError::XmlError(err)
+    }
+}
+
+impl From<DataEntryTransitionError> for APIError {
+    fn from(err: DataEntryTransitionError) -> Self {
+        Self::Conflict(
+            err.to_string(),
+            ErrorReference::PollingStationStatusTransition,
+        )
     }
 }
 

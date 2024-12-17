@@ -937,6 +937,114 @@
           }
         }
       },
+      "DataEntryStatus": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "FirstEntryNotStarted"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/FirstEntryInProgress"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "FirstEntryInProgress"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/SecondEntryNotStarted"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "SecondEntryNotStarted"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/SecondEntryInProgress"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "SecondEntryInProgress"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/EntriesNotEqual"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "EntriesNotEqual"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "state",
+              "status"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/components/schemas/EntryResult"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "EntryResult"
+                ]
+              }
+            }
+          }
+        ]
+      },
       "DifferencesCounts": {
         "type": "object",
         "description": "Differences counts, part of the polling station results.",
@@ -1352,7 +1460,7 @@
             "minimum": 0
           },
           "state": {
-            "$ref": "#/components/schemas/PollingStationStatus"
+            "$ref": "#/components/schemas/DataEntryStatus"
           },
           "updated_at": {
             "type": "integer",
@@ -1457,114 +1565,6 @@
             "description": "Votes counts (\"2. Aantal getelde stembiljetten\")"
           }
         }
-      },
-      "PollingStationStatus": {
-        "oneOf": [
-          {
-            "type": "object",
-            "required": [
-              "status"
-            ],
-            "properties": {
-              "status": {
-                "type": "string",
-                "enum": [
-                  "FirstEntryNotStarted"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/FirstEntryInProgress"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "FirstEntryInProgress"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/SecondEntryNotStarted"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "SecondEntryNotStarted"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/SecondEntryInProgress"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "SecondEntryInProgress"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/EntriesNotEqual"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "EntriesNotEqual"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/EntryResult"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "EntryResult"
-                ]
-              }
-            }
-          }
-        ]
       },
       "PollingStationType": {
         "type": "string",

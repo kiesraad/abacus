@@ -1,9 +1,9 @@
 use axum::extract::FromRef;
 use sqlx::{query, query_as, SqlitePool};
 
-use super::status::{DataEntryStatus, FirstEntryInProgress};
+use super::status::DataEntryStatus;
 use super::{PollingStation, PollingStationDataEntry, PollingStationResults};
-use crate::data_entry::{DataEntry, PollingStationResultsEntry};
+use crate::data_entry::PollingStationResultsEntry;
 use crate::polling_station::repository::PollingStations;
 use crate::AppState;
 
@@ -64,7 +64,7 @@ impl PollingStationDataEntries {
     pub async fn get_or_new(
         &self,
         polling_station_id: u32,
-        state: &DataEntry,
+        //state: &DataEntry,
     ) -> Result<DataEntryStatus, sqlx::Error> {
         Ok(query_as!(
             PollingStationDataEntry,
@@ -81,11 +81,7 @@ WHERE polling_station_id = ?
         .fetch_optional(&self.0)
         .await?
         .map(|psde| psde.state.0)
-        .unwrap_or(DataEntryStatus::FirstEntryInProgress(
-            FirstEntryInProgress {
-                first_entry_state: state.clone(),
-            },
-        )))
+        .unwrap_or(DataEntryStatus::FirstEntryNotStarted))
     }
 
     pub async fn update_status(

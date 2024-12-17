@@ -15,9 +15,13 @@ export function ElectionProgress() {
 
   const stats: Stat[] = useMemo(() => {
     const total = statuses.length;
-    const totalFirstEntry = statuses.filter((s) =>
-      ["second_entry", "second_entry_unfinished", "second_entry_in_progress", "definitive"].includes(s.status),
-    ).length;
+    const firstEntryFinished: PollingStationStatus[] = [
+      "second_entry",
+      "second_entry_unfinished",
+      "second_entry_in_progress",
+      "definitive",
+    ];
+    const totalFirstEntry = statuses.filter((s) => firstEntryFinished.includes(s.status)).length;
     const totalDefinitive = statuses.filter((s) => s.status === "definitive").length;
     return [
       {

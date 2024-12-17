@@ -1,7 +1,6 @@
 use axum::extract::FromRef;
 use sqlx::{query, query_as, SqlitePool};
 
-use crate::data_entry::PollingStationDataEntry;
 use crate::polling_station::structs::{PollingStation, PollingStationRequest};
 use crate::AppState;
 
@@ -165,27 +164,6 @@ impl PollingStations {
         .rows_affected();
 
         Ok(rows_affected > 0)
-    }
-
-    pub async fn statuses(
-        &self,
-        election_id: u32,
-    ) -> Result<Vec<PollingStationDataEntry>, sqlx::Error> {
-        query_as!(
-            PollingStationDataEntry,
-            r#"
-SELECT
-  id AS "id: u32",
-  de.state AS "state: _",
-  updated_at
-FROM polling_stations AS p
-LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
-WHERE election_id = $1
-"#,
-            election_id
-        )
-        .fetch_all(&self.0)
-        .await
     }
 }
 

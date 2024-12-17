@@ -9,7 +9,7 @@ use utoipa::ToSchema;
 pub use self::structs::*;
 use crate::data_entry::repository::PollingStationDataEntries;
 use crate::election::repository::Elections;
-use crate::election::Election;
+use crate::election::{Election, ElectionStatusResponse};
 use crate::error::{APIError, ErrorResponse};
 use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::PollingStation;
@@ -242,6 +242,27 @@ pub async fn polling_station_data_entry_finalise(
     polling_station_data_entries.upsert(id, new_state).await?;
 
     Ok(())
+}
+
+/// Get election polling stations data entry statuses
+#[utoipa::path(
+    get,
+    path = "/api/elections/{election_id}/status",
+    responses(
+        (status = 200, description = "Election", body = ElectionStatusResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
+)]
+pub async fn election_status(
+    State(data_entry_repo): State<PollingStationDataEntries>,
+    Path(id): Path<u32>,
+) -> Result<Json<ElectionStatusResponse>, APIError> {
+    let statuses = data_entry_repo.statuses(id).await?;
+    Ok(Json(ElectionStatusResponse { statuses }))
 }
 
 #[cfg(test)]

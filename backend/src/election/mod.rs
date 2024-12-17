@@ -83,27 +83,6 @@ pub async fn election_details(
     }))
 }
 
-/// Get election polling stations data entry statuses
-#[utoipa::path(
-    get,
-    path = "/api/elections/{election_id}/status",
-    responses(
-        (status = 200, description = "Election", body = ElectionStatusResponse),
-        (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("election_id" = u32, description = "Election database id"),
-    ),
-)]
-pub async fn election_status(
-    State(polling_station_repo): State<PollingStations>,
-    Path(id): Path<u32>,
-) -> Result<Json<ElectionStatusResponse>, APIError> {
-    let statuses = polling_station_repo.statuses(id).await?;
-    Ok(Json(ElectionStatusResponse { statuses }))
-}
-
 /// Download a generated PDF with election results
 #[utoipa::path(
     get,

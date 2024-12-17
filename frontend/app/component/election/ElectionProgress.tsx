@@ -23,9 +23,9 @@ export function ElectionProgress() {
       "second_entry",
       "second_entry_unfinished",
       "second_entry_in_progress",
-    ].concat(firstAndSecondEntryFinished) as PollingStationStatus[];
+      ...firstAndSecondEntryFinished,
+    ];
     const totalFirstEntry = statuses.filter((s) => firstEntryFinished.includes(s.status)).length;
-
     const totalFirstAndSecondEntryFinished = statuses.filter((s) =>
       firstAndSecondEntryFinished.includes(s.status),
     ).length;

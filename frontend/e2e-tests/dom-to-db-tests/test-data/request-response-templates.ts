@@ -1,7 +1,5 @@
 import { GetDataEntryResponse, SaveDataEntryRequest, SaveDataEntryResponse } from "@kiesraad/api";
 
-//TODO: rename file to match purpose
-
 export const emptyDataEntryResponse: GetDataEntryResponse = {
   progress: 0,
   data: {

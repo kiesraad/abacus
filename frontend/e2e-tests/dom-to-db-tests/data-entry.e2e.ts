@@ -14,7 +14,7 @@ import {
 } from "e2e-tests/page-objects/data_entry";
 
 import { test } from "./fixtures";
-import { noErrorsWarningsResponse, noRecountNoDifferencesRequest } from "./test-data/PollingStationTestData";
+import { noErrorsWarningsResponse, noRecountNoDifferencesRequest } from "./test-data/request-response-templates";
 
 async function fillDataEntryNoRecountNoDifferences(page: Page) {
   const recountedPage = new RecountedPage(page);

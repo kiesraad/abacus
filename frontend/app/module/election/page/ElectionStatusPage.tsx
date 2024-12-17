@@ -26,6 +26,7 @@ import {
   ProgressBarColorClass,
   Table,
 } from "@kiesraad/ui";
+import { formatDateTime } from "@kiesraad/util";
 
 import cls from "./ElectionStatusPage.module.css";
 
@@ -105,12 +106,7 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
 
   const finishedAtCell = (
     <Table.Cell key={`${polling_station.id}-time`}>
-      {polling_station.finished_at
-        ? new Date(polling_station.finished_at * 1000).toLocaleTimeString("nl-NL", {
-            timeStyle: "short",
-            hour12: false,
-          })
-        : ""}
+      {polling_station.finished_at ? formatDateTime(new Date(polling_station.finished_at * 1000)) : ""}
     </Table.Cell>
   );
   const progressCell = (

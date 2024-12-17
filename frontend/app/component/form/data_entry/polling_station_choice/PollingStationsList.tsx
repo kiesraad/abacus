@@ -19,7 +19,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
       <Table.Body>
         {pollingStations.map((pollingStation: PollingStation) => {
           const status = electionStatus.statuses.find((status) => status.id === pollingStation.id)?.status;
-          if (status === "definitive") {
+          if (status === "definitive" || status === "first_second_entry_different") {
             return null;
           }
 

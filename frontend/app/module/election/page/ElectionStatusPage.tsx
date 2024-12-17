@@ -79,15 +79,13 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
   );
 
   switch (category) {
-    case "errors_and_warnings":
-      return <CategoryHeader />;
-    case "unfinished":
-      return <CategoryHeader />;
     case "in_progress":
       return <CategoryHeader>{[progressColumn]}</CategoryHeader>;
     case "first_entry_finished":
     case "definitive":
       return <CategoryHeader>{[finishedAtColumn]}</CategoryHeader>;
+    case "errors_and_warnings":
+    case "unfinished":
     default:
       return <CategoryHeader />;
   }

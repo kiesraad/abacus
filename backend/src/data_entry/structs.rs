@@ -1,6 +1,6 @@
+use crate::data_entry::status::DataEntryStatus;
 use crate::election::Election;
 use crate::error::ErrorReference;
-use crate::polling_station::status::PollingStationStatus;
 use crate::polling_station::structs::PollingStation;
 use crate::validation::{
     above_percentage_threshold, FieldPath, ValidationResult, ValidationResultCode,
@@ -17,8 +17,8 @@ use utoipa::ToSchema;
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Default)]
 pub struct PollingStationDataEntry {
     pub id: u32,
-    #[schema(value_type = PollingStationStatus)]
-    pub state: Json<PollingStationStatus>,
+    #[schema(value_type = DataEntryStatus)]
+    pub state: Json<DataEntryStatus>,
     pub updated_at: i64,
 }
 

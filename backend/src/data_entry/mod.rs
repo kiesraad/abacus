@@ -3,6 +3,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde::{Deserialize, Serialize};
+use status::{DataEntryStatus, PollingStationTransitionError};
 use utoipa::ToSchema;
 
 pub use self::structs::*;
@@ -11,12 +12,12 @@ use crate::election::repository::Elections;
 use crate::election::Election;
 use crate::error::{APIError, ErrorReference, ErrorResponse};
 use crate::polling_station::repository::PollingStations;
-use crate::polling_station::status::{PollingStationStatus, PollingStationTransitionError};
 use crate::polling_station::structs::PollingStation;
 use crate::validation::ValidationResults;
 
 pub mod entry_number;
 pub mod repository;
+pub mod status;
 pub mod structs;
 
 /// Request structure for saving data entry of polling station results
@@ -59,7 +60,7 @@ pub async fn polling_station_data_entry_claim(
     State(elections): State<Elections>,
     data_entry_request: DataEntry,
 ) -> Result<SaveDataEntryResponse, APIError> {
-    let polling_station_data_entry: PollingStationStatus = polling_station_data_entries
+    let polling_station_data_entry: DataEntryStatus = polling_station_data_entries
         .get_or_new(id, &data_entry_request)
         .await?;
 
@@ -108,7 +109,7 @@ pub async fn polling_station_data_entry_save(
         .get_or_new(id, &data_entry_request)
         .await?;
 
-    let new_state: PollingStationStatus = polling_station_status_entry
+    let new_state: DataEntryStatus = polling_station_status_entry
         .save_entry(&data_entry_request)
         .map_err(to_api_error)?;
 

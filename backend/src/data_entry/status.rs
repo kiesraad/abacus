@@ -15,7 +15,7 @@ pub enum PollingStationTransitionError {
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, Clone, PartialEq)]
 #[serde(tag = "status", content = "state")]
-pub enum PollingStationStatus {
+pub enum DataEntryStatus {
     FirstEntryNotStarted, // First entry has not started yet
     FirstEntryInProgress(FirstEntryInProgress),
     SecondEntryNotStarted(SecondEntryNotStarted),
@@ -51,15 +51,15 @@ pub struct EntryResult {
     pub finalised_entry: DataEntry,
 }
 
-impl PollingStationStatus {
+impl DataEntryStatus {
     pub fn claim_entry(self, state: &DataEntry) -> Result<Self, PollingStationTransitionError> {
         match self {
-            PollingStationStatus::FirstEntryNotStarted => {
+            DataEntryStatus::FirstEntryNotStarted => {
                 Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
                     first_entry_state: state.clone(),
                 }))
             }
-            PollingStationStatus::SecondEntryNotStarted(SecondEntryNotStarted {
+            DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
                 finalised_first_entry,
             }) => Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
@@ -71,12 +71,12 @@ impl PollingStationStatus {
 
     pub fn save_entry(self, state: &DataEntry) -> Result<Self, PollingStationTransitionError> {
         match self {
-            PollingStationStatus::FirstEntryInProgress(_) => {
+            DataEntryStatus::FirstEntryInProgress(_) => {
                 Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
                     first_entry_state: state.clone(),
                 }))
             }
-            PollingStationStatus::SecondEntryInProgress(SecondEntryInProgress {
+            DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
                 ..
             }) => Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
@@ -89,12 +89,12 @@ impl PollingStationStatus {
 
     pub fn finalise_entry(self) -> Result<Self, PollingStationTransitionError> {
         match self {
-            PollingStationStatus::FirstEntryInProgress(state) => {
+            DataEntryStatus::FirstEntryInProgress(state) => {
                 Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
                     finalised_first_entry: state.first_entry_state,
                 }))
             }
-            PollingStationStatus::SecondEntryInProgress(SecondEntryInProgress {
+            DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
                 second_entry_state,
             }) => {
@@ -116,27 +116,23 @@ impl PollingStationStatus {
 
     pub fn delete(self) -> Result<Self, PollingStationTransitionError> {
         match self {
-            PollingStationStatus::FirstEntryInProgress(_) => {
-                Ok(PollingStationStatus::FirstEntryNotStarted)
-            }
-            PollingStationStatus::SecondEntryNotStarted(_) => todo!(),
-            PollingStationStatus::SecondEntryInProgress(SecondEntryInProgress {
+            DataEntryStatus::FirstEntryInProgress(_) => Ok(DataEntryStatus::FirstEntryNotStarted),
+            DataEntryStatus::SecondEntryNotStarted(_) => todo!(),
+            DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
                 ..
-            }) => Ok(PollingStationStatus::SecondEntryNotStarted(
+            }) => Ok(DataEntryStatus::SecondEntryNotStarted(
                 SecondEntryNotStarted {
                     finalised_first_entry,
                 },
             )),
-            PollingStationStatus::EntriesNotEqual(_) => {
-                Ok(PollingStationStatus::FirstEntryNotStarted)
-            }
+            DataEntryStatus::EntriesNotEqual(_) => Ok(DataEntryStatus::FirstEntryNotStarted),
             _ => Err(PollingStationTransitionError::Invalid),
         }
     }
 
     pub fn resolve(self, entry_number: EntryNumber) -> Result<Self, PollingStationTransitionError> {
-        let PollingStationStatus::EntriesNotEqual(EntriesNotEqual {
+        let DataEntryStatus::EntriesNotEqual(EntriesNotEqual {
             first_entry,
             second_entry,
         }) = self
@@ -156,39 +152,39 @@ impl PollingStationStatus {
 
     pub fn get_progress(&self) -> u8 {
         match self {
-            PollingStationStatus::FirstEntryNotStarted => 0,
-            PollingStationStatus::FirstEntryInProgress(state) => state.first_entry_state.progress,
-            PollingStationStatus::SecondEntryNotStarted(_) => 0,
-            PollingStationStatus::SecondEntryInProgress(state) => state.second_entry_state.progress,
-            PollingStationStatus::EntriesNotEqual(_) => 100,
-            PollingStationStatus::EntryResult(_) => 100,
+            DataEntryStatus::FirstEntryNotStarted => 0,
+            DataEntryStatus::FirstEntryInProgress(state) => state.first_entry_state.progress,
+            DataEntryStatus::SecondEntryNotStarted(_) => 0,
+            DataEntryStatus::SecondEntryInProgress(state) => state.second_entry_state.progress,
+            DataEntryStatus::EntriesNotEqual(_) => 100,
+            DataEntryStatus::EntryResult(_) => 100,
         }
     }
 
     pub fn get_data(&self) -> Option<PollingStationResults> {
         match self {
-            PollingStationStatus::FirstEntryInProgress(state) => {
+            DataEntryStatus::FirstEntryInProgress(state) => {
                 Some(state.first_entry_state.data.clone())
             }
-            PollingStationStatus::SecondEntryInProgress(state) => {
+            DataEntryStatus::SecondEntryInProgress(state) => {
                 Some(state.second_entry_state.data.clone())
             }
-            PollingStationStatus::EntriesNotEqual(state) => Some(state.second_entry.data.clone()),
-            PollingStationStatus::EntryResult(state) => Some(state.finalised_entry.data.clone()),
+            DataEntryStatus::EntriesNotEqual(state) => Some(state.second_entry.data.clone()),
+            DataEntryStatus::EntryResult(state) => Some(state.finalised_entry.data.clone()),
             _ => None,
         }
     }
 
     pub fn get_client_state(&self) -> Option<serde_json::Value> {
         match self {
-            PollingStationStatus::FirstEntryInProgress(state) => {
+            DataEntryStatus::FirstEntryInProgress(state) => {
                 state.first_entry_state.client_state.clone()
             }
-            PollingStationStatus::SecondEntryInProgress(state) => {
+            DataEntryStatus::SecondEntryInProgress(state) => {
                 state.second_entry_state.client_state.clone()
             }
-            PollingStationStatus::EntriesNotEqual(state) => state.second_entry.client_state.clone(),
-            PollingStationStatus::EntryResult(state) => state.finalised_entry.client_state.clone(),
+            DataEntryStatus::EntriesNotEqual(state) => state.second_entry.client_state.clone(),
+            DataEntryStatus::EntryResult(state) => state.finalised_entry.client_state.clone(),
             _ => None,
         }
     }
@@ -208,7 +204,7 @@ impl Display for PollingStationTransitionError {
     }
 }
 
-impl Default for PollingStationStatus {
+impl Default for DataEntryStatus {
     fn default() -> Self {
         Self::FirstEntryNotStarted
     }

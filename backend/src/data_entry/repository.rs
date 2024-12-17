@@ -1,10 +1,10 @@
 use axum::extract::FromRef;
 use sqlx::{query, query_as, SqlitePool};
 
+use super::status::{DataEntryStatus, FirstEntryInProgress};
 use super::{PollingStation, PollingStationDataEntry, PollingStationResults};
 use crate::data_entry::{DataEntry, PollingStationResultsEntry};
 use crate::polling_station::repository::PollingStations;
-use crate::polling_station::status::{FirstEntryInProgress, PollingStationStatus};
 use crate::AppState;
 
 pub struct PollingStationDataEntries(SqlitePool);
@@ -16,7 +16,7 @@ impl PollingStationDataEntries {
     }
 
     /// Saves the data entry or updates it if it already exists
-    pub async fn upsert(&self, id: u32, state: PollingStationStatus) -> Result<(), sqlx::Error> {
+    pub async fn upsert(&self, id: u32, state: DataEntryStatus) -> Result<(), sqlx::Error> {
         let state = serde_json::to_value(state).expect("should be serializable to JSON");
         sqlx::query!(
             r#"
@@ -65,7 +65,7 @@ impl PollingStationDataEntries {
         &self,
         polling_station_id: u32,
         state: &DataEntry,
-    ) -> Result<PollingStationStatus, sqlx::Error> {
+    ) -> Result<DataEntryStatus, sqlx::Error> {
         Ok(query_as!(
             PollingStationDataEntry,
             r#"
@@ -81,7 +81,7 @@ WHERE polling_station_id = ?
         .fetch_optional(&self.0)
         .await?
         .map(|psde| psde.state.0)
-        .unwrap_or(PollingStationStatus::FirstEntryInProgress(
+        .unwrap_or(DataEntryStatus::FirstEntryInProgress(
             FirstEntryInProgress {
                 first_entry_state: state.clone(),
             },
@@ -91,7 +91,7 @@ WHERE polling_station_id = ?
     pub async fn update_status(
         &self,
         polling_station_id: u32,
-        status: PollingStationStatus,
+        status: DataEntryStatus,
     ) -> Result<(), sqlx::Error> {
         let status = serde_json::to_value(status).expect("should always be serializable to JSON");
         query!(

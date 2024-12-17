@@ -16,7 +16,7 @@ __Trigger:__
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
 2. De beheerder leest de verkiezingsdefinitie in.
 3. De coördinator leest de kandidatenlijst in.
-4. [De coördinator coördinator zet de stembureaus in de applicatie.](#de-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
+4. [De beheerder of de coördinator zet de stembureaus in de applicatie.](#de-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
 5. De beheerder maakt de gebruikers aan.
 
 __Uitbreidingen:__  
@@ -54,35 +54,35 @@ __Uitbreidingen:__
 - Afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
 
 
-## De coördinator zet de stembureaus in de applicatie (zee)
+## De beheerder of coördinator zet de stembureaus in de applicatie (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
 __Precondities:__
 
-- De coördinator heeft de lijst met gepubliceerde stembureaus.
+- De lijst met gepubliceerde stembureaus is beschikbaar.
 - De invoer is nog niet gestart.
 
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__
 
-1. De coördinator selecteert de verkiezing.
-2. De coördinator importeert het EML-NL bestand met de stembureaus.
+1. De beheerder of coördinator selecteert de verkiezing.
+2. De beheerder of coördinator importeert het EML-NL bestand met de stembureaus.
 3. De applicatie stelt vast dat de stembureaus aan de validatieregels voldoen.
-4. De coördinator stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
+4. De beheerder of coördinator stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 
 __Uitbreidingen:__  
 
-1a. De coördinator selecteert een andere verkiezing dan van het bestand en de lijst met stembureaus:
+1a. De beheerder of coördinator selecteert een andere verkiezing dan van het bestand en de lijst met stembureaus:
 
 2a. Er is geen te importeren bestand met stembureaus:  
-&emsp; 2a1. De coördinator voert de stembureaus handmatig in.
+&emsp; 2a1. De beheerder of coördinator voert de stembureaus handmatig in.
 
 3a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
 
 4a. De lijst met stembureaus moet aangepast worden:  
-&emsp; 4a1. De coördinator past de stembureaus aan.
+&emsp; 4a1. De beheerder of coördinator past de stembureaus aan.
 
 ### Open punten
 

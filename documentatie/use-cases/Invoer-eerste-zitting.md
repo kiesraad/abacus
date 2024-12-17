@@ -42,7 +42,7 @@ __Trigger:__ De coördinator ontvangt een SB PV evt. met corrigendum.
 
 __Hoofdscenario:__
 
-1. De coördinator geeft het SB PV evt. met corrigendum aan de eerste invoerder.
+1. De coördinator geeft het SB PV (eventueel met corrigendum) aan de eerste invoerder.
 2. (tijdens invoer) De coördinator monitort de voortgang op het statusoverzicht van de steminvoer.
 3. [De eerste invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in-zee)
 4. De coördinator geeft het SB PV evt. met corrigendum aan de tweede invoerder.

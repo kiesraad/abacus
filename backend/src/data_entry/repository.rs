@@ -61,7 +61,7 @@ impl PollingStationDataEntries {
         }
     }
 
-    pub async fn get_or_new(
+    pub async fn get_or_create(
         &self,
         polling_station_id: u32,
         //state: &DataEntry,
@@ -104,7 +104,7 @@ WHERE polling_station_id = ?
 
         Ok(())
     }
-    
+
     pub async fn statuses(
         &self,
         election_id: u32,
@@ -125,7 +125,6 @@ WHERE election_id = $1
         .fetch_all(&self.0)
         .await
     }
-
 }
 
 pub struct PollingStationResultsEntries(SqlitePool);

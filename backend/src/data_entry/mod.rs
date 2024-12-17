@@ -54,7 +54,7 @@ pub async fn polling_station_data_entry_claim(
     data_entry_request: DataEntry,
 ) -> Result<SaveDataEntryResponse, APIError> {
     let polling_station_data_entry: DataEntryStatus =
-        polling_station_data_entries.get_or_new(id).await?;
+        polling_station_data_entries.get_or_create(id).await?;
 
     let new_state = polling_station_data_entry.claim_entry(
         data_entry_request.progress,
@@ -99,7 +99,7 @@ pub async fn polling_station_data_entry_save(
 ) -> Result<SaveDataEntryResponse, APIError> {
     // TODO: #657 execute all checks in this function in a single SQL transaction
 
-    let polling_station_status_entry = polling_station_data_entries.get_or_new(id).await?;
+    let polling_station_status_entry = polling_station_data_entries.get_or_create(id).await?;
 
     let new_state: DataEntryStatus = polling_station_status_entry.save_entry(
         data_entry_request.progress,

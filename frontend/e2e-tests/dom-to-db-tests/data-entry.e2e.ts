@@ -14,11 +14,7 @@ import {
 } from "e2e-tests/page-objects/data_entry";
 
 import { test } from "./fixtures";
-import {
-  noErrorsWarningsResponse,
-  noRecountNoDifferencesRequest,
-  pollingStation33,
-} from "./test-data/PollingStationTestData";
+import { noErrorsWarningsResponse, noRecountNoDifferencesRequest } from "./test-data/PollingStationTestData";
 
 async function fillDataEntryNoRecountNoDifferences(page: Page) {
   const recountedPage = new RecountedPage(page);
@@ -90,14 +86,13 @@ async function fillDataEntryNoRecountNoDifferences(page: Page) {
 }
 
 test.describe("full data entry flow", () => {
-  test("no recount, no differences", async ({ page }) => {
+  test("no recount, no differences", async ({ page, pollingStation1 }) => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    const pollingStation = pollingStation33;
-    await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation.name);
+    await pollingStationChoicePage.pollingStationNumber.fill(pollingStation1.number.toString());
+    await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation1.name);
     await pollingStationChoicePage.clickStart();
 
     await fillDataEntryNoRecountNoDifferences(page);
@@ -111,13 +106,12 @@ test.describe("full data entry flow", () => {
     );
   });
 
-  test("recount, no differences", async ({ page }) => {
+  test("recount, no differences", async ({ page, pollingStation1 }) => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    const pollingStation = pollingStation33;
-    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation1.number);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.fieldset).toBeVisible();
@@ -169,13 +163,12 @@ test.describe("full data entry flow", () => {
     await pollingStationChoicePage.dataEntrySuccess.waitFor();
   });
 
-  test("no recount, difference of more ballots counted", async ({ page }) => {
+  test("no recount, difference of more ballots counted", async ({ page, pollingStation1 }) => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    const pollingStation = pollingStation33;
-    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation1.number);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.fieldset).toBeVisible();
@@ -235,13 +228,12 @@ test.describe("full data entry flow", () => {
     await pollingStationChoicePage.dataEntrySuccess.waitFor();
   });
 
-  test("recount, difference of fewer ballots counted", async ({ page }) => {
+  test("recount, difference of fewer ballots counted", async ({ page, pollingStation1 }) => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    const pollingStation = pollingStation33;
-    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation1.number);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.fieldset).toBeVisible();
@@ -388,7 +380,7 @@ test.describe("full data entry flow", () => {
 });
 
 test.describe("second data entry", () => {
-  test("equal second data entry after first data entry", async ({ page, request }) => {
+  test("equal second data entry after first data entry", async ({ page, request, pollingStation1 }) => {
     const saveResponse = await request.post("/api/polling_stations/1/data_entries/1", {
       data: noRecountNoDifferencesRequest,
     });
@@ -400,9 +392,8 @@ test.describe("second data entry", () => {
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    const pollingStation = pollingStation33;
-    await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation.name);
+    await pollingStationChoicePage.pollingStationNumber.fill(pollingStation1.number.toString());
+    await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation1.name);
     await pollingStationChoicePage.clickStart();
 
     await expect(page).toHaveURL("/elections/1/data-entry/1/2/recounted");
@@ -416,7 +407,7 @@ test.describe("second data entry", () => {
     );
 
     await expect(pollingStationChoicePage.fieldsetNextPollingStation).toBeVisible();
-    await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());
+    await pollingStationChoicePage.pollingStationNumber.fill(pollingStation1.number.toString());
     await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(
       "Stembureau 33(Op Rolletjes)is al twee keer ingevoerd",
     );

@@ -81,7 +81,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
           )}
         </FormLayout.Alert>
       )}
-      <Form onSubmit={handleSubmit} id="polling-station-form">
+      <Form onSubmit={handleSubmit} id="polling-station-form" ref={formRef} noValidate>
         <FormLayout disabled={requestState.status === "loading"}>
           <FormLayout.Section title={t("general_details")}>
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />
@@ -107,11 +107,12 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               />
             </FormLayout.Row>
 
-            {/* TODO: Choicelist (required) error handling */}
-            {/* error={validationResult.polling_station_type ? t(`form.errors.${validationResult.polling_station_type}`) : undefined} */}
             <FormLayout.Field>
               <ChoiceList>
                 <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
+                {validationResult.polling_station_type && (
+                  <ChoiceList.Error>{t(`form.errors.${validationResult.polling_station_type}`)}</ChoiceList.Error>
+                )}
                 <ChoiceList.Radio
                   id={`polling_station_type-FixedLocation`}
                   name={"polling_station_type"}

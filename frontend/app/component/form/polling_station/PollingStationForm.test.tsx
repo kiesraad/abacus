@@ -40,13 +40,13 @@ async function fillForm(user: UserEvent, testPollingStation: PollingStation | Om
 
   switch (testPollingStation.polling_station_type) {
     case "FixedLocation":
-      await userEvent.click(inputs.typeOptionFixedLocation);
+      await user.click(inputs.typeOptionFixedLocation);
       break;
     case "Special":
-      await userEvent.click(inputs.typeOptionSpecial);
+      await user.click(inputs.typeOptionSpecial);
       break;
     case "Mobile":
-      await userEvent.click(inputs.typeOptionMobile);
+      await user.click(inputs.typeOptionMobile);
       break;
   }
 }
@@ -87,7 +87,6 @@ describe("PollingStationForm", () => {
       await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
       const inputs = getInputs();
 
-      // test choice list wait for merge.
       await waitFor(() => {
         expect(inputs.number).toBeInvalid();
         expect(inputs.number).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");

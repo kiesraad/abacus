@@ -119,9 +119,9 @@ Abacus zal worden gedraaid op een gesloten netwerk zonder internettoegang. De ba
 
 Voor de frontend wordt TypeScript gebruikt, een meer uitgebreide versie van JavaScript met typing. Voor de gebruikersinterface wordt de populaire library React gebruikt.
 
-De backend wordt gemaakt met Rust, een high-level programmeertaal waarmee je efficiënt kunt programmeren. Het unieke eigendomssysteem van Rust voorkomt geheugenfouten, en de taal heeft een 'strict type system' waardoor minder bugs ontstaan. Ook is dit een populaire, open-source programmeertaal met een grote community.
+De backend wordt gemaakt met Rust, een high-level programmeertaal waarmee je efficiënt kunt programmeren. Het unieke systeem van '[ownership](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html)' in Rust voorkomt geheugenfouten, en de taal heeft een '[strict type system](https://doc.rust-lang.org/book/ch03-02-data-types.html)' waardoor minder bugs ontstaan. Ook is dit een populaire, open-source programmeertaal met een grote community.
 
-Voor de database wordt SQLite gebruikt. Deze library is populair, lichtgewicht en gebruiksvriendelijk, en bovendien is installatie van SQLite niet vereist.
+Voor de database wordt SQLite gebruikt. Deze library is populair, lichtgewicht en gebruiksvriendelijk voor developers, en bovendien is SQLite een '[zero-configuration database](https://www.sqlite.org/zeroconf.html)'. Dit betekent dat installeren niet nodig is, zodat de developer meteen aan de slag kan.
 
 Voor meer informatie over onze keuzes en de onderbouwingen hiervan lees je het document [Overwegingen talen en frameworks](/documentatie/softwarearchitectuur/overwegingen-talen-en-frameworks.md).
 

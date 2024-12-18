@@ -7,7 +7,6 @@ use utoipa::ToSchema;
 use self::repository::Elections;
 pub use self::structs::*;
 use crate::data_entry::repository::PollingStationResultsEntries;
-use crate::data_entry::PollingStationDataEntry;
 use crate::eml::axum::Eml;
 use crate::eml::{eml_document_hash, EMLDocument, EML510};
 use crate::pdf_gen::generate_pdf;
@@ -33,12 +32,6 @@ pub struct ElectionListResponse {
 pub struct ElectionDetailsResponse {
     pub election: Election,
     pub polling_stations: Vec<PollingStation>,
-}
-
-/// Election polling stations data entry statuses response
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct ElectionStatusResponse {
-    pub statuses: Vec<PollingStationDataEntry>,
 }
 
 /// Get a list of all elections, without their candidate lists

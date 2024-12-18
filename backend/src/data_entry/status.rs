@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
+use serde_json::value::RawValue;
 use sqlx::Type;
 use utoipa::ToSchema;
 
@@ -13,7 +14,7 @@ pub enum DataEntryTransitionError {
     SecondEntryAlreadyClaimed,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, Clone, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone)]
 #[serde(tag = "status", content = "state")]
 pub enum DataEntryStatus {
     FirstEntryNotStarted, // First entry has not started yet
@@ -24,7 +25,7 @@ pub enum DataEntryStatus {
     EntryResult(EntryResult), // First and second entry are finished
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash, ToSchema, Type)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema, Type)]
 pub struct FirstEntryInProgress {
     /// Data entry progress between 0 and 100
     #[schema(maximum = 100)]
@@ -33,16 +34,16 @@ pub struct FirstEntryInProgress {
     pub first_entry: PollingStationResults,
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)
-    pub client_state: Option<serde_json::Value>,
+    pub client_state: Option<Box<RawValue>>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash, ToSchema, Type)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema, Type)]
 pub struct SecondEntryNotStarted {
     /// Data entry for a polling station
     pub finalised_first_entry: PollingStationResults,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash, ToSchema, Type)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema, Type)]
 pub struct SecondEntryInProgress {
     /// Data entry for a polling station
     pub finalised_first_entry: PollingStationResults,
@@ -53,16 +54,16 @@ pub struct SecondEntryInProgress {
     pub second_entry: PollingStationResults,
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)
-    pub client_state: Option<serde_json::Value>,
+    pub client_state: Option<Box<RawValue>>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash, ToSchema, Type)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema, Type)]
 pub struct EntriesNotEqual {
     pub first_entry: PollingStationResults,
     pub second_entry: PollingStationResults,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash, ToSchema, Type)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema, Type)]
 pub struct EntryResult {
     pub finalised_entry: PollingStationResults,
 }
@@ -72,7 +73,7 @@ impl DataEntryStatus {
         self,
         progress: u8,
         entry: PollingStationResults,
-        client_state: Option<serde_json::Value>,
+        client_state: Option<Box<RawValue>>,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryNotStarted => {
@@ -98,7 +99,7 @@ impl DataEntryStatus {
         self,
         progress: u8,
         entry: PollingStationResults,
-        client_state: Option<serde_json::Value>,
+        client_state: Option<Box<RawValue>>,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(_) => {
@@ -180,6 +181,24 @@ impl DataEntryStatus {
         }
     }
 
+    pub fn get_first_entry_progress(&self) -> Option<u8> {
+        match self {
+            DataEntryStatus::FirstEntryNotStarted => None,
+            DataEntryStatus::FirstEntryInProgress(state) => Some(state.progress),
+            _ => Some(100),
+        }
+    }
+
+    pub fn get_second_entry_progress(&self) -> Option<u8> {
+        match self {
+            DataEntryStatus::FirstEntryNotStarted
+            | DataEntryStatus::FirstEntryInProgress(_)
+            | DataEntryStatus::SecondEntryNotStarted(_) => None,
+            DataEntryStatus::SecondEntryInProgress(state) => Some(state.progress),
+            _ => Some(100),
+        }
+    }
+
     pub fn get_progress(&self) -> u8 {
         match self {
             DataEntryStatus::FirstEntryNotStarted => 0,
@@ -191,6 +210,7 @@ impl DataEntryStatus {
         }
     }
 
+    /// Get the data for the current entry if there is any
     pub fn get_data(&self) -> Result<&PollingStationResults, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => Ok(&state.first_entry),
@@ -201,11 +221,28 @@ impl DataEntryStatus {
         }
     }
 
-    pub fn get_client_state(&self) -> Option<&serde_json::Value> {
+    /// Extract the client state if there is any
+    pub fn get_client_state(&self) -> Option<&RawValue> {
         match self {
-            DataEntryStatus::FirstEntryInProgress(state) => state.client_state.as_ref(),
-            DataEntryStatus::SecondEntryInProgress(state) => state.client_state.as_ref(),
+            DataEntryStatus::FirstEntryInProgress(state) => {
+                state.client_state.as_ref().map(|v| v.as_ref())
+            }
+            DataEntryStatus::SecondEntryInProgress(state) => {
+                state.client_state.as_ref().map(|v| v.as_ref())
+            }
             _ => None,
+        }
+    }
+
+    /// Get the name of the current status as a string
+    pub fn status_name(&self) -> &'static str {
+        match self {
+            DataEntryStatus::FirstEntryNotStarted => "FirstEntryNotStarted",
+            DataEntryStatus::FirstEntryInProgress(_) => "FirstEntryInProgress",
+            DataEntryStatus::SecondEntryNotStarted(_) => "SecondEntryNotStarted",
+            DataEntryStatus::SecondEntryInProgress(_) => "SecondEntryInProgress",
+            DataEntryStatus::EntriesNotEqual(_) => "EntriesNotEqual",
+            DataEntryStatus::EntryResult(_) => "EntryResult",
         }
     }
 }

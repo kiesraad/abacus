@@ -7,6 +7,7 @@ use backend::data_entry::{
     SaveDataEntryResponse, VotersCounts, VotesCounts,
 };
 use hyper::StatusCode;
+use serde_json::value::RawValue;
 
 pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     DataEntry {
@@ -50,7 +51,7 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
                 ],
             }],
         },
-        client_state: client_state.map(|client_state| serde_json::from_str(client_state).unwrap()),
+        client_state: client_state.map(|v| RawValue::from_string(v.to_string()).unwrap()),
     }
 }
 

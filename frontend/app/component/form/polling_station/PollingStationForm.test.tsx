@@ -49,8 +49,6 @@ async function fillForm(user: UserEvent, testPollingStation: PollingStation | Om
       await userEvent.click(inputs.typeOptionMobile);
       break;
   }
-
-  await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 }
 
 describe("PollingStationForm", () => {

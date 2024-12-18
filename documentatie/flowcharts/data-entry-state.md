@@ -6,7 +6,7 @@ The "save" endpoint, used to for [First/Second]EntryInProgress states is kept ou
 
 ```mermaid
 stateDiagram
-FirstEntryNotStarted --> FirstEntryInProgress: delete
+FirstEntryNotStarted --> FirstEntryInProgress: claim
 #FirstEntryInProgress --> FirstEntryInProgress: save
 FirstEntryInProgress --> SecondEntryNotStarted: finalise
 FirstEntryInProgress --> FirstEntryNotStarted: delete

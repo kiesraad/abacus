@@ -17,7 +17,7 @@ __Trigger:__
 2. De beheerder leest de verkiezingsdefinitie in.
 3. De beheerder leest de kandidatenlijst in.
 4. [De beheerder of de coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
-5. De beheerder maakt de gebruikers aan.
+5. De beheerder of de coördinator maken de gebruikers aan.
 
 __Uitbreidingen:__  
 1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:

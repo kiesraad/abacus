@@ -105,7 +105,7 @@ In de afbeelding hieronder zie je hoe Abacus werkt op het gemeentelijk stemburea
 
 **LET OP: dit is een concept en is nog in ontwikkeling.**
 
-![Uitslagvaststelling](/documentatie/gebruikersdocumentatie/img/proces%20uitslagvaststelling.png)
+![Uitslagvaststelling](/documentatie/gebruikersdocumentatie/img/proces%20uitslagvaststelling%20v2.png)
 
 - Bovenaan staat IMPORT: gebruikers kunnen kandidaten en verkiezingsdefinities in EML-formaat importeren in Abacus.
 - Links staat INVOER: gebruikers kunnen verkiezingsresultaten invoeren, inclusief verklaringen over ontbrekende stembiljetten/stempassen en klachten van kiezers.

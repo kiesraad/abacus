@@ -91,7 +91,6 @@ Omdat er niet al te vaak verkiezingen zijn, maken de gebruikers slechts korte ti
 
 - Er worden regelmatige gebruikerstests gedaan met echte gebruikers.
 - De invoer wordt in kleinere secties gedaan met een validatiecheck na elke invoer.
-- Je kunt de invoer pauzeren en later doorgaan.
 - De software wordt geoptimaliseerd voor gebruik met een toetsenbord en is eenvoudig aan te leren.
 - De software geeft duidelijk aan hoe onjuiste of inconsistente invoer kan worden opgelost.
 - De software wordt aangeleverd met duidelijke documentatie en instructiemateriaal.

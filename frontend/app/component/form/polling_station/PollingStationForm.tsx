@@ -81,7 +81,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
           )}
         </FormLayout.Alert>
       )}
-      <Form ref={formRef} onSubmit={handleSubmit} id="polling-station-form" noValidate>
+      <Form onSubmit={handleSubmit} id="polling-station-form">
         <FormLayout disabled={requestState.status === "loading"}>
           <FormLayout.Section title={t("general_details")}>
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />

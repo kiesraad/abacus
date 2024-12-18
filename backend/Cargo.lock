@@ -181,7 +181,7 @@ dependencies = [
  "serde_json",
  "serde_path_to_error",
  "serde_urlencoded",
- "sync_wrapper 1.0.2",
+ "sync_wrapper",
  "tokio",
  "tower",
  "tower-layer",
@@ -204,7 +204,7 @@ dependencies = [
  "mime",
  "pin-project-lite",
  "rustversion",
- "sync_wrapper 1.0.2",
+ "sync_wrapper",
  "tower-layer",
  "tower-service",
  "tracing",
@@ -280,6 +280,7 @@ dependencies = [
  "typst-pdf",
  "utoipa",
  "utoipa-swagger-ui",
+ "zip",
 ]
 
 [[package]]
@@ -1746,9 +1747,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve"
-version = "1.0.0-beta.0"
+version = "1.0.0-beta.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "91d8c9333232caa4939f4100112e95772f7d4d514fee6782158517467c696699"
+checksum = "8f234dfb9823bf1ee3e60cf228476787436a02b25aae6d92161cc1f8fd585de2"
 dependencies = [
  "axum",
  "brotli",
@@ -1761,9 +1762,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-core"
-version = "1.0.0-beta.0"
+version = "1.0.0-beta.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9fd1820b04d6757e80f8d1c05c3e69bc7ba6cde7089a72f130e8218073cdf171"
+checksum = "3555677d291432c4edb6bb56bd924bed8aefc12501ef1ad59b4015a32d920bcf"
 dependencies = [
  "brotli",
  "mime_guess",
@@ -1773,9 +1774,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-macros"
-version = "1.0.0-beta.0"
+version = "1.0.0-beta.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f787c2ba670f8f10f9f02c1f6231cedf8d92bb40bf90e745a05f11aa620c7c2c"
+checksum = "820dedac43a846c57a05f41516130cb547cd97f8bca9ee0e88b9a79f94ab30f5"
 dependencies = [
  "memory-serve-core",
 ]
@@ -2380,7 +2381,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_urlencoded",
- "sync_wrapper 1.0.2",
+ "sync_wrapper",
  "tokio",
  "tower-service",
  "url",
@@ -2552,18 +2553,18 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "serde"
-version = "1.0.215"
+version = "1.0.216"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6513c1ad0b11a9376da888e3e0baa0077f1aed55c17f50e7b2397136129fb88f"
+checksum = "0b9781016e935a97e8beecf0c933758c97a5520d32930e460142b4cd80c6338e"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.215"
+version = "1.0.216"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad1e866f866923f252f05c889987993144fb74e722403468a4ebd70c3cd756c0"
+checksum = "46f859dbbf73865c6627ed570e78961cd3ac92407a2d117204c49232485da55e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3113,12 +3114,6 @@ dependencies = [
 
 [[package]]
 name = "sync_wrapper"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2047c6ded9c721764247e62cd3b03c09ffc529b2ba5b10ec482ae507a4a70160"
-
-[[package]]
-name = "sync_wrapper"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0bf256ce5efdfa370213c1dabab5935a12e49f2c58d15e9eac2870d3b4f27263"
@@ -3400,14 +3395,14 @@ dependencies = [
 
 [[package]]
 name = "tower"
-version = "0.5.1"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2873938d487c3cfb9aed7546dc9f2711d867c9f90c46b889989a2cb84eba6b4f"
+checksum = "d039ad9159c98b70ecfd540b2573b97f7f52c3e8d9f8ad57a24b916a536975f9"
 dependencies = [
  "futures-core",
  "futures-util",
  "pin-project-lite",
- "sync_wrapper 0.1.2",
+ "sync_wrapper",
  "tokio",
  "tower-layer",
  "tower-service",
@@ -4469,6 +4464,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "99d52293fc86ea7cf13971b3bb81eb21683636e7ae24c729cdaf1b7c4157a352"
 dependencies = [
  "arbitrary",
+ "chrono",
  "crc32fast",
  "crossbeam-utils",
  "displaydoc",

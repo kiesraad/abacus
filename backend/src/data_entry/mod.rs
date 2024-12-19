@@ -111,7 +111,7 @@ pub async fn polling_station_data_entry_save(
     let election = elections.get(polling_station.election_id).await?;
 
     let validation_results = validate_polling_station_results(
-        new_state.get_data().unwrap(),
+        new_state.get_data()?,
         &polling_station,
         &election,
     )?;

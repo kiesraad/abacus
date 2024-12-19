@@ -297,7 +297,7 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
-    await checkAndSavePage.fieldset.isVisible();
+    await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
     await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();

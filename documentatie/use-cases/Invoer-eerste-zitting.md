@@ -1,6 +1,6 @@
 # Invoer eerste zitting
 
-## Het GSB voert de PV's en eventuele SB corrigenda's (DSO) in de applicatie in (vlieger)
+## Het GSB voert de PV's en eventuele SB corrigenda (DSO) in de applicatie in (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
 
@@ -19,10 +19,10 @@ __Hoofdscenario:__
 3. De coördinator sluit de invoer af.
 4. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
 5. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
-6. De applicatie genereert de PVs en EMLs etc.
+6. De applicatie genereert de PV's en EML's etc.
 
 __Uitbreidingen:__  
-4a. De applicatie stelt vast dat niet voor niet alle stembureaus resultaten zijn ingevoerd:
+4a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
 
 5a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
 

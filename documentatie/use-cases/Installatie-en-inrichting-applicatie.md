@@ -68,7 +68,7 @@ __Precondities:__
 __Hoofdscenario:__
 
 1. De beheerder of coördinator selecteert de verkiezing.
-2. De beheerder of coördinator importeert het EML-NL bestand met de stembureaus.
+2. De beheerder of coördinator importeert het EML_NL-bestand met de stembureaus.
 3. De applicatie stelt vast dat de stembureaus aan de validatieregels voldoen.
 4. De beheerder of coördinator stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 
@@ -93,5 +93,5 @@ __Uitbreidingen:__
 - Bij gelijktijdige verkiezingen (gemeenteraad en stadsdeel bijvoorbeeld) zou het mooi zijn om de stembureaus van één
   naar een andere verkiezing te kopiëren. Minder mooi alternatief is eerst exporteren en dan importeren.
 - Zodra invoer gestart is, mag het niet mogelijk zijn om stembureaus aan te passen of te verwijderen. Verwijderen wordt nu
-  afgedwongen d.m.v. foreign keys in de database. Checks voor aanpassen en checks o.b.v. van de fases van de verkiezing in de
+  afgedwongen d.m.v. foreign keys in de database. Checks voor aanpassen en checks o.b.v. de fases van de verkiezing in de
   applicatie moeten nog uitgewerkt worden.

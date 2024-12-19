@@ -81,7 +81,7 @@ pub(crate) mod tests {
                 } else {
                     Some(*voter_count)
                 },
-                polling_station_type: PollingStationType::Special,
+                polling_station_type: Some(PollingStationType::Special),
                 street: "Teststraat".to_string(),
                 house_number: format!("{idx}"),
                 house_number_addition: if idx % 2 == 0 {

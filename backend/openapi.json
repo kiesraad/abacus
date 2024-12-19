@@ -1378,7 +1378,6 @@
           "election_id",
           "name",
           "number",
-          "polling_station_type",
           "street",
           "house_number",
           "postal_code",
@@ -1416,7 +1415,14 @@
             "format": "int64"
           },
           "polling_station_type": {
-            "$ref": "#/components/schemas/PollingStationType"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PollingStationType"
+              }
+            ]
           },
           "postal_code": {
             "type": "string"
@@ -1447,7 +1453,6 @@
         "required": [
           "name",
           "number",
-          "polling_station_type",
           "street",
           "house_number",
           "postal_code",
@@ -1475,7 +1480,14 @@
             "format": "int64"
           },
           "polling_station_type": {
-            "$ref": "#/components/schemas/PollingStationType"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PollingStationType"
+              }
+            ]
           },
           "postal_code": {
             "type": "string"

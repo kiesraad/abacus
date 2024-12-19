@@ -19,7 +19,7 @@ pub struct PollingStation {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub number_of_voters: Option<i64>,
-    pub polling_station_type: PollingStationType,
+    pub polling_station_type: Option<PollingStationType>,
     pub street: String,
     pub house_number: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,7 +44,7 @@ pub struct PollingStationRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub number_of_voters: Option<i64>,
-    pub polling_station_type: PollingStationType,
+    pub polling_station_type: Option<PollingStationType>,
     pub street: String,
     pub house_number: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -113,7 +113,7 @@ pub(crate) mod tests {
             name: "Testplek".to_string(),
             number: 34,
             number_of_voters,
-            polling_station_type: PollingStationType::Special,
+            polling_station_type: Some(PollingStationType::Special),
             street: "Teststraat".to_string(),
             house_number: "2".to_string(),
             house_number_addition: Some("b".to_string()),

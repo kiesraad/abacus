@@ -26,19 +26,21 @@ Het wettelijke kader voor de verkiezingen is de Kieswet met het bijbehorende Kie
 
 In Nederland stemmen we op papier. In het stembureau gelden strikte regels om het stemgeheim te bewaren.
 
-![Stemmen in stemhokjes](/documentatie/gebruikersdocumentatie/img/stemhokjes.jpg)
+![Stemmen in stemhokjes](/documentatie/gebruikersdocumentatie/img/stemhokjes.jpg "Stemmen in stemhokjes")
+*Beeld: ©Kiesraad, Martijn Beekman*
 
 Na het sluiten van de stembussen worden alle stemmen met de hand geteld, waarbij een vier-ogenprincipe wordt gehanteerd. De stemmen worden op lijst gesorteerd waarna de stemmen per kandidaat worden geteld.
 
-![Het papieren telproces](/documentatie/gebruikersdocumentatie/img/telproces.jpg)
+![Het papieren telproces](/documentatie/gebruikersdocumentatie/img/telproces.jpg "Het papieren telproces")
+*Beeld: ©Kiesraad, Martijn Beekman*
 
 Wanneer alle stemmen geteld zijn, vult de voorzitter van het stembureau alle uitkomsten in op een proces-verbaal. Het totale aantal toegelaten kiezers (met stempas, volmacht en kiezerspas), het aantal uitgebrachte stemmen en het eventuele verschil daartussen worden eerst ingevuld. Vervolgens worden alle stemmen per kandidaat ingevuld[^1]. Dat ziet er als volgt uit:
 
-![Een proces-verbaal](/documentatie/gebruikersdocumentatie/img/pv.jpg)
+![Een proces-verbaal](/documentatie/gebruikersdocumentatie/img/pv.jpg "Een proces-verbaal")
 
 Dan wordt alles naar een centrale plek in de gemeente gebracht (meestal het gemeentehuis), waar het gemeentelijk stembureau de werkzaamheden overneemt.
 
-[^1]: Het proces waarbij alle stemmen per kandidaat direct in het stembureau worden geteld heet *decentrale stemopneming*. In sommige gemeentes tellen de stembureaus alleen de stemmen per lijst, waarna de stemmen per kandidaat op bij het gemeentelijk stembureau worden geteld. Dit heet *centrale stemopneming*.
+[^1]: Het proces waarbij alle stemmen per kandidaat direct in het stembureau worden geteld heet *decentrale stemopneming*.      In sommige gemeentes tellen de stembureaus alleen de stemmen per lijst, waarna de stemmen per kandidaat op bij het gemeentelijk stembureau worden geteld. Dit heet *centrale stemopneming*.
 
 ### Gemeentelijk stembureau, hoofdstembureau, centraal stembureau
 Wanneer alle documenten bij het gemeentelijk stembureau zijn kan het optellen beginnen.
@@ -97,7 +99,7 @@ Omdat er niet al te vaak verkiezingen zijn, maken de gebruikers slechts korte ti
 
 Dit is een voorbeeld van de gebruikersinterface:
 
-![Interface](/documentatie/gebruikersdocumentatie/img/abacus-interface.png)
+![Interface](/documentatie/gebruikersdocumentatie/img/abacus-interface.png "Gebruikersinterface")
 
 ### Functionaliteit
 
@@ -105,7 +107,7 @@ In de afbeelding hieronder zie je hoe Abacus werkt op het gemeentelijk stemburea
 
 **LET OP: dit is een concept en is nog in ontwikkeling.**
 
-![Uitslagvaststelling](/documentatie/gebruikersdocumentatie/img/proces%20uitslagvaststelling%20v2.png)
+![Uitslagvaststelling](/documentatie/gebruikersdocumentatie/img/proces%20uitslagvaststelling%20v2.png "Proces uitslagvaststelling")
 
 - Bovenaan staat IMPORT: gebruikers kunnen kandidaten en verkiezingsdefinities in EML-formaat importeren in Abacus.
 - Links staat INVOER: gebruikers kunnen verkiezingsresultaten invoeren, inclusief verklaringen over ontbrekende stembiljetten/stempassen en klachten van kiezers.

@@ -11,7 +11,7 @@ import {
 } from "e2e-tests/page-objects/data_entry";
 
 import { test } from "./fixtures";
-import { emptyDataEntryResponse } from "./test-data/PollingStationTestData";
+import { emptyDataEntryResponse } from "./test-data/request-response-templates";
 
 test.describe("resume data entry flow", () => {
   const fillFirstTwoPagesAndAbort = async (page: Page) => {

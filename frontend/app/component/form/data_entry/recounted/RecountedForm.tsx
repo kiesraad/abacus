@@ -2,7 +2,16 @@ import * as React from "react";
 
 import { useRecounted } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { BottomBar, Button, ChoiceList, Feedback, Form, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
+import {
+  BottomBar,
+  Button,
+  ChoiceList,
+  Feedback,
+  Form,
+  KeyboardKey,
+  KeyboardKeys,
+  useFormKeyboardNavigation,
+} from "@kiesraad/ui";
 
 interface FormElements extends HTMLFormControlsCollection {
   yes: HTMLInputElement;
@@ -15,6 +24,8 @@ interface RecountedFormElement extends HTMLFormElement {
 
 export function RecountedForm() {
   const formRef = React.useRef<RecountedFormElement>(null);
+
+  useFormKeyboardNavigation(formRef);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;

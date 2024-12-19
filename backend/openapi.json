@@ -94,13 +94,13 @@
         }
       }
     },
-    "/api/elections/{election_id}/download_results": {
+    "/api/elections/{election_id}/download_pdf_results": {
       "get": {
         "tags": [
           "election"
         ],
         "summary": "Download a generated PDF with election results",
-        "operationId": "election_download_results",
+        "operationId": "election_download_pdf_results",
         "parameters": [
           {
             "name": "election_id",
@@ -123,12 +123,6 @@
                   "type": "string"
                 },
                 "description": "attachment; filename=\"filename.pdf\""
-              },
-              "Content-Type": {
-                "schema": {
-                  "type": "string"
-                },
-                "description": "application/pdf"
               }
             },
             "content": {
@@ -181,16 +175,66 @@
         "responses": {
           "200": {
             "description": "XML",
+            "content": {
+              "text/xml": {}
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/elections/{election_id}/download_zip_results": {
+      "get": {
+        "tags": [
+          "election"
+        ],
+        "summary": "Download a zip containing a PDF for the PV and the EML with election results",
+        "operationId": "election_download_zip_results",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ZIP",
             "headers": {
-              "Content-Type": {
+              "Content-Disposition": {
                 "schema": {
                   "type": "string"
                 },
-                "description": "text/xml"
+                "description": "attachment; filename=\"filename.zip\""
               }
             },
             "content": {
-              "text/xml": {}
+              "application/zip": {}
             }
           },
           "404": {
@@ -841,6 +885,81 @@
           }
         }
       }
+    },
+    "/api/user/login": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Login endpoint, authenticates a user and creates a new session + session cookie",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credentials"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The logged in user id and user name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/logout": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Logout endpoint, deletes the session cookie",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Successful logout, or user was already logged out"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -908,6 +1027,21 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "Credentials": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
           }
         }
       },
@@ -1308,7 +1442,9 @@
           "PdfGenerationError",
           "PollingStationRepeated",
           "PollingStationValidationErrors",
-          "InvalidPoliticalGroup"
+          "InvalidPoliticalGroup",
+          "InvalidUsernamePassword",
+          "InvalidSession"
         ]
       },
       "ErrorResponse": {
@@ -1384,6 +1520,23 @@
           },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "username"
+        ],
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "username": {
+            "type": "string"
           }
         }
       },
@@ -1796,6 +1949,10 @@
     }
   },
   "tags": [
+    {
+      "name": "authentication",
+      "description": "Authentication and user API"
+    },
     {
       "name": "election",
       "description": "Election API"

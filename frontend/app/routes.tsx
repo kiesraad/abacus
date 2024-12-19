@@ -16,6 +16,8 @@ import { PollingStationListPage, PollingStationsLayout } from "app/module/pollin
 import { UsersHomePage } from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
 
+import { t } from "@kiesraad/i18n";
+
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
 import {
@@ -47,7 +49,13 @@ export const routes = createRoutesFromElements(
         <Route index element={<ElectionHomePage />} />
         <Route
           path="report"
-          element={__API_MSW__ ? <NotAvailableInMock title="Invoerfase afronden - Abacus" /> : <ElectionReportPage />}
+          element={
+            __API_MSW__ ? (
+              <NotAvailableInMock title={`${t("election.title.finish_data_entry")} - Abacus`} />
+            ) : (
+              <ElectionReportPage />
+            )
+          }
         />
         <Route path="status" element={<ElectionStatusPage />} />
         <Route path="polling-stations" element={<PollingStationsLayout />}>

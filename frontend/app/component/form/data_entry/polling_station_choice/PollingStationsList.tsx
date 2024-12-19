@@ -1,4 +1,5 @@
 import { PollingStation, useElectionStatus } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { Badge, Table } from "@kiesraad/ui";
 import { getUrlForDataEntry } from "@kiesraad/util";
 
@@ -12,8 +13,8 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
   return (
     <Table id="polling_station_list">
       <Table.Header>
-        <Table.Column>Nummer</Table.Column>
-        <Table.Column>Stembureau</Table.Column>
+        <Table.Column>{t("number")}</Table.Column>
+        <Table.Column>{t("polling_station.title.singular")}</Table.Column>
       </Table.Header>
       <Table.Body>
         {pollingStations.map((pollingStation: PollingStation) => {

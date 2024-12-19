@@ -1,3 +1,8 @@
+use crate::data_entry::repository::PollingStationDataEntries;
+use crate::election::repository::Elections;
+use crate::error::{APIError, ErrorResponse};
+use crate::polling_station::repository::PollingStations;
+use crate::polling_station::structs::PollingStation;
 use axum::extract::{FromRequest, Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
@@ -7,18 +12,13 @@ use status::DataEntryStatus;
 use utoipa::ToSchema;
 
 pub use self::structs::*;
-use crate::data_entry::repository::PollingStationDataEntries;
-use crate::election::repository::Elections;
-use crate::election::Election;
-use crate::error::{APIError, ErrorResponse};
-use crate::polling_station::repository::PollingStations;
-use crate::polling_station::structs::PollingStation;
-use crate::validation::ValidationResults;
+pub use self::validation::*;
 
 pub mod entry_number;
 pub mod repository;
 pub mod status;
 pub mod structs;
+mod validation;
 
 /// Request structure for saving data entry of polling station results
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, FromRequest)]
@@ -120,27 +120,6 @@ pub async fn polling_station_data_entry_save(
     polling_station_data_entries.upsert(id, new_state).await?;
 
     Ok(SaveDataEntryResponse { validation_results })
-}
-
-fn validate_polling_station_results(
-    polling_station_results: &PollingStationResults,
-    polling_station: &PollingStation,
-    election: &Election,
-) -> Result<ValidationResults, APIError> {
-    let mut validation_results = ValidationResults::default();
-    polling_station_results.validate(
-        election,
-        polling_station,
-        &mut validation_results,
-        &"data".into(),
-    )?;
-    validation_results
-        .errors
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    validation_results
-        .warnings
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    Ok(validation_results)
 }
 
 /// Response structure for getting data entry of polling station results

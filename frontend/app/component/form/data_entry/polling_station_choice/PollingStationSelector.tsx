@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { PollingStation } from "@kiesraad/api";
-import { t } from "@kiesraad/i18n";
+import { PollingStation, PollingStationStatus } from "@kiesraad/api";
+import { t, tx } from "@kiesraad/i18n";
 import { IconError, IconWarning } from "@kiesraad/icon";
 import { Badge, Icon, InputField, Spinner } from "@kiesraad/ui";
 import { cn, removeLeadingZeros, usePollingStationStatus } from "@kiesraad/util";
@@ -28,6 +28,7 @@ export function PollingStationSelector({
   handleSubmit,
 }: PollingStationSelectorProps) {
   const currentPollingStationStatus = usePollingStationStatus(currentPollingStation?.id);
+  const firstAndSecondEntryFinished: PollingStationStatus[] = ["first_second_entry_different", "definitive"];
 
   return (
     <div className={cls.container}>
@@ -63,15 +64,16 @@ export function PollingStationSelector({
               </div>
             );
           } else if (currentPollingStation) {
-            if (currentPollingStationStatus === "definitive") {
+            if (currentPollingStationStatus && firstAndSecondEntryFinished.includes(currentPollingStationStatus)) {
               return (
                 <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.warning)}>
                   <span className={cls.icon}>
                     <Icon icon={<IconWarning aria-label={t("contains_warning")} />} color="warning" />
                   </span>
-                  {t("polling_station.title.singular")} {currentPollingStation.number}
-                  <span className="bold">({currentPollingStation.name})</span>
-                  {t("polling_station_choice.has_already_been_filled_twice")}
+                  {tx("polling_station_choice.has_already_been_filled_twice", undefined, {
+                    nr: currentPollingStation.number,
+                    name: currentPollingStation.name,
+                  })}
                 </div>
               );
             } else {

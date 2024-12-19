@@ -40,7 +40,7 @@ impl PollingStationDataEntries {
     pub async fn get(&self, id: u32) -> Result<PollingStationDataEntry, sqlx::Error> {
         query_as!(
             PollingStationDataEntry,
-            r#"SELECT polling_station_id AS "id: u32", state AS "state: _", updated_at FROM polling_station_data_entries WHERE polling_station_id = ?"#,
+            r#"SELECT polling_station_id AS "polling_station_id: u32", state AS "state: _", updated_at FROM polling_station_data_entries WHERE polling_station_id = ?"#,
             id,
         )
             .fetch_one(&self.0)
@@ -49,11 +49,11 @@ impl PollingStationDataEntries {
 
     pub async fn delete(&self, id: u32) -> Result<(), sqlx::Error> {
         let res = query!(
-            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ? AND finalised_at IS NULL",
+            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ?",
             id,
         )
-            .execute(&self.0)
-            .await?;
+        .execute(&self.0)
+        .await?;
         if res.rows_affected() == 0 {
             Err(sqlx::Error::RowNotFound)
         } else {
@@ -70,7 +70,7 @@ impl PollingStationDataEntries {
             PollingStationDataEntry,
             r#"
 SELECT
-  polling_station_id AS "id: u32",
+  polling_station_id AS "polling_station_id: u32",
   state AS "state: _",
   updated_at
 FROM polling_station_data_entries
@@ -113,8 +113,8 @@ WHERE polling_station_id = ?
             PollingStationDataEntry,
             r#"
 SELECT
-  id AS "id: u32",
-  de.state AS "state: _",
+  polling_station_id AS "polling_station_id: u32",
+  COALESCE(de.state, '{ "status": "FirstEntryNotStarted" }') AS "state!: _",
   updated_at
 FROM polling_stations AS p
 LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id

@@ -260,7 +260,7 @@ pub async fn election_status(
         .await?
         .into_iter()
         .map(|status| ElectionStatusResponseEntry {
-            polling_station_id: status.id,
+            polling_station_id: status.polling_station_id,
             status: status.state.status_name().to_string(),
             first_data_entry_progress: status.state.get_first_entry_progress(),
             second_data_entry_progress: status.state.get_second_entry_progress(),

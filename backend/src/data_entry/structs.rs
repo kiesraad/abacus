@@ -9,7 +9,7 @@ use utoipa::ToSchema;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Default)]
 pub struct PollingStationDataEntry {
-    pub id: u32,
+    pub polling_station_id: u32,
     #[schema(value_type = DataEntryStatus)]
     pub state: Json<DataEntryStatus>,
     pub updated_at: i64,

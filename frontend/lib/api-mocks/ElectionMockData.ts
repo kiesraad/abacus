@@ -421,11 +421,11 @@ export const electionMockData = electionDetailsMockResponse.election as Required
 export const electionStatusMockResponse: ElectionStatusResponse = {
   statuses: [
     {
-      id: 1,
+      polling_station_id: 1,
       status: "not_started",
     },
     {
-      id: 2,
+      polling_station_id: 2,
       status: "definitive",
     },
   ],

@@ -5,7 +5,7 @@ import { PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
-import { cn, getUrlForDataEntry, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
+import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
 
 import cls from "./PollingStationChoiceForm.module.css";
 import { PollingStationLink } from "./PollingStationLink";
@@ -24,7 +24,7 @@ const DEFINITIVE_POLLING_STATION_ALERT: string = t("polling_station_choice.polli
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
 
-  const { election, pollingStations } = useElection();
+  const { pollingStations } = useElection();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
@@ -50,7 +50,9 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
     const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
-    const pollingStationStatus = electionStatus.statuses.find((status) => status.id === pollingStation?.id)?.status;
+    const pollingStationStatus = electionStatus.statuses.find(
+      (status) => status.polling_station_id === pollingStation?.id,
+    )?.status;
 
     if (pollingStationStatus === "definitive") {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
@@ -59,7 +61,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     }
 
     if (pollingStation) {
-      navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStationStatus));
+      navigate(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}`);
     } else {
       setAlert(INVALID_POLLING_STATION_ALERT);
       setLoading(false);
@@ -77,7 +79,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       ].includes(status.status),
     )
     .map((status) => ({
-      pollingStation: pollingStations.find((ps) => ps.id === status.id),
+      pollingStation: pollingStations.find((ps) => ps.id === status.polling_station_id),
       status: status.status,
     }));
 
@@ -93,9 +95,9 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           <Alert type="notify" variant="no-icon">
             <h2>{t("polling_station_choice.unfinished_input_title")}</h2>
             <p>{t("polling_station_choice.unfinished_input_content")}</p>
-            {unfinished.map(({ pollingStation, status }) => {
+            {unfinished.map(({ pollingStation }) => {
               return pollingStation === undefined ? null : (
-                <PollingStationLink key={pollingStation.id} pollingStation={pollingStation} status={status} />
+                <PollingStationLink key={pollingStation.id} pollingStation={pollingStation} />
               );
             })}
           </Alert>

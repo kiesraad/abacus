@@ -1,20 +1,18 @@
 import { Link } from "react-router-dom";
 
-import { PollingStation, PollingStationStatus } from "@kiesraad/api";
+import { PollingStation } from "@kiesraad/api";
 import { IconArrowNarrowRight } from "@kiesraad/icon";
-import { getUrlForDataEntry } from "@kiesraad/util";
 
 import cls from "./PollingStationLink.module.css";
 
 interface PollingStationLinkProps {
   pollingStation: PollingStation;
-  status: PollingStationStatus;
 }
 
-export function PollingStationLink({ pollingStation, status }: PollingStationLinkProps) {
+export function PollingStationLink({ pollingStation }: PollingStationLinkProps) {
   return (
     <p>
-      <Link className={cls.link} to={getUrlForDataEntry(pollingStation.election_id, pollingStation.id, status)}>
+      <Link className={cls.link} to={`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}`}>
         <span className={cls.number}>{pollingStation.number}</span>
         {" - "}
         <span>{pollingStation.name}</span>

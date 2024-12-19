@@ -1,7 +1,6 @@
 import { PollingStation, useElectionStatus } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Badge, Table } from "@kiesraad/ui";
-import { getUrlForDataEntry } from "@kiesraad/util";
 
 export interface PollingStationsListProps {
   pollingStations: PollingStation[];
@@ -18,7 +17,9 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
       </Table.Header>
       <Table.Body>
         {pollingStations.map((pollingStation: PollingStation) => {
-          const status = electionStatus.statuses.find((status) => status.id === pollingStation.id)?.status;
+          const status = electionStatus.statuses.find(
+            (status) => status.polling_station_id === pollingStation.id,
+          )?.status;
           if (status === "definitive") {
             return null;
           }
@@ -26,7 +27,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
           return (
             <Table.LinkRow
               key={pollingStation.number}
-              to={getUrlForDataEntry(pollingStation.election_id, pollingStation.id, status)}
+              to={`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}`}
             >
               <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
               <Table.Cell>

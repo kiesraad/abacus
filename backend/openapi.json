@@ -1182,12 +1182,12 @@
       "DataEntryStatusName": {
         "type": "string",
         "enum": [
-          "FirstEntryNotStarted",
-          "FirstEntryInProgress",
-          "SecondEntryNotStarted",
-          "SecondEntryInProgress",
-          "EntriesNotEqual",
-          "Definitive"
+          "first_entry_not_started",
+          "first_entry_in_progress",
+          "second_entry_not_started",
+          "second_entry_in_progress",
+          "entries_not_equal",
+          "definitive"
         ]
       },
       "Definitive": {

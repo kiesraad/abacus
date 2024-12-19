@@ -1,11 +1,11 @@
 #![cfg(test)]
 
-use hyper::StatusCode;
-use sqlx::SqlitePool;
-
+use crate::shared::example_data_entry;
 use crate::utils::serve_api;
 use backend::election::{ElectionDetailsResponse, ElectionListResponse, ElectionStatusResponse};
 use backend::polling_station::PollingStationStatus;
+use hyper::StatusCode;
+use sqlx::SqlitePool;
 
 mod shared;
 mod utils;
@@ -187,6 +187,78 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
         body.statuses[0].status,
         PollingStationStatus::FirstEntryInProgress
     );
+}
+
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+async fn test_election_first_second_data_entry_finalise_ok(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    // Save data entries for election 1, polling station 1
+    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
+    shared::create_and_finalise_data_entry(&addr, 1, 2).await;
+
+    // Check that the status is Definitive
+    let url = format!("http://{addr}/api/elections/1/status");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+    assert_eq!(body.statuses.len(), 2);
+
+    let statuses = [
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap(),
+        body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
+    ];
+
+    assert_eq!(statuses[0].status, PollingStationStatus::Definitive);
+    assert_eq!(statuses[1].status, PollingStationStatus::NotStarted);
+}
+
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+async fn test_election_first_second_data_entry_finalise_different(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    // Save first data entries for election 1, polling station 1
+    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
+
+    // Save different second data entry
+    let mut request_body = example_data_entry(None);
+    request_body.data.votes_counts.blank_votes_count = 0;
+    request_body.data.votes_counts.invalid_votes_count = 2;
+    let url = format!("http://{addr}/api/polling_stations/1/data_entries/2");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&request_body)
+        .send()
+        .await
+        .unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+
+    // Finalise the second data entry
+    let url = format!("http://{addr}/api/polling_stations/1/data_entries/2/finalise");
+    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+
+    // Check that the status is FirstSecondEntryDifferent
+    let url = format!("http://{addr}/api/elections/1/status");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+    assert_eq!(body.statuses.len(), 2);
+
+    let statuses = [
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap(),
+        body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
+    ];
+
+    assert_eq!(
+        statuses[0].status,
+        PollingStationStatus::FirstSecondEntryDifferent
+    );
+    assert_eq!(statuses[1].status, PollingStationStatus::NotStarted);
 }
 
 #[sqlx::test(fixtures("../fixtures/elections.sql"))]

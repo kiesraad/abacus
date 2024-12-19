@@ -30,26 +30,17 @@ pub struct AppState {
 /// Axum router for the application
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let data_entry_routes = Router::new()
+        .route("/", get(data_entry::polling_station_data_entry_get))
         .route(
-            "/:entry_number",
-            get(data_entry::polling_station_data_entry_get),
-        )
-        .route(
-            "/:entry_number/finalise",
+            "/finalise",
             post(data_entry::polling_station_data_entry_finalise),
         )
+        .route("/claim", post(data_entry::polling_station_data_entry_claim))
         .route(
-            "/:entry_number/claim",
-            post(data_entry::polling_station_data_entry_claim),
-        )
-        .route(
-            "/:entry_number/delete",
+            "/delete",
             post(data_entry::polling_station_data_entry_delete),
         )
-        .route(
-            "/:entry_number/save",
-            post(data_entry::polling_station_data_entry_save),
-        );
+        .route("/save", post(data_entry::polling_station_data_entry_save));
 
     let polling_station_routes = Router::new().route(
         "/:polling_station_id",

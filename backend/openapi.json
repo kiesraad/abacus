@@ -594,7 +594,7 @@
         }
       }
     },
-    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
+    "/api/polling_stations/{polling_station_id}/data_entries": {
       "get": {
         "tags": [
           "data_entry"
@@ -606,17 +606,6 @@
             "name": "polling_station_id",
             "in": "path",
             "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "entry_number",
-            "in": "path",
-            "description": "Data entry number (first or second data entry)",
             "required": true,
             "schema": {
               "type": "integer",
@@ -669,17 +658,6 @@
             "name": "polling_station_id",
             "in": "path",
             "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "entry_number",
-            "in": "path",
-            "description": "Data entry number (first or second data entry)",
             "required": true,
             "schema": {
               "type": "integer",
@@ -768,17 +746,6 @@
               "format": "int32",
               "minimum": 0
             }
-          },
-          {
-            "name": "entry_number",
-            "in": "path",
-            "description": "Data entry number (first or second data entry)",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
           }
         ],
         "responses": {
@@ -808,7 +775,7 @@
         }
       }
     },
-    "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise": {
+    "/api/polling_stations/{polling_station_id}/data_entries/finalise": {
       "post": {
         "tags": [
           "data_entry"
@@ -820,17 +787,6 @@
             "name": "polling_station_id",
             "in": "path",
             "description": "Polling station database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "entry_number",
-            "in": "path",
-            "description": "Data entry number (first or second data entry)",
             "required": true,
             "schema": {
               "type": "integer",

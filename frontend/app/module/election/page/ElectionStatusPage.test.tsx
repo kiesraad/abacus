@@ -51,11 +51,12 @@ describe("ElectionStatusPage", () => {
 
     const items = [...screen.getByTestId("polling-stations-per-status").children];
     expect(items[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Stembureaus per status" }));
-    expect(items[1]).toHaveTextContent("Niet afgeronde invoer (1)");
-    expect(items[2]).toHaveTextContent("Invoer bezig (1)");
-    expect(items[3]).toHaveTextContent("Eerste invoer klaar (1)");
-    expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (0)");
-    expect(items[5]).toHaveTextContent("Werkvoorraad (1)");
+    expect(items[1]).toHaveTextContent("Fouten en waarschuwingen (0)");
+    expect(items[2]).toHaveTextContent("Niet afgeronde invoer (1)");
+    expect(items[3]).toHaveTextContent("Invoer bezig (1)");
+    expect(items[4]).toHaveTextContent("Eerste invoer klaar (1)");
+    expect(items[5]).toHaveTextContent("Eerste en tweede invoer klaar (0)");
+    expect(items[6]).toHaveTextContent("Werkvoorraad (1)");
 
     const progress = [...screen.getByTestId("progress").children];
     expect(progress[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Voortgang" }));
@@ -66,6 +67,7 @@ describe("ElectionStatusPage", () => {
       { percentage: 25, class: "first-entry-finished" },
       { percentage: 25, class: "in-progress" },
       { percentage: 25, class: "unfinished" },
+      { percentage: 0, class: "errors-and-warnings" },
       { percentage: 25, class: "not-started" },
     ];
     bars.forEach((bar, index) => {

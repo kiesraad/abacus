@@ -15,17 +15,14 @@ export function ElectionProgress() {
 
   const stats: Stat[] = useMemo(() => {
     const total = statuses.length;
-    const firstAndSecondEntryFinished: PollingStationStatus[] = [
-      // TODO: Add FirstSecondEntryDifferent in #745
-      "definitive",
-    ];
+    const firstAndSecondEntryFinished: PollingStationStatus[] = ["first_second_entry_different", "definitive"];
     const firstEntryFinished: PollingStationStatus[] = [
       "second_entry",
       "second_entry_unfinished",
       "second_entry_in_progress",
       ...firstAndSecondEntryFinished,
     ];
-    const totalFirstEntry = statuses.filter((s) => firstEntryFinished.includes(s.status)).length;
+    const totalFirstEntryFinished = statuses.filter((s) => firstEntryFinished.includes(s.status)).length;
     const totalFirstAndSecondEntryFinished = statuses.filter((s) =>
       firstAndSecondEntryFinished.includes(s.status),
     ).length;
@@ -33,7 +30,7 @@ export function ElectionProgress() {
       {
         title: t("status.first_entry_finished_short"),
         id: "first-entry-finished",
-        percentage: total > 0 ? Math.round((totalFirstEntry / total) * 100) : 0,
+        percentage: total > 0 ? Math.round((totalFirstEntryFinished / total) * 100) : 0,
       },
       {
         title: t("status.first_and_second_entry_finished"),

@@ -14,7 +14,8 @@ const typeToLabel: { [S in PollingStationStatus]: { label: string; icon?: ReactE
   second_entry: { label: t("data_entry.second_entry") },
   second_entry_in_progress: { label: t("data_entry.second_entry"), icon: <Icon size="sm" icon={<IconPencil />} /> },
   second_entry_unfinished: { label: t("data_entry.second_entry"), icon: <Icon size="sm" icon={<IconPencil />} /> },
-  definitive: { label: "Definitief" },
+  first_second_entry_different: { label: t("data_entry.first_second_entry_different") },
+  definitive: { label: t("data_entry.definitive") },
 };
 
 export interface BadgeProps {

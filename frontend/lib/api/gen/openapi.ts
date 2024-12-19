@@ -321,6 +321,7 @@ export type PollingStationStatus =
   | "second_entry"
   | "second_entry_in_progress"
   | "second_entry_unfinished"
+  | "first_second_entry_different"
   | "definitive";
 
 export interface PollingStationStatusEntry {

@@ -5,6 +5,7 @@ use axum::Router;
 use memory_serve::MemoryServe;
 use sqlx::SqlitePool;
 use std::error::Error;
+use tower_http::trace::TraceLayer;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -91,6 +92,8 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             "/api/polling_stations/:polling_station_id/data_entries",
             data_entry_routes,
         );
+
+    let app = app.layer(TraceLayer::new_for_http());
 
     #[cfg(feature = "memory-serve")]
     let app = {

@@ -6,7 +6,6 @@ type: epic
 labels: ''
 assignees: ''
 projects: ["kiesraad/1"]
-area: epic
 
 ---
 

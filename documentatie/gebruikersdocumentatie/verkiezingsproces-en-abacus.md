@@ -34,7 +34,7 @@ Na het sluiten van de stembussen worden alle stemmen met de hand geteld, waarbij
 
 Wanneer alle stemmen geteld zijn, vult de voorzitter van het stembureau alle uitkomsten in op een proces-verbaal. Het totale aantal toegelaten kiezers (met stempas, volmacht en kiezerspas), het aantal uitgebrachte stemmen en het eventuele verschil daartussen worden eerst ingevuld. Vervolgens worden alle stemmen per kandidaat ingevuld[^1]. Dat ziet er als volgt uit:
 
-![Een proces-verbaal](/documentatie/gebruikersdocumentatie/img/pv.png)
+![Een proces-verbaal](/documentatie/gebruikersdocumentatie/img/pv.jpg)
 
 Dan wordt alles naar een centrale plek in de gemeente gebracht (meestal het gemeentehuis), waar het gemeentelijk stembureau de werkzaamheden overneemt.
 

@@ -3,11 +3,10 @@
 use std::net::SocketAddr;
 
 use backend::data_entry::{
-    CandidateVotes, DataEntry, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-    SaveDataEntryResponse, VotersCounts, VotesCounts,
+    status::ClientState, CandidateVotes, DataEntry, DifferencesCounts, PoliticalGroupVotes,
+    PollingStationResults, SaveDataEntryResponse, VotersCounts, VotesCounts,
 };
 use hyper::StatusCode;
-use serde_json::value::RawValue;
 
 pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     DataEntry {
@@ -51,7 +50,7 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
                 ],
             }],
         },
-        client_state: client_state.map(|v| RawValue::from_string(v.to_string()).unwrap()),
+        client_state: ClientState::new_from_str(client_state).unwrap(),
     }
 }
 

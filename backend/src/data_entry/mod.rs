@@ -8,7 +8,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde::{Deserialize, Serialize};
-use status::DataEntryStatus;
+use status::{ClientState, DataEntryStatus, DataEntryStatusName};
 use utoipa::ToSchema;
 
 pub use self::structs::*;
@@ -31,7 +31,7 @@ pub struct DataEntry {
     pub data: PollingStationResults,
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)
-    pub client_state: Option<Box<serde_json::value::RawValue>>,
+    pub client_state: ClientState,
 }
 
 /// Response structure for saving data entry of polling station results
@@ -233,7 +233,7 @@ pub struct ElectionStatusResponse {
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct ElectionStatusResponseEntry {
     pub polling_station_id: u32,
-    pub status: String,
+    pub status: DataEntryStatusName,
     pub first_data_entry_progress: Option<u8>,
     pub second_data_entry_progress: Option<u8>,
 }
@@ -261,7 +261,7 @@ pub async fn election_status(
         .into_iter()
         .map(|status| ElectionStatusResponseEntry {
             polling_station_id: status.polling_station_id,
-            status: status.state.status_name().to_string(),
+            status: status.state.status_name(),
             first_data_entry_progress: status.state.get_first_entry_progress(),
             second_data_entry_progress: status.state.get_second_entry_progress(),
         })
@@ -318,7 +318,7 @@ pub mod tests {
                     ],
                 }],
             },
-            client_state: None,
+            client_state: ClientState(None),
         }
     }
 

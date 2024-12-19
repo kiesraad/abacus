@@ -1179,6 +1179,17 @@
           }
         ]
       },
+      "DataEntryStatusName": {
+        "type": "string",
+        "enum": [
+          "FirstEntryNotStarted",
+          "FirstEntryInProgress",
+          "SecondEntryNotStarted",
+          "SecondEntryInProgress",
+          "EntriesNotEqual",
+          "EntryResult"
+        ]
+      },
       "DifferencesCounts": {
         "type": "object",
         "description": "Differences counts, part of the polling station results.",
@@ -1388,7 +1399,7 @@
             "minimum": 0
           },
           "status": {
-            "type": "string"
+            "$ref": "#/components/schemas/DataEntryStatusName"
           }
         }
       },

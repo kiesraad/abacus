@@ -1,5 +1,6 @@
 #![cfg(test)]
 
+use backend::data_entry::status::DataEntryStatusName;
 use backend::data_entry::{
     ElectionStatusResponse, GetDataEntryResponse, SaveDataEntryResponse, ValidationResultCode,
 };
@@ -274,9 +275,15 @@ async fn test_election_details_status(pool: SqlitePool) {
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
-    assert_eq!(body.statuses[0].status, "FirstEntryNotStarted");
+    assert_eq!(
+        body.statuses[0].status,
+        DataEntryStatusName::FirstEntryNotStarted
+    );
     assert_eq!(body.statuses[0].first_data_entry_progress, None);
-    assert_eq!(body.statuses[1].status, "FirstEntryNotStarted");
+    assert_eq!(
+        body.statuses[1].status,
+        DataEntryStatusName::FirstEntryNotStarted
+    );
     assert_eq!(body.statuses[1].first_data_entry_progress, None);
 
     // Finalise the first entry of one and set the other in progress
@@ -303,10 +310,16 @@ async fn test_election_details_status(pool: SqlitePool) {
             .unwrap(),
     ];
 
-    assert_eq!(statuses[0].status, "SecondEntryNotStarted");
+    assert_eq!(
+        statuses[0].status,
+        DataEntryStatusName::SecondEntryNotStarted
+    );
     assert_eq!(statuses[0].first_data_entry_progress, Some(100));
     assert_eq!(statuses[0].second_data_entry_progress, None);
-    assert_eq!(statuses[1].status, "FirstEntryInProgress");
+    assert_eq!(
+        statuses[1].status,
+        DataEntryStatusName::FirstEntryInProgress
+    );
     assert_eq!(statuses[1].first_data_entry_progress, Some(60));
     assert_eq!(statuses[1].second_data_entry_progress, None);
 
@@ -333,10 +346,16 @@ async fn test_election_details_status(pool: SqlitePool) {
             .unwrap(),
     ];
 
-    assert_eq!(statuses[0].status, "SecondEntryInProgress");
+    assert_eq!(
+        statuses[0].status,
+        DataEntryStatusName::SecondEntryInProgress
+    );
     assert_eq!(statuses[0].first_data_entry_progress, Some(100));
     assert_eq!(statuses[0].second_data_entry_progress, Some(60));
-    assert_eq!(statuses[1].status, "FirstEntryUnfinished");
+    assert_eq!(
+        statuses[1].status,
+        DataEntryStatusName::FirstEntryNotStarted
+    );
     assert_eq!(statuses[1].first_data_entry_progress, Some(60));
 
     // polling station 2 should now be unfinished
@@ -354,7 +373,7 @@ async fn test_election_details_status(pool: SqlitePool) {
             .find(|ps| ps.polling_station_id == 1)
             .unwrap()
             .status,
-        "SecondEntryUnfinished"
+        DataEntryStatusName::SecondEntryNotStarted
     );
 
     // polling station 2 should now be definitive
@@ -366,7 +385,10 @@ async fn test_election_details_status(pool: SqlitePool) {
 
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
-    assert_eq!(statuses[1].status, "FirstEntryInProgress");
+    assert_eq!(
+        statuses[1].status,
+        DataEntryStatusName::FirstEntryInProgress
+    );
     assert_eq!(statuses[1].first_data_entry_progress, Some(60));
 }
 
@@ -394,5 +416,8 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
         body.statuses
     );
     assert_eq!(body.statuses[0].polling_station_id, 3);
-    assert_eq!(body.statuses[0].status, "FirstEntryInProgress");
+    assert_eq!(
+        body.statuses[0].status,
+        DataEntryStatusName::FirstEntryInProgress
+    );
 }

@@ -1167,12 +1167,12 @@
             ],
             "properties": {
               "state": {
-                "$ref": "#/components/schemas/EntryResult"
+                "$ref": "#/components/schemas/Definitive"
               },
               "status": {
                 "type": "string",
                 "enum": [
-                  "EntryResult"
+                  "Definitive"
                 ]
               }
             }
@@ -1187,8 +1187,19 @@
           "SecondEntryNotStarted",
           "SecondEntryInProgress",
           "EntriesNotEqual",
-          "EntryResult"
+          "Definitive"
         ]
+      },
+      "Definitive": {
+        "type": "object",
+        "required": [
+          "finalised_at"
+        ],
+        "properties": {
+          "finalised_at": {
+            "type": "string"
+          }
+        }
       },
       "DifferencesCounts": {
         "type": "object",
@@ -1414,17 +1425,6 @@
             "$ref": "#/components/schemas/PollingStationResults"
           },
           "second_entry": {
-            "$ref": "#/components/schemas/PollingStationResults"
-          }
-        }
-      },
-      "EntryResult": {
-        "type": "object",
-        "required": [
-          "finalised_entry"
-        ],
-        "properties": {
-          "finalised_entry": {
             "$ref": "#/components/schemas/PollingStationResults"
           }
         }

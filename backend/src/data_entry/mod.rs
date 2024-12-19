@@ -7,6 +7,7 @@ use axum::extract::{FromRequest, Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
+use repository::PollingStationResultsEntries;
 use serde::{Deserialize, Serialize};
 use status::{ClientState, DataEntryStatus, DataEntryStatusName};
 use utoipa::ToSchema;
@@ -212,13 +213,30 @@ pub async fn polling_station_data_entry_delete(
 )]
 pub async fn polling_station_data_entry_finalise(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(_polling_station_results): State<PollingStationResultsEntries>,
     Path(id): Path<u32>,
 ) -> Result<(), APIError> {
     let polling_station_data_entry = polling_station_data_entries.get(id).await?;
 
-    let new_state = polling_station_data_entry.state.0.finalise_entry()?;
+    if polling_station_data_entry.state.0.is_first_entry_finished() {
+        let new_state = polling_station_data_entry.state.0.finalise_first_entry()?;
+        polling_station_data_entries.upsert(id, new_state).await?;
+    } else {
+        let (new_state, data) = polling_station_data_entry.state.0.finalise_second_entry()?;
 
-    polling_station_data_entries.upsert(id, new_state).await?;
+        match (new_state, data) {
+            (DataEntryStatus::Definitive(_), Some(_data)) => {
+                // Save the data to the database
+                // TODO: create nice query
+            }
+            (DataEntryStatus::Definitive(_), None) => {
+                panic!("Data entry is in definitive state but no data is present");
+            }
+            (new_state, _) => {
+                polling_station_data_entries.upsert(id, new_state).await?;
+            }
+        }
+    }
 
     Ok(())
 }
@@ -346,6 +364,7 @@ pub mod tests {
     async fn finalise(pool: SqlitePool) -> Response {
         polling_station_data_entry_finalise(
             State(PollingStationDataEntries::new(pool.clone())),
+            State(PollingStationResultsEntries::new(pool.clone())),
             Path(1),
         )
         .await

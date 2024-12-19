@@ -22,10 +22,6 @@
     background-color: var(--progress-bar-errors-and-warnings);
   }
 
-  &.unfinished {
-    background-color: var(--progress-bar-unfinished);
-  }
-
   &.in-progress {
     background-color: var(--progress-bar-in-progress);
   }

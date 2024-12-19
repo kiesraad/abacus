@@ -10,7 +10,7 @@ import { electionMockData } from "@kiesraad/api-mocks";
 import { RecountedForm } from "./RecountedForm";
 
 const Component = (
-  <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
+  <PollingStationFormController election={electionMockData} pollingStationId={1}>
     <RecountedForm />
   </PollingStationFormController>
 );

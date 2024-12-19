@@ -20,7 +20,6 @@ function renderForm(defaultFormState: Partial<FormState> = {}, defaultValues?: P
       <PollingStationFormController
         election={electionMockData}
         pollingStationId={1}
-        entryNumber={1}
         defaultFormState={defaultFormState}
         defaultValues={defaultValues}
       >

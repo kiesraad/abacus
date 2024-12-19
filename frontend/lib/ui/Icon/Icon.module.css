@@ -32,12 +32,6 @@
     }
   }
 
-  &.unfinished {
-    svg {
-      fill: var(--progress-bar-unfinished);
-    }
-  }
-
   &.in-progress {
     svg {
       fill: var(--progress-bar-in-progress);

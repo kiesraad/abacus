@@ -1,4 +1,4 @@
-import { GetDataEntryResponse, SaveDataEntryRequest, SaveDataEntryResponse } from "@kiesraad/api";
+import { DataEntry, GetDataEntryResponse, SaveDataEntryResponse } from "@kiesraad/api";
 
 export const emptyDataEntryResponse: GetDataEntryResponse = {
   progress: 0,
@@ -98,7 +98,7 @@ export const noRecountNoDifferencesRequest: Record<string, unknown> = {
     acceptedWarnings: [],
     continue: true,
   },
-} satisfies SaveDataEntryRequest;
+} satisfies DataEntry;
 
 export const noErrorsWarningsResponse: Record<string, unknown> = {
   validation_results: {

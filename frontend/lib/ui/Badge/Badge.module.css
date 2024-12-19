@@ -61,8 +61,7 @@
 }
 
 .not_started,
-.first_entry_in_progress,
-.first_entry_unfinished {
+.first_entry_in_progress {
   background: var(--badge-first-entry-bg);
   color: var(--badge-first-entry);
 }
@@ -73,8 +72,7 @@
 }
 
 .second_entry,
-.second_entry_in_progress,
-.second_entry_unfinished {
+.second_entry_in_progress {
   background: var(--badge-second-entry-bg);
   color: var(--badge-second-entry);
 }

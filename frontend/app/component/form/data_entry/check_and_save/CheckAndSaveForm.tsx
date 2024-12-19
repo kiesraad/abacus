@@ -29,14 +29,14 @@ export function CheckAndSaveForm() {
 
   const navigate = useNavigate();
   const { election } = useElection();
-  const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId, entryNumber } =
+  const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId } =
     usePollingStationFormController();
 
   const getUrlForFormSection = React.useCallback(
     (id: FormSectionID) => {
-      return getUrlForFormSectionID(election.id, pollingStationId, entryNumber, id);
+      return getUrlForFormSectionID(election.id, pollingStationId, id);
     },
-    [election, pollingStationId, entryNumber],
+    [election, pollingStationId],
   );
 
   React.useEffect(() => {

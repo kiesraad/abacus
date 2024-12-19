@@ -62,31 +62,26 @@ export interface POLLING_STATION_DELETE_REQUEST_PARAMS {
 }
 export type POLLING_STATION_DELETE_REQUEST_PATH = `/api/polling_stations/${number}`;
 
-// /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
+// /api/polling_stations/{polling_station_id}/data_entries
 export interface POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS {
   polling_station_id: number;
-  entry_number: number;
 }
-export type POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
+export type POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${number}/data_entries`;
 export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: number;
-  entry_number: number;
 }
-export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
-export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = SaveDataEntryRequest;
+export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries`;
+export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = DataEntry;
 export interface POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS {
   polling_station_id: number;
-  entry_number: number;
 }
-export type POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
+export type POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries`;
 
-// /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
+// /api/polling_stations/{polling_station_id}/data_entries/finalise
 export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
   polling_station_id: number;
-  entry_number: number;
 }
-export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
-  `/api/polling_stations/${number}/data_entries/${number}/finalise`;
+export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/finalise`;
 
 // /api/user/login
 export type LOGIN_REQUEST_PARAMS = Record<string, never>;
@@ -126,6 +121,27 @@ export interface CandidateVotes {
 export interface Credentials {
   password: string;
   username: string;
+}
+
+/**
+ * Request structure for saving data entry of polling station results
+ */
+export interface DataEntry {
+  client_state: unknown;
+  data: PollingStationResults;
+  progress: number;
+}
+
+export type DataEntryStatusName =
+  | "first_entry_not_started"
+  | "first_entry_in_progress"
+  | "second_entry_not_started"
+  | "second_entry_in_progress"
+  | "entries_not_equal"
+  | "definitive";
+
+export interface Definitive {
+  finished_at: string;
 }
 
 /**
@@ -188,7 +204,23 @@ export type ElectionStatus = "DataEntryInProgress" | "DataEntryFinished";
  * Election polling stations data entry statuses response
  */
 export interface ElectionStatusResponse {
-  statuses: PollingStationStatusEntry[];
+  statuses: ElectionStatusResponseEntry[];
+}
+
+/**
+ * Election polling stations data entry statuses response
+ */
+export interface ElectionStatusResponseEntry {
+  finished_at?: string;
+  first_data_entry_progress?: number;
+  polling_station_id: number;
+  second_data_entry_progress?: number;
+  status: DataEntryStatusName;
+}
+
+export interface EntriesNotEqual {
+  first_entry: PollingStationResults;
+  second_entry: PollingStationResults;
 }
 
 /**
@@ -207,6 +239,7 @@ export type ErrorReference =
   | "InvalidData"
   | "InvalidJson"
   | "InvalidDataEntryNumber"
+  | "InvalidStateTransition"
   | "EntryNotUnique"
   | "DatabaseError"
   | "InternalServerError"
@@ -224,6 +257,12 @@ export interface ErrorResponse {
   error: string;
   fatal: boolean;
   reference: ErrorReference;
+}
+
+export interface FirstEntryInProgress {
+  client_state: unknown;
+  first_entry: PollingStationResults;
+  progress: number;
 }
 
 /**
@@ -314,41 +353,27 @@ export interface PollingStationResults {
   votes_counts: VotesCounts;
 }
 
-export type PollingStationStatus =
-  | "not_started"
-  | "first_entry_in_progress"
-  | "first_entry_unfinished"
-  | "second_entry"
-  | "second_entry_in_progress"
-  | "second_entry_unfinished"
-  | "definitive";
-
-export interface PollingStationStatusEntry {
-  data_entry_progress?: number;
-  finished_at?: number;
-  id: number;
-  status: PollingStationStatus;
-}
-
 /**
  * Type of Polling station
  */
 export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
 
 /**
- * Request structure for saving data entry of polling station results
- */
-export interface SaveDataEntryRequest {
-  client_state: unknown;
-  data: PollingStationResults;
-  progress: number;
-}
-
-/**
  * Response structure for saving data entry of polling station results
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
+}
+
+export interface SecondEntryInProgress {
+  client_state: unknown;
+  finalised_first_entry: PollingStationResults;
+  progress: number;
+  second_entry: PollingStationResults;
+}
+
+export interface SecondEntryNotStarted {
+  finalised_first_entry: PollingStationResults;
 }
 
 export interface ValidationResult {

@@ -20,6 +20,7 @@
     "PollingStationSecondEntryAlreadyFinalised": "De tweede invoer voor dit stembureau is al definitief",
     "PollingStationResultsAlreadyFinalised": "De invoer voor dit stembureau is al definitief",
     "PollingStationDataValidation": "De invoer voor dit stembureau is niet geldig",
+    "InvalidStateTransition": "Er is een ongeldige actie uitgevoerd",
     "InvalidVoteGroup": "De politieke partij van de stem is niet geldig",
     "InvalidVoteCandidate": "De kandidaat van de stem is niet geldig",
     "InvalidDataEntryNumber": "Het invoer nummer is ongeldig",

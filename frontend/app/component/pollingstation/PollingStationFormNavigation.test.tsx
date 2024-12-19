@@ -100,7 +100,6 @@ describe("PollingStationFormNavigation", () => {
       values: {
         recounted: true,
       },
-      entryNumber: 1,
     });
 
     (useBlocker as Mock).mockReturnValue({

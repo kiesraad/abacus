@@ -86,14 +86,18 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
         .filter((ps) => ps.election_id === Number(params.election_id))
         .map((ps) => ps.id);
 
-      for (const id of pollingStationIds) {
-        if (Database.results.some((r) => r.pollingStationId === id)) {
-          response.statuses.push({ id, status: "definitive" });
-        } else if (Database.dataEntries.some((d) => d.pollingStationId === id)) {
-          const dataEntry = Database.dataEntries.find((d) => d.pollingStationId === id);
-          response.statuses.push({ id, status: "first_entry_in_progress", data_entry_progress: dataEntry?.progress });
+      for (const polling_station_id of pollingStationIds) {
+        if (Database.results.some((r) => r.pollingStationId === polling_station_id)) {
+          response.statuses.push({ polling_station_id, status: "definitive" });
+        } else if (Database.dataEntries.some((d) => d.pollingStationId === polling_station_id)) {
+          const dataEntry = Database.dataEntries.find((d) => d.pollingStationId === polling_station_id);
+          response.statuses.push({
+            polling_station_id,
+            status: "first_entry_in_progress",
+            first_data_entry_progress: dataEntry?.progress,
+          });
         } else {
-          response.statuses.push({ id, status: "not_started" });
+          response.statuses.push({ polling_station_id, status: "first_entry_not_started" });
         }
       }
 
@@ -125,7 +129,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   SaveDataEntryResponse | ErrorResponse
->("/api/polling_stations/:polling_station_id/data_entries/:entry_number", async ({ request, params }) => {
+>("/api/polling_stations/:polling_station_id/data_entries", async ({ request, params }) => {
   let json: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
 
   try {
@@ -144,16 +148,13 @@ export const PollingStationDataEntrySaveHandler = http.post<
 
     const dataEntry: DataEntryRecord = {
       pollingStationId: Number(params.polling_station_id),
-      entryNumber: Number(params.entry_number),
       progress: json.progress,
       data: json.data,
       clientState: json.client_state as ClientState,
       updated_at: Number(Date.now() / 1000),
     };
 
-    Database.dataEntries = Database.dataEntries.filter(
-      (d) => d.pollingStationId !== dataEntry.pollingStationId || d.entryNumber !== dataEntry.entryNumber,
-    );
+    Database.dataEntries = Database.dataEntries.filter((d) => d.pollingStationId !== dataEntry.pollingStationId);
     Database.dataEntries.push(dataEntry);
 
     const response: SaveDataEntryResponse = {
@@ -179,12 +180,9 @@ export const PollingStationDataEntrySaveHandler = http.post<
 // get data entry handler
 export const PollingStationDataEntryGetHandler = http.get<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
->("/api/polling_stations/:polling_station_id/data_entries/:entry_number", ({ params }) => {
+>("/api/polling_stations/:polling_station_id/data_entries", ({ params }) => {
   const pollingStationId = Number(params.polling_station_id);
-  const entryNumber = Number(params.entry_number);
-  const dataEntryRecord = Database.dataEntries.find(
-    (d) => d.pollingStationId === pollingStationId && d.entryNumber === entryNumber,
-  );
+  const dataEntryRecord = Database.dataEntries.find((d) => d.pollingStationId === pollingStationId);
   if (!dataEntryRecord) return HttpResponse.text(null, { status: 404 });
 
   const response: GetDataEntryResponse = {
@@ -200,20 +198,16 @@ export const PollingStationDataEntryGetHandler = http.get<
 // delete data entry handler
 export const PollingStationDataEntryDeleteHandler = http.delete<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
->("/api/polling_stations/:polling_station_id/data_entries/:entry_number", ({ params }) => {
-  Database.dataEntries = Database.dataEntries.filter(
-    (d) => d.pollingStationId !== Number(params.polling_station_id) || d.entryNumber !== Number(params.entry_number),
-  );
+>("/api/polling_stations/:polling_station_id/data_entries", ({ params }) => {
+  Database.dataEntries = Database.dataEntries.filter((d) => d.pollingStationId !== Number(params.polling_station_id));
   return HttpResponse.text(null, { status: 204 });
 });
 
 // finalise data entry handler
 export const PollingStationDataEntryFinaliseHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
->("/api/polling_stations/:polling_station_id/data_entries/:entry_number/finalise", ({ params }) => {
-  const idx = Database.dataEntries.findIndex(
-    (d) => d.pollingStationId === Number(params.polling_station_id) && d.entryNumber === Number(params.entry_number),
-  );
+>("/api/polling_stations/:polling_station_id/data_entries/finalise", ({ params }) => {
+  const idx = Database.dataEntries.findIndex((d) => d.pollingStationId === Number(params.polling_station_id));
   if (idx === -1) return HttpResponse.text(null, { status: 404 });
 
   const dataEntry = Database.dataEntries.splice(idx, 1)[0];
@@ -221,7 +215,6 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
 
   Database.results.push({
     pollingStationId: dataEntry.pollingStationId,
-    entryNumber: dataEntry.entryNumber,
     data: dataEntry.data,
     created_at: dataEntry.updated_at,
   });

@@ -30,7 +30,6 @@ import { PollingStationControllerContext } from "./PollingStationControllerConte
 export interface PollingStationFormControllerProps {
   election: Required<Election>;
   pollingStationId: number;
-  entryNumber: number;
   children: React.ReactNode;
   defaultValues?: Partial<PollingStationResults>;
   defaultFormState?: Partial<FormState>;
@@ -132,7 +131,6 @@ export type Status = "idle" | "saving" | "deleting" | "deleted" | "finalising" |
 export function PollingStationFormController({
   election,
   pollingStationId,
-  entryNumber,
   children,
   defaultValues = undefined,
   defaultFormState = undefined,
@@ -227,14 +225,14 @@ export function PollingStationFormController({
   // check if the targetFormSectionID has changed and navigate to the url for that section
   React.useEffect(() => {
     if (!targetFormSectionID) return;
-    const url = getUrlForFormSectionID(election.id, pollingStationId, entryNumber, targetFormSectionID);
-    if (location.pathname === getBaseUrl(election.id, pollingStationId, entryNumber)) {
+    const url = getUrlForFormSectionID(election.id, pollingStationId, targetFormSectionID);
+    if (location.pathname === getBaseUrl(election.id, pollingStationId)) {
       navigate(url, { replace: true });
     } else if (location.pathname !== url) {
       navigate(url);
     }
     setTargetFormSectionID(null);
-  }, [targetFormSectionID, navigate, election.id, pollingStationId, entryNumber, location.pathname]);
+  }, [targetFormSectionID, navigate, election.id, pollingStationId, location.pathname]);
 
   const registerCurrentForm = React.useCallback(
     (form: AnyFormReference) => {
@@ -401,7 +399,6 @@ export function PollingStationFormController({
         deleteDataEntry,
         finaliseDataEntry,
         pollingStationId,
-        entryNumber,
       }}
     >
       {children}

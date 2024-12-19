@@ -24,7 +24,6 @@ function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
     <PollingStationFormController
       election={electionMockData}
       pollingStationId={pollingStationMockData.id}
-      entryNumber={1}
       defaultValues={defaultValues}
     >
       <DifferencesForm />

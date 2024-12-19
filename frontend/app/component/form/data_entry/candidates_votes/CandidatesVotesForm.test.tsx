@@ -24,12 +24,7 @@ import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
   return render(
-    <PollingStationFormController
-      election={electionMockData}
-      pollingStationId={1}
-      entryNumber={1}
-      defaultValues={defaultValues}
-    >
+    <PollingStationFormController election={electionMockData} pollingStationId={1} defaultValues={defaultValues}>
       <CandidatesVotesForm group={politicalGroupMockData} />
     </PollingStationFormController>,
   );
@@ -61,11 +56,7 @@ describe("Test CandidatesVotesForm", () => {
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <PollingStationFormController
-          election={electionMockData}
-          pollingStationId={pollingStationMockData.id}
-          entryNumber={1}
-        >
+        <PollingStationFormController election={electionMockData} pollingStationId={pollingStationMockData.id}>
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>
       );
@@ -94,11 +85,7 @@ describe("Test CandidatesVotesForm", () => {
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <PollingStationFormController
-          election={electionMockData}
-          pollingStationId={pollingStationMockData.id}
-          entryNumber={1}
-        >
+        <PollingStationFormController election={electionMockData} pollingStationId={pollingStationMockData.id}>
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>
       );
@@ -283,11 +270,7 @@ describe("Test CandidatesVotesForm", () => {
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <PollingStationFormController
-          election={electionMockData}
-          pollingStationId={pollingStationMockData.id}
-          entryNumber={1}
-        >
+        <PollingStationFormController election={electionMockData} pollingStationId={pollingStationMockData.id}>
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>
       );

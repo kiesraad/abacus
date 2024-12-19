@@ -23,11 +23,7 @@ const mockNavigate = vi.fn();
 const renderAbortDataEntryControl = () => {
   render(
     <ElectionProvider electionId={1}>
-      <PollingStationFormController
-        election={electionMockData}
-        pollingStationId={pollingStationMockData.id}
-        entryNumber={1}
-      >
+      <PollingStationFormController election={electionMockData} pollingStationId={pollingStationMockData.id}>
         <AbortDataEntryControl />
         <VotersAndVotesForm />
       </PollingStationFormController>

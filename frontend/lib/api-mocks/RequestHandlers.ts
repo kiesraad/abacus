@@ -129,7 +129,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   SaveDataEntryResponse | ErrorResponse
->("/api/polling_stations/:polling_station_id/data_entries/:entry_number", async ({ request, params }) => {
+>("/api/polling_stations/:polling_station_id/data_entries", async ({ request, params }) => {
   let json: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
 
   try {
@@ -180,7 +180,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
 // get data entry handler
 export const PollingStationDataEntryGetHandler = http.get<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
->("/api/polling_stations/:polling_station_id/data_entries/:entry_number", ({ params }) => {
+>("/api/polling_stations/:polling_station_id/data_entries", ({ params }) => {
   const pollingStationId = Number(params.polling_station_id);
   const dataEntryRecord = Database.dataEntries.find((d) => d.pollingStationId === pollingStationId);
   if (!dataEntryRecord) return HttpResponse.text(null, { status: 404 });
@@ -198,7 +198,7 @@ export const PollingStationDataEntryGetHandler = http.get<
 // delete data entry handler
 export const PollingStationDataEntryDeleteHandler = http.delete<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
->("/api/polling_stations/:polling_station_id/data_entries/:entry_number", ({ params }) => {
+>("/api/polling_stations/:polling_station_id/data_entries", ({ params }) => {
   Database.dataEntries = Database.dataEntries.filter((d) => d.pollingStationId !== Number(params.polling_station_id));
   return HttpResponse.text(null, { status: 204 });
 });
@@ -206,7 +206,7 @@ export const PollingStationDataEntryDeleteHandler = http.delete<
 // finalise data entry handler
 export const PollingStationDataEntryFinaliseHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
->("/api/polling_stations/:polling_station_id/data_entries/:entry_number/finalise", ({ params }) => {
+>("/api/polling_stations/:polling_station_id/data_entries/finalise", ({ params }) => {
   const idx = Database.dataEntries.findIndex((d) => d.pollingStationId === Number(params.polling_station_id));
   if (idx === -1) return HttpResponse.text(null, { status: 404 });
 

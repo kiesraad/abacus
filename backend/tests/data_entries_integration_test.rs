@@ -11,8 +11,8 @@ use std::net::SocketAddr;
 
 use utils::serve_api;
 
-mod utils;
 mod shared;
+mod utils;
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {

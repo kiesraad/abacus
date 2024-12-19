@@ -74,7 +74,7 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__  
 
-1a. De beheerder of coördinator selecteert een andere verkiezing dan van het bestand en de lijst met stembureaus:
+1a. De beheerder of coördinator selecteert een andere verkiezing dan van het EML_NL-bestand en de lijst met gepubliceerde stembureaus:
 
 2a. Er is geen te importeren bestand met stembureaus:  
 &emsp; 2a1. De beheerder of coördinator voert de stembureaus handmatig in.

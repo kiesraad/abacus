@@ -102,7 +102,7 @@ pub struct EntriesNotEqual {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 pub struct Definitive {
     #[schema(value_type = String)]
-    pub finalised_at: chrono::DateTime<chrono::Utc>,
+    pub finished_at: chrono::DateTime<chrono::Utc>,
 }
 
 impl DataEntryStatus {
@@ -185,7 +185,7 @@ impl DataEntryStatus {
                 if true {
                     Ok((
                         Self::Definitive(Definitive {
-                            finalised_at: chrono::Utc::now(),
+                            finished_at: chrono::Utc::now(),
                         }),
                         Some(state.second_entry),
                     ))
@@ -234,13 +234,13 @@ impl DataEntryStatus {
         match entry_number {
             EntryNumber::FirstEntry => Ok((
                 Self::Definitive(Definitive {
-                    finalised_at: chrono::Utc::now(),
+                    finished_at: chrono::Utc::now(),
                 }),
                 first_entry,
             )),
             EntryNumber::SecondEntry => Ok((
                 Self::Definitive(Definitive {
-                    finalised_at: chrono::Utc::now(),
+                    finished_at: chrono::Utc::now(),
                 }),
                 second_entry,
             )),
@@ -314,9 +314,9 @@ impl DataEntryStatus {
         )
     }
 
-    pub fn finalised_at(&self) -> Option<&chrono::DateTime<chrono::Utc>> {
+    pub fn finished_at(&self) -> Option<&chrono::DateTime<chrono::Utc>> {
         match self {
-            DataEntryStatus::Definitive(Definitive { finalised_at }) => Some(finalised_at),
+            DataEntryStatus::Definitive(Definitive { finished_at }) => Some(finished_at),
             _ => None,
         }
     }

@@ -23,15 +23,15 @@ describe("ElectionStatusPage", () => {
       statuses: [
         {
           polling_station_id: 1,
-          status: "not_started",
+          status: "first_entry_not_started",
         },
         {
           polling_station_id: 2,
-          status: "second_entry",
+          status: "second_entry_not_started",
         },
         {
           polling_station_id: 3,
-          status: "first_entry_unfinished",
+          status: "first_entry_in_progress",
           first_data_entry_progress: 60,
         },
         {

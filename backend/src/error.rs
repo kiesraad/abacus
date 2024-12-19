@@ -26,7 +26,6 @@ pub enum ErrorReference {
     PollingStationSecondEntryAlreadyFinalised,
     PollingStationResultsAlreadyFinalised,
     PollingStationDataValidation,
-    PollingStationStatusTransition,
     InvalidVoteGroup,
     InvalidVoteCandidate,
     InvalidData,
@@ -280,10 +279,7 @@ impl From<SeError> for APIError {
 
 impl From<DataEntryTransitionError> for APIError {
     fn from(err: DataEntryTransitionError) -> Self {
-        Self::Conflict(
-            err.to_string(),
-            ErrorReference::PollingStationStatusTransition,
-        )
+        Self::Conflict(err.to_string(), ErrorReference::InvalidStateTransition)
     }
 }
 

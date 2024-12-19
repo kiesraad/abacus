@@ -422,7 +422,7 @@ export const electionStatusMockResponse: ElectionStatusResponse = {
   statuses: [
     {
       polling_station_id: 1,
-      status: "not_started",
+      status: "first_entry_not_started",
     },
     {
       polling_station_id: 2,

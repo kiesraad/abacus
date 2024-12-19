@@ -132,6 +132,18 @@ export interface DataEntry {
   progress: number;
 }
 
+export type DataEntryStatusName =
+  | "first_entry_not_started"
+  | "first_entry_in_progress"
+  | "second_entry_not_started"
+  | "second_entry_in_progress"
+  | "entries_not_equal"
+  | "definitive";
+
+export interface Definitive {
+  finished_at: string;
+}
+
 /**
  * Differences counts, part of the polling station results.
  */
@@ -199,19 +211,16 @@ export interface ElectionStatusResponse {
  * Election polling stations data entry statuses response
  */
 export interface ElectionStatusResponseEntry {
-  first_data_entry_progress?: unknown;
+  finished_at?: string;
+  first_data_entry_progress?: number;
   polling_station_id: number;
-  second_data_entry_progress?: unknown;
-  status: string;
+  second_data_entry_progress?: number;
+  status: DataEntryStatusName;
 }
 
 export interface EntriesNotEqual {
   first_entry: PollingStationResults;
   second_entry: PollingStationResults;
-}
-
-export interface EntryResult {
-  finalised_entry: PollingStationResults;
 }
 
 /**
@@ -225,7 +234,6 @@ export type ErrorReference =
   | "PollingStationSecondEntryAlreadyFinalised"
   | "PollingStationResultsAlreadyFinalised"
   | "PollingStationDataValidation"
-  | "PollingStationStatusTransition"
   | "InvalidVoteGroup"
   | "InvalidVoteCandidate"
   | "InvalidData"

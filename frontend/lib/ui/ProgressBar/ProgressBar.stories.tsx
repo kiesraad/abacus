@@ -32,7 +32,6 @@ export const MultiProgressBar: Story<ProgressBarProps> = ({
   title,
   data = [
     { percentage: 5, class: "errors-and-warnings" },
-    { percentage: 3, class: "unfinished" },
     { percentage: 35, class: "in-progress" },
     { percentage: 30, class: "first-entry-finished" },
     { percentage: 25, class: "definitive" },

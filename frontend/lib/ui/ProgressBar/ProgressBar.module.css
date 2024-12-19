@@ -47,10 +47,6 @@
   background-color: var(--progress-bar-errors-and-warnings);
 }
 
-:global(.unfinished) {
-  background-color: var(--progress-bar-unfinished);
-}
-
 :global(.in-progress) {
   background-color: var(--progress-bar-in-progress);
 }

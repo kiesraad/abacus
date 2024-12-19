@@ -97,7 +97,7 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
             first_data_entry_progress: dataEntry?.progress,
           });
         } else {
-          response.statuses.push({ polling_station_id, status: "not_started" });
+          response.statuses.push({ polling_station_id, status: "first_entry_not_started" });
         }
       }
 

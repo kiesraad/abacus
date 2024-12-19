@@ -7,6 +7,7 @@ use axum::extract::{FromRequest, Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
+use chrono::{DateTime, Utc};
 use repository::PollingStationResultsEntries;
 use serde::{Deserialize, Serialize};
 use status::{ClientState, DataEntryStatus, DataEntryStatusName};
@@ -267,8 +268,13 @@ pub struct ElectionStatusResponse {
 pub struct ElectionStatusResponseEntry {
     pub polling_station_id: u32,
     pub status: DataEntryStatusName,
+    #[schema(value_type = u8, required = false)]
     pub first_data_entry_progress: Option<u8>,
+    #[schema(value_type = u8, required = false)]
     pub second_data_entry_progress: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String)]
+    pub finished_at: Option<DateTime<Utc>>,
 }
 
 /// Get election polling stations data entry statuses
@@ -297,6 +303,7 @@ pub async fn election_status(
             status: status.state.status_name(),
             first_data_entry_progress: status.state.get_first_entry_progress(),
             second_data_entry_progress: status.state.get_second_entry_progress(),
+            finished_at: status.state.finished_at().cloned(),
         })
         .collect();
     Ok(Json(ElectionStatusResponse { statuses }))

@@ -50,7 +50,7 @@ export const BasicTable: Story = () => (
             <Table.NumberCell className="bg-gray">34</Table.NumberCell>
             <Table.Cell>
               <span>Testplek</span>
-              <Badge type="not_started" />
+              <Badge type="first_entry_not_started" />
             </Table.Cell>
           </Table.Row>
         </Table.Body>

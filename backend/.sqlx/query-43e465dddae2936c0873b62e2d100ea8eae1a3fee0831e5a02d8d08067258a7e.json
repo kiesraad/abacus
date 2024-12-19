@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\nSELECT\n  polling_station_id AS \"id: u32\",\n  state AS \"state: _\",\n  updated_at\nFROM polling_station_data_entries\nWHERE polling_station_id = ?\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "state: _",
+        "ordinal": 1,
+        "type_info": "Blob"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 2,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "43e465dddae2936c0873b62e2d100ea8eae1a3fee0831e5a02d8d08067258a7e"
+}

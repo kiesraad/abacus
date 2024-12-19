@@ -46,15 +46,32 @@ impl IntoResponse for SaveDataEntryResponse {
     }
 }
 
+/// Claim a data entry for a polling station
+#[utoipa::path(
+    post,
+    path = "/api/polling_stations/{polling_station_id}/data_entries/claim",
+    request_body = DataEntry,
+    responses(
+        (status = 200, description = "Data entry claimed successfully", body = SaveDataEntryResponse),
+        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
 pub async fn polling_station_data_entry_claim(
-    Path(id): Path<u32>,
+    Path(polling_station_id): Path<u32>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(elections): State<Elections>,
     data_entry_request: DataEntry,
 ) -> Result<SaveDataEntryResponse, APIError> {
-    let polling_station_data_entry: DataEntryStatus =
-        polling_station_data_entries.get_or_create(id).await?;
+    let polling_station_data_entry: DataEntryStatus = polling_station_data_entries
+        .get_or_create(polling_station_id)
+        .await?;
 
     let new_state = polling_station_data_entry.claim_entry(
         data_entry_request.progress,
@@ -62,13 +79,15 @@ pub async fn polling_station_data_entry_claim(
         data_entry_request.client_state,
     )?;
 
-    let polling_station = polling_stations_repo.get(id).await?;
+    let polling_station = polling_stations_repo.get(polling_station_id).await?;
     let election = elections.get(polling_station.election_id).await?;
 
     let validation_results =
         validate_polling_station_results(new_state.get_data()?, &polling_station, &election)?;
 
-    polling_station_data_entries.upsert(id, new_state).await?;
+    polling_station_data_entries
+        .upsert(polling_station_id, new_state)
+        .await?;
 
     Ok(SaveDataEntryResponse { validation_results })
 }
@@ -76,7 +95,7 @@ pub async fn polling_station_data_entry_claim(
 /// Save or update a data entry for a polling station
 #[utoipa::path(
     post,
-    path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
+    path = "/api/polling_stations/{polling_station_id}/data_entries",
     request_body = DataEntry,
     responses(
         (status = 200, description = "Data entry saved successfully", body = SaveDataEntryResponse),
@@ -87,7 +106,6 @@ pub async fn polling_station_data_entry_claim(
     ),
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
-        ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
 )]
 pub async fn polling_station_data_entry_save(
@@ -133,7 +151,7 @@ pub struct GetDataEntryResponse {
 /// Get an in-progress (not finalised) data entry for a polling station
 #[utoipa::path(
     get,
-    path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
+    path = "/api/polling_stations/{polling_station_id}/data_entries",
     responses(
         (status = 200, description = "Data entry retrieved successfully", body = GetDataEntryResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
@@ -141,7 +159,6 @@ pub struct GetDataEntryResponse {
     ),
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
-        ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
 )]
 pub async fn polling_station_data_entry_get(
@@ -174,7 +191,7 @@ pub async fn polling_station_data_entry_get(
 /// Delete an in-progress (not finalised) data entry for a polling station
 #[utoipa::path(
     delete,
-    path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
+    path = "/api/polling_stations/{polling_station_id}/data_entries",
     responses(
         (status = 204, description = "Data entry deleted successfully"),
         (status = 404, description = "Not found", body = ErrorResponse),
@@ -182,7 +199,6 @@ pub async fn polling_station_data_entry_get(
     ),
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
-        ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
 )]
 pub async fn polling_station_data_entry_delete(
@@ -197,7 +213,7 @@ pub async fn polling_station_data_entry_delete(
 /// Finalise the data entry for a polling station
 #[utoipa::path(
     post,
-    path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise",
+    path = "/api/polling_stations/{polling_station_id}/data_entries/finalise",
     responses(
         (status = 200, description = "Data entry finalised successfully"),
         (status = 404, description = "Not found", body = ErrorResponse),
@@ -207,7 +223,6 @@ pub async fn polling_station_data_entry_delete(
     ),
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
-        ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
 )]
 pub async fn polling_station_data_entry_finalise(

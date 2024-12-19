@@ -110,11 +110,8 @@ pub async fn polling_station_data_entry_save(
     let polling_station = polling_stations_repo.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
 
-    let validation_results = validate_polling_station_results(
-        new_state.get_data()?,
-        &polling_station,
-        &election,
-    )?;
+    let validation_results =
+        validate_polling_station_results(new_state.get_data()?, &polling_station, &election)?;
 
     // Save the data entry or update it if it already exists
     polling_station_data_entries.upsert(id, new_state).await?;

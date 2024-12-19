@@ -1,9 +1,12 @@
 ---
 name: Epic template
-about: template for epics
+about: Template for epics
 title: 'Epic: '
+type: epic
 labels: ''
 assignees: ''
+projects: ["kiesraad/1"]
+area: epic
 
 ---
 

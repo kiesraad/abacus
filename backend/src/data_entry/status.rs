@@ -26,6 +26,7 @@ pub enum DataEntryStatus {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+#[serde(rename_all = "snake_case")]
 pub enum DataEntryStatusName {
     FirstEntryNotStarted,
     FirstEntryInProgress,

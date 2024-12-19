@@ -13,11 +13,11 @@ FirstEntryInProgress --> FirstEntryNotStarted: delete
 SecondEntryNotStarted --> SecondEntryInProgress: claim
 #SecondEntryInProgress --> SecondEntryInProgress: save
 state is_equal <<choice>>
-is_equal --> EntryResult: equal? yes
+is_equal --> Definitive: equal? yes
 is_equal --> EntriesNotEqual: equal? no
 SecondEntryInProgress --> is_equal: finalise
 SecondEntryInProgress --> SecondEntryNotStarted: delete
 #EntriesNotEqual --> EntriesNotEqual: save
 # Will be Implemented in #130: EntriesNotEqual --> NotStarted: delete
-EntriesNotEqual --> EntryResult: resolve
+EntriesNotEqual --> Definitive: resolve
 ```

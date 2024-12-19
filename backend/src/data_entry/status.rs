@@ -22,7 +22,7 @@ pub enum DataEntryStatus {
     SecondEntryNotStarted(SecondEntryNotStarted),
     SecondEntryInProgress(SecondEntryInProgress),
     EntriesNotEqual(EntriesNotEqual),
-    EntryResult(EntryResult), // First and second entry are finished
+    Definitive(Definitive), // First and second entry are finished
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
@@ -32,7 +32,7 @@ pub enum DataEntryStatusName {
     SecondEntryNotStarted,
     SecondEntryInProgress,
     EntriesNotEqual,
-    EntryResult,
+    Definitive,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
@@ -99,8 +99,9 @@ pub struct EntriesNotEqual {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
-pub struct EntryResult {
-    pub finalised_entry: PollingStationResults,
+pub struct Definitive {
+    #[schema(value_type = String)]
+    pub finalised_at: chrono::DateTime<chrono::Utc>,
 }
 
 impl DataEntryStatus {
@@ -163,24 +164,38 @@ impl DataEntryStatus {
         }
     }
 
-    pub fn finalise_entry(self) -> Result<Self, DataEntryTransitionError> {
+    pub fn finalise_first_entry(self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => {
                 Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
                     finalised_first_entry: state.first_entry,
                 }))
             }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    pub fn finalise_second_entry(
+        self,
+    ) -> Result<(Self, Option<PollingStationResults>), DataEntryTransitionError> {
+        match self {
             DataEntryStatus::SecondEntryInProgress(state) => {
                 // TODO: Add the check implemented in #745
                 if true {
-                    Ok(Self::EntryResult(EntryResult {
-                        finalised_entry: state.second_entry,
-                    }))
+                    Ok((
+                        Self::Definitive(Definitive {
+                            finalised_at: chrono::Utc::now(),
+                        }),
+                        Some(state.second_entry),
+                    ))
                 } else {
-                    Ok(Self::EntriesNotEqual(EntriesNotEqual {
-                        first_entry: state.finalised_first_entry,
-                        second_entry: state.second_entry,
-                    }))
+                    Ok((
+                        Self::EntriesNotEqual(EntriesNotEqual {
+                            first_entry: state.finalised_first_entry,
+                            second_entry: state.second_entry,
+                        }),
+                        None,
+                    ))
                 }
             }
             _ => Err(DataEntryTransitionError::Invalid),
@@ -203,7 +218,10 @@ impl DataEntryStatus {
         }
     }
 
-    pub fn resolve(self, entry_number: EntryNumber) -> Result<Self, DataEntryTransitionError> {
+    pub fn resolve(
+        self,
+        entry_number: EntryNumber,
+    ) -> Result<(Self, PollingStationResults), DataEntryTransitionError> {
         let DataEntryStatus::EntriesNotEqual(EntriesNotEqual {
             first_entry,
             second_entry,
@@ -213,12 +231,18 @@ impl DataEntryStatus {
         };
 
         match entry_number {
-            EntryNumber::FirstEntry => Ok(Self::EntryResult(EntryResult {
-                finalised_entry: first_entry,
-            })),
-            EntryNumber::SecondEntry => Ok(Self::EntryResult(EntryResult {
-                finalised_entry: second_entry,
-            })),
+            EntryNumber::FirstEntry => Ok((
+                Self::Definitive(Definitive {
+                    finalised_at: chrono::Utc::now(),
+                }),
+                first_entry,
+            )),
+            EntryNumber::SecondEntry => Ok((
+                Self::Definitive(Definitive {
+                    finalised_at: chrono::Utc::now(),
+                }),
+                second_entry,
+            )),
         }
     }
 
@@ -247,7 +271,7 @@ impl DataEntryStatus {
             DataEntryStatus::SecondEntryNotStarted(_) => 0,
             DataEntryStatus::SecondEntryInProgress(state) => state.progress,
             DataEntryStatus::EntriesNotEqual(_) => 100,
-            DataEntryStatus::EntryResult(_) => 100,
+            DataEntryStatus::Definitive(_) => 100,
         }
     }
 
@@ -257,7 +281,6 @@ impl DataEntryStatus {
             DataEntryStatus::FirstEntryInProgress(state) => Ok(&state.first_entry),
             DataEntryStatus::SecondEntryInProgress(state) => Ok(&state.second_entry),
             DataEntryStatus::EntriesNotEqual(state) => Ok(&state.second_entry),
-            DataEntryStatus::EntryResult(state) => Ok(&state.finalised_entry),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -279,7 +302,21 @@ impl DataEntryStatus {
             DataEntryStatus::SecondEntryNotStarted(_) => DataEntryStatusName::SecondEntryNotStarted,
             DataEntryStatus::SecondEntryInProgress(_) => DataEntryStatusName::SecondEntryInProgress,
             DataEntryStatus::EntriesNotEqual(_) => DataEntryStatusName::EntriesNotEqual,
-            DataEntryStatus::EntryResult(_) => DataEntryStatusName::EntryResult,
+            DataEntryStatus::Definitive(_) => DataEntryStatusName::Definitive,
+        }
+    }
+
+    pub fn is_first_entry_finished(&self) -> bool {
+        matches!(
+            self,
+            DataEntryStatus::FirstEntryNotStarted | DataEntryStatus::FirstEntryInProgress(_)
+        )
+    }
+
+    pub fn finalised_at(&self) -> Option<&chrono::DateTime<chrono::Utc>> {
+        match self {
+            DataEntryStatus::Definitive(Definitive { finalised_at }) => Some(finalised_at),
+            _ => None,
         }
     }
 }

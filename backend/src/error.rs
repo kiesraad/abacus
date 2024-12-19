@@ -1,6 +1,7 @@
 use std::error::Error;
 
 use crate::authentication::AuthenticationError;
+use crate::data_entry::status::DataEntryTransitionError;
 use crate::data_entry::DataError;
 use axum::extract::rejection::JsonRejection;
 use axum::http::StatusCode;
@@ -25,11 +26,13 @@ pub enum ErrorReference {
     PollingStationSecondEntryAlreadyFinalised,
     PollingStationResultsAlreadyFinalised,
     PollingStationDataValidation,
+    PollingStationStatusTransition,
     InvalidVoteGroup,
     InvalidVoteCandidate,
     InvalidData,
     InvalidJson,
     InvalidDataEntryNumber,
+    InvalidStateTransition,
     EntryNotUnique,
     DatabaseError,
     InternalServerError,
@@ -59,6 +62,7 @@ impl IntoResponse for ErrorResponse {
 /// trait implementation
 #[derive(Debug)]
 pub enum APIError {
+    BadRequest(String, ErrorReference),
     NotFound(String, ErrorReference),
     Conflict(String, ErrorReference),
     InvalidData(DataError),
@@ -85,6 +89,9 @@ impl IntoResponse for APIError {
         }
 
         let (status, response) = match self {
+            APIError::BadRequest(message, reference) => {
+                (StatusCode::BAD_REQUEST, to_error(&message, reference, true))
+            }
             APIError::NotFound(message, reference) => {
                 (StatusCode::NOT_FOUND, to_error(&message, reference, true))
             }
@@ -268,6 +275,15 @@ impl From<InvalidHeaderValue> for APIError {
 impl From<SeError> for APIError {
     fn from(err: SeError) -> Self {
         APIError::XmlError(err)
+    }
+}
+
+impl From<DataEntryTransitionError> for APIError {
+    fn from(err: DataEntryTransitionError) -> Self {
+        Self::Conflict(
+            err.to_string(),
+            ErrorReference::PollingStationStatusTransition,
+        )
     }
 }
 

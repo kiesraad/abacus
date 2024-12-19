@@ -138,7 +138,7 @@ export function PollingStationFormController({
   defaultFormState = undefined,
   defaultCurrentForm = null,
 }: PollingStationFormControllerProps) {
-  const requestPath: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+  const requestPath: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries`;
   const client = useApi();
   const navigate = useNavigate();
   const location = useLocation();

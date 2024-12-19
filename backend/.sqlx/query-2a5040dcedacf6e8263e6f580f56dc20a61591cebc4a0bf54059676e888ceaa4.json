@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT data FROM polling_station_data_entries",
+  "query": "SELECT state FROM polling_station_data_entries",
   "describe": {
     "columns": [
       {
-        "name": "data",
+        "name": "state",
         "ordinal": 0,
         "type_info": "Blob"
       }
@@ -13,8 +13,8 @@
       "Right": 0
     },
     "nullable": [
-      true
+      false
     ]
   },
-  "hash": "54090c6e48184f53333337402e420a5e1869df3c942949b3846d1f930bfaad70"
+  "hash": "2a5040dcedacf6e8263e6f580f56dc20a61591cebc4a0bf54059676e888ceaa4"
 }

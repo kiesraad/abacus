@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\nSELECT\n  id AS \"id: u32\",\n  de.state AS \"state: _\",\n  updated_at\nFROM polling_stations AS p\nLEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id\nWHERE election_id = $1\n",
+  "query": "SELECT polling_station_id AS \"polling_station_id: u32\", state AS \"state: _\", updated_at FROM polling_station_data_entries WHERE polling_station_id = ?",
   "describe": {
     "columns": [
       {
-        "name": "id: u32",
+        "name": "polling_station_id: u32",
         "ordinal": 0,
         "type_info": "Integer"
       },
@@ -28,5 +28,5 @@
       false
     ]
   },
-  "hash": "d7b71f41dac9d563ccbc24dbf99836dc7c0343ca1990d9c6d9d391eb951b03e7"
+  "hash": "703ab91ea4cd46402b6fc85e39ee1313f0862d266683c411f80ef36b4d82bc09"
 }

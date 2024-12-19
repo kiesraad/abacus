@@ -409,7 +409,7 @@ test.describe("second data entry", () => {
     await expect(pollingStationChoicePage.fieldsetNextPollingStation).toBeVisible();
     await pollingStationChoicePage.pollingStationNumber.fill(pollingStation1.number.toString());
     await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(
-      "Stembureau 33(Op Rolletjes)is al twee keer ingevoerd",
+      "Stembureau 33 (Op Rolletjes) is al twee keer ingevoerd",
     );
     await pollingStationChoicePage.clickStart();
     await expect(pollingStationChoicePage.pollingStationSubmitFeedback).toContainText(

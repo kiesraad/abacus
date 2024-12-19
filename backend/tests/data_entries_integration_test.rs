@@ -9,10 +9,10 @@ use serde_json::json;
 use sqlx::SqlitePool;
 use std::net::SocketAddr;
 
-use crate::utils::serve_api;
+use utils::serve_api;
 
-mod shared;
 mod utils;
+mod shared;
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {

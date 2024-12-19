@@ -6,7 +6,6 @@ use sqlx::SqlitePool;
 use crate::utils::serve_api;
 use backend::election::{ElectionDetailsResponse, ElectionListResponse};
 
-mod shared;
 mod utils;
 
 #[sqlx::test(fixtures("../fixtures/elections.sql"))]

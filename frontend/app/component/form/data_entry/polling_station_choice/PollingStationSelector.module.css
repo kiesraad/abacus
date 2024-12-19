@@ -21,9 +21,8 @@
   align-content: center;
   font-size: var(--font-size-body);
   display: inline-flex;
-  gap: 0 0.5rem;
+  gap: 0.5rem;
   align-items: center;
-  flex-wrap: wrap;
   width: 100%;
 
   &.error {

@@ -70,10 +70,12 @@ export function PollingStationSelector({
                   <span className={cls.icon}>
                     <Icon icon={<IconWarning aria-label={t("contains_warning")} />} color="warning" />
                   </span>
-                  {tx("polling_station_choice.has_already_been_filled_twice", undefined, {
-                    nr: currentPollingStation.number,
-                    name: currentPollingStation.name,
-                  })}
+                  <span>
+                    {tx("polling_station_choice.has_already_been_filled_twice", undefined, {
+                      nr: currentPollingStation.number,
+                      name: currentPollingStation.name,
+                    })}
+                  </span>
                 </div>
               );
             } else {

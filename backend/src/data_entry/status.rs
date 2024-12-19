@@ -7,14 +7,14 @@ use utoipa::ToSchema;
 
 use crate::data_entry::{entry_number::EntryNumber, PollingStationResults};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum DataEntryTransitionError {
     Invalid,
     FirstEntryAlreadyClaimed,
     SecondEntryAlreadyClaimed,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
 #[serde(tag = "status", content = "state")]
 pub enum DataEntryStatus {
     FirstEntryNotStarted, // First entry has not started yet
@@ -25,7 +25,17 @@ pub enum DataEntryStatus {
     EntryResult(EntryResult), // First and second entry are finished
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, ToSchema, Type)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+pub enum DataEntryStatusName {
+    FirstEntryNotStarted,
+    FirstEntryInProgress,
+    SecondEntryNotStarted,
+    SecondEntryInProgress,
+    EntriesNotEqual,
+    EntryResult,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 pub struct FirstEntryInProgress {
     /// Data entry progress between 0 and 100
     #[schema(maximum = 100)]
@@ -34,16 +44,41 @@ pub struct FirstEntryInProgress {
     pub first_entry: PollingStationResults,
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)
-    pub client_state: Option<Box<RawValue>>,
+    pub client_state: ClientState,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, ToSchema, Type)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Type)]
+#[serde(transparent)]
+pub struct ClientState(pub Option<Box<RawValue>>);
+
+impl ClientState {
+    pub fn as_ref(&self) -> Option<&RawValue> {
+        self.0.as_ref().map(|v| v.as_ref())
+    }
+
+    pub fn new_from_str(s: Option<&str>) -> Result<ClientState, serde_json::Error> {
+        let res = s
+            .map(|v| RawValue::from_string(v.to_string()))
+            .transpose()?;
+        Ok(ClientState(res))
+    }
+}
+
+impl PartialEq for ClientState {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.as_ref().map(|v| v.get()) == other.0.as_ref().map(|v| v.get())
+    }
+}
+
+impl Eq for ClientState {}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 pub struct SecondEntryNotStarted {
     /// Data entry for a polling station
     pub finalised_first_entry: PollingStationResults,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, ToSchema, Type)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 pub struct SecondEntryInProgress {
     /// Data entry for a polling station
     pub finalised_first_entry: PollingStationResults,
@@ -54,16 +89,16 @@ pub struct SecondEntryInProgress {
     pub second_entry: PollingStationResults,
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)
-    pub client_state: Option<Box<RawValue>>,
+    pub client_state: ClientState,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, ToSchema, Type)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 pub struct EntriesNotEqual {
     pub first_entry: PollingStationResults,
     pub second_entry: PollingStationResults,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, ToSchema, Type)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 pub struct EntryResult {
     pub finalised_entry: PollingStationResults,
 }
@@ -73,7 +108,7 @@ impl DataEntryStatus {
         self,
         progress: u8,
         entry: PollingStationResults,
-        client_state: Option<Box<RawValue>>,
+        client_state: ClientState,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryNotStarted => {
@@ -91,6 +126,12 @@ impl DataEntryStatus {
                 second_entry: entry,
                 client_state,
             })),
+            DataEntryStatus::FirstEntryInProgress(_) => {
+                Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
+            }
+            DataEntryStatus::SecondEntryInProgress(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
+            }
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -99,7 +140,7 @@ impl DataEntryStatus {
         self,
         progress: u8,
         entry: PollingStationResults,
-        client_state: Option<Box<RawValue>>,
+        client_state: ClientState,
     ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(_) => {
@@ -224,25 +265,21 @@ impl DataEntryStatus {
     /// Extract the client state if there is any
     pub fn get_client_state(&self) -> Option<&RawValue> {
         match self {
-            DataEntryStatus::FirstEntryInProgress(state) => {
-                state.client_state.as_ref().map(|v| v.as_ref())
-            }
-            DataEntryStatus::SecondEntryInProgress(state) => {
-                state.client_state.as_ref().map(|v| v.as_ref())
-            }
+            DataEntryStatus::FirstEntryInProgress(state) => state.client_state.as_ref(),
+            DataEntryStatus::SecondEntryInProgress(state) => state.client_state.as_ref(),
             _ => None,
         }
     }
 
     /// Get the name of the current status as a string
-    pub fn status_name(&self) -> &'static str {
+    pub fn status_name(&self) -> DataEntryStatusName {
         match self {
-            DataEntryStatus::FirstEntryNotStarted => "FirstEntryNotStarted",
-            DataEntryStatus::FirstEntryInProgress(_) => "FirstEntryInProgress",
-            DataEntryStatus::SecondEntryNotStarted(_) => "SecondEntryNotStarted",
-            DataEntryStatus::SecondEntryInProgress(_) => "SecondEntryInProgress",
-            DataEntryStatus::EntriesNotEqual(_) => "EntriesNotEqual",
-            DataEntryStatus::EntryResult(_) => "EntryResult",
+            DataEntryStatus::FirstEntryNotStarted => DataEntryStatusName::FirstEntryNotStarted,
+            DataEntryStatus::FirstEntryInProgress(_) => DataEntryStatusName::FirstEntryInProgress,
+            DataEntryStatus::SecondEntryNotStarted(_) => DataEntryStatusName::SecondEntryNotStarted,
+            DataEntryStatus::SecondEntryInProgress(_) => DataEntryStatusName::SecondEntryInProgress,
+            DataEntryStatus::EntriesNotEqual(_) => DataEntryStatusName::EntriesNotEqual,
+            DataEntryStatus::EntryResult(_) => DataEntryStatusName::EntryResult,
         }
     }
 }
@@ -264,5 +301,51 @@ impl Display for DataEntryTransitionError {
 impl Default for DataEntryStatus {
     fn default() -> Self {
         Self::FirstEntryNotStarted
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn can_claim_not_started() {
+        let status = DataEntryStatus::FirstEntryNotStarted;
+        let entry = PollingStationResults::default();
+        let client_state = ClientState::new_from_str(Some("{}")).unwrap();
+        let progress = 0;
+
+        let new_status = status
+            .claim_entry(progress, entry.clone(), client_state.clone())
+            .unwrap();
+
+        assert_eq!(
+            new_status,
+            DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+                progress,
+                first_entry: entry,
+                client_state
+            })
+        );
+    }
+
+    #[test]
+    fn cannot_claim_already_claimed() {
+        let mut initial_entry = PollingStationResults::default();
+        initial_entry.votes_counts.votes_candidates_count = 100;
+        let initial_entry = initial_entry;
+
+        let status = DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+            progress: 0,
+            first_entry: initial_entry,
+            client_state: ClientState::new_from_str(Some("{}")).unwrap(),
+        });
+
+        let try_new_status =
+            status.claim_entry(0, PollingStationResults::default(), ClientState::default());
+        assert_eq!(
+            try_new_status,
+            Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
+        );
     }
 }

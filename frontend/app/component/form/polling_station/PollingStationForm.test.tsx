@@ -72,7 +72,7 @@ describe("PollingStationForm", () => {
       const user = userEvent.setup();
       await fillForm(user, testPollingStation);
 
-      await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+      await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
       await waitFor(() => {
         expect(onSaved).toHaveBeenCalledWith(expect.objectContaining(testPollingStation));
@@ -181,7 +181,7 @@ describe("PollingStationForm", () => {
     await user.clear(input);
     await user.type(input, "test2");
 
-    await userEvent.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
+    await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
 
     await waitFor(() => {
       expect(onSaved).toHaveBeenCalled();

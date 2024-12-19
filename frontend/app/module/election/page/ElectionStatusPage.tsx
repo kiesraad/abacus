@@ -170,7 +170,7 @@ export function ElectionStatusPage() {
   }
 
   const pollingStationsWithStatuses = pollingStations.map((ps) => {
-    const status = statuses.find((element) => element.id === ps.id);
+    const status = statuses.find((element) => element.polling_station_id === ps.id);
     return { ...ps, ...status } as PollingStationWithStatus;
   });
 

@@ -4,7 +4,6 @@ import { electionListMockResponse, getElectionMockData } from "./ElectionMockDat
 
 export interface Record {
   pollingStationId: number;
-  entryNumber: number;
   data: PollingStationResults;
 }
 
@@ -33,7 +32,6 @@ const initialData: Database = {
   results: [
     {
       pollingStationId: 4,
-      entryNumber: 1,
       created_at: new Date().getTime(),
       data: getInitialValues(getElectionMockData(1).election as Required<Election>),
     },
@@ -41,7 +39,6 @@ const initialData: Database = {
   dataEntries: [
     {
       pollingStationId: 2,
-      entryNumber: 1,
       progress: 0,
       clientState: {
         furthest: "recounted",
@@ -54,7 +51,6 @@ const initialData: Database = {
     },
     {
       pollingStationId: 3,
-      entryNumber: 1,
       progress: 42,
       clientState: {
         furthest: "political_group_votes_6",

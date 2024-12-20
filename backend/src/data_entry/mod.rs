@@ -7,6 +7,7 @@ use axum::extract::{FromRequest, Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
+use chrono::{DateTime, Utc};
 use repository::PollingStationResultsEntries;
 use serde::{Deserialize, Serialize};
 use status::{ClientState, DataEntryStatus, DataEntryStatusName};
@@ -252,8 +253,13 @@ pub struct ElectionStatusResponse {
 pub struct ElectionStatusResponseEntry {
     pub polling_station_id: u32,
     pub status: DataEntryStatusName,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub first_data_entry_progress: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub second_data_entry_progress: Option<u8>,
+    #[schema(value_type = String)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub finished_at: Option<DateTime<Utc>>,
 }
 
 /// Get election polling stations data entry statuses
@@ -282,6 +288,7 @@ pub async fn election_status(
             status: status.state.status_name(),
             first_data_entry_progress: status.state.get_first_entry_progress(),
             second_data_entry_progress: status.state.get_second_entry_progress(),
+            finished_at: status.state.finished_at().cloned(),
         })
         .collect();
     Ok(Json(ElectionStatusResponse { statuses }))
@@ -438,8 +445,8 @@ pub mod tests {
         // assert_eq!(rows.len(), 2);
         // let first_entry = rows.iter().find(|row| row.entry_number == 1).unwrap();
         // let second_entry = rows.iter().find(|row| row.entry_number == 2).unwrap();
-        // assert!(first_entry.finalised_at.is_some());
-        // assert!(second_entry.finalised_at.is_none());
+        // assert!(first_entry.finished_at.is_some());
+        // assert!(second_entry.finished_at.is_none());
 
         // Check that nothing is added to polling_station_results yet
         let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")

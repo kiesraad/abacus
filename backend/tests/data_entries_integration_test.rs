@@ -331,7 +331,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     let status = response.status();
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
-    // polling station 1 should now be in progress, polling station 2 is still incomplete and set to unfinished
+    // polling station 1 should now be first entry in progress, polling station 2 is still in the second entry in progress state
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());

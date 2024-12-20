@@ -1193,10 +1193,10 @@
       "Definitive": {
         "type": "object",
         "required": [
-          "finalised_at"
+          "finished_at"
         ],
         "properties": {
-          "finalised_at": {
+          "finished_at": {
             "type": "string"
           }
         }
@@ -1388,6 +1388,9 @@
           "status"
         ],
         "properties": {
+          "finished_at": {
+            "type": "string"
+          },
           "first_data_entry_progress": {
             "type": [
               "integer",
@@ -1440,7 +1443,6 @@
           "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationResultsAlreadyFinalised",
           "PollingStationDataValidation",
-          "PollingStationStatusTransition",
           "InvalidVoteGroup",
           "InvalidVoteCandidate",
           "InvalidData",

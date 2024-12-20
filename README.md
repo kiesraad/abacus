@@ -66,7 +66,7 @@ Meer informatie over het proces en de uitvoering van de verkiezingen in Nederlan
 
 ## Bijdragen
 
-We ontwikkelen Abacus open source omdat dit de transparantie bevordert. We zijn altijd nieuwsgierig naar nieuwe perspectieven of invalshoeken, alle vragen zijn welkom. Voor de duidelijkheid: de Kiesraad heeft concrete plannen en doelstellingen met Acabus, en die zijn leidend. Hierdoor is het goed mogelijk dat een waardevolle bijdrage uit de community toch niet kan worden meegenomen, omdat we anders beloofde dingen niet op tijd waar kunnen maken. Als je iets wilt bijdragen aan de software, neem dan vooraf contact op via e-mail: abacus[@]kiesraad.nl.
+We ontwikkelen Abacus open source omdat dit de transparantie bevordert. We zijn altijd nieuwsgierig naar nieuwe perspectieven of invalshoeken, alle vragen zijn welkom. Voor de duidelijkheid: de Kiesraad heeft concrete plannen en doelstellingen met Abacus, en die zijn leidend. Hierdoor is het goed mogelijk dat een waardevolle bijdrage uit de community toch niet kan worden meegenomen, omdat we anders beloofde dingen niet op tijd waar kunnen maken. Als je iets wilt bijdragen aan de software, neem dan vooraf contact op via e-mail: abacus[@]kiesraad.nl.
 
 Het team werkt met een planning en epics zoals opgenomen in het projectbord. Alle PR's worden grondig gereviewd, zoals we dat ook met ons eigen werk doen. We zoeken regelmatig nieuwe collega's.
 

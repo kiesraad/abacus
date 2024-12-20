@@ -633,7 +633,7 @@
       "number": 10,
       "number_of_voters": 123,
       "polling_station_type": "FixedLocation",
-      "street": "Teststraat van de lange staatnaam der straten van de straatnamen",
+      "street": "Teststraat van de lange straatnaam der straten van de straatnamen",
       "house_number": 1,
       "house_number_addition": null,
       "postal_code": "0123AB",

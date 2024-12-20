@@ -1402,10 +1402,7 @@
             "type": "string"
           },
           "first_data_entry_progress": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           },
@@ -1415,10 +1412,7 @@
             "minimum": 0
           },
           "second_data_entry_progress": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           },

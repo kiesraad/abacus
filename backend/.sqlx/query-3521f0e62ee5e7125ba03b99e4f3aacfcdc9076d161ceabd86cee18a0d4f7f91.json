@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\nINSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)\nVALUES\n(4, 1, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12', '1234 YQ', 'Den Haag');\n",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "3521f0e62ee5e7125ba03b99e4f3aacfcdc9076d161ceabd86cee18a0d4f7f91"
+}

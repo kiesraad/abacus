@@ -49,7 +49,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      const moreBallotsCount = await screen.findByTestId("more_ballots_count");
+      const moreBallotsCount = await screen.findByRole("textbox", { name: "I Stembiljetten méér geteld" });
       await user.type(moreBallotsCount, "12345");
       expect(moreBallotsCount).toHaveValue("12345");
 
@@ -66,7 +66,7 @@ describe("Test DifferencesForm", () => {
       renderForm({ recounted: false });
       const spy = vi.spyOn(global, "fetch");
 
-      const moreBallotsCount = await screen.findByTestId("more_ballots_count");
+      const moreBallotsCount = await screen.findByRole("textbox", { name: "I Stembiljetten méér geteld" });
       await user.type(moreBallotsCount, "12345");
       expect(moreBallotsCount).toHaveValue("12345");
 
@@ -84,7 +84,7 @@ describe("Test DifferencesForm", () => {
 
       renderForm({ recounted: false });
 
-      const moreBallotsCount = await screen.findByTestId("more_ballots_count");
+      const moreBallotsCount = await screen.findByRole("textbox", { name: "I Stembiljetten méér geteld" });
       expect(moreBallotsCount.closest("fieldset")).toHaveAccessibleName(
         "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
       );
@@ -95,35 +95,37 @@ describe("Test DifferencesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const fewerBallotsCount = screen.getByTestId("fewer_ballots_count");
+      const fewerBallotsCount = screen.getByRole("textbox", { name: "J Stembiljetten minder geteld" });
       expect(fewerBallotsCount).toHaveFocus();
       await user.paste("6789");
       expect(fewerBallotsCount).toHaveValue("6789");
 
       await user.keyboard("{enter}");
 
-      const unreturnedBallotsCount = screen.getByTestId("unreturned_ballots_count");
+      const unreturnedBallotsCount = screen.getByRole("textbox", { name: "K Niet ingeleverde stembiljetten" });
       expect(unreturnedBallotsCount).toHaveFocus();
       await user.type(unreturnedBallotsCount, "123");
       expect(unreturnedBallotsCount).toHaveValue("123");
 
       await user.keyboard("{enter}");
 
-      const tooFewBallotsHandedOutCount = screen.getByTestId("too_few_ballots_handed_out_count");
+      const tooFewBallotsHandedOutCount = screen.getByRole("textbox", {
+        name: "L Te weinig uitgereikte stembiljetten",
+      });
       expect(tooFewBallotsHandedOutCount).toHaveFocus();
       await user.paste("4242");
       expect(tooFewBallotsHandedOutCount).toHaveValue("4242");
 
       await user.keyboard("{enter}");
 
-      const tooManyBallotsHandedOutCount = screen.getByTestId("too_many_ballots_handed_out_count");
+      const tooManyBallotsHandedOutCount = screen.getByRole("textbox", { name: "M Te veel uitgereikte stembiljetten" });
       expect(tooManyBallotsHandedOutCount).toHaveFocus();
       await user.type(tooManyBallotsHandedOutCount, "12");
       expect(tooManyBallotsHandedOutCount).toHaveValue("12");
 
       await user.keyboard("{enter}");
 
-      const otherExplanationCount = screen.getByTestId("other_explanation_count");
+      const otherExplanationCount = screen.getByRole("textbox", { name: "N Andere verklaring voor het verschil" });
       expect(otherExplanationCount).toHaveFocus();
       // Test if maxLength on field works
       await user.type(otherExplanationCount, "1234567890");
@@ -131,7 +133,7 @@ describe("Test DifferencesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const noExplanationCount = screen.getByTestId("no_explanation_count");
+      const noExplanationCount = screen.getByRole("textbox", { name: "O Geen verklaring voor het verschil" });
       expect(noExplanationCount).toHaveFocus();
       await user.type(noExplanationCount, "3");
       expect(noExplanationCount).toHaveValue("3");

@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 import { formatNumber } from "e2e-tests/e2e-test-utils";
 import {
   CandidatesListPage,
@@ -10,93 +10,108 @@ import {
   RecountedPage,
   VotersAndVotesPage,
   VotersCounts,
-  VotersRecounts,
   VotesCounts,
 } from "e2e-tests/page-objects/data_entry";
 
 import { test } from "./fixtures";
-import { pollingStation33 } from "./test-data/PollingStationTestData";
+import { noErrorsWarningsResponse, noRecountNoDifferencesRequest } from "./test-data/request-response-templates";
+
+async function fillDataEntryNoRecountNoDifferences(page: Page) {
+  const recountedPage = new RecountedPage(page);
+  await expect(recountedPage.yes).toBeFocused();
+  await recountedPage.no.check();
+  await expect(recountedPage.no).toBeChecked();
+  await recountedPage.next.click();
+
+  const votersAndVotesPage = new VotersAndVotesPage(page);
+  await expect(votersAndVotesPage.pollCardCount).toBeFocused();
+  const voters: VotersCounts = {
+    poll_card_count: 1000,
+    proxy_certificate_count: 50,
+    voter_card_count: 75,
+    total_admitted_voters_count: 1125,
+  };
+  const votes: VotesCounts = {
+    votes_candidates_count: 1090,
+    blank_votes_count: 20,
+    invalid_votes_count: 15,
+    total_votes_cast_count: 1125,
+  };
+  await votersAndVotesPage.inputVotersCounts(voters);
+  await votersAndVotesPage.inputVotesCounts(votes);
+  await expect(votersAndVotesPage.pollCardCount).toHaveValue(formatNumber(voters.poll_card_count));
+  await votersAndVotesPage.next.click();
+
+  const differencesPage = new DifferencesPage(page);
+  await expect(differencesPage.moreBallotsCount).toBeFocused();
+  await differencesPage.next.click();
+
+  const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+  await expect(candidatesListPage_1.getCandidate(0)).toBeFocused();
+
+  await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
+  const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/1/data_entries/([12])"));
+  await candidatesListPage_1.next.click();
+
+  const response = await responsePromise;
+  expect(response.status()).toBe(200);
+  expect(response.request().postDataJSON()).toMatchObject(noRecountNoDifferencesRequest);
+  expect(await response.json()).toMatchObject(noErrorsWarningsResponse);
+
+  const checkAndSavePage = new CheckAndSavePage(page);
+  await expect(checkAndSavePage.fieldset).toBeVisible();
+
+  await expect(checkAndSavePage.summaryText).toContainText(
+    "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
+  );
+
+  const expectedSummaryItems = [
+    { text: "Alle optellingen kloppen", iconLabel: "opgeslagen" },
+    { text: "Er zijn geen blokkerende fouten of waarschuwingen", iconLabel: "opgeslagen" },
+    { text: "Je kan de resultaten van dit stembureau opslaan", iconLabel: "opgeslagen" },
+  ];
+  const listItems = checkAndSavePage.allSummaryListItems();
+  const expectedTexts = Array.from(expectedSummaryItems, (item) => item.text);
+  await expect(listItems).toHaveText(expectedTexts);
+
+  for (const expectedItem of expectedSummaryItems) {
+    await expect(checkAndSavePage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(expectedItem.iconLabel);
+  }
+
+  await checkAndSavePage.save.click();
+
+  const pollingStationChoicePage = new PollingStationChoicePage(page);
+  await expect(pollingStationChoicePage.fieldsetNextPollingStation).toBeVisible();
+  await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
+}
 
 test.describe("full data entry flow", () => {
-  test("no recount, no differences", async ({ page }) => {
+  test("no recount, no differences", async ({ page, pollingStation1 }) => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    const pollingStation = pollingStation33;
-    await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());
-    await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation.name);
+    await pollingStationChoicePage.pollingStationNumber.fill(pollingStation1.number.toString());
+    await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation1.name);
     await pollingStationChoicePage.clickStart();
 
-    const recountedPage = new RecountedPage(page);
-    await expect(recountedPage.yes).toBeFocused();
-    await recountedPage.no.check();
-    await expect(recountedPage.no).toBeChecked();
-    await recountedPage.next.click();
+    await fillDataEntryNoRecountNoDifferences(page);
 
-    const votersAndVotesPage = new VotersAndVotesPage(page);
-    await expect(votersAndVotesPage.pollCardCount).toBeFocused();
-    const voters: VotersCounts = {
-      poll_card_count: 1000,
-      proxy_certificate_count: 50,
-      voter_card_count: 75,
-      total_admitted_voters_count: 1125,
-    };
-    const votes: VotesCounts = {
-      votes_candidates_count: 1090,
-      blank_votes_count: 20,
-      invalid_votes_count: 15,
-      total_votes_cast_count: 1125,
-    };
-    await votersAndVotesPage.inputVotersCounts(voters);
-    await votersAndVotesPage.inputVotesCounts(votes);
-    await expect(votersAndVotesPage.pollCardCount).toHaveValue(formatNumber(voters.poll_card_count));
-    await votersAndVotesPage.next.click();
-
-    const differencesPage = new DifferencesPage(page);
-    await expect(differencesPage.moreBallotsCount).toBeFocused();
-    await differencesPage.next.click();
-
-    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
-    await expect(candidatesListPage_1.getCandidate(0)).toBeFocused();
-
-    await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
-    await candidatesListPage_1.next.click();
-
-    const checkAndSavePage = new CheckAndSavePage(page);
-    await checkAndSavePage.fieldset.waitFor();
-
-    await expect(checkAndSavePage.summaryText).toContainText(
-      "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
+    await expect(pollingStationChoicePage.alertInputSaved).toHaveText(
+      [
+        "Je invoer is opgeslagen",
+        "Geef het papieren proces-verbaal terug aan de coördinator.",
+        "Een andere invoerder doet straks de tweede invoer.",
+      ].join(""),
     );
-
-    const expectedSummaryItems = [
-      { text: "Alle optellingen kloppen", iconLabel: "opgeslagen" },
-      { text: "Er zijn geen blokkerende fouten of waarschuwingen", iconLabel: "opgeslagen" },
-      { text: "Je kan de resultaten van dit stembureau opslaan", iconLabel: "opgeslagen" },
-    ];
-    const listItems = checkAndSavePage.allSummaryListItems();
-    const expectedTexts = Array.from(expectedSummaryItems, (item) => item.text);
-    await expect(listItems).toHaveText(expectedTexts);
-
-    for (const expectedItem of expectedSummaryItems) {
-      await expect(checkAndSavePage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(
-        expectedItem.iconLabel,
-      );
-    }
-
-    await checkAndSavePage.save.click();
-    await pollingStationChoicePage.fieldsetNextPollingStation.waitFor();
-    await pollingStationChoicePage.dataEntrySuccess.waitFor();
   });
 
-  test("recount, no differences", async ({ page }) => {
+  test("recount, no differences", async ({ page, pollingStation1 }) => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    const pollingStation = pollingStation33;
-    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation1.number);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.fieldset).toBeVisible();
@@ -120,14 +135,14 @@ test.describe("full data entry flow", () => {
       total_votes_cast_count: 1125,
     };
     await votersAndVotesPage.inputVotesCounts(votes);
-    const votersRecounts: VotersRecounts = {
-      poll_card_recount: 987,
-      proxy_certificate_recount: 103,
-      voter_card_recount: 35,
-      total_admitted_voters_recount: 1125,
+    const votersRecounts: VotersCounts = {
+      poll_card_count: 987,
+      proxy_certificate_count: 103,
+      voter_card_count: 35,
+      total_admitted_voters_count: 1125,
     };
     await votersAndVotesPage.inputVotersRecounts(votersRecounts);
-    await expect(votersAndVotesPage.pollCardRecount).toHaveValue(formatNumber(votersRecounts.poll_card_recount));
+    await expect(votersAndVotesPage.pollCardRecount).toHaveValue(formatNumber(votersRecounts.poll_card_count));
     await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
@@ -145,16 +160,15 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
 
-    await pollingStationChoicePage.dataEntrySuccess.waitFor();
+    await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
   });
 
-  test("no recount, difference of more ballots counted", async ({ page }) => {
+  test("no recount, difference of more ballots counted", async ({ page, pollingStation1 }) => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    const pollingStation = pollingStation33;
-    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation1.number);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.fieldset).toBeVisible();
@@ -211,16 +225,15 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
 
-    await pollingStationChoicePage.dataEntrySuccess.waitFor();
+    await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
   });
 
-  test("recount, difference of fewer ballots counted", async ({ page }) => {
+  test("recount, difference of fewer ballots counted", async ({ page, pollingStation1 }) => {
     await page.goto("/elections/1/data-entry");
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
-    const pollingStation = pollingStation33;
-    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
+    await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation1.number);
 
     const recountedPage = new RecountedPage(page);
     await expect(recountedPage.fieldset).toBeVisible();
@@ -247,11 +260,11 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotesCounts(votes);
 
-    const votersRecounts: VotersRecounts = {
-      poll_card_recount: 1020,
-      proxy_certificate_recount: 50,
-      voter_card_recount: 75,
-      total_admitted_voters_recount: 1145,
+    const votersRecounts: VotersCounts = {
+      poll_card_count: 1020,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 1145,
     };
     await votersAndVotesPage.inputVotersRecounts(votersRecounts);
     await votersAndVotesPage.next.click();
@@ -284,14 +297,14 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
-    await checkAndSavePage.fieldset.waitFor();
+    await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
-    await pollingStationChoicePage.dataEntrySuccess.waitFor();
+    await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
   });
 
   test("submit with accepted warning on voters and votes page", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/recounted");
+    await page.goto("/elections/1/data-entry/1/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -323,19 +336,19 @@ test.describe("full data entry flow", () => {
     await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
-    await differencesPage.fieldset.waitFor();
+    await expect(differencesPage.fieldset).toBeVisible();
 
     await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
 
     await differencesPage.next.click();
 
     const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
-    await candidatesListPage_1.fieldset.waitFor();
+    await expect(candidatesListPage_1.fieldset).toBeVisible();
     await candidatesListPage_1.fillCandidatesAndTotal([99, 1], 100);
     await candidatesListPage_1.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
-    await checkAndSavePage.fieldset.waitFor();
+    await expect(checkAndSavePage.fieldset).toBeVisible();
 
     await expect(checkAndSavePage.summaryText).toContainText(
       "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
@@ -361,14 +374,53 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
     const pollingStationChoicePage = new PollingStationChoicePage(page);
-    await pollingStationChoicePage.fieldsetNextPollingStation.waitFor();
-    await pollingStationChoicePage.dataEntrySuccess.waitFor();
+    await expect(pollingStationChoicePage.fieldsetNextPollingStation).toBeVisible();
+    await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
+  });
+});
+
+test.describe("second data entry", () => {
+  test("equal second data entry after first data entry", async ({ page, request, pollingStation1 }) => {
+    const saveResponse = await request.post("/api/polling_stations/1/data_entries/1", {
+      data: noRecountNoDifferencesRequest,
+    });
+    expect(saveResponse.ok()).toBeTruthy();
+    const finaliseResponse = await request.post("/api/polling_stations/1/data_entries/1/finalise");
+    expect(finaliseResponse.ok()).toBeTruthy();
+
+    await page.goto("/elections/1/data-entry");
+
+    const pollingStationChoicePage = new PollingStationChoicePage(page);
+    await expect(pollingStationChoicePage.fieldset).toBeVisible();
+    await pollingStationChoicePage.pollingStationNumber.fill(pollingStation1.number.toString());
+    await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation1.name);
+    await pollingStationChoicePage.clickStart();
+
+    await expect(page).toHaveURL("/elections/1/data-entry/1/2/recounted");
+
+    // fill in exactly like first data entry
+    await fillDataEntryNoRecountNoDifferences(page);
+
+    await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
+    await expect(pollingStationChoicePage.alertInputSaved).toHaveText(
+      ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
+    );
+
+    await expect(pollingStationChoicePage.fieldsetNextPollingStation).toBeVisible();
+    await pollingStationChoicePage.pollingStationNumber.fill(pollingStation1.number.toString());
+    await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(
+      "Stembureau 33 (Op Rolletjes) is al twee keer ingevoerd",
+    );
+    await pollingStationChoicePage.clickStart();
+    await expect(pollingStationChoicePage.pollingStationSubmitFeedback).toContainText(
+      "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
+    );
   });
 });
 
 test.describe("errors and warnings", () => {
   test("correct error on voters and votes page", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/recounted");
+    await page.goto("/elections/1/data-entry/1/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -410,13 +462,13 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.warning).toBeHidden();
 
     const differencesPage = new DifferencesPage(page);
-    await differencesPage.fieldset.waitFor();
+    await expect(differencesPage.fieldset).toBeVisible();
 
     await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
   test("correct error F.204", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/recounted");
+    await page.goto("/elections/1/data-entry/1/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -437,7 +489,7 @@ test.describe("errors and warnings", () => {
     await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
     const differencesPage = new DifferencesPage(page);
-    await differencesPage.fieldset.waitFor();
+    await expect(differencesPage.fieldset).toBeVisible();
     await differencesPage.next.click();
 
     const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
@@ -459,15 +511,15 @@ test.describe("errors and warnings", () => {
     await candidatesListPage_1.next.click();
 
     const checkAndSavePage = new CheckAndSavePage(page);
-    await checkAndSavePage.fieldset.waitFor();
+    await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
-    await pollingStationChoicePage.dataEntrySuccess.waitFor();
+    await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
   });
 
   test("correct warning on voters and votes page", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/recounted");
+    await page.goto("/elections/1/data-entry/1/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -515,13 +567,13 @@ test.describe("errors and warnings", () => {
     await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
 
     const differencesPage = new DifferencesPage(page);
-    await differencesPage.fieldset.waitFor();
+    await expect(differencesPage.fieldset).toBeVisible();
 
     await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
   test("remove option to accept warning on voters and votes page after input change", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/recounted");
+    await page.goto("/elections/1/data-entry/1/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -565,13 +617,13 @@ test.describe("errors and warnings", () => {
 
 test.describe("navigation", () => {
   test("navigate away from Differences page without saving", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/recounted");
+    await page.goto("/elections/1/data-entry/1/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
-    await votersAndVotesPage.fieldset.waitFor();
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
     const voters: VotersCounts = {
       poll_card_count: 99,
       proxy_certificate_count: 1,
@@ -590,7 +642,7 @@ test.describe("navigation", () => {
     await expect(differencesPage.fieldset).toBeVisible();
 
     await differencesPage.navPanel.votersAndVotes.click();
-    await votersAndVotesPage.fieldset.waitFor();
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
 
     const votersUpdates: VotersCounts = {
       poll_card_count: 90,
@@ -617,18 +669,18 @@ test.describe("navigation", () => {
 
     // return to VotersAndVotes page and verify change is not saved
     await recountedPage.navPanel.votersAndVotes.click();
-    await votersAndVotesPage.fieldset.waitFor();
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.pollCardCount).toHaveValue("99");
   });
 
   test("navigate away from Differences page with saving", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/recounted");
+    await page.goto("/elections/1/data-entry/1/1/recounted");
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
 
     const votersAndVotesPage = new VotersAndVotesPage(page);
-    await votersAndVotesPage.fieldset.waitFor();
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
     const voters: VotersCounts = {
       poll_card_count: 99,
       proxy_certificate_count: 1,
@@ -647,7 +699,7 @@ test.describe("navigation", () => {
     await expect(differencesPage.fieldset).toBeVisible();
 
     await differencesPage.navPanel.votersAndVotes.click();
-    await votersAndVotesPage.fieldset.waitFor();
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
 
     const votersUpdates: VotersCounts = {
       poll_card_count: 90,
@@ -674,20 +726,20 @@ test.describe("navigation", () => {
 
     // return to VotersAndVotes page and verify change is saved
     await recountedPage.navPanel.votersAndVotes.click();
-    await votersAndVotesPage.fieldset.waitFor();
+    await expect(votersAndVotesPage.fieldset).toBeVisible();
     await expect(votersAndVotesPage.pollCardCount).toHaveValue("90");
   });
 
   test.describe("navigation panel icons", () => {
     test("check icons for accept, active, empty, error, warning, unsaved statuses", async ({ page }) => {
-      await page.goto("/elections/1/data-entry/1/recounted");
+      await page.goto("/elections/1/data-entry/1/1/recounted");
 
       const recountedPage = new RecountedPage(page);
       await expect(recountedPage.navPanel.recountedIcon).toHaveAccessibleName("je bent hier");
       await recountedPage.checkNoAndClickNext();
 
       const votersAndVotesPage = new VotersAndVotesPage(page);
-      await votersAndVotesPage.fieldset.waitFor();
+      await expect(votersAndVotesPage.fieldset).toBeVisible();
       await expect(votersAndVotesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
       await expect(votersAndVotesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("je bent hier");
 
@@ -709,22 +761,22 @@ test.describe("navigation", () => {
       await votersAndVotesPage.next.click();
 
       const differencesPage = new DifferencesPage(page);
-      await differencesPage.fieldset.waitFor();
+      await expect(differencesPage.fieldset).toBeVisible();
       await expect(differencesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
       await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
       await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
       await differencesPage.navPanel.votersAndVotes.click();
 
-      await votersAndVotesPage.fieldset.waitFor();
+      await expect(votersAndVotesPage.fieldset).toBeVisible();
       await expect(votersAndVotesPage.navPanel.differencesIcon).toHaveAccessibleName("nog niet afgerond");
       await votersAndVotesPage.navPanel.differences.click();
 
-      await differencesPage.fieldset.waitFor();
+      await expect(differencesPage.fieldset).toBeVisible();
       await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
       await differencesPage.next.click();
 
       const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
-      await candidatesListPage_1.fieldset.waitFor();
+      await expect(candidatesListPage_1.fieldset).toBeVisible();
       await expect(candidatesListPage_1.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
       await expect(candidatesListPage_1.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
       await expect(candidatesListPage_1.navPanel.differencesIcon).toHaveAccessibleName("leeg");
@@ -733,7 +785,7 @@ test.describe("navigation", () => {
       await candidatesListPage_1.next.click();
       await candidatesListPage_1.navPanel.differences.click();
 
-      await differencesPage.fieldset.waitFor();
+      await expect(differencesPage.fieldset).toBeVisible();
       await expect(differencesPage.navPanel.recountedIcon).toHaveAccessibleName("opgeslagen");
       await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
       await expect(differencesPage.navPanel.differencesIcon).toHaveAccessibleName("je bent hier");
@@ -743,7 +795,7 @@ test.describe("navigation", () => {
       await candidatesListPage_1.fillCandidatesAndTotal([50, 50], 100);
       await candidatesListPage_1.next.click();
       const checkAndSavePage = new CheckAndSavePage(page);
-      await checkAndSavePage.fieldset.waitFor();
+      await expect(checkAndSavePage.fieldset).toBeVisible();
       await expect(checkAndSavePage.navPanel.checkAndSaveIcon).toHaveAccessibleName("je bent hier");
       await expect(checkAndSavePage.navPanel.listIcon(1)).toHaveAccessibleName("opgeslagen");
 

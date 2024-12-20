@@ -101,7 +101,7 @@ describe("Test VotersAndVotesForm", () => {
 
       renderForm({ recounted: false });
 
-      const pollCards = await screen.findByTestId("poll_card_count");
+      const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       await user.type(pollCards, "12345");
       expect(pollCards).toHaveValue("12345");
 
@@ -118,7 +118,7 @@ describe("Test VotersAndVotesForm", () => {
       renderForm({ recounted: false });
       const spy = vi.spyOn(global, "fetch");
 
-      const pollCards = await screen.findByTestId("poll_card_count");
+      const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       await user.type(pollCards, "12345");
       expect(pollCards).toHaveValue("12345");
 
@@ -134,9 +134,9 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm({ recounted: true });
 
-      const pollCards = await screen.findByTestId("poll_card_count");
+      const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       expect(pollCards.closest("fieldset")).toHaveAccessibleName("Toegelaten kiezers en uitgebrachte stemmen");
       expect(pollCards).toHaveAccessibleName("A Stempassen");
       expect(pollCards).toHaveFocus();
@@ -146,35 +146,35 @@ describe("Test VotersAndVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const proxyCertificates = screen.getByTestId("proxy_certificate_count");
+      const proxyCertificates = screen.getByRole("textbox", { name: "B Volmachtbewijzen" });
       expect(proxyCertificates).toHaveFocus();
       await user.paste("6789");
       expect(proxyCertificates).toHaveValue("6789");
 
       await user.keyboard("{enter}");
 
-      const voterCards = screen.getByTestId("voter_card_count");
+      const voterCards = screen.getByRole("textbox", { name: "C Kiezerspassen" });
       expect(voterCards).toHaveFocus();
       await user.type(voterCards, "123");
       expect(voterCards).toHaveValue("123");
 
       await user.keyboard("{enter}");
 
-      const totalAdmittedVoters = screen.getByTestId("total_admitted_voters_count");
+      const totalAdmittedVoters = screen.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
       expect(totalAdmittedVoters).toHaveFocus();
       await user.paste("4242");
       expect(totalAdmittedVoters).toHaveValue("4242");
 
       await user.keyboard("{enter}");
 
-      const votesOnCandidates = screen.getByTestId("votes_candidates_count");
+      const votesOnCandidates = screen.getByRole("textbox", { name: "E Stemmen op kandidaten" });
       expect(votesOnCandidates).toHaveFocus();
       await user.type(votesOnCandidates, "12");
       expect(votesOnCandidates).toHaveValue("12");
 
       await user.keyboard("{enter}");
 
-      const blankVotes = screen.getByTestId("blank_votes_count");
+      const blankVotes = screen.getByRole("textbox", { name: "F Blanco stemmen" });
       expect(blankVotes).toHaveFocus();
       // Test if maxLength on field works
       await user.type(blankVotes, "1234567890");
@@ -182,17 +182,45 @@ describe("Test VotersAndVotesForm", () => {
 
       await user.keyboard("{enter}");
 
-      const invalidVotes = screen.getByTestId("invalid_votes_count");
+      const invalidVotes = screen.getByRole("textbox", { name: "G Ongeldige stemmen" });
       expect(invalidVotes).toHaveFocus();
       await user.type(invalidVotes, "3");
       expect(invalidVotes).toHaveValue("3");
 
       await user.keyboard("{enter}");
 
-      const totalVotesCast = screen.getByTestId("total_votes_cast_count");
+      const totalVotesCast = screen.getByRole("textbox", { name: "H Totaal uitgebrachte stemmen" });
       expect(totalVotesCast).toHaveFocus();
       await user.type(totalVotesCast, "555");
       expect(totalVotesCast).toHaveValue("555");
+
+      await user.keyboard("{enter}");
+
+      const pollCardsRecount = screen.getByRole("textbox", { name: "A.2 Stempassen" });
+      expect(pollCardsRecount).toHaveFocus();
+      await user.type(pollCardsRecount, "700");
+      expect(pollCardsRecount).toHaveValue("700");
+
+      await user.keyboard("{enter}");
+
+      const proxyCertificatesRecount = screen.getByRole("textbox", { name: "B.2 Volmachtbewijzen" });
+      expect(proxyCertificatesRecount).toHaveFocus();
+      await user.type(proxyCertificatesRecount, "140");
+      expect(proxyCertificatesRecount).toHaveValue("140");
+
+      await user.keyboard("{enter}");
+
+      const voterCardsRecount = screen.getByRole("textbox", { name: "C.2 Kiezerspassen" });
+      expect(voterCardsRecount).toHaveFocus();
+      await user.type(voterCardsRecount, "160");
+      expect(voterCardsRecount).toHaveValue("160");
+
+      await user.keyboard("{enter}");
+
+      const totalAdmittedVotersRecount = screen.getByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" });
+      expect(totalAdmittedVotersRecount).toHaveFocus();
+      await user.type(totalAdmittedVotersRecount, "1000");
+      expect(totalAdmittedVotersRecount).toHaveValue("1000");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
@@ -200,7 +228,7 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   describe("VotersAndVotesForm API request and response", () => {
-    test("VotersAndVotesForm request body is equal to the form data", async () => {
+    test("VotersAndVotesForm without recount: request body is equal to the form data", async () => {
       const expectedRequest = {
         data: {
           ...emptyDataEntryRequest.data,
@@ -228,6 +256,60 @@ describe("Test VotersAndVotesForm", () => {
       await userTypeInputs(user, {
         ...expectedRequest.data.voters_counts,
         ...expectedRequest.data.votes_counts,
+      });
+
+      const spy = vi.spyOn(global, "fetch");
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      expect(spy).toHaveBeenCalled();
+      const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
+
+      expect(url).toEqual("/api/polling_stations/1/data_entries/1");
+      expect(method).toEqual("POST");
+      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+      expect(request_body.data).toEqual(expectedRequest.data);
+    });
+
+    test("VotersAndVotesForm with recount: request body is equal to the form data", async () => {
+      const expectedRequest = {
+        data: {
+          ...emptyDataEntryRequest.data,
+          recounted: true,
+          voters_counts: {
+            poll_card_count: 1,
+            proxy_certificate_count: 2,
+            voter_card_count: 3,
+            total_admitted_voters_count: 6,
+          },
+          voters_recounts: {
+            poll_card_count: 7,
+            proxy_certificate_count: 8,
+            voter_card_count: 9,
+            total_admitted_voters_count: 24,
+          },
+          votes_counts: {
+            votes_candidates_count: 4,
+            blank_votes_count: 5,
+            invalid_votes_count: 6,
+            total_votes_cast_count: 15,
+          },
+        },
+        client_state: {},
+      };
+
+      const user = userEvent.setup();
+
+      renderForm({ recounted: true });
+
+      await userTypeInputs(user, {
+        ...expectedRequest.data.voters_counts,
+        ...expectedRequest.data.votes_counts,
+        poll_card_recount: expectedRequest.data.voters_recounts.poll_card_count,
+        proxy_certificate_recount: expectedRequest.data.voters_recounts.proxy_certificate_count,
+        voter_card_recount: expectedRequest.data.voters_recounts.voter_card_count,
+        total_admitted_voters_recount: expectedRequest.data.voters_recounts.total_admitted_voters_count,
       });
 
       const spy = vi.spyOn(global, "fetch");
@@ -353,10 +435,10 @@ describe("Test VotersAndVotesForm", () => {
           errors: [
             {
               fields: [
-                "data.voters_recounts.total_admitted_voters_recount",
-                "data.voters_recounts.poll_card_recount",
-                "data.voters_recounts.proxy_certificate_recount",
-                "data.voters_recounts.voter_card_recount",
+                "data.voters_recounts.total_admitted_voters_count",
+                "data.voters_recounts.poll_card_count",
+                "data.voters_recounts.proxy_certificate_count",
+                "data.voters_recounts.voter_card_count",
               ],
               code: "F203",
             },
@@ -730,10 +812,7 @@ describe("Test VotersAndVotesForm", () => {
           errors: [],
           warnings: [
             {
-              fields: [
-                "data.votes_counts.total_votes_cast_count",
-                "data.voters_recounts.total_admitted_voters_recount",
-              ],
+              fields: ["data.votes_counts.total_votes_cast_count", "data.voters_recounts.total_admitted_voters_count"],
               code: "W207",
             },
           ],
@@ -822,10 +901,10 @@ describe("Test VotersAndVotesForm", () => {
                 "data.votes_counts.blank_votes_count",
                 "data.votes_counts.invalid_votes_count",
                 "data.votes_counts.total_votes_cast_count",
-                "data.voters_recounts.poll_card_recount",
-                "data.voters_recounts.proxy_certificate_recount",
-                "data.voters_recounts.voter_card_recount",
-                "data.voters_recounts.total_admitted_voters_recount",
+                "data.voters_recounts.poll_card_count",
+                "data.voters_recounts.proxy_certificate_count",
+                "data.voters_recounts.voter_card_count",
+                "data.voters_recounts.total_admitted_voters_count",
               ],
               code: "W209",
             },

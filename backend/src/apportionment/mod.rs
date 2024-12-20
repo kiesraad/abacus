@@ -1,10 +1,10 @@
 use crate::apportionment::fraction::Fraction;
-use crate::pdf_gen::models::ModelNa31_2Summary;
+use crate::summary::ElectionSummary;
 
 mod fraction;
 
 /// Apportionment - work in progress!!
-pub fn apportionment_wip(totals: &ModelNa31_2Summary) {
+pub fn apportionment_wip(totals: &ElectionSummary) {
     println!("Totals {:#?}", totals);
 
     // calculate quota (kiesdeler) as a proper fraction
@@ -84,11 +84,11 @@ pub fn apportionment_wip(totals: &ModelNa31_2Summary) {
 mod tests {
     use crate::apportionment::apportionment_wip;
     use crate::data_entry::{PoliticalGroupVotes, VotersCounts, VotesCounts};
-    use crate::pdf_gen::models::{ModelNa31_2Summary, SummaryDifferencesCounts};
+    use crate::summary::{ElectionSummary, SummaryDifferencesCounts};
 
     #[test]
     fn test() {
-        let totals = ModelNa31_2Summary {
+        let totals = ElectionSummary {
             voters_counts: VotersCounts {
                 poll_card_count: 1200,
                 proxy_certificate_count: 0,

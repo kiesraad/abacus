@@ -1,60 +1,143 @@
-import { PollingStationType, usePollingStationListRequest } from "@kiesraad/api";
-import { Loader, PageTitle, Table } from "@kiesraad/ui";
-import { useNumericParam } from "@kiesraad/util";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
-const labelForPollingStationType: { [K in PollingStationType]: string } = {
-  FixedLocation: "Vaste locatie",
-  Special: "Bijzonder",
-  Mobile: "Mobiel",
-};
+import { NavBar } from "app/component/navbar/NavBar.tsx";
+
+import { useElection, usePollingStationListRequest } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
+import { IconPlus } from "@kiesraad/icon";
+import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
+import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationListPage() {
   const electionId = useNumericParam("electionId");
+  const { election } = useElection();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { requestState } = usePollingStationListRequest(electionId);
 
   if (requestState.status === "loading") {
     return <Loader />;
   }
 
-  if (requestState.status === "api-error" || requestState.status === "network-error") {
+  if ("error" in requestState) {
     throw requestState.error;
   }
 
   const data = requestState.data;
 
+  const updatedId = searchParams.get("updated");
+  const updatedPollingStation = updatedId ? data.polling_stations.find((ps) => ps.id === parseInt(updatedId)) : null;
+
+  const createdId = searchParams.get("created");
+  const createdPollingStation = createdId ? data.polling_stations.find((ps) => ps.id === parseInt(createdId)) : null;
+
+  const deletedPollingStation = searchParams.get("deleted");
+
+  const closeAlert = () => {
+    setSearchParams("");
+  };
+
+  const labelForPollingStationType = {
+    FixedLocation: t("polling_station.type.FixedLocation"),
+    Special: t("polling_station.type.Special"),
+    Mobile: t("polling_station.type.Mobile"),
+  };
+  //TODO: Table needs highlight option
+  //TODO: Alert has some layout glitches
   return (
     <>
-      <PageTitle title="Stembureaus - Abacus" />
+      <PageTitle title={`${t("polling_stations")} - Abacus`} />
+      <NavBar>
+        <Link to={`/elections/${election.id}#coordinator`}>
+          <span className="bold">{election.location}</span>
+          <span>&mdash;</span>
+          <span>{election.name}</span>
+        </Link>
+      </NavBar>
       <header>
         <section>
-          <h1>Stembureaus</h1>
+          <h1>{t("polling_station.title.plural")}</h1>
         </section>
       </header>
+      {updatedPollingStation && (
+        <Alert type="success" onClose={closeAlert}>
+          <strong>
+            {t("polling_station.message.polling_station_updated", {
+              number: updatedPollingStation.number,
+              name: updatedPollingStation.name,
+            })}
+          </strong>
+        </Alert>
+      )}
+
+      {createdPollingStation && (
+        <Alert type="success" onClose={closeAlert}>
+          <strong>
+            {t("polling_station.message.polling_station_created", {
+              number: createdPollingStation.number,
+              name: createdPollingStation.name,
+            })}
+          </strong>
+        </Alert>
+      )}
+
+      {deletedPollingStation && (
+        <Alert type="success" onClose={closeAlert}>
+          <strong>
+            {t("polling_station.message.polling_station_deleted", { pollingStation: deletedPollingStation })}
+          </strong>
+        </Alert>
+      )}
       <main>
         {!data.polling_stations.length ? (
           <article>
-            <h2>Hoe wil je stembureaus toevoegen?</h2>
-            Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.
-            {/* TODO Create polling station: issue #431 */}
+            <h2>{t("polling_station.title.how_to_add")}</h2>
+            <p className="mb-lg">{t("polling_station.message.no_polling_stations")}</p>
+
+            <Toolbar>
+              <Toolbar.Section pos="start">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<IconPlus />}
+                  onClick={() => {
+                    navigate("create");
+                  }}
+                >
+                  {t("manual_input")}
+                </Button>
+              </Toolbar.Section>
+            </Toolbar>
           </article>
         ) : (
           <article>
+            <Toolbar>
+              <Toolbar.Section pos="end">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<IconPlus />}
+                  onClick={() => {
+                    navigate("create");
+                  }}
+                >
+                  {t("polling_station.form.create")}
+                </Button>
+              </Toolbar.Section>
+            </Toolbar>
+
             <Table id="polling_stations">
               <Table.Header>
-                <Table.Column>Nummer</Table.Column>
-                <Table.Column>Naam</Table.Column>
-                <Table.Column>Soort</Table.Column>
+                <Table.Column>{t("number")}</Table.Column>
+                <Table.Column>{t("name")}</Table.Column>
+                <Table.Column>{t("type")}</Table.Column>
               </Table.Header>
-              <Table.Body>
+              <Table.Body className="fs-md">
                 {data.polling_stations.map((station) => (
-                  <Table.LinkRow key={station.id} to={`#todo-${station.id}`}>
-                    <Table.Cell number fontSizeClass="fs-body">
-                      {station.number}
-                    </Table.Cell>
-                    <Table.Cell fontSizeClass="fs-md">{station.name}</Table.Cell>
-                    <Table.Cell fontSizeClass="fs-md">
-                      {labelForPollingStationType[station.polling_station_type]}
-                    </Table.Cell>
+                  <Table.LinkRow key={station.id} to={`${station.id}/update`}>
+                    <Table.NumberCell>{station.number}</Table.NumberCell>
+                    <Table.Cell className="break-word">{station.name}</Table.Cell>
+                    <Table.Cell>{labelForPollingStationType[station.polling_station_type]}</Table.Cell>
                   </Table.LinkRow>
                 ))}
               </Table.Body>

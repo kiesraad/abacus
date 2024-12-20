@@ -6,6 +6,7 @@ use sqlx::SqlitePool;
 use backend::polling_station::{
     PollingStation, PollingStationListResponse, PollingStationRequest, PollingStationType,
 };
+use backend::ErrorResponse;
 
 use crate::utils::serve_api;
 
@@ -164,6 +165,46 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
         StatusCode::NOT_FOUND,
         "Unexpected response status"
     );
+}
+
+#[sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("elections", "polling_stations", "polling_station_data_entries")
+))]
+async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let url = format!("http://{addr}/api/polling_stations/2");
+
+    let response = reqwest::Client::new().delete(&url).send().await.unwrap();
+
+    let status = response.status();
+    assert_eq!(
+        status,
+        StatusCode::UNPROCESSABLE_ENTITY,
+        "Unexpected response status"
+    );
+    let body: ErrorResponse = response.json().await.unwrap();
+    assert_eq!(body.error, "Invalid data");
+}
+
+#[sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("elections", "polling_stations", "polling_station_results")
+))]
+async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let url = format!("http://{addr}/api/polling_stations/7");
+
+    let response = reqwest::Client::new().delete(&url).send().await.unwrap();
+
+    let status = response.status();
+    assert_eq!(
+        status,
+        StatusCode::UNPROCESSABLE_ENTITY,
+        "Unexpected response status"
+    );
+    let body: ErrorResponse = response.json().await.unwrap();
+    assert_eq!(body.error, "Invalid data");
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]

@@ -20,9 +20,16 @@ export default defineConfig(({ command }) => {
     __GIT_COMMIT__: undefined as string | undefined,
   };
   if (command == "build") {
-    const gitDirty = execSync("git status --porcelain").toString().trimEnd().length > 0;
-    const gitBranch = process.env.GITHUB_HEAD_REF ?? execSync("git rev-parse --abbrev-ref HEAD").toString().trimEnd();
-    const gitCommit = execSync("git rev-parse --short HEAD").toString().trimEnd();
+    let gitDirty: boolean | undefined;
+    let gitBranch: string | undefined;
+    let gitCommit: string | undefined;
+    try {
+      gitDirty = execSync("git status --porcelain").toString().trimEnd().length > 0;
+      gitBranch = process.env.GITHUB_HEAD_REF ?? execSync("git rev-parse --abbrev-ref HEAD").toString().trimEnd();
+      gitCommit = execSync("git rev-parse --short HEAD").toString().trimEnd();
+    } catch {
+      // ignore errors, most likely building from outside a Git repository
+    }
     gitDetails = {
       __GIT_DIRTY__: JSON.stringify(gitDirty),
       __GIT_BRANCH__: JSON.stringify(gitBranch),
@@ -79,6 +86,8 @@ export default defineConfig(({ command }) => {
       environment: "jsdom",
       setupFiles: ["app/test/unit/setup.ts"],
       includeSource: ["app/**/*.ts", "lib/**/*.ts"],
+      // GitHub Actions Windows runners seem slower than Linux runners, so we need to increase the test timeout
+      testTimeout: process.platform === "win32" ? 15_000 : 5_000,
     },
   } satisfies UserConfig;
 });

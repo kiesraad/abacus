@@ -5,7 +5,11 @@ import { cn } from "@kiesraad/util";
 
 import cls from "./CheckboxAndRadio.module.css";
 
-export function ChoiceList({ children }: { children: React.ReactNode }) {
+export interface ChoiceListProps {
+  children: React.ReactNode;
+}
+
+export function ChoiceList({ children }: ChoiceListProps) {
   return <fieldset className={cn(cls["choice-list"])}>{children}</fieldset>;
 }
 
@@ -18,6 +22,8 @@ ChoiceList.Title = ({ children }: { children: React.ReactNode }) => (
     <h6>{children}</h6>
   </legend>
 );
+
+ChoiceList.Error = ({ children }: { children: React.ReactNode }) => <p className={cls.error}>{children}</p>;
 
 ChoiceList.Checkbox = ({
   id,
@@ -50,6 +56,7 @@ ChoiceList.Radio = ({
   disabled,
   autoFocus,
   defaultChecked,
+  defaultValue,
   hasError,
   reference,
 }: ChoiceListOptionProps) => (
@@ -62,6 +69,7 @@ ChoiceList.Radio = ({
     defaultChecked={defaultChecked}
     hasError={hasError}
     ref={reference}
+    defaultValue={defaultValue}
   >
     {children}
   </Radio>

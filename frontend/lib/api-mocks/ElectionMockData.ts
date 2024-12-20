@@ -1,11 +1,10 @@
-import { NotFoundError } from "app/component/error/Error.types.ts";
-
 import {
   Candidate,
   Election,
   ElectionDetailsResponse,
   ElectionListResponse,
   ElectionStatusResponse,
+  NotFoundError,
   PoliticalGroup,
 } from "@kiesraad/api";
 
@@ -346,8 +345,10 @@ export const electionListMockResponse: ElectionListResponse = {
       location: "Heemdamseburg",
       number_of_voters: 100,
       category: "Municipal",
+      number_of_seats: 29,
       election_date: "2024-11-30",
       nomination_date: "2024-11-01",
+      status: "DataEntryInProgress",
     },
     {
       id: 2,
@@ -355,8 +356,10 @@ export const electionListMockResponse: ElectionListResponse = {
       location: "Heemdamseburg",
       number_of_voters: 100,
       category: "Municipal",
+      number_of_seats: 29,
       election_date: "2024-01-30",
       nomination_date: "2024-01-01",
+      status: "DataEntryInProgress",
     },
     {
       id: 3,
@@ -364,8 +367,32 @@ export const electionListMockResponse: ElectionListResponse = {
       location: "Spookdorp",
       number_of_voters: 0,
       category: "Municipal",
+      number_of_seats: 29,
       election_date: "2032-10-31",
       nomination_date: "2032-09-01",
+      status: "DataEntryInProgress",
+    },
+    {
+      id: 4,
+      name: "Gemeenteraadsverkiezingen ingevuld",
+      location: "Heemdamseburg",
+      number_of_voters: 100,
+      category: "Municipal",
+      number_of_seats: 29,
+      election_date: "2020-01-30",
+      nomination_date: "2020-01-01",
+      status: "DataEntryInProgress",
+    },
+    {
+      id: 5,
+      name: "Gemeenteraadsverkiezingen afgerond",
+      location: "Heemdamseburg",
+      number_of_voters: 100,
+      category: "Municipal",
+      number_of_seats: 29,
+      election_date: "2020-01-30",
+      nomination_date: "2020-01-01",
+      status: "DataEntryFinished",
     },
   ],
 };
@@ -374,7 +401,7 @@ export const getElectionMockData = (election_id: number): Required<ElectionDetai
   const election = electionListMockResponse.elections.find((e) => e.id === election_id);
 
   if (!election) {
-    throw new NotFoundError(`Election with id ${election_id} not found`);
+    throw new NotFoundError("error.election_not_found");
   }
 
   if (election_id === 2) {
@@ -400,6 +427,10 @@ export const electionStatusMockResponse: ElectionStatusResponse = {
     {
       id: 2,
       status: "definitive",
+    },
+    {
+      id: 3,
+      status: "first_second_entry_different",
     },
   ],
 };

@@ -28,6 +28,7 @@
     flex-direction: column;
     gap: 1rem;
     max-width: 48rem;
+    word-break: break-word;
 
     h2 {
       margin-bottom: 0;
@@ -48,8 +49,8 @@
     background-color: var(--color-error-bg);
     > button:focus,
     > button:focus-visible {
-      background: var(--color-error-hover);
-      border-color: var(--color-error-focus);
+      background: var(--base-white);
+      border-color: var(--border-color-focus);
     }
     > button:hover {
       background: var(--color-error-hover);
@@ -63,8 +64,8 @@
     background-color: var(--color-warning-bg);
     > button:focus,
     > button:focus-visible {
-      background: var(--color-warning-hover);
-      border-color: var(--color-warning-focus);
+      background: var(--base-white);
+      border-color: var(--border-color-focus);
     }
     > button:hover {
       background: var(--color-warning-hover);
@@ -78,8 +79,8 @@
     background-color: var(--color-notify-bg);
     > button:focus,
     > button:focus-visible {
-      background: var(--color-notify-hover);
-      border-color: var(--color-notify-focus);
+      background: var(--base-white);
+      border-color: var(--border-color-focus);
     }
     > button:hover {
       background: var(--color-notify-hover);
@@ -93,8 +94,8 @@
     background-color: var(--color-success-bg);
     > button:focus,
     > button:focus-visible {
-      background: var(--color-success-hover);
-      border-color: var(--color-success-focus);
+      background: var(--base-white);
+      border-color: var(--border-color-focus);
     }
     > button:hover {
       background: var(--color-success-hover);

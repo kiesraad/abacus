@@ -17,7 +17,7 @@ npm install
 Install Playwright dependencies:
 
 ```sh
-npx playwright install --with-deps
+npx playwright install --with-deps --no-shell
 ```
 
 ### Running
@@ -91,10 +91,14 @@ The application uses the following dependencies:
 - `msw`: Mock Service Worker for mocking the server, client side
 - `vite`: frontend build tool
 - `ladle`: simple development and test environment for UI components
+- `postcss` and `autoprefixer`: CSS post processors
+- `lefthook`: git hook automation
+- `cross-env`: for building on Windows
 
 #### Testing / linting dependencies
 
 - `vitest`: Jest compatible unit test framework
+- `jsdom`: a pure-JavaScript implementation of many web standards for use with Node.js
 - `testing-library`: (React) component and dom test utilities
 - `playwright`: e2e testing framework
 - `prettier`: Opinionated code formatter

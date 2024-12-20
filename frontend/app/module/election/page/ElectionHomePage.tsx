@@ -5,6 +5,7 @@ import { MockTest } from "app/component/MockTest";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
 
 export function ElectionHomePage() {
@@ -12,7 +13,7 @@ export function ElectionHomePage() {
 
   return (
     <>
-      <PageTitle title="Details verkiezing - Abacus" />
+      <PageTitle title={`${t("election.title.details")} - Abacus`} />
       <NavBar>
         <span>
           <span className="bold">{election.location}</span>
@@ -29,10 +30,23 @@ export function ElectionHomePage() {
         <article>
           <ul>
             <li>
-              <Link to={`status#coordinator`}>Status</Link>
+              {t("coordinator")}:
+              <ul>
+                <li>
+                  <Link to={`status#coordinator`}>{t("election.status")}</Link>
+                </li>
+                <li>
+                  <Link to={`polling-stations#coordinator`}>{t("polling_station.title.plural")}</Link>
+                </li>
+              </ul>
             </li>
             <li>
-              <Link to={`polling-stations#coordinator`}>Stembureaus</Link>
+              {t("typist")}:
+              <ul>
+                <li>
+                  <Link to={`data-entry`}>{t("data_entry.title")}</Link>
+                </li>
+              </ul>
             </li>
           </ul>
           {__API_MSW__ && <MockTest />}

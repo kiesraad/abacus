@@ -393,6 +393,19 @@ export function getClientState(formState: FormState, acceptWarnings: boolean, co
   return clientState;
 }
 
+export function calculateDataEntryProgress(formState: FormState) {
+  const sections = Object.keys(formState.sections);
+  const totalSections = sections.length;
+
+  const furthestSection = formState.sections[formState.furthest];
+  if (furthestSection === undefined) {
+    console.warn("Furthest could not be found in sections");
+    return 0;
+  }
+
+  return Math.round(((furthestSection.index + 1) / totalSections) * 100);
+}
+
 export function buildFormState(
   clientState: ClientState,
   validationResults: ValidationResults,

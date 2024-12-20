@@ -1,34 +1,35 @@
 import { Link, Outlet } from "react-router-dom";
 
-import { NotFoundError } from "app/component/error";
 import { NavBar } from "app/component/navbar/NavBar";
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 import { AbortDataEntryControl } from "app/module/data_entry";
 
-import { PollingStationFormController, useElection } from "@kiesraad/api";
+import { NotFoundError, PollingStationFormController, useElection } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
 import { Badge, PageTitle, PollingStationNumber, StickyNav, WorkStationNumber } from "@kiesraad/ui";
 import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";
 
 export function PollingStationLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
+  const entryNumber = useNumericParam("entryNumber");
   const { election, pollingStation } = useElection(pollingStationId);
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
 
   if (!pollingStation) {
-    throw new NotFoundError("Stembureau niet gevonden");
+    throw new NotFoundError("error.polling_station_not_found");
   }
 
   if (pollingStationStatus === "definitive") {
-    throw new Error("Polling station already finalised");
+    throw new Error("error.polling_station_already_definitive");
   }
 
   return (
-    <PollingStationFormController election={election} pollingStationId={pollingStation.id} entryNumber={1}>
-      <PageTitle title={`Invoeren ${pollingStation.number} ${pollingStation.name} - Abacus`} />
+    <PollingStationFormController election={election} pollingStationId={pollingStation.id} entryNumber={entryNumber}>
+      <PageTitle title={`${t("data_entry.title")} ${pollingStation.number} ${pollingStation.name} - Abacus`} />
       <NavBar>
-        <Link to={"/elections"}>Overzicht</Link>
+        <Link to={"/elections"}>{t("overview")}</Link>
         <IconChevronRight />
         <Link to={`/elections/${election.id}/data-entry`}>
           <span className="bold">{election.location}</span>

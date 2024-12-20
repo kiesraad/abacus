@@ -1,7 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { PollingStation } from "@kiesraad/api";
-import { IconError } from "@kiesraad/icon";
+import { PollingStation, PollingStationStatus } from "@kiesraad/api";
+import { t, tx } from "@kiesraad/i18n";
+import { IconError, IconWarning } from "@kiesraad/icon";
 import { Badge, Icon, InputField, Spinner } from "@kiesraad/ui";
 import { cn, removeLeadingZeros, usePollingStationStatus } from "@kiesraad/util";
 
@@ -27,6 +28,7 @@ export function PollingStationSelector({
   handleSubmit,
 }: PollingStationSelectorProps) {
   const currentPollingStationStatus = usePollingStationStatus(currentPollingStation?.id);
+  const firstAndSecondEntryFinished: PollingStationStatus[] = ["first_second_entry_different", "definitive"];
 
   return (
     <div className={cls.container}>
@@ -35,7 +37,7 @@ export function PollingStationSelector({
         className={cls.input}
         name="number"
         value={pollingStationNumber}
-        label="Voer het nummer in:"
+        label={t("polling_station_choice.insert_number")}
         fieldWidth="narrow"
         margin={false}
         maxLength={6}
@@ -58,23 +60,43 @@ export function PollingStationSelector({
                 <span className={cls.icon}>
                   <Icon icon={<Spinner size="md" />} />
                 </span>
-                <span>aan het zoeken …</span>
+                <span>{t("polling_station_choice.searching")} &hellip;</span>
               </div>
             );
           } else if (currentPollingStation) {
-            return (
-              <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.success)}>
-                <span className="bold">{currentPollingStation.name}</span>
-                {currentPollingStationStatus && <Badge type={currentPollingStationStatus} showIcon />}
-              </div>
-            );
+            if (currentPollingStationStatus && firstAndSecondEntryFinished.includes(currentPollingStationStatus)) {
+              return (
+                <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.warning)}>
+                  <span className={cls.icon}>
+                    <Icon icon={<IconWarning aria-label={t("contains_warning")} />} color="warning" />
+                  </span>
+                  <span>
+                    {tx("polling_station_choice.has_already_been_filled_twice", undefined, {
+                      nr: currentPollingStation.number,
+                      name: currentPollingStation.name,
+                    })}
+                  </span>
+                </div>
+              );
+            } else {
+              return (
+                <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.success)}>
+                  <span className="bold">{currentPollingStation.name}</span>
+                  {currentPollingStationStatus && <Badge type={currentPollingStationStatus} showIcon />}
+                </div>
+              );
+            }
           } else {
             return (
               <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls.error)}>
                 <span className={cls.icon}>
-                  <Icon icon={<IconError aria-label={"bevat een fout"} />} color="error" />
+                  <Icon icon={<IconError aria-label={t("contains_error")} />} color="error" />
                 </span>
-                <span>Geen stembureau gevonden met nummer {removeLeadingZeros(pollingStationNumber)}</span>
+                <span>
+                  {t("polling_station_choice.no_polling_station_found_with_number", {
+                    nr: removeLeadingZeros(pollingStationNumber),
+                  })}
+                </span>
               </div>
             );
           }

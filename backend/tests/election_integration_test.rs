@@ -1,11 +1,11 @@
 #![cfg(test)]
 
-use hyper::StatusCode;
-use sqlx::SqlitePool;
-
+use crate::shared::example_data_entry;
 use crate::utils::serve_api;
 use backend::election::{ElectionDetailsResponse, ElectionListResponse, ElectionStatusResponse};
 use backend::polling_station::PollingStationStatus;
+use hyper::StatusCode;
+use sqlx::SqlitePool;
 
 mod shared;
 mod utils;
@@ -22,7 +22,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     let body: ElectionListResponse = response.json().await.unwrap();
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(body.elections.len(), 4);
+    assert_eq!(body.elections.len(), 5);
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
@@ -66,63 +66,206 @@ async fn test_election_details_status(pool: SqlitePool) {
     let status = response.status();
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
-    // Ensure the response is what we expect
+    // Ensure the statuses are "NotStarted"
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
     assert_eq!(body.statuses[0].status, PollingStationStatus::NotStarted);
+    assert_eq!(body.statuses[0].data_entry_progress, None);
     assert_eq!(body.statuses[1].status, PollingStationStatus::NotStarted);
+    assert_eq!(body.statuses[1].data_entry_progress, None);
 
-    // Finalise one and set the other in progress
-    shared::create_and_finalise_data_entry(&addr, 1).await;
-    shared::create_and_save_data_entry(&addr, 2, Some(r#"{"continue": true}"#)).await;
+    // Finalise the first entry of one and set the other in progress
+    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
+    shared::create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": true}"#)).await;
 
     let url = format!("http://{addr}/api/elections/1/status");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
-    // Ensure the response is what we expect:
-    // polling station 1 is now complete, polling station 2 is still incomplete and set to in progress
+    // polling station 1's first entry is now complete, polling station 2 is still incomplete and set to in progress
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
+    let statuses = [
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap(),
+        body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
+    ];
+
+    assert_eq!(statuses[0].status, PollingStationStatus::SecondEntry);
+    assert_eq!(statuses[0].data_entry_progress, None);
     assert_eq!(
-        body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
-        PollingStationStatus::Definitive
-    );
-    assert_eq!(
-        body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,
+        statuses[1].status,
         PollingStationStatus::FirstEntryInProgress
     );
+    assert_eq!(statuses[1].data_entry_progress, Some(60));
 
-    // Abort and save the other data entry
-    shared::create_and_save_data_entry(&addr, 2, Some(r#"{"continue": false}"#)).await;
+    // Abort and save the entries
+    shared::create_and_save_data_entry(&addr, 1, 2, Some(r#"{"continue": true}"#)).await;
+    shared::create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": false}"#)).await;
 
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
-    // Ensure the response is what we expect:
-    // polling station 1 is now complete, polling station 2 is still incomplete and set to unfinished
+    // polling station 1 should now be in progress, polling station 2 is still incomplete and set to unfinished
     println!("response body: {:?}", &body);
+    assert_eq!(status, StatusCode::OK);
+    assert!(!body.statuses.is_empty());
+    let statuses = [
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap(),
+        body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
+    ];
+
+    assert_eq!(
+        statuses[0].status,
+        PollingStationStatus::SecondEntryInProgress
+    );
+    assert_eq!(statuses[0].data_entry_progress, Some(60));
+    assert_eq!(
+        statuses[1].status,
+        PollingStationStatus::FirstEntryUnfinished
+    );
+    assert_eq!(statuses[1].data_entry_progress, Some(60));
+
+    // polling station 2 should now be unfinished
+    shared::create_and_save_data_entry(&addr, 1, 2, Some(r#"{"continue": false}"#)).await;
+
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
     assert_eq!(status, StatusCode::OK);
     assert!(!body.statuses.is_empty());
     assert_eq!(
         body.statuses.iter().find(|ps| ps.id == 1).unwrap().status,
-        PollingStationStatus::Definitive
+        PollingStationStatus::SecondEntryUnfinished
     );
+
+    // polling station 2 should now be definitive
+    shared::create_and_finalise_data_entry(&addr, 1, 2).await;
+
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(!body.statuses.is_empty());
     assert_eq!(
-        body.statuses.iter().find(|ps| ps.id == 2).unwrap().status,
+        statuses[1].status,
         PollingStationStatus::FirstEntryUnfinished
     );
+    assert_eq!(statuses[1].data_entry_progress, Some(60));
+}
+
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+async fn test_election_details_status_no_other_election_statuses(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    // Save data entry for election 1, polling station 1
+    shared::create_and_save_data_entry(&addr, 1, 1, Some(r#"{"continue": true}"#)).await;
+
+    // Save data entry for election 2, polling station 3
+    shared::create_and_save_data_entry(&addr, 3, 1, Some(r#"{"continue": true}"#)).await;
+
+    // Get statuses for election 2
+    let url = format!("http://{addr}/api/elections/2/status");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
+    assert_eq!(
+        body.statuses.len(),
+        1,
+        "there can be only one {:?}",
+        body.statuses
+    );
+    assert_eq!(body.statuses[0].id, 3);
+    assert_eq!(
+        body.statuses[0].status,
+        PollingStationStatus::FirstEntryInProgress
+    );
+}
+
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+async fn test_election_first_second_data_entry_finalise_ok(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    // Save data entries for election 1, polling station 1
+    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
+    shared::create_and_finalise_data_entry(&addr, 1, 2).await;
+
+    // Check that the status is Definitive
+    let url = format!("http://{addr}/api/elections/1/status");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+    assert_eq!(body.statuses.len(), 2);
+
+    let statuses = [
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap(),
+        body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
+    ];
+
+    assert_eq!(statuses[0].status, PollingStationStatus::Definitive);
+    assert_eq!(statuses[1].status, PollingStationStatus::NotStarted);
+}
+
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+async fn test_election_first_second_data_entry_finalise_different(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    // Save first data entries for election 1, polling station 1
+    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
+
+    // Save different second data entry
+    let mut request_body = example_data_entry(None);
+    request_body.data.votes_counts.blank_votes_count = 0;
+    request_body.data.votes_counts.invalid_votes_count = 2;
+    let url = format!("http://{addr}/api/polling_stations/1/data_entries/2");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&request_body)
+        .send()
+        .await
+        .unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+
+    // Finalise the second data entry
+    let url = format!("http://{addr}/api/polling_stations/1/data_entries/2/finalise");
+    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+
+    // Check that the status is FirstSecondEntryDifferent
+    let url = format!("http://{addr}/api/elections/1/status");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+    assert_eq!(body.statuses.len(), 2);
+
+    let statuses = [
+        body.statuses.iter().find(|ps| ps.id == 1).unwrap(),
+        body.statuses.iter().find(|ps| ps.id == 2).unwrap(),
+    ];
+
+    assert_eq!(
+        statuses[0].status,
+        PollingStationStatus::FirstSecondEntryDifferent
+    );
+    assert_eq!(statuses[1].status, PollingStationStatus::NotStarted);
 }
 
 #[sqlx::test(fixtures("../fixtures/elections.sql"))]
 async fn test_election_pdf_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/1/download_results");
+    let url = format!("http://{addr}/api/elections/1/download_pdf_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let content_disposition = response.headers().get("Content-Disposition");
@@ -141,4 +284,65 @@ async fn test_election_pdf_download(pool: SqlitePool) {
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
     // But the header should also contain ".pdf"
     assert!(content_disposition_string.contains(".pdf"));
+}
+
+#[sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("elections", "polling_stations", "polling_station_results")
+))]
+async fn test_election_xml_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/4/download_xml_results");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let content_type = response.headers().get("Content-Type");
+
+    // Ensure the response is what we expect
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "text/xml");
+
+    let body = response.text().await.unwrap();
+    assert!(body.contains("<Election>"));
+    assert!(body.contains("<ValidVotes>125</ValidVotes>"));
+}
+
+#[sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("elections", "polling_stations", "polling_station_results")
+))]
+async fn test_election_zip_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/4/download_zip_results");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    let content_disposition = response.headers().get("Content-Disposition");
+    let content_type = response.headers().get("Content-Type");
+
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "application/zip");
+
+    let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
+    assert_eq!(&content_disposition_string[..21], "attachment; filename=");
+    assert_eq!(
+        &content_disposition_string[21..],
+        "\"election_result_GR2024_Heemdamseburg.zip\""
+    );
+
+    let bytes = response.bytes().await.unwrap();
+    let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();
+    {
+        let xml_file = archive
+            .by_name("Telling_GR2024_Heemdamseburg.eml.xml")
+            .unwrap();
+        assert!(xml_file.size() > 0);
+    }
+
+    {
+        let pdf_file = archive
+            .by_name("Model_Na31-2_GR2024_Heemdamseburg.pdf")
+            .unwrap();
+        assert!(pdf_file.size() > 0);
+    }
 }

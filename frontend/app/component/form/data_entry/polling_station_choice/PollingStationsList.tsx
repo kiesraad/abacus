@@ -1,5 +1,7 @@
 import { PollingStation, useElectionStatus } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { Badge, Table } from "@kiesraad/ui";
+import { getUrlForDataEntry } from "@kiesraad/util";
 
 export interface PollingStationsListProps {
   pollingStations: PollingStation[];
@@ -11,22 +13,23 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
   return (
     <Table id="polling_station_list">
       <Table.Header>
-        <Table.Column>Nummer</Table.Column>
-        <Table.Column>Stembureau</Table.Column>
+        <Table.Column>{t("number")}</Table.Column>
+        <Table.Column>{t("polling_station.title.singular")}</Table.Column>
       </Table.Header>
       <Table.Body>
         {pollingStations.map((pollingStation: PollingStation) => {
           const status = electionStatus.statuses.find((status) => status.id === pollingStation.id)?.status;
-          if (status === "definitive") {
+          if (status === "definitive" || status === "first_second_entry_different") {
             return null;
           }
 
           return (
-            <Table.LinkRow key={pollingStation.number} to={`./${pollingStation.id}`}>
-              <Table.Cell number fontSizeClass="fs-body">
-                {pollingStation.number}
-              </Table.Cell>
-              <Table.Cell fontSizeClass="fs-md">
+            <Table.LinkRow
+              key={pollingStation.number}
+              to={getUrlForDataEntry(pollingStation.election_id, pollingStation.id, status)}
+            >
+              <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
+              <Table.Cell>
                 <span>{pollingStation.name}</span>
                 {status && <Badge type={status} showIcon />}
               </Table.Cell>

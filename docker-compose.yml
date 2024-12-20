@@ -1,10 +1,11 @@
 services:
-  api:
+  backend:
     image: ghcr.io/tweedegolf/rust-dev:stable
     ports:
       - "8080:8080"
     user: "${USER_ID:?USER_ID not set}:${GROUP_ID:?GROUP_ID not set}"
     environment:
+      RUST_LOG: debug
       TZ: "Europe/Amsterdam"
       CARGO_HOME: .cargo
       CARGO_TARGET_DIR: "./target-docker"
@@ -14,7 +15,7 @@ services:
     command: ["cargo", "watch", "--why", "--ignore", ".cargo", "--ignore", "db.sqlite*", "--ignore", "target-docker", "-x", "run --"]
 
   frontend:
-    depends_on: [api]
+    depends_on: [backend]
     image: node:20
     ports:
       - 3000:3000
@@ -24,6 +25,6 @@ services:
     user: "${USER_ID:?USER_ID not set}:${GROUP_ID:?GROUP_ID not set}"
     environment:
       TZ: "Europe/Amsterdam"
-      API_HOST: http://api:8080
+      API_HOST: http://backend:8080
       VITE_HOST: "0.0.0.0"
     command: ["npm", "run", "dev:server", "--", "--host"]

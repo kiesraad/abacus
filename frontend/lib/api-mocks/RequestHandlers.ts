@@ -7,17 +7,21 @@ import {
   ElectionStatusResponse,
   ErrorResponse,
   GetDataEntryResponse,
+  POLLING_STATION_CREATE_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS,
+  POLLING_STATION_GET_REQUEST_PARAMS,
   POLLING_STATION_LIST_REQUEST_PARAMS,
+  POLLING_STATION_UPDATE_REQUEST_PARAMS,
+  PollingStation,
   PollingStationListResponse,
+  PollingStationRequest,
   SaveDataEntryResponse,
 } from "@kiesraad/api";
 
-import { Database, DataEntryRecord } from "./Database.ts";
+import { Database, DataEntryRecord, pollingStationID } from "./Database.ts";
 import { validate } from "./DataEntry.ts";
 import { electionListMockResponse, getElectionMockData } from "./ElectionMockData";
-import { getPollingStationMockData } from "./PollingStationMockData";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -81,13 +85,15 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
       const pollingStationIds = Database.pollingStations
         .filter((ps) => ps.election_id === Number(params.election_id))
         .map((ps) => ps.id);
-      for (const pollingStationId of pollingStationIds) {
-        if (Database.results.some((r) => r.pollingStationId === pollingStationId)) {
-          response.statuses.push({ id: pollingStationId, status: "definitive" });
-        } else if (Database.dataEntries.some((d) => d.pollingStationId === pollingStationId)) {
-          response.statuses.push({ id: pollingStationId, status: "first_entry_in_progress" });
+
+      for (const id of pollingStationIds) {
+        if (Database.results.some((r) => r.pollingStationId === id)) {
+          response.statuses.push({ id, status: "definitive" });
+        } else if (Database.dataEntries.some((d) => d.pollingStationId === id)) {
+          const dataEntry = Database.dataEntries.find((d) => d.pollingStationId === id);
+          response.statuses.push({ id, status: "first_entry_in_progress", data_entry_progress: dataEntry?.progress });
         } else {
-          response.statuses.push({ id: pollingStationId, status: "not_started" });
+          response.statuses.push({ id, status: "not_started" });
         }
       }
 
@@ -107,7 +113,7 @@ export const PollingStationListRequestHandler = http.get<ParamsToString<POLLING_
       return HttpResponse.json({}, { status: 404 });
     }
 
-    const pollingStations = getPollingStationMockData(electionId);
+    const pollingStations = Database.pollingStations.filter((ps) => ps.election_id === electionId);
     return HttpResponse.json({ polling_stations: pollingStations } satisfies PollingStationListResponse, {
       status: 200,
     });
@@ -129,7 +135,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
       return HttpResponse.json(
         {
           error: "Cannot save data entry for a polling station that has already been finalised",
-          reference: "PollingStationAlreadyFinalized",
+          reference: "PollingStationFirstEntryAlreadyFinalised",
           fatal: false,
         } satisfies ErrorResponse,
         { status: 409 },
@@ -139,6 +145,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
     const dataEntry: DataEntryRecord = {
       pollingStationId: Number(params.polling_station_id),
       entryNumber: Number(params.entry_number),
+      progress: json.progress,
       data: json.data,
       clientState: json.client_state as ClientState,
       updated_at: Number(Date.now() / 1000),
@@ -181,6 +188,7 @@ export const PollingStationDataEntryGetHandler = http.get<
   if (!dataEntryRecord) return HttpResponse.text(null, { status: 404 });
 
   const response: GetDataEntryResponse = {
+    progress: dataEntryRecord.progress,
     data: dataEntryRecord.data,
     client_state: dataEntryRecord.clientState,
     validation_results: validate(dataEntryRecord.data),
@@ -221,6 +229,83 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
   return HttpResponse.text(null, { status: 200 });
 });
 
+export const PollingStationCreateHandler = http.post<ParamsToString<POLLING_STATION_CREATE_REQUEST_PARAMS>>(
+  "/api/elections/:election_id/polling_stations",
+  async ({ request, params }) => {
+    const electionID = parseInt(params.election_id, 10);
+
+    const json = (await request.json()) as PollingStationRequest;
+
+    //check if exists
+    const ps = Database.pollingStations.find((ps) => ps.election_id === electionID && ps.number === json.number);
+    if (ps) {
+      const errorResponse: ErrorResponse = {
+        error: "Polling station already exists",
+        fatal: false,
+        reference: "EntryNotUnique",
+      };
+      return HttpResponse.json(errorResponse, { status: 409 });
+    }
+
+    const newPollingStation: PollingStation = {
+      id: pollingStationID(),
+      election_id: electionID,
+      ...json,
+    };
+
+    Database.pollingStations.push(newPollingStation);
+
+    return HttpResponse.json(newPollingStation, { status: 201 });
+  },
+);
+
+export const PollingStationUpdateHandler = http.put<ParamsToString<POLLING_STATION_UPDATE_REQUEST_PARAMS>>(
+  "/api/polling_stations/:polling_station_id",
+  async ({ request, params }) => {
+    const pollingStationId = parseInt(params.polling_station_id, 10);
+
+    const json = (await request.json()) as PollingStationRequest;
+
+    //check if exists
+    const ps = Database.pollingStations.find((ps) => ps.id === pollingStationId);
+    if (ps) {
+      const updatedPollingStation: PollingStation = {
+        ...ps,
+        ...json,
+      };
+
+      Database.pollingStations = Database.pollingStations.map((ps) =>
+        ps.id === pollingStationId ? updatedPollingStation : ps,
+      );
+
+      return HttpResponse.text("", { status: 200 });
+    }
+
+    return HttpResponse.json(
+      {
+        error: "Not Found",
+        fatal: false,
+        reference: "EntryNotFound",
+      } satisfies ErrorResponse,
+      { status: 404 },
+    );
+  },
+);
+
+export const PollingStationGetHandler = http.get<ParamsToString<POLLING_STATION_GET_REQUEST_PARAMS>>(
+  "/api/polling_stations/:polling_station_id",
+  ({ params }) => {
+    const pollingStationId = parseInt(params.polling_station_id, 10);
+
+    //check if exists
+    const ps = Database.pollingStations.find((ps) => ps.id === pollingStationId);
+    if (ps) {
+      return HttpResponse.json(ps, { status: 200 });
+    }
+    return HttpResponse.text("Not Found", { status: 404 });
+  },
+);
+
 export const handlers: HttpHandler[] = [
   pingHandler,
   ElectionListRequestHandler,
@@ -231,4 +316,7 @@ export const handlers: HttpHandler[] = [
   PollingStationDataEntryGetHandler,
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
+  PollingStationCreateHandler,
+  PollingStationGetHandler,
+  PollingStationUpdateHandler,
 ];

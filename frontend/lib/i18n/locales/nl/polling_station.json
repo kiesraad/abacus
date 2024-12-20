@@ -1,0 +1,46 @@
+{
+  "title": {
+    "singular": "Stembureau",
+    "plural": "Stembureaus",
+    "type": "Soort stembureau",
+    "address": "Adres van het stembureau",
+    "how_to_add": "Hoe wil je stembureaus toevoegen?"
+  },
+  "message": {
+    "no_polling_stations": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
+    "polling_station_updated": "Wijzigingen stembureau {number} ({name}) opgeslagen",
+    "polling_station_created": "Stembureau {number} ({name}) toegevoegd",
+    "polling_station_deleted": "Stembureau {pollingStation} verwijderd",
+    "delete_error_title": "Stembureau kan niet verwijderd worden",
+    "delete_error": "Het stembureau kan niet meer verwijderd worden. De invoerfase is al gestart."
+  },
+  "number_of_voters": "Aantal kiesgerechtigden",
+  "street": "Straatnaam",
+  "street_and_number": "Straatnaam en huisnummer",
+  "house_number": "Huisnummer",
+  "house_number_addition": "Toevoeging",
+  "zipcode": "Postcode",
+  "locality": "Plaats",
+  "form": {
+    "create": "Stembureau toevoegen",
+    "save_create": "Opslaan en toevoegen",
+    "save_update": "Wijzigingen opslaan"
+  },
+  "type": {
+    "FixedLocation": "Vaste locatie",
+    "Special": "Bijzonder",
+    "Mobile": "Mobiel"
+  },
+  "unsaved_changes_title": "Let op: niet opgeslagen wijzigingen",
+  "unsaved_changes_message": "Je hebt in <strong>{name}</strong> wijzigingen gemaakt die nog niet zijn opgeslagen.",
+  "current_form": "het huidige formulier",
+  "create": "Stembureau toevoegen",
+  "update": "Stembureau wijzigen",
+  "delete": "Stembureau verwijderen",
+  "delete_are_you_sure": "Weet je zeker dat je dit stembureau wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
+  "save_changes": "Wil je deze wijzigingen bewaren?",
+  "recounted_question": "Is er herteld?",
+  "voters_and_vote_count": "Aantal kiezers en stemmen",
+  "add_choice": "Hoe wil je stembureaus toevoegen?",
+  "empty": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen."
+}

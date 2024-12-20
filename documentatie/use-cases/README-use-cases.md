@@ -40,7 +40,7 @@ Waarom deze werkwijze nuttig kan zijn:
 
 ## Use case template
 
-De meest minimale versie van een use case bestaat uit scope, niveau en beschrijving. De onderstaande lijst met minimale en optionele velden is dus niet definitief en kan aangepast worden. We kunnen ook velden toevoegen, zoals "verkiezingen" (voor welke verkiezingen geldt deze use case?) of input/output-bestanden (EML's, PV's, CSV's, ...)
+De meest minimale versie van een use case bestaat uit scope, niveau en beschrijving. De onderstaande lijst met minimale en optionele velden is dus niet definitief en kan aangepast worden. We kunnen ook velden toevoegen, zoals "verkiezingen" (voor welke verkiezingen geldt deze use case?) of input/output-bestanden (EMLs, PV's, CSV's, ...)
 
 ### Minimale velden
 
@@ -50,13 +50,13 @@ __Niveau:__
 - Hoog-over (vlieger) 🪁
 - Gebruikersdoel (zee) 🌊
   - 1 persoon, 1 sessie (ca. 2-20 minuten)
-  - Dit is het deale niveau voor use cases.
+  - Dit is het ideale niveau voor use cases.
 - Subfunctie (vis) 🐟
   - Schrijf deze alleen wanneer dit echt nodig is.
 - Te laag (schelp) 🐚
   - Dit niveau is te granulair, gooi ze weg.
 
-__Trigger__: trigger van de use case
+__Trigger:__ trigger van de use case
 
 __Hoofdscenario:__
 
@@ -68,11 +68,11 @@ __Hoofdscenario:__
   - Een validatie om een stakeholder te beschermen
   - Een *internal state change* namens een stakeholder
 
-__uitbreidingen:__
+__Uitbreidingen:__
 
 - De nummering van een uitbreiding komt overeen met de stap in het hoofdscenario waarvan het een uitbreiding is.
 
-__open punten:__  
+__Open punten:__  
 
 - Schrijf hier open punten op die gerelateerd zijn aan deze use case.
 - Dit kopje is niet aanwezig als er geen open punten zijn.
@@ -80,7 +80,6 @@ __open punten:__
 ### Mogelijke extra velden
 
 - Precondities
-- Open punten
 - Stakeholders en belangen van stakeholders die door de use case beschermd worden
 - Minimale garanties
 - Succesgaranties

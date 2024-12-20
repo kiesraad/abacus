@@ -52,16 +52,17 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use chrono::Utc;
-    use models::{ModelNa31_2Input, ModelNa31_2Summary};
+    use models::ModelNa31_2Input;
 
+    use super::*;
+    use crate::election::ElectionStatus;
     use crate::{
         election::{tests::election_fixture, Election, ElectionCategory},
         polling_station::{PollingStation, PollingStationType},
+        summary::ElectionSummary,
     };
-
-    use super::*;
 
     pub fn polling_stations_fixture(
         election: &Election,
@@ -104,12 +105,17 @@ mod tests {
                 location: "Heemdamseburg".to_string(),
                 number_of_voters: 100,
                 category: ElectionCategory::Municipal,
+                number_of_seats: 29,
                 election_date: Utc::now().date_naive(),
                 nomination_date: Utc::now().date_naive(),
+                status: ElectionStatus::DataEntryFinished,
                 political_groups: None,
             },
             polling_stations: vec![],
-            summary: ModelNa31_2Summary::zero(),
+            summary: ElectionSummary::zero(),
+            hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
+                .to_string(),
+            creation_date_time: "04-12-2024 12:08".to_string(),
         }))
         .unwrap();
 
@@ -122,7 +128,10 @@ mod tests {
         let content = generate_pdf(PdfModel::ModelNa31_2(ModelNa31_2Input {
             polling_stations: polling_stations_fixture(&election, &[100, 200, 300]),
             election,
-            summary: ModelNa31_2Summary::zero(),
+            summary: ElectionSummary::zero(),
+            hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
+                .to_string(),
+            creation_date_time: "04-12-2024 12:08".to_string(),
         }))
         .unwrap();
 

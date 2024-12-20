@@ -27,6 +27,8 @@
   - Vermijden van "normalization of deviance": "dit kan voor één keer" wordt "dit kan wel eens een keer" en vervolgens "dit kan wel"
   - Vermijden van "failure demand" (extra werk omdat het de eerste keer niet goed genoeg was): managen van je backlog/bevindingenregister kost uiteindelijk vrijwel altijd meer tijd en energie dan gelijk oplossen
 
+Voor de praktische uitwerking van de policy, zie ["Uitwerking zero bug policy"](/documentatie/ontwikkelproces/zero-bug-policy.md).
+
 ### Vroege feedback en end-to-end feedback
 
 - Vroege feedback:
@@ -44,7 +46,7 @@
 We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op de waarborgen uit het verkiezingsproces:
 
 - Betrouwbaarheid: kun je de software in de meeste situaties vertrouwen?
-- Bruikbaarheid: is de software makkelijk te gebruiken? (voor alle bedoelde gebruikers, dus ook installatie, controleerbaar door burger, etc)
+- Bruikbaarheid: is de software makkelijk te gebruiken? (voor alle bedoelde gebruikers, dus ook installatie, controleerbaar door burger, etc.)
 - Beveiliging: biedt de software voldoende bescherming tegen ongewenst gebruik?
 - Testbaarheid: is het eenvoudig om de software te testen en controleren?
 - Onderhoudbaarheid: kan de software eenvoudig worden onderhouden en aangepast?
@@ -72,8 +74,8 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
   - Voor CI (continous integration, zie hieronder) moet dit strict gezien minder dan 1 dag zijn. Dat is in de praktijk erg lastig, vandaar de 1-3 dagen.
 - één ticket/taak mag in meerdere PR's gebouwd worden.
 - Pair/ensemble programming telt als review.
-- Vraag vroeg feedback op je design wanneer nodig: [editing over proof-reading](https://buttondown.email/hillelwayne/archive/code-review-vs-code-proofreading/) (Hillel Wayne)
-- Zoveel mogelijk afvangen d.m.v. linting en static code analysis, zodat menselijke code review kan focussen op design e.d.
+- Vraag vroeg om feedback: [editing over proof-reading](https://buttondown.email/hillelwayne/archive/code-review-vs-code-proofreading/) (Hillel Wayne)
+- Zoveel mogelijk afvangen d.m.v. linting en static code analysis, zodat menselijke code review kan focussen op architectuur e.d.
 
 #### Handmatige tests en automatische tests
 
@@ -82,8 +84,8 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 
 #### Continuous Integration / Continous Delivery (CI/CD)
 
-- CI: risico's migiteren bij het integreren van code door dit continu te doen.
-  - Ideaal: elke developer intregreert eigen code minstens één keer per dag met de gedeelde branch.
+- CI: risico's mitigeren bij het integreren van code door dit continu te doen.
+  - Ideaal: elke developer integreert eigen code minstens één keer per dag met de gedeelde branch.
 - CD: risico's mitigeren bij het opleveren van een installeerbaar product door dit continu te doen.
   - De pipeline resulteert in een installeerbare en werkende applicatie.
 - Dus er is een CI/CD-pipeline nodig met quality gates (nog niet alle gates zijn geïmplementeerd):
@@ -117,7 +119,7 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 - Frequentie: te bepalen
 - Doel:
   - Feedback ophalen van externe stakeholders, bijv. gemeentes
-  - Feedback ophalen van externe geïnteresseerden, bijv. betrokken burgers maar ook de community van experts (programmeren, testen)
+  - Feedback ophalen van externe geïnteresseerden, bijv. betrokken burgers, maar ook de community van experts (programmeren, testen)
 - Faciliteren door:
   - Het uitvoeren van kleinschalige gebruikerstests
   - Het organiseren van sessies om feedback op te halen

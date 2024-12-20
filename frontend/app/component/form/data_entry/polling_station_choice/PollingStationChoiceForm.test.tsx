@@ -1,10 +1,13 @@
+import * as router from "react-router";
+
+import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 import { overrideOnce, render, screen, within } from "app/test/unit";
 
-import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
+import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionStatusMockResponse } from "@kiesraad/api-mocks";
 
 function renderPollingStationChoicePage() {
@@ -18,7 +21,7 @@ function renderPollingStationChoicePage() {
 }
 
 describe("Test PollingStationChoiceForm", () => {
-  describe("Polling station data entry form", () => {
+  describe("Polling station choice form", () => {
     test("Form field entry", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
@@ -145,8 +148,50 @@ describe("Test PollingStationChoiceForm", () => {
       // Test if the polling station name is shown
       await user.type(pollingStation, "34");
 
-      // Click submit again and see that the alert appeared again
+      // Click submit and see that the alert appears
       await user.click(submitButton);
+
+      // Test if the warning message is shown correctly
+      await waitFor(() => {
+        expect(screen.getByTestId("pollingStationSelectorFeedback").textContent).toBe(
+          "Stembureau 34 (Testplek) is al twee keer ingevoerd",
+        );
+      });
+
+      expect(
+        within(screen.getByTestId("pollingStationSubmitFeedback")).getByText(
+          "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
+        ),
+      ).toBeVisible();
+    });
+
+    test("Selecting a valid, but with different entries polling station shows alert", async () => {
+      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+      overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
+      const user = userEvent.setup();
+      render(
+        <ElectionProvider electionId={1}>
+          <ElectionStatusProvider electionId={1}>
+            <PollingStationChoiceForm anotherEntry />
+          </ElectionStatusProvider>
+        </ElectionProvider>,
+      );
+
+      const submitButton = await screen.findByRole("button", { name: "Beginnen" });
+      const pollingStation = screen.getByTestId("pollingStation");
+
+      // Test if the polling station name is shown
+      await user.type(pollingStation, "35");
+
+      // Click submit and see that the alert appears
+      await user.click(submitButton);
+
+      // Test if the warning message is shown correctly
+      await waitFor(() => {
+        expect(screen.getByTestId("pollingStationSelectorFeedback").textContent).toBe(
+          "Stembureau 35 (Testschool) is al twee keer ingevoerd",
+        );
+      });
 
       expect(
         within(screen.getByTestId("pollingStationSubmitFeedback")).getByText(
@@ -166,10 +211,37 @@ describe("Test PollingStationChoiceForm", () => {
       const pollingStationSearching = await screen.findByTestId("pollingStationSelectorFeedback");
       expect(within(pollingStationSearching).getByText("aan het zoeken …")).toBeVisible();
     });
+
+    test("Selecting polling station with second data entry opens correct page", async () => {
+      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+      overrideOnce("get", "/api/elections/1/status", 200, {
+        statuses: [
+          {
+            id: 1,
+            status: "second_entry",
+          },
+          {
+            id: 2,
+            status: "definitive",
+          },
+        ],
+      } satisfies ElectionStatusResponse);
+
+      const mockNavigate = vi.fn();
+      vi.spyOn(router, "useNavigate").mockImplementation(() => mockNavigate);
+
+      renderPollingStationChoicePage();
+
+      const user = userEvent.setup();
+      const pollingStation = await screen.findByTestId("pollingStation");
+      await user.type(pollingStation, "33");
+      await user.click(screen.getByRole("button", { name: "Beginnen" }));
+      expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry/1/2");
+    });
   });
 
   describe("Polling station list", () => {
-    test("Display polling station list", async () => {
+    test("Polling station list is displayed", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
 
@@ -192,7 +264,7 @@ describe("Test PollingStationChoiceForm", () => {
       expect(within(pollingStationList).queryByText("Testplek")).toBe(null);
     });
 
-    test("Polling station list no stations", async () => {
+    test("Empty polling station list shows message", async () => {
       overrideOnce("get", "/api/elections/1", 200, { ...electionDetailsMockResponse, polling_stations: [] });
       const user = userEvent.setup();
       renderPollingStationChoicePage();
@@ -203,6 +275,58 @@ describe("Test PollingStationChoiceForm", () => {
 
       // Check if the error message is visible
       expect(screen.getByText("Geen stembureaus gevonden")).toBeVisible();
+    });
+
+    test("Second data entry has correct link", async () => {
+      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+      overrideOnce("get", "/api/elections/1/status", 200, {
+        statuses: [
+          {
+            id: 1,
+            status: "second_entry",
+          },
+          {
+            id: 2,
+            status: "definitive",
+          },
+        ],
+      } satisfies ElectionStatusResponse);
+
+      const mockNavigate = vi.fn();
+      vi.spyOn(router, "useNavigate").mockImplementation(() => mockNavigate);
+
+      renderPollingStationChoicePage();
+
+      // Open the polling station list
+      const user = userEvent.setup();
+      const openPollingStationList = await screen.findByTestId("openPollingStationList");
+      await user.click(openPollingStationList);
+
+      // Click polling station 33 and check if the link is correct
+      const pollingStationList = await screen.findByTestId("polling_station_list");
+      await userEvent.click(within(pollingStationList).getByText("33"));
+      expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry/1/2");
+    });
+  });
+
+  describe("Polling station in progress", () => {
+    test("Show polling stations as 'in progress'", async () => {
+      overrideOnce("get", "api/elections/1/status", 200, {
+        statuses: [
+          { id: 1, status: "not_started" },
+          { id: 2, status: "first_entry_in_progress", data_entry_progress: 42 },
+          { id: 3, status: "first_entry_unfinished", data_entry_progress: 42 },
+          { id: 4, status: "definitive" },
+        ],
+      } satisfies ElectionStatusResponse);
+
+      renderPollingStationChoicePage();
+
+      const alert = await screen.findByRole("alert");
+      expect(await within(alert).findByRole("heading", { name: "Je hebt nog een openstaande invoer" })).toBeVisible();
+
+      const pollingStations = await within(alert).findAllByRole("link");
+      expect(pollingStations.map((ps) => ps.textContent)).toEqual(["34 - Testplek", "35 - Testschool"]);
     });
   });
 });

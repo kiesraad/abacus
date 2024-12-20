@@ -1,4 +1,11 @@
-import { ApiError, ApiResponseStatus, NetworkError, type ValidationResultCode } from "@kiesraad/api";
+import {
+  ApiError,
+  ApiResponseStatus,
+  FatalApiError,
+  NetworkError,
+  NotFoundError,
+  type ValidationResultCode,
+} from "@kiesraad/api";
 
 export type ResultCode = ValidationResultCode | "REFORMAT_WARNING";
 
@@ -13,13 +20,15 @@ export type ErrorsAndWarnings = {
   warnings: FieldValidationResult[];
 };
 
-export type ApiResult<T> = ApiResponse<T> | ApiError | NetworkError;
+export type AnyApiError = ApiError | FatalApiError | NetworkError | NotFoundError;
+
+export type ApiResult<T, E = AnyApiError> = ApiResponse<T> | E;
 
 export interface ServerError {
   error: string;
 }
 
-export type RequestMethod = "GET" | "POST" | "DELETE";
+export type RequestMethod = "GET" | "POST" | "PUT" | "DELETE";
 
 export interface ApiResponse<T> {
   status: ApiResponseStatus.Success;

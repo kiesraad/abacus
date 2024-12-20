@@ -12,11 +12,23 @@ export interface ELECTION_DETAILS_REQUEST_PARAMS {
 }
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
 
-// /api/elections/{election_id}/download_results
-export interface ELECTION_DOWNLOAD_RESULTS_REQUEST_PARAMS {
+// /api/elections/{election_id}/download_pdf_results
+export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
   election_id: number;
 }
-export type ELECTION_DOWNLOAD_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_results`;
+export type ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_pdf_results`;
+
+// /api/elections/{election_id}/download_xml_results
+export interface ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_xml_results`;
+
+// /api/elections/{election_id}/download_zip_results
+export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_zip_results`;
 
 // /api/elections/{election_id}/polling_stations
 export interface POLLING_STATION_LIST_REQUEST_PARAMS {
@@ -76,6 +88,15 @@ export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
 export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
+// /api/user/login
+export type LOGIN_REQUEST_PARAMS = Record<string, never>;
+export type LOGIN_REQUEST_PATH = `/api/user/login`;
+export type LOGIN_REQUEST_BODY = Credentials;
+
+// /api/user/logout
+export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
+export type LOGOUT_REQUEST_PATH = `/api/user/logout`;
+
 /** TYPES **/
 
 /**
@@ -102,6 +123,11 @@ export interface CandidateVotes {
   votes: number;
 }
 
+export interface Credentials {
+  password: string;
+  username: string;
+}
+
 /**
  * Differences counts, part of the polling station results.
  */
@@ -125,8 +151,10 @@ export interface Election {
   location: string;
   name: string;
   nomination_date: string;
+  number_of_seats: number;
   number_of_voters: number;
   political_groups?: PoliticalGroup[];
+  status: ElectionStatus;
 }
 
 /**
@@ -152,28 +180,42 @@ export interface ElectionListResponse {
 }
 
 /**
+ * Election status (limited for now)
+ */
+export type ElectionStatus = "DataEntryInProgress" | "DataEntryFinished";
+
+/**
  * Election polling stations data entry statuses response
  */
 export interface ElectionStatusResponse {
   statuses: PollingStationStatusEntry[];
 }
 
+/**
+ * Error reference used to show the corresponding error message to the end-user
+ */
 export type ErrorReference =
   | "EntryNumberNotSupported"
   | "EntryNotFound"
-  | "PollingStationAlreadyFinalized"
+  | "PollingStationFirstEntryAlreadyFinalised"
+  | "PollingStationFirstEntryNotFinalised"
+  | "PollingStationSecondEntryAlreadyFinalised"
+  | "PollingStationResultsAlreadyFinalised"
   | "PollingStationDataValidation"
   | "InvalidVoteGroup"
   | "InvalidVoteCandidate"
   | "InvalidData"
   | "InvalidJson"
+  | "InvalidDataEntryNumber"
   | "EntryNotUnique"
   | "DatabaseError"
   | "InternalServerError"
   | "PdfGenerationError"
   | "PollingStationRepeated"
   | "PollingStationValidationErrors"
-  | "InvalidPoliticalGroup";
+  | "InvalidPoliticalGroup"
+  | "InvalidUsernamePassword"
+  | "InvalidSession";
 
 /**
  * Response structure for errors
@@ -190,8 +232,14 @@ export interface ErrorResponse {
 export interface GetDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
+  progress: number;
   updated_at: number;
   validation_results: ValidationResults;
+}
+
+export interface LoginResponse {
+  user_id: number;
+  username: string;
 }
 
 /**
@@ -262,13 +310,22 @@ export interface PollingStationResults {
   political_group_votes: PoliticalGroupVotes[];
   recounted?: boolean;
   voters_counts: VotersCounts;
-  voters_recounts?: VotersRecounts;
+  voters_recounts?: VotersCounts;
   votes_counts: VotesCounts;
 }
 
-export type PollingStationStatus = "not_started" | "first_entry_in_progress" | "first_entry_unfinished" | "definitive";
+export type PollingStationStatus =
+  | "not_started"
+  | "first_entry_in_progress"
+  | "first_entry_unfinished"
+  | "second_entry"
+  | "second_entry_in_progress"
+  | "second_entry_unfinished"
+  | "first_second_entry_different"
+  | "definitive";
 
 export interface PollingStationStatusEntry {
+  data_entry_progress?: number;
   finished_at?: number;
   id: number;
   status: PollingStationStatus;
@@ -285,6 +342,7 @@ export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
 export interface SaveDataEntryRequest {
   client_state: unknown;
   data: PollingStationResults;
+  progress: number;
 }
 
 /**
@@ -336,16 +394,6 @@ export interface VotersCounts {
   proxy_certificate_count: number;
   total_admitted_voters_count: number;
   voter_card_count: number;
-}
-
-/**
- * Recounted voters counts, this replaces the original voters counts in the polling station results.
- */
-export interface VotersRecounts {
-  poll_card_recount: number;
-  proxy_certificate_recount: number;
-  total_admitted_voters_recount: number;
-  voter_card_recount: number;
 }
 
 /**

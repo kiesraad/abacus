@@ -1,0 +1,22 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  padding-bottom: var(--space-sm);
+}
+
+.toolbar-section {
+  display: flex;
+  gap: var(--space-md-lg);
+  &.start {
+    /* default aligned at the start */
+  }
+
+  &.center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  &.end {
+    margin-left: auto;
+  }
+}

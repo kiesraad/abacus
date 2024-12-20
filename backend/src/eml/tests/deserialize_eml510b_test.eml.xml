@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EML Id="510b" SchemaVersion="5" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:rg="http://www.kiesraad.nl/reportgenerator" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <TransactionId>1</TransactionId>
+    <ManagingAuthority>
+        <AuthorityIdentifier Id="HSB1">Test Authority</AuthorityIdentifier>
+        <AuthorityAddress/>
+    </ManagingAuthority>
+    <kr:CreationDateTime>2021-09-01T12:00:00</kr:CreationDateTime>
+    <Count>
+        <EventIdentifier/>
+        <Election>
+            <ElectionIdentifier Id="GR2022">
+                <ElectionName>Municipal Election</ElectionName>
+                <ElectionCategory>GR</ElectionCategory>
+                <kr:ElectionSubcategory>GR1</kr:ElectionSubcategory>
+                <kr:ElectionDomain Id="1">Gemeente</kr:ElectionDomain>
+                <kr:ElectionDate>2021-09-01</kr:ElectionDate>
+            </ElectionIdentifier>
+            <Contests>
+                <Contest>
+                    <ContestIdentifier Id="geen"/>
+                    <TotalVotes>
+                        <Selection>
+                            <AffiliationIdentifier Id="1">
+                                <RegisteredName>Test Party</RegisteredName>
+                            </AffiliationIdentifier>
+                            <ValidVotes>100</ValidVotes>
+                        </Selection>
+                        <Selection>
+                            <Candidate>
+                                <CandidateIdentifier Id="1"/>
+                            </Candidate>
+                            <ValidVotes>50</ValidVotes>
+                        </Selection>
+                        <Selection>
+                            <Candidate>
+                                <CandidateIdentifier Id="2"/>
+                            </Candidate>
+                            <ValidVotes>50</ValidVotes>
+                        </Selection>
+                        <Cast>100</Cast>
+                        <TotalCounted>100</TotalCounted>
+                        <RejectedVotes ReasonCode="ongeldig">0</RejectedVotes>
+                        <RejectedVotes ReasonCode="blanco">0</RejectedVotes>
+                    </TotalVotes>
+                    <ReportingUnitVotes>
+                        <ReportingUnitIdentifier Id="HSB1::1234">Op rolletjes</ReportingUnitIdentifier>
+                        <Selection>
+                            <AffiliationIdentifier Id="1">
+                                <RegisteredName>Test Party</RegisteredName>
+                            </AffiliationIdentifier>
+                            <ValidVotes>100</ValidVotes>
+                        </Selection>
+                        <Selection>
+                            <Candidate>
+                                <CandidateIdentifier Id="1"/>
+                            </Candidate>
+                            <ValidVotes>50</ValidVotes>
+                        </Selection>
+                        <Selection>
+                            <Candidate>
+                                <CandidateIdentifier Id="2"/>
+                            </Candidate>
+                            <ValidVotes>50</ValidVotes>
+                        </Selection>
+                        <Cast>100</Cast>
+                        <TotalCounted>100</TotalCounted>
+                        <RejectedVotes ReasonCode="ongeldig">0</RejectedVotes>
+                        <RejectedVotes ReasonCode="blanco">0</RejectedVotes>
+                    </ReportingUnitVotes>
+                </Contest>
+            </Contests>
+        </Election>
+    </Count>
+</EML>

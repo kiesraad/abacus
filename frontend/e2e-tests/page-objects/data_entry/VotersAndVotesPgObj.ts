@@ -16,13 +16,6 @@ export interface VotesCounts {
   total_votes_cast_count: number;
 }
 
-export interface VotersRecounts {
-  poll_card_recount: number;
-  proxy_certificate_recount: number;
-  voter_card_recount: number;
-  total_admitted_voters_recount: number;
-}
-
 export class VotersAndVotesPage extends DataEntryBasePage {
   readonly fieldset: Locator;
   readonly headingRecount: Locator;
@@ -54,22 +47,22 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     });
 
     // voters counts
-    this.pollCardCount = page.getByTestId("poll_card_count");
-    this.proxyCertificateCount = page.getByTestId("proxy_certificate_count");
-    this.voterCardCount = page.getByTestId("voter_card_count");
-    this.totalAdmittedVotersCount = page.getByTestId("total_admitted_voters_count");
+    this.pollCardCount = page.getByRole("textbox", { name: "A Stempassen" });
+    this.proxyCertificateCount = page.getByRole("textbox", { name: "B Volmachtbewijzen" });
+    this.voterCardCount = page.getByRole("textbox", { name: "C Kiezerspassen" });
+    this.totalAdmittedVotersCount = page.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
 
     // votes counts
-    this.votesCandidatesCount = page.getByTestId("votes_candidates_count");
-    this.blankVotesCount = page.getByTestId("blank_votes_count");
-    this.invalidVotesCount = page.getByTestId("invalid_votes_count");
-    this.totalVotesCastCount = page.getByTestId("total_votes_cast_count");
+    this.votesCandidatesCount = page.getByRole("textbox", { name: "E Stemmen op kandidaten" });
+    this.blankVotesCount = page.getByRole("textbox", { name: "F Blanco stemmen" });
+    this.invalidVotesCount = page.getByRole("textbox", { name: "G Ongeldige stemmen" });
+    this.totalVotesCastCount = page.getByRole("textbox", { name: "H Totaal uitgebrachte stemmen" });
 
     // voters recounts
-    this.pollCardRecount = page.getByTestId("poll_card_recount");
-    this.proxyCertificateRecount = page.getByTestId("proxy_certificate_recount");
-    this.voterCardRecount = page.getByTestId("voter_card_recount");
-    this.totalAdmittedVotersRecount = page.getByTestId("total_admitted_voters_recount");
+    this.pollCardRecount = page.getByRole("textbox", { name: "A.2 Stempassen" });
+    this.proxyCertificateRecount = page.getByRole("textbox", { name: "B.2 Volmachtbewijzen" });
+    this.voterCardRecount = page.getByRole("textbox", { name: "C.2 Kiezerspassen" });
+    this.totalAdmittedVotersRecount = page.getByRole("textbox", { name: "D.2 Totaal toegelaten kiezers" });
 
     this.acceptWarnings = page.getByLabel("Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.");
 
@@ -90,14 +83,14 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     await this.totalVotesCastCount.fill(votesCounts.total_votes_cast_count.toString());
   }
 
-  async inputVotersRecounts(votersRecounts: VotersRecounts) {
-    await this.pollCardRecount.fill(votersRecounts.poll_card_recount.toString());
-    await this.proxyCertificateRecount.fill(votersRecounts.proxy_certificate_recount.toString());
-    await this.voterCardRecount.fill(votersRecounts.voter_card_recount.toString());
-    await this.totalAdmittedVotersRecount.fill(votersRecounts.total_admitted_voters_recount.toString());
+  async inputVotersRecounts(votersRecounts: VotersCounts) {
+    await this.pollCardRecount.fill(votersRecounts.poll_card_count.toString());
+    await this.proxyCertificateRecount.fill(votersRecounts.proxy_certificate_count.toString());
+    await this.voterCardRecount.fill(votersRecounts.voter_card_count.toString());
+    await this.totalAdmittedVotersRecount.fill(votersRecounts.total_admitted_voters_count.toString());
   }
 
-  async fillInPageAndClickNext(votersCounts: VotersCounts, votesCounts: VotesCounts, votersRecounts?: VotersRecounts) {
+  async fillInPageAndClickNext(votersCounts: VotersCounts, votesCounts: VotesCounts, votersRecounts?: VotersCounts) {
     await this.inputVotersCounts(votersCounts);
     await this.inputVotesCounts(votesCounts);
     if (votersRecounts) {

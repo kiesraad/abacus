@@ -5,6 +5,9 @@ on:
   pull_request:
   merge_group:
     types: [checks_requested]
+  push:
+    branches:
+      - main
 
 env:
   CARGO_TERM_COLOR: always
@@ -14,7 +17,10 @@ env:
 jobs:
   backend:
     name: Backend
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: ./backend
@@ -33,7 +39,11 @@ jobs:
         working-directory: ./frontend
       # Compile and test backend
       - name: Setup Rust
-        run: rustup update stable && rustup default stable
+        shell: bash
+        run: >
+          rustup update stable &&
+          rustup default stable &&
+          echo RUST_VERSION=$(rustc --version | cut -d' ' -f2) >> $GITHUB_ENV
       - name: Cargo cache
         uses: actions/cache@v4
         with:
@@ -45,8 +55,8 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             ./backend/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          key: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-
       - name: Check rustfmt
         run: cargo --verbose --locked fmt --all -- --check
       - name: Check Clippy with all features
@@ -59,8 +69,9 @@ jobs:
         run: cargo --verbose --locked build --features memory-serve
       - uses: actions/upload-artifact@v4
         with:
-          name: backend-build
-          path: backend/target/debug/api
+          name: backend-build-${{ matrix.os }}
+          path: ${{ runner.os == 'Windows' && 'backend/target/debug/abacus.exe' || 'backend/target/debug/abacus' }}
+  
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
@@ -87,11 +98,13 @@ jobs:
         with:
           name: frontend-build
           path: frontend/dist
-  playwright:
-    name: Playwright
-    needs:
-      - backend # frontend is included in backend build
-    runs-on: ubuntu-latest
+
+  playwright-ui:
+    name: Playwright UI tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: frontend
@@ -101,20 +114,88 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install npm dependencies
+      - name: Install dependencies
         run: npm ci
-      - name: Install Playwright
-        run: npx playwright install --with-deps
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps --no-shell
       - name: Run UI e2e tests
         run: npm run e2e:lib-ui
+
+  playwright-app:
+    name: Playwright app tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps --no-shell
       - name: Run app e2e tests
         run: npm run e2e:app
+
+  playwright-d2d:
+    name: Playwright d2d tests (${{ matrix.os }}, ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
+    needs:
+      - backend # frontend is included in backend build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        shardIndex: [1, 2, 3]
+        shardTotal: [3]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps --no-shell
       - name: Download backend-build
         uses: actions/download-artifact@v4
         with:
-          name: backend-build
+          name: backend-build-${{ matrix.os }}
           path: builds/backend
       - name: make backend build executable
-        run: chmod a+x ../builds/backend/api
+        run: chmod a+x ../builds/backend/abacus
+        if: runner.os != 'Windows'
       - name: Run DOM to Database e2e tests
-        run: npm run e2e:d2d
+        run: npm run e2e:d2d -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+  deploy:
+    name: Deploy to abacus-test.nl
+    needs:
+      - backend
+    environment:
+      name: test
+      url: https://${{ github.sha }}.abacus-test.nl
+    permissions:
+      contents: read
+      deployments: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download abacus
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-build-ubuntu-latest
+      - name: Upload binary to test server
+        run: |
+          curl -s \
+          -H "Authorization: Bearer ${{ secrets.ABACUS_TEST_API_KEY }}" \
+          -T ./abacus \
+          https://abacus-test.nl/etes/api/v1/executable/${{ github.event.pull_request.head.sha || github.sha }}/${{ github.sha }}

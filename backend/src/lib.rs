@@ -9,14 +9,16 @@ use std::error::Error;
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod apportionment;
+pub mod authentication;
 pub mod data_entry;
 pub mod election;
+pub mod eml;
 mod error;
 #[cfg(feature = "dev-database")]
 pub mod fixtures;
 pub mod pdf_gen;
 pub mod polling_station;
-pub mod validation;
+pub mod summary;
 
 pub use error::{APIError, ErrorResponse};
 
@@ -56,8 +58,16 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/", get(election::election_list))
         .route("/:election_id", get(election::election_details))
         .route(
-            "/:election_id/download_results",
-            get(election::election_download_results),
+            "/:election_id/download_zip_results",
+            get(election::election_download_zip_results),
+        )
+        .route(
+            "/:election_id/download_pdf_results",
+            get(election::election_download_pdf_results),
+        )
+        .route(
+            "/:election_id/download_xml_results",
+            get(election::election_download_xml_results),
         )
         .route(
             "/:election_id/polling_stations",
@@ -66,7 +76,12 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route("/:election_id/status", get(election::election_status));
 
+    let user_router = Router::new()
+        .route("/login", post(authentication::login))
+        .route("/logout", post(authentication::logout));
+
     let app = Router::new()
+        .nest("/api/user", user_router)
         .nest("/api/elections", election_routes)
         .nest("/api/polling_stations", polling_station_routes)
         .nest(
@@ -111,10 +126,14 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[derive(OpenApi)]
     #[openapi(
         paths(
+            authentication::login,
+            authentication::logout,
             election::election_list,
             election::election_details,
             election::election_status,
-            election::election_download_results,
+            election::election_download_zip_results,
+            election::election_download_pdf_results,
+            election::election_download_xml_results,
             data_entry::polling_station_data_entry_save,
             data_entry::polling_station_data_entry_get,
             data_entry::polling_station_data_entry_delete,
@@ -128,6 +147,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         components(
             schemas(
                 ErrorResponse,
+                authentication::Credentials,
+                authentication::LoginResponse,
                 data_entry::CandidateVotes,
                 data_entry::SaveDataEntryRequest,
                 data_entry::SaveDataEntryResponse,
@@ -136,8 +157,10 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 data_entry::PoliticalGroupVotes,
                 data_entry::PollingStationResults,
                 data_entry::VotersCounts,
-                data_entry::VotersRecounts,
                 data_entry::VotesCounts,
+                data_entry::ValidationResult,
+                data_entry::ValidationResultCode,
+                data_entry::ValidationResults,
                 election::Election,
                 election::ElectionCategory,
                 election::PoliticalGroup,
@@ -152,12 +175,10 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 polling_station::PollingStationStatusEntry,
                 polling_station::PollingStationType,
                 polling_station::PollingStationRequest,
-                validation::ValidationResult,
-                validation::ValidationResultCode,
-                validation::ValidationResults,
             ),
         ),
         tags(
+            (name = "authentication", description = "Authentication and user API"),
             (name = "election", description = "Election API"),
             (name = "polling_station", description = "Polling station API"),
         )

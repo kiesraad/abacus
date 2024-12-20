@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
+import { PollingStation, PollingStationStatus, useElection, useElectionStatus } from "@kiesraad/api";
+import { t, tx } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
-import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
+import { cn, getUrlForDataEntry, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
 
 import cls from "./PollingStationChoiceForm.module.css";
 import { PollingStationLink } from "./PollingStationLink";
@@ -17,14 +18,13 @@ export interface PollingStationChoiceFormProps {
   anotherEntry?: boolean;
 }
 
-const INVALID_POLLING_STATION_ALERT: string = "Voer een geldig nummer van een stembureau in om te beginnen";
-const DEFINITIVE_POLLING_STATION_ALERT: string =
-  "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden";
+const INVALID_POLLING_STATION_ALERT: string = t("polling_station_choice.enter_a_valid_number_to_start");
+const DEFINITIVE_POLLING_STATION_ALERT: string = t("polling_station_choice.polling_station_entry_not_possible");
 
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
 
-  const { pollingStations } = useElection();
+  const { election, pollingStations } = useElection();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
@@ -50,16 +50,17 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
     const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
-    const pollingStationStatusEntry = electionStatus.statuses.find((status) => status.id === pollingStation?.id);
+    const pollingStationStatus = electionStatus.statuses.find((status) => status.id === pollingStation?.id)?.status;
+    const firstAndSecondEntryFinished: PollingStationStatus[] = ["first_second_entry_different", "definitive"];
 
-    if (pollingStationStatusEntry?.status === "definitive") {
+    if (pollingStationStatus && firstAndSecondEntryFinished.includes(pollingStationStatus)) {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
       setLoading(false);
       return;
     }
 
     if (pollingStation) {
-      navigate(`./${pollingStation.id}`);
+      navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStationStatus));
     } else {
       setAlert(INVALID_POLLING_STATION_ALERT);
       setLoading(false);
@@ -68,8 +69,18 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   };
 
   const unfinished = electionStatus.statuses
-    .filter((status) => status.status === "first_entry_unfinished")
-    .map((status) => pollingStations.find((ps) => ps.id === status.id));
+    .filter((status) =>
+      [
+        "first_entry_unfinished",
+        "first_entry_in_progress",
+        "second_entry_unfinished",
+        "second_entry_in_progress",
+      ].includes(status.status),
+    )
+    .map((status) => ({
+      pollingStation: pollingStations.find((ps) => ps.id === status.id),
+      status: status.status,
+    }));
 
   return (
     <form
@@ -81,21 +92,19 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       {unfinished.length > 0 && (
         <div className="mb-lg">
           <Alert type="notify" variant="no-icon">
-            <h2>Je hebt nog een openstaande invoer</h2>
-            <p>
-              Je bent begonnen met het invoeren van onderstaande stembureaus, maar hebt deze nog niet helemaal afgerond:
-            </p>
-            {unfinished.map((pollingStation) => {
+            <h2>{t("polling_station_choice.unfinished_input_title")}</h2>
+            <p>{t("polling_station_choice.unfinished_input_content")}</p>
+            {unfinished.map(({ pollingStation, status }) => {
               return pollingStation === undefined ? null : (
-                <PollingStationLink key={pollingStation.id} pollingStation={pollingStation} />
+                <PollingStationLink key={pollingStation.id} pollingStation={pollingStation} status={status} />
               );
             })}
           </Alert>
         </div>
       )}
       <fieldset>
-        <legend className="h2 mb-lg">
-          {anotherEntry ? "Verder met een volgend stembureau?" : "Welk stembureau ga je invoeren?"}
+        <legend className="heading-lg mb-lg">
+          {anotherEntry ? t("polling_station_choice.insert_another") : t("polling_station_choice.insert_title")}
         </legend>
         <PollingStationSelector
           pollingStationNumber={pollingStationNumber}
@@ -107,15 +116,11 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           setAlert={setAlert}
           handleSubmit={handleSubmit}
         />
-        <p className="md">
-          Klopt de naam van het stembureau met de naam op je papieren proces-verbaal?
-          <br />
-          Dan kan je beginnen. Klopt de naam niet? Overleg met de coördinator.
-        </p>
+        <p className="md">{tx("polling_station_choice.name_correct_warning")}</p>
         {alert && (
           <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
             <span className={cls.icon}>
-              <Icon icon={<IconError aria-label={"bevat een fout"} />} color="error" />
+              <Icon icon={<IconError aria-label={t("contains_error")} />} color="error" />
             </span>
             <span>{alert}</span>
           </div>
@@ -129,7 +134,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
                 handleSubmit();
               }}
             >
-              Beginnen
+              {t("start")}
             </Button>
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
           </BottomBar.Row>
@@ -138,24 +143,20 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       <div className={cls.pollingStationList}>
         <details>
           <summary>
-            Weet je het nummer niet?
+            {t("polling_station_choice.unknown_number")}
             <br />
             <span id="openPollingStationList" className={cn(cls.underlined, cls.pointer)}>
-              Bekijk de lijst met alle stembureaus
+              {t("polling_station_choice.view_list")}
             </span>
           </summary>
-          <h2 className={cls.formTitle}>Kies het stembureau</h2>
-          {(() => {
-            if (pollingStations.length === 0) {
-              return (
-                <Alert type={"error"} variant="small">
-                  <p>Geen stembureaus gevonden</p>
-                </Alert>
-              );
-            } else {
-              return <PollingStationsList pollingStations={pollingStations} />;
-            }
-          })()}
+          <h2 className={cls.formTitle}>{t("polling_station_choice.choose_polling_station")}</h2>
+          {pollingStations.length === 0 ? (
+            <Alert type="error" variant="small">
+              <p>{t("polling_station_choice.no_polling_stations_found")}</p>
+            </Alert>
+          ) : (
+            <PollingStationsList pollingStations={pollingStations} />
+          )}
         </details>
       </div>
     </form>

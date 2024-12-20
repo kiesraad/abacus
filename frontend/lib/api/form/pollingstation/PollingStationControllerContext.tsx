@@ -1,6 +1,6 @@
 import { createContext, RefObject } from "react";
 
-import { ApiError, PollingStationResults } from "@kiesraad/api";
+import { ApiError, ApiResult, PollingStationResults, SaveDataEntryResponse } from "@kiesraad/api";
 
 import {
   AnyFormReference,
@@ -18,11 +18,12 @@ export interface iPollingStationControllerContext {
   setTemporaryCache: (cache: TemporaryCache | null) => boolean;
   cache: TemporaryCache | null;
   currentForm: AnyFormReference | null;
-  submitCurrentForm: (params?: SubmitCurrentFormOptions) => Promise<void>;
+  submitCurrentForm: (params?: SubmitCurrentFormOptions) => Promise<ApiResult<SaveDataEntryResponse, ApiError>>;
   registerCurrentForm: (form: AnyFormReference) => void;
   deleteDataEntry: () => Promise<void>;
   finaliseDataEntry: () => Promise<void>;
   pollingStationId: number;
+  entryNumber: number;
 }
 
 export const PollingStationControllerContext = createContext<iPollingStationControllerContext | undefined>(undefined);

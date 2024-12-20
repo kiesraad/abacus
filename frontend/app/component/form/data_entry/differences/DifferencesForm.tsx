@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { getErrorsAndWarnings, useDifferences } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import {
   Alert,
   BottomBar,
@@ -12,6 +13,7 @@ import {
   InputGridRow,
   KeyboardKey,
   KeyboardKeys,
+  useFormKeyboardNavigation,
 } from "@kiesraad/ui";
 import { deformatNumber } from "@kiesraad/util";
 
@@ -34,6 +36,8 @@ interface DifferencesFormElement extends HTMLFormElement {
 export function DifferencesForm() {
   const formRef = React.useRef<DifferencesFormElement>(null);
   const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
+
+  useFormKeyboardNavigation(formRef);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;
@@ -124,12 +128,7 @@ export function DifferencesForm() {
   };
 
   return (
-    <Form
-      onSubmit={handleSubmit}
-      ref={formRef}
-      id="differences_form"
-      title="Verschillen tussen toegelaten kiezers en uitgebrachte stemmen"
-    >
+    <Form onSubmit={handleSubmit} ref={formRef} id="differences_form" title={t("differences.differences_form_title")}>
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}
@@ -138,9 +137,9 @@ export function DifferencesForm() {
       )}
       <InputGrid key="differences">
         <InputGrid.Header>
-          <th>Veld</th>
-          <th>Geteld aantal</th>
-          <th>Omschrijving</th>
+          <th>{t("field")}</th>
+          <th>{t("counted_number")}</th>
+          <th>{t("description")}</th>
         </InputGrid.Header>
         <InputGrid.Body>
           <InputGridRow
@@ -148,7 +147,7 @@ export function DifferencesForm() {
             key="I"
             field="I"
             id="more_ballots_count"
-            title="Stembiljetten méér geteld"
+            title={t("differences.more_ballots_count")}
             defaultValue={sectionValues.differences_counts.more_ballots_count}
             {...defaultProps}
           />
@@ -156,7 +155,7 @@ export function DifferencesForm() {
             key="J"
             field="J"
             id="fewer_ballots_count"
-            title="Stembiljetten minder geteld"
+            title={t("differences.fewer_ballots_count")}
             defaultValue={sectionValues.differences_counts.fewer_ballots_count}
             addSeparator
             {...defaultProps}
@@ -166,7 +165,7 @@ export function DifferencesForm() {
             key="K"
             field="K"
             id="unreturned_ballots_count"
-            title="Niet ingeleverde stembiljetten"
+            title={t("differences.unreturned_ballots_count")}
             defaultValue={sectionValues.differences_counts.unreturned_ballots_count}
             {...defaultProps}
           />
@@ -174,7 +173,7 @@ export function DifferencesForm() {
             key="L"
             field="L"
             id="too_few_ballots_handed_out_count"
-            title="Te weinig uitgereikte stembiljetten"
+            title={t("differences.too_few_ballots_handed_out_count")}
             defaultValue={sectionValues.differences_counts.too_few_ballots_handed_out_count}
             {...defaultProps}
           />
@@ -182,7 +181,7 @@ export function DifferencesForm() {
             key="M"
             field="M"
             id="too_many_ballots_handed_out_count"
-            title="Te veel uitgereikte stembiljetten"
+            title={t("differences.too_many_ballots_handed_out_count")}
             defaultValue={sectionValues.differences_counts.too_many_ballots_handed_out_count}
             {...defaultProps}
           />
@@ -190,7 +189,7 @@ export function DifferencesForm() {
             key="N"
             field="N"
             id="other_explanation_count"
-            title="Andere verklaring voor het verschil"
+            title={t("differences.other_explanation_count")}
             defaultValue={sectionValues.differences_counts.other_explanation_count}
             addSeparator
             {...defaultProps}
@@ -200,7 +199,7 @@ export function DifferencesForm() {
             key="O"
             field="O"
             id="no_explanation_count"
-            title="Geen verklaring voor het verschil"
+            title={t("differences.no_explanation_count")}
             defaultValue={sectionValues.differences_counts.no_explanation_count}
             {...defaultProps}
           />
@@ -210,7 +209,7 @@ export function DifferencesForm() {
         {warningsWarning && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
-              <p>Je kan alleen verder als je het het papieren proces-verbaal hebt gecontroleerd.</p>
+              <p>{t("differences.continue_after_check")}</p>
             </Alert>
           </BottomBar.Row>
         )}
@@ -221,13 +220,13 @@ export function DifferencesForm() {
               defaultChecked={acceptWarnings}
               hasError={warningsWarning}
               ref={acceptWarningsRef}
-              label="Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."
+              label={t("differences.differences_form_accept_warnings")}
             />
           </BottomBar.Row>
         )}
         <BottomBar.Row>
           <Button type="submit" size="lg" disabled={status.current === "saving"}>
-            Volgende
+            {t("next")}
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
         </BottomBar.Row>

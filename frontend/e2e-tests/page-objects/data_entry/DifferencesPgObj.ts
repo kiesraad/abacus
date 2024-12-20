@@ -36,13 +36,13 @@ export class DifferencesPage extends DataEntryBasePage {
       name: "Verschillen tussen toegelaten kiezers en uitgebrachte stemmen",
     });
 
-    this.moreBallotsCount = page.getByTestId("more_ballots_count");
-    this.fewerBallotsCount = page.getByTestId("fewer_ballots_count");
-    this.unreturnedBallotsCount = page.getByTestId("unreturned_ballots_count");
-    this.tooFewBallotsHandedOutCount = page.getByTestId("too_few_ballots_handed_out_count");
-    this.tooManyBallotsHandedOutCount = page.getByTestId("too_many_ballots_handed_out_count");
-    this.otherExplanationCount = page.getByTestId("other_explanation_count");
-    this.noExplanationCount = page.getByTestId("no_explanation_count");
+    this.moreBallotsCount = page.getByRole("textbox", { name: "I Stembiljetten méér geteld" });
+    this.fewerBallotsCount = page.getByRole("textbox", { name: "J Stembiljetten minder geteld" });
+    this.unreturnedBallotsCount = page.getByRole("textbox", { name: "K Niet ingeleverde stembiljetten" });
+    this.tooFewBallotsHandedOutCount = page.getByRole("textbox", { name: "L Te weinig uitgereikte stembiljetten" });
+    this.tooManyBallotsHandedOutCount = page.getByRole("textbox", { name: "M Te veel uitgereikte stembiljetten" });
+    this.otherExplanationCount = page.getByRole("textbox", { name: "N Andere verklaring voor het verschil" });
+    this.noExplanationCount = page.getByRole("textbox", { name: "O Geen verklaring voor het verschil" });
 
     this.next = page.getByRole("button", { name: "Volgende" });
   }

@@ -3,6 +3,11 @@
   line-height: 1.5rem;
   border-spacing: unset;
   color: var(--color-help-text);
+  font-size: var(--font-size-body);
+
+  thead {
+    font-size: var(--font-size-xs);
+  }
 
   th,
   td {
@@ -32,15 +37,12 @@
     margin-left: 0.5rem;
   }
 
-  td.number {
+  td.number-cell {
     text-align: right;
+    font-size: var(--font-size-body);
     font-weight: bold;
     width: 6.5rem;
     line-height: 1.75rem;
-  }
-
-  tr.background-styling {
-    background-color: var(--bg-gray);
   }
 
   tr.row-link {

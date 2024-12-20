@@ -1,6 +1,7 @@
 use axum::extract::FromRef;
 use sqlx::{query, Sqlite, SqlitePool, Transaction};
 
+use super::entry_number::EntryNumber;
 use super::{PollingStation, PollingStationResults, PollingStationResultsEntry};
 use crate::polling_station::repository::PollingStations;
 use crate::AppState;
@@ -17,15 +18,31 @@ impl PollingStationDataEntries {
     pub async fn upsert(
         &self,
         id: u32,
-        entry_number: u8,
+        entry_number: EntryNumber,
+        progress: u8,
         data: String,
         client_state: String,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query!("INSERT INTO polling_station_data_entries (polling_station_id, entry_number, data, client_state) VALUES (?, ?, ?, ?)\
-              ON CONFLICT(polling_station_id, entry_number) DO UPDATE SET data = excluded.data, client_state = excluded.client_state, updated_at = unixepoch()",
-            id, entry_number, data, client_state)
-            .execute(&self.0)
-            .await?;
+        sqlx::query!(
+            r#"
+            INSERT INTO polling_station_data_entries
+              (polling_station_id, entry_number, progress, data, client_state)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(polling_station_id, entry_number) DO
+            UPDATE SET
+              progress = excluded.progress,
+              data = excluded.data,
+              client_state = excluded.client_state,
+              updated_at = unixepoch()
+            "#,
+            id,
+            entry_number,
+            progress,
+            data,
+            client_state
+        )
+        .execute(&self.0)
+        .await?;
 
         Ok(())
     }
@@ -34,32 +51,32 @@ impl PollingStationDataEntries {
         &self,
         tx: &mut Transaction<'_, Sqlite>,
         id: u32,
-        entry_number: u8,
-    ) -> Result<(Vec<u8>, Vec<u8>, i64), sqlx::Error> {
+        entry_number: EntryNumber,
+    ) -> Result<(u8, Vec<u8>, Vec<u8>, i64), sqlx::Error> {
         let res = query!(
-            "SELECT data, client_state, updated_at FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
+            r#"SELECT progress AS "progress: u8", data, client_state, updated_at FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?"#,
             id,
             entry_number
         )
             .fetch_one(&mut **tx)
-        .await?;
-        if let (Some(data), Some(client_state), updated_at) =
-            (res.data, res.client_state, res.updated_at)
+            .await?;
+        if let (progress, Some(data), Some(client_state), updated_at) =
+            (res.progress, res.data, res.client_state, res.updated_at)
         {
-            Ok((data, client_state, updated_at))
+            Ok((progress, data, client_state, updated_at))
         } else {
             Err(sqlx::Error::RowNotFound)
         }
     }
 
-    pub async fn delete(&self, id: u32, entry_number: u8) -> Result<(), sqlx::Error> {
+    pub async fn delete(&self, id: u32, entry_number: EntryNumber) -> Result<(), sqlx::Error> {
         let res = query!(
-            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?",
+            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ? AND finalised_at IS NULL",
             id,
             entry_number
         )
-        .execute(&self.0)
-        .await?;
+            .execute(&self.0)
+            .await?;
         if res.rows_affected() == 0 {
             Err(sqlx::Error::RowNotFound)
         } else {
@@ -67,19 +84,40 @@ impl PollingStationDataEntries {
         }
     }
 
-    pub async fn finalise(
+    pub async fn finalise_data_entry(
         &self,
         tx: &mut Transaction<'_, Sqlite>,
         id: u32,
+        entry_number: EntryNumber,
     ) -> Result<(), sqlx::Error> {
-        // future: support second data entry
         query!(
-            "INSERT INTO polling_station_results (polling_station_id, data) SELECT polling_station_id, data FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = 1",
+            r#"
+            UPDATE polling_station_data_entries
+            SET finalised_at = unixepoch(), progress = 100
+            WHERE polling_station_id = ? AND entry_number = ?"#,
             id,
+            entry_number
         )
         .execute(&mut **tx)
         .await?;
 
+        Ok(())
+    }
+
+    pub async fn to_result(
+        &self,
+        tx: &mut Transaction<'_, Sqlite>,
+        id: u32,
+    ) -> Result<(), sqlx::Error> {
+        // Copies first data entry to results
+        query!(
+            "INSERT INTO polling_station_results (polling_station_id, data) SELECT polling_station_id, data FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = 1",
+            id,
+        )
+            .execute(&mut **tx)
+            .await?;
+
+        // Deletes all entries from a polling station
         query!(
             "DELETE FROM polling_station_data_entries WHERE polling_station_id = ?",
             id
@@ -90,10 +128,37 @@ impl PollingStationDataEntries {
         Ok(())
     }
 
-    pub async fn exists_finalised(&self, id: u32) -> Result<bool, sqlx::Error> {
+    pub async fn exists_entry(&self, id: u32, entry_number: u8) -> Result<bool, sqlx::Error> {
         let res = query!(
-            "SELECT EXISTS(SELECT 1 FROM polling_station_results WHERE polling_station_id = ?) AS `exists`",
-            id
+            r#"
+            SELECT EXISTS(
+              SELECT 1 FROM polling_station_data_entries
+              WHERE polling_station_id = ?
+                AND entry_number = ?)
+            AS `exists`"#,
+            id,
+            entry_number
+        )
+        .fetch_one(&self.0)
+        .await?;
+        Ok(res.exists == 1)
+    }
+
+    pub async fn exists_finalised_entry(
+        &self,
+        id: u32,
+        entry_number: u8,
+    ) -> Result<bool, sqlx::Error> {
+        let res = query!(
+            r#"
+            SELECT EXISTS(
+              SELECT 1 FROM polling_station_data_entries
+              WHERE polling_station_id = ?
+                AND entry_number = ?
+                AND finalised_at IS NOT NULL)
+            AS `exists`"#,
+            id,
+            entry_number
         )
         .fetch_one(&self.0)
         .await?;
@@ -160,6 +225,21 @@ impl PollingStationResultsEntries {
                 Ok((polling_station, entry.data))
             })
             .collect::<Result<_, sqlx::Error>>() // this collect causes the iterator to fail early if there was any error
+    }
+
+    /// Check if a polling station has results
+    pub async fn exists(&self, id: u32) -> Result<bool, sqlx::Error> {
+        let res = query!(
+            r#"
+            SELECT EXISTS(
+              SELECT 1 FROM polling_station_results
+              WHERE polling_station_id = ?)
+            AS `exists`"#,
+            id
+        )
+        .fetch_one(&self.0)
+        .await?;
+        Ok(res.exists == 1)
     }
 }
 

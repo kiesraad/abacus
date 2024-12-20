@@ -16,8 +16,8 @@ const submit = async () => {
 };
 
 const startPollingStationInput = async () => {
-  await router.navigate("/elections/1/data-entry/1");
-  expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1");
+  await router.navigate("/elections/1/data-entry/1/1");
+  expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/1");
 };
 
 const expectRecountedForm = async (inputShouldHaveFocus = true) => {
@@ -51,7 +51,7 @@ const expectVotersAndVotesForm = async (inputShouldHaveFocus = true) => {
   });
   if (inputShouldHaveFocus) {
     await waitFor(() => {
-      expect(screen.getByTestId("poll_card_count")).toHaveFocus();
+      expect(screen.getByRole("textbox", { name: "A Stempassen" })).toHaveFocus();
     });
   }
 };
@@ -79,7 +79,7 @@ const expectDifferencesForm = async (inputShouldHaveFocus = true) => {
   });
   if (inputShouldHaveFocus) {
     await waitFor(() => {
-      expect(screen.getByTestId("more_ballots_count")).toHaveFocus();
+      expect(screen.getByRole("textbox", { name: "I Stembiljetten méér geteld" })).toHaveFocus();
     });
   }
 };
@@ -119,7 +119,7 @@ const fillPoliticalGroupCandidatesVotesForm = async () => {
 
 const expectCheckAndSavePage = async (bodyShouldHaveFocus = true) => {
   await waitFor(() => {
-    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/save");
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/1/save");
   });
   if (bodyShouldHaveFocus) {
     await waitFor(() => {
@@ -194,6 +194,8 @@ const expectPollingStationChoicePage = async () => {
 const submitWith422Response = async () => {
   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
     error: "JSON error or invalid data (Unprocessable Content)",
+    fatal: false,
+    reference: "InvalidJson",
   });
   await submit();
 };
@@ -206,6 +208,8 @@ const expect422ClientError = async () => {
 const submitWith500Response = async () => {
   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
     error: "Internal server error",
+    fatal: false,
+    reference: "InternalServerError",
   });
   await submit();
 };
@@ -615,34 +619,22 @@ describe("Polling Station data entry integration tests", () => {
       vi.spyOn(console, "error").mockImplementation(() => {});
       render();
 
-      const formFillingSteps = [
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submitWith422Response,
-        expect422ClientError,
-      ];
-
-      for (const step of formFillingSteps) {
-        await step();
-      }
+      await startPollingStationInput();
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submitWith422Response();
+      await expect422ClientError();
     });
 
     test("5xx response results in error shown", async () => {
       vi.spyOn(console, "error").mockImplementation(() => {});
       render();
 
-      const formFillingSteps = [
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submitWith500Response,
-        expect500ServerError,
-      ];
-
-      for (const step of formFillingSteps) {
-        await step();
-      }
+      await startPollingStationInput();
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submitWith500Response();
+      await expect500ServerError();
     });
   });
 });

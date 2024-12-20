@@ -48,6 +48,12 @@
     fill: currentColor;
   }
 
+  &.primary-destructive {
+    border-color: var(--red-600);
+    background: var(--red-600);
+    color: var(--base-white);
+  }
+
   &.secondary {
     color: var(--text-color-body);
     border-color: var(--bg-gray-darkest);
@@ -78,19 +84,48 @@
     }
   }
 
-  &.alert {
-    border-color: var(--color-error);
-    background: var(--color-error);
-    color: var(--base-white);
-  }
-
-  &.ghost {
+  &.tertiary {
     background: transparent;
     border-color: transparent;
     color: var(--button-color-primary);
 
     &:hover {
       background: rgba(16, 48, 81, 0.1);
+    }
+  }
+
+  &.tertiary-destructive {
+    --button-border-width: 0px;
+    border: none;
+    background: transparent;
+    color: var(--red-700);
+
+    &:not(:hover, :active) {
+      box-shadow: none;
+    }
+
+    &:hover {
+      background: var(--red-50);
+    }
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      --button-border-width: 2px;
+      border: var(--button-border-width) solid var(--border-color-focus);
+      box-shadow: 0 0 0 4px var(--shadow-color-focus);
+    }
+
+    &:active {
+      border-color: var(--red-100);
+      background-color: var(--red-100);
+    }
+
+    &:disabled {
+      box-shadow: none;
+      background: var(--button-color-bg-disabled);
+      border-color: var(--button-color-bg-disabled);
+      color: var(--button-color-disabled);
     }
   }
 

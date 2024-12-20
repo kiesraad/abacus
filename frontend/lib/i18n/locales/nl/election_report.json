@@ -3,5 +3,6 @@
   "about_to_stop_data_entry": "Je staat op het punt het invoeren van stemmen te stoppen.",
   "data_entry_finish_steps_explanation": "<ul><li>In de volgende stap kan je het proces-verbaal van deze zitting opmaken en de officiële telbestanden downloaden.</li><li>Zolang het concept proces-verbaal nog niet is ondertekend en gedeeld met het centraal stembureau, kan je nog terug naar de steminvoer.</li></ul>",
   "for_recount_new_session_needed": "Als er na het afronden van de zitting nog stemmen herteld worden, moet dan in een nieuwe zitting van het gemeentelijke stembureau.",
-  "download_report": "Download proces-verbaal"
+  "download_report": "Download los proces-verbaal",
+  "download_zip": "Download proces-verbaal met telbestand"
 }

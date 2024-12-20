@@ -79,16 +79,25 @@ pub struct PollingStationStatusEntry {
     pub status: PollingStationStatus,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
+    #[schema(maximum = 100)]
+    /// Data entry progress between 0 and 100
+    pub data_entry_progress: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub finished_at: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum PollingStationStatus {
-    NotStarted,           // First entry has not started yet
-    FirstEntryInProgress, // First entry is currently in progress
-    FirstEntryUnfinished, // First entry has been aborted and the data has been saved
-    Definitive, // First entry is finished (TODO: will become `First and second entry are finished`)
+    NotStarted,                // First entry has not started yet
+    FirstEntryInProgress,      // First entry is currently in progress
+    FirstEntryUnfinished,      // First entry has been aborted and the data has been saved
+    SecondEntry,               // Ready for second entry
+    SecondEntryInProgress,     // Second entry is currently in progress
+    SecondEntryUnfinished,     // Second entry has been aborted and the data has been saved
+    FirstSecondEntryDifferent, // First and second entry are different
+    Definitive,                // First and second entry are finished
 }
 
 #[cfg(test)]

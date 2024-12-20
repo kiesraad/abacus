@@ -35,7 +35,7 @@
 ### Gegevensinvoer - stap specifiek
 #### Stap 1: Herteld?
 - Alle gebruikers hadden moeite om het juiste deel van het papieren formulier te vinden waar deze vraag op sloeg.
-  - [ ] Update tekst van de vraag, maak duidelijk dat deze verwijst naar of het selectievakje op de eerste pagina is aangevinkt.
+  - [x] Update tekst van de vraag, maak duidelijk dat deze verwijst naar of het selectievakje op de eerste pagina is aangevinkt. (opgelost in kiesraad/abacus/issues/399)
 
 #### Stap 2: Toegelaten kiezers en getelde stemmen
 - Gebruikers leken zich niet bewust van de letters naast de invoervelden en hoe deze verwijzen naar de letters op het papieren formulier.
@@ -52,15 +52,15 @@ De papieren formulieren gebruikten een oudere lay-out van deze sectie (TK2023) v
 
 #### Stap n: Lijsten
 - De invoer "Totaal lijst x" wordt vaak over het hoofd gezien/vergeten. Abacus scrollt gebruikers dan naar de bovenkant van de pagina en toont fout F.401 (totalen komen niet overeen met stemmen op kandidaten). Gebruikers hebben vrij lang nodig om de fout te herstellen.
-  - [ ] Versnel foutherstel door een specifieke foutmelding onderaan de pagina weer te geven wanneer "Totaal lijst X" leeg is (en er wel stemmen op kandidaten zijn) (zie [Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&node-type=frame&t=VOfeUhME521tHpCy-11))
+  - [x] Versnel foutherstel door een specifieke foutmelding onderaan de pagina weer te geven wanneer "Totaal lijst X" leeg is (en er wel stemmen op kandidaten zijn) (zie [Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&node-type=frame&t=VOfeUhME521tHpCy-11)) (opgelost in kiesraad/abacus/issues/500)
 
 #### Stap: Controleren en opslaan
 - Verschillende gebruikers waren verward door de `Op [Lijst 2](#) zijn geen stemmen` feedback, onzeker of ze een fout hadden gemaakt.
-  - [ ] Overweeg om deze feedback te verwijderen, aangezien per ongeluk overgeslagen lijsten al leiden tot fout F.204 (totalen komen niet overeen) en zo alsnog worden opgemerkt.
+  - [x] Overweeg om deze feedback te verwijderen, aangezien per ongeluk overgeslagen lijsten al leiden tot fout F.204 (totalen komen niet overeen) en zo alsnog worden opgemerkt. (opgelost in kiesraad/abacus/501)
 - De tekst en het icoon van de feedback 'stap x heeft geaccepteerde waarschuwingen' veroorzaakten ook verwarring.
-  - [ ] Overweeg om het icoon voor dit bericht te wijzigen naar een groene vink in plaats van een waarschuwingsicoon.
+  - [x] Overweeg om het icoon voor dit bericht te wijzigen naar een groene vink in plaats van een waarschuwingsicoon. (opgelost in kiesraad/abacus/issues/502)
 - De laatste regel 'Je kan de resultaten van dit stembureau opslaan' werd nauwelijks opgemerkt.
-  - [ ] Overweeg om extra witruimte voor deze regel toe te voegen om deze conclusie beter te laten opvallen.
+  - [x] Overweeg om extra witruimte voor deze regel toe te voegen om deze conclusie beter te laten opvallen. (opgelost in kiesraad/abacus/pull/525)
 
 ### Gegevensinvoer - algemene bevindingen
 #### Toetsenbord- en muisgebruik
@@ -68,7 +68,7 @@ De papieren formulieren gebruikten een oudere lay-out van deze sectie (TK2023) v
 - Sommige gebruikers hielden hun hand constant op de muis.
 - De meeste gebruikers bleven hun muis gebruiken, zelfs in situaties waarin het toetsenbord sneller en efficiënter was. Redenen:
   - Bij navigeren naar een volgende stap plaatsen we de focus op de titel van die sectie in plaats van op het eerste invoerveld (voor toegankelijkheid). Gebruikers wisten niet hoe ze met het toetsenbord de focus naar het eerste invoerveld konden verplaatsen en gebruikten hun muis.
-    - [ ] Zet de focus bij het laden van de volgende stap op het eerste invoerveld in plaats van op de titel. Zorg dat de gekozen oplossing toegankelijk is (gebruik `aria-announce` of iets vergelijkbaars om de context van het gefocuste invoerveld aan te geven).
+    - [x] Zet de focus bij het laden van de volgende stap op het eerste invoerveld in plaats van op de titel. Zorg dat de gekozen oplossing toegankelijk is (gebruik `aria-announce` of iets vergelijkbaars om de context van het gefocuste invoerveld aan te geven). (opgelost in kiesraad/abacus/issues/503)
   - Sommige gebruikers gebruikten `Tab` of de `pijl-omlaag` om binnen een formulier te navigeren.
   - Geen enkele gebruiker gebruikte `Enter` om naar het volgende invoerveld te navigeren.
 - De toetsenbord-tips (`Shift`+`Enter` om pagina te verzenden en `Shift` + `pijl-omlaag` om naar het laatste invoerveld te navigeren) werden nauwelijks ontdekt. Zelfs wanneer erop gewezen, werden ze nog steeds niet vaak gebruikt.

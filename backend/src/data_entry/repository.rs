@@ -75,7 +75,7 @@ impl PollingStationDataEntries {
         polling_station_id: u32,
         state: &DataEntryStatus,
     ) -> Result<(), sqlx::Error> {
-        let state = serde_json::to_value(state).expect("should be serializable to JSON");
+        let state = Json(state);
         sqlx::query!(
             r#"
                 INSERT INTO polling_station_data_entries (polling_station_id, state)
@@ -122,6 +122,41 @@ impl PollingStationDataEntries {
         })
         .fetch_all(&self.0)
         .await
+    }
+
+    pub async fn make_definitive(
+        &self,
+        polling_station_id: u32,
+        new_state: &DataEntryStatus,
+        definitive_entry: &PollingStationResults,
+    ) -> Result<(), sqlx::Error> {
+        let mut tx = self.0.begin().await?;
+        let definitive_entry = Json(definitive_entry);
+        query!(
+            "INSERT INTO polling_station_results (polling_station_id, data) VALUES ($1, $2)",
+            polling_station_id,
+            definitive_entry
+        )
+        .execute(tx.as_mut())
+        .await?;
+
+        let new_state = Json(new_state);
+        sqlx::query!(
+            r#"
+                INSERT INTO polling_station_data_entries (polling_station_id, state)
+                VALUES (?, ?)
+                ON CONFLICT(polling_station_id) DO
+                UPDATE SET
+                    state = excluded.state,
+                    updated_at = CURRENT_TIMESTAMP
+            "#,
+            polling_station_id,
+            new_state
+        )
+        .execute(&self.0)
+        .await?;
+
+        Ok(())
     }
 }
 

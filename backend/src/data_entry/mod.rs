@@ -9,7 +9,6 @@ use axum::response::{IntoResponse, Response};
 use axum::Json;
 use chrono::{DateTime, Utc};
 use entry_number::EntryNumber;
-use repository::PollingStationResultsEntries;
 use serde::{Deserialize, Serialize};
 use status::{ClientState, DataEntryStatus, DataEntryStatusName};
 use utoipa::ToSchema;
@@ -208,7 +207,6 @@ pub async fn polling_station_data_entry_delete(
 )]
 pub async fn polling_station_data_entry_finalise(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
-    State(_polling_station_results): State<PollingStationResultsEntries>,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<(), APIError> {
     let state = polling_station_data_entries.get_or_default(id).await?;
@@ -221,16 +219,18 @@ pub async fn polling_station_data_entry_finalise(
         EntryNumber::SecondEntry => {
             let (new_state, data) = state.finalise_second_entry()?;
 
-            match (new_state, data) {
-                (DataEntryStatus::Definitive(_), Some(_data)) => {
+            match (&new_state, data) {
+                (DataEntryStatus::Definitive(_), Some(data)) => {
                     // Save the data to the database
-                    // TODO: create nice query
+                    polling_station_data_entries
+                        .make_definitive(id, &new_state, &data)
+                        .await?;
                 }
                 (DataEntryStatus::Definitive(_), None) => {
-                    panic!("Data entry is in definitive state but no data is present");
+                    unreachable!("Data entry is in definitive state but no data is present");
                 }
                 (new_state, _) => {
-                    polling_station_data_entries.upsert(id, &new_state).await?;
+                    polling_station_data_entries.upsert(id, new_state).await?;
                 }
             }
         }
@@ -363,7 +363,6 @@ pub mod tests {
     async fn finalise(pool: SqlitePool, entry_number: EntryNumber) -> Response {
         polling_station_data_entry_finalise(
             State(PollingStationDataEntries::new(pool.clone())),
-            State(PollingStationResultsEntries::new(pool.clone())),
             Path((1, entry_number)),
         )
         .await

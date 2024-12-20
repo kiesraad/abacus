@@ -34,6 +34,7 @@ pub fn apportionment_wip(totals: &ElectionSummary) {
     );
     let mut remaining_seats = seats - whole_seats_count;
     let mut rest_seats = vec![0; totals.political_group_votes.len()];
+    let mut idx_last_remaining_seat;
 
     // allocate remaining seats (restzetels)
     // using greatest average ("stelsel grootste gemiddelden")
@@ -56,15 +57,29 @@ pub fn apportionment_wip(totals: &ElectionSummary) {
             .expect("Maximum average should be found");
         println!("Max: {} (idx {})", max, idx);
 
-        // if maximum occurs more than once, exit with error
-        let max_count = avgs.iter().filter(|&a| a == max).count();
-        if max_count > 1 {
-            // TODO: if multiple parties have the same max, use drawing of lots
-            panic!("Multiple parties have the same max average");
+        // if maximum occurs more than once, exit with error if less remaining seats are available than max count
+        let max_count = avgs.iter().filter(|&a| a == max).count() as u64;
+        if max_count > remaining_seats {
+            // TODO: if multiple parties have the same max and not enough remaining seats are available, use drawing of lots
+            panic!("Drawing of lots is needed!");
         }
 
         rest_seats[idx] += 1;
         remaining_seats -= 1;
+        idx_last_remaining_seat = idx;
+    }
+
+    // TODO: Add check for absolute majority of votes vs seats and adjust last remaining seat accordingly
+    if (idx_last_remaining_seat) {
+        println!("Last remaining seat: idx {}", idx_last_remaining_seat);
+        let absolute_majority_votes_count: u32 =
+            if let 0 = totals.votes_counts.votes_candidates_count % 2 {
+                // with an even number of valid votes on candidates: 50% + 1
+                ((totals.votes_counts.votes_candidates_count / 2) as f64 + 1.0) as u32
+            } else {
+                // with an uneven number of valid votes on candidates: 50% + ½
+                ((totals.votes_counts.votes_candidates_count / 2) as f64 + 0.5) as u32
+            };
     }
 
     println!("===========================");

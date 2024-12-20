@@ -6,12 +6,13 @@ We doen "Just-In-Time Refinement", dus refinement op het "last responsible momen
 
 Voor de meeste epics betekent dit dat we ze pas verder uitwerken, op het moment dat we eraan beginnen te werken. Hiervoor doen we een epic kick-off.
 
-De epic kick-off wordt georganiseerd door de twee epic owners. Deelnemers aan de epic kick-off zijn de epic owners, mensen die worden uitgenodigd vanwege hun expertise (UX, security, juridisch, testen, ...), en mensen die er uit interesse bij willen zijn.
+De epic kick-off wordt tijdens onze twee-wekelijkse meeting ingepland door de twee epic owners. Deelnemers aan de epic kick-off zijn de epic owners, mensen die worden uitgenodigd vanwege hun expertise (UX, security, juridisch, testen, ...), en mensen die er uit interesse bij willen zijn.
 
 In de kick-off worden o.a. de volgende vragen behandeld:
 
 - Is de context van de epic duidelijk? Waar past het in het verkiezingsproces? Hoe past het in de rest van de applicatie?
 - Is de scope duidelijk? Wat is wel in scope van de epic, wat niet?
+- Past de epic in de huidige architectuur of zijn er wijzigingen nodig?
 - Is de epic duidelijk genoeg om mee te starten? Kun je je de demo van de epic inbeelden?
 - Heb je alles wat je nodig hebt om te starten? Bijvoorbeeld voldoende UI-designs? (voldoende, niet per se volledige)
 - Is de epic klein genoeg?

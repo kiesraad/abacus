@@ -11,10 +11,3 @@ De use cases zijn niet specifiek over welke documenten (bijv. PVs) en bestanden 
 Voor een uitleg over de methode die we hanteren voor use cases, zie [README-use-cases.md](./README-use-cases.md).
 
 Voor een use case-template, zie [template-use-cases.md](./template-use-case.md).
-
-## Opdeling use cases in bestanden
-
-De naam van elk bestand met use cases bestaat uit twee delen:
-
-- de naam van de primaire actor, bijv. GSB, CSB, Kiesraad
-- het niveau van de use case: uiterste → hoogover → gebruikersdoelen → subfuncties

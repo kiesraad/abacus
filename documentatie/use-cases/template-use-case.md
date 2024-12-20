@@ -1,27 +1,27 @@
 # Template use case
 
-## naam use case
+## Naam use case
 
-__niveau:__ ...  (☁️/🪁/🌊/🐟)
+__Niveau:__ ...  (☁️/🪁/🌊/🐟)
 
-__precondities:__  
+__Precondities:__  
 
 - ...
 
 ### Hoofdscenario en uitbreidingen
 
-__trigger:__  
+__Trigger:__  
 
 - ...
 
-__hoofdscenario__:  
+__Hoofdscenario:__  
 
 1. ...  
 
-__uitbreidingen__:  
-1a. conditie van de uitbreiding:  
+__Uitbreidingen:__  
+1a. Conditie van de uitbreiding:  
 &emsp; 1a1: eerste actie  
 
-### open punten
+### Open punten
 
 - ...  

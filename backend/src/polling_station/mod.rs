@@ -171,8 +171,8 @@ mod tests {
         let _ = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
-(1, 1, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12', '1234 YQ', 'Den Haag'),
-(2, 1, 'Testplek', 34, NULL, 'bijzonder', 'Teststraat', '1234 QY', 'Testdorp')
+(1, 1, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),
+(2, 1, 'Testplek', 34, NULL, 'bijzonder', 'Teststraat 2b', '1234 QY', 'Testdorp')
 "#)
             .execute(&pool)
             .await

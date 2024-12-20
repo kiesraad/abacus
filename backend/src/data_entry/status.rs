@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
 use sqlx::Type;
@@ -102,11 +103,12 @@ pub struct EntriesNotEqual {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 pub struct Definitive {
     #[schema(value_type = String)]
-    pub finished_at: chrono::DateTime<chrono::Utc>,
+    pub finished_at: DateTime<Utc>,
 }
 
 impl DataEntryStatus {
-    pub fn claim_entry(
+    /// Claim of the first entry by a specific typist
+    pub fn claim_first_entry(
         self,
         progress: u8,
         entry: PollingStationResults,
@@ -120,16 +122,28 @@ impl DataEntryStatus {
                     client_state,
                 }))
             }
-            DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
-                finalised_first_entry,
-            }) => Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
-                finalised_first_entry,
-                progress,
-                second_entry: entry,
-                client_state,
-            })),
             DataEntryStatus::FirstEntryInProgress(_) => {
                 Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Claim of the second entry by a specific typist
+    pub fn claim_second_entry(
+        self,
+        progress: u8,
+        entry: PollingStationResults,
+        client_state: ClientState,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::SecondEntryNotStarted(state) => {
+                Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
+                    finalised_first_entry: state.finalised_first_entry,
+                    progress,
+                    second_entry: entry,
+                    client_state,
+                }))
             }
             DataEntryStatus::SecondEntryInProgress(_) => {
                 Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
@@ -138,7 +152,8 @@ impl DataEntryStatus {
         }
     }
 
-    pub fn save_entry(
+    /// Update the data in the first entry while it is in progress
+    pub fn update_first_entry(
         self,
         progress: u8,
         entry: PollingStationResults,
@@ -152,6 +167,18 @@ impl DataEntryStatus {
                     client_state,
                 }))
             }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Update the data in the second entry while it is in progress
+    pub fn update_second_entry(
+        self,
+        progress: u8,
+        entry: PollingStationResults,
+        client_state: ClientState,
+    ) -> Result<Self, DataEntryTransitionError> {
+        match self {
             DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
                 ..
@@ -165,6 +192,7 @@ impl DataEntryStatus {
         }
     }
 
+    /// Complete the first entry and allow a second entry to be started
     pub fn finalise_first_entry(self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => {
@@ -176,6 +204,8 @@ impl DataEntryStatus {
         }
     }
 
+    /// Complete the second entry and compare the two entries, then either
+    /// make the data entry process definitive or return the conflict
     pub fn finalise_second_entry(
         self,
     ) -> Result<(Self, Option<PollingStationResults>), DataEntryTransitionError> {
@@ -185,7 +215,7 @@ impl DataEntryStatus {
                 if true {
                     Ok((
                         Self::Definitive(Definitive {
-                            finished_at: chrono::Utc::now(),
+                            finished_at: Utc::now(),
                         }),
                         Some(state.second_entry),
                     ))
@@ -203,9 +233,17 @@ impl DataEntryStatus {
         }
     }
 
-    pub fn delete(self) -> Result<Self, DataEntryTransitionError> {
+    /// Delete the first entry while it is in progress
+    pub fn delete_first_entry(self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(_) => Ok(DataEntryStatus::FirstEntryNotStarted),
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Delete the second entry while it is in progress
+    pub fn delete_second_entry(self) -> Result<Self, DataEntryTransitionError> {
+        match self {
             DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
                 ..
@@ -219,6 +257,8 @@ impl DataEntryStatus {
         }
     }
 
+    /// Resolve a conflicted data entry process to either the first or the
+    /// second entry
     pub fn resolve(
         self,
         entry_number: EntryNumber,
@@ -234,19 +274,21 @@ impl DataEntryStatus {
         match entry_number {
             EntryNumber::FirstEntry => Ok((
                 Self::Definitive(Definitive {
-                    finished_at: chrono::Utc::now(),
+                    finished_at: Utc::now(),
                 }),
                 first_entry,
             )),
             EntryNumber::SecondEntry => Ok((
                 Self::Definitive(Definitive {
-                    finished_at: chrono::Utc::now(),
+                    finished_at: Utc::now(),
                 }),
                 second_entry,
             )),
         }
     }
 
+    /// Get the progress of the first entry (if there is a first entry), from
+    /// 0 - 100
     pub fn get_first_entry_progress(&self) -> Option<u8> {
         match self {
             DataEntryStatus::FirstEntryNotStarted => None,
@@ -255,6 +297,8 @@ impl DataEntryStatus {
         }
     }
 
+    /// Get the progress of the second entry (if there is a second entry),
+    /// from 0 - 100
     pub fn get_second_entry_progress(&self) -> Option<u8> {
         match self {
             DataEntryStatus::FirstEntryNotStarted
@@ -265,6 +309,7 @@ impl DataEntryStatus {
         }
     }
 
+    /// Get the total progress of the data entry process (from 0 - 100)
     pub fn get_progress(&self) -> u8 {
         match self {
             DataEntryStatus::FirstEntryNotStarted => 0,
@@ -295,7 +340,7 @@ impl DataEntryStatus {
         }
     }
 
-    /// Get the name of the current status as a string
+    /// Get the name of the current status
     pub fn status_name(&self) -> DataEntryStatusName {
         match self {
             DataEntryStatus::FirstEntryNotStarted => DataEntryStatusName::FirstEntryNotStarted,
@@ -307,6 +352,7 @@ impl DataEntryStatus {
         }
     }
 
+    /// Returns true if the first entry is finished
     pub fn is_first_entry_finished(&self) -> bool {
         matches!(
             self,
@@ -314,7 +360,8 @@ impl DataEntryStatus {
         )
     }
 
-    pub fn finished_at(&self) -> Option<&chrono::DateTime<chrono::Utc>> {
+    /// Returns the timestamp at which point this data entry process was made definitive
+    pub fn finished_at(&self) -> Option<&DateTime<Utc>> {
         match self {
             DataEntryStatus::Definitive(Definitive { finished_at }) => Some(finished_at),
             _ => None,
@@ -354,7 +401,7 @@ mod tests {
         let progress = 0;
 
         let new_status = status
-            .claim_entry(progress, entry.clone(), client_state.clone())
+            .claim_first_entry(progress, entry.clone(), client_state.clone())
             .unwrap();
 
         assert_eq!(
@@ -380,7 +427,7 @@ mod tests {
         });
 
         let try_new_status =
-            status.claim_entry(0, PollingStationResults::default(), ClientState::default());
+            status.claim_first_entry(0, PollingStationResults::default(), ClientState::default());
         assert_eq!(
             try_new_status,
             Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)

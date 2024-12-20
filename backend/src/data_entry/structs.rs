@@ -1,6 +1,7 @@
 use crate::data_entry::status::DataEntryStatus;
 use crate::error::ErrorReference;
 use crate::APIError;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
 use sqlx::FromRow;
@@ -12,7 +13,8 @@ pub struct PollingStationDataEntry {
     pub polling_station_id: u32,
     #[schema(value_type = DataEntryStatus)]
     pub state: Json<DataEntryStatus>,
-    pub updated_at: i64,
+    #[schema(value_type = String)]
+    pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

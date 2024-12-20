@@ -15,66 +15,51 @@ impl PollingStationDataEntries {
         Self(pool)
     }
 
-    /// Saves the data entry or updates it if it already exists
-    pub async fn upsert(&self, id: u32, state: DataEntryStatus) -> Result<(), sqlx::Error> {
-        let state = serde_json::to_value(state).expect("should be serializable to JSON");
-        sqlx::query!(
-            r#"
-            INSERT INTO polling_station_data_entries
-              (polling_station_id, state)
-            VALUES (?, ?)
-            ON CONFLICT(polling_station_id) DO
-            UPDATE SET
-              state = excluded.state,
-              updated_at = unixepoch()
-            "#,
-            id,
-            state
-        )
-        .execute(&self.0)
-        .await?;
-
-        Ok(())
-    }
-
-    pub async fn get(&self, id: u32) -> Result<PollingStationDataEntry, sqlx::Error> {
-        query_as!(
-            PollingStationDataEntry,
-            r#"SELECT polling_station_id AS "polling_station_id: u32", state AS "state: _", updated_at FROM polling_station_data_entries WHERE polling_station_id = ?"#,
-            id,
-        )
-            .fetch_one(&self.0)
-            .await
-    }
-
-    pub async fn delete(&self, id: u32) -> Result<(), sqlx::Error> {
-        let res = query!(
-            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ?",
-            id,
-        )
-        .execute(&self.0)
-        .await?;
-        if res.rows_affected() == 0 {
-            Err(sqlx::Error::RowNotFound)
-        } else {
-            Ok(())
-        }
-    }
-
-    pub async fn get_or_create(
+    /// Get the full polling station data entry row for a given polling station
+    /// id, or return an error if there is no data
+    pub async fn get_row(
         &self,
         polling_station_id: u32,
-        //state: &DataEntry,
+    ) -> Result<PollingStationDataEntry, sqlx::Error> {
+        query_as!(
+            PollingStationDataEntry,
+            r#"
+                SELECT
+                    polling_station_id AS "polling_station_id: u32",
+                    state AS "state: _",
+                    updated_at AS "updated_at: _"
+                FROM polling_station_data_entries
+                WHERE polling_station_id = ?
+            "#,
+            polling_station_id,
+        )
+        .fetch_one(&self.0)
+        .await
+    }
+
+    /// Get a data entry or return an error if there is no data entry for the
+    /// given polling station id
+    pub async fn get(&self, polling_station_id: u32) -> Result<DataEntryStatus, sqlx::Error> {
+        self.get_row(polling_station_id)
+            .await
+            .map(|psde| psde.state.0)
+    }
+
+    /// Get a data entry or return the default data entry state for the given
+    /// polling station id
+    pub async fn get_or_default(
+        &self,
+        polling_station_id: u32,
     ) -> Result<DataEntryStatus, sqlx::Error> {
         Ok(query_as!(
             PollingStationDataEntry,
             r#"
-SELECT
-  polling_station_id AS "polling_station_id: u32",
-  state AS "state: _",
-  updated_at
-FROM polling_station_data_entries
-WHERE polling_station_id = ?
+                SELECT
+                    polling_station_id AS "polling_station_id: u32",
+                    state AS "state: _",
+                    updated_at AS "updated_at: _"
+                FROM polling_station_data_entries
+                WHERE polling_station_id = ?
             "#,
             polling_station_id
         )
@@ -84,27 +69,32 @@ WHERE polling_station_id = ?
         .unwrap_or(DataEntryStatus::FirstEntryNotStarted))
     }
 
-    pub async fn update_status(
+    /// Saves the data entry or updates it if it already exists for a given polling station id
+    pub async fn upsert(
         &self,
         polling_station_id: u32,
-        status: DataEntryStatus,
+        state: &DataEntryStatus,
     ) -> Result<(), sqlx::Error> {
-        let status = serde_json::to_value(status).expect("should always be serializable to JSON");
-        query!(
+        let state = serde_json::to_value(state).expect("should be serializable to JSON");
+        sqlx::query!(
             r#"
-            UPDATE polling_station_data_entries
-            SET state = ?
-            WHERE polling_station_id = ?
+                INSERT INTO polling_station_data_entries (polling_station_id, state)
+                VALUES (?, ?)
+                ON CONFLICT(polling_station_id) DO
+                UPDATE SET
+                    state = excluded.state,
+                    updated_at = CURRENT_TIMESTAMP
             "#,
-            status,
-            polling_station_id
+            polling_station_id,
+            state
         )
-        .fetch_all(&self.0)
+        .execute(&self.0)
         .await?;
 
         Ok(())
     }
 
+    /// Get the status for each polling station data entry in an election
     pub async fn statuses(
         &self,
         election_id: u32,
@@ -112,14 +102,14 @@ WHERE polling_station_id = ?
         query_as!(
             PollingStationDataEntry,
             r#"
-SELECT
-  polling_station_id AS "polling_station_id: u32",
-  COALESCE(de.state, '{ "status": "FirstEntryNotStarted" }') AS "state!: _",
-  updated_at
-FROM polling_stations AS p
-LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
-WHERE election_id = $1
-"#,
+                SELECT
+                    polling_station_id AS "polling_station_id: u32",
+                    COALESCE(de.state, '{ "status": "FirstEntryNotStarted" }') AS "state!: _",
+                    updated_at AS "updated_at: _"
+                FROM polling_stations AS p
+                LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
+                WHERE election_id = $1
+            "#,
             election_id
         )
         .fetch_all(&self.0)

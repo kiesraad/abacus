@@ -39,10 +39,6 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             post(data_entry::polling_station_data_entry_finalise),
         )
         .route(
-            "/:entry_number/claim",
-            post(data_entry::polling_station_data_entry_claim),
-        )
-        .route(
             "/:entry_number/delete",
             post(data_entry::polling_station_data_entry_delete),
         )

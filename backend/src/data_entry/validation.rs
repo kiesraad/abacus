@@ -137,7 +137,7 @@ impl From<String> for FieldPath {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct DataError {
     message: &'static str,
 }

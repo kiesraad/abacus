@@ -5,13 +5,33 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
 
-use crate::data_entry::{entry_number::EntryNumber, PollingStationResults};
+use crate::{
+    data_entry::{entry_number::EntryNumber, PollingStationResults},
+    election::Election,
+    polling_station::PollingStation,
+};
+
+use super::{validate_polling_station_results, DataError, ValidationResults};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DataEntryTransitionError {
     Invalid,
     FirstEntryAlreadyClaimed,
     SecondEntryAlreadyClaimed,
+    ValidatorError(DataError),
+    ValidationError(ValidationResults),
+}
+
+impl From<DataError> for DataEntryTransitionError {
+    fn from(err: DataError) -> Self {
+        Self::ValidatorError(err)
+    }
+}
+
+impl From<ValidationResults> for DataEntryTransitionError {
+    fn from(err: ValidationResults) -> Self {
+        Self::ValidationError(err)
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
@@ -182,9 +202,23 @@ impl DataEntryStatus {
     }
 
     /// Complete the first entry and allow a second entry to be started
-    pub fn finalise_first_entry(self) -> Result<Self, DataEntryTransitionError> {
+    pub fn finalise_first_entry(
+        self,
+        polling_station: &PollingStation,
+        election: &Election,
+    ) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => {
+                let validation_results = validate_polling_station_results(
+                    &state.first_entry,
+                    polling_station,
+                    election,
+                )?;
+
+                if validation_results.has_errors() {
+                    return Err(validation_results.into());
+                }
+
                 Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
                     finalised_first_entry: state.first_entry,
                 }))
@@ -197,9 +231,21 @@ impl DataEntryStatus {
     /// make the data entry process definitive or return the conflict
     pub fn finalise_second_entry(
         self,
+        polling_station: &PollingStation,
+        election: &Election,
     ) -> Result<(Self, Option<PollingStationResults>), DataEntryTransitionError> {
         match self {
             DataEntryStatus::SecondEntryInProgress(state) => {
+                let validation_results = validate_polling_station_results(
+                    &state.second_entry,
+                    polling_station,
+                    election,
+                )?;
+
+                if validation_results.has_errors() {
+                    return Err(validation_results.into());
+                }
+
                 if state.finalised_first_entry == state.second_entry {
                     Ok((
                         Self::Definitive(Definitive {
@@ -367,6 +413,10 @@ impl Display for DataEntryTransitionError {
                 write!(f, "First entry already claimed")
             }
             DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
+            DataEntryTransitionError::ValidatorError(data_error) => {
+                write!(f, "Validator error: {}", data_error)
+            }
+            DataEntryTransitionError::ValidationError(_) => write!(f, "Validation errors"),
         }
     }
 }

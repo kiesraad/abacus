@@ -207,17 +207,22 @@ pub async fn polling_station_data_entry_delete(
 )]
 pub async fn polling_station_data_entry_finalise(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
+    State(elections_repo): State<Elections>,
+    State(polling_stations_repo): State<PollingStations>,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<(), APIError> {
     let state = polling_station_data_entries.get_or_default(id).await?;
 
+    let polling_station = polling_stations_repo.get(id).await?;
+    let election = elections_repo.get(polling_station.election_id).await?;
+
     match entry_number {
         EntryNumber::FirstEntry => {
-            let new_state = state.finalise_first_entry()?;
+            let new_state = state.finalise_first_entry(&polling_station, &election)?;
             polling_station_data_entries.upsert(id, &new_state).await?;
         }
         EntryNumber::SecondEntry => {
-            let (new_state, data) = state.finalise_second_entry()?;
+            let (new_state, data) = state.finalise_second_entry(&polling_station, &election)?;
 
             match (&new_state, data) {
                 (DataEntryStatus::Definitive(_), Some(data)) => {
@@ -335,6 +340,13 @@ pub mod tests {
         }
     }
 
+    async fn get_data_entry_status(pool: SqlitePool, polling_station_id: u32) -> DataEntryStatus {
+        PollingStationDataEntries::new(pool.clone())
+            .get(polling_station_id)
+            .await
+            .unwrap()
+    }
+
     async fn save(
         pool: SqlitePool,
         request_body: DataEntry,
@@ -363,6 +375,8 @@ pub mod tests {
     async fn finalise(pool: SqlitePool, entry_number: EntryNumber) -> Response {
         polling_station_data_entry_finalise(
             State(PollingStationDataEntries::new(pool.clone())),
+            State(Elections::new(pool.clone())),
+            State(PollingStations::new(pool.clone())),
             Path((1, entry_number)),
         )
         .await
@@ -492,11 +506,10 @@ pub mod tests {
             .await
             .unwrap();
         assert_eq!(row_count.count, 1);
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 0);
+
+        // Check that the status is 'Definitive'
+        let status = get_data_entry_status(pool.clone(), 1).await;
+        assert!(matches!(status, DataEntryStatus::Definitive(_)));
 
         // Check that we can't save a new data entry after finalising
         let response = save(pool.clone(), request_body.clone(), EntryNumber::FirstEntry).await;
@@ -553,12 +566,8 @@ pub mod tests {
         let response = delete(pool.clone(), EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
-        // check if data entry was deleted
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 0);
+        let status = get_data_entry_status(pool.clone(), 1).await;
+        assert_eq!(status, DataEntryStatus::FirstEntryNotStarted);
     }
 
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
@@ -570,7 +579,8 @@ pub mod tests {
         )
         .await
         .into_response();
-        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+
+        assert_eq!(response.status(), StatusCode::CONFLICT);
     }
 
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
@@ -587,7 +597,7 @@ pub mod tests {
             // check that deleting finalised or non-existent data entry returns 404
             for _entry_number in 1..=2 {
                 let response = delete(pool.clone(), entry_number).await;
-                assert_eq!(response.status(), StatusCode::NOT_FOUND);
+                assert_eq!(response.status(), StatusCode::CONFLICT);
             }
 
             // after the first data entry, check if it is still in the database

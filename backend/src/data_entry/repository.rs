@@ -153,8 +153,10 @@ impl PollingStationDataEntries {
             polling_station_id,
             new_state
         )
-        .execute(&self.0)
+        .execute(tx.as_mut())
         .await?;
+
+        tx.commit().await?;
 
         Ok(())
     }

@@ -217,9 +217,9 @@ export interface ElectionStatusResponse {
  */
 export interface ElectionStatusResponseEntry {
   finished_at?: string;
-  first_data_entry_progress?: unknown;
+  first_data_entry_progress?: number;
   polling_station_id: number;
-  second_data_entry_progress?: unknown;
+  second_data_entry_progress?: number;
   status: DataEntryStatusName;
 }
 
@@ -277,7 +277,7 @@ export interface GetDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
   progress: number;
-  updated_at: number;
+  updated_at: string;
   validation_results: ValidationResults;
 }
 

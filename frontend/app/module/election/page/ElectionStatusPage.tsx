@@ -7,8 +7,8 @@ import { NavBar } from "app/component/navbar/NavBar";
 
 import {
   DataEntryStatusName,
+  ElectionStatusResponseEntry,
   PollingStation,
-  PollingStationStatusEntry,
   useElection,
   useElectionStatus,
 } from "@kiesraad/api";
@@ -30,7 +30,7 @@ import { formatDateTime } from "@kiesraad/util";
 
 import cls from "./ElectionStatusPage.module.css";
 
-interface PollingStationWithStatus extends PollingStation, PollingStationStatusEntry {}
+interface PollingStationWithStatus extends PollingStation, ElectionStatusResponseEntry {}
 
 const statusCategories = ["in_progress", "first_entry_finished", "definitive", "not_started"] as const;
 type StatusCategory = (typeof statusCategories)[number];
@@ -68,8 +68,6 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
   );
 
   switch (category) {
-    case "unfinished":
-      return <CategoryHeader />;
     case "in_progress":
       return <CategoryHeader>{[progressColumn]}</CategoryHeader>;
     case "first_entry_finished":
@@ -82,12 +80,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
 
 function getTableRowForCategory(category: StatusCategory, polling_station: PollingStationWithStatus): ReactNode {
   // TODO: future `errors_and_warnings` status should be added to showBadge array
-  const showBadge: PollingStationStatus[] = [
-    "first_entry_unfinished",
-    "first_entry_in_progress",
-    "second_entry_unfinished",
-    "second_entry_in_progress",
-  ];
+  const showBadge: DataEntryStatusName[] = ["first_entry_in_progress", "second_entry_in_progress"];
 
   function CategoryPollingStationRow({ children }: { children?: ReactNode[] }) {
     return (
@@ -104,22 +97,20 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
 
   const finishedAtCell = (
     <Table.Cell key={`${polling_station.id}-time`}>
-      {polling_station.finished_at ? formatDateTime(new Date(polling_station.finished_at * 1000)) : ""}
+      {polling_station.finished_at ? formatDateTime(new Date(polling_station.finished_at)) : ""}
     </Table.Cell>
   );
   const progressCell = (
     <Table.Cell key={`${polling_station.id}-progress`}>
       <ProgressBar
         id={`${polling_station.id}-progressbar`}
-        data={{ percentage: polling_station.data_entry_progress ?? 0, class: "default" }}
+        data={{ percentage: polling_station.first_data_entry_progress ?? 0, class: "default" }}
         showPercentage
       />
     </Table.Cell>
   );
   // TODO: Needs to be updated when user accounts are implemented
   switch (category) {
-    case "unfinished":
-      return <CategoryPollingStationRow key={polling_station.id} />;
     case "in_progress":
       return <CategoryPollingStationRow key={polling_station.id}>{[progressCell]}</CategoryPollingStationRow>;
     case "first_entry_finished":
@@ -130,7 +121,7 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
   }
 }
 
-function statusCount(entries: PollingStationStatusEntry[], category: StatusCategory): number {
+function statusCount(entries: ElectionStatusResponseEntry[], category: StatusCategory): number {
   return entries.filter((s) => statusesForCategory[category].includes(s.status)).length;
 }
 

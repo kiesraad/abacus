@@ -16,7 +16,7 @@
       {
         "name": "updated_at: _",
         "ordinal": 2,
-        "type_info": "Datetime"
+        "type_info": "Integer"
       }
     ],
     "parameters": {

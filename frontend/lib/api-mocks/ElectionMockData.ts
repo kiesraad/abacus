@@ -421,7 +421,7 @@ export const electionMockData = electionDetailsMockResponse.election as Required
 export const electionStatusMockResponse: ElectionStatusResponse = {
   statuses: [
     {
-      polling_station_Id: 1,
+      polling_station_id: 1,
       status: "first_entry_not_started",
     },
     {

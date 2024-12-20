@@ -47,7 +47,7 @@ export const emptyDataEntryResponse: GetDataEntryResponse = {
     warnings: [],
   },
   client_state: {},
-  updated_at: Number(Date.now() / 1000),
+  updated_at: Date.now().toString(),
 };
 
 export const noRecountNoDifferencesRequest: Record<string, unknown> = {

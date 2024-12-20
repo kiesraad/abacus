@@ -2,7 +2,7 @@
 
 - Kwalitatieve, gemodereerde gebruikerstest
 - 6 deelnemers, interviews van 45 minuten
-- Matig tot ervaren computergebruikers, enige bekendheid met verkiezingsproces (5 van de 6 hadden geholpen als vrijwilliger op een stembureau)
+- Matig tot ervaren computergebruikers, enige bekendheid met het verkiezingsproces (5 van de 6 hadden geholpen als vrijwilliger op een stembureau)
 - Getest op Windows + Chrome
 - Computer met extern scherm, toetsenbord met numeriek toetsenblok en muis
 - Getest op #kiesraad/abacus, commit #9420c5c

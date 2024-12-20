@@ -1,9 +1,9 @@
 use axum::extract::FromRef;
-use sqlx::{query, query_as, SqlitePool};
+use sqlx::{query, query_as, types::Json, SqlitePool};
 
 use super::status::DataEntryStatus;
 use super::{PollingStation, PollingStationDataEntry, PollingStationResults};
-use crate::data_entry::PollingStationResultsEntry;
+use crate::data_entry::{ElectionStatusResponseEntry, PollingStationResultsEntry};
 use crate::polling_station::repository::PollingStations;
 use crate::AppState;
 
@@ -98,20 +98,28 @@ impl PollingStationDataEntries {
     pub async fn statuses(
         &self,
         election_id: u32,
-    ) -> Result<Vec<PollingStationDataEntry>, sqlx::Error> {
-        query_as!(
-            PollingStationDataEntry,
+    ) -> Result<Vec<ElectionStatusResponseEntry>, sqlx::Error> {
+        query!(
             r#"
                 SELECT
                     polling_station_id AS "polling_station_id: u32",
-                    COALESCE(de.state, '{ "status": "FirstEntryNotStarted" }') AS "state!: _",
-                    updated_at AS "updated_at: _"
+                    de.state AS "state: Option<Json<DataEntryStatus>>"
                 FROM polling_stations AS p
                 LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
                 WHERE election_id = $1
             "#,
             election_id
         )
+        .map(|status| {
+            let state = status.state.unwrap_or_default();
+            ElectionStatusResponseEntry {
+                polling_station_id: status.polling_station_id,
+                status: state.status_name(),
+                first_data_entry_progress: state.get_first_entry_progress(),
+                second_data_entry_progress: state.get_second_entry_progress(),
+                finished_at: state.finished_at().cloned(),
+            }
+        })
         .fetch_all(&self.0)
         .await
     }

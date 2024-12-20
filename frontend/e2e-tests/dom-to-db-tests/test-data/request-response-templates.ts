@@ -47,7 +47,7 @@ export const emptyDataEntryResponse: GetDataEntryResponse = {
     warnings: [],
   },
   client_state: {},
-  updated_at: Date.now().toString(),
+  updated_at: new Date().toISOString(),
 };
 
 export const noRecountNoDifferencesRequest: Record<string, unknown> = {

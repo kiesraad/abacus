@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                SELECT\n                    polling_station_id AS \"polling_station_id: u32\",\n                    de.state AS \"state: Option<Json<DataEntryStatus>>\"\n                FROM polling_stations AS p\n                LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id\n                WHERE election_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "polling_station_id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "state: Option<Json<DataEntryStatus>>",
+        "ordinal": 1,
+        "type_info": "Blob"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "b9045ab2284e69dfc9fedf7c462e59a86bd7e93f43e8a4d9200ca1a2edd01dca"
+}

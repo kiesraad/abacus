@@ -2,7 +2,6 @@ use std::fmt::Display;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use serde_json::value::RawValue;
 use sqlx::Type;
 use utoipa::ToSchema;
 
@@ -49,30 +48,20 @@ pub struct FirstEntryInProgress {
     pub client_state: ClientState,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone, Type)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Type, Eq, PartialEq)]
 #[serde(transparent)]
-pub struct ClientState(pub Option<Box<RawValue>>);
+pub struct ClientState(pub Option<serde_json::Value>);
 
 impl ClientState {
-    pub fn as_ref(&self) -> Option<&RawValue> {
-        self.0.as_ref().map(|v| v.as_ref())
+    pub fn as_ref(&self) -> Option<&serde_json::Value> {
+        self.0.as_ref()
     }
 
     pub fn new_from_str(s: Option<&str>) -> Result<ClientState, serde_json::Error> {
-        let res = s
-            .map(|v| RawValue::from_string(v.to_string()))
-            .transpose()?;
+        let res = s.map(serde_json::from_str).transpose()?;
         Ok(ClientState(res))
     }
 }
-
-impl PartialEq for ClientState {
-    fn eq(&self, other: &Self) -> bool {
-        self.0.as_ref().map(|v| v.get()) == other.0.as_ref().map(|v| v.get())
-    }
-}
-
-impl Eq for ClientState {}
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 pub struct SecondEntryNotStarted {
@@ -332,7 +321,7 @@ impl DataEntryStatus {
     }
 
     /// Extract the client state if there is any
-    pub fn get_client_state(&self) -> Option<&RawValue> {
+    pub fn get_client_state(&self) -> Option<&serde_json::Value> {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => state.client_state.as_ref(),
             DataEntryStatus::SecondEntryInProgress(state) => state.client_state.as_ref(),

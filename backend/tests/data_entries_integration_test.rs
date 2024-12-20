@@ -213,8 +213,8 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     let get_response: GetDataEntryResponse = response.json().await.unwrap();
     assert_eq!(get_response.data, request_body.data);
     assert_eq!(
-        get_response.client_state.as_ref().map(|v| v.get()),
-        request_body.client_state.as_ref().map(|v| v.get())
+        get_response.client_state.as_ref(),
+        request_body.client_state.as_ref()
     );
     assert_eq!(
         get_response.validation_results,

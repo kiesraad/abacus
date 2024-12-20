@@ -29,7 +29,7 @@ pub struct GetDataEntryResponse {
     pub progress: u8,
     pub data: PollingStationResults,
     #[schema(value_type = Object)]
-    pub client_state: Option<Box<serde_json::value::RawValue>>,
+    pub client_state: Option<serde_json::Value>,
     pub validation_results: ValidationResults,
     #[schema(value_type = String)]
     pub updated_at: DateTime<Utc>,
@@ -53,7 +53,7 @@ pub async fn polling_station_data_entry_get(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
-    Path(id): Path<u32>, // note: we don't need the entry number here
+    Path((id, _entry_number)): Path<(u32, EntryNumber)>, // note: we don't need the entry number here
 ) -> Result<Json<GetDataEntryResponse>, APIError> {
     let polling_station = polling_stations.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;
@@ -278,18 +278,7 @@ pub async fn election_status(
     State(data_entry_repo): State<PollingStationDataEntries>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
-    let statuses = data_entry_repo
-        .statuses(id)
-        .await?
-        .into_iter()
-        .map(|status| ElectionStatusResponseEntry {
-            polling_station_id: status.polling_station_id,
-            status: status.state.status_name(),
-            first_data_entry_progress: status.state.get_first_entry_progress(),
-            second_data_entry_progress: status.state.get_second_entry_progress(),
-            finished_at: status.state.finished_at().cloned(),
-        })
-        .collect();
+    let statuses = data_entry_repo.statuses(id).await?;
     Ok(Json(ElectionStatusResponse { statuses }))
 }
 

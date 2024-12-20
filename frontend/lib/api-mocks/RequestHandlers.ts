@@ -196,7 +196,7 @@ export const PollingStationDataEntryGetHandler = http.get<
     data: dataEntryRecord.data,
     client_state: dataEntryRecord.clientState,
     validation_results: validate(dataEntryRecord.data),
-    updated_at: Date.now().toString(),
+    updated_at: new Date().toISOString(),
   };
   return HttpResponse.json(response, { status: 200 });
 });

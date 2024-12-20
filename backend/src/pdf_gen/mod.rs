@@ -81,14 +81,8 @@ pub(crate) mod tests {
                 } else {
                     Some(*voter_count)
                 },
-                polling_station_type: PollingStationType::Special,
-                street: "Teststraat".to_string(),
-                house_number: format!("{idx}"),
-                house_number_addition: if idx % 2 == 0 {
-                    Some("b".to_string())
-                } else {
-                    None
-                },
+                polling_station_type: Some(PollingStationType::Special),
+                address: "Teststraat 2a".to_string(),
                 postal_code: "1234 QY".to_string(),
                 locality: "Testdorp".to_string(),
             });

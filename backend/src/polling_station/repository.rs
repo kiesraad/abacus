@@ -25,10 +25,8 @@ impl PollingStations {
                 name,
                 number,
                 number_of_voters,
-                polling_station_type,
-                street,
-                house_number,
-                house_number_addition,
+                polling_station_type AS "polling_station_type: _",
+                address,
                 postal_code,
                 locality
             FROM polling_stations
@@ -51,10 +49,8 @@ impl PollingStations {
                 name,
                 number,
                 number_of_voters,
-                polling_station_type,
-                street,
-                house_number,
-                house_number_addition,
+                polling_station_type AS "polling_station_type: _",
+                address,
                 postal_code,
                 locality
             FROM polling_stations
@@ -81,22 +77,18 @@ impl PollingStations {
               number,
               number_of_voters,
               polling_station_type,
-              street,
-              house_number,
-              house_number_addition,
+              address,
               postal_code,
               locality
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
               id AS "id: u32",
               election_id AS "election_id: u32",
               name,
               number,
               number_of_voters,
-              polling_station_type,
-              street,
-              house_number,
-              house_number_addition,
+              polling_station_type AS "polling_station_type: _",
+              address,
               postal_code,
               locality
             "#,
@@ -105,9 +97,7 @@ impl PollingStations {
             new_polling_station.number,
             new_polling_station.number_of_voters,
             new_polling_station.polling_station_type,
-            new_polling_station.street,
-            new_polling_station.house_number,
-            new_polling_station.house_number_addition,
+            new_polling_station.address,
             new_polling_station.postal_code,
             new_polling_station.locality,
         )
@@ -129,9 +119,7 @@ impl PollingStations {
               number = ?,
               number_of_voters = ?,
               polling_station_type = ?,
-              street = ?,
-              house_number = ?,
-              house_number_addition = ?,
+              address = ?,
               postal_code = ?,
               locality = ?
             WHERE
@@ -141,9 +129,7 @@ impl PollingStations {
             polling_station_update.number,
             polling_station_update.number_of_voters,
             polling_station_update.polling_station_type,
-            polling_station_update.street,
-            polling_station_update.house_number,
-            polling_station_update.house_number_addition,
+            polling_station_update.address,
             polling_station_update.postal_code,
             polling_station_update.locality,
             polling_station_id,

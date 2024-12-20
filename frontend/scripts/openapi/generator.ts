@@ -135,6 +135,19 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
     }
   }
 
+  if ("oneOf" in s) {
+    return (
+      s.oneOf
+        ?.map((obj) => {
+          if ("$ref" in obj) {
+            return obj.$ref.substring(obj.$ref.lastIndexOf("/") + 1);
+          }
+          return obj.type || "unknown";
+        })
+        .join(" | ") ?? "unknown"
+    );
+  }
+
   let type = "unknown";
   switch (s.type) {
     case "string":

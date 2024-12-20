@@ -15,8 +15,7 @@
     "delete_error": "Het stembureau kan niet meer verwijderd worden. De invoerfase is al gestart."
   },
   "number_of_voters": "Aantal kiesgerechtigden",
-  "street": "Straatnaam",
-  "street_and_number": "Straatnaam en huisnummer",
+  "address": "Straatnaam en huisnummer",
   "house_number": "Huisnummer",
   "house_number_addition": "Toevoeging",
   "zipcode": "Postcode",

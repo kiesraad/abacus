@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                id AS \"id: u32\",\n                election_id AS \"election_id: u32\",\n                name,\n                number,\n                number_of_voters,\n                polling_station_type,\n                street,\n                house_number,\n                house_number_addition,\n                postal_code,\n                locality\n            FROM polling_stations\n            WHERE election_id = $1\n            ",
+  "query": "\n            INSERT INTO polling_stations (\n              election_id,\n              name,\n              number,\n              number_of_voters,\n              polling_station_type,\n              address,\n              postal_code,\n              locality\n            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n              id AS \"id: u32\",\n              election_id AS \"election_id: u32\",\n              name,\n              number,\n              number_of_voters,\n              polling_station_type AS \"polling_station_type: _\",\n              address,\n              postal_code,\n              locality\n            ",
   "describe": {
     "columns": [
       {
@@ -29,38 +29,28 @@
         "type_info": "Integer"
       },
       {
-        "name": "polling_station_type",
+        "name": "polling_station_type: _",
         "ordinal": 5,
         "type_info": "Text"
       },
       {
-        "name": "street",
+        "name": "address",
         "ordinal": 6,
         "type_info": "Text"
       },
       {
-        "name": "house_number",
+        "name": "postal_code",
         "ordinal": 7,
         "type_info": "Text"
       },
       {
-        "name": "house_number_addition",
-        "ordinal": 8,
-        "type_info": "Text"
-      },
-      {
-        "name": "postal_code",
-        "ordinal": 9,
-        "type_info": "Text"
-      },
-      {
         "name": "locality",
-        "ordinal": 10,
+        "ordinal": 8,
         "type_info": "Text"
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 8
     },
     "nullable": [
       false,
@@ -68,13 +58,11 @@
       false,
       false,
       true,
-      false,
-      false,
-      false,
       true,
+      false,
       false,
       false
     ]
   },
-  "hash": "6a00e6137189ea2154679c5b16f6377a1130a41f479e32e2039c671caaa4c804"
+  "hash": "72030c53547f1f72bdc99c1bb56d8620298d7289bcd475d8775eca8f9a5d2c9b"
 }

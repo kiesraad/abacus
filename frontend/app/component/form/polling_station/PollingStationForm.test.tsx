@@ -10,17 +10,10 @@ import { PollingStationForm } from "./PollingStationForm";
 async function fillForm(user: UserEvent, testPollingStation: PollingStation | Omit<PollingStation, "id">) {
   await user.type(await screen.findByRole("textbox", { name: "Nummer" }), testPollingStation.number.toString());
   await user.type(await screen.findByRole("textbox", { name: "Naam" }), testPollingStation.name.toString());
-  await user.type(await screen.findByRole("textbox", { name: "Straatnaam" }), testPollingStation.street.toString());
   await user.type(
-    await screen.findByRole("textbox", { name: "Huisnummer" }),
-    testPollingStation.house_number.toString(),
+    await screen.findByRole("textbox", { name: "Straatnaam en huisnummer" }),
+    testPollingStation.address.toString(),
   );
-  if (testPollingStation.house_number_addition) {
-    await user.type(
-      await screen.findByRole("textbox", { name: "Toevoeging" }),
-      testPollingStation.house_number_addition.toString(),
-    );
-  }
   await user.type(await screen.findByRole("textbox", { name: "Postcode" }), testPollingStation.postal_code.toString());
   await user.type(await screen.findByRole("textbox", { name: "Plaats" }), testPollingStation.locality.toString());
   await user.type(
@@ -40,12 +33,11 @@ describe("PollingStationForm create", () => {
       election_id: 1,
       number: 1,
       name: "test",
-      street: "test",
+      address: "test",
       postal_code: "1234",
       locality: "test",
       polling_station_type: "FixedLocation",
       number_of_voters: 1,
-      house_number: "test",
     };
 
     const onSaved = vi.fn();
@@ -66,12 +58,11 @@ describe("PollingStationForm create", () => {
       election_id: 1,
       number: 1,
       name: "test",
-      street: "test",
+      address: "test",
       postal_code: "1234",
       locality: "test",
       polling_station_type: "FixedLocation",
       number_of_voters: 1,
-      house_number: "test",
     };
 
     const onSaved = vi.fn();

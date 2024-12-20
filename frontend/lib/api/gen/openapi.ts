@@ -261,17 +261,15 @@ export interface PoliticalGroupVotes {
  * Polling station of a certain [crate::election::Election]
  */
 export interface PollingStation {
+  address: string;
   election_id: number;
-  house_number: string;
-  house_number_addition?: string;
   id: number;
   locality: string;
   name: string;
   number: number;
   number_of_voters?: number;
-  polling_station_type: PollingStationType;
+  polling_station_type?: null | PollingStationType;
   postal_code: string;
-  street: string;
 }
 
 /**
@@ -285,15 +283,13 @@ export interface PollingStationListResponse {
  * Polling station of a certain [crate::election::Election]
  */
 export interface PollingStationRequest {
-  house_number: string;
-  house_number_addition?: string;
+  address: string;
   locality: string;
   name: string;
   number: number;
   number_of_voters?: number;
-  polling_station_type: PollingStationType;
+  polling_station_type?: null | PollingStationType;
   postal_code: string;
-  street: string;
 }
 
 /**

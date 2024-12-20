@@ -120,9 +120,7 @@ was. Indien er meerdere zittingslocaties waren, vermeld dan per lid de locatie.]
         #if polling_station.polling_station_type == "Mobile" [
           _(Mobiel stembureau)_
         ] else [
-          #polling_station.street #polling_station.house_number #if "house_number_addition" in polling_station and polling_station.house_number_addition != none [
-            #polling_station.house_number_addition
-          ] \
+          #polling_station.address \
           #polling_station.postal_code #polling_station.locality
         ]
       ]

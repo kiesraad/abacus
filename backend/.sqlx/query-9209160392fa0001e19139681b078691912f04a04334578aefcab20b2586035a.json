@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                id AS \"id: u32\",\n                election_id AS \"election_id: u32\",\n                name,\n                number,\n                number_of_voters,\n                polling_station_type,\n                street,\n                house_number,\n                house_number_addition,\n                postal_code,\n                locality\n            FROM polling_stations\n            WHERE id = $1\n            ",
+  "query": "\n            SELECT\n                id AS \"id: u32\",\n                election_id AS \"election_id: u32\",\n                name,\n                number,\n                number_of_voters,\n                polling_station_type AS \"polling_station_type: _\",\n                address,\n                postal_code,\n                locality\n            FROM polling_stations\n            WHERE election_id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -29,33 +29,23 @@
         "type_info": "Integer"
       },
       {
-        "name": "polling_station_type",
+        "name": "polling_station_type: _",
         "ordinal": 5,
         "type_info": "Text"
       },
       {
-        "name": "street",
+        "name": "address",
         "ordinal": 6,
         "type_info": "Text"
       },
       {
-        "name": "house_number",
+        "name": "postal_code",
         "ordinal": 7,
         "type_info": "Text"
       },
       {
-        "name": "house_number_addition",
-        "ordinal": 8,
-        "type_info": "Text"
-      },
-      {
-        "name": "postal_code",
-        "ordinal": 9,
-        "type_info": "Text"
-      },
-      {
         "name": "locality",
-        "ordinal": 10,
+        "ordinal": 8,
         "type_info": "Text"
       }
     ],
@@ -68,13 +58,11 @@
       false,
       false,
       true,
-      false,
-      false,
-      false,
       true,
+      false,
       false,
       false
     ]
   },
-  "hash": "7f8236bc8562684bd372060c85ba9990460814755aaba03e367e32d32afe339e"
+  "hash": "9209160392fa0001e19139681b078691912f04a04334578aefcab20b2586035a"
 }

@@ -146,7 +146,7 @@ Daarmee is de keuze voor Rust op basis van alle redelijke inschattingen en overw
 
 We hebben gekozen voor de volgende libraries:
 
-- De library [SQLite](https://www.sqlite.org/) die een SQL-database engine implementeert. Dit is zeer populair, lichtgewicht en makkelijk in gebruik. Je hoeft bovendien niets te installeren. Het is handiger dan PostgreSQL, dat je zou moeten installeren op de computer of zou moeten meeleveren in de installer.
+- De library [SQLite](https://www.sqlite.org/) die een SQL database engine implementeert. Dit is zeer populair, lichtgewicht en makkelijk in gebruik. Je hoeft bovendien niets te installeren. Het is handiger dan PostgreSQL, dat je zou moeten installeren op de computer of zou moeten meeleveren in de installer.
 - De web library [axum](https://github.com/tokio-rs/axum). Deze library wordt veel gebruikt en goed ondersteund.
 - De database library [sqlx](https://github.com/launchbadge/sqlx) voor SQL.
 - De specificatie [OpenAPI](https://www.openapis.org/what-is-openapi), die wordt gebruikt voor interne technische documentatie.

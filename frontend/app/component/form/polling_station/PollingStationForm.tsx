@@ -34,11 +34,9 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
       locality: elements.locality.value,
       name: elements.name.value,
       number_of_voters: elements.number_of_voters?.value ? deformatNumber(elements.number_of_voters.value) : undefined,
-      polling_station_type: elements.polling_station_type.value as PollingStationType,
+      polling_station_type: elements.polling_station_type?.value as PollingStationType,
       postal_code: elements.postal_code.value,
-      street: elements.street.value,
-      house_number: elements.house_number.value,
-      house_number_addition: elements.house_number_addition?.value,
+      address: elements.address.value,
     };
 
     if (pollingStation) {
@@ -122,24 +120,10 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
           <FormLayout.Section title={t("polling_station.title.address")}>
             <FormLayout.Row>
               <InputField
-                id="street"
-                name="street"
-                label={t("polling_station.street")}
-                defaultValue={pollingStation?.street}
-              />
-              <InputField
-                id="house_number"
-                name="house_number"
-                fieldWidth="narrow"
-                label={t("polling_station.house_number")}
-                defaultValue={pollingStation?.house_number}
-              />
-              <InputField
-                id="house_number_addition"
-                name="house_number_addition"
-                fieldWidth="narrow"
-                label={t("polling_station.house_number_addition")}
-                defaultValue={pollingStation?.house_number_addition}
+                id="address"
+                name="address"
+                label={t("polling_station.address")}
+                defaultValue={pollingStation?.address}
               />
             </FormLayout.Row>
             <FormLayout.Row>

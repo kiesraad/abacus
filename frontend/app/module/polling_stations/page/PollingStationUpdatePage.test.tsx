@@ -17,12 +17,11 @@ describe("PollingStationCreatePage", () => {
     election_id: 1,
     number: 1,
     name: "test",
-    street: "test",
+    address: "test",
     postal_code: "1234",
     locality: "test",
     polling_station_type: "FixedLocation",
     number_of_voters: 1,
-    house_number: "test",
   };
 
   test("Shows form", async () => {

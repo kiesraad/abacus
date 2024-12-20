@@ -1,8 +1,21 @@
+use crate::data_entry::status::DataEntryStatus;
 use crate::error::ErrorReference;
 use crate::APIError;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::types::Json;
+use sqlx::FromRow;
 use std::ops::AddAssign;
 use utoipa::ToSchema;
+
+#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Default)]
+pub struct PollingStationDataEntry {
+    pub polling_station_id: u32,
+    #[schema(value_type = DataEntryStatus)]
+    pub state: Json<DataEntryStatus>,
+    #[schema(value_type = String)]
+    pub updated_at: DateTime<Utc>,
+}
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PollingStationResultsEntry {

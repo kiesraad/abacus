@@ -199,7 +199,7 @@
   --badge-objections: #4a1fb8;
   --badge-objections-bg: #ebe9fe;
   --badge-difference: var(--base-white);
-  --badge-difference-bg: #d92d20;
+  --badge-difference-bg: var(--red-600);
   --badge-typist-busy: var(--link-active);
   --badge-typist-busy-bg: var(--shadow-color-focus);
   --badge-definitive: var(--base-white);

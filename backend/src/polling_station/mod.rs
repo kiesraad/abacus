@@ -192,7 +192,7 @@ VALUES
         let result = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
-(4, 1, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12', '1234 YQ', 'Den Haag');
+(4, 1, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
 "#)
             .execute(&pool)
             .await;

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
+import { DataEntryStatusName, PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
@@ -53,8 +53,9 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     const pollingStationStatus = electionStatus.statuses.find(
       (status) => status.polling_station_id === pollingStation?.id,
     )?.status;
+    const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
 
-    if (pollingStationStatus === "definitive") {
+    if (pollingStationStatus && firstAndSecondEntryFinished.includes(pollingStationStatus)) {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
       setLoading(false);
       return;

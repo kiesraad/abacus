@@ -1,13 +1,26 @@
 import type { Story } from "@ladle/react";
 
+import type { DataEntryStatusName } from "@kiesraad/api";
+
 import { Badge, BadgeProps } from "./Badge";
+
+const badgeTypes: DataEntryStatusName[] = [
+  "first_entry_not_started",
+  "first_entry_in_progress",
+  "second_entry_not_started",
+  "second_entry_in_progress",
+  "entries_different",
+  "definitive",
+];
 
 export const AllBadges: Story = () => {
   return (
     <>
-      <Badge type="definitive" />
-      <Badge type="first_entry_not_started" />
-      <Badge type="first_entry_in_progress" showIcon />
+      {badgeTypes.map((type) => (
+        <div id={type} key={type}>
+          <Badge type={type} showIcon />
+        </div>
+      ))}
     </>
   );
 };
@@ -16,7 +29,7 @@ export const CustomizableBadge: Story<BadgeProps> = ({ type, showIcon }) => <Bad
 
 CustomizableBadge.argTypes = {
   type: {
-    options: ["definitive", "not_started", "first_entry_in_progress"],
+    options: badgeTypes,
     defaultValue: "first_entry_not_started",
     control: { type: "radio" },
   },

@@ -21,7 +21,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
           const status = electionStatus.statuses.find(
             (status) => status.polling_station_id === pollingStation.id,
           )?.status;
-          if (status === "definitive") {
+          if (status === "definitive" || status === "entries_different") {
             return null;
           }
 

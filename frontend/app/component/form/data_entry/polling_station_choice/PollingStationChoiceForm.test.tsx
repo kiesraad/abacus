@@ -154,7 +154,42 @@ describe("Test PollingStationChoiceForm", () => {
       // Test if the warning message is shown correctly
       await waitFor(() => {
         expect(screen.getByTestId("pollingStationSelectorFeedback").textContent).toBe(
-          "Stembureau 34(Testplek)is al twee keer ingevoerd",
+          "Stembureau 34 (Testplek) is al twee keer ingevoerd",
+        );
+      });
+
+      expect(
+        within(screen.getByTestId("pollingStationSubmitFeedback")).getByText(
+          "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
+        ),
+      ).toBeVisible();
+    });
+
+    test("Selecting a valid, but with different entries polling station shows alert", async () => {
+      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+      overrideOnce("get", "/api/elections/1/status", 200, electionStatusMockResponse);
+      const user = userEvent.setup();
+      render(
+        <ElectionProvider electionId={1}>
+          <ElectionStatusProvider electionId={1}>
+            <PollingStationChoiceForm anotherEntry />
+          </ElectionStatusProvider>
+        </ElectionProvider>,
+      );
+
+      const submitButton = await screen.findByRole("button", { name: "Beginnen" });
+      const pollingStation = screen.getByTestId("pollingStation");
+
+      // Test if the polling station name is shown
+      await user.type(pollingStation, "35");
+
+      // Click submit and see that the alert appears
+      await user.click(submitButton);
+
+      // Test if the warning message is shown correctly
+      await waitFor(() => {
+        expect(screen.getByTestId("pollingStationSelectorFeedback").textContent).toBe(
+          "Stembureau 35 (Testschool) is al twee keer ingevoerd",
         );
       });
 

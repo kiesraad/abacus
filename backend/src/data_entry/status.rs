@@ -21,7 +21,7 @@ pub enum DataEntryStatus {
     FirstEntryInProgress(FirstEntryInProgress),
     SecondEntryNotStarted(SecondEntryNotStarted),
     SecondEntryInProgress(SecondEntryInProgress),
-    EntriesNotEqual(EntriesNotEqual),
+    EntriesDifferent(EntriesDifferent),
     Definitive(Definitive), // First and second entry are finished
 }
 
@@ -32,7 +32,7 @@ pub enum DataEntryStatusName {
     FirstEntryInProgress,
     SecondEntryNotStarted,
     SecondEntryInProgress,
-    EntriesNotEqual,
+    EntriesDifferent,
     Definitive,
 }
 
@@ -84,7 +84,7 @@ pub struct SecondEntryInProgress {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
-pub struct EntriesNotEqual {
+pub struct EntriesDifferent {
     pub first_entry: PollingStationResults,
     pub second_entry: PollingStationResults,
 }
@@ -200,8 +200,7 @@ impl DataEntryStatus {
     ) -> Result<(Self, Option<PollingStationResults>), DataEntryTransitionError> {
         match self {
             DataEntryStatus::SecondEntryInProgress(state) => {
-                // TODO: Add the check implemented in #745
-                if true {
+                if state.finalised_first_entry == state.second_entry {
                     Ok((
                         Self::Definitive(Definitive {
                             finished_at: Utc::now(),
@@ -210,7 +209,7 @@ impl DataEntryStatus {
                     ))
                 } else {
                     Ok((
-                        Self::EntriesNotEqual(EntriesNotEqual {
+                        Self::EntriesDifferent(EntriesDifferent {
                             first_entry: state.finalised_first_entry,
                             second_entry: state.second_entry,
                         }),
@@ -241,7 +240,7 @@ impl DataEntryStatus {
                     finalised_first_entry,
                 },
             )),
-            DataEntryStatus::EntriesNotEqual(_) => Ok(DataEntryStatus::FirstEntryNotStarted),
+            DataEntryStatus::EntriesDifferent(_) => Ok(DataEntryStatus::FirstEntryNotStarted),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -252,7 +251,7 @@ impl DataEntryStatus {
         self,
         entry_number: EntryNumber,
     ) -> Result<(Self, PollingStationResults), DataEntryTransitionError> {
-        let DataEntryStatus::EntriesNotEqual(EntriesNotEqual {
+        let DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry,
             second_entry,
         }) = self
@@ -305,7 +304,7 @@ impl DataEntryStatus {
             DataEntryStatus::FirstEntryInProgress(state) => state.progress,
             DataEntryStatus::SecondEntryNotStarted(_) => 0,
             DataEntryStatus::SecondEntryInProgress(state) => state.progress,
-            DataEntryStatus::EntriesNotEqual(_) => 100,
+            DataEntryStatus::EntriesDifferent(_) => 100,
             DataEntryStatus::Definitive(_) => 100,
         }
     }
@@ -315,7 +314,7 @@ impl DataEntryStatus {
         match self {
             DataEntryStatus::FirstEntryInProgress(state) => Ok(&state.first_entry),
             DataEntryStatus::SecondEntryInProgress(state) => Ok(&state.second_entry),
-            DataEntryStatus::EntriesNotEqual(state) => Ok(&state.second_entry),
+            DataEntryStatus::EntriesDifferent(state) => Ok(&state.second_entry),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -336,7 +335,7 @@ impl DataEntryStatus {
             DataEntryStatus::FirstEntryInProgress(_) => DataEntryStatusName::FirstEntryInProgress,
             DataEntryStatus::SecondEntryNotStarted(_) => DataEntryStatusName::SecondEntryNotStarted,
             DataEntryStatus::SecondEntryInProgress(_) => DataEntryStatusName::SecondEntryInProgress,
-            DataEntryStatus::EntriesNotEqual(_) => DataEntryStatusName::EntriesNotEqual,
+            DataEntryStatus::EntriesDifferent(_) => DataEntryStatusName::EntriesDifferent,
             DataEntryStatus::Definitive(_) => DataEntryStatusName::Definitive,
         }
     }

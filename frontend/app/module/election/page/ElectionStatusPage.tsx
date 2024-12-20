@@ -32,10 +32,17 @@ import cls from "./ElectionStatusPage.module.css";
 
 interface PollingStationWithStatus extends PollingStation, ElectionStatusResponseEntry {}
 
-const statusCategories = ["in_progress", "first_entry_finished", "definitive", "not_started"] as const;
+const statusCategories = [
+  "errors_and_warnings",
+  "in_progress",
+  "first_entry_finished",
+  "definitive",
+  "not_started",
+] as const;
 type StatusCategory = (typeof statusCategories)[number];
 
 const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
+  errors_and_warnings: "errors-and-warnings",
   in_progress: "in-progress",
   first_entry_finished: "first-entry-finished",
   definitive: "definitive",
@@ -43,6 +50,7 @@ const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
 };
 
 const statusesForCategory: Record<StatusCategory, DataEntryStatusName[]> = {
+  errors_and_warnings: ["entries_different"],
   in_progress: ["first_entry_in_progress", "second_entry_in_progress"],
   first_entry_finished: ["second_entry_not_started"],
   definitive: ["definitive"],
@@ -79,8 +87,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
 }
 
 function getTableRowForCategory(category: StatusCategory, polling_station: PollingStationWithStatus): ReactNode {
-  // TODO: future `errors_and_warnings` status should be added to showBadge array
-  const showBadge: DataEntryStatusName[] = ["first_entry_in_progress", "second_entry_in_progress"];
+  const showBadge: DataEntryStatusName[] = ["first_entry_in_progress", "second_entry_in_progress", "entries_different"];
 
   function CategoryPollingStationRow({ children }: { children?: ReactNode[] }) {
     return (

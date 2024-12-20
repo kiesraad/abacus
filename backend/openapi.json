@@ -1159,12 +1159,12 @@
             ],
             "properties": {
               "state": {
-                "$ref": "#/components/schemas/EntriesNotEqual"
+                "$ref": "#/components/schemas/EntriesDifferent"
               },
               "status": {
                 "type": "string",
                 "enum": [
-                  "EntriesNotEqual"
+                  "EntriesDifferent"
                 ]
               }
             }
@@ -1196,7 +1196,7 @@
           "first_entry_in_progress",
           "second_entry_not_started",
           "second_entry_in_progress",
-          "entries_not_equal",
+          "entries_different",
           "definitive"
         ]
       },
@@ -1421,7 +1421,7 @@
           }
         }
       },
-      "EntriesNotEqual": {
+      "EntriesDifferent": {
         "type": "object",
         "required": [
           "first_entry",

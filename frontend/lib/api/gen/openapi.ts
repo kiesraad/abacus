@@ -142,7 +142,7 @@ export type DataEntryStatusName =
   | "first_entry_in_progress"
   | "second_entry_not_started"
   | "second_entry_in_progress"
-  | "entries_not_equal"
+  | "entries_different"
   | "definitive";
 
 export interface Definitive {
@@ -223,7 +223,7 @@ export interface ElectionStatusResponseEntry {
   status: DataEntryStatusName;
 }
 
-export interface EntriesNotEqual {
+export interface EntriesDifferent {
   first_entry: PollingStationResults;
   second_entry: PollingStationResults;
 }

@@ -1,10 +1,9 @@
 #![cfg(test)]
 
-use hyper::StatusCode;
-use sqlx::SqlitePool;
-
 use crate::utils::serve_api;
 use backend::election::{ElectionDetailsResponse, ElectionListResponse};
+use hyper::StatusCode;
+use sqlx::SqlitePool;
 
 mod utils;
 

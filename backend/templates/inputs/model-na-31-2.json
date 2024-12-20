@@ -549,7 +549,7 @@
       "number": 10,
       "number_of_voters": 123,
       "polling_station_type": "FixedLocation",
-      "address": "Teststraat van de lange staatnaam der straten van de straatnamen",
+      "address": "Teststraat van de lange straatnaam der straten van de straatnamen",
       "postal_code": "0123AB",
       "locality": "Heemdamseburg"
     }

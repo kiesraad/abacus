@@ -428,5 +428,9 @@ export const electionStatusMockResponse: ElectionStatusResponse = {
       id: 2,
       status: "definitive",
     },
+    {
+      id: 3,
+      status: "first_second_entry_different",
+    },
   ],
 };

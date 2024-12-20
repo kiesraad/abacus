@@ -190,14 +190,15 @@ SELECT
     WHEN de.polling_station_id IS NOT NULL THEN
         (CASE
            WHEN de.entry_number = 1 THEN
-             (CASE WHEN de.finalised_at IS NOT NULL THEN "SecondEntry" ELSE
+             (CASE WHEN de.finalised_at IS NOT NULL THEN 'SecondEntry' ELSE
                (CASE WHEN json_extract(de.client_state, '$.continue') = true
                  THEN 'FirstEntryInProgress'
                  ELSE 'FirstEntryUnfinished' END)
              END)
              
            WHEN de.entry_number = 2 THEN
-             (CASE WHEN json_extract(de.client_state, '$.continue') = true
+            (CASE WHEN finalised_at IS NOT NULL THEN 'FirstSecondEntryDifferent'
+                WHEN json_extract(de.client_state, '$.continue') = true
                 THEN 'SecondEntryInProgress'
                 ELSE 'SecondEntryUnfinished' END)
         END)
@@ -218,7 +219,6 @@ SELECT
   CASE
     WHEN de.polling_station_id IS NOT NULL THEN de.updated_at
     WHEN r.polling_station_id IS NOT NULL THEN r.created_at
-    ELSE NULL
     END AS "finished_at!: _"
 
 FROM polling_stations AS p

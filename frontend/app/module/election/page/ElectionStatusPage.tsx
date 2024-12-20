@@ -32,10 +32,18 @@ import cls from "./ElectionStatusPage.module.css";
 
 interface PollingStationWithStatus extends PollingStation, PollingStationStatusEntry {}
 
-const statusCategories = ["unfinished", "in_progress", "first_entry_finished", "definitive", "not_started"] as const;
+const statusCategories = [
+  "errors_and_warnings",
+  "unfinished",
+  "in_progress",
+  "first_entry_finished",
+  "definitive",
+  "not_started",
+] as const;
 type StatusCategory = (typeof statusCategories)[number];
 
 const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
+  errors_and_warnings: "errors-and-warnings",
   unfinished: "unfinished",
   in_progress: "in-progress",
   first_entry_finished: "first-entry-finished",
@@ -44,6 +52,7 @@ const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
 };
 
 const statusesForCategory: Record<StatusCategory, PollingStationStatus[]> = {
+  errors_and_warnings: ["first_second_entry_different"],
   unfinished: ["first_entry_unfinished", "second_entry_unfinished"],
   in_progress: ["first_entry_in_progress", "second_entry_in_progress"],
   first_entry_finished: ["second_entry"],
@@ -70,8 +79,6 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
   );
 
   switch (category) {
-    case "unfinished":
-      return <CategoryHeader />;
     case "in_progress":
       return <CategoryHeader>{[progressColumn]}</CategoryHeader>;
     case "first_entry_finished":
@@ -83,12 +90,12 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
 }
 
 function getTableRowForCategory(category: StatusCategory, polling_station: PollingStationWithStatus): ReactNode {
-  // TODO: future `errors_and_warnings` status should be added to showBadge array
   const showBadge: PollingStationStatus[] = [
     "first_entry_unfinished",
     "first_entry_in_progress",
     "second_entry_unfinished",
     "second_entry_in_progress",
+    "first_second_entry_different",
   ];
 
   function CategoryPollingStationRow({ children }: { children?: ReactNode[] }) {
@@ -120,8 +127,6 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
   );
   // TODO: Needs to be updated when user accounts are implemented
   switch (category) {
-    case "unfinished":
-      return <CategoryPollingStationRow key={polling_station.id} />;
     case "in_progress":
       return <CategoryPollingStationRow key={polling_station.id}>{[progressCell]}</CategoryPollingStationRow>;
     case "first_entry_finished":

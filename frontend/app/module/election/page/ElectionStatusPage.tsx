@@ -6,8 +6,8 @@ import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import {
+  DataEntryStatusName,
   PollingStation,
-  PollingStationStatus,
   PollingStationStatusEntry,
   useElection,
   useElectionStatus,
@@ -32,23 +32,21 @@ import cls from "./ElectionStatusPage.module.css";
 
 interface PollingStationWithStatus extends PollingStation, PollingStationStatusEntry {}
 
-const statusCategories = ["unfinished", "in_progress", "first_entry_finished", "definitive", "not_started"] as const;
+const statusCategories = ["in_progress", "first_entry_finished", "definitive", "not_started"] as const;
 type StatusCategory = (typeof statusCategories)[number];
 
 const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
-  unfinished: "unfinished",
   in_progress: "in-progress",
   first_entry_finished: "first-entry-finished",
   definitive: "definitive",
   not_started: "not-started",
 };
 
-const statusesForCategory: Record<StatusCategory, PollingStationStatus[]> = {
-  unfinished: ["first_entry_unfinished", "second_entry_unfinished"],
+const statusesForCategory: Record<StatusCategory, DataEntryStatusName[]> = {
   in_progress: ["first_entry_in_progress", "second_entry_in_progress"],
-  first_entry_finished: ["second_entry"],
+  first_entry_finished: ["second_entry_not_started"],
   definitive: ["definitive"],
-  not_started: ["not_started"],
+  not_started: ["first_entry_not_started"],
 };
 
 function getTableHeaderForCategory(category: StatusCategory): ReactNode {
@@ -170,7 +168,7 @@ export function ElectionStatusPage() {
   }
 
   const pollingStationsWithStatuses = pollingStations.map((ps) => {
-    const status = statuses.find((element) => element.id === ps.id);
+    const status = statuses.find((element) => element.polling_station_id === ps.id);
     return { ...ps, ...status } as PollingStationWithStatus;
   });
 

@@ -22,21 +22,21 @@ describe("ElectionStatusPage", () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         {
-          id: 1,
-          status: "not_started",
+          polling_station_id: 1,
+          status: "first_entry_not_started",
         },
         {
-          id: 2,
-          status: "second_entry",
+          polling_station_id: 2,
+          status: "second_entry_not_started",
           finished_at: new Date().getTime() / 1000,
         },
         {
-          id: 3,
-          status: "first_entry_unfinished",
+          polling_station_id: 3,
+          status: "first_entry_in_progress",
           data_entry_progress: 60,
         },
         {
-          id: 4,
+          polling_station_id: 4,
           status: "first_entry_in_progress",
           data_entry_progress: 40,
         },

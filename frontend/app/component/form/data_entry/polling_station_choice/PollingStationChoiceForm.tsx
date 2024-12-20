@@ -50,7 +50,9 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
     const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
-    const pollingStationStatus = electionStatus.statuses.find((status) => status.id === pollingStation?.id)?.status;
+    const pollingStationStatus = electionStatus.statuses.find(
+      (status) => status.polling_station_id === pollingStation?.id,
+    )?.status;
 
     if (pollingStationStatus === "definitive") {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
@@ -77,7 +79,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       ].includes(status.status),
     )
     .map((status) => ({
-      pollingStation: pollingStations.find((ps) => ps.id === status.id),
+      pollingStation: pollingStations.find((ps) => ps.id === status.polling_station_id),
       status: status.status,
     }));
 

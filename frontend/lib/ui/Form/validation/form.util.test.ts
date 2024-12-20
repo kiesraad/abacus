@@ -39,6 +39,7 @@ describe("Form Utils", () => {
     expect(isValid).toBe(true);
     expect(requestObject).toEqual({ name: "Polling station A", number: 17 });
   });
+
   test("Process form, validation errors", () => {
     type RequestObject = {
       name: string;
@@ -56,7 +57,7 @@ describe("Form Utils", () => {
 
     const numberInput = document.createElement("input");
     numberInput.name = "number";
-    numberInput.value = "abc";
+    numberInput.value = "1a";
 
     const { isValid, validationResult } = processForm<RequestObject>(fields, { name: nameInput, number: numberInput });
     expect(isValid).toBe(false);

@@ -151,9 +151,8 @@ describe("PollingStationForm", () => {
           ["Er bestaat al een stembureau met nummer 42.", "Het nummer van het stembureau moet uniek zijn."].join(""),
         );
       });
-      //TODO:
-      //this is being called, handleSubmit is called twice. but why?
-      //expect(onSaved).not.toHaveBeenCalled();
+
+      expect(onSaved).not.toHaveBeenCalled();
     });
   });
 

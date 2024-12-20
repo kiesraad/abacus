@@ -1,5 +1,4 @@
-//TODO: Refactor ValidationRules to FormProperties
-import { deformatNumber } from "@kiesraad/util";
+import { deformatNumber, parseIntStrict } from "@kiesraad/util";
 
 export type ValidationError =
   | "FORM_VALIDATION_RESULT_REQUIRED"
@@ -59,13 +58,17 @@ export function processForm<RequestObject>(
     }
 
     switch (field.type) {
-      case "number":
-        value = field.isFormatted ? deformatNumber(value) : parseInt(value);
-        if (isNaN(value)) {
+      case "number": {
+        const parsedValue = field.isFormatted ? deformatNumber(value) : parseIntStrict(value);
+        //parseIntStrict is used in deformatNumber as well, the result is a number or undefined.
+        if (parsedValue === undefined) {
           validationResult[fieldName] = "FORM_VALIDATION_RESULT_INVALID_NUMBER";
           continue;
+        } else {
+          value = parsedValue;
         }
         break;
+      }
       case "string":
       default:
         break;

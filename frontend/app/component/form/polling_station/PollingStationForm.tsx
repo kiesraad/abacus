@@ -69,7 +69,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
         <FormLayout.Alert>
           {requestState.error.reference === "EntryNotUnique" ? (
             <Alert type="error">
-              <h2 id="testt">
+              <h2>
                 {t("polling_station.form.not_unique.title", { number: formRef.current?.elements.number.value || "-1" })}
               </h2>
               <p>{t("polling_station.form.not_unique.description")}</p>

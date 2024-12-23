@@ -59,8 +59,8 @@ describe("DataEntryHomePage", () => {
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "definitive" },
-        { id: 2, status: "definitive" },
+        { polling_station_id: 1, status: "definitive" },
+        { polling_station_id: 2, status: "definitive" },
       ],
     });
 
@@ -70,8 +70,8 @@ describe("DataEntryHomePage", () => {
   test("Resume input visible when some are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "first_entry_in_progress" },
-        { id: 2, status: "first_entry_not_started" },
+        { polling_station_id: 1, status: "first_entry_in_progress" },
+        { polling_station_id: 2, status: "first_entry_not_started" },
       ],
     });
     renderDataEntryHomePage();
@@ -84,8 +84,8 @@ describe("DataEntryHomePage", () => {
   test("Resume input invisible when none are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "first_entry_not_started" },
-        { id: 2, status: "definitive" },
+        { polling_station_id: 1, status: "first_entry_not_started" },
+        { polling_station_id: 2, status: "definitive" },
       ],
     });
     renderDataEntryHomePage();

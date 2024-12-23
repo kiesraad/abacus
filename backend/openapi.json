@@ -4,7 +4,8 @@
     "title": "backend",
     "description": "",
     "license": {
-      "name": "EUPL-1.2"
+      "name": "EUPL-1.2",
+      "identifier": "EUPL-1.2"
     },
     "version": "0.1.0"
   },
@@ -1531,6 +1532,7 @@
           "second_entry",
           "second_entry_in_progress",
           "second_entry_unfinished",
+          "first_second_entry_different",
           "definitive"
         ]
       },

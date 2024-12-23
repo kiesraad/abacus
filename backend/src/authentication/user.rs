@@ -102,7 +102,7 @@ impl Users {
         Ok(user)
     }
 
-    /// Create a new user, save a Argon2id v19 hash of the password
+    /// Create a new user, save an Argon2id v19 hash of the password
     #[allow(unused)]
     pub async fn create(
         &self,

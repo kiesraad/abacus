@@ -224,7 +224,7 @@ Is bij alle afzonderlijke stembureaus het aantal uitgebrachte stemmen en het aan
 
 #pagebreak(weak: true)
 
-= Nieuwe telling aantal toeglaten kiezers bij overklaarde verschillen
+= Nieuwe telling aantal toegelaten kiezers bij onverklaarde verschillen
 
 Voor de stembureaus met de nummers #text_input(value: input.summary.recounted_polling_stations.map(str).join(", "), empty_width: 300pt) heeft het #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 een nieuwe telling uitgevoerd van het aantal toegelaten kiezers, omdat er sprake was van een onverklaard verschil tussen

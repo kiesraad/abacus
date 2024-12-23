@@ -130,7 +130,7 @@ export class ApiClient {
     );
   }
 
-  // perform a HTTP request and handle the response
+  // perform an HTTP request and handle the response
   async request<T>(
     method: RequestMethod,
     path: string,

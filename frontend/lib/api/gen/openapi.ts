@@ -275,10 +275,10 @@ export interface FirstEntryInProgress {
  */
 export interface GetDataEntryResponse {
   client_state: unknown;
-  data?: unknown;
+  data: PollingStationResults;
   progress: number;
   updated_at: string;
-  validation_results?: unknown;
+  validation_results: ValidationResults;
 }
 
 export interface LoginResponse {

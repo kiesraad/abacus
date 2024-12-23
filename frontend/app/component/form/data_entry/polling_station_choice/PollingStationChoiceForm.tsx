@@ -90,7 +90,6 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
             <h2>{t("polling_station_choice.unfinished_input_title")}</h2>
             <p>{t("polling_station_choice.unfinished_input_content")}</p>
             {unfinished.map(({ pollingStation, status }) => {
-              console.log(pollingStation, status);
               return pollingStation === undefined ? null : (
                 <PollingStationLink key={pollingStation.id} pollingStation={pollingStation} status={status} />
               );

@@ -26,9 +26,11 @@ mod validation;
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct GetDataEntryResponse {
     pub progress: u8,
+    #[schema(value_type = PollingStationResults)]
     pub data: Option<PollingStationResults>,
     #[schema(value_type = Object)]
     pub client_state: Option<serde_json::Value>,
+    #[schema(value_type = ValidationResults)]
     pub validation_results: Option<ValidationResults>,
     #[schema(value_type = String)]
     pub updated_at: DateTime<Utc>,

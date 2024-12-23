@@ -211,19 +211,28 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
 
     // check that the data entry is the same
     let get_response: GetDataEntryResponse = response.json().await.unwrap();
-    assert_eq!(get_response.data.unwrap(), request_body.data);
+    assert_eq!(get_response.data, request_body.data);
     assert_eq!(
         get_response.client_state.as_ref(),
         request_body.client_state.as_ref()
     );
     assert_eq!(
-        get_response.validation_results.unwrap(),
+        get_response.validation_results,
         save_response.validation_results
     );
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            tracing_subscriber::EnvFilter::builder()
+                .with_default_directive(tracing::level_filters::LevelFilter::INFO.into())
+                .from_env()
+                .unwrap(),
+        )
+        .init();
+
     let addr = serve_api(pool.clone()).await;
     shared::create_and_finalise_data_entry(&addr, 1, 1).await;
 

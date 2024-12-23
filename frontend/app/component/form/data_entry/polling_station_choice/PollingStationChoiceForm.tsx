@@ -71,14 +71,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   };
 
   const unfinished = electionStatus.statuses
-    .filter((status) =>
-      [
-        "first_entry_unfinished",
-        "first_entry_in_progress",
-        "second_entry_unfinished",
-        "second_entry_in_progress",
-      ].includes(status.status),
-    )
+    .filter((status) => ["first_entry_in_progress", "second_entry_in_progress"].includes(status.status))
     .map((status) => ({
       pollingStation: pollingStations.find((ps) => ps.id === status.polling_station_id),
       status: status.status,
@@ -97,6 +90,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
             <h2>{t("polling_station_choice.unfinished_input_title")}</h2>
             <p>{t("polling_station_choice.unfinished_input_content")}</p>
             {unfinished.map(({ pollingStation, status }) => {
+              console.log(pollingStation, status);
               return pollingStation === undefined ? null : (
                 <PollingStationLink key={pollingStation.id} pollingStation={pollingStation} status={status} />
               );

@@ -36,6 +36,7 @@
   border: 2px solid var(--base-white);
   display: inline-flex;
   gap: 0.5rem;
+  min-width: fit-content;
   max-width: fit-content;
   align-items: center;
 }

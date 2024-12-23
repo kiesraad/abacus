@@ -61,7 +61,6 @@ The following dependencies (crates) are used:
 - `sqlx`: async SQL library featuring compile-time checked queries.
 - `tokio`: runtime for writing asynchronous applications.
 - `tower`: a library of modular and reusable components for building robust networking clients and servers.
-- `tower-http`: Tower middleware and utilities for HTTP clients and servers.
 - `tracing`: a framework for instrumenting Rust programs to collect structured, event-based diagnostic information.
 - `tracing-subscriber`: utilities for implementing and composing `tracing` subscribers.
 - `typst`: a new markup-based typesetting system that is powerful and easy to learn.

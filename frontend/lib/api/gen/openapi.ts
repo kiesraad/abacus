@@ -373,12 +373,14 @@ export interface SaveDataEntryResponse {
 export interface SecondEntryInProgress {
   client_state: unknown;
   finalised_first_entry: PollingStationResults;
+  first_entry_finished_at: string;
   progress: number;
   second_entry: PollingStationResults;
 }
 
 export interface SecondEntryNotStarted {
   finalised_first_entry: PollingStationResults;
+  first_entry_finished_at: string;
 }
 
 export interface ValidationResult {

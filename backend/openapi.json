@@ -1798,6 +1798,7 @@
         "type": "object",
         "required": [
           "finalised_first_entry",
+          "first_entry_finished_at",
           "progress",
           "second_entry",
           "client_state"
@@ -1810,6 +1811,10 @@
           "finalised_first_entry": {
             "$ref": "#/components/schemas/PollingStationResults",
             "description": "Data entry for a polling station"
+          },
+          "first_entry_finished_at": {
+            "type": "string",
+            "description": "When the first entry was finalised"
           },
           "progress": {
             "type": "integer",
@@ -1827,12 +1832,16 @@
       "SecondEntryNotStarted": {
         "type": "object",
         "required": [
-          "finalised_first_entry"
+          "finalised_first_entry",
+          "first_entry_finished_at"
         ],
         "properties": {
           "finalised_first_entry": {
             "$ref": "#/components/schemas/PollingStationResults",
             "description": "Data entry for a polling station"
+          },
+          "first_entry_finished_at": {
+            "type": "string"
           }
         }
       },

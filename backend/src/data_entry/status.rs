@@ -87,12 +87,17 @@ impl ClientState {
 pub struct SecondEntryNotStarted {
     /// Data entry for a polling station
     pub finalised_first_entry: PollingStationResults,
+    #[schema(value_type = String)]
+    pub first_entry_finished_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
 pub struct SecondEntryInProgress {
     /// Data entry for a polling station
     pub finalised_first_entry: PollingStationResults,
+    /// When the first entry was finalised
+    #[schema(value_type = String)]
+    pub first_entry_finished_at: DateTime<Utc>,
     /// Data entry progress between 0 and 100
     #[schema(maximum = 100)]
     pub progress: u8,
@@ -149,6 +154,7 @@ impl DataEntryStatus {
             DataEntryStatus::SecondEntryNotStarted(state) => {
                 Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
                     finalised_first_entry: state.finalised_first_entry,
+                    first_entry_finished_at: state.first_entry_finished_at,
                     progress,
                     second_entry: entry,
                     client_state,
@@ -190,9 +196,11 @@ impl DataEntryStatus {
         match self {
             DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
+                first_entry_finished_at,
                 ..
             }) => Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
+                first_entry_finished_at,
                 progress,
                 second_entry: entry,
                 client_state,
@@ -221,6 +229,7 @@ impl DataEntryStatus {
 
                 Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
                     finalised_first_entry: state.first_entry,
+                    first_entry_finished_at: Utc::now(),
                 }))
             }
             _ => Err(DataEntryTransitionError::Invalid),
@@ -280,10 +289,12 @@ impl DataEntryStatus {
         match self {
             DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
+                first_entry_finished_at,
                 ..
             }) => Ok(DataEntryStatus::SecondEntryNotStarted(
                 SecondEntryNotStarted {
                     finalised_first_entry,
+                    first_entry_finished_at,
                 },
             )),
             DataEntryStatus::EntriesDifferent(_) => Ok(DataEntryStatus::FirstEntryNotStarted),
@@ -397,6 +408,14 @@ impl DataEntryStatus {
     /// Returns the timestamp at which point this data entry process was made definitive
     pub fn finished_at(&self) -> Option<&DateTime<Utc>> {
         match self {
+            DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
+                first_entry_finished_at,
+                ..
+            }) => Some(first_entry_finished_at),
+            DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+                first_entry_finished_at,
+                ..
+            }) => Some(first_entry_finished_at),
             DataEntryStatus::Definitive(Definitive { finished_at }) => Some(finished_at),
             _ => None,
         }

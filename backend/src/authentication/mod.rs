@@ -18,7 +18,7 @@ mod util;
 
 pub use error::AuthenticationError;
 
-/// Session life time, for both cookie and database
+/// Session lifetime, for both cookie and database
 pub const SESSION_LIFE_TIME: Duration = Duration::from_secs(60 * 60 * 2); // 2 hours
 
 /// Session cookie name

@@ -70,19 +70,21 @@ pub fn apportionment_wip(seats: u64, totals: &ElectionSummary) {
 
     println!("===========================");
 
-    // TODO: Add check for absolute majority of votes vs seats and adjust last remaining seat accordingly
+    // TODO: Add check for absolute majority of votes vs seats and adjust last remaining seat assigned accordingly
     if let Some(idx) = idx_last_remaining_seat {
         println!("Last remaining seat given to idx: {}", idx);
+        let half_of_votes_count = totals.votes_counts.votes_candidates_count as f64 / 2.0;
+        println!("Half of votes count: {}", half_of_votes_count);
         let absolute_majority_votes_count: u32 =
-            if let 0 = totals.votes_counts.votes_candidates_count % 2 {
+            if totals.votes_counts.votes_candidates_count % 2 == 0 {
                 // with an even number of valid votes on candidates: 50% + 1
-                ((totals.votes_counts.votes_candidates_count / 2) as f64 + 1.0) as u32
+                (half_of_votes_count + 1.0) as u32
             } else {
                 // with an uneven number of valid votes on candidates: 50% + ½
-                ((totals.votes_counts.votes_candidates_count / 2) as f64 + 0.5) as u32
+                (half_of_votes_count + 0.5) as u32
             };
         println!(
-            "Absolute majority cotes count: {}",
+            "Absolute majority votes count: {}",
             absolute_majority_votes_count
         )
     }
@@ -140,26 +142,30 @@ mod tests {
         // TODO: Find an election result to trigger Kieswet Article P9
         let totals = ElectionSummary {
             voters_counts: VotersCounts {
-                poll_card_count: 1200,
+                poll_card_count: 15001,
                 proxy_certificate_count: 0,
                 voter_card_count: 0,
-                total_admitted_voters_count: 1200,
+                total_admitted_voters_count: 15001,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 1200,
+                votes_candidates_count: 15001,
                 blank_votes_count: 0,
                 invalid_votes_count: 0,
-                total_votes_cast_count: 1200,
+                total_votes_cast_count: 15001,
             },
             differences_counts: SummaryDifferencesCounts::zero(),
             recounted_polling_stations: vec![],
             political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, 601, &[]),
-                PoliticalGroupVotes::from_test_data_auto(2, 300, &[]),
-                PoliticalGroupVotes::from_test_data_auto(3, 299, &[]),
+                PoliticalGroupVotes::from_test_data_auto(1, 7501, &[]),
+                PoliticalGroupVotes::from_test_data_auto(2, 1250, &[]),
+                PoliticalGroupVotes::from_test_data_auto(3, 1250, &[]),
+                PoliticalGroupVotes::from_test_data_auto(4, 1250, &[]),
+                PoliticalGroupVotes::from_test_data_auto(5, 1250, &[]),
+                PoliticalGroupVotes::from_test_data_auto(6, 1250, &[]),
+                PoliticalGroupVotes::from_test_data_auto(7, 1250, &[]),
             ],
         };
 
-        apportionment_wip(27, &totals);
+        apportionment_wip(23, &totals);
     }
 }

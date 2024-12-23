@@ -1,6 +1,6 @@
 # Wie mag waarvoor stemmen?
 
-Doel van dit document is een overzicht te hebben waar stemmen vandaag komen voor de verschillende verkiezingen. Het is dus niet bedoeld om juridisch volledig dekkend te zijn.
+Doel van dit document is een overzicht te hebben waar stemmen vandaan komen voor de verschillende verkiezingen. Het is dus niet bedoeld om juridisch volledig dekkend te zijn.
 
 Voor alle verkiezingen geldt dat iemand 18 jaar of ouder moet zijn en niet uitgesloten van kiesrecht.
 

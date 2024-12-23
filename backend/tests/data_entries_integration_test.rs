@@ -211,13 +211,13 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
 
     // check that the data entry is the same
     let get_response: GetDataEntryResponse = response.json().await.unwrap();
-    assert_eq!(get_response.data, request_body.data);
+    assert_eq!(get_response.data.unwrap(), request_body.data);
     assert_eq!(
         get_response.client_state.as_ref(),
         request_body.client_state.as_ref()
     );
     assert_eq!(
-        get_response.validation_results,
+        get_response.validation_results.unwrap(),
         save_response.validation_results
     );
 }
@@ -257,9 +257,9 @@ async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     let response = delete_data_entry(addr).await;
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
-    // delete a non-existing data entry
+    // we should not be allowed to delete the entry again
     let response = delete_data_entry(addr).await;
-    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
@@ -354,7 +354,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[0].second_data_entry_progress, Some(60));
     assert_eq!(
         statuses[1].status,
-        DataEntryStatusName::FirstEntryNotStarted
+        DataEntryStatusName::FirstEntryInProgress
     );
     assert_eq!(statuses[1].first_data_entry_progress, Some(60));
 
@@ -373,7 +373,7 @@ async fn test_election_details_status(pool: SqlitePool) {
             .find(|ps| ps.polling_station_id == 1)
             .unwrap()
             .status,
-        DataEntryStatusName::SecondEntryNotStarted
+        DataEntryStatusName::SecondEntryInProgress
     );
 
     // polling station 2 should now be definitive

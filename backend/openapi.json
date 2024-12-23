@@ -1514,9 +1514,7 @@
         "description": "Response structure for getting data entry of polling station results",
         "required": [
           "progress",
-          "data",
           "client_state",
-          "validation_results",
           "updated_at"
         ],
         "properties": {
@@ -1524,7 +1522,14 @@
             "type": "object"
           },
           "data": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PollingStationResults"
+              }
+            ]
           },
           "progress": {
             "type": "integer",
@@ -1535,7 +1540,14 @@
             "type": "string"
           },
           "validation_results": {
-            "$ref": "#/components/schemas/ValidationResults"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ValidationResults"
+              }
+            ]
           }
         }
       },

@@ -33,15 +33,12 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route(
             "/:entry_number",
             get(data_entry::polling_station_data_entry_get)
-                .post(data_entry::polling_station_data_entry_save),
+                .post(data_entry::polling_station_data_entry_save)
+                .delete(data_entry::polling_station_data_entry_delete),
         )
         .route(
             "/:entry_number/finalise",
             post(data_entry::polling_station_data_entry_finalise),
-        )
-        .route(
-            "/:entry_number/delete",
-            post(data_entry::polling_station_data_entry_delete),
         );
 
     let polling_station_routes = Router::new().route(

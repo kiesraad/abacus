@@ -26,10 +26,10 @@ mod validation;
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct GetDataEntryResponse {
     pub progress: u8,
-    pub data: PollingStationResults,
+    pub data: Option<PollingStationResults>,
     #[schema(value_type = Object)]
     pub client_state: Option<serde_json::Value>,
-    pub validation_results: ValidationResults,
+    pub validation_results: Option<ValidationResults>,
     #[schema(value_type = String)]
     pub updated_at: DateTime<Utc>,
 }
@@ -58,13 +58,22 @@ pub async fn polling_station_data_entry_get(
     let election = elections.get(polling_station.election_id).await?;
     let ps_entry = polling_station_data_entries.get_row(id).await?;
 
-    let data = ps_entry.state.get_data()?.clone();
+    let data = ps_entry.state.get_data().ok();
     let client_state = ps_entry.state.get_client_state().map(|v| v.to_owned());
 
-    let validation_results = validate_polling_station_results(&data, &polling_station, &election)?;
+    let validation_results = if let Some(d) = data {
+        Some(validate_polling_station_results(
+            d,
+            &polling_station,
+            &election,
+        )?)
+    } else {
+        None
+    };
+
     Ok(Json(GetDataEntryResponse {
         progress: ps_entry.state.get_progress(),
-        data,
+        data: data.cloned(),
         client_state,
         validation_results,
         updated_at: ps_entry.updated_at,

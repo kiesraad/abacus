@@ -32,7 +32,8 @@
   "type": {
     "FixedLocation": "Vaste locatie",
     "Special": "Bijzonder",
-    "Mobile": "Mobiel"
+    "Mobile": "Mobiel",
+    "Unknown": "Onbekend"
   },
   "unsaved_changes_title": "Let op: niet opgeslagen wijzigingen",
   "unsaved_changes_message": "Je hebt in <strong>{name}</strong> wijzigingen gemaakt die nog niet zijn opgeslagen.",

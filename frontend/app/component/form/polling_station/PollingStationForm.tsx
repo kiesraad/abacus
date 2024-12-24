@@ -22,11 +22,11 @@ interface Form extends HTMLFormElement {
 const formFields: FormFields<PollingStationRequest> = {
   number: { required: true, type: "number" },
   name: { required: true, type: "string" },
-  locality: { type: "string" },
+  polling_station_type: { type: "string", mapUndefined: true },
   number_of_voters: { type: "number", isFormatted: true },
-  polling_station_type: { type: "string" },
-  postal_code: { type: "string" },
   address: { type: "string" },
+  postal_code: { type: "string" },
+  locality: { type: "string" },
 };
 
 export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
@@ -132,6 +132,13 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                   defaultValue={"Mobile"}
                   defaultChecked={pollingStation?.polling_station_type === "Mobile"}
                   label={t("polling_station.type.Mobile")}
+                />
+                <ChoiceList.Radio
+                  id={`polling_station_type-Undefined`}
+                  name={"polling_station_type"}
+                  defaultValue={"Undefined"}
+                  defaultChecked={pollingStation?.polling_station_type === undefined}
+                  label={t("polling_station.type.Unknown")}
                 />
               </ChoiceList>
             </FormLayout.Field>

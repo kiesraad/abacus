@@ -18,6 +18,14 @@ export type FormFieldString = FormFieldBase & {
   type: "string";
   minLength?: number;
   maxLength?: number;
+  mapUndefined?: false;
+};
+
+export type FormFieldStringUndefined = FormFieldBase & {
+  type: "string";
+  minLength?: number;
+  maxLength?: number;
+  mapUndefined: true;
 };
 
 export type FormFieldNumber = FormFieldBase & {
@@ -31,9 +39,11 @@ type FieldValue<F extends AnyFormField> = F extends FormFieldNumber
   ? number
   : F extends FormFieldString
     ? string
-    : never;
+    : F extends FormFieldStringUndefined
+      ? string | undefined
+      : never;
 
-export type AnyFormField = FormFieldNumber | FormFieldString;
+export type AnyFormField = FormFieldNumber | FormFieldString | FormFieldStringUndefined;
 
 export type FormFields<T> = Record<keyof T, AnyFormField>;
 export type ValidationResult<T> = Record<keyof T, ValidationError | undefined>;
@@ -50,9 +60,7 @@ export function processForm<RequestObject>(
     const input = elements[fieldName];
     let value: FieldValue<AnyFormField> = input.value.trim();
 
-    if (!field.required && value === "") {
-      continue;
-    } else if (field.required && value === "") {
+    if (field.required && value === "") {
       validationResult[fieldName] = "FORM_VALIDATION_RESULT_REQUIRED";
       continue;
     }
@@ -70,6 +78,10 @@ export function processForm<RequestObject>(
         break;
       }
       case "string":
+        if (field.mapUndefined && value === "Undefined") {
+          value = undefined;
+        }
+        break;
       default:
         break;
     }
@@ -81,7 +93,6 @@ export function processForm<RequestObject>(
       requestObject[fieldName] = value as RequestObject[typeof fieldName];
     }
   }
-
   const isEmpty = Object.values(validationResult).every((value) => value === undefined);
   return { requestObject, validationResult, isValid: isEmpty };
 }
@@ -96,6 +107,8 @@ export function validateFormValue(field: AnyFormField, value: string | number | 
         if (field.maxLength && value.length > field.maxLength) {
           return "FORM_VALIDATION_RESULT_MAX_LENGTH";
         }
+      } else if (field.mapUndefined && value === undefined) {
+        return null;
       } else {
         return "FORM_VALIDATION_RESULT_INVALID_TYPE";
       }

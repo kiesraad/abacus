@@ -79,7 +79,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
           )}
         </FormLayout.Alert>
       )}
-      <Form onSubmit={handleSubmit} id="polling-station-form" ref={formRef} noValidate>
+      <Form onSubmit={handleSubmit} id="polling-station-form" ref={formRef}>
         <FormLayout disabled={requestState.status === "loading"}>
           <FormLayout.Section title={t("general_details")}>
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />
@@ -92,7 +92,6 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 label={t("number")}
                 fieldWidth="narrow"
                 defaultValue={pollingStation?.number}
-                pattern="[0-9]*"
                 error={validationResult.number ? t(`form.errors.${validationResult.number}`) : undefined}
                 hideErrorMessage={requestState.status === "api-error"}
               />

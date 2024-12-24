@@ -7,7 +7,7 @@ Daarnaast is het belangrijk om het tempo in de feedback-loop te houden. Sync rev
 
 ## Schrijven van een PR
 
-- Wat is de scope van de wijzigingen? (voeg eventueel screenhots toe)
+- Wat is de scope van de wijzigingen? (voeg eventueel screenshots toe)
 - Wat heb je getest? Met welke edge cases heb je expliciet rekening gehouden?
 - Zijn er specifieke punten waarvan je wil dat de reviewers er zeker naar kijken?
 - Zijn er specifieke mensen van wie je een review wil vanwege hun specialisatie?

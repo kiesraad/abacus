@@ -207,7 +207,7 @@ pub async fn election_download_zip_results(
     let mut zip = zip::ZipWriter::new(&mut cursor);
     let options = SimpleFileOptions::default()
         .compression_method(zip::CompressionMethod::DEFLATE)
-        // zip file format does not support dates beyond 2107 or inserted leap (i.e. 61th) second
+        // zip file format does not support dates beyond 2107 or inserted leap (i.e. 61st) second
         .last_modified_time(
             chrono::Local::now()
                 .naive_local()

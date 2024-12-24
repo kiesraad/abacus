@@ -43,10 +43,8 @@ async fn test_polling_station_creation(pool: SqlitePool) {
             name: "New Polling Station".to_string(),
             number: 5,
             number_of_voters: Some(426),
-            polling_station_type: PollingStationType::FixedLocation,
-            street: "Teststraat".to_string(),
-            house_number: "3".to_string(),
-            house_number_addition: None,
+            polling_station_type: Some(PollingStationType::FixedLocation),
+            address: "Teststraat 2a".to_string(),
             postal_code: "1234 QY".to_string(),
             locality: "Heemdamseburg".to_string(),
         })
@@ -62,7 +60,10 @@ async fn test_polling_station_creation(pool: SqlitePool) {
     println!("response body: {:?}", &body);
     assert_eq!(body.election_id, election_id);
     assert_eq!(body.name, "New Polling Station");
-    assert_eq!(body.polling_station_type, PollingStationType::FixedLocation);
+    assert_eq!(
+        body.polling_station_type,
+        Some(PollingStationType::FixedLocation)
+    );
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
@@ -80,7 +81,7 @@ async fn test_polling_station_get(pool: SqlitePool) {
     println!("response body: {:?}", &body);
     assert_eq!(body.election_id, 1);
     assert_eq!(body.name, "Testplek");
-    assert_eq!(body.polling_station_type, PollingStationType::Special);
+    assert_eq!(body.polling_station_type, Some(PollingStationType::Special));
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
@@ -94,10 +95,8 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
             name: "Testverandering".to_string(),
             number: 34,
             number_of_voters: Some(2000),
-            polling_station_type: PollingStationType::Special,
-            street: "Teststraat".to_string(),
-            house_number: "2".to_string(),
-            house_number_addition: Some("bis".to_string()),
+            polling_station_type: Some(PollingStationType::Special),
+            address: "Teststraat 2a".to_string(),
             postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         })
@@ -118,8 +117,43 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
 
     let updated_body: PollingStation = updated.json().await.unwrap();
     assert_eq!(updated_body.name, "Testverandering");
-    assert_eq!(updated_body.street, "Teststraat");
-    assert_eq!(updated_body.house_number_addition, Some("bis".to_string()));
+    assert_eq!(updated_body.address, "Teststraat 2a");
+}
+
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let url = format!("http://{addr}/api/polling_stations/2");
+
+    let response = reqwest::Client::new()
+        .put(&url)
+        .json(&PollingStationRequest {
+            name: "Testverandering".to_string(),
+            number: 34,
+            number_of_voters: Some(2000),
+            polling_station_type: None,
+            address: "Teststraat 2a".to_string(),
+            postal_code: "1234 QY".to_string(),
+            locality: "Testdorp".to_string(),
+        })
+        .send()
+        .await
+        .unwrap();
+
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK, "Unexpected response status");
+
+    let updated = reqwest::Client::new().get(&url).send().await.unwrap();
+
+    assert_eq!(
+        updated.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
+
+    let updated_body: PollingStation = updated.json().await.unwrap();
+    assert_eq!(updated_body.name, "Testverandering");
+    assert_eq!(updated_body.polling_station_type, None);
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
@@ -133,10 +167,8 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
             name: "Testverandering".to_string(),
             number: 34,
             number_of_voters: Some(2000),
-            polling_station_type: PollingStationType::Special,
-            street: "Teststraat".to_string(),
-            house_number: "2".to_string(),
-            house_number_addition: Some("bis".to_string()),
+            polling_station_type: Some(PollingStationType::Special),
+            address: "Teststraat 2a".to_string(),
             postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         })
@@ -230,10 +262,8 @@ async fn test_polling_station_non_unique(pool: SqlitePool) {
             name: "New Polling Station".to_string(),
             number: 33,
             number_of_voters: None,
-            polling_station_type: PollingStationType::FixedLocation,
-            street: "Teststraat".to_string(),
-            house_number: "3".to_string(),
-            house_number_addition: None,
+            polling_station_type: Some(PollingStationType::FixedLocation),
+            address: "Teststraat 2a".to_string(),
             postal_code: "1234 QY".to_string(),
             locality: "Heemdamseburg".to_string(),
         })

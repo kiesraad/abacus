@@ -14,7 +14,7 @@ export function useRecounted(getValues: () => RecountedValue) {
       setTemporaryCache(null);
       return data;
     }
-    return { recounted: values?.recounted };
+    return { recounted: values.recounted };
   }, [values, setTemporaryCache, cache]);
 
   const errors = React.useMemo(() => {

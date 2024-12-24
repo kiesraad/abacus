@@ -52,7 +52,7 @@ pub async fn polling_station_data_entry_get(
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
-    Path((id, _entry_number)): Path<(u32, EntryNumber)>, // note: we don't need the entry number here
+    Path((id, _entry_number)): Path<(u32, EntryNumber)>, // TODO: remove this when implementing #762
 ) -> Result<Json<GetDataEntryResponse>, APIError> {
     let polling_station = polling_stations.get(id).await?;
     let election = elections.get(polling_station.election_id).await?;

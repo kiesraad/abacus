@@ -1,8 +1,21 @@
+use crate::data_entry::status::DataEntryStatus;
 use crate::error::ErrorReference;
 use crate::APIError;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::types::Json;
+use sqlx::FromRow;
 use std::ops::AddAssign;
 use utoipa::ToSchema;
+
+#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Default)]
+pub struct PollingStationDataEntry {
+    pub polling_station_id: u32,
+    #[schema(value_type = DataEntryStatus)]
+    pub state: Json<DataEntryStatus>,
+    #[schema(value_type = String)]
+    pub updated_at: DateTime<Utc>,
+}
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PollingStationResultsEntry {
@@ -18,8 +31,7 @@ pub struct PollingStationResultsEntry {
 /// Bijlage 2: uitkomsten per stembureau" from the
 /// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
 /// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(test, derive(Default))]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct PollingStationResults {
     /// Recounted ("Is er herteld? - See form for official long description of the checkbox")
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,8 +62,7 @@ impl PollingStationResults {
 pub type Count = u32;
 
 /// Voters counts, part of the polling station results.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(test, derive(Default))]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct VotersCounts {
     /// Number of valid poll cards ("Aantal geldige stempassen")
     #[schema(value_type = u32)]
@@ -77,8 +88,7 @@ impl AddAssign<&VotersCounts> for VotersCounts {
 }
 
 /// Votes counts, part of the polling station results.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(test, derive(Default))]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct VotesCounts {
     /// Number of valid votes on candidates
     /// ("Aantal stembiljetten met een geldige stem op een kandidaat")
@@ -105,8 +115,7 @@ impl AddAssign<&VotesCounts> for VotesCounts {
 }
 
 /// Differences counts, part of the polling station results.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(test, derive(Default))]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct DifferencesCounts {
     /// Number of more counted ballots ("Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?")
     #[schema(value_type = u32)]
@@ -146,8 +155,7 @@ impl DifferencesCounts {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(test, derive(Default))]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct PoliticalGroupVotes {
     pub number: u8,
     #[schema(value_type = u32)]

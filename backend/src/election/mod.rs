@@ -15,7 +15,7 @@ use crate::eml::{eml_document_hash, EMLDocument, EML510};
 use crate::pdf_gen::generate_pdf;
 use crate::pdf_gen::models::{ModelNa31_2Input, PdfModel};
 use crate::polling_station::repository::PollingStations;
-use crate::polling_station::structs::{PollingStation, PollingStationStatusEntry};
+use crate::polling_station::structs::PollingStation;
 use crate::summary::ElectionSummary;
 use crate::{APIError, ErrorResponse};
 
@@ -35,12 +35,6 @@ pub struct ElectionListResponse {
 pub struct ElectionDetailsResponse {
     pub election: Election,
     pub polling_stations: Vec<PollingStation>,
-}
-
-/// Election polling stations data entry statuses response
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct ElectionStatusResponse {
-    pub statuses: Vec<PollingStationStatusEntry>,
 }
 
 /// Get a list of all elections, without their candidate lists
@@ -83,27 +77,6 @@ pub async fn election_details(
         election,
         polling_stations,
     }))
-}
-
-/// Get election polling stations data entry statuses
-#[utoipa::path(
-    get,
-    path = "/api/elections/{election_id}/status",
-    responses(
-        (status = 200, description = "Election", body = ElectionStatusResponse),
-        (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("election_id" = u32, description = "Election database id"),
-    ),
-)]
-pub async fn election_status(
-    State(polling_station_repo): State<PollingStations>,
-    Path(id): Path<u32>,
-) -> Result<Json<ElectionStatusResponse>, APIError> {
-    let statuses = polling_station_repo.status(id).await?;
-    Ok(Json(ElectionStatusResponse { statuses }))
 }
 
 struct ResultsInput {

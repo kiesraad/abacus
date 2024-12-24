@@ -59,8 +59,8 @@ describe("DataEntryHomePage", () => {
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "definitive" },
-        { id: 2, status: "definitive" },
+        { polling_station_id: 1, status: "definitive" },
+        { polling_station_id: 2, status: "definitive" },
       ],
     });
 
@@ -70,8 +70,8 @@ describe("DataEntryHomePage", () => {
   test("Resume input visible when some are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "first_entry_unfinished" },
-        { id: 2, status: "not_started" },
+        { polling_station_id: 1, status: "first_entry_in_progress" },
+        { polling_station_id: 2, status: "first_entry_not_started" },
       ],
     });
     renderDataEntryHomePage();
@@ -84,8 +84,8 @@ describe("DataEntryHomePage", () => {
   test("Resume input invisible when none are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "not_started" },
-        { id: 2, status: "definitive" },
+        { polling_station_id: 1, status: "first_entry_not_started" },
+        { polling_station_id: 2, status: "definitive" },
       ],
     });
     renderDataEntryHomePage();
@@ -97,8 +97,8 @@ describe("DataEntryHomePage", () => {
   test("Rerender re-fetches election status", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "not_started" },
-        { id: 2, status: "not_started" },
+        { polling_station_id: 1, status: "first_entry_not_started" },
+        { polling_station_id: 2, status: "first_entry_not_started" },
       ],
     } satisfies ElectionStatusResponse);
 
@@ -124,8 +124,8 @@ describe("DataEntryHomePage", () => {
     // new status is that all polling stations are definitive, so the alert should be visible
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "definitive" },
-        { id: 2, status: "definitive" },
+        { polling_station_id: 1, status: "definitive" },
+        { polling_station_id: 2, status: "definitive" },
       ],
     } satisfies ElectionStatusResponse);
 

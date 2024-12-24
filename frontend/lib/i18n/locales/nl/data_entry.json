@@ -24,6 +24,6 @@
   },
   "first_entry": "1e invoer",
   "second_entry": "2e invoer",
-  "first_second_entry_different": "Verschil invoer 1 en 2",
+  "entries_different": "Verschil invoer 1 en 2",
   "definitive": "Definitief"
 }

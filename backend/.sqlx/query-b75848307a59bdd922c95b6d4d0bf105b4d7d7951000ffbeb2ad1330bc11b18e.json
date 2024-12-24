@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO polling_station_results (polling_station_id, data) VALUES ($1, $2)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "b75848307a59bdd922c95b6d4d0bf105b4d7d7951000ffbeb2ad1330bc11b18e"
+}

@@ -22,23 +22,23 @@ describe("ElectionStatusPage", () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         {
-          id: 1,
-          status: "not_started",
+          polling_station_id: 1,
+          status: "first_entry_not_started",
         },
         {
-          id: 2,
-          status: "second_entry",
-          finished_at: new Date().getTime() / 1000,
+          polling_station_id: 2,
+          status: "second_entry_not_started",
+          finished_at: new Date().toISOString(),
         },
         {
-          id: 3,
-          status: "first_entry_unfinished",
-          data_entry_progress: 60,
-        },
-        {
-          id: 4,
+          polling_station_id: 3,
           status: "first_entry_in_progress",
-          data_entry_progress: 40,
+          first_data_entry_progress: 60,
+        },
+        {
+          polling_station_id: 4,
+          status: "first_entry_in_progress",
+          first_data_entry_progress: 40,
         },
       ],
     } satisfies ElectionStatusResponse);
@@ -52,11 +52,10 @@ describe("ElectionStatusPage", () => {
     const items = [...screen.getByTestId("polling-stations-per-status").children];
     expect(items[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Stembureaus per status" }));
     expect(items[1]).toHaveTextContent("Fouten en waarschuwingen (0)");
-    expect(items[2]).toHaveTextContent("Niet afgeronde invoer (1)");
-    expect(items[3]).toHaveTextContent("Invoer bezig (1)");
-    expect(items[4]).toHaveTextContent("Eerste invoer klaar (1)");
-    expect(items[5]).toHaveTextContent("Eerste en tweede invoer klaar (0)");
-    expect(items[6]).toHaveTextContent("Werkvoorraad (1)");
+    expect(items[2]).toHaveTextContent("Invoer bezig (2)");
+    expect(items[3]).toHaveTextContent("Eerste invoer klaar (1)");
+    expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (0)");
+    expect(items[5]).toHaveTextContent("Werkvoorraad (1)");
 
     const progress = [...screen.getByTestId("progress").children];
     expect(progress[0]).toEqual(screen.getByRole("heading", { level: 3, name: "Voortgang" }));
@@ -65,8 +64,7 @@ describe("ElectionStatusPage", () => {
     const expectedData = [
       { percentage: 0, class: "definitive" },
       { percentage: 25, class: "first-entry-finished" },
-      { percentage: 25, class: "in-progress" },
-      { percentage: 25, class: "unfinished" },
+      { percentage: 50, class: "in-progress" },
       { percentage: 0, class: "errors-and-warnings" },
       { percentage: 25, class: "not-started" },
     ];
@@ -78,36 +76,28 @@ describe("ElectionStatusPage", () => {
     });
 
     const tablesRoot = screen.getByRole("article");
-    expect(within(tablesRoot).getAllByRole("heading", { level: 3 }).length).toBe(4);
-    expect(within(tablesRoot).getAllByRole("table").length).toBe(4);
+    expect(within(tablesRoot).getAllByRole("heading", { level: 3 }).length).toBe(3);
+    expect(within(tablesRoot).getAllByRole("table").length).toBe(3);
 
     const tables = [...tablesRoot.children];
 
-    expect(tables[0]).toContain(screen.getByRole("heading", { level: 3, name: "Niet afgeronde invoer (1)" }));
-    const unfinishedTable = within(tables[0] as HTMLElement).getByTestId("unfinished");
-    const unfinishedRows = within(unfinishedTable).getAllByRole("row");
-    expect(unfinishedRows.length).toBe(2);
-    expect(unfinishedRows[0]).toHaveTextContent(/Nummer/);
-    expect(unfinishedRows[0]).toHaveTextContent(/Stembureau/);
-    expect(unfinishedRows[1]).toHaveTextContent(/35/);
-    expect(unfinishedRows[1]).toHaveTextContent(/Testschool/);
-    expect(unfinishedRows[1]).toHaveTextContent(/1e invoer/);
-
-    expect(tables[1]).toContain(screen.getByRole("heading", { level: 3, name: "Invoer bezig (1)" }));
-    const inProgressTable = within(tables[1] as HTMLElement).getByTestId("in_progress");
+    expect(tables[0]).toContain(screen.getByRole("heading", { level: 3, name: "Invoer bezig (2)" }));
+    const inProgressTable = within(tables[0] as HTMLElement).getByTestId("in_progress");
     const inProgressRows = within(inProgressTable).getAllByRole("row");
-    expect(inProgressRows.length).toBe(2);
+    expect(inProgressRows.length).toBe(3);
     expect(inProgressRows[0]).toHaveTextContent(/Nummer/);
     expect(inProgressRows[0]).toHaveTextContent(/Stembureau/);
     expect(inProgressRows[0]).toHaveTextContent(/Voortgang/);
-
-    expect(inProgressRows[1]).toHaveTextContent(/36/);
-    expect(inProgressRows[1]).toHaveTextContent(/Testbuurthuis/);
+    expect(inProgressRows[1]).toHaveTextContent(/35/);
+    expect(inProgressRows[1]).toHaveTextContent(/Testschool/);
     expect(inProgressRows[1]).toHaveTextContent(/1e invoer/);
-    expect(within(inProgressRows[1] as HTMLElement).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "40");
+    expect(inProgressRows[2]).toHaveTextContent(/36/);
+    expect(inProgressRows[2]).toHaveTextContent(/Testbuurthuis/);
+    expect(inProgressRows[2]).toHaveTextContent(/1e invoer/);
+    expect(within(inProgressRows[2] as HTMLElement).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "40");
 
-    expect(tables[2]).toContain(screen.getByRole("heading", { level: 3, name: "Eerste invoer klaar (1)" }));
-    const firstEntryFinishedTable = within(tables[2] as HTMLElement).getByTestId("first_entry_finished");
+    expect(tables[1]).toContain(screen.getByRole("heading", { level: 3, name: "Eerste invoer klaar (1)" }));
+    const firstEntryFinishedTable = within(tables[1] as HTMLElement).getByTestId("first_entry_finished");
     const firstEntryFinishedRows = within(firstEntryFinishedTable).getAllByRole("row");
     expect(firstEntryFinishedRows.length).toBe(2);
     expect(firstEntryFinishedRows[0]).toHaveTextContent(/Nummer/);
@@ -117,8 +107,8 @@ describe("ElectionStatusPage", () => {
     expect(firstEntryFinishedRows[1]).toHaveTextContent(/Testplek/);
     expect(firstEntryFinishedRows[1]).toHaveTextContent(/vandaag/);
 
-    expect(tables[3]).toContain(screen.getByRole("heading", { level: 3, name: "Werkvoorraad (1)" }));
-    const notStartedTable = within(tables[3] as HTMLElement).getByTestId("not_started");
+    expect(tables[2]).toContain(screen.getByRole("heading", { level: 3, name: "Werkvoorraad (1)" }));
+    const notStartedTable = within(tables[2] as HTMLElement).getByTestId("not_started");
     const notStartedRows = within(notStartedTable).getAllByRole("row");
     expect(notStartedRows.length).toBe(2);
     expect(notStartedRows[0]).toHaveTextContent(/Nummer/);

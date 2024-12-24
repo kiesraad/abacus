@@ -217,11 +217,11 @@ describe("Test PollingStationChoiceForm", () => {
       overrideOnce("get", "/api/elections/1/status", 200, {
         statuses: [
           {
-            id: 1,
-            status: "second_entry",
+            polling_station_id: 1,
+            status: "second_entry_not_started",
           },
           {
-            id: 2,
+            polling_station_id: 2,
             status: "definitive",
           },
         ],
@@ -282,11 +282,11 @@ describe("Test PollingStationChoiceForm", () => {
       overrideOnce("get", "/api/elections/1/status", 200, {
         statuses: [
           {
-            id: 1,
-            status: "second_entry",
+            polling_station_id: 1,
+            status: "second_entry_not_started",
           },
           {
-            id: 2,
+            polling_station_id: 2,
             status: "definitive",
           },
         ],
@@ -313,10 +313,10 @@ describe("Test PollingStationChoiceForm", () => {
     test("Show polling stations as 'in progress'", async () => {
       overrideOnce("get", "api/elections/1/status", 200, {
         statuses: [
-          { id: 1, status: "not_started" },
-          { id: 2, status: "first_entry_in_progress", data_entry_progress: 42 },
-          { id: 3, status: "first_entry_unfinished", data_entry_progress: 42 },
-          { id: 4, status: "definitive" },
+          { polling_station_id: 1, status: "first_entry_not_started" },
+          { polling_station_id: 2, status: "first_entry_in_progress", first_data_entry_progress: 42 },
+          { polling_station_id: 3, status: "first_entry_in_progress", first_data_entry_progress: 42 },
+          { polling_station_id: 4, status: "definitive" },
         ],
       } satisfies ElectionStatusResponse);
 

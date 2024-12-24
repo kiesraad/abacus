@@ -19,6 +19,8 @@
   gap: 0.75rem;
   cursor: pointer;
 
+  width: max-content;
+
   &:hover {
     background-color: var(--button-color-primary-hover);
     border-color: var(--button-color-primary-hover);

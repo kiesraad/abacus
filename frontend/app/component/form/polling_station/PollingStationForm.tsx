@@ -90,7 +90,8 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 id="number"
                 name="number"
                 label={t("number")}
-                fieldWidth="narrow"
+                fieldWidth="narrowest"
+                margin="mb-md-lg"
                 defaultValue={pollingStation?.number}
                 error={validationResult.number ? t(`form.errors.${validationResult.number}`) : undefined}
                 hideErrorMessage={requestState.status === "api-error"}
@@ -99,6 +100,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 id="name"
                 name="name"
                 label={t("name")}
+                margin="mb-md-lg"
                 defaultValue={pollingStation?.name}
                 error={validationResult.name ? t(`form.errors.${validationResult.name}`) : undefined}
               />
@@ -139,7 +141,8 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               name="number_of_voters"
               label={t("polling_station.number_of_voters")}
               subtext={t("optional")}
-              fieldWidth="narrow-field"
+              fieldWidth="full-field-with-narrowest-input"
+              margin="mb-md-lg"
               defaultValue={pollingStation?.number_of_voters}
               error={
                 validationResult.number_of_voters ? t(`form.errors.${validationResult.number_of_voters}`) : undefined
@@ -154,6 +157,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 id="address"
                 name="address"
                 fieldWidth="full"
+                margin="mb-md-lg"
                 label={t("polling_station.address")}
                 defaultValue={pollingStation?.address}
                 error={validationResult.address ? t(`form.errors.${validationResult.address}`) : undefined}
@@ -163,7 +167,8 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               <InputField
                 id="postal_code"
                 name="postal_code"
-                fieldWidth="narrow"
+                fieldWidth="narrowest"
+                margin="mb-md-lg"
                 label={t("polling_station.postal_code")}
                 defaultValue={pollingStation?.postal_code}
                 error={validationResult.postal_code ? t(`form.errors.${validationResult.postal_code}`) : undefined}
@@ -171,6 +176,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               <InputField
                 id="locality"
                 name="locality"
+                margin="mb-md-lg"
                 label={t("polling_station.locality")}
                 defaultValue={pollingStation?.locality}
                 error={validationResult.locality ? t(`form.errors.${validationResult.locality}`) : undefined}

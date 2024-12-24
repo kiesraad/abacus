@@ -1412,14 +1412,7 @@
             "format": "int64"
           },
           "polling_station_type": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/PollingStationType"
-              }
-            ]
+            "$ref": "#/components/schemas/PollingStationType"
           },
           "postal_code": {
             "type": "string"
@@ -1470,14 +1463,7 @@
             "format": "int64"
           },
           "polling_station_type": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/PollingStationType"
-              }
-            ]
+            "$ref": "#/components/schemas/PollingStationType"
           },
           "postal_code": {
             "type": "string"

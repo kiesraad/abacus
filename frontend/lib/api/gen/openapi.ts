@@ -268,7 +268,7 @@ export interface PollingStation {
   name: string;
   number: number;
   number_of_voters?: number;
-  polling_station_type?: null | PollingStationType;
+  polling_station_type?: PollingStationType;
   postal_code: string;
 }
 
@@ -288,7 +288,7 @@ export interface PollingStationRequest {
   name: string;
   number: number;
   number_of_voters?: number;
-  polling_station_type?: null | PollingStationType;
+  polling_station_type?: PollingStationType;
   postal_code: string;
 }
 

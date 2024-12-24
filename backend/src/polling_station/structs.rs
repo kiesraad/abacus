@@ -19,6 +19,8 @@ pub struct PollingStation {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub number_of_voters: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub polling_station_type: Option<PollingStationType>,
     pub address: String,
     pub postal_code: String,
@@ -40,6 +42,8 @@ pub struct PollingStationRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub number_of_voters: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub polling_station_type: Option<PollingStationType>,
     pub address: String,
     pub postal_code: String,

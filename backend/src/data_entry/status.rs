@@ -297,7 +297,14 @@ impl DataEntryStatus {
                     first_entry_finished_at,
                 },
             )),
-            DataEntryStatus::EntriesDifferent(_) => Ok(DataEntryStatus::FirstEntryNotStarted),
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
+    }
+
+    /// Delete both entries while resolving differences
+    pub fn delete_entries(self) -> Result<Self, DataEntryTransitionError> {
+        match self {
+            DataEntryStatus::EntriesDifferent(_) => Ok(Self::FirstEntryNotStarted),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -367,12 +374,11 @@ impl DataEntryStatus {
     }
 
     /// Get the data for the current entry if there is any
-    pub fn get_data(&self) -> Result<&PollingStationResults, DataEntryTransitionError> {
+    pub fn get_data(&self) -> Option<&PollingStationResults> {
         match self {
-            DataEntryStatus::FirstEntryInProgress(state) => Ok(&state.first_entry),
-            DataEntryStatus::SecondEntryInProgress(state) => Ok(&state.second_entry),
-            DataEntryStatus::EntriesDifferent(state) => Ok(&state.second_entry),
-            _ => Err(DataEntryTransitionError::Invalid),
+            DataEntryStatus::FirstEntryInProgress(state) => Some(&state.first_entry),
+            DataEntryStatus::SecondEntryInProgress(state) => Some(&state.second_entry),
+            _ => None,
         }
     }
 

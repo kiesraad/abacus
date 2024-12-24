@@ -1,6 +1,6 @@
 use crate::data_entry::repository::PollingStationDataEntries;
 use crate::election::repository::Elections;
-use crate::error::{APIError, ErrorResponse};
+use crate::error::{APIError, ErrorReference, ErrorResponse};
 use crate::polling_station::repository::PollingStations;
 use crate::polling_station::structs::PollingStation;
 use axum::extract::{FromRequest, Path, State};
@@ -58,19 +58,20 @@ pub async fn polling_station_data_entry_get(
     let election = elections.get(polling_station.election_id).await?;
     let ps_entry = polling_station_data_entries.get_row(id).await?;
 
-    %&#%^&#$@%!#$ This returns an invalid state transition, but we should do that in the case of second entry not started
-    let data = ps_entry.state.get_data().cloned().unwrap_or_default();
+    let Some(data) = ps_entry.state.get_data() else {
+        return Err(APIError::NotFound(
+            "entry has no data".to_string(),
+            ErrorReference::EntryNotFound,
+        ));
+    };
+
     let client_state = ps_entry.state.get_client_state().map(|v| v.to_owned());
 
-    let validation_results = validate_polling_station_results(
-            &data,
-            &polling_station,
-            &election,
-        )?;
+    let validation_results = validate_polling_station_results(data, &polling_station, &election)?;
 
     Ok(Json(GetDataEntryResponse {
         progress: ps_entry.state.get_progress(),
-        data,
+        data: data.clone(),
         client_state,
         validation_results,
         updated_at: ps_entry.updated_at,
@@ -157,8 +158,11 @@ pub async fn polling_station_data_entry_save(
     };
 
     // validate the results
-    let validation_results =
-        validate_polling_station_results(new_state.get_data()?, &polling_station, &election)?;
+    let validation_results = validate_polling_station_results(
+        new_state.get_data().expect("data should never be None"),
+        &polling_station,
+        &election,
+    )?;
 
     // Save the data entry or update it if it already exists
     polling_station_data_entries.upsert(id, &new_state).await?;

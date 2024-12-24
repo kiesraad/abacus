@@ -48,7 +48,7 @@ export function processForm<RequestObject>(
   for (const fieldName in fields) {
     const field = fields[fieldName];
     const input = elements[fieldName];
-    let value: FieldValue<AnyFormField> = input.value;
+    let value: FieldValue<AnyFormField> = input.value.trim();
 
     if (!field.required && value === "") {
       continue;

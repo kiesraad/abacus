@@ -53,7 +53,7 @@ describe("Form Utils", () => {
 
     const nameInput = document.createElement("input");
     nameInput.name = "name";
-    nameInput.value = "";
+    nameInput.value = " ";
 
     const numberInput = document.createElement("input");
     numberInput.name = "number";

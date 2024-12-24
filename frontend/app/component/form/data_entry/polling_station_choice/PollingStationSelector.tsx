@@ -39,7 +39,6 @@ export function PollingStationSelector({
         value={pollingStationNumber}
         label={t("polling_station_choice.insert_number")}
         fieldWidth="narrow"
-        margin={false}
         maxLength={6}
         autoFocus={true}
         onChange={(e) => {

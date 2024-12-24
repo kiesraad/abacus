@@ -10,10 +10,11 @@ export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElem
   subtext?: string;
   hint?: string;
   fieldSize?: "small" | "medium" | "large" | "text-area";
-  fieldWidth?: "narrow" | "wide" | "narrow-field";
+  fieldWidth?: "narrowest" | "narrow" | "wide" | "full" | "full-field-with-narrowest-input";
   error?: string;
-  margin?: boolean;
+  margin?: "mb-md" | "mb-md-lg" | "mb-lg";
   numberInput?: boolean;
+  hideErrorMessage?: boolean;
 }
 
 export function InputField({
@@ -27,9 +28,10 @@ export function InputField({
   fieldWidth = "wide",
   error = "",
   disabled = false,
-  margin = true,
+  margin = "mb-lg",
   autoFocus,
   numberInput,
+  hideErrorMessage,
   ...InputFieldProps
 }: InputFieldProps) {
   let inputEl: React.ReactNode;
@@ -63,14 +65,14 @@ export function InputField({
   }
 
   return (
-    <div className={`${cls.inputfield} ${margin ? "mb-lg" : ""}`}>
+    <div className={`${cls.inputfield} ${margin}`}>
       <label className={`${fieldSize} ${fieldWidth} ${error ? "error" : ""}`}>
         <span className="label">
           {label} {subtext && <span className="subtext">{subtext}</span>}
         </span>
         {disabled ? <div className={`${fieldSize} disabled_input`}>{value}</div> : inputEl}
       </label>
-      {(error || hint) && (
+      {!hideErrorMessage && (error || hint) && (
         <span id={`${name}-hint_or_error`} className={error ? "error" : "hint"}>
           {error || hint || <>&nbsp;</>}
         </span>

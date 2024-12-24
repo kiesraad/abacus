@@ -27,10 +27,6 @@
 }
 
 .polling-station-list {
-  details {
-    margin: 2rem 0 0.5rem 0;
-  }
-
   details[open] {
     summary {
       display: none;

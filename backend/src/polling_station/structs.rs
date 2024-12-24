@@ -19,12 +19,10 @@ pub struct PollingStation {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub number_of_voters: Option<i64>,
-    pub polling_station_type: PollingStationType,
-    pub street: String,
-    pub house_number: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub house_number_addition: Option<String>,
+    pub polling_station_type: Option<PollingStationType>,
+    pub address: String,
     pub postal_code: String,
     pub locality: String,
 }
@@ -44,12 +42,10 @@ pub struct PollingStationRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub number_of_voters: Option<i64>,
-    pub polling_station_type: PollingStationType,
-    pub street: String,
-    pub house_number: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub house_number_addition: Option<String>,
+    pub polling_station_type: Option<PollingStationType>,
+    pub address: String,
     pub postal_code: String,
     pub locality: String,
 }
@@ -90,13 +86,14 @@ pub struct PollingStationStatusEntry {
 #[derive(Debug, Serialize, Deserialize, ToSchema, sqlx::Type, Eq, PartialEq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum PollingStationStatus {
-    NotStarted,            // First entry has not started yet
-    FirstEntryInProgress,  // First entry is currently in progress
-    FirstEntryUnfinished,  // First entry has been aborted and the data has been saved
-    SecondEntry,           // Ready for second entry
-    SecondEntryInProgress, // Second entry is currently in progress
-    SecondEntryUnfinished, // Second entry has been aborted and the data has been saved
-    Definitive,            // First and second entry are finished
+    NotStarted,                // First entry has not started yet
+    FirstEntryInProgress,      // First entry is currently in progress
+    FirstEntryUnfinished,      // First entry has been aborted and the data has been saved
+    SecondEntry,               // Ready for second entry
+    SecondEntryInProgress,     // Second entry is currently in progress
+    SecondEntryUnfinished,     // Second entry has been aborted and the data has been saved
+    FirstSecondEntryDifferent, // First and second entry are different
+    Definitive,                // First and second entry are finished
 }
 
 #[cfg(test)]
@@ -113,10 +110,8 @@ pub(crate) mod tests {
             name: "Testplek".to_string(),
             number: 34,
             number_of_voters,
-            polling_station_type: PollingStationType::Special,
-            street: "Teststraat".to_string(),
-            house_number: "2".to_string(),
-            house_number_addition: Some("b".to_string()),
+            polling_station_type: Some(PollingStationType::Special),
+            address: "Teststraat 2a".to_string(),
             postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         }

@@ -22,7 +22,7 @@ Voor de vertaling van begrippen uit de wet naar variabelen en functienamen in on
 | Proces-verbaal          | PV        | Certified Election Results |                                                                                                                                |
 | Stempas                 |           | Poll Card                  | via https://english.kiesraad.nl/elections/elections-of-the-house-of-representatives                                            |
 | Kiezerspas              |           | Voter Card                 | via https://english.kiesraad.nl/elections/elections-of-the-house-of-representatives                                            |
-| Volmachtsbewijs         |           | Proxy Certificate          |                                                                                                                                |
+| Volmachtbewijs          |           | Proxy Certificate          |                                                                                                                                |
 | Blanco stem             |           | Blank Vote                 |                                                                                                                                |
 | Ongeldige stem          |           | Invalid Vote               |                                                                                                                                |
 | Toegelaten kiezers      |           | Admitted Voters            |                                                                                                                                |

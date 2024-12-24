@@ -120,9 +120,7 @@ was. Indien er meerdere zittingslocaties waren, vermeld dan per lid de locatie.]
         #if polling_station.polling_station_type == "Mobile" [
           _(Mobiel stembureau)_
         ] else [
-          #polling_station.street #polling_station.house_number #if "house_number_addition" in polling_station and polling_station.house_number_addition != none [
-            #polling_station.house_number_addition
-          ] \
+          #polling_station.address \
           #polling_station.postal_code #polling_station.locality
         ]
       ]
@@ -226,7 +224,7 @@ Is bij alle afzonderlijke stembureaus het aantal uitgebrachte stemmen en het aan
 
 #pagebreak(weak: true)
 
-= Nieuwe telling aantal toeglaten kiezers bij overklaarde verschillen
+= Nieuwe telling aantal toegelaten kiezers bij onverklaarde verschillen
 
 Voor de stembureaus met de nummers #text_input(value: input.summary.recounted_polling_stations.map(str).join(", "), empty_width: 300pt) heeft het #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 een nieuwe telling uitgevoerd van het aantal toegelaten kiezers, omdat er sprake was van een onverklaard verschil tussen

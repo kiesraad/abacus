@@ -12,9 +12,7 @@ function getInputs() {
     number: screen.getByRole("textbox", { name: "Nummer" }),
     name: screen.getByRole("textbox", { name: "Naam" }),
     numberOfVoters: screen.getByRole("textbox", { name: "Aantal kiesgerechtigden Optioneel" }),
-    street: screen.getByRole("textbox", { name: "Straatnaam" }),
-    houseNumber: screen.getByRole("textbox", { name: "Huisnummer" }),
-    houseNumberAddition: screen.getByRole("textbox", { name: "Toevoeging" }),
+    address: screen.getByRole("textbox", { name: "Straatnaam en huisnummer" }),
     postalCode: screen.getByRole("textbox", { name: "Postcode" }),
     locality: screen.getByRole("textbox", { name: "Plaats" }),
     typeOptionFixedLocation: screen.getByRole("radio", { name: "Vaste locatie" }),
@@ -29,11 +27,7 @@ async function fillForm(user: UserEvent, testPollingStation: PollingStation | Om
   const inputs = getInputs();
   await user.type(inputs.number, testPollingStation.number.toString());
   await user.type(inputs.name, testPollingStation.name.toString());
-  await user.type(inputs.street, testPollingStation.street.toString());
-  await user.type(inputs.houseNumber, testPollingStation.house_number.toString());
-  if (testPollingStation.house_number_addition) {
-    await user.type(inputs.houseNumberAddition, testPollingStation.house_number_addition.toString());
-  }
+  await user.type(inputs.address, testPollingStation.address.toString());
   await user.type(inputs.postalCode, testPollingStation.postal_code.toString());
   await user.type(inputs.locality, testPollingStation.locality.toString());
   await user.type(inputs.numberOfVoters, String(testPollingStation.number_of_voters?.toString()));
@@ -53,17 +47,16 @@ async function fillForm(user: UserEvent, testPollingStation: PollingStation | Om
 
 describe("PollingStationForm", () => {
   describe("PollingStationForm create", () => {
-    test("Succesful create", async () => {
+    test("Successful create", async () => {
       const testPollingStation: Omit<PollingStation, "id"> = {
         election_id: 1,
         number: 1,
         name: "test",
-        street: "test",
+        address: "Teststraat 1",
         postal_code: "1234",
         locality: "test",
         polling_station_type: "FixedLocation",
         number_of_voters: 1,
-        house_number: "test",
       };
 
       const onSaved = vi.fn();
@@ -126,13 +119,11 @@ describe("PollingStationForm", () => {
         election_id: 1,
         number: 42,
         name: "test",
-        street: "test",
+        address: "Teststraat 5A",
         postal_code: "1234",
         locality: "test",
         polling_station_type: "FixedLocation",
         number_of_voters: 1,
-        house_number: "test",
-        house_number_addition: "A",
       };
 
       const user = userEvent.setup();
@@ -162,12 +153,11 @@ describe("PollingStationForm", () => {
       election_id: 1,
       number: 1,
       name: "test",
-      street: "test",
+      address: "Teststraat 2",
       postal_code: "1234",
       locality: "test",
       polling_station_type: "FixedLocation",
       number_of_voters: 1,
-      house_number: "test",
     };
 
     const onSaved = vi.fn();

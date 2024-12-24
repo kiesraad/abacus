@@ -84,18 +84,19 @@ impl PollingStationDataEntries {
         }
     }
 
-    pub async fn finalise_first_entry(
+    pub async fn finalise_data_entry(
         &self,
         tx: &mut Transaction<'_, Sqlite>,
         id: u32,
+        entry_number: EntryNumber,
     ) -> Result<(), sqlx::Error> {
-        // future: support second data entry
         query!(
             r#"
             UPDATE polling_station_data_entries
             SET finalised_at = unixepoch(), progress = 100
-            WHERE polling_station_id = ? AND entry_number = 1"#,
+            WHERE polling_station_id = ? AND entry_number = ?"#,
             id,
+            entry_number
         )
         .execute(&mut **tx)
         .await?;
@@ -103,7 +104,7 @@ impl PollingStationDataEntries {
         Ok(())
     }
 
-    pub async fn finalise(
+    pub async fn to_result(
         &self,
         tx: &mut Transaction<'_, Sqlite>,
         id: u32,

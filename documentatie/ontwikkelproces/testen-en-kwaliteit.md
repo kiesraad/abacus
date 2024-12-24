@@ -54,13 +54,13 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 
 ## Kwaliteits- en testprogramma
 
-| Wannneer           | Hoe vaak        | Wie                   | Wat    |
-| ------------------ | --------------- | --------------------- | ------ |
-| ontwikkeling       | continu         | ontwikkelteam         | permanente reviews van code en documentatie, handmatig en automatisch testen, CI/CD |
-| ontwikkeling       | regelmatig      | stakeholders Kiesraad | feedback op applicatie en documentatie |
-| tussentijds        | te bepalen      | externe stakeholders, externe geïnteresseerden | feedback op code, applicatie en documentatie |
-| oefen-release      | elk half jaar   | externe partijen      | code review, pentest |
-| verkiezingsrelease | elke verkiezing | externe partijen      | code review, pentest, toetsing wettelijke kaders |
+| Wanneer            | Hoe vaak        | Wie                                            | Wat                                                                                 |
+|--------------------|-----------------|------------------------------------------------|-------------------------------------------------------------------------------------|
+| ontwikkeling       | continu         | ontwikkelteam                                  | permanente reviews van code en documentatie, handmatig en automatisch testen, CI/CD |
+| ontwikkeling       | regelmatig      | stakeholders Kiesraad                          | feedback op applicatie en documentatie                                              |
+| tussentijds        | te bepalen      | externe stakeholders, externe geïnteresseerden | feedback op code, applicatie en documentatie                                        |
+| oefen-release      | elk half jaar   | externe partijen                               | code review, pentest                                                                |
+| verkiezingsrelease | elke verkiezing | externe partijen                               | code review, pentest, toetsing wettelijke kaders                                    |
 
 ### Ontwikkelteam
 
@@ -71,7 +71,7 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 #### Permanente code reviews
 
 - Kleine PR's, het doel is dat PR's 1-3 dagen open staan.
-  - Voor CI (continous integration, zie hieronder) moet dit strict gezien minder dan 1 dag zijn. Dat is in de praktijk erg lastig, vandaar de 1-3 dagen.
+  - Voor CI (continuous integration, zie hieronder) moet dit strict gezien minder dan 1 dag zijn. Dat is in de praktijk erg lastig, vandaar de 1-3 dagen.
 - één ticket/taak mag in meerdere PR's gebouwd worden.
 - Pair/ensemble programming telt als review.
 - Vraag vroeg om feedback: [editing over proof-reading](https://buttondown.email/hillelwayne/archive/code-review-vs-code-proofreading/) (Hillel Wayne)
@@ -82,7 +82,7 @@ We gebruiken deze kwaliteitscriteria om ons werk te toetsen. Ze sluiten aan op d
 - Handmatig en automatisch testen gaan samen ("contemporary exploratory testing"), dus niet eerst handmatig testen en het dan automatiseren.
 - Artefacten zoals testautomatisering, test cases, etc. zijn het resultaat van testen, niet de input.
 
-#### Continuous Integration / Continous Delivery (CI/CD)
+#### Continuous Integration / Continuous Delivery (CI/CD)
 
 - CI: risico's mitigeren bij het integreren van code door dit continu te doen.
   - Ideaal: elke developer integreert eigen code minstens één keer per dag met de gedeelde branch.

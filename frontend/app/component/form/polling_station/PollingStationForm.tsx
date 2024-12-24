@@ -26,9 +26,7 @@ const formFields: FormFields<PollingStationRequest> = {
   number_of_voters: { type: "number", isFormatted: true },
   polling_station_type: { type: "string" },
   postal_code: { type: "string" },
-  street: { type: "string" },
-  house_number: { type: "string" },
-  house_number_addition: { type: "string" },
+  address: { type: "string" },
 };
 
 export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
@@ -154,31 +152,11 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
           <FormLayout.Section title={t("polling_station.title.address")}>
             <FormLayout.Row>
               <InputField
-                id="street"
-                name="street"
-                label={t("polling_station.street")}
-                defaultValue={pollingStation?.street}
-                error={validationResult.street ? t(`form.errors.${validationResult.street}`) : undefined}
-              />
-              <InputField
-                id="house_number"
-                name="house_number"
-                fieldWidth="narrow"
-                label={t("polling_station.house_number")}
-                defaultValue={pollingStation?.house_number}
-                error={validationResult.house_number ? t(`form.errors.${validationResult.house_number}`) : undefined}
-              />
-              <InputField
-                id="house_number_addition"
-                name="house_number_addition"
-                fieldWidth="narrow"
-                label={t("polling_station.house_number_addition")}
-                defaultValue={pollingStation?.house_number_addition}
-                error={
-                  validationResult.house_number_addition
-                    ? t(`form.errors.${validationResult.house_number_addition}`)
-                    : undefined
-                }
+                id="address"
+                name="address"
+                label={t("polling_station.address")}
+                defaultValue={pollingStation?.address}
+                error={validationResult.address ? t(`form.errors.${validationResult.address}`) : undefined}
               />
             </FormLayout.Row>
             <FormLayout.Row>
@@ -186,7 +164,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 id="postal_code"
                 name="postal_code"
                 fieldWidth="narrow"
-                label={t("polling_station.zipcode")}
+                label={t("polling_station.postal_code")}
                 defaultValue={pollingStation?.postal_code}
                 error={validationResult.postal_code ? t(`form.errors.${validationResult.postal_code}`) : undefined}
               />

@@ -153,6 +153,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               <InputField
                 id="address"
                 name="address"
+                fieldWidth="full"
                 label={t("polling_station.address")}
                 defaultValue={pollingStation?.address}
                 error={validationResult.address ? t(`form.errors.${validationResult.address}`) : undefined}

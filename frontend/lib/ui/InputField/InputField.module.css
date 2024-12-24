@@ -13,6 +13,11 @@
       width: 32rem;
     }
 
+    &:global(.full),
+    &:global(.full) ~ span {
+      width: 43.5rem;
+    }
+
     &:global(.narrow-field) {
       width: 32rem;
 

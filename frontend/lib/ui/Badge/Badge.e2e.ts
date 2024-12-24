@@ -23,10 +23,10 @@ test("badges are visible", async ({ page }) => {
   await expect(secondEntryInProgressBadge).toContainText("2e invoer");
   await expect(secondEntryInProgressBadge.getByRole("img")).toHaveAttribute("data-icon", "IconPencil");
 
-  const firstSecondEntryDifferentBadge = page.getByTestId("first_second_entry_different");
-  await expect(firstSecondEntryDifferentBadge).toBeVisible();
-  await expect(firstSecondEntryDifferentBadge).toContainText("Verschil invoer 1 en 2");
-  await expect(firstSecondEntryDifferentBadge.getByRole("img")).toBeHidden();
+  const entriesDifferentBadge = page.getByTestId("entries_different");
+  await expect(entriesDifferentBadge).toBeVisible();
+  await expect(entriesDifferentBadge).toContainText("Verschil invoer 1 en 2");
+  await expect(entriesDifferentBadge.getByRole("img")).toBeHidden();
 
   const definitiveBadge = page.getByTestId("definitive");
   await expect(definitiveBadge).toBeVisible();

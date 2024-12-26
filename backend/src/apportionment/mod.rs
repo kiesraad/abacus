@@ -139,33 +139,34 @@ mod tests {
 
     #[test]
     fn test_with_absolute_majority() {
-        // TODO: Find an election result to trigger Kieswet Article P9
+        // This test triggers Kieswet Article P9
         let totals = ElectionSummary {
             voters_counts: VotersCounts {
-                poll_card_count: 15001,
+                poll_card_count: 15000,
                 proxy_certificate_count: 0,
                 voter_card_count: 0,
-                total_admitted_voters_count: 15001,
+                total_admitted_voters_count: 15000,
             },
             votes_counts: VotesCounts {
-                votes_candidates_count: 15001,
+                votes_candidates_count: 15000,
                 blank_votes_count: 0,
                 invalid_votes_count: 0,
-                total_votes_cast_count: 15001,
+                total_votes_cast_count: 15000,
             },
             differences_counts: SummaryDifferencesCounts::zero(),
             recounted_polling_stations: vec![],
             political_group_votes: vec![
                 PoliticalGroupVotes::from_test_data_auto(1, 7501, &[]),
-                PoliticalGroupVotes::from_test_data_auto(2, 1250, &[]),
-                PoliticalGroupVotes::from_test_data_auto(3, 1250, &[]),
-                PoliticalGroupVotes::from_test_data_auto(4, 1250, &[]),
-                PoliticalGroupVotes::from_test_data_auto(5, 1250, &[]),
-                PoliticalGroupVotes::from_test_data_auto(6, 1250, &[]),
-                PoliticalGroupVotes::from_test_data_auto(7, 1250, &[]),
+                PoliticalGroupVotes::from_test_data_auto(2, 1249, &[]),
+                PoliticalGroupVotes::from_test_data_auto(3, 1249, &[]),
+                PoliticalGroupVotes::from_test_data_auto(4, 1249, &[]),
+                PoliticalGroupVotes::from_test_data_auto(5, 1249, &[]),
+                PoliticalGroupVotes::from_test_data_auto(6, 1249, &[]),
+                PoliticalGroupVotes::from_test_data_auto(7, 1249, &[]),
+                PoliticalGroupVotes::from_test_data_auto(8, 6, &[]),
             ],
         };
 
-        apportionment_wip(23, &totals);
+        apportionment_wip(24, &totals);
     }
 }

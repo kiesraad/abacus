@@ -1,15 +1,16 @@
 #![cfg(test)]
 
-use backend::data_entry::status::DataEntryStatusName;
+use backend::data_entry::status::DataEntryStatusName::*;
 use backend::data_entry::{
-    ElectionStatusResponse, GetDataEntryResponse, SaveDataEntryResponse, ValidationResultCode,
+    ElectionStatusResponse, ElectionStatusResponseEntry, GetDataEntryResponse,
+    SaveDataEntryResponse, ValidationResultCode,
 };
 use backend::ErrorResponse;
 use reqwest::{Response, StatusCode};
 use serde_json::json;
 use sqlx::SqlitePool;
+use std::collections::BTreeMap;
 use std::net::SocketAddr;
-
 use utils::serve_api;
 
 mod shared;
@@ -271,134 +272,71 @@ async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
+async fn get_statuses(addr: &SocketAddr) -> BTreeMap<u32, ElectionStatusResponseEntry> {
+    let url = format!("http://{addr}/api/elections/1/status");
+    let response = reqwest::Client::new().get(url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+    assert!(!body.statuses.is_empty());
+    body.statuses
+        .into_iter()
+        .fold(BTreeMap::new(), |mut acc, entry| {
+            acc.insert(entry.polling_station_id, entry);
+            acc
+        })
+}
+
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/1/status");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    let status = response.status();
-    let body: ElectionStatusResponse = response.json().await.unwrap();
-
     // Ensure the statuses are "NotStarted"
-    println!("response body: {:?}", &body);
-    assert_eq!(status, StatusCode::OK);
-    assert!(!body.statuses.is_empty());
-    assert_eq!(
-        body.statuses[0].status,
-        DataEntryStatusName::FirstEntryNotStarted
-    );
-    assert_eq!(body.statuses[0].first_data_entry_progress, None);
-    assert_eq!(
-        body.statuses[1].status,
-        DataEntryStatusName::FirstEntryNotStarted
-    );
-    assert_eq!(body.statuses[1].first_data_entry_progress, None);
+    let statuses = get_statuses(&addr).await;
+    assert_eq!(statuses[&1].status, FirstEntryNotStarted);
+    assert_eq!(statuses[&1].first_data_entry_progress, None);
+    assert_eq!(statuses[&1].second_data_entry_progress, None);
+    assert_eq!(statuses[&2].status, FirstEntryNotStarted);
+    assert_eq!(statuses[&2].first_data_entry_progress, None);
+    assert_eq!(statuses[&2].second_data_entry_progress, None);
 
     // Finalise the first entry of one and set the other in progress
     shared::create_and_finalise_data_entry(&addr, 1, 1).await;
     shared::create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": true}"#)).await;
 
-    let url = format!("http://{addr}/api/elections/1/status");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    let status = response.status();
-    let body: ElectionStatusResponse = response.json().await.unwrap();
-
     // polling station 1's first entry is now complete, polling station 2 is still incomplete and set to in progress
-    println!("response body: {:?}", &body);
-    assert_eq!(status, StatusCode::OK);
-    assert!(!body.statuses.is_empty());
-    let statuses = [
-        body.statuses
-            .iter()
-            .find(|ps| ps.polling_station_id == 1)
-            .unwrap(),
-        body.statuses
-            .iter()
-            .find(|ps| ps.polling_station_id == 2)
-            .unwrap(),
-    ];
+    let statuses = get_statuses(&addr).await;
+    assert_eq!(statuses[&1].status, SecondEntryNotStarted);
+    assert_eq!(statuses[&1].first_data_entry_progress, Some(100));
+    assert_eq!(statuses[&1].second_data_entry_progress, None);
+    assert_eq!(statuses[&2].status, FirstEntryInProgress);
+    assert_eq!(statuses[&2].first_data_entry_progress, Some(60));
+    assert_eq!(statuses[&2].second_data_entry_progress, None);
 
-    assert_eq!(
-        statuses[0].status,
-        DataEntryStatusName::SecondEntryNotStarted
-    );
-    assert_eq!(statuses[0].first_data_entry_progress, Some(100));
-    assert_eq!(statuses[0].second_data_entry_progress, None);
-    assert_eq!(
-        statuses[1].status,
-        DataEntryStatusName::FirstEntryInProgress
-    );
-    assert_eq!(statuses[1].first_data_entry_progress, Some(60));
-    assert_eq!(statuses[1].second_data_entry_progress, None);
-
-    // Abort and save the entries
+    // Save the entries
     shared::create_and_save_data_entry(&addr, 1, 2, Some(r#"{"continue": true}"#)).await;
     shared::create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": false}"#)).await;
 
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    let status = response.status();
-    let body: ElectionStatusResponse = response.json().await.unwrap();
+    // polling station 1 should now be SecondEntryInProgress, polling station 2 is still in the FirstEntryInProgress state
+    let statuses = get_statuses(&addr).await;
+    assert_eq!(statuses[&1].status, SecondEntryInProgress);
+    assert_eq!(statuses[&1].first_data_entry_progress, Some(100));
+    assert_eq!(statuses[&1].second_data_entry_progress, Some(60));
+    assert_eq!(statuses[&2].status, FirstEntryInProgress);
+    assert_eq!(statuses[&2].first_data_entry_progress, Some(60));
+    assert_eq!(statuses[&2].second_data_entry_progress, None);
 
-    // polling station 1 should now be first entry in progress, polling station 2 is still in the second entry in progress state
-    println!("response body: {:?}", &body);
-    assert_eq!(status, StatusCode::OK);
-    assert!(!body.statuses.is_empty());
-    let statuses = [
-        body.statuses
-            .iter()
-            .find(|ps| ps.polling_station_id == 1)
-            .unwrap(),
-        body.statuses
-            .iter()
-            .find(|ps| ps.polling_station_id == 2)
-            .unwrap(),
-    ];
-
-    assert_eq!(
-        statuses[0].status,
-        DataEntryStatusName::SecondEntryInProgress
-    );
-    assert_eq!(statuses[0].first_data_entry_progress, Some(100));
-    assert_eq!(statuses[0].second_data_entry_progress, Some(60));
-    assert_eq!(
-        statuses[1].status,
-        DataEntryStatusName::FirstEntryInProgress
-    );
-    assert_eq!(statuses[1].first_data_entry_progress, Some(60));
-
-    // polling station 2 should now be unfinished
-    shared::create_and_save_data_entry(&addr, 1, 2, Some(r#"{"continue": false}"#)).await;
-
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    let status = response.status();
-    let body: ElectionStatusResponse = response.json().await.unwrap();
-
-    assert_eq!(status, StatusCode::OK);
-    assert!(!body.statuses.is_empty());
-    assert_eq!(
-        body.statuses
-            .iter()
-            .find(|ps| ps.polling_station_id == 1)
-            .unwrap()
-            .status,
-        DataEntryStatusName::SecondEntryInProgress
-    );
-
-    // polling station 2 should now be definitive
+    // finalise second data entry for polling station 1
     shared::create_and_finalise_data_entry(&addr, 1, 2).await;
 
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    let status = response.status();
-    let body: ElectionStatusResponse = response.json().await.unwrap();
-
-    assert_eq!(status, StatusCode::OK);
-    assert!(!body.statuses.is_empty());
-    assert_eq!(
-        statuses[1].status,
-        DataEntryStatusName::FirstEntryInProgress
-    );
-    assert_eq!(statuses[1].first_data_entry_progress, Some(60));
+    // polling station 1 should now be definitive
+    let statuses = get_statuses(&addr).await;
+    assert_eq!(statuses[&1].status, Definitive);
+    assert_eq!(statuses[&1].first_data_entry_progress, Some(100));
+    assert_eq!(statuses[&1].second_data_entry_progress, Some(100));
+    assert_eq!(statuses[&2].status, FirstEntryInProgress);
+    assert_eq!(statuses[&2].first_data_entry_progress, Some(60));
+    assert_eq!(statuses[&2].second_data_entry_progress, None);
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
@@ -425,8 +363,5 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
         body.statuses
     );
     assert_eq!(body.statuses[0].polling_station_id, 3);
-    assert_eq!(
-        body.statuses[0].status,
-        DataEntryStatusName::FirstEntryInProgress
-    );
+    assert_eq!(body.statuses[0].status, FirstEntryInProgress);
 }

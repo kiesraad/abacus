@@ -102,7 +102,7 @@ impl PollingStationDataEntries {
         query!(
             r#"
                 SELECT
-                    polling_station_id AS "polling_station_id: u32",
+                    id AS "polling_station_id: u32",
                     de.state AS "state: Option<Json<DataEntryStatus>>"
                 FROM polling_stations AS p
                 LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id

@@ -473,18 +473,13 @@ pub mod tests {
         let response = save(pool.clone(), request_body.clone(), EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check if the first data entry was finalised and that a second entry was created
-
-        // TODO: fix
-        // let rows = query!("SELECT * FROM polling_station_data_entries")
-        //     .fetch_all(&pool)
-        //     .await
-        //     .unwrap();
-        // assert_eq!(rows.len(), 2);
-        // let first_entry = rows.iter().find(|row| row.entry_number == 1).unwrap();
-        // let second_entry = rows.iter().find(|row| row.entry_number == 2).unwrap();
-        // assert!(first_entry.finished_at.is_some());
-        // assert!(second_entry.finished_at.is_none());
+        // Check if entry is now in SecondEntryInProgress state
+        let data = query!("SELECT state FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .expect("One row should exist");
+        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
 
         // Check that nothing is added to polling_station_results yet
         let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")
@@ -531,9 +526,8 @@ pub mod tests {
     // test creating first and different second data entry
     #[sqlx::test(fixtures(path = "../../fixtures", scripts("elections", "polling_stations")))]
     async fn test_first_second_data_entry_different(pool: SqlitePool) {
-        let request_body = example_data_entry();
-
         // Save and finalise the first data entry
+        let request_body = example_data_entry();
         let response = save(pool.clone(), request_body.clone(), EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone(), EntryNumber::FirstEntry).await;
@@ -548,15 +542,14 @@ pub mod tests {
         let response = finalise(pool.clone(), EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check that the finalised first and second data entries are still in the database
-        // TODO: fix
-        /*
-                let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries WHERE finalised_at IS NOT NULL")
-                    .fetch_one(&pool)
-                    .await
-                    .unwrap();
-                assert_eq!(row_count.count, 2);
-        */
+        // Check if entry is now in EntriesDifferent state
+        let data = query!("SELECT state FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .expect("One row should exist");
+        let status: DataEntryStatus = serde_json::from_slice(&data.state).unwrap();
+        assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
+
         // Check that no result has been created
         let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")
             .fetch_one(&pool)

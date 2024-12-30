@@ -1,4 +1,3 @@
--- TODO: need to update state json to match the new data structure
 INSERT INTO
   polling_station_data_entries (polling_station_id, state, updated_at)
 VALUES

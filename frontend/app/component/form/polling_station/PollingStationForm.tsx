@@ -44,6 +44,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
 
     const { isValid, requestObject } = process(elements);
     if (!isValid) {
+      window.scrollTo(0, 0);
       return;
     }
     if (pollingStation) {

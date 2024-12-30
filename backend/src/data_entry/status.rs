@@ -435,7 +435,7 @@ impl Display for DataEntryTransitionError {
                 write!(f, "First entry already claimed")
             }
             DataEntryTransitionError::SecondEntryAlreadyClaimed => {
-                write!(f, "First entry already claimed")
+                write!(f, "Second entry already claimed")
             }
             DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
             DataEntryTransitionError::ValidatorError(data_error) => {

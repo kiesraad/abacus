@@ -4,7 +4,11 @@ use crate::summary::ElectionSummary;
 mod fraction;
 
 /// Apportionment - work in progress!!
-pub fn apportionment_wip(seats: u64, totals: &ElectionSummary) {
+pub fn seat_allocation(seats: u64, totals: &ElectionSummary) {
+    if seats < 19 {
+        panic!("Seat allocation for < 19 seats is not yet implemented.");
+    }
+    println!("Seat allocation for 19 or more seats.");
     println!("Totals {:#?}", totals);
 
     // calculate quota (kiesdeler) as a proper fraction
@@ -70,7 +74,7 @@ pub fn apportionment_wip(seats: u64, totals: &ElectionSummary) {
 
     println!("===========================");
 
-    // TODO: Add check for absolute majority of votes vs seats and adjust last remaining seat assigned accordingly
+    // TODO: #785 Add check for absolute majority of votes vs seats and adjust last remaining seat assigned accordingly
     if let Some(idx) = idx_last_remaining_seat {
         println!("Last remaining seat given to idx: {}", idx);
         let half_of_votes_count = totals.votes_counts.votes_candidates_count as f64 / 2.0;
@@ -104,12 +108,13 @@ pub fn apportionment_wip(seats: u64, totals: &ElectionSummary) {
 
 #[cfg(test)]
 mod tests {
-    use crate::apportionment::apportionment_wip;
+    use crate::apportionment::seat_allocation;
     use crate::data_entry::{PoliticalGroupVotes, VotersCounts, VotesCounts};
     use crate::summary::{ElectionSummary, SummaryDifferencesCounts};
 
     #[test]
-    fn test() {
+    #[should_panic]
+    fn test_seat_allocation_less_than_19_seats() {
         let totals = ElectionSummary {
             voters_counts: VotersCounts {
                 poll_card_count: 1200,
@@ -134,12 +139,72 @@ mod tests {
             ],
         };
 
-        apportionment_wip(23, &totals);
+        seat_allocation(17, &totals);
     }
 
     #[test]
-    fn test_with_absolute_majority() {
-        // This test triggers Kieswet Article P9
+    fn test_seat_allocation_19_or_more_seats() {
+        let totals = ElectionSummary {
+            voters_counts: VotersCounts {
+                poll_card_count: 1200,
+                proxy_certificate_count: 0,
+                voter_card_count: 0,
+                total_admitted_voters_count: 1200,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 1200,
+                blank_votes_count: 0,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 1200,
+            },
+            differences_counts: SummaryDifferencesCounts::zero(),
+            recounted_polling_stations: vec![],
+            political_group_votes: vec![
+                PoliticalGroupVotes::from_test_data_auto(1, 600, &[]),
+                PoliticalGroupVotes::from_test_data_auto(2, 302, &[]),
+                PoliticalGroupVotes::from_test_data_auto(3, 98, &[]),
+                PoliticalGroupVotes::from_test_data_auto(4, 99, &[]),
+                PoliticalGroupVotes::from_test_data_auto(5, 101, &[]),
+            ],
+        };
+
+        seat_allocation(23, &totals);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_seat_allocation_with_drawing_of_lots_error() {
+        let totals = ElectionSummary {
+            voters_counts: VotersCounts {
+                poll_card_count: 1200,
+                proxy_certificate_count: 0,
+                voter_card_count: 0,
+                total_admitted_voters_count: 1200,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 1200,
+                blank_votes_count: 0,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 1200,
+            },
+            differences_counts: SummaryDifferencesCounts::zero(),
+            recounted_polling_stations: vec![],
+            political_group_votes: vec![
+                PoliticalGroupVotes::from_test_data_auto(1, 500, &[]),
+                PoliticalGroupVotes::from_test_data_auto(2, 140, &[]),
+                PoliticalGroupVotes::from_test_data_auto(3, 140, &[]),
+                PoliticalGroupVotes::from_test_data_auto(4, 140, &[]),
+                PoliticalGroupVotes::from_test_data_auto(5, 140, &[]),
+                PoliticalGroupVotes::from_test_data_auto(6, 140, &[]),
+            ],
+        };
+
+        seat_allocation(23, &totals);
+    }
+
+    #[test]
+    fn test_with_absolute_majority_votes_but_not_seats() {
+        // This test triggers Kieswet Article P9 (#785)
         let totals = ElectionSummary {
             voters_counts: VotersCounts {
                 poll_card_count: 15000,
@@ -167,6 +232,6 @@ mod tests {
             ],
         };
 
-        apportionment_wip(24, &totals);
+        seat_allocation(24, &totals);
     }
 }

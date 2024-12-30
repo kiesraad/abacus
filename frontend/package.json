@@ -19,6 +19,8 @@
     "e2e:app": "playwright test -c playwright.app.config.ts",
     "e2e:d2d": "cross-env LOCAL_CI=true playwright test -c playwright.d2d.config.ts",
     "e2e:d2d-dev": "playwright test -c playwright.d2d.config.ts",
+    "e2e:model": "cross-env LOCAL_CI=true playwright test -c playwright.model-based.config.ts",
+    "e2e:model-dev": "playwright test -c playwright.model-based.config.ts",
     "ladle": "ladle serve",
     "build:ladle": "ladle build",
     "start:msw": "cross-env API_MODE=mock vite",
@@ -47,6 +49,7 @@
     "@typescript-eslint/eslint-plugin": "^8.18.1",
     "@typescript-eslint/parser": "^8.18.1",
     "@vitejs/plugin-react-swc": "^3.7.2",
+    "@xstate/graph": "^3.0.1",
     "autoprefixer": "^10.4.20",
     "cross-env": "^7.0.3",
     "eslint": "^9.17.0",
@@ -73,7 +76,8 @@
     "vite-node": "^2.1.8",
     "vite-plugin-html": "^3.2.2",
     "vitest": "^2.1.8",
-    "vitest-fail-on-console": "^0.7.1"
+    "vitest-fail-on-console": "^0.7.1",
+    "xstate": "^5.19.1"
   },
   "msw": {
     "workerDirectory": [

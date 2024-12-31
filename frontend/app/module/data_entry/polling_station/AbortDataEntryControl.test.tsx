@@ -5,9 +5,8 @@ import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { VotersAndVotesForm } from "app/component/form/data_entry/voters_and_votes/VotersAndVotesForm";
+import { emptyDataEntryRequest } from "app/component/form/testHelperFunctions.ts";
 import { AbortDataEntryControl } from "app/module/data_entry";
-import { overrideOnce, render, screen, server } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form";
 
 import {
   ElectionProvider,
@@ -17,6 +16,7 @@ import {
   SaveDataEntryResponse,
 } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
+import { overrideOnce, render, screen, server } from "@kiesraad/test";
 
 const mockNavigate = vi.fn();
 

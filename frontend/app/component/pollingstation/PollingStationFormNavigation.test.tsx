@@ -1,19 +1,26 @@
-import { useBlocker, useNavigate } from "react-router-dom";
-
 import { render, screen } from "@testing-library/react";
-import { afterAll, beforeAll, describe, expect, Mock, test, vi } from "vitest";
+import { describe, expect, Mock, test, vi } from "vitest";
 
-import { defaultFormState, emptyDataEntryRequest } from "app/test/unit/form.ts";
+import { defaultFormState, emptyDataEntryRequest } from "app/component/form/testHelperFunctions.ts";
 
 import { usePollingStationFormController } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
 import { PollingStationFormNavigation } from "./PollingStationFormNavigation";
 
+const mocks = vi.hoisted(() => {
+  return {
+    useNavigate: vi.fn().mockReturnValue(vi.fn()),
+    useBlocker: vi.fn().mockReturnValue(vi.fn()),
+  };
+});
+
 vi.mock("react-router-dom", () => ({
-  Link: vi.fn(),
-  useNavigate: vi.fn(),
-  useBlocker: vi.fn(),
+  useNavigate: mocks.useNavigate,
+  useBlocker: mocks.useBlocker,
+  Navigate: vi.fn(),
+  Route: vi.fn(),
+  createRoutesFromElements: vi.fn(),
 }));
 
 vi.mock("@kiesraad/api", async () => {
@@ -25,17 +32,6 @@ vi.mock("@kiesraad/api", async () => {
 });
 
 describe("PollingStationFormNavigation", () => {
-  const mockNavigate = vi.fn();
-
-  beforeAll(() => {
-    (useBlocker as Mock).mockReturnValue(vi.fn());
-    (useNavigate as Mock).mockReturnValue(mockNavigate);
-  });
-
-  afterAll(() => {
-    vi.clearAllMocks();
-  });
-
   test("It blocks navigation when form has changes", () => {
     (usePollingStationFormController as Mock).mockReturnValue({
       status: { current: "idle" },
@@ -58,7 +54,7 @@ describe("PollingStationFormNavigation", () => {
     });
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
-    const shouldBlock = (useBlocker as Mock).mock.lastCall;
+    const shouldBlock = mocks.useBlocker.mock.lastCall;
     if (Array.isArray(shouldBlock)) {
       const blocker = shouldBlock[0] as ({
         currentLocation,
@@ -103,14 +99,14 @@ describe("PollingStationFormNavigation", () => {
       entryNumber: 1,
     });
 
-    (useBlocker as Mock).mockReturnValue({
+    mocks.useBlocker.mockReturnValue({
       state: "blocked",
       location: { pathname: "/elections/1/data-entry/1/1" },
     });
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
-    const shouldBlock = (useBlocker as Mock).mock.lastCall;
+    const shouldBlock = mocks.useBlocker.mock.lastCall;
     if (Array.isArray(shouldBlock)) {
       const blocker = shouldBlock[0] as ({
         currentLocation,

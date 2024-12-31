@@ -1,7 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
-import { renderHook, waitFor } from "app/test/unit";
+import { renderHook, waitFor } from "@kiesraad/test";
 
 import { useWatchForChanges } from "./useWatchForChanges";
 

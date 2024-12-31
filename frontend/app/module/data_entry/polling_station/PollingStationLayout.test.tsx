@@ -3,7 +3,6 @@ import * as Router from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { PollingStationLayout } from "app/module/data_entry";
-import { overrideOnce, render, screen, within } from "app/test/unit";
 
 import {
   Election,
@@ -13,6 +12,7 @@ import {
   PollingStationFormController,
 } from "@kiesraad/api";
 import { electionDetailsMockResponse, pollingStationMockData } from "@kiesraad/api-mocks";
+import { overrideOnce, render, screen, within } from "@kiesraad/test";
 
 describe("PollingStationLayout", () => {
   const election = electionDetailsMockResponse.election as Required<Election>;

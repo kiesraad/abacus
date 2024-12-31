@@ -2,14 +2,13 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import {
+  emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
-} from "app/component/form/testHelperFunctions";
-import { getUrlMethodAndBody, overrideOnce, render, screen, within } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form";
-import { getCandidateFullNamesFromMockData } from "app/test/unit/test-utils";
+  getCandidateFullNamesFromMockData,
+} from "app/component/form/testHelperFunctions.ts";
 
 import {
   Election,
@@ -19,6 +18,7 @@ import {
   PollingStationResults,
 } from "@kiesraad/api";
 import { electionMockData, politicalGroupMockData, pollingStationMockData } from "@kiesraad/api-mocks";
+import { getUrlMethodAndBody, overrideOnce, render, screen, within } from "@kiesraad/test";
 
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 

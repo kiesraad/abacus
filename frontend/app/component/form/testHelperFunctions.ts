@@ -1,5 +1,43 @@
-import { FormState, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, ValidationResult } from "@kiesraad/api";
+import { expect } from "vitest";
+
+import {
+  FormState,
+  PoliticalGroup,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  ValidationResult,
+} from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
+import { screen, within } from "@kiesraad/test";
+
+export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(fields: Array<string>, feedbackMessage: string) {
+  fields.forEach((field) => {
+    const inputField = within(screen.getByTestId(`cell-${field}`)).getByRole("textbox");
+    expect(inputField).toBeInvalid();
+    expect(inputField).toHaveAccessibleErrorMessage(feedbackMessage);
+  });
+}
+
+export function expectFieldsToHaveIconAndToHaveAccessibleName(fields: Array<string>, accessibleName: string) {
+  fields.forEach((field) => {
+    const icon = within(screen.getByTestId(`cell-${field}`)).getByRole("img");
+    expect(icon).toHaveAccessibleName(accessibleName);
+  });
+}
+
+export function expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(fields: Array<string>) {
+  fields.forEach((field) => {
+    const inputField = within(screen.getByTestId(`cell-${field}`)).getByRole("textbox");
+    expect(inputField).toBeValid();
+    expect(inputField).not.toHaveAccessibleErrorMessage();
+  });
+}
+
+export function expectFieldsToNotHaveIcon(fields: Array<string>) {
+  fields.forEach((field) => {
+    const icon = within(screen.getByTestId(`cell-${field}`)).queryByRole("img");
+    expect(icon).toBeNull();
+  });
+}
 
 export const emptyDataEntryRequest: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = {
   progress: 0,
@@ -133,3 +171,12 @@ export const defaultFormState: FormState = {
     },
   },
 };
+
+export function getCandidateFullNamesFromMockData(politicalGroupMockData: PoliticalGroup): string[] {
+  const candidateNames = politicalGroupMockData.candidates.map((candidate) => {
+    return candidate.first_name
+      ? `${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`
+      : `${candidate.last_name}, ${candidate.initials}`;
+  });
+  return candidateNames;
+}

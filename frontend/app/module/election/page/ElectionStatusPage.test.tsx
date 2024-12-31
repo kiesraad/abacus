@@ -1,10 +1,10 @@
 import { describe, expect, test } from "vitest";
 
 import { ElectionStatusPage } from "app/module/election";
-import { overrideOnce, render, screen, within } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { getElectionMockData } from "@kiesraad/api-mocks";
+import { overrideOnce, render, screen, within } from "@kiesraad/test";
 
 const renderElectionStatusPage = () =>
   render(

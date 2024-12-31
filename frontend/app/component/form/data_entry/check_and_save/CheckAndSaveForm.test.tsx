@@ -4,11 +4,11 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
-import { overrideOnce, render, screen, server, within } from "app/test/unit";
-import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/test/unit/form";
+import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/component/form/testHelperFunctions.ts";
 
 import { ElectionProvider, FormState, PollingStationFormController, PollingStationResults } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionMockData } from "@kiesraad/api-mocks";
+import { overrideOnce, render, screen, server, within } from "@kiesraad/test";
 
 const mockNavigate = vi.fn();
 

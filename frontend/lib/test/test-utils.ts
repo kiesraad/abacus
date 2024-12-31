@@ -1,11 +1,9 @@
 import { ReactElement } from "react";
-import { createMemoryRouter } from "react-router-dom";
+import { createMemoryRouter, RouteObject } from "react-router-dom";
 
 import { render, RenderOptions, screen } from "@testing-library/react";
 import { UserEvent } from "@testing-library/user-event";
 import { expect } from "vitest";
-
-import { routes } from "app/routes";
 
 import { Providers } from "./Providers";
 
@@ -19,7 +17,7 @@ export { customRender as render };
 export { router } from "./router";
 /* eslint-enable import/export */
 
-export const setupTestRouter = () => {
+export const setupTestRouter = (routes: RouteObject[]) => {
   return createMemoryRouter(routes, {
     future: {
       v7_normalizeFormMethod: true,

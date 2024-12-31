@@ -1,8 +1,9 @@
 use axum::extract::FromRef;
-use sqlx::{query, Sqlite, SqlitePool, Transaction};
+use sqlx::{query, query_as, types::Json, SqlitePool};
 
-use super::entry_number::EntryNumber;
-use super::{PollingStation, PollingStationResults, PollingStationResultsEntry};
+use super::status::DataEntryStatus;
+use super::{PollingStation, PollingStationDataEntry, PollingStationResults};
+use crate::data_entry::{ElectionStatusResponseEntry, PollingStationResultsEntry};
 use crate::polling_station::repository::PollingStations;
 use crate::AppState;
 
@@ -14,32 +15,78 @@ impl PollingStationDataEntries {
         Self(pool)
     }
 
-    /// Saves the data entry or updates it if it already exists
+    /// Get the full polling station data entry row for a given polling station
+    /// id, or return an error if there is no data
+    pub async fn get_row(
+        &self,
+        polling_station_id: u32,
+    ) -> Result<PollingStationDataEntry, sqlx::Error> {
+        query_as!(
+            PollingStationDataEntry,
+            r#"
+                SELECT
+                    polling_station_id AS "polling_station_id: u32",
+                    state AS "state: _",
+                    updated_at AS "updated_at: _"
+                FROM polling_station_data_entries
+                WHERE polling_station_id = ?
+            "#,
+            polling_station_id,
+        )
+        .fetch_one(&self.0)
+        .await
+    }
+
+    /// Get a data entry or return an error if there is no data entry for the
+    /// given polling station id
+    pub async fn get(&self, polling_station_id: u32) -> Result<DataEntryStatus, sqlx::Error> {
+        self.get_row(polling_station_id)
+            .await
+            .map(|psde| psde.state.0)
+    }
+
+    /// Get a data entry or return the default data entry state for the given
+    /// polling station id
+    pub async fn get_or_default(
+        &self,
+        polling_station_id: u32,
+    ) -> Result<DataEntryStatus, sqlx::Error> {
+        Ok(query_as!(
+            PollingStationDataEntry,
+            r#"
+                SELECT
+                    polling_station_id AS "polling_station_id: u32",
+                    state AS "state: _",
+                    updated_at AS "updated_at: _"
+                FROM polling_station_data_entries
+                WHERE polling_station_id = ?
+            "#,
+            polling_station_id
+        )
+        .fetch_optional(&self.0)
+        .await?
+        .map(|psde| psde.state.0)
+        .unwrap_or(DataEntryStatus::FirstEntryNotStarted))
+    }
+
+    /// Saves the data entry or updates it if it already exists for a given polling station id
     pub async fn upsert(
         &self,
-        id: u32,
-        entry_number: EntryNumber,
-        progress: u8,
-        data: String,
-        client_state: String,
+        polling_station_id: u32,
+        state: &DataEntryStatus,
     ) -> Result<(), sqlx::Error> {
+        let state = Json(state);
         sqlx::query!(
             r#"
-            INSERT INTO polling_station_data_entries
-              (polling_station_id, entry_number, progress, data, client_state)
-            VALUES (?, ?, ?, ?, ?)
-            ON CONFLICT(polling_station_id, entry_number) DO
-            UPDATE SET
-              progress = excluded.progress,
-              data = excluded.data,
-              client_state = excluded.client_state,
-              updated_at = unixepoch()
+                INSERT INTO polling_station_data_entries (polling_station_id, state)
+                VALUES (?, ?)
+                ON CONFLICT(polling_station_id) DO
+                UPDATE SET
+                    state = excluded.state,
+                    updated_at = CURRENT_TIMESTAMP
             "#,
-            id,
-            entry_number,
-            progress,
-            data,
-            client_state
+            polling_station_id,
+            state
         )
         .execute(&self.0)
         .await?;
@@ -47,122 +94,71 @@ impl PollingStationDataEntries {
         Ok(())
     }
 
-    pub async fn get(
+    /// Get the status for each polling station data entry in an election
+    pub async fn statuses(
         &self,
-        tx: &mut Transaction<'_, Sqlite>,
-        id: u32,
-        entry_number: EntryNumber,
-    ) -> Result<(u8, Vec<u8>, Vec<u8>, i64), sqlx::Error> {
-        let res = query!(
-            r#"SELECT progress AS "progress: u8", data, client_state, updated_at FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ?"#,
-            id,
-            entry_number
-        )
-            .fetch_one(&mut **tx)
-            .await?;
-        if let (progress, Some(data), Some(client_state), updated_at) =
-            (res.progress, res.data, res.client_state, res.updated_at)
-        {
-            Ok((progress, data, client_state, updated_at))
-        } else {
-            Err(sqlx::Error::RowNotFound)
-        }
-    }
-
-    pub async fn delete(&self, id: u32, entry_number: EntryNumber) -> Result<(), sqlx::Error> {
-        let res = query!(
-            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = ? AND finalised_at IS NULL",
-            id,
-            entry_number
-        )
-            .execute(&self.0)
-            .await?;
-        if res.rows_affected() == 0 {
-            Err(sqlx::Error::RowNotFound)
-        } else {
-            Ok(())
-        }
-    }
-
-    pub async fn finalise_data_entry(
-        &self,
-        tx: &mut Transaction<'_, Sqlite>,
-        id: u32,
-        entry_number: EntryNumber,
-    ) -> Result<(), sqlx::Error> {
+        election_id: u32,
+    ) -> Result<Vec<ElectionStatusResponseEntry>, sqlx::Error> {
         query!(
             r#"
-            UPDATE polling_station_data_entries
-            SET finalised_at = unixepoch(), progress = 100
-            WHERE polling_station_id = ? AND entry_number = ?"#,
-            id,
-            entry_number
+                SELECT
+                    id AS "polling_station_id: u32",
+                    de.state AS "state: Option<Json<DataEntryStatus>>"
+                FROM polling_stations AS p
+                LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
+                WHERE election_id = $1
+            "#,
+            election_id
         )
-        .execute(&mut **tx)
+        .map(|status| {
+            let state = status.state.unwrap_or_default();
+            ElectionStatusResponseEntry {
+                polling_station_id: status.polling_station_id,
+                status: state.status_name(),
+                first_data_entry_progress: state.get_first_entry_progress(),
+                second_data_entry_progress: state.get_second_entry_progress(),
+                finished_at: state.finished_at().cloned(),
+            }
+        })
+        .fetch_all(&self.0)
+        .await
+    }
+
+    pub async fn make_definitive(
+        &self,
+        polling_station_id: u32,
+        new_state: &DataEntryStatus,
+        definitive_entry: &PollingStationResults,
+    ) -> Result<(), sqlx::Error> {
+        let mut tx = self.0.begin().await?;
+        let definitive_entry = Json(definitive_entry);
+        query!(
+            "INSERT INTO polling_station_results (polling_station_id, data) VALUES ($1, $2)",
+            polling_station_id,
+            definitive_entry
+        )
+        .execute(tx.as_mut())
         .await?;
+
+        let new_state = Json(new_state);
+        sqlx::query!(
+            r#"
+                INSERT INTO polling_station_data_entries (polling_station_id, state)
+                VALUES (?, ?)
+                ON CONFLICT(polling_station_id) DO
+                UPDATE SET
+                    state = excluded.state,
+                    updated_at = CURRENT_TIMESTAMP
+            "#,
+            polling_station_id,
+            new_state
+        )
+        .execute(tx.as_mut())
+        .await?;
+
+        tx.commit().await?;
 
         Ok(())
-    }
-
-    pub async fn to_result(
-        &self,
-        tx: &mut Transaction<'_, Sqlite>,
-        id: u32,
-    ) -> Result<(), sqlx::Error> {
-        // Copies first data entry to results
-        query!(
-            "INSERT INTO polling_station_results (polling_station_id, data) SELECT polling_station_id, data FROM polling_station_data_entries WHERE polling_station_id = ? AND entry_number = 1",
-            id,
-        )
-            .execute(&mut **tx)
-            .await?;
-
-        // Deletes all entries from a polling station
-        query!(
-            "DELETE FROM polling_station_data_entries WHERE polling_station_id = ?",
-            id
-        )
-        .execute(&mut **tx)
-        .await?;
-
-        Ok(())
-    }
-
-    pub async fn exists_entry(&self, id: u32, entry_number: u8) -> Result<bool, sqlx::Error> {
-        let res = query!(
-            r#"
-            SELECT EXISTS(
-              SELECT 1 FROM polling_station_data_entries
-              WHERE polling_station_id = ?
-                AND entry_number = ?)
-            AS `exists`"#,
-            id,
-            entry_number
-        )
-        .fetch_one(&self.0)
-        .await?;
-        Ok(res.exists == 1)
-    }
-
-    pub async fn exists_finalised_entry(
-        &self,
-        id: u32,
-        entry_number: u8,
-    ) -> Result<bool, sqlx::Error> {
-        let res = query!(
-            r#"
-            SELECT EXISTS(
-              SELECT 1 FROM polling_station_data_entries
-              WHERE polling_station_id = ?
-                AND entry_number = ?
-                AND finalised_at IS NOT NULL)
-            AS `exists`"#,
-            id,
-            entry_number
-        )
-        .fetch_one(&self.0)
-        .await?;
-        Ok(res.exists == 1)
     }
 }
 

@@ -55,14 +55,18 @@
   color: var(--badge-difference);
 }
 
+.entries_different {
+  background: var(--badge-difference-bg);
+  color: var(--badge-difference);
+}
+
 .extra_entry {
   background: var(--badge-extra-entry-bg);
   color: var(--badge-extra-entry);
 }
 
-.not_started,
-.first_entry_in_progress,
-.first_entry_unfinished {
+.first_entry_not_started,
+.first_entry_in_progress {
   background: var(--badge-first-entry-bg);
   color: var(--badge-first-entry);
 }
@@ -72,16 +76,10 @@
   color: var(--badge-objections);
 }
 
-.second_entry,
-.second_entry_in_progress,
-.second_entry_unfinished {
+.second_entry_not_started,
+.second_entry_in_progress {
   background: var(--badge-second-entry-bg);
   color: var(--badge-second-entry);
-}
-
-.first_second_entry_different {
-  background: var(--badge-difference-bg);
-  color: var(--badge-difference);
 }
 
 .typist_busy {

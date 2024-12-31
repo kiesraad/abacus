@@ -8,6 +8,7 @@ import {
   ApiResult,
   buildFormState,
   calculateDataEntryProgress,
+  DataEntry,
   Election,
   getClientState,
   GetDataEntryResponse,
@@ -17,7 +18,6 @@ import {
   isFatalError,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   PollingStationResults,
-  SaveDataEntryRequest,
   SaveDataEntryResponse,
   updateFormStateAfterSubmit,
   useApi,
@@ -173,7 +173,7 @@ export function PollingStationFormController({
 
       if (responseData.client_state) {
         // save data entry, continue is set to true to make sure polling station status changes to InProgress
-        const requestBody: SaveDataEntryRequest = {
+        const requestBody: DataEntry = {
           progress: responseData.progress,
           data: responseData.data,
           client_state: { ...responseData.client_state, continue: true },
@@ -206,7 +206,7 @@ export function PollingStationFormController({
 
       // save initial data entry, continue is set to true to make sure polling station has status FirstEntryInProgress
       const clientState = getClientState(formState, false, true);
-      const requestBody: SaveDataEntryRequest = {
+      const requestBody: DataEntry = {
         progress: 0,
         data: values,
         client_state: clientState,
@@ -327,7 +327,7 @@ export function PollingStationFormController({
       progress,
       data: newValues,
       client_state: clientState,
-    } satisfies SaveDataEntryRequest);
+    } satisfies DataEntry);
     status.current = aborting ? "aborted" : "idle";
 
     if (response instanceof ApiError) {

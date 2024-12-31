@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { PollingStation, PollingStationStatus } from "@kiesraad/api";
+import { DataEntryStatusName, PollingStation } from "@kiesraad/api";
 import { IconArrowNarrowRight } from "@kiesraad/icon";
 import { getUrlForDataEntry } from "@kiesraad/util";
 
@@ -8,7 +8,7 @@ import cls from "./PollingStationLink.module.css";
 
 interface PollingStationLinkProps {
   pollingStation: PollingStation;
-  status: PollingStationStatus;
+  status: DataEntryStatusName;
 }
 
 export function PollingStationLink({ pollingStation, status }: PollingStationLinkProps) {

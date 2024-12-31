@@ -7,13 +7,16 @@ pub enum EntryNumber {
     FirstEntry,
     SecondEntry,
 }
+
 #[derive(Debug)]
 pub struct InvalidEntryNumberError(u8);
+
 impl Display for InvalidEntryNumberError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "invalid entry number `{}`", self.0)
     }
 }
+
 impl TryFrom<u8> for EntryNumber {
     type Error = InvalidEntryNumberError;
     fn try_from(n: u8) -> Result<Self, Self::Error> {
@@ -24,6 +27,7 @@ impl TryFrom<u8> for EntryNumber {
         }
     }
 }
+
 impl<'de> Deserialize<'de> for EntryNumber {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -33,6 +37,7 @@ impl<'de> Deserialize<'de> for EntryNumber {
         Self::try_from(n).map_err(serde::de::Error::custom)
     }
 }
+
 impl<'q> sqlx::Encode<'q, Sqlite> for EntryNumber {
     fn encode_by_ref(
         &self,
@@ -45,6 +50,7 @@ impl<'q> sqlx::Encode<'q, Sqlite> for EntryNumber {
         n.encode(buf)
     }
 }
+
 impl sqlx::Type<Sqlite> for EntryNumber {
     fn type_info() -> <Sqlite as sqlx::Database>::TypeInfo {
         u8::type_info()

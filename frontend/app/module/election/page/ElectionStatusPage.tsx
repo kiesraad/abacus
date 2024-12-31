@@ -6,9 +6,9 @@ import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import {
+  DataEntryStatusName,
+  ElectionStatusResponseEntry,
   PollingStation,
-  PollingStationStatus,
-  PollingStationStatusEntry,
   useElection,
   useElectionStatus,
 } from "@kiesraad/api";
@@ -30,11 +30,10 @@ import { formatDateTime } from "@kiesraad/util";
 
 import cls from "./ElectionStatusPage.module.css";
 
-interface PollingStationWithStatus extends PollingStation, PollingStationStatusEntry {}
+interface PollingStationWithStatus extends PollingStation, ElectionStatusResponseEntry {}
 
 const statusCategories = [
   "errors_and_warnings",
-  "unfinished",
   "in_progress",
   "first_entry_finished",
   "definitive",
@@ -44,20 +43,18 @@ type StatusCategory = (typeof statusCategories)[number];
 
 const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> = {
   errors_and_warnings: "errors-and-warnings",
-  unfinished: "unfinished",
   in_progress: "in-progress",
   first_entry_finished: "first-entry-finished",
   definitive: "definitive",
   not_started: "not-started",
 };
 
-const statusesForCategory: Record<StatusCategory, PollingStationStatus[]> = {
-  errors_and_warnings: ["first_second_entry_different"],
-  unfinished: ["first_entry_unfinished", "second_entry_unfinished"],
+const statusesForCategory: Record<StatusCategory, DataEntryStatusName[]> = {
+  errors_and_warnings: ["entries_different"],
   in_progress: ["first_entry_in_progress", "second_entry_in_progress"],
-  first_entry_finished: ["second_entry"],
+  first_entry_finished: ["second_entry_not_started"],
   definitive: ["definitive"],
-  not_started: ["not_started"],
+  not_started: ["first_entry_not_started"],
 };
 
 function getTableHeaderForCategory(category: StatusCategory): ReactNode {
@@ -90,13 +87,7 @@ function getTableHeaderForCategory(category: StatusCategory): ReactNode {
 }
 
 function getTableRowForCategory(category: StatusCategory, polling_station: PollingStationWithStatus): ReactNode {
-  const showBadge: PollingStationStatus[] = [
-    "first_entry_unfinished",
-    "first_entry_in_progress",
-    "second_entry_unfinished",
-    "second_entry_in_progress",
-    "first_second_entry_different",
-  ];
+  const showBadge: DataEntryStatusName[] = ["first_entry_in_progress", "second_entry_in_progress", "entries_different"];
 
   function CategoryPollingStationRow({ children }: { children?: ReactNode[] }) {
     return (
@@ -113,14 +104,14 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
 
   const finishedAtCell = (
     <Table.Cell key={`${polling_station.id}-time`}>
-      {polling_station.finished_at ? formatDateTime(new Date(polling_station.finished_at * 1000)) : ""}
+      {polling_station.finished_at ? formatDateTime(new Date(polling_station.finished_at)) : ""}
     </Table.Cell>
   );
   const progressCell = (
     <Table.Cell key={`${polling_station.id}-progress`}>
       <ProgressBar
         id={`${polling_station.id}-progressbar`}
-        data={{ percentage: polling_station.data_entry_progress ?? 0, class: "default" }}
+        data={{ percentage: polling_station.first_data_entry_progress ?? 0, class: "default" }}
         showPercentage
       />
     </Table.Cell>
@@ -137,7 +128,7 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
   }
 }
 
-function statusCount(entries: PollingStationStatusEntry[], category: StatusCategory): number {
+function statusCount(entries: ElectionStatusResponseEntry[], category: StatusCategory): number {
   return entries.filter((s) => statusesForCategory[category].includes(s.status)).length;
 }
 
@@ -175,7 +166,7 @@ export function ElectionStatusPage() {
   }
 
   const pollingStationsWithStatuses = pollingStations.map((ps) => {
-    const status = statuses.find((element) => element.id === ps.id);
+    const status = statuses.find((element) => element.polling_station_id === ps.id);
     return { ...ps, ...status } as PollingStationWithStatus;
   });
 

@@ -29,8 +29,8 @@
     "serve": "npm run build:msw && npx serve dist"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-router-dom": "^6.27.0"
   },
   "devDependencies": {
@@ -42,8 +42,8 @@
     "@testing-library/user-event": "^14.5.2",
     "@trivago/prettier-plugin-sort-imports": "^5.2.0",
     "@types/node": "^20.17.10",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
     "@typescript-eslint/eslint-plugin": "^8.18.2",
     "@typescript-eslint/parser": "^8.18.2",
     "@vitejs/plugin-react-swc": "^3.7.2",

@@ -1,13 +1,10 @@
 import { expect } from "vitest";
 
-import {
-  FormState,
-  PoliticalGroup,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  ValidationResult,
-} from "@kiesraad/api";
+import { PoliticalGroup, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, ValidationResult } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 import { screen, within } from "@kiesraad/test";
+
+import { FormState } from "./data_entry/PollingStationFormController";
 
 export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(fields: Array<string>, feedbackMessage: string) {
   fields.forEach((field) => {

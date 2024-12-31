@@ -1,4 +1,4 @@
-import { FormSectionID } from "@kiesraad/api";
+import { FormSectionID } from "../form/data_entry/PollingStationFormController";
 
 export function getBaseUrl(electionId: number, pollingStationId: number, entryNumber: number) {
   return `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}`;

@@ -1,6 +1,8 @@
 import * as React from "react";
 
-import { PollingStationResults, usePollingStationFormController } from "@kiesraad/api";
+import { PollingStationResults } from "@kiesraad/api";
+
+import { usePollingStationFormController } from "../usePollingStationFormController";
 
 export type VotersAndVotesValues = Pick<PollingStationResults, "voters_counts" | "votes_counts" | "voters_recounts">;
 

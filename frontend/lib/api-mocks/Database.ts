@@ -1,4 +1,7 @@
-import { ClientState, Election, getInitialValues, PollingStation, PollingStationResults } from "@kiesraad/api";
+import { ClientState } from "app/component/form/data_entry/PollingStationFormController";
+import { getInitialValues } from "app/component/form/data_entry/pollingStationUtils";
+
+import { Election, PollingStation, PollingStationResults } from "@kiesraad/api";
 
 import { electionListMockResponse, getElectionMockData } from "./ElectionMockData.ts";
 

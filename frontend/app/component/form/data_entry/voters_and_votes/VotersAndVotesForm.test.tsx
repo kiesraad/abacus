@@ -9,15 +9,11 @@ import {
   expectFieldsToNotHaveIcon,
 } from "app/component/form/testHelperFunctions.ts";
 
-import {
-  FormState,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationFormController,
-  PollingStationResults,
-} from "@kiesraad/api";
+import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@kiesraad/api";
 import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs, waitFor } from "@kiesraad/test";
 
+import { FormState, PollingStationFormController } from "../PollingStationFormController";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const defaultFormState: FormState = {

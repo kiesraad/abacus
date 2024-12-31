@@ -1,19 +1,17 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, Mock, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { defaultFormState, emptyDataEntryRequest } from "app/component/form/testHelperFunctions.ts";
 
-import { usePollingStationFormController } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
 import { PollingStationFormNavigation } from "./PollingStationFormNavigation";
 
-const mocks = vi.hoisted(() => {
-  return {
-    useNavigate: vi.fn().mockReturnValue(vi.fn()),
-    useBlocker: vi.fn().mockReturnValue(vi.fn()),
-  };
-});
+const mocks = vi.hoisted(() => ({
+  useNavigate: vi.fn().mockReturnValue(vi.fn()),
+  useBlocker: vi.fn().mockReturnValue(vi.fn()),
+  usePollingStationFormController: vi.fn(),
+}));
 
 vi.mock("react-router-dom", () => ({
   useNavigate: mocks.useNavigate,
@@ -23,17 +21,13 @@ vi.mock("react-router-dom", () => ({
   createRoutesFromElements: vi.fn(),
 }));
 
-vi.mock("@kiesraad/api", async () => {
-  const utils = await vi.importActual("../../../lib/api/form/pollingstation/pollingStationUtils.ts");
-  return {
-    usePollingStationFormController: vi.fn(),
-    currentFormHasChanges: utils.currentFormHasChanges,
-  };
-});
+vi.mock("../form/data_entry/usePollingStationFormController", () => ({
+  usePollingStationFormController: mocks.usePollingStationFormController,
+}));
 
 describe("PollingStationFormNavigation", () => {
   test("It blocks navigation when form has changes", () => {
-    (usePollingStationFormController as Mock).mockReturnValue({
+    mocks.usePollingStationFormController.mockReturnValue({
       status: { current: "idle" },
       formState: {
         ...defaultFormState,
@@ -69,7 +63,7 @@ describe("PollingStationFormNavigation", () => {
   });
 
   test("It blocks navigation when form has errors", async () => {
-    (usePollingStationFormController as Mock).mockReturnValue({
+    mocks.usePollingStationFormController.mockReturnValue({
       status: { current: "idle" },
       formState: {
         ...defaultFormState,
@@ -129,7 +123,7 @@ describe("PollingStationFormNavigation", () => {
   });
 
   test("422 response results in display of error message", async () => {
-    (usePollingStationFormController as Mock).mockReturnValue({
+    mocks.usePollingStationFormController.mockReturnValue({
       status: { current: "idle" },
       formState: defaultFormState,
       apiError: {
@@ -156,7 +150,7 @@ describe("PollingStationFormNavigation", () => {
   });
 
   test("500 response results in display of error message", async () => {
-    (usePollingStationFormController as Mock).mockReturnValue({
+    mocks.usePollingStationFormController.mockReturnValue({
       status: { current: "idle" },
       formState: defaultFormState,
       apiError: {

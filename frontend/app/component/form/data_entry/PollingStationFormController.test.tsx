@@ -2,7 +2,9 @@ import * as React from "react";
 
 import { describe, expect, test } from "vitest";
 
-import { PollingStationFormController, usePollingStationFormController } from "@kiesraad/api";
+import { PollingStationFormController } from "app/component/form/data_entry/PollingStationFormController";
+import { usePollingStationFormController } from "app/component/form/data_entry/usePollingStationFormController";
+
 import { electionMockData } from "@kiesraad/api-mocks";
 import { overrideOnce, Providers, renderHook, waitFor } from "@kiesraad/test";
 

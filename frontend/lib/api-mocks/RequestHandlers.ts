@@ -1,7 +1,8 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 
+import { ClientState } from "app/component/form/data_entry/PollingStationFormController";
+
 import {
-  ClientState,
   ElectionDetailsResponse,
   ElectionListResponse,
   ElectionStatusResponse,

@@ -1,7 +1,5 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 
-import { ClientState } from "app/component/form/data_entry/PollingStationFormController";
-
 import {
   ElectionDetailsResponse,
   ElectionListResponse,
@@ -152,7 +150,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
       entryNumber: Number(params.entry_number),
       progress: json.progress,
       data: json.data,
-      clientState: json.client_state as ClientState,
+      clientState: json.client_state,
       updated_at: Number(Date.now() / 1000),
     };
 

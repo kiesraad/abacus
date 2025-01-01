@@ -35,7 +35,7 @@ const machine = createMachine({
     emptyVotersVotesPage: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageWithValidData",
-        ABORT_AND_SAVE: "pollingStationChoicePageSaved",
+        IMMEDIATE_ABORT_AND_SAVE: "pollingStationChoicePageInitialSaved", // ony fills in recounted page, so can't go to RESUME_DATA_ENTRY
         ABORT_AND_DELETE: "pollingStationChoicePage",
       },
     },
@@ -48,7 +48,18 @@ const machine = createMachine({
     },
     pollingStationChoicePage: {},
     differencesPage: {},
-    pollingStationChoicePageSaved: {},
+    pollingStationChoicePageSaved: {
+      on: {
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResume",
+      },
+    },
+    pollingStationChoicePageInitialSaved: {
+      on: {
+        RESUME_DATA_ENTRY: "votersVotesPageEmptyAfterResume",
+      },
+    },
+    votersVotesPageAfterResume: {},
+    votersVotesPageEmptyAfterResume: {},
   },
 });
 
@@ -66,7 +77,7 @@ const votes: VotesCounts = {
   total_votes_cast_count: 100,
 };
 
-test.describe("My app", () => {
+test.describe("Data entry", () => {
   createTestModel(machine)
     .getSimplePaths()
     .forEach((path) => {
@@ -98,7 +109,33 @@ test.describe("My app", () => {
             },
             votersVotesPageWithValidData: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              // TODO: check for filled fields?
+              // Can't check for values of input fields until after submitting
+            },
+            votersVotesPageAfterResume: async () => {
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(voters);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votes);
+            },
+            votersVotesPageEmptyAfterResume: async () => {
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersEmpty: VotersCounts = {
+                poll_card_count: 0,
+                proxy_certificate_count: 0,
+                voter_card_count: 0,
+                total_admitted_voters_count: 0,
+              };
+              const votesEmpty: VotesCounts = {
+                votes_candidates_count: 0,
+                blank_votes_count: 0,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 0,
+              };
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(votersEmpty);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votesEmpty);
             },
             pollingStationChoicePage: async () => {
               await expect(pollingStationChoicePage.fieldset).toBeVisible();
@@ -109,7 +146,7 @@ test.describe("My app", () => {
             pollingStationChoicePageSaved: async () => {
               await expect(pollingStationChoicePage.fieldset).toBeVisible();
               await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
-                `${pollingStation1.number.toString()} - ${pollingStation1.name}`,
+                `${pollingStation1.number} - ${pollingStation1.name}`,
               );
             },
             differencesPage: async () => {
@@ -125,12 +162,22 @@ test.describe("My app", () => {
               await votersAndVotesPage.abortInput.click();
               await abortModal.saveInput.click();
             },
+            IMMEDIATE_ABORT_AND_SAVE: async () => {
+              await votersAndVotesPage.abortInput.click();
+              await abortModal.saveInput.click();
+            },
             ABORT_AND_DELETE: async () => {
               await votersAndVotesPage.abortInput.click();
               await abortModal.discardInput.click();
             },
             SUBMIT: async () => {
               await votersAndVotesPage.next.click();
+            },
+            RESUME_DATA_ENTRY: async () => {
+              // TODO: include in page object
+              await pollingStationChoicePage.alertDataEntryInProgress
+                .getByRole("link", { name: `${pollingStation1.number} - ${pollingStation1.name}` })
+                .click();
             },
           },
         });

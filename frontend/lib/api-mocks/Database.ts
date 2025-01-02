@@ -1,6 +1,6 @@
-import { ClientState, Election, getInitialValues, PollingStation, PollingStationResults } from "@kiesraad/api";
+import { Election, PollingStation, PollingStationResults } from "@kiesraad/api";
 
-import { electionListMockResponse, getElectionMockData } from "./ElectionMockData.ts";
+import { electionListMockResponse, getElectionMockData } from "./ElectionMockData";
 
 export interface Record {
   pollingStationId: number;
@@ -14,7 +14,7 @@ export interface ResultRecord extends Record {
 
 export interface DataEntryRecord extends Record {
   progress: number;
-  clientState: ClientState;
+  clientState: unknown;
   updated_at: number;
 }
 
@@ -30,42 +30,8 @@ const electionMockData = electionListMockResponse.elections.map(({ id }) => getE
 const initialData: Database = {
   elections: electionMockData.map((e) => e.election),
   pollingStations: electionMockData.reduce<PollingStation[]>((stations, e) => [...stations, ...e.polling_stations], []),
-  results: [
-    {
-      pollingStationId: 4,
-      entryNumber: 1,
-      created_at: new Date().getTime(),
-      data: getInitialValues(getElectionMockData(1).election as Required<Election>),
-    },
-  ],
-  dataEntries: [
-    {
-      pollingStationId: 2,
-      entryNumber: 1,
-      progress: 0,
-      clientState: {
-        furthest: "recounted",
-        current: "recounted",
-        acceptedWarnings: [],
-        continue: true,
-      },
-      updated_at: new Date().getTime(),
-      data: getInitialValues(getElectionMockData(1).election as Required<Election>),
-    },
-    {
-      pollingStationId: 3,
-      entryNumber: 1,
-      progress: 42,
-      clientState: {
-        furthest: "political_group_votes_6",
-        current: "political_group_votes_6",
-        acceptedWarnings: [],
-        continue: true,
-      },
-      updated_at: new Date().getTime(),
-      data: getInitialValues(getElectionMockData(1).election as Required<Election>),
-    },
-  ],
+  results: [],
+  dataEntries: [],
 };
 
 export let Database: Database = structuredClone(initialData);

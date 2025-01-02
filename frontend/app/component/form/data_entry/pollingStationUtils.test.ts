@@ -1,13 +1,12 @@
 import { assert, describe, expect, test } from "vitest";
 
-import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/test/unit/form";
+import { PollingStationResults, ValidationResult } from "@kiesraad/api";
 
+import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "../testHelperFunctions";
+import { AnyFormReference, ClientValidationResult, FormSection } from "./PollingStationFormController";
 import {
   addValidationResultToFormState,
-  AnyFormReference,
-  ClientValidationResult,
   currentFormHasChanges,
-  FormSection,
   formSectionComplete,
   getErrorsAndWarnings,
   getNextSectionID,
@@ -15,10 +14,8 @@ import {
   hasOnlyGlobalValidationResults,
   isFormSectionEmpty,
   isGlobalValidationResult,
-  PollingStationResults,
   resetFormSectionState,
-  ValidationResult,
-} from "@kiesraad/api";
+} from "./pollingStationUtils";
 
 const defaultValues: PollingStationResults = emptyDataEntryRequest.data;
 

@@ -4,9 +4,9 @@ import { screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { PollingStationListPage } from "app/module/polling_stations";
-import { overrideOnce, render } from "app/test/unit";
 
 import { ElectionProvider, PollingStationListResponse } from "@kiesraad/api";
+import { overrideOnce, render } from "@kiesraad/test";
 
 describe("PollingStationListPage", () => {
   test("Show polling stations", async () => {

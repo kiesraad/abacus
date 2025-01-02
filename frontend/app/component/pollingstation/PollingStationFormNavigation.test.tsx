@@ -1,43 +1,33 @@
-import { useBlocker, useNavigate } from "react-router-dom";
-
 import { render, screen } from "@testing-library/react";
-import { afterAll, beforeAll, describe, expect, Mock, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
-import { defaultFormState, emptyDataEntryRequest } from "app/test/unit/form.ts";
+import { defaultFormState, emptyDataEntryRequest } from "app/component/form/testHelperFunctions";
 
-import { usePollingStationFormController } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 
 import { PollingStationFormNavigation } from "./PollingStationFormNavigation";
 
-vi.mock("react-router-dom", () => ({
-  Link: vi.fn(),
-  useNavigate: vi.fn(),
-  useBlocker: vi.fn(),
+const mocks = vi.hoisted(() => ({
+  useNavigate: vi.fn().mockReturnValue(vi.fn()),
+  useBlocker: vi.fn().mockReturnValue(vi.fn()),
+  usePollingStationFormController: vi.fn(),
 }));
 
-vi.mock("@kiesraad/api", async () => {
-  const utils = await vi.importActual("../../../lib/api/form/pollingstation/pollingStationUtils.ts");
-  return {
-    usePollingStationFormController: vi.fn(),
-    currentFormHasChanges: utils.currentFormHasChanges,
-  };
-});
+vi.mock("react-router-dom", () => ({
+  useNavigate: mocks.useNavigate,
+  useBlocker: mocks.useBlocker,
+  Navigate: vi.fn(),
+  Route: vi.fn(),
+  createRoutesFromElements: vi.fn(),
+}));
+
+vi.mock("../form/data_entry/usePollingStationFormController", () => ({
+  usePollingStationFormController: mocks.usePollingStationFormController,
+}));
 
 describe("PollingStationFormNavigation", () => {
-  const mockNavigate = vi.fn();
-
-  beforeAll(() => {
-    (useBlocker as Mock).mockReturnValue(vi.fn());
-    (useNavigate as Mock).mockReturnValue(mockNavigate);
-  });
-
-  afterAll(() => {
-    vi.clearAllMocks();
-  });
-
   test("It blocks navigation when form has changes", () => {
-    (usePollingStationFormController as Mock).mockReturnValue({
+    mocks.usePollingStationFormController.mockReturnValue({
       status: { current: "idle" },
       formState: {
         ...defaultFormState,
@@ -58,7 +48,7 @@ describe("PollingStationFormNavigation", () => {
     });
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
-    const shouldBlock = (useBlocker as Mock).mock.lastCall;
+    const shouldBlock = mocks.useBlocker.mock.lastCall;
     if (Array.isArray(shouldBlock)) {
       const blocker = shouldBlock[0] as ({
         currentLocation,
@@ -73,7 +63,7 @@ describe("PollingStationFormNavigation", () => {
   });
 
   test("It blocks navigation when form has errors", async () => {
-    (usePollingStationFormController as Mock).mockReturnValue({
+    mocks.usePollingStationFormController.mockReturnValue({
       status: { current: "idle" },
       formState: {
         ...defaultFormState,
@@ -103,14 +93,14 @@ describe("PollingStationFormNavigation", () => {
       entryNumber: 1,
     });
 
-    (useBlocker as Mock).mockReturnValue({
+    mocks.useBlocker.mockReturnValue({
       state: "blocked",
       location: { pathname: "/elections/1/data-entry/1/1" },
     });
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
-    const shouldBlock = (useBlocker as Mock).mock.lastCall;
+    const shouldBlock = mocks.useBlocker.mock.lastCall;
     if (Array.isArray(shouldBlock)) {
       const blocker = shouldBlock[0] as ({
         currentLocation,
@@ -133,7 +123,7 @@ describe("PollingStationFormNavigation", () => {
   });
 
   test("422 response results in display of error message", async () => {
-    (usePollingStationFormController as Mock).mockReturnValue({
+    mocks.usePollingStationFormController.mockReturnValue({
       status: { current: "idle" },
       formState: defaultFormState,
       apiError: {
@@ -160,7 +150,7 @@ describe("PollingStationFormNavigation", () => {
   });
 
   test("500 response results in display of error message", async () => {
-    (usePollingStationFormController as Mock).mockReturnValue({
+    mocks.usePollingStationFormController.mockReturnValue({
       status: { current: "idle" },
       formState: defaultFormState,
       apiError: {

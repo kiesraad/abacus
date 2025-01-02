@@ -2,10 +2,11 @@ import * as React from "react";
 
 import { describe, expect, test } from "vitest";
 
-import { overrideOnce, Providers, renderHook, waitFor } from "app/test/unit";
+import { PollingStationFormController } from "app/component/form/data_entry/PollingStationFormController";
+import { usePollingStationFormController } from "app/component/form/data_entry/usePollingStationFormController";
 
-import { PollingStationFormController, usePollingStationFormController } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
+import { overrideOnce, Providers, renderHook, waitFor } from "@kiesraad/test";
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <Providers>

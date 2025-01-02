@@ -1,7 +1,6 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
-  ClientState,
   ElectionDetailsResponse,
   ElectionListResponse,
   ElectionStatusResponse,
@@ -19,8 +18,8 @@ import {
   SaveDataEntryResponse,
 } from "@kiesraad/api";
 
-import { Database, DataEntryRecord, pollingStationID } from "./Database.ts";
-import { validate } from "./DataEntry.ts";
+import { Database, DataEntryRecord, pollingStationID } from "./Database";
+import { validate } from "./DataEntry";
 import { electionListMockResponse, getElectionMockData } from "./ElectionMockData";
 
 type ParamsToString<T> = {
@@ -151,7 +150,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
       entryNumber: Number(params.entry_number),
       progress: json.progress,
       data: json.data,
-      clientState: json.client_state as ClientState,
+      clientState: json.client_state,
       updated_at: Number(Date.now() / 1000),
     };
 

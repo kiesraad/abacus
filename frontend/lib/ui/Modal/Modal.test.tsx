@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { getQueriesForElement, render, screen } from "app/test/unit";
+import { getQueriesForElement, render, screen } from "@kiesraad/test";
 
 import { Modal } from "./Modal";
 

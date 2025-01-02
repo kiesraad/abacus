@@ -5,11 +5,13 @@ import { PollingStationFormNavigation } from "app/component/pollingstation/Polli
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 import { AbortDataEntryControl } from "app/module/data_entry";
 
-import { NotFoundError, PollingStationFormController, useElection } from "@kiesraad/api";
+import { NotFoundError, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
 import { Badge, PageTitle, PollingStationNumber, StickyNav, WorkStationNumber } from "@kiesraad/ui";
 import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";
+
+import { PollingStationFormController } from "../../../component/form/data_entry/PollingStationFormController";
 
 export function PollingStationLayout() {
   const pollingStationId = useNumericParam("pollingStationId");

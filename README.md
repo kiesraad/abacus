@@ -96,7 +96,7 @@ Auteursrecht © 2024 Kiesraad.
 Gelicentieerd onder EUPL-1.2 of hoger, tenzij anders aangegeven:
 
 - Fonts in `frontend/static/font` en `backend/templates/fonts` zijn gelicentieerd onder de SIL Open Font License versie 1.1 (OFL v1.1).
-- De bestanden `frontend/app/msw-mock-api.ts` en `frontend/app/test/unit/server.ts`
+- De bestanden `frontend/app/msw-mock-api.ts` en `frontend/lib/test/server.ts`
   zijn gelicentieerd onder de Mozilla Public License v2.0 (MPL 2.0).
 - Dependencies uit npm en Cargo zijn gelicentieerd onder hun eigen respectievelijke licenties.
 

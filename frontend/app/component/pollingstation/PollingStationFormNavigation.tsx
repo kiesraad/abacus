@@ -3,19 +3,14 @@ import { BlockerFunction, useBlocker, useNavigate } from "react-router-dom";
 
 import { AbortDataEntryModal } from "app/module/data_entry";
 
-import {
-  AnyFormReference,
-  currentFormHasChanges,
-  Election,
-  FormSectionID,
-  FormState,
-  PollingStationResults,
-  usePollingStationFormController,
-} from "@kiesraad/api";
+import { Election, PollingStationResults } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
-import { ErrorModal } from "../error/ErrorModal";
+import { ErrorModal } from "../error";
+import { AnyFormReference, FormSectionID, FormState } from "../form/data_entry/PollingStationFormController";
+import { currentFormHasChanges } from "../form/data_entry/pollingStationUtils";
+import { usePollingStationFormController } from "../form/data_entry/usePollingStationFormController";
 import { getUrlForFormSectionID } from "./utils";
 
 export interface PollingStationFormNavigationProps {

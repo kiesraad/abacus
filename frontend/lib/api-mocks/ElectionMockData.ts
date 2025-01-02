@@ -8,7 +8,7 @@ import {
   PoliticalGroup,
 } from "@kiesraad/api";
 
-import { getPollingStationMockData } from "./PollingStationMockData.ts";
+import { getPollingStationMockData } from "./PollingStationMockData";
 
 export const politicalGroupMockData: PoliticalGroup = {
   number: 1,

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { CandidateVotes, getErrorsAndWarnings, PoliticalGroup, usePoliticalGroup } from "@kiesraad/api";
+import { CandidateVotes, PoliticalGroup } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import {
   Alert,
@@ -18,6 +18,8 @@ import {
 import { candidateNumberFromId, deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
+import { getErrorsAndWarnings } from "../pollingStationUtils";
+import { usePoliticalGroup } from "./usePoliticalGroups";
 
 interface FormElements extends HTMLFormControlsCollection {
   total: HTMLInputElement;

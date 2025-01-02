@@ -1,13 +1,14 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { expectErrorPage, expectNotFound, overrideOnce, Providers, setupTestRouter } from "app/test/unit";
+import { routes } from "app/routes";
 
 import { electionStatusMockResponse } from "@kiesraad/api-mocks";
+import { expectErrorPage, expectNotFound, overrideOnce, Providers, setupTestRouter } from "@kiesraad/test";
 
 // NOTE: We're not using the wrapped render function here,
 // since we want control over our own memory router.
-const router = setupTestRouter();
+const router = setupTestRouter(routes);
 const render = () => rtlRender(<Providers router={router} />);
 
 describe("routes", () => {

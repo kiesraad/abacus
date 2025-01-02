@@ -3,9 +3,8 @@ import * as Router from "react-router";
 import { screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { render } from "app/test/unit";
-
 import { ElectionProvider } from "@kiesraad/api";
+import { render } from "@kiesraad/test";
 
 import { PollingStationCreatePage } from "./PollingStationCreatePage";
 

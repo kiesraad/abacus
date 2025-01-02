@@ -1,13 +1,9 @@
 import { ReactElement } from "react";
-import { createMemoryRouter } from "react-router-dom";
+import { createMemoryRouter, RouteObject } from "react-router-dom";
 
 import { render, RenderOptions, screen } from "@testing-library/react";
 import { UserEvent } from "@testing-library/user-event";
 import { expect } from "vitest";
-
-import { routes } from "app/routes";
-
-import { PoliticalGroup } from "@kiesraad/api";
 
 import { Providers } from "./Providers";
 
@@ -21,7 +17,7 @@ export { customRender as render };
 export { router } from "./router";
 /* eslint-enable import/export */
 
-export const setupTestRouter = () => {
+export const setupTestRouter = (routes: RouteObject[]) => {
   return createMemoryRouter(routes, {
     future: {
       v7_normalizeFormMethod: true,
@@ -68,13 +64,4 @@ export async function userTypeInputs(user: UserEvent, inputs: { [key: string]: s
     await user.type(input, value.toString());
     expect(input).toHaveValue(value.toString());
   }
-}
-
-export function getCandidateFullNamesFromMockData(politicalGroupMockData: PoliticalGroup): string[] {
-  const candidateNames = politicalGroupMockData.candidates.map((candidate) => {
-    return candidate.first_name
-      ? `${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`
-      : `${candidate.last_name}, ${candidate.initials}`;
-  });
-  return candidateNames;
 }

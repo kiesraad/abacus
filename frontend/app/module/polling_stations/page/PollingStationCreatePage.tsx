@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 
 import { PollingStationForm } from "app/component/form/polling_station/PollingStationForm";
-import { NavBar } from "app/component/navbar/NavBar.tsx";
+import { NavBar } from "app/component/navbar/NavBar";
 
 import { PollingStation, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

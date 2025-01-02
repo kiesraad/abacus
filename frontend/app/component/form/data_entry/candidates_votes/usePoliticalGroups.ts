@@ -1,6 +1,8 @@
 import * as React from "react";
 
-import { PoliticalGroupVotes, usePollingStationFormController } from "@kiesraad/api";
+import { PoliticalGroupVotes } from "@kiesraad/api";
+
+import { usePollingStationFormController } from "../usePollingStationFormController";
 
 export function usePoliticalGroup(
   political_group_number: number,

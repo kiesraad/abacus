@@ -2,21 +2,18 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import {
+  emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
 } from "app/component/form/testHelperFunctions";
-import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form";
 
-import {
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationFormController,
-  PollingStationResults,
-} from "@kiesraad/api";
+import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@kiesraad/api";
 import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
+import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "@kiesraad/test";
 
+import { PollingStationFormController } from "../PollingStationFormController";
 import { DifferencesForm } from "./DifferencesForm";
 
 function renderForm(defaultValues: Partial<PollingStationResults> = {}) {

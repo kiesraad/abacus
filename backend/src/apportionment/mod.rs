@@ -1,12 +1,13 @@
 use crate::apportionment::fraction::Fraction;
 use crate::summary::ElectionSummary;
+use serde::{Deserialize, Serialize};
 
 mod fraction;
 
 /// Apportionment - work in progress!!
-pub fn seat_allocation(seats: u64, totals: &ElectionSummary) {
+pub fn seat_allocation(seats: u64, totals: &ElectionSummary) -> Result<(), ApportionmentError> {
     if seats < 19 {
-        panic!("Seat allocation for < 19 seats is not yet implemented.");
+        return Err(ApportionmentError::SeatAllocationLessThan19SeatsNotImplemented);
     }
     println!("Seat allocation for 19 or more seats.");
     println!("Totals {:#?}", totals);
@@ -20,7 +21,7 @@ pub fn seat_allocation(seats: u64, totals: &ElectionSummary) {
     println!("Seats: {}", seats);
     println!("Quota: {}", quota);
 
-    // TODO: check for lijstuitputting (allocated seats cannot be more than total candidates)
+    // TODO: #787 check for lijstuitputting (allocated seats cannot be more than total candidates)
 
     // calculate number of whole seats for each party
     let mut whole_seats = vec![];
@@ -37,7 +38,7 @@ pub fn seat_allocation(seats: u64, totals: &ElectionSummary) {
     );
     let mut remaining_seats = seats - whole_seats_count;
     let mut rest_seats = vec![0; totals.political_group_votes.len()];
-    let mut idx_last_remaining_seat: Option<usize> = None;
+    // let mut idx_last_remaining_seat: Option<usize> = None;
 
     // allocate remaining seats (restzetels)
     // using greatest average ("stelsel grootste gemiddelden")
@@ -63,35 +64,16 @@ pub fn seat_allocation(seats: u64, totals: &ElectionSummary) {
         // if maximum occurs more than once, exit with error if less remaining seats are available than max count
         let max_count = avgs.iter().filter(|&a| a == max).count() as u64;
         if max_count > remaining_seats {
-            // TODO: if multiple parties have the same max and not enough remaining seats are available, use drawing of lots
-            panic!("Drawing of lots is needed!");
+            // TODO: #788 if multiple parties have the same max and not enough remaining seats are available, use drawing of lots
+            return Err(ApportionmentError::DrawingOfLotsNotImplemented);
         }
 
         rest_seats[idx] += 1;
         remaining_seats -= 1;
-        idx_last_remaining_seat = Some(idx);
+        // idx_last_remaining_seat = Some(idx);
     }
-
-    println!("===========================");
 
     // TODO: #785 Add check for absolute majority of votes vs seats and adjust last remaining seat assigned accordingly
-    if let Some(idx) = idx_last_remaining_seat {
-        println!("Last remaining seat given to idx: {}", idx);
-        let half_of_votes_count = totals.votes_counts.votes_candidates_count as f64 / 2.0;
-        println!("Half of votes count: {}", half_of_votes_count);
-        let absolute_majority_votes_count: u32 =
-            if totals.votes_counts.votes_candidates_count % 2 == 0 {
-                // with an even number of valid votes on candidates: 50% + 1
-                (half_of_votes_count + 1.0) as u32
-            } else {
-                // with an uneven number of valid votes on candidates: 50% + ½
-                (half_of_votes_count + 0.5) as u32
-            };
-        println!(
-            "Absolute majority votes count: {}",
-            absolute_majority_votes_count
-        )
-    }
 
     println!("===========================");
     println!("Whole seats: {:?}", whole_seats);
@@ -104,16 +86,25 @@ pub fn seat_allocation(seats: u64, totals: &ElectionSummary) {
             .map(|(a, b)| a + b)
             .collect::<Vec<_>>()
     );
+
+    Ok(())
+}
+
+/// Errors that can occur during apportionment
+// TODO: integrate this with the application-wide error.rs once the apportionment functionality is finished
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+pub enum ApportionmentError {
+    SeatAllocationLessThan19SeatsNotImplemented,
+    DrawingOfLotsNotImplemented,
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::apportionment::seat_allocation;
+    use crate::apportionment::{seat_allocation, ApportionmentError};
     use crate::data_entry::{PoliticalGroupVotes, VotersCounts, VotesCounts};
     use crate::summary::{ElectionSummary, SummaryDifferencesCounts};
 
     #[test]
-    #[should_panic]
     fn test_seat_allocation_less_than_19_seats() {
         let totals = ElectionSummary {
             voters_counts: VotersCounts {
@@ -139,7 +130,11 @@ mod tests {
             ],
         };
 
-        seat_allocation(17, &totals);
+        let result = seat_allocation(17, &totals);
+        assert_eq!(
+            result,
+            Err(ApportionmentError::SeatAllocationLessThan19SeatsNotImplemented)
+        );
     }
 
     #[test]
@@ -168,11 +163,11 @@ mod tests {
             ],
         };
 
-        seat_allocation(23, &totals);
+        let result = seat_allocation(23, &totals);
+        assert!(result.is_ok());
     }
 
     #[test]
-    #[should_panic]
     fn test_seat_allocation_with_drawing_of_lots_error() {
         let totals = ElectionSummary {
             voters_counts: VotersCounts {
@@ -199,39 +194,7 @@ mod tests {
             ],
         };
 
-        seat_allocation(23, &totals);
-    }
-
-    #[test]
-    fn test_with_absolute_majority_votes_but_not_seats() {
-        // This test triggers Kieswet Article P9 (#785)
-        let totals = ElectionSummary {
-            voters_counts: VotersCounts {
-                poll_card_count: 15000,
-                proxy_certificate_count: 0,
-                voter_card_count: 0,
-                total_admitted_voters_count: 15000,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_count: 15000,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 15000,
-            },
-            differences_counts: SummaryDifferencesCounts::zero(),
-            recounted_polling_stations: vec![],
-            political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, 7501, &[]),
-                PoliticalGroupVotes::from_test_data_auto(2, 1249, &[]),
-                PoliticalGroupVotes::from_test_data_auto(3, 1249, &[]),
-                PoliticalGroupVotes::from_test_data_auto(4, 1249, &[]),
-                PoliticalGroupVotes::from_test_data_auto(5, 1249, &[]),
-                PoliticalGroupVotes::from_test_data_auto(6, 1249, &[]),
-                PoliticalGroupVotes::from_test_data_auto(7, 1249, &[]),
-                PoliticalGroupVotes::from_test_data_auto(8, 6, &[]),
-            ],
-        };
-
-        seat_allocation(24, &totals);
+        let result = seat_allocation(23, &totals);
+        assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 }

@@ -304,7 +304,7 @@ describe("Test PollingStationChoiceForm", () => {
 
       // Click polling station 33 and check if the link is correct
       const pollingStationList = await screen.findByTestId("polling_station_list");
-      await userEvent.click(within(pollingStationList).getByText("33"));
+      await user.click(within(pollingStationList).getByText("33"));
       expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry/1/2");
     });
   });

@@ -25,10 +25,11 @@ describe("usePreventFormEnterSubmit", () => {
       event.preventDefault();
     });
     const { getByTestId } = render(<TestComponent cb={fn} />);
+    const user = userEvent.setup();
 
     const input = getByTestId("input-test");
     input.focus();
-    await userEvent.type(input, "hello{enter}");
+    await user.type(input, "hello{enter}");
 
     expect(fn).not.toHaveBeenCalled();
   });

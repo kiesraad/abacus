@@ -1,8 +1,15 @@
 .form-layout {
   padding-bottom: var(--space-xl);
 }
+
 .form-section {
   padding-bottom: var(--space-md);
+
+  h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    margin-bottom: var(--space-md-lg);
+  }
 }
 
 .form-row {

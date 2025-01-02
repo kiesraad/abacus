@@ -21,7 +21,7 @@ export function deformatNumber(s: string) {
   if (cleaned == "") {
     cleaned = "0";
   }
-  return parseInt(cleaned, 10);
+  return parseInt(cleaned);
 }
 
 export function validateNumberString(s: string | null | undefined) {

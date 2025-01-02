@@ -40,7 +40,7 @@ export function PollingStationLayout() {
         </Link>
       </NavBar>
       <header>
-        <section>
+        <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
           {pollingStationStatus && <Badge type={pollingStationStatus} />}

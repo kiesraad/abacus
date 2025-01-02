@@ -1,6 +1,6 @@
 import { Election, PollingStation, PollingStationResults } from "@kiesraad/api";
 
-import { electionListMockResponse, getElectionMockData } from "./ElectionMockData.ts";
+import { electionListMockResponse, getElectionMockData } from "./ElectionMockData";
 
 export interface Record {
   pollingStationId: number;

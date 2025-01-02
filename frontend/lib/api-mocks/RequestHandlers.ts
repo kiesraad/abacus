@@ -18,8 +18,8 @@ import {
   SaveDataEntryResponse,
 } from "@kiesraad/api";
 
-import { Database, DataEntryRecord, pollingStationID } from "./Database.ts";
-import { validate } from "./DataEntry.ts";
+import { Database, DataEntryRecord, pollingStationID } from "./Database";
+import { validate } from "./DataEntry";
 import { electionListMockResponse, getElectionMockData } from "./ElectionMockData";
 
 type ParamsToString<T> = {

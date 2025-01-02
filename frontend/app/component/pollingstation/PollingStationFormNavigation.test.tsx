@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { defaultFormState, emptyDataEntryRequest } from "app/component/form/testHelperFunctions.ts";
+import { defaultFormState, emptyDataEntryRequest } from "app/component/form/testHelperFunctions";
 
 import { electionMockData } from "@kiesraad/api-mocks";
 

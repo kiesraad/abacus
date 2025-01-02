@@ -8,7 +8,7 @@ import { ErrorResponse, PollingStation } from "@kiesraad/api";
 import { PollingStationForm } from "./PollingStationForm";
 
 function getInputs() {
-  const result = {
+  return {
     number: screen.getByRole("textbox", { name: "Nummer" }),
     name: screen.getByRole("textbox", { name: "Naam" }),
     numberOfVoters: screen.getByRole("textbox", { name: "Aantal kiesgerechtigden Optioneel" }),
@@ -19,8 +19,6 @@ function getInputs() {
     typeOptionSpecial: screen.getByRole("radio", { name: "Bijzonder" }),
     typeOptionMobile: screen.getByRole("radio", { name: "Mobiel" }),
   };
-
-  return result;
 }
 
 async function fillForm(user: UserEvent, testPollingStation: PollingStation | Omit<PollingStation, "id">) {

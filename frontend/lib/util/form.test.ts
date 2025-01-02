@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { AnyFormField, FormFields, processForm, validateFormValue, ValidationError } from "./form.util";
+import { AnyFormField, FormFields, processForm, validateFormValue, ValidationError } from "@kiesraad/util";
 
 describe("Form Utils", () => {
   test.each<[AnyFormField, string | number, ValidationError | null]>([

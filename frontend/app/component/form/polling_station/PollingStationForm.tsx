@@ -2,7 +2,8 @@ import * as React from "react";
 
 import { isSuccess, PollingStation, PollingStationRequest, useCrud } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { Alert, Button, ChoiceList, Form, FormFields, FormLayout, InputField, useForm } from "@kiesraad/ui";
+import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@kiesraad/ui";
+import { FormFields, useForm } from "@kiesraad/util";
 
 export interface PollingStationFormProps {
   electionId: number;

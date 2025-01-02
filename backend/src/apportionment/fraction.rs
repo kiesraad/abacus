@@ -93,18 +93,16 @@ mod tests {
     fn test_from_count() {
         let numerator = 5 as Count;
         let fraction = Fraction::new(5, 1);
-        let fraction_string = format!("{}", fraction);
         assert_eq!(fraction, Fraction::from_count(numerator));
-        assert_eq!(fraction_string, "5")
+        assert_eq!(fraction.to_string(), "5")
     }
 
     #[test]
     fn test_from_u64() {
         let numerator = 10u64;
         let fraction = Fraction::new(10, 1);
-        let fraction_string = format!("{}", fraction);
         assert_eq!(fraction, Fraction::from_u64(numerator));
-        assert_eq!(fraction_string, "10")
+        assert_eq!(fraction.to_string(), "10")
     }
 
     #[test]
@@ -112,9 +110,8 @@ mod tests {
         let fraction = Fraction::new(11, 5);
         let other_fraction = Fraction::new(1, 2);
         let divided = Fraction::new(22, 5);
-        let divided_string = format!("{}", divided);
         assert_eq!(divided, fraction.divide(&other_fraction));
-        assert_eq!(divided_string, "4 2/5")
+        assert_eq!(divided.to_string(), "4 2/5")
     }
 
     #[test]
@@ -122,9 +119,8 @@ mod tests {
         let fraction = Fraction::new(1, 5);
         let other_fraction = Fraction::new(2, 9);
         let divided = Fraction::new(9, 10);
-        let divided_string = format!("{}", divided);
         assert_eq!(divided, fraction.divide(&other_fraction));
-        assert_eq!(divided_string, "9/10")
+        assert_eq!(divided.to_string(), "9/10")
     }
 
     #[test]
@@ -138,8 +134,7 @@ mod tests {
     #[test]
     fn test_nan() {
         let fraction = Fraction::new(1, 0);
-        let fraction_string = format!("{}", fraction);
-        assert_eq!(fraction_string, "NaN");
+        assert_eq!(fraction.to_string(), "NaN");
     }
 
     #[test]

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { PollingStation, PollingStationStatus, useElection, useElectionStatus } from "@kiesraad/api";
+import { DataEntryStatusName, PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
@@ -50,8 +50,10 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
     const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
-    const pollingStationStatus = electionStatus.statuses.find((status) => status.id === pollingStation?.id)?.status;
-    const firstAndSecondEntryFinished: PollingStationStatus[] = ["first_second_entry_different", "definitive"];
+    const pollingStationStatus = electionStatus.statuses.find(
+      (status) => status.polling_station_id === pollingStation?.id,
+    )?.status;
+    const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
 
     if (pollingStationStatus && firstAndSecondEntryFinished.includes(pollingStationStatus)) {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
@@ -69,16 +71,9 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   };
 
   const unfinished = electionStatus.statuses
-    .filter((status) =>
-      [
-        "first_entry_unfinished",
-        "first_entry_in_progress",
-        "second_entry_unfinished",
-        "second_entry_in_progress",
-      ].includes(status.status),
-    )
+    .filter((status) => ["first_entry_in_progress", "second_entry_in_progress"].includes(status.status))
     .map((status) => ({
-      pollingStation: pollingStations.find((ps) => ps.id === status.id),
+      pollingStation: pollingStations.find((ps) => ps.id === status.polling_station_id),
       status: status.status,
     }));
 

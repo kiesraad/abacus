@@ -11,6 +11,8 @@ use sqlx::SqlitePool;
 use tokio::net::TcpListener;
 use tokio::signal;
 use tracing::info;
+use tracing::level_filters::LevelFilter;
+use tracing_subscriber::EnvFilter;
 
 /// Abacus API and asset server
 #[derive(Parser, Debug)]
@@ -38,7 +40,13 @@ struct Args {
 /// API server and in-memory file router on port 8080.
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    tracing_subscriber::fmt().init();
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            EnvFilter::builder()
+                .with_default_directive(LevelFilter::INFO.into())
+                .from_env()?,
+        )
+        .init();
 
     let args = Args::parse();
     let pool = create_sqlite_pool(&args).await?;

@@ -20,16 +20,16 @@ h6,
   margin-top: 0;
   font-family: var(--font-header-body), sans-serif;
   color: var(--text-color-header);
-  font-size: 1rem;
   font-style: normal;
   font-weight: normal;
-  letter-spacing: -0.72px;
 }
 
 h1,
 .heading-xl {
   font-family: var(--font-header), sans-serif;
   font-size: 2.25rem;
+  line-height: 2.35rem;
+  letter-spacing: -0.045rem;
 }
 
 h2,

@@ -17,11 +17,11 @@ describe("ElectionProgress", () => {
       statuses: [
         {
           id: 1,
-          status: "not_started",
+          status: "first_entry_not_started",
         },
         {
           id: 2,
-          status: "second_entry",
+          status: "second_entry_not_started",
         },
         {
           id: 3,

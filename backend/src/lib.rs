@@ -1,10 +1,11 @@
 use axum::extract::FromRef;
-use axum::routing::{delete, get, post};
+use axum::routing::{get, post};
 use axum::Router;
 #[cfg(feature = "memory-serve")]
 use memory_serve::MemoryServe;
 use sqlx::SqlitePool;
 use std::error::Error;
+use tower_http::trace::TraceLayer;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -31,15 +32,9 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let data_entry_routes = Router::new()
         .route(
             "/:entry_number",
-            post(data_entry::polling_station_data_entry_save),
-        )
-        .route(
-            "/:entry_number",
-            get(data_entry::polling_station_data_entry_get),
-        )
-        .route(
-            "/:entry_number",
-            delete(data_entry::polling_station_data_entry_delete),
+            get(data_entry::polling_station_data_entry_get)
+                .post(data_entry::polling_station_data_entry_save)
+                .delete(data_entry::polling_station_data_entry_delete),
         )
         .route(
             "/:entry_number/finalise",
@@ -73,7 +68,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             get(polling_station::polling_station_list)
                 .post(polling_station::polling_station_create),
         )
-        .route("/:election_id/status", get(election::election_status));
+        .route("/:election_id/status", get(data_entry::election_status));
 
     let user_router = Router::new()
         .route("/login", post(authentication::login))
@@ -87,6 +82,8 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             "/api/polling_stations/:polling_station_id/data_entries",
             data_entry_routes,
         );
+
+    let app = app.layer(TraceLayer::new_for_http());
 
     #[cfg(feature = "memory-serve")]
     let app = {
@@ -129,7 +126,6 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             authentication::logout,
             election::election_list,
             election::election_details,
-            election::election_status,
             election::election_download_zip_results,
             election::election_download_pdf_results,
             election::election_download_xml_results,
@@ -137,6 +133,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             data_entry::polling_station_data_entry_get,
             data_entry::polling_station_data_entry_delete,
             data_entry::polling_station_data_entry_finalise,
+            data_entry::election_status,
             polling_station::polling_station_list,
             polling_station::polling_station_create,
             polling_station::polling_station_get,
@@ -146,17 +143,22 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         components(
             schemas(
                 ErrorResponse,
+                data_entry::DataEntry,
                 authentication::Credentials,
                 authentication::LoginResponse,
                 data_entry::CandidateVotes,
-                data_entry::SaveDataEntryRequest,
+                data_entry::DataEntry,
                 data_entry::SaveDataEntryResponse,
                 data_entry::GetDataEntryResponse,
                 data_entry::DifferencesCounts,
                 data_entry::PoliticalGroupVotes,
+                data_entry::status::DataEntryStatus,
+                data_entry::status::DataEntryStatusName,
                 data_entry::PollingStationResults,
                 data_entry::VotersCounts,
                 data_entry::VotesCounts,
+                data_entry::ElectionStatusResponse,
+                data_entry::ElectionStatusResponseEntry,
                 data_entry::ValidationResult,
                 data_entry::ValidationResultCode,
                 data_entry::ValidationResults,
@@ -167,11 +169,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 election::CandidateGender,
                 election::ElectionListResponse,
                 election::ElectionDetailsResponse,
-                election::ElectionStatusResponse,
                 polling_station::PollingStation,
                 polling_station::PollingStationListResponse,
-                polling_station::PollingStationStatus,
-                polling_station::PollingStationStatusEntry,
                 polling_station::PollingStationType,
                 polling_station::PollingStationRequest,
             ),

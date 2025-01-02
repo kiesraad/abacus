@@ -227,22 +227,22 @@ const gotoForm = async (id: FormIdentifier, inputShouldHaveFocus = true) => {
     const bits = id.split("_");
     if (bits.length === 2 && bits[1]) {
       const pgNumber = parseInt(bits[1]);
-      await userEvent.click(screen.getByRole("link", { name: `Lijst ${pgNumber}` }));
+      await user.click(screen.getByRole("link", { name: `Lijst ${pgNumber}` }));
       await expectPoliticalGroupCandidatesForm(pgNumber, inputShouldHaveFocus);
       return;
     }
   }
   switch (id) {
     case "recounted":
-      await userEvent.click(screen.getByRole("link", { name: "Is er herteld?" }));
+      await user.click(screen.getByRole("link", { name: "Is er herteld?" }));
       await expectRecountedForm(inputShouldHaveFocus);
       break;
     case "voters_and_votes":
-      await userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
+      await user.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
       await expectVotersAndVotesForm(inputShouldHaveFocus);
       break;
     case "differences":
-      await userEvent.click(screen.getByRole("link", { name: "Verschillen" }));
+      await user.click(screen.getByRole("link", { name: "Verschillen" }));
       await expectDifferencesForm(inputShouldHaveFocus);
       break;
   }
@@ -363,7 +363,7 @@ describe("Polling Station data entry integration tests", () => {
         fillDifferencesForm,
         submit,
         // navigate back to the 'voters and votes' form
-        () => userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
+        () => user.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
         expectVotersAndVotesForm,
       ];
 
@@ -384,7 +384,7 @@ describe("Polling Station data entry integration tests", () => {
         expectVotersAndVotesForm,
         fillVotersAndVotesForm,
         // don't submit, and navigate back to the 'recounted' form
-        () => userEvent.click(screen.getByRole("link", { name: "Is er herteld?" })),
+        () => user.click(screen.getByRole("link", { name: "Is er herteld?" })),
         expectRecountedForm,
       ];
 
@@ -404,7 +404,7 @@ describe("Polling Station data entry integration tests", () => {
       await fillVotersAndVotesForm();
       await submit();
       await expectDifferencesForm();
-      await userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
+      await user.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
       await expectVotersAndVotesForm();
       await submit();
       await expectDifferencesForm();
@@ -426,7 +426,7 @@ describe("Polling Station data entry integration tests", () => {
         fillDifferencesForm,
         submit,
         // navigate back to the 'voters and votes' form and submit
-        () => userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
+        () => user.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
         expectVotersAndVotesForm,
         submit,
         // expect to be on the 'differences' form
@@ -443,7 +443,7 @@ describe("Polling Station data entry integration tests", () => {
 
       const steps = [
         ...stepsForPendingChanges,
-        () => userEvent.click(screen.getByRole("link", { name: "Verschillen" })),
+        () => user.click(screen.getByRole("link", { name: "Verschillen" })),
         expectBlockerModal,
       ];
 
@@ -484,7 +484,7 @@ describe("Polling Station data entry integration tests", () => {
           userTypeInputs(user, {
             total_admitted_voters_count: total_votes,
           }),
-        () => userEvent.click(screen.getByRole("link", { name: "Is er herteld?" })),
+        () => user.click(screen.getByRole("link", { name: "Is er herteld?" })),
         expectBlockerModal,
         () => user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" })),
         expectRecountedForm,

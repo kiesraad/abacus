@@ -56,5 +56,16 @@
   "users": "Gebruikers",
   "version": "Versie",
   "vote_count": "Aantal stemmen",
+  "form": {
+    "errors": {
+      "FORM_VALIDATION_RESULT_REQUIRED": "Dit veld mag niet leeg zijn",
+      "FORM_VALIDATION_RESULT_MIN_LENGTH": "Waarde is te kort",
+      "FORM_VALIDATION_RESULT_MAX_LENGTH": "Waarde is te lang",
+      "FORM_VALIDATION_RESULT_INVALID_TYPE": "Niet het juiste type",
+      "FORM_VALIDATION_RESULT_MIN": "Waarde is te laag",
+      "FORM_VALIDATION_RESULT_MAX": "Waarde is te hoog",
+      "FORM_VALIDATION_RESULT_INVALID_NUMBER": "Dit is geen getal. Voer een getal in"
+    }
+  },
   "you_are_here": "je bent hier"
 }

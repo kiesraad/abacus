@@ -51,12 +51,16 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
       void update(requestObject).then((result) => {
         if (isSuccess(result)) {
           onSaved?.(result.data);
+        } else {
+          window.scrollTo(0, 0);
         }
       });
     } else {
       void create(requestObject).then((result) => {
         if (isSuccess(result)) {
           onSaved?.(result.data);
+        } else {
+          window.scrollTo(0, 0);
         }
       });
     }

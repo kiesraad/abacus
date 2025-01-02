@@ -141,4 +141,24 @@ mod tests {
         let fraction_string = format!("{}", fraction);
         assert_eq!(fraction_string, "NaN");
     }
+
+    #[test]
+    fn test_eq() {
+        assert_eq!(Fraction::new(1, 4), Fraction::new(2, 8));
+    }
+
+    #[test]
+    fn test_ne() {
+        assert_ne!(Fraction::new(1, 4), Fraction::new(2, 4));
+    }
+
+    #[test]
+    fn test_greater_than() {
+        assert!(Fraction::new(1, 2) > Fraction::new(1, 3));
+    }
+
+    #[test]
+    fn test_smaller_than() {
+        assert!(Fraction::new(1, 3) < Fraction::new(1, 2));
+    }
 }

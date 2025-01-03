@@ -17,11 +17,7 @@ if (!rootDiv) {
 const root = createRoot(rootDiv);
 
 function render() {
-  const router = createBrowserRouter(routes, {
-    future: {
-      v7_normalizeFormMethod: true,
-    },
-  });
+  const router = createBrowserRouter(routes);
 
   root.render(
     <StrictMode>

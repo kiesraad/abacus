@@ -18,7 +18,7 @@ export function LoginForm() {
 
   function handleSubmit(event: FormEvent<LoginFormElement>) {
     event.preventDefault();
-    navigate("../account/setup");
+    void navigate("../account/setup");
   }
 
   return (

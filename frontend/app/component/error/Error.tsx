@@ -31,7 +31,7 @@ export function Error({ title, error, children }: ErrorProps) {
                 variant="secondary"
                 leftIcon={<IconArrowLeft />}
                 onClick={() => {
-                  navigate(-1);
+                  void navigate(-1);
                 }}
               >
                 {t("history_back")}

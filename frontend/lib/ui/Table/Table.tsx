@@ -50,7 +50,7 @@ function LinkRow({ children, to }: { children: React.ReactNode[]; to: To }) {
   const navigate = useNavigate();
 
   function handleClick() {
-    navigate(to);
+    void navigate(to);
   }
 
   return (

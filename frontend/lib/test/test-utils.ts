@@ -6,6 +6,7 @@ import { UserEvent } from "@testing-library/user-event";
 import { expect } from "vitest";
 
 import { Providers } from "./Providers";
+import { getRouter } from "./router";
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
   render(ui, { wrapper: Providers, ...options });
@@ -14,16 +15,26 @@ const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">
 // Re-export everything in RTL but shadow the original `render` with our custom implementation.
 export * from "@testing-library/react";
 export { customRender as render };
-export { router } from "./router";
 /* eslint-enable import/export */
 
 export const setupTestRouter = (routes: RouteObject[]) => {
-  return createMemoryRouter(routes, {
-    future: {
-      v7_normalizeFormMethod: true,
-    },
-  });
+  return createMemoryRouter(routes);
 };
+
+export function renderReturningRouter(ui: ReactElement) {
+  const router = getRouter(ui);
+  const providers = () => Providers({ router });
+  render(ui, { wrapper: providers });
+  return router;
+}
+
+export function renderReturningRouter2(ui: ReactElement) {
+  const router = getRouter(ui);
+  const providers = () => Providers({ router });
+  const result = render(ui, { wrapper: providers });
+  const rerender = result.rerender;
+  return { router, rerender };
+}
 
 export const expectErrorPage = async () => {
   expect(await screen.findByText(/Abacus is stuk/)).toBeVisible();

@@ -32,7 +32,7 @@ export function DataEntryHomePage() {
   const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
 
   function closeDataEntrySavedAlert() {
-    navigate(location.pathname);
+    void navigate(location.pathname);
   }
 
   return (

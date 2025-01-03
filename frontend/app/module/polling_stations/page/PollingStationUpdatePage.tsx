@@ -12,7 +12,6 @@ import { Alert, Button, Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationUpdatePage() {
-  const electionId = useNumericParam("electionId");
   const pollingStationId = useNumericParam("pollingStationId");
   const { election } = useElection();
   const navigate = useNavigate();
@@ -26,22 +25,24 @@ export function PollingStationUpdatePage() {
 
   const [error, setError] = React.useState<[string, string] | undefined>(undefined);
 
+  const parentUrl = `/elections/${election.id}/polling_stations`;
+
   function closeError() {
     setError(undefined);
   }
 
-  const handleSaved = () => {
-    navigate(`../?updated=${pollingStationId}`);
-  };
+  function handleSaved() {
+    void navigate(`${parentUrl}?updated=${pollingStationId}`);
+  }
 
-  const handleCancel = () => {
-    navigate("..");
-  };
+  function handleCancel() {
+    void navigate(parentUrl);
+  }
 
   function handleDeleted() {
     toggleShowDeleteModal();
     const pollingStation = "data" in requestState ? `${requestState.data.number} (${requestState.data.name})` : "";
-    navigate(`../?deleted=${encodeURIComponent(pollingStation)}`);
+    void navigate(`${parentUrl}?deleted=${encodeURIComponent(pollingStation)}`);
   }
 
   function handleDeleteError() {
@@ -89,7 +90,7 @@ export function PollingStationUpdatePage() {
           {requestState.status === "success" && (
             <>
               <PollingStationForm
-                electionId={electionId}
+                electionId={election.id}
                 pollingStation={requestState.data}
                 onSaved={handleSaved}
                 onCancel={handleCancel}

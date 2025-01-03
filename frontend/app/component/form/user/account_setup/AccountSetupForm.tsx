@@ -17,7 +17,7 @@ export function AccountSetupForm() {
   const navigate = useNavigate();
   function handleSubmit(event: FormEvent<AccountSetupFormElement>) {
     event.preventDefault();
-    navigate("/elections#new-account");
+    void navigate("/elections#new-account");
   }
 
   return (

@@ -1,7 +1,5 @@
-import * as Router from "react-router";
-
 import { screen } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { PollingStationListPage } from "app/module/polling_stations";
 
@@ -10,8 +8,6 @@ import { overrideOnce, render } from "@kiesraad/test";
 
 describe("PollingStationListPage", () => {
   test("Show polling stations", async () => {
-    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1" });
-
     render(
       <ElectionProvider electionId={1}>
         <PollingStationListPage />
@@ -48,8 +44,6 @@ describe("PollingStationListPage", () => {
     overrideOnce("get", "/api/elections/1/polling_stations", 200, {
       polling_stations: [],
     } satisfies PollingStationListResponse);
-
-    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1" });
 
     render(
       <ElectionProvider electionId={1}>

@@ -25,7 +25,7 @@ export function OverviewPage() {
   }
 
   function closeNewAccountAlert() {
-    navigate(location.pathname);
+    void navigate(location.pathname);
   }
 
   return (

@@ -62,7 +62,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     }
 
     if (pollingStation) {
-      navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStationStatus));
+      void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStationStatus));
     } else {
       setAlert(INVALID_POLLING_STATION_ALERT);
       setLoading(false);

@@ -9,6 +9,7 @@ use tower_http::trace::TraceLayer;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
+pub mod apportionment;
 pub mod authentication;
 pub mod data_entry;
 pub mod election;

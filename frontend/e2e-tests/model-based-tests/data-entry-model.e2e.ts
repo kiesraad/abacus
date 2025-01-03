@@ -29,17 +29,33 @@ import { test } from "../dom-to-db-tests/fixtures";
 //      niet bewaren
 //      sluit modal
 
+// in-form navigation
+// naar recount en gelijk terug naar voters -> niet gesubmitte data in voters blijft
+// naar recount en wijziging en terug naar voters -> optie om op te slaan of niet
+// naar recount en wijziging en submit
+
 // questions
 // include recount page in model to deal with IMMEDIATE_ABORT_AND_SAVE in a better/different way?
 
 const machine = createMachine({
-  initial: "emptyVotersVotesPage",
+  initial: "emptyRecountedPage",
   states: {
+    emptyRecountedPage: {
+      on: {
+        SELECT_NO_RECOUNT: "noRecount",
+      },
+    },
+    noRecount: {
+      on: {
+        SUBMIT_RECOUNT: "emptyVotersVotesPage",
+      },
+    },
     emptyVotersVotesPage: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageWithValidData",
         CLICK_ABORT: "immediateAbortInputModal", // needed to distinguish save and resume flow
         NAV_TO_POLLING_STATION_PAGE: "immediateAbortInputModal",
+        GO_TO_RECOUNTED_PAGE: "recountedPageNo",
       },
     },
     votersVotesPageWithValidData: {
@@ -47,6 +63,7 @@ const machine = createMachine({
         SUBMIT: "differencesPage",
         CLICK_ABORT: "abortInputModal",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModal",
+        GO_TO_RECOUNTED_PAGE: "recountedPageNo",
       },
     },
     abortInputModal: {
@@ -75,6 +92,15 @@ const machine = createMachine({
     },
     votersVotesPageAfterResume: {},
     votersVotesPageEmptyAfterResume: {},
+    recountedPageNo: {
+      // on: {
+      //   GO_TO_VOTERS_PAGE:
+      // }
+      // go to voters page
+      // change to yes and go to voters page and save
+      // change to yes and go to voters page and do not save
+      // submit and go to voters page
+    },
   },
 });
 
@@ -111,16 +137,21 @@ test.describe("Data entry", () => {
         await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation1.name);
         await pollingStationChoicePage.clickStart();
 
-        await recountedPage.no.check();
-        await recountedPage.next.click();
-
-        await expect(votersAndVotesPage.fieldset).toBeVisible();
-
         await path.test({
           states: {
+            emptyRecountedPage: async () => {
+              await expect(recountedPage.fieldset).toBeVisible();
+            },
+            noRecountRecountedPage: async () => {
+              await expect(recountedPage.no).toBeChecked();
+            },
             emptyVotersVotesPage: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               // TODO: check for empty fields?
+            },
+            recountedPageNo: async () => {
+              await expect(recountedPage.fieldset).toBeVisible();
+              await expect(recountedPage.no).toBeChecked();
             },
             votersVotesPageWithValidData: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -181,6 +212,12 @@ test.describe("Data entry", () => {
             },
           },
           events: {
+            SELECT_NO_RECOUNT: async () => {
+              await recountedPage.no.check();
+            },
+            SUBMIT_RECOUNT: async () => {
+              await recountedPage.next.click();
+            },
             FILL_WITH_VALID_DATA: async () => {
               await votersAndVotesPage.inputVotersCounts(voters);
               await votersAndVotesPage.inputVotesCounts(votes);
@@ -189,7 +226,14 @@ test.describe("Data entry", () => {
               await votersAndVotesPage.abortInput.click();
             },
             NAV_TO_POLLING_STATION_PAGE: async () => {
+              // TODO: do not use page
               await page.getByRole("link", { name: "Heemdamseburg" }).click();
+            },
+            GO_TO_RECOUNTED_PAGE: async () => {
+              await votersAndVotesPage.navPanel.recounted.click();
+            },
+            GO_TO_VOTERS_PAGE: async () => {
+              await recountedPage.navPanel.votersAndVotes.click();
             },
             SUBMIT: async () => {
               await votersAndVotesPage.next.click();

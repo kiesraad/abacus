@@ -7,16 +7,16 @@ import { PollingStation, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
 import { PageTitle } from "@kiesraad/ui";
-import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationCreatePage() {
-  const electionId = useNumericParam("electionId");
   const { election } = useElection();
   const navigate = useNavigate();
 
-  const handleSaved = (ps: PollingStation) => {
-    navigate(`../?created=${ps.id}`);
-  };
+  const parentUrl = `/elections/${election.id}/polling_stations`;
+
+  function handleSaved(ps: PollingStation) {
+    void navigate(`${parentUrl}?created=${ps.id}`);
+  }
 
   return (
     <>
@@ -39,7 +39,7 @@ export function PollingStationCreatePage() {
       </header>
       <main>
         <article>
-          <PollingStationForm electionId={electionId} onSaved={handleSaved} />
+          <PollingStationForm electionId={election.id} onSaved={handleSaved} />
         </article>
       </main>
     </>

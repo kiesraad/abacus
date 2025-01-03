@@ -82,7 +82,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
     if (currentSection && furthestSection) {
       if (currentSection.index > furthestSection.index) {
         const url = getUrlForFormSection(furthestSection.id);
-        navigate(url);
+        void navigate(url);
       }
     }
   }, [formState, navigate, getUrlForFormSection]);
@@ -97,7 +97,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
   const onSave = () =>
     void (async () => {
       await submitCurrentForm({ continueToNextSection: false });
-      if (blocker.location) navigate(blocker.location.pathname);
+      if (blocker.location) void navigate(blocker.location.pathname);
       if (blocker.reset) blocker.reset();
     })();
 

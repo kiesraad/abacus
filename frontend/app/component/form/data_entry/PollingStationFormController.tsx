@@ -231,9 +231,9 @@ export function PollingStationFormController({
     if (!targetFormSectionID) return;
     const url = getUrlForFormSectionID(election.id, pollingStationId, entryNumber, targetFormSectionID);
     if (location.pathname === getBaseUrl(election.id, pollingStationId, entryNumber)) {
-      navigate(url, { replace: true });
+      void navigate(url, { replace: true });
     } else if (location.pathname !== url) {
-      navigate(url);
+      void navigate(url);
     }
     setTargetFormSectionID(null);
   }, [targetFormSectionID, navigate, election.id, pollingStationId, entryNumber, location.pathname]);

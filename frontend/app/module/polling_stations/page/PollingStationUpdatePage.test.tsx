@@ -1,16 +1,19 @@
-import * as Router from "react-router";
-
 import { within } from "@testing-library/dom";
 import { screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider, PollingStation } from "@kiesraad/api";
-import { overrideOnce, render, server } from "@kiesraad/test";
+import { overrideOnce, render, renderReturningRouter, server } from "@kiesraad/test";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
-describe("PollingStationCreatePage", () => {
+vi.mock(import("@kiesraad/util"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  useNumericParam: vi.fn().mockReturnValue(1),
+}));
+
+describe("PollingStationUpdatePage", () => {
   const testPollingStation: PollingStation = {
     id: 1,
     election_id: 1,
@@ -24,8 +27,6 @@ describe("PollingStationCreatePage", () => {
   };
 
   test("Shows form", async () => {
-    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "1" });
-
     overrideOnce("get", `/api/polling_stations/${testPollingStation.id}`, 200, testPollingStation);
 
     render(
@@ -42,13 +43,9 @@ describe("PollingStationCreatePage", () => {
   });
 
   test("Navigates back on save", async () => {
-    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "1" });
-    const navigate = vi.fn();
-    vi.spyOn(Router, "useNavigate").mockReturnValue(navigate);
-
     overrideOnce("get", `/api/polling_stations/${testPollingStation.id}`, 200, testPollingStation);
 
-    render(
+    const router = renderReturningRouter(
       <ElectionProvider electionId={1}>
         <PollingStationUpdatePage />
       </ElectionProvider>,
@@ -58,7 +55,8 @@ describe("PollingStationCreatePage", () => {
     saveButton.click();
 
     await waitFor(() => {
-      expect(navigate).toHaveBeenCalledWith("../?updated=1");
+      expect(router.state.location.pathname).toEqual("/elections/1/polling_stations");
+      expect(router.state.location.search).toEqual("?updated=1");
     });
   });
 
@@ -66,13 +64,9 @@ describe("PollingStationCreatePage", () => {
     test("Returns to list page with a message", async () => {
       const user = userEvent.setup();
 
-      vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "1" });
-      const navigate = vi.fn();
-      vi.spyOn(Router, "useNavigate").mockReturnValue(navigate);
-
       overrideOnce("get", `/api/polling_stations/${testPollingStation.id}`, 200, testPollingStation);
 
-      render(
+      const router = renderReturningRouter(
         <ElectionProvider electionId={1}>
           <PollingStationUpdatePage />
         </ElectionProvider>,
@@ -101,17 +95,12 @@ describe("PollingStationCreatePage", () => {
         expect(request_url).toContain(`/api/polling_stations/${testPollingStation.id}`);
       });
 
-      await waitFor(() => {
-        expect(navigate).toHaveBeenCalledWith("../?deleted=1%20(test)");
-      });
+      expect(router.state.location.pathname).toEqual("/elections/1/polling_stations");
+      expect(router.state.location.search).toEqual("?deleted=1%20(test)");
     });
 
     test("Shows an error message when delete was not possible", async () => {
       const user = userEvent.setup();
-
-      vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "1" });
-      const navigate = vi.fn();
-      vi.spyOn(Router, "useNavigate").mockReturnValue(navigate);
 
       overrideOnce("get", `/api/polling_stations/${testPollingStation.id}`, 200, testPollingStation);
       overrideOnce("delete", `/api/polling_stations/${testPollingStation.id}`, 422, {

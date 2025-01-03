@@ -1,17 +1,15 @@
-import * as router from "react-router";
-
 import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionStatusMockResponse } from "@kiesraad/api-mocks";
-import { overrideOnce, render, screen, within } from "@kiesraad/test";
+import { overrideOnce, render, renderReturningRouter, screen, within } from "@kiesraad/test";
 
 function renderPollingStationChoicePage() {
-  render(
+  return renderReturningRouter(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
         <PollingStationChoiceForm />
@@ -227,16 +225,14 @@ describe("Test PollingStationChoiceForm", () => {
         ],
       } satisfies ElectionStatusResponse);
 
-      const mockNavigate = vi.fn();
-      vi.spyOn(router, "useNavigate").mockImplementation(() => mockNavigate);
-
-      renderPollingStationChoicePage();
+      const router = renderPollingStationChoicePage();
 
       const user = userEvent.setup();
       const pollingStation = await screen.findByTestId("pollingStation");
       await user.type(pollingStation, "33");
       await user.click(screen.getByRole("button", { name: "Beginnen" }));
-      expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry/1/2");
+
+      expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/2");
     });
   });
 
@@ -292,10 +288,7 @@ describe("Test PollingStationChoiceForm", () => {
         ],
       } satisfies ElectionStatusResponse);
 
-      const mockNavigate = vi.fn();
-      vi.spyOn(router, "useNavigate").mockImplementation(() => mockNavigate);
-
-      renderPollingStationChoicePage();
+      const router = renderPollingStationChoicePage();
 
       // Open the polling station list
       const user = userEvent.setup();
@@ -305,7 +298,8 @@ describe("Test PollingStationChoiceForm", () => {
       // Click polling station 33 and check if the link is correct
       const pollingStationList = await screen.findByTestId("polling_station_list");
       await user.click(within(pollingStationList).getByText("33"));
-      expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry/1/2");
+
+      expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/2");
     });
   });
 

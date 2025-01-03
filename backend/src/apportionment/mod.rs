@@ -27,7 +27,7 @@ pub fn seat_allocation(seats: u64, totals: &ElectionSummary) -> Result<(), Appor
     let mut whole_seats = vec![];
     for pg in &totals.political_group_votes {
         let pg_votes = Fraction::from_count(pg.total);
-        let pg_seats = pg_votes.divide_whole(&quota);
+        let pg_seats = pg_votes.divide_and_return_whole_number(&quota);
         whole_seats.push(pg_seats);
     }
 

@@ -30,8 +30,8 @@ impl Fraction {
         }
     }
 
-    // divide by whole number and return the whole number
-    pub fn divide_whole(&self, other: &Self) -> u64 {
+    // divide and return the whole number (integer division)
+    pub fn divide_and_return_whole_number(&self, other: &Self) -> u64 {
         (self.numerator * other.denominator) / (self.denominator * other.numerator)
     }
 }
@@ -64,13 +64,13 @@ impl Display for Fraction {
         if self.denominator == 0 {
             return write!(f, "NaN");
         }
-        let whole_part = self.numerator / self.denominator;
+        let whole_number = self.numerator / self.denominator;
         let remainder = self.numerator % self.denominator;
-        if whole_part > 0 {
+        if whole_number > 0 {
             if remainder > 0 {
-                write!(f, "{} {}/{}", whole_part, remainder, self.denominator)
+                write!(f, "{} {}/{}", whole_number, remainder, self.denominator)
             } else {
-                write!(f, "{}", whole_part)
+                write!(f, "{}", whole_number)
             }
         } else {
             write!(f, "{}/{}", self.numerator, self.denominator)
@@ -91,44 +91,46 @@ mod tests {
 
     #[test]
     fn test_from_count() {
-        let numerator = 5 as Count;
-        let fraction = Fraction::new(5, 1);
-        assert_eq!(fraction, Fraction::from_count(numerator));
+        let count = 5 as Count;
+        let fraction = Fraction::from_count(count);
+        assert_eq!(fraction, Fraction::new(5, 1));
         assert_eq!(fraction.to_string(), "5")
     }
 
     #[test]
     fn test_from_u64() {
         let numerator = 10u64;
-        let fraction = Fraction::new(10, 1);
-        assert_eq!(fraction, Fraction::from_u64(numerator));
+        let fraction = Fraction::from_u64(numerator);
+        assert_eq!(fraction, Fraction::new(10, 1));
         assert_eq!(fraction.to_string(), "10")
     }
 
     #[test]
-    fn test_divide_whole_part_larger_than_zero() {
+    fn test_divide_whole_number_larger_than_zero() {
         let fraction = Fraction::new(11, 5);
         let other_fraction = Fraction::new(1, 2);
-        let divided = Fraction::new(22, 5);
-        assert_eq!(divided, fraction.divide(&other_fraction));
+        let divided = fraction.divide(&other_fraction);
+        assert_eq!(divided, Fraction::new(22, 5));
         assert_eq!(divided.to_string(), "4 2/5")
     }
 
     #[test]
-    fn test_divide_whole_part_smaller_than_zero() {
+    fn test_divide_whole_number_smaller_than_zero() {
         let fraction = Fraction::new(1, 5);
         let other_fraction = Fraction::new(2, 9);
-        let divided = Fraction::new(9, 10);
-        assert_eq!(divided, fraction.divide(&other_fraction));
+        let divided = fraction.divide(&other_fraction);
+        assert_eq!(divided, Fraction::new(9, 10));
         assert_eq!(divided.to_string(), "9/10")
     }
 
     #[test]
-    fn test_divide_whole() {
+    fn test_divide_and_return_whole_number() {
         let fraction = Fraction::new(11, 5);
         let other_fraction = Fraction::new(1, 2);
-        let divided_whole = 4u64;
-        assert_eq!(divided_whole, fraction.divide_whole(&other_fraction));
+        assert_eq!(
+            fraction.divide_and_return_whole_number(&other_fraction),
+            4u64
+        );
     }
 
     #[test]

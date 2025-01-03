@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import { Footer } from "app/component/footer/Footer";
 import { MockTest } from "app/component/MockTest";

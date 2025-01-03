@@ -1,5 +1,5 @@
 import * as React from "react";
-import { To, useNavigate } from "react-router-dom";
+import { To, useNavigate } from "react-router";
 
 import { cn } from "@kiesraad/util";
 
@@ -50,7 +50,7 @@ function LinkRow({ children, to }: { children: React.ReactNode[]; to: To }) {
   const navigate = useNavigate();
 
   function handleClick() {
-    navigate(to);
+    void navigate(to);
   }
 
   return (

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import { DataEntryStatusName, PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
@@ -62,7 +62,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     }
 
     if (pollingStation) {
-      navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStationStatus));
+      void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStationStatus));
     } else {
       setAlert(INVALID_POLLING_STATION_ALERT);
       setLoading(false);

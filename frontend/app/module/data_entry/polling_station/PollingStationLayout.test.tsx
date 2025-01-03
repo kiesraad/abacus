@@ -1,5 +1,3 @@
-import * as Router from "react-router";
-
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { PollingStationLayout } from "app/module/data_entry";
@@ -10,17 +8,16 @@ import { overrideOnce, render, screen, within } from "@kiesraad/test";
 
 import { PollingStationFormController } from "../../../component/form/data_entry/PollingStationFormController";
 
+vi.mock(import("@kiesraad/util"), async (importOriginal) => ({
+  ...(await importOriginal()),
+  useNumericParam: vi.fn().mockReturnValue(1),
+}));
+
 describe("PollingStationLayout", () => {
   const election = electionDetailsMockResponse.election as Required<Election>;
 
   beforeEach(() => {
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-
-    vi.spyOn(Router, "useParams").mockReturnValue({
-      electionId: election.id.toString(),
-      pollingStationId: pollingStationMockData.id.toString(),
-      entryNumber: "1",
-    });
   });
 
   test("Render", async () => {

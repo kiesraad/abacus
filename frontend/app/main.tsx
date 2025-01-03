@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router";
 
 import { ApiProvider } from "@kiesraad/api";
 
@@ -17,11 +17,7 @@ if (!rootDiv) {
 const root = createRoot(rootDiv);
 
 function render() {
-  const router = createBrowserRouter(routes, {
-    future: {
-      v7_normalizeFormMethod: true,
-    },
-  });
+  const router = createBrowserRouter(routes);
 
   root.render(
     <StrictMode>

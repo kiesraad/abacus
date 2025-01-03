@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router";
 
 import { ElectionProgress } from "app/component/election/ElectionProgress";
 import { Footer } from "app/component/footer/Footer";
@@ -32,7 +32,7 @@ export function DataEntryHomePage() {
   const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
 
   function closeDataEntrySavedAlert() {
-    navigate(location.pathname);
+    void navigate(location.pathname);
   }
 
   return (

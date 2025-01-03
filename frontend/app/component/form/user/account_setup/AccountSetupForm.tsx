@@ -1,5 +1,5 @@
 import { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import { t } from "@kiesraad/i18n";
 import { BottomBar, Button, InputField } from "@kiesraad/ui";
@@ -17,7 +17,7 @@ export function AccountSetupForm() {
   const navigate = useNavigate();
   function handleSubmit(event: FormEvent<AccountSetupFormElement>) {
     event.preventDefault();
-    navigate("/elections#new-account");
+    void navigate("/elections#new-account");
   }
 
   return (

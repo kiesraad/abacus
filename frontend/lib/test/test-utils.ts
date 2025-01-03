@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { createMemoryRouter, RouteObject } from "react-router-dom";
+import { createMemoryRouter, RouteObject } from "react-router";
 
 import { render, RenderOptions, screen } from "@testing-library/react";
 import { UserEvent } from "@testing-library/user-event";

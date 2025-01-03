@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BlockerFunction, useBlocker, useNavigate } from "react-router-dom";
+import { BlockerFunction, useBlocker, useNavigate } from "react-router";
 
 import { AbortDataEntryModal } from "app/module/data_entry";
 

@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router";
 
 import { NavBar } from "app/component/navbar/NavBar";
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";

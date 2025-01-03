@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 
 import { getBaseUrl, getUrlForFormSectionID } from "app/component/pollingstation/utils";
 

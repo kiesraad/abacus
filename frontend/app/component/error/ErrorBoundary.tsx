@@ -1,4 +1,4 @@
-import { useRouteError } from "react-router-dom";
+import { useRouteError } from "react-router";
 
 import { FatalErrorPage } from "app/module/FatalErrorPage";
 import { NotFoundPage } from "app/module/NotFoundPage";

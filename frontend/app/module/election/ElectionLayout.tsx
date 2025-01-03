@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
 import { useNumericParam } from "@kiesraad/util";

@@ -1,4 +1,4 @@
-import { Link, To, useLocation, useNavigate } from "react-router-dom";
+import { Link, To, useLocation, useNavigate } from "react-router";
 
 import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
 import { Footer } from "app/component/footer/Footer";

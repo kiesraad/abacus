@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
   usePollingStationFormController: vi.fn(),
 }));
 
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useNavigate: mocks.useNavigate,
   useBlocker: mocks.useBlocker,
   Navigate: vi.fn(),

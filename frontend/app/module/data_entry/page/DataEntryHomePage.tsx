@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router";
 
 import { ElectionProgress } from "app/component/election/ElectionProgress";
 import { Footer } from "app/component/footer/Footer";

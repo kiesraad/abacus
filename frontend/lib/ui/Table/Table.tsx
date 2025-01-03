@@ -1,5 +1,5 @@
 import * as React from "react";
-import { To, useNavigate } from "react-router-dom";
+import { To, useNavigate } from "react-router";
 
 import { cn } from "@kiesraad/util";
 

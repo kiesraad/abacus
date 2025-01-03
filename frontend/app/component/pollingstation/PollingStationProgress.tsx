@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 
 import { useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

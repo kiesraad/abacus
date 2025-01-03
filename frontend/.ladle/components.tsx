@@ -1,4 +1,4 @@
-import { StaticRouter } from "react-router-dom";
+import { StaticRouter } from "react-router";
 
 import type { GlobalProvider } from "@ladle/react";
 

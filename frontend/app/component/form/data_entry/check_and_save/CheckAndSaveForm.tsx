@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ReactElement } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 
 import { useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";

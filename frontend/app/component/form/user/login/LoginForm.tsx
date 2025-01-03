@@ -1,5 +1,5 @@
 import { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import { t } from "@kiesraad/i18n";
 import { BottomBar, Button, InputField } from "@kiesraad/ui";

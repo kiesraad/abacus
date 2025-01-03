@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 
 import { PollingStationForm } from "app/component/form/polling_station/PollingStationForm";
 import { NavBar } from "app/component/navbar/NavBar";

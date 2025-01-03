@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import { useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

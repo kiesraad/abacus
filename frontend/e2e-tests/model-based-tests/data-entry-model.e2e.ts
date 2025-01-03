@@ -29,21 +29,36 @@ import { test } from "../dom-to-db-tests/fixtures";
 //      niet bewaren
 //      sluit modal
 
+// questions
+// include recount page in model to deal with IMMEDIATE_ABORT_AND_SAVE in a better/different way?
+
 const machine = createMachine({
   initial: "emptyVotersVotesPage",
   states: {
     emptyVotersVotesPage: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageWithValidData",
-        IMMEDIATE_ABORT_AND_SAVE: "pollingStationChoicePageInitialSaved", // ony fills in recounted page, so can't go to RESUME_DATA_ENTRY
-        ABORT_AND_DELETE: "pollingStationChoicePage",
+        CLICK_ABORT: "immediateAbortInputModal", // needed to distinguish save and resume flow
+        NAV_TO_POLLING_STATION_PAGE: "immediateAbortInputModal",
       },
     },
     votersVotesPageWithValidData: {
       on: {
         SUBMIT: "differencesPage",
-        ABORT_AND_SAVE: "pollingStationChoicePageSaved",
-        ABORT_AND_DELETE: "pollingStationChoicePage",
+        CLICK_ABORT: "abortInputModal",
+        NAV_TO_POLLING_STATION_PAGE: "abortInputModal",
+      },
+    },
+    abortInputModal: {
+      on: {
+        SAVE_INPUT: "pollingStationChoicePageSaved",
+        DISCARD_INPUT: "pollingStationChoicePage",
+      },
+    },
+    immediateAbortInputModal: {
+      on: {
+        SAVE_INPUT: "pollingStationChoicePageInitialSaved",
+        DISCARD_INPUT: "pollingStationChoicePage",
       },
     },
     pollingStationChoicePage: {},
@@ -111,6 +126,15 @@ test.describe("Data entry", () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               // Can't check for values of input fields until after submitting
             },
+            immediateAbortInputModal: async () => {
+              await expect(abortModal.heading).toBeVisible();
+            },
+            differencesPage: async () => {
+              await expect(differencesPage.fieldset).toBeVisible();
+            },
+            abortInputModal: async () => {
+              await expect(abortModal.heading).toBeVisible();
+            },
             votersVotesPageAfterResume: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               const votersFields = await votersAndVotesPage.getVotersCounts();
@@ -149,8 +173,11 @@ test.describe("Data entry", () => {
                 `${pollingStation1.number} - ${pollingStation1.name}`,
               );
             },
-            differencesPage: async () => {
-              await expect(differencesPage.fieldset).toBeVisible();
+            pollingStationChoicePageInitialSaved: async () => {
+              await expect(pollingStationChoicePage.fieldset).toBeVisible();
+              await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
+                `${pollingStation1.number} - ${pollingStation1.name}`,
+              );
             },
           },
           events: {
@@ -158,20 +185,20 @@ test.describe("Data entry", () => {
               await votersAndVotesPage.inputVotersCounts(voters);
               await votersAndVotesPage.inputVotesCounts(votes);
             },
-            ABORT_AND_SAVE: async () => {
+            CLICK_ABORT: async () => {
               await votersAndVotesPage.abortInput.click();
-              await abortModal.saveInput.click();
             },
-            IMMEDIATE_ABORT_AND_SAVE: async () => {
-              await votersAndVotesPage.abortInput.click();
-              await abortModal.saveInput.click();
-            },
-            ABORT_AND_DELETE: async () => {
-              await votersAndVotesPage.abortInput.click();
-              await abortModal.discardInput.click();
+            NAV_TO_POLLING_STATION_PAGE: async () => {
+              await page.getByRole("link", { name: "Heemdamseburg" }).click();
             },
             SUBMIT: async () => {
               await votersAndVotesPage.next.click();
+            },
+            SAVE_INPUT: async () => {
+              await abortModal.saveInput.click();
+            },
+            DISCARD_INPUT: async () => {
+              await abortModal.discardInput.click();
             },
             RESUME_DATA_ENTRY: async () => {
               // TODO: include in page object

@@ -34,18 +34,15 @@ import { test } from "../dom-to-db-tests/fixtures";
 // naar recount en wijziging en terug naar voters -> optie om op te slaan of niet
 // naar recount en wijziging en submit
 
-// questions
-// include recount page in model to deal with IMMEDIATE_ABORT_AND_SAVE in a better/different way?
-
 const machine = createMachine({
   initial: "emptyRecountedPage",
   states: {
     emptyRecountedPage: {
       on: {
-        SELECT_NO_RECOUNT: "noRecount",
+        SELECT_NO_RECOUNT: "noRecountRecountedPage",
       },
     },
-    noRecount: {
+    noRecountRecountedPage: {
       on: {
         SUBMIT_RECOUNT: "emptyVotersVotesPage",
       },
@@ -63,7 +60,7 @@ const machine = createMachine({
         SUBMIT: "differencesPage",
         CLICK_ABORT: "abortInputModal",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModal",
-        GO_TO_RECOUNTED_PAGE: "recountedPageNo",
+        // GO_TO_RECOUNTED_PAGE: "recountedPageNo", // TODO: this will cache the non-submitted voters/votes data
       },
     },
     abortInputModal: {
@@ -93,13 +90,27 @@ const machine = createMachine({
     votersVotesPageAfterResume: {},
     votersVotesPageEmptyAfterResume: {},
     recountedPageNo: {
-      // on: {
-      //   GO_TO_VOTERS_PAGE:
-      // }
+      on: {
+        GO_TO_VOTERS_PAGE: "emptyVotersVotesPage",
+        // TODO: SELECT_YES_RECOUNT makes the tests fail that then submit the voters/votes page
+        SELECT_YES_RECOUNT: "yesRecountRecountedPage", // or is the state: recount page with non-submitted change?
+      },
       // go to voters page
       // change to yes and go to voters page and save
       // change to yes and go to voters page and do not save
       // submit and go to voters page
+    },
+    yesRecountRecountedPage: {
+      on: {
+        SUBMIT_RECOUNT: "emptyVotersVotesPage", // TODO: but with recount fields
+        GO_TO_VOTERS_PAGE: "unsavedChangesModal",
+      },
+    },
+    unsavedChangesModal: {
+      on: {
+        SAVE_UNSUBMITTED_CHANGES: "emptyVotersVotesPage", // TODO: but with recount fields
+        DISCARD_UNSUBMITTED_CHANGES: "emptyVotersVotesPage", // TODO: but with recount fields
+      },
     },
   },
 });
@@ -145,6 +156,9 @@ test.describe("Data entry", () => {
             noRecountRecountedPage: async () => {
               await expect(recountedPage.no).toBeChecked();
             },
+            yesRecountRecountedPage: async () => {
+              await expect(recountedPage.yes).toBeChecked();
+            },
             emptyVotersVotesPage: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               // TODO: check for empty fields?
@@ -165,6 +179,9 @@ test.describe("Data entry", () => {
             },
             abortInputModal: async () => {
               await expect(abortModal.heading).toBeVisible();
+            },
+            unsavedChangesModal: async () => {
+              await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
             },
             votersVotesPageAfterResume: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -215,6 +232,9 @@ test.describe("Data entry", () => {
             SELECT_NO_RECOUNT: async () => {
               await recountedPage.no.check();
             },
+            SELECT_YES_RECOUNT: async () => {
+              await recountedPage.yes.check();
+            },
             SUBMIT_RECOUNT: async () => {
               await recountedPage.next.click();
             },
@@ -243,6 +263,12 @@ test.describe("Data entry", () => {
             },
             DISCARD_INPUT: async () => {
               await abortModal.discardInput.click();
+            },
+            SAVE_UNSUBMITTED_CHANGES: async () => {
+              await recountedPage.unsavedChangesModal.saveInput.click();
+            },
+            DISCARD_UNSUBMITTED_CHANGES: async () => {
+              await recountedPage.unsavedChangesModal.discardInput.click();
             },
             RESUME_DATA_ENTRY: async () => {
               // TODO: include in page object

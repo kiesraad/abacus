@@ -1,6 +1,7 @@
 use crate::data_entry::Count;
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
+use std::ops::{Div, Mul};
 
 pub struct Fraction {
     numerator: u64,
@@ -23,16 +24,31 @@ impl Fraction {
         Self::new(numerator, 1)
     }
 
-    pub fn divide(&self, other: &Self) -> Self {
+    // divide and return the whole number (integer division)
+    pub fn divide_and_return_whole_number(&self, other: &Self) -> u64 {
+        (self.numerator * other.denominator) / (self.denominator * other.numerator)
+    }
+}
+
+impl Div for Fraction {
+    type Output = Self;
+
+    fn div(self, other: Self) -> Self {
         Self {
             numerator: self.numerator * other.denominator,
             denominator: self.denominator * other.numerator,
         }
     }
+}
 
-    // divide and return the whole number (integer division)
-    pub fn divide_and_return_whole_number(&self, other: &Self) -> u64 {
-        (self.numerator * other.denominator) / (self.denominator * other.numerator)
+impl Mul for Fraction {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        Self {
+            numerator: self.numerator * other.numerator,
+            denominator: self.denominator * other.denominator,
+        }
     }
 }
 
@@ -106,21 +122,9 @@ mod tests {
     }
 
     #[test]
-    fn test_divide_whole_number_larger_than_zero() {
-        let fraction = Fraction::new(11, 5);
-        let other_fraction = Fraction::new(1, 2);
-        let divided = fraction.divide(&other_fraction);
-        assert_eq!(divided, Fraction::new(22, 5));
-        assert_eq!(divided.to_string(), "4 2/5")
-    }
-
-    #[test]
-    fn test_divide_whole_number_smaller_than_zero() {
-        let fraction = Fraction::new(1, 5);
-        let other_fraction = Fraction::new(2, 9);
-        let divided = fraction.divide(&other_fraction);
-        assert_eq!(divided, Fraction::new(9, 10));
-        assert_eq!(divided.to_string(), "9/10")
+    fn test_nan() {
+        let fraction = Fraction::new(1, 0);
+        assert_eq!(fraction.to_string(), "NaN");
     }
 
     #[test]
@@ -134,9 +138,30 @@ mod tests {
     }
 
     #[test]
-    fn test_nan() {
-        let fraction = Fraction::new(1, 0);
-        assert_eq!(fraction.to_string(), "NaN");
+    fn test_div_whole_number_larger_than_zero() {
+        let fraction = Fraction::new(11, 5);
+        let other_fraction = Fraction::new(1, 2);
+        let divided = fraction / other_fraction;
+        assert_eq!(divided, Fraction::new(22, 5));
+        assert_eq!(divided.to_string(), "4 2/5")
+    }
+
+    #[test]
+    fn test_div_whole_number_smaller_than_zero() {
+        let fraction = Fraction::new(1, 5);
+        let other_fraction = Fraction::new(2, 9);
+        let divided = fraction / other_fraction;
+        assert_eq!(divided, Fraction::new(9, 10));
+        assert_eq!(divided.to_string(), "9/10")
+    }
+
+    #[test]
+    fn test_mul() {
+        let fraction = Fraction::new(1, 5);
+        let other_fraction = Fraction::new(2, 9);
+        let divided = fraction * other_fraction;
+        assert_eq!(divided, Fraction::new(2, 45));
+        assert_eq!(divided.to_string(), "2/45")
     }
 
     #[test]

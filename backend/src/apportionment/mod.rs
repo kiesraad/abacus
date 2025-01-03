@@ -5,7 +5,10 @@ use serde::{Deserialize, Serialize};
 mod fraction;
 
 /// Apportionment - work in progress!!
-pub fn seat_allocation(seats: u64, totals: &ElectionSummary) -> Result<(), ApportionmentError> {
+pub fn seat_allocation(
+    seats: u64,
+    totals: &ElectionSummary,
+) -> Result<Vec<u64>, ApportionmentError> {
     if seats < 19 {
         return Err(ApportionmentError::SeatAllocationLessThan19SeatsNotImplemented);
     }
@@ -15,8 +18,7 @@ pub fn seat_allocation(seats: u64, totals: &ElectionSummary) -> Result<(), Appor
     // calculate quota (kiesdeler) as a proper fraction
     let total_votes = Fraction::from_count(totals.votes_counts.votes_candidates_count);
     let seats_fraction = Fraction::from_u64(seats);
-
-    let quota = total_votes.divide(&seats_fraction);
+    let quota = total_votes / seats_fraction;
 
     println!("Seats: {}", seats);
     println!("Quota: {}", quota);
@@ -49,7 +51,7 @@ pub fn seat_allocation(seats: u64, totals: &ElectionSummary) -> Result<(), Appor
         for (idx, pg) in totals.political_group_votes.iter().enumerate() {
             let pg_votes = Fraction::from_count(pg.total);
             let pg_seats_new = whole_seats[idx] + rest_seats[idx] + 1;
-            let pg_avg_votes = pg_votes.divide(&Fraction::from_u64(pg_seats_new));
+            let pg_avg_votes = pg_votes / Fraction::from_u64(pg_seats_new);
             avgs.push(pg_avg_votes);
         }
         println!("Avgs: {:?}", avgs);
@@ -78,16 +80,13 @@ pub fn seat_allocation(seats: u64, totals: &ElectionSummary) -> Result<(), Appor
     println!("===========================");
     println!("Whole seats: {:?}", whole_seats);
     println!("Remaining seats: {:?}", rest_seats);
-    println!(
-        "Total seats: {:?}",
-        whole_seats
-            .iter()
-            .zip(rest_seats.iter())
-            .map(|(a, b)| a + b)
-            .collect::<Vec<_>>()
-    );
-
-    Ok(())
+    let total_seats = whole_seats
+        .iter()
+        .zip(rest_seats.iter())
+        .map(|(a, b)| a + b)
+        .collect::<Vec<_>>();
+    println!("Total seats: {:?}", total_seats);
+    Ok(total_seats)
 }
 
 /// Errors that can occur during apportionment
@@ -105,7 +104,7 @@ mod tests {
     use crate::summary::{ElectionSummary, SummaryDifferencesCounts};
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats() {
+    fn test_seat_allocation_less_than_19_seats_with_remaining_seats() {
         let totals = ElectionSummary {
             voters_counts: VotersCounts {
                 poll_card_count: 1200,
@@ -138,7 +137,7 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_19_or_more_seats() {
+    fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
         let totals = ElectionSummary {
             voters_counts: VotersCounts {
                 poll_card_count: 1200,
@@ -164,7 +163,7 @@ mod tests {
         };
 
         let result = seat_allocation(23, &totals);
-        assert!(result.is_ok());
+        assert_eq!(result, Ok(vec![12, 6, 1, 2, 2]));
     }
 
     #[test]

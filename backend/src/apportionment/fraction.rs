@@ -159,9 +159,9 @@ mod tests {
     fn test_mul() {
         let fraction = Fraction::new(1, 5);
         let other_fraction = Fraction::new(2, 9);
-        let divided = fraction * other_fraction;
-        assert_eq!(divided, Fraction::new(2, 45));
-        assert_eq!(divided.to_string(), "2/45")
+        let multiplied = fraction * other_fraction;
+        assert_eq!(multiplied, Fraction::new(2, 45));
+        assert_eq!(multiplied.to_string(), "2/45")
     }
 
     #[test]

@@ -115,12 +115,12 @@ pub fn seat_allocation(
     println!("======================================================");
     println!("Whole seats: {:?}", whole_seats);
     println!("Remaining seats: {:?}", rest_seats);
-    let totals = whole_seats
+    let total_seats = whole_seats
         .iter()
         .map(|(pg_number, seats)| seats + rest_seats.get(pg_number).unwrap_or(&0))
         .collect::<Vec<_>>();
-    println!("Total seats: {:?}", totals);
-    Ok(totals)
+    println!("Total seats: {:?}", total_seats);
+    Ok(total_seats)
 }
 
 /// Errors that can occur during apportionment

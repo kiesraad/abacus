@@ -28,10 +28,9 @@ updates:
       # ESLint major upgrades usually have breaking changes
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
-      # React Router 7 has breaking changes, see #621
-      # Update to 6.28 needs feature flags to be set to opt-in for version 7 features, to avoid warnings.
-      - dependency-name: "react-router-dom"
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      # React Router major upgrades usually have breaking changes
+      - dependency-name: "react-router"
+        update-types: ["version-update:semver-major"]
       # React major upgrades usually have breaking changes, see #716 for React 19
       - dependency-name: "react"
         update-types: ["version-update:semver-major"]

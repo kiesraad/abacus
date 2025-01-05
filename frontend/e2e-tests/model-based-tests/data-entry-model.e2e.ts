@@ -13,6 +13,11 @@ import { createMachine } from "xstate";
 
 import { test } from "../dom-to-db-tests/fixtures";
 
+// TODO:
+// - errors and warnings: fix, accept, abort and save, cache(?)
+// - close abort modal, close nav out model, close nav inside modal
+// - check if it matters in coverage to merge identical states or events
+
 // model:
 // fill in page
 //      with valid data
@@ -28,7 +33,6 @@ import { test } from "../dom-to-db-tests/fixtures";
 //      bewaren
 //      niet bewaren
 //      sluit modal
-
 // in-form navigation
 // naar recount en gelijk terug naar voters -> niet gesubmitte data in voters blijft
 // naar recount en wijziging en terug naar voters -> optie om op te slaan of niet
@@ -48,6 +52,11 @@ const machine = createMachine({
         RESUME_DATA_ENTRY: "votersVotesPageAfterResume",
       },
     },
+    pollingStationChoicePageChanged: {
+      on: {
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChanged",
+      },
+    },
     recountedPageNo: {},
     recountedPageNoSaved: {
       on: {
@@ -57,6 +66,16 @@ const machine = createMachine({
     recountedPageNoDiscarded: {
       on: {
         GO_TO_VOTERS_VOTES_PAGE: "submittedVotersVotesPage",
+      },
+    },
+    recountedPageCached: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "cachedVotersVotesPage",
+      },
+    },
+    cachedVotersVotesPage: {
+      on: {
+        SUBMIT: "differencesPage",
       },
     },
     emptyVotersVotesPage: {
@@ -72,7 +91,7 @@ const machine = createMachine({
         SUBMIT: "differencesPage",
         CLICK_ABORT: "abortInputModal",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModal",
-        // GO_TO_RECOUNTED_PAGE: "recountedPageNo", // TODO: this will cache the non-submitted voters/votes data, but values are not in DOM
+        GO_TO_RECOUNTED_PAGE: "recountedPageCached",
       },
     },
     submittedVotersVotesPage: {
@@ -83,14 +102,14 @@ const machine = createMachine({
     submittedChangedVotersVotesPage: {},
     votersVotesPageWithChangedValidData: {
       on: {
-        // SUBMIT: "differencesPage",
-        // TODO: abort and save and check for changed data
-        // CLICK_ABORT: "abortInputModal",
-        // NAV_TO_POLLING_STATION_PAGE: "abortInputModal",
+        SUBMIT: "differencesPage",
+        CLICK_ABORT: "abortInputModalChangedValidData",
+        NAV_TO_POLLING_STATION_PAGE: "abortInputModalChangedValidData",
         GO_TO_RECOUNTED_PAGE: "unsavedChangesModal",
       },
     },
     votersVotesPageAfterResume: {}, // not same votersVotesPageWithValidData because submitted in this case
+    votersVotesPageAfterResumeChanged: {},
     votersVotesPageEmptyAfterResume: {}, // same as emptyVotersVotesPage?
     differencesPage: {
       on: {
@@ -109,10 +128,16 @@ const machine = createMachine({
         DISCARD_INPUT: "pollingStationChoicePage",
       },
     },
+    abortInputModalChangedValidData: {
+      on: {
+        SAVE_INPUT: "pollingStationChoicePageChanged",
+        DISCARD_INPUT: "pollingStationChoicePage",
+      },
+    },
     unsavedChangesModal: {
       on: {
-        SAVE_UNSUBMITTED_CHANGES: "recountedPageNoSaved", // goes to Recount page, which is now an end state
-        DISCARD_UNSUBMITTED_CHANGES: "recountedPageNoDiscarded", // goes to Recount page, which is now an end state
+        SAVE_UNSUBMITTED_CHANGES: "recountedPageNoSaved",
+        DISCARD_UNSUBMITTED_CHANGES: "recountedPageNoDiscarded",
       },
     },
   },
@@ -190,6 +215,9 @@ test.describe("Data entry", () => {
             abortInputModal: async () => {
               await expect(abortModal.heading).toBeVisible();
             },
+            abortInputModalChangedValidData: async () => {
+              await expect(abortModal.heading).toBeVisible();
+            },
             unsavedChangesModal: async () => {
               await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
             },
@@ -202,7 +230,15 @@ test.describe("Data entry", () => {
               expect(votesFields).toStrictEqual(votes);
             },
             submittedChangedVotersVotesPage: async () => {
-              // same as votersVotesPageAfterResume
+              // same as votersVotesPageAfterResumeChanged
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(votersChanged);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votes);
+            },
+            votersVotesPageAfterResumeChanged: async () => {
+              // same as votersVotesPageAfterResumeChanged
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               const votersFields = await votersAndVotesPage.getVotersCounts();
               expect(votersFields).toStrictEqual(votersChanged);
@@ -210,6 +246,7 @@ test.describe("Data entry", () => {
               expect(votesFields).toStrictEqual(votes);
             },
             votersVotesPageAfterResume: async () => {
+              // same as submittedVotersVotesPage
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               const votersFields = await votersAndVotesPage.getVotersCounts();
               expect(votersFields).toStrictEqual(voters);

@@ -48,38 +48,11 @@ const machine = createMachine({
         RESUME_DATA_ENTRY: "votersVotesPageAfterResume",
       },
     },
-    // emptyRecountedPage: {
-    //   on: {
-    //     SELECT_NO_RECOUNT: "noRecountRecountedPage",
-    //   },
-    // },
-    // noRecountRecountedPage: {
-    //   on: {
-    //     SUBMIT_RECOUNT: "emptyVotersVotesPage",
-    //   },
-    // },
-    recountedPageNo: {
-      // reached by going back from emptyVotersVotesPage
-      // on: {
-      //   GO_TO_VOTERS_PAGE: "emptyVotersVotesPage",
-      //   // TODO: SELECT_YES_RECOUNT makes the tests fail that then submit the voters/votes page
-      //   SELECT_YES_RECOUNT: "yesRecountRecountedPage", // or is the state: recount page with non-submitted change?
-      // },
-      // go to voters page
-      // change to yes and go to voters page and save
-      // change to yes and go to voters page and do not save
-      // submit and go to voters page
-    },
-    // yesRecountRecountedPage: {
-    //   on: {
-    //     SUBMIT_RECOUNT: "emptyVotersVotesPage", // TODO: but with recount fields
-    //     GO_TO_VOTERS_PAGE: "unsavedChangesModal",
-    //   },
-    // },
+    recountedPageNo: {},
     emptyVotersVotesPage: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageWithValidData",
-        CLICK_ABORT: "immediateAbortInputModal", // needed to distinguish save and resume flow
+        CLICK_ABORT: "immediateAbortInputModal", // separate state needed to distinguish save and resume flow
         NAV_TO_POLLING_STATION_PAGE: "immediateAbortInputModal",
         GO_TO_RECOUNTED_PAGE: "recountedPageNo",
       },
@@ -89,15 +62,30 @@ const machine = createMachine({
         SUBMIT: "differencesPage",
         CLICK_ABORT: "abortInputModal",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModal",
-        // GO_TO_RECOUNTED_PAGE: "recountedPageNo", // TODO: this will cache the non-submitted voters/votes data
+        // GO_TO_RECOUNTED_PAGE: "recountedPageNo", // TODO: this will cache the non-submitted voters/votes data, but values are not in DOM
       },
     },
-    votersVotesPageAfterResume: {},
-    votersVotesPageEmptyAfterResume: {},
-    differencesPage: {
-      // TODO: return to submitted VotersVotes page then nav back to recount page
+    submittedVotersVotesPage: {
+      on: {
+        CHANGE_VALID_DATA: "votersVotesPageWithChangedValidData",
+      },
     },
-
+    votersVotesPageWithChangedValidData: {
+      on: {
+        // SUBMIT: "differencesPage",
+        // TODO: abort and save and check for changed data
+        // CLICK_ABORT: "abortInputModal",
+        // NAV_TO_POLLING_STATION_PAGE: "abortInputModal",
+        GO_TO_RECOUNTED_PAGE: "unsavedChangesModal",
+      },
+    },
+    votersVotesPageAfterResume: {}, // not same votersVotesPageWithValidData because submitted in this case
+    votersVotesPageEmptyAfterResume: {}, // same as emptyVotersVotesPage?
+    differencesPage: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "submittedVotersVotesPage",
+      },
+    },
     abortInputModal: {
       on: {
         SAVE_INPUT: "pollingStationChoicePageSaved",
@@ -112,8 +100,8 @@ const machine = createMachine({
     },
     unsavedChangesModal: {
       on: {
-        SAVE_UNSUBMITTED_CHANGES: "emptyVotersVotesPage", // TODO: but with recount fields
-        DISCARD_UNSUBMITTED_CHANGES: "emptyVotersVotesPage", // TODO: but with recount fields
+        SAVE_UNSUBMITTED_CHANGES: "recountedPageNo", // goes to Recount page, which is now an end state
+        DISCARD_UNSUBMITTED_CHANGES: "recountedPageNo", // goes to Recount page, which is now an end state
       },
     },
   },
@@ -122,6 +110,14 @@ const machine = createMachine({
 const voters: VotersCounts = {
   poll_card_count: 90,
   proxy_certificate_count: 10,
+  voter_card_count: 0,
+  total_admitted_voters_count: 100,
+};
+
+const votersChanged: VotersCounts = {
+  // TODO: consider changing voters in test, but reset values at start of test
+  poll_card_count: 80,
+  proxy_certificate_count: 20,
   voter_card_count: 0,
   total_admitted_voters_count: 100,
 };
@@ -158,15 +154,6 @@ test.describe("Data entry", () => {
 
         await path.test({
           states: {
-            // emptyRecountedPage: async () => {
-            //   await expect(recountedPage.fieldset).toBeVisible();
-            // },
-            // noRecountRecountedPage: async () => {
-            //   await expect(recountedPage.no).toBeChecked();
-            // },
-            // yesRecountRecountedPage: async () => {
-            //   await expect(recountedPage.yes).toBeChecked();
-            // },
             emptyVotersVotesPage: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               // TODO: check for empty fields?
@@ -176,6 +163,10 @@ test.describe("Data entry", () => {
               await expect(recountedPage.no).toBeChecked();
             },
             votersVotesPageWithValidData: async () => {
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              // Can't check for values of input fields until after submitting
+            },
+            votersVotesPageWithChangedValidData: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               // Can't check for values of input fields until after submitting
             },
@@ -190,6 +181,14 @@ test.describe("Data entry", () => {
             },
             unsavedChangesModal: async () => {
               await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
+            },
+            submittedVotersVotesPage: async () => {
+              // same as votersVotesPageAfterResume
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(voters);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votes);
             },
             votersVotesPageAfterResume: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
@@ -237,18 +236,12 @@ test.describe("Data entry", () => {
             },
           },
           events: {
-            // SELECT_NO_RECOUNT: async () => {
-            //   await recountedPage.no.check();
-            // },
-            // SELECT_YES_RECOUNT: async () => {
-            //   await recountedPage.yes.check();
-            // },
-            // SUBMIT_RECOUNT: async () => {
-            //   await recountedPage.next.click();
-            // },
             FILL_WITH_VALID_DATA: async () => {
               await votersAndVotesPage.inputVotersCounts(voters);
               await votersAndVotesPage.inputVotesCounts(votes);
+            },
+            CHANGE_VALID_DATA: async () => {
+              await votersAndVotesPage.inputVotersCounts(votersChanged);
             },
             CLICK_ABORT: async () => {
               await votersAndVotesPage.abortInput.click();
@@ -260,8 +253,8 @@ test.describe("Data entry", () => {
             GO_TO_RECOUNTED_PAGE: async () => {
               await votersAndVotesPage.navPanel.recounted.click();
             },
-            GO_TO_VOTERS_PAGE: async () => {
-              await recountedPage.navPanel.votersAndVotes.click();
+            GO_TO_VOTERS_VOTES_PAGE: async () => {
+              await differencesPage.navPanel.votersAndVotes.click();
             },
             SUBMIT: async () => {
               await votersAndVotesPage.next.click();

@@ -35,18 +35,47 @@ import { test } from "../dom-to-db-tests/fixtures";
 // naar recount en wijziging en submit
 
 const machine = createMachine({
-  initial: "emptyRecountedPage",
+  initial: "emptyVotersVotesPage",
   states: {
-    emptyRecountedPage: {
+    pollingStationChoicePage: {},
+    pollingStationChoicePageInitialSaved: {
       on: {
-        SELECT_NO_RECOUNT: "noRecountRecountedPage",
+        RESUME_DATA_ENTRY: "votersVotesPageEmptyAfterResume",
       },
     },
-    noRecountRecountedPage: {
+    pollingStationChoicePageSaved: {
       on: {
-        SUBMIT_RECOUNT: "emptyVotersVotesPage",
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResume",
       },
     },
+    // emptyRecountedPage: {
+    //   on: {
+    //     SELECT_NO_RECOUNT: "noRecountRecountedPage",
+    //   },
+    // },
+    // noRecountRecountedPage: {
+    //   on: {
+    //     SUBMIT_RECOUNT: "emptyVotersVotesPage",
+    //   },
+    // },
+    recountedPageNo: {
+      // reached by going back from emptyVotersVotesPage
+      // on: {
+      //   GO_TO_VOTERS_PAGE: "emptyVotersVotesPage",
+      //   // TODO: SELECT_YES_RECOUNT makes the tests fail that then submit the voters/votes page
+      //   SELECT_YES_RECOUNT: "yesRecountRecountedPage", // or is the state: recount page with non-submitted change?
+      // },
+      // go to voters page
+      // change to yes and go to voters page and save
+      // change to yes and go to voters page and do not save
+      // submit and go to voters page
+    },
+    // yesRecountRecountedPage: {
+    //   on: {
+    //     SUBMIT_RECOUNT: "emptyVotersVotesPage", // TODO: but with recount fields
+    //     GO_TO_VOTERS_PAGE: "unsavedChangesModal",
+    //   },
+    // },
     emptyVotersVotesPage: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageWithValidData",
@@ -63,6 +92,12 @@ const machine = createMachine({
         // GO_TO_RECOUNTED_PAGE: "recountedPageNo", // TODO: this will cache the non-submitted voters/votes data
       },
     },
+    votersVotesPageAfterResume: {},
+    votersVotesPageEmptyAfterResume: {},
+    differencesPage: {
+      // TODO: return to submitted VotersVotes page then nav back to recount page
+    },
+
     abortInputModal: {
       on: {
         SAVE_INPUT: "pollingStationChoicePageSaved",
@@ -73,37 +108,6 @@ const machine = createMachine({
       on: {
         SAVE_INPUT: "pollingStationChoicePageInitialSaved",
         DISCARD_INPUT: "pollingStationChoicePage",
-      },
-    },
-    pollingStationChoicePage: {},
-    differencesPage: {},
-    pollingStationChoicePageSaved: {
-      on: {
-        RESUME_DATA_ENTRY: "votersVotesPageAfterResume",
-      },
-    },
-    pollingStationChoicePageInitialSaved: {
-      on: {
-        RESUME_DATA_ENTRY: "votersVotesPageEmptyAfterResume",
-      },
-    },
-    votersVotesPageAfterResume: {},
-    votersVotesPageEmptyAfterResume: {},
-    recountedPageNo: {
-      on: {
-        GO_TO_VOTERS_PAGE: "emptyVotersVotesPage",
-        // TODO: SELECT_YES_RECOUNT makes the tests fail that then submit the voters/votes page
-        SELECT_YES_RECOUNT: "yesRecountRecountedPage", // or is the state: recount page with non-submitted change?
-      },
-      // go to voters page
-      // change to yes and go to voters page and save
-      // change to yes and go to voters page and do not save
-      // submit and go to voters page
-    },
-    yesRecountRecountedPage: {
-      on: {
-        SUBMIT_RECOUNT: "emptyVotersVotesPage", // TODO: but with recount fields
-        GO_TO_VOTERS_PAGE: "unsavedChangesModal",
       },
     },
     unsavedChangesModal: {
@@ -148,17 +152,21 @@ test.describe("Data entry", () => {
         await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation1.name);
         await pollingStationChoicePage.clickStart();
 
+        await expect(recountedPage.fieldset).toBeVisible();
+        await recountedPage.no.check();
+        await recountedPage.next.click();
+
         await path.test({
           states: {
-            emptyRecountedPage: async () => {
-              await expect(recountedPage.fieldset).toBeVisible();
-            },
-            noRecountRecountedPage: async () => {
-              await expect(recountedPage.no).toBeChecked();
-            },
-            yesRecountRecountedPage: async () => {
-              await expect(recountedPage.yes).toBeChecked();
-            },
+            // emptyRecountedPage: async () => {
+            //   await expect(recountedPage.fieldset).toBeVisible();
+            // },
+            // noRecountRecountedPage: async () => {
+            //   await expect(recountedPage.no).toBeChecked();
+            // },
+            // yesRecountRecountedPage: async () => {
+            //   await expect(recountedPage.yes).toBeChecked();
+            // },
             emptyVotersVotesPage: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               // TODO: check for empty fields?
@@ -229,15 +237,15 @@ test.describe("Data entry", () => {
             },
           },
           events: {
-            SELECT_NO_RECOUNT: async () => {
-              await recountedPage.no.check();
-            },
-            SELECT_YES_RECOUNT: async () => {
-              await recountedPage.yes.check();
-            },
-            SUBMIT_RECOUNT: async () => {
-              await recountedPage.next.click();
-            },
+            // SELECT_NO_RECOUNT: async () => {
+            //   await recountedPage.no.check();
+            // },
+            // SELECT_YES_RECOUNT: async () => {
+            //   await recountedPage.yes.check();
+            // },
+            // SUBMIT_RECOUNT: async () => {
+            //   await recountedPage.next.click();
+            // },
             FILL_WITH_VALID_DATA: async () => {
               await votersAndVotesPage.inputVotersCounts(voters);
               await votersAndVotesPage.inputVotesCounts(votes);

@@ -49,6 +49,16 @@ const machine = createMachine({
       },
     },
     recountedPageNo: {},
+    recountedPageNoSaved: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "submittedChangedVotersVotesPage",
+      },
+    },
+    recountedPageNoDiscarded: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "submittedVotersVotesPage",
+      },
+    },
     emptyVotersVotesPage: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageWithValidData",
@@ -70,6 +80,7 @@ const machine = createMachine({
         CHANGE_VALID_DATA: "votersVotesPageWithChangedValidData",
       },
     },
+    submittedChangedVotersVotesPage: {},
     votersVotesPageWithChangedValidData: {
       on: {
         // SUBMIT: "differencesPage",
@@ -100,8 +111,8 @@ const machine = createMachine({
     },
     unsavedChangesModal: {
       on: {
-        SAVE_UNSUBMITTED_CHANGES: "recountedPageNo", // goes to Recount page, which is now an end state
-        DISCARD_UNSUBMITTED_CHANGES: "recountedPageNo", // goes to Recount page, which is now an end state
+        SAVE_UNSUBMITTED_CHANGES: "recountedPageNoSaved", // goes to Recount page, which is now an end state
+        DISCARD_UNSUBMITTED_CHANGES: "recountedPageNoDiscarded", // goes to Recount page, which is now an end state
       },
     },
   },
@@ -187,6 +198,14 @@ test.describe("Data entry", () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               const votersFields = await votersAndVotesPage.getVotersCounts();
               expect(votersFields).toStrictEqual(voters);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votes);
+            },
+            submittedChangedVotersVotesPage: async () => {
+              // same as votersVotesPageAfterResume
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(votersChanged);
               const votesFields = await votersAndVotesPage.getVotesCounts();
               expect(votesFields).toStrictEqual(votes);
             },

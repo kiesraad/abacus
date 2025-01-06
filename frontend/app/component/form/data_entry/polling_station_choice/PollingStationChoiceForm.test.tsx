@@ -5,10 +5,10 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
-import { overrideOnce, render, screen, within } from "app/test/unit";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionStatusMockResponse } from "@kiesraad/api-mocks";
+import { overrideOnce, render, screen, within } from "@kiesraad/test";
 
 function renderPollingStationChoicePage() {
   render(

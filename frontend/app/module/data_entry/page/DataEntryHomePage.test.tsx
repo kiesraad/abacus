@@ -3,10 +3,11 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { overrideOnce, Providers, render, screen, setupTestRouter, waitFor, within } from "app/test/unit";
+import { routes } from "app/routes";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
+import { overrideOnce, Providers, render, screen, setupTestRouter, waitFor, within } from "@kiesraad/test";
 
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
@@ -144,7 +145,7 @@ describe("DataEntryHomePage", () => {
     const user = userEvent.setup();
 
     // Set up router and navigate to the data entry home page
-    const router = setupTestRouter();
+    const router = setupTestRouter(routes);
     await router.navigate("/elections/1/data-entry");
     rtlRender(<Providers router={router} />);
 

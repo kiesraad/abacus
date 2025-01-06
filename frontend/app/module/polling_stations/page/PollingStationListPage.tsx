@@ -1,6 +1,6 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
-import { NavBar } from "app/component/navbar/NavBar.tsx";
+import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, usePollingStationListRequest } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";

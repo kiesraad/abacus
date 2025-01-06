@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { render } from "app/test/unit";
+import { render } from "@kiesraad/test";
 
 import { DefaultIcon } from "./Icon.stories";
 

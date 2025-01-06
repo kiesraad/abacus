@@ -1,9 +1,8 @@
 import { UserEvent, userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { overrideOnce, render, screen, waitFor } from "app/test/unit";
-
 import { ErrorResponse, PollingStation } from "@kiesraad/api";
+import { overrideOnce, render, screen, waitFor } from "@kiesraad/test";
 
 import { PollingStationForm } from "./PollingStationForm";
 

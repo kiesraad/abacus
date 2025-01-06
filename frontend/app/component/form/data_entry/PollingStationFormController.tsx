@@ -6,26 +6,28 @@ import { getBaseUrl, getUrlForFormSectionID } from "app/component/pollingstation
 import {
   ApiError,
   ApiResult,
-  buildFormState,
-  calculateDataEntryProgress,
   DataEntry,
   Election,
-  getClientState,
   GetDataEntryResponse,
-  getInitialFormState,
-  getInitialValues,
-  getNextSectionID,
   isFatalError,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   PollingStationResults,
   SaveDataEntryResponse,
-  updateFormStateAfterSubmit,
   useApi,
   useApiRequestWithErrors,
   ValidationResult,
 } from "@kiesraad/api";
 
 import { PollingStationControllerContext } from "./PollingStationControllerContext";
+import {
+  buildFormState,
+  calculateDataEntryProgress,
+  getClientState,
+  getInitialFormState,
+  getInitialValues,
+  getNextSectionID,
+  updateFormStateAfterSubmit,
+} from "./pollingStationUtils";
 
 export interface PollingStationFormControllerProps {
   election: Required<Election>;

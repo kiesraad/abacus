@@ -25,6 +25,7 @@
       "@kiesraad/api-mocks": ["lib/api-mocks/index.ts"],
       "@kiesraad/ui": ["lib/ui/index.ts"],
       "@kiesraad/icon": ["lib/icon/index.ts"],
+      "@kiesraad/test": ["lib/test/index.ts"],
       "@kiesraad/util": ["lib/util/index.ts"],
       "@kiesraad/i18n": ["lib/i18n/index.ts"]
     },

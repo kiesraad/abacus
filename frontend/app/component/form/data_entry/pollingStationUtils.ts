@@ -4,6 +4,7 @@ import { Election, PollingStationResults, ValidationResult, ValidationResults } 
 import { ValidationResultType } from "@kiesraad/ui";
 import { deepEqual, fieldNameFromPath, FieldSection, objectHasOnlyEmptyValues, rootFieldSection } from "@kiesraad/util";
 
+import { DifferencesValues } from "./differences/useDifferences";
 import {
   AnyFormReference,
   ClientState,
@@ -13,9 +14,8 @@ import {
   FormState,
   INITIAL_FORM_SECTION_ID,
 } from "./PollingStationFormController";
-import { DifferencesValues } from "./useDifferences";
-import { RecountedValue } from "./useRecounted";
-import { VotersAndVotesValues } from "./useVotersAndVotes";
+import { RecountedValue } from "./recounted/useRecounted";
+import { VotersAndVotesValues } from "./voters_and_votes/useVotersAndVotes";
 
 function checkAndAddValidationResult(
   section: FormSection,

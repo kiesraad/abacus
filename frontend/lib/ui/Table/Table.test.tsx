@@ -4,7 +4,7 @@ import { within } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { render, screen } from "app/test/unit";
+import { render, screen } from "@kiesraad/test";
 
 import { BasicTable, LinkTable } from "./Table.stories";
 

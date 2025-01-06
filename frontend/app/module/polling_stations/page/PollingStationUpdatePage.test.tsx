@@ -5,9 +5,8 @@ import { screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { overrideOnce, render, server } from "app/test/unit";
-
 import { ElectionProvider, PollingStation } from "@kiesraad/api";
+import { overrideOnce, render, server } from "@kiesraad/test";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 

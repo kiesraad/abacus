@@ -4,19 +4,19 @@ import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { VotersAndVotesForm } from "app/component/form/data_entry/voters_and_votes/VotersAndVotesForm";
-import { AbortDataEntryControl } from "app/module/data_entry";
-import { overrideOnce, render, screen, server } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form";
-
 import {
   ElectionProvider,
   ErrorResponse,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationFormController,
   SaveDataEntryResponse,
 } from "@kiesraad/api";
 import { electionDetailsMockResponse, electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
+import { overrideOnce, render, screen, server } from "@kiesraad/test";
+
+import { PollingStationFormController } from "../../../component/form/data_entry/PollingStationFormController";
+import { VotersAndVotesForm } from "../../../component/form/data_entry/voters_and_votes/VotersAndVotesForm";
+import { emptyDataEntryRequest } from "../../../component/form/testHelperFunctions";
+import { AbortDataEntryControl } from "./AbortDataEntryControl";
 
 const mockNavigate = vi.fn();
 

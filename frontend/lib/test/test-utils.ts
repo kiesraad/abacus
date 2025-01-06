@@ -28,14 +28,6 @@ export function renderReturningRouter(ui: ReactElement) {
   return router;
 }
 
-export function renderReturningRouter2(ui: ReactElement) {
-  const router = getRouter(ui);
-  const providers = () => Providers({ router });
-  const result = render(ui, { wrapper: providers });
-  const rerender = result.rerender;
-  return { router, rerender };
-}
-
 export const expectErrorPage = async () => {
   expect(await screen.findByText(/Abacus is stuk/)).toBeVisible();
 };

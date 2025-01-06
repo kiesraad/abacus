@@ -69,7 +69,7 @@ async fn test_polling_station_creation(pool: SqlitePool) {
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/2");
+    let url = format!("http://{addr}/api/elections/1/polling_stations/2");
 
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
@@ -87,7 +87,7 @@ async fn test_polling_station_get(pool: SqlitePool) {
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_update_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/2");
+    let url = format!("http://{addr}/api/elections/1/polling_stations/2");
 
     let response = reqwest::Client::new()
         .put(&url)
@@ -123,7 +123,7 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/2");
+    let url = format!("http://{addr}/api/elections/1/polling_stations/2");
 
     let response = reqwest::Client::new()
         .put(&url)
@@ -159,7 +159,7 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_update_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/40404");
+    let url = format!("http://{addr}/api/elections/1/polling_stations/40404");
 
     let response = reqwest::Client::new()
         .put(&url)
@@ -183,7 +183,7 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_delete_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/2");
+    let url = format!("http://{addr}/api/elections/1/polling_stations/2");
 
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
 
@@ -205,7 +205,7 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
 ))]
 async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/2");
+    let url = format!("http://{addr}/api/elections/1/polling_stations/2");
 
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
 
@@ -225,7 +225,7 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
 ))]
 async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/7");
+    let url = format!("http://{addr}/api/elections/4/polling_stations/7");
 
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
 
@@ -242,7 +242,7 @@ async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/40404");
+    let url = format!("http://{addr}/api/elections/1/polling_stations/40404");
 
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
 

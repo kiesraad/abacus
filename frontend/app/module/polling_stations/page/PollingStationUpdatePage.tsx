@@ -16,7 +16,7 @@ export function PollingStationUpdatePage() {
   const { election } = useElection();
   const navigate = useNavigate();
 
-  const { requestState } = usePollingStationGet(pollingStationId);
+  const { requestState } = usePollingStationGet(electionId, pollingStationId);
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
   function toggleShowDeleteModal() {
@@ -106,6 +106,7 @@ export function PollingStationUpdatePage() {
               </Button>
               {showDeleteModal && (
                 <PollingStationDeleteModal
+                  electionId={electionId}
                   pollingStationId={pollingStationId}
                   onCancel={toggleShowDeleteModal}
                   onError={handleDeleteError}

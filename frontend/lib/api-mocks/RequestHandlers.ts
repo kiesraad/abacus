@@ -263,14 +263,15 @@ export const PollingStationCreateHandler = http.post<ParamsToString<POLLING_STAT
 );
 
 export const PollingStationUpdateHandler = http.put<ParamsToString<POLLING_STATION_UPDATE_REQUEST_PARAMS>>(
-  "/api/polling_stations/:polling_station_id",
+  "/api/elections/:election_id/polling_stations/:polling_station_id",
   async ({ request, params }) => {
+    const electionId = parseInt(params.election_id, 10);
     const pollingStationId = parseInt(params.polling_station_id, 10);
 
     const json = (await request.json()) as PollingStationRequest;
 
     //check if exists
-    const ps = Database.pollingStations.find((ps) => ps.id === pollingStationId);
+    const ps = Database.pollingStations.find((ps) => ps.id === pollingStationId && ps.election_id === electionId);
     if (ps) {
       const updatedPollingStation: PollingStation = {
         ...ps,
@@ -296,12 +297,13 @@ export const PollingStationUpdateHandler = http.put<ParamsToString<POLLING_STATI
 );
 
 export const PollingStationGetHandler = http.get<ParamsToString<POLLING_STATION_GET_REQUEST_PARAMS>>(
-  "/api/polling_stations/:polling_station_id",
+  "/api/elections/:election_id/polling_stations/:polling_station_id",
   ({ params }) => {
+    const electionId = parseInt(params.election_id, 10);
     const pollingStationId = parseInt(params.polling_station_id, 10);
 
     //check if exists
-    const ps = Database.pollingStations.find((ps) => ps.id === pollingStationId);
+    const ps = Database.pollingStations.find((ps) => ps.id === pollingStationId && ps.election_id === electionId);
     if (ps) {
       return HttpResponse.json(ps, { status: 200 });
     }

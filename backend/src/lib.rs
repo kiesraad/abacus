@@ -42,12 +42,18 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             post(data_entry::polling_station_data_entry_finalise),
         );
 
-    let polling_station_routes = Router::new().route(
-        "/{polling_station_id}",
-        get(polling_station::polling_station_get)
-            .put(polling_station::polling_station_update)
-            .delete(polling_station::polling_station_delete),
-    );
+    let polling_station_routes = Router::new()
+        .route(
+            "/",
+            get(polling_station::polling_station_list)
+                .post(polling_station::polling_station_create),
+        )
+        .route(
+            "/{polling_station_id}",
+            get(polling_station::polling_station_get)
+                .put(polling_station::polling_station_update)
+                .delete(polling_station::polling_station_delete),
+        );
 
     let election_routes = Router::new()
         .route("/", get(election::election_list))
@@ -64,11 +70,6 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             "/{election_id}/download_xml_results",
             get(election::election_download_xml_results),
         )
-        .route(
-            "/{election_id}/polling_stations",
-            get(polling_station::polling_station_list)
-                .post(polling_station::polling_station_create),
-        )
         .route("/{election_id}/status", get(data_entry::election_status));
 
     let user_router = Router::new()
@@ -78,7 +79,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let app = Router::new()
         .nest("/api/user", user_router)
         .nest("/api/elections", election_routes)
-        .nest("/api/polling_stations", polling_station_routes)
+        .nest(
+            "/api/elections/{election_id}/polling_stations",
+            polling_station_routes,
+        )
         .nest(
             "/api/polling_stations/{polling_station_id}/data_entries",
             data_entry_routes,

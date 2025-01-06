@@ -387,13 +387,13 @@
         }
       }
     },
-    "/api/elections/{election_id}/status": {
+    "/api/elections/{election_id}/polling_stations/{polling_station_id}": {
       "get": {
         "tags": [
-          "data_entry"
+          "polling_station"
         ],
-        "summary": "Get election polling stations data entry statuses",
-        "operationId": "election_status",
+        "summary": "Get a [PollingStation]",
+        "operationId": "polling_station_get",
         "parameters": [
           {
             "name": "election_id",
@@ -405,50 +405,7 @@
               "format": "int32",
               "minimum": 0
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Election",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ElectionStatusResponse"
-                }
-              }
-            }
           },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/polling_stations/{polling_station_id}": {
-      "get": {
-        "tags": [
-          "polling_station"
-        ],
-        "summary": "Get a [PollingStation]",
-        "operationId": "polling_station_get",
-        "parameters": [
           {
             "name": "polling_station_id",
             "in": "path",
@@ -501,6 +458,17 @@
         "summary": "Update a [PollingStation]",
         "operationId": "polling_station_update",
         "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
           {
             "name": "polling_station_id",
             "in": "path",
@@ -557,6 +525,17 @@
         "operationId": "polling_station_delete",
         "parameters": [
           {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
             "name": "polling_station_id",
             "in": "path",
             "description": "Polling station database id",
@@ -574,6 +553,60 @@
           },
           "404": {
             "description": "Polling station not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/elections/{election_id}/status": {
+      "get": {
+        "tags": [
+          "data_entry"
+        ],
+        "summary": "Get election polling stations data entry statuses",
+        "operationId": "election_status",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Election",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectionStatusResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {

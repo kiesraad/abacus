@@ -78,6 +78,7 @@ Additionally, the following development dependencies are used:
 
 - `reqwest`: HTTP client for testing the API.
 - `http-body-util`: trait used to extract a response body in some tests.
+- `tracing-test`: helper functions and macros that allow for easier testing of crates that use `tracing`.
 
 ### Database
 

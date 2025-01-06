@@ -1,5 +1,5 @@
 import { ReactNode, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 
 import { HeaderElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
 import { Footer } from "app/component/footer/Footer";
@@ -162,7 +162,7 @@ export function ElectionStatusPage() {
   }, [statuses, categoryCounts]);
 
   function finishInput() {
-    navigate("../report#coordinator");
+    void navigate("../report#coordinator");
   }
 
   const pollingStationsWithStatuses = pollingStations.map((ps) => {
@@ -212,7 +212,7 @@ export function ElectionStatusPage() {
               variant="secondary"
               leftIcon={<IconPlus />}
               onClick={() => {
-                navigate(`/elections/${election.id}/polling-stations`);
+                void navigate(`/elections/${election.id}/polling-stations`);
               }}
             >
               {t("election_status.add_polling_station")}

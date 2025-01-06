@@ -1,4 +1,4 @@
-import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
+import { createRoutesFromElements, Navigate, Route } from "react-router";
 
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AdministratorLayout } from "app/module/AdministratorLayout";

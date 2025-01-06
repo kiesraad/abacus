@@ -1,11 +1,8 @@
 import { ReactNode } from "react";
-import { createMemoryRouter } from "react-router-dom";
+import { createMemoryRouter } from "react-router";
 
-import { Router } from "@remix-run/router";
-
-export let router: Router;
+export type Router = ReturnType<typeof createMemoryRouter>;
 
 export function getRouter(children: ReactNode) {
-  router = createMemoryRouter([{ path: "*", element: children }]);
-  return router;
+  return createMemoryRouter([{ path: "*", element: children }]);
 }

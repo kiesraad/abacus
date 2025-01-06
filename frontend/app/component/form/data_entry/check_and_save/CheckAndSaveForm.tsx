@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ReactElement } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 
 import { useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
@@ -58,7 +58,7 @@ export function CheckAndSaveForm() {
       if (!finalisationAllowed) return;
 
       await finaliseDataEntry();
-      navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
+      await navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
     })(event);
 
   return (

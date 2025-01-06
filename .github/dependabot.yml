@@ -14,6 +14,12 @@ updates:
     groups:
       cargo:
         patterns: ["*"]
+    ignore:
+      # New axum major and minor versions usually have breaking changes, see #790 for axum 0.8
+      - dependency-name: "axum"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "axum-extra"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:

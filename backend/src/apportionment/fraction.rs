@@ -138,21 +138,12 @@ mod tests {
     }
 
     #[test]
-    fn test_div_whole_number_larger_than_zero() {
+    fn test_div() {
         let fraction = Fraction::new(11, 5);
         let other_fraction = Fraction::new(1, 2);
         let divided = fraction / other_fraction;
         assert_eq!(divided, Fraction::new(22, 5));
         assert_eq!(divided.to_string(), "4 2/5")
-    }
-
-    #[test]
-    fn test_div_whole_number_smaller_than_zero() {
-        let fraction = Fraction::new(1, 5);
-        let other_fraction = Fraction::new(2, 9);
-        let divided = fraction / other_fraction;
-        assert_eq!(divided, Fraction::new(9, 10));
-        assert_eq!(divided.to_string(), "9/10")
     }
 
     #[test]

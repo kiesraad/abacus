@@ -1,8 +1,9 @@
 use crate::data_entry::Count;
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
-use std::ops::{Div, Mul};
+use std::ops::{Add, Div, Mul, Sub};
 
+#[derive(Clone, Copy)]
 pub struct Fraction {
     numerator: u64,
     denominator: u64,
@@ -30,13 +31,24 @@ impl Fraction {
     }
 }
 
-impl Div for Fraction {
+impl Add for Fraction {
     type Output = Self;
 
-    fn div(self, other: Self) -> Self {
+    fn add(self, other: Self) -> Self {
         Self {
-            numerator: self.numerator * other.denominator,
-            denominator: self.denominator * other.numerator,
+            numerator: self.numerator * other.denominator + other.numerator * self.denominator,
+            denominator: self.denominator * other.denominator,
+        }
+    }
+}
+
+impl Sub for Fraction {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self {
+            numerator: self.numerator * other.denominator - other.numerator * self.denominator,
+            denominator: self.denominator * other.denominator,
         }
     }
 }
@@ -48,6 +60,17 @@ impl Mul for Fraction {
         Self {
             numerator: self.numerator * other.numerator,
             denominator: self.denominator * other.denominator,
+        }
+    }
+}
+
+impl Div for Fraction {
+    type Output = Self;
+
+    fn div(self, other: Self) -> Self {
+        Self {
+            numerator: self.numerator * other.denominator,
+            denominator: self.denominator * other.numerator,
         }
     }
 }
@@ -138,12 +161,21 @@ mod tests {
     }
 
     #[test]
-    fn test_div() {
-        let fraction = Fraction::new(11, 5);
-        let other_fraction = Fraction::new(1, 2);
-        let divided = fraction / other_fraction;
-        assert_eq!(divided, Fraction::new(22, 5));
-        assert_eq!(divided.to_string(), "4 2/5")
+    fn test_add() {
+        let fraction = Fraction::new(1, 3);
+        let other_fraction = Fraction::new(1, 4);
+        let multiplied = fraction + other_fraction;
+        assert_eq!(multiplied, Fraction::new(7, 12));
+        assert_eq!(multiplied.to_string(), "7/12")
+    }
+
+    #[test]
+    fn test_sub() {
+        let fraction = Fraction::new(2, 5);
+        let other_fraction = Fraction::new(1, 4);
+        let multiplied = fraction - other_fraction;
+        assert_eq!(multiplied, Fraction::new(3, 20));
+        assert_eq!(multiplied.to_string(), "3/20")
     }
 
     #[test]
@@ -153,6 +185,15 @@ mod tests {
         let multiplied = fraction * other_fraction;
         assert_eq!(multiplied, Fraction::new(2, 45));
         assert_eq!(multiplied.to_string(), "2/45")
+    }
+
+    #[test]
+    fn test_div() {
+        let fraction = Fraction::new(11, 5);
+        let other_fraction = Fraction::new(1, 2);
+        let divided = fraction / other_fraction;
+        assert_eq!(divided, Fraction::new(22, 5));
+        assert_eq!(divided.to_string(), "4 2/5")
     }
 
     #[test]

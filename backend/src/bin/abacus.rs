@@ -1,17 +1,17 @@
-use std::error::Error;
-use std::net::{Ipv4Addr, SocketAddr};
-use std::str::FromStr;
-
+use axum::serve::ListenerExt;
 #[cfg(feature = "dev-database")]
 use backend::fixtures;
 use backend::router;
 use clap::Parser;
 use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::SqlitePool;
+use std::error::Error;
+use std::net::{Ipv4Addr, SocketAddr};
+use std::str::FromStr;
 use tokio::net::TcpListener;
 use tokio::signal;
-use tracing::info;
 use tracing::level_filters::LevelFilter;
+use tracing::{info, trace};
 use tracing_subscriber::EnvFilter;
 
 /// Abacus API and asset server
@@ -56,9 +56,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(&address).await?;
     info!("Starting API server on http://{}", listener.local_addr()?);
+    let listener = listener.tap_io(|tcp_stream| {
+        if let Err(err) = tcp_stream.set_nodelay(true) {
+            trace!("failed to set TCP_NODELAY on incoming connection: {err:#}");
+        }
+    });
     axum::serve(listener, app.into_make_service())
         .with_graceful_shutdown(shutdown_signal())
-        .tcp_nodelay(true)
         .await?;
     Ok(())
 }

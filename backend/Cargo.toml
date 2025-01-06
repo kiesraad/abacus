@@ -20,15 +20,15 @@ required-features = ["openapi"]
 # Note: if you add a dependency here, please update the README.md for the backend as well.
 
 [dependencies]
-axum = { version = "0.7", features = ["macros", "tracing"] }
-axum-extra = { version = "0.9.6", default-features = false, features = ["attachment", "cookie"] }
+axum = { version = "0.8", features = ["macros", "tracing"] }
+axum-extra = { version = "0.10", default-features = false, features = ["attachment", "cookie"] }
 chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
 clap = { version = "4.5", default-features = false, features = ["derive", "std", "help"] }
 hyper = { version = "1", features = ["full"] }
 tokio = { version = "1", features = ["full"] }
-memory-serve = { version = "1.0.0-beta.1", features = ["force-embed"], optional = true }
-utoipa = { version = "=5.3.0", features = ["axum_extras"] }
-utoipa-swagger-ui = { version = "=8.1.0", features = ["axum"], optional = true }
+memory-serve = { version = "1.0.0-beta.2", features = ["force-embed"], optional = true }
+utoipa = { version = "5.3.1", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "8.1.1", features = ["axum"], optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "chrono"] }

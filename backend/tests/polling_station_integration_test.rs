@@ -3,13 +3,14 @@
 use reqwest::StatusCode;
 use sqlx::SqlitePool;
 
+use crate::shared::create_and_save_data_entry;
+use crate::utils::serve_api;
 use backend::polling_station::{
     PollingStation, PollingStationListResponse, PollingStationRequest, PollingStationType,
 };
 use backend::ErrorResponse;
 
-use crate::utils::serve_api;
-
+mod shared;
 mod utils;
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
@@ -199,14 +200,13 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
     );
 }
 
-#[sqlx::test(fixtures(
-    path = "../fixtures",
-    scripts("elections", "polling_stations", "polling_station_data_entries")
-))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/elections/1/polling_stations/2");
 
+    create_and_save_data_entry(&addr, 2, 1, None).await;
+
+    let url = format!("http://{addr}/api/elections/1/polling_stations/2");
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
 
     let status = response.status();

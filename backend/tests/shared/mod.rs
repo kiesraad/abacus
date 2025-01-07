@@ -82,6 +82,7 @@ pub async fn create_and_save_data_entry(
     assert_eq!(validation_results.validation_results.warnings.len(), 0);
 }
 
+#[allow(dead_code)]
 pub async fn create_and_finalise_data_entry(
     addr: &SocketAddr,
     polling_station_id: u32,

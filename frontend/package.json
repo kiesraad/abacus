@@ -16,7 +16,6 @@
     "preview": "vite preview",
     "test": "vitest",
     "e2e:lib-ui": "playwright test -c playwright.lib-ui.config.ts",
-    "e2e:app": "playwright test -c playwright.app.config.ts",
     "e2e:d2d": "cross-env LOCAL_CI=true playwright test -c playwright.d2d.config.ts",
     "e2e:d2d-dev": "playwright test -c playwright.d2d.config.ts",
     "ladle": "ladle serve",

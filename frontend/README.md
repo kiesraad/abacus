@@ -54,9 +54,6 @@ Browser tests using Playwright:
 # tests for ui components using ladle:
 npm run e2e:lib-ui
 
-# tests for frontend with msw:
-npm run e2e:app
-
 # tests for frontend with backend and database
 # tests use database at backend/target/debug/playwright.sqlite
 # build frontend, build backend, setup fresh seeded database:

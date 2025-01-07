@@ -1,10 +1,12 @@
 #![cfg(test)]
 
+use crate::shared::create_result;
 use crate::utils::serve_api;
 use backend::election::{ElectionDetailsResponse, ElectionListResponse};
 use hyper::StatusCode;
 use sqlx::SqlitePool;
 
+mod shared;
 mod utils;
 
 #[sqlx::test(fixtures("../fixtures/elections.sql"))]
@@ -79,14 +81,14 @@ async fn test_election_pdf_download(pool: SqlitePool) {
     assert!(content_disposition_string.contains(".pdf"));
 }
 
-#[sqlx::test(fixtures(
-    path = "../fixtures",
-    scripts("elections", "polling_stations", "polling_station_results")
-))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_election_xml_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/4/download_xml_results");
+    create_result(&addr, 1).await;
+    create_result(&addr, 2).await;
+
+    let url = format!("http://{addr}/api/elections/1/download_xml_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let content_type = response.headers().get("Content-Type");
@@ -97,17 +99,17 @@ async fn test_election_xml_download(pool: SqlitePool) {
 
     let body = response.text().await.unwrap();
     assert!(body.contains("<Election>"));
-    assert!(body.contains("<ValidVotes>125</ValidVotes>"));
+    assert!(body.contains("<ValidVotes>204</ValidVotes>"));
 }
 
-#[sqlx::test(fixtures(
-    path = "../fixtures",
-    scripts("elections", "polling_stations", "polling_station_results")
-))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
 async fn test_election_zip_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/4/download_zip_results");
+    create_result(&addr, 1).await;
+    create_result(&addr, 2).await;
+
+    let url = format!("http://{addr}/api/elections/1/download_zip_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let content_disposition = response.headers().get("Content-Disposition");

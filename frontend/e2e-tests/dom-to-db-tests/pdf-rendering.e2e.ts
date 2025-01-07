@@ -6,14 +6,14 @@ import { stat } from "node:fs/promises";
 import { test } from "./fixtures";
 
 test.describe("pdf rendering", () => {
-  test("it downloads a pdf", async ({ page }) => {
-    await page.goto("/elections/4/status#coordinator");
+  test("it downloads a pdf", async ({ page, completedElection }) => {
+    await page.goto(`/elections/${completedElection.id}/status#coordinator`);
 
     const electionStatusPage = new ElectionStatus(page);
     await electionStatusPage.finish.click();
 
     const electionReportPage = new ElectionReport(page);
-    const responsePromise = page.waitForResponse("/api/elections/4/download_pdf_results");
+    const responsePromise = page.waitForResponse(`/api/elections/${completedElection.id}/download_pdf_results`);
     const downloadPromise = page.waitForEvent("download");
     await electionReportPage.downloadPdf.click();
 

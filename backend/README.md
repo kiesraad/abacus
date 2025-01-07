@@ -27,7 +27,11 @@ In this version of `memory-serve`, the path must be absolute, since `build.rs`
 has no knowledge of the project it is currently built in. Example:
 
 ```shell
-ASSET_DIR=$PWD/frontend/dist cargo run --features memory-serve
+cd frontend
+npm run build
+cd ../backend
+sqlx database setup
+ASSET_DIR=$PWD/../frontend/dist cargo run --features memory-serve
 ```
 
 ### Linting

@@ -1,0 +1,59 @@
+.status-main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background-color: var(--bg-gray);
+}
+
+.status-title {
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+
+  h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    margin: 0;
+  }
+
+  button {
+    width: 16.5rem;
+  }
+
+  .buttons {
+    min-width: calc(16.5rem + 2px);
+    min-height: calc(3.125rem + 2px);
+    display: flex;
+    align-items: center;
+  }
+}
+
+.status-section {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+
+  div:has(> nav) {
+    margin: 0;
+    flex: 0 0 19.5rem;
+  }
+}
+
+.status-article {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  flex: 1;
+  background-color: var(--base-white);
+  border-radius: 0.5rem;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

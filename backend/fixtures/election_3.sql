@@ -1,56 +1,6 @@
-INSERT INTO elections (id, name, location, number_of_voters, category, number_of_seats, election_date, nomination_date, status, political_groups)
-VALUES
-    (1, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', 29, '2024-11-30', '2024-11-1', 'DataEntryInProgress',
-        '[
-          {
-            "number": 1,
-            "name": "Political Group A",
-            "candidates": [
-              {
-                "number": 1,
-                "initials": "A.",
-                "first_name": "Alice",
-                "last_name": "Foo",
-                "locality": "Amsterdam",
-                "gender": "Female"
-              },
-              {
-                "number": 2,
-                "initials": "C.",
-                "first_name": "Charlie",
-                "last_name": "Doe",
-                "locality": "Rotterdam",
-                "gender": null
-              }
-            ]
-          }
-        ]'),
-       (2, 'Municipal Re-election', 'Heemdamseburg', 100, 'Municipal', 29, '2024-12-31', '2024-12-1', 'DataEntryInProgress',
-        '[
-          {
-            "number": 1,
-            "name": "Political Group A",
-            "candidates": [
-              {
-                "number": 1,
-                "initials": "A.",
-                "first_name": "Alice",
-                "last_name": "Foo",
-                "locality": "Amsterdam",
-                "gender": "Female"
-              },
-              {
-                "number": 2,
-                "initials": "C.",
-                "first_name": "Charlie",
-                "last_name": "Doe",
-                "locality": "Rotterdam",
-                "gender": null
-              }
-            ]
-          }
-        ]'),
-       (3, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '2024-11-1', 'DataEntryInProgress','[
+INSERT INTO elections (id, name, location, number_of_voters, category, number_of_seats, election_date, nomination_date,
+                       status, political_groups)
+VALUES (3, 'Gemeenteraad 2026', 'Juinen', 3500, 'Municipal', 29, '2024-11-30', '2024-11-1', 'DataEntryInProgress', '[
          {
            "number": 1,
            "name": "Lijst Hekking",
@@ -828,3 +778,10 @@ VALUES
            ]
          }
        ]');
+
+INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
+                              postal_code, locality)
+VALUES (4, 3, 'Studio The Rules', 1, NULL, 'FixedLocation', 'Gerontoplein 1', '1337 YQ', 'Juinen'),
+       (5, 3, 'Buurtcentrum de Mattenklopper', 2, 1000, 'Special', 'Complexiteitslaan 2b', '1337 QY',
+        'Juinen'),
+       (6, 3, 'Positivo Zaal', 3, NULL, 'FixedLocation', 'Kerkweg 3', '1337 QA', 'Juinen');

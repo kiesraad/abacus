@@ -9,7 +9,7 @@ use sqlx::SqlitePool;
 mod shared;
 mod utils;
 
-#[sqlx::test(fixtures("../fixtures/elections.sql"))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1", "election_2")))]
 async fn test_election_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -21,10 +21,10 @@ async fn test_election_list_works(pool: SqlitePool) {
     let body: ElectionListResponse = response.json().await.unwrap();
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(body.elections.len(), 3);
+    assert_eq!(body.elections.len(), 2);
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -56,7 +56,7 @@ async fn test_election_details_not_found(pool: SqlitePool) {
     assert_eq!(status, StatusCode::NOT_FOUND);
 }
 
-#[sqlx::test(fixtures("../fixtures/elections.sql"))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_election_pdf_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -81,7 +81,7 @@ async fn test_election_pdf_download(pool: SqlitePool) {
     assert!(content_disposition_string.contains(".pdf"));
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_election_xml_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -102,7 +102,7 @@ async fn test_election_xml_download(pool: SqlitePool) {
     assert!(body.contains("<ValidVotes>204</ValidVotes>"));
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_election_zip_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

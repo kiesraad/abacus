@@ -16,13 +16,13 @@ use utils::serve_api;
 mod shared;
 mod utils;
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     shared::create_and_finalise_data_entry(&addr, 1, 1).await;
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -161,7 +161,7 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
     );
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -189,7 +189,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
 }
 
 /// test that we can get a data entry after saving it
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -223,7 +223,7 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     );
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
     tracing_subscriber::fmt()
         .with_env_filter(
@@ -243,7 +243,7 @@ async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -287,7 +287,7 @@ async fn get_statuses(addr: &SocketAddr) -> BTreeMap<u32, ElectionStatusResponse
         })
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -339,7 +339,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_data_entry_progress, None);
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1", "election_2")))]
 async fn test_election_details_status_no_other_election_statuses(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

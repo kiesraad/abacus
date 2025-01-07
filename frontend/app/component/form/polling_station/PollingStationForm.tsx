@@ -21,7 +21,7 @@ interface Form extends HTMLFormElement {
 }
 
 const formFields: FormFields<PollingStationRequest> = {
-  number: { required: true, type: "number" },
+  number: { required: true, type: "number", isPollingStationNumber: true },
   name: { required: true, type: "string" },
   polling_station_type: { type: "string", mapUndefined: true },
   number_of_voters: { type: "number", isFormatted: true },

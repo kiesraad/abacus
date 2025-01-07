@@ -142,14 +142,16 @@ pub fn seat_allocation(
             let mut surpluses = BTreeMap::<u8, Fraction>::new();
             for pg in totals.political_group_votes.iter() {
                 let pg_total_votes = Fraction::from_count(pg.total);
-                if pg_total_votes > threshold {
+                if pg_total_votes >= threshold {
                     let pg_whole_seats = Fraction::from_u64(
                         *whole_seats
                             .get(&pg.number)
                             .expect("Political group should have number of whole seats"),
                     );
                     let surplus = pg_total_votes - (quota * pg_whole_seats);
-                    surpluses.insert(pg.number, surplus);
+                    if surplus > Fraction::new(0, 1) {
+                        surpluses.insert(pg.number, surplus);
+                    }
                 }
             }
             while remaining_seats > 0 {
@@ -165,7 +167,9 @@ pub fn seat_allocation(
                     // pg_number_last_remaining_seat = Some(pg_number);
                     info!("Remaining seat assigned to pg_number: {}", pg_number);
                 } else {
+                    info!("Use get_pg_number_with_largest_average!");
                     // TODO: Start using get_pg_number_with_largest_average for remaining seats
+                    break;
                 }
             }
         }
@@ -217,16 +221,91 @@ mod tests {
             differences_counts: SummaryDifferencesCounts::zero(),
             recounted_polling_stations: vec![],
             political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, 600, &[]),
-                PoliticalGroupVotes::from_test_data_auto(2, 302, &[]),
-                PoliticalGroupVotes::from_test_data_auto(3, 99, &[]),
-                PoliticalGroupVotes::from_test_data_auto(4, 51, &[]),
-                PoliticalGroupVotes::from_test_data_auto(5, 148, &[]),
+                PoliticalGroupVotes::from_test_data_auto(1, 540, &[]),
+                PoliticalGroupVotes::from_test_data_auto(2, 160, &[]),
+                PoliticalGroupVotes::from_test_data_auto(3, 160, &[]),
+                PoliticalGroupVotes::from_test_data_auto(4, 80, &[]),
+                PoliticalGroupVotes::from_test_data_auto(5, 80, &[]),
+                PoliticalGroupVotes::from_test_data_auto(6, 80, &[]),
+                PoliticalGroupVotes::from_test_data_auto(7, 60, &[]),
+                PoliticalGroupVotes::from_test_data_auto(8, 40, &[]),
             ],
         };
 
-        let result = seat_allocation(17, &totals);
+        let result = seat_allocation(15, &totals);
+        assert_eq!(result, Ok(vec![7, 2, 2, 1, 1, 1, 1, 0]));
+    }
+
+    #[test]
+    #[traced_test]
+    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system(
+    ) {
+        let totals = ElectionSummary {
+            voters_counts: VotersCounts {
+                poll_card_count: 1200,
+                proxy_certificate_count: 0,
+                voter_card_count: 0,
+                total_admitted_voters_count: 1200,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 1200,
+                blank_votes_count: 0,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 1200,
+            },
+            differences_counts: SummaryDifferencesCounts::zero(),
+            recounted_polling_stations: vec![],
+            political_group_votes: vec![
+                PoliticalGroupVotes::from_test_data_auto(1, 540, &[]),
+                PoliticalGroupVotes::from_test_data_auto(2, 160, &[]),
+                PoliticalGroupVotes::from_test_data_auto(3, 160, &[]),
+                PoliticalGroupVotes::from_test_data_auto(4, 80, &[]),
+                PoliticalGroupVotes::from_test_data_auto(5, 80, &[]),
+                PoliticalGroupVotes::from_test_data_auto(6, 80, &[]),
+                PoliticalGroupVotes::from_test_data_auto(7, 55, &[]),
+                PoliticalGroupVotes::from_test_data_auto(8, 45, &[]),
+            ],
+        };
+
+        let result = seat_allocation(15, &totals);
+        // TODO: To be updated
         assert_eq!(result, Ok(vec![9, 4, 2, 0, 2]));
+    }
+
+    #[test]
+    #[traced_test]
+    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_no_surpluses(
+    ) {
+        let totals = ElectionSummary {
+            voters_counts: VotersCounts {
+                poll_card_count: 1200,
+                proxy_certificate_count: 0,
+                voter_card_count: 0,
+                total_admitted_voters_count: 1200,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: 1200,
+                blank_votes_count: 0,
+                invalid_votes_count: 0,
+                total_votes_cast_count: 1200,
+            },
+            differences_counts: SummaryDifferencesCounts::zero(),
+            recounted_polling_stations: vec![],
+            political_group_votes: vec![
+                PoliticalGroupVotes::from_test_data_auto(1, 560, &[]),
+                PoliticalGroupVotes::from_test_data_auto(2, 160, &[]),
+                PoliticalGroupVotes::from_test_data_auto(3, 160, &[]),
+                PoliticalGroupVotes::from_test_data_auto(4, 80, &[]),
+                PoliticalGroupVotes::from_test_data_auto(5, 80, &[]),
+                PoliticalGroupVotes::from_test_data_auto(6, 80, &[]),
+                PoliticalGroupVotes::from_test_data_auto(7, 40, &[]),
+                PoliticalGroupVotes::from_test_data_auto(8, 40, &[]),
+            ],
+        };
+
+        let result = seat_allocation(15, &totals);
+        // TODO: To be updated
+        assert_eq!(result, Ok(vec![6, 2, 2, 1, 1, 1, 0, 0]));
     }
 
     #[test]

@@ -36,7 +36,7 @@ impl PollingStations {
         .await
     }
 
-    /// Get a single polling from an election
+    /// Get a single polling station
     pub async fn get(&self, id: u32) -> Result<PollingStation, sqlx::Error> {
         query_as!(
             PollingStation,
@@ -55,6 +55,35 @@ impl PollingStations {
             WHERE id = $1
             "#,
             id
+        )
+        .fetch_one(&self.0)
+        .await
+    }
+
+    /// Get a single polling station for an election
+    pub async fn get_for_election(
+        &self,
+        election_id: u32,
+        id: u32,
+    ) -> Result<PollingStation, sqlx::Error> {
+        query_as!(
+            PollingStation,
+            r#"
+            SELECT
+                id AS "id: u32",
+                election_id AS "election_id: u32",
+                name,
+                number,
+                number_of_voters,
+                polling_station_type AS "polling_station_type: _",
+                address,
+                postal_code,
+                locality
+            FROM polling_stations
+            WHERE id = $1 AND election_id = $2
+            "#,
+            id,
+            election_id
         )
         .fetch_one(&self.0)
         .await
@@ -106,6 +135,7 @@ impl PollingStations {
     /// Update a single polling station for an election
     pub async fn update(
         &self,
+        election_id: u32,
         polling_station_id: u32,
         polling_station_update: PollingStationRequest,
     ) -> Result<bool, sqlx::Error> {
@@ -121,7 +151,7 @@ impl PollingStations {
               postal_code = ?,
               locality = ?
             WHERE
-              id = ?
+              id = ? AND election_id = ?
             "#,
             polling_station_update.name,
             polling_station_update.number,
@@ -131,6 +161,7 @@ impl PollingStations {
             polling_station_update.postal_code,
             polling_station_update.locality,
             polling_station_id,
+            election_id,
         )
         .execute(&self.0)
         .await?
@@ -140,10 +171,11 @@ impl PollingStations {
     }
 
     /// Delete a single polling station for an election
-    pub async fn delete(&self, polling_station_id: u32) -> Result<bool, sqlx::Error> {
+    pub async fn delete(&self, election_id: u32, id: u32) -> Result<bool, sqlx::Error> {
         let rows_affected = query!(
-            r#"DELETE FROM polling_stations WHERE id = ?"#,
-            polling_station_id,
+            r#"DELETE FROM polling_stations WHERE id = ? AND election_id = ?"#,
+            id,
+            election_id,
         )
         .execute(&self.0)
         .await?

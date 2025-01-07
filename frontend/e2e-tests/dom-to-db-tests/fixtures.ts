@@ -1,6 +1,6 @@
 import { test as base, expect } from "@playwright/test";
 
-import { PollingStation } from "@kiesraad/api";
+import { POLLING_STATION_GET_REQUEST_PATH, PollingStation } from "@kiesraad/api";
 
 type AutoFixtures = {
   // AutoFixtures contain { auto: true } and are called for each test automatically.
@@ -23,7 +23,8 @@ export const test = base.extend<AutoFixtures & Fixtures>({
     { auto: true },
   ],
   pollingStation1: async ({ request }, use) => {
-    const response = await request.get(`/api/polling_stations/1`);
+    const url: POLLING_STATION_GET_REQUEST_PATH = `/api/elections/1/polling_stations/1`;
+    const response = await request.get(url);
     expect(response.ok()).toBeTruthy();
     const pollingStation = (await response.json()) as PollingStation;
     await use(pollingStation);

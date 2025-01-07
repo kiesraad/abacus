@@ -27,7 +27,12 @@ describe("PollingStationUpdatePage", () => {
   };
 
   test("Shows form", async () => {
-    overrideOnce("get", `/api/polling_stations/${testPollingStation.id}`, 200, testPollingStation);
+    overrideOnce(
+      "get",
+      `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`,
+      200,
+      testPollingStation,
+    );
 
     render(
       <ElectionProvider electionId={1}>
@@ -43,7 +48,12 @@ describe("PollingStationUpdatePage", () => {
   });
 
   test("Navigates back on save", async () => {
-    overrideOnce("get", `/api/polling_stations/${testPollingStation.id}`, 200, testPollingStation);
+    overrideOnce(
+      "get",
+      `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`,
+      200,
+      testPollingStation,
+    );
 
     const router = renderReturningRouter(
       <ElectionProvider electionId={1}>
@@ -64,7 +74,12 @@ describe("PollingStationUpdatePage", () => {
     test("Returns to list page with a message", async () => {
       const user = userEvent.setup();
 
-      overrideOnce("get", `/api/polling_stations/${testPollingStation.id}`, 200, testPollingStation);
+      overrideOnce(
+        "get",
+        `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`,
+        200,
+        testPollingStation,
+      );
 
       const router = renderReturningRouter(
         <ElectionProvider electionId={1}>
@@ -81,7 +96,13 @@ describe("PollingStationUpdatePage", () => {
       let request_method: string;
       let request_url: string;
 
-      overrideOnce("delete", `/api/polling_stations/${testPollingStation.id}`, 200, "");
+      overrideOnce(
+        "delete",
+        `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`,
+        200,
+        "",
+      );
+
       server.events.on("request:start", ({ request }) => {
         request_method = request.method;
         request_url = request.url;
@@ -92,7 +113,9 @@ describe("PollingStationUpdatePage", () => {
 
       await waitFor(() => {
         expect(request_method).toEqual("DELETE");
-        expect(request_url).toContain(`/api/polling_stations/${testPollingStation.id}`);
+        expect(request_url).toContain(
+          `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`,
+        );
       });
 
       expect(router.state.location.pathname).toEqual("/elections/1/polling_stations");
@@ -102,8 +125,9 @@ describe("PollingStationUpdatePage", () => {
     test("Shows an error message when delete was not possible", async () => {
       const user = userEvent.setup();
 
-      overrideOnce("get", `/api/polling_stations/${testPollingStation.id}`, 200, testPollingStation);
-      overrideOnce("delete", `/api/polling_stations/${testPollingStation.id}`, 422, {
+      const url = `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`;
+      overrideOnce("get", url, 200, testPollingStation);
+      overrideOnce("delete", url, 422, {
         error: "Invalid data",
         fatal: false,
         reference: "InvalidData",

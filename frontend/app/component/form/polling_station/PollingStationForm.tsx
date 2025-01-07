@@ -36,7 +36,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
   const { process, validationResult } = useForm<PollingStationRequest>(formFields);
   const { requestState, create, update } = useCrud<PollingStation>({
     create: `/api/elections/${electionId}/polling_stations`,
-    update: pollingStation ? `/api/polling_stations/${pollingStation.id}` : undefined,
+    update: pollingStation ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
   });
 
   const handleSubmit = (event: React.FormEvent<Form>) => {

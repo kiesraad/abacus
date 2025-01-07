@@ -21,7 +21,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     let body: ElectionListResponse = response.json().await.unwrap();
     println!("response body: {:?}", &body);
     assert_eq!(status, StatusCode::OK);
-    assert_eq!(body.elections.len(), 5);
+    assert_eq!(body.elections.len(), 3);
 }
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]

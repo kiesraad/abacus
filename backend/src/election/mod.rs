@@ -1,4 +1,7 @@
 use axum::extract::{Path, State};
+#[cfg(feature = "dev-database")]
+use axum::http::StatusCode;
+use axum::response::{IntoResponse, Response};
 use axum::Json;
 use axum_extra::response::Attachment;
 use serde::{Deserialize, Serialize};
@@ -35,6 +38,12 @@ pub struct ElectionListResponse {
 pub struct ElectionDetailsResponse {
     pub election: Election,
     pub polling_stations: Vec<PollingStation>,
+}
+
+impl IntoResponse for Election {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
 }
 
 /// Get a list of all elections, without their candidate lists
@@ -77,6 +86,28 @@ pub async fn election_details(
         election,
         polling_stations,
     }))
+}
+
+/// Create an election. For test usage only!
+#[utoipa::path(
+    post,
+    path = "/api/elections",
+    request_body = ElectionRequest,
+    responses(
+        (status = 201, description = "Election created", body = Election),
+        (status = 400, description = "Bad request", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+#[cfg(feature = "dev-database")]
+pub async fn election_create(
+    State(elections_repo): State<Elections>,
+    Json(new_election): Json<ElectionRequest>,
+) -> Result<(StatusCode, Election), APIError> {
+    Ok((
+        StatusCode::CREATED,
+        elections_repo.create(new_election).await?,
+    ))
 }
 
 struct ResultsInput {

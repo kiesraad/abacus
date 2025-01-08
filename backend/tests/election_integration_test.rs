@@ -2,6 +2,8 @@
 
 use crate::shared::create_result;
 use crate::utils::serve_api;
+#[cfg(feature = "dev-database")]
+use backend::election::Election;
 use backend::election::{ElectionDetailsResponse, ElectionListResponse};
 use hyper::StatusCode;
 use sqlx::SqlitePool;
@@ -42,6 +44,59 @@ async fn test_election_details_works(pool: SqlitePool) {
         .polling_stations
         .iter()
         .any(|ps| ps.name == "Op Rolletjes"));
+}
+
+#[sqlx::test]
+#[cfg(feature = "dev-database")]
+async fn test_election_create_works(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&serde_json::json!({
+            "name": "Test Election",
+            "location": "Test Location",
+            "number_of_voters": 100,
+            "category": "Municipal",
+            "number_of_seats": 29,
+            "election_date": "2026-01-01",
+            "nomination_date": "2026-01-01",
+            "status": "DataEntryInProgress",
+            "political_groups": [
+          {
+            "number": 1,
+            "name": "Political Group A",
+            "candidates": [
+              {
+                "number": 1,
+                "initials": "A.",
+                "first_name": "Alice",
+                "last_name": "Foo",
+                "locality": "Amsterdam",
+                "gender": "Female"
+              },
+              {
+                "number": 2,
+                "initials": "C.",
+                "first_name": "Charlie",
+                "last_name": "Doe",
+                "locality": "Rotterdam",
+                "gender": null
+              }
+            ]
+          }
+        ]
+        }))
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    let status = response.status();
+    assert_eq!(status, StatusCode::CREATED);
+    let body: Election = response.json().await.unwrap();
+    assert_eq!(body.name, "Test Election");
 }
 
 #[sqlx::test]

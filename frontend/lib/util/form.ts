@@ -36,7 +36,7 @@ export type FormFieldNumber = FormFieldBase & {
   max?: number;
 };
 
-type FieldValue<F extends AnyFormField> = F extends FormFieldNumber
+export type FieldValue<F extends AnyFormField> = F extends FormFieldNumber
   ? number
   : F extends FormFieldString
     ? string

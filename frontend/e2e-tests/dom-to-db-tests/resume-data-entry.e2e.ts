@@ -47,15 +47,15 @@ test.describe("resume data entry flow", () => {
   };
 
   test.describe("resume after saving", () => {
-    test("resuming data entry shows previous data", async ({ page, pollingStation1 }) => {
-      const abortInputModal = await fillFirstTwoPagesAndAbort(page, pollingStation1);
+    test("resuming data entry shows previous data", async ({ page, pollingStation }) => {
+      const abortInputModal = await fillFirstTwoPagesAndAbort(page, pollingStation);
       await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
-      await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1`);
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
       const differencesPage = new DifferencesPage(page);
       await expect(differencesPage.fieldset).toBeVisible();
@@ -81,14 +81,14 @@ test.describe("resume data entry flow", () => {
 
     // Reproduce issue where navigating between sections is blocked by modal, even though there are no changes.
     // https://github.com/kiesraad/abacus/pull/417#pullrequestreview-2347886699
-    test("navigation works after resuming data entry", async ({ page, pollingStation1 }) => {
-      const abortInputModal = await fillFirstTwoPagesAndAbort(page, pollingStation1);
+    test("navigation works after resuming data entry", async ({ page, pollingStation }) => {
+      const abortInputModal = await fillFirstTwoPagesAndAbort(page, pollingStation);
       await abortInputModal.saveInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
-      await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1`);
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
       const differencesPage = new DifferencesPage(page);
       await expect(differencesPage.fieldset).toBeVisible();
@@ -105,8 +105,8 @@ test.describe("resume data entry flow", () => {
       await expect(candidatesListPage_1.fieldset).toBeVisible();
     });
 
-    test("save input from voters and votes page with error", async ({ page, request, pollingStation1 }) => {
-      await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
+    test("save input from voters and votes page with error", async ({ page, request, pollingStation }) => {
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
       const recountedPage = new RecountedPage(page);
       await expect(recountedPage.fieldset).toBeVisible();
@@ -131,7 +131,7 @@ test.describe("resume data entry flow", () => {
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
       await expect(pollingStationChoicePage.resumeDataEntry).toBeVisible();
 
-      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation1.id}/data_entries/1`);
+      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
@@ -168,8 +168,8 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.fieldset).toBeVisible();
     });
 
-    test("save input from voters and votes page with warning", async ({ page, request, pollingStation1 }) => {
-      await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
+    test("save input from voters and votes page with warning", async ({ page, request, pollingStation }) => {
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
       const recountedPage = new RecountedPage(page);
       await expect(recountedPage.fieldset).toBeVisible();
@@ -204,7 +204,7 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
-      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation1.id}/data_entries/1`);
+      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
@@ -242,8 +242,8 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.fieldset).toBeVisible();
     });
 
-    test("resuming with unsubmitted input (cached data) shows that data", async ({ page, pollingStation1 }) => {
-      await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
+    test("resuming with unsubmitted input (cached data) shows that data", async ({ page, pollingStation }) => {
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
       const recountedPage = new RecountedPage(page);
       await recountedPage.checkNoAndClickNext();
@@ -278,8 +278,8 @@ test.describe("resume data entry flow", () => {
       await expect(votersAndVotesPage.totalAdmittedVotersCount).toHaveValue("42");
     });
 
-    test("save unsubmitted input when changing recounted works", async ({ page, pollingStation1 }) => {
-      await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
+    test("save unsubmitted input when changing recounted works", async ({ page, pollingStation }) => {
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
       const recountedPage = new RecountedPage(page);
       await recountedPage.checkYesAndClickNext();
@@ -305,7 +305,7 @@ test.describe("resume data entry flow", () => {
       await recountedPage.abortInput.click();
 
       const abortInputModal = new AbortInputModal(page);
-      const responsePromise = page.waitForResponse(`/api/polling_stations/${pollingStation1.id}/data_entries/1`);
+      const responsePromise = page.waitForResponse(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
       await abortInputModal.saveInput.click();
 
       const response = await responsePromise;
@@ -317,15 +317,15 @@ test.describe("resume data entry flow", () => {
   });
 
   test.describe("resume after deleting", () => {
-    test("deleting data entry doesn't show previous data", async ({ page, pollingStation1 }) => {
-      const abortInputModal = await fillFirstTwoPagesAndAbort(page, pollingStation1);
+    test("deleting data entry doesn't show previous data", async ({ page, pollingStation }) => {
+      const abortInputModal = await fillFirstTwoPagesAndAbort(page, pollingStation);
       await expect(abortInputModal.heading).toBeFocused();
       await abortInputModal.discardInput.click();
 
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
-      await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
       // recounted page should have no option selected
       const recountedPage = new RecountedPage(page);
@@ -333,8 +333,8 @@ test.describe("resume data entry flow", () => {
       await expect(recountedPage.no).not.toBeChecked();
     });
 
-    test("discard input from voters and votes page with error", async ({ page, request, pollingStation1 }) => {
-      await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
+    test("discard input from voters and votes page with error", async ({ page, request, pollingStation }) => {
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
       const recountedPage = new RecountedPage(page);
       await expect(recountedPage.fieldset).toBeVisible();
@@ -356,12 +356,12 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
-      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation1.id}/data_entries/1`);
+      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(404);
     });
 
-    test("discard input from voters and votes page with warning", async ({ page, request, pollingStation1 }) => {
-      await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
+    test("discard input from voters and votes page with warning", async ({ page, request, pollingStation }) => {
+      await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);
 
       const recountedPage = new RecountedPage(page);
       await expect(recountedPage.fieldset).toBeVisible();
@@ -396,7 +396,7 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
-      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation1.id}/data_entries/1`);
+      const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(404);
     });
   });

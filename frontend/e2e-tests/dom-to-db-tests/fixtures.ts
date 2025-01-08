@@ -18,11 +18,15 @@ import {
   pollingStationRequests,
 } from "./test-data/request-response-templates";
 
+// Regular fixtures need to be passed into the test's arguments.
 type Fixtures = {
-  // Regular fixtures need to be passed into the test's arguments.
+  // Election without polling stations
   emptyElection: Election;
-  election1: ElectionDetailsResponse;
-  pollingStation1: PollingStation;
+  // Election with two polling stations
+  election: ElectionDetailsResponse;
+  // First polling station of the election
+  pollingStation: PollingStation;
+  // Election with polling stations and two completed data entries for each
   completedElection: Election;
 };
 
@@ -36,7 +40,7 @@ export const test = base.extend<Fixtures>({
 
     await use(election);
   },
-  election1: async ({ request, emptyElection }, use) => {
+  election: async ({ request, emptyElection }, use) => {
     // create polling stations in the existing emptyElection
     const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${emptyElection.id}/polling_stations`;
     for (const pollingStationRequest of pollingStationRequests) {
@@ -52,18 +56,18 @@ export const test = base.extend<Fixtures>({
 
     await use(election);
   },
-  pollingStation1: async ({ request, election1 }, use) => {
+  pollingStation: async ({ request, election }, use) => {
     // get the first polling station of the existing election
-    const url: POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${election1.election.id}/polling_stations/${election1.polling_stations[0]?.id ?? 0}`;
+    const url: POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${election.election.id}/polling_stations/${election.polling_stations[0]?.id ?? 0}`;
     const response = await request.get(url);
     expect(response.ok()).toBeTruthy();
     const pollingStation = (await response.json()) as PollingStation;
 
     await use(pollingStation);
   },
-  completedElection: async ({ request, election1 }, use) => {
+  completedElection: async ({ request, election }, use) => {
     // finalise both data entries for all polling stations
-    for (const pollingStationId of election1.polling_stations.map((ps) => ps.id)) {
+    for (const pollingStationId of election.polling_stations.map((ps) => ps.id)) {
       for (const entryNumber of [1, 2]) {
         const save_url: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
         const saveResponse = await request.post(save_url, {
@@ -78,6 +82,6 @@ export const test = base.extend<Fixtures>({
       }
     }
 
-    await use(election1.election);
+    await use(election.election);
   },
 });

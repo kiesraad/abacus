@@ -2,63 +2,82 @@ import { test as base, expect } from "@playwright/test";
 
 import {
   Election,
+  ELECTION_CREATE_REQUEST_PATH,
   ELECTION_DETAILS_REQUEST_PATH,
   ElectionDetailsResponse,
+  POLLING_STATION_CREATE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   POLLING_STATION_GET_REQUEST_PATH,
   PollingStation,
 } from "@kiesraad/api";
 
-import { noRecountNoDifferencesRequest } from "./test-data/request-response-templates";
-
-type AutoFixtures = {
-  // AutoFixtures contain { auto: true } and are called for each test automatically.
-  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  resetDatabase: void;
-};
+import {
+  electionRequest,
+  noRecountNoDifferencesRequest,
+  pollingStationRequests,
+} from "./test-data/request-response-templates";
 
 type Fixtures = {
   // Regular fixtures need to be passed into the test's arguments.
+  emptyElection: Election;
+  election1: ElectionDetailsResponse;
   pollingStation1: PollingStation;
   completedElection: Election;
 };
 
-export const test = base.extend<AutoFixtures & Fixtures>({
-  resetDatabase: [
-    async ({ request }, use) => {
-      const response = await request.post(`/reset`);
-      expect(response.ok()).toBeTruthy();
-      await use();
-    },
-    { auto: true },
-  ],
-  pollingStation1: async ({ request }, use) => {
-    const url: POLLING_STATION_GET_REQUEST_PATH = `/api/elections/1/polling_stations/1`;
+export const test = base.extend<Fixtures>({
+  emptyElection: async ({ request }, use) => {
+    // create an election with no polling stations
+    const url: ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
+    const electionResponse = await request.post(url, { data: electionRequest });
+    expect(electionResponse.ok()).toBeTruthy();
+    const election = (await electionResponse.json()) as Election;
+
+    await use(election);
+  },
+  election1: async ({ request, emptyElection }, use) => {
+    // create polling stations in the existing emptyElection
+    const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${emptyElection.id}/polling_stations`;
+    for (const pollingStationRequest of pollingStationRequests) {
+      const pollingStationResponse = await request.post(url, { data: pollingStationRequest });
+      expect(pollingStationResponse.ok()).toBeTruthy();
+    }
+
+    // get election details
+    const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${emptyElection.id}`;
+    const electionResponse = await request.get(electionUrl);
+    expect(electionResponse.ok()).toBeTruthy();
+    const election = (await electionResponse.json()) as ElectionDetailsResponse;
+
+    await use(election);
+  },
+  pollingStation1: async ({ request, election1 }, use) => {
+    // get the first polling station of the existing election
+    const url: POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${election1.election.id}/polling_stations/${election1.polling_stations[0]?.id ?? 0}`;
     const response = await request.get(url);
     expect(response.ok()).toBeTruthy();
     const pollingStation = (await response.json()) as PollingStation;
+
     await use(pollingStation);
   },
-  completedElection: async ({ request }, use) => {
-    const url: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/1`;
-    const response = await request.get(url);
-    expect(response.ok()).toBeTruthy();
-    const election = (await response.json()) as ElectionDetailsResponse;
-
-    for (const pollingStationId of [1, 2]) {
+  completedElection: async ({ request, election1 }, use) => {
+    // finalise both data entries for all polling stations
+    for (const pollingStationId of election1.polling_stations.map((ps) => ps.id)) {
       for (const entryNumber of [1, 2]) {
         const save_url: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
         const saveResponse = await request.post(save_url, {
           data: noRecountNoDifferencesRequest,
         });
+        // eslint-disable-next-line playwright/no-standalone-expect
         expect(saveResponse.ok()).toBeTruthy();
         const finalise_url: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}/finalise`;
         const finaliseResponse = await request.post(finalise_url);
+        // eslint-disable-next-line playwright/no-standalone-expect
         expect(finaliseResponse.ok()).toBeTruthy();
       }
     }
 
-    await use(election.election);
+    await use(election1.election);
   },
 });

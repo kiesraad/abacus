@@ -50,7 +50,7 @@ async function fillDataEntryNoRecountNoDifferences(page: Page) {
   await expect(candidatesListPage_1.getCandidate(0)).toBeFocused();
 
   await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
-  const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/1/data_entries/([12])"));
+  const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/(\\d+)/data_entries/([12])"));
   await candidatesListPage_1.next.click();
 
   const response = await responsePromise;
@@ -87,7 +87,7 @@ async function fillDataEntryNoRecountNoDifferences(page: Page) {
 
 test.describe("full data entry flow", () => {
   test("no recount, no differences", async ({ page, pollingStation1 }) => {
-    await page.goto("/elections/1/data-entry");
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry`);
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
@@ -107,7 +107,7 @@ test.describe("full data entry flow", () => {
   });
 
   test("recount, no differences", async ({ page, pollingStation1 }) => {
-    await page.goto("/elections/1/data-entry");
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry`);
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
@@ -164,7 +164,7 @@ test.describe("full data entry flow", () => {
   });
 
   test("no recount, difference of more ballots counted", async ({ page, pollingStation1 }) => {
-    await page.goto("/elections/1/data-entry");
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry`);
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
@@ -229,7 +229,7 @@ test.describe("full data entry flow", () => {
   });
 
   test("recount, difference of fewer ballots counted", async ({ page, pollingStation1 }) => {
-    await page.goto("/elections/1/data-entry");
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry`);
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
@@ -303,8 +303,8 @@ test.describe("full data entry flow", () => {
     await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
   });
 
-  test("submit with accepted warning on voters and votes page", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/1/recounted");
+  test("submit with accepted warning on voters and votes page", async ({ page, pollingStation1 }) => {
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -381,14 +381,14 @@ test.describe("full data entry flow", () => {
 
 test.describe("second data entry", () => {
   test("equal second data entry after first data entry", async ({ page, request, pollingStation1 }) => {
-    const saveResponse = await request.post("/api/polling_stations/1/data_entries/1", {
+    const saveResponse = await request.post(`/api/polling_stations/${pollingStation1.id}/data_entries/1`, {
       data: noRecountNoDifferencesRequest,
     });
     expect(saveResponse.ok()).toBeTruthy();
-    const finaliseResponse = await request.post("/api/polling_stations/1/data_entries/1/finalise");
+    const finaliseResponse = await request.post(`/api/polling_stations/${pollingStation1.id}/data_entries/1/finalise`);
     expect(finaliseResponse.ok()).toBeTruthy();
 
-    await page.goto("/elections/1/data-entry");
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry`);
 
     const pollingStationChoicePage = new PollingStationChoicePage(page);
     await expect(pollingStationChoicePage.fieldset).toBeVisible();
@@ -396,7 +396,9 @@ test.describe("second data entry", () => {
     await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation1.name);
     await pollingStationChoicePage.clickStart();
 
-    await expect(page).toHaveURL("/elections/1/data-entry/1/2/recounted");
+    await expect(page).toHaveURL(
+      `/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/2/recounted`,
+    );
 
     // fill in exactly like first data entry
     await fillDataEntryNoRecountNoDifferences(page);
@@ -419,8 +421,8 @@ test.describe("second data entry", () => {
 });
 
 test.describe("errors and warnings", () => {
-  test("correct error on voters and votes page", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/1/recounted");
+  test("correct error on voters and votes page", async ({ page, pollingStation1 }) => {
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -467,8 +469,8 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
-  test("correct error F.204", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/1/recounted");
+  test("correct error F.204", async ({ page, pollingStation1 }) => {
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -518,8 +520,8 @@ test.describe("errors and warnings", () => {
     await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
   });
 
-  test("correct warning on voters and votes page", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/1/recounted");
+  test("correct warning on voters and votes page", async ({ page, pollingStation1 }) => {
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -572,8 +574,11 @@ test.describe("errors and warnings", () => {
     await expect(differencesPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
   });
 
-  test("remove option to accept warning on voters and votes page after input change", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/1/recounted");
+  test("remove option to accept warning on voters and votes page after input change", async ({
+    page,
+    pollingStation1,
+  }) => {
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -616,8 +621,8 @@ test.describe("errors and warnings", () => {
 });
 
 test.describe("navigation", () => {
-  test("navigate away from Differences page without saving", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/1/recounted");
+  test("navigate away from Differences page without saving", async ({ page, pollingStation1 }) => {
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -673,8 +678,8 @@ test.describe("navigation", () => {
     await expect(votersAndVotesPage.pollCardCount).toHaveValue("99");
   });
 
-  test("navigate away from Differences page with saving", async ({ page }) => {
-    await page.goto("/elections/1/data-entry/1/1/recounted");
+  test("navigate away from Differences page with saving", async ({ page, pollingStation1 }) => {
+    await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
 
     const recountedPage = new RecountedPage(page);
     await recountedPage.checkNoAndClickNext();
@@ -731,8 +736,11 @@ test.describe("navigation", () => {
   });
 
   test.describe("navigation panel icons", () => {
-    test("check icons for accept, active, empty, error, warning, unsaved statuses", async ({ page }) => {
-      await page.goto("/elections/1/data-entry/1/1/recounted");
+    test("check icons for accept, active, empty, error, warning, unsaved statuses", async ({
+      page,
+      pollingStation1,
+    }) => {
+      await page.goto(`/elections/${pollingStation1.election_id}/data-entry/${pollingStation1.id}/1/recounted`);
 
       const recountedPage = new RecountedPage(page);
       await expect(recountedPage.navPanel.recountedIcon).toHaveAccessibleName("je bent hier");

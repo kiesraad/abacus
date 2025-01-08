@@ -1,7 +1,5 @@
 import type { Story } from "@ladle/react";
 
-import { Election } from "@kiesraad/api";
-
 import { ElectionStatus } from "./ElectionStatus";
 import { mockElection, mockPollingStations } from "./mockData";
 
@@ -67,48 +65,6 @@ export const InProgress: Story<StoryProps> = ({ navigate }) => (
     navigate={navigate}
   />
 );
-
-export const InputFinished: Story<StoryProps> = ({ navigate }) => (
-  <ElectionStatus
-    statuses={[
-      {
-        polling_station_id: 1,
-        status: "definitive",
-      },
-      {
-        polling_station_id: 2,
-        status: "definitive",
-      },
-    ]}
-    election={mockElection}
-    pollingStations={mockPollingStations}
-    navigate={navigate}
-  />
-);
-
-export const ElectionFinished: Story<StoryProps> = ({ navigate }) => {
-  const mockData: Required<Election> = {
-    ...mockElection,
-    status: "DataEntryFinished",
-  };
-  return (
-    <ElectionStatus
-      statuses={[
-        {
-          polling_station_id: 1,
-          status: "definitive",
-        },
-        {
-          polling_station_id: 2,
-          status: "definitive",
-        },
-      ]}
-      election={mockData}
-      pollingStations={mockPollingStations}
-      navigate={navigate}
-    />
-  );
-};
 
 export default {
   title: "App / ElectionStatus",

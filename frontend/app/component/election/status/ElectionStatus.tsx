@@ -67,7 +67,7 @@ export function ElectionStatus({ statuses, election, pollingStations, navigate }
 
   return (
     <>
-      <div className={cls.statusMain}>
+      <div className={cls.container}>
         <div className={cls.statusTitle}>
           <h2 id="status-title">{t("election_status.main_title")}</h2>
           <div className={cls.buttons}>

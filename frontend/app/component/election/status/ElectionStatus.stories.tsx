@@ -1,8 +1,8 @@
 import type { Story } from "@ladle/react";
 
-import { ElectionStatus } from "app/component/election/status/ElectionStatus";
-
 import { Election, ElectionStatusResponseEntry, PollingStation } from "@kiesraad/api";
+
+import { ElectionStatus } from "./ElectionStatus";
 
 export const Werkvoorraad: Story = () => (
   <ElectionStatus
@@ -14,6 +14,7 @@ export const Werkvoorraad: Story = () => (
 );
 
 export default {
+  title: "App / ElectionStatus",
   argTypes: {
     background: {
       control: { type: "background" },

@@ -73,8 +73,8 @@ export function processForm<RequestObject>(
           : field.isPollingStationNumber
             ? parsePollingStationNumber(value)
             : parseIntStrict(value);
-        //parseIntStrict is used in deformatNumber as well, the result is a number or undefined.
-        if (parsedValue === undefined) {
+        //parseInt is used in deformatNumber, the result is a number or NaN.
+        if (parsedValue === undefined || Number.isNaN(parsedValue)) {
           validationResult[fieldName] = "FORM_VALIDATION_RESULT_INVALID_NUMBER";
           continue;
         } else {

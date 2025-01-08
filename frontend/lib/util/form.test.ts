@@ -37,7 +37,7 @@ describe("Form", () => {
 
     // Number required
     [{ type: "number", required: true }, "", "FORM_VALIDATION_RESULT_REQUIRED", undefined],
-    // FIXME [{ type: "number", required: false }, "", undefined, undefined],
+    // FIXME in issue #824 [{ type: "number", required: false }, "", undefined, undefined],
 
     // Number min/max
     [{ type: "number", min: 3 }, "2", "FORM_VALIDATION_RESULT_MIN", undefined],
@@ -50,11 +50,11 @@ describe("Form", () => {
     [{ type: "number", isFormatted: true }, "-5", undefined, -5],
     [{ type: "number", isFormatted: true }, "005", undefined, 5],
     [{ type: "number", isFormatted: true }, "5.005", undefined, 5005],
-    // FIXME [{ type: "number", isFormatted: true  }, "x", "FORM_VALIDATION_RESULT_INVALID_NUMBER", undefined],
+    [{ type: "number", isFormatted: true }, "x", "FORM_VALIDATION_RESULT_INVALID_NUMBER", undefined],
 
     // Number isFormatted required
     [{ type: "number", isFormatted: true, required: true }, "", "FORM_VALIDATION_RESULT_REQUIRED", undefined],
-    // FIXME [{ type: "number", isFormatted: true , required: false }, "", undefined, undefined],
+    // FIXME in issue #824 [{ type: "number", isFormatted: true , required: false }, "", undefined, undefined],
 
     // Number isPollingStationNumber valid
     [{ type: "number", isPollingStationNumber: true }, "5", undefined, 5],
@@ -70,8 +70,8 @@ describe("Form", () => {
       "FORM_VALIDATION_RESULT_REQUIRED",
       undefined,
     ],
-    // FIXME [{ type: "number", isPollingStationNumber: true , required: false }, "", undefined, undefined],
-  ])("processForm for field type %j with input '%s' should return %j / %s", (field, inputValue, error, value) => {
+    // FIXME in issue #824 [{ type: "number", isPollingStationNumber: true , required: false }, "", undefined, undefined],
+  ])("processForm for field type %j with input %j should return %j, %j", (field, inputValue, error, value) => {
     type RequestObject = { field: FieldValue<typeof field> };
     const formFields: FormFields<RequestObject> = { field };
 

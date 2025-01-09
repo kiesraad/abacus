@@ -29,7 +29,7 @@ describe("Form", () => {
     // Number valid
     [{ type: "number" }, "5", undefined, 5],
     [{ type: "number" }, "-5", undefined, -5],
-    [{ type: "number" }, "005", "FORM_VALIDATION_RESULT_INVALID_NUMBER", undefined],
+    [{ type: "number" }, "005", undefined, 5],
     [{ type: "number" }, "5.005", "FORM_VALIDATION_RESULT_INVALID_NUMBER", undefined],
     [{ type: "number" }, "x", "FORM_VALIDATION_RESULT_INVALID_NUMBER", undefined],
     [{ type: "number" }, "12a", "FORM_VALIDATION_RESULT_INVALID_NUMBER", undefined],
@@ -55,22 +55,6 @@ describe("Form", () => {
     // Number isFormatted required
     [{ type: "number", isFormatted: true, required: true }, "", "FORM_VALIDATION_RESULT_REQUIRED", undefined],
     // FIXME in issue #824 [{ type: "number", isFormatted: true , required: false }, "", undefined, undefined],
-
-    // Number isPollingStationNumber valid
-    [{ type: "number", isPollingStationNumber: true }, "5", undefined, 5],
-    [{ type: "number", isPollingStationNumber: true }, "-5", undefined, -5],
-    [{ type: "number", isPollingStationNumber: true }, "005", undefined, 5],
-    [{ type: "number", isPollingStationNumber: true }, "5.005", "FORM_VALIDATION_RESULT_INVALID_NUMBER", undefined],
-    [{ type: "number", isPollingStationNumber: true }, "x", "FORM_VALIDATION_RESULT_INVALID_NUMBER", undefined],
-
-    // Number isPollingStationNumber required
-    [
-      { type: "number", isPollingStationNumber: true, required: true },
-      "",
-      "FORM_VALIDATION_RESULT_REQUIRED",
-      undefined,
-    ],
-    // FIXME in issue #824 [{ type: "number", isPollingStationNumber: true , required: false }, "", undefined, undefined],
   ])("processForm for field type %j with input %j should return %j, %j", (field, inputValue, error, value) => {
     type RequestObject = { field: FieldValue<typeof field> };
     const formFields: FormFields<RequestObject> = { field };

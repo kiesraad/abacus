@@ -1,4 +1,4 @@
-import { deformatNumber, parseIntStrict, parsePollingStationNumber } from "@kiesraad/util";
+import { deformatNumber, parseIntUserInput } from "@kiesraad/util";
 
 export type ValidationError =
   | "FORM_VALIDATION_RESULT_REQUIRED"
@@ -31,7 +31,6 @@ export type FormFieldStringUndefined = FormFieldBase & {
 export type FormFieldNumber = FormFieldBase & {
   type: "number";
   isFormatted?: boolean;
-  isPollingStationNumber?: boolean;
   min?: number;
   max?: number;
 };
@@ -68,11 +67,7 @@ export function processForm<RequestObject>(
 
     switch (field.type) {
       case "number": {
-        const parsedValue = field.isFormatted
-          ? deformatNumber(value)
-          : field.isPollingStationNumber
-            ? parsePollingStationNumber(value)
-            : parseIntStrict(value);
+        const parsedValue = field.isFormatted ? deformatNumber(value) : parseIntUserInput(value);
         //parseInt is used in deformatNumber, the result is a number or NaN.
         if (parsedValue === undefined || Number.isNaN(parsedValue)) {
           validationResult[fieldName] = "FORM_VALIDATION_RESULT_INVALID_NUMBER";

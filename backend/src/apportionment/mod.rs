@@ -56,7 +56,7 @@ fn get_pg_number_with_largest_surplus(
     let (&pg_number, &max) = surpluses
         .iter()
         .max_by(|(_, a), (_, b)| a.cmp(b))
-        .expect("Maximum average should be found");
+        .expect("Maximum surplus should be found");
     debug!("Max: {} (pg_number {})", max, pg_number);
 
     // if maximum occurs more than once, exit with error if less remaining seats are available than max count

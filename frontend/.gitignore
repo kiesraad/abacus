@@ -28,6 +28,7 @@ translations
 test-results
 coverage
 mock
+test-report.junit.xml
 
 # Automatically created: https://github.com/mswjs/msw/discussions/1015#discussioncomment-1747585
 mockServiceWorker.js

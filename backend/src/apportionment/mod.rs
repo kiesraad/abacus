@@ -7,6 +7,20 @@ use tracing::{debug, info};
 
 mod fraction;
 
+fn get_number_of_whole_seats_per_pg(
+    pg_votes: &[PoliticalGroupVotes],
+    quota: &Fraction,
+) -> BTreeMap<u8, u64> {
+    // calculate number of whole seats for each party
+    let mut whole_seats = BTreeMap::<u8, u64>::new();
+    for pg in pg_votes {
+        let pg_votes = Fraction::from_count(pg.total);
+        let pg_seats = pg_votes.divide_and_return_whole_number(quota);
+        whole_seats.insert(pg.number, pg_seats);
+    }
+    whole_seats
+}
+
 fn get_pg_number_with_largest_average(
     pg_votes: &[PoliticalGroupVotes],
     whole_seats: &BTreeMap<u8, u64>,
@@ -45,6 +59,34 @@ fn get_pg_number_with_largest_average(
     }
 
     Ok(pg_number)
+}
+
+fn get_surplus_per_pg_where_total_votes_meets_the_threshold(
+    pg_votes: &[PoliticalGroupVotes],
+    whole_seats: &BTreeMap<u8, u64>,
+    quota: &Fraction,
+) -> BTreeMap<u8, Fraction> {
+    // get parties that have at least 3/4 (0.75) of the quota in total votes,
+    // and for each party calculate the amount of surplus votes,
+    // i.e. the number of total votes minus the quota times the number of whole seats
+    let threshold = Fraction::new(3, 4) * *quota;
+    debug!("Threshold: {}", threshold);
+    let mut surpluses = BTreeMap::<u8, Fraction>::new();
+    for pg in pg_votes.iter() {
+        let pg_total_votes = Fraction::from_count(pg.total);
+        if pg_total_votes >= threshold {
+            let pg_whole_seats = Fraction::from_u64(
+                *whole_seats
+                    .get(&pg.number)
+                    .expect("Political group should have number of whole seats"),
+            );
+            let surplus = pg_total_votes - (*quota * pg_whole_seats);
+            if surplus > Fraction::new(0, 1) {
+                surpluses.insert(pg.number, surplus);
+            }
+        }
+    }
+    surpluses
 }
 
 fn get_pg_number_with_largest_surplus(
@@ -92,14 +134,7 @@ pub fn seat_allocation(
 
     // TODO: #787 check for lijstuitputting (allocated seats cannot be more than total candidates)
 
-    // calculate number of whole seats for each party
-    let mut whole_seats = BTreeMap::<u8, u64>::new();
-    for pg in &totals.political_group_votes {
-        let pg_votes = Fraction::from_count(pg.total);
-        let pg_seats = pg_votes.divide_and_return_whole_number(&quota);
-        whole_seats.insert(pg.number, pg_seats);
-    }
-
+    let whole_seats = get_number_of_whole_seats_per_pg(&totals.political_group_votes, &quota);
     let whole_seats_count = whole_seats.values().sum::<u64>();
     info!(
         "Whole seats: {:?} (total: {})",
@@ -138,26 +173,11 @@ pub fn seat_allocation(
         } else {
             info!("Remaining seats calculation for less than 19 seats.");
             // using greatest surpluses system ("stelsel grootste overschotten")
-            // get parties that have at least 3/4 (0.75) of the quota in total votes,
-            // and for each party calculate the amount of surplus votes,
-            // i.e. the number of total votes minus the quota times the number of whole seats
-            let threshold = Fraction::new(3, 4) * quota;
-            debug!("Threshold: {}", threshold);
-            let mut surpluses = BTreeMap::<u8, Fraction>::new();
-            for pg in totals.political_group_votes.iter() {
-                let pg_total_votes = Fraction::from_count(pg.total);
-                if pg_total_votes >= threshold {
-                    let pg_whole_seats = Fraction::from_u64(
-                        *whole_seats
-                            .get(&pg.number)
-                            .expect("Political group should have number of whole seats"),
-                    );
-                    let surplus = pg_total_votes - (quota * pg_whole_seats);
-                    if surplus > Fraction::new(0, 1) {
-                        surpluses.insert(pg.number, surplus);
-                    }
-                }
-            }
+            let mut surpluses = get_surplus_per_pg_where_total_votes_meets_the_threshold(
+                &totals.political_group_votes,
+                &whole_seats,
+                &quota,
+            );
             while remaining_seats > 0 {
                 info!("======================================================");
                 debug!("Remaining seats: {}", remaining_seats);
@@ -224,40 +244,43 @@ pub enum ApportionmentError {
 #[cfg(test)]
 mod tests {
     use crate::apportionment::{seat_allocation, ApportionmentError};
-    use crate::data_entry::{PoliticalGroupVotes, VotersCounts, VotesCounts};
+    use crate::data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts};
     use crate::summary::{ElectionSummary, SummaryDifferencesCounts};
     use tracing_test::traced_test;
+
+    fn get_election_summary(pg_votes: Vec<Count>) -> ElectionSummary {
+        let total_votes = pg_votes.iter().sum();
+        let mut political_group_votes: Vec<PoliticalGroupVotes> = vec![];
+        for (index, votes) in pg_votes.iter().enumerate() {
+            political_group_votes.push(PoliticalGroupVotes::from_test_data_auto(
+                (index + 1) as u8,
+                *votes,
+                &[],
+            ))
+        }
+        ElectionSummary {
+            voters_counts: VotersCounts {
+                poll_card_count: total_votes,
+                proxy_certificate_count: 0,
+                voter_card_count: 0,
+                total_admitted_voters_count: total_votes,
+            },
+            votes_counts: VotesCounts {
+                votes_candidates_count: total_votes,
+                blank_votes_count: 0,
+                invalid_votes_count: 0,
+                total_votes_cast_count: total_votes,
+            },
+            differences_counts: SummaryDifferencesCounts::zero(),
+            recounted_polling_stations: vec![],
+            political_group_votes,
+        }
+    }
 
     #[test]
     #[traced_test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_system() {
-        let totals = ElectionSummary {
-            voters_counts: VotersCounts {
-                poll_card_count: 1200,
-                proxy_certificate_count: 0,
-                voter_card_count: 0,
-                total_admitted_voters_count: 1200,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_count: 1200,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 1200,
-            },
-            differences_counts: SummaryDifferencesCounts::zero(),
-            recounted_polling_stations: vec![],
-            political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, 540, &[]),
-                PoliticalGroupVotes::from_test_data_auto(2, 160, &[]),
-                PoliticalGroupVotes::from_test_data_auto(3, 160, &[]),
-                PoliticalGroupVotes::from_test_data_auto(4, 80, &[]),
-                PoliticalGroupVotes::from_test_data_auto(5, 80, &[]),
-                PoliticalGroupVotes::from_test_data_auto(6, 80, &[]),
-                PoliticalGroupVotes::from_test_data_auto(7, 60, &[]),
-                PoliticalGroupVotes::from_test_data_auto(8, 40, &[]),
-            ],
-        };
-
+        let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 60, 40]);
         let result = seat_allocation(15, &totals);
         assert_eq!(result, Ok(vec![7, 2, 2, 1, 1, 1, 1, 0]));
     }
@@ -266,33 +289,7 @@ mod tests {
     #[traced_test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system(
     ) {
-        let totals = ElectionSummary {
-            voters_counts: VotersCounts {
-                poll_card_count: 1200,
-                proxy_certificate_count: 0,
-                voter_card_count: 0,
-                total_admitted_voters_count: 1200,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_count: 1200,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 1200,
-            },
-            differences_counts: SummaryDifferencesCounts::zero(),
-            recounted_polling_stations: vec![],
-            political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, 540, &[]),
-                PoliticalGroupVotes::from_test_data_auto(2, 160, &[]),
-                PoliticalGroupVotes::from_test_data_auto(3, 160, &[]),
-                PoliticalGroupVotes::from_test_data_auto(4, 80, &[]),
-                PoliticalGroupVotes::from_test_data_auto(5, 80, &[]),
-                PoliticalGroupVotes::from_test_data_auto(6, 80, &[]),
-                PoliticalGroupVotes::from_test_data_auto(7, 55, &[]),
-                PoliticalGroupVotes::from_test_data_auto(8, 45, &[]),
-            ],
-        };
-
+        let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
         let result = seat_allocation(15, &totals);
         assert_eq!(result, Ok(vec![8, 2, 2, 1, 1, 1, 0, 0]));
     }
@@ -301,96 +298,34 @@ mod tests {
     #[traced_test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_no_surpluses(
     ) {
-        let totals = ElectionSummary {
-            voters_counts: VotersCounts {
-                poll_card_count: 1200,
-                proxy_certificate_count: 0,
-                voter_card_count: 0,
-                total_admitted_voters_count: 1200,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_count: 1200,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 1200,
-            },
-            differences_counts: SummaryDifferencesCounts::zero(),
-            recounted_polling_stations: vec![],
-            political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, 560, &[]),
-                PoliticalGroupVotes::from_test_data_auto(2, 160, &[]),
-                PoliticalGroupVotes::from_test_data_auto(3, 160, &[]),
-                PoliticalGroupVotes::from_test_data_auto(4, 80, &[]),
-                PoliticalGroupVotes::from_test_data_auto(5, 80, &[]),
-                PoliticalGroupVotes::from_test_data_auto(6, 80, &[]),
-                PoliticalGroupVotes::from_test_data_auto(7, 40, &[]),
-                PoliticalGroupVotes::from_test_data_auto(8, 40, &[]),
-            ],
-        };
-
+        let totals = get_election_summary(vec![560, 160, 160, 80, 80, 80, 40, 40]);
         let result = seat_allocation(15, &totals);
         assert_eq!(result, Ok(vec![8, 2, 2, 1, 1, 1, 0, 0]));
     }
 
     #[test]
     #[traced_test]
-    fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
-        let totals = ElectionSummary {
-            voters_counts: VotersCounts {
-                poll_card_count: 1200,
-                proxy_certificate_count: 0,
-                voter_card_count: 0,
-                total_admitted_voters_count: 1200,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_count: 1200,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 1200,
-            },
-            differences_counts: SummaryDifferencesCounts::zero(),
-            recounted_polling_stations: vec![],
-            political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, 600, &[]),
-                PoliticalGroupVotes::from_test_data_auto(2, 302, &[]),
-                PoliticalGroupVotes::from_test_data_auto(3, 98, &[]),
-                PoliticalGroupVotes::from_test_data_auto(4, 99, &[]),
-                PoliticalGroupVotes::from_test_data_auto(5, 101, &[]),
-            ],
-        };
+    fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error() {
+        let totals = get_election_summary(vec![500, 140, 140, 140, 140, 140]);
+        let result = seat_allocation(15, &totals);
+        assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+        assert!(logs_contain(
+            "Drawing of lots is needed but not yet implemented!"
+        ));
+    }
 
+    #[test]
+    #[traced_test]
+    fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
+        let totals = get_election_summary(vec![600, 302, 98, 99, 101]);
         let result = seat_allocation(23, &totals);
         assert_eq!(result, Ok(vec![12, 6, 1, 2, 2]));
     }
 
     #[test]
     #[traced_test]
-    fn test_seat_allocation_with_drawing_of_lots_error() {
-        let totals = ElectionSummary {
-            voters_counts: VotersCounts {
-                poll_card_count: 1200,
-                proxy_certificate_count: 0,
-                voter_card_count: 0,
-                total_admitted_voters_count: 1200,
-            },
-            votes_counts: VotesCounts {
-                votes_candidates_count: 1200,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 1200,
-            },
-            differences_counts: SummaryDifferencesCounts::zero(),
-            recounted_polling_stations: vec![],
-            political_group_votes: vec![
-                PoliticalGroupVotes::from_test_data_auto(1, 500, &[]),
-                PoliticalGroupVotes::from_test_data_auto(2, 140, &[]),
-                PoliticalGroupVotes::from_test_data_auto(3, 140, &[]),
-                PoliticalGroupVotes::from_test_data_auto(4, 140, &[]),
-                PoliticalGroupVotes::from_test_data_auto(5, 140, &[]),
-                PoliticalGroupVotes::from_test_data_auto(6, 140, &[]),
-            ],
-        };
-
+    fn test_seat_allocation_19_or_more_seats_with_drawing_of_lots_error() {
+        let totals = get_election_summary(vec![500, 140, 140, 140, 140, 140]);
         let result = seat_allocation(23, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
         assert!(logs_contain(

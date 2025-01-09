@@ -119,6 +119,7 @@ pub fn seat_allocation(
             while remaining_seats > 0 {
                 info!("======================================================");
                 debug!("Remaining seats: {}", remaining_seats);
+                // assign remaining seat to the party with the largest average
                 let pg_number = get_pg_number_with_largest_average(
                     &totals.political_group_votes,
                     &whole_seats,
@@ -129,11 +130,14 @@ pub fn seat_allocation(
                 *rest_seats.entry(pg_number).or_insert(0) += 1;
                 remaining_seats -= 1;
                 // pg_number_last_remaining_seat = Some(pg_number);
-                info!("Remaining seat assigned to pg_number: {}", pg_number);
+                info!(
+                    "Remaining seat assigned using greatest average system to pg_number: {}",
+                    pg_number
+                );
             }
         } else {
             info!("Remaining seats calculation for less than 19 seats.");
-            // using greatest surplus system ("stelsel grootste overschotten")
+            // using greatest surpluses system ("stelsel grootste overschotten")
             // get parties that have at least 3/4 (0.75) of the quota in total votes,
             // and for each party calculate the amount of surplus votes,
             // i.e. the number of total votes minus the quota times the number of whole seats
@@ -158,6 +162,8 @@ pub fn seat_allocation(
                 info!("======================================================");
                 debug!("Remaining seats: {}", remaining_seats);
                 if !surpluses.is_empty() {
+                    // assign remaining seat to the party with the largest surplus and
+                    // remove that party and surplus from the list
                     let pg_number =
                         get_pg_number_with_largest_surplus(&surpluses, remaining_seats)?;
 
@@ -165,11 +171,31 @@ pub fn seat_allocation(
                     surpluses.remove(&pg_number);
                     remaining_seats -= 1;
                     // pg_number_last_remaining_seat = Some(pg_number);
-                    info!("Remaining seat assigned to pg_number: {}", pg_number);
+                    info!(
+                        "Remaining seat assigned using greatest surplus system to pg_number: {}",
+                        pg_number
+                    );
                 } else {
-                    info!("Use get_pg_number_with_largest_average!");
-                    // TODO: Start using get_pg_number_with_largest_average for remaining seats
-                    break;
+                    // once there are no parties with surpluses left and more remaining seats exist,
+                    // assign remaining seat to the party with the largest average
+                    // using greatest averages system ("stelsel grootste gemiddelden")
+                    let pg_number = get_pg_number_with_largest_average(
+                        &totals.political_group_votes,
+                        &whole_seats,
+                        &rest_seats,
+                        remaining_seats,
+                    )?;
+                    // TODO: The formal description states that initially rest seats can only be
+                    //  assigned to unique parties, but with even more remaining seats then multiple
+                    //  seats can be assigned to the same party.
+                    //  Should there be any limitation built in for this theoretical case?
+                    *rest_seats.entry(pg_number).or_insert(0) += 1;
+                    remaining_seats -= 1;
+                    // pg_number_last_remaining_seat = Some(pg_number);
+                    info!(
+                        "Remaining seat assigned using greatest average system to pg_number: {}",
+                        pg_number
+                    );
                 }
             }
         }
@@ -268,8 +294,7 @@ mod tests {
         };
 
         let result = seat_allocation(15, &totals);
-        // TODO: To be updated
-        assert_eq!(result, Ok(vec![9, 4, 2, 0, 2]));
+        assert_eq!(result, Ok(vec![8, 2, 2, 1, 1, 1, 0, 0]));
     }
 
     #[test]
@@ -304,8 +329,7 @@ mod tests {
         };
 
         let result = seat_allocation(15, &totals);
-        // TODO: To be updated
-        assert_eq!(result, Ok(vec![6, 2, 2, 1, 1, 1, 0, 0]));
+        assert_eq!(result, Ok(vec![8, 2, 2, 1, 1, 1, 0, 0]));
     }
 
     #[test]

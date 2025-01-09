@@ -164,18 +164,18 @@ mod tests {
     fn test_add() {
         let fraction = Fraction::new(1, 3);
         let other_fraction = Fraction::new(1, 4);
-        let multiplied = fraction + other_fraction;
-        assert_eq!(multiplied, Fraction::new(7, 12));
-        assert_eq!(multiplied.to_string(), "7/12")
+        let added = fraction + other_fraction;
+        assert_eq!(added, Fraction::new(7, 12));
+        assert_eq!(added.to_string(), "7/12")
     }
 
     #[test]
     fn test_sub() {
         let fraction = Fraction::new(2, 5);
         let other_fraction = Fraction::new(1, 4);
-        let multiplied = fraction - other_fraction;
-        assert_eq!(multiplied, Fraction::new(3, 20));
-        assert_eq!(multiplied.to_string(), "3/20")
+        let subtracted = fraction - other_fraction;
+        assert_eq!(subtracted, Fraction::new(3, 20));
+        assert_eq!(subtracted.to_string(), "3/20")
     }
 
     #[test]

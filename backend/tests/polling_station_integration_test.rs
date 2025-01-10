@@ -10,8 +10,8 @@ use backend::polling_station::{
 };
 use backend::ErrorResponse;
 
-mod shared;
-mod utils;
+pub mod shared;
+pub mod utils;
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_polling_station_listing(pool: SqlitePool) {

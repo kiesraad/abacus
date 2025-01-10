@@ -8,8 +8,8 @@ use backend::election::{ElectionDetailsResponse, ElectionListResponse};
 use hyper::StatusCode;
 use sqlx::SqlitePool;
 
-mod shared;
-mod utils;
+pub mod shared;
+pub mod utils;
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("election_1", "election_2")))]
 async fn test_election_list_works(pool: SqlitePool) {

@@ -1,5 +1,4 @@
 #![cfg(test)]
-#![allow(dead_code)]
 
 use std::net::SocketAddr;
 

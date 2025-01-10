@@ -13,8 +13,8 @@ use std::collections::BTreeMap;
 use std::net::SocketAddr;
 use utils::serve_api;
 
-mod shared;
-mod utils;
+pub mod shared;
+pub mod utils;
 
 #[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {

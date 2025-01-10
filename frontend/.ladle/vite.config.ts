@@ -1,3 +1,5 @@
+import path from "path";
+
 export default {
   css: {
     modules: {
@@ -6,4 +8,5 @@ export default {
       localsConvention: "dashes",
     },
   },
+  publicDir: path.join(__dirname, ".."),
 };

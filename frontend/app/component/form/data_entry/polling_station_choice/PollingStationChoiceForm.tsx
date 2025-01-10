@@ -5,7 +5,7 @@ import { DataEntryStatusName, PollingStation, useElection, useElectionStatus } f
 import { t, tx } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
-import { cn, getUrlForDataEntry, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
+import { cn, getUrlForDataEntry, parseIntUserInput, useDebouncedCallback } from "@kiesraad/util";
 
 import cls from "./PollingStationChoiceForm.module.css";
 import { PollingStationLink } from "./PollingStationLink";
@@ -37,7 +37,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   }, USER_INPUT_DEBOUNCE);
 
   useMemo(() => {
-    const parsedInt = parsePollingStationNumber(pollingStationNumber);
+    const parsedInt = parseIntUserInput(pollingStationNumber);
     setLoading(true);
     debouncedCallback(pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt));
   }, [pollingStationNumber, pollingStations, debouncedCallback]);
@@ -48,7 +48,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       return;
     }
 
-    const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
+    const parsedStationNumber = parseIntUserInput(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
     const pollingStationStatus = electionStatus.statuses.find(
       (status) => status.polling_station_id === pollingStation?.id,

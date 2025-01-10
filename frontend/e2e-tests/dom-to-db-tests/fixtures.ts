@@ -1,3 +1,4 @@
+/* eslint-disable playwright/no-standalone-expect */
 import { test as base, expect } from "@playwright/test";
 
 import {
@@ -73,11 +74,9 @@ export const test = base.extend<Fixtures>({
         const saveResponse = await request.post(save_url, {
           data: noRecountNoDifferencesRequest,
         });
-        // eslint-disable-next-line playwright/no-standalone-expect
         expect(saveResponse.ok()).toBeTruthy();
         const finalise_url: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}/finalise`;
         const finaliseResponse = await request.post(finalise_url);
-        // eslint-disable-next-line playwright/no-standalone-expect
         expect(finaliseResponse.ok()).toBeTruthy();
       }
     }

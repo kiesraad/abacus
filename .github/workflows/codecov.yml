@@ -32,6 +32,8 @@ jobs:
         uses: cargo-bins/cargo-binstall@main
       - name: Install Tarpaulin
         run: cargo binstall cargo-tarpaulin
+      - name: Install Nextest
+        run: cargo binstall cargo-nextest
       - name: Cargo cache
         uses: actions/cache@v4
         with:
@@ -44,6 +46,14 @@ jobs:
             ./backend/target/
           key: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-
+      - name: Run tests
+        run: cargo nextest run --profile ci
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./target/nextest/ci/junit.xml
       - name: Generate code coverage
         run: cargo --verbose --locked tarpaulin --timeout 120 --out xml
       - name: Upload coverage to Codecov

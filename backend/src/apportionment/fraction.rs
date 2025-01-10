@@ -163,10 +163,10 @@ mod tests {
     #[test]
     fn test_add() {
         let fraction = Fraction::new(1, 3);
-        let other_fraction = Fraction::new(1, 4);
+        let other_fraction = Fraction::new(2, 4);
         let added = fraction + other_fraction;
-        assert_eq!(added, Fraction::new(7, 12));
-        assert_eq!(added.to_string(), "7/12")
+        assert_eq!(added, Fraction::new(10, 12));
+        assert_eq!(added.to_string(), "10/12")
     }
 
     #[test]

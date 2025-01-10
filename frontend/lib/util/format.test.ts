@@ -14,9 +14,17 @@ describe("Format util", () => {
     ["123456", "123.456"],
     ["1000000", "1.000.000"],
   ])("Number format string %s as %s", (input: string, expected: string) => {
-    expect(validateNumberString(input)).equals(true);
-    expect(formatNumber(input)).equals(expected);
-    expect(deformatNumber(expected)).equals(parseInt(input, 10));
+    expect(validateNumberString(input)).toBe(true);
+    expect(formatNumber(input)).toBe(expected);
+    expect(deformatNumber(expected)).toBe(parseInt(input, 10));
+  });
+
+  test.each([
+    ["000", 0],
+    ["", 0],
+    ["x", NaN],
+  ])("Deformat number %s as %s", (input: string, expected: number) => {
+    expect(deformatNumber(input)).toBe(expected);
   });
 
   const today = new Date();
@@ -30,6 +38,6 @@ describe("Format util", () => {
     [yesterday, `${yesterday.toLocaleString(t("date_locale"), { weekday: "long" })} 10:20`],
     [one_week_ago, `${one_week_ago.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} 10:20`],
   ])("Date format string %s as %s", (input: Date, expected: string) => {
-    expect(formatDateTime(input)).equals(expected);
+    expect(formatDateTime(input)).toEqual(expected);
   });
 });

@@ -1,3 +1,4 @@
+import { codecovVitePlugin } from "@codecov/vite-plugin";
 import react from "@vitejs/plugin-react-swc";
 import { execSync } from "node:child_process";
 import path from "path";
@@ -63,7 +64,14 @@ export default defineConfig(({ command }) => {
       ...gitDetails,
     },
     optimizeDeps: { exclude: ["msw"] },
-    plugins: [react()],
+    plugins: [
+      react(),
+      codecovVitePlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName: "abacus-frontend",
+        uploadToken: process.env.CODECOV_TOKEN,
+      }),
+    ],
     resolve: {
       alias: mapObj(
         tsConfig.compilerOptions.paths,

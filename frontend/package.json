@@ -28,6 +28,7 @@
     "serve": "npm run build:msw && npx serve dist"
   },
   "dependencies": {
+    "@codecov/vite-plugin": "^1.8.0",
     "@vitejs/plugin-react-swc": "^3.7.2",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.1",

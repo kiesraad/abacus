@@ -14,9 +14,11 @@ export function PollingStationCreatePage() {
   const { election } = useElection();
   const navigate = useNavigate();
 
-  const handleSaved = (ps: PollingStation) => {
-    navigate(`../?created=${ps.id}`);
-  };
+  const parentUrl = `/elections/${election.id}/polling-stations`;
+
+  function handleSaved(ps: PollingStation) {
+    void navigate(`${parentUrl}?created=${ps.id}`);
+  }
 
   return (
     <>

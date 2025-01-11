@@ -13,9 +13,7 @@ import { createMachine } from "xstate";
 
 import { test } from "../dom-to-db-tests/fixtures";
 
-// TODO:
-// - explain naming scheme
-// - check if it matters in coverage to merge identical states or events
+// TODO: look into testModel.testCoverage(options?) but it's in @xstate/test, unclear if also in @xstate/graph
 
 /*
 model:
@@ -37,31 +35,38 @@ nav to polling stations page
      sluit modal (TODO)
 */
 
-// naamgeving
-// pagina's: pollingstation, recounted, votervotes, differences
-// data: empty, cached, filled in, submitted/saved, deleted
-// change: filled in, cached, saved
-
 const machine = createMachine({
+  /*
+The names of the states in the machine keep track of two states:
+1. the current page
+2. the state of the data on the voters and votes page
+
+So the state pollingStationsPageChangedSaved means that we're on the polling stations page, we have
+changed the initial input on the voters and votes page, and we have saved it as part of navigating
+to the polling stations page.
+
+Since we're tracking two states in the machine, the code of some of the states is the same, because
+they can check only one of the two states.
+*/
   initial: "voterVotesPageEmpty",
   states: {
-    pollingStationsPage: {},
-    pollingStationsPageRecountSaved: {
+    pollingStationsPageDiscarded: {},
+    pollginStationsPageEmptySaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeEmpty",
       },
     },
-    pollingStationsPageSaved: {
+    pollingStationsPageFilledSaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResume",
       },
     },
-    pollingStationsPageChangesSaved: {
+    pollingStationsPageChangedSaved: {
       on: {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChanged",
       },
     },
-    recountedPage: {},
+    recountedPageEmpty: {},
     recountedPageSaved: {
       on: {
         GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageChangedSubmitted",
@@ -87,7 +92,7 @@ const machine = createMachine({
         FILL_WITH_VALID_DATA: "votersVotesPageFilled",
         CLICK_ABORT: "abortInputModalEmpty", // separate state needed to distinguish save and resume flow
         NAV_TO_POLLING_STATION_PAGE: "abortInputModalEmpty",
-        GO_TO_RECOUNTED_PAGE: "recountedPage",
+        GO_TO_RECOUNTED_PAGE: "recountedPageEmpty",
       },
     },
     votersVotesPageFilled: {
@@ -122,20 +127,20 @@ const machine = createMachine({
     },
     abortInputModalFilled: {
       on: {
-        SAVE_INPUT: "pollingStationsPageSaved",
-        DISCARD_INPUT: "pollingStationsPage",
+        SAVE_INPUT: "pollingStationsPageFilledSaved",
+        DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
     abortInputModalEmpty: {
       on: {
-        SAVE_INPUT: "pollingStationsPageRecountSaved",
-        DISCARD_INPUT: "pollingStationsPage",
+        SAVE_INPUT: "pollginStationsPageEmptySaved",
+        DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
     abortInputModalChanged: {
       on: {
-        SAVE_INPUT: "pollingStationsPageChangesSaved",
-        DISCARD_INPUT: "pollingStationsPage",
+        SAVE_INPUT: "pollingStationsPageChangedSaved",
+        DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
     unsavedChangesModalChanged: {
@@ -162,11 +167,25 @@ const votersChanged: VotersCounts = {
   total_admitted_voters_count: 100,
 };
 
+const votersEmpty: VotersCounts = {
+  poll_card_count: 0,
+  proxy_certificate_count: 0,
+  voter_card_count: 0,
+  total_admitted_voters_count: 0,
+};
+
 const votes: VotesCounts = {
   votes_candidates_count: 100,
   blank_votes_count: 0,
   invalid_votes_count: 0,
   total_votes_cast_count: 100,
+};
+
+const votesEmpty: VotesCounts = {
+  votes_candidates_count: 0,
+  blank_votes_count: 0,
+  invalid_votes_count: 0,
+  total_votes_cast_count: 0,
 };
 
 test.describe("Data entry", () => {
@@ -194,11 +213,31 @@ test.describe("Data entry", () => {
 
         await path.test({
           states: {
-            voterVotesPageEmpty: async () => {
-              await expect(votersAndVotesPage.fieldset).toBeVisible();
-              // TODO: check for empty fields?
+            pollingStationsPageDiscarded: async () => {
+              await expect(pollingStationChoicePage.fieldset).toBeVisible();
+              await expect(pollingStationChoicePage.alertDataEntryInProgress).not.toContainText(
+                `${pollingStation1.number.toString()} - ${pollingStation1.name}`,
+              );
             },
-            recountedPage: async () => {
+            pollginStationsPageEmptySaved: async () => {
+              await expect(pollingStationChoicePage.fieldset).toBeVisible();
+              await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
+                `${pollingStation1.number} - ${pollingStation1.name}`,
+              );
+            },
+            pollingStationsPageFilledSaved: async () => {
+              await expect(pollingStationChoicePage.fieldset).toBeVisible();
+              await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
+                `${pollingStation1.number} - ${pollingStation1.name}`,
+              );
+            },
+            pollingStationsPageChangedSaved: async () => {
+              await expect(pollingStationChoicePage.fieldset).toBeVisible();
+              await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
+                `${pollingStation1.number} - ${pollingStation1.name}`,
+              );
+            },
+            recountedPageEmpty: async () => {
               await expect(recountedPage.fieldset).toBeVisible();
               await expect(recountedPage.no).toBeChecked();
             },
@@ -210,10 +249,42 @@ test.describe("Data entry", () => {
               await expect(recountedPage.fieldset).toBeVisible();
               await expect(recountedPage.no).toBeChecked();
             },
+            recountedPageCached: async () => {
+              await expect(recountedPage.fieldset).toBeVisible();
+              await expect(recountedPage.no).toBeChecked();
+            },
+            voterVotesPageCached: async () => {
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(voters);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votes);
+            },
+            voterVotesPageEmpty: async () => {
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(votersEmpty);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votesEmpty);
+            },
             votersVotesPageFilled: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               const votersFields = await votersAndVotesPage.getVotersCounts();
               expect(votersFields).toStrictEqual(voters);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votes);
+            },
+            votersVotesPageSubmitted: async () => {
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(voters);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votes);
+            },
+            votersVotesPageChangedSubmitted: async () => {
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(votersChanged);
               const votesFields = await votersAndVotesPage.getVotesCounts();
               expect(votesFields).toStrictEqual(votes);
             },
@@ -225,13 +296,34 @@ test.describe("Data entry", () => {
               const votesFields = await votersAndVotesPage.getVotesCounts();
               expect(votesFields).toStrictEqual(votes);
             },
-            abortInputModalEmpty: async () => {
-              await expect(abortModal.heading).toBeVisible();
+            votersVotesPageAfterResume: async () => {
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(voters);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votes);
+            },
+            votersVotesPageAfterResumeChanged: async () => {
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(votersChanged);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votes);
+            },
+            votersVotesPageAfterResumeEmpty: async () => {
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(votersEmpty);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votesEmpty);
             },
             differencesPage: async () => {
               await expect(differencesPage.fieldset).toBeVisible();
             },
-            abortInputModal: async () => {
+            abortInputModalFilled: async () => {
+              await expect(abortModal.heading).toBeVisible();
+            },
+            abortInputModalEmpty: async () => {
               await expect(abortModal.heading).toBeVisible();
             },
             abortInputModalChanged: async () => {
@@ -239,77 +331,6 @@ test.describe("Data entry", () => {
             },
             unsavedChangesModalChanged: async () => {
               await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
-            },
-            votersVotesPageSubmitted: async () => {
-              // same as votersVotesPageAfterResume
-              await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(voters);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votes);
-            },
-            votersVotesPageChangedSubmitted: async () => {
-              // same as votersVotesPageAfterResumeChanged
-              await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(votersChanged);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votes);
-            },
-            votersVotesPageAfterResumeChanged: async () => {
-              // same as votersVotesPageAfterResumeChanged
-              await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(votersChanged);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votes);
-            },
-            votersVotesPageAfterResume: async () => {
-              // same as votersVotesPageSubmitted
-              await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(voters);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votes);
-            },
-            votersVotesPageAfterResumeEmpty: async () => {
-              await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersEmpty: VotersCounts = {
-                poll_card_count: 0,
-                proxy_certificate_count: 0,
-                voter_card_count: 0,
-                total_admitted_voters_count: 0,
-              };
-              const votesEmpty: VotesCounts = {
-                votes_candidates_count: 0,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 0,
-              };
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(votersEmpty);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votesEmpty);
-            },
-            pollingStationChoicePage: async () => {
-              await expect(pollingStationChoicePage.fieldset).toBeVisible();
-              await expect(pollingStationChoicePage.alertDataEntryInProgress).not.toContainText(
-                `${pollingStation1.number.toString()} - ${pollingStation1.name}`,
-              );
-            },
-            pollingStationsPageSaved: async () => {
-              // same as pollingStationsPageRecountSaved
-              await expect(pollingStationChoicePage.fieldset).toBeVisible();
-              await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
-                `${pollingStation1.number} - ${pollingStation1.name}`,
-              );
-            },
-            pollingStationsPageRecountSaved: async () => {
-              // same as pollingStationsPageSaved
-              await expect(pollingStationChoicePage.fieldset).toBeVisible();
-              await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
-                `${pollingStation1.number} - ${pollingStation1.name}`,
-              );
             },
           },
           events: {

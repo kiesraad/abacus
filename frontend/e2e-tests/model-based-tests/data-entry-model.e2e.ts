@@ -15,29 +15,27 @@ import { test } from "../dom-to-db-tests/fixtures";
 
 // TODO:
 // - explain naming scheme
-// - errors and warnings: fix, accept, abort and save, cache(?)
-// - close abort modal, close nav out model, close nav inside modal
 // - check if it matters in coverage to merge identical states or events
 
-// model:
-// fill in page
-//      with valid data
-//      with error data
-//      with warning data
-// submit page
-// Invoer afbreken
-//      opslaan
-//      niet opslaan
-//      sluit modal
-// naar Is er herteld?
-// naar data-entry of elections page
-//      bewaren
-//      niet bewaren
-//      sluit modal
-// in-form navigation
-// naar recount en gelijk terug naar voters -> niet gesubmitte data in voters blijft
-// naar recount en wijziging en terug naar voters -> optie om op te slaan of niet
-// naar recount en wijziging en submit
+/*
+model:
+fill in page
+     with valid data
+     with error data (TODO); fix (TODO); nav (TODO), afbreken (TOD)
+     with warning data (TODO); fix (TODO) or accept (TODO); nav (TODO), afbreken (TOD)
+submit page
+invoer afbreken
+     opslaan
+     niet opslaan
+     close modal (TODO)
+nav to Is er herteld?
+  cache
+  modal: bewaren, niet bewaren, close modal (TODO)
+nav to polling stations page
+     bewaren
+     niet bewaren
+     sluit modal (TODO)
+*/
 
 // naamgeving
 // pagina's: pollingstation, recounted, votervotes, differences
@@ -221,7 +219,11 @@ test.describe("Data entry", () => {
             },
             votersVotesPageChangedFilled: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              // TODO: can check! Can't check for values of input fields until after submitting
+              await expect(votersAndVotesPage.fieldset).toBeVisible();
+              const votersFields = await votersAndVotesPage.getVotersCounts();
+              expect(votersFields).toStrictEqual(votersChanged);
+              const votesFields = await votersAndVotesPage.getVotesCounts();
+              expect(votesFields).toStrictEqual(votes);
             },
             abortInputModalEmpty: async () => {
               await expect(abortModal.heading).toBeVisible();

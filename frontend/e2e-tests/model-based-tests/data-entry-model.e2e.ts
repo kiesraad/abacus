@@ -13,7 +13,11 @@ import { createMachine } from "xstate";
 
 import { test } from "../dom-to-db-tests/fixtures";
 
-// TODO: look into testModel.testCoverage(options?) but it's in @xstate/test, unclear if also in @xstate/graph
+// TODO: look into testModel.testCoverage(options?) but it's in @xstate/test, unclear if also in @xstate/graph.
+// Currently there's not check that the test contains code for both all states and all events. Thet tests will
+// just run. In case of an event without code, they will very likely fail; in case of a state without code
+// the test will just pass.
+// For the states in the machine there is a check that each state is defined.
 
 /*
 model:
@@ -58,7 +62,7 @@ they can check only one of the two states.
     },
     pollingStationsPageFilledSaved: {
       on: {
-        RESUME_DATA_ENTRY: "votersVotesPageAfterResume",
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeSaved",
       },
     },
     pollingStationsPageChangedSaved: {
@@ -90,7 +94,7 @@ they can check only one of the two states.
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageFilled",
-        CLICK_ABORT: "abortInputModalEmpty", // separate state needed to distinguish save and resume flow
+        CLICK_ABORT: "abortInputModalEmpty",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModalEmpty",
         GO_TO_RECOUNTED_PAGE: "recountedPageEmpty",
       },
@@ -117,9 +121,9 @@ they can check only one of the two states.
         GO_TO_RECOUNTED_PAGE: "unsavedChangesModalChanged",
       },
     },
-    votersVotesPageAfterResume: {}, // not same votersVotesPageFilled because submitted in this case
+    votersVotesPageAfterResumeSaved: {},
     votersVotesPageAfterResumeChanged: {},
-    votersVotesPageAfterResumeEmpty: {}, // same as voterVotesPageEmpty?
+    votersVotesPageAfterResumeEmpty: {},
     differencesPage: {
       on: {
         GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageSubmitted",
@@ -160,7 +164,6 @@ const voters: VotersCounts = {
 };
 
 const votersChanged: VotersCounts = {
-  // TODO: consider changing voters in test, but reset values at start of test
   poll_card_count: 80,
   proxy_certificate_count: 20,
   voter_card_count: 0,
@@ -296,7 +299,7 @@ test.describe("Data entry", () => {
               const votesFields = await votersAndVotesPage.getVotesCounts();
               expect(votesFields).toStrictEqual(votes);
             },
-            votersVotesPageAfterResume: async () => {
+            votersVotesPageAfterResumeSaved: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
               const votersFields = await votersAndVotesPage.getVotersCounts();
               expect(votersFields).toStrictEqual(voters);
@@ -345,7 +348,7 @@ test.describe("Data entry", () => {
               await votersAndVotesPage.abortInput.click();
             },
             NAV_TO_POLLING_STATION_PAGE: async () => {
-              // TODO: do not use page
+              // TODO: add to page object
               await page.getByRole("link", { name: "Heemdamseburg" }).click();
             },
             GO_TO_RECOUNTED_PAGE: async () => {
@@ -370,7 +373,7 @@ test.describe("Data entry", () => {
               await recountedPage.unsavedChangesModal.discardInput.click();
             },
             RESUME_DATA_ENTRY: async () => {
-              // TODO: include in page object
+              // TODO: add to page object
               await pollingStationChoicePage.alertDataEntryInProgress
                 .getByRole("link", { name: `${pollingStation1.number} - ${pollingStation1.name}` })
                 .click();

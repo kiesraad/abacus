@@ -77,6 +77,8 @@ jobs:
       - name: Install musl
         run: sudo apt-get update && sudo apt-get install -y musl-tools
         if: matrix.target.os == 'ubuntu-latest'
+      - name: Install target
+        run: rustup target add ${{ matrix.target.name }}
       - name: Build
         run: cargo --verbose --locked build --features memory-serve --target=${{ matrix.target.name }}
       - uses: actions/upload-artifact@v4

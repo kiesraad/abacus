@@ -65,7 +65,7 @@ describe("PollingStationUpdatePage", () => {
     saveButton.click();
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toEqual("/elections/1/polling_stations");
+      expect(router.state.location.pathname).toEqual("/elections/1/polling-stations");
       expect(router.state.location.search).toEqual("?updated=1");
     });
   });
@@ -118,7 +118,7 @@ describe("PollingStationUpdatePage", () => {
         );
       });
 
-      expect(router.state.location.pathname).toEqual("/elections/1/polling_stations");
+      expect(router.state.location.pathname).toEqual("/elections/1/polling-stations");
       expect(router.state.location.search).toEqual("?deleted=1%20(test)");
     });
 

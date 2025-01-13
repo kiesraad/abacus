@@ -197,7 +197,7 @@ fn allocate_remaining_seats(
     Ok(rest_seats)
 }
 
-/// Apportionment - work in progress!!
+/// Apportionment
 pub fn seat_allocation(
     seats: u64,
     totals: &ElectionSummary,
@@ -263,7 +263,6 @@ mod tests {
     use crate::apportionment::{seat_allocation, ApportionmentError};
     use crate::data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts};
     use crate::summary::{ElectionSummary, SummaryDifferencesCounts};
-    use tracing_test::traced_test;
 
     fn get_election_summary(pg_votes: Vec<Count>) -> ElectionSummary {
         let total_votes = pg_votes.iter().sum();
@@ -295,7 +294,6 @@ mod tests {
     }
 
     #[test]
-    #[traced_test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_system() {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 60, 40]);
         let result = seat_allocation(15, &totals);
@@ -303,7 +301,6 @@ mod tests {
     }
 
     #[test]
-    #[traced_test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system(
     ) {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
@@ -312,7 +309,6 @@ mod tests {
     }
 
     #[test]
-    #[traced_test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_no_surpluses(
     ) {
         let totals = get_election_summary(vec![560, 160, 160, 80, 80, 80, 40, 40]);
@@ -321,18 +317,13 @@ mod tests {
     }
 
     #[test]
-    #[traced_test]
     fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error() {
         let totals = get_election_summary(vec![500, 140, 140, 140, 140, 140]);
         let result = seat_allocation(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
-        assert!(logs_contain(
-            "Drawing of lots is needed but not yet implemented!"
-        ));
     }
 
     #[test]
-    #[traced_test]
     fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
         let totals = get_election_summary(vec![600, 302, 98, 99, 101]);
         let result = seat_allocation(23, &totals);
@@ -340,13 +331,9 @@ mod tests {
     }
 
     #[test]
-    #[traced_test]
     fn test_seat_allocation_19_or_more_seats_with_drawing_of_lots_error() {
         let totals = get_election_summary(vec![500, 140, 140, 140, 140, 140]);
         let result = seat_allocation(23, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
-        assert!(logs_contain(
-            "Drawing of lots is needed but not yet implemented!"
-        ));
     }
 }

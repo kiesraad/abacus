@@ -41,7 +41,7 @@ export const routes = createRoutesFromElements(
     <Route path="account" element={<LoginLayout />}>
       <Route index element={<UserHomePage />} />
       <Route path="login" element={<LoginPage />} />
-      <Route path="account/setup" element={<AccountSetupPage />} />
+      <Route path="setup" element={<AccountSetupPage />} />
     </Route>
     <Route path="elections" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />

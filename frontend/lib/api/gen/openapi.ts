@@ -5,6 +5,9 @@
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
+export type ELECTION_CREATE_REQUEST_PARAMS = Record<string, never>;
+export type ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
+export type ELECTION_CREATE_REQUEST_BODY = ElectionRequest;
 
 // /api/elections/{election_id}
 export interface ELECTION_DETAILS_REQUEST_PARAMS {
@@ -201,6 +204,21 @@ Does not include the candidate list (political groups) to keep the response size
  */
 export interface ElectionListResponse {
   elections: Election[];
+}
+
+/**
+ * Election request
+ */
+export interface ElectionRequest {
+  category: ElectionCategory;
+  election_date: string;
+  location: string;
+  name: string;
+  nomination_date: string;
+  number_of_seats: number;
+  number_of_voters: number;
+  political_groups: PoliticalGroup[];
+  status: ElectionStatus;
 }
 
 /**

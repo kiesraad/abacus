@@ -72,6 +72,9 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route("/{election_id}/status", get(data_entry::election_status));
 
+    #[cfg(feature = "dev-database")]
+    let election_routes = election_routes.route("/", post(election::election_create));
+
     let user_router = Router::new()
         .route("/login", post(authentication::login))
         .route("/logout", post(authentication::logout));
@@ -130,6 +133,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             authentication::login,
             authentication::logout,
             election::election_list,
+            election::election_create,
             election::election_details,
             election::election_download_zip_results,
             election::election_download_pdf_results,
@@ -174,6 +178,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 election::CandidateGender,
                 election::ElectionListResponse,
                 election::ElectionDetailsResponse,
+                election::ElectionRequest,
                 polling_station::PollingStation,
                 polling_station::PollingStationListResponse,
                 polling_station::PollingStationType,

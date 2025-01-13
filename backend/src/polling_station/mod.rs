@@ -172,8 +172,13 @@ pub async fn polling_station_delete(
 mod tests {
     use sqlx::{query, SqlitePool};
 
-    #[sqlx::test(fixtures("../../fixtures/elections.sql"))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1", "election_2")))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
+        query!("DELETE FROM polling_stations")
+            .execute(&pool)
+            .await
+            .unwrap();
+
         // Insert two unique polling stations
         let _ = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)

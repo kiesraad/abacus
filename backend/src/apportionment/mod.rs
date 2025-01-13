@@ -12,13 +12,14 @@ fn get_number_of_whole_seats_per_pg(
     quota: &Fraction,
 ) -> BTreeMap<u8, u64> {
     // calculate number of whole seats for each party
-    let mut whole_seats = BTreeMap::<u8, u64>::new();
-    for pg in pg_votes {
-        let pg_votes = Fraction::from_count(pg.total);
-        let pg_seats = pg_votes.divide_and_return_whole_number(quota);
-        whole_seats.insert(pg.number, pg_seats);
-    }
-    whole_seats
+    pg_votes
+        .iter()
+        .fold(BTreeMap::new(), |mut whole_seats, pg| {
+            let pg_total = Fraction::from_count(pg.total);
+            let pg_seats = pg_total.divide_and_return_whole_number(quota);
+            whole_seats.insert(pg.number, pg_seats);
+            whole_seats
+        })
 }
 
 fn get_pg_number_with_largest_average(
@@ -27,8 +28,7 @@ fn get_pg_number_with_largest_average(
     rest_seats: &BTreeMap<u8, u64>,
     remaining_seats: u64,
 ) -> Result<u8, ApportionmentError> {
-    let mut averages = BTreeMap::<u8, Fraction>::new();
-    for pg in pg_votes.iter() {
+    let averages = pg_votes.iter().fold(BTreeMap::new(), |mut averages, pg| {
         let pg_total = Fraction::from_count(pg.total);
         let pg_seats_new = whole_seats
             .get(&pg.number)
@@ -37,7 +37,9 @@ fn get_pg_number_with_largest_average(
             + 1;
         let pg_avg_votes = pg_total / Fraction::from_u64(pg_seats_new);
         averages.insert(pg.number, pg_avg_votes);
-    }
+        averages
+    });
+
     debug!("Averages: {:?}", averages);
 
     let (&pg_number, &max) = averages
@@ -71,22 +73,22 @@ fn get_surplus_per_pg_where_total_votes_meets_the_threshold(
     // i.e. the number of total votes minus the quota times the number of whole seats
     let threshold = Fraction::new(3, 4) * *quota;
     debug!("Threshold: {}", threshold);
-    let mut surpluses = BTreeMap::<u8, Fraction>::new();
-    for pg in pg_votes.iter() {
-        let pg_total_votes = Fraction::from_count(pg.total);
-        if pg_total_votes >= threshold {
+
+    pg_votes.iter().fold(BTreeMap::new(), |mut surpluses, pg| {
+        let pg_total = Fraction::from_count(pg.total);
+        if pg_total >= threshold {
             let pg_whole_seats = Fraction::from_u64(
                 *whole_seats
                     .get(&pg.number)
                     .expect("Political group should have number of whole seats"),
             );
-            let surplus = pg_total_votes - (*quota * pg_whole_seats);
+            let surplus = pg_total - (*quota * pg_whole_seats);
             if surplus > Fraction::new(0, 1) {
                 surpluses.insert(pg.number, surplus);
             }
         }
-    }
-    surpluses
+        surpluses
+    })
 }
 
 fn get_pg_number_with_largest_surplus(

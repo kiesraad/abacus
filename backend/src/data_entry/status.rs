@@ -637,7 +637,7 @@ mod tests {
     }
 
     /// SecondEntryInProgress --> is_equal: finalise
-    /// is_equal --> EntriesNotEqual: equal? no
+    /// is_equal --> EntriesDifferent: equal? no
     #[test]
     fn second_entry_in_progress_finalise_not_equal() {
         let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {

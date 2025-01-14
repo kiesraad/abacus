@@ -10,9 +10,13 @@
 import { delay, http, HttpResponse, JsonBodyType } from "msw";
 import { setupServer } from "msw/node";
 
-import { handlers } from "@kiesraad/api-mocks";
-
-export const server = setupServer(...handlers);
+export const server = setupServer(
+  // Tests should mock all requests explicitly, return http 500 with the url for the missing ones.
+  http.all("*", ({ request }) => {
+    const pathname = new URL(request.url).pathname;
+    return HttpResponse.text(`Unhandled request: "${request.method} ${pathname}"`, { status: 500 });
+  }),
+);
 
 // Override request handlers in order to test special cases
 export function overrideOnce(

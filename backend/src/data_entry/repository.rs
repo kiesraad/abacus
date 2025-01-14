@@ -180,7 +180,7 @@ impl PollingStationResultsEntries {
             SELECT
                 r.polling_station_id AS "polling_station_id: u32",
                 r.data,
-                r.created_at AS "created_at: i64"
+                r.created_at
             FROM polling_station_results AS r
             LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
             WHERE p.election_id = $1
@@ -193,7 +193,7 @@ impl PollingStationResultsEntries {
             Ok(PollingStationResultsEntry {
                 polling_station_id: row.polling_station_id,
                 data,
-                created_at: row.created_at,
+                created_at: row.created_at.and_utc(),
             })
         })
         .fetch_all(&self.0)

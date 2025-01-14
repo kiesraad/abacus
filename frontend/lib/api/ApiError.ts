@@ -56,6 +56,15 @@ export class NotFoundError extends FatalError {
   }
 }
 
+export function isError<T>(result: ApiResult<T>): result is Error {
+  return (
+    result instanceof ApiError ||
+    result instanceof FatalApiError ||
+    result instanceof NotFoundError ||
+    result instanceof NetworkError
+  );
+}
+
 export function isSuccess<T>(result: ApiResult<T>): result is ApiResponse<T> {
   return !(
     result instanceof ApiError ||

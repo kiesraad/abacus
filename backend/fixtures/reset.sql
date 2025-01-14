@@ -3,3 +3,5 @@ DELETE FROM polling_station_results;
 DELETE FROM polling_station_data_entries;
 DELETE FROM polling_stations;
 DELETE FROM elections;
+DELETE FROM users;
+DELETE FROM sessions;

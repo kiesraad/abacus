@@ -721,7 +721,7 @@ mod tests {
     }
 
     //TODO: Will be Implemented in #130:
-    // EntriesNotEqual --> NotStarted: delete
+    // EntriesDifferent --> NotStarted: delete
     /*
     #[test]
     fn entries_not_equal_to_definitive() {

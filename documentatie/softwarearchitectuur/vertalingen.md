@@ -13,8 +13,8 @@ De volgende ontwerpkeuzes zijn gemaakt:
 
 - Vertalen op basis van globale functies (`t()` en `tx()`)
 - Input van de functies is een "translation key" eventueel genest in een namespace (gescheiden door een `.`)
-- Vertalingen zijn opgesplits in meerdere geneste json bestanden
-- We kunnen de geneste json converteren naar `PO` formaat en weer terug
+- Vertalingen zijn opgesplitst in meerdere geneste JSON bestanden
+- We kunnen de geneste JSON converteren naar `PO` formaat en weer terug
 
 ## Gebruik
 
@@ -29,7 +29,7 @@ function t(
     vars?: Record<string, string | number>
 ): string;
 
-/// test: "Hello {item}!
+// test: "Hello {item}!
 expect(t("test", { item: "World" })).toEqual("Hello World!");
 ````
 
@@ -55,7 +55,7 @@ tx("test", {
 // result: Visit my homepage <a href="https://www.kiesraad.nl/">here</a>
 ````
 
-Toegestande HTML tekst in vertalingen zijn: "ul", "li", "p", "strong", "code".
+Toegestande HTML tags in vertalingen zijn: "ul", "li", "p", "strong", "code".
 Newlines worden door de `tx()` functie automatisch omgezet naar `<br>`.
 
 ### Vertalingen toevoegen
@@ -67,12 +67,12 @@ Zie bijvoorbeeld [deze link](https://lokalise.com/blog/translation-keys-naming-a
 
 ## Conversie
 
-Vertalingen kunnen van ons eigen genest-json formaat worden geconverteerd worden naar `.po` formaat.
+Vertalingen kunnen van ons eigen geneste JSON formaat geconverteerd worden naar `.po` formaat.
 
 ### JSON naar PO
 
 Gebruik dit script om `.po`-bestanden te maken (één voor elke gedefinieerde locale) die gebruikt kunnen worden in vertaalsoftware.
-Dit script genereert `.po`-vertaalbestanden van de huidige json-vertalingen in `/frontend/lib/i18n/loclales/<locale>/*.json`:
+Dit script genereert `.po`-vertaalbestanden van de huidige JSON-vertalingen in `/frontend/lib/i18n/loclales/<locale>/*.json`:
 
 ```sh
 npm run gen:po
@@ -82,8 +82,8 @@ Dit resulteert in `/frontend/translations/<locale>.po`. Deze kunnen geïmporteer
 
 #### PO naar JSON
 
-Gebruik dit script om aangepaste `.po`-bestanden terug te converteren naar onze applicatie-json-vertaalbestanden.
-Dit script genereert json-vertaalbestanden van `.po`-vertaalbestanden in `/frontend/translations/<locale>.po`:
+Gebruik dit script om aangepaste `.po`-bestanden terug te converteren naar onze applicatie-JSON-vertaalbestanden.
+Dit script genereert JSON-vertaalbestanden van `.po`-vertaalbestanden in `/frontend/translations/<locale>.po`:
 
 ```sh
 npm run gen:translation-json

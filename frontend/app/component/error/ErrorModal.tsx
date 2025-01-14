@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { ApiError } from "@kiesraad/api";
+import { AnyApiError, ApiError } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
 import cls from "./ErrorModal.module.css";
 
 interface ErrorModalProps {
-  error: ApiError;
+  error: AnyApiError;
 }
 
 export function ErrorModal({ error }: ErrorModalProps) {
@@ -26,14 +26,31 @@ export function ErrorModal({ error }: ErrorModalProps) {
     return null;
   }
 
+  if (error instanceof ApiError) {
+    return (
+      <Modal title={t("something_went_wrong")} onClose={hideModal}>
+        <div id="error-modal" className={cls.error}>
+          <p>
+            <strong>{t(`error.api_error.${error.reference}`)}</strong>
+          </p>
+          <nav>
+            <Button onClick={hideModal}>{t("close_message")}</Button>
+          </nav>
+        </div>
+      </Modal>
+    );
+  }
+
   return (
     <Modal title={t("something_went_wrong")} onClose={hideModal}>
       <div id="error-modal" className={cls.error}>
-        <p>
-          <strong>
-            {t("error_code")}: <code>{error.code}</code>
-          </strong>
-        </p>
+        {error instanceof ApiError && error.code && (
+          <p>
+            <strong>
+              {t("error_code")}: <code>{error.code}</code>
+            </strong>
+          </p>
+        )}
         <p>{error.message}</p>
         <nav>
           <Button onClick={hideModal}>{t("close_message")}</Button>

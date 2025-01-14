@@ -33,7 +33,7 @@ function DevLinks() {
         </li>
         <ul>
           {electionList.map((election) => (
-            <li>
+            <li key={election.id}>
               <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
             </li>
           ))}
@@ -48,7 +48,7 @@ function DevLinks() {
         </li>
         <ul>
           {electionList.map((election) => (
-            <li>
+            <li key={election.id}>
               <Link to={`/elections/${election.id}#coordinator`}>{election.name}</Link>
               <ul>
                 <li>

@@ -66,19 +66,19 @@ jobs:
             ./backend/target/
           key: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-
-      - name: Check rustfmt
-        run: cargo --verbose --locked fmt --all -- --check
-      - name: Check Clippy with all features
-        run: cargo --verbose --locked clippy --all-targets --all-features -- -D warnings
-      - name: Check Clippy without default features
-        run: cargo --verbose --locked clippy --all-targets --no-default-features -- -D warnings
-      - name: Run tests
-        run: cargo --verbose --locked test
       - name: Install musl
         run: sudo apt-get update && sudo apt-get install -y musl-tools
         if: matrix.target.os == 'ubuntu-latest'
       - name: Install target
         run: rustup target add ${{ matrix.target.name }}
+      - name: Check rustfmt
+        run: cargo --verbose --locked fmt --all -- --check
+      - name: Check Clippy with all features
+        run: cargo --verbose --locked clippy --target=${{ matrix.target.name }} --all-targets --all-features -- -D warnings
+      - name: Check Clippy without default features
+        run: cargo --verbose --locked clippy --target=${{ matrix.target.name }} --all-targets --no-default-features -- -D warnings
+      - name: Run tests
+        run: cargo --verbose --locked test --target=${{ matrix.target.name }}
       - name: Build
         run: cargo --verbose --locked build --features memory-serve --target=${{ matrix.target.name }}
       - uses: actions/upload-artifact@v4

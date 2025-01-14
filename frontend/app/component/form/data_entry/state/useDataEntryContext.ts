@@ -1,5 +1,6 @@
 import { useContext } from "react";
-import { DataEntryContext } from "./DataEntryProvider";
+
+import { DataEntryContext } from "./DataEntryContext";
 
 export function useDataEntryContext() {
   const context = useContext(DataEntryContext);

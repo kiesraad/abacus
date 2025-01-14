@@ -172,7 +172,7 @@ pub async fn polling_station_delete(
 mod tests {
     use sqlx::{query, SqlitePool};
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1", "election_2")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3")))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
         query!("DELETE FROM polling_stations")
             .execute(&pool)
@@ -183,8 +183,8 @@ mod tests {
         let _ = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
-(1, 1, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),
-(2, 1, 'Testplek', 34, NULL, 'bijzonder', 'Teststraat 2b', '1234 QY', 'Testdorp')
+(1, 2, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),
+(2, 2, 'Testplek', 34, NULL, 'bijzonder', 'Teststraat 2b', '1234 QY', 'Testdorp')
 "#)
             .execute(&pool)
             .await
@@ -194,7 +194,7 @@ VALUES
         let _ = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
-(3, 2, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
+(3, 3, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
 "#)
             .execute(&pool)
             .await
@@ -204,7 +204,7 @@ VALUES
         let result = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
-(4, 1, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
+(4, 2, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
 "#)
             .execute(&pool)
             .await;

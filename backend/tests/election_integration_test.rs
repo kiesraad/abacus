@@ -11,7 +11,7 @@ use sqlx::SqlitePool;
 pub mod shared;
 pub mod utils;
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1", "election_2")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3")))]
 async fn test_election_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -26,11 +26,11 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body.elections.len(), 2);
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
 async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/1");
+    let url = format!("http://{addr}/api/elections/2");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
     // Ensure the response is what we expect
@@ -111,11 +111,11 @@ async fn test_election_details_not_found(pool: SqlitePool) {
     assert_eq!(status, StatusCode::NOT_FOUND);
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
 async fn test_election_pdf_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/1/download_pdf_results");
+    let url = format!("http://{addr}/api/elections/2/download_pdf_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let content_disposition = response.headers().get("Content-Disposition");
@@ -136,14 +136,14 @@ async fn test_election_pdf_download(pool: SqlitePool) {
     assert!(content_disposition_string.contains(".pdf"));
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
 async fn test_election_xml_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     create_result(&addr, 1).await;
     create_result(&addr, 2).await;
 
-    let url = format!("http://{addr}/api/elections/1/download_xml_results");
+    let url = format!("http://{addr}/api/elections/2/download_xml_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let content_type = response.headers().get("Content-Type");
@@ -157,14 +157,14 @@ async fn test_election_xml_download(pool: SqlitePool) {
     assert!(body.contains("<ValidVotes>204</ValidVotes>"));
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_1")))]
+#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
 async fn test_election_zip_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     create_result(&addr, 1).await;
     create_result(&addr, 2).await;
 
-    let url = format!("http://{addr}/api/elections/1/download_zip_results");
+    let url = format!("http://{addr}/api/elections/2/download_zip_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     let content_disposition = response.headers().get("Content-Disposition");

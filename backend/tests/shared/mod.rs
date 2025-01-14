@@ -104,7 +104,7 @@ pub async fn create_result(addr: &SocketAddr, polling_station_id: u32) {
     create_and_finalise_data_entry(addr, polling_station_id, 2).await;
 
     // check that data entry status for this polling station is now Definitive
-    let url = format!("http://{addr}/api/elections/1/status");
+    let url = format!("http://{addr}/api/elections/2/status");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
     let status = response.status();
     assert_eq!(status, StatusCode::OK);

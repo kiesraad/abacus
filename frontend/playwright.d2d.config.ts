@@ -31,6 +31,8 @@ const config: PlaywrightTestConfig = defineConfig({
     {
       command: returnWebserverCommand(),
       port: 8081,
+      stdout: "pipe",
+      stderr: "pipe",
     },
   ],
 });

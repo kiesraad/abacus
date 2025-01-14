@@ -709,7 +709,7 @@ mod tests {
         assert!(matches!(next, DataEntryStatus::SecondEntryNotStarted(_)));
     }
 
-    /// EntriesNotEqual --> Definitive: resolve
+    /// EntriesDifferent --> Definitive: resolve
     #[test]
     fn entries_not_equal_to_definitive() {
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {

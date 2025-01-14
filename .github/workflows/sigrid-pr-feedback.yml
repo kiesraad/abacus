@@ -17,6 +17,7 @@ jobs:
         with:
           customer: kiesraad
           system: abacus
+          convert: rust
         env:
           SIGRID_CI_TOKEN: "${{ secrets.SIGRID_CI_TOKEN }}"
       - name: "Sigrid PR feedback"

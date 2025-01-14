@@ -1,0 +1,186 @@
+partner: "sig"
+customer: "kiesraad"
+system: "abacus"
+model: "2024"
+repository: "eu-central"
+default_excludes: false
+
+
+components:
+# Backend componenten
+  - name: "(Backend) Beheer"
+    include:
+      - ".*/backend/src/election/.*"
+  - name: "(Backend) Data entry"
+    include:
+      - ".*/backend/src/data_entry/.*"
+  - name: "(Backend) PDF generation"
+    include:
+      - ".*/backend/src/pdf_gen/.*"
+  - name: "(Backend) Polling station"
+    include:
+      - ".*/backend/src/polling_station/.*"
+  - name: "(Backend) Bin"
+    include:
+      - ".*/backend/src/bin/.*"
+  - name: "(Backend) Split Tests"
+    include:
+    - ".*/backend/src/split-tests/.*"
+  - name: "(Backend) Src Root Files"
+    include:
+      - ".*/backend/src/error.rs"
+      - ".*/backend/src/fixtures.rs"
+      - ".*/backend/src/lib.rs"
+      - ".*/backend/src/validation.rs"
+  - name: "(Backend) Tests"
+    include:
+     - ".*/backend/tests/.*"
+
+
+# Frontend componenten
+  - name: "(Frontend) App Root Files"
+    include:
+    - ".*/frontend/app/app.test.ts"
+    - ".*/frontend/app/main.tsx"
+    - ".*/frontend/app/msw-mock-api.ts"
+    - ".*/frontend/app/routes.test.tsx"
+    - ".*/frontend/app/routes.tsx"
+  - name: "(Frontend) Components/election"
+    include:
+      - ".*/frontend/app/component/election/.*"
+  - name: "(Frontend) Components/error"
+    include:
+      - ".*/frontend/app/component/error/.*"
+  - name: "(Frontend) Components/footer"
+    include:
+      - ".*/frontend/app/component/footer/.*"
+  - name: "(Frontend) Components/form"
+    include:
+      - ".*/frontend/app/component/form/.*"
+  - name: "(Frontend) Components/navbar"
+    include:
+      - ".*/frontend/app/component/navbar/.*"
+  - name: "(Frontend) Components/pollingstation"
+    include:
+      - ".*/frontend/app/component/pollingstation/.*"
+
+  - name: "(Frontend) Modules/Root files"
+    include:
+      - ".*/frontend/app/module/AdministratorLayout.tsx"
+      - ".*/frontend/app/module/DevHomePage.tsx"
+      - ".*/frontend/app/module/FatalError.tsx"
+      - ".*/frontend/app/module/NotAvailableInMock.tsx"
+      - ".*/frontend/app/module/NotFound.tsx"
+      - ".*/frontend/app/module/RootLayout.tsx"
+  - name: "(Frontend) Modules/account"
+    include:
+      - ".*/frontend/app/module/account/.*"
+  - name: "(Frontend) Modules/data_entry"
+    include:
+      - ".*/frontend/app/module/data_entry/.*"
+  - name: "(Frontend) Modules/election"
+    include:
+      - ".*/frontend/app/module/election/.*"
+  - name: "(Frontend) Modules/logs"
+    include:
+      - ".*/frontend/app/module/logs/.*"
+  - name: "(Frontend) Modules/polling_stations"
+    include:
+      - ".*/frontend/app/module/polling_stations/.*"
+  - name: "(Frontend) Modules/users"
+    include:
+      - ".*/frontend/app/module/users/.*"
+  - name: "(Frontend) Modules/workstations"
+    include:
+      - ".*/frontend/app/module/workstations/.*"
+  # - name: "Modules/overig"
+  #   include:
+  #     - ".*/frontend/app/module/.*[.]tsx"
+  #     - ".*/frontend/app/module/.*[.]tsx"
+
+  - name: "(Frontend) Lib/i18n"
+    include:
+      - ".*/frontend/lib/i18n/.*"
+  - name: "(Frontend) Lib/UI"
+    include:
+      - ".*/frontend/lib/ui/.*"
+  - name: "(Frontend) Lib/Util"
+    include:
+      - ".*/frontend/lib/util/.*"
+  - name: "(Frontend) Lib/API"
+    include:
+      - ".*/frontend/lib/api/.*"
+      - ".*/frontend/lib/api-mocks/.*"
+
+  - name: "(Frontend) e2e tests"
+    include:
+      - ".*/frontend/e2e-tests/.*"
+  - name: "(Frontend) Unit tests"
+    include:
+      - ".*/frontend/app/test/.*"
+  - name: "(Frontend) Scripts"
+    include:
+    - ".*/frontend/scripts/.*"
+
+languages:
+- name: "Css"
+- name: "Javascript"
+- name: "Plsql"
+  production:
+    include:
+    - ".*/migrations/.*[.]sql"
+    exclude:
+    - ".*/fixtures/.*[.]sql"
+  test:
+  generated:
+
+- name: "Rust"
+  production:
+    include:
+    - ".*/gen-openapi.rs"
+    - ".*/api.rs"
+  test:
+  generated:
+    include:
+    - ".*/gen/.*[.]rs"
+
+- name: "Typescript"
+  production:
+    include:
+    - ".*NotAvailableInMock.tsx"
+    - ".*/lib/api-mocks/.*[.]ts"
+    - ".*/lib/api-mocks/.*[.]tsx"
+    exclude:
+    - ".*MockData.ts"
+  test:
+    include:
+    - ".*[.]e2e[.]ts"
+  generated:
+    include:
+    - ".*/gen/.*[.]ts"
+
+
+exclude:
+- ".*/frontend/app/component/MockTest[.]tsx"
+- ".*/[.]ladle.*"
+- ".*[.]d[.]ts"
+- ".*/frontend/lib/icon/.*"
+- ".*[.]config[.]ts"
+- ".*/migrations/.*"
+
+dependencychecker:
+  blocklist:
+  - "NONE"
+  transitive: true
+
+architecture:
+  enabled: true
+  custom_components: true
+
+thirdpartyfindings:
+  enabled: true
+
+alerts:
+  enabled: true
+  recipients:
+    - support@softwareimprovementgroup.com

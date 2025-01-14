@@ -711,7 +711,7 @@ mod tests {
 
     /// EntriesDifferent --> Definitive: resolve
     #[test]
-    fn entries_not_equal_to_definitive() {
+    fn entries_different_to_definitive() {
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             second_entry: polling_station_result(),
             first_entry: PollingStationResults::default(),

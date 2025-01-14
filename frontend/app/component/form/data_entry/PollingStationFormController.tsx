@@ -387,7 +387,7 @@ export function PollingStationFormController({
       status.current = "finalised";
     }
   };
-
+  
   return (
     <PollingStationControllerContext.Provider
       value={{

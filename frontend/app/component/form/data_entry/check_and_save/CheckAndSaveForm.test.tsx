@@ -2,7 +2,12 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider, PollingStationResults } from "@kiesraad/api";
-import { electionDetailsMockResponse, electionMockData } from "@kiesraad/api-mocks";
+import {
+  electionMockData,
+  ElectionRequestHandler,
+  PollingStationDataEntryGetHandler,
+  PollingStationDataEntrySaveHandler,
+} from "@kiesraad/api-mocks";
 import { overrideOnce, renderReturningRouter, screen, server, within } from "@kiesraad/test";
 
 import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "../../testHelperFunctions";
@@ -29,7 +34,7 @@ function renderForm(defaultFormState: Partial<FormState> = {}, defaultValues?: P
 
 describe("Test CheckAndSaveForm", () => {
   beforeEach(() => {
-    overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+    server.use(ElectionRequestHandler, PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
   });
 
   test("Data entry can be finalised", async () => {
@@ -130,6 +135,9 @@ describe("Test CheckAndSaveForm", () => {
 });
 
 describe("Test CheckAndSaveForm summary", () => {
+  beforeEach(() => {
+    server.use(ElectionRequestHandler, PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+  });
   test("Blocking", async () => {
     const formState = structuredClone(defaultFormState);
     formState.sections.voters_votes_counts.errors = [errorWarningMocks.F201];

@@ -1,5 +1,5 @@
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   Election,
@@ -7,8 +7,13 @@ import {
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationResults,
 } from "@kiesraad/api";
-import { electionMockData, politicalGroupMockData } from "@kiesraad/api-mocks";
-import { getUrlMethodAndBody, overrideOnce, render, screen, within } from "@kiesraad/test";
+import {
+  electionMockData,
+  politicalGroupMockData,
+  PollingStationDataEntryGetHandler,
+  PollingStationDataEntrySaveHandler,
+} from "@kiesraad/api-mocks";
+import { getUrlMethodAndBody, overrideOnce, render, screen, server, within } from "@kiesraad/test";
 
 import {
   emptyDataEntryRequest,
@@ -41,6 +46,10 @@ const candidatesFieldIds = {
 };
 
 describe("Test CandidatesVotesForm", () => {
+  beforeEach(() => {
+    server.use(PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+  });
+
   describe("CandidatesVotesForm renders correctly", () => {
     test("Candidates with first name", async () => {
       const politicalGroupMockData: PoliticalGroup = {

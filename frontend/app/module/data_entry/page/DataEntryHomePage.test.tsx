@@ -6,8 +6,13 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { routes } from "app/routes";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
-import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
-import { overrideOnce, Providers, render, screen, setupTestRouter, waitFor, within } from "@kiesraad/test";
+import {
+  electionDetailsMockResponse,
+  ElectionListRequestHandler,
+  ElectionRequestHandler,
+  ElectionStatusRequestHandler,
+} from "@kiesraad/api-mocks";
+import { overrideOnce, Providers, render, screen, server, setupTestRouter, waitFor, within } from "@kiesraad/test";
 
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
@@ -22,6 +27,7 @@ const renderDataEntryHomePage = () =>
 
 describe("DataEntryHomePage", () => {
   beforeEach(() => {
+    server.use(ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
   });
 

@@ -1,17 +1,26 @@
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { errorWarningMocks } from "app/component/form/testHelperFunctions";
 import { routes } from "app/routes";
 
 import { SaveDataEntryResponse } from "@kiesraad/api";
-import { electionMockData } from "@kiesraad/api-mocks";
+import {
+  ElectionListRequestHandler,
+  electionMockData,
+  ElectionRequestHandler,
+  ElectionStatusRequestHandler,
+  PollingStationDataEntryDeleteHandler,
+  PollingStationDataEntryGetHandler,
+  PollingStationDataEntrySaveHandler,
+} from "@kiesraad/api-mocks";
 import {
   overrideOnce,
   Providers,
   Router,
   screen,
+  server,
   setupTestRouter,
   userTypeInputs,
   waitFor,
@@ -298,6 +307,16 @@ async function executeStepsForPendingChanges(router: Router) {
 }
 
 describe("Polling Station data entry integration tests", () => {
+  beforeEach(() => {
+    server.use(
+      ElectionListRequestHandler,
+      ElectionRequestHandler,
+      ElectionStatusRequestHandler,
+      PollingStationDataEntryGetHandler,
+      PollingStationDataEntrySaveHandler,
+      PollingStationDataEntryDeleteHandler,
+    );
+  });
   describe("Navigation through the form", () => {
     test("Fill in complete form", async () => {
       const router = renderWithRouter();

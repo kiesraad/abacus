@@ -1,5 +1,5 @@
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   emptyDataEntryRequest,
@@ -10,8 +10,12 @@ import {
 } from "app/component/form/testHelperFunctions";
 
 import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@kiesraad/api";
-import { electionMockData } from "@kiesraad/api-mocks";
-import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs, waitFor } from "@kiesraad/test";
+import {
+  electionMockData,
+  PollingStationDataEntryGetHandler,
+  PollingStationDataEntrySaveHandler,
+} from "@kiesraad/api-mocks";
+import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs, waitFor } from "@kiesraad/test";
 
 import { FormState, PollingStationFormController } from "../PollingStationFormController";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
@@ -91,6 +95,10 @@ const recountFieldIds = {
 };
 
 describe("Test VotersAndVotesForm", () => {
+  beforeEach(() => {
+    server.use(PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+  });
+
   describe("VotersAndVotesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
@@ -124,10 +132,6 @@ describe("Test VotersAndVotesForm", () => {
     });
 
     test("Form field entry and keybindings", async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [] },
-      });
-
       const user = userEvent.setup();
 
       renderForm({ recounted: true });

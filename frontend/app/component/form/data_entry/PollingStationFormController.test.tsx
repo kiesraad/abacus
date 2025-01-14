@@ -1,14 +1,18 @@
 import * as React from "react";
 
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { PollingStationFormController } from "app/component/form/data_entry/PollingStationFormController";
 import { usePollingStationFormController } from "app/component/form/data_entry/usePollingStationFormController";
 import { errorWarningMocks } from "app/component/form/testHelperFunctions";
 
 import { SaveDataEntryResponse } from "@kiesraad/api";
-import { electionMockData } from "@kiesraad/api-mocks";
-import { overrideOnce, Providers, renderHook, waitFor } from "@kiesraad/test";
+import {
+  electionMockData,
+  PollingStationDataEntryGetHandler,
+  PollingStationDataEntrySaveHandler,
+} from "@kiesraad/api-mocks";
+import { overrideOnce, Providers, renderHook, server, waitFor } from "@kiesraad/test";
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <Providers>
@@ -19,6 +23,9 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 describe("PollingStationFormController", () => {
+  beforeEach(() => {
+    server.use(PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+  });
   test("PollingStationFormController renderHook", async () => {
     const { result } = renderHook(() => usePollingStationFormController(), {
       wrapper: Wrapper,

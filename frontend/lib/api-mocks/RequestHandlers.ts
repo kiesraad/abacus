@@ -20,25 +20,6 @@ type ParamsToString<T> = {
   [P in keyof T]: string;
 };
 
-type PingParams = Record<string, never>;
-type PingRequestBody = {
-  ping: string;
-};
-type PingResponseBody = {
-  pong: string;
-};
-
-// ping handler for testing
-const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>("/ping", async ({ request }) => {
-  const data = await request.json();
-
-  const pong = data.ping || "pong";
-
-  return HttpResponse.json({
-    pong,
-  });
-});
-
 // get election list handler
 export const ElectionListRequestHandler = http.get("/api/elections", () =>
   HttpResponse.json(electionListMockResponse, { status: 200 }),
@@ -112,7 +93,6 @@ export const PollingStationGetHandler = http.get<ParamsToString<POLLING_STATION_
 );
 
 export const handlers: HttpHandler[] = [
-  pingHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,

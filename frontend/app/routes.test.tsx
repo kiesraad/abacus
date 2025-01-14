@@ -1,8 +1,13 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { electionStatusMockResponse } from "@kiesraad/api-mocks";
-import { expectErrorPage, expectNotFound, overrideOnce, Providers, setupTestRouter } from "@kiesraad/test";
+import {
+  ElectionListRequestHandler,
+  ElectionRequestHandler,
+  electionStatusMockResponse,
+  ElectionStatusRequestHandler,
+} from "@kiesraad/api-mocks";
+import { expectErrorPage, expectNotFound, overrideOnce, Providers, server, setupTestRouter } from "@kiesraad/test";
 
 import { routes } from "./routes";
 
@@ -14,6 +19,8 @@ const renderWithRouter = () => {
 
 describe("routes", () => {
   beforeEach(() => {
+    server.use(ElectionListRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
+
     // Since we test what happens after an error, we want vitest to ignore them
     vi.spyOn(console, "error").mockImplementation(() => {
       /* do nothing */

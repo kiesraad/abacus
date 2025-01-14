@@ -3,8 +3,15 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { PollingStationLayout } from "app/module/data_entry";
 
 import { Election, ElectionListProvider, ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
-import { electionDetailsMockResponse, pollingStationMockData } from "@kiesraad/api-mocks";
-import { overrideOnce, render, screen, within } from "@kiesraad/test";
+import {
+  electionDetailsMockResponse,
+  ElectionListRequestHandler,
+  ElectionRequestHandler,
+  ElectionStatusRequestHandler,
+  PollingStationDataEntryGetHandler,
+  pollingStationMockData,
+} from "@kiesraad/api-mocks";
+import { render, screen, server, within } from "@kiesraad/test";
 
 import { PollingStationFormController } from "../../../component/form/data_entry/PollingStationFormController";
 
@@ -17,7 +24,12 @@ describe("PollingStationLayout", () => {
   const election = electionDetailsMockResponse.election as Required<Election>;
 
   beforeEach(() => {
-    overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+    server.use(
+      ElectionListRequestHandler,
+      ElectionRequestHandler,
+      ElectionStatusRequestHandler,
+      PollingStationDataEntryGetHandler,
+    );
   });
 
   test("Render", async () => {

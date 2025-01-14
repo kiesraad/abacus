@@ -173,4 +173,39 @@ describe("PollingStationForm", () => {
       expect(onSaved).toHaveBeenCalled();
     });
   });
+
+  test("Client errors after server error", async () => {
+    const onSaved = vi.fn();
+    render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+    const inputs = getInputs();
+
+    const user = userEvent.setup();
+
+    //generate server error:
+    overrideOnce("post", `/api/elections/1/polling_stations`, 409, {
+      error: "Polling station already exists",
+      fatal: false,
+      reference: "EntryNotUnique",
+    } satisfies ErrorResponse);
+    await user.type(inputs.number, "42");
+    await user.type(inputs.name, "A great name");
+
+    await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        ["Er bestaat al een stembureau met nummer 42.", "Het nummer van het stembureau moet uniek zijn."].join(""),
+      );
+    });
+
+    //generate client error:
+    await user.type(inputs.number, "asd");
+    await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+    await waitFor(() => {
+      expect(inputs.number).toHaveAccessibleErrorMessage("Dit is geen getal. Voer een getal in");
+    });
+
+    expect(onSaved).not.toHaveBeenCalled();
+  });
 });

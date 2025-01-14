@@ -34,13 +34,14 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
   const formRef = React.useRef<Form>(null);
 
   const { process, validationResult } = useForm<PollingStationRequest>(formFields);
-  const { requestState, create, update } = useCrud<PollingStation>({
+  const { requestState, create, update, reset } = useCrud<PollingStation>({
     create: `/api/elections/${electionId}/polling_stations`,
     update: pollingStation ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
   });
 
   const handleSubmit = (event: React.FormEvent<Form>) => {
     event.preventDefault();
+    reset();
     const elements = event.currentTarget.elements;
 
     const { isValid, requestObject } = process(elements);

@@ -9,7 +9,7 @@ export class PollingStationListPgObj {
   constructor(page: Page) {
     this.page = page;
 
-    this.alert = this.page.locator("role=alert");
-    this.createPollingStationButton = this.page.getByRole("button", { name: "Stembureau toevoegen" });
+    this.alert = page.locator("role=alert");
+    this.createPollingStationButton = page.getByRole("button", { name: "Stembureau toevoegen" });
   }
 }

@@ -14,10 +14,10 @@ SecondEntryNotStarted --> SecondEntryInProgress: claim
 #SecondEntryInProgress --> SecondEntryInProgress: save
 state is_equal <<choice>>
 is_equal --> Definitive: equal? yes
-is_equal --> EntriesNotEqual: equal? no
+is_equal --> EntriesDifferent: equal? no
 SecondEntryInProgress --> is_equal: finalise
 SecondEntryInProgress --> SecondEntryNotStarted: delete
-#EntriesNotEqual --> EntriesNotEqual: save
-# Will be Implemented in #130: EntriesNotEqual --> NotStarted: delete
-EntriesNotEqual --> Definitive: resolve
+#EntriesDifferent --> EntriesDifferent: save
+# Will be Implemented in #130: EntriesDifferent --> NotStarted: delete
+EntriesDifferent --> Definitive: resolve
 ```

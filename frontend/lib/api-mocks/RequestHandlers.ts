@@ -17,7 +17,7 @@ import {
 } from "@kiesraad/api";
 
 import { Database } from "./Database";
-import { electionListMockResponse, getElectionMockData } from "./ElectionMockData";
+import { getElectionMockData } from "./ElectionMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
 
 type ParamsToString<T> = {
@@ -107,17 +107,10 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
 
 // get polling stations
 export const PollingStationListRequestHandler = http.get<ParamsToString<POLLING_STATION_LIST_REQUEST_PARAMS>>(
-  "/api/elections/:election_id/polling_stations",
-  ({ params }) => {
-    const electionId = Number(params.election_id);
-    if (!electionListMockResponse.elections.some((e) => e.id === electionId)) {
-      return HttpResponse.json({}, { status: 404 });
-    }
-
-    const pollingStations = Database.pollingStations.filter((ps) => ps.election_id === electionId);
-    return HttpResponse.json({ polling_stations: pollingStations } satisfies PollingStationListResponse, {
-      status: 200,
-    });
+  "/api/elections/*/polling_stations",
+  () => {
+    const response: PollingStationListResponse = { polling_stations: pollingStationMockData };
+    return HttpResponse.json(response, { status: 200 });
   },
 );
 

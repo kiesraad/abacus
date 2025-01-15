@@ -7,7 +7,7 @@ import {
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationResults,
 } from "@kiesraad/api";
-import { electionMockData, politicalGroupMockData, pollingStationMockData } from "@kiesraad/api-mocks";
+import { electionMockData, politicalGroupMockData } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, within } from "@kiesraad/test";
 
 import {
@@ -60,11 +60,7 @@ describe("Test CandidatesVotesForm", () => {
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <PollingStationFormController
-          election={electionMockData}
-          pollingStationId={pollingStationMockData.id}
-          entryNumber={1}
-        >
+        <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>
       );
@@ -93,11 +89,7 @@ describe("Test CandidatesVotesForm", () => {
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <PollingStationFormController
-          election={electionMockData}
-          pollingStationId={pollingStationMockData.id}
-          entryNumber={1}
-        >
+        <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>
       );
@@ -282,11 +274,7 @@ describe("Test CandidatesVotesForm", () => {
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <PollingStationFormController
-          election={electionMockData}
-          pollingStationId={pollingStationMockData.id}
-          entryNumber={1}
-        >
+        <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>
       );

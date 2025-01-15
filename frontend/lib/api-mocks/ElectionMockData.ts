@@ -4,11 +4,10 @@ import {
   ElectionDetailsResponse,
   ElectionListResponse,
   ElectionStatusResponse,
-  NotFoundError,
   PoliticalGroup,
 } from "@kiesraad/api";
 
-import { getPollingStationMockData } from "./PollingStationMockData";
+import { pollingStationMockData } from "./PollingStationMockData";
 
 export const politicalGroupMockData: PoliticalGroup = {
   number: 1,
@@ -397,25 +396,18 @@ export const electionListMockResponse: ElectionListResponse = {
   ],
 };
 
-export const getElectionMockData = (election_id: number): Required<ElectionDetailsResponse> => {
-  const election = electionListMockResponse.elections.find((e) => e.id === election_id);
-
-  if (!election) {
-    throw new NotFoundError("error.election_not_found");
-  }
-
-  if (election_id === 2) {
-    election.political_groups = politicalGroupsMockData.slice(0, 2);
-  } else if (election_id === 3) {
-    election.political_groups = [];
-  } else {
-    election.political_groups = politicalGroupsMockData;
-  }
-
-  return { election, polling_stations: getPollingStationMockData(election_id) };
+export const getElectionMockData = (election: Partial<Election> = {}): Required<ElectionDetailsResponse> => {
+  return {
+    election: {
+      ...electionListMockResponse.elections[0]!,
+      political_groups: politicalGroupsMockData,
+      ...election,
+    },
+    polling_stations: pollingStationMockData,
+  };
 };
 
-export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData(1);
+export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
 export const electionMockData = electionDetailsMockResponse.election as Required<Election>;
 
 export const electionStatusMockResponse: ElectionStatusResponse = {

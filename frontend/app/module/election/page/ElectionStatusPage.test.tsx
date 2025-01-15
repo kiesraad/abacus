@@ -17,7 +17,7 @@ const renderElectionStatusPage = () =>
 
 describe("ElectionStatusPage", () => {
   test("Finish input not visible when data entry is in progress", () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(1));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData());
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
@@ -47,7 +47,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Finish input visible when data entry has finished", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(1));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData());
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
@@ -66,7 +66,7 @@ describe("ElectionStatusPage", () => {
   });
 
   test("Finish input not visible when election is finished", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData(5));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({ status: "DataEntryFinished" }));
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { id: 1, status: "definitive" },

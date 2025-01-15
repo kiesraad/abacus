@@ -72,10 +72,10 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
 
 // get election status handler
 export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
-  "/api/elections/:election_id/status",
+  "/api/elections/*/status",
   ({ params }) => {
     try {
-      getElectionMockData(Number(params.election_id));
+      getElectionMockData();
 
       const response: ElectionStatusResponse = {
         statuses: [],

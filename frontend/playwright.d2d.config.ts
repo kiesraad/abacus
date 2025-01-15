@@ -25,12 +25,12 @@ const config: PlaywrightTestConfig = defineConfig({
   testMatch: /\.e2e\.ts/,
   use: {
     ...commonConfig.use,
-    baseURL: "http://localhost:8081",
+    baseURL: "http://127.0.0.1:8081",
   },
   webServer: [
     {
       command: returnWebserverCommand(),
-      port: 8081,
+      url: "http://127.0.0.1:8081",
       stdout: "pipe",
       stderr: "pipe",
     },

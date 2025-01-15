@@ -16,8 +16,8 @@ use super::{validate_polling_station_results, DataError, ValidationResults};
 #[derive(Debug, PartialEq, Eq)]
 pub enum DataEntryTransitionError {
     Invalid,
-    FirstEntryAlreadyClaimed,
-    SecondEntryAlreadyClaimed,
+    EntryAlreadyClaimed,
+    EntryAlreadyFinalised,
     ValidatorError(DataError),
     ValidationError(ValidationResults),
 }
@@ -137,8 +137,9 @@ impl DataEntryStatus {
                 }))
             }
             DataEntryStatus::FirstEntryInProgress(_) => {
-                Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
+                Err(DataEntryTransitionError::EntryAlreadyClaimed)
             }
+            DataEntryStatus::Definitive(_) => Err(DataEntryTransitionError::EntryAlreadyFinalised),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -161,8 +162,9 @@ impl DataEntryStatus {
                 }))
             }
             DataEntryStatus::SecondEntryInProgress(_) => {
-                Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
+                Err(DataEntryTransitionError::EntryAlreadyClaimed)
             }
+            DataEntryStatus::Definitive(_) => Err(DataEntryTransitionError::EntryAlreadyFinalised),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -182,6 +184,12 @@ impl DataEntryStatus {
                     client_state,
                 }))
             }
+            DataEntryStatus::FirstEntryNotStarted => todo!(),
+            DataEntryStatus::SecondEntryNotStarted(_)
+            | DataEntryStatus::SecondEntryInProgress(_) => {
+                Err(DataEntryTransitionError::EntryAlreadyFinalised)
+            }
+            DataEntryStatus::Definitive(_) => Err(DataEntryTransitionError::EntryAlreadyFinalised),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -205,6 +213,7 @@ impl DataEntryStatus {
                 second_entry: entry,
                 client_state,
             })),
+            DataEntryStatus::Definitive(_) => Err(DataEntryTransitionError::EntryAlreadyFinalised),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -231,6 +240,11 @@ impl DataEntryStatus {
                     finalised_first_entry: state.first_entry,
                     first_entry_finished_at: Utc::now(),
                 }))
+            }
+            DataEntryStatus::SecondEntryNotStarted(_)
+            | DataEntryStatus::SecondEntryInProgress(_)
+            | DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::EntryAlreadyFinalised)
             }
             _ => Err(DataEntryTransitionError::Invalid),
         }
@@ -272,6 +286,7 @@ impl DataEntryStatus {
                     ))
                 }
             }
+            DataEntryStatus::Definitive(_) => Err(DataEntryTransitionError::EntryAlreadyFinalised),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -297,6 +312,7 @@ impl DataEntryStatus {
                     first_entry_finished_at,
                 },
             )),
+            DataEntryStatus::Definitive(_) => Err(DataEntryTransitionError::EntryAlreadyFinalised),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -305,6 +321,7 @@ impl DataEntryStatus {
     pub fn delete_entries(self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::EntriesDifferent(_) => Ok(Self::FirstEntryNotStarted),
+            DataEntryStatus::Definitive(_) => Err(DataEntryTransitionError::EntryAlreadyFinalised),
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -431,11 +448,11 @@ impl DataEntryStatus {
 impl Display for DataEntryTransitionError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DataEntryTransitionError::FirstEntryAlreadyClaimed => {
-                write!(f, "First entry already claimed")
+            DataEntryTransitionError::EntryAlreadyClaimed => {
+                write!(f, "Entry already claimed")
             }
-            DataEntryTransitionError::SecondEntryAlreadyClaimed => {
-                write!(f, "Second entry already claimed")
+            DataEntryTransitionError::EntryAlreadyFinalised => {
+                write!(f, "Entry already finalised")
             }
             DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
             DataEntryTransitionError::ValidatorError(data_error) => {
@@ -493,7 +510,7 @@ mod tests {
             status.claim_first_entry(0, PollingStationResults::default(), ClientState::default());
         assert_eq!(
             try_new_status,
-            Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
+            Err(DataEntryTransitionError::EntryAlreadyClaimed)
         );
     }
 }

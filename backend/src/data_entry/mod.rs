@@ -393,7 +393,7 @@ pub mod tests {
         .into_response()
     }
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_2")))]
     async fn test_create_data_entry(pool: SqlitePool) {
         let mut request_body = example_data_entry();
         request_body.data.voters_counts.poll_card_count = 100; // incorrect value
@@ -409,7 +409,7 @@ pub mod tests {
         assert_eq!(row_count.count, 1);
     }
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_2")))]
     async fn test_cannot_finalise_with_errors(pool: SqlitePool) {
         let mut request_body = example_data_entry();
         request_body.data.voters_counts.poll_card_count = 100; // incorrect value
@@ -421,7 +421,7 @@ pub mod tests {
         assert_eq!(response.status(), StatusCode::CONFLICT);
     }
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_2")))]
     async fn test_update_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();
         let response = save(pool.clone(), request_body.clone(), EntryNumber::FirstEntry).await;
@@ -449,7 +449,7 @@ pub mod tests {
         );
     }
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_2")))]
     async fn test_finalise_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();
 
@@ -459,7 +459,7 @@ pub mod tests {
         assert_eq!(response.status(), StatusCode::OK);
     }
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_2")))]
     async fn test_save_second_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();
 
@@ -489,7 +489,7 @@ pub mod tests {
         assert_eq!(row_count.count, 0);
     }
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_2")))]
     async fn test_finalise_second_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();
 
@@ -524,7 +524,7 @@ pub mod tests {
     }
 
     // test creating first and different second data entry
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_2")))]
     async fn test_first_second_data_entry_different(pool: SqlitePool) {
         // Save and finalise the first data entry
         let request_body = example_data_entry();
@@ -558,7 +558,7 @@ pub mod tests {
         assert_eq!(row_count.count, 0);
     }
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_2")))]
     async fn test_polling_station_data_entry_delete(pool: SqlitePool) {
         // create data entry
         let request_body = example_data_entry();
@@ -573,7 +573,7 @@ pub mod tests {
         assert_eq!(status, DataEntryStatus::FirstEntryNotStarted);
     }
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_2")))]
     async fn test_polling_station_data_entry_delete_nonexistent(pool: SqlitePool) {
         // check that deleting a non-existing data entry returns 404
         let response = polling_station_data_entry_delete(
@@ -586,7 +586,7 @@ pub mod tests {
         assert_eq!(response.status(), StatusCode::CONFLICT);
     }
 
-    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_1")))]
+    #[sqlx::test(fixtures(path = "../../fixtures", scripts("election_2")))]
     async fn test_data_entry_delete_finalised_not_possible(pool: SqlitePool) {
         for entry_number in 1..=2 {
             let entry_number = EntryNumber::try_from(entry_number).unwrap();

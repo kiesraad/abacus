@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-- [Node](https://nodejs.org) v20
+- [Node](https://nodejs.org) v22
 
 ### Building
 

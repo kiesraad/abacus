@@ -16,7 +16,7 @@ services:
 
   frontend:
     depends_on: [backend]
-    image: node:20
+    image: node:22
     ports:
       - 3000:3000
     volumes:

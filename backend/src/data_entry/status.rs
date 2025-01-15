@@ -495,47 +495,6 @@ mod tests {
         }
     }
 
-    #[test]
-    fn can_claim_not_started() {
-        let status = DataEntryStatus::FirstEntryNotStarted;
-        let entry = polling_station_result();
-        let client_state = ClientState::new_from_str(Some("{}")).unwrap();
-        let progress = 0;
-
-        let new_status = status
-            .claim_first_entry(progress, entry.clone(), client_state.clone())
-            .unwrap();
-
-        assert_eq!(
-            new_status,
-            DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
-                progress,
-                first_entry: entry,
-                client_state
-            })
-        );
-    }
-
-    #[test]
-    fn cannot_claim_already_claimed() {
-        let mut initial_entry = polling_station_result();
-        initial_entry.votes_counts.votes_candidates_count = 100;
-        let initial_entry = initial_entry;
-
-        let status = DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
-            progress: 0,
-            first_entry: initial_entry,
-            client_state: ClientState::new_from_str(Some("{}")).unwrap(),
-        });
-
-        let try_new_status =
-            status.claim_first_entry(0, polling_station_result(), ClientState::default());
-        assert_eq!(
-            try_new_status,
-            Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
-        );
-    }
-
     /// FirstEntryNotStarted --> FirstEntryInProgress: claim
     #[test]
     fn first_entry_not_started_to_first_entry_in_progress() {

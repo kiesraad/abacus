@@ -5,8 +5,8 @@ import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/
 import { test } from "./fixtures";
 
 test.describe("Polling station CRUD", () => {
-  test("it redirects correctly after succesful create", async ({ page }) => {
-    await page.goto("/elections/1/polling-stations#coordinator");
+  test("it redirects correctly after succesful create", async ({ page, emptyElection }) => {
+    await page.goto(`/elections/${emptyElection.id}/polling-stations#coordinator`);
 
     const pollingStationListPage = new PollingStationListPgObj(page);
     await pollingStationListPage.createPollingStationButton.click();

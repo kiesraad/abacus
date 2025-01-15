@@ -14,13 +14,13 @@ import {
   POLLING_STATION_UPDATE_REQUEST_PARAMS,
   PollingStation,
   PollingStationListResponse,
-  PollingStationRequest,
   SaveDataEntryResponse,
 } from "@kiesraad/api";
 
-import { Database, DataEntryRecord, pollingStationID } from "./Database";
+import { Database, DataEntryRecord } from "./Database";
 import { validate } from "./DataEntry";
 import { electionListMockResponse, getElectionMockData } from "./ElectionMockData";
+import { pollingStationMockData } from "./PollingStationMockData";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -233,82 +233,18 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
 });
 
 export const PollingStationCreateHandler = http.post<ParamsToString<POLLING_STATION_CREATE_REQUEST_PARAMS>>(
-  "/api/elections/:election_id/polling_stations",
-  async ({ request, params }) => {
-    const electionID = parseInt(params.election_id, 10);
-
-    const json = (await request.json()) as PollingStationRequest;
-
-    //check if exists
-    const ps = Database.pollingStations.find((ps) => ps.election_id === electionID && ps.number === json.number);
-    if (ps) {
-      const errorResponse: ErrorResponse = {
-        error: "Polling station already exists",
-        fatal: false,
-        reference: "EntryNotUnique",
-      };
-      return HttpResponse.json(errorResponse, { status: 409 });
-    }
-
-    const newPollingStation: PollingStation = {
-      id: pollingStationID(),
-      election_id: electionID,
-      ...json,
-    };
-
-    Database.pollingStations.push(newPollingStation);
-
-    return HttpResponse.json(newPollingStation, { status: 201 });
-  },
+  "/api/elections/*/polling_stations",
+  () => HttpResponse.json(pollingStationMockData[1]! satisfies PollingStation, { status: 201 }),
 );
 
 export const PollingStationUpdateHandler = http.put<ParamsToString<POLLING_STATION_UPDATE_REQUEST_PARAMS>>(
-  "/api/elections/:election_id/polling_stations/:polling_station_id",
-  async ({ request, params }) => {
-    const electionId = parseInt(params.election_id, 10);
-    const pollingStationId = parseInt(params.polling_station_id, 10);
-
-    const json = (await request.json()) as PollingStationRequest;
-
-    //check if exists
-    const ps = Database.pollingStations.find((ps) => ps.id === pollingStationId && ps.election_id === electionId);
-    if (ps) {
-      const updatedPollingStation: PollingStation = {
-        ...ps,
-        ...json,
-      };
-
-      Database.pollingStations = Database.pollingStations.map((ps) =>
-        ps.id === pollingStationId ? updatedPollingStation : ps,
-      );
-
-      return HttpResponse.text("", { status: 200 });
-    }
-
-    return HttpResponse.json(
-      {
-        error: "Not Found",
-        fatal: false,
-        reference: "EntryNotFound",
-      } satisfies ErrorResponse,
-      { status: 404 },
-    );
-  },
+  "/api/elections/*/polling_stations/*",
+  () => HttpResponse.text("", { status: 200 }),
 );
 
 export const PollingStationGetHandler = http.get<ParamsToString<POLLING_STATION_GET_REQUEST_PARAMS>>(
-  "/api/elections/:election_id/polling_stations/:polling_station_id",
-  ({ params }) => {
-    const electionId = parseInt(params.election_id, 10);
-    const pollingStationId = parseInt(params.polling_station_id, 10);
-
-    //check if exists
-    const ps = Database.pollingStations.find((ps) => ps.id === pollingStationId && ps.election_id === electionId);
-    if (ps) {
-      return HttpResponse.json(ps, { status: 200 });
-    }
-    return HttpResponse.text("Not Found", { status: 404 });
-  },
+  "/api/elections/*/polling_stations/*",
+  () => HttpResponse.json(pollingStationMockData[0]! satisfies PollingStation, { status: 200 }),
 );
 
 export const handlers: HttpHandler[] = [

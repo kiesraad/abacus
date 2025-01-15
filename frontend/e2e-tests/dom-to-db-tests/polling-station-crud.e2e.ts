@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
-import { PollingStationFormPgObj } from "e2e-tests/page-objects/crud/PollingStationFormPgObj";
-import { PollingStationListPgObj } from "e2e-tests/page-objects/crud/PollingStationListPgObj";
+import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
+import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 
 import { test } from "./fixtures";
 

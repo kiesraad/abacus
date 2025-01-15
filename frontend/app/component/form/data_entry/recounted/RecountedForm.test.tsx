@@ -1,9 +1,9 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { emptyDataEntryRequest } from "app/component/form/testHelperFunctions";
+import { emptyDataEntryRequest, errorWarningMocks } from "app/component/form/testHelperFunctions";
 
-import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@kiesraad/api";
+import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, SaveDataEntryResponse } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen } from "@kiesraad/test";
 
@@ -138,6 +138,10 @@ describe("Test RecountedForm", () => {
 
       expect(yes).not.toBeChecked();
       expect(no).not.toBeChecked();
+
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [errorWarningMocks.F101], warnings: [] },
+      } as SaveDataEntryResponse);
 
       await user.click(submitButton);
 

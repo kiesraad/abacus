@@ -70,7 +70,7 @@ export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: num
 
 // get election status handler
 export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
-  "/api/elections/*/status",
+  "/api/elections/:election_id/status",
   ({ params }) => {
     try {
       getElectionMockData();
@@ -107,7 +107,7 @@ export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_i
 
 // get polling stations
 export const PollingStationListRequestHandler = http.get<ParamsToString<POLLING_STATION_LIST_REQUEST_PARAMS>>(
-  "/api/elections/*/polling_stations",
+  "/api/elections/:election_id/polling_stations",
   () => {
     const response: PollingStationListResponse = { polling_stations: pollingStationMockData };
     return HttpResponse.json(response, { status: 200 });
@@ -119,7 +119,7 @@ export const PollingStationDataEntrySaveHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   SaveDataEntryResponse | ErrorResponse
->("/api/polling_stations/*/data_entries/*", () => {
+>("/api/polling_stations/:polling_station_id/data_entries/:entry_number", () => {
   const response: SaveDataEntryResponse = { validation_results: { errors: [], warnings: [] } };
   return HttpResponse.json(response, { status: 200 });
 });
@@ -134,25 +134,29 @@ export const PollingStationDataEntryGetHandler = http.get<
 // delete data entry handler
 export const PollingStationDataEntryDeleteHandler = http.delete<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
->("/api/polling_stations/*/data_entries/*", () => HttpResponse.text(null, { status: 204 }));
+>("/api/polling_stations/:polling_station_id/data_entries/:entry_number", () =>
+  HttpResponse.text(null, { status: 204 }),
+);
 
 // finalise data entry handler
 export const PollingStationDataEntryFinaliseHandler = http.post<
   ParamsToString<POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS>
->("/api/polling_stations/*/data_entries/*/finalise", () => HttpResponse.text(null, { status: 200 }));
+>("/api/polling_stations/:election_id/data_entries/:entry_number/finalise", () =>
+  HttpResponse.text(null, { status: 200 }),
+);
 
 export const PollingStationCreateHandler = http.post<ParamsToString<POLLING_STATION_CREATE_REQUEST_PARAMS>>(
-  "/api/elections/*/polling_stations",
+  "/api/elections/:election_id/polling_stations",
   () => HttpResponse.json(pollingStationMockData[1]! satisfies PollingStation, { status: 201 }),
 );
 
 export const PollingStationUpdateHandler = http.put<ParamsToString<POLLING_STATION_UPDATE_REQUEST_PARAMS>>(
-  "/api/elections/*/polling_stations/*",
+  "/api/elections/:election_id/polling_stations/:polling_station_id",
   () => HttpResponse.text("", { status: 200 }),
 );
 
 export const PollingStationGetHandler = http.get<ParamsToString<POLLING_STATION_GET_REQUEST_PARAMS>>(
-  "/api/elections/*/polling_stations/*",
+  "/api/elections/:election_id/polling_stations/:polling_station_id",
   () => HttpResponse.json(pollingStationMockData[0]! satisfies PollingStation, { status: 200 }),
 );
 

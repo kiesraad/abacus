@@ -1,9 +1,6 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
-  ElectionDetailsResponse,
-  ElectionListResponse,
-  ElectionStatusResponse,
   ErrorResponse,
   POLLING_STATION_CREATE_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
@@ -16,8 +13,7 @@ import {
   SaveDataEntryResponse,
 } from "@kiesraad/api";
 
-import { Database } from "./Database";
-import { getElectionMockData } from "./ElectionMockData";
+import { electionDetailsMockResponse, electionListMockResponse, electionStatusMockResponse } from "./ElectionMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
 
 type ParamsToString<T> = {
@@ -44,65 +40,20 @@ const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>("/p
 });
 
 // get election list handler
-export const ElectionListRequestHandler = http.get("/api/elections", () => {
-  const response: ElectionListResponse = {
-    elections: Database.elections.map((e) => ({ ...e, political_groups: undefined })),
-  };
-  return HttpResponse.json(response, { status: 200 });
-});
+export const ElectionListRequestHandler = http.get("/api/elections", () =>
+  HttpResponse.json(electionListMockResponse, { status: 200 }),
+);
 
 // get election details handler
 export const ElectionRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id",
-  ({ params }) => {
-    const election = Database.elections.find((e) => e.id === Number(params.election_id));
-    if (!election) {
-      return HttpResponse.text(null, { status: 404 });
-    }
-    const pollingStations = Database.pollingStations.filter((ps) => ps.election_id === Number(params.election_id));
-    const response: ElectionDetailsResponse = {
-      election,
-      polling_stations: pollingStations,
-    };
-    return HttpResponse.json(response, { status: 200 });
-  },
+  () => HttpResponse.json(electionDetailsMockResponse, { status: 200 }),
 );
 
 // get election status handler
 export const ElectionStatusRequestHandler = http.get<ParamsToString<{ election_id: number }>>(
   "/api/elections/:election_id/status",
-  ({ params }) => {
-    try {
-      getElectionMockData();
-
-      const response: ElectionStatusResponse = {
-        statuses: [],
-      };
-
-      const pollingStationIds = Database.pollingStations
-        .filter((ps) => ps.election_id === Number(params.election_id))
-        .map((ps) => ps.id);
-
-      for (const polling_station_id of pollingStationIds) {
-        if (Database.results.some((r) => r.pollingStationId === polling_station_id)) {
-          response.statuses.push({ polling_station_id, status: "definitive" });
-        } else if (Database.dataEntries.some((d) => d.pollingStationId === polling_station_id)) {
-          const dataEntry = Database.dataEntries.find((d) => d.pollingStationId === polling_station_id);
-          response.statuses.push({
-            polling_station_id,
-            status: "first_entry_in_progress",
-            first_data_entry_progress: dataEntry?.progress,
-          });
-        } else {
-          response.statuses.push({ polling_station_id, status: "first_entry_not_started" });
-        }
-      }
-
-      return HttpResponse.json(response, { status: 200 });
-    } catch {
-      return HttpResponse.text(null, { status: 404 });
-    }
-  },
+  () => HttpResponse.json(electionStatusMockResponse, { status: 200 }),
 );
 
 // get polling stations

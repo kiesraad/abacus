@@ -3,6 +3,7 @@ import { t } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
 export interface PollingStationDeleteModalProps {
+  electionId: number;
   pollingStationId: number;
   onDeleted: () => void;
   onError: () => void;
@@ -10,12 +11,13 @@ export interface PollingStationDeleteModalProps {
 }
 
 export function PollingStationDeleteModal({
+  electionId,
   pollingStationId,
   onDeleted,
   onCancel,
   onError,
 }: PollingStationDeleteModalProps) {
-  const { remove, requestState } = useCrud(`/api/polling_stations/${pollingStationId}`);
+  const { remove, requestState } = useCrud(`/api/elections/${electionId}/polling_stations/${pollingStationId}`);
 
   function handleDelete() {
     void remove().then((result) => {

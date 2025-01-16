@@ -5,6 +5,9 @@
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
+export type ELECTION_CREATE_REQUEST_PARAMS = Record<string, never>;
+export type ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
+export type ELECTION_CREATE_REQUEST_BODY = ElectionRequest;
 
 // /api/elections/{election_id}
 export interface ELECTION_DETAILS_REQUEST_PARAMS {
@@ -41,26 +44,29 @@ export interface POLLING_STATION_CREATE_REQUEST_PARAMS {
 export type POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
 export type POLLING_STATION_CREATE_REQUEST_BODY = PollingStationRequest;
 
+// /api/elections/{election_id}/polling_stations/{polling_station_id}
+export interface POLLING_STATION_GET_REQUEST_PARAMS {
+  election_id: number;
+  polling_station_id: number;
+}
+export type POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${number}/polling_stations/${number}`;
+export interface POLLING_STATION_UPDATE_REQUEST_PARAMS {
+  election_id: number;
+  polling_station_id: number;
+}
+export type POLLING_STATION_UPDATE_REQUEST_PATH = `/api/elections/${number}/polling_stations/${number}`;
+export type POLLING_STATION_UPDATE_REQUEST_BODY = PollingStationRequest;
+export interface POLLING_STATION_DELETE_REQUEST_PARAMS {
+  election_id: number;
+  polling_station_id: number;
+}
+export type POLLING_STATION_DELETE_REQUEST_PATH = `/api/elections/${number}/polling_stations/${number}`;
+
 // /api/elections/{election_id}/status
 export interface ELECTION_STATUS_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
-
-// /api/polling_stations/{polling_station_id}
-export interface POLLING_STATION_GET_REQUEST_PARAMS {
-  polling_station_id: number;
-}
-export type POLLING_STATION_GET_REQUEST_PATH = `/api/polling_stations/${number}`;
-export interface POLLING_STATION_UPDATE_REQUEST_PARAMS {
-  polling_station_id: number;
-}
-export type POLLING_STATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${number}`;
-export type POLLING_STATION_UPDATE_REQUEST_BODY = PollingStationRequest;
-export interface POLLING_STATION_DELETE_REQUEST_PARAMS {
-  polling_station_id: number;
-}
-export type POLLING_STATION_DELETE_REQUEST_PATH = `/api/polling_stations/${number}`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
 export interface POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS {
@@ -198,6 +204,21 @@ Does not include the candidate list (political groups) to keep the response size
  */
 export interface ElectionListResponse {
   elections: Election[];
+}
+
+/**
+ * Election request
+ */
+export interface ElectionRequest {
+  category: ElectionCategory;
+  election_date: string;
+  location: string;
+  name: string;
+  nomination_date: string;
+  number_of_seats: number;
+  number_of_voters: number;
+  political_groups: PoliticalGroup[];
+  status: ElectionStatus;
 }
 
 /**

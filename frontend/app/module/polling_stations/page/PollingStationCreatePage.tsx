@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 
 import { PollingStationForm } from "app/component/form/polling_station/PollingStationForm";
 import { NavBar } from "app/component/navbar/NavBar";
@@ -7,10 +7,8 @@ import { PollingStation, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
 import { PageTitle } from "@kiesraad/ui";
-import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationCreatePage() {
-  const electionId = useNumericParam("electionId");
   const { election } = useElection();
   const navigate = useNavigate();
 
@@ -41,7 +39,7 @@ export function PollingStationCreatePage() {
       </header>
       <main>
         <article>
-          <PollingStationForm electionId={electionId} onSaved={handleSaved} />
+          <PollingStationForm electionId={election.id} onSaved={handleSaved} />
         </article>
       </main>
     </>

@@ -21,7 +21,7 @@ pub struct PollingStationDataEntry {
 pub struct PollingStationResultsEntry {
     pub polling_station_id: u32,
     pub data: PollingStationResults,
-    pub created_at: i64,
+    pub created_at: DateTime<Utc>,
 }
 
 /// PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.

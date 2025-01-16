@@ -16,11 +16,20 @@ env:
 
 jobs:
   backend:
-    name: Backend
+    name: Backend (${{ matrix.target.os }})
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+        target: 
+          - os: ubuntu-latest
+            name: x86_64-unknown-linux-musl
+            binary: backend/target/x86_64-unknown-linux-musl/debug/abacus
+          - os: macos-latest
+            name: aarch64-apple-darwin
+            binary: backend/target/aarch64-apple-darwin/debug/abacus
+          - os: windows-latest
+            name: x86_64-pc-windows-msvc
+            binary: backend/target/x86_64-pc-windows-msvc/debug/abacus.exe
+    runs-on: ${{ matrix.target.os }}
     defaults:
       run:
         working-directory: ./backend
@@ -57,20 +66,25 @@ jobs:
             ./backend/target/
           key: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-
+      - name: Install musl
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+        if: matrix.target.os == 'ubuntu-latest'
+      - name: Install target
+        run: rustup target add ${{ matrix.target.name }}
       - name: Check rustfmt
         run: cargo --verbose --locked fmt --all -- --check
       - name: Check Clippy with all features
-        run: cargo --verbose --locked clippy --all-targets --all-features -- -D warnings
+        run: cargo --verbose --locked clippy --target=${{ matrix.target.name }} --all-targets --all-features -- -D warnings
       - name: Check Clippy without default features
-        run: cargo --verbose --locked clippy --all-targets --no-default-features -- -D warnings
+        run: cargo --verbose --locked clippy --target=${{ matrix.target.name }} --all-targets --no-default-features -- -D warnings
       - name: Run tests
-        run: cargo --verbose --locked test
+        run: cargo --verbose --locked test --target=${{ matrix.target.name }}
       - name: Build
-        run: cargo --verbose --locked build --features memory-serve
+        run: cargo --verbose --locked build --features memory-serve --target=${{ matrix.target.name }}
       - uses: actions/upload-artifact@v4
         with:
-          name: backend-build-${{ matrix.os }}
-          path: ${{ runner.os == 'Windows' && 'backend/target/debug/abacus.exe' || 'backend/target/debug/abacus' }}
+          name: abacus-${{ matrix.target.os }}
+          path: ${{ matrix.target.binary }}
   
   frontend:
     name: Frontend
@@ -121,37 +135,13 @@ jobs:
       - name: Run UI e2e tests
         run: npm run e2e:lib-ui
 
-  playwright-app:
-    name: Playwright app tests
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        working-directory: frontend
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Install dependencies
-        run: npm ci
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps --no-shell
-      - name: Run app e2e tests
-        run: npm run e2e:app
-
   playwright-d2d:
-    name: Playwright d2d tests (${{ matrix.os }}, ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
+    name: Playwright d2d tests (${{ matrix.os }})
     needs:
       - backend # frontend is included in backend build
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        shardIndex: [1, 2, 3]
-        shardTotal: [3]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -166,16 +156,16 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps --no-shell
-      - name: Download backend-build
+      - name: Download abacus
         uses: actions/download-artifact@v4
         with:
-          name: backend-build-${{ matrix.os }}
+          name: abacus-${{ matrix.os }}
           path: builds/backend
       - name: make backend build executable
         run: chmod a+x ../builds/backend/abacus
         if: runner.os != 'Windows'
       - name: Run DOM to Database e2e tests
-        run: npm run e2e:d2d -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: npm run e2e:d2d
 
   deploy:
     name: Deploy to abacus-test.nl
@@ -192,7 +182,7 @@ jobs:
       - name: Download abacus
         uses: actions/download-artifact@v4
         with:
-          name: backend-build-ubuntu-latest
+          name: abacus-ubuntu-latest
       - name: Upload binary to test server
         run: |
           curl -s \

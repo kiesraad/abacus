@@ -32,44 +32,48 @@ pub struct AppState {
 pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let data_entry_routes = Router::new()
         .route(
-            "/:entry_number",
+            "/{entry_number}",
             get(data_entry::polling_station_data_entry_get)
                 .post(data_entry::polling_station_data_entry_save)
                 .delete(data_entry::polling_station_data_entry_delete),
         )
         .route(
-            "/:entry_number/finalise",
+            "/{entry_number}/finalise",
             post(data_entry::polling_station_data_entry_finalise),
         );
 
-    let polling_station_routes = Router::new().route(
-        "/:polling_station_id",
-        get(polling_station::polling_station_get)
-            .put(polling_station::polling_station_update)
-            .delete(polling_station::polling_station_delete),
-    );
-
-    let election_routes = Router::new()
-        .route("/", get(election::election_list))
-        .route("/:election_id", get(election::election_details))
+    let polling_station_routes = Router::new()
         .route(
-            "/:election_id/download_zip_results",
-            get(election::election_download_zip_results),
-        )
-        .route(
-            "/:election_id/download_pdf_results",
-            get(election::election_download_pdf_results),
-        )
-        .route(
-            "/:election_id/download_xml_results",
-            get(election::election_download_xml_results),
-        )
-        .route(
-            "/:election_id/polling_stations",
+            "/",
             get(polling_station::polling_station_list)
                 .post(polling_station::polling_station_create),
         )
-        .route("/:election_id/status", get(data_entry::election_status));
+        .route(
+            "/{polling_station_id}",
+            get(polling_station::polling_station_get)
+                .put(polling_station::polling_station_update)
+                .delete(polling_station::polling_station_delete),
+        );
+
+    let election_routes = Router::new()
+        .route("/", get(election::election_list))
+        .route("/{election_id}", get(election::election_details))
+        .route(
+            "/{election_id}/download_zip_results",
+            get(election::election_download_zip_results),
+        )
+        .route(
+            "/{election_id}/download_pdf_results",
+            get(election::election_download_pdf_results),
+        )
+        .route(
+            "/{election_id}/download_xml_results",
+            get(election::election_download_xml_results),
+        )
+        .route("/{election_id}/status", get(data_entry::election_status));
+
+    #[cfg(feature = "dev-database")]
+    let election_routes = election_routes.route("/", post(election::election_create));
 
     let user_router = Router::new()
         .route("/login", post(authentication::login))
@@ -78,9 +82,12 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let app = Router::new()
         .nest("/api/user", user_router)
         .nest("/api/elections", election_routes)
-        .nest("/api/polling_stations", polling_station_routes)
         .nest(
-            "/api/polling_stations/:polling_station_id/data_entries",
+            "/api/elections/{election_id}/polling_stations",
+            polling_station_routes,
+        )
+        .nest(
+            "/api/polling_stations/{polling_station_id}/data_entries",
             data_entry_routes,
         );
 
@@ -126,6 +133,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             authentication::login,
             authentication::logout,
             election::election_list,
+            election::election_create,
             election::election_details,
             election::election_download_zip_results,
             election::election_download_pdf_results,
@@ -170,6 +178,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 election::CandidateGender,
                 election::ElectionListResponse,
                 election::ElectionDetailsResponse,
+                election::ElectionRequest,
                 polling_station::PollingStation,
                 polling_station::PollingStationListResponse,
                 polling_station::PollingStationType,

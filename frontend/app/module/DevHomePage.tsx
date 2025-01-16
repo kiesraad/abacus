@@ -1,14 +1,85 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import { MockTest } from "app/component/MockTest";
 import { NavBar } from "app/component/navbar/NavBar";
 
+import { ElectionListProvider, useElectionList } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { PageTitle } from "@kiesraad/ui";
+import { AppLayout, PageTitle } from "@kiesraad/ui";
+
+function DevLinks() {
+  const { electionList } = useElectionList();
+
+  return (
+    <>
+      <strong>{t("general")}</strong>
+      <ul>
+        <li>
+          <Link to={`/account`}>{t("user.account")}</Link>
+          <ul>
+            <li>
+              <Link to={`/account/login`}>{t("user.login")}</Link>
+            </li>
+            <li>
+              <Link to={`/account/setup`}>{t("user.account_setup")}</Link>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <strong>{t("typist")}</strong>
+      <ul>
+        <li>
+          <Link to={"/elections"}>{t("election.title.plural")}</Link>
+        </li>
+        <ul>
+          {electionList.map((election) => (
+            <li>
+              <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
+            </li>
+          ))}
+        </ul>
+      </ul>
+      <strong>
+        {t("administrator")} / {t("coordinator")}
+      </strong>
+      <ul>
+        <li>
+          <Link to={"/elections#administrator"}>{t("election.manage")}</Link>
+        </li>
+        <ul>
+          {electionList.map((election) => (
+            <li>
+              <Link to={`/elections/${election.id}#coordinator`}>{election.name}</Link>
+              <ul>
+                <li>
+                  <Link to={`/elections/${election.id}/status#coordinator`}>{t("election_status.main_title")}</Link>
+                </li>
+                <li>
+                  <Link to={`/elections/${election.id}/polling-stations#coordinator`}>
+                    {t("polling_station.title.plural")}
+                  </Link>
+                </li>
+              </ul>
+            </li>
+          ))}
+        </ul>
+        <li>
+          <Link to={`/users#administratorcoordinator`}>{t("user.manage")}</Link>
+        </li>
+        <li>
+          <Link to={`/workstations#administrator`}>{t("workstations.manage")}</Link>
+        </li>
+        <li>
+          <Link to={`/logs#administratorcoordinator`}>{t("activity_log")}</Link>
+        </li>
+      </ul>
+    </>
+  );
+}
 
 export function DevHomePage() {
   return (
-    <>
+    <AppLayout>
       <PageTitle title="Dev Homepage - Abacus" />
       <NavBar />
       <header>
@@ -18,66 +89,12 @@ export function DevHomePage() {
       </header>
       <main>
         <article>
-          <strong>{t("user.account")}</strong>
-          <ul>
-            <li>
-              <Link to={`/account`}>{t("user.account")}</Link>
-            </li>
-          </ul>
-          <strong>{t("typist")}</strong>
-          <ul>
-            <li>
-              <Link to={"/elections"}>{t("election.title.plural")}</Link>
-            </li>
-            <ul>
-              <li>
-                <Link to={`/elections/1/data-entry`}>
-                  {t("data_entry.title")} {t("election.title.singular")} 1
-                </Link>
-              </li>
-            </ul>
-          </ul>
-          <strong>
-            {t("administrator")} / {t("coordinator")}
-          </strong>
-          <ul>
-            <li>
-              <Link to={"/elections#administrator"}>{t("election.manage")}</Link>
-            </li>
-            <ul>
-              <li>
-                <Link to={`/elections/1#coordinator`}>{t("election.title.singular")} 1</Link>
-              </li>
-              <li>
-                <Link to={`/elections/1/status#coordinator`}>
-                  {t("election_status.main_title")} {t("election.title.singular")} 1
-                </Link>
-              </li>
-              <li>
-                <Link to={`/elections/1/polling-stations#coordinator`}>
-                  {t("polling_station.title.plural")} {t("election.title.singular")} 1
-                </Link>
-              </li>
-              <li>
-                <Link to={`/elections/3/polling-stations#coordinator`}>
-                  {t("polling_station.title.plural")} {t("election.title.singular")} 3 ({t("empty")})
-                </Link>
-              </li>
-            </ul>
-            <li>
-              <Link to={`/users#administratorcoordinator`}>{t("user.manage")}</Link>
-            </li>
-            <li>
-              <Link to={`/workstations#administrator`}>{t("workstations.manage")}</Link>
-            </li>
-            <li>
-              <Link to={`/logs#administratorcoordinator`}>{t("activity_log")}</Link>
-            </li>
-          </ul>
-
+          <ElectionListProvider>
+            <DevLinks />
+          </ElectionListProvider>
           {__API_MSW__ && <MockTest />}
         </article>
       </main>
-    </>
+    </AppLayout>
   );
 }

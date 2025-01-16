@@ -1,4 +1,4 @@
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router";
 
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -6,14 +6,12 @@ import { useElection, usePollingStationListRequest } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconPlus } from "@kiesraad/icon";
 import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
-import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationListPage() {
-  const electionId = useNumericParam("electionId");
   const { election } = useElection();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { requestState } = usePollingStationListRequest(electionId);
+  const { requestState } = usePollingStationListRequest(election.id);
 
   if (requestState.status === "loading") {
     return <Loader />;
@@ -33,9 +31,9 @@ export function PollingStationListPage() {
 
   const deletedPollingStation = searchParams.get("deleted");
 
-  const closeAlert = () => {
+  function closeAlert() {
     setSearchParams("");
-  };
+  }
 
   const labelForPollingStationType = {
     FixedLocation: t("polling_station.type.FixedLocation"),
@@ -101,7 +99,7 @@ export function PollingStationListPage() {
                   size="sm"
                   leftIcon={<IconPlus />}
                   onClick={() => {
-                    navigate("create");
+                    void navigate("create");
                   }}
                 >
                   {t("manual_input")}
@@ -118,7 +116,7 @@ export function PollingStationListPage() {
                   size="sm"
                   leftIcon={<IconPlus />}
                   onClick={() => {
-                    navigate("create");
+                    void navigate("create");
                   }}
                 >
                   {t("polling_station.form.create")}

@@ -1,4 +1,4 @@
-import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
+import { createRoutesFromElements, Navigate, Route } from "react-router";
 
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AdministratorLayout } from "app/module/AdministratorLayout";
@@ -41,7 +41,7 @@ export const routes = createRoutesFromElements(
     <Route path="account" element={<LoginLayout />}>
       <Route index element={<UserHomePage />} />
       <Route path="login" element={<LoginPage />} />
-      <Route path="account/setup" element={<AccountSetupPage />} />
+      <Route path="setup" element={<AccountSetupPage />} />
     </Route>
     <Route path="elections" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />

@@ -1,5 +1,4 @@
 use axum::{
-    async_trait,
     extract::{FromRef, FromRequestParts},
     http::request::Parts,
 };
@@ -38,7 +37,6 @@ impl User {
 
 /// Implement the FromRequestParts trait for User, this allows us to extract a User from a request
 /// using the user repository and the session cookie
-#[async_trait]
 impl<S> FromRequestParts<S> for User
 where
     Users: FromRequestParts<S>,

@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "engines": {
-    "node": ">=20.11.1"
+    "node": ">=22"
   },
   "scripts": {
     "dev": "cross-env API_MODE=mock vite",
@@ -40,7 +40,7 @@
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
     "@trivago/prettier-plugin-sort-imports": "^5.2.1",
-    "@types/node": "^20.17.12",
+    "@types/node": "^22.10.6",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^8.19.1",

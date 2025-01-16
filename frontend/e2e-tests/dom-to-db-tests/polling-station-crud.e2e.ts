@@ -18,7 +18,7 @@ test.describe("Polling station CRUD", () => {
       name: "test42",
     });
 
-    await form.submitCreate();
+    await form.create.click();
 
     expect(await pollingStationListPage.alert.textContent()).toContain("Stembureau 42 (test42) toegevoegd");
   });

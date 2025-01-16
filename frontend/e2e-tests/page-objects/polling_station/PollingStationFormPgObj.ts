@@ -20,10 +20,6 @@ export class PollingStationFormPgObj {
     this.create = page.getByRole("button", { name: "Opslaan en toevoegen" });
   }
 
-  async submitCreate() {
-    await this.create.click();
-  }
-
   async fillIn(values: Partial<Pick<PollingStation, "number" | "name">>) {
     if (values.number !== undefined) {
       await this.number.fill(values.number.toString());

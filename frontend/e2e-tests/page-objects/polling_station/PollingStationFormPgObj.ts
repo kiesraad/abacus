@@ -10,7 +10,6 @@ export class PollingStationFormPgObj {
   readonly name: Locator;
 
   readonly create: Locator;
-  readonly update: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -19,14 +18,10 @@ export class PollingStationFormPgObj {
     this.name = page.getByRole("textbox", { name: "Naam", exact: true });
 
     this.create = page.getByRole("button", { name: "Opslaan en toevoegen" });
-    this.update = page.getByRole("button", { name: "Wijzigingen opslaan" });
   }
 
   async submitCreate() {
     await this.create.click();
-  }
-  async submitUpdate() {
-    await this.update.click();
   }
 
   async fillIn(values: Partial<Pick<PollingStation, "number" | "name">>) {

@@ -25,7 +25,6 @@ export function PollingStationUpdatePage() {
 
   const [error, setError] = React.useState<[string, string] | undefined>(undefined);
 
-
   const parentUrl = `/elections/${election.id}/polling-stations`;
 
   function closeError() {

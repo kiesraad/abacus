@@ -27,6 +27,7 @@ fn get_pg_number_with_largest_average(
     whole_seats: &BTreeMap<u8, u64>,
     rest_seats: &BTreeMap<u8, u64>,
     remaining_seats: u64,
+    unique_pgs: Option<&Vec<u8>>,
 ) -> Result<u8, ApportionmentError> {
     let averages = pg_votes.iter().fold(BTreeMap::new(), |mut averages, pg| {
         let pg_total = Fraction::from_count(pg.total);
@@ -36,7 +37,9 @@ fn get_pg_number_with_largest_average(
             + rest_seats.get(&pg.number).unwrap_or(&0)
             + 1;
         let pg_avg_votes = pg_total / Fraction::from_u64(pg_seats_new);
-        averages.insert(pg.number, pg_avg_votes);
+        if unique_pgs.is_none() || unique_pgs.unwrap_or(&vec![]).contains(&pg.number) {
+            averages.insert(pg.number, pg_avg_votes);
+        }
         averages
     });
 
@@ -59,7 +62,6 @@ fn get_pg_number_with_largest_average(
         info!("Drawing of lots is needed but not yet implemented!");
         return Err(ApportionmentError::DrawingOfLotsNotImplemented);
     }
-
     Ok(pg_number)
 }
 
@@ -114,7 +116,6 @@ fn get_pg_number_with_largest_surplus(
         info!("Drawing of lots is needed but not yet implemented!");
         return Err(ApportionmentError::DrawingOfLotsNotImplemented);
     }
-
     Ok(pg_number)
 }
 
@@ -129,7 +130,7 @@ fn allocate_remaining_seats(
 
     if seats >= 19 {
         info!("Remaining seats calculation for 19 or more seats.");
-        // using greatest average system ("stelsel grootste gemiddelden")
+        // using largest averages system ("stelsel grootste gemiddelden")
         while remaining_seats > 0 {
             info!("======================================================");
             debug!("Remaining seats: {}", remaining_seats);
@@ -139,21 +140,25 @@ fn allocate_remaining_seats(
                 whole_seats,
                 &rest_seats,
                 remaining_seats,
+                None,
             )?;
-
             *rest_seats.entry(pg_number).or_insert(0) += 1;
             remaining_seats -= 1;
             // pg_number_last_remaining_seat = Some(pg_number);
             info!(
-                "Remaining seat assigned using greatest average system to pg_number: {}",
+                "Remaining seat assigned using largest averages system to pg_number: {}",
                 pg_number
             );
         }
     } else {
         info!("Remaining seats calculation for less than 19 seats.");
-        // using greatest surpluses system ("stelsel grootste overschotten")
+        // using largest surpluses system ("stelsel grootste overschotten")
         let mut surpluses =
             get_surplus_per_pg_where_total_votes_meets_the_threshold(pg_votes, whole_seats, quota);
+        let mut unique_pgs = pg_votes.iter().fold(Vec::new(), |mut unique_pgs, pg| {
+            unique_pgs.push(pg.number);
+            unique_pgs
+        });
         while remaining_seats > 0 {
             info!("======================================================");
             debug!("Remaining seats: {}", remaining_seats);
@@ -161,34 +166,40 @@ fn allocate_remaining_seats(
                 // assign remaining seat to the party with the largest surplus and
                 // remove that party and surplus from the list
                 let pg_number = get_pg_number_with_largest_surplus(&surpluses, remaining_seats)?;
-
                 *rest_seats.entry(pg_number).or_insert(0) += 1;
                 surpluses.remove(&pg_number);
                 remaining_seats -= 1;
                 // pg_number_last_remaining_seat = Some(pg_number);
                 info!(
-                    "Remaining seat assigned using greatest surplus system to pg_number: {}",
+                    "Remaining seat assigned using largest surpluses system to pg_number: {}",
                     pg_number
                 );
             } else {
                 // once there are no parties with surpluses left and more remaining seats exist,
-                // assign remaining seat to the party with the largest average
-                // using greatest averages system ("stelsel grootste gemiddelden")
+                // assign remaining seat to the unique political group with the largest average
+                // using unique largest averages system ("stelsel grootste gemiddelden")
+                // if there are still remaining seats after assigning each political group one,
+                // assign remaining seat to the political group with the largest average
+                // using largest averages system ("stelsel grootste gemiddelden")
                 let pg_number = get_pg_number_with_largest_average(
                     pg_votes,
                     whole_seats,
                     &rest_seats,
                     remaining_seats,
+                    if !unique_pgs.is_empty() {
+                        Some(&unique_pgs)
+                    } else {
+                        None
+                    },
                 )?;
-                // TODO: The formal description states that initially rest seats can only be
-                //  assigned to unique parties, but with even more remaining seats then multiple
-                //  seats can be assigned to the same party.
-                //  Should there be any limitation built in for this theoretical case?
                 *rest_seats.entry(pg_number).or_insert(0) += 1;
                 remaining_seats -= 1;
+                if !unique_pgs.is_empty() {
+                    unique_pgs.retain(|&pg_num| pg_num != pg_number);
+                }
                 // pg_number_last_remaining_seat = Some(pg_number);
                 info!(
-                    "Remaining seat assigned using greatest average system to pg_number: {}",
+                    "Remaining seat assigned using greatest averages system to pg_number: {}",
                     pg_number
                 );
             }

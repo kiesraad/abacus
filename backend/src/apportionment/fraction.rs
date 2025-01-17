@@ -1,11 +1,21 @@
 use crate::data_entry::Count;
+use serde::Serialize;
 use std::{
     fmt::{Debug, Display, Formatter, Result},
     ops::{Add, Div, Mul, Sub},
 };
+use utoipa::ToSchema;
 
 #[derive(Clone, Copy)]
 pub struct Fraction {
+    numerator: u64,
+    denominator: u64,
+}
+
+/// Fraction with the integer part split out for display purposes
+#[derive(Clone, Copy, Debug, Serialize, ToSchema)]
+pub struct DisplayFraction {
+    integer: u64,
     numerator: u64,
     denominator: u64,
 }
@@ -26,8 +36,8 @@ impl Fraction {
         Self::new(numerator, 1)
     }
 
-    // divide and return the whole number (integer division)
-    pub fn divide_and_return_whole_number(&self, other: &Self) -> u64 {
+    // divide and return the integer (integer division)
+    pub fn divide_and_return_integer(&self, other: &Self) -> u64 {
         (self.numerator * other.denominator) / (self.denominator * other.numerator)
     }
 }
@@ -104,13 +114,13 @@ impl Display for Fraction {
         if self.denominator == 0 {
             return write!(f, "NaN");
         }
-        let whole_number = self.numerator / self.denominator;
+        let integer = self.numerator / self.denominator;
         let remainder = self.numerator % self.denominator;
-        if whole_number > 0 {
+        if integer > 0 {
             if remainder > 0 {
-                write!(f, "{} {}/{}", whole_number, remainder, self.denominator)
+                write!(f, "{} {}/{}", integer, remainder, self.denominator)
             } else {
-                write!(f, "{}", whole_number)
+                write!(f, "{}", integer)
             }
         } else {
             write!(f, "{}/{}", self.numerator, self.denominator)
@@ -121,6 +131,23 @@ impl Display for Fraction {
 impl Debug for Fraction {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(f, "{}", self)
+    }
+}
+
+impl From<Fraction> for DisplayFraction {
+    fn from(fraction: Fraction) -> Self {
+        Self {
+            integer: fraction.numerator / fraction.denominator,
+            numerator: fraction.numerator % fraction.denominator,
+            denominator: fraction.denominator,
+        }
+    }
+}
+
+impl PartialEq for DisplayFraction {
+    fn eq(&self, other: &Self) -> bool {
+        (self.integer == other.integer)
+            && (self.numerator * other.denominator == self.denominator * other.numerator)
     }
 }
 
@@ -153,13 +180,10 @@ mod tests {
     }
 
     #[test]
-    fn test_divide_and_return_whole_number() {
+    fn test_divide_and_return_integer() {
         let fraction = Fraction::new(11, 5);
         let other_fraction = Fraction::new(1, 2);
-        assert_eq!(
-            fraction.divide_and_return_whole_number(&other_fraction),
-            4u64
-        );
+        assert_eq!(fraction.divide_and_return_integer(&other_fraction), 4u64);
     }
 
     #[test]
@@ -216,5 +240,31 @@ mod tests {
     #[test]
     fn test_smaller_than() {
         assert!(Fraction::new(1, 3) < Fraction::new(1, 2));
+    }
+
+    #[test]
+    fn test_display_fraction_integer_gt_0() {
+        let fraction = DisplayFraction::from(Fraction::new(11, 5));
+        assert_eq!(
+            fraction,
+            DisplayFraction {
+                integer: 2,
+                numerator: 1,
+                denominator: 5
+            }
+        );
+    }
+
+    #[test]
+    fn test_display_fraction_integer_0() {
+        let fraction = DisplayFraction::from(Fraction::new(2, 5));
+        assert_eq!(
+            fraction,
+            DisplayFraction {
+                integer: 0,
+                numerator: 2,
+                denominator: 5
+            }
+        );
     }
 }

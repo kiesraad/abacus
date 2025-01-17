@@ -1,11 +1,67 @@
-use crate::{
-    apportionment::fraction::Fraction, data_entry::PoliticalGroupVotes, summary::ElectionSummary,
-};
+use crate::{data_entry::PoliticalGroupVotes, summary::ElectionSummary};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use tracing::{debug, info};
+use utoipa::ToSchema;
 
-mod fraction;
+pub use self::fraction::*;
+
+pub mod fraction;
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ApportionmentResult {
+    seats: u64,
+    quota: DisplayFraction,
+    political_group_seats: Vec<PoliticalGroupSeats>,
+    rest_seat_allocation: RestSeatAllocationDetails,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct PoliticalGroupSeats {
+    political_group_number: u8,
+    whole_seats: u64,
+    rest_seats: u64,
+    total_seats: u64,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub enum RestSeatAllocationDetails {
+    RestSeatsAllocationDetailsLt19Seats(Lt19SeatsAllocation),
+    RestSeatsAllocationDetailsGte19Seats(Gte19SeatsAllocation),
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct Lt19SeatsAllocation {
+    largest_surpluses: Vec<LargestSurplusesAllocation>,
+    highest_averages_max_one: Vec<HighestAveragesAllocation>,
+    highest_averages_remainder: Vec<HighestAveragesAllocation>,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct Gte19SeatsAllocation {
+    highest_averages: Vec<HighestAveragesAllocation>,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct HighestAveragesAllocation {
+    rest_seat_number: u64,
+    averages: Vec<Average>,
+    assigned_to_political_group_number: u8,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct LargestSurplusesAllocation {
+    political_group_number: u8,
+    surplus: DisplayFraction,
+    rest_seats: u64,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct Average {
+    political_group_number: u8,
+    average: DisplayFraction,
+    highest: bool,
+}
 
 fn get_number_of_whole_seats_per_pg(
     pg_votes: &[PoliticalGroupVotes],
@@ -16,13 +72,13 @@ fn get_number_of_whole_seats_per_pg(
         .iter()
         .fold(BTreeMap::new(), |mut whole_seats, pg| {
             let pg_total = Fraction::from_count(pg.total);
-            let pg_seats = pg_total.divide_and_return_whole_number(quota);
+            let pg_seats = pg_total.divide_and_return_integer(quota);
             whole_seats.insert(pg.number, pg_seats);
             whole_seats
         })
 }
 
-fn get_pg_number_with_largest_average(
+fn get_pg_number_with_highest_average(
     pg_votes: &[PoliticalGroupVotes],
     whole_seats: &BTreeMap<u8, u64>,
     rest_seats: &BTreeMap<u8, u64>,
@@ -93,7 +149,7 @@ fn get_surplus_per_pg_where_total_votes_meets_the_threshold(
     })
 }
 
-fn get_pg_number_with_largest_surplus(
+fn get_pg_number_with_highest_surplus(
     surpluses: &BTreeMap<u8, Fraction>,
     remaining_seats: u64,
 ) -> Result<u8, ApportionmentError> {
@@ -130,12 +186,12 @@ fn allocate_remaining_seats(
 
     if seats >= 19 {
         info!("Remaining seats calculation for 19 or more seats.");
-        // using largest averages system ("stelsel grootste gemiddelden")
+        // using highest averages system ("stelsel grootste gemiddelden")
         while remaining_seats > 0 {
             info!("======================================================");
             debug!("Remaining seats: {}", remaining_seats);
-            // assign remaining seat to the party with the largest average
-            let pg_number = get_pg_number_with_largest_average(
+            // assign remaining seat to the party with the highest average
+            let pg_number = get_pg_number_with_highest_average(
                 pg_votes,
                 whole_seats,
                 &rest_seats,
@@ -145,13 +201,13 @@ fn allocate_remaining_seats(
             *rest_seats.entry(pg_number).or_insert(0) += 1;
             remaining_seats -= 1;
             info!(
-                "Remaining seat assigned using largest averages system to pg_number: {}",
+                "Remaining seat assigned using highest averages system to pg_number: {}",
                 pg_number
             );
         }
     } else {
         info!("Remaining seats calculation for less than 19 seats.");
-        // using largest surpluses system ("stelsel grootste overschotten")
+        // using highest surpluses system ("stelsel grootste overschotten")
         let mut surpluses =
             get_surplus_per_pg_where_total_votes_meets_the_threshold(pg_votes, whole_seats, quota);
         let mut unique_pgs = pg_votes.iter().fold(Vec::new(), |mut unique_pgs, pg| {
@@ -162,24 +218,24 @@ fn allocate_remaining_seats(
             info!("======================================================");
             debug!("Remaining seats: {}", remaining_seats);
             if !surpluses.is_empty() {
-                // assign remaining seat to the party with the largest surplus and
+                // assign remaining seat to the party with the highest surplus and
                 // remove that party and surplus from the list
-                let pg_number = get_pg_number_with_largest_surplus(&surpluses, remaining_seats)?;
+                let pg_number = get_pg_number_with_highest_surplus(&surpluses, remaining_seats)?;
                 *rest_seats.entry(pg_number).or_insert(0) += 1;
                 surpluses.remove(&pg_number);
                 remaining_seats -= 1;
                 info!(
-                    "Remaining seat assigned using largest surpluses system to pg_number: {}",
+                    "Remaining seat assigned using highest surpluses system to pg_number: {}",
                     pg_number
                 );
             } else {
                 // once there are no parties with surpluses left and more remaining seats exist,
                 // assign remaining seat to the unique political group with the largest average
-                // using unique largest averages system ("stelsel grootste gemiddelden")
+                // using unique highest averages system ("stelsel grootste gemiddelden")
                 // if there are still remaining seats after assigning each political group one,
-                // assign remaining seat to the political group with the largest average
-                // using largest averages system ("stelsel grootste gemiddelden")
-                let pg_number = get_pg_number_with_largest_average(
+                // assign remaining seat to the political group with the highest average
+                // using highest averages system ("stelsel grootste gemiddelden")
+                let pg_number = get_pg_number_with_highest_average(
                     pg_votes,
                     whole_seats,
                     &rest_seats,
@@ -196,7 +252,7 @@ fn allocate_remaining_seats(
                     unique_pgs.retain(|&pg_num| pg_num != pg_number);
                 }
                 info!(
-                    "Remaining seat assigned using greatest averages system to pg_number: {}",
+                    "Remaining seat assigned using highest averages system to pg_number: {}",
                     pg_number
                 );
             }

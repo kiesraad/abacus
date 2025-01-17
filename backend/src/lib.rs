@@ -154,7 +154,13 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         components(
             schemas(
                 ErrorResponse,
-                data_entry::DataEntry,
+                apportionment::ApportionmentResult,
+                apportionment::DisplayFraction,
+                apportionment::Lt19SeatsAllocation,
+                apportionment::Gte19SeatsAllocation,
+                apportionment::HighestAveragesAllocation,
+                apportionment::LargestSurplusesAllocation,
+                apportionment::PoliticalGroupSeats,
                 authentication::Credentials,
                 authentication::LoginResponse,
                 data_entry::CandidateVotes,

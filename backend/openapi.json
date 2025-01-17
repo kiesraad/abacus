@@ -1057,6 +1057,55 @@
   },
   "components": {
     "schemas": {
+      "ApportionmentResult": {
+        "type": "object",
+        "required": [
+          "seats",
+          "quota",
+          "political_group_seats",
+          "rest_seat_allocation"
+        ],
+        "properties": {
+          "political_group_seats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupSeats"
+            }
+          },
+          "quota": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "rest_seat_allocation": {
+            "$ref": "#/components/schemas/RestSeatAllocationDetails"
+          },
+          "seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "Average": {
+        "type": "object",
+        "required": [
+          "political_group_number",
+          "average",
+          "highest"
+        ],
+        "properties": {
+          "average": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "highest": {
+            "type": "boolean"
+          },
+          "political_group_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "Candidate": {
         "type": "object",
         "description": "Candidate",
@@ -1347,6 +1396,32 @@
             "type": "integer",
             "format": "int32",
             "description": "Number of unreturned ballots (\"Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?\")",
+            "minimum": 0
+          }
+        }
+      },
+      "DisplayFraction": {
+        "type": "object",
+        "description": "Fraction with the integer part split out for display purposes",
+        "required": [
+          "integer",
+          "numerator",
+          "denominator"
+        ],
+        "properties": {
+          "denominator": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "integer": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "numerator": {
+            "type": "integer",
+            "format": "int64",
             "minimum": 0
           }
         }
@@ -1675,6 +1750,69 @@
           }
         }
       },
+      "Gte19SeatsAllocation": {
+        "type": "object",
+        "required": [
+          "highest_averages"
+        ],
+        "properties": {
+          "highest_averages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HighestAveragesAllocation"
+            }
+          }
+        }
+      },
+      "HighestAveragesAllocation": {
+        "type": "object",
+        "required": [
+          "rest_seat_number",
+          "averages",
+          "assigned_to_political_group_number"
+        ],
+        "properties": {
+          "assigned_to_political_group_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "averages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Average"
+            }
+          },
+          "rest_seat_number": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "LargestSurplusesAllocation": {
+        "type": "object",
+        "required": [
+          "political_group_number",
+          "surplus",
+          "rest_seats"
+        ],
+        "properties": {
+          "political_group_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "rest_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "surplus": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          }
+        }
+      },
       "LoginResponse": {
         "type": "object",
         "required": [
@@ -1689,6 +1827,34 @@
           },
           "username": {
             "type": "string"
+          }
+        }
+      },
+      "Lt19SeatsAllocation": {
+        "type": "object",
+        "required": [
+          "largest_surpluses",
+          "highest_averages_max_one",
+          "highest_averages_remainder"
+        ],
+        "properties": {
+          "highest_averages_max_one": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HighestAveragesAllocation"
+            }
+          },
+          "highest_averages_remainder": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HighestAveragesAllocation"
+            }
+          },
+          "largest_surpluses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LargestSurplusesAllocation"
+            }
           }
         }
       },
@@ -1713,6 +1879,37 @@
           "number": {
             "type": "integer",
             "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "PoliticalGroupSeats": {
+        "type": "object",
+        "required": [
+          "political_group_number",
+          "whole_seats",
+          "rest_seats",
+          "total_seats"
+        ],
+        "properties": {
+          "political_group_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "rest_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "total_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "whole_seats": {
+            "type": "integer",
+            "format": "int64",
             "minimum": 0
           }
         }
@@ -1888,6 +2085,32 @@
           "FixedLocation",
           "Special",
           "Mobile"
+        ]
+      },
+      "RestSeatAllocationDetails": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "RestSeatsAllocationDetailsLt19Seats"
+            ],
+            "properties": {
+              "RestSeatsAllocationDetailsLt19Seats": {
+                "$ref": "#/components/schemas/Lt19SeatsAllocation"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "RestSeatsAllocationDetailsGte19Seats"
+            ],
+            "properties": {
+              "RestSeatsAllocationDetailsGte19Seats": {
+                "$ref": "#/components/schemas/Gte19SeatsAllocation"
+              }
+            }
+          }
         ]
       },
       "SaveDataEntryResponse": {

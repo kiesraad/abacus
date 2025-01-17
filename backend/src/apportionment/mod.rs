@@ -67,7 +67,7 @@ fn get_number_of_whole_seats_per_pg(
     pg_votes: &[PoliticalGroupVotes],
     quota: &Fraction,
 ) -> BTreeMap<u8, u64> {
-    // calculate number of whole seats for each party
+    // calculate number of whole seats for each political group
     pg_votes
         .iter()
         .fold(BTreeMap::new(), |mut whole_seats, pg| {
@@ -110,7 +110,7 @@ fn get_pg_number_with_highest_average(
     // if maximum occurs more than once, exit with error if less remaining seats are available than max count
     let max_count = averages.iter().filter(|(_, &n)| n == max).count() as u64;
     if max_count > remaining_seats {
-        // TODO: #788 if multiple parties have the same max and not enough remaining seats are available, use drawing of lots
+        // TODO: #788 if multiple political groups have the same max and not enough remaining seats are available, use drawing of lots
         debug!(
             "Max count: {} is higher than remaining seats: {}",
             max_count, remaining_seats
@@ -126,8 +126,8 @@ fn get_surplus_per_pg_where_total_votes_meets_the_threshold(
     whole_seats: &BTreeMap<u8, u64>,
     quota: &Fraction,
 ) -> BTreeMap<u8, Fraction> {
-    // get parties that have at least 3/4 (0.75) of the quota in total votes,
-    // and for each party calculate the amount of surplus votes,
+    // get political groups that have at least 3/4 (0.75) of the quota in total votes,
+    // and for each political group calculate the amount of surplus votes,
     // i.e. the number of total votes minus the quota times the number of whole seats
     let threshold = Fraction::new(3, 4) * *quota;
     debug!("Threshold: {}", threshold);
@@ -164,7 +164,7 @@ fn get_pg_number_with_highest_surplus(
     // if maximum occurs more than once, exit with error if less remaining seats are available than max count
     let max_count = surpluses.iter().filter(|(_, &n)| n == max).count() as u64;
     if max_count > remaining_seats {
-        // TODO: #788 if multiple parties have the same max and not enough remaining seats are available, use drawing of lots
+        // TODO: #788 if multiple political groups have the same max and not enough remaining seats are available, use drawing of lots
         debug!(
             "Max count: {} is higher than remaining seats: {}",
             max_count, remaining_seats
@@ -190,7 +190,7 @@ fn allocate_remaining_seats(
         while remaining_seats > 0 {
             info!("======================================================");
             debug!("Remaining seats: {}", remaining_seats);
-            // assign remaining seat to the party with the highest average
+            // assign remaining seat to the political group with the highest average
             let pg_number = get_pg_number_with_highest_average(
                 pg_votes,
                 whole_seats,
@@ -218,8 +218,8 @@ fn allocate_remaining_seats(
             info!("======================================================");
             debug!("Remaining seats: {}", remaining_seats);
             if !surpluses.is_empty() {
-                // assign remaining seat to the party with the highest surplus and
-                // remove that party and surplus from the list
+                // assign remaining seat to the political group with the highest surplus and
+                // remove that political group and surplus from the list
                 let pg_number = get_pg_number_with_highest_surplus(&surpluses, remaining_seats)?;
                 *rest_seats.entry(pg_number).or_insert(0) += 1;
                 surpluses.remove(&pg_number);
@@ -229,7 +229,7 @@ fn allocate_remaining_seats(
                     pg_number
                 );
             } else {
-                // once there are no parties with surpluses left and more remaining seats exist,
+                // once there are no political groups with surpluses left and more remaining seats exist,
                 // assign remaining seat to the unique political group with the largest average
                 // using unique highest averages system ("stelsel grootste gemiddelden")
                 // if there are still remaining seats after assigning each political group one,

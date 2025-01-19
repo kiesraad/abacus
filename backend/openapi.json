@@ -1062,11 +1062,10 @@
         "required": [
           "seats",
           "quota",
-          "political_group_seats",
-          "rest_seat_allocation"
+          "political_groups_seats"
         ],
         "properties": {
-          "political_group_seats": {
+          "political_groups_seats": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PoliticalGroupSeats"
@@ -1076,7 +1075,14 @@
             "$ref": "#/components/schemas/DisplayFraction"
           },
           "rest_seat_allocation": {
-            "$ref": "#/components/schemas/RestSeatAllocationDetails"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RestSeatAllocationDetails"
+              }
+            ]
           },
           "seats": {
             "type": "integer",
@@ -1790,7 +1796,7 @@
           }
         }
       },
-      "LargestSurplusesAllocation": {
+      "HighestSurplusesAllocation": {
         "type": "object",
         "required": [
           "political_group_number",
@@ -1833,7 +1839,7 @@
       "Lt19SeatsAllocation": {
         "type": "object",
         "required": [
-          "largest_surpluses",
+          "highest_surpluses",
           "highest_averages_max_one",
           "highest_averages_remainder"
         ],
@@ -1850,10 +1856,10 @@
               "$ref": "#/components/schemas/HighestAveragesAllocation"
             }
           },
-          "largest_surpluses": {
+          "highest_surpluses": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/LargestSurplusesAllocation"
+              "$ref": "#/components/schemas/HighestSurplusesAllocation"
             }
           }
         }

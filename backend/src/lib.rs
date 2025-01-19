@@ -159,7 +159,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 apportionment::Lt19SeatsAllocation,
                 apportionment::Gte19SeatsAllocation,
                 apportionment::HighestAveragesAllocation,
-                apportionment::LargestSurplusesAllocation,
+                apportionment::HighestSurplusesAllocation,
                 apportionment::PoliticalGroupSeats,
                 authentication::Credentials,
                 authentication::LoginResponse,

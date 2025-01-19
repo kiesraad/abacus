@@ -105,6 +105,19 @@ export type LOGOUT_REQUEST_PATH = `/api/user/logout`;
 
 /** TYPES **/
 
+export interface ApportionmentResult {
+  political_groups_seats: PoliticalGroupSeats[];
+  quota: DisplayFraction;
+  rest_seat_allocation?: null | RestSeatAllocationDetails;
+  seats: number;
+}
+
+export interface Average {
+  average: DisplayFraction;
+  highest: boolean;
+  political_group_number: number;
+}
+
 /**
  * Candidate
  */
@@ -166,6 +179,15 @@ export interface DifferencesCounts {
   too_few_ballots_handed_out_count: number;
   too_many_ballots_handed_out_count: number;
   unreturned_ballots_count: number;
+}
+
+/**
+ * Fraction with the integer part split out for display purposes
+ */
+export interface DisplayFraction {
+  denominator: number;
+  integer: number;
+  numerator: number;
 }
 
 /**
@@ -302,9 +324,31 @@ export interface GetDataEntryResponse {
   validation_results: ValidationResults;
 }
 
+export interface Gte19SeatsAllocation {
+  highest_averages: HighestAveragesAllocation[];
+}
+
+export interface HighestAveragesAllocation {
+  assigned_to_political_group_number: number;
+  averages: Average[];
+  rest_seat_number: number;
+}
+
+export interface HighestSurplusesAllocation {
+  political_group_number: number;
+  rest_seats: number;
+  surplus: DisplayFraction;
+}
+
 export interface LoginResponse {
   user_id: number;
   username: string;
+}
+
+export interface Lt19SeatsAllocation {
+  highest_averages_max_one: HighestAveragesAllocation[];
+  highest_averages_remainder: HighestAveragesAllocation[];
+  highest_surpluses: HighestSurplusesAllocation[];
 }
 
 /**
@@ -314,6 +358,13 @@ export interface PoliticalGroup {
   candidates: Candidate[];
   name: string;
   number: number;
+}
+
+export interface PoliticalGroupSeats {
+  political_group_number: number;
+  rest_seats: number;
+  total_seats: number;
+  whole_seats: number;
 }
 
 export interface PoliticalGroupVotes {

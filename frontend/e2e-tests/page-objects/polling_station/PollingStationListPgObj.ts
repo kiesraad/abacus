@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
-export class PollingStationListEmptyElectionPgObj {
+export class PollingStationListPgObj {
   protected readonly page: Page;
 
   readonly alert: Locator;
@@ -10,6 +10,6 @@ export class PollingStationListEmptyElectionPgObj {
     this.page = page;
 
     this.alert = page.locator("role=alert");
-    this.createPollingStation = page.getByRole("button", { name: "Handmatig invullen" });
+    this.createPollingStation = page.getByRole("button", { name: "Stembureau toevoegen" });
   }
 }

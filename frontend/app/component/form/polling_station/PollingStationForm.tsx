@@ -69,7 +69,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
 
   const numberFieldError = validationResult.number
     ? t(`form.errors.${validationResult.number}`)
-    : requestState.status === "api-error" && requestState.error.reference === "EntryNotUnique"
+    : isValid && requestState.status === "api-error" && requestState.error.reference === "EntryNotUnique"
       ? t("polling_station.form.not_unique.error")
       : undefined;
 

@@ -2,12 +2,7 @@ import { useEffect, useState } from "react";
 
 import { ApiResult } from "./api.types";
 import { useApi } from "./useApi";
-import {
-  ApiRequestState,
-  ApiRequestStateWithoutFatalErrors,
-  fatalRequestState,
-  handleApiResult,
-} from "./useApiRequest";
+import { ApiRequestState, fatalRequestState, handleApiResult } from "./useApiRequest";
 
 export type CrudRequestState<T> =
   | {
@@ -20,12 +15,7 @@ export interface UseCrudReturn<T> {
   create: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
   update: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
   remove: (controller?: AbortController) => Promise<ApiResult<T>>;
-  reset: () => void; // Reset the request state to idle
   requestState: CrudRequestState<T>;
-}
-
-export interface UseLimitedCrudReturn<T> extends UseCrudReturn<T> {
-  requestState: ApiRequestStateWithoutFatalErrors<T>;
 }
 
 export type ApiPaths =
@@ -98,16 +88,11 @@ export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
     return handleApiResult(result, setRequestState, controller);
   };
 
-  const reset = () => {
-    setRequestState({ status: "idle" });
-  };
-
   return {
     get,
     create,
     update,
     remove,
     requestState,
-    reset,
   };
 }

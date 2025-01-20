@@ -33,15 +33,14 @@ const formFields: FormFields<PollingStationRequest> = {
 export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
   const formRef = React.useRef<Form>(null);
 
-  const { process, validationResult } = useForm<PollingStationRequest>(formFields);
-  const { requestState, create, update, reset } = useCrud<PollingStation>({
+  const { process, isValid, validationResult } = useForm<PollingStationRequest>(formFields);
+  const { requestState, create, update } = useCrud<PollingStation>({
     create: `/api/elections/${electionId}/polling_stations`,
     update: pollingStation ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
   });
 
   const handleSubmit = (event: React.FormEvent<Form>) => {
     event.preventDefault();
-    reset();
     const elements = event.currentTarget.elements;
 
     const { isValid, requestObject } = process(elements);
@@ -76,7 +75,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
 
   return (
     <div>
-      {requestState.status === "api-error" && (
+      {isValid && requestState.status === "api-error" && (
         <FormLayout.Alert>
           {requestState.error.reference === "EntryNotUnique" ? (
             <Alert type="error">

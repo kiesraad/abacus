@@ -68,6 +68,12 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
     }
   };
 
+  const numberFieldError = validationResult.number
+    ? t(`form.errors.${validationResult.number}`)
+    : requestState.status === "api-error" && requestState.error.reference === "EntryNotUnique"
+      ? " "
+      : undefined;
+
   return (
     <div>
       {requestState.status === "api-error" && (
@@ -100,13 +106,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 fieldWidth="narrowest"
                 margin="mb-md-lg"
                 defaultValue={pollingStation?.number}
-                error={
-                  validationResult.number
-                    ? t(`form.errors.${validationResult.number}`)
-                    : requestState.status === "api-error" && requestState.error.reference === "EntryNotUnique"
-                      ? " "
-                      : undefined
-                }
+                error={numberFieldError}
                 hideErrorMessage={requestState.status === "api-error"}
               />
               <InputField

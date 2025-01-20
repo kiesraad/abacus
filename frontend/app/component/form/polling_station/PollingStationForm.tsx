@@ -100,7 +100,13 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 fieldWidth="narrowest"
                 margin="mb-md-lg"
                 defaultValue={pollingStation?.number}
-                error={validationResult.number ? t(`form.errors.${validationResult.number}`) : undefined}
+                error={
+                  validationResult.number
+                    ? t(`form.errors.${validationResult.number}`)
+                    : requestState.status === "api-error" && requestState.error.reference === "EntryNotUnique"
+                      ? " "
+                      : undefined
+                }
                 hideErrorMessage={requestState.status === "api-error"}
               />
               <InputField

@@ -389,25 +389,24 @@ pub fn seat_allocation(
     // TODO: #785 Add check for absolute majority of votes vs seats and adjust last remaining seat allocated accordingly
 
     info!("======================================================");
-    let political_groups_seats =
-        &totals
-            .political_group_votes
-            .iter()
-            .fold(Vec::new(), |mut political_groups_seats, pg| {
-                let whole_seats = whole_seats.get(&pg.number).unwrap_or(&0);
-                let rest_seats = rest_seats.get(&pg.number).unwrap_or(&0);
-                political_groups_seats.push(PoliticalGroupSeats {
-                    political_group_number: pg.number,
-                    whole_seats: *whole_seats,
-                    rest_seats: *rest_seats,
-                    total_seats: *whole_seats + *rest_seats,
-                });
-                political_groups_seats
-            });
+    let political_groups_seats = totals
+        .political_group_votes
+        .iter()
+        .map(|pg| {
+            let whole_seats = whole_seats.get(&pg.number).unwrap_or(&0);
+            let rest_seats = rest_seats.get(&pg.number).unwrap_or(&0);
+            PoliticalGroupSeats {
+                political_group_number: pg.number,
+                whole_seats: *whole_seats,
+                rest_seats: *rest_seats,
+                total_seats: *whole_seats + *rest_seats,
+            }
+        })
+        .collect();
     Ok(ApportionmentResult {
         seats,
         quota: DisplayFraction::from(quota),
-        political_groups_seats: political_groups_seats.clone(), // TODO: Why does this need .clone()?
+        political_groups_seats,
         rest_seat_allocation,
     })
 }

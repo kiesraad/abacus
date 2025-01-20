@@ -16,9 +16,10 @@ import {
 } from "@kiesraad/ui";
 
 import { getUrlForFormSectionID } from "../../../pollingstation/utils";
-import { FormSectionID } from "../PollingStationFormController";
-import { getPollingStationSummary, PollingStationFormSectionStatus } from "../pollingStationUtils";
-import { usePollingStationFormController } from "../usePollingStationFormController";
+import { getPollingStationSummary, PollingStationFormSectionStatus } from "../state/dataEntryUtils";
+import { FormSectionId } from "../state/types";
+import useDataEntry from "../state/useDataEntry";
+import { useDataEntryContext } from "../state/useDataEntryContext";
 
 export function CheckAndSaveForm() {
   const formRef = React.useRef<HTMLFormElement>(null);
@@ -26,23 +27,17 @@ export function CheckAndSaveForm() {
 
   const navigate = useNavigate();
   const { election } = useElection();
-  const { registerCurrentForm, formState, status, finaliseDataEntry, pollingStationId, entryNumber } =
-    usePollingStationFormController();
+  const { formState, status, onFinaliseDataEntry, pollingStationId, entryNumber } = useDataEntryContext({
+    id: "save",
+    type: "save",
+  });
 
   const getUrlForFormSection = React.useCallback(
-    (id: FormSectionID) => {
+    (id: FormSectionId) => {
       return getUrlForFormSectionID(election.id, pollingStationId, entryNumber, id);
     },
     [election, pollingStationId, entryNumber],
   );
-
-  React.useEffect(() => {
-    registerCurrentForm({
-      id: "save",
-      type: "save",
-      getValues: () => ({}),
-    });
-  }, [registerCurrentForm]);
 
   const summary = React.useMemo(() => {
     return getPollingStationSummary(formState);
@@ -57,7 +52,7 @@ export function CheckAndSaveForm() {
 
       if (!finalisationAllowed) return;
 
-      await finaliseDataEntry();
+      await onFinaliseDataEntry();
       await navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
     })(event);
 
@@ -124,7 +119,7 @@ export function CheckAndSaveForm() {
       {finalisationAllowed && (
         <BottomBar type="form">
           <BottomBar.Row>
-            <Button type="submit" size="lg" disabled={status.current === "finalising"}>
+            <Button type="submit" size="lg" disabled={status === "finalising"}>
               {t("save")}
             </Button>
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

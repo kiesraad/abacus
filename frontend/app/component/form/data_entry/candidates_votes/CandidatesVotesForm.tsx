@@ -18,7 +18,7 @@ import {
 import { candidateNumberFromId, deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
-import { getErrorsAndWarnings } from "../pollingStationUtils";
+import { getErrorsAndWarnings } from "../state/dataEntryUtils";
 import { usePoliticalGroup } from "./usePoliticalGroups";
 
 interface FormElements extends HTMLFormControlsCollection {

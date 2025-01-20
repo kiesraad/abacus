@@ -1,9 +1,9 @@
 import { useContext, useEffect } from "react";
 
 import { DataEntryContext } from "./DataEntryContext";
-import { FormSectionReference } from "./types";
+import { DataEntryStateAndActionsLoaded, FormSectionReference } from "./types";
 
-export function useDataEntryContext(form: FormSectionReference) {
+export function useDataEntryContext(form?: FormSectionReference): DataEntryStateAndActionsLoaded {
   const context = useContext(DataEntryContext);
 
   if (!context) {
@@ -12,11 +12,10 @@ export function useDataEntryContext(form: FormSectionReference) {
 
   // register the current form
   useEffect(() => {
-    context.dispatch({
-      type: "REGISTER_CURRENT_FORM",
-      form,
-    });
-  }, []);
+    if (form && context.currentForm.id !== form.id) {
+      context.register(form);
+    }
+  }, [form]);
 
   return context;
 }

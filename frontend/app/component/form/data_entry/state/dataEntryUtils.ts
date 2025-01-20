@@ -2,20 +2,10 @@ import { ErrorsAndWarnings } from "lib/api/api.types";
 
 import { Election, PollingStationResults, ValidationResult, ValidationResults } from "@kiesraad/api";
 import { ValidationResultType } from "@kiesraad/ui";
-import { deepEqual, fieldNameFromPath, FieldSection, objectHasOnlyEmptyValues, rootFieldSection } from "@kiesraad/util";
+import { fieldNameFromPath, FieldSection, objectHasOnlyEmptyValues, rootFieldSection } from "@kiesraad/util";
 
-import { DifferencesValues } from "../differences/useDifferences";
-import { RecountedValue } from "../recounted/useRecounted";
-import { VotersAndVotesValues } from "../voters_and_votes/useVotersAndVotes";
 import { INITIAL_FORM_SECTION_ID } from "./reducer";
-import {
-  ClientState,
-  ClientValidationResult,
-  FormSection,
-  FormSectionId,
-  FormSectionReference,
-  FormState,
-} from "./types";
+import { ClientState, ClientValidationResult, FormSection, FormSectionId, FormState } from "./types";
 
 function checkAndAddValidationResult(
   section: FormSection,

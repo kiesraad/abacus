@@ -1,6 +1,5 @@
 import { Outlet } from "react-router";
-
-import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
+import { DataEntryProvider } from "app/component/form/data_entry/state/DataEntryProvider";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 import { AbortDataEntryControl } from "app/module/data_entry";
 
@@ -8,8 +7,6 @@ import { NotFoundError, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Badge, PageTitle, PollingStationNumber, StickyNav, WorkStationNumber } from "@kiesraad/ui";
 import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";
-
-import { PollingStationFormController } from "../../../component/form/data_entry/PollingStationFormController";
 
 export function PollingStationLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
@@ -26,7 +23,7 @@ export function PollingStationLayout() {
   }
 
   return (
-    <PollingStationFormController election={election} pollingStationId={pollingStation.id} entryNumber={entryNumber}>
+    <DataEntryProvider election={election} pollingStationId={pollingStation.id} entryNumber={entryNumber}>
       <PageTitle title={`${t("data_entry.title")} ${pollingStation.number} ${pollingStation.name} - Abacus`} />
       <header>
         <section className="smaller-gap">
@@ -44,10 +41,9 @@ export function PollingStationLayout() {
           <PollingStationProgress />
         </StickyNav>
         <article>
-          <PollingStationFormNavigation pollingStationId={pollingStation.id} election={election} />
           <Outlet />
         </article>
       </main>
-    </PollingStationFormController>
+    </DataEntryProvider>
   );
 }

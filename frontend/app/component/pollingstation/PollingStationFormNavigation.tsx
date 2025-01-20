@@ -1,26 +1,39 @@
 import * as React from "react";
-import { BlockerFunction, useBlocker, useNavigate } from "react-router";
+import { useBlocker, useNavigate } from "react-router";
 
-import { AbortDataEntryModal } from "app/module/data_entry";
-
-import { Election, PollingStationResults } from "@kiesraad/api";
+import { ApiError, PollingStationResults } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
 import { ErrorModal } from "../error";
-import { AnyFormReference, FormSectionID, FormState } from "../form/data_entry/PollingStationFormController";
-import { currentFormHasChanges } from "../form/data_entry/pollingStationUtils";
-import { usePollingStationFormController } from "../form/data_entry/usePollingStationFormController";
+import { FormSectionId, SubmitCurrentFormOptions } from "../form/data_entry/state/types";
+import { useDataEntryContext } from "../form/data_entry/state/useDataEntryContext";
 import { getUrlForFormSectionID } from "./utils";
 
 export interface PollingStationFormNavigationProps {
-  pollingStationId: number;
-  election: Required<Election>;
+  onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>;
+  currentValues: Partial<PollingStationResults>;
+  hasChanges: boolean;
+  acceptWarnings: boolean;
 }
 
-export function PollingStationFormNavigation({ pollingStationId, election }: PollingStationFormNavigationProps) {
-  const { status, formState, apiError, currentForm, values, setTemporaryCache, submitCurrentForm, entryNumber } =
-    usePollingStationFormController();
+export function PollingStationFormNavigation({
+  onSubmit,
+  currentValues,
+  acceptWarnings,
+  hasChanges,
+}: PollingStationFormNavigationProps) {
+  const {
+    status,
+    election,
+    pollingStationId,
+    formState,
+    error,
+    currentForm,
+    setCache,
+    entryNumber,
+    onDeleteDataEntry,
+  } = useDataEntryContext();
 
   const navigate = useNavigate();
 
@@ -30,50 +43,57 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
     [election, pollingStationId, entryNumber],
   );
 
-  const getUrlForFormSection = React.useCallback(
-    (id: FormSectionID) => {
-      return getUrlForFormSectionID(election.id, pollingStationId, entryNumber, id);
-    },
-    [election, pollingStationId, entryNumber],
-  );
+  const getUrlForFormSection = (id: FormSectionId) =>
+    getUrlForFormSectionID(election.id, pollingStationId, entryNumber, id);
 
-  const shouldBlock = React.useCallback<BlockerFunction>(
-    ({ currentLocation, nextLocation }) => {
-      if (
-        status.current === "deleted" ||
-        status.current === "finalised" ||
-        status.current === "aborted" ||
-        currentLocation.pathname === nextLocation.pathname ||
-        !currentForm
-      ) {
+  const blocker = useBlocker(({ currentLocation, nextLocation }) => {
+    if (
+      status === "deleted" ||
+      status === "finalised" ||
+      status === "aborted" ||
+      currentLocation.pathname === nextLocation.pathname ||
+      !currentForm
+    ) {
+      return false;
+    }
+
+    //check if nextLocation is outside the data entry flow
+    if (!isPartOfDataEntryFlow(nextLocation.pathname)) {
+      return true;
+    }
+
+    const reasons: BlockReason[] = [];
+    const formSection = formState.sections[currentForm.id];
+    if (formSection) {
+      if (formSection.errors.length > 0) {
+        reasons.push("errors");
+      }
+
+      if (formSection.warnings.length > 0 && !formSection.acceptWarnings) {
+        reasons.push("warnings");
+      }
+
+      if (formSection.acceptWarnings !== acceptWarnings || hasChanges) {
+        reasons.push("changes");
+      }
+    }
+
+    //currently only block on changes
+    if (reasons.includes("changes")) {
+      if (formState.current === formState.furthest) {
+        setCache({
+          key: currentForm.id,
+          data: currentValues,
+        });
+
         return false;
       }
 
-      //check if nextLocation is outside the data entry flow
-      if (!isPartOfDataEntryFlow(nextLocation.pathname)) {
-        return true;
-      }
+      return true;
+    }
 
-      const reasons = reasonsBlocked(formState, currentForm, values);
-
-      //currently only block on changes
-      if (reasons.includes("changes")) {
-        if (formState.current === formState.furthest) {
-          setTemporaryCache({
-            key: currentForm.id,
-            data: currentForm.getValues(),
-          });
-          return false;
-        }
-        return true;
-      }
-
-      return false;
-    },
-    [status, formState, currentForm, setTemporaryCache, values, isPartOfDataEntryFlow],
-  );
-
-  const blocker = useBlocker(shouldBlock);
+    return false;
+  });
 
   //prevent navigating to sections that are not yet active
   React.useEffect(() => {
@@ -89,34 +109,51 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
 
   // scroll up when an error occurs
   React.useEffect(() => {
-    if (apiError) {
+    if (error) {
       window.scrollTo(0, 0);
     }
-  }, [apiError]);
+  }, [error]);
 
-  const onSave = () =>
-    void (async () => {
-      await submitCurrentForm({ continueToNextSection: false });
-      if (blocker.location) void navigate(blocker.location.pathname);
-      if (blocker.reset) blocker.reset();
-    })();
+  async function onSave() {
+    await onSubmit({ continueToNextSection: false });
+
+    if (blocker.location) {
+      void navigate(blocker.location.pathname);
+    }
+
+    if (blocker.reset) {
+      blocker.reset();
+    }
+  }
+
+  const onAbortModalSave = async () => {
+    if (blocker.state === "blocked" && (await onSubmit({ continueToNextSection: false }))) {
+      blocker.proceed();
+    }
+  };
+
+  const onAbortModalDelete = async () => {
+    if (blocker.state === "blocked" && (await onDeleteDataEntry())) {
+      blocker.proceed();
+    }
+  };
 
   return (
     <>
       {blocker.state === "blocked" && (
         <>
           {!isPartOfDataEntryFlow(blocker.location.pathname) ? (
-            <AbortDataEntryModal
-              onCancel={() => {
-                blocker.reset();
-              }}
-              onSave={() => {
-                blocker.proceed();
-              }}
-              onDelete={() => {
-                blocker.proceed();
-              }}
-            />
+            <Modal title={t("data_entry.abort.title")} onClose={() => blocker.reset()}>
+              {tx("data_entry.abort.description")}
+              <nav>
+                <Button size="lg" onClick={onAbortModalSave} disabled={status === "saving"}>
+                  {t("data_entry.abort.save_input")}
+                </Button>
+                <Button size="lg" variant="secondary" onClick={onAbortModalDelete} disabled={status === "deleting"}>
+                  {t("data_entry.abort.discard_input")}
+                </Button>
+              </nav>
+            </Modal>
           ) : (
             <Modal
               title={t("polling_station.unsaved_changes_title")}
@@ -128,9 +165,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
                 {tx(
                   "polling_station.unsaved_changes_message",
                   {},
-                  {
-                    name: formState.sections[formState.current]?.title || t("polling_station.current_form"),
-                  },
+                  { name: formState.sections[formState.current]?.title || t("polling_station.current_form") },
                 )}
               </p>
               <p>{t("polling_station.save_changes")}</p>
@@ -152,36 +187,9 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
           )}
         </>
       )}
-      {apiError && <ErrorModal error={apiError} />}
+      {error instanceof ApiError && <ErrorModal error={error} />}
     </>
   );
 }
 
 type BlockReason = "errors" | "warnings" | "changes";
-
-function reasonsBlocked(
-  formState: FormState,
-  currentForm: AnyFormReference,
-  values: PollingStationResults,
-): BlockReason[] {
-  const result: BlockReason[] = [];
-
-  const formSection = formState.sections[currentForm.id];
-  if (formSection) {
-    if (formSection.errors.length > 0) {
-      result.push("errors");
-    }
-    if (formSection.warnings.length > 0 && !formSection.acceptWarnings) {
-      result.push("warnings");
-    }
-
-    if (
-      (currentForm.getAcceptWarnings && formSection.acceptWarnings !== currentForm.getAcceptWarnings()) ||
-      currentFormHasChanges(currentForm, values)
-    ) {
-      result.push("changes");
-    }
-  }
-
-  return result;
-}

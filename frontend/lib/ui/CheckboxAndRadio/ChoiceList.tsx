@@ -55,6 +55,8 @@ ChoiceList.Radio = ({
   defaultValue,
   hasError,
   reference,
+  value,
+  onChange,
 }: ChoiceListOptionProps) => (
   <Radio
     id={id}
@@ -66,6 +68,8 @@ ChoiceList.Radio = ({
     hasError={hasError}
     ref={reference}
     defaultValue={defaultValue}
+    value={value}
+    onChange={onChange}
   >
     {children}
   </Radio>

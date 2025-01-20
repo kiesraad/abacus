@@ -2,8 +2,6 @@ import * as React from "react";
 
 import { PollingStationResults } from "@kiesraad/api";
 
-import { usePollingStationFormController } from "../usePollingStationFormController";
-
 export type DifferencesValues = Pick<PollingStationResults, "differences_counts">;
 
 export function useDifferences(getValues: () => DifferencesValues, getAcceptWarnings?: () => boolean) {

@@ -9,21 +9,29 @@ export const INITIAL_FORM_SECTION_REFERENCE: FormSectionReference = {
   type: "recounted",
 };
 
-export function getInitialState(election: Required<Election>): DataEntryState {
+export function getInitialState(
+  election: Required<Election>,
+  pollingStationId: number,
+  entryNumber: number,
+): DataEntryState {
   return {
     election,
+    pollingStationId,
     initialData: null,
     error: null,
     pollingStationResults: null,
+    entryNumber,
     formState: getInitialFormState(election),
     targetFormSectionId: INITIAL_FORM_SECTION_ID,
     status: "idle",
     currentForm: INITIAL_FORM_SECTION_REFERENCE,
-    temporaryCache: null,
+    cache: null,
   };
 }
 
 export default function dataEntryReducer(state: DataEntryState, action: DataEntryAction): DataEntryState {
+  console.log("ACTION", action);
+
   switch (action.type) {
     case "DATA_ENTRY_LOADED":
       if (action.dataEntry.client_state) {
@@ -63,7 +71,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         ...state,
         error: action.error,
       };
-    case "SET_FORM_STATUS":
+    case "SET_STATUS":
       return {
         ...state,
         status: action.status,
@@ -83,6 +91,11 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         targetFormSectionId: action.continueToNextSection
           ? getNextSectionID(action.formState)
           : state.targetFormSectionId,
+      };
+    case "RESET_TARGET_FORM_SECTION":
+      return {
+        ...state,
+        targetFormSectionId: null,
       };
     case "REGISTER_CURRENT_FORM":
       if (state.currentForm !== null && action.form.id !== state.currentForm.id) {

@@ -2,43 +2,28 @@ import * as React from "react";
 
 import { PoliticalGroupVotes } from "@kiesraad/api";
 
-import { usePollingStationFormController } from "../usePollingStationFormController";
+import { useDataEntryContext } from "../state/useDataEntryContext";
 
 export function usePoliticalGroup(
   political_group_number: number,
   getValues: () => PoliticalGroupVotes,
   getAcceptWarnings?: () => boolean,
 ) {
-  const { status, values, formState, setTemporaryCache, cache, registerCurrentForm, submitCurrentForm } =
-    usePollingStationFormController();
+  const { status, pollingStationResults, formState, cache, onSubmitForm } = useDataEntryContext({
+    type: "political_group_votes",
+    id: `political_group_votes_${political_group_number}`,
+  });
 
   const sectionValues = React.useMemo(() => {
     if (cache && cache.key === `political_group_votes_${political_group_number}`) {
       const data = cache.data;
-      setTemporaryCache(null);
       return data as PoliticalGroupVotes;
     }
-    return values.political_group_votes.find((pg) => pg.number === political_group_number);
-  }, [values, political_group_number, setTemporaryCache, cache]);
+    return pollingStationResults.political_group_votes.find((pg) => pg.number === political_group_number);
+  }, [pollingStationResults, political_group_number, cache]);
 
-  const errors = React.useMemo(() => {
-    return formState.sections[`political_group_votes_${political_group_number}`]?.errors || [];
-  }, [formState, political_group_number]);
-
-  const warnings = React.useMemo(() => {
-    return formState.sections[`political_group_votes_${political_group_number}`]?.warnings || [];
-  }, [formState, political_group_number]);
-
-  //Once form is rendered, register the form
-  React.useEffect(() => {
-    registerCurrentForm({
-      type: "political_group_votes",
-      id: `political_group_votes_${political_group_number}`,
-      number: political_group_number,
-      getValues,
-      getAcceptWarnings: getAcceptWarnings,
-    });
-  }, [registerCurrentForm, getValues, political_group_number, getAcceptWarnings]);
+  const errors = formState.sections[`political_group_votes_${political_group_number}`]?.errors || [];
+  const warnings = formState.sections[`political_group_votes_${political_group_number}`]?.warnings || [];
 
   return {
     status,
@@ -46,8 +31,7 @@ export function usePoliticalGroup(
     errors,
     warnings,
     isSaved: formState.sections[`political_group_votes_${political_group_number}`]?.isSaved || false,
-    setTemporaryCache,
-    submit: submitCurrentForm,
+    submit: onSubmitForm,
     acceptWarnings: formState.sections[`political_group_votes_${political_group_number}`]?.acceptWarnings || false,
   };
 }

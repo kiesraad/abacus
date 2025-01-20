@@ -17,7 +17,7 @@ import {
 import { deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
-import { getErrorsAndWarnings } from "../pollingStationUtils";
+import { getErrorsAndWarnings } from "../state/dataEntryUtils";
 import { useDifferences } from "./useDifferences";
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -117,7 +117,7 @@ export function DifferencesForm() {
     if (isSaved) {
       window.scrollTo(0, 0);
     }
-  }, [isSaved, errors, warnings]);
+  }, [isSaved]);
 
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;

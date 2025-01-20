@@ -1,5 +1,5 @@
 import { createContext } from "react";
 
-import { DataEntryStateAndActions } from "./types";
+import { DataEntryStateAndActionsLoaded } from "./types";
 
-export const DataEntryContext = createContext<DataEntryStateAndActions | null>(null);
+export const DataEntryContext = createContext<DataEntryStateAndActionsLoaded | null>(null);

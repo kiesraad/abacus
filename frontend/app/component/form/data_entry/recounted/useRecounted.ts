@@ -1,46 +1,52 @@
-import * as React from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { PollingStationResults } from "@kiesraad/api";
+import { useFormKeyboardNavigation } from "@kiesraad/ui";
 
-import { usePollingStationFormController } from "../usePollingStationFormController";
+import { useDataEntryContext } from "../state/useDataEntryContext";
 
 export type RecountedValue = Pick<PollingStationResults, "recounted">;
 
-export function useRecounted(getValues: () => RecountedValue) {
-  const { status, values, formState, submitCurrentForm, setTemporaryCache, registerCurrentForm, cache } =
-    usePollingStationFormController();
+export function useRecounted() {
+  const { status, pollingStationResults, formState, onSubmitForm } = useDataEntryContext({
+    id: "recounted",
+    type: "recounted",
+  });
 
-  const sectionValues = React.useMemo(() => {
-    if (cache && cache.key === "recounted") {
-      const data = cache.data as RecountedValue;
-      setTemporaryCache(null);
-      return data;
+  // derived state
+  const { errors, warnings, isSaved } = formState.sections.recounted;
+  const hasValidationError = errors.length > 0;
+
+  // local state
+  const [recounted, setRecounted] = useState<boolean | undefined>(pollingStationResults.recounted);
+
+  // submit and save to form contents
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    onSubmitForm({ recounted });
+  };
+
+  // form keyboard navigation
+  const formRef = useRef<HTMLFormElement>(null);
+  useFormKeyboardNavigation(formRef);
+
+  // scroll to top when saved
+  useEffect(() => {
+    if (isSaved) {
+      window.scrollTo(0, 0);
     }
-    return { recounted: values.recounted };
-  }, [values, setTemporaryCache, cache]);
-
-  const errors = React.useMemo(() => {
-    return formState.sections.recounted.errors;
-  }, [formState]);
-
-  const warnings = React.useMemo(() => {
-    return formState.sections.recounted.warnings;
-  }, [formState]);
-
-  React.useEffect(() => {
-    registerCurrentForm({
-      id: "recounted",
-      type: "recounted",
-      getValues,
-    });
-  }, [registerCurrentForm, getValues]);
+  }, [isSaved, warnings, errors]);
 
   return {
     status,
-    sectionValues,
+    formRef,
+    recounted,
+    setRecounted,
     errors,
     warnings,
-    isSaved: formState.sections.recounted.isSaved,
-    submit: submitCurrentForm,
+    hasValidationError,
+    isSaved,
+    isSaving: status === "saving",
+    onSubmit,
   };
 }

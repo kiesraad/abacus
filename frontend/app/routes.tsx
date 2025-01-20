@@ -1,6 +1,5 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router";
 
-import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AdministratorLayout } from "app/module/AdministratorLayout";
 import {
   ElectionHomePage,
@@ -22,9 +21,7 @@ import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
 import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
 import {
-  CandidatesVotesPage,
   DataEntryHomePage,
-  DifferencesPage,
   PollingStationLayout,
   RecountedPage,
   VotersAndVotesPage,
@@ -72,9 +69,9 @@ export const routes = createRoutesFromElements(
             <Route index element={null} />
             <Route path="recounted" element={<RecountedPage />} />
             <Route path="voters-and-votes" element={<VotersAndVotesPage />} />
-            <Route path="differences" element={<DifferencesPage />} />
+            {/* <Route path="differences" element={<DifferencesPage />} />
             <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-            <Route path="save" element={<CheckAndSaveForm />} />
+            <Route path="save" element={<CheckAndSaveForm />} /> */}
           </Route>
         </Route>
       </Route>

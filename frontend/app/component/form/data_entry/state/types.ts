@@ -4,19 +4,29 @@ import { AnyApiError, Election, GetDataEntryResponse, PollingStationResults, Val
 
 export interface DataEntryState {
   election: Required<Election>;
+  pollingStationId: number;
   initialData: GetDataEntryResponse | null;
   error: AnyApiError | null;
   pollingStationResults: PollingStationResults | null;
   formState: FormState;
   targetFormSectionId: FormSectionId | null;
   status: Status;
+  entryNumber: number;
   currentForm: FormSectionReference;
-  temporaryCache: TemporaryCache | null;
+  cache: TemporaryCache | null;
 }
 
 export interface DataEntryStateAndActions extends DataEntryState {
   dispatch: DataEntryDispatch;
-  onSubmitForm: (data: FormSectionData, options?: SubmitCurrentFormOptions) => void;
+  onSubmitForm: (data: Partial<PollingStationResults>, options?: SubmitCurrentFormOptions) => Promise<boolean>;
+  onDeleteDataEntry: () => Promise<boolean>;
+  onFinaliseDataEntry: () => Promise<boolean>;
+  register: (form: FormSectionReference) => void;
+  setCache: (cache: TemporaryCache) => void;
+}
+
+export interface DataEntryStateAndActionsLoaded extends DataEntryStateAndActions {
+  pollingStationResults: PollingStationResults;
 }
 
 export type DataEntryDispatch = Dispatch<DataEntryAction>;
@@ -47,8 +57,15 @@ export type DataEntryAction =
       continueToNextSection: boolean;
     }
   | {
-      type: "SET_FORM_STATUS";
+      type: "SET_STATUS";
       status: Status;
+    }
+  | {
+      type: "SET_CACHE";
+      cache: TemporaryCache;
+    }
+  | {
+      type: "RESET_TARGET_FORM_SECTION";
     }
   | {
       type: "REGISTER_CURRENT_FORM";

@@ -1,3 +1,5 @@
+import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
+
 import { t } from "@kiesraad/i18n";
 import {
   Alert,
@@ -13,6 +15,7 @@ import {
 } from "@kiesraad/ui";
 
 import { useVotersAndVotes } from "./useVotersAndVotes";
+import { formValuesToValues } from "./votersAndVotesValues";
 
 export function VotersAndVotesForm() {
   const {
@@ -27,6 +30,7 @@ export function VotersAndVotesForm() {
     hasValidationWarning,
     isSaving,
     isSaved,
+    hasChanges,
     acceptWarnings,
     setAcceptWarnings,
     showAcceptWarnings,
@@ -37,12 +41,19 @@ export function VotersAndVotesForm() {
   return (
     <Form
       onSubmit={(e) => {
-        onSubmit(e);
+        e.preventDefault();
+        onSubmit();
       }}
       ref={formRef}
       id="voters_and_votes_form"
       title={t("voters_and_votes.form_title")}
     >
+      <PollingStationFormNavigation
+        onSubmit={onSubmit}
+        currentValues={formValuesToValues(currentValues)}
+        hasChanges={hasChanges}
+        acceptWarnings={acceptWarnings}
+      />
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
       )}

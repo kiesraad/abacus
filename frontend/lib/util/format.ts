@@ -5,11 +5,17 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
 });
 
 export function formatNumber(s: string | number | null | undefined | readonly string[]) {
-  if (typeof s !== "string" && typeof s !== "number") return "";
+  if (typeof s !== "string" && typeof s !== "number") {
+    return "";
+  }
+
   let result = `${s}`.replace(/\D/g, "");
-  if (result === "") return "";
-  result = numberFormatter.format(Number(result));
-  return result;
+
+  if (result === "") {
+    return "";
+  }
+
+  return numberFormatter.format(Number(result));
 }
 
 export function deformatNumber(s: FormDataEntryValue | string | null) {

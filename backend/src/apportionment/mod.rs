@@ -16,7 +16,7 @@ pub struct ApportionmentResult {
     rest_seat_allocation: Option<RestSeatAllocationDetails>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Debug, PartialEq, Serialize, ToSchema)]
 pub struct PoliticalGroupSeats {
     political_group_number: u8,
     whole_seats: u64,

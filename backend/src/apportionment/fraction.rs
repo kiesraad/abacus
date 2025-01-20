@@ -13,7 +13,7 @@ pub struct Fraction {
 }
 
 /// Fraction with the integer part split out for display purposes
-#[derive(Clone, Copy, Debug, Serialize, ToSchema)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct DisplayFraction {
     integer: u64,
     numerator: u64,

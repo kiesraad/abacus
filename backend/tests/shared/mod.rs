@@ -2,12 +2,14 @@
 
 use std::net::SocketAddr;
 
+use backend::data_entry::status::DataEntryStatusName;
 use backend::data_entry::{
-    status::ClientState, CandidateVotes, DataEntry, DifferencesCounts, PoliticalGroupVotes,
-    PollingStationResults, SaveDataEntryResponse, VotersCounts, VotesCounts,
+    status::ClientState, CandidateVotes, DataEntry, DifferencesCounts, ElectionStatusResponse,
+    PoliticalGroupVotes, PollingStationResults, SaveDataEntryResponse, VotersCounts, VotesCounts,
 };
 use hyper::StatusCode;
 
+// example data entry for an election with one party with two candidates
 pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     DataEntry {
         progress: 60,
@@ -95,4 +97,24 @@ pub async fn create_and_finalise_data_entry(
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
+}
+
+pub async fn create_result(addr: &SocketAddr, polling_station_id: u32) {
+    create_and_finalise_data_entry(addr, polling_station_id, 1).await;
+    create_and_finalise_data_entry(addr, polling_station_id, 2).await;
+
+    // check that data entry status for this polling station is now Definitive
+    let url = format!("http://{addr}/api/elections/2/status");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+    assert_eq!(
+        body.statuses
+            .iter()
+            .find(|s| s.polling_station_id == polling_station_id)
+            .unwrap()
+            .status,
+        DataEntryStatusName::Definitive
+    );
 }

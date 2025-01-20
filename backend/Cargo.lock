@@ -523,9 +523,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.5.23"
+version = "4.5.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3135e7ec2ef7b10c6ed8950f0f792ed96ee093fa088608f1c76e569722700c84"
+checksum = "a8eb5e908ef3a6efbe1ed62520fb7287959888c88485abe072543190ecc66783"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -533,9 +533,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.5.23"
+version = "4.5.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "30582fc632330df2bd26877bde0c1f4470d57c582bbc070376afcd04d8cb4838"
+checksum = "96b01801b5fc6a0a232407abc821660c9c6d25a1cafc0d4f85f29fb8d9afc121"
 dependencies = [
  "anstyle",
  "clap_lex",
@@ -543,9 +543,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "4.5.18"
+version = "4.5.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4ac6a0c7b1a9e9a5186361f67dfa1b88213572f427fb9ab038efb2bd8c582dab"
+checksum = "54b755194d6389280185988721fffba69495eed5ee9feeee9a599b53db80318c"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -1759,9 +1759,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve"
-version = "1.0.0-beta.2"
+version = "1.0.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "445c739527dc8ae33038d184cb76acbf634495e087cb43e77a63e29c2a0d4d8a"
+checksum = "8e6d9acc9a1da61ff1cddd3c9e301d43986e4f9af3a9ac5380dbeb8ffec52320"
 dependencies = [
  "axum",
  "brotli",
@@ -1774,9 +1774,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-core"
-version = "1.0.0-beta.2"
+version = "1.0.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56ff3599a33398bf6bd9cd85985d2b0304a16b0e55afd225e07b95da99d3a652"
+checksum = "906955122968f374552374cef85ba628bcc0972a692ee09eec95aa4018dfe7b5"
 dependencies = [
  "brotli",
  "mime_guess",
@@ -1786,9 +1786,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-macros"
-version = "1.0.0-beta.2"
+version = "1.0.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c538645dbc7aab663241fb271bab217700687ba2ee33fca755f2b814e6c3fcb7"
+checksum = "799c7dc7710151c7e8c8eb9345d58a548e36d11aacde60b7efebb0e45a9e3ffd"
 dependencies = [
  "memory-serve-core",
 ]
@@ -2585,9 +2585,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.134"
+version = "1.0.137"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d00f4175c42ee48b15416f6193a959ba3a0d67fc699a0db9ad12df9f83991c7d"
+checksum = "930cfb6e6abf99298aaad7d29abbef7a9999a9a8806a40088f55f0dcec03146b"
 dependencies = [
  "itoa",
  "memchr",
@@ -3304,9 +3304,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.42.0"
+version = "1.43.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5cec9b21b0450273377fc97bd4c33a8acffc8c996c987a7c5b319a0083707551"
+checksum = "3d61fa4ffa3de412bfea335c6ecff681de2b609ba3c77ef3e00e521813a9ed9e"
 dependencies = [
  "backtrace",
  "bytes",
@@ -3322,9 +3322,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-macros"
-version = "2.4.0"
+version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "693d596312e88961bc67d7f1f97af8a70227d9f90c31bba5806eec004978d752"
+checksum = "6e06d43f1345a3bcd39f6a56dbb7dcab2ba47e68e8ac134855e7e2bdbaf8cab8"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3868,9 +3868,9 @@ dependencies = [
 
 [[package]]
 name = "utoipa-swagger-ui"
-version = "8.1.1"
+version = "9.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "040cad8bd8de63f3d028e08e5b39be49d68f8a646e99f4aea2e2d4d82c34b21f"
+checksum = "161166ec520c50144922a625d8bc4925cc801b2dda958ab69878527c0e5c5d61"
 dependencies = [
  "axum",
  "base64",

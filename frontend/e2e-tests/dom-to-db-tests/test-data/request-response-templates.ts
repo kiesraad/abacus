@@ -1,4 +1,64 @@
-import { DataEntry, GetDataEntryResponse, SaveDataEntryResponse } from "@kiesraad/api";
+import {
+  DataEntry,
+  ElectionRequest,
+  GetDataEntryResponse,
+  PollingStationRequest,
+  SaveDataEntryResponse,
+} from "@kiesraad/api";
+
+export const electionRequest: ElectionRequest = {
+  name: "Test Election",
+  location: "Test Location",
+  number_of_voters: 100,
+  category: "Municipal",
+  number_of_seats: 29,
+  election_date: "2026-01-01",
+  nomination_date: "2026-01-01",
+  status: "DataEntryInProgress",
+  political_groups: [
+    {
+      number: 1,
+      name: "Political Group A",
+      candidates: [
+        {
+          number: 1,
+          initials: "A.",
+          first_name: "Alice",
+          last_name: "Foo",
+          locality: "Amsterdam",
+          gender: "Female",
+        },
+        {
+          number: 2,
+          initials: "C.",
+          first_name: "Charlie",
+          last_name: "Doe",
+          locality: "Rotterdam",
+        },
+      ],
+    },
+  ],
+};
+
+export const pollingStationRequests: PollingStationRequest[] = [
+  {
+    name: "Op Rolletjes",
+    number: 33,
+    polling_station_type: "Mobile",
+    address: "Rijksweg A12 1",
+    postal_code: "1234 YQ",
+    locality: "Den Haag",
+  },
+  {
+    name: "Testplek",
+    number: 34,
+    number_of_voters: 1000,
+    polling_station_type: "Special",
+    address: "Teststraat 2b",
+    postal_code: "1234 QY",
+    locality: "Testdorp",
+  },
+];
 
 export const emptyDataEntryResponse: GetDataEntryResponse = {
   progress: 0,

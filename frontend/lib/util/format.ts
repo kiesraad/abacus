@@ -12,7 +12,11 @@ export function formatNumber(s: string | number | null | undefined | readonly st
   return result;
 }
 
-export function deformatNumber(s: string) {
+export function deformatNumber(s: FormDataEntryValue | string | null) {
+  if (s === null || typeof s !== "string") {
+    return 0;
+  }
+
   const separator = numberFormatter.format(11111).replace(/\p{Number}/gu, "");
   const escapedSeparator = separator.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
 

@@ -1,8 +1,13 @@
 import { Election } from "@kiesraad/api";
 
-import { ClientState, INITIAL_FORM_SECTION_ID } from "../PollingStationFormController";
-import { buildFormState, getInitialFormState, getInitialValues } from "../pollingStationUtils";
-import { DataEntryAction, DataEntryState } from "./types";
+import { buildFormState, getInitialFormState, getInitialValues, getNextSectionID } from "./dataEntryUtils";
+import { ClientState, DataEntryAction, DataEntryState, FormSectionId, FormSectionReference } from "./types";
+
+export const INITIAL_FORM_SECTION_ID: FormSectionId = "recounted";
+export const INITIAL_FORM_SECTION_REFERENCE: FormSectionReference = {
+  id: "recounted",
+  type: "recounted",
+};
 
 export function getInitialState(election: Required<Election>): DataEntryState {
   return {
@@ -11,9 +16,9 @@ export function getInitialState(election: Required<Election>): DataEntryState {
     error: null,
     pollingStationResults: null,
     formState: getInitialFormState(election),
-    targetFormSectionID: null,
+    targetFormSectionId: INITIAL_FORM_SECTION_ID,
     status: "idle",
-    currentForm: null,
+    currentForm: INITIAL_FORM_SECTION_REFERENCE,
     temporaryCache: null,
   };
 }
@@ -22,7 +27,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
   switch (action.type) {
     case "DATA_ENTRY_LOADED":
       if (action.dataEntry.client_state) {
-        const { formState, targetFormSectionID } = buildFormState(
+        const { formState, targetFormSectionId } = buildFormState(
           action.dataEntry.client_state as ClientState,
           action.dataEntry.validation_results,
           state.election,
@@ -31,7 +36,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         return {
           ...state,
           formState,
-          targetFormSectionID,
+          targetFormSectionId,
           initialData: action.dataEntry,
           pollingStationResults: action.dataEntry.data,
           error: null,
@@ -41,7 +46,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
       return {
         ...state,
         formState: getInitialFormState(state.election),
-        targetFormSectionID: INITIAL_FORM_SECTION_ID,
+        targetFormSectionId: INITIAL_FORM_SECTION_ID,
         initialData: action.dataEntry,
         pollingStationResults: action.dataEntry.data,
         error: null,
@@ -51,12 +56,33 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         ...state,
         pollingStationResults: getInitialValues(state.election),
         formState: getInitialFormState(state.election),
-        targetFormSectionID: INITIAL_FORM_SECTION_ID,
+        targetFormSectionId: INITIAL_FORM_SECTION_ID,
       };
     case "DATA_ENTRY_LOAD_FAILED":
       return {
         ...state,
         error: action.error,
+      };
+    case "SET_FORM_STATUS":
+      return {
+        ...state,
+        status: action.status,
+      };
+    case "FORM_SAVE_FAILED":
+      return {
+        ...state,
+        status: "idle",
+        error: action.error,
+      };
+    case "FORM_SAVED":
+      return {
+        ...state,
+        status: "idle",
+        error: null,
+        formState: action.formState,
+        targetFormSectionId: action.continueToNextSection
+          ? getNextSectionID(action.formState)
+          : state.targetFormSectionId,
       };
     case "REGISTER_CURRENT_FORM":
       if (state.currentForm !== null && action.form.id !== state.currentForm.id) {

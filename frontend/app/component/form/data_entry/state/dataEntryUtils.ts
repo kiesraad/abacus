@@ -4,18 +4,18 @@ import { Election, PollingStationResults, ValidationResult, ValidationResults } 
 import { ValidationResultType } from "@kiesraad/ui";
 import { deepEqual, fieldNameFromPath, FieldSection, objectHasOnlyEmptyValues, rootFieldSection } from "@kiesraad/util";
 
-import { DifferencesValues } from "./differences/useDifferences";
+import { DifferencesValues } from "../differences/useDifferences";
+import { RecountedValue } from "../recounted/useRecounted";
+import { VotersAndVotesValues } from "../voters_and_votes/useVotersAndVotes";
+import { INITIAL_FORM_SECTION_ID } from "./reducer";
 import {
-  AnyFormReference,
   ClientState,
   ClientValidationResult,
   FormSection,
-  FormSectionID,
+  FormSectionId,
+  FormSectionReference,
   FormState,
-  INITIAL_FORM_SECTION_ID,
-} from "./PollingStationFormController";
-import { RecountedValue } from "./recounted/useRecounted";
-import { VotersAndVotesValues } from "./voters_and_votes/useVotersAndVotes";
+} from "./types";
 
 function checkAndAddValidationResult(
   section: FormSection,
@@ -55,7 +55,7 @@ export function addValidationResultToFormState(
           break;
         case "political_group_votes":
           if (index !== undefined) {
-            const sectionKey = `political_group_votes_${index + 1}` as FormSectionID;
+            const sectionKey = `political_group_votes_${index + 1}` as FormSectionId;
             const section = formState.sections[sectionKey];
             if (section) {
               checkAndAddValidationResult(section, target, validationResult);
@@ -106,6 +106,7 @@ export function resetFormSectionState(formState: FormState) {
 
 export function getNextSectionID(formState: FormState) {
   const currentSection = formState.sections[formState.current];
+
   if (currentSection && currentSection.isSubmitted && formSectionComplete(currentSection)) {
     for (const section of Object.values(formState.sections)) {
       if ((formState.furthest === "save" && section.errors.length > 0) || section.index === currentSection.index + 1) {
@@ -113,46 +114,8 @@ export function getNextSectionID(formState: FormState) {
       }
     }
   }
+
   return null;
-}
-
-export function currentFormHasChanges(currentForm: AnyFormReference, values: PollingStationResults): boolean {
-  if (currentForm.type === "recounted") {
-    const valA: RecountedValue = { recounted: values.recounted };
-    const valB = currentForm.getValues();
-    return !deepEqual(valA, valB);
-  }
-
-  if (currentForm.type === "voters_and_votes") {
-    const valA: VotersAndVotesValues = {
-      voters_counts: values.voters_counts,
-      votes_counts: values.votes_counts,
-      voters_recounts: values.voters_recounts,
-    };
-    const valB = currentForm.getValues();
-    return !deepEqual(valA, valB, true);
-  }
-
-  if (currentForm.type === "differences") {
-    const valA: DifferencesValues = {
-      differences_counts: values.differences_counts,
-    };
-    const valB = currentForm.getValues();
-    return !deepEqual(valA, valB, true);
-  }
-
-  if (currentForm.type === "save") {
-    return false;
-  }
-
-  //political_group_votes
-  const valA = values.political_group_votes.find((pg) => pg.number === currentForm.number);
-  if (valA) {
-    const valB = currentForm.getValues();
-    return !deepEqual(valA, valB, true);
-  }
-
-  return false;
 }
 
 export function isGlobalValidationResult(validationResult: ValidationResult): boolean {
@@ -418,7 +381,7 @@ export function buildFormState(
   newFormState.current = clientState.current;
 
   // set accepted warnings
-  clientState.acceptedWarnings.forEach((sectionID: FormSectionID) => {
+  clientState.acceptedWarnings.forEach((sectionID: FormSectionId) => {
     const section = newFormState.sections[sectionID];
     if (section) {
       section.acceptWarnings = true;
@@ -435,19 +398,19 @@ export function buildFormState(
 
   // set accepted warnings for the current section
   const acceptWarnings = clientState.acceptedWarnings.some(
-    (sectionID: FormSectionID) => sectionID === newFormState.current,
+    (sectionID: FormSectionId) => sectionID === newFormState.current,
   );
 
   updateFormStateAfterSubmit(newFormState, validationResults, acceptWarnings, clientState.continue);
 
-  let targetFormSectionID: FormSectionID;
+  let targetFormSectionId: FormSectionId;
   if (clientState.continue) {
-    targetFormSectionID = getNextSectionID(newFormState) ?? newFormState.current;
+    targetFormSectionId = getNextSectionID(newFormState) ?? newFormState.current;
   } else {
-    targetFormSectionID = newFormState.current;
+    targetFormSectionId = newFormState.current;
   }
 
-  return { formState: newFormState, targetFormSectionID };
+  return { formState: newFormState, targetFormSectionId };
 }
 
 export function updateFormStateAfterSubmit(
@@ -455,7 +418,7 @@ export function updateFormStateAfterSubmit(
   validationResults: ValidationResults,
   acceptWarnings: boolean,
   continueToNextSection: boolean = false,
-) {
+): FormState {
   resetFormSectionState(formState);
 
   const currentFormSection = formState.sections[formState.current];
@@ -492,4 +455,6 @@ export function updateFormStateAfterSubmit(
       section.acceptWarnings = false;
     }
   });
+
+  return formState;
 }

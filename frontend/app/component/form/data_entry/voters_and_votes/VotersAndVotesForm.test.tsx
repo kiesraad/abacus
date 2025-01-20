@@ -17,7 +17,6 @@ import {
 } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs, waitFor } from "@kiesraad/test";
 
-import { FormState, PollingStationFormController } from "../PollingStationFormController";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const defaultFormState: FormState = {

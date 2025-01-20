@@ -53,6 +53,7 @@ export type DataEntryAction =
     }
   | {
       type: "FORM_SAVED";
+      data: PollingStationResults;
       formState: FormState;
       continueToNextSection: boolean;
     }

@@ -9,6 +9,10 @@ export function formatNumber(s: string | number | null | undefined | readonly st
     return "";
   }
 
+  if (typeof s === "number" && s === 0) {
+    return "";
+  }
+
   let result = `${s}`.replace(/\D/g, "");
 
   if (result === "") {

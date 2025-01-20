@@ -48,6 +48,7 @@ export function onSubmitForm(
 
     dispatch({
       type: "FORM_SAVED",
+      data: newValues,
       formState: updateFormStateAfterSubmit(
         state.formState,
         response.data.validation_results,

@@ -1,9 +1,10 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { PollingStationResults } from "@kiesraad/api";
 import { useFormKeyboardNavigation } from "@kiesraad/ui";
 
 import { useDataEntryContext } from "../state/useDataEntryContext";
+import { SubmitCurrentFormOptions } from "../state/types";
 
 export type RecountedValue = Pick<PollingStationResults, "recounted">;
 
@@ -21,9 +22,19 @@ export function useRecounted() {
   const [recounted, setRecounted] = useState<boolean | undefined>(pollingStationResults.recounted);
 
   // submit and save to form contents
-  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    onSubmitForm({ recounted });
+  const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {
+    const data: Partial<PollingStationResults> = { recounted };
+
+    if (!pollingStationResults.voters_recounts && recounted) {
+      data.voters_recounts = {
+        poll_card_count: 0,
+        proxy_certificate_count: 0,
+        voter_card_count: 0,
+        total_admitted_voters_count: 0,
+      };
+    }
+
+    return onSubmitForm(data, options);
   };
 
   // form keyboard navigation
@@ -42,6 +53,7 @@ export function useRecounted() {
     formRef,
     recounted,
     setRecounted,
+    pollingStationResults,
     errors,
     warnings,
     hasValidationError,

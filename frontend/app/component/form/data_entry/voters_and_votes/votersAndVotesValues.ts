@@ -35,7 +35,7 @@ export function valuesToFormValues(values: VotersAndVotesValues): VotersAndVotes
   };
 }
 
-export function formValuesToValues(formData: VotersAndVotesFormValues): VotersAndVotesValues {
+export function formValuesToValues(formData: VotersAndVotesFormValues, recounted: boolean): VotersAndVotesValues {
   return {
     voters_counts: {
       poll_card_count: deformatNumber(formData.poll_card_count),
@@ -49,7 +49,7 @@ export function formValuesToValues(formData: VotersAndVotesFormValues): VotersAn
       invalid_votes_count: deformatNumber(formData.invalid_votes_count),
       total_votes_cast_count: deformatNumber(formData.total_votes_cast_count),
     },
-    voters_recounts: formData.poll_card_recount
+    voters_recounts: recounted
       ? {
           poll_card_count: deformatNumber(formData.poll_card_recount),
           proxy_certificate_count: deformatNumber(formData.proxy_certificate_recount),

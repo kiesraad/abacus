@@ -29,18 +29,18 @@ export function useVotersAndVotes() {
           voters_recounts: pollingStationResults.voters_recounts || undefined,
         });
   const [currentValues, setCurrentValues] = useState<VotersAndVotesFormValues>(defaultValues);
-  const [acceptedWarnings, setAcceptWarnings] = useState(false);
+  const [acceptWarnings, setAcceptWarnings] = useState(false);
   const [warningsWarning, setWarningsWarning] = useState(false);
 
   // derived state
-  const { errors, warnings, isSaved, acceptWarnings } = formState.sections.voters_votes_counts;
+  const { errors, warnings, isSaved } = formState.sections.voters_votes_counts;
   const hasChanges = warnings.length > 0 && isSaved && !deepEqual(currentValues, defaultValues);
   const hasValidationError = errors.length > 0;
   const hasValidationWarning = warnings.length > 0;
-  const showAcceptWarnings = errors.length === 0 && warnings.length > 0 && !hasChanges;
+  const showAcceptWarnings = errors.length === 0 && warnings.length > 0;
   const defaultProps = {
     errorsAndWarnings: isSaved ? getErrorsAndWarnings(errors, warnings) : undefined,
-    warningsAccepted: acceptedWarnings,
+    warningsAccepted: acceptWarnings,
   };
 
   // form keyboard navigation
@@ -49,7 +49,7 @@ export function useVotersAndVotes() {
 
   // submit and save to form contents
   const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {
-    const data: VotersAndVotesValues = formValuesToValues(currentValues);
+    const data: VotersAndVotesValues = formValuesToValues(currentValues, pollingStationResults.recounted || false);
     if (!hasValidationError && hasValidationWarning) {
       if (!hasChanges && !acceptWarnings) {
         setWarningsWarning(true);

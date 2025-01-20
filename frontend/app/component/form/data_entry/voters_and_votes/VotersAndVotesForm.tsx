@@ -38,11 +38,13 @@ export function VotersAndVotesForm() {
     defaultProps,
   } = useVotersAndVotes();
 
+  console.log('upper checked', acceptWarnings);
+
   return (
     <Form
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmit();
+        void onSubmit();
       }}
       ref={formRef}
       id="voters_and_votes_form"
@@ -50,7 +52,7 @@ export function VotersAndVotesForm() {
     >
       <PollingStationFormNavigation
         onSubmit={onSubmit}
-        currentValues={formValuesToValues(currentValues)}
+        currentValues={formValuesToValues(currentValues, pollingStationResults.recounted || false)}
         hasChanges={hasChanges}
         acceptWarnings={acceptWarnings}
       />
@@ -73,7 +75,7 @@ export function VotersAndVotesForm() {
             field="A"
             id="poll_card_count"
             title={t("voters_and_votes.poll_card_count")}
-            value={currentValues.poll_card_count}
+            value={currentValues.poll_card_count || ''}
             onChange={(e) =>
               setCurrentValues({
                 ...currentValues,
@@ -87,7 +89,7 @@ export function VotersAndVotesForm() {
             field="B"
             id="proxy_certificate_count"
             title={t("voters_and_votes.proxy_certificate_count")}
-            value={currentValues.proxy_certificate_count}
+            value={currentValues.proxy_certificate_count || ''}
             onChange={(e) =>
               setCurrentValues({
                 ...currentValues,
@@ -101,7 +103,7 @@ export function VotersAndVotesForm() {
             field="C"
             id="voter_card_count"
             title={t("voters_and_votes.voter_card_count")}
-            value={currentValues.voter_card_count}
+            value={currentValues.voter_card_count || ''}
             onChange={(e) =>
               setCurrentValues({
                 ...currentValues,
@@ -117,7 +119,7 @@ export function VotersAndVotesForm() {
             title={t("voters_and_votes.total_admitted_voters_count")}
             isTotal
             addSeparator
-            value={currentValues.total_admitted_voters_count}
+            value={currentValues.total_admitted_voters_count || ''}
             onChange={(e) =>
               setCurrentValues({
                 ...currentValues,
@@ -131,7 +133,7 @@ export function VotersAndVotesForm() {
             field="E"
             id="votes_candidates_count"
             title={t("voters_and_votes.votes_candidates_count")}
-            value={currentValues.votes_candidates_count}
+            value={currentValues.votes_candidates_count || ''}
             onChange={(e) =>
               setCurrentValues({
                 ...currentValues,
@@ -145,7 +147,7 @@ export function VotersAndVotesForm() {
             field="F"
             id="blank_votes_count"
             title={t("voters_and_votes.blank_votes_count")}
-            value={currentValues.blank_votes_count}
+            value={currentValues.blank_votes_count || ''}
             onChange={(e) =>
               setCurrentValues({
                 ...currentValues,
@@ -159,7 +161,7 @@ export function VotersAndVotesForm() {
             field="G"
             id="invalid_votes_count"
             title={t("voters_and_votes.invalid_votes_count")}
-            value={currentValues.invalid_votes_count}
+            value={currentValues.invalid_votes_count || ''}
             onChange={(e) =>
               setCurrentValues({
                 ...currentValues,
@@ -173,7 +175,7 @@ export function VotersAndVotesForm() {
             field="H"
             id="total_votes_cast_count"
             title={t("voters_and_votes.total_votes_cast_count")}
-            value={currentValues.total_votes_cast_count}
+            value={currentValues.total_votes_cast_count || ''}
             onChange={(e) =>
               setCurrentValues({
                 ...currentValues,
@@ -198,11 +200,11 @@ export function VotersAndVotesForm() {
                 field="A.2"
                 id="poll_card_recount"
                 title={t("voters_and_votes.poll_card_recount")}
-                value={currentValues.poll_card_count}
+                value={currentValues.poll_card_recount || ''}
                 onChange={(e) =>
                   setCurrentValues({
                     ...currentValues,
-                    poll_card_count: e.target.value,
+                    poll_card_recount: e.target.value,
                   })
                 }
                 {...defaultProps}
@@ -212,11 +214,11 @@ export function VotersAndVotesForm() {
                 field="B.2"
                 id="proxy_certificate_recount"
                 title={t("voters_and_votes.proxy_certificate_recount")}
-                value={currentValues.proxy_certificate_count}
+                value={currentValues.proxy_certificate_recount || ''}
                 onChange={(e) =>
                   setCurrentValues({
                     ...currentValues,
-                    proxy_certificate_count: e.target.value,
+                    proxy_certificate_recount: e.target.value,
                   })
                 }
                 {...defaultProps}
@@ -226,11 +228,11 @@ export function VotersAndVotesForm() {
                 field="C.2"
                 id="voter_card_recount"
                 title={t("voters_and_votes.voter_card_recount")}
-                value={currentValues.voter_card_count}
+                value={currentValues.voter_card_recount || ''}
                 onChange={(e) =>
                   setCurrentValues({
                     ...currentValues,
-                    voter_card_count: e.target.value,
+                    voter_card_recount: e.target.value,
                   })
                 }
                 {...defaultProps}
@@ -240,11 +242,11 @@ export function VotersAndVotesForm() {
                 field="D.2"
                 id="total_admitted_voters_recount"
                 title={t("voters_and_votes.total_admitted_voters_recount")}
-                value={currentValues.total_admitted_voters_count}
+                value={currentValues.total_admitted_voters_recount || ''}
                 onChange={(e) =>
                   setCurrentValues({
                     ...currentValues,
-                    total_admitted_voters_count: e.target.value,
+                    total_admitted_voters_recount: e.target.value,
                   })
                 }
                 isTotal
@@ -254,7 +256,6 @@ export function VotersAndVotesForm() {
           </>
         )}
       </InputGrid>
-
       <BottomBar type="input-grid">
         {warningsWarning && (
           <BottomBar.Row>

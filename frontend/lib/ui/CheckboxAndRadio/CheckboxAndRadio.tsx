@@ -8,11 +8,13 @@ export interface CheckboxAndRadioProps extends React.InputHTMLAttributes<HTMLInp
   id: string;
   type?: "checkbox" | "radio";
   label: string;
+  checked?: boolean;
   children?: React.ReactNode;
   indeterminate?: boolean;
   hasError?: boolean;
   defaultChecked?: boolean;
   autoFocus?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const CheckboxAndRadio = React.forwardRef<HTMLInputElement, CheckboxAndRadioProps>(
@@ -23,10 +25,12 @@ export const CheckboxAndRadio = React.forwardRef<HTMLInputElement, CheckboxAndRa
       name,
       type,
       label,
+      checked,
       children,
       indeterminate,
       disabled,
       autoFocus,
+      onChange,
       hasError,
       defaultChecked,
       ...inputProps
@@ -35,14 +39,17 @@ export const CheckboxAndRadio = React.forwardRef<HTMLInputElement, CheckboxAndRa
   ) => {
     return (
       <div className={cn(cls["checkbox-and-radio"])} id={`${type}-container-${id}`}>
+        {console.log('checked', checked)}
         <input
           className={`${type}${indeterminate ? " indeterminate" : ""}`}
           type={type}
           id={id}
           value={value}
           name={name}
+          checked={checked}
           defaultChecked={defaultChecked}
           ref={ref}
+          onChange={onChange}
           disabled={disabled}
           autoFocus={autoFocus}
           aria-invalid={hasError}

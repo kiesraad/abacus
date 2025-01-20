@@ -73,6 +73,8 @@ export function PollingStationFormNavigation({
         reasons.push("warnings");
       }
 
+      console.log(formSection.acceptWarnings !== acceptWarnings, hasChanges);
+
       if (formSection.acceptWarnings !== acceptWarnings || hasChanges) {
         reasons.push("changes");
       }

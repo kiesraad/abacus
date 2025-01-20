@@ -87,6 +87,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         ...state,
         status: "idle",
         error: null,
+        pollingStationResults: action.data,
         formState: action.formState,
         targetFormSectionId: action.continueToNextSection
           ? getNextSectionID(action.formState)

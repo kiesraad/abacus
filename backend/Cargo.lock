@@ -1759,9 +1759,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve"
-version = "1.0.0-beta.2"
+version = "1.0.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "445c739527dc8ae33038d184cb76acbf634495e087cb43e77a63e29c2a0d4d8a"
+checksum = "8e6d9acc9a1da61ff1cddd3c9e301d43986e4f9af3a9ac5380dbeb8ffec52320"
 dependencies = [
  "axum",
  "brotli",
@@ -1774,9 +1774,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-core"
-version = "1.0.0-beta.2"
+version = "1.0.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56ff3599a33398bf6bd9cd85985d2b0304a16b0e55afd225e07b95da99d3a652"
+checksum = "906955122968f374552374cef85ba628bcc0972a692ee09eec95aa4018dfe7b5"
 dependencies = [
  "brotli",
  "mime_guess",
@@ -1786,9 +1786,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-macros"
-version = "1.0.0-beta.2"
+version = "1.0.0-beta.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c538645dbc7aab663241fb271bab217700687ba2ee33fca755f2b814e6c3fcb7"
+checksum = "799c7dc7710151c7e8c8eb9345d58a548e36d11aacde60b7efebb0e45a9e3ffd"
 dependencies = [
  "memory-serve-core",
 ]
@@ -2585,9 +2585,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.135"
+version = "1.0.137"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b0d7ba2887406110130a978386c4e1befb98c674b4fba677954e4db976630d9"
+checksum = "930cfb6e6abf99298aaad7d29abbef7a9999a9a8806a40088f55f0dcec03146b"
 dependencies = [
  "itoa",
  "memchr",
@@ -3868,9 +3868,9 @@ dependencies = [
 
 [[package]]
 name = "utoipa-swagger-ui"
-version = "8.1.1"
+version = "9.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "040cad8bd8de63f3d028e08e5b39be49d68f8a646e99f4aea2e2d4d82c34b21f"
+checksum = "161166ec520c50144922a625d8bc4925cc801b2dda958ab69878527c0e5c5d61"
 dependencies = [
  "axum",
  "base64",

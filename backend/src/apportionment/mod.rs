@@ -24,7 +24,6 @@ pub struct PoliticalGroupSeats {
     total_seats: u64,
 }
 
-// TODO: This type of enum is not being added to openapi.ts by gen_openapi_types.ts causing error in openapi.ts
 #[derive(Debug, PartialEq, Serialize, ToSchema)]
 pub enum RestSeatAllocationDetails {
     RestSeatsAllocationDetailsLt19Seats(Lt19SeatsAllocation),
@@ -127,17 +126,14 @@ fn perform_highest_average_allocation(
         return Err(ApportionmentError::DrawingOfLotsNotImplemented);
     }
 
-    let result_averages =
-        averages
-            .iter()
-            .fold(Vec::new(), |mut result_averages, (pg_number, average)| {
-                result_averages.push(Average {
-                    political_group_number: *pg_number,
-                    average: DisplayFraction::from(*average),
-                    highest: *average == highest_average,
-                });
-                result_averages
-            });
+    let result_averages: Vec<Average> = averages
+        .iter()
+        .map(|(pg_number, average)| Average {
+            political_group_number: *pg_number,
+            average: DisplayFraction::from(*average),
+            highest: *average == highest_average,
+        })
+        .collect();
 
     Ok(HighestAveragesAllocation {
         rest_seat_number,
@@ -259,17 +255,14 @@ fn allocate_remaining_seats(
             unique_pgs.push(pg.number);
             unique_pgs
         });
-        let mut highest_surpluses =
-            surpluses
-                .iter()
-                .fold(Vec::new(), |mut highest_surpluses, (pg_number, surplus)| {
-                    highest_surpluses.push(HighestSurplusesAllocation {
-                        political_group_number: *pg_number,
-                        surplus: DisplayFraction::from(*surplus),
-                        rest_seats: 0,
-                    });
-                    highest_surpluses
-                });
+        let mut highest_surpluses: Vec<HighestSurplusesAllocation> = surpluses
+            .iter()
+            .map(|(pg_number, surplus)| HighestSurplusesAllocation {
+                political_group_number: *pg_number,
+                surplus: DisplayFraction::from(*surplus),
+                rest_seats: 0,
+            })
+            .collect();
         let mut highest_averages_max_one = Vec::new();
         let mut highest_averages_remainder = Vec::new();
         while remaining_seats > 0 {
@@ -460,14 +453,11 @@ mod tests {
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_system() {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 60, 40]);
         let result = seat_allocation(15, &totals).unwrap();
-        let total_seats =
-            result
-                .political_groups_seats
-                .iter()
-                .fold(Vec::new(), |mut total_seats, pg| {
-                    total_seats.push(pg.total_seats);
-                    total_seats
-                });
+        let total_seats: Vec<u64> = result
+            .political_groups_seats
+            .iter()
+            .map(|pg| pg.total_seats)
+            .collect();
         assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
     }
 
@@ -476,14 +466,11 @@ mod tests {
     ) {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
         let result = seat_allocation(15, &totals).unwrap();
-        let total_seats =
-            result
-                .political_groups_seats
-                .iter()
-                .fold(Vec::new(), |mut total_seats, pg| {
-                    total_seats.push(pg.total_seats);
-                    total_seats
-                });
+        let total_seats: Vec<u64> = result
+            .political_groups_seats
+            .iter()
+            .map(|pg| pg.total_seats)
+            .collect();
         assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
     }
 
@@ -492,14 +479,11 @@ mod tests {
     ) {
         let totals = get_election_summary(vec![560, 160, 160, 80, 80, 80, 40, 40]);
         let result = seat_allocation(15, &totals).unwrap();
-        let total_seats =
-            result
-                .political_groups_seats
-                .iter()
-                .fold(Vec::new(), |mut total_seats, pg| {
-                    total_seats.push(pg.total_seats);
-                    total_seats
-                });
+        let total_seats: Vec<u64> = result
+            .political_groups_seats
+            .iter()
+            .map(|pg| pg.total_seats)
+            .collect();
         assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
     }
 
@@ -514,14 +498,11 @@ mod tests {
     fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
         let totals = get_election_summary(vec![600, 302, 98, 99, 101]);
         let result = seat_allocation(23, &totals).unwrap();
-        let total_seats =
-            result
-                .political_groups_seats
-                .iter()
-                .fold(Vec::new(), |mut total_seats, pg| {
-                    total_seats.push(pg.total_seats);
-                    total_seats
-                });
+        let total_seats: Vec<u64> = result
+            .political_groups_seats
+            .iter()
+            .map(|pg| pg.total_seats)
+            .collect();
         assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
     }
 

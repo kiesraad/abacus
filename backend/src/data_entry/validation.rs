@@ -1,9 +1,11 @@
-use crate::data_entry::{
-    CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
-    VotersCounts, VotesCounts,
+use crate::{
+    data_entry::{
+        CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
+        VotersCounts, VotesCounts,
+    },
+    election::Election,
+    polling_station::PollingStation,
 };
-use crate::election::Election;
-use crate::polling_station::PollingStation;
 
 use std::fmt;
 
@@ -887,8 +889,9 @@ impl Validate for CandidateVotes {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::election::tests::election_fixture;
-    use crate::polling_station::structs::tests::polling_station_fixture;
+    use crate::{
+        election::tests::election_fixture, polling_station::structs::tests::polling_station_fixture,
+    };
     use test_log::test;
 
     #[test]

@@ -58,9 +58,8 @@ pub(crate) mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::election::ElectionStatus;
     use crate::{
-        election::{tests::election_fixture, Election, ElectionCategory},
+        election::{tests::election_fixture, Election, ElectionCategory, ElectionStatus},
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
     };

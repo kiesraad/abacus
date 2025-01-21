@@ -1,26 +1,28 @@
-use axum::extract::{Path, State};
 #[cfg(feature = "dev-database")]
 use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
-use axum::Json;
+use axum::{
+    extract::{Path, State},
+    response::{IntoResponse, Response},
+    Json,
+};
 use axum_extra::response::Attachment;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use zip::result::ZipError;
-use zip::write::SimpleFileOptions;
+use zip::{result::ZipError, write::SimpleFileOptions};
 
 use self::repository::Elections;
 pub use self::structs::*;
-use crate::data_entry::repository::PollingStationResultsEntries;
-use crate::data_entry::PollingStationResults;
-use crate::eml::axum::Eml;
-use crate::eml::{eml_document_hash, EMLDocument, EML510};
-use crate::pdf_gen::generate_pdf;
-use crate::pdf_gen::models::{ModelNa31_2Input, PdfModel};
-use crate::polling_station::repository::PollingStations;
-use crate::polling_station::structs::PollingStation;
-use crate::summary::ElectionSummary;
-use crate::{APIError, ErrorResponse};
+use crate::{
+    data_entry::{repository::PollingStationResultsEntries, PollingStationResults},
+    eml::{axum::Eml, eml_document_hash, EMLDocument, EML510},
+    pdf_gen::{
+        generate_pdf,
+        models::{ModelNa31_2Input, PdfModel},
+    },
+    polling_station::{repository::PollingStations, structs::PollingStation},
+    summary::ElectionSummary,
+    APIError, ErrorResponse,
+};
 
 pub(crate) mod repository;
 pub mod structs;

@@ -2,10 +2,10 @@
 
 use std::net::SocketAddr;
 
-use backend::data_entry::status::DataEntryStatusName;
 use backend::data_entry::{
-    status::ClientState, CandidateVotes, DataEntry, DifferencesCounts, ElectionStatusResponse,
-    PoliticalGroupVotes, PollingStationResults, SaveDataEntryResponse, VotersCounts, VotesCounts,
+    status::{ClientState, DataEntryStatusName},
+    CandidateVotes, DataEntry, DifferencesCounts, ElectionStatusResponse, PoliticalGroupVotes,
+    PollingStationResults, SaveDataEntryResponse, VotersCounts, VotesCounts,
 };
 use hyper::StatusCode;
 

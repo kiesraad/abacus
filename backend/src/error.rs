@@ -1,12 +1,15 @@
 use std::error::Error;
 
-use crate::authentication::AuthenticationError;
-use crate::data_entry::status::DataEntryTransitionError;
-use crate::data_entry::DataError;
-use axum::extract::rejection::JsonRejection;
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
-use axum::Json;
+use crate::{
+    authentication::AuthenticationError,
+    data_entry::{status::DataEntryTransitionError, DataError},
+};
+use axum::{
+    extract::rejection::JsonRejection,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
+};
 use hyper::header::InvalidHeaderValue;
 use quick_xml::SeError;
 use serde::{Deserialize, Serialize};

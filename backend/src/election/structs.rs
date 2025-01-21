@@ -102,8 +102,7 @@ pub enum CandidateGender {
 pub(crate) mod tests {
     use chrono::NaiveDate;
 
-    use crate::election::CandidateGender::X;
-    use crate::election::{Candidate, ElectionCategory, PoliticalGroup};
+    use crate::election::{Candidate, CandidateGender::X, ElectionCategory, PoliticalGroup};
 
     use super::*;
 

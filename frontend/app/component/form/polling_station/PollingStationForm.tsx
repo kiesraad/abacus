@@ -99,7 +99,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 fieldWidth="narrowest"
                 margin="mb-md-lg"
                 defaultValue={pollingStation?.number}
-                error={validationResult.number ? t(`form.errors.${validationResult.number}`) : undefined}
+                error={validationResult.number ? t(`form_errors.${validationResult.number}`) : undefined}
                 hideErrorMessage={requestState.status === "api-error"}
               />
               <InputField
@@ -108,7 +108,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 label={t("name")}
                 margin="mb-md-lg"
                 defaultValue={pollingStation?.name}
-                error={validationResult.name ? t(`form.errors.${validationResult.name}`) : undefined}
+                error={validationResult.name ? t(`form_errors.${validationResult.name}`) : undefined}
               />
             </FormLayout.Row>
 
@@ -116,7 +116,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               <ChoiceList>
                 <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
                 {validationResult.polling_station_type && (
-                  <ChoiceList.Error>{t(`form.errors.${validationResult.polling_station_type}`)}</ChoiceList.Error>
+                  <ChoiceList.Error>{t(`form_errors.${validationResult.polling_station_type}`)}</ChoiceList.Error>
                 )}
                 <ChoiceList.Radio
                   id={`polling_station_type-FixedLocation`}
@@ -158,7 +158,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               margin="mb-md-lg"
               defaultValue={pollingStation?.number_of_voters}
               error={
-                validationResult.number_of_voters ? t(`form.errors.${validationResult.number_of_voters}`) : undefined
+                validationResult.number_of_voters ? t(`form_errors.${validationResult.number_of_voters}`) : undefined
               }
               numberInput
             />
@@ -173,7 +173,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 margin="mb-md-lg"
                 label={t("polling_station.address")}
                 defaultValue={pollingStation?.address}
-                error={validationResult.address ? t(`form.errors.${validationResult.address}`) : undefined}
+                error={validationResult.address ? t(`form_errors.${validationResult.address}`) : undefined}
               />
             </FormLayout.Row>
             <FormLayout.Row>
@@ -184,7 +184,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 margin="mb-md-lg"
                 label={t("polling_station.postal_code")}
                 defaultValue={pollingStation?.postal_code}
-                error={validationResult.postal_code ? t(`form.errors.${validationResult.postal_code}`) : undefined}
+                error={validationResult.postal_code ? t(`form_errors.${validationResult.postal_code}`) : undefined}
               />
               <InputField
                 id="locality"
@@ -192,7 +192,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 margin="mb-md-lg"
                 label={t("polling_station.locality")}
                 defaultValue={pollingStation?.locality}
-                error={validationResult.locality ? t(`form.errors.${validationResult.locality}`) : undefined}
+                error={validationResult.locality ? t(`form_errors.${validationResult.locality}`) : undefined}
               />
             </FormLayout.Row>
           </FormLayout.Section>

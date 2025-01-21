@@ -8,7 +8,7 @@ import {
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   SaveDataEntryResponse,
 } from "@kiesraad/api";
-import { electionDetailsMockResponse, electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse, electionMockData } from "@kiesraad/api-mocks";
 import { overrideOnce, renderReturningRouter, screen, server } from "@kiesraad/test";
 
 import { PollingStationFormController } from "../../../component/form/data_entry/PollingStationFormController";
@@ -19,11 +19,7 @@ import { AbortDataEntryControl } from "./AbortDataEntryControl";
 const renderAbortDataEntryControl = () => {
   return renderReturningRouter(
     <ElectionProvider electionId={1}>
-      <PollingStationFormController
-        election={electionMockData}
-        pollingStationId={pollingStationMockData.id}
-        entryNumber={1}
-      >
+      <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
         <AbortDataEntryControl />
         <VotersAndVotesForm />
       </PollingStationFormController>

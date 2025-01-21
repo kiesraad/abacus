@@ -25,11 +25,7 @@ describe("PollingStationLayout", () => {
       <ElectionListProvider>
         <ElectionProvider electionId={election.id}>
           <ElectionStatusProvider electionId={election.id}>
-            <PollingStationFormController
-              election={election}
-              pollingStationId={pollingStationMockData.id}
-              entryNumber={1}
-            >
+            <PollingStationFormController election={election} pollingStationId={1} entryNumber={1}>
               <PollingStationLayout />
             </PollingStationFormController>
           </ElectionStatusProvider>
@@ -38,8 +34,9 @@ describe("PollingStationLayout", () => {
     );
 
     // Wait for the page to be loaded and check if the polling station information is displayed
-    expect(await screen.findByRole("heading", { level: 1, name: pollingStationMockData.name }));
-    expect(await screen.findByText(pollingStationMockData.number));
+    const pollingStation = pollingStationMockData[0]!;
+    expect(await screen.findByRole("heading", { level: 1, name: pollingStation.name }));
+    expect(await screen.findByText(pollingStation.number));
 
     // Check if the navigation bar displays the correct information
     const nav = await screen.findByRole("navigation", { name: /primary-navigation/i });

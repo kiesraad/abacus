@@ -889,6 +889,7 @@ mod tests {
     use super::*;
     use crate::election::tests::election_fixture;
     use crate::polling_station::structs::tests::polling_station_fixture;
+    use test_log::test;
 
     #[test]
     fn test_validation_result_append() {

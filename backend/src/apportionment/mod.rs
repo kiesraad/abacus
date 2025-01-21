@@ -102,6 +102,7 @@ mod tests {
     use crate::apportionment::{seat_allocation, ApportionmentError};
     use crate::data_entry::{PoliticalGroupVotes, VotersCounts, VotesCounts};
     use crate::summary::{ElectionSummary, SummaryDifferencesCounts};
+    use test_log::test;
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats() {

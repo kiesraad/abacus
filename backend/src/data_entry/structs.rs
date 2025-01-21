@@ -235,6 +235,7 @@ pub struct CandidateVotes {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test_log::test;
 
     #[test]
     fn test_votes_addition() {

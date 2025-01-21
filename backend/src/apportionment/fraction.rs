@@ -104,6 +104,7 @@ impl Debug for Fraction {
 mod tests {
     use super::*;
     use crate::apportionment::fraction::Fraction;
+    use test_log::test;
 
     #[test]
     fn test_from_count() {

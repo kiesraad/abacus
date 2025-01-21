@@ -603,6 +603,7 @@ impl CandidateIdentifier {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test_log::test;
 
     #[test]
     fn test_eml510() {

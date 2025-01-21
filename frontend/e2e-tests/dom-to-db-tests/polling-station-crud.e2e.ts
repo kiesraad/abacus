@@ -12,8 +12,8 @@ test.describe("Polling station CRUD", () => {
   }) => {
     await page.goto(`/elections/${emptyElection.id}/polling-stations#coordinator`);
 
-    const pollingStationListPage = new PollingStationListEmptyPgObj(page);
-    await pollingStationListPage.createPollingStation.click();
+    const pollingStationListEmptyPage = new PollingStationListEmptyPgObj(page);
+    await pollingStationListEmptyPage.createPollingStation.click();
 
     const form = new PollingStationFormPgObj(page);
 
@@ -24,6 +24,7 @@ test.describe("Polling station CRUD", () => {
 
     await form.create.click();
 
+    const pollingStationListPage = new PollingStationListPgObj(page);
     expect(await pollingStationListPage.alert.textContent()).toContain("Stembureau 42 (test42) toegevoegd");
   });
 

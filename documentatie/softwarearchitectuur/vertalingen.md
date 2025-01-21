@@ -24,12 +24,13 @@ Er kunnen dynamische elementen in de vertaling zitten die je met dezelfde functi
 Zie het volgende voorbeeld:
 
 ```typescript
+// signature van de vertaalfunctie
 function t(
     k: TranslationPath,
     vars?: Record<string, string | number>
 ): string;
 
-// test: "Hello {item}!
+// in het vertaalbestand staat de key "test" met waarde: "Hello {item}!
 expect(t("test", { item: "World" })).toEqual("Hello World!");
 ````
 
@@ -42,17 +43,18 @@ Voorbeeld:
 
 
 ```typescript
+// signature van de vertaalfunctie
 function tx(
   k: TranslationPath,
   elements?: Record<string, RenderCallback>,
   vars?: Record<string, string | number>,
 ): ReactElement
 
-// test: Visit my homepage <link>here</link>
+// in het vertaalbestand staat de key "test" met waarde: Visit my homepage <link>here</link>
 tx("test", {
     link: (title) => <a href="https://www.kiesraad.nl/">{title}</a>
 });
-// result: Visit my homepage <a href="https://www.kiesraad.nl/">here</a>
+// resultaat: Visit my homepage <a href="https://www.kiesraad.nl/">here</a>
 ````
 
 Toegestande HTML tags in vertalingen zijn: "ul", "li", "p", "strong", "code".

@@ -75,6 +75,10 @@ Ze volgende zaken kunnen helpen bij het kiezen van een goede key structuur:
 - Probeer keys niet te diep te nesten, niet meer dan 4 segmenten.
 - Zorg dat keys kort maar uniek zijn.
 
+Merk op dat een segment van een key niet als losse key gebruikt kan worden. Als bijvoorbeeld "differences.more_ballots_count"
+bestaat mag "differences" niet als losse key worden gedefinieerd. Een oplossing hioervoor is om de prefix "title" te gebruiken.
+Bijvoorbeeld `differences.title`: `Verschillen`.
+
 Zie ook [deze link](https://lokalise.com/blog/translation-keys-naming-and-organizing/) voor tips.
 
 ## Conversie

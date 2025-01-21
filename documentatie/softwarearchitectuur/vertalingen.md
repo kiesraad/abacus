@@ -42,7 +42,7 @@ de functie `tx()`.
 Voorbeeld:
 
 
-```typescript
+```tsx
 // signature van de vertaalfunctie
 function tx(
   k: TranslationPath,
@@ -57,12 +57,12 @@ tx("test", {
 // resultaat: Visit my homepage <a href="https://www.kiesraad.nl/">here</a>
 ````
 
-Toegestande HTML tags in vertalingen zijn: "ul", "li", "p", "strong", "code".
+Toegestane HTML tags in vertalingen zijn: "ul", "li", "p", "strong", "code".
 Newlines worden door de `tx()` functie automatisch omgezet naar `<br>`.
 
 ### Vertalingen toevoegen
 
-Vertalingen (van key naar vertaling) zijn te vinden in `/frontend/lib/i18n/loclales/<locale>/*.json`.
+Vertalingen (van key naar vertaling) zijn te vinden in `/frontend/lib/i18n/locales/<locale>/*.json`.
 
 Het kiezen van een goede vertaal-key en structuur is een kunst.
 Zie bijvoorbeeld [deze link](https://lokalise.com/blog/translation-keys-naming-and-organizing/) voor tips.
@@ -74,7 +74,7 @@ Vertalingen kunnen van ons eigen geneste JSON formaat geconverteerd worden naar 
 ### JSON naar PO
 
 Gebruik dit script om `.po`-bestanden te maken (één voor elke gedefinieerde locale) die gebruikt kunnen worden in vertaalsoftware.
-Dit script genereert `.po`-vertaalbestanden van de huidige JSON-vertalingen in `/frontend/lib/i18n/loclales/<locale>/*.json`:
+Dit script genereert `.po`-vertaalbestanden van de huidige JSON-vertalingen in `/frontend/lib/i18n/locales/<locale>/*.json`:
 
 ```sh
 npm run gen:po
@@ -82,7 +82,7 @@ npm run gen:po
 
 Dit resulteert in `/frontend/translations/<locale>.po`. Deze kunnen geïmporteerd worden in vertaalsoftware.
 
-#### PO naar JSON
+### PO naar JSON
 
 Gebruik dit script om aangepaste `.po`-bestanden terug te converteren naar onze applicatie-JSON-vertaalbestanden.
 Dit script genereert JSON-vertaalbestanden van `.po`-vertaalbestanden in `/frontend/translations/<locale>.po`:
@@ -91,4 +91,4 @@ Dit script genereert JSON-vertaalbestanden van `.po`-vertaalbestanden in `/front
 npm run gen:translation-json
 ```
 
-Dit resulteert in `/frontend/lib/i18n/loclales/<locale>/*.json`. Deze bevatten de teksten die door de applicatie worden gebruikt.
+Dit resulteert in `/frontend/lib/i18n/locales/<locale>/*.json`. Deze bevatten de teksten die door de applicatie worden gebruikt.

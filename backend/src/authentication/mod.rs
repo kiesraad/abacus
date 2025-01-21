@@ -127,6 +127,7 @@ mod tests {
     use http_body_util::BodyExt;
     use hyper::{header::CONTENT_TYPE, Method};
     use sqlx::SqlitePool;
+    use test_log::test;
     use tower::ServiceExt;
 
     use super::{login, logout};
@@ -144,7 +145,7 @@ mod tests {
             .with_state(state)
     }
 
-    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_login_success(pool: SqlitePool) {
         let app = create_app(pool);
 
@@ -175,7 +176,7 @@ mod tests {
         assert_eq!(result.username, "user");
     }
 
-    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_login_error(pool: SqlitePool) {
         let app = create_app(pool);
 
@@ -200,7 +201,7 @@ mod tests {
         assert_eq!(response.status(), 401);
     }
 
-    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_logout(pool: SqlitePool) {
         let app = create_app(pool);
 

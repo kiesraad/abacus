@@ -1,17 +1,17 @@
 #![cfg(test)]
 
-use crate::shared::create_result;
-use crate::utils::serve_api;
+use crate::{shared::create_result, utils::serve_api};
 #[cfg(feature = "dev-database")]
 use backend::election::Election;
 use backend::election::{ElectionDetailsResponse, ElectionListResponse};
 use hyper::StatusCode;
 use sqlx::SqlitePool;
+use test_log::test;
 
 pub mod shared;
 pub mod utils;
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3"))))]
 async fn test_election_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -26,7 +26,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body.elections.len(), 2);
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -46,7 +46,7 @@ async fn test_election_details_works(pool: SqlitePool) {
         .any(|ps| ps.name == "Op Rolletjes"));
 }
 
-#[sqlx::test]
+#[test(sqlx::test)]
 #[cfg(feature = "dev-database")]
 async fn test_election_create_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -99,7 +99,7 @@ async fn test_election_create_works(pool: SqlitePool) {
     assert_eq!(body.name, "Test Election");
 }
 
-#[sqlx::test]
+#[test(sqlx::test)]
 async fn test_election_details_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -111,7 +111,7 @@ async fn test_election_details_not_found(pool: SqlitePool) {
     assert_eq!(status, StatusCode::NOT_FOUND);
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_election_pdf_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -136,7 +136,7 @@ async fn test_election_pdf_download(pool: SqlitePool) {
     assert!(content_disposition_string.contains(".pdf"));
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_election_xml_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -157,7 +157,7 @@ async fn test_election_xml_download(pool: SqlitePool) {
     assert!(body.contains("<ValidVotes>204</ValidVotes>"));
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_election_zip_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

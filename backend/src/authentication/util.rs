@@ -35,6 +35,7 @@ pub(super) fn get_expires_at(duration: Duration) -> Result<u64, AuthenticationEr
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test_log::test;
 
     #[test]
     fn test_create_new_session_key() {

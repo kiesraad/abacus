@@ -1,7 +1,9 @@
 use crate::data_entry::Count;
-use std::fmt;
-use std::fmt::{Debug, Display, Formatter};
-use std::ops::{Div, Mul};
+use std::{
+    fmt,
+    fmt::{Debug, Display, Formatter},
+    ops::{Div, Mul},
+};
 
 pub struct Fraction {
     numerator: u64,
@@ -104,6 +106,7 @@ impl Debug for Fraction {
 mod tests {
     use super::*;
     use crate::apportionment::fraction::Fraction;
+    use test_log::test;
 
     #[test]
     fn test_from_count() {

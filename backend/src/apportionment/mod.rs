@@ -1,5 +1,4 @@
-use crate::apportionment::fraction::Fraction;
-use crate::summary::ElectionSummary;
+use crate::{apportionment::fraction::Fraction, summary::ElectionSummary};
 use serde::{Deserialize, Serialize};
 
 mod fraction;
@@ -99,9 +98,12 @@ pub enum ApportionmentError {
 
 #[cfg(test)]
 mod tests {
-    use crate::apportionment::{seat_allocation, ApportionmentError};
-    use crate::data_entry::{PoliticalGroupVotes, VotersCounts, VotesCounts};
-    use crate::summary::{ElectionSummary, SummaryDifferencesCounts};
+    use crate::{
+        apportionment::{seat_allocation, ApportionmentError},
+        data_entry::{PoliticalGroupVotes, VotersCounts, VotesCounts},
+        summary::{ElectionSummary, SummaryDifferencesCounts},
+    };
+    use test_log::test;
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats() {

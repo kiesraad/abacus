@@ -55,11 +55,11 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
 pub(crate) mod tests {
     use chrono::Utc;
     use models::ModelNa31_2Input;
+    use test_log::test;
 
     use super::*;
-    use crate::election::ElectionStatus;
     use crate::{
-        election::{tests::election_fixture, Election, ElectionCategory},
+        election::{tests::election_fixture, Election, ElectionCategory, ElectionStatus},
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
     };

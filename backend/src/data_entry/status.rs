@@ -502,9 +502,12 @@ impl Default for DataEntryStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::data_entry::{CandidateVotes, PoliticalGroupVotes, VotersCounts, VotesCounts};
-    use crate::election::{Candidate, Election, ElectionCategory, ElectionStatus, PoliticalGroup};
-    use crate::polling_station::{PollingStation, PollingStationType};
+    use crate::{
+        data_entry::{CandidateVotes, PoliticalGroupVotes, VotersCounts, VotesCounts},
+        election::{Candidate, Election, ElectionCategory, ElectionStatus, PoliticalGroup},
+        polling_station::{PollingStation, PollingStationType},
+    };
+    use test_log::test;
 
     fn polling_station_result() -> PollingStationResults {
         PollingStationResults {

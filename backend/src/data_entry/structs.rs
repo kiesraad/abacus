@@ -1,10 +1,7 @@
-use crate::data_entry::status::DataEntryStatus;
-use crate::error::ErrorReference;
-use crate::APIError;
+use crate::{data_entry::status::DataEntryStatus, error::ErrorReference, APIError};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::types::Json;
-use sqlx::FromRow;
+use sqlx::{types::Json, FromRow};
 use std::ops::AddAssign;
 use utoipa::ToSchema;
 
@@ -235,6 +232,7 @@ pub struct CandidateVotes {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test_log::test;
 
     #[test]
     fn test_votes_addition() {

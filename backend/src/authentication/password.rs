@@ -34,6 +34,7 @@ pub(super) fn verify_password(password: &str, password_hash: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test_log::test;
 
     #[test]
     fn test_hash_password_and_verify() {

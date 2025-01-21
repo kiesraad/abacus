@@ -3,15 +3,14 @@ use axum::serve::ListenerExt;
 use backend::fixtures;
 use backend::router;
 use clap::Parser;
-use sqlx::sqlite::SqliteConnectOptions;
-use sqlx::SqlitePool;
-use std::error::Error;
-use std::net::{Ipv4Addr, SocketAddr};
-use std::str::FromStr;
-use tokio::net::TcpListener;
-use tokio::signal;
-use tracing::level_filters::LevelFilter;
-use tracing::{info, trace};
+use sqlx::{sqlite::SqliteConnectOptions, SqlitePool};
+use std::{
+    error::Error,
+    net::{Ipv4Addr, SocketAddr},
+    str::FromStr,
+};
+use tokio::{net::TcpListener, signal};
+use tracing::{info, level_filters::LevelFilter, trace};
 use tracing_subscriber::EnvFilter;
 
 /// Abacus API and asset server

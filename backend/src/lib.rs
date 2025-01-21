@@ -1,6 +1,8 @@
-use axum::extract::FromRef;
-use axum::routing::{get, post};
-use axum::Router;
+use axum::{
+    extract::FromRef,
+    routing::{get, post},
+    Router,
+};
 #[cfg(feature = "memory-serve")]
 use memory_serve::MemoryServe;
 use sqlx::SqlitePool;

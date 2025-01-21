@@ -65,11 +65,23 @@ Newlines worden door de `tx()` functie automatisch omgezet naar `<br>`.
 Vertalingen (van key naar vertaling) zijn te vinden in `/frontend/lib/i18n/locales/<locale>/*.json`.
 
 Het kiezen van een goede vertaal-key en structuur is een kunst.
-Zie bijvoorbeeld [deze link](https://lokalise.com/blog/translation-keys-naming-and-organizing/) voor tips.
+
+Ze volgende zaken kunnen helpen bij het kiezen van een goede key structuur:
+
+- Hele algemene of korte vertalingen kunnen in `generic.json` worden geplaatst.
+- Probeer met de structuur van de key op een beknopte manier de structuur van de frontend code te volgen, zoals keys groeperen op component of directory.
+- Zorg dat de individuele bestanden niet de groot worden, waardoor je het overzicht kunt verliezen, probeer niet meer dan 100 keys in een bestand te zetten.
+- De huidige structuur mag aangepast worden! Als er veranderingen of andere inzichten zijn, neem dan de moeite om de structuur aan te passen.
+- Probeer keys niet te diep te nesten, niet meer dan 4 segmenten.
+- Zorg dat keys kort maar uniek zijn.
+
+Zie ook [deze link](https://lokalise.com/blog/translation-keys-naming-and-organizing/) voor tips.
 
 ## Conversie
 
 Vertalingen kunnen van ons eigen geneste JSON formaat geconverteerd worden naar `.po` formaat.
+
+De volgende scripts moeten worden aangeroepen vanuit de "frontend/" map.
 
 ### JSON naar PO
 

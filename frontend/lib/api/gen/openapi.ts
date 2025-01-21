@@ -164,10 +164,6 @@ export type DataEntryStatusName =
   | "entries_different"
   | "definitive";
 
-export interface Definitive {
-  finished_at: string;
-}
-
 /**
  * Differences counts, part of the polling station results.
  */
@@ -266,11 +262,6 @@ export interface ElectionStatusResponseEntry {
   status: DataEntryStatusName;
 }
 
-export interface EntriesDifferent {
-  first_entry: PollingStationResults;
-  second_entry: PollingStationResults;
-}
-
 /**
  * Error reference used to show the corresponding error message to the end-user
  */
@@ -305,12 +296,6 @@ export interface ErrorResponse {
   error: string;
   fatal: boolean;
   reference: ErrorReference;
-}
-
-export interface FirstEntryInProgress {
-  client_state: unknown;
-  first_entry: PollingStationResults;
-  progress: number;
 }
 
 /**
@@ -431,24 +416,13 @@ export interface PollingStationResults {
  */
 export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
 
+export type RestSeatAllocationDetails = Lt19SeatsAllocation | Gte19SeatsAllocation;
+
 /**
  * Response structure for saving data entry of polling station results
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
-}
-
-export interface SecondEntryInProgress {
-  client_state: unknown;
-  finalised_first_entry: PollingStationResults;
-  first_entry_finished_at: string;
-  progress: number;
-  second_entry: PollingStationResults;
-}
-
-export interface SecondEntryNotStarted {
-  finalised_first_entry: PollingStationResults;
-  first_entry_finished_at: string;
 }
 
 export interface ValidationResult {

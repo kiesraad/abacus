@@ -117,6 +117,18 @@ function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
     if (v.enum) {
       result.push(`export type ${name} = ${v.enum.map((e) => `"${e}"`).join(" | ")};`);
     }
+  } else if (v.oneOf) {
+    const types: string[] = [];
+    for (const obj of v.oneOf) {
+      if ("properties" in obj && obj.properties) {
+        for (const property of Object.values(obj.properties)) {
+          if ("$ref" in property) {
+            types.push(property.$ref.substring(property.$ref.lastIndexOf("/") + 1));
+          }
+        }
+      }
+    }
+    result.push(`export type ${name} = ${types.join(" | ")};`);
   }
 
   return result.join("\n");

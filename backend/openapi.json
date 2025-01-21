@@ -1219,114 +1219,6 @@
           }
         }
       },
-      "DataEntryStatus": {
-        "oneOf": [
-          {
-            "type": "object",
-            "required": [
-              "status"
-            ],
-            "properties": {
-              "status": {
-                "type": "string",
-                "enum": [
-                  "FirstEntryNotStarted"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/FirstEntryInProgress"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "FirstEntryInProgress"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/SecondEntryNotStarted"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "SecondEntryNotStarted"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/SecondEntryInProgress"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "SecondEntryInProgress"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/EntriesDifferent"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "EntriesDifferent"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/Definitive"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "Definitive"
-                ]
-              }
-            }
-          }
-        ]
-      },
       "DataEntryStatusName": {
         "type": "string",
         "enum": [
@@ -1337,17 +1229,6 @@
           "entries_different",
           "definitive"
         ]
-      },
-      "Definitive": {
-        "type": "object",
-        "required": [
-          "finished_at"
-        ],
-        "properties": {
-          "finished_at": {
-            "type": "string"
-          }
-        }
       },
       "DifferencesCounts": {
         "type": "object",
@@ -1638,21 +1519,6 @@
           }
         }
       },
-      "EntriesDifferent": {
-        "type": "object",
-        "required": [
-          "first_entry",
-          "second_entry"
-        ],
-        "properties": {
-          "first_entry": {
-            "$ref": "#/components/schemas/PollingStationResults"
-          },
-          "second_entry": {
-            "$ref": "#/components/schemas/PollingStationResults"
-          }
-        }
-      },
       "ErrorReference": {
         "type": "string",
         "description": "Error reference used to show the corresponding error message to the end-user",
@@ -1698,31 +1564,6 @@
           },
           "reference": {
             "$ref": "#/components/schemas/ErrorReference"
-          }
-        }
-      },
-      "FirstEntryInProgress": {
-        "type": "object",
-        "required": [
-          "progress",
-          "first_entry",
-          "client_state"
-        ],
-        "properties": {
-          "client_state": {
-            "type": "object",
-            "description": "Client state for the data entry (arbitrary JSON)"
-          },
-          "first_entry": {
-            "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
-          },
-          "progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Data entry progress between 0 and 100",
-            "maximum": 100,
-            "minimum": 0
           }
         }
       },
@@ -2128,57 +1969,6 @@
         "properties": {
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
-          }
-        }
-      },
-      "SecondEntryInProgress": {
-        "type": "object",
-        "required": [
-          "finalised_first_entry",
-          "first_entry_finished_at",
-          "progress",
-          "second_entry",
-          "client_state"
-        ],
-        "properties": {
-          "client_state": {
-            "type": "object",
-            "description": "Client state for the data entry (arbitrary JSON)"
-          },
-          "finalised_first_entry": {
-            "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
-          },
-          "first_entry_finished_at": {
-            "type": "string",
-            "description": "When the first entry was finalised"
-          },
-          "progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Data entry progress between 0 and 100",
-            "maximum": 100,
-            "minimum": 0
-          },
-          "second_entry": {
-            "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
-          }
-        }
-      },
-      "SecondEntryNotStarted": {
-        "type": "object",
-        "required": [
-          "finalised_first_entry",
-          "first_entry_finished_at"
-        ],
-        "properties": {
-          "finalised_first_entry": {
-            "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
-          },
-          "first_entry_finished_at": {
-            "type": "string"
           }
         }
       },

@@ -51,8 +51,7 @@ export function PollingStationFormNavigation({
       status === "deleted" ||
       status === "finalised" ||
       status === "aborted" ||
-      currentLocation.pathname === nextLocation.pathname ||
-      !currentForm
+      currentLocation.pathname === nextLocation.pathname
     ) {
       return false;
     }
@@ -72,8 +71,6 @@ export function PollingStationFormNavigation({
       if (formSection.warnings.length > 0 && !formSection.acceptWarnings) {
         reasons.push("warnings");
       }
-
-      console.log(formSection.acceptWarnings !== acceptWarnings, hasChanges);
 
       if (formSection.acceptWarnings !== acceptWarnings || hasChanges) {
         reasons.push("changes");
@@ -129,14 +126,22 @@ export function PollingStationFormNavigation({
   }
 
   const onAbortModalSave = async () => {
-    if (blocker.state === "blocked" && (await onSubmit({ continueToNextSection: false }))) {
-      blocker.proceed();
+    if (blocker.state === "blocked") {
+      if (await onSubmit({ continueToNextSection: false })) {
+        blocker.proceed();
+      } else{
+        blocker.reset();
+      }
     }
   };
 
   const onAbortModalDelete = async () => {
-    if (blocker.state === "blocked" && (await onDeleteDataEntry())) {
-      blocker.proceed();
+    if (blocker.state === "blocked") {
+      if (await onDeleteDataEntry()) {
+        blocker.proceed();
+      } else {
+        blocker.reset();
+      }
     }
   };
 
@@ -145,13 +150,26 @@ export function PollingStationFormNavigation({
       {blocker.state === "blocked" && (
         <>
           {!isPartOfDataEntryFlow(blocker.location.pathname) ? (
-            <Modal title={t("data_entry.abort.title")} onClose={() => blocker.reset()}>
+            <Modal title={t("data_entry.abort.title")} onClose={() => { blocker.reset(); }}>
               {tx("data_entry.abort.description")}
               <nav>
-                <Button size="lg" onClick={onAbortModalSave} disabled={status === "saving"}>
+                <Button
+                  size="lg"
+                  onClick={() => {
+                    void onAbortModalSave();
+                  }}
+                  disabled={status === "saving"}
+                >
                   {t("data_entry.abort.save_input")}
                 </Button>
-                <Button size="lg" variant="secondary" onClick={onAbortModalDelete} disabled={status === "deleting"}>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  onClick={() => {
+                    void onAbortModalDelete();
+                  }}
+                  disabled={status === "deleting"}
+                >
                   {t("data_entry.abort.discard_input")}
                 </Button>
               </nav>
@@ -172,7 +190,7 @@ export function PollingStationFormNavigation({
               </p>
               <p>{t("polling_station.save_changes")}</p>
               <nav>
-                <Button size="lg" onClick={onSave}>
+                <Button size="lg" onClick={() => { void onSave(); }}>
                   {t("save_changes")}
                 </Button>
                 <Button

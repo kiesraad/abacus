@@ -39,7 +39,6 @@ export const CheckboxAndRadio = React.forwardRef<HTMLInputElement, CheckboxAndRa
   ) => {
     return (
       <div className={cn(cls["checkbox-and-radio"])} id={`${type}-container-${id}`}>
-        {console.log('checked', checked)}
         <input
           className={`${type}${indeterminate ? " indeterminate" : ""}`}
           type={type}

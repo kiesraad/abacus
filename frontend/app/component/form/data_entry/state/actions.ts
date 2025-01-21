@@ -8,7 +8,19 @@ import {
 } from "@kiesraad/api";
 
 import { calculateDataEntryProgress, getClientState, updateFormStateAfterSubmit } from "./dataEntryUtils";
-import { DataEntryDispatch, DataEntryState, SubmitCurrentFormOptions } from "./types";
+import { DataEntryDispatch, DataEntryState, FormSectionReference, SubmitCurrentFormOptions, TemporaryCache } from "./types";
+
+export function registerForm(dispatch: DataEntryDispatch) {
+  return (form: FormSectionReference) => {
+    dispatch({ type: "REGISTER_CURRENT_FORM", form });
+  };
+}
+
+export function setCache(dispatch: DataEntryDispatch) {
+  return (cache: TemporaryCache) => {
+    dispatch({ type: "SET_CACHE", cache });
+  };
+}
 
 export function onSubmitForm(
   client: ApiClient,

@@ -48,6 +48,7 @@ ChoiceList.Radio = ({
   id,
   name,
   label,
+  checked,
   children,
   disabled,
   autoFocus,
@@ -62,6 +63,7 @@ ChoiceList.Radio = ({
     id={id}
     name={name}
     label={label}
+    checked={checked}
     disabled={disabled}
     autoFocus={autoFocus}
     defaultChecked={defaultChecked}

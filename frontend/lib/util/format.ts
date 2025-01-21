@@ -13,7 +13,7 @@ export function formatNumber(s: string | number | null | undefined | readonly st
     return "";
   }
 
-  let result = `${s}`.replace(/\D/g, "");
+  const result = `${s}`.replace(/\D/g, "");
 
   if (result === "") {
     return "";

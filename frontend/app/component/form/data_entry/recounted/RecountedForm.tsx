@@ -6,7 +6,6 @@ import { PollingStationFormNavigation } from "app/component/pollingstation/Polli
 
 export function RecountedForm() {
   const {
-    status,
     recounted,
     formRef,
     pollingStationResults,
@@ -17,8 +16,6 @@ export function RecountedForm() {
     isSaving,
     onSubmit
   } = useRecounted();
-
-  console.log(recounted, pollingStationResults, status)
 
   return (
     <Form

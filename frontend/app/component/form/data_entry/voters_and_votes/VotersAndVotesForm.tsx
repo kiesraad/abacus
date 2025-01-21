@@ -23,7 +23,7 @@ export function VotersAndVotesForm() {
     onSubmit,
     pollingStationResults,
     currentValues,
-    setCurrentValues,
+    setValues,
     errors,
     hasValidationError,
     warnings,
@@ -37,8 +37,6 @@ export function VotersAndVotesForm() {
     warningsWarning,
     defaultProps,
   } = useVotersAndVotes();
-
-  console.log('upper checked', acceptWarnings);
 
   return (
     <Form
@@ -76,12 +74,12 @@ export function VotersAndVotesForm() {
             id="poll_card_count"
             title={t("voters_and_votes.poll_card_count")}
             value={currentValues.poll_card_count || ''}
-            onChange={(e) =>
-              setCurrentValues({
+            onChange={(e) => {
+              setValues({
                 ...currentValues,
                 poll_card_count: e.target.value,
               })
-            }
+            }}
             {...defaultProps}
           />
           <InputGridRow
@@ -90,12 +88,12 @@ export function VotersAndVotesForm() {
             id="proxy_certificate_count"
             title={t("voters_and_votes.proxy_certificate_count")}
             value={currentValues.proxy_certificate_count || ''}
-            onChange={(e) =>
-              setCurrentValues({
+            onChange={(e) => {
+              setValues({
                 ...currentValues,
                 proxy_certificate_count: e.target.value,
               })
-            }
+            }}
             {...defaultProps}
           />
           <InputGridRow
@@ -104,12 +102,12 @@ export function VotersAndVotesForm() {
             id="voter_card_count"
             title={t("voters_and_votes.voter_card_count")}
             value={currentValues.voter_card_count || ''}
-            onChange={(e) =>
-              setCurrentValues({
+            onChange={(e) => {
+              setValues({
                 ...currentValues,
                 voter_card_count: e.target.value,
               })
-            }
+            }}
             {...defaultProps}
           />
           <InputGridRow
@@ -120,12 +118,12 @@ export function VotersAndVotesForm() {
             isTotal
             addSeparator
             value={currentValues.total_admitted_voters_count || ''}
-            onChange={(e) =>
-              setCurrentValues({
+            onChange={(e) => {
+              setValues({
                 ...currentValues,
                 total_admitted_voters_count: e.target.value,
               })
-            }
+            }}
             {...defaultProps}
           />
           <InputGridRow
@@ -134,12 +132,12 @@ export function VotersAndVotesForm() {
             id="votes_candidates_count"
             title={t("voters_and_votes.votes_candidates_count")}
             value={currentValues.votes_candidates_count || ''}
-            onChange={(e) =>
-              setCurrentValues({
+            onChange={(e) => {
+              setValues({
                 ...currentValues,
                 votes_candidates_count: e.target.value,
               })
-            }
+            }}
             {...defaultProps}
           />
           <InputGridRow
@@ -148,12 +146,12 @@ export function VotersAndVotesForm() {
             id="blank_votes_count"
             title={t("voters_and_votes.blank_votes_count")}
             value={currentValues.blank_votes_count || ''}
-            onChange={(e) =>
-              setCurrentValues({
+            onChange={(e) => {
+              setValues({
                 ...currentValues,
                 blank_votes_count: e.target.value,
               })
-            }
+            }}
             {...defaultProps}
           />
           <InputGridRow
@@ -162,12 +160,12 @@ export function VotersAndVotesForm() {
             id="invalid_votes_count"
             title={t("voters_and_votes.invalid_votes_count")}
             value={currentValues.invalid_votes_count || ''}
-            onChange={(e) =>
-              setCurrentValues({
+            onChange={(e) => {
+              setValues({
                 ...currentValues,
                 invalid_votes_count: e.target.value,
               })
-            }
+            }}
             {...defaultProps}
           />
           <InputGridRow
@@ -176,12 +174,12 @@ export function VotersAndVotesForm() {
             id="total_votes_cast_count"
             title={t("voters_and_votes.total_votes_cast_count")}
             value={currentValues.total_votes_cast_count || ''}
-            onChange={(e) =>
-              setCurrentValues({
+            onChange={(e) => {
+              setValues({
                 ...currentValues,
                 total_votes_cast_count: e.target.value,
               })
-            }
+            }}
             isTotal
             {...defaultProps}
           />
@@ -201,12 +199,12 @@ export function VotersAndVotesForm() {
                 id="poll_card_recount"
                 title={t("voters_and_votes.poll_card_recount")}
                 value={currentValues.poll_card_recount || ''}
-                onChange={(e) =>
-                  setCurrentValues({
+                onChange={(e) => {
+                  setValues({
                     ...currentValues,
                     poll_card_recount: e.target.value,
                   })
-                }
+                }}
                 {...defaultProps}
               />
               <InputGridRow
@@ -215,12 +213,12 @@ export function VotersAndVotesForm() {
                 id="proxy_certificate_recount"
                 title={t("voters_and_votes.proxy_certificate_recount")}
                 value={currentValues.proxy_certificate_recount || ''}
-                onChange={(e) =>
-                  setCurrentValues({
+                onChange={(e) => {
+                  setValues({
                     ...currentValues,
                     proxy_certificate_recount: e.target.value,
                   })
-                }
+                }}
                 {...defaultProps}
               />
               <InputGridRow
@@ -229,12 +227,12 @@ export function VotersAndVotesForm() {
                 id="voter_card_recount"
                 title={t("voters_and_votes.voter_card_recount")}
                 value={currentValues.voter_card_recount || ''}
-                onChange={(e) =>
-                  setCurrentValues({
+                onChange={(e) => {
+                  setValues({
                     ...currentValues,
                     voter_card_recount: e.target.value,
                   })
-                }
+                }}
                 {...defaultProps}
               />
               <InputGridRow
@@ -243,12 +241,12 @@ export function VotersAndVotesForm() {
                 id="total_admitted_voters_recount"
                 title={t("voters_and_votes.total_admitted_voters_recount")}
                 value={currentValues.total_admitted_voters_recount || ''}
-                onChange={(e) =>
-                  setCurrentValues({
+                onChange={(e) => {
+                  setValues({
                     ...currentValues,
                     total_admitted_voters_recount: e.target.value,
                   })
-                }
+                }}
                 isTotal
                 {...defaultProps}
               />
@@ -270,7 +268,9 @@ export function VotersAndVotesForm() {
               id="voters_and_votes_form_accept_warnings"
               checked={acceptWarnings}
               hasError={warningsWarning}
-              onChange={(e) => setAcceptWarnings(e.target.checked)}
+              onChange={(e) => {
+                setAcceptWarnings(e.target.checked);
+              }}
               label={t("voters_and_votes.form_accept_warnings")}
             />
           </BottomBar.Row>

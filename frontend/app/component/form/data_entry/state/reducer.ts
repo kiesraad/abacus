@@ -76,6 +76,11 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         ...state,
         status: action.status,
       };
+    case "SET_CACHE":
+      return {
+        ...state,
+        cache: action.cache,
+      };
     case "FORM_SAVE_FAILED":
       return {
         ...state,

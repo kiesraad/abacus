@@ -18,6 +18,8 @@ pub enum DataEntryTransitionError {
     Invalid,
     FirstEntryAlreadyClaimed,
     SecondEntryAlreadyClaimed,
+    FirstEntryAlreadyFinalised,
+    SecondEntryAlreadyFinalised,
     ValidatorError(DataError),
     ValidationError(ValidationResults),
 }
@@ -139,6 +141,9 @@ impl DataEntryStatus {
             DataEntryStatus::FirstEntryInProgress(_) => {
                 Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
             }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -163,6 +168,9 @@ impl DataEntryStatus {
             DataEntryStatus::SecondEntryInProgress(_) => {
                 Err(DataEntryTransitionError::SecondEntryAlreadyClaimed)
             }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -181,6 +189,13 @@ impl DataEntryStatus {
                     first_entry: entry,
                     client_state,
                 }))
+            }
+            DataEntryStatus::SecondEntryNotStarted(_)
+            | DataEntryStatus::SecondEntryInProgress(_) => {
+                Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+            }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
             }
             _ => Err(DataEntryTransitionError::Invalid),
         }
@@ -205,6 +220,9 @@ impl DataEntryStatus {
                 second_entry: entry,
                 client_state,
             })),
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -231,6 +249,13 @@ impl DataEntryStatus {
                     finalised_first_entry: state.first_entry,
                     first_entry_finished_at: Utc::now(),
                 }))
+            }
+            DataEntryStatus::SecondEntryNotStarted(_)
+            | DataEntryStatus::SecondEntryInProgress(_) => {
+                Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+            }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
             }
             _ => Err(DataEntryTransitionError::Invalid),
         }
@@ -272,6 +297,9 @@ impl DataEntryStatus {
                     ))
                 }
             }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -280,6 +308,13 @@ impl DataEntryStatus {
     pub fn delete_first_entry(self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::FirstEntryInProgress(_) => Ok(DataEntryStatus::FirstEntryNotStarted),
+            DataEntryStatus::SecondEntryNotStarted(_)
+            | DataEntryStatus::SecondEntryInProgress(_) => {
+                Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
+            }
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -297,6 +332,9 @@ impl DataEntryStatus {
                     first_entry_finished_at,
                 },
             )),
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -305,6 +343,9 @@ impl DataEntryStatus {
     pub fn delete_entries(self) -> Result<Self, DataEntryTransitionError> {
         match self {
             DataEntryStatus::EntriesDifferent(_) => Ok(Self::FirstEntryNotStarted),
+            DataEntryStatus::Definitive(_) => {
+                Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
+            }
             _ => Err(DataEntryTransitionError::Invalid),
         }
     }
@@ -437,6 +478,12 @@ impl Display for DataEntryTransitionError {
             DataEntryTransitionError::SecondEntryAlreadyClaimed => {
                 write!(f, "Second entry already claimed")
             }
+            DataEntryTransitionError::SecondEntryAlreadyFinalised => {
+                write!(f, "Second entry already finalised")
+            }
+            DataEntryTransitionError::FirstEntryAlreadyFinalised => {
+                write!(f, "First entry already finalised")
+            }
             DataEntryTransitionError::Invalid => write!(f, "Invalid state transition"),
             DataEntryTransitionError::ValidatorError(data_error) => {
                 write!(f, "Validator error: {}", data_error)
@@ -455,45 +502,236 @@ impl Default for DataEntryStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::data_entry::{CandidateVotes, PoliticalGroupVotes, VotersCounts, VotesCounts};
+    use crate::election::{Candidate, Election, ElectionCategory, ElectionStatus, PoliticalGroup};
+    use crate::polling_station::{PollingStation, PollingStationType};
 
-    #[test]
-    fn can_claim_not_started() {
-        let status = DataEntryStatus::FirstEntryNotStarted;
-        let entry = PollingStationResults::default();
-        let client_state = ClientState::new_from_str(Some("{}")).unwrap();
-        let progress = 0;
-
-        let new_status = status
-            .claim_first_entry(progress, entry.clone(), client_state.clone())
-            .unwrap();
-
-        assert_eq!(
-            new_status,
-            DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
-                progress,
-                first_entry: entry,
-                client_state
-            })
-        );
+    fn polling_station_result() -> PollingStationResults {
+        PollingStationResults {
+            recounted: Some(false),
+            ..Default::default()
+        }
     }
 
-    #[test]
-    fn cannot_claim_already_claimed() {
-        let mut initial_entry = PollingStationResults::default();
-        initial_entry.votes_counts.votes_candidates_count = 100;
-        let initial_entry = initial_entry;
+    fn polling_station() -> PollingStation {
+        PollingStation {
+            id: 1,
+            election_id: 1,
+            name: "Test polling station".to_string(),
+            number: 1,
+            number_of_voters: None,
+            polling_station_type: Some(PollingStationType::FixedLocation),
+            address: "Test street".to_string(),
+            postal_code: "1234 YQ".to_string(),
+            locality: "Test city".to_string(),
+        }
+    }
 
-        let status = DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+    fn election() -> Election {
+        Election {
+            id: 1,
+            name: "Test election".to_string(),
+            location: "Test location".to_string(),
+            number_of_voters: 100,
+            category: ElectionCategory::Municipal,
+            number_of_seats: 18,
+            election_date: chrono::Utc::now().date_naive(),
+            nomination_date: chrono::Utc::now().date_naive(),
+            status: ElectionStatus::DataEntryInProgress,
+            political_groups: Some(vec![]),
+        }
+    }
+
+    /// FirstEntryNotStarted --> FirstEntryInProgress: claim
+    #[test]
+    fn first_entry_not_started_to_first_entry_in_progress() {
+        let initial = DataEntryStatus::FirstEntryNotStarted;
+        let next = initial
+            .claim_first_entry(0, polling_station_result(), ClientState::default())
+            .unwrap();
+        assert!(matches!(next, DataEntryStatus::FirstEntryInProgress(_)));
+    }
+
+    /// FirstEntryInProgress --> FirstEntryInProgress: save
+    #[test]
+    fn first_entry_in_progress_to_first_entry_in_progress() {
+        let initial = DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
             progress: 0,
-            first_entry: initial_entry,
+            first_entry: polling_station_result(),
             client_state: ClientState::new_from_str(Some("{}")).unwrap(),
         });
 
-        let try_new_status =
-            status.claim_first_entry(0, PollingStationResults::default(), ClientState::default());
-        assert_eq!(
-            try_new_status,
-            Err(DataEntryTransitionError::FirstEntryAlreadyClaimed)
-        );
+        let next = initial
+            .update_first_entry(0, polling_station_result(), ClientState::default())
+            .unwrap();
+        assert!(matches!(next, DataEntryStatus::FirstEntryInProgress(_)));
     }
+
+    /// FirstEntryInProgress --> SecondEntryNotStarted: finalise
+    #[test]
+    fn first_entry_in_progress_to_second_entry_not_started() {
+        let initial = DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+            progress: 0,
+            first_entry: polling_station_result(),
+            client_state: ClientState::new_from_str(Some("{}")).unwrap(),
+        });
+
+        let next = initial
+            .finalise_first_entry(&polling_station(), &election())
+            .unwrap();
+        assert!(matches!(next, DataEntryStatus::SecondEntryNotStarted(_)));
+    }
+
+    /// FirstEntryInProgress --> FirstEntryNotStarted: delete
+    #[test]
+    fn first_entry_in_progress_to_first_entry_not_started() {
+        let initial = DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
+            progress: 0,
+            first_entry: polling_station_result(),
+            client_state: ClientState::new_from_str(Some("{}")).unwrap(),
+        });
+
+        let next = initial.delete_first_entry().unwrap();
+        assert!(matches!(next, DataEntryStatus::FirstEntryNotStarted));
+    }
+
+    /// SecondEntryNotStarted --> SecondEntryInProgress: claim
+    #[test]
+    fn second_entry_not_started_to_second_entry_in_progress() {
+        let initial = DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
+            finalised_first_entry: polling_station_result(),
+            first_entry_finished_at: chrono::Utc::now(),
+        });
+        let next = initial
+            .claim_second_entry(0, polling_station_result(), ClientState::default())
+            .unwrap();
+        assert!(matches!(next, DataEntryStatus::SecondEntryInProgress(_)));
+    }
+
+    /// SecondEntryInProgress --> SecondEntryInProgress: save
+    #[test]
+    fn second_entry_in_progress_to_second_entry_in_progress() {
+        let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+            finalised_first_entry: polling_station_result(),
+            first_entry_finished_at: chrono::Utc::now(),
+            progress: 0,
+            second_entry: polling_station_result(),
+            client_state: ClientState::default(),
+        });
+        let next = initial
+            .update_second_entry(0, polling_station_result(), ClientState::default())
+            .unwrap();
+        assert!(matches!(next, DataEntryStatus::SecondEntryInProgress(_)));
+    }
+
+    /// SecondEntryInProgress --> is_equal: finalise
+    /// is_equal --> Definitive: equal? yes
+    #[test]
+    fn second_entry_in_progress_finalise_equal() {
+        let initial_equal = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+            finalised_first_entry: polling_station_result(),
+            first_entry_finished_at: chrono::Utc::now(),
+            progress: 0,
+            second_entry: polling_station_result(),
+            client_state: ClientState::default(),
+        });
+
+        let next_equal = initial_equal
+            .finalise_second_entry(&polling_station(), &election())
+            .unwrap();
+        assert!(matches!(next_equal.0, DataEntryStatus::Definitive(_)));
+    }
+
+    /// SecondEntryInProgress --> is_equal: finalise
+    /// is_equal --> EntriesDifferent: equal? no
+    #[test]
+    fn second_entry_in_progress_finalise_not_equal() {
+        let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+            finalised_first_entry: polling_station_result(),
+            first_entry_finished_at: chrono::Utc::now(),
+            progress: 0,
+            second_entry: PollingStationResults {
+                voters_counts: VotersCounts {
+                    poll_card_count: 1,
+                    proxy_certificate_count: 0,
+                    voter_card_count: 0,
+                    total_admitted_voters_count: 1,
+                },
+                votes_counts: VotesCounts {
+                    votes_candidates_count: 1,
+                    blank_votes_count: 0,
+                    invalid_votes_count: 0,
+                    total_votes_cast_count: 1,
+                },
+                political_group_votes: vec![PoliticalGroupVotes {
+                    number: 1,
+                    total: 1,
+                    candidate_votes: vec![CandidateVotes {
+                        number: 1,
+                        votes: 1,
+                    }],
+                }],
+                ..polling_station_result()
+            },
+            client_state: ClientState::default(),
+        });
+
+        let next = initial
+            .finalise_second_entry(
+                &polling_station(),
+                &Election {
+                    political_groups: Some(vec![PoliticalGroup {
+                        number: 1,
+                        name: "Test group".to_string(),
+                        candidates: vec![Candidate {
+                            number: 1,
+                            initials: "A.".to_string(),
+                            first_name: None,
+                            last_name_prefix: None,
+                            last_name: "Candidate".to_string(),
+                            locality: "Test locality".to_string(),
+                            country_code: None,
+                            gender: None,
+                        }],
+                    }]),
+                    ..election()
+                },
+            )
+            .unwrap();
+        assert!(matches!(next.0, DataEntryStatus::EntriesDifferent(_)));
+    }
+
+    /// SecondEntryInProgress --> SecondEntryNotStarted: delete
+    #[test]
+    fn second_entry_in_progress_to_second_entry_not_started() {
+        let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+            finalised_first_entry: polling_station_result(),
+            first_entry_finished_at: chrono::Utc::now(),
+            progress: 0,
+            second_entry: polling_station_result(),
+            client_state: ClientState::default(),
+        });
+        let next = initial.delete_second_entry().unwrap();
+        assert!(matches!(next, DataEntryStatus::SecondEntryNotStarted(_)));
+    }
+
+    /// EntriesDifferent --> Definitive: resolve
+    #[test]
+    fn entries_different_to_definitive() {
+        let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
+            second_entry: polling_station_result(),
+            first_entry: PollingStationResults::default(),
+        });
+        let next = initial.resolve(EntryNumber::SecondEntry).unwrap();
+        assert!(matches!(next.0, DataEntryStatus::Definitive(_)));
+    }
+
+    //TODO: Will be Implemented in #130:
+    // EntriesDifferent --> NotStarted: delete
+    /*
+    #[test]
+    fn entries_not_equal_to_definitive() {
+        todo!();
+    }
+    */
 }

@@ -14,7 +14,9 @@ configure({
 failOnConsole();
 
 beforeAll(() => {
-  server.listen();
+  server.listen({
+    onUnhandledRequest: "error",
+  });
 
   // mock scrollIntoView, used in progresslist
   Element.prototype.scrollIntoView = vi.fn();

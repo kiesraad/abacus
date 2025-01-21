@@ -9,6 +9,7 @@ import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationDataEntryGetHandler,
+  PollingStationDataEntrySaveHandler,
   pollingStationMockData,
 } from "@kiesraad/api-mocks";
 import { render, screen, server, within } from "@kiesraad/test";
@@ -29,6 +30,7 @@ describe("PollingStationLayout", () => {
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       PollingStationDataEntryGetHandler,
+      PollingStationDataEntrySaveHandler,
     );
   });
 

@@ -144,7 +144,6 @@ fn allocate_remaining_seats(
             )?;
             *rest_seats.entry(pg_number).or_insert(0) += 1;
             remaining_seats -= 1;
-            // pg_number_last_remaining_seat = Some(pg_number);
             info!(
                 "Remaining seat assigned using largest averages system to pg_number: {}",
                 pg_number
@@ -169,7 +168,6 @@ fn allocate_remaining_seats(
                 *rest_seats.entry(pg_number).or_insert(0) += 1;
                 surpluses.remove(&pg_number);
                 remaining_seats -= 1;
-                // pg_number_last_remaining_seat = Some(pg_number);
                 info!(
                     "Remaining seat assigned using largest surpluses system to pg_number: {}",
                     pg_number
@@ -197,7 +195,6 @@ fn allocate_remaining_seats(
                 if !unique_pgs.is_empty() {
                     unique_pgs.retain(|&pg_num| pg_num != pg_number);
                 }
-                // pg_number_last_remaining_seat = Some(pg_number);
                 info!(
                     "Remaining seat assigned using greatest averages system to pg_number: {}",
                     pg_number
@@ -234,7 +231,6 @@ pub fn seat_allocation(
     );
     let remaining_seats = seats - whole_seats_count;
     let mut rest_seats = BTreeMap::<u8, u64>::new();
-    // let mut pg_number_last_remaining_seat: Option<u8> = None;
 
     info!("======================================================");
 

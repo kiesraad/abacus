@@ -68,7 +68,6 @@ The following dependencies (crates) are used:
 - `tower-http`: Tower middleware and utilities for HTTP clients and servers.
 - `tracing`: a framework for instrumenting Rust programs to collect structured, event-based diagnostic information.
 - `tracing-subscriber`: utilities for implementing and composing `tracing` subscribers.
-- `test-log`: show tracing messages while running tests
 - `typst`: a new markup-based typesetting system that is powerful and easy to learn.
 - `typst-pdf`: a PDF exporter for Typst.
 - `utoipa`: library for documenting REST APIs using OpenAPI.
@@ -77,6 +76,7 @@ The following dependencies (crates) are used:
 
 Additionally, the following development dependencies are used:
 
+- `test-log`: show tracing messages while running tests
 - `reqwest`: HTTP client for testing the API.
 - `http-body-util`: trait used to extract a response body in some tests.
 

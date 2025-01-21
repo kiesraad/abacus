@@ -35,13 +35,7 @@ export type ApiRequestFatalErrorState =
     };
 
 // All possible states, including errors
-export type ApiRequestState<T> =
-  | ApiRequestStateWithoutFatalErrors<T>
-  | {
-      status: "api-error";
-      error: ApiError;
-    }
-  | ApiRequestFatalErrorState;
+export type ApiRequestState<T> = ApiRequestStateWithoutFatalErrors<T> | ApiRequestFatalErrorState;
 
 export interface UseApiRequestReturn<T> {
   requestState: ApiRequestState<T>;

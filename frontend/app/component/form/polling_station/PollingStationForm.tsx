@@ -33,7 +33,7 @@ const formFields: FormFields<PollingStationRequest> = {
 export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
   const formRef = React.useRef<Form>(null);
 
-  const { process, validationResult } = useForm<PollingStationRequest>(formFields);
+  const { process, isValid, validationResult } = useForm<PollingStationRequest>(formFields);
   const { requestState, create, update } = useCrud<PollingStation>({
     create: `/api/elections/${electionId}/polling_stations`,
     update: pollingStation ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
@@ -67,9 +67,16 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
     }
   };
 
+  let numberFieldError;
+  if (validationResult.number) {
+    numberFieldError = t(`form_errors.${validationResult.number}`);
+  } else if (isValid && requestState.status === "api-error" && requestState.error.reference === "EntryNotUnique") {
+    numberFieldError = t("polling_station.form.not_unique.error");
+  }
+
   return (
     <div>
-      {requestState.status === "api-error" && (
+      {isValid && requestState.status === "api-error" && (
         <FormLayout.Alert>
           {requestState.error.reference === "EntryNotUnique" ? (
             <Alert type="error">
@@ -99,8 +106,10 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 fieldWidth="narrowest"
                 margin="mb-md-lg"
                 defaultValue={pollingStation?.number}
-                error={validationResult.number ? t(`form_errors.${validationResult.number}`) : undefined}
-                hideErrorMessage={requestState.status === "api-error"}
+                error={numberFieldError}
+                hideErrorMessage={
+                  requestState.status === "api-error" && requestState.error.reference !== "EntryNotUnique"
+                }
               />
               <InputField
                 id="name"

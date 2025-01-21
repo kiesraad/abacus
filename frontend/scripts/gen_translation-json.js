@@ -29,7 +29,7 @@ function parsePoFile(contents) {
     if (line.startsWith("msgid")) {
       msgid = line.replace("msgid", "").trim().replace(/^"|"$/g, "");
     } else if (line.startsWith("msgstr")) {
-      msgstr = line.replace("msgstr", "").trim().replace(/^"|"$/g, "").replace("\\\\n", "\\n");
+      msgstr = line.replace("msgstr", "").trim().replace(/^"|"$/g, "").replace(/\\n/g, "\n");
       translations[msgid] = msgstr;
     }
   }

@@ -33,7 +33,7 @@ const formFields: FormFields<PollingStationRequest> = {
 export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
   const formRef = React.useRef<Form>(null);
 
-  const { process, validationResult } = useForm<PollingStationRequest>(formFields);
+  const { process, isValid, validationResult } = useForm<PollingStationRequest>(formFields);
   const { requestState, create, update } = useCrud<PollingStation>({
     create: `/api/elections/${electionId}/polling_stations`,
     update: pollingStation ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
@@ -67,9 +67,16 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
     }
   };
 
+  let numberFieldError;
+  if (validationResult.number) {
+    numberFieldError = t(`form_errors.${validationResult.number}`);
+  } else if (isValid && requestState.status === "api-error" && requestState.error.reference === "EntryNotUnique") {
+    numberFieldError = t("polling_station.form.not_unique.error");
+  }
+
   return (
     <div>
-      {requestState.status === "api-error" && (
+      {isValid && requestState.status === "api-error" && (
         <FormLayout.Alert>
           {requestState.error.reference === "EntryNotUnique" ? (
             <Alert type="error">
@@ -99,8 +106,10 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 fieldWidth="narrowest"
                 margin="mb-md-lg"
                 defaultValue={pollingStation?.number}
-                error={validationResult.number ? t(`form.errors.${validationResult.number}`) : undefined}
-                hideErrorMessage={requestState.status === "api-error"}
+                error={numberFieldError}
+                hideErrorMessage={
+                  requestState.status === "api-error" && requestState.error.reference !== "EntryNotUnique"
+                }
               />
               <InputField
                 id="name"
@@ -108,7 +117,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 label={t("name")}
                 margin="mb-md-lg"
                 defaultValue={pollingStation?.name}
-                error={validationResult.name ? t(`form.errors.${validationResult.name}`) : undefined}
+                error={validationResult.name ? t(`form_errors.${validationResult.name}`) : undefined}
               />
             </FormLayout.Row>
 
@@ -116,7 +125,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               <ChoiceList>
                 <ChoiceList.Title>{t("polling_station.title.type")}</ChoiceList.Title>
                 {validationResult.polling_station_type && (
-                  <ChoiceList.Error>{t(`form.errors.${validationResult.polling_station_type}`)}</ChoiceList.Error>
+                  <ChoiceList.Error>{t(`form_errors.${validationResult.polling_station_type}`)}</ChoiceList.Error>
                 )}
                 <ChoiceList.Radio
                   id={`polling_station_type-FixedLocation`}
@@ -158,7 +167,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
               margin="mb-md-lg"
               defaultValue={pollingStation?.number_of_voters}
               error={
-                validationResult.number_of_voters ? t(`form.errors.${validationResult.number_of_voters}`) : undefined
+                validationResult.number_of_voters ? t(`form_errors.${validationResult.number_of_voters}`) : undefined
               }
               numberInput
             />
@@ -173,7 +182,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 margin="mb-md-lg"
                 label={t("polling_station.address")}
                 defaultValue={pollingStation?.address}
-                error={validationResult.address ? t(`form.errors.${validationResult.address}`) : undefined}
+                error={validationResult.address ? t(`form_errors.${validationResult.address}`) : undefined}
               />
             </FormLayout.Row>
             <FormLayout.Row>
@@ -184,7 +193,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 margin="mb-md-lg"
                 label={t("polling_station.postal_code")}
                 defaultValue={pollingStation?.postal_code}
-                error={validationResult.postal_code ? t(`form.errors.${validationResult.postal_code}`) : undefined}
+                error={validationResult.postal_code ? t(`form_errors.${validationResult.postal_code}`) : undefined}
               />
               <InputField
                 id="locality"
@@ -192,7 +201,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 margin="mb-md-lg"
                 label={t("polling_station.locality")}
                 defaultValue={pollingStation?.locality}
-                error={validationResult.locality ? t(`form.errors.${validationResult.locality}`) : undefined}
+                error={validationResult.locality ? t(`form_errors.${validationResult.locality}`) : undefined}
               />
             </FormLayout.Row>
           </FormLayout.Section>

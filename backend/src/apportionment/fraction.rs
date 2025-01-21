@@ -1,7 +1,8 @@
 use crate::data_entry::Count;
-use std::fmt;
-use std::fmt::{Debug, Display, Formatter};
-use std::ops::{Add, Div, Mul, Sub};
+use std::{
+    fmt::{Debug, Display, Formatter, Result},
+    ops::{Add, Div, Mul, Sub},
+};
 
 #[derive(Clone, Copy)]
 pub struct Fraction {
@@ -99,7 +100,7 @@ impl PartialEq for Fraction {
 impl Eq for Fraction {}
 
 impl Display for Fraction {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         if self.denominator == 0 {
             return write!(f, "NaN");
         }
@@ -118,7 +119,7 @@ impl Display for Fraction {
 }
 
 impl Debug for Fraction {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(f, "{}", self)
     }
 }
@@ -127,6 +128,7 @@ impl Debug for Fraction {
 mod tests {
     use super::*;
     use crate::apportionment::fraction::Fraction;
+    use test_log::test;
 
     #[test]
     fn test_from_count() {

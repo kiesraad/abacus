@@ -148,10 +148,11 @@ impl FromRef<AppState> for Sessions {
 mod test {
     use sqlx::SqlitePool;
     use std::time::Duration;
+    use test_log::test;
 
     use crate::authentication::session::Sessions;
 
-    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_create_and_get_session(pool: SqlitePool) {
         let sessions = Sessions::new(pool);
 
@@ -166,7 +167,7 @@ mod test {
         assert_eq!(session, session_from_db);
     }
 
-    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_session(pool: SqlitePool) {
         let sessions = Sessions::new(pool);
         let session = sessions.create(1, Duration::from_secs(60)).await.unwrap();
@@ -181,7 +182,7 @@ mod test {
         assert_eq!(None, session_from_db);
     }
 
-    #[sqlx::test(fixtures("../../fixtures/users.sql"))]
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_old_sessions(pool: SqlitePool) {
         let sessions = Sessions::new(pool);
 

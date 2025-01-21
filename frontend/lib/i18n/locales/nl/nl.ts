@@ -7,6 +7,7 @@ import election_report from "./election_report.json";
 import election_status from "./election_status.json";
 import error from "./error.json";
 import feedback from "./feedback.json";
+import form_errors from "./form_errors.json";
 import generic from "./generic.json";
 import messages from "./messages.json";
 import polling_station from "./polling_station.json";
@@ -19,6 +20,7 @@ import workstations from "./workstations.json";
 
 const nl = {
   ...generic,
+  form_errors,
   candidates_votes,
   check_and_save,
   data_entry,

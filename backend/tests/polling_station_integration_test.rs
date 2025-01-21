@@ -2,18 +2,23 @@
 
 use reqwest::StatusCode;
 use sqlx::SqlitePool;
+use test_log::test;
 
-use crate::shared::{create_and_save_data_entry, create_result};
-use crate::utils::serve_api;
-use backend::polling_station::{
-    PollingStation, PollingStationListResponse, PollingStationRequest, PollingStationType,
+use crate::{
+    shared::{create_and_save_data_entry, create_result},
+    utils::serve_api,
 };
-use backend::ErrorResponse;
+use backend::{
+    polling_station::{
+        PollingStation, PollingStationListResponse, PollingStationRequest, PollingStationType,
+    },
+    ErrorResponse,
+};
 
 pub mod shared;
 pub mod utils;
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_listing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -32,7 +37,7 @@ async fn test_polling_station_listing(pool: SqlitePool) {
         .any(|ps| ps.name == "Op Rolletjes"))
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_creation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 2;
@@ -67,7 +72,7 @@ async fn test_polling_station_creation(pool: SqlitePool) {
     );
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 2;
@@ -86,7 +91,7 @@ async fn test_polling_station_get(pool: SqlitePool) {
     assert_eq!(body.polling_station_type, Some(PollingStationType::Special));
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_update_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
@@ -122,7 +127,7 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
     assert_eq!(updated_body.address, "Teststraat 2a");
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
@@ -158,7 +163,7 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
     assert_eq!(updated_body.polling_station_type, None);
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_update_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/40404");
@@ -182,7 +187,7 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
     assert_eq!(status, StatusCode::NOT_FOUND, "Unexpected response status");
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_delete_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
@@ -201,7 +206,7 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
     );
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -220,7 +225,7 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     assert_eq!(body.error, "Invalid data");
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -239,7 +244,7 @@ async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
     assert_eq!(body.error, "Invalid data");
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/40404");
@@ -250,7 +255,7 @@ async fn test_polling_station_delete_not_found(pool: SqlitePool) {
     assert_eq!(status, StatusCode::NOT_FOUND, "Unexpected response status");
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_non_unique(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 2;
@@ -275,7 +280,7 @@ async fn test_polling_station_non_unique(pool: SqlitePool) {
     assert_eq!(status, StatusCode::CONFLICT, "Unexpected response status");
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("election_2")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_list_invalid_election(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/elections/1234/polling_stations");

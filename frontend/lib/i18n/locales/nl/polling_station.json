@@ -26,7 +26,8 @@
     "save_update": "Wijzigingen opslaan",
     "not_unique": {
       "title": "Er bestaat al een stembureau met nummer {number}.",
-      "description": "Het nummer van het stembureau moet uniek zijn."
+      "description": "Het nummer van het stembureau moet uniek zijn.",
+      "error": "Voer een uniek nummer in"
     }
   },
   "type": {

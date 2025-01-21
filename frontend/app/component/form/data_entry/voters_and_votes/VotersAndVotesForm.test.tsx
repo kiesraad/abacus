@@ -10,7 +10,7 @@ import {
 } from "app/component/form/testHelperFunctions";
 
 import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@kiesraad/api";
-import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
+import { electionMockData } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs, waitFor } from "@kiesraad/test";
 
 import { FormState, PollingStationFormController } from "../PollingStationFormController";
@@ -59,7 +59,7 @@ function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
   return render(
     <PollingStationFormController
       election={electionMockData}
-      pollingStationId={pollingStationMockData.id}
+      pollingStationId={1}
       entryNumber={1}
       defaultValues={defaultValues}
       defaultFormState={defaultFormState}

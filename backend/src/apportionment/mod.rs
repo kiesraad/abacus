@@ -1,6 +1,6 @@
-use crate::apportionment::fraction::Fraction;
-use crate::data_entry::PoliticalGroupVotes;
-use crate::summary::ElectionSummary;
+use crate::{
+    apportionment::fraction::Fraction, data_entry::PoliticalGroupVotes, summary::ElectionSummary,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use tracing::{debug, info};
@@ -267,9 +267,12 @@ pub enum ApportionmentError {
 
 #[cfg(test)]
 mod tests {
-    use crate::apportionment::{seat_allocation, ApportionmentError};
-    use crate::data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts};
-    use crate::summary::{ElectionSummary, SummaryDifferencesCounts};
+    use crate::{
+        apportionment::{seat_allocation, ApportionmentError},
+        data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts},
+        summary::{ElectionSummary, SummaryDifferencesCounts},
+    };
+    use test_log::test;
 
     fn get_election_summary(pg_votes: Vec<Count>) -> ElectionSummary {
         let total_votes = pg_votes.iter().sum();

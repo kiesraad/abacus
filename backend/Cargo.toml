@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 license = "EUPL-1.2"
 rust-version = "1.75"
-
 default-run = "abacus"
 
 [features]
@@ -47,6 +46,7 @@ cookie = "0.18.1"
 zip = { version = "2.2.2", default-features = false, features = ["deflate", "chrono"] }
 
 [dev-dependencies]
+test-log = "0.2.17"
 http-body-util = "0.1.2"
 reqwest = { version = "0.12", default-features = false, features = ["json"] }
 

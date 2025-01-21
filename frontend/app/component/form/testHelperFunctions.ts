@@ -1,6 +1,11 @@
 import { expect } from "vitest";
 
-import { PoliticalGroup, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, ValidationResult } from "@kiesraad/api";
+import {
+  PoliticalGroup,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  ValidationResult,
+  ValidationResultCode,
+} from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 import { screen, within } from "@kiesraad/test";
 
@@ -74,13 +79,15 @@ export const emptyDataEntryRequest: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY
   },
 };
 
-type ErrorMap = {
-  F201: ValidationResult;
-  W301: ValidationResult;
-  W302: ValidationResult;
+type ErrorWarningsMap<Code extends ValidationResultCode> = {
+  [C in Code]: ValidationResult & { code: C };
 };
 
-export const errorWarningMocks: ErrorMap = {
+export const errorWarningMocks: ErrorWarningsMap<"F101" | "F201" | "F301" | "F204" | "W301" | "W302"> = {
+  F101: {
+    fields: ["data.recounted"],
+    code: "F101",
+  },
   F201: {
     fields: [
       "data.voters_counts.poll_card_count",
@@ -89,6 +96,14 @@ export const errorWarningMocks: ErrorMap = {
       "data.voters_counts.total_admitted_voters_count",
     ],
     code: "F201",
+  },
+  F204: {
+    fields: ["data.votes_counts.votes_candidates_count", "data.political_group_votes"],
+    code: "F204",
+  },
+  F301: {
+    fields: ["data.differences_counts.more_ballots_count"],
+    code: "F301",
   },
   W301: {
     fields: [

@@ -42,6 +42,7 @@ describe("routes", () => {
   test("Non existing election id results in not found page", async () => {
     // Navigate to a non-existing page
     const router = renderWithRouter();
+    overrideOnce("get", "/api/elections/9876", 404, null);
     await router.navigate("/elections/9876/data-entry");
     expect(router.state.location.pathname).toEqual("/elections/9876/data-entry");
     await expectNotFound("Verkiezing niet gevonden");

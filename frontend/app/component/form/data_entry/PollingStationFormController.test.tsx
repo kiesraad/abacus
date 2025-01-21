@@ -4,7 +4,9 @@ import { describe, expect, test } from "vitest";
 
 import { PollingStationFormController } from "app/component/form/data_entry/PollingStationFormController";
 import { usePollingStationFormController } from "app/component/form/data_entry/usePollingStationFormController";
+import { errorWarningMocks } from "app/component/form/testHelperFunctions";
 
+import { SaveDataEntryResponse } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 import { overrideOnce, Providers, renderHook, waitFor } from "@kiesraad/test";
 
@@ -70,6 +72,10 @@ describe("PollingStationFormController", () => {
       // wait for the form state to be updated after registering the form
       expect(result.current.formState.current).toBe("voters_votes_counts");
     });
+
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+      validation_results: { errors: [errorWarningMocks.F201], warnings: [] },
+    } as SaveDataEntryResponse);
 
     await result.current.submitCurrentForm();
 

@@ -2,8 +2,10 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
+import { errorWarningMocks } from "app/component/form/testHelperFunctions";
 import { routes } from "app/routes";
 
+import { SaveDataEntryResponse } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 import {
   overrideOnce,
@@ -141,27 +143,29 @@ async function expectCheckAndSavePage(router: Router, bodyShouldHaveFocus = true
   }
 }
 
-async function expectFeedbackError(code?: string) {
+async function expectFeedbackError(code: string) {
+  const error = screen.getByTestId("feedback-error");
   await waitFor(() => {
-    expect(screen.getByTestId("feedback-error")).toBeInTheDocument();
+    expect(error).toBeInTheDocument();
   });
   if (code) {
-    expect(screen.getByText(code)).toBeInTheDocument();
+    expect(within(error).getByText(code)).toBeInTheDocument();
   }
   await waitFor(() => {
-    expect(screen.getByRole("heading", { level: 3 })).toHaveFocus();
+    expect(within(error).getByRole("heading", { level: 3 })).toHaveFocus();
   });
 }
 
-async function expectFeedbackWarning(code?: string) {
+async function expectFeedbackWarning(code: string) {
+  const warning = screen.getByTestId("feedback-warning");
   await waitFor(() => {
-    expect(screen.getByTestId("feedback-warning")).toBeInTheDocument();
+    expect(warning).toBeInTheDocument();
   });
   if (code) {
-    expect(screen.getByText(code)).toBeInTheDocument();
+    expect(within(warning).getByText(code)).toBeInTheDocument();
   }
   await waitFor(() => {
-    expect(screen.getByRole("heading", { level: 3 })).toHaveFocus();
+    expect(within(warning).getByRole("heading", { level: 3 })).toHaveFocus();
   });
 }
 
@@ -282,8 +286,12 @@ async function executeStepsForPendingChanges(router: Router) {
     invalid_votes_count: 1,
     total_votes_cast_count: 3,
   });
+
+  overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+    validation_results: { errors: [errorWarningMocks.F201], warnings: [] },
+  } as SaveDataEntryResponse);
   await submit();
-  await expectFeedbackError();
+  await expectFeedbackError("F.201");
   await fillVotersAndVotesForm({
     total_admitted_voters_count: 3,
   });
@@ -333,9 +341,17 @@ describe("Polling Station data entry integration tests", () => {
       await expectDifferencesForm();
       await fillDifferencesForm();
       await submit();
-      for (const pg of electionMockData.political_groups) {
-        await expectPoliticalGroupCandidatesForm(pg.number);
+
+      const lastGroup = electionMockData.political_groups[electionMockData.political_groups.length - 1];
+      for (const group of electionMockData.political_groups) {
+        await expectPoliticalGroupCandidatesForm(group.number);
         await fillPoliticalGroupCandidatesVotesForm();
+
+        if (group === lastGroup) {
+          overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+            validation_results: { errors: [errorWarningMocks.F204], warnings: [] },
+          } as SaveDataEntryResponse);
+        }
         await submit();
       }
       await expectVotersAndVotesForm(false);
@@ -436,8 +452,12 @@ describe("Polling Station data entry integration tests", () => {
       await userTypeInputs(user, {
         total_admitted_voters_count: 1,
       });
+
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [errorWarningMocks.F201], warnings: [] },
+      } as SaveDataEntryResponse);
       await submit();
-      await expectFeedbackError();
+      await expectFeedbackError("F.201");
 
       await userTypeInputs(user, {
         total_admitted_voters_count: total_votes,
@@ -474,6 +494,10 @@ describe("Polling Station data entry integration tests", () => {
       await gotoForm("recounted");
       await expectElementContainsIcon("list-item-save", "nog niet afgerond");
       await fillRecountedFormYes();
+
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [errorWarningMocks.F301], warnings: [] },
+      } as SaveDataEntryResponse);
       await submit();
       await expectVotersAndVotesForm();
       await expectElementContainsIcon("list-item-differences", "bevat een fout");
@@ -517,6 +541,10 @@ describe("Polling Station data entry integration tests", () => {
       await submit();
       await expectDifferencesForm(false);
       await fillDifferencesForm({ fewer_ballots_count: 1, no_explanation_count: 2 });
+
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [], warnings: [errorWarningMocks.W302] },
+      } as SaveDataEntryResponse);
       await submit();
       await expectFeedbackWarning("W.302");
       await acceptWarnings();
@@ -529,6 +557,10 @@ describe("Polling Station data entry integration tests", () => {
       await userTypeInputs(user, {
         total_admitted_voters_count: 1,
       });
+
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [errorWarningMocks.F201], warnings: [] },
+      } as SaveDataEntryResponse);
       await submit();
       await expectVotersAndVotesForm(false);
       await gotoForm("differences", false);

@@ -56,6 +56,9 @@ describe("PollingStationForm", () => {
         number_of_voters: 1,
       };
 
+      const createdPollingStation: PollingStation = { id: 99, ...testPollingStation };
+      overrideOnce("post", "/api/elections/1/polling_stations", 201, createdPollingStation);
+
       const onSaved = vi.fn();
       render(<PollingStationForm electionId={1} onSaved={onSaved} />);
 
@@ -65,7 +68,7 @@ describe("PollingStationForm", () => {
       await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
       await waitFor(() => {
-        expect(onSaved).toHaveBeenCalledWith(expect.objectContaining(testPollingStation));
+        expect(onSaved).toHaveBeenCalledWith(createdPollingStation);
       });
     });
 

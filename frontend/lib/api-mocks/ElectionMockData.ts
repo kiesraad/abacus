@@ -1,14 +1,12 @@
 import {
-  Candidate,
   Election,
   ElectionDetailsResponse,
   ElectionListResponse,
   ElectionStatusResponse,
-  NotFoundError,
   PoliticalGroup,
 } from "@kiesraad/api";
 
-import { getPollingStationMockData } from "./PollingStationMockData";
+import { pollingStationMockData } from "./PollingStationMockData";
 
 export const politicalGroupMockData: PoliticalGroup = {
   number: 1,
@@ -220,120 +218,28 @@ export const politicalGroupMockData: PoliticalGroup = {
   ],
 };
 
-const candidates: Candidate[] = [
-  {
-    number: 1,
-    initials: "A.",
-    first_name: "Alice",
-    last_name: "Foo",
-    locality: "Amsterdam",
-    gender: "Female",
-  },
-  {
-    number: 2,
-    initials: "C.",
-    first_name: "Charlie",
-    last_name: "Doe",
-    locality: "Rotterdam",
-  },
-];
-
 const politicalGroupsMockData: PoliticalGroup[] = [
   politicalGroupMockData,
   {
     number: 2,
     name: "Wijzen van Water en Wind",
-    candidates: candidates,
-  },
-  {
-    number: 3,
-    name: "Eeuwenoude Aarde Unie",
-    candidates: candidates,
-  },
-  {
-    number: 4,
-    name: "Verbond van Licht en Leven",
-    candidates: candidates,
-  },
-  {
-    number: 5,
-    name: "Nieuwe Horizon Beweging",
-    candidates: candidates,
-  },
-  {
-    number: 6,
-    name: "VRG",
-    candidates: candidates,
-  },
-  {
-    number: 7,
-    name: "Harmonie van Hemel en Aarde",
-    candidates: candidates,
-  },
-  {
-    number: 8,
-    name: "Stralende Sterren Alliantie",
-    candidates: candidates,
-  },
-  {
-    number: 9,
-    name: "Tijdloze Toekomst Partij",
-    candidates: candidates,
-  },
-  {
-    number: 10,
-    name: "Kosmische Kracht Coalitie",
-    candidates: candidates,
-  },
-  {
-    number: 11,
-    name: "Magische Melodieën Beweging",
-    candidates: candidates,
-  },
-  {
-    number: 12,
-    name: "Zilveren Zonnestralen Partij",
-    candidates: candidates,
-  },
-  {
-    number: 13,
-    name: "Mystieke Maanlicht Liga",
-    candidates: candidates,
-  },
-  {
-    number: 14,
-    name: "GVR",
-    candidates: candidates,
-  },
-  {
-    number: 15,
-    name: "Partij voor de ontwikkeling",
-    candidates: candidates,
-  },
-  {
-    number: 16,
-    name: "Bond van de kiezers",
-    candidates: candidates,
-  },
-  {
-    number: 17,
-    name: "Omega",
-    candidates: candidates,
-  },
-  {
-    number: 18,
-    name: "Partij van de werkers",
-    candidates: candidates,
-  },
-  {
-    number: 19,
-    name: "Sterrenpartij",
-    candidates: candidates,
-  },
-  {
-    number: 20,
-    name: "Partij voor de zon",
-    candidates: candidates,
+    candidates: [
+      {
+        number: 1,
+        initials: "A.",
+        first_name: "Alice",
+        last_name: "Foo",
+        locality: "Amsterdam",
+        gender: "Female",
+      },
+      {
+        number: 2,
+        initials: "C.",
+        first_name: "Charlie",
+        last_name: "Doe",
+        locality: "Rotterdam",
+      },
+    ],
   },
 ];
 
@@ -350,72 +256,21 @@ export const electionListMockResponse: ElectionListResponse = {
       nomination_date: "2024-11-01",
       status: "DataEntryInProgress",
     },
-    {
-      id: 2,
-      name: "Gemeenteraadsverkiezingen 2030",
-      location: "Heemdamseburg",
-      number_of_voters: 100,
-      category: "Municipal",
-      number_of_seats: 29,
-      election_date: "2024-01-30",
-      nomination_date: "2024-01-01",
-      status: "DataEntryInProgress",
-    },
-    {
-      id: 3,
-      name: "Gemeenteraadsverkiezingen leeg",
-      location: "Spookdorp",
-      number_of_voters: 0,
-      category: "Municipal",
-      number_of_seats: 29,
-      election_date: "2032-10-31",
-      nomination_date: "2032-09-01",
-      status: "DataEntryInProgress",
-    },
-    {
-      id: 4,
-      name: "Gemeenteraadsverkiezingen ingevuld",
-      location: "Heemdamseburg",
-      number_of_voters: 100,
-      category: "Municipal",
-      number_of_seats: 29,
-      election_date: "2020-01-30",
-      nomination_date: "2020-01-01",
-      status: "DataEntryInProgress",
-    },
-    {
-      id: 5,
-      name: "Gemeenteraadsverkiezingen afgerond",
-      location: "Heemdamseburg",
-      number_of_voters: 100,
-      category: "Municipal",
-      number_of_seats: 29,
-      election_date: "2020-01-30",
-      nomination_date: "2020-01-01",
-      status: "DataEntryFinished",
-    },
   ],
 };
 
-export const getElectionMockData = (election_id: number): Required<ElectionDetailsResponse> => {
-  const election = electionListMockResponse.elections.find((e) => e.id === election_id);
-
-  if (!election) {
-    throw new NotFoundError("error.election_not_found");
-  }
-
-  if (election_id === 2) {
-    election.political_groups = politicalGroupsMockData.slice(0, 2);
-  } else if (election_id === 3) {
-    election.political_groups = [];
-  } else {
-    election.political_groups = politicalGroupsMockData;
-  }
-
-  return { election, polling_stations: getPollingStationMockData(election_id) };
+export const getElectionMockData = (election: Partial<Election> = {}): Required<ElectionDetailsResponse> => {
+  return {
+    election: {
+      ...electionListMockResponse.elections[0]!,
+      political_groups: politicalGroupsMockData,
+      ...election,
+    },
+    polling_stations: pollingStationMockData,
+  };
 };
 
-export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData(1);
+export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
 export const electionMockData = electionDetailsMockResponse.election as Required<Election>;
 
 export const electionStatusMockResponse: ElectionStatusResponse = {

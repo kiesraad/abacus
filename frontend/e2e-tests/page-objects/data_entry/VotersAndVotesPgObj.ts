@@ -1,20 +1,8 @@
 import { type Locator, type Page } from "@playwright/test";
 
+import { VotersCounts, VotesCounts } from "@kiesraad/api";
+
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
-
-export interface VotersCounts {
-  poll_card_count: number;
-  proxy_certificate_count: number;
-  voter_card_count: number;
-  total_admitted_voters_count: number;
-}
-
-export interface VotesCounts {
-  votes_candidates_count: number;
-  blank_votes_count: number;
-  invalid_votes_count: number;
-  total_votes_cast_count: number;
-}
 
 export class VotersAndVotesPage extends DataEntryBasePage {
   readonly fieldset: Locator;

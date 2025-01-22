@@ -21,6 +21,15 @@ export class RecountedPage extends DataEntryBasePage {
     this.next = page.getByRole("button", { name: "Volgende" });
   }
 
+  // TODO: consider refactoring
+  async setRecountedAndClickNext(recounted: boolean) {
+    if (recounted) {
+      await this.checkYesAndClickNext();
+    } else {
+      await this.checkNoAndClickNext();
+    }
+  }
+
   async checkNoAndClickNext() {
     await this.no.click();
     await this.next.click();

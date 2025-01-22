@@ -3,6 +3,7 @@ import { type Locator, type Page } from "@playwright/test";
 export class NavigationPanel {
   protected readonly page: Page;
 
+  readonly navElement: Locator;
   readonly recounted: Locator;
   readonly recountedIcon: Locator;
   readonly votersAndVotes: Locator;
@@ -15,18 +16,27 @@ export class NavigationPanel {
   constructor(page: Page) {
     this.page = page;
 
-    this.recounted = page.locator("li").filter({ hasText: "Is er herteld?" });
+    this.navElement = page.getByRole("navigation");
+
+    this.recounted = this.navElement.getByRole("listitem").filter({ hasText: "Is er herteld?" });
     this.recountedIcon = this.recounted.getByRole("img");
-    this.votersAndVotes = page.locator("li").filter({ hasText: "Aantal kiezers en stemmen" });
+    this.votersAndVotes = this.navElement.getByRole("listitem").filter({ hasText: "Aantal kiezers en stemmen" });
     this.votersAndVotesIcon = this.votersAndVotes.getByRole("img");
-    this.differences = page.locator("li").filter({ hasText: "Verschillen" });
+    this.differences = this.navElement.getByRole("listitem").filter({ hasText: "Verschillen" });
     this.differencesIcon = this.differences.getByRole("img");
-    this.checkAndSave = page.locator("li").filter({ hasText: "Controleren en opslaan" });
+    this.checkAndSave = this.navElement.getByRole("listitem").filter({ hasText: "Controleren en opslaan" });
     this.checkAndSaveIcon = this.checkAndSave.getByRole("img");
   }
 
+  allLists() {
+    return this.navElement
+      .getByRole("listitem")
+      .filter({ hasText: /^Lijst / })
+      .all();
+  }
+
   list(listNumber: number) {
-    return this.page.locator("li").filter({ hasText: `Lijst ${listNumber} - ` });
+    return this.navElement.getByRole("listitem").filter({ hasText: `Lijst ${listNumber} - ` });
   }
 
   listIcon(listNumber: number) {

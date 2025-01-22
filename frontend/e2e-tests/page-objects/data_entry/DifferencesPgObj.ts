@@ -48,7 +48,7 @@ export class DifferencesPage extends DataEntryBasePage {
     this.next = page.getByRole("button", { name: "Volgende" });
   }
 
-  async fillFields(fields: DifferencesCounts) {
+  async fillInPageAndClickNext(fields: DifferencesCounts) {
     await this.moreBallotsCount.fill(fields.more_ballots_count.toString());
     await this.fewerBallotsCount.fill(fields.fewer_ballots_count.toString());
     await this.unreturnedBallotsCount.fill(fields.unreturned_ballots_count.toString());
@@ -56,6 +56,7 @@ export class DifferencesPage extends DataEntryBasePage {
     await this.tooManyBallotsHandedOutCount.fill(fields.too_many_ballots_handed_out_count.toString());
     await this.otherExplanationCount.fill(fields.other_explanation_count.toString());
     await this.noExplanationCount.fill(fields.no_explanation_count.toString());
+    await this.next.click();
   }
 
   async fillMoreBallotsFields(fields: MoreBallotsFields) {

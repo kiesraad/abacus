@@ -1,21 +1,19 @@
 import * as React from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 
-import {
-  FormSection,
-  FormSectionID,
-  isFormSectionEmpty,
-  useElection,
-  usePollingStationFormController,
-} from "@kiesraad/api";
+import { useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { MenuStatus, ProgressList } from "@kiesraad/ui";
+
+import { FormSection, FormSectionID } from "../form/data_entry/PollingStationFormController";
+import { isFormSectionEmpty } from "../form/data_entry/pollingStationUtils";
+import { usePollingStationFormController } from "../form/data_entry/usePollingStationFormController";
 
 export function PollingStationProgress() {
   const { pollingStationId } = useParams();
   const { election } = useElection();
 
-  const { formState, values } = usePollingStationFormController();
+  const { formState, values, entryNumber } = usePollingStationFormController();
 
   const menuStatusForFormSection = React.useCallback(
     (formSection?: FormSection): MenuStatus => {
@@ -63,7 +61,7 @@ export function PollingStationProgress() {
           active={formState.current === "recounted"}
         >
           {formState.current !== "recounted" ? (
-            <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/recounted`}>
+            <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}/recounted`}>
               <span>{t("polling_station.recounted_question")}</span>
             </Link>
           ) : (
@@ -79,7 +77,7 @@ export function PollingStationProgress() {
         >
           {formState.current !== "voters_votes_counts" &&
           formState.sections.voters_votes_counts.index <= currentIndex ? (
-            <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/voters-and-votes`}>
+            <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}/voters-and-votes`}>
               <span>{t("polling_station.voters_and_vote_count")}</span>
             </Link>
           ) : (
@@ -94,7 +92,7 @@ export function PollingStationProgress() {
           active={formState.current === "differences_counts"}
         >
           {formState.current !== "differences_counts" && formState.sections.differences_counts.index <= currentIndex ? (
-            <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/differences`}>
+            <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}/differences`}>
               <span>{t("differences.title")}</span>
             </Link>
           ) : (
@@ -118,7 +116,7 @@ export function PollingStationProgress() {
               scrollIntoView
             >
               {formState.current !== formSection.id && formSection.index <= currentIndex ? (
-                <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/list/${listId}`}>
+                <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}/list/${listId}`}>
                   <span>
                     {t("list")} {list.number} - {list.name}
                   </span>
@@ -141,7 +139,7 @@ export function PollingStationProgress() {
           disabled={formState.furthest !== "save"}
         >
           {formState.current !== "save" && formState.furthest === "save" ? (
-            <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/save`}>
+            <Link to={`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}/save`}>
               <span>{t("check_and_save.title")}</span>
             </Link>
           ) : (

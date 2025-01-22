@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
-import { PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
+import { DataEntryStatusName, PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
-import { cn, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
+import { cn, getUrlForDataEntry, parseIntUserInput, useDebouncedCallback } from "@kiesraad/util";
 
 import cls from "./PollingStationChoiceForm.module.css";
 import { PollingStationLink } from "./PollingStationLink";
@@ -18,14 +18,13 @@ export interface PollingStationChoiceFormProps {
   anotherEntry?: boolean;
 }
 
-const INVALID_POLLING_STATION_ALERT: string = "Voer een geldig nummer van een stembureau in om te beginnen";
-const DEFINITIVE_POLLING_STATION_ALERT: string =
-  "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden";
+const INVALID_POLLING_STATION_ALERT: string = t("polling_station_choice.enter_a_valid_number_to_start");
+const DEFINITIVE_POLLING_STATION_ALERT: string = t("polling_station_choice.polling_station_entry_not_possible");
 
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
 
-  const { pollingStations } = useElection();
+  const { election, pollingStations } = useElection();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
@@ -38,7 +37,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   }, USER_INPUT_DEBOUNCE);
 
   useMemo(() => {
-    const parsedInt = parsePollingStationNumber(pollingStationNumber);
+    const parsedInt = parseIntUserInput(pollingStationNumber);
     setLoading(true);
     debouncedCallback(pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt));
   }, [pollingStationNumber, pollingStations, debouncedCallback]);
@@ -49,18 +48,21 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       return;
     }
 
-    const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
+    const parsedStationNumber = parseIntUserInput(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
-    const pollingStationStatusEntry = electionStatus.statuses.find((status) => status.id === pollingStation?.id);
+    const pollingStationStatus = electionStatus.statuses.find(
+      (status) => status.polling_station_id === pollingStation?.id,
+    )?.status;
+    const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
 
-    if (pollingStationStatusEntry?.status === "definitive") {
+    if (pollingStationStatus && firstAndSecondEntryFinished.includes(pollingStationStatus)) {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
       setLoading(false);
       return;
     }
 
     if (pollingStation) {
-      navigate(`./${pollingStation.id}`);
+      void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStationStatus));
     } else {
       setAlert(INVALID_POLLING_STATION_ALERT);
       setLoading(false);
@@ -69,8 +71,11 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   };
 
   const unfinished = electionStatus.statuses
-    .filter((status) => status.status === "first_entry_unfinished" || status.status === "first_entry_in_progress")
-    .map((status) => pollingStations.find((ps) => ps.id === status.id));
+    .filter((status) => ["first_entry_in_progress", "second_entry_in_progress"].includes(status.status))
+    .map((status) => ({
+      pollingStation: pollingStations.find((ps) => ps.id === status.polling_station_id),
+      status: status.status,
+    }));
 
   return (
     <form
@@ -84,9 +89,9 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           <Alert type="notify" variant="no-icon">
             <h2>{t("polling_station_choice.unfinished_input_title")}</h2>
             <p>{t("polling_station_choice.unfinished_input_content")}</p>
-            {unfinished.map((pollingStation) => {
+            {unfinished.map(({ pollingStation, status }) => {
               return pollingStation === undefined ? null : (
-                <PollingStationLink key={pollingStation.id} pollingStation={pollingStation} />
+                <PollingStationLink key={pollingStation.id} pollingStation={pollingStation} status={status} />
               );
             })}
           </Alert>
@@ -110,7 +115,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         {alert && (
           <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
             <span className={cls.icon}>
-              <Icon icon={<IconError aria-label={t("polling_station_choice.contains_error")} />} color="error" />
+              <Icon icon={<IconError aria-label={t("contains_error")} />} color="error" />
             </span>
             <span>{alert}</span>
           </div>

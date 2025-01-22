@@ -12,7 +12,7 @@ function updateTestTranslation(value: string) {
 describe("i18n", () => {
   test("Use translation functions", () => {
     // simple translation
-    expect(t("election.election")).toEqual("Verkiezing");
+    expect(t("election.title.singular")).toEqual("Verkiezing");
 
     // variable interpolation
     updateTestTranslation("Hello {item}!");

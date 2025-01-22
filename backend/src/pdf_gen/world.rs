@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
 use super::models::PdfModel;
-use typst::utils::LazyHash;
 use typst::{
     diag::{FileError, FileResult},
     foundations::{Bytes, Datetime},
     syntax::{FileId, Source, VirtualPath},
     text::{Font, FontBook},
+    utils::LazyHash,
     Library, World,
 };
 

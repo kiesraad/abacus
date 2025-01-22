@@ -3,10 +3,11 @@ import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { overrideOnce, Providers, render, screen, setupTestRouter, waitFor, within } from "app/test/unit";
+import { routes } from "app/routes";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
 import { electionDetailsMockResponse } from "@kiesraad/api-mocks";
+import { overrideOnce, Providers, render, screen, setupTestRouter, waitFor, within } from "@kiesraad/test";
 
 import { DataEntryHomePage } from "./DataEntryHomePage";
 
@@ -59,8 +60,8 @@ describe("DataEntryHomePage", () => {
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "definitive" },
-        { id: 2, status: "definitive" },
+        { polling_station_id: 1, status: "definitive" },
+        { polling_station_id: 2, status: "definitive" },
       ],
     });
 
@@ -70,8 +71,8 @@ describe("DataEntryHomePage", () => {
   test("Resume input visible when some are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "first_entry_unfinished" },
-        { id: 2, status: "not_started" },
+        { polling_station_id: 1, status: "first_entry_in_progress" },
+        { polling_station_id: 2, status: "first_entry_not_started" },
       ],
     });
     renderDataEntryHomePage();
@@ -84,8 +85,8 @@ describe("DataEntryHomePage", () => {
   test("Resume input invisible when none are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "not_started" },
-        { id: 2, status: "definitive" },
+        { polling_station_id: 1, status: "first_entry_not_started" },
+        { polling_station_id: 2, status: "definitive" },
       ],
     });
     renderDataEntryHomePage();
@@ -97,8 +98,8 @@ describe("DataEntryHomePage", () => {
   test("Rerender re-fetches election status", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "not_started" },
-        { id: 2, status: "not_started" },
+        { polling_station_id: 1, status: "first_entry_not_started" },
+        { polling_station_id: 2, status: "first_entry_not_started" },
       ],
     } satisfies ElectionStatusResponse);
 
@@ -124,8 +125,8 @@ describe("DataEntryHomePage", () => {
     // new status is that all polling stations are definitive, so the alert should be visible
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { id: 1, status: "definitive" },
-        { id: 2, status: "definitive" },
+        { polling_station_id: 1, status: "definitive" },
+        { polling_station_id: 2, status: "definitive" },
       ],
     } satisfies ElectionStatusResponse);
 
@@ -144,7 +145,7 @@ describe("DataEntryHomePage", () => {
     const user = userEvent.setup();
 
     // Set up router and navigate to the data entry home page
-    const router = setupTestRouter();
+    const router = setupTestRouter(routes);
     await router.navigate("/elections/1/data-entry");
     rtlRender(<Providers router={router} />);
 
@@ -161,7 +162,7 @@ describe("DataEntryHomePage", () => {
     expect(screen.queryByText(alertHeading)).not.toBeInTheDocument();
 
     // Set the hash to show the alert and expect it to be visible
-    await router.navigate({ hash: "data-entry-saved" });
+    await router.navigate({ hash: "data-entry-saved-1" });
     expect(await screen.findByRole("heading", { level: 2, name: alertHeading })).toBeVisible();
 
     // Close the alert and expect it to be hidden

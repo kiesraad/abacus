@@ -19,6 +19,10 @@
   margin-bottom: var(--space-md);
 }
 
+.mb-md-lg {
+  margin-bottom: var(--space-md-lg);
+}
+
 .mb-lg {
   margin-bottom: var(--space-lg);
 }
@@ -38,4 +42,19 @@
 
 .fs-body {
   font-size: var(--font-size-body);
+}
+
+/* Color */
+.bg-gray {
+  background-color: var(--bg-gray);
+}
+
+/* Width */
+.w-13 {
+  width: 13rem;
+}
+
+/* Text wrap, transformations etc. */
+.break-word {
+  word-break: break-word;
 }

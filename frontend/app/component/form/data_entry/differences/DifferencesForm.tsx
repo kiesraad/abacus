@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import { getErrorsAndWarnings, useDifferences } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import {
   Alert,
@@ -13,10 +12,13 @@ import {
   InputGridRow,
   KeyboardKey,
   KeyboardKeys,
+  useFormKeyboardNavigation,
 } from "@kiesraad/ui";
 import { deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
+import { getErrorsAndWarnings } from "../pollingStationUtils";
+import { useDifferences } from "./useDifferences";
 
 interface FormElements extends HTMLFormControlsCollection {
   more_ballots_count: HTMLInputElement;
@@ -35,6 +37,8 @@ interface DifferencesFormElement extends HTMLFormElement {
 export function DifferencesForm() {
   const formRef = React.useRef<DifferencesFormElement>(null);
   const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
+
+  useFormKeyboardNavigation(formRef);
 
   const getValues = React.useCallback(() => {
     const form = formRef.current;

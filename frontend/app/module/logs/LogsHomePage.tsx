@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -8,9 +8,9 @@ import { PageTitle } from "@kiesraad/ui";
 export function LogsHomePage() {
   return (
     <>
-      <PageTitle title="Activiteitenlog - Abacus" />
+      <PageTitle title={`${t("activity_log")} - Abacus`} />
       <NavBar>
-        <Link to={"/elections#administrator"}>{t("election.elections")}</Link>
+        <Link to={"/elections#administrator"}>{t("election.title.plural")}</Link>
         <Link to={"/users#administratorcoordinator"}>{t("users")}</Link>
         <Link to={"/workstations#administrator"}>{t("workstations.workstations")}</Link>
         <span className="active">{t("logs")}</span>

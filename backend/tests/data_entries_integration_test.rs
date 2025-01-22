@@ -1,25 +1,29 @@
 #![cfg(test)]
 
-use backend::data_entry::{GetDataEntryResponse, SaveDataEntryResponse};
-use backend::validation::ValidationResultCode;
-use backend::ErrorResponse;
+use backend::{
+    data_entry::{
+        status::DataEntryStatusName::*, ElectionStatusResponse, ElectionStatusResponseEntry,
+        GetDataEntryResponse, SaveDataEntryResponse, ValidationResultCode,
+    },
+    ErrorResponse,
+};
 use reqwest::{Response, StatusCode};
 use serde_json::json;
 use sqlx::SqlitePool;
-use std::net::SocketAddr;
+use std::{collections::BTreeMap, net::SocketAddr};
+use test_log::test;
+use utils::serve_api;
 
-use crate::utils::serve_api;
+pub mod shared;
+pub mod utils;
 
-mod shared;
-mod utils;
-
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     shared::create_and_finalise_data_entry(&addr, 1, 1).await;
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -133,7 +137,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     );
 }
 
-#[sqlx::test]
+#[test(sqlx::test)]
 async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -158,7 +162,7 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
     );
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -186,7 +190,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
 }
 
 /// test that we can get a data entry after saving it
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -210,16 +214,17 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
     // check that the data entry is the same
     let get_response: GetDataEntryResponse = response.json().await.unwrap();
     assert_eq!(get_response.data, request_body.data);
-    assert_eq!(get_response.client_state, request_body.client_state);
+    assert_eq!(
+        get_response.client_state.as_ref(),
+        request_body.client_state.as_ref()
+    );
     assert_eq!(
         get_response.validation_results,
         save_response.validation_results
     );
 }
 
-#[ignore] // TODO: Enable this test when we support second entry in the frontend
-/// test that we can still get a first data entry when it's already finalised
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     shared::create_and_finalise_data_entry(&addr, 1, 1).await;
@@ -227,10 +232,10 @@ async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
     // get the data entry and expect 404 Not Found
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[sqlx::test(fixtures(path = "../fixtures", scripts("elections", "polling_stations")))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -254,7 +259,101 @@ async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     let response = delete_data_entry(addr).await;
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
-    // delete a non-existing data entry
+    // we should not be allowed to delete the entry again
     let response = delete_data_entry(addr).await;
-    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    assert_eq!(response.status(), StatusCode::CONFLICT);
+}
+
+async fn get_statuses(addr: &SocketAddr) -> BTreeMap<u32, ElectionStatusResponseEntry> {
+    let url = format!("http://{addr}/api/elections/2/status");
+    let response = reqwest::Client::new().get(url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+    assert!(!body.statuses.is_empty());
+    body.statuses
+        .into_iter()
+        .fold(BTreeMap::new(), |mut acc, entry| {
+            acc.insert(entry.polling_station_id, entry);
+            acc
+        })
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+async fn test_election_details_status(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    // Ensure the statuses are "NotStarted"
+    let statuses = get_statuses(&addr).await;
+    assert_eq!(statuses[&1].status, FirstEntryNotStarted);
+    assert_eq!(statuses[&1].first_data_entry_progress, None);
+    assert_eq!(statuses[&1].second_data_entry_progress, None);
+    assert_eq!(statuses[&2].status, FirstEntryNotStarted);
+    assert_eq!(statuses[&2].first_data_entry_progress, None);
+    assert_eq!(statuses[&2].second_data_entry_progress, None);
+
+    // Finalise the first entry of one and set the other in progress
+    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
+    shared::create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": true}"#)).await;
+
+    // polling station 1's first entry is now complete, polling station 2 is still incomplete and set to in progress
+    let statuses = get_statuses(&addr).await;
+    assert_eq!(statuses[&1].status, SecondEntryNotStarted);
+    assert_eq!(statuses[&1].first_data_entry_progress, Some(100));
+    assert_eq!(statuses[&1].second_data_entry_progress, None);
+    assert_eq!(statuses[&2].status, FirstEntryInProgress);
+    assert_eq!(statuses[&2].first_data_entry_progress, Some(60));
+    assert_eq!(statuses[&2].second_data_entry_progress, None);
+
+    // Save the entries
+    shared::create_and_save_data_entry(&addr, 1, 2, Some(r#"{"continue": true}"#)).await;
+    shared::create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": false}"#)).await;
+
+    // polling station 1 should now be SecondEntryInProgress, polling station 2 is still in the FirstEntryInProgress state
+    let statuses = get_statuses(&addr).await;
+    assert_eq!(statuses[&1].status, SecondEntryInProgress);
+    assert_eq!(statuses[&1].first_data_entry_progress, Some(100));
+    assert_eq!(statuses[&1].second_data_entry_progress, Some(60));
+    assert_eq!(statuses[&2].status, FirstEntryInProgress);
+    assert_eq!(statuses[&2].first_data_entry_progress, Some(60));
+    assert_eq!(statuses[&2].second_data_entry_progress, None);
+
+    // finalise second data entry for polling station 1
+    shared::create_and_finalise_data_entry(&addr, 1, 2).await;
+
+    // polling station 1 should now be definitive
+    let statuses = get_statuses(&addr).await;
+    assert_eq!(statuses[&1].status, Definitive);
+    assert_eq!(statuses[&1].first_data_entry_progress, Some(100));
+    assert_eq!(statuses[&1].second_data_entry_progress, Some(100));
+    assert_eq!(statuses[&2].status, FirstEntryInProgress);
+    assert_eq!(statuses[&2].first_data_entry_progress, Some(60));
+    assert_eq!(statuses[&2].second_data_entry_progress, None);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3"))))]
+async fn test_election_details_status_no_other_election_statuses(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    // Save data entry for election 1, polling station 1
+    shared::create_and_save_data_entry(&addr, 1, 1, Some(r#"{"continue": true}"#)).await;
+
+    // Save data entry for election 2, polling station 3
+    shared::create_and_save_data_entry(&addr, 3, 1, Some(r#"{"continue": true}"#)).await;
+
+    // Get statuses for election 2
+    let url = format!("http://{addr}/api/elections/3/status");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let status = response.status();
+    assert_eq!(status, StatusCode::OK);
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+
+    assert_eq!(
+        body.statuses.len(),
+        1,
+        "there can be only one {:?}",
+        body.statuses
+    );
+    assert_eq!(body.statuses[0].polling_station_id, 3);
+    assert_eq!(body.statuses[0].status, FirstEntryInProgress);
 }

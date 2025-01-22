@@ -6,6 +6,7 @@
   > header {
     padding: 1rem 5rem;
     display: flex;
+    gap: 1rem;
     min-height: 7rem;
     align-items: center;
     justify-content: space-between;
@@ -20,6 +21,9 @@
         gap: 0.5rem;
         line-height: 1.75rem;
       }
+    }
+    section:global(.smaller-gap) {
+      gap: 1rem;
     }
   }
 
@@ -49,10 +53,11 @@
       &.no_footer {
         padding-bottom: 0;
       }
-      > form.no_footer {
+      > form:global(.no_footer) {
         height: 100%;
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
       }
     }
   }

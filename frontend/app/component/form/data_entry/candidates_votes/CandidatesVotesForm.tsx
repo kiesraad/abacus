@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { CandidateVotes, getErrorsAndWarnings, PoliticalGroup, usePoliticalGroup } from "@kiesraad/api";
+import { CandidateVotes, PoliticalGroup } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import {
   Alert,
@@ -13,10 +13,13 @@ import {
   InputGridRow,
   KeyboardKey,
   KeyboardKeys,
+  useFormKeyboardNavigation,
 } from "@kiesraad/ui";
 import { candidateNumberFromId, deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
+import { getErrorsAndWarnings } from "../pollingStationUtils";
+import { usePoliticalGroup } from "./usePoliticalGroups";
 
 interface FormElements extends HTMLFormControlsCollection {
   total: HTMLInputElement;
@@ -33,6 +36,8 @@ export interface CandidatesVotesFormProps {
 
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
   const formRef = React.useRef<CandidatesVotesFormElement>(null);
+  useFormKeyboardNavigation(formRef);
+
   const acceptWarningsRef = React.useRef<HTMLInputElement>(null);
   const getValues = React.useCallback(() => {
     const form = formRef.current;

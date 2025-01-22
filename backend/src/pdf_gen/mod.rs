@@ -55,11 +55,11 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
 pub(crate) mod tests {
     use chrono::Utc;
     use models::ModelNa31_2Input;
+    use test_log::test;
 
     use super::*;
-    use crate::election::ElectionStatus;
     use crate::{
-        election::{tests::election_fixture, Election, ElectionCategory},
+        election::{tests::election_fixture, Election, ElectionCategory, ElectionStatus},
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
     };
@@ -81,14 +81,8 @@ pub(crate) mod tests {
                 } else {
                     Some(*voter_count)
                 },
-                polling_station_type: PollingStationType::Special,
-                street: "Teststraat".to_string(),
-                house_number: format!("{idx}"),
-                house_number_addition: if idx % 2 == 0 {
-                    Some("b".to_string())
-                } else {
-                    None
-                },
+                polling_station_type: Some(PollingStationType::Special),
+                address: "Teststraat 2a".to_string(),
                 postal_code: "1234 QY".to_string(),
                 locality: "Testdorp".to_string(),
             });
@@ -113,6 +107,9 @@ pub(crate) mod tests {
             },
             polling_stations: vec![],
             summary: ElectionSummary::zero(),
+            hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
+                .to_string(),
+            creation_date_time: "04-12-2024 12:08".to_string(),
         }))
         .unwrap();
 
@@ -126,6 +123,9 @@ pub(crate) mod tests {
             polling_stations: polling_stations_fixture(&election, &[100, 200, 300]),
             election,
             summary: ElectionSummary::zero(),
+            hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
+                .to_string(),
+            creation_date_time: "04-12-2024 12:08".to_string(),
         }))
         .unwrap();
 

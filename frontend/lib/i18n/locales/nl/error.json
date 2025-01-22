@@ -1,4 +1,5 @@
 {
+  "title": "Abacus is stuk",
   "label": "Fout",
   "not_found": "Pagina niet gevonden",
   "election_not_found": "Verkiezing niet gevonden",
@@ -14,9 +15,12 @@
   "api_error": {
     "EntryNumberNotSupported": "Ongeldige invoer voor dit stembureau",
     "EntryNotFound": "De invoer is niet gevonden",
-    "PollingStationFirstEntryAlreadyFinalised": "De invoer voor dit stembureau is al definitief",
+    "PollingStationFirstEntryAlreadyFinalised": "De eerste invoer voor dit stembureau is al definitief",
     "PollingStationFirstEntryNotFinalised": "De eerste invoer voor dit stembureau is nog niet definitief",
+    "PollingStationSecondEntryAlreadyFinalised": "De tweede invoer voor dit stembureau is al definitief",
+    "PollingStationResultsAlreadyFinalised": "De invoer voor dit stembureau is al definitief",
     "PollingStationDataValidation": "De invoer voor dit stembureau is niet geldig",
+    "InvalidStateTransition": "Er is een ongeldige actie uitgevoerd",
     "InvalidVoteGroup": "De politieke partij van de stem is niet geldig",
     "InvalidVoteCandidate": "De kandidaat van de stem is niet geldig",
     "InvalidDataEntryNumber": "Het invoer nummer is ongeldig",
@@ -28,6 +32,8 @@
     "PdfGenerationError": "Er is een fout opgetreden bij het genereren van de PDF",
     "PollingStationRepeated": "Het stembureau is al ingevoerd",
     "PollingStationValidationErrors": "Er zijn fouten opgetreden bij het valideren van het stembureau",
-    "InvalidPoliticalGroup": "De politieke partij is niet geldig"
+    "InvalidPoliticalGroup": "De politieke partij is niet geldig",
+    "InvalidUsernamePassword": "De gebruikersnaam of het wachtwoord is onjuist",
+    "InvalidSession": "De sessie is ongeldig"
   }
 }

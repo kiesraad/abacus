@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router";
 
 import { ElectionProgress } from "app/component/election/ElectionProgress";
 import { Footer } from "app/component/footer/Footer";
@@ -27,15 +27,17 @@ export function DataEntryHomePage() {
     };
   }, [refetch]);
 
-  const showDataEntrySavedAlert = location.hash === "#data-entry-saved";
+  const showFirstDataEntrySavedAlert = location.hash === "#data-entry-saved-1";
+  const showSecondDataEntrySavedAlert = location.hash === "#data-entry-saved-2";
+  const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
 
   function closeDataEntrySavedAlert() {
-    navigate(location.pathname);
+    void navigate(location.pathname);
   }
 
   return (
     <>
-      <PageTitle title={`${t("data_entry.pick_polling_sation")} - Abacus`} />
+      <PageTitle title={`${t("data_entry.pick_polling_station")} - Abacus`} />
       <NavBar>
         <Link to={"/elections"}>{t("overview")}</Link>
       </NavBar>
@@ -47,13 +49,17 @@ export function DataEntryHomePage() {
           <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
-      {showDataEntrySavedAlert && (
+      {dataEntryDone && (
         <Alert type="success" onClose={closeDataEntrySavedAlert}>
           <h2>{t("data_entry.entry_saved")}</h2>
           <p>
             {t("data_entry.success.return_paper")}
-            <br />
-            {t("data_entry.success.second_entry_info")}
+            {showFirstDataEntrySavedAlert && (
+              <>
+                <br />
+                {t("data_entry.success.second_entry_info")}
+              </>
+            )}
           </p>
         </Alert>
       )}
@@ -61,13 +67,13 @@ export function DataEntryHomePage() {
         <Alert type="success">
           <h2>{t("data_entry.completed.all_entries_completed")}</h2>
           <p>{t("data_entry.completed.thank_you")}</p>
-          <p>{t("data_entry.completed.info")}</p>
+          <p>{t("data_entry.completed.info", { electionName: election.name })}</p>
           <p>{t("data_entry.completed.wait_for_instructions")}</p>
         </Alert>
       )}
       <main>
         <article id="polling-station-choice-form">
-          <PollingStationChoiceForm anotherEntry={showDataEntrySavedAlert} />
+          <PollingStationChoiceForm anotherEntry={dataEntryDone} />
         </article>
         <ElectionProgress />
       </main>

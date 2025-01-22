@@ -1,19 +1,19 @@
 import { ReactElement } from "react";
 
-import { type PollingStationStatus } from "@kiesraad/api";
+import { type DataEntryStatusName } from "@kiesraad/api";
+import { t } from "@kiesraad/i18n";
 import { IconPencil } from "@kiesraad/icon";
 
 import { Icon } from "../Icon";
 import cls from "./Badge.module.css";
 
-const typeToLabel: { [S in PollingStationStatus]: { label: string; icon?: ReactElement } } = {
-  not_started: { label: "1e invoer" },
-  first_entry_in_progress: { label: "1e invoer", icon: <Icon size="sm" icon={<IconPencil />} /> },
-  first_entry_unfinished: { label: "1e invoer", icon: <Icon size="sm" icon={<IconPencil />} /> },
-  second_entry: { label: "2e invoer" },
-  second_entry_in_progress: { label: "2e invoer", icon: <Icon size="sm" icon={<IconPencil />} /> },
-  second_entry_unfinished: { label: "2e invoer", icon: <Icon size="sm" icon={<IconPencil />} /> },
-  definitive: { label: "Definitief" },
+const typeToLabel: { [S in DataEntryStatusName]: { label: string; icon?: ReactElement } } = {
+  first_entry_not_started: { label: t("data_entry.first_entry") },
+  first_entry_in_progress: { label: t("data_entry.first_entry"), icon: <Icon size="sm" icon={<IconPencil />} /> },
+  second_entry_not_started: { label: t("data_entry.second_entry") },
+  second_entry_in_progress: { label: t("data_entry.second_entry"), icon: <Icon size="sm" icon={<IconPencil />} /> },
+  entries_different: { label: t("data_entry.entries_different") },
+  definitive: { label: t("data_entry.definitive") },
 };
 
 export interface BadgeProps {

@@ -14,6 +14,12 @@ updates:
     groups:
       cargo:
         patterns: ["*"]
+    ignore:
+      # New axum major and minor versions usually have breaking changes, see #790 for axum 0.8
+      - dependency-name: "axum"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "axum-extra"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
@@ -22,13 +28,24 @@ updates:
       npm:
         patterns: ["*"]
     ignore:
+      # @types/node depends on Node.js version, which we upgrade manually
       - dependency-name: "@types/node"
-        # Depends on Node.js version, which we upgrade manually
         update-types: ["version-update:semver-major"]
+      # ESLint major upgrades usually have breaking changes
       - dependency-name: "eslint"
-        # ESLint major upgrades usually have breaking changes, #213 for ESLint 9
         update-types: ["version-update:semver-major"]
-      - dependency-name: "react-router-dom"
-        # Update to 6.28 needs feature flags to be set to opt-in for version 7 features, to avoid warnings.
-        # Update to 7 has a potential problem to be solved, see issue #621
-        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      # React Router major upgrades usually have breaking changes
+      - dependency-name: "react-router"
+        update-types: ["version-update:semver-major"]
+      # React major upgrades usually have breaking changes, see #716 for React 19
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react-dom"
+        update-types: ["version-update:semver-major"]
+      # Vite major upgrades usually have breaking changes, see #721 for Vite 6
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]

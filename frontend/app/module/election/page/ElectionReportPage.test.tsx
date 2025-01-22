@@ -2,9 +2,10 @@ import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { ElectionReportPage } from "app/module/election";
-import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "app/test/unit";
+import { routes } from "app/routes";
 
 import { ElectionProvider, ElectionStatusProvider } from "@kiesraad/api";
+import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@kiesraad/test";
 
 describe("ElectionReportPage", () => {
   test("Error when election is not ready", async () => {
@@ -12,7 +13,7 @@ describe("ElectionReportPage", () => {
     vi.spyOn(console, "error").mockImplementation(() => {
       /* do nothing */
     });
-    const router = setupTestRouter();
+    const router = setupTestRouter(routes);
 
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
@@ -47,6 +48,7 @@ describe("ElectionReportPage", () => {
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Steminvoer eerste zitting afronden" }));
     expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" }));
-    expect(await screen.findByRole("button", { name: "Download proces-verbaal" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
   });
 });

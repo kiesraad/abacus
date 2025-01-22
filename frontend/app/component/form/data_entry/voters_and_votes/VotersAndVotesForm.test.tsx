@@ -2,22 +2,18 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import {
+  emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
 } from "app/component/form/testHelperFunctions";
-import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs, waitFor } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form";
 
-import {
-  FormState,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationFormController,
-  PollingStationResults,
-} from "@kiesraad/api";
-import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
+import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@kiesraad/api";
+import { electionMockData } from "@kiesraad/api-mocks";
+import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs, waitFor } from "@kiesraad/test";
 
+import { FormState, PollingStationFormController } from "../PollingStationFormController";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const defaultFormState: FormState = {
@@ -63,7 +59,7 @@ function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
   return render(
     <PollingStationFormController
       election={electionMockData}
-      pollingStationId={pollingStationMockData.id}
+      pollingStationId={1}
       entryNumber={1}
       defaultValues={defaultValues}
       defaultFormState={defaultFormState}

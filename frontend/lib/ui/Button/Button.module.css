@@ -19,6 +19,8 @@
   gap: 0.75rem;
   cursor: pointer;
 
+  width: max-content;
+
   &:hover {
     background-color: var(--button-color-primary-hover);
     border-color: var(--button-color-primary-hover);
@@ -49,8 +51,8 @@
   }
 
   &.primary-destructive {
-    border-color: var(--color-error);
-    background: var(--color-error);
+    border-color: var(--red-600);
+    background: var(--red-600);
     color: var(--base-white);
   }
 

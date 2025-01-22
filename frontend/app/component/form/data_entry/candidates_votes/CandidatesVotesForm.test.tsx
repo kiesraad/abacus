@@ -2,24 +2,23 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import {
+  Election,
+  PoliticalGroup,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  PollingStationResults,
+} from "@kiesraad/api";
+import { electionMockData, politicalGroupMockData } from "@kiesraad/api-mocks";
+import { getUrlMethodAndBody, overrideOnce, render, screen, within } from "@kiesraad/test";
+
+import {
+  emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
-} from "app/component/form/testHelperFunctions";
-import { getUrlMethodAndBody, overrideOnce, render, screen, within } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form";
-import { getCandidateFullNamesFromMockData } from "app/test/unit/test-utils";
-
-import {
-  Election,
-  PoliticalGroup,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationFormController,
-  PollingStationResults,
-} from "@kiesraad/api";
-import { electionMockData, politicalGroupMockData, pollingStationMockData } from "@kiesraad/api-mocks";
-
+  getCandidateFullNamesFromMockData,
+} from "../../testHelperFunctions";
+import { PollingStationFormController } from "../PollingStationFormController";
 import { CandidatesVotesForm } from "./CandidatesVotesForm";
 
 function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
@@ -61,11 +60,7 @@ describe("Test CandidatesVotesForm", () => {
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <PollingStationFormController
-          election={electionMockData}
-          pollingStationId={pollingStationMockData.id}
-          entryNumber={1}
-        >
+        <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>
       );
@@ -94,11 +89,7 @@ describe("Test CandidatesVotesForm", () => {
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <PollingStationFormController
-          election={electionMockData}
-          pollingStationId={pollingStationMockData.id}
-          entryNumber={1}
-        >
+        <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>
       );
@@ -283,11 +274,7 @@ describe("Test CandidatesVotesForm", () => {
       const politicalGroupMock = politicalGroupMockData as Required<PoliticalGroup>;
 
       const Component = (
-        <PollingStationFormController
-          election={electionMockData}
-          pollingStationId={pollingStationMockData.id}
-          entryNumber={1}
-        >
+        <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
           <CandidatesVotesForm group={politicalGroupMock} />
         </PollingStationFormController>
       );

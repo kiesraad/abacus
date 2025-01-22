@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-- [Node](https://nodejs.org) v20
+- [Node](https://nodejs.org) v22
 
 ### Building
 
@@ -54,9 +54,6 @@ Browser tests using Playwright:
 # tests for ui components using ladle:
 npm run e2e:lib-ui
 
-# tests for frontend with msw:
-npm run e2e:app
-
 # tests for frontend with backend and database
 # tests use database at backend/target/debug/playwright.sqlite
 # build frontend, build backend, setup fresh seeded database:
@@ -83,7 +80,7 @@ The application uses the following dependencies:
 
 - `react`: creating efficient, declarative, and component-based web applications.
 - `react-dom`: DOM implementation for rendering UI
-- `react-dom-router`: Handling browser routing for React applications
+- `react-router`: Handling browser routing for React applications
 
 #### Development dependencies
 
@@ -91,10 +88,14 @@ The application uses the following dependencies:
 - `msw`: Mock Service Worker for mocking the server, client side
 - `vite`: frontend build tool
 - `ladle`: simple development and test environment for UI components
+- `postcss` and `autoprefixer`: CSS post processors
+- `lefthook`: git hook automation
+- `cross-env`: for building on Windows
 
 #### Testing / linting dependencies
 
 - `vitest`: Jest compatible unit test framework
+- `jsdom`: a pure-JavaScript implementation of many web standards for use with Node.js
 - `testing-library`: (React) component and dom test utilities
 - `playwright`: e2e testing framework
 - `prettier`: Opinionated code formatter

@@ -1,4 +1,4 @@
-import { Link, To, useLocation, useNavigate } from "react-router-dom";
+import { Link, To, useLocation, useNavigate } from "react-router";
 
 import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
 import { Footer } from "app/component/footer/Footer";
@@ -25,14 +25,16 @@ export function OverviewPage() {
   }
 
   function closeNewAccountAlert() {
-    navigate(location.pathname);
+    void navigate(location.pathname);
   }
 
   return (
     <>
-      <PageTitle title="Overzicht verkiezingen - Abacus" />
+      <PageTitle title={`${t("election.title.overview")} - Abacus`} />
       <NavBar>
-        <span className={isAdministrator ? "active" : ""}>{isAdministrator ? "Verkiezingen" : "Overzicht"}</span>
+        <span className={isAdministrator ? "active" : ""}>
+          {isAdministrator ? t("election.title.plural") : t("overview")}
+        </span>
         {isAdministrator && (
           <>
             <Link to={"/users#administratorcoordinator"}>{t("users")}</Link>
@@ -43,7 +45,7 @@ export function OverviewPage() {
       </NavBar>
       <header>
         <section>
-          <h1>{isAdministrator ? t("manage_elections") : t("election.elections")}</h1>
+          <h1>{isAdministrator ? t("election.manage") : t("election.title.plural")}</h1>
         </section>
         {!isAdministrator && (
           <section>
@@ -61,16 +63,18 @@ export function OverviewPage() {
         <article>
           <Table id="overview">
             <Table.Header>
-              <Table.Column>{t("election.election")}</Table.Column>
-              {isAdministrator && <Table.Column>{t("role")}</Table.Column>}
+              <Table.Column>{t("election.title.singular")}</Table.Column>
+              <Table.Column>
+                {!isAdministrator ? t("election.location") : t("election.level_polling_station")}
+              </Table.Column>
               <Table.Column>{t("election_status.label")}</Table.Column>
             </Table.Header>
-            <Table.Body>
+            <Table.Body className="fs-md">
               {electionList.map((election) => (
                 <Table.LinkRow key={election.id} to={electionLink(election)}>
-                  <Table.Cell fontSizeClass="fs-body">{election.name}</Table.Cell>
-                  {isAdministrator && <Table.Cell fontSizeClass="fs-md"></Table.Cell>}
-                  <Table.Cell fontSizeClass="fs-md">
+                  <Table.Cell className="fs-body">{election.name}</Table.Cell>
+                  <Table.Cell>{!isAdministrator ? election.location : ""}</Table.Cell>
+                  <Table.Cell>
                     <ElectionStatusWithIcon
                       status={election.status}
                       userRole={isAdministrator ? "coordinator" : "typist"}

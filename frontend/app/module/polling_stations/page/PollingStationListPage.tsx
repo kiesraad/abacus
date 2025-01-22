@@ -1,16 +1,17 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router";
 
-import { usePollingStationListRequest } from "@kiesraad/api";
+import { NavBar } from "app/component/navbar/NavBar";
+
+import { useElection, usePollingStationListRequest } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconPlus } from "@kiesraad/icon";
 import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
-import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationListPage() {
-  const electionId = useNumericParam("electionId");
+  const { election } = useElection();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { requestState } = usePollingStationListRequest(electionId);
+  const { requestState } = usePollingStationListRequest(election.id);
 
   if (requestState.status === "loading") {
     return <Loader />;
@@ -28,9 +29,11 @@ export function PollingStationListPage() {
   const createdId = searchParams.get("created");
   const createdPollingStation = createdId ? data.polling_stations.find((ps) => ps.id === parseInt(createdId)) : null;
 
-  const closeAlert = () => {
+  const deletedPollingStation = searchParams.get("deleted");
+
+  function closeAlert() {
     setSearchParams("");
-  };
+  }
 
   const labelForPollingStationType = {
     FixedLocation: t("polling_station.type.FixedLocation"),
@@ -42,6 +45,13 @@ export function PollingStationListPage() {
   return (
     <>
       <PageTitle title={`${t("polling_stations")} - Abacus`} />
+      <NavBar>
+        <Link to={`/elections/${election.id}#coordinator`}>
+          <span className="bold">{election.location}</span>
+          <span>&mdash;</span>
+          <span>{election.name}</span>
+        </Link>
+      </NavBar>
       <header>
         <section>
           <h1>{t("polling_station.title.plural")}</h1>
@@ -68,6 +78,14 @@ export function PollingStationListPage() {
           </strong>
         </Alert>
       )}
+
+      {deletedPollingStation && (
+        <Alert type="success" onClose={closeAlert}>
+          <strong>
+            {t("polling_station.message.polling_station_deleted", { pollingStation: deletedPollingStation })}
+          </strong>
+        </Alert>
+      )}
       <main>
         {!data.polling_stations.length ? (
           <article>
@@ -81,7 +99,7 @@ export function PollingStationListPage() {
                   size="sm"
                   leftIcon={<IconPlus />}
                   onClick={() => {
-                    navigate("create");
+                    void navigate("create");
                   }}
                 >
                   {t("manual_input")}
@@ -98,7 +116,7 @@ export function PollingStationListPage() {
                   size="sm"
                   leftIcon={<IconPlus />}
                   onClick={() => {
-                    navigate("create");
+                    void navigate("create");
                   }}
                 >
                   {t("polling_station.form.create")}
@@ -112,15 +130,13 @@ export function PollingStationListPage() {
                 <Table.Column>{t("name")}</Table.Column>
                 <Table.Column>{t("type")}</Table.Column>
               </Table.Header>
-              <Table.Body>
+              <Table.Body className="fs-md">
                 {data.polling_stations.map((station) => (
-                  <Table.LinkRow key={station.id} to={`update/${station.id}`}>
-                    <Table.Cell number fontSizeClass="fs-body">
-                      {station.number}
-                    </Table.Cell>
-                    <Table.Cell fontSizeClass="fs-md">{station.name}</Table.Cell>
-                    <Table.Cell fontSizeClass="fs-md">
-                      {labelForPollingStationType[station.polling_station_type]}
+                  <Table.LinkRow key={station.id} to={`${station.id}/update`}>
+                    <Table.NumberCell>{station.number}</Table.NumberCell>
+                    <Table.Cell className="break-word">{station.name}</Table.Cell>
+                    <Table.Cell>
+                      {station.polling_station_type && labelForPollingStationType[station.polling_station_type]}
                     </Table.Cell>
                   </Table.LinkRow>
                 ))}

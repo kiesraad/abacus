@@ -6,7 +6,7 @@ pre-commit:
     backend-sqlx-prepare:
       root: "backend/"
       glob: "*.rs"
-      run: cargo sqlx prepare -- --all-targets --all-features
+      run: cargo sqlx prepare -- --all-targets --all-features && git add .sqlx
     backend-formatter:
       root: "backend/"
       glob: "*.rs"

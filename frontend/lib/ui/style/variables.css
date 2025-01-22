@@ -32,13 +32,14 @@
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
-  --font-size-lg: 1.9rem;
+  --font-size-lg: 1.875rem;
   --font-size-xl: 3rem;
 
   /* SPACING */
   --space-md: 1rem;
   --space-md-lg: 1.5rem;
   --space-lg: 2rem;
+  --space-xl: 3rem;
 
   /* CORNERS */
   --rounded-default: 0.5rem;
@@ -198,7 +199,7 @@
   --badge-objections: #4a1fb8;
   --badge-objections-bg: #ebe9fe;
   --badge-difference: var(--base-white);
-  --badge-difference-bg: #d92d20;
+  --badge-difference-bg: var(--red-600);
   --badge-typist-busy: var(--link-active);
   --badge-typist-busy-bg: var(--shadow-color-focus);
   --badge-definitive: var(--base-white);

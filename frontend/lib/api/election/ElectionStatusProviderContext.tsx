@@ -1,9 +1,9 @@
 import { createContext } from "react";
 
-import { ApiResult, ElectionStatusResponse, PollingStationStatusEntry } from "@kiesraad/api";
+import { ApiResult, ElectionStatusResponse, ElectionStatusResponseEntry } from "@kiesraad/api";
 
 export interface iElectionStatusProviderContext {
-  statuses: Required<PollingStationStatusEntry[]>;
+  statuses: Required<ElectionStatusResponseEntry[]>;
   refetch: (controller?: AbortController) => Promise<ApiResult<ElectionStatusResponse>>;
 }
 

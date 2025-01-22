@@ -17,11 +17,11 @@ describe("ElectionProgress", () => {
       statuses: [
         {
           id: 1,
-          status: "not_started",
+          status: "first_entry_not_started",
         },
         {
           id: 2,
-          status: "not_started",
+          status: "second_entry_not_started",
         },
         {
           id: 3,
@@ -36,9 +36,14 @@ describe("ElectionProgress", () => {
 
     render(<ElectionProgress />);
 
-    const definitiveEntry = screen.getByTestId("progressbar-definitive");
-    expect(definitiveEntry).toBeInTheDocument();
-    expect(definitiveEntry).toHaveTextContent("Alles samen");
-    expect(definitiveEntry).toHaveTextContent("25%");
+    const firstEntryFinishedBar = screen.getByTestId("progressbar-first-entry-finished");
+    expect(firstEntryFinishedBar).toBeInTheDocument();
+    expect(firstEntryFinishedBar).toHaveTextContent("1e invoer klaar");
+    expect(firstEntryFinishedBar).toHaveTextContent("50%");
+
+    const definitiveBar = screen.getByTestId("progressbar-first-and-second-entry-finished");
+    expect(definitiveBar).toBeInTheDocument();
+    expect(definitiveBar).toHaveTextContent("1e en 2e invoer klaar");
+    expect(definitiveBar).toHaveTextContent("25%");
   });
 });

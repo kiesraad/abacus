@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import { useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -26,10 +26,10 @@ export function AbortDataEntryControl() {
         <AbortDataEntryModal
           onCancel={toggleAbortModal}
           onSave={() => {
-            navigate(`/elections/${election.id}/data-entry`);
+            void navigate(`/elections/${election.id}/data-entry`);
           }}
           onDelete={() => {
-            navigate(`/elections/${election.id}/data-entry`);
+            void navigate(`/elections/${election.id}/data-entry`);
           }}
         />
       )}

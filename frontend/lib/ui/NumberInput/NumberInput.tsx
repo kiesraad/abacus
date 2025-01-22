@@ -56,7 +56,7 @@ function onBlur(event: React.FocusEvent<HTMLInputElement>) {
 
 //only accept numbers
 function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-  //allow keyboard shortcuts and navigation (e.g. copy paste, select all, arrow keys)
+  //allow keyboard shortcuts and navigation (e.g. copy and paste, select all, arrow keys)
   if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) {
     return;
   }

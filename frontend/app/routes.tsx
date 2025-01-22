@@ -1,4 +1,4 @@
-import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
+import { createRoutesFromElements, Navigate, Route } from "react-router";
 
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AdministratorLayout } from "app/module/AdministratorLayout";
@@ -15,6 +15,8 @@ import { NotAvailableInMock } from "app/module/NotAvailableInMock";
 import { PollingStationListPage, PollingStationsLayout } from "app/module/polling_stations";
 import { UsersHomePage } from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
+
+import { t } from "@kiesraad/i18n";
 
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
@@ -39,7 +41,7 @@ export const routes = createRoutesFromElements(
     <Route path="account" element={<LoginLayout />}>
       <Route index element={<UserHomePage />} />
       <Route path="login" element={<LoginPage />} />
-      <Route path="account/setup" element={<AccountSetupPage />} />
+      <Route path="setup" element={<AccountSetupPage />} />
     </Route>
     <Route path="elections" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />
@@ -47,17 +49,23 @@ export const routes = createRoutesFromElements(
         <Route index element={<ElectionHomePage />} />
         <Route
           path="report"
-          element={__API_MSW__ ? <NotAvailableInMock title="Invoerfase afronden - Abacus" /> : <ElectionReportPage />}
+          element={
+            __API_MSW__ ? (
+              <NotAvailableInMock title={`${t("election.title.finish_data_entry")} - Abacus`} />
+            ) : (
+              <ElectionReportPage />
+            )
+          }
         />
         <Route path="status" element={<ElectionStatusPage />} />
         <Route path="polling-stations" element={<PollingStationsLayout />}>
           <Route index element={<PollingStationListPage />} />
           <Route path="create" element={<PollingStationCreatePage />} />
-          <Route path="update/:pollingStationId" element={<PollingStationUpdatePage />} />
+          <Route path=":pollingStationId/update" element={<PollingStationUpdatePage />} />
         </Route>
         <Route path="data-entry" element={null}>
           <Route index element={<DataEntryHomePage />} />
-          <Route path=":pollingStationId" element={<PollingStationLayout />}>
+          <Route path=":pollingStationId/:entryNumber" element={<PollingStationLayout />}>
             {/* The PollingStationFormController will navigate to the correct section. */}
             <Route index element={null} />
             <Route path="recounted" element={<RecountedPage />} />

@@ -56,7 +56,7 @@ __Niveau:__
 - Te laag (schelp) 🐚
   - Dit niveau is te granulair, gooi ze weg.
 
-__Trigger__: trigger van de use case
+__Trigger:__ trigger van de use case
 
 __Hoofdscenario:__
 
@@ -68,11 +68,11 @@ __Hoofdscenario:__
   - Een validatie om een stakeholder te beschermen
   - Een *internal state change* namens een stakeholder
 
-__uitbreidingen:__
+__Uitbreidingen:__
 
 - De nummering van een uitbreiding komt overeen met de stap in het hoofdscenario waarvan het een uitbreiding is.
 
-__open punten:__  
+__Open punten:__  
 
 - Schrijf hier open punten op die gerelateerd zijn aan deze use case.
 - Dit kopje is niet aanwezig als er geen open punten zijn.
@@ -80,7 +80,6 @@ __open punten:__
 ### Mogelijke extra velden
 
 - Precondities
-- Open punten
 - Stakeholders en belangen van stakeholders die door de use case beschermd worden
 - Minimale garanties
 - Succesgaranties

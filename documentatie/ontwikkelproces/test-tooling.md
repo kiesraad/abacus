@@ -16,7 +16,7 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 - React UI elementen: [React Testing Library][react-testing-library]; [Ladle][ladle] en [Playwright][playwright]
 - React componenten: [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
 - React integration tests: [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
-- Frontend met mocked backend: [Playwright][playwright] en [Mock Service Worker][mock-service-worker]
+- Frontend met mocked backend: [Mock Service Worker][mock-service-worker]
 
 
 ```mermaid
@@ -81,11 +81,9 @@ title: Frontend met mocked backend
 flowchart LR
     fe(Frontend)
 
-    playwright([Playwright])
     browser([Browser])
     msw([Mock Service Worker])
 
-    playwright ---> fe
     browser ---> fe
 
     subgraph app

@@ -24,7 +24,7 @@ export function removeLeadingZeros(input: string) {
 
 // Checks if the _whole_ string is numeric, ignoring leading zeroes, returning it as a number.
 // Returns undefined when non-numeric characters are encountered
-export function parsePollingStationNumber(text: string): number | undefined {
+export function parseIntUserInput(text: string): number | undefined {
   const num = parseInt(text, 10);
   return !isNaN(num) && num.toString() === removeLeadingZeros(text) ? num : undefined;
 }

@@ -1,33 +1,25 @@
-import * as router from "react-router";
-
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
-import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import { VotersAndVotesForm } from "app/component/form/data_entry/voters_and_votes/VotersAndVotesForm";
-import { AbortDataEntryControl } from "app/module/data_entry";
-import { overrideOnce, render, screen, server } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import {
   ElectionProvider,
   ErrorResponse,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationFormController,
   SaveDataEntryResponse,
 } from "@kiesraad/api";
-import { electionDetailsMockResponse, electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
+import { electionDetailsMockResponse, electionMockData } from "@kiesraad/api-mocks";
+import { overrideOnce, renderReturningRouter, screen, server } from "@kiesraad/test";
 
-const mockNavigate = vi.fn();
+import { PollingStationFormController } from "../../../component/form/data_entry/PollingStationFormController";
+import { VotersAndVotesForm } from "../../../component/form/data_entry/voters_and_votes/VotersAndVotesForm";
+import { emptyDataEntryRequest } from "../../../component/form/testHelperFunctions";
+import { AbortDataEntryControl } from "./AbortDataEntryControl";
 
 const renderAbortDataEntryControl = () => {
-  render(
+  return renderReturningRouter(
     <ElectionProvider electionId={1}>
-      <PollingStationFormController
-        election={electionMockData}
-        pollingStationId={pollingStationMockData.id}
-        entryNumber={1}
-      >
+      <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
         <AbortDataEntryControl />
         <VotersAndVotesForm />
       </PollingStationFormController>
@@ -38,7 +30,6 @@ const renderAbortDataEntryControl = () => {
 describe("Test AbortDataEntryControl", () => {
   beforeEach(() => {
     overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-    vi.spyOn(router, "useNavigate").mockImplementation(() => mockNavigate);
   });
 
   test("renders and toggles the modal", async () => {
@@ -56,7 +47,7 @@ describe("Test AbortDataEntryControl", () => {
 
   test("saves the form state and navigates on save", async () => {
     // render the abort button
-    renderAbortDataEntryControl();
+    const router = renderAbortDataEntryControl();
     const user = userEvent.setup();
 
     // click the abort button to open the modal
@@ -93,12 +84,12 @@ describe("Test AbortDataEntryControl", () => {
     });
 
     // check that the user is navigated back to the data entry page
-    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry");
+    expect(router.state.location.pathname).toBe("/elections/1/data-entry");
   });
 
   test("deletes the data entry and navigates on delete", async () => {
     // render the abort button, then click it to open the modal
-    renderAbortDataEntryControl();
+    const router = renderAbortDataEntryControl();
     const user = userEvent.setup();
 
     // click the abort button to open the modal
@@ -121,6 +112,6 @@ describe("Test AbortDataEntryControl", () => {
     expect(request_url).toBe("http://localhost:3000/api/polling_stations/1/data_entries/1");
 
     // check that the user is navigated back to the data entry page
-    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry");
+    expect(router.state.location.pathname).toBe("/elections/1/data-entry");
   });
 });

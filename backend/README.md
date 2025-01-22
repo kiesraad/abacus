@@ -27,7 +27,11 @@ In this version of `memory-serve`, the path must be absolute, since `build.rs`
 has no knowledge of the project it is currently built in. Example:
 
 ```shell
-ASSET_DIR=$PWD/frontend/dist cargo run --features memory-serve
+cd frontend
+npm run build
+cd ../backend
+sqlx database setup
+ASSET_DIR=$PWD/../frontend/dist cargo run --features memory-serve
 ```
 
 ### Linting
@@ -44,22 +48,37 @@ Use `cargo test` to run the tests. The tests are also run in a GitHub Actions wo
 
 The following dependencies (crates) are used:
 
+- `argon2`: password hashing implementation (Argon2id).
 - `axum`: web application framework that focuses on ergonomics and modularity.
-- `hyper`: fast and correct HTTP implementation.
-- `tokio`: runtime for writing asynchronous applications.
-- `memory-serve`: serves frontend assets from memory, but ad-hoc from disk during development.
-- `utoipa`: library for documenting REST APIs using OpenAPI.
-- `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
-- `serde`: framework for serializing and deserializing data structures.
-- `serde_json`: JSON support for Serde.
-- `sqlx`: async SQL library featuring compile-time checked queries.
+- `axum-extra`: handling for attachments and cookies in `axum`.
 - `chrono`: date and time library.
 - `clap`: library for command-line argument parsing.
+- `cookie`: dependency of axum_extra, for encoding and parsing cookies.
+- `hyper`: fast and correct HTTP implementation.
+- `memory-serve`: serves frontend assets from memory, but ad-hoc from disk during development.
+- `password_hash`: password hashing interfaces.
 - `quick-xml`: reading and writing EML_NL XML files.
+- `rand`: create a random session key.
+- `serde`: framework for serializing and deserializing data structures.
+- `serde_json`: JSON support for Serde.
+- `sha2`: generating a hash of the EML_NL XML files for inclusion in the PDF.
+- `sqlx`: async SQL library featuring compile-time checked queries.
+- `tokio`: runtime for writing asynchronous applications.
+- `tower`: a library of modular and reusable components for building robust networking clients and servers.
+- `tower-http`: Tower middleware and utilities for HTTP clients and servers.
+- `tracing`: a framework for instrumenting Rust programs to collect structured, event-based diagnostic information.
+- `tracing-subscriber`: utilities for implementing and composing `tracing` subscribers.
+- `typst`: a new markup-based typesetting system that is powerful and easy to learn.
+- `typst-pdf`: a PDF exporter for Typst.
+- `utoipa`: library for documenting REST APIs using OpenAPI.
+- `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
+- `zip`: creating a zip of the EML_NL and PDF PV.
 
 Additionally, the following development dependencies are used:
 
+- `test-log`: show tracing messages while running tests
 - `reqwest`: HTTP client for testing the API.
+- `http-body-util`: trait used to extract a response body in some tests.
 
 ### Database
 

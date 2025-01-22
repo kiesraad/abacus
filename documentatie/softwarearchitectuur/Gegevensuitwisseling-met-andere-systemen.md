@@ -10,7 +10,7 @@ Abacus worden air-gapped en lokaal gedraaid. Gegevensuitwisseling gebeurt dus no
 De Kiesraad beheert `vapp-metadata.zip` met daarin de volgende bestanden:
 - `MasterElectionTree.xml`: xml, maar geen EML_NL
 - `parties.txt`: politieke partijen
-- `cities.txt`: woonplaasten in Nederland
+- `cities.txt`: woonplaatsen in Nederland
 - `nonEuropeanCities.txt`: woonplaatsen in Caribisch Nederland
 - `metadata-version.txt`
 

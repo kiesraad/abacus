@@ -133,7 +133,9 @@ export interface ApportionmentStep {
 /**
  * Records the political group and specific change for a specific remainder seat
  */
-export type AssignedSeat = HighestAverageAssignedSeat | HighestSurplusAssignedSeat;
+export type AssignedSeat =
+  | { HighestAverage: HighestAverageAssignedSeat }
+  | { HighestSurplus: HighestSurplusAssignedSeat };
 
 /**
  * Candidate
@@ -361,6 +363,7 @@ weren't used to get whole seats. The number of seats earned as a whole and
 the number of rest/remainder seats.
  */
 export interface PoliticalGroupStanding {
+  meets_surplus_threshold: boolean;
   pg_number: number;
   rest_seats: number;
   surplus_votes: DisplayFraction;

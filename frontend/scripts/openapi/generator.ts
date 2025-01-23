@@ -95,7 +95,7 @@ function addRequest(requestPath: string, request: OperationObject) {
 
 function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
   if ("$ref" in v) {
-    return v.$ref.substring(v.$ref.lastIndexOf("/") + 1);
+    return tsType(v);
   }
 
   const result: string[] = [];
@@ -106,58 +106,31 @@ function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
   }
 
   if (v.type === "object") {
-    if (v.properties) {
-      result.push(`export interface ${name} {`);
-      Object.entries(v.properties).forEach(([k, v2]) => {
-        result.push(`  ${k}${isRequired(k, v.required)}: ${tsType(v2)};`);
-      });
-      result.push("}");
-    }
-  } else if (v.type === "string") {
-    if (v.enum) {
-      result.push(`export type ${name} = ${v.enum.map((e) => `"${e}"`).join(" | ")};`);
-    }
-  } else if (v.oneOf) {
-    const types: string[] = [];
-    for (const obj of v.oneOf) {
-      if ("properties" in obj && obj.properties) {
-        for (const property of Object.values(obj.properties)) {
-          if ("$ref" in property) {
-            types.push(property.$ref.substring(property.$ref.lastIndexOf("/") + 1));
-          }
-        }
-      }
-    }
-    result.push(`export type ${name} = ${types.join(" | ")};`);
+    result.push(`export interface ${name} ${tsType(v)}`);
+  } else {
+    result.push(`export type ${name} = ${tsType(v)};`);
   }
 
   return result.join("\n");
 }
 
 function tsType(s: ReferenceObject | SchemaObject | undefined): string {
-  //TODO: handle missing schema
-  if (!s) return "string";
+  if (!s) return "unknown";
+
   if ("$ref" in s) {
     return s.$ref.substring(s.$ref.lastIndexOf("/") + 1);
   }
 
-  if ("allOf" in s) {
-    if (s.allOf) {
-      return s.allOf.map((s2) => tsType(s2)).join(" & ");
-    }
+  if (s.allOf) {
+    return s.allOf.map((s2) => tsType(s2)).join(" & ");
   }
 
-  if ("oneOf" in s) {
-    return (
-      s.oneOf
-        ?.map((obj) => {
-          if ("$ref" in obj) {
-            return obj.$ref.substring(obj.$ref.lastIndexOf("/") + 1);
-          }
-          return obj.type || "unknown";
-        })
-        .join(" | ") ?? "unknown"
-    );
+  if (s.oneOf) {
+    return s.oneOf.map((obj) => tsType(obj)).join(" | ");
+  }
+
+  if (s.enum) {
+    return s.enum.map((e) => `"${e}"`).join(" | ");
   }
 
   let type = "unknown";
@@ -172,6 +145,15 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
       break;
     case "array":
       type = `${tsType(s.items)}[]`;
+      break;
+    case "object":
+      if (s.properties) {
+        type = "{";
+        Object.entries(s.properties).forEach(([k, v2]) => {
+          type += `  ${k}${isRequired(k, s.required)}: ${tsType(v2)};`;
+        });
+        type += "}";
+      }
       break;
   }
 

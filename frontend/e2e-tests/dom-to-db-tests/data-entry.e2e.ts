@@ -65,8 +65,8 @@ test.describe("full data entry flow", () => {
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);
-    expect(response.request().postDataJSON()).toMatchObject(noRecountNoDifferencesRequest);
-    expect(await response.json()).toMatchObject(noErrorsWarningsResponse);
+    expect(response.request().postDataJSON()).toStrictEqual(noRecountNoDifferencesRequest);
+    expect(await response.json()).toStrictEqual(noErrorsWarningsResponse);
 
     const checkAndSavePage = new CheckAndSavePage(page);
     await expect(checkAndSavePage.fieldset).toBeVisible();

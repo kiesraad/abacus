@@ -1,12 +1,17 @@
 import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 
 import { ElectionProvider, ElectionStatusProvider, ElectionStatusResponse } from "@kiesraad/api";
-import { electionDetailsMockResponse, electionStatusMockResponse } from "@kiesraad/api-mocks";
-import { overrideOnce, render, renderReturningRouter, screen, within } from "@kiesraad/test";
+import {
+  electionDetailsMockResponse,
+  ElectionRequestHandler,
+  electionStatusMockResponse,
+  ElectionStatusRequestHandler,
+} from "@kiesraad/api-mocks";
+import { overrideOnce, render, renderReturningRouter, screen, server, within } from "@kiesraad/test";
 
 function renderPollingStationChoicePage() {
   return renderReturningRouter(
@@ -19,6 +24,9 @@ function renderPollingStationChoicePage() {
 }
 
 describe("Test PollingStationChoiceForm", () => {
+  beforeEach(() => {
+    server.use(ElectionStatusRequestHandler);
+  });
   describe("Polling station choice form", () => {
     test("Form field entry", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
@@ -305,6 +313,7 @@ describe("Test PollingStationChoiceForm", () => {
 
   describe("Polling station in progress", () => {
     test("Show polling stations as 'in progress'", async () => {
+      server.use(ElectionRequestHandler);
       overrideOnce("get", "api/elections/1/status", 200, {
         statuses: [
           { polling_station_id: 1, status: "first_entry_not_started" },

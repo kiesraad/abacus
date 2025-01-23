@@ -1,8 +1,9 @@
 import { UserEvent, userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorResponse, PollingStation } from "@kiesraad/api";
-import { overrideOnce, render, screen, waitFor } from "@kiesraad/test";
+import { PollingStationCreateHandler, PollingStationUpdateHandler } from "@kiesraad/api-mocks";
+import { overrideOnce, render, screen, server, waitFor } from "@kiesraad/test";
 
 import { PollingStationForm } from "./PollingStationForm";
 
@@ -43,6 +44,9 @@ async function fillForm(user: UserEvent, testPollingStation: PollingStation | Om
 }
 
 describe("PollingStationForm", () => {
+  beforeEach(() => {
+    server.use(PollingStationCreateHandler, PollingStationUpdateHandler);
+  });
   describe("PollingStationForm create", () => {
     test("Successful create", async () => {
       const testPollingStation: Omit<PollingStation, "id"> = {

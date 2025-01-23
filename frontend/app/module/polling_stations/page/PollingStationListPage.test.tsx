@@ -1,12 +1,17 @@
 import { screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { PollingStationListPage } from "app/module/polling_stations";
 
 import { ElectionProvider, PollingStationListResponse } from "@kiesraad/api";
-import { overrideOnce, render } from "@kiesraad/test";
+import { ElectionRequestHandler, PollingStationListRequestHandler } from "@kiesraad/api-mocks";
+import { overrideOnce, render, server } from "@kiesraad/test";
 
 describe("PollingStationListPage", () => {
+  beforeEach(() => {
+    server.use(ElectionRequestHandler, PollingStationListRequestHandler);
+  });
+
   test("Show polling stations", async () => {
     render(
       <ElectionProvider electionId={1}>

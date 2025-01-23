@@ -158,8 +158,8 @@ export class ApiClient {
       }
 
       const message = (e as Error).message || "Network error";
-      console.error(e);
-      return new NetworkError(message);
+      console.error(e, method, path);
+      return new NetworkError(`${message}, ${method} ${path}`);
     }
   }
 

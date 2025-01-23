@@ -1,11 +1,15 @@
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { emptyDataEntryRequest, errorWarningMocks } from "app/component/form/testHelperFunctions";
 
 import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, SaveDataEntryResponse } from "@kiesraad/api";
-import { electionMockData } from "@kiesraad/api-mocks";
-import { getUrlMethodAndBody, overrideOnce, render, screen } from "@kiesraad/test";
+import {
+  electionMockData,
+  PollingStationDataEntryGetHandler,
+  PollingStationDataEntrySaveHandler,
+} from "@kiesraad/api-mocks";
+import { getUrlMethodAndBody, overrideOnce, render, screen, server } from "@kiesraad/test";
 
 import { PollingStationFormController } from "../PollingStationFormController";
 import { RecountedForm } from "./RecountedForm";
@@ -17,6 +21,9 @@ const Component = (
 );
 
 describe("Test RecountedForm", () => {
+  beforeEach(() => {
+    server.use(PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+  });
   describe("RecountedForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       render(Component);

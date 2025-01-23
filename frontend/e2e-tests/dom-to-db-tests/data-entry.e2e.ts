@@ -378,13 +378,8 @@ test.describe("full data entry flow", () => {
 });
 
 test.describe("second data entry", () => {
-  test("equal second data entry after first data entry", async ({ page, request, pollingStation }) => {
-    const saveResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1`, {
-      data: noRecountNoDifferencesRequest,
-    });
-    expect(saveResponse.ok()).toBeTruthy();
-    const finaliseResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/finalise`);
-    expect(finaliseResponse.ok()).toBeTruthy();
+  test("equal second data entry after first data entry", async ({ page, pollingStationFirstEntryDone }) => {
+    const pollingStation = pollingStationFirstEntryDone;
 
     await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
 

@@ -11,7 +11,6 @@ import {
   VotersAndVotesPage,
 } from "./page-objects/data_entry";
 
-// TODO: split in fillDataEntryPages en fillDataEntryPagesAndConfirm?
 export async function fillDataEntry(page: Page, results: PollingStationResults) {
   const recountedPage = new RecountedPage(page);
   await expect(recountedPage.fieldset).toBeVisible();

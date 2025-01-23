@@ -12,10 +12,14 @@ import {
   VotersAndVotesPage,
 } from "e2e-tests/page-objects/data_entry";
 
-import { PollingStationResults, VotersCounts, VotesCounts } from "@kiesraad/api";
+import { VotersCounts, VotesCounts } from "@kiesraad/api";
 
 import { test } from "./fixtures";
-import { noErrorsWarningsResponse, noRecountNoDifferencesRequest } from "./test-data/request-response-templates";
+import {
+  noErrorsWarningsResponse,
+  noRecountNoDifferencesDataEntry,
+  noRecountNoDifferencesRequest,
+} from "./test-data/request-response-templates";
 
 test.describe("full data entry flow", () => {
   test("no recount, no differences", async ({ page, pollingStation }) => {
@@ -393,10 +397,7 @@ test.describe("second data entry", () => {
       `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/recounted`,
     );
 
-    // TODO: is there a better solution?
-    // noRecountNoDifferencesRequest should be Record<string, unknown> as it is now
-    // the fillDataEntry argument results should be PollingStationResults as it is now
-    await fillDataEntry(page, noRecountNoDifferencesRequest.data as PollingStationResults);
+    await fillDataEntry(page, noRecountNoDifferencesDataEntry);
 
     await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
     await expect(pollingStationChoicePage.alertInputSaved).toHaveText(

@@ -3,7 +3,7 @@ import * as React from "react";
 import { isSuccess, PollingStation, PollingStationRequest, useCrud } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, Button, ChoiceList, Form, FormLayout, InputField } from "@kiesraad/ui";
-import { FormFields, useForm } from "@kiesraad/util";
+import { FormFields, useForm, ValidationError } from "@kiesraad/util";
 
 export interface PollingStationFormProps {
   electionId: number;
@@ -69,11 +69,11 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
 
   let numberFieldError;
   if (validationResult.number) {
-    validationResult.number =
+    const errorTextKey: ValidationError =
       validationResult.number === "FORM_VALIDATION_RESULT_MIN"
         ? "FORM_VALIDATION_RESULT_INVALID_NUMBER"
         : validationResult.number;
-    numberFieldError = t(`form_errors.${validationResult.number}`);
+    numberFieldError = t(`form_errors.${errorTextKey}`);
   } else if (isValid && requestState.status === "api-error" && requestState.error.reference === "EntryNotUnique") {
     numberFieldError = t("polling_station.form.not_unique.error");
   }

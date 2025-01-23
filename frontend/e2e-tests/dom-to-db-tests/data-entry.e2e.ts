@@ -393,7 +393,9 @@ test.describe("second data entry", () => {
       `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/recounted`,
     );
 
-    // TODO: do something smarter with types
+    // TODO: is there a better solution?
+    // noRecountNoDifferencesRequest should be Record<string, unknown> as it is now
+    // the fillDataEntry argument results should be PollingStationResults as it is now
     await fillDataEntry(page, noRecountNoDifferencesRequest.data as PollingStationResults);
 
     await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();

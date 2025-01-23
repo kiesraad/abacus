@@ -29,7 +29,7 @@ type PingResponseBody = {
 };
 
 // ping handler for testing
-const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>("/ping", async ({ request }) => {
+export const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBody>("/ping", async ({ request }) => {
   const data = await request.json();
 
   const pong = data.ping || "pong";

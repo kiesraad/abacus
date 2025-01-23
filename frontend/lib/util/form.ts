@@ -67,6 +67,10 @@ export function processForm<RequestObject>(
 
     switch (field.type) {
       case "number": {
+        if (!field.required && value === "") {
+          value = undefined;
+          break;
+        }
         const parsedValue = field.isFormatted ? deformatNumber(value) : parseIntUserInput(value);
         //parseInt is used in deformatNumber, the result is a number or NaN.
         if (parsedValue === undefined || Number.isNaN(parsedValue)) {
@@ -121,6 +125,8 @@ export function validateFormValue(field: AnyFormField, value: string | number | 
         if (field.max && value > field.max) {
           return "FORM_VALIDATION_RESULT_MAX";
         }
+      } else if (!field.required && value === undefined) {
+        return null;
       } else {
         return "FORM_VALIDATION_RESULT_INVALID_TYPE";
       }

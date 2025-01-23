@@ -4,8 +4,6 @@ import { NavigationPanel } from "./NavigationPanelPgObj";
 import { UnsavedChangesModal } from "./UnsavedChangesModalPgObj";
 
 export class DataEntryBasePage {
-  protected readonly page: Page;
-
   readonly unsavedChangesModal: UnsavedChangesModal;
   readonly navPanel: NavigationPanel;
 
@@ -15,7 +13,7 @@ export class DataEntryBasePage {
   readonly warning: Locator;
   readonly feedbackHeader: Locator;
 
-  constructor(page: Page) {
+  constructor(protected readonly page: Page) {
     this.page = page;
 
     this.unsavedChangesModal = new UnsavedChangesModal(page);

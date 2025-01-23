@@ -1,8 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
 export class PollingStationChoicePage {
-  protected readonly page: Page;
-
   readonly fieldset: Locator;
   readonly fieldsetNextPollingStation: Locator;
   readonly pollingStationNumber: Locator;
@@ -13,7 +11,7 @@ export class PollingStationChoicePage {
   readonly dataEntrySuccess: Locator;
   readonly resumeDataEntry: Locator;
 
-  constructor(page: Page) {
+  constructor(protected readonly page: Page) {
     this.page = page;
 
     this.fieldset = page.getByRole("group", {

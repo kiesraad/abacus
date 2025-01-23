@@ -3,15 +3,12 @@ import { type Locator, type Page } from "@playwright/test";
 import { PollingStation } from "@kiesraad/api";
 
 export class PollingStationFormPgObj {
-  protected readonly page: Page;
-
-  //required inputs
   readonly number: Locator;
   readonly name: Locator;
 
   readonly create: Locator;
 
-  constructor(page: Page) {
+  constructor(protected readonly page: Page) {
     this.page = page;
 
     this.number = page.getByRole("textbox", { name: "Nummer", exact: true });

@@ -1,8 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 
 export class NavigationPanel {
-  protected readonly page: Page;
-
   readonly navElement: Locator;
   readonly recounted: Locator;
   readonly recountedIcon: Locator;
@@ -13,7 +11,7 @@ export class NavigationPanel {
   readonly checkAndSave: Locator;
   readonly checkAndSaveIcon: Locator;
 
-  constructor(page: Page) {
+  constructor(protected readonly page: Page) {
     this.page = page;
 
     this.navElement = page.getByRole("navigation");

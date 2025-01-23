@@ -12,8 +12,6 @@ export class PollingStationChoicePage {
   readonly resumeDataEntry: Locator;
 
   constructor(protected readonly page: Page) {
-    this.page = page;
-
     this.fieldset = page.getByRole("group", {
       name: "Welk stembureau ga je invoeren?",
     });

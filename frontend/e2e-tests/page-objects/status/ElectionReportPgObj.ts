@@ -6,8 +6,6 @@ export class ElectionReport {
   readonly downloadZip: Locator;
 
   constructor(protected readonly page: Page) {
-    this.page = page;
-
     this.downloadPdf = page.getByRole("button", { name: "Download los proces-verbaal" });
     this.downloadZip = page.getByRole("button", { name: "Download proces-verbaal met telbestand" });
   }

@@ -8,8 +8,6 @@ export class AbortInputModal {
   readonly discardInput: Locator;
 
   constructor(protected readonly page: Page) {
-    this.page = page;
-
     this.modal = page.getByRole("dialog");
     this.close = this.modal.getByRole("button", { name: "Annuleren" });
     this.heading = this.modal.getByRole("heading", {

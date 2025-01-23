@@ -14,8 +14,6 @@ export class DataEntryBasePage {
   readonly feedbackHeader: Locator;
 
   constructor(protected readonly page: Page) {
-    this.page = page;
-
     this.unsavedChangesModal = new UnsavedChangesModal(page);
     this.navPanel = new NavigationPanel(page);
 

@@ -12,8 +12,6 @@ export class NavigationPanel {
   readonly checkAndSaveIcon: Locator;
 
   constructor(protected readonly page: Page) {
-    this.page = page;
-
     this.navElement = page.getByRole("navigation");
 
     this.recounted = this.navElement.getByRole("listitem").filter({ hasText: "Is er herteld?" });

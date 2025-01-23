@@ -9,8 +9,6 @@ export class PollingStationFormPgObj {
   readonly create: Locator;
 
   constructor(protected readonly page: Page) {
-    this.page = page;
-
     this.number = page.getByRole("textbox", { name: "Nummer", exact: true });
     this.name = page.getByRole("textbox", { name: "Naam", exact: true });
 

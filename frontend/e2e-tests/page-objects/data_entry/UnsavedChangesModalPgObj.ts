@@ -7,8 +7,6 @@ export class UnsavedChangesModal {
   readonly discardInput: Locator;
 
   constructor(protected readonly page: Page) {
-    this.page = page;
-
     this.modal = page.getByRole("dialog");
     this.heading = this.modal.getByRole("heading", {
       level: 2,

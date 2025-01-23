@@ -21,7 +21,7 @@ interface Form extends HTMLFormElement {
 }
 
 const formFields: FormFields<PollingStationRequest> = {
-  number: { required: true, type: "number" },
+  number: { required: true, type: "number", min: 1 },
   name: { required: true, type: "string" },
   polling_station_type: { type: "string", mapUndefined: true },
   number_of_voters: { type: "number", isFormatted: true },
@@ -69,6 +69,10 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
 
   let numberFieldError;
   if (validationResult.number) {
+    validationResult.number =
+      validationResult.number === "FORM_VALIDATION_RESULT_MIN"
+        ? "FORM_VALIDATION_RESULT_INVALID_NUMBER"
+        : validationResult.number;
     numberFieldError = t(`form_errors.${validationResult.number}`);
   } else if (isValid && requestState.status === "api-error" && requestState.error.reference === "EntryNotUnique") {
     numberFieldError = t("polling_station.form.not_unique.error");

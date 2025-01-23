@@ -30,6 +30,7 @@ pub struct PoliticalGroupStanding {
     pg_number: u8,
     votes_cast: Fraction,
     surplus_votes: Fraction,
+    meets_surplus_threshold: bool,
     whole_seats: u64,
     rest_seats: u64,
 }
@@ -49,6 +50,7 @@ impl PoliticalGroupStanding {
         PoliticalGroupStanding {
             votes_cast,
             surplus_votes,
+            meets_surplus_threshold: votes_cast >= quota * Fraction::new(3, 4),
             pg_number: pg.number,
             whole_seats: pg_seats,
             rest_seats: 0,
@@ -58,11 +60,6 @@ impl PoliticalGroupStanding {
     /// Returns the votes per seat, if one remainder seat were to be added
     fn next_votes_per_seat(&self) -> Fraction {
         self.votes_cast / Fraction::from(self.total_seats() + 1)
-    }
-
-    /// Returns true if the political group has more than 3/4 of the quota in votes
-    fn meets_threshold(&self, quota: Fraction) -> bool {
-        self.votes_cast >= quota * Fraction::new(3, 4)
     }
 
     /// Add a rest seat to the political group and return the updated instance
@@ -198,7 +195,7 @@ pub fn seat_allocation(
     let remaining_seats = seats - whole_seats_count;
 
     let (steps, final_standing) = if remaining_seats > 0 {
-        allocate_remainder(&initial_standing, seats, quota, remaining_seats)?
+        allocate_remainder(&initial_standing, seats, remaining_seats)?
     } else {
         info!("All seats have been allocated without any remainder seats");
         (vec![], initial_standing.clone())
@@ -220,7 +217,6 @@ pub fn seat_allocation(
 fn allocate_remainder(
     initial_standing: &[PoliticalGroupStanding],
     seats: u64,
-    quota: Fraction,
     total_remaining_seats: u64,
 ) -> Result<(Vec<ApportionmentStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
     let mut steps = vec![];
@@ -236,7 +232,6 @@ fn allocate_remainder(
         } else {
             step_allocate_remainder_using_highest_surplus(
                 &current_standing,
-                quota,
                 remaining_seats,
                 &steps,
             )?
@@ -288,12 +283,11 @@ fn step_allocate_remainder_using_highest_averages(
 /// for this process.
 fn political_groups_qualifying_for_highest_surplus<'a>(
     standing: &'a [PoliticalGroupStanding],
-    quota: Fraction,
     previous: &'a [ApportionmentStep],
 ) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
     standing.iter().filter(move |p| {
         p.surplus_votes > Fraction::ZERO
-            && p.meets_threshold(quota)
+            && p.meets_surplus_threshold
             && !previous.iter().any(|prev| {
                 prev.change.is_assigned_by_surplus()
                     && prev.change.political_group_number() == p.pg_number
@@ -322,13 +316,12 @@ fn political_groups_qualifying_for_unique_highest_average<'a>(
 /// 19 seats.
 fn step_allocate_remainder_using_highest_surplus(
     assigned_seats: &[PoliticalGroupStanding],
-    quota: Fraction,
     remaining_seats: u64,
     previous: &[ApportionmentStep],
 ) -> Result<AssignedSeat, ApportionmentError> {
     // first we check if there are any political groups that still qualify for a highest surplus allocated seat
     let mut qualifying_for_surplus =
-        political_groups_qualifying_for_highest_surplus(assigned_seats, quota, previous).peekable();
+        political_groups_qualifying_for_highest_surplus(assigned_seats, previous).peekable();
 
     // If there is a least one element in the iterator, we know we can still do highest surplus, do that!
     if qualifying_for_surplus.peek().is_some() {

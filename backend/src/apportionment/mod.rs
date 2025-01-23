@@ -16,9 +16,33 @@ pub mod fraction;
 pub struct ApportionmentResult {
     seats: u64,
     quota: Fraction,
-    whole_seats_standing: Vec<PoliticalGroupStanding>,
     steps: Vec<ApportionmentStep>,
-    final_standing: Vec<PoliticalGroupStanding>,
+    final_standing: Vec<PoliticalGroupSeatAssignment>,
+}
+
+#[derive(Debug, PartialEq, Serialize, ToSchema)]
+pub struct PoliticalGroupSeatAssignment {
+    pg_number: u8,
+    votes_cast: Fraction,
+    surplus_votes: Fraction,
+    meets_surplus_threshold: bool,
+    whole_seats: u64,
+    rest_seats: u64,
+    total_seats: u64,
+}
+
+impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
+    fn from(pg: PoliticalGroupStanding) -> Self {
+        PoliticalGroupSeatAssignment {
+            pg_number: pg.pg_number,
+            votes_cast: pg.votes_cast,
+            surplus_votes: pg.surplus_votes,
+            meets_surplus_threshold: pg.meets_surplus_threshold,
+            whole_seats: pg.whole_seats,
+            rest_seats: pg.rest_seats,
+            total_seats: pg.total_seats(),
+        }
+    }
 }
 
 /// Contains the standing for a specific political group. This contains their
@@ -31,6 +55,7 @@ pub struct PoliticalGroupStanding {
     votes_cast: Fraction,
     surplus_votes: Fraction,
     meets_surplus_threshold: bool,
+    next_votes_per_seat: Fraction,
     whole_seats: u64,
     rest_seats: u64,
 }
@@ -51,21 +76,18 @@ impl PoliticalGroupStanding {
             votes_cast,
             surplus_votes,
             meets_surplus_threshold: votes_cast >= quota * Fraction::new(3, 4),
+            next_votes_per_seat: votes_cast / Fraction::from(pg_seats + 1),
             pg_number: pg.number,
             whole_seats: pg_seats,
             rest_seats: 0,
         }
     }
 
-    /// Returns the votes per seat, if one remainder seat were to be added
-    fn next_votes_per_seat(&self) -> Fraction {
-        self.votes_cast / Fraction::from(self.total_seats() + 1)
-    }
-
     /// Add a rest seat to the political group and return the updated instance
     fn add_rest_seat(self) -> Self {
         PoliticalGroupStanding {
             rest_seats: self.rest_seats + 1,
+            next_votes_per_seat: self.votes_cast / Fraction::from(self.total_seats() + 2),
             ..self
         }
     }
@@ -106,12 +128,12 @@ fn political_groups_with_largest_average<'a>(
         (Fraction::ZERO, vec![]),
         |(current_max, mut max_groups), pg| {
             // If this average is higher than any previously seen, we reset the list of groups matching
-            if pg.next_votes_per_seat() > current_max {
-                (pg.next_votes_per_seat(), vec![pg])
+            if pg.next_votes_per_seat > current_max {
+                (pg.next_votes_per_seat, vec![pg])
             } else {
                 // If the next average seats for this political group is the same as the
                 // max we add it to the list of groups that have that current maximum
-                if pg.next_votes_per_seat() == current_max {
+                if pg.next_votes_per_seat == current_max {
                     max_groups.push(pg);
                 }
                 (current_max, max_groups)
@@ -204,9 +226,8 @@ pub fn seat_allocation(
     Ok(ApportionmentResult {
         seats,
         quota,
-        whole_seats_standing: initial_standing,
         steps,
-        final_standing,
+        final_standing: final_standing.into_iter().map(Into::into).collect(),
     })
 }
 
@@ -237,6 +258,8 @@ fn allocate_remainder(
             )?
         };
 
+        let standing = current_standing.clone();
+
         // update the current standing by finding the selected group and adding
         // the remainder seat to their tally
         current_standing = current_standing
@@ -252,9 +275,9 @@ fn allocate_remainder(
 
         // add the update to the remainder assignment steps
         steps.push(ApportionmentStep {
+            standing,
             rest_seat_number,
             change: step,
-            new_standing: current_standing.clone(),
         });
     }
 
@@ -273,7 +296,7 @@ fn step_allocate_remainder_using_highest_averages(
     Ok(AssignedSeat::HighestAverage(HighestAverageAssignedSeat {
         selected_pg_number: selected_pg.pg_number,
         pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
-        votes_per_seat: selected_pg.next_votes_per_seat(),
+        votes_per_seat: selected_pg.next_votes_per_seat,
     }))
 }
 
@@ -351,7 +374,7 @@ fn step_allocate_remainder_using_highest_surplus(
             Ok(AssignedSeat::HighestAverage(HighestAverageAssignedSeat {
                 selected_pg_number: selected_pg.pg_number,
                 pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
-                votes_per_seat: selected_pg.next_votes_per_seat(),
+                votes_per_seat: selected_pg.next_votes_per_seat,
             }))
         } else {
             // We've now even exhausted unique highest average seats: every group that qualified
@@ -369,7 +392,7 @@ fn step_allocate_remainder_using_highest_surplus(
 pub struct ApportionmentStep {
     rest_seat_number: u64,
     change: AssignedSeat,
-    new_standing: Vec<PoliticalGroupStanding>,
+    standing: Vec<PoliticalGroupStanding>,
 }
 
 /// Records the political group and specific change for a specific remainder seat
@@ -429,7 +452,7 @@ pub enum ApportionmentError {
 #[cfg(test)]
 mod tests {
     use crate::{
-        apportionment::{seat_allocation, ApportionmentError, PoliticalGroupStanding},
+        apportionment::{seat_allocation, ApportionmentError},
         data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts},
         summary::{ElectionSummary, SummaryDifferencesCounts},
     };
@@ -471,7 +494,7 @@ mod tests {
         let total_seats = result
             .final_standing
             .iter()
-            .map(PoliticalGroupStanding::total_seats)
+            .map(|p| p.total_seats)
             .collect::<Vec<_>>();
         assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
     }
@@ -484,7 +507,7 @@ mod tests {
         let total_seats = result
             .final_standing
             .iter()
-            .map(PoliticalGroupStanding::total_seats)
+            .map(|p| p.total_seats)
             .collect::<Vec<_>>();
         assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
     }
@@ -497,7 +520,7 @@ mod tests {
         let total_seats = result
             .final_standing
             .iter()
-            .map(PoliticalGroupStanding::total_seats)
+            .map(|p| p.total_seats)
             .collect::<Vec<_>>();
         assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
     }
@@ -516,7 +539,7 @@ mod tests {
         let total_seats = result
             .final_standing
             .iter()
-            .map(PoliticalGroupStanding::total_seats)
+            .map(|p| p.total_seats)
             .collect::<Vec<_>>();
         assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
     }

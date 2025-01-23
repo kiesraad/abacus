@@ -1063,7 +1063,6 @@
         "required": [
           "seats",
           "quota",
-          "whole_seats_standing",
           "steps",
           "final_standing"
         ],
@@ -1071,7 +1070,7 @@
           "final_standing": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PoliticalGroupStanding"
+              "$ref": "#/components/schemas/PoliticalGroupSeatAssignment"
             }
           },
           "quota": {
@@ -1087,12 +1086,6 @@
             "items": {
               "$ref": "#/components/schemas/ApportionmentStep"
             }
-          },
-          "whole_seats_standing": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupStanding"
-            }
           }
         }
       },
@@ -1102,22 +1095,22 @@
         "required": [
           "rest_seat_number",
           "change",
-          "new_standing"
+          "standing"
         ],
         "properties": {
           "change": {
             "$ref": "#/components/schemas/AssignedSeat"
           },
-          "new_standing": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupStanding"
-            }
-          },
           "rest_seat_number": {
             "type": "integer",
             "format": "int64",
             "minimum": 0
+          },
+          "standing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupStanding"
+            }
           }
         }
       },
@@ -1749,6 +1742,49 @@
           }
         }
       },
+      "PoliticalGroupSeatAssignment": {
+        "type": "object",
+        "required": [
+          "pg_number",
+          "votes_cast",
+          "surplus_votes",
+          "meets_surplus_threshold",
+          "whole_seats",
+          "rest_seats",
+          "total_seats"
+        ],
+        "properties": {
+          "meets_surplus_threshold": {
+            "type": "boolean"
+          },
+          "pg_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "rest_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "surplus_votes": {
+            "$ref": "#/components/schemas/Fraction"
+          },
+          "total_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "votes_cast": {
+            "$ref": "#/components/schemas/Fraction"
+          },
+          "whole_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
       "PoliticalGroupStanding": {
         "type": "object",
         "description": "Contains the standing for a specific political group. This contains their\npolitical group number, how many votes were cast, the surplus votes that\nweren't used to get whole seats. The number of seats earned as a whole and\nthe number of rest/remainder seats.",
@@ -1757,12 +1793,16 @@
           "votes_cast",
           "surplus_votes",
           "meets_surplus_threshold",
+          "next_votes_per_seat",
           "whole_seats",
           "rest_seats"
         ],
         "properties": {
           "meets_surplus_threshold": {
             "type": "boolean"
+          },
+          "next_votes_per_seat": {
+            "$ref": "#/components/schemas/Fraction"
           },
           "pg_number": {
             "type": "integer",

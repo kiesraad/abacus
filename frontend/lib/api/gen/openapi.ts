@@ -113,11 +113,10 @@ standings. The final standing contains the number of seats per political
 group that was assigned after all seats were assigned.
  */
 export interface ApportionmentResult {
-  final_standing: PoliticalGroupStanding[];
+  final_standing: PoliticalGroupSeatAssignment[];
   quota: Fraction;
   seats: number;
   steps: ApportionmentStep[];
-  whole_seats_standing: PoliticalGroupStanding[];
 }
 
 /**
@@ -126,8 +125,8 @@ once that remainder seat was assigned
  */
 export interface ApportionmentStep {
   change: AssignedSeat;
-  new_standing: PoliticalGroupStanding[];
   rest_seat_number: number;
+  standing: PoliticalGroupStanding[];
 }
 
 /**
@@ -362,6 +361,16 @@ export interface PoliticalGroup {
   number: number;
 }
 
+export interface PoliticalGroupSeatAssignment {
+  meets_surplus_threshold: boolean;
+  pg_number: number;
+  rest_seats: number;
+  surplus_votes: Fraction;
+  total_seats: number;
+  votes_cast: Fraction;
+  whole_seats: number;
+}
+
 /**
  * Contains the standing for a specific political group. This contains their
 political group number, how many votes were cast, the surplus votes that
@@ -370,6 +379,7 @@ the number of rest/remainder seats.
  */
 export interface PoliticalGroupStanding {
   meets_surplus_threshold: boolean;
+  next_votes_per_seat: Fraction;
   pg_number: number;
   rest_seats: number;
   surplus_votes: Fraction;

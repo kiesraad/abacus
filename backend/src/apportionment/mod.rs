@@ -451,6 +451,7 @@ pub enum ApportionmentError {
 
 #[cfg(test)]
 mod tests {
+    use crate::apportionment::ApportionmentResult;
     use crate::{
         apportionment::{seat_allocation, ApportionmentError},
         data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts},
@@ -487,15 +488,19 @@ mod tests {
         }
     }
 
+    fn get_total_seats(result: ApportionmentResult) -> Vec<u64> {
+        result
+            .final_standing
+            .iter()
+            .map(|p| p.total_seats)
+            .collect::<Vec<_>>()
+    }
+
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_system() {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 60, 40]);
         let result = seat_allocation(15, &totals).unwrap();
-        let total_seats = result
-            .final_standing
-            .iter()
-            .map(|p| p.total_seats)
-            .collect::<Vec<_>>();
+        let total_seats = get_total_seats(result);
         assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
     }
 
@@ -504,11 +509,7 @@ mod tests {
     ) {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
         let result = seat_allocation(15, &totals).unwrap();
-        let total_seats = result
-            .final_standing
-            .iter()
-            .map(|p| p.total_seats)
-            .collect::<Vec<_>>();
+        let total_seats = get_total_seats(result);
         assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
     }
 
@@ -517,11 +518,7 @@ mod tests {
     ) {
         let totals = get_election_summary(vec![560, 160, 160, 80, 80, 80, 40, 40]);
         let result = seat_allocation(15, &totals).unwrap();
-        let total_seats = result
-            .final_standing
-            .iter()
-            .map(|p| p.total_seats)
-            .collect::<Vec<_>>();
+        let total_seats = get_total_seats(result);
         assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
     }
 
@@ -536,11 +533,7 @@ mod tests {
     fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
         let totals = get_election_summary(vec![600, 302, 98, 99, 101]);
         let result = seat_allocation(23, &totals).unwrap();
-        let total_seats = result
-            .final_standing
-            .iter()
-            .map(|p| p.total_seats)
-            .collect::<Vec<_>>();
+        let total_seats = get_total_seats(result);
         assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
     }
 

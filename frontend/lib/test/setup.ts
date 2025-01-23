@@ -36,7 +36,6 @@ beforeAll(() => {
 
 afterEach(() => {
   cleanup();
-  vi.clearAllMocks();
   server.resetHandlers();
   server.events.removeAllListeners();
 });

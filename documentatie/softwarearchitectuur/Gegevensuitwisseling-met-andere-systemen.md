@@ -1,6 +1,6 @@
 # Gegevensuitwisseling met andere systemen
 
-Abacus worden air-gapped en lokaal gedraaid. Gegevensuitwisseling gebeurt dus nooit over een netwerk.
+Abacus wordt air-gapped en lokaal gedraaid. Gegevensuitwisseling gebeurt dus nooit over een netwerk.
 
 
 ## Importeren van data
@@ -18,7 +18,7 @@ Deze bestanden zijn onderdeel van OSV2020 PP, KS en U.
 
 Het CSB van de verkiezing maakt met OSV2020 KS de verkiezingsdefinitie en de kandidatenlijst aan. 
 
-De xSBs (GSB, CSB, etc) lezen de verkiezingsdefinitie en de kandidatenlijst in de uitslagensoftware (nu: OSV2020 U, straks: Abacus) in.
+De xSB's (GSB, CSB, etc) lezen de verkiezingsdefinitie en de kandidatenlijst in de uitslagensoftware (nu: OSV2020 U, straks: Abacus) in.
 
 ### Stembureaus
 nog in te vullen

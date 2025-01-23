@@ -333,7 +333,8 @@ export interface GetDataEntryResponse {
 average method.
  */
 export interface HighestAverageAssignedSeat {
-  pg_number: number;
+  pg_options: number[];
+  selected_pg_number: number;
   votes_per_seat: Fraction;
 }
 
@@ -342,7 +343,8 @@ export interface HighestAverageAssignedSeat {
 surplus method.
  */
 export interface HighestSurplusAssignedSeat {
-  pg_number: number;
+  pg_options: number[];
+  selected_pg_number: number;
   surplus_votes: Fraction;
 }
 

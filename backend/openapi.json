@@ -1059,58 +1059,114 @@
     "schemas": {
       "ApportionmentResult": {
         "type": "object",
+        "description": "The result of the apportionment procedure. This contains the number of\nseats and the quota that was used. It then contains the initial standing\nafter whole seats were assigned, and each of the changes and intermediate\nstandings. The final standing contains the number of seats per political\ngroup that was assigned after all seats were assigned.",
         "required": [
           "seats",
           "quota",
-          "political_groups_seats"
+          "whole_seats_standing",
+          "steps",
+          "final_standing"
         ],
         "properties": {
-          "political_groups_seats": {
+          "final_standing": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PoliticalGroupSeats"
+              "$ref": "#/components/schemas/PoliticalGroupStanding"
             }
           },
           "quota": {
             "$ref": "#/components/schemas/DisplayFraction"
           },
-          "rest_seat_allocation": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/RestSeatAllocationDetails"
-              }
-            ]
-          },
           "seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApportionmentStep"
+            }
+          },
+          "whole_seats_standing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupStanding"
+            }
+          }
+        }
+      },
+      "ApportionmentStep": {
+        "type": "object",
+        "description": "Records the details for a specific remainder seat, and how the standing is\nonce that remainder seat was assigned",
+        "required": [
+          "rest_seat_number",
+          "change",
+          "new_standing"
+        ],
+        "properties": {
+          "change": {
+            "$ref": "#/components/schemas/AssignedSeat"
+          },
+          "new_standing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupStanding"
+            }
+          },
+          "rest_seat_number": {
             "type": "integer",
             "format": "int64",
             "minimum": 0
           }
         }
       },
-      "Average": {
-        "type": "object",
-        "required": [
-          "political_group_number",
-          "average",
-          "highest"
-        ],
-        "properties": {
-          "average": {
-            "$ref": "#/components/schemas/DisplayFraction"
+      "AssignedSeat": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "assignment_method"
+                ],
+                "properties": {
+                  "assignment_method": {
+                    "type": "string",
+                    "enum": [
+                      "HighestAverage"
+                    ]
+                  }
+                }
+              }
+            ]
           },
-          "highest": {
-            "type": "boolean"
-          },
-          "political_group_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestSurplusAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "assignment_method"
+                ],
+                "properties": {
+                  "assignment_method": {
+                    "type": "string",
+                    "enum": [
+                      "HighestSurplus"
+                    ]
+                  }
+                }
+              }
+            ]
           }
-        }
+        ],
+        "description": "Records the political group and specific change for a specific remainder seat"
       },
       "Candidate": {
         "type": "object",
@@ -1289,19 +1345,12 @@
       },
       "DisplayFraction": {
         "type": "object",
-        "description": "Fraction with the integer part split out for display purposes",
         "required": [
-          "integer",
           "numerator",
           "denominator"
         ],
         "properties": {
           "denominator": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "integer": {
             "type": "integer",
             "format": "int64",
             "minimum": 0
@@ -1597,65 +1646,38 @@
           }
         }
       },
-      "Gte19SeatsAllocation": {
+      "HighestAverageAssignedSeat": {
         "type": "object",
+        "description": "Contains the details for an assigned seat, assigned through the highest\naverage method.",
         "required": [
-          "highest_averages"
+          "pg_number",
+          "votes_per_seat"
         ],
         "properties": {
-          "highest_averages": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/HighestAveragesAllocation"
-            }
-          }
-        }
-      },
-      "HighestAveragesAllocation": {
-        "type": "object",
-        "required": [
-          "rest_seat_number",
-          "averages",
-          "assigned_to_political_group_number"
-        ],
-        "properties": {
-          "assigned_to_political_group_number": {
+          "pg_number": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "averages": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Average"
-            }
-          },
-          "rest_seat_number": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
+          "votes_per_seat": {
+            "$ref": "#/components/schemas/DisplayFraction"
           }
         }
       },
-      "HighestSurplusesAllocation": {
+      "HighestSurplusAssignedSeat": {
         "type": "object",
+        "description": "Contains the details for an assigned seat, assigned through the highest\nsurplus method.",
         "required": [
-          "political_group_number",
-          "surplus",
-          "rest_seats"
+          "pg_number",
+          "surplus_votes"
         ],
         "properties": {
-          "political_group_number": {
+          "pg_number": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
           },
-          "rest_seats": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "surplus": {
+          "surplus_votes": {
             "$ref": "#/components/schemas/DisplayFraction"
           }
         }
@@ -1674,34 +1696,6 @@
           },
           "username": {
             "type": "string"
-          }
-        }
-      },
-      "Lt19SeatsAllocation": {
-        "type": "object",
-        "required": [
-          "highest_surpluses",
-          "highest_averages_max_one",
-          "highest_averages_remainder"
-        ],
-        "properties": {
-          "highest_averages_max_one": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/HighestAveragesAllocation"
-            }
-          },
-          "highest_averages_remainder": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/HighestAveragesAllocation"
-            }
-          },
-          "highest_surpluses": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/HighestSurplusesAllocation"
-            }
           }
         }
       },
@@ -1730,16 +1724,18 @@
           }
         }
       },
-      "PoliticalGroupSeats": {
+      "PoliticalGroupStanding": {
         "type": "object",
+        "description": "Contains the standing for a specific political group. This contains their\npolitical group number, how many votes were cast, the surplus votes that\nweren't used to get whole seats. The number of seats earned as a whole and\nthe number of rest/remainder seats.",
         "required": [
-          "political_group_number",
+          "pg_number",
+          "votes_cast",
+          "surplus_votes",
           "whole_seats",
-          "rest_seats",
-          "total_seats"
+          "rest_seats"
         ],
         "properties": {
-          "political_group_number": {
+          "pg_number": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -1749,10 +1745,11 @@
             "format": "int64",
             "minimum": 0
           },
-          "total_seats": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
+          "surplus_votes": {
+            "$ref": "#/components/schemas/DisplayFraction"
+          },
+          "votes_cast": {
+            "$ref": "#/components/schemas/DisplayFraction"
           },
           "whole_seats": {
             "type": "integer",
@@ -1932,32 +1929,6 @@
           "FixedLocation",
           "Special",
           "Mobile"
-        ]
-      },
-      "RestSeatAllocationDetails": {
-        "oneOf": [
-          {
-            "type": "object",
-            "required": [
-              "RestSeatsAllocationDetailsLt19Seats"
-            ],
-            "properties": {
-              "RestSeatsAllocationDetailsLt19Seats": {
-                "$ref": "#/components/schemas/Lt19SeatsAllocation"
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "RestSeatsAllocationDetailsGte19Seats"
-            ],
-            "properties": {
-              "RestSeatsAllocationDetailsGte19Seats": {
-                "$ref": "#/components/schemas/Gte19SeatsAllocation"
-              }
-            }
-          }
         ]
       },
       "SaveDataEntryResponse": {

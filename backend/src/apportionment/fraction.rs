@@ -4,15 +4,21 @@ use std::{
     fmt::{Debug, Display, Formatter, Result},
     ops::{Add, Div, Mul, Sub},
 };
-use utoipa::ToSchema;
+use utoipa::{PartialSchema, ToSchema};
 
-#[derive(Clone, Copy, Serialize, ToSchema)]
+#[derive(Clone, Copy, Serialize)]
 #[serde(into = "DisplayFraction")]
-#[schema(as = DisplayFraction)]
 pub struct Fraction {
     numerator: u64,
     denominator: u64,
 }
+
+impl PartialSchema for Fraction {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        DisplayFraction::schema()
+    }
+}
+impl ToSchema for Fraction {}
 
 impl Fraction {
     pub const ZERO: Fraction = Fraction::new(0, 1);
@@ -148,6 +154,7 @@ impl PartialEq for DisplayFraction {
 
 /// Fraction with the integer part split out for display purposes
 #[derive(Clone, Copy, Debug, Serialize, ToSchema)]
+#[schema(as = Fraction)]
 pub struct DisplayFraction {
     integer: u64,
     numerator: u64,

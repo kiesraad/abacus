@@ -114,7 +114,7 @@ group that was assigned after all seats were assigned.
  */
 export interface ApportionmentResult {
   final_standing: PoliticalGroupStanding[];
-  quota: DisplayFraction;
+  quota: Fraction;
   seats: number;
   steps: ApportionmentStep[];
   whole_seats_standing: PoliticalGroupStanding[];
@@ -134,8 +134,8 @@ export interface ApportionmentStep {
  * Records the political group and specific change for a specific remainder seat
  */
 export type AssignedSeat =
-  | { HighestAverage: HighestAverageAssignedSeat }
-  | { HighestSurplus: HighestSurplusAssignedSeat };
+  | (HighestAverageAssignedSeat & { assigned_by: "HighestAverage" })
+  | (HighestSurplusAssignedSeat & { assigned_by: "HighestSurplus" });
 
 /**
  * Candidate
@@ -194,11 +194,6 @@ export interface DifferencesCounts {
   too_few_ballots_handed_out_count: number;
   too_many_ballots_handed_out_count: number;
   unreturned_ballots_count: number;
-}
-
-export interface DisplayFraction {
-  denominator: number;
-  numerator: number;
 }
 
 /**
@@ -314,6 +309,15 @@ export interface ErrorResponse {
 }
 
 /**
+ * Fraction with the integer part split out for display purposes
+ */
+export interface Fraction {
+  denominator: number;
+  integer: number;
+  numerator: number;
+}
+
+/**
  * Response structure for getting data entry of polling station results
  */
 export interface GetDataEntryResponse {
@@ -330,7 +334,7 @@ average method.
  */
 export interface HighestAverageAssignedSeat {
   pg_number: number;
-  votes_per_seat: DisplayFraction;
+  votes_per_seat: Fraction;
 }
 
 /**
@@ -339,7 +343,7 @@ surplus method.
  */
 export interface HighestSurplusAssignedSeat {
   pg_number: number;
-  surplus_votes: DisplayFraction;
+  surplus_votes: Fraction;
 }
 
 export interface LoginResponse {
@@ -366,8 +370,8 @@ export interface PoliticalGroupStanding {
   meets_surplus_threshold: boolean;
   pg_number: number;
   rest_seats: number;
-  surplus_votes: DisplayFraction;
-  votes_cast: DisplayFraction;
+  surplus_votes: Fraction;
+  votes_cast: Fraction;
   whole_seats: number;
 }
 

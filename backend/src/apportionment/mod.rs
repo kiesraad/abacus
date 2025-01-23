@@ -368,6 +368,7 @@ pub struct ApportionmentStep {
 
 /// Records the political group and specific change for a specific remainder seat
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, ToSchema)]
+#[serde(tag = "assigned_by")]
 pub enum AssignedSeat {
     HighestAverage(HighestAverageAssignedSeat),
     HighestSurplus(HighestSurplusAssignedSeat),

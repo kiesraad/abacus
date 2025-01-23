@@ -1075,7 +1075,7 @@
             }
           },
           "quota": {
-            "$ref": "#/components/schemas/DisplayFraction"
+            "$ref": "#/components/schemas/Fraction"
           },
           "seats": {
             "type": "integer",
@@ -1124,26 +1124,46 @@
       "AssignedSeat": {
         "oneOf": [
           {
-            "type": "object",
-            "required": [
-              "HighestAverage"
-            ],
-            "properties": {
-              "HighestAverage": {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "assigned_by"
+                ],
+                "properties": {
+                  "assigned_by": {
+                    "type": "string",
+                    "enum": [
+                      "HighestAverage"
+                    ]
+                  }
+                }
               }
-            }
+            ]
           },
           {
-            "type": "object",
-            "required": [
-              "HighestSurplus"
-            ],
-            "properties": {
-              "HighestSurplus": {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/HighestSurplusAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "assigned_by"
+                ],
+                "properties": {
+                  "assigned_by": {
+                    "type": "string",
+                    "enum": [
+                      "HighestSurplus"
+                    ]
+                  }
+                }
               }
-            }
+            ]
           }
         ],
         "description": "Records the political group and specific change for a specific remainder seat"
@@ -1319,25 +1339,6 @@
             "type": "integer",
             "format": "int32",
             "description": "Number of unreturned ballots (\"Hoe vaak heeft een kiezer het stembiljet niet ingeleverd?\")",
-            "minimum": 0
-          }
-        }
-      },
-      "DisplayFraction": {
-        "type": "object",
-        "required": [
-          "numerator",
-          "denominator"
-        ],
-        "properties": {
-          "denominator": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "numerator": {
-            "type": "integer",
-            "format": "int64",
             "minimum": 0
           }
         }
@@ -1596,6 +1597,32 @@
           }
         }
       },
+      "Fraction": {
+        "type": "object",
+        "description": "Fraction with the integer part split out for display purposes",
+        "required": [
+          "integer",
+          "numerator",
+          "denominator"
+        ],
+        "properties": {
+          "denominator": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "integer": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "numerator": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
       "GetDataEntryResponse": {
         "type": "object",
         "description": "Response structure for getting data entry of polling station results",
@@ -1640,7 +1667,7 @@
             "minimum": 0
           },
           "votes_per_seat": {
-            "$ref": "#/components/schemas/DisplayFraction"
+            "$ref": "#/components/schemas/Fraction"
           }
         }
       },
@@ -1658,7 +1685,7 @@
             "minimum": 0
           },
           "surplus_votes": {
-            "$ref": "#/components/schemas/DisplayFraction"
+            "$ref": "#/components/schemas/Fraction"
           }
         }
       },
@@ -1730,10 +1757,10 @@
             "minimum": 0
           },
           "surplus_votes": {
-            "$ref": "#/components/schemas/DisplayFraction"
+            "$ref": "#/components/schemas/Fraction"
           },
           "votes_cast": {
-            "$ref": "#/components/schemas/DisplayFraction"
+            "$ref": "#/components/schemas/Fraction"
           },
           "whole_seats": {
             "type": "integer",

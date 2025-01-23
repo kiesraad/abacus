@@ -28,11 +28,11 @@ export class NavigationPanel {
     this.checkAndSaveIcon = this.checkAndSave.getByRole("img");
   }
 
-  allLists() {
+  allListNames() {
     return this.navElement
       .getByRole("listitem")
       .filter({ hasText: /^Lijst / })
-      .all();
+      .allTextContents();
   }
 
   list(listNumber: number) {

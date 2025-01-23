@@ -105,18 +105,35 @@ export type LOGOUT_REQUEST_PATH = `/api/user/logout`;
 
 /** TYPES **/
 
+/**
+ * The result of the apportionment procedure. This contains the number of
+seats and the quota that was used. It then contains the initial standing
+after whole seats were assigned, and each of the changes and intermediate
+standings. The final standing contains the number of seats per political
+group that was assigned after all seats were assigned.
+ */
 export interface ApportionmentResult {
-  political_groups_seats: PoliticalGroupSeats[];
+  final_standing: PoliticalGroupStanding[];
   quota: DisplayFraction;
-  rest_seat_allocation?: null | RestSeatAllocationDetails;
   seats: number;
+  steps: ApportionmentStep[];
+  whole_seats_standing: PoliticalGroupStanding[];
 }
 
-export interface Average {
-  average: DisplayFraction;
-  highest: boolean;
-  political_group_number: number;
+/**
+ * Records the details for a specific remainder seat, and how the standing is
+once that remainder seat was assigned
+ */
+export interface ApportionmentStep {
+  change: AssignedSeat;
+  new_standing: PoliticalGroupStanding[];
+  rest_seat_number: number;
 }
+
+/**
+ * Records the political group and specific change for a specific remainder seat
+ */
+export type AssignedSeat = HighestAverageAssignedSeat | HighestSurplusAssignedSeat;
 
 /**
  * Candidate
@@ -177,12 +194,8 @@ export interface DifferencesCounts {
   unreturned_ballots_count: number;
 }
 
-/**
- * Fraction with the integer part split out for display purposes
- */
 export interface DisplayFraction {
   denominator: number;
-  integer: number;
   numerator: number;
 }
 
@@ -309,31 +322,27 @@ export interface GetDataEntryResponse {
   validation_results: ValidationResults;
 }
 
-export interface Gte19SeatsAllocation {
-  highest_averages: HighestAveragesAllocation[];
+/**
+ * Contains the details for an assigned seat, assigned through the highest
+average method.
+ */
+export interface HighestAverageAssignedSeat {
+  pg_number: number;
+  votes_per_seat: DisplayFraction;
 }
 
-export interface HighestAveragesAllocation {
-  assigned_to_political_group_number: number;
-  averages: Average[];
-  rest_seat_number: number;
-}
-
-export interface HighestSurplusesAllocation {
-  political_group_number: number;
-  rest_seats: number;
-  surplus: DisplayFraction;
+/**
+ * Contains the details for an assigned seat, assigned through the highest
+surplus method.
+ */
+export interface HighestSurplusAssignedSeat {
+  pg_number: number;
+  surplus_votes: DisplayFraction;
 }
 
 export interface LoginResponse {
   user_id: number;
   username: string;
-}
-
-export interface Lt19SeatsAllocation {
-  highest_averages_max_one: HighestAveragesAllocation[];
-  highest_averages_remainder: HighestAveragesAllocation[];
-  highest_surpluses: HighestSurplusesAllocation[];
 }
 
 /**
@@ -345,10 +354,17 @@ export interface PoliticalGroup {
   number: number;
 }
 
-export interface PoliticalGroupSeats {
-  political_group_number: number;
+/**
+ * Contains the standing for a specific political group. This contains their
+political group number, how many votes were cast, the surplus votes that
+weren't used to get whole seats. The number of seats earned as a whole and
+the number of rest/remainder seats.
+ */
+export interface PoliticalGroupStanding {
+  pg_number: number;
   rest_seats: number;
-  total_seats: number;
+  surplus_votes: DisplayFraction;
+  votes_cast: DisplayFraction;
   whole_seats: number;
 }
 
@@ -415,8 +431,6 @@ export interface PollingStationResults {
  * Type of Polling station
  */
 export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
-
-export type RestSeatAllocationDetails = Lt19SeatsAllocation | Gte19SeatsAllocation;
 
 /**
  * Response structure for saving data entry of polling station results

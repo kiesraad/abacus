@@ -1124,46 +1124,26 @@
       "AssignedSeat": {
         "oneOf": [
           {
-            "allOf": [
-              {
+            "type": "object",
+            "required": [
+              "HighestAverage"
+            ],
+            "properties": {
+              "HighestAverage": {
                 "$ref": "#/components/schemas/HighestAverageAssignedSeat"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "assignment_method"
-                ],
-                "properties": {
-                  "assignment_method": {
-                    "type": "string",
-                    "enum": [
-                      "HighestAverage"
-                    ]
-                  }
-                }
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
+            "type": "object",
+            "required": [
+              "HighestSurplus"
+            ],
+            "properties": {
+              "HighestSurplus": {
                 "$ref": "#/components/schemas/HighestSurplusAssignedSeat"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "assignment_method"
-                ],
-                "properties": {
-                  "assignment_method": {
-                    "type": "string",
-                    "enum": [
-                      "HighestSurplus"
-                    ]
-                  }
-                }
               }
-            ]
+            }
           }
         ],
         "description": "Records the political group and specific change for a specific remainder seat"

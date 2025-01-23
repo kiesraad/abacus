@@ -1657,11 +1657,20 @@
         "type": "object",
         "description": "Contains the details for an assigned seat, assigned through the highest\naverage method.",
         "required": [
-          "pg_number",
+          "selected_pg_number",
+          "pg_options",
           "votes_per_seat"
         ],
         "properties": {
-          "pg_number": {
+          "pg_options": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          "selected_pg_number": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -1675,11 +1684,20 @@
         "type": "object",
         "description": "Contains the details for an assigned seat, assigned through the highest\nsurplus method.",
         "required": [
-          "pg_number",
+          "selected_pg_number",
+          "pg_options",
           "surplus_votes"
         ],
         "properties": {
-          "pg_number": {
+          "pg_options": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          "selected_pg_number": {
             "type": "integer",
             "format": "int32",
             "minimum": 0

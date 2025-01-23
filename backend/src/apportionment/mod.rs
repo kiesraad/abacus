@@ -268,9 +268,11 @@ fn step_allocate_remainder_using_highest_averages(
     standing: &[PoliticalGroupStanding],
     remaining_seats: u64,
 ) -> Result<AssignedSeat, ApportionmentError> {
-    let selected_pg = political_groups_with_largest_average(standing, remaining_seats)?[0];
+    let selected_pgs = political_groups_with_largest_average(standing, remaining_seats)?;
+    let selected_pg = selected_pgs[0];
     Ok(AssignedSeat::HighestAverage(HighestAverageAssignedSeat {
-        pg_number: selected_pg.pg_number,
+        selected_pg_number: selected_pg.pg_number,
+        pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
         votes_per_seat: selected_pg.next_votes_per_seat(),
     }))
 }
@@ -325,10 +327,12 @@ fn step_allocate_remainder_using_highest_surplus(
 
     // If there is a least one element in the iterator, we know we can still do highest surplus, do that!
     if qualifying_for_surplus.peek().is_some() {
-        let selected_pg =
-            political_groups_with_highest_surplus(qualifying_for_surplus, remaining_seats)?[0];
+        let selected_pgs =
+            political_groups_with_highest_surplus(qualifying_for_surplus, remaining_seats)?;
+        let selected_pg = selected_pgs[0];
         Ok(AssignedSeat::HighestSurplus(HighestSurplusAssignedSeat {
-            pg_number: selected_pg.pg_number,
+            selected_pg_number: selected_pg.pg_number,
+            pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
             surplus_votes: selected_pg.surplus_votes,
         }))
     } else {
@@ -339,12 +343,14 @@ fn step_allocate_remainder_using_highest_surplus(
             political_groups_qualifying_for_unique_highest_average(assigned_seats, previous)
                 .peekable();
         if qualifying_for_unique_highest_average.peek().is_some() {
-            let selected_pg = political_groups_with_largest_average(
+            let selected_pgs = political_groups_with_largest_average(
                 qualifying_for_unique_highest_average,
                 remaining_seats,
-            )?[0];
+            )?;
+            let selected_pg = selected_pgs[0];
             Ok(AssignedSeat::HighestAverage(HighestAverageAssignedSeat {
-                pg_number: selected_pg.pg_number,
+                selected_pg_number: selected_pg.pg_number,
+                pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
                 votes_per_seat: selected_pg.next_votes_per_seat(),
             }))
         } else {
@@ -367,7 +373,7 @@ pub struct ApportionmentStep {
 }
 
 /// Records the political group and specific change for a specific remainder seat
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
 #[serde(tag = "assigned_by")]
 pub enum AssignedSeat {
     HighestAverage(HighestAverageAssignedSeat),
@@ -379,8 +385,8 @@ impl AssignedSeat {
     /// seat
     fn political_group_number(&self) -> u8 {
         match self {
-            AssignedSeat::HighestAverage(highest_average) => highest_average.pg_number,
-            AssignedSeat::HighestSurplus(highest_surplus) => highest_surplus.pg_number,
+            AssignedSeat::HighestAverage(highest_average) => highest_average.selected_pg_number,
+            AssignedSeat::HighestSurplus(highest_surplus) => highest_surplus.selected_pg_number,
         }
     }
 
@@ -397,17 +403,19 @@ impl AssignedSeat {
 
 /// Contains the details for an assigned seat, assigned through the highest
 /// average method.
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
 pub struct HighestAverageAssignedSeat {
-    pg_number: u8,
+    selected_pg_number: u8,
+    pg_options: Vec<u8>,
     votes_per_seat: Fraction,
 }
 
 /// Contains the details for an assigned seat, assigned through the highest
 /// surplus method.
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
 pub struct HighestSurplusAssignedSeat {
-    pg_number: u8,
+    selected_pg_number: u8,
+    pg_options: Vec<u8>,
     surplus_votes: Fraction,
 }
 

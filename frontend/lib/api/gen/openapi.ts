@@ -328,8 +328,7 @@ export interface GetDataEntryResponse {
 }
 
 /**
- * Contains the details for an assigned seat, assigned through the highest
-average method.
+ * Contains the details for an assigned seat, assigned through the highest average method.
  */
 export interface HighestAverageAssignedSeat {
   pg_options: number[];
@@ -338,8 +337,7 @@ export interface HighestAverageAssignedSeat {
 }
 
 /**
- * Contains the details for an assigned seat, assigned through the highest
-surplus method.
+ * Contains the details for an assigned seat, assigned through the highest surplus method.
  */
 export interface HighestSurplusAssignedSeat {
   pg_options: number[];

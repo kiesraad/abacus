@@ -9,7 +9,7 @@ import {
   PollingStationChoicePage,
   RecountedPage,
   VotersAndVotesPage,
-} from "./page-objects/data_entry";
+} from "../page-objects/data_entry";
 
 export async function fillDataEntry(page: Page, results: PollingStationResults) {
   const recountedPage = new RecountedPage(page);

@@ -20,8 +20,8 @@ function returnWebserverCommand(): string {
 
 const config: PlaywrightTestConfig = defineConfig({
   ...commonConfig,
-  testDir: "./e2e-tests/dom-to-db-tests",
-  outputDir: "./test-results/dom-to-db",
+  testDir: "./e2e-tests",
+  outputDir: "./test-results/e2e-tests",
   testMatch: /\.e2e\.ts/,
   use: {
     ...commonConfig.use,

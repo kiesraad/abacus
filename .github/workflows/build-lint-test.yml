@@ -113,8 +113,8 @@ jobs:
           name: frontend-build
           path: frontend/dist
 
-  playwright-ui:
-    name: Playwright UI tests
+  playwright-ladle:
+    name: Playwright ladle tests
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -132,13 +132,14 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps --no-shell
-      - name: Run UI e2e tests
-        run: npm run e2e:lib-ui
+      - name: Run ladle playwright tests
+        run: npm run test:ladle
 
-  playwright-d2d:
-    name: Playwright d2d tests (${{ matrix.os }})
+  playwright-e2e:
+    name: Playwright e2e tests (${{ matrix.os }})
     needs:
-      - backend # frontend is included in backend build
+      - backend
+      - frontend # for the tests, frontend build is included in backend job
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -164,13 +165,14 @@ jobs:
       - name: make backend build executable
         run: chmod a+x ../builds/backend/abacus
         if: runner.os != 'Windows'
-      - name: Run DOM to Database e2e tests
-        run: npm run e2e:d2d
+      - name: Run e2e playwright tests
+        run: npm run test:e2e
 
   deploy:
     name: Deploy to abacus-test.nl
     needs:
       - backend
+      - frontend # for the tests, frontend build is included in backend job
     environment:
       name: test
       url: https://${{ github.sha }}.abacus-test.nl

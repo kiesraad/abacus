@@ -8,17 +8,16 @@ import { electionMockData } from "@kiesraad/api-mocks";
 import { PollingStationFormNavigation } from "./PollingStationFormNavigation";
 
 const mocks = vi.hoisted(() => ({
-  useNavigate: vi.fn().mockReturnValue(vi.fn()),
   useBlocker: vi.fn().mockReturnValue(vi.fn()),
   usePollingStationFormController: vi.fn(),
 }));
 
 vi.mock("react-router", () => ({
-  useNavigate: mocks.useNavigate,
+  useNavigate: () => () => {},
   useBlocker: mocks.useBlocker,
-  Navigate: vi.fn(),
-  Route: vi.fn(),
-  createRoutesFromElements: vi.fn(),
+  Navigate: () => {},
+  Route: () => {},
+  createRoutesFromElements: () => {},
 }));
 
 vi.mock("../form/data_entry/usePollingStationFormController", () => ({
@@ -46,6 +45,12 @@ describe("PollingStationFormNavigation", () => {
         recounted: true,
       },
     });
+
+    mocks.useBlocker.mockReturnValue({
+      state: "blocked",
+      location: { pathname: "/elections/1/data-entry/1/1" },
+    });
+
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
     const shouldBlock = mocks.useBlocker.mock.lastCall;
@@ -59,6 +64,8 @@ describe("PollingStationFormNavigation", () => {
       }) => boolean;
 
       expect(blocker({ currentLocation: { pathname: "a" }, nextLocation: { pathname: "b" } })).toBe(true);
+    } else {
+      expect.fail("shouldBlock should be an array");
     }
   });
 
@@ -119,6 +126,8 @@ describe("PollingStationFormNavigation", () => {
 
       const title = await screen.findByTestId("modal-title");
       expect(title).toBeInTheDocument();
+    } else {
+      expect.fail("shouldBlock should be an array");
     }
   });
 
@@ -142,6 +151,8 @@ describe("PollingStationFormNavigation", () => {
         recounted: true,
       },
     });
+
+    mocks.useBlocker.mockReturnValue({ state: "unblocked" });
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
@@ -167,6 +178,8 @@ describe("PollingStationFormNavigation", () => {
       setTemporaryCache: vi.fn(),
       values: emptyDataEntryRequest.data,
     });
+
+    mocks.useBlocker.mockReturnValue({ state: "unblocked" });
 
     render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 

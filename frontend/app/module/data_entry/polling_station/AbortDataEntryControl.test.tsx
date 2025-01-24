@@ -8,8 +8,14 @@ import {
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   SaveDataEntryResponse,
 } from "@kiesraad/api";
-import { electionDetailsMockResponse, electionMockData } from "@kiesraad/api-mocks";
-import { overrideOnce, renderReturningRouter, screen, server } from "@kiesraad/test";
+import {
+  electionMockData,
+  ElectionRequestHandler,
+  PollingStationDataEntryDeleteHandler,
+  PollingStationDataEntryGetHandler,
+  PollingStationDataEntrySaveHandler,
+} from "@kiesraad/api-mocks";
+import { renderReturningRouter, screen, server } from "@kiesraad/test";
 
 import { PollingStationFormController } from "../../../component/form/data_entry/PollingStationFormController";
 import { VotersAndVotesForm } from "../../../component/form/data_entry/voters_and_votes/VotersAndVotesForm";
@@ -29,7 +35,7 @@ const renderAbortDataEntryControl = () => {
 
 describe("Test AbortDataEntryControl", () => {
   beforeEach(() => {
-    overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+    server.use(ElectionRequestHandler, PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
   });
 
   test("renders and toggles the modal", async () => {
@@ -98,7 +104,7 @@ describe("Test AbortDataEntryControl", () => {
 
     // set up a listener to check if the delete request is made
     let request_method, request_url;
-    overrideOnce("delete", "/api/polling_stations/1/data_entries/1", 204, null);
+    server.use(PollingStationDataEntryDeleteHandler);
     server.events.on("request:start", ({ request }) => {
       request_method = request.method;
       request_url = request.url;

@@ -1,16 +1,17 @@
 import { within } from "@testing-library/dom";
 import { screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider, PollingStation } from "@kiesraad/api";
+import { ElectionRequestHandler, PollingStationUpdateHandler } from "@kiesraad/api-mocks";
 import { overrideOnce, render, renderReturningRouter, server } from "@kiesraad/test";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
 vi.mock(import("@kiesraad/util"), async (importOriginal) => ({
   ...(await importOriginal()),
-  useNumericParam: vi.fn().mockReturnValue(1),
+  useNumericParam: () => 1,
 }));
 
 describe("PollingStationUpdatePage", () => {
@@ -25,6 +26,10 @@ describe("PollingStationUpdatePage", () => {
     polling_station_type: "FixedLocation",
     number_of_voters: 1,
   };
+
+  beforeEach(() => {
+    server.use(ElectionRequestHandler, PollingStationUpdateHandler);
+  });
 
   test("Shows form", async () => {
     overrideOnce(

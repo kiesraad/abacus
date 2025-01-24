@@ -1,8 +1,9 @@
 import { UserEvent, userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorResponse, PollingStation } from "@kiesraad/api";
-import { overrideOnce, render, screen, waitFor } from "@kiesraad/test";
+import { PollingStationCreateHandler, PollingStationUpdateHandler } from "@kiesraad/api-mocks";
+import { overrideOnce, render, screen, server, waitFor } from "@kiesraad/test";
 
 import { PollingStationForm } from "./PollingStationForm";
 
@@ -43,6 +44,9 @@ async function fillForm(user: UserEvent, testPollingStation: PollingStation | Om
 }
 
 describe("PollingStationForm", () => {
+  beforeEach(() => {
+    server.use(PollingStationCreateHandler, PollingStationUpdateHandler);
+  });
   describe("PollingStationForm create", () => {
     test("Successful create", async () => {
       const testPollingStation: Omit<PollingStation, "id"> = {
@@ -90,26 +94,28 @@ describe("PollingStationForm", () => {
       expect(onSaved).not.toHaveBeenCalled();
     });
 
-    test("Validation client errors", async () => {
-      const onSaved = vi.fn();
-      render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+    test.each([["asd"], ["0"]])(
+      "Validation client error - invalid polling station number: %s",
+      async (pollingStationNumber) => {
+        const onSaved = vi.fn();
+        render(<PollingStationForm electionId={1} onSaved={onSaved} />);
 
-      const user = userEvent.setup();
+        const user = userEvent.setup();
 
-      const inputs = getInputs();
+        const inputs = getInputs();
 
-      await user.type(inputs.number, "abc");
-      await user.click(inputs.typeOptionFixedLocation);
+        await user.type(inputs.number, pollingStationNumber);
 
-      await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+        await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
-      await waitFor(() => {
-        expect(inputs.number).toBeInvalid();
-        expect(inputs.number).toHaveAccessibleErrorMessage("Dit is geen getal. Voer een getal in");
-      });
+        await waitFor(() => {
+          expect(inputs.number).toBeInvalid();
+          expect(inputs.number).toHaveAccessibleErrorMessage("Dit is geen getal. Voer een getal in");
+        });
 
-      expect(onSaved).not.toHaveBeenCalled();
-    });
+        expect(onSaved).not.toHaveBeenCalled();
+      },
+    );
 
     test("Validation backend errors", async () => {
       const onSaved = vi.fn();

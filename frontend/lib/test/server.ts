@@ -10,9 +10,7 @@
 import { delay, http, HttpResponse, JsonBodyType } from "msw";
 import { setupServer } from "msw/node";
 
-import { handlers } from "@kiesraad/api-mocks";
-
-export const server = setupServer(...handlers);
+export const server = setupServer();
 
 // Override request handlers in order to test special cases
 export function overrideOnce(

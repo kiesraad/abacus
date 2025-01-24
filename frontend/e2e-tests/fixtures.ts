@@ -27,6 +27,8 @@ type Fixtures = {
   election: ElectionDetailsResponse;
   // First polling station of the election
   pollingStation: PollingStation;
+  // First polling station of the election with first data entry done
+  pollingStationFirstEntryDone: PollingStation;
   // Election with polling stations and two completed data entries for each
   completedElection: Election;
 };
@@ -63,6 +65,17 @@ export const test = base.extend<Fixtures>({
     const response = await request.get(url);
     expect(response.ok()).toBeTruthy();
     const pollingStation = (await response.json()) as PollingStation;
+
+    await use(pollingStation);
+  },
+  pollingStationFirstEntryDone: async ({ request, pollingStation }, use) => {
+    // first data entry of the existing polling station
+    const saveResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1`, {
+      data: noRecountNoDifferencesRequest,
+    });
+    expect(saveResponse.ok()).toBeTruthy();
+    const finaliseResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/finalise`);
+    expect(finaliseResponse.ok()).toBeTruthy();
 
     await use(pollingStation);
   },

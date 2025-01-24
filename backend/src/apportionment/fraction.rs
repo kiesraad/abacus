@@ -1,10 +1,10 @@
 use crate::data_entry::Count;
 use std::{
-    fmt,
-    fmt::{Debug, Display, Formatter},
-    ops::{Div, Mul},
+    fmt::{Debug, Display, Formatter, Result},
+    ops::{Add, Div, Mul, Sub},
 };
 
+#[derive(Clone, Copy)]
 pub struct Fraction {
     numerator: u64,
     denominator: u64,
@@ -32,13 +32,24 @@ impl Fraction {
     }
 }
 
-impl Div for Fraction {
+impl Add for Fraction {
     type Output = Self;
 
-    fn div(self, other: Self) -> Self {
+    fn add(self, other: Self) -> Self {
         Self {
-            numerator: self.numerator * other.denominator,
-            denominator: self.denominator * other.numerator,
+            numerator: self.numerator * other.denominator + other.numerator * self.denominator,
+            denominator: self.denominator * other.denominator,
+        }
+    }
+}
+
+impl Sub for Fraction {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self {
+            numerator: self.numerator * other.denominator - other.numerator * self.denominator,
+            denominator: self.denominator * other.denominator,
         }
     }
 }
@@ -50,6 +61,17 @@ impl Mul for Fraction {
         Self {
             numerator: self.numerator * other.numerator,
             denominator: self.denominator * other.denominator,
+        }
+    }
+}
+
+impl Div for Fraction {
+    type Output = Self;
+
+    fn div(self, other: Self) -> Self {
+        Self {
+            numerator: self.numerator * other.denominator,
+            denominator: self.denominator * other.numerator,
         }
     }
 }
@@ -78,7 +100,7 @@ impl PartialEq for Fraction {
 impl Eq for Fraction {}
 
 impl Display for Fraction {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         if self.denominator == 0 {
             return write!(f, "NaN");
         }
@@ -97,7 +119,7 @@ impl Display for Fraction {
 }
 
 impl Debug for Fraction {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(f, "{}", self)
     }
 }
@@ -141,21 +163,21 @@ mod tests {
     }
 
     #[test]
-    fn test_div_whole_number_larger_than_zero() {
-        let fraction = Fraction::new(11, 5);
-        let other_fraction = Fraction::new(1, 2);
-        let divided = fraction / other_fraction;
-        assert_eq!(divided, Fraction::new(22, 5));
-        assert_eq!(divided.to_string(), "4 2/5")
+    fn test_add() {
+        let fraction = Fraction::new(1, 3);
+        let other_fraction = Fraction::new(2, 4);
+        let added = fraction + other_fraction;
+        assert_eq!(added, Fraction::new(10, 12));
+        assert_eq!(added.to_string(), "10/12")
     }
 
     #[test]
-    fn test_div_whole_number_smaller_than_zero() {
-        let fraction = Fraction::new(1, 5);
-        let other_fraction = Fraction::new(2, 9);
-        let divided = fraction / other_fraction;
-        assert_eq!(divided, Fraction::new(9, 10));
-        assert_eq!(divided.to_string(), "9/10")
+    fn test_sub() {
+        let fraction = Fraction::new(2, 5);
+        let other_fraction = Fraction::new(1, 4);
+        let subtracted = fraction - other_fraction;
+        assert_eq!(subtracted, Fraction::new(3, 20));
+        assert_eq!(subtracted.to_string(), "3/20")
     }
 
     #[test]
@@ -165,6 +187,15 @@ mod tests {
         let multiplied = fraction * other_fraction;
         assert_eq!(multiplied, Fraction::new(2, 45));
         assert_eq!(multiplied.to_string(), "2/45")
+    }
+
+    #[test]
+    fn test_div() {
+        let fraction = Fraction::new(11, 5);
+        let other_fraction = Fraction::new(1, 2);
+        let divided = fraction / other_fraction;
+        assert_eq!(divided, Fraction::new(22, 5));
+        assert_eq!(divided.to_string(), "4 2/5")
     }
 
     #[test]

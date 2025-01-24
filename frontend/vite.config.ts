@@ -84,6 +84,7 @@ export default defineConfig(({ command }) => {
     },
     test: {
       environment: "jsdom",
+      restoreMocks: true,
       setupFiles: ["lib/test/setup.ts"],
       includeSource: ["app/**/*.ts", "lib/**/*.ts"],
       // GitHub Actions Windows runners seem slower than Linux runners, so we need to increase the test timeout

@@ -11,7 +11,7 @@ import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
 vi.mock(import("@kiesraad/util"), async (importOriginal) => ({
   ...(await importOriginal()),
-  useNumericParam: vi.fn().mockReturnValue(1),
+  useNumericParam: () => 1,
 }));
 
 describe("PollingStationUpdatePage", () => {

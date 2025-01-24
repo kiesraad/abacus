@@ -1,6 +1,6 @@
 # Abacus uitproberen, installeren en starten
 
-Het uitproberen, installeren en starten van Abacus kan op verschillende manieren, met elk verschillende doeleinden.
+Het uitproberen, installeren en starten van Abacus kan op verschillende manieren. Is Abacus nieuw voor je, begin dan bij de optie 'Uitproberen'. Kom je er met de onderstaande instructies niet uit, neem dan contact op met het team via abacus@kiesraad.nl. 
 Hieronder vind je instructies voor de verschillende methodes.
 
 ## Uitproberen
@@ -152,7 +152,7 @@ cargo install sqlx-cli
 
 *Let op: voor deze methode moet je de repository klonen of downloaden.*
 
-In plaats van het script kun je ook handmatig `cargo run` vanuit de backend-map en `npm run dev` vanuit de frontend-map in twee verschillende terminals starten. Hiervoor gelden dezelfde vereisten als bij het uitvoeren van het pull-and-run-script. Deze optie is bedoeld voor development.
+In plaats van het script kun je ook handmatig `cargo run` vanuit de backend-map en `npm run dev:server` vanuit de frontend-map in twee verschillende terminals starten. Hiervoor gelden dezelfde vereisten als bij het uitvoeren van het pull-and-run-script. Deze optie is bedoeld voor development.
 
 ### Methode 5: Docker compose (Linux, macOS, Windows)
 
@@ -166,7 +166,7 @@ Ook deze optie is bedoeld voor development.
 
 ### Help
 
-Voor meer informatie over de argumenten bekijk je de help. Op macOS en Linux gebruik je de volgende opdracht:
+Voor meer informatie over de argumenten bekijk je de helpfunctie via de commandline. Op macOS en Linux gebruik je de volgende opdracht:
 
 ```sh
 ./path/to/binary/abacus(-OS-version) --help

@@ -58,8 +58,8 @@ jobs:
           name: abacus-${{ matrix.target.os }}
           path: ${{ matrix.target.binary }}
 
-  playwright-d2d:
-    name: Playwright d2d tests (${{ matrix.os }}, ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
+  playwright-e2e:
+    name: Playwright e2e tests (${{ matrix.os }}, ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
     needs:
       - build
     strategy:
@@ -90,13 +90,13 @@ jobs:
         run: chmod a+x ../builds/backend/abacus
         if: runner.os != 'Windows'
       - name: Run DOM to Database e2e tests
-        run: npm run e2e:d2d -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: npm run test:e2e -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
 
   release:
     name: Release
     needs:
       - build
-      - playwright-d2d
+      - playwright-e2e
     runs-on: ubuntu-latest
     permissions:
       # contents write permission is needed to push the tag

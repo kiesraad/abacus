@@ -1,6 +1,4 @@
 import { expect } from "@playwright/test";
-import { fillDataEntry } from "e2e-tests/e2e-test-helpers";
-import { formatNumber } from "e2e-tests/e2e-test-utils";
 import {
   CandidatesListPage,
   CheckAndSavePage,
@@ -15,6 +13,8 @@ import {
 import { VotersCounts, VotesCounts } from "@kiesraad/api";
 
 import { test } from "./fixtures";
+import { fillDataEntry } from "./helpers-utils/e2e-test-helpers";
+import { formatNumber } from "./helpers-utils/e2e-test-utils";
 import {
   noErrorsWarningsResponse,
   noRecountNoDifferencesDataEntry,

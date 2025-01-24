@@ -36,9 +36,8 @@
     "app/**/*",
     "lib/**/*",
     "scripts/**/*",
-    "playwright.app.config.ts",
-    "playwright.d2d.config.ts",
-    "playwright.lib-ui.config.ts",
+    "playwright.e2e.config.ts",
+    "playwright.ladle.config.ts",
     "vite.config.ts",
     "e2e-tests/**/*"
   ]

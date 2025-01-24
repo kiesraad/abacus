@@ -1,11 +1,32 @@
 INSERT INTO elections (id, name, location, number_of_voters, category, number_of_seats, election_date, nomination_date,
                        status, political_groups)
-VALUES (2, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', 29, '2024-11-30', '2024-11-1',
+VALUES (2, 'Municipal Election', 'Heemdamseburg', 100, 'Municipal', 15, '2024-11-30', '2024-11-1',
         'DataEntryInProgress',
         '[
           {
             "number": 1,
             "name": "Political Group A",
+            "candidates": [
+              {
+                "number": 1,
+                "initials": "A.",
+                "first_name": "Alice",
+                "last_name": "Foo",
+                "locality": "Amsterdam",
+                "gender": "Female"
+              },
+              {
+                "number": 2,
+                "initials": "C.",
+                "first_name": "Charlie",
+                "last_name": "Doe",
+                "locality": "Rotterdam",
+                "gender": null
+              }
+            ]
+          },{
+            "number": 2,
+            "name": "Political Group B",
             "candidates": [
               {
                 "number": 1,

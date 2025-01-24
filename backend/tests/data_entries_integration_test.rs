@@ -66,6 +66,20 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
                 "votes": 4
               }
             ]
+          },
+          {
+            "number": 2,
+            "total": 11,
+            "candidate_votes": [
+              {
+                "number": 1,
+                "votes": 6
+              },
+              {
+                "number": 2,
+                "votes": 4
+              }
+            ]
           }
         ]
       },
@@ -89,7 +103,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     }
     let body: SaveDataEntryResponse = response.json().await.unwrap();
     let errors = body.validation_results.errors;
-    assert_eq!(errors.len(), 4);
+    assert_eq!(errors.len(), 5);
     // error 1
     assert_eq!(errors[0].code, ValidationResultCode::F201);
     assert_eq!(
@@ -124,6 +138,10 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     // error 4
     assert_eq!(errors[3].code, ValidationResultCode::F401);
     assert_eq!(errors[3].fields, vec!["data.political_group_votes[0]"]);
+    // error 5
+    assert_eq!(errors[4].code, ValidationResultCode::F401);
+    assert_eq!(errors[4].fields, vec!["data.political_group_votes[1]"]);
+
     let warnings = body.validation_results.warnings;
     assert_eq!(warnings.len(), 1);
     // warning 1

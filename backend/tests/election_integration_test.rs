@@ -154,7 +154,7 @@ async fn test_election_xml_download(pool: SqlitePool) {
 
     let body = response.text().await.unwrap();
     assert!(body.contains("<Election>"));
-    assert!(body.contains("<ValidVotes>204</ValidVotes>"));
+    assert!(body.contains("<TotalCounted>204</TotalCounted>"));
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]

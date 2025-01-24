@@ -3,11 +3,11 @@ use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 use utoipa::ToSchema;
 
-pub use self::fraction::*;
 pub use self::api::*;
+pub use self::fraction::*;
 
-mod fraction;
 mod api;
+mod fraction;
 
 /// The result of the apportionment procedure. This contains the number of
 /// seats and the quota that was used. It then contains the initial standing

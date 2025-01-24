@@ -37,20 +37,36 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
                 other_explanation_count: 0,
                 no_explanation_count: 0,
             },
-            political_group_votes: vec![PoliticalGroupVotes {
-                number: 1,
-                total: 102,
-                candidate_votes: vec![
-                    CandidateVotes {
-                        number: 1,
-                        votes: 54,
-                    },
-                    CandidateVotes {
-                        number: 2,
-                        votes: 48,
-                    },
-                ],
-            }],
+            political_group_votes: vec![
+                PoliticalGroupVotes {
+                    number: 1,
+                    total: 60,
+                    candidate_votes: vec![
+                        CandidateVotes {
+                            number: 1,
+                            votes: 40,
+                        },
+                        CandidateVotes {
+                            number: 2,
+                            votes: 20,
+                        },
+                    ],
+                },
+                PoliticalGroupVotes {
+                    number: 2,
+                    total: 42,
+                    candidate_votes: vec![
+                        CandidateVotes {
+                            number: 1,
+                            votes: 30,
+                        },
+                        CandidateVotes {
+                            number: 2,
+                            votes: 12,
+                        },
+                    ],
+                },
+            ],
         },
         client_state: ClientState::new_from_str(client_state).unwrap(),
     }

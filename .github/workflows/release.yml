@@ -89,7 +89,7 @@ jobs:
       - name: make backend build executable
         run: chmod a+x ../builds/backend/abacus
         if: runner.os != 'Windows'
-      - name: Run DOM to Database e2e tests
+      - name: Run Playwright e2e tests
         run: npm run test:e2e -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
 
   release:

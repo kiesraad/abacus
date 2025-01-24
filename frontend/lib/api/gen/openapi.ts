@@ -296,7 +296,8 @@ export type ErrorReference =
   | "PollingStationValidationErrors"
   | "InvalidPoliticalGroup"
   | "InvalidUsernamePassword"
-  | "InvalidSession";
+  | "InvalidSession"
+  | "DrawingOfLotsRequired";
 
 /**
  * Response structure for errors

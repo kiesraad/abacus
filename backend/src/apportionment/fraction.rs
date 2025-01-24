@@ -1,12 +1,12 @@
 use crate::data_entry::Count;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{
     fmt::{Debug, Display, Formatter, Result},
     ops::{Add, Div, Mul, Sub},
 };
 use utoipa::{PartialSchema, ToSchema};
 
-#[derive(Clone, Copy, Serialize)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
 #[serde(into = "DisplayFraction")]
 pub struct Fraction {
     numerator: u64,

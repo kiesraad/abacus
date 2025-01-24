@@ -4,15 +4,17 @@ use tracing::{debug, info};
 use utoipa::ToSchema;
 
 pub use self::fraction::*;
+pub use self::api::*;
 
-pub mod fraction;
+mod fraction;
+mod api;
 
 /// The result of the apportionment procedure. This contains the number of
 /// seats and the quota that was used. It then contains the initial standing
 /// after whole seats were assigned, and each of the changes and intermediate
 /// standings. The final standing contains the number of seats per political
 /// group that was assigned after all seats were assigned.
-#[derive(Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApportionmentResult {
     seats: u64,
     quota: Fraction,
@@ -22,7 +24,7 @@ pub struct ApportionmentResult {
 
 /// Contains information about the final assignment of seats for a specific
 /// political group.
-#[derive(Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupSeatAssignment {
     /// Political group number for which this assigment applies
     pg_number: u8,
@@ -54,10 +56,9 @@ impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
     }
 }
 
-/// Contains the standing for a specific political group. This is all the
-/// information that is needed to compute the apportionment for that specific
-/// political group.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, ToSchema)]
+/// Contains the standing for a specific political group. This is all the information
+/// that is needed to compute the apportionment for that specific political group.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupStanding {
     /// Political group number for which this standing applies
     pg_number: u8,
@@ -412,7 +413,7 @@ fn step_allocate_remainder_using_highest_surplus(
 
 /// Records the details for a specific remainder seat, and how the standing is
 /// once that remainder seat was assigned
-#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApportionmentStep {
     rest_seat_number: u64,
     change: AssignedSeat,
@@ -420,7 +421,7 @@ pub struct ApportionmentStep {
 }
 
 /// Records the political group and specific change for a specific remainder seat
-#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(tag = "assigned_by")]
 pub enum AssignedSeat {
     HighestAverage(HighestAverageAssignedSeat),
@@ -448,7 +449,7 @@ impl AssignedSeat {
 }
 
 /// Contains the details for an assigned seat, assigned through the highest average method.
-#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct HighestAverageAssignedSeat {
     /// The political group that was selected for this seat has this political group number
     selected_pg_number: u8,
@@ -459,7 +460,7 @@ pub struct HighestAverageAssignedSeat {
 }
 
 /// Contains the details for an assigned seat, assigned through the highest surplus method.
-#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct HighestSurplusAssignedSeat {
     /// The political group that was selected for this seat has this political group number
     selected_pg_number: u8,
@@ -471,7 +472,7 @@ pub struct HighestSurplusAssignedSeat {
 
 /// Errors that can occur during apportionment
 // TODO: integrate this with the application-wide error.rs once the apportionment functionality is finished
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ApportionmentError {
     DrawingOfLotsNotImplemented,
 }

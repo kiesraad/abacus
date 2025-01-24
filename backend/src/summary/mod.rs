@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-
+use utoipa::ToSchema;
 use crate::{
     data_entry::{
         CandidateVotes, Count, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
@@ -11,9 +11,8 @@ use crate::{
     APIError,
 };
 
-/// Contains a summary of the election results, added up from the votes of all
-/// polling stations.
-#[derive(Serialize, Deserialize, Debug)]
+/// Contains a summary of the election results, added up from the votes of all polling stations.
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 pub struct ElectionSummary {
     /// The total number of voters
     pub voters_counts: VotersCounts,
@@ -143,9 +142,8 @@ impl ElectionSummary {
     }
 }
 
-/// Contains a summary of the differences, containing which polling stations had
-/// differences.
-#[derive(Debug, Serialize, Deserialize)]
+/// Contains a summary of the differences, containing which polling stations had differences.
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct SummaryDifferencesCounts {
     pub more_ballots_count: SumCount,
     pub fewer_ballots_count: SumCount,
@@ -199,8 +197,9 @@ impl SummaryDifferencesCounts {
 
 /// Contains a summary count, containing both the count and a list of polling
 /// stations that contributed to it.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct SumCount {
+    #[schema(value_type = u32)]
     pub count: Count,
     pub polling_stations: Vec<i64>,
 }

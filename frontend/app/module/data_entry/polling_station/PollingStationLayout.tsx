@@ -1,15 +1,17 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router";
 
 import { NavBar } from "app/component/navbar/NavBar";
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 import { AbortDataEntryControl } from "app/module/data_entry";
 
-import { NotFoundError, PollingStationFormController, useElection } from "@kiesraad/api";
+import { NotFoundError, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
 import { Badge, PageTitle, PollingStationNumber, StickyNav, WorkStationNumber } from "@kiesraad/ui";
 import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";
+
+import { PollingStationFormController } from "../../../component/form/data_entry/PollingStationFormController";
 
 export function PollingStationLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
@@ -38,7 +40,7 @@ export function PollingStationLayout() {
         </Link>
       </NavBar>
       <header>
-        <section>
+        <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
           {pollingStationStatus && <Badge type={pollingStationStatus} />}

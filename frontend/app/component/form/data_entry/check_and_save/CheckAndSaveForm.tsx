@@ -1,16 +1,8 @@
 import * as React from "react";
 import { ReactElement } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 
-import { getUrlForFormSectionID } from "app/component/pollingstation/utils";
-
-import {
-  FormSectionID,
-  getPollingStationSummary,
-  PollingStationFormSectionStatus,
-  useElection,
-  usePollingStationFormController,
-} from "@kiesraad/api";
+import { useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import {
   BottomBar,
@@ -22,6 +14,11 @@ import {
   StatusList,
   useFormKeyboardNavigation,
 } from "@kiesraad/ui";
+
+import { getUrlForFormSectionID } from "../../../pollingstation/utils";
+import { FormSectionID } from "../PollingStationFormController";
+import { getPollingStationSummary, PollingStationFormSectionStatus } from "../pollingStationUtils";
+import { usePollingStationFormController } from "../usePollingStationFormController";
 
 export function CheckAndSaveForm() {
   const formRef = React.useRef<HTMLFormElement>(null);
@@ -61,7 +58,7 @@ export function CheckAndSaveForm() {
       if (!finalisationAllowed) return;
 
       await finaliseDataEntry();
-      navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
+      await navigate(`/elections/${election.id}/data-entry#data-entry-saved-${entryNumber}`);
     })(event);
 
   return (

@@ -3,8 +3,7 @@ import { FormEvent, FormEventHandler, ReactNode, useRef } from "react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { render, screen } from "app/test/unit";
-
+import { render, screen } from "@kiesraad/test";
 import { useFormKeyboardNavigation } from "@kiesraad/ui";
 
 import { Form } from "./Form";
@@ -94,6 +93,7 @@ describe("useKeyboard", () => {
         </button>
       </FormWithNavigation>,
     );
+    const user = userEvent.setup();
 
     const firstInput = screen.getByTestId("inp1");
     const secondInput = screen.getByTestId("inp2");
@@ -103,23 +103,23 @@ describe("useKeyboard", () => {
     firstInput.focus();
     expect(firstInput).toHaveFocus();
 
-    await userEvent.keyboard("{arrowdown}");
+    await user.keyboard("{arrowdown}");
 
     expect(secondInput).toHaveFocus();
 
-    await userEvent.keyboard("{arrowup}");
+    await user.keyboard("{arrowup}");
 
     expect(firstInput).toHaveFocus();
 
-    await userEvent.keyboard("{tab}");
+    await user.keyboard("{tab}");
 
     expect(secondInput).toHaveFocus();
 
-    await userEvent.keyboard("{enter}");
+    await user.keyboard("{enter}");
 
     expect(thirdInput).toHaveFocus();
 
-    await userEvent.keyboard("{enter}");
+    await user.keyboard("{enter}");
 
     expect(submitButton).toHaveFocus();
   });
@@ -137,6 +137,7 @@ describe("useKeyboard", () => {
         </button>
       </FormWithNavigation>,
     );
+    const user = userEvent.setup();
 
     const firstInput = screen.getByTestId("inp1");
     const thirdInput = screen.getByTestId("inp3");
@@ -144,10 +145,10 @@ describe("useKeyboard", () => {
     thirdInput.focus();
     expect(thirdInput).toHaveFocus();
 
-    await userEvent.keyboard("{Shift>}{arrowup}{/Shift}");
+    await user.keyboard("{Shift>}{arrowup}{/Shift}");
     expect(firstInput).toHaveFocus();
 
-    await userEvent.keyboard("{Shift>}{arrowdown}{/Shift}");
+    await user.keyboard("{Shift>}{arrowdown}{/Shift}");
     expect(thirdInput).toHaveFocus();
   });
 
@@ -161,6 +162,7 @@ describe("useKeyboard", () => {
         <input id="inp3" defaultValue="fizz3" />
       </FormWithNavigation>,
     );
+    const user = userEvent.setup();
 
     const firstInput = screen.getByTestId("inp1");
     const thirdInput = screen.getByTestId("inp3");
@@ -168,10 +170,10 @@ describe("useKeyboard", () => {
     thirdInput.focus();
     expect(thirdInput).toHaveFocus();
 
-    await userEvent.keyboard("{Shift>}{arrowup}{/Shift}");
+    await user.keyboard("{Shift>}{arrowup}{/Shift}");
     expect(firstInput).toHaveFocus();
 
-    await userEvent.keyboard("{Shift>}{arrowdown}{/Shift}");
+    await user.keyboard("{Shift>}{arrowdown}{/Shift}");
     expect(thirdInput).toHaveFocus();
   });
 
@@ -194,6 +196,7 @@ describe("useKeyboard", () => {
         </button>
       </FormWithNavigation>,
     );
+    const user = userEvent.setup();
 
     const firstInput = screen.getByTestId("inp1");
     const checkbox = screen.getByTestId("checkbox");
@@ -201,10 +204,10 @@ describe("useKeyboard", () => {
     checkbox.focus();
     expect(checkbox).toHaveFocus();
 
-    await userEvent.keyboard("{Shift>}{arrowup}{/Shift}");
+    await user.keyboard("{Shift>}{arrowup}{/Shift}");
     expect(firstInput).toHaveFocus();
 
-    await userEvent.keyboard("{Shift>}{arrowdown}{/Shift}");
+    await user.keyboard("{Shift>}{arrowdown}{/Shift}");
     expect(checkbox).toHaveFocus();
   });
 
@@ -217,6 +220,7 @@ describe("useKeyboard", () => {
         <input id="inp3" defaultValue="fizz3" />
       </FormWithNavigation>,
     );
+    const user = userEvent.setup();
 
     const firstInput = screen.getByTestId("inp1");
     const secondInput = screen.getByTestId("inp2");
@@ -224,10 +228,10 @@ describe("useKeyboard", () => {
     secondInput.focus();
     expect(secondInput).toHaveFocus();
 
-    await userEvent.keyboard("{arrowup}");
+    await user.keyboard("{arrowup}");
     expect(firstInput).toHaveFocus();
 
-    await userEvent.keyboard("{arrowup}");
+    await user.keyboard("{arrowup}");
     expect(firstInput).toHaveFocus();
   });
 
@@ -239,6 +243,7 @@ describe("useKeyboard", () => {
         <input id="inp2" defaultValue="fizz2" />
       </FormWithNavigation>,
     );
+    const user = userEvent.setup();
 
     const firstInput = screen.getByTestId("inp1");
     const secondInput = screen.getByTestId("inp2");
@@ -246,10 +251,10 @@ describe("useKeyboard", () => {
     firstInput.focus();
     expect(firstInput).toHaveFocus();
 
-    await userEvent.keyboard("{arrowdown}");
+    await user.keyboard("{arrowdown}");
     expect(secondInput).toHaveFocus();
 
-    await userEvent.keyboard("{arrowdown}");
+    await user.keyboard("{arrowdown}");
     expect(secondInput).toHaveFocus();
   });
 
@@ -264,6 +269,7 @@ describe("useKeyboard", () => {
         </button>
       </FormWithNavigation>,
     );
+    const user = userEvent.setup();
 
     const secondInput = screen.getByTestId("inp2");
     const submitButton = screen.getByTestId("test-submit-button");
@@ -271,10 +277,10 @@ describe("useKeyboard", () => {
     secondInput.focus();
     expect(secondInput).toHaveFocus();
 
-    await userEvent.keyboard("{arrowdown}");
+    await user.keyboard("{arrowdown}");
     expect(submitButton).toHaveFocus();
 
-    await userEvent.keyboard("{arrowdown}");
+    await user.keyboard("{arrowdown}");
     expect(submitButton).toHaveFocus();
   });
 });

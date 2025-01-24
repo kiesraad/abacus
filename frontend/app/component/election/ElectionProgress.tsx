@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { PollingStationStatus, useElectionStatus } from "@kiesraad/api";
+import { DataEntryStatusName, useElectionStatus } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Progress, ProgressBar } from "@kiesraad/ui";
 
@@ -15,10 +15,9 @@ export function ElectionProgress() {
 
   const stats: Stat[] = useMemo(() => {
     const total = statuses.length;
-    const firstAndSecondEntryFinished: PollingStationStatus[] = ["first_second_entry_different", "definitive"];
-    const firstEntryFinished: PollingStationStatus[] = [
-      "second_entry",
-      "second_entry_unfinished",
+    const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
+    const firstEntryFinished: DataEntryStatusName[] = [
+      "second_entry_not_started",
       "second_entry_in_progress",
       ...firstAndSecondEntryFinished,
     ];

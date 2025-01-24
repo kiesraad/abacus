@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { PollingStation, PollingStationStatus } from "@kiesraad/api";
+import { DataEntryStatusName, PollingStation } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconError, IconWarning } from "@kiesraad/icon";
 import { Badge, Icon, InputField, Spinner } from "@kiesraad/ui";
@@ -28,7 +28,7 @@ export function PollingStationSelector({
   handleSubmit,
 }: PollingStationSelectorProps) {
   const currentPollingStationStatus = usePollingStationStatus(currentPollingStation?.id);
-  const firstAndSecondEntryFinished: PollingStationStatus[] = ["first_second_entry_different", "definitive"];
+  const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
 
   return (
     <div className={cls.container}>
@@ -39,7 +39,6 @@ export function PollingStationSelector({
         value={pollingStationNumber}
         label={t("polling_station_choice.insert_number")}
         fieldWidth="narrow"
-        margin={false}
         maxLength={6}
         autoFocus={true}
         onChange={(e) => {

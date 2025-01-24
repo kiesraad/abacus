@@ -1,17 +1,15 @@
 import type { Story } from "@ladle/react";
 
-import type { PollingStationStatus } from "@kiesraad/api";
+import type { DataEntryStatusName } from "@kiesraad/api";
 
 import { Badge, BadgeProps } from "./Badge";
 
-const badgeTypes: PollingStationStatus[] = [
-  "not_started",
+const badgeTypes: DataEntryStatusName[] = [
+  "first_entry_not_started",
   "first_entry_in_progress",
-  "first_entry_unfinished",
-  "second_entry",
+  "second_entry_not_started",
   "second_entry_in_progress",
-  "second_entry_unfinished",
-  "first_second_entry_different",
+  "entries_different",
   "definitive",
 ];
 
@@ -32,7 +30,7 @@ export const CustomizableBadge: Story<BadgeProps> = ({ type, showIcon }) => <Bad
 CustomizableBadge.argTypes = {
   type: {
     options: badgeTypes,
-    defaultValue: "not_started",
+    defaultValue: "first_entry_not_started",
     control: { type: "radio" },
   },
   showIcon: {

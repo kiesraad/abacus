@@ -1,5 +1,4 @@
 use axum::{
-    async_trait,
     extract::{FromRef, FromRequestParts},
     http::request::Parts,
 };
@@ -38,7 +37,6 @@ impl User {
 
 /// Implement the FromRequestParts trait for User, this allows us to extract a User from a request
 /// using the user repository and the session cookie
-#[async_trait]
 impl<S> FromRequestParts<S> for User
 where
     Users: FromRequestParts<S>,
@@ -187,12 +185,13 @@ impl FromRef<AppState> for Users {
 mod tests {
     use sqlx::SqlitePool;
     use std::time::Duration;
+    use test_log::test;
 
     use crate::authentication::{
         error::AuthenticationError, session::Sessions, user::Users, util::get_current_time,
     };
 
-    #[sqlx::test]
+    #[test(sqlx::test)]
     async fn test_create_user(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
@@ -210,7 +209,7 @@ mod tests {
         assert_eq!(user, fetched_user);
     }
 
-    #[sqlx::test]
+    #[test(sqlx::test)]
     async fn test_authenticate_user(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
@@ -241,7 +240,7 @@ mod tests {
         ));
     }
 
-    #[sqlx::test]
+    #[test(sqlx::test)]
     async fn test_from_session_key(pool: SqlitePool) {
         let users = Users::new(pool.clone());
         let sessions = Sessions::new(pool.clone());

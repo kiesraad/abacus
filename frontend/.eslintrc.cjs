@@ -51,5 +51,11 @@ module.exports = {
         "react-hooks/rules-of-hooks": "off",
       },
     },
+    {
+      files: ["*.test.tsx", "lib/api-mocks/**/*.ts", "lib/test/**/*.ts"],
+      rules: {
+        "@typescript-eslint/no-non-null-assertion": "off",
+      },
+    },
   ],
 };

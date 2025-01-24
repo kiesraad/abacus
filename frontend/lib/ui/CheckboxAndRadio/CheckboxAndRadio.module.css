@@ -8,6 +8,15 @@
   margin: 0;
   padding: 0;
 
+  legend {
+    display: contents;
+    font-size: var(--font-size-md);
+    font-style: normal;
+    line-height: 1.5rem;
+    color: var(--text-color-header);
+    font-weight: bold;
+  }
+
   .error {
     padding: 0;
     margin: -0.75rem 0 0 0;

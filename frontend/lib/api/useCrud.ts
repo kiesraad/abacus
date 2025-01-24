@@ -2,12 +2,7 @@ import { useEffect, useState } from "react";
 
 import { ApiResult } from "./api.types";
 import { useApi } from "./useApi";
-import {
-  ApiRequestState,
-  ApiRequestStateWithoutFatalErrors,
-  fatalRequestState,
-  handleApiResult,
-} from "./useApiRequest";
+import { ApiRequestState, fatalRequestState, handleApiResult } from "./useApiRequest";
 
 export type CrudRequestState<T> =
   | {
@@ -21,10 +16,6 @@ export interface UseCrudReturn<T> {
   update: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
   remove: (controller?: AbortController) => Promise<ApiResult<T>>;
   requestState: CrudRequestState<T>;
-}
-
-export interface UseLimitedCrudReturn<T> extends UseCrudReturn<T> {
-  requestState: ApiRequestStateWithoutFatalErrors<T>;
 }
 
 export type ApiPaths =

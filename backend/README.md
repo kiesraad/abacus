@@ -27,7 +27,11 @@ In this version of `memory-serve`, the path must be absolute, since `build.rs`
 has no knowledge of the project it is currently built in. Example:
 
 ```shell
-ASSET_DIR=$PWD/frontend/dist cargo run --features memory-serve
+cd frontend
+npm run build
+cd ../backend
+sqlx database setup
+ASSET_DIR=$PWD/../frontend/dist cargo run --features memory-serve
 ```
 
 ### Linting
@@ -61,6 +65,7 @@ The following dependencies (crates) are used:
 - `sqlx`: async SQL library featuring compile-time checked queries.
 - `tokio`: runtime for writing asynchronous applications.
 - `tower`: a library of modular and reusable components for building robust networking clients and servers.
+- `tower-http`: Tower middleware and utilities for HTTP clients and servers.
 - `tracing`: a framework for instrumenting Rust programs to collect structured, event-based diagnostic information.
 - `tracing-subscriber`: utilities for implementing and composing `tracing` subscribers.
 - `typst`: a new markup-based typesetting system that is powerful and easy to learn.
@@ -71,6 +76,7 @@ The following dependencies (crates) are used:
 
 Additionally, the following development dependencies are used:
 
+- `test-log`: show tracing messages while running tests
 - `reqwest`: HTTP client for testing the API.
 - `http-body-util`: trait used to extract a response body in some tests.
 

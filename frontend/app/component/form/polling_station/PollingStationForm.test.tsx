@@ -1,64 +1,165 @@
 import { UserEvent, userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { render, screen, waitFor } from "app/test/unit";
-
-import { PollingStation } from "@kiesraad/api";
+import { ErrorResponse, PollingStation } from "@kiesraad/api";
+import { PollingStationCreateHandler, PollingStationUpdateHandler } from "@kiesraad/api-mocks";
+import { overrideOnce, render, screen, server, waitFor } from "@kiesraad/test";
 
 import { PollingStationForm } from "./PollingStationForm";
 
-async function fillForm(user: UserEvent, testPollingStation: PollingStation | Omit<PollingStation, "id">) {
-  await user.type(await screen.findByRole("textbox", { name: "Nummer" }), testPollingStation.number.toString());
-  await user.type(await screen.findByRole("textbox", { name: "Naam" }), testPollingStation.name.toString());
-  await user.type(
-    await screen.findByRole("textbox", { name: "Straatnaam en huisnummer" }),
-    testPollingStation.address.toString(),
-  );
-  await user.type(await screen.findByRole("textbox", { name: "Postcode" }), testPollingStation.postal_code.toString());
-  await user.type(await screen.findByRole("textbox", { name: "Plaats" }), testPollingStation.locality.toString());
-  await user.type(
-    screen.getByRole("textbox", { name: "Aantal kiesgerechtigden Optioneel" }),
-    String(testPollingStation.number_of_voters?.toString()),
-  );
-
-  const pollingStationType = screen.getByRole("radio", { name: "Vaste locatie" });
-  await userEvent.click(pollingStationType);
-
-  await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+function getInputs() {
+  return {
+    number: screen.getByRole("textbox", { name: "Nummer" }),
+    name: screen.getByRole("textbox", { name: "Naam" }),
+    numberOfVoters: screen.getByRole("textbox", { name: "Aantal kiesgerechtigden Optioneel" }),
+    address: screen.getByRole("textbox", { name: "Straatnaam en huisnummer" }),
+    postalCode: screen.getByRole("textbox", { name: "Postcode" }),
+    locality: screen.getByRole("textbox", { name: "Plaats" }),
+    typeOptionFixedLocation: screen.getByRole("radio", { name: "Vaste locatie" }),
+    typeOptionSpecial: screen.getByRole("radio", { name: "Bijzonder" }),
+    typeOptionMobile: screen.getByRole("radio", { name: "Mobiel" }),
+  };
 }
 
-describe("PollingStationForm create", () => {
-  test("PollingStationForm create", async () => {
-    const testPollingStation: Omit<PollingStation, "id"> = {
-      election_id: 1,
-      number: 1,
-      name: "test",
-      address: "test",
-      postal_code: "1234",
-      locality: "test",
-      polling_station_type: "FixedLocation",
-      number_of_voters: 1,
-    };
+async function fillForm(user: UserEvent, testPollingStation: PollingStation | Omit<PollingStation, "id">) {
+  const inputs = getInputs();
+  await user.type(inputs.number, testPollingStation.number.toString());
+  await user.type(inputs.name, testPollingStation.name.toString());
+  await user.type(inputs.address, testPollingStation.address.toString());
+  await user.type(inputs.postalCode, testPollingStation.postal_code.toString());
+  await user.type(inputs.locality, testPollingStation.locality.toString());
+  await user.type(inputs.numberOfVoters, String(testPollingStation.number_of_voters?.toString()));
 
-    const onSaved = vi.fn();
-    render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+  switch (testPollingStation.polling_station_type) {
+    case "FixedLocation":
+      await user.click(inputs.typeOptionFixedLocation);
+      break;
+    case "Special":
+      await user.click(inputs.typeOptionSpecial);
+      break;
+    case "Mobile":
+      await user.click(inputs.typeOptionMobile);
+      break;
+  }
+}
 
-    const user = userEvent.setup();
-    await fillForm(user, testPollingStation);
+describe("PollingStationForm", () => {
+  beforeEach(() => {
+    server.use(PollingStationCreateHandler, PollingStationUpdateHandler);
+  });
+  describe("PollingStationForm create", () => {
+    test("Successful create", async () => {
+      const testPollingStation: Omit<PollingStation, "id"> = {
+        election_id: 1,
+        number: 1,
+        name: "test",
+        address: "Teststraat 1",
+        postal_code: "1234",
+        locality: "test",
+        polling_station_type: "FixedLocation",
+        number_of_voters: 1,
+      };
 
-    await userEvent.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+      const createdPollingStation: PollingStation = { id: 99, ...testPollingStation };
+      overrideOnce("post", "/api/elections/1/polling_stations", 201, createdPollingStation);
 
-    await waitFor(() => {
-      expect(onSaved).toHaveBeenCalledWith(expect.objectContaining(testPollingStation));
+      const onSaved = vi.fn();
+      render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+
+      const user = userEvent.setup();
+      await fillForm(user, testPollingStation);
+
+      await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+      await waitFor(() => {
+        expect(onSaved).toHaveBeenCalledWith(createdPollingStation);
+      });
+    });
+
+    test("Validation required fields", async () => {
+      const onSaved = vi.fn();
+      render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+
+      const user = userEvent.setup();
+      await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+      const inputs = getInputs();
+
+      await waitFor(() => {
+        expect(inputs.number).toBeInvalid();
+        expect(inputs.number).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+        expect(inputs.name).toBeInvalid();
+        expect(inputs.name).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+      });
+
+      expect(onSaved).not.toHaveBeenCalled();
+    });
+
+    test.each([["asd"], ["0"]])(
+      "Validation client error - invalid polling station number: %s",
+      async (pollingStationNumber) => {
+        const onSaved = vi.fn();
+        render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+
+        const user = userEvent.setup();
+
+        const inputs = getInputs();
+
+        await user.type(inputs.number, pollingStationNumber);
+
+        await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+        await waitFor(() => {
+          expect(inputs.number).toBeInvalid();
+          expect(inputs.number).toHaveAccessibleErrorMessage("Dit is geen getal. Voer een getal in");
+        });
+
+        expect(onSaved).not.toHaveBeenCalled();
+      },
+    );
+
+    test("Validation backend errors", async () => {
+      const onSaved = vi.fn();
+      render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+
+      const testObj: Omit<PollingStation, "id"> = {
+        election_id: 1,
+        number: 42,
+        name: "test",
+        address: "Teststraat 5A",
+        postal_code: "1234",
+        locality: "test",
+        polling_station_type: "FixedLocation",
+        number_of_voters: 1,
+      };
+
+      const user = userEvent.setup();
+      await fillForm(user, testObj);
+
+      overrideOnce("post", `/api/elections/1/polling_stations`, 409, {
+        error: "Polling station already exists",
+        fatal: false,
+        reference: "EntryNotUnique",
+      } satisfies ErrorResponse);
+
+      await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+      await waitFor(() => {
+        expect(screen.getByRole("alert")).toHaveTextContent(
+          ["Er bestaat al een stembureau met nummer 42.", "Het nummer van het stembureau moet uniek zijn."].join(""),
+        );
+      });
+
+      expect(onSaved).not.toHaveBeenCalled();
     });
   });
+
   test("PollingStationForm update", async () => {
     const testPollingStation: PollingStation = {
       id: 1,
       election_id: 1,
       number: 1,
       name: "test",
-      address: "test",
+      address: "Teststraat 2",
       postal_code: "1234",
       locality: "test",
       polling_station_type: "FixedLocation",
@@ -75,10 +176,45 @@ describe("PollingStationForm create", () => {
     await user.clear(input);
     await user.type(input, "test2");
 
-    await userEvent.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
+    await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
 
     await waitFor(() => {
       expect(onSaved).toHaveBeenCalled();
     });
+  });
+
+  test("Client errors after server error", async () => {
+    const onSaved = vi.fn();
+    render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+    const inputs = getInputs();
+
+    const user = userEvent.setup();
+
+    //generate server error:
+    overrideOnce("post", `/api/elections/1/polling_stations`, 409, {
+      error: "Polling station already exists",
+      fatal: false,
+      reference: "EntryNotUnique",
+    } satisfies ErrorResponse);
+    await user.type(inputs.number, "42");
+    await user.type(inputs.name, "A great name");
+
+    await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        ["Er bestaat al een stembureau met nummer 42.", "Het nummer van het stembureau moet uniek zijn."].join(""),
+      );
+    });
+
+    //generate client error:
+    await user.type(inputs.number, "asd");
+    await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+    await waitFor(() => {
+      expect(inputs.number).toHaveAccessibleErrorMessage("Dit is geen getal. Voer een getal in");
+    });
+
+    expect(onSaved).not.toHaveBeenCalled();
   });
 });

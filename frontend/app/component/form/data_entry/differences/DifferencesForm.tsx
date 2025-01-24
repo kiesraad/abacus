@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import { getErrorsAndWarnings, useDifferences } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import {
   Alert,
@@ -18,6 +17,8 @@ import {
 import { deformatNumber } from "@kiesraad/util";
 
 import { useWatchForChanges } from "../../useWatchForChanges";
+import { getErrorsAndWarnings } from "../pollingStationUtils";
+import { useDifferences } from "./useDifferences";
 
 interface FormElements extends HTMLFormControlsCollection {
   more_ballots_count: HTMLInputElement;

@@ -1,23 +1,28 @@
-use axum::extract::{Path, State};
-use axum::Json;
+#[cfg(feature = "dev-database")]
+use axum::http::StatusCode;
+use axum::{
+    extract::{Path, State},
+    response::{IntoResponse, Response},
+    Json,
+};
 use axum_extra::response::Attachment;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use zip::result::ZipError;
-use zip::write::SimpleFileOptions;
+use zip::{result::ZipError, write::SimpleFileOptions};
 
 use self::repository::Elections;
 pub use self::structs::*;
-use crate::data_entry::repository::PollingStationResultsEntries;
-use crate::data_entry::PollingStationResults;
-use crate::eml::axum::Eml;
-use crate::eml::{eml_document_hash, EMLDocument, EML510};
-use crate::pdf_gen::generate_pdf;
-use crate::pdf_gen::models::{ModelNa31_2Input, PdfModel};
-use crate::polling_station::repository::PollingStations;
-use crate::polling_station::structs::{PollingStation, PollingStationStatusEntry};
-use crate::summary::ElectionSummary;
-use crate::{APIError, ErrorResponse};
+use crate::{
+    data_entry::{repository::PollingStationResultsEntries, PollingStationResults},
+    eml::{axum::Eml, eml_document_hash, EMLDocument, EML510},
+    pdf_gen::{
+        generate_pdf,
+        models::{ModelNa31_2Input, PdfModel},
+    },
+    polling_station::{repository::PollingStations, structs::PollingStation},
+    summary::ElectionSummary,
+    APIError, ErrorResponse,
+};
 
 pub(crate) mod repository;
 pub mod structs;
@@ -37,10 +42,10 @@ pub struct ElectionDetailsResponse {
     pub polling_stations: Vec<PollingStation>,
 }
 
-/// Election polling stations data entry statuses response
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-pub struct ElectionStatusResponse {
-    pub statuses: Vec<PollingStationStatusEntry>,
+impl IntoResponse for Election {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
 }
 
 /// Get a list of all elections, without their candidate lists
@@ -85,25 +90,26 @@ pub async fn election_details(
     }))
 }
 
-/// Get election polling stations data entry statuses
+/// Create an election. For test usage only!
 #[utoipa::path(
-    get,
-    path = "/api/elections/{election_id}/status",
+    post,
+    path = "/api/elections",
+    request_body = ElectionRequest,
     responses(
-        (status = 200, description = "Election", body = ElectionStatusResponse),
-        (status = 404, description = "Not found", body = ErrorResponse),
+        (status = 201, description = "Election created", body = Election),
+        (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    params(
-        ("election_id" = u32, description = "Election database id"),
-    ),
 )]
-pub async fn election_status(
-    State(polling_station_repo): State<PollingStations>,
-    Path(id): Path<u32>,
-) -> Result<Json<ElectionStatusResponse>, APIError> {
-    let statuses = polling_station_repo.status(id).await?;
-    Ok(Json(ElectionStatusResponse { statuses }))
+#[cfg(feature = "dev-database")]
+pub async fn election_create(
+    State(elections_repo): State<Elections>,
+    Json(new_election): Json<ElectionRequest>,
+) -> Result<(StatusCode, Election), APIError> {
+    Ok((
+        StatusCode::CREATED,
+        elections_repo.create(new_election).await?,
+    ))
 }
 
 struct ResultsInput {

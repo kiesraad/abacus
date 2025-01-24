@@ -104,6 +104,7 @@ pub fn eml_document_hash(input: &str, chunked: bool) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test_log::test;
 
     #[derive(Debug, Serialize, Deserialize)]
     struct EmptyDoc {

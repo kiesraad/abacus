@@ -1,17 +1,18 @@
-import * as Router from "react-router";
-
 import { screen } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { PollingStationListPage } from "app/module/polling_stations";
-import { overrideOnce, render } from "app/test/unit";
 
 import { ElectionProvider, PollingStationListResponse } from "@kiesraad/api";
+import { ElectionRequestHandler, PollingStationListRequestHandler } from "@kiesraad/api-mocks";
+import { overrideOnce, render, server } from "@kiesraad/test";
 
 describe("PollingStationListPage", () => {
-  test("Show polling stations", async () => {
-    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1" });
+  beforeEach(() => {
+    server.use(ElectionRequestHandler, PollingStationListRequestHandler);
+  });
 
+  test("Show polling stations", async () => {
     render(
       <ElectionProvider electionId={1}>
         <PollingStationListPage />
@@ -48,8 +49,6 @@ describe("PollingStationListPage", () => {
     overrideOnce("get", "/api/elections/1/polling_stations", 200, {
       polling_stations: [],
     } satisfies PollingStationListResponse);
-
-    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1" });
 
     render(
       <ElectionProvider electionId={1}>

@@ -20,19 +20,17 @@ function returnWebserverCommand(): string {
 
 const config: PlaywrightTestConfig = defineConfig({
   ...commonConfig,
-  workers: 1, // overrides commonConfig to disable parallel test execution
-  reportSlowTests: { max: 5, threshold: 25000 }, // TODO: split test files so we can return to default of 15 seconds
   testDir: "./e2e-tests/model-based-tests",
   outputDir: "./test-results/model-based",
   testMatch: /\.e2e\.ts/,
   use: {
     ...commonConfig.use,
-    baseURL: "http://localhost:8081",
+    baseURL: "http://127.0.0.1:8081",
   },
   webServer: [
     {
       command: returnWebserverCommand(),
-      port: 8081,
+      url: "http://127.0.0.1:8081",
     },
   ],
 });

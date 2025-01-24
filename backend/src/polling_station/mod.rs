@@ -1,14 +1,15 @@
-use axum::extract::{Path, State};
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
-use axum::Json;
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
+};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use self::repository::PollingStations;
 pub use self::structs::*;
-use crate::election::repository::Elections;
-use crate::{APIError, ErrorResponse};
+use crate::{election::repository::Elections, APIError, ErrorResponse};
 
 pub mod repository;
 pub mod structs;
@@ -86,30 +87,33 @@ pub async fn polling_station_create(
 /// Get a [PollingStation]
 #[utoipa::path(
     get,
-    path = "/api/polling_stations/{polling_station_id}",
+    path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",
     responses(
         (status = 200, description = "Polling station found", body = PollingStation),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
+        ("election_id" = u32, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
 pub async fn polling_station_get(
     State(polling_stations): State<PollingStations>,
-    Path(polling_station_id): Path<u32>,
+    Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     Ok((
         StatusCode::OK,
-        polling_stations.get(polling_station_id).await?,
+        polling_stations
+            .get_for_election(election_id, polling_station_id)
+            .await?,
     ))
 }
 
 /// Update a [PollingStation]
 #[utoipa::path(
     put,
-    path = "/api/polling_stations/{polling_station_id}",
+    path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",
     request_body = PollingStationRequest,
     responses(
         (status = 200, description = "Polling station updated successfully"),
@@ -117,16 +121,17 @@ pub async fn polling_station_get(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
+        ("election_id" = u32, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
 pub async fn polling_station_update(
     State(polling_stations): State<PollingStations>,
-    Path(polling_station_id): Path<u32>,
+    Path((election_id, polling_station_id)): Path<(u32, u32)>,
     polling_station_update: PollingStationRequest,
 ) -> Result<StatusCode, APIError> {
     let updated = polling_stations
-        .update(polling_station_id, polling_station_update)
+        .update(election_id, polling_station_id, polling_station_update)
         .await?;
 
     if updated {
@@ -138,21 +143,24 @@ pub async fn polling_station_update(
 /// Delete a [PollingStation]
 #[utoipa::path(
     delete,
-    path = "/api/polling_stations/{polling_station_id}",
+    path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",
     responses(
         (status = 200, description = "Polling station deleted successfully"),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
+        ("election_id" = u32, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
 pub async fn polling_station_delete(
     State(polling_stations): State<PollingStations>,
-    Path(polling_station_id): Path<u32>,
+    Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<StatusCode, APIError> {
-    let deleted = polling_stations.delete(polling_station_id).await?;
+    let deleted = polling_stations
+        .delete(election_id, polling_station_id)
+        .await?;
 
     if deleted {
         Ok(StatusCode::OK)
@@ -164,15 +172,21 @@ pub async fn polling_station_delete(
 #[cfg(test)]
 mod tests {
     use sqlx::{query, SqlitePool};
+    use test_log::test;
 
-    #[sqlx::test(fixtures("../../fixtures/elections.sql"))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
+        query!("DELETE FROM polling_stations")
+            .execute(&pool)
+            .await
+            .unwrap();
+
         // Insert two unique polling stations
         let _ = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
-(1, 1, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),
-(2, 1, 'Testplek', 34, NULL, 'bijzonder', 'Teststraat 2b', '1234 QY', 'Testdorp')
+(1, 2, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),
+(2, 2, 'Testplek', 34, NULL, 'bijzonder', 'Teststraat 2b', '1234 QY', 'Testdorp')
 "#)
             .execute(&pool)
             .await
@@ -182,7 +196,7 @@ VALUES
         let _ = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
-(3, 2, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
+(3, 3, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
 "#)
             .execute(&pool)
             .await
@@ -192,7 +206,7 @@ VALUES
         let result = query!(r#"
 INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
-(4, 1, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
+(4, 2, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
 "#)
             .execute(&pool)
             .await;

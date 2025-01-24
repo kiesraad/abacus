@@ -1,29 +1,30 @@
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
+  emptyDataEntryRequest,
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
   expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
   expectFieldsToNotHaveIcon,
 } from "app/component/form/testHelperFunctions";
-import { getUrlMethodAndBody, overrideOnce, render, screen, userTypeInputs } from "app/test/unit";
-import { emptyDataEntryRequest } from "app/test/unit/form";
 
+import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@kiesraad/api";
 import {
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationFormController,
-  PollingStationResults,
-} from "@kiesraad/api";
-import { electionMockData, pollingStationMockData } from "@kiesraad/api-mocks";
+  electionMockData,
+  PollingStationDataEntryGetHandler,
+  PollingStationDataEntrySaveHandler,
+} from "@kiesraad/api-mocks";
+import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs } from "@kiesraad/test";
 
+import { PollingStationFormController } from "../PollingStationFormController";
 import { DifferencesForm } from "./DifferencesForm";
 
 function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
   return render(
     <PollingStationFormController
       election={electionMockData}
-      pollingStationId={pollingStationMockData.id}
+      pollingStationId={1}
       entryNumber={1}
       defaultValues={defaultValues}
     >
@@ -43,6 +44,10 @@ const differencesFieldIds = {
 };
 
 describe("Test DifferencesForm", () => {
+  beforeEach(() => {
+    server.use(PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+  });
+
   describe("DifferencesForm user interactions", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();

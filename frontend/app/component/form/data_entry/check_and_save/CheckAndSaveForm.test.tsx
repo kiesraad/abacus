@@ -1,21 +1,23 @@
-import * as router from "react-router";
-
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
-import { overrideOnce, render, screen, server, within } from "app/test/unit";
-import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "app/test/unit/form";
+import { ElectionProvider, PollingStationResults } from "@kiesraad/api";
+import {
+  electionMockData,
+  ElectionRequestHandler,
+  PollingStationDataEntryGetHandler,
+  PollingStationDataEntrySaveHandler,
+} from "@kiesraad/api-mocks";
+import { overrideOnce, renderReturningRouter, screen, server, within } from "@kiesraad/test";
 
-import { ElectionProvider, FormState, PollingStationFormController, PollingStationResults } from "@kiesraad/api";
-import { electionDetailsMockResponse, electionMockData } from "@kiesraad/api-mocks";
-
-const mockNavigate = vi.fn();
+import { defaultFormState, emptyDataEntryRequest, errorWarningMocks } from "../../testHelperFunctions";
+import { FormState, PollingStationFormController } from "../PollingStationFormController";
+import { CheckAndSaveForm } from "./CheckAndSaveForm";
 
 const defaultValues = emptyDataEntryRequest.data;
 
 function renderForm(defaultFormState: Partial<FormState> = {}, defaultValues?: Partial<PollingStationResults>) {
-  return render(
+  return renderReturningRouter(
     <ElectionProvider electionId={1}>
       <PollingStationFormController
         election={electionMockData}
@@ -32,12 +34,11 @@ function renderForm(defaultFormState: Partial<FormState> = {}, defaultValues?: P
 
 describe("Test CheckAndSaveForm", () => {
   beforeEach(() => {
-    overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-    vi.spyOn(router, "useNavigate").mockImplementation(() => mockNavigate);
+    server.use(ElectionRequestHandler, PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
   });
 
   test("Data entry can be finalised", async () => {
-    renderForm();
+    const router = renderForm();
     const user = userEvent.setup();
 
     // set up a listener to check if the finalisation request is made
@@ -56,7 +57,8 @@ describe("Test CheckAndSaveForm", () => {
     expect(request_url).toBe("http://localhost:3000/api/polling_stations/1/data_entries/1/finalise");
 
     // check that the user is navigated back to the data entry page
-    expect(mockNavigate).toHaveBeenCalledWith("/elections/1/data-entry#data-entry-saved-1");
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
+    expect(router.state.location.hash).toEqual("#data-entry-saved-1");
   });
 
   test("Shift+Enter submits form", async () => {
@@ -133,6 +135,9 @@ describe("Test CheckAndSaveForm", () => {
 });
 
 describe("Test CheckAndSaveForm summary", () => {
+  beforeEach(() => {
+    server.use(ElectionRequestHandler, PollingStationDataEntryGetHandler, PollingStationDataEntrySaveHandler);
+  });
   test("Blocking", async () => {
     const formState = structuredClone(defaultFormState);
     formState.sections.voters_votes_counts.errors = [errorWarningMocks.F201];

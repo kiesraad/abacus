@@ -6,12 +6,12 @@ import {
   PollingStationChoicePage,
   RecountedPage,
   VotersAndVotesPage,
-  VotersCounts,
-  VotesCounts,
 } from "e2e-tests/page-objects/data_entry";
 import { createMachine } from "xstate";
 
-import { test } from "../dom-to-db-tests/fixtures";
+import { VotersCounts, VotesCounts } from "@kiesraad/api";
+
+import { test } from "../fixtures";
 
 // TODO: look into testModel.testCoverage(options?) but it's in @xstate/test, unclear if also in @xstate/graph.
 // Currently there's not check that the test contains code for both all states and all events. Thet tests will
@@ -196,18 +196,18 @@ test.describe("Data entry", () => {
     .getSimplePaths()
     .forEach((path) => {
       // eslint-disable-next-line playwright/valid-title
-      test(path.description, async ({ page, pollingStation1 }) => {
+      test(path.description, async ({ page, pollingStation }) => {
         const pollingStationChoicePage = new PollingStationChoicePage(page);
         const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
         const differencesPage = new DifferencesPage(page);
         const abortModal = new AbortInputModal(page);
 
-        await page.goto("/elections/1/data-entry");
+        await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
 
         await expect(pollingStationChoicePage.fieldset).toBeVisible();
-        await pollingStationChoicePage.pollingStationNumber.fill(pollingStation1.number.toString());
-        await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation1.name);
+        await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());
+        await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation.name);
         await pollingStationChoicePage.clickStart();
 
         await expect(recountedPage.fieldset).toBeVisible();
@@ -218,26 +218,24 @@ test.describe("Data entry", () => {
           states: {
             pollingStationsPageDiscarded: async () => {
               await expect(pollingStationChoicePage.fieldset).toBeVisible();
-              await expect(pollingStationChoicePage.alertDataEntryInProgress).not.toContainText(
-                `${pollingStation1.number.toString()} - ${pollingStation1.name}`,
-              );
+              await expect(pollingStationChoicePage.alertDataEntryInProgress).toBeHidden();
             },
             pollginStationsPageEmptySaved: async () => {
               await expect(pollingStationChoicePage.fieldset).toBeVisible();
               await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
-                `${pollingStation1.number} - ${pollingStation1.name}`,
+                `${pollingStation.number} - ${pollingStation.name}`,
               );
             },
             pollingStationsPageFilledSaved: async () => {
               await expect(pollingStationChoicePage.fieldset).toBeVisible();
               await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
-                `${pollingStation1.number} - ${pollingStation1.name}`,
+                `${pollingStation.number} - ${pollingStation.name}`,
               );
             },
             pollingStationsPageChangedSaved: async () => {
               await expect(pollingStationChoicePage.fieldset).toBeVisible();
               await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
-                `${pollingStation1.number} - ${pollingStation1.name}`,
+                `${pollingStation.number} - ${pollingStation.name}`,
               );
             },
             recountedPageEmpty: async () => {
@@ -349,7 +347,7 @@ test.describe("Data entry", () => {
             },
             NAV_TO_POLLING_STATION_PAGE: async () => {
               // TODO: add to page object
-              await page.getByRole("link", { name: "Heemdamseburg" }).click();
+              await page.getByRole("link", { name: "Test Location" }).click();
             },
             GO_TO_RECOUNTED_PAGE: async () => {
               await votersAndVotesPage.navPanel.recounted.click();
@@ -375,7 +373,7 @@ test.describe("Data entry", () => {
             RESUME_DATA_ENTRY: async () => {
               // TODO: add to page object
               await pollingStationChoicePage.alertDataEntryInProgress
-                .getByRole("link", { name: `${pollingStation1.number} - ${pollingStation1.name}` })
+                .getByRole("link", { name: `${pollingStation.number} - ${pollingStation.name}` })
                 .click();
             },
           },

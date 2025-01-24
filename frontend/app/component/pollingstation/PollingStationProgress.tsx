@@ -1,15 +1,13 @@
 import * as React from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 
-import {
-  FormSection,
-  FormSectionID,
-  isFormSectionEmpty,
-  useElection,
-  usePollingStationFormController,
-} from "@kiesraad/api";
+import { useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { MenuStatus, ProgressList } from "@kiesraad/ui";
+
+import { FormSection, FormSectionID } from "../form/data_entry/PollingStationFormController";
+import { isFormSectionEmpty } from "../form/data_entry/pollingStationUtils";
+import { usePollingStationFormController } from "../form/data_entry/usePollingStationFormController";
 
 export function PollingStationProgress() {
   const { pollingStationId } = useParams();

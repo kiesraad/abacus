@@ -1,8 +1,10 @@
 import { useState } from "react";
 
-import { ApiError, ApiResult, usePollingStationFormController } from "@kiesraad/api";
+import { ApiError, ApiResult } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
+
+import { usePollingStationFormController } from "../../../component/form/data_entry/usePollingStationFormController";
 
 export interface AbortDataEntryModalProps {
   onCancel: () => void;

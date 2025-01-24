@@ -1,21 +1,16 @@
 import * as React from "react";
-import { BlockerFunction, useBlocker, useNavigate } from "react-router-dom";
+import { BlockerFunction, useBlocker, useNavigate } from "react-router";
 
 import { AbortDataEntryModal } from "app/module/data_entry";
 
-import {
-  AnyFormReference,
-  currentFormHasChanges,
-  Election,
-  FormSectionID,
-  FormState,
-  PollingStationResults,
-  usePollingStationFormController,
-} from "@kiesraad/api";
+import { Election, PollingStationResults } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
-import { ErrorModal } from "../error/ErrorModal";
+import { ErrorModal } from "../error";
+import { AnyFormReference, FormSectionID, FormState } from "../form/data_entry/PollingStationFormController";
+import { currentFormHasChanges } from "../form/data_entry/pollingStationUtils";
+import { usePollingStationFormController } from "../form/data_entry/usePollingStationFormController";
 import { getUrlForFormSectionID } from "./utils";
 
 export interface PollingStationFormNavigationProps {
@@ -87,7 +82,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
     if (currentSection && furthestSection) {
       if (currentSection.index > furthestSection.index) {
         const url = getUrlForFormSection(furthestSection.id);
-        navigate(url);
+        void navigate(url);
       }
     }
   }, [formState, navigate, getUrlForFormSection]);
@@ -102,7 +97,7 @@ export function PollingStationFormNavigation({ pollingStationId, election }: Pol
   const onSave = () =>
     void (async () => {
       await submitCurrentForm({ continueToNextSection: false });
-      if (blocker.location) navigate(blocker.location.pathname);
+      if (blocker.location) void navigate(blocker.location.pathname);
       if (blocker.reset) blocker.reset();
     })();
 

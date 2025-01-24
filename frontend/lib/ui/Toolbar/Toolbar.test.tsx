@@ -1,7 +1,7 @@
 import { within } from "@testing-library/dom";
 import { describe, expect, test } from "vitest";
 
-import { render, screen } from "app/test/unit";
+import { render, screen } from "@kiesraad/test";
 
 import { BasicToolbar } from "./Toolbar.stories";
 

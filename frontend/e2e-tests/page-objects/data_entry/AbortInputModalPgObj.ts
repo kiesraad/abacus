@@ -1,17 +1,13 @@
 import { type Locator, type Page } from "@playwright/test";
 
 export class AbortInputModal {
-  protected readonly page: Page;
-
   readonly modal: Locator;
   readonly close: Locator;
   readonly heading: Locator;
   readonly saveInput: Locator;
   readonly discardInput: Locator;
 
-  constructor(page: Page) {
-    this.page = page;
-
+  constructor(protected readonly page: Page) {
     this.modal = page.getByRole("dialog");
     this.close = this.modal.getByRole("button", { name: "Annuleren" });
     this.heading = this.modal.getByRole("heading", {

@@ -23,6 +23,23 @@ pub struct Election {
     pub political_groups: Option<Vec<PoliticalGroup>>,
 }
 
+/// Election request
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
+#[cfg(feature = "dev-database")]
+pub struct ElectionRequest {
+    pub name: String,
+    pub location: String,
+    pub number_of_voters: u32,
+    pub category: ElectionCategory,
+    pub number_of_seats: u32,
+    #[schema(value_type = String, format = "date")]
+    pub election_date: NaiveDate,
+    #[schema(value_type = String, format = "date")]
+    pub nomination_date: NaiveDate,
+    pub status: ElectionStatus,
+    pub political_groups: Vec<PoliticalGroup>,
+}
+
 /// Election category (limited for now)
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type)]
 pub enum ElectionCategory {
@@ -85,8 +102,7 @@ pub enum CandidateGender {
 pub(crate) mod tests {
     use chrono::NaiveDate;
 
-    use crate::election::CandidateGender::X;
-    use crate::election::{Candidate, ElectionCategory, PoliticalGroup};
+    use crate::election::{Candidate, CandidateGender::X, ElectionCategory, PoliticalGroup};
 
     use super::*;
 

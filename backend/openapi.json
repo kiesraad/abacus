@@ -1648,7 +1648,7 @@
       },
       "HighestAverageAssignedSeat": {
         "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the highest\naverage method.",
+        "description": "Contains the details for an assigned seat, assigned through the highest average method.",
         "required": [
           "selected_pg_number",
           "pg_options",
@@ -1675,7 +1675,7 @@
       },
       "HighestSurplusAssignedSeat": {
         "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the highest\nsurplus method.",
+        "description": "Contains the details for an assigned seat, assigned through the highest surplus method.",
         "required": [
           "selected_pg_number",
           "pg_options",

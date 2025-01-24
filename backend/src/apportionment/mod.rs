@@ -113,9 +113,9 @@ fn initial_whole_seats_per_political_group(
 /// This is determined based on seeing what would happen to the average votes
 /// per seat if one additional seat would be assigned to each political group.
 ///
-/// It then returns all the political groups for which this fraction is the
-/// highest. If there are more political groups than there are remaining seats
-/// to be assigned, a drawing of lots is required.
+/// It then returns all the political groups for which this fraction is the highest.
+/// If there are more political groups than there are remaining seats to be assigned,
+/// a drawing of lots is required.
 ///
 /// This function will always return at least one group.
 fn political_groups_with_largest_average<'a>(
@@ -231,10 +231,9 @@ pub fn seat_allocation(
     })
 }
 
-/// This function allocates the remainder seats after seats won through having
-/// gathered enough votes for entire seats remain. These remainder seats are
-/// assigned through two different procedures, depending on how many seats are
-/// available in total.
+/// This function allocates the rest seats that remain after whole seat allocation
+/// is finished. These remainder seats are assigned through two different procedures,
+/// depending on how many total seats are available in the election.
 fn allocate_remainder(
     initial_standing: &[PoliticalGroupStanding],
     seats: u64,
@@ -284,9 +283,8 @@ fn allocate_remainder(
     Ok((steps, current_standing))
 }
 
-/// Assign the next remainder seat, and return which group that seat was assigned
-/// to. This assigment is done according to the rules for elections with 19 seats
-/// or more.
+/// Assign the next remainder seat, and return which group that seat was assigned to.
+/// This assigment is done according to the rules for elections with 19 seats or more.
 fn step_allocate_remainder_using_highest_averages(
     standing: &[PoliticalGroupStanding],
     remaining_seats: u64,
@@ -300,12 +298,11 @@ fn step_allocate_remainder_using_highest_averages(
     }))
 }
 
-/// Get an iterator that lists all the parties that qualify for getting a seat
-/// through the highest surplus process. This checks the previously assigned
-/// seats to make sure that only parties that didn't previously get a seat
-/// assigned are allowed to still get a seat through the surplus process.
-/// Additionally only political parties that met the threshold are considered
-/// for this process.
+/// Get an iterator that lists all the parties that qualify for getting a seat through
+/// the highest surplus process. This checks the previously assigned seats to make sure
+/// that only parties that didn't previously get a seat assigned are allowed to still
+/// get a seat through the surplus process. Additionally only political parties that
+/// met the threshold are considered for this process.
 fn political_groups_qualifying_for_highest_surplus<'a>(
     standing: &'a [PoliticalGroupStanding],
     previous: &'a [ApportionmentStep],
@@ -320,10 +317,9 @@ fn political_groups_qualifying_for_highest_surplus<'a>(
     })
 }
 
-/// Get an iterator that lists all the parties that qualify for unique highest
-/// average. This checks the previously assigned seats to make sure that every
-/// group that already got a remainder seat through the highest average
-/// procedure does not qualify.
+/// Get an iterator that lists all the parties that qualify for unique highest average.
+/// This checks the previously assigned seats to make sure that every group that already
+/// got a remainder seat through the highest average procedure does not qualify.
 fn political_groups_qualifying_for_unique_highest_average<'a>(
     assigned_seats: &'a [PoliticalGroupStanding],
     previous: &'a [ApportionmentStep],
@@ -336,9 +332,8 @@ fn political_groups_qualifying_for_unique_highest_average<'a>(
     })
 }
 
-/// Assign the next remainder seat, and return which group that seat was assigned
-/// to. This assigment is done according to the rules for elections with less than
-/// 19 seats.
+/// Assign the next remainder seat, and return which group that seat was assigned to.
+/// This assigment is done according to the rules for elections with less than 19 seats.
 fn step_allocate_remainder_using_highest_surplus(
     assigned_seats: &[PoliticalGroupStanding],
     remaining_seats: u64,
@@ -348,7 +343,7 @@ fn step_allocate_remainder_using_highest_surplus(
     let mut qualifying_for_surplus =
         political_groups_qualifying_for_highest_surplus(assigned_seats, previous).peekable();
 
-    // If there is a least one element in the iterator, we know we can still do highest surplus, do that!
+    // If there is at least one element in the iterator, we know we can still do a highest surplus allocation
     if qualifying_for_surplus.peek().is_some() {
         let selected_pgs =
             political_groups_with_highest_surplus(qualifying_for_surplus, remaining_seats)?;
@@ -359,7 +354,7 @@ fn step_allocate_remainder_using_highest_surplus(
             surplus_votes: selected_pg.surplus_votes,
         }))
     } else {
-        // We've now exhausted highest surplus seats, we now do unique highest average instead:
+        // We've now exhausted the highest surplus seats, we now do unique highest average instead:
         // we allow every group to get a seat, not allowing any group to get a second remainder seat
         // while there are still parties that did not get a remainder seat.
         let mut qualifying_for_unique_highest_average =
@@ -404,8 +399,7 @@ pub enum AssignedSeat {
 }
 
 impl AssignedSeat {
-    /// Get the political group number for the group this step has assigned a
-    /// seat
+    /// Get the political group number for the group this step has assigned a seat
     fn political_group_number(&self) -> u8 {
         match self {
             AssignedSeat::HighestAverage(highest_average) => highest_average.selected_pg_number,
@@ -424,8 +418,7 @@ impl AssignedSeat {
     }
 }
 
-/// Contains the details for an assigned seat, assigned through the highest
-/// average method.
+/// Contains the details for an assigned seat, assigned through the highest average method.
 #[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
 pub struct HighestAverageAssignedSeat {
     selected_pg_number: u8,
@@ -433,8 +426,7 @@ pub struct HighestAverageAssignedSeat {
     votes_per_seat: Fraction,
 }
 
-/// Contains the details for an assigned seat, assigned through the highest
-/// surplus method.
+/// Contains the details for an assigned seat, assigned through the highest surplus method.
 #[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
 pub struct HighestSurplusAssignedSeat {
     selected_pg_number: u8,
@@ -451,9 +443,8 @@ pub enum ApportionmentError {
 
 #[cfg(test)]
 mod tests {
-    use crate::apportionment::ApportionmentResult;
     use crate::{
-        apportionment::{seat_allocation, ApportionmentError},
+        apportionment::{seat_allocation, ApportionmentError, ApportionmentResult},
         data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts},
         summary::{ElectionSummary, SummaryDifferencesCounts},
     };

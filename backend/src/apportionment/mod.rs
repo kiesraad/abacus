@@ -20,14 +20,23 @@ pub struct ApportionmentResult {
     final_standing: Vec<PoliticalGroupSeatAssignment>,
 }
 
+/// Contains information about the final assignment of seats for a specific
+/// political group.
 #[derive(Debug, PartialEq, Serialize, ToSchema)]
 pub struct PoliticalGroupSeatAssignment {
+    /// Political group number for which this assigment applies
     pg_number: u8,
-    votes_cast: Fraction,
+    /// The number of votes cast for this group
+    votes_cast: u64,
+    /// The surplus votes that were not used to get whole seats assigned to this political group
     surplus_votes: Fraction,
+    /// Whether this group met the threshold for surplus seat assigment
     meets_surplus_threshold: bool,
+    /// The number of whole seats assigned to this group
     whole_seats: u64,
+    /// The number of rest seats assigned to this group
     rest_seats: u64,
+    /// The total number of seats assigned to this group
     total_seats: u64,
 }
 
@@ -45,18 +54,24 @@ impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
     }
 }
 
-/// Contains the standing for a specific political group. This contains their
-/// political group number, how many votes were cast, the surplus votes that
-/// weren't used to get whole seats. The number of seats earned as a whole and
-/// the number of rest/remainder seats.
+/// Contains the standing for a specific political group. This is all the
+/// information that is needed to compute the apportionment for that specific
+/// political group.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, ToSchema)]
 pub struct PoliticalGroupStanding {
+    /// Political group number for which this standing applies
     pg_number: u8,
-    votes_cast: Fraction,
+    /// The number of votes cast for this group
+    votes_cast: u64,
+    /// The surplus of votes that was not used to get whole seats (does not have to be a whole number of votes)
     surplus_votes: Fraction,
+    /// Whether the surplus votes meet the threshold to be applicable for surplus seat assignment
     meets_surplus_threshold: bool,
+    /// The number of votes per seat if a new seat would be added to the current rest seats
     next_votes_per_seat: Fraction,
+    /// The number of whole seats this political group got
     whole_seats: u64,
+    /// The current number of rest seats this political group got
     rest_seats: u64,
 }
 
@@ -73,7 +88,7 @@ impl PoliticalGroupStanding {
             pg.number, pg.total
         );
         PoliticalGroupStanding {
-            votes_cast,
+            votes_cast: pg.total.into(),
             surplus_votes,
             meets_surplus_threshold: votes_cast >= quota * Fraction::new(3, 4),
             next_votes_per_seat: votes_cast / Fraction::from(pg_seats + 1),
@@ -85,9 +100,11 @@ impl PoliticalGroupStanding {
 
     /// Add a rest seat to the political group and return the updated instance
     fn add_rest_seat(self) -> Self {
+        info!("Adding rest seat to political group {}", self.pg_number);
         PoliticalGroupStanding {
             rest_seats: self.rest_seats + 1,
-            next_votes_per_seat: self.votes_cast / Fraction::from(self.total_seats() + 2),
+            next_votes_per_seat: Fraction::from(self.votes_cast)
+                / Fraction::from(self.total_seats() + 2),
             ..self
         }
     }
@@ -421,16 +438,22 @@ impl AssignedSeat {
 /// Contains the details for an assigned seat, assigned through the highest average method.
 #[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
 pub struct HighestAverageAssignedSeat {
+    /// The political group that was selected for this seat has this political group number
     selected_pg_number: u8,
+    /// The list from which the political group was selected, all of them having the same votes per seat
     pg_options: Vec<u8>,
+    /// This is the votes per seat achieved by the selected political group
     votes_per_seat: Fraction,
 }
 
 /// Contains the details for an assigned seat, assigned through the highest surplus method.
 #[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
 pub struct HighestSurplusAssignedSeat {
+    /// The political group that was selected for this seat has this political group number
     selected_pg_number: u8,
+    /// The list from which the political group was selected, all of them having the same number of surplus votes
     pg_options: Vec<u8>,
+    /// The number of surplus votes achieved by the selected political group
     surplus_votes: Fraction,
 }
 

@@ -359,21 +359,24 @@ export interface PoliticalGroup {
   number: number;
 }
 
+/**
+ * Contains information about the final assignment of seats for a specific
+political group.
+ */
 export interface PoliticalGroupSeatAssignment {
   meets_surplus_threshold: boolean;
   pg_number: number;
   rest_seats: number;
   surplus_votes: Fraction;
   total_seats: number;
-  votes_cast: Fraction;
+  votes_cast: number;
   whole_seats: number;
 }
 
 /**
- * Contains the standing for a specific political group. This contains their
-political group number, how many votes were cast, the surplus votes that
-weren't used to get whole seats. The number of seats earned as a whole and
-the number of rest/remainder seats.
+ * Contains the standing for a specific political group. This is all the
+information that is needed to compute the apportionment for that specific
+political group.
  */
 export interface PoliticalGroupStanding {
   meets_surplus_threshold: boolean;
@@ -381,7 +384,7 @@ export interface PoliticalGroupStanding {
   pg_number: number;
   rest_seats: number;
   surplus_votes: Fraction;
-  votes_cast: Fraction;
+  votes_cast: number;
   whole_seats: number;
 }
 

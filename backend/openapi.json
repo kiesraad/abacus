@@ -1661,15 +1661,18 @@
               "type": "integer",
               "format": "int32",
               "minimum": 0
-            }
+            },
+            "description": "The list from which the political group was selected, all of them having the same votes per seat"
           },
           "selected_pg_number": {
             "type": "integer",
             "format": "int32",
+            "description": "The political group that was selected for this seat has this political group number",
             "minimum": 0
           },
           "votes_per_seat": {
-            "$ref": "#/components/schemas/Fraction"
+            "$ref": "#/components/schemas/Fraction",
+            "description": "This is the votes per seat achieved by the selected political group"
           }
         }
       },
@@ -1688,15 +1691,18 @@
               "type": "integer",
               "format": "int32",
               "minimum": 0
-            }
+            },
+            "description": "The list from which the political group was selected, all of them having the same number of surplus votes"
           },
           "selected_pg_number": {
             "type": "integer",
             "format": "int32",
+            "description": "The political group that was selected for this seat has this political group number",
             "minimum": 0
           },
           "surplus_votes": {
-            "$ref": "#/components/schemas/Fraction"
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The number of surplus votes achieved by the selected political group"
           }
         }
       },
@@ -1744,6 +1750,7 @@
       },
       "PoliticalGroupSeatAssignment": {
         "type": "object",
+        "description": "Contains information about the final assignment of seats for a specific\npolitical group.",
         "required": [
           "pg_number",
           "votes_cast",
@@ -1755,39 +1762,48 @@
         ],
         "properties": {
           "meets_surplus_threshold": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether this group met the threshold for surplus seat assigment"
           },
           "pg_number": {
             "type": "integer",
             "format": "int32",
+            "description": "Political group number for which this assigment applies",
             "minimum": 0
           },
           "rest_seats": {
             "type": "integer",
             "format": "int64",
+            "description": "The number of rest seats assigned to this group",
             "minimum": 0
           },
           "surplus_votes": {
-            "$ref": "#/components/schemas/Fraction"
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The surplus votes that were not used to get whole seats assigned to this political group"
           },
           "total_seats": {
             "type": "integer",
             "format": "int64",
+            "description": "The total number of seats assigned to this group",
             "minimum": 0
           },
           "votes_cast": {
-            "$ref": "#/components/schemas/Fraction"
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of votes cast for this group",
+            "minimum": 0
           },
           "whole_seats": {
             "type": "integer",
             "format": "int64",
+            "description": "The number of whole seats assigned to this group",
             "minimum": 0
           }
         }
       },
       "PoliticalGroupStanding": {
         "type": "object",
-        "description": "Contains the standing for a specific political group. This contains their\npolitical group number, how many votes were cast, the surplus votes that\nweren't used to get whole seats. The number of seats earned as a whole and\nthe number of rest/remainder seats.",
+        "description": "Contains the standing for a specific political group. This is all the\ninformation that is needed to compute the apportionment for that specific\npolitical group.",
         "required": [
           "pg_number",
           "votes_cast",
@@ -1799,30 +1815,39 @@
         ],
         "properties": {
           "meets_surplus_threshold": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the surplus votes meet the threshold to be applicable for surplus seat assignment"
           },
           "next_votes_per_seat": {
-            "$ref": "#/components/schemas/Fraction"
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The number of votes per seat if a new seat would be added to the current rest seats"
           },
           "pg_number": {
             "type": "integer",
             "format": "int32",
+            "description": "Political group number for which this standing applies",
             "minimum": 0
           },
           "rest_seats": {
             "type": "integer",
             "format": "int64",
+            "description": "The current number of rest seats this political group got",
             "minimum": 0
           },
           "surplus_votes": {
-            "$ref": "#/components/schemas/Fraction"
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The surplus of votes that was not used to get whole seats (does not have to be a whole number of votes)"
           },
           "votes_cast": {
-            "$ref": "#/components/schemas/Fraction"
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of votes cast for this group",
+            "minimum": 0
           },
           "whole_seats": {
             "type": "integer",
             "format": "int64",
+            "description": "The number of whole seats this political group got",
             "minimum": 0
           }
         }

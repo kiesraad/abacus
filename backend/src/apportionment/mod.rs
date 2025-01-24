@@ -161,12 +161,18 @@ fn political_groups_with_largest_average<'a>(
     // Programming error if political groups is empty at this point
     debug_assert!(!political_groups.is_empty());
 
-    debug!("Found {max_average} votes per seat as the maximum for political groups: {political_groups:?}");
+    debug!(
+        "Found {max_average} votes per seat as the maximum for political groups: {:?}",
+        political_group_numbers(&political_groups)
+    );
 
     // Check if we can actually assign all these political groups a seat, otherwise we would need to draw lots
     if political_groups.len() as u64 > remaining_seats {
         // TODO: #788 if multiple political groups have the same highest average and not enough remaining seats are available, use drawing of lots
-        debug!("Drawing of lots is required for political groups: {political_groups:?}, only {remaining_seats} seats available");
+        debug!(
+            "Drawing of lots is required for political groups: {:?}, only {remaining_seats} seats available",
+            political_group_numbers(&political_groups)
+        );
         Err(ApportionmentError::DrawingOfLotsNotImplemented)
     } else {
         Ok(political_groups)
@@ -198,12 +204,18 @@ fn political_groups_with_highest_surplus<'a>(
     // Programming error if zero political groups were selected at this point
     debug_assert!(!political_groups.is_empty());
 
-    debug!("Found {max_surplus} surplus votes as the maximum for political groups: {political_groups:?}");
+    debug!(
+        "Found {max_surplus} surplus votes as the maximum for political groups: {:?}",
+        political_group_numbers(&political_groups)
+    );
 
     // Check if we can actually assign all these political groups
     if political_groups.len() as u64 > remaining_seats {
         // TODO: #788 if multiple political groups have the same highest surplus and not enough remaining seats are available, use drawing of lots
-        debug!("Drawing of lots is required for political groups: {political_groups:?}, only {remaining_seats} seats available");
+        debug!(
+            "Drawing of lots is required for political groups: {:?}, only {remaining_seats} seats available",
+            political_group_numbers(&political_groups)
+        );
         Err(ApportionmentError::DrawingOfLotsNotImplemented)
     } else {
         Ok(political_groups)
@@ -462,6 +474,11 @@ pub struct HighestSurplusAssignedSeat {
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum ApportionmentError {
     DrawingOfLotsNotImplemented,
+}
+
+/// Create a vector containing just the political group numbers from an iterator of the current standing
+fn political_group_numbers(standing: &[&PoliticalGroupStanding]) -> Vec<u8> {
+    standing.iter().map(|s| s.pg_number).collect()
 }
 
 #[cfg(test)]

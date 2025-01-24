@@ -5,7 +5,7 @@ import commonConfig from "./playwright.common.config";
 const config: PlaywrightTestConfig = defineConfig({
   ...commonConfig,
   testDir: "./lib/ui",
-  outputDir: "./test-results/lib-ui",
+  outputDir: "./test-results/ladle",
   testMatch: /\.e2e\.ts/,
   use: {
     ...commonConfig.use,

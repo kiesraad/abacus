@@ -1,16 +1,12 @@
 import { type Locator, type Page } from "@playwright/test";
 
 export class UnsavedChangesModal {
-  protected readonly page: Page;
-
   readonly modal: Locator;
   readonly heading: Locator;
   readonly saveInput: Locator;
   readonly discardInput: Locator;
 
-  constructor(page: Page) {
-    this.page = page;
-
+  constructor(protected readonly page: Page) {
     this.modal = page.getByRole("dialog");
     this.heading = this.modal.getByRole("heading", {
       level: 2,

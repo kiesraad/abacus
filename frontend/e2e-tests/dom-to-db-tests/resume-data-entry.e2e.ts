@@ -6,11 +6,9 @@ import {
   PollingStationChoicePage,
   RecountedPage,
   VotersAndVotesPage,
-  VotersCounts,
-  VotesCounts,
 } from "e2e-tests/page-objects/data_entry";
 
-import { PollingStation } from "@kiesraad/api";
+import { PollingStation, VotersCounts, VotesCounts } from "@kiesraad/api";
 
 import { test } from "./fixtures";
 import { emptyDataEntryResponse } from "./test-data/request-response-templates";

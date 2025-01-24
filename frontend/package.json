@@ -69,9 +69,9 @@
     "prettier": "^3.4.2",
     "typescript": "^5.7.3",
     "vite": "^5.4.13",
-    "vite-node": "^2.1.8",
+    "vite-node": "^3.0.3",
     "vite-plugin-html": "^3.2.2",
-    "vitest": "^2.1.8",
+    "vitest": "^3.0.3",
     "vitest-fail-on-console": "^0.7.1"
   },
   "msw": {

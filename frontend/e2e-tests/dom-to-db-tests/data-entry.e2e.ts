@@ -1,4 +1,5 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { fillDataEntry } from "e2e-tests/e2e-test-helpers";
 import { formatNumber } from "e2e-tests/e2e-test-utils";
 import {
   CandidatesListPage,
@@ -9,81 +10,16 @@ import {
   PollingStationChoicePage,
   RecountedPage,
   VotersAndVotesPage,
-  VotersCounts,
-  VotesCounts,
 } from "e2e-tests/page-objects/data_entry";
 
+import { VotersCounts, VotesCounts } from "@kiesraad/api";
+
 import { test } from "./fixtures";
-import { noErrorsWarningsResponse, noRecountNoDifferencesRequest } from "./test-data/request-response-templates";
-
-async function fillDataEntryNoRecountNoDifferences(page: Page) {
-  const recountedPage = new RecountedPage(page);
-  await expect(recountedPage.yes).toBeFocused();
-  await recountedPage.no.check();
-  await expect(recountedPage.no).toBeChecked();
-  await recountedPage.next.click();
-
-  const votersAndVotesPage = new VotersAndVotesPage(page);
-  await expect(votersAndVotesPage.pollCardCount).toBeFocused();
-  const voters: VotersCounts = {
-    poll_card_count: 1000,
-    proxy_certificate_count: 50,
-    voter_card_count: 75,
-    total_admitted_voters_count: 1125,
-  };
-  const votes: VotesCounts = {
-    votes_candidates_count: 1090,
-    blank_votes_count: 20,
-    invalid_votes_count: 15,
-    total_votes_cast_count: 1125,
-  };
-  await votersAndVotesPage.inputVotersCounts(voters);
-  await votersAndVotesPage.inputVotesCounts(votes);
-  await expect(votersAndVotesPage.pollCardCount).toHaveValue(formatNumber(voters.poll_card_count));
-  await votersAndVotesPage.next.click();
-
-  const differencesPage = new DifferencesPage(page);
-  await expect(differencesPage.moreBallotsCount).toBeFocused();
-  await differencesPage.next.click();
-
-  const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
-  await expect(candidatesListPage_1.getCandidate(0)).toBeFocused();
-
-  await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
-  const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/(\\d+)/data_entries/([12])"));
-  await candidatesListPage_1.next.click();
-
-  const response = await responsePromise;
-  expect(response.status()).toBe(200);
-  expect(response.request().postDataJSON()).toMatchObject(noRecountNoDifferencesRequest);
-  expect(await response.json()).toMatchObject(noErrorsWarningsResponse);
-
-  const checkAndSavePage = new CheckAndSavePage(page);
-  await expect(checkAndSavePage.fieldset).toBeVisible();
-
-  await expect(checkAndSavePage.summaryText).toContainText(
-    "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
-  );
-
-  const expectedSummaryItems = [
-    { text: "Alle optellingen kloppen", iconLabel: "opgeslagen" },
-    { text: "Er zijn geen blokkerende fouten of waarschuwingen", iconLabel: "opgeslagen" },
-    { text: "Je kan de resultaten van dit stembureau opslaan", iconLabel: "opgeslagen" },
-  ];
-  const listItems = checkAndSavePage.allSummaryListItems();
-  const expectedTexts = Array.from(expectedSummaryItems, (item) => item.text);
-  await expect(listItems).toHaveText(expectedTexts);
-
-  for (const expectedItem of expectedSummaryItems) {
-    await expect(checkAndSavePage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(expectedItem.iconLabel);
-  }
-
-  await checkAndSavePage.save.click();
-
-  const pollingStationChoicePage = new PollingStationChoicePage(page);
-  await expect(pollingStationChoicePage.fieldsetNextPollingStation).toBeVisible();
-  await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
-}
+import {
+  noErrorsWarningsResponse,
+  noRecountNoDifferencesDataEntry,
+  noRecountNoDifferencesRequest,
+} from "./test-data/request-response-templates";
 
 test.describe("full data entry flow", () => {
   test("no recount, no differences", async ({ page, pollingStation }) => {
@@ -95,7 +31,73 @@ test.describe("full data entry flow", () => {
     await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation.name);
     await pollingStationChoicePage.clickStart();
 
-    await fillDataEntryNoRecountNoDifferences(page);
+    const recountedPage = new RecountedPage(page);
+    await expect(recountedPage.yes).toBeFocused();
+    await recountedPage.no.check();
+    await expect(recountedPage.no).toBeChecked();
+    await recountedPage.next.click();
+
+    const votersAndVotesPage = new VotersAndVotesPage(page);
+    await expect(votersAndVotesPage.pollCardCount).toBeFocused();
+    const voters: VotersCounts = {
+      poll_card_count: 1000,
+      proxy_certificate_count: 50,
+      voter_card_count: 75,
+      total_admitted_voters_count: 1125,
+    };
+    const votes: VotesCounts = {
+      votes_candidates_count: 1090,
+      blank_votes_count: 20,
+      invalid_votes_count: 15,
+      total_votes_cast_count: 1125,
+    };
+    await votersAndVotesPage.inputVotersCounts(voters);
+    await votersAndVotesPage.inputVotesCounts(votes);
+    await expect(votersAndVotesPage.pollCardCount).toHaveValue(formatNumber(voters.poll_card_count));
+    await votersAndVotesPage.next.click();
+
+    const differencesPage = new DifferencesPage(page);
+    await expect(differencesPage.moreBallotsCount).toBeFocused();
+    await differencesPage.next.click();
+
+    const candidatesListPage_1 = new CandidatesListPage(page, "Lijst 1 - Political Group A");
+    await expect(candidatesListPage_1.getCandidate(0)).toBeFocused();
+
+    await candidatesListPage_1.fillCandidatesAndTotal([837, 253], 1090);
+    const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/(\\d+)/data_entries/([12])"));
+    await candidatesListPage_1.next.click();
+
+    const response = await responsePromise;
+    expect(response.status()).toBe(200);
+    expect(response.request().postDataJSON()).toStrictEqual(noRecountNoDifferencesRequest);
+    expect(await response.json()).toStrictEqual(noErrorsWarningsResponse);
+
+    const checkAndSavePage = new CheckAndSavePage(page);
+    await expect(checkAndSavePage.fieldset).toBeVisible();
+
+    await expect(checkAndSavePage.summaryText).toContainText(
+      "De aantallen die je hebt ingevoerd in de verschillende stappen spreken elkaar niet tegen. Er zijn geen blokkerende fouten of waarschuwingen.",
+    );
+
+    const expectedSummaryItems = [
+      { text: "Alle optellingen kloppen", iconLabel: "opgeslagen" },
+      { text: "Er zijn geen blokkerende fouten of waarschuwingen", iconLabel: "opgeslagen" },
+      { text: "Je kan de resultaten van dit stembureau opslaan", iconLabel: "opgeslagen" },
+    ];
+    const listItems = checkAndSavePage.allSummaryListItems();
+    const expectedTexts = Array.from(expectedSummaryItems, (item) => item.text);
+    await expect(listItems).toHaveText(expectedTexts);
+
+    for (const expectedItem of expectedSummaryItems) {
+      await expect(checkAndSavePage.summaryListItemIcon(expectedItem.text)).toHaveAccessibleName(
+        expectedItem.iconLabel,
+      );
+    }
+
+    await checkAndSavePage.save.click();
+
+    await expect(pollingStationChoicePage.fieldsetNextPollingStation).toBeVisible();
+    await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
 
     await expect(pollingStationChoicePage.alertInputSaved).toHaveText(
       [
@@ -206,10 +208,10 @@ test.describe("full data entry flow", () => {
     await expect(differencesPage.fieldset).toBeVisible();
 
     const moreBallotsFields: MoreBallotsFields = {
-      moreBallotsCount: 25,
-      tooManyBallotsHandedOutCount: 9,
-      otherExplanationCount: 6,
-      noExplanationCount: 10,
+      more_ballots_count: 25,
+      too_many_ballots_handed_out_count: 9,
+      other_explanation_count: 6,
+      no_explanation_count: 10,
     };
     await differencesPage.fillMoreBallotsFields(moreBallotsFields);
     await differencesPage.next.click();
@@ -281,11 +283,11 @@ test.describe("full data entry flow", () => {
     await expect(differencesPage.fieldset).toBeVisible();
 
     const fewerBallotsFields: FewerBallotsFields = {
-      fewerBallotsCount: 20,
-      unreturnedBallotsCount: 6,
-      tooFewBallotsHandedOutCount: 3,
-      otherExplanationCount: 7,
-      noExplanationCount: 4,
+      fewer_ballots_count: 20,
+      unreturned_ballots_count: 6,
+      too_few_ballots_handed_out_count: 3,
+      other_explanation_count: 7,
+      no_explanation_count: 4,
     };
     await differencesPage.fillFewerBallotsFields(fewerBallotsFields);
     await differencesPage.next.click();
@@ -380,13 +382,8 @@ test.describe("full data entry flow", () => {
 });
 
 test.describe("second data entry", () => {
-  test("equal second data entry after first data entry", async ({ page, request, pollingStation }) => {
-    const saveResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1`, {
-      data: noRecountNoDifferencesRequest,
-    });
-    expect(saveResponse.ok()).toBeTruthy();
-    const finaliseResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/finalise`);
-    expect(finaliseResponse.ok()).toBeTruthy();
+  test("equal second data entry after first data entry", async ({ page, pollingStationFirstEntryDone }) => {
+    const pollingStation = pollingStationFirstEntryDone;
 
     await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
 
@@ -400,8 +397,7 @@ test.describe("second data entry", () => {
       `/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/2/recounted`,
     );
 
-    // fill in exactly like first data entry
-    await fillDataEntryNoRecountNoDifferences(page);
+    await fillDataEntry(page, noRecountNoDifferencesDataEntry);
 
     await expect(pollingStationChoicePage.dataEntrySuccess).toBeVisible();
     await expect(pollingStationChoicePage.alertInputSaved).toHaveText(

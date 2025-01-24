@@ -60,7 +60,6 @@
     "eslint-plugin-react-refresh": "^0.4.18",
     "jsdom": "^26.0.0",
     "lefthook": "^1.10.9",
-    "lint-staged": "^15.4.1",
     "msw": "^2.7.0",
     "postcss": "^8.5.1",
     "postcss-import": "^16.1.0",
@@ -77,8 +76,5 @@
     "workerDirectory": [
       ""
     ]
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx,json}": "eslint --cache --fix"
   }
 }

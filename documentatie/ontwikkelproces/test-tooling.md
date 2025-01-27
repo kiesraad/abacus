@@ -8,15 +8,29 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 
 
 ## Frontend
-- Linting: [eslint][eslint]
-- Formatting: [prettier][prettier]
-- Test runners: [Vitest][vitest] en [Playwright][playwright]
-- Mock server: [Mock Service Worker][mock-service-worker]
-- Unit tests (voor utils e.d.): geen additionele tools of libraries nodig
-- React UI elementen: [React Testing Library][react-testing-library]; [Ladle][ladle] en [Playwright][playwright]
-- React componenten: [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
-- React integration tests: [React Testing Library][react-testing-library] en [Mock Service Worker][mock-service-worker]
-- Frontend met mocked backend: [Mock Service Worker][mock-service-worker]
+
+### Frontend "units"
+- Container componenten: zijn verantwoordelijk voor het ophalen en weergave van data, zoals pagina's    
+- Presentational componenten: zijn verantwoordelijk voor het weergeven van data
+- Overige units: bijvoorbeeld API code, utility functies
+
+### Tooling
+- [eslint][eslint]: Linting
+- [prettier][prettier]: Formatting 
+- [Vitest][vitest]: Test runner 
+- [Playwright][playwright]: Test framework inclusief runner tegen browser-engine
+- [Mock Service Worker][mock-service-worker]: Mock server
+- [React Testing Library][react-testing-library]: Library voor het testen van React componenten
+- [Ladle][ladle]: Library voor het ontwikkelen en testen van alleenstaande componenten (alternatief voor Storybook)
+
+### Testsoorten
+
+Presentational componenten:
+- Ladle met RTL
+- Ladle met Playwright
+
+
+- ... met MSW
 
 
 ```mermaid

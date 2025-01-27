@@ -228,7 +228,7 @@ async function submitWith422Response() {
 
 async function expect422ClientError() {
   const feedbackServerError = await screen.findByTestId("error-modal");
-  expect(feedbackServerError).toHaveTextContent("Foutcode: 422JSON error or invalid data (Unprocessable Content)");
+  expect(feedbackServerError).toHaveTextContent("De JSON is niet geldig");
 }
 
 async function submitWith500Response() {
@@ -242,7 +242,7 @@ async function submitWith500Response() {
 
 async function expect500ServerError() {
   const feedbackServerError = await screen.findByTestId("error-modal");
-  expect(feedbackServerError).toHaveTextContent("Foutcode: 500Internal server error");
+  expect(feedbackServerError).toHaveTextContent("Er is een interne fout opgetreden");
 }
 
 type FormIdentifier = "recounted" | "voters_and_votes" | "differences" | `candidates_${number}`;

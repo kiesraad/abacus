@@ -4,7 +4,8 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, SqlitePool};
+use sqlx::{query_as, Error, FromRow, SqlitePool};
+use utoipa::ToSchema;
 
 use crate::{APIError, AppState};
 
@@ -16,7 +17,7 @@ use super::{
 };
 
 /// User object, corresponds to a row in the users table
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow, ToSchema)]
 pub struct User {
     id: u32,
     username: String,
@@ -56,6 +57,15 @@ where
 
         Ok(users.get_by_session_key(session_cookie.value()).await?)
     }
+}
+
+#[derive(Serialize, FromRow, ToSchema)]
+#[cfg_attr(test, derive(Deserialize))]
+pub struct ListedUser {
+    id: u32,
+    username: String,
+    updated_at: i64,
+    created_at: i64,
 }
 
 pub struct Users(SqlitePool);
@@ -172,6 +182,21 @@ impl Users {
         .await?;
 
         Ok(user)
+    }
+
+    pub async fn list(&self) -> Result<Vec<ListedUser>, Error> {
+        let users = query_as!(
+            ListedUser,
+            r#"SELECT
+                id as "id: u32",
+                username,
+                updated_at,
+                created_at
+            FROM users"#
+        )
+        .fetch_all(&self.0)
+        .await?;
+        Ok(users)
     }
 }
 

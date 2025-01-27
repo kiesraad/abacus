@@ -1,4 +1,4 @@
-import { createRef, FormEvent, useState } from "react";
+import { FormEvent, useState } from "react";
 
 import {
   AnyApiError,
@@ -12,6 +12,12 @@ import {
 } from "@kiesraad/api";
 import { t, TranslationPath } from "@kiesraad/i18n";
 import { Alert, BottomBar, Button, FormLayout, InputField, Loader } from "@kiesraad/ui";
+
+const INITIAL_FORM_STATE = {
+  password: "",
+  newPassword: "",
+  newPasswordRepeat: "",
+};
 
 function errorMessage(error: AnyApiError | TranslationPath) {
   if (typeof error === "string") {
@@ -27,9 +33,9 @@ function errorMessage(error: AnyApiError | TranslationPath) {
 
 export function ChangePasswordForm() {
   const { user, client } = useApiState();
+  const [formState, setFormState] = useState(INITIAL_FORM_STATE);
   const [loading, setLoading] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
-  const ref = createRef<HTMLFormElement>();
   const [error, setError] = useState<AnyApiError | TranslationPath | null>(null);
 
   // Handle form submission
@@ -37,10 +43,7 @@ export function ChangePasswordForm() {
     event.preventDefault();
 
     // Validate the form
-    const formData = new FormData(event.currentTarget);
-    const newPassword = formData.get("new_password") as string;
-    const newPasswordRepeat = formData.get("new_password_repeat") as string;
-    if (newPassword !== newPasswordRepeat) {
+    if (formState.newPassword !== formState.newPasswordRepeat) {
       setError("user.password_mismatch");
       return;
     }
@@ -50,8 +53,8 @@ export function ChangePasswordForm() {
     const requestPath: CHANGE_PASSWORD_REQUEST_PATH = "/api/user/change-password";
     const requestBody: CHANGE_PASSWORD_REQUEST_BODY = {
       username: user?.username as string,
-      password: formData.get("password") as string,
-      new_password: formData.get("new_password") as string,
+      password: formState.password,
+      new_password: formState.newPassword,
     };
     const result = await client.postRequest<LoginResponse>(requestPath, requestBody);
 
@@ -61,7 +64,7 @@ export function ChangePasswordForm() {
       setError(result);
       setSuccess(false);
     } else {
-      ref.current?.reset();
+      setFormState(INITIAL_FORM_STATE);
       setError(null);
       setSuccess(true);
     }
@@ -74,7 +77,6 @@ export function ChangePasswordForm() {
   return (
     <form
       className="no_footer"
-      ref={ref}
       onSubmit={(e) => {
         void handleSubmit(e);
       }}
@@ -109,9 +111,35 @@ export function ChangePasswordForm() {
         <h2 className="mb-lg">
           {t("user.username")}: {user.username}
         </h2>
-        <InputField name="password" label={t("user.password")} hint={t("user.current_password_hint")} type="password" />
-        <InputField name="new_password" label={t("user.password_new")} hint={t("user.password_new")} type="password" />
-        <InputField name="new_password_repeat" label={t("user.password_repeat")} type="password" />
+        <InputField
+          name="password"
+          label={t("user.password")}
+          hint={t("user.current_password_hint")}
+          type="password"
+          value={formState.password}
+          onChange={(e) => {
+            setFormState({ ...formState, password: e.target.value });
+          }}
+        />
+        <InputField
+          name="new_password"
+          label={t("user.password_new")}
+          hint={t("user.password_new")}
+          type="password"
+          value={formState.newPassword}
+          onChange={(e) => {
+            setFormState({ ...formState, newPassword: e.target.value });
+          }}
+        />
+        <InputField
+          name="new_password_repeat"
+          label={t("user.password_repeat")}
+          type="password"
+          value={formState.newPasswordRepeat}
+          onChange={(e) => {
+            setFormState({ ...formState, newPasswordRepeat: e.target.value });
+          }}
+        />
       </FormLayout>
       <BottomBar type="footer">
         <BottomBar.Row>

@@ -162,7 +162,13 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         components(
             schemas(
                 ErrorResponse,
-                data_entry::DataEntry,
+                apportionment::DisplayFraction,
+                apportionment::ApportionmentResult,
+                apportionment::PoliticalGroupStanding,
+                apportionment::ApportionmentStep,
+                apportionment::AssignedSeat,
+                apportionment::HighestAverageAssignedSeat,
+                apportionment::HighestSurplusAssignedSeat,
                 authentication::Credentials,
                 authentication::LoginResponse,
                 data_entry::CandidateVotes,
@@ -171,7 +177,6 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 data_entry::GetDataEntryResponse,
                 data_entry::DifferencesCounts,
                 data_entry::PoliticalGroupVotes,
-                data_entry::status::DataEntryStatus,
                 data_entry::status::DataEntryStatusName,
                 data_entry::PollingStationResults,
                 data_entry::VotersCounts,

@@ -1,34 +1,55 @@
 use crate::data_entry::Count;
+use serde::Serialize;
 use std::{
     fmt::{Debug, Display, Formatter, Result},
     ops::{Add, Div, Mul, Sub},
 };
+use utoipa::{PartialSchema, ToSchema};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize)]
+#[serde(into = "DisplayFraction")]
 pub struct Fraction {
     numerator: u64,
     denominator: u64,
 }
 
+impl PartialSchema for Fraction {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        DisplayFraction::schema()
+    }
+}
+impl ToSchema for Fraction {}
+
 impl Fraction {
-    pub fn new(numerator: u64, denominator: u64) -> Self {
+    pub const ZERO: Fraction = Fraction::new(0, 1);
+
+    pub const fn new(numerator: u64, denominator: u64) -> Self {
         Self {
             numerator,
             denominator,
         }
     }
 
-    pub fn from_count(numerator: Count) -> Self {
-        Self::new(numerator as u64, 1)
+    /// Returns the whole number part of the fraction
+    pub fn integer_part(self) -> u64 {
+        self.numerator / self.denominator
     }
 
-    pub fn from_u64(numerator: u64) -> Self {
+    /// Returns the remainder of the fraction after the integer part is removed
+    pub fn fractional_part(self) -> Fraction {
+        Fraction::new(self.numerator % self.denominator, self.denominator)
+    }
+}
+
+impl From<u64> for Fraction {
+    fn from(numerator: u64) -> Self {
         Self::new(numerator, 1)
     }
+}
 
-    // divide and return the whole number (integer division)
-    pub fn divide_and_return_whole_number(&self, other: &Self) -> u64 {
-        (self.numerator * other.denominator) / (self.denominator * other.numerator)
+impl From<Count> for Fraction {
+    fn from(count: Count) -> Self {
+        Self::new(u64::from(count), 1)
     }
 }
 
@@ -104,13 +125,13 @@ impl Display for Fraction {
         if self.denominator == 0 {
             return write!(f, "NaN");
         }
-        let whole_number = self.numerator / self.denominator;
+        let integer = self.numerator / self.denominator;
         let remainder = self.numerator % self.denominator;
-        if whole_number > 0 {
+        if integer > 0 {
             if remainder > 0 {
-                write!(f, "{} {}/{}", whole_number, remainder, self.denominator)
+                write!(f, "{} {}/{}", integer, remainder, self.denominator)
             } else {
-                write!(f, "{}", whole_number)
+                write!(f, "{}", integer)
             }
         } else {
             write!(f, "{}/{}", self.numerator, self.denominator)
@@ -124,6 +145,33 @@ impl Debug for Fraction {
     }
 }
 
+impl PartialEq for DisplayFraction {
+    fn eq(&self, other: &Self) -> bool {
+        (self.integer == other.integer)
+            && (self.numerator * other.denominator == self.denominator * other.numerator)
+    }
+}
+
+/// Fraction with the integer part split out for display purposes
+#[derive(Clone, Copy, Debug, Serialize, ToSchema)]
+#[schema(as = Fraction)]
+pub struct DisplayFraction {
+    integer: u64,
+    numerator: u64,
+    denominator: u64,
+}
+
+impl From<Fraction> for DisplayFraction {
+    fn from(fraction: Fraction) -> Self {
+        let remainder = fraction.fractional_part();
+        Self {
+            integer: fraction.integer_part(),
+            numerator: remainder.numerator,
+            denominator: remainder.denominator,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -133,7 +181,7 @@ mod tests {
     #[test]
     fn test_from_count() {
         let count = 5 as Count;
-        let fraction = Fraction::from_count(count);
+        let fraction = Fraction::from(count);
         assert_eq!(fraction, Fraction::new(5, 1));
         assert_eq!(fraction.to_string(), "5")
     }
@@ -141,7 +189,7 @@ mod tests {
     #[test]
     fn test_from_u64() {
         let numerator = 10u64;
-        let fraction = Fraction::from_u64(numerator);
+        let fraction = Fraction::from(numerator);
         assert_eq!(fraction, Fraction::new(10, 1));
         assert_eq!(fraction.to_string(), "10")
     }
@@ -153,13 +201,12 @@ mod tests {
     }
 
     #[test]
-    fn test_divide_and_return_whole_number() {
+    fn test_integer_and_fractional_part_after_division() {
         let fraction = Fraction::new(11, 5);
         let other_fraction = Fraction::new(1, 2);
-        assert_eq!(
-            fraction.divide_and_return_whole_number(&other_fraction),
-            4u64
-        );
+        let div = fraction / other_fraction;
+        assert_eq!(div.integer_part(), 4u64);
+        assert_eq!(div.fractional_part(), Fraction::new(2, 5));
     }
 
     #[test]
@@ -216,5 +263,31 @@ mod tests {
     #[test]
     fn test_smaller_than() {
         assert!(Fraction::new(1, 3) < Fraction::new(1, 2));
+    }
+
+    #[test]
+    fn test_display_fraction_integer_gt_0() {
+        let fraction = DisplayFraction::from(Fraction::new(11, 5));
+        assert_eq!(
+            fraction,
+            DisplayFraction {
+                integer: 2,
+                numerator: 1,
+                denominator: 5
+            }
+        );
+    }
+
+    #[test]
+    fn test_display_fraction_integer_0() {
+        let fraction = DisplayFraction::from(Fraction::new(2, 5));
+        assert_eq!(
+            fraction,
+            DisplayFraction {
+                integer: 0,
+                numerator: 2,
+                denominator: 5
+            }
+        );
     }
 }

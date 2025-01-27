@@ -19,7 +19,7 @@ pre-commit:
     backend-openapi:
       root: "backend/"
       glob: "*.rs"
-      run: cargo run --package backend --bin gen-openapi && git add openapi.json
+      run: cargo run --package abacus --bin gen-openapi && git add openapi.json
     frontend-formatter:
       root: "frontend/"
       run: npx prettier --ignore-unknown --write {staged_files}

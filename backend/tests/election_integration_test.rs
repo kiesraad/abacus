@@ -2,8 +2,8 @@
 
 use crate::{shared::create_result, utils::serve_api};
 #[cfg(feature = "dev-database")]
-use backend::election::Election;
-use backend::election::{ElectionDetailsResponse, ElectionListResponse};
+use abacus::election::Election;
+use abacus::election::{ElectionDetailsResponse, ElectionListResponse};
 use hyper::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;

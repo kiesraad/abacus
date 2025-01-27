@@ -1,6 +1,6 @@
 #![cfg(test)]
 
-use backend::{
+use abacus::{
     data_entry::{
         status::DataEntryStatusName::*, ElectionStatusResponse, ElectionStatusResponseEntry,
         GetDataEntryResponse, SaveDataEntryResponse, ValidationResultCode,

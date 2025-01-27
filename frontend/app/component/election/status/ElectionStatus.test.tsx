@@ -54,6 +54,7 @@ describe("ElectionStatus", () => {
     expect(inProgressRows[1]).toHaveTextContent(/35/);
     expect(inProgressRows[1]).toHaveTextContent(/Testschool/);
     expect(inProgressRows[1]).toHaveTextContent(/1e invoer/);
+    expect(within(inProgressRows[1] as HTMLElement).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "60");
     expect(inProgressRows[2]).toHaveTextContent(/36/);
     expect(inProgressRows[2]).toHaveTextContent(/Testbuurthuis/);
     expect(inProgressRows[2]).toHaveTextContent(/2e invoer/);

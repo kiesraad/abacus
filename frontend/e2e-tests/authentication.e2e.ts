@@ -7,6 +7,7 @@ test.describe("authentication", () => {
     crypto.getRandomValues(array);
     const random = array.toString();
     const username = `user_${random}`;
+    const password = "password_test";
     // create a test user
     const createUserResponse = await request.post("/api/user/development/create", {
       headers: {
@@ -14,7 +15,7 @@ test.describe("authentication", () => {
       },
       data: {
         username,
-        password: "password_test",
+        password,
       },
     });
     expect(createUserResponse.status()).toBe(201);
@@ -22,7 +23,7 @@ test.describe("authentication", () => {
     await page.goto("/account/login");
 
     await page.getByLabel("Gebruikersnaam").fill(username);
-    await page.getByLabel("Wachtwoord").fill("password_test");
+    await page.getByLabel("Wachtwoord").fill(password);
     await page.getByRole("button", { name: "Inloggen" }).click();
 
     // TODO: use new page object when we know which page to render

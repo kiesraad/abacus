@@ -23,7 +23,7 @@ macro_rules! load_fixtures {
 ///
 /// This list should be updated manually when a new fixture is added that
 /// needs to be loaded when seeding fixtures.
-const FIXTURES: &[Fixture] = load_fixtures!(["reset", "election_1"]);
+const FIXTURES: &[Fixture] = load_fixtures!(["reset", "election_3", "users"]);
 
 /// The data contained in a fixture file
 struct Fixture {

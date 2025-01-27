@@ -1123,7 +1123,7 @@
     "schemas": {
       "ApportionmentResult": {
         "type": "object",
-        "description": "The result of the apportionment procedure. This contains the number of\nseats and the quota that was used. It then contains the initial standing\nafter whole seats were assigned, and each of the changes and intermediate\nstandings. The final standing contains the number of seats per political\ngroup that was assigned after all seats were assigned.",
+        "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after whole seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
         "required": [
           "seats",
           "quota",
@@ -1871,7 +1871,7 @@
       },
       "PoliticalGroupSeatAssignment": {
         "type": "object",
-        "description": "Contains information about the final assignment of seats for a specific\npolitical group.",
+        "description": "Contains information about the final assignment of seats for a specific political group.",
         "required": [
           "pg_number",
           "votes_cast",
@@ -1924,7 +1924,7 @@
       },
       "PoliticalGroupStanding": {
         "type": "object",
-        "description": "Contains the standing for a specific political group. This is all the\ninformation that is needed to compute the apportionment for that specific\npolitical group.",
+        "description": "Contains the standing for a specific political group. This is all the information\nthat is needed to compute the apportionment for that specific political group.",
         "required": [
           "pg_number",
           "votes_cast",

@@ -1,10 +1,14 @@
 use crate::data_entry::Count;
 use serde::{Deserialize, Serialize};
 use std::{
+    cmp::Ordering,
     fmt::{Debug, Display, Formatter, Result},
     ops::{Add, Div, Mul, Sub},
 };
-use utoipa::{PartialSchema, ToSchema};
+use utoipa::{
+    openapi::{schema::Schema, RefOr},
+    PartialSchema, ToSchema,
+};
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 #[serde(into = "DisplayFraction")]
@@ -14,7 +18,7 @@ pub struct Fraction {
 }
 
 impl PartialSchema for Fraction {
-    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+    fn schema() -> RefOr<Schema> {
         DisplayFraction::schema()
     }
 }
@@ -98,13 +102,13 @@ impl Div for Fraction {
 }
 
 impl PartialOrd for Fraction {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
 impl Ord for Fraction {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         // compare using integer math
         let lhs = self.numerator * other.denominator;
         let rhs = self.denominator * other.numerator;
@@ -174,8 +178,10 @@ impl From<Fraction> for DisplayFraction {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::apportionment::fraction::Fraction;
+    use crate::{
+        apportionment::{DisplayFraction, Fraction},
+        data_entry::Count,
+    };
     use test_log::test;
 
     #[test]

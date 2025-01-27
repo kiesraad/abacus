@@ -9,11 +9,10 @@ pub use self::fraction::*;
 mod api;
 mod fraction;
 
-/// The result of the apportionment procedure. This contains the number of
-/// seats and the quota that was used. It then contains the initial standing
-/// after whole seats were assigned, and each of the changes and intermediate
-/// standings. The final standing contains the number of seats per political
-/// group that was assigned after all seats were assigned.
+/// The result of the apportionment procedure. This contains the number of seats and the quota
+/// that was used. It then contains the initial standing after whole seats were assigned,
+/// and each of the changes and intermediate standings. The final standing contains the
+/// number of seats per political group that was assigned after all seats were assigned.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApportionmentResult {
     seats: u64,
@@ -22,8 +21,7 @@ pub struct ApportionmentResult {
     final_standing: Vec<PoliticalGroupSeatAssignment>,
 }
 
-/// Contains information about the final assignment of seats for a specific
-/// political group.
+/// Contains information about the final assignment of seats for a specific political group.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupSeatAssignment {
     /// Political group number for which this assigment applies
@@ -77,8 +75,8 @@ pub struct PoliticalGroupStanding {
 }
 
 impl PoliticalGroupStanding {
-    /// Create a new instance computing the whole number of seats that were
-    /// assigned to a political group.
+    /// Create a new instance computing the whole number of seats that
+    /// were assigned to a political group.
     fn new(pg: &PoliticalGroupVotes, quota: Fraction) -> Self {
         let votes_cast = Fraction::from(pg.total);
         let pg_seats = (votes_cast / quota).integer_part();
@@ -261,8 +259,8 @@ pub fn seat_allocation(
     })
 }
 
-/// This function allocates the rest seats that remain after whole seat allocation
-/// is finished. These remainder seats are assigned through two different procedures,
+/// This function allocates the rest seats that remain after whole seat allocation is finished.
+/// These remainder seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
 fn allocate_remainder(
     initial_standing: &[PoliticalGroupStanding],

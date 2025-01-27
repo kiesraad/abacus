@@ -1057,6 +1057,110 @@
   },
   "components": {
     "schemas": {
+      "ApportionmentResult": {
+        "type": "object",
+        "description": "The result of the apportionment procedure. This contains the number of\nseats and the quota that was used. It then contains the initial standing\nafter whole seats were assigned, and each of the changes and intermediate\nstandings. The final standing contains the number of seats per political\ngroup that was assigned after all seats were assigned.",
+        "required": [
+          "seats",
+          "quota",
+          "steps",
+          "final_standing"
+        ],
+        "properties": {
+          "final_standing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupSeatAssignment"
+            }
+          },
+          "quota": {
+            "$ref": "#/components/schemas/Fraction"
+          },
+          "seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApportionmentStep"
+            }
+          }
+        }
+      },
+      "ApportionmentStep": {
+        "type": "object",
+        "description": "Records the details for a specific remainder seat, and how the standing is\nonce that remainder seat was assigned",
+        "required": [
+          "rest_seat_number",
+          "change",
+          "standing"
+        ],
+        "properties": {
+          "change": {
+            "$ref": "#/components/schemas/AssignedSeat"
+          },
+          "rest_seat_number": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "standing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupStanding"
+            }
+          }
+        }
+      },
+      "AssignedSeat": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "assigned_by"
+                ],
+                "properties": {
+                  "assigned_by": {
+                    "type": "string",
+                    "enum": [
+                      "HighestAverage"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestSurplusAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "assigned_by"
+                ],
+                "properties": {
+                  "assigned_by": {
+                    "type": "string",
+                    "enum": [
+                      "HighestSurplus"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "description": "Records the political group and specific change for a specific remainder seat"
+      },
       "Candidate": {
         "type": "object",
         "description": "Candidate",
@@ -1164,114 +1268,6 @@
           }
         }
       },
-      "DataEntryStatus": {
-        "oneOf": [
-          {
-            "type": "object",
-            "required": [
-              "status"
-            ],
-            "properties": {
-              "status": {
-                "type": "string",
-                "enum": [
-                  "FirstEntryNotStarted"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/FirstEntryInProgress"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "FirstEntryInProgress"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/SecondEntryNotStarted"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "SecondEntryNotStarted"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/SecondEntryInProgress"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "SecondEntryInProgress"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/EntriesDifferent"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "EntriesDifferent"
-                ]
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "state",
-              "status"
-            ],
-            "properties": {
-              "state": {
-                "$ref": "#/components/schemas/Definitive"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "Definitive"
-                ]
-              }
-            }
-          }
-        ]
-      },
       "DataEntryStatusName": {
         "type": "string",
         "enum": [
@@ -1282,17 +1278,6 @@
           "entries_different",
           "definitive"
         ]
-      },
-      "Definitive": {
-        "type": "object",
-        "required": [
-          "finished_at"
-        ],
-        "properties": {
-          "finished_at": {
-            "type": "string"
-          }
-        }
       },
       "DifferencesCounts": {
         "type": "object",
@@ -1557,21 +1542,6 @@
           }
         }
       },
-      "EntriesDifferent": {
-        "type": "object",
-        "required": [
-          "first_entry",
-          "second_entry"
-        ],
-        "properties": {
-          "first_entry": {
-            "$ref": "#/components/schemas/PollingStationResults"
-          },
-          "second_entry": {
-            "$ref": "#/components/schemas/PollingStationResults"
-          }
-        }
-      },
       "ErrorReference": {
         "type": "string",
         "description": "Error reference used to show the corresponding error message to the end-user",
@@ -1620,27 +1590,28 @@
           }
         }
       },
-      "FirstEntryInProgress": {
+      "Fraction": {
         "type": "object",
+        "description": "Fraction with the integer part split out for display purposes",
         "required": [
-          "progress",
-          "first_entry",
-          "client_state"
+          "integer",
+          "numerator",
+          "denominator"
         ],
         "properties": {
-          "client_state": {
-            "type": "object",
-            "description": "Client state for the data entry (arbitrary JSON)"
-          },
-          "first_entry": {
-            "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
-          },
-          "progress": {
+          "denominator": {
             "type": "integer",
-            "format": "int32",
-            "description": "Data entry progress between 0 and 100",
-            "maximum": 100,
+            "format": "int64",
+            "minimum": 0
+          },
+          "integer": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "numerator": {
+            "type": "integer",
+            "format": "int64",
             "minimum": 0
           }
         }
@@ -1672,6 +1643,66 @@
           },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
+          }
+        }
+      },
+      "HighestAverageAssignedSeat": {
+        "type": "object",
+        "description": "Contains the details for an assigned seat, assigned through the highest average method.",
+        "required": [
+          "selected_pg_number",
+          "pg_options",
+          "votes_per_seat"
+        ],
+        "properties": {
+          "pg_options": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "The list from which the political group was selected, all of them having the same votes per seat"
+          },
+          "selected_pg_number": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The political group that was selected for this seat has this political group number",
+            "minimum": 0
+          },
+          "votes_per_seat": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "This is the votes per seat achieved by the selected political group"
+          }
+        }
+      },
+      "HighestSurplusAssignedSeat": {
+        "type": "object",
+        "description": "Contains the details for an assigned seat, assigned through the highest surplus method.",
+        "required": [
+          "selected_pg_number",
+          "pg_options",
+          "surplus_votes"
+        ],
+        "properties": {
+          "pg_options": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "The list from which the political group was selected, all of them having the same number of surplus votes"
+          },
+          "selected_pg_number": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The political group that was selected for this seat has this political group number",
+            "minimum": 0
+          },
+          "surplus_votes": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The number of surplus votes achieved by the selected political group"
           }
         }
       },
@@ -1713,6 +1744,110 @@
           "number": {
             "type": "integer",
             "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "PoliticalGroupSeatAssignment": {
+        "type": "object",
+        "description": "Contains information about the final assignment of seats for a specific\npolitical group.",
+        "required": [
+          "pg_number",
+          "votes_cast",
+          "surplus_votes",
+          "meets_surplus_threshold",
+          "whole_seats",
+          "rest_seats",
+          "total_seats"
+        ],
+        "properties": {
+          "meets_surplus_threshold": {
+            "type": "boolean",
+            "description": "Whether this group met the threshold for surplus seat assigment"
+          },
+          "pg_number": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number for which this assigment applies",
+            "minimum": 0
+          },
+          "rest_seats": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of rest seats assigned to this group",
+            "minimum": 0
+          },
+          "surplus_votes": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The surplus votes that were not used to get whole seats assigned to this political group"
+          },
+          "total_seats": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The total number of seats assigned to this group",
+            "minimum": 0
+          },
+          "votes_cast": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of votes cast for this group",
+            "minimum": 0
+          },
+          "whole_seats": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of whole seats assigned to this group",
+            "minimum": 0
+          }
+        }
+      },
+      "PoliticalGroupStanding": {
+        "type": "object",
+        "description": "Contains the standing for a specific political group. This is all the\ninformation that is needed to compute the apportionment for that specific\npolitical group.",
+        "required": [
+          "pg_number",
+          "votes_cast",
+          "surplus_votes",
+          "meets_surplus_threshold",
+          "next_votes_per_seat",
+          "whole_seats",
+          "rest_seats"
+        ],
+        "properties": {
+          "meets_surplus_threshold": {
+            "type": "boolean",
+            "description": "Whether the surplus votes meet the threshold to be applicable for surplus seat assignment"
+          },
+          "next_votes_per_seat": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The number of votes per seat if a new seat would be added to the current rest seats"
+          },
+          "pg_number": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number for which this standing applies",
+            "minimum": 0
+          },
+          "rest_seats": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The current number of rest seats this political group got",
+            "minimum": 0
+          },
+          "surplus_votes": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The surplus of votes that was not used to get whole seats (does not have to be a whole number of votes)"
+          },
+          "votes_cast": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of votes cast for this group",
+            "minimum": 0
+          },
+          "whole_seats": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of whole seats this political group got",
             "minimum": 0
           }
         }
@@ -1899,57 +2034,6 @@
         "properties": {
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
-          }
-        }
-      },
-      "SecondEntryInProgress": {
-        "type": "object",
-        "required": [
-          "finalised_first_entry",
-          "first_entry_finished_at",
-          "progress",
-          "second_entry",
-          "client_state"
-        ],
-        "properties": {
-          "client_state": {
-            "type": "object",
-            "description": "Client state for the data entry (arbitrary JSON)"
-          },
-          "finalised_first_entry": {
-            "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
-          },
-          "first_entry_finished_at": {
-            "type": "string",
-            "description": "When the first entry was finalised"
-          },
-          "progress": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Data entry progress between 0 and 100",
-            "maximum": 100,
-            "minimum": 0
-          },
-          "second_entry": {
-            "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
-          }
-        }
-      },
-      "SecondEntryNotStarted": {
-        "type": "object",
-        "required": [
-          "finalised_first_entry",
-          "first_entry_finished_at"
-        ],
-        "properties": {
-          "finalised_first_entry": {
-            "$ref": "#/components/schemas/PollingStationResults",
-            "description": "Data entry for a polling station"
-          },
-          "first_entry_finished_at": {
-            "type": "string"
           }
         }
       },

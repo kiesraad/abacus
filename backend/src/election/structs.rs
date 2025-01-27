@@ -25,7 +25,6 @@ pub struct Election {
 
 /// Election request
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug)]
-#[cfg(feature = "dev-database")]
 pub struct ElectionRequest {
     pub name: String,
     pub location: String,

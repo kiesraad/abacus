@@ -106,6 +106,37 @@ export type LOGOUT_REQUEST_PATH = `/api/user/logout`;
 /** TYPES **/
 
 /**
+ * The result of the apportionment procedure. This contains the number of
+seats and the quota that was used. It then contains the initial standing
+after whole seats were assigned, and each of the changes and intermediate
+standings. The final standing contains the number of seats per political
+group that was assigned after all seats were assigned.
+ */
+export interface ApportionmentResult {
+  final_standing: PoliticalGroupSeatAssignment[];
+  quota: Fraction;
+  seats: number;
+  steps: ApportionmentStep[];
+}
+
+/**
+ * Records the details for a specific remainder seat, and how the standing is
+once that remainder seat was assigned
+ */
+export interface ApportionmentStep {
+  change: AssignedSeat;
+  rest_seat_number: number;
+  standing: PoliticalGroupStanding[];
+}
+
+/**
+ * Records the political group and specific change for a specific remainder seat
+ */
+export type AssignedSeat =
+  | (HighestAverageAssignedSeat & { assigned_by: "HighestAverage" })
+  | (HighestSurplusAssignedSeat & { assigned_by: "HighestSurplus" });
+
+/**
  * Candidate
  */
 export interface Candidate {
@@ -150,10 +181,6 @@ export type DataEntryStatusName =
   | "second_entry_in_progress"
   | "entries_different"
   | "definitive";
-
-export interface Definitive {
-  finished_at: string;
-}
 
 /**
  * Differences counts, part of the polling station results.
@@ -244,11 +271,6 @@ export interface ElectionStatusResponseEntry {
   status: DataEntryStatusName;
 }
 
-export interface EntriesDifferent {
-  first_entry: PollingStationResults;
-  second_entry: PollingStationResults;
-}
-
 /**
  * Error reference used to show the corresponding error message to the end-user
  */
@@ -285,10 +307,13 @@ export interface ErrorResponse {
   reference: ErrorReference;
 }
 
-export interface FirstEntryInProgress {
-  client_state: unknown;
-  first_entry: PollingStationResults;
-  progress: number;
+/**
+ * Fraction with the integer part split out for display purposes
+ */
+export interface Fraction {
+  denominator: number;
+  integer: number;
+  numerator: number;
 }
 
 /**
@@ -300,6 +325,24 @@ export interface GetDataEntryResponse {
   progress: number;
   updated_at: string;
   validation_results: ValidationResults;
+}
+
+/**
+ * Contains the details for an assigned seat, assigned through the highest average method.
+ */
+export interface HighestAverageAssignedSeat {
+  pg_options: number[];
+  selected_pg_number: number;
+  votes_per_seat: Fraction;
+}
+
+/**
+ * Contains the details for an assigned seat, assigned through the highest surplus method.
+ */
+export interface HighestSurplusAssignedSeat {
+  pg_options: number[];
+  selected_pg_number: number;
+  surplus_votes: Fraction;
 }
 
 export interface LoginResponse {
@@ -314,6 +357,35 @@ export interface PoliticalGroup {
   candidates: Candidate[];
   name: string;
   number: number;
+}
+
+/**
+ * Contains information about the final assignment of seats for a specific
+political group.
+ */
+export interface PoliticalGroupSeatAssignment {
+  meets_surplus_threshold: boolean;
+  pg_number: number;
+  rest_seats: number;
+  surplus_votes: Fraction;
+  total_seats: number;
+  votes_cast: number;
+  whole_seats: number;
+}
+
+/**
+ * Contains the standing for a specific political group. This is all the
+information that is needed to compute the apportionment for that specific
+political group.
+ */
+export interface PoliticalGroupStanding {
+  meets_surplus_threshold: boolean;
+  next_votes_per_seat: Fraction;
+  pg_number: number;
+  rest_seats: number;
+  surplus_votes: Fraction;
+  votes_cast: number;
+  whole_seats: number;
 }
 
 export interface PoliticalGroupVotes {
@@ -385,19 +457,6 @@ export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
-}
-
-export interface SecondEntryInProgress {
-  client_state: unknown;
-  finalised_first_entry: PollingStationResults;
-  first_entry_finished_at: string;
-  progress: number;
-  second_entry: PollingStationResults;
-}
-
-export interface SecondEntryNotStarted {
-  finalised_first_entry: PollingStationResults;
-  first_entry_finished_at: string;
 }
 
 export interface ValidationResult {

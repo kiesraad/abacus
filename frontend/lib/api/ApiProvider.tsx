@@ -1,14 +1,23 @@
-import * as React from "react";
+import { ReactNode } from "react";
 
+import { ApiState } from "./api.types";
 import { ApiClient } from "./ApiClient";
 import { ApiProviderContext } from "./ApiProviderContext";
+import useSessionState from "./useSessionState";
 
 export interface ApiProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function ApiProvider({ children }: ApiProviderProps) {
   const client = new ApiClient();
+  const { user, setUser } = useSessionState();
 
-  return <ApiProviderContext.Provider value={client}>{children}</ApiProviderContext.Provider>;
+  const apiState: ApiState = {
+    client,
+    user,
+    setUser,
+  };
+
+  return <ApiProviderContext.Provider value={apiState}>{children}</ApiProviderContext.Provider>;
 }

@@ -94,6 +94,11 @@ export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
 export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
+// /api/user/change-password
+export type CHANGE_PASSWORD_REQUEST_PARAMS = Record<string, never>;
+export type CHANGE_PASSWORD_REQUEST_PATH = `/api/user/change-password`;
+export type CHANGE_PASSWORD_REQUEST_BODY = ChangePasswordRequest;
+
 // /api/user/login
 export type LOGIN_REQUEST_PARAMS = Record<string, never>;
 export type LOGIN_REQUEST_PATH = `/api/user/login`;
@@ -102,6 +107,10 @@ export type LOGIN_REQUEST_BODY = Credentials;
 // /api/user/logout
 export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
 export type LOGOUT_REQUEST_PATH = `/api/user/logout`;
+
+// /api/user/whoami
+export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
+export type WHOAMI_REQUEST_PATH = `/api/user/whoami`;
 
 /** TYPES **/
 
@@ -158,6 +167,12 @@ export type CandidateGender = "Male" | "Female" | "X";
 export interface CandidateVotes {
   number: number;
   votes: number;
+}
+
+export interface ChangePasswordRequest {
+  new_password: string;
+  password: string;
+  username: string;
 }
 
 export interface Credentials {

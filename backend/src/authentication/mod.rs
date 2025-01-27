@@ -92,6 +92,66 @@ pub async fn login(
     Ok((updated_jar, Json(LoginResponse::from(&user))))
 }
 
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct ChangePasswordRequest {
+    username: String,
+    password: String,
+    new_password: String,
+}
+
+/// Change password endpoint, updates a user password
+#[utoipa::path(
+  get,
+  path = "/api/user/whoami",
+  responses(
+      (status = 200, description = "The current user name and id", body = LoginResponse),
+      (status = 401, description = "Invalid user session", body = ErrorResponse),
+      (status = 500, description = "Internal server error", body = ErrorResponse),
+  ),
+)]
+pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
+    let user = user.ok_or(AuthenticationError::UserNotFound)?;
+
+    Ok(Json(LoginResponse::from(&user)))
+}
+
+/// Change password endpoint, updates a user password
+#[utoipa::path(
+  post,
+  path = "/api/user/change-password",
+  request_body = ChangePasswordRequest,
+  responses(
+      (status = 200, description = "The current user name and id", body = LoginResponse),
+      (status = 401, description = "Invalid credentials", body = ErrorResponse),
+      (status = 500, description = "Internal server error", body = ErrorResponse),
+  ),
+)]
+pub async fn change_password(
+    State(users): State<Users>,
+    user: User,
+    Json(credentials): Json<ChangePasswordRequest>,
+) -> Result<impl IntoResponse, APIError> {
+    if user.username() != credentials.username {
+        return Err(AuthenticationError::UserNotFound.into());
+    }
+
+    // Check the username + password combination
+    let authenticated = users
+        .authenticate(&credentials.username, &credentials.password)
+        .await?;
+
+    if authenticated.id() != user.id() {
+        return Err(AuthenticationError::InvalidPassword.into());
+    }
+
+    // Update the password
+    users
+        .update_password(user.id(), &credentials.new_password)
+        .await?;
+
+    Ok(Json(LoginResponse::from(&user)))
+}
+
 /// Logout endpoint, deletes the session cookie
 #[utoipa::path(
     post,
@@ -126,6 +186,7 @@ pub async fn logout(
 #[utoipa::path(
   post,
   path = "/api/user/development/create",
+  request_body = Credentials,
   responses(
       (status = 201, description = "User was successfully created"),
       (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -146,7 +207,7 @@ pub async fn development_create_user(
 /// Development endpoint: login as a user (unauthenticated)
 #[cfg(debug_assertions)]
 #[utoipa::path(
-  post,
+  get,
   path = "/api/user/development/login",
   responses(
     (status = 200, description = "The logged in user id and user name", body = LoginResponse),
@@ -196,7 +257,9 @@ mod tests {
 
         let router = Router::new()
             .route("/api/user/login", post(login))
-            .route("/api/user/logout", post(logout));
+            .route("/api/user/logout", post(logout))
+            .route("/api/user/whoami", get(whoami))
+            .route("/api/user/change-password", post(change_password));
 
         #[cfg(debug_assertions)]
         let router = router
@@ -335,8 +398,98 @@ mod tests {
         assert_eq!(response.status(), 200);
     }
 
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_whoami(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/login")
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        serde_json::to_vec(&Credentials {
+                            username: "user".to_string(),
+                            password: "password".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+
+        let cookie = response
+            .headers()
+            .get("set-cookie")
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: LoginResponse = serde_json::from_slice(&body).unwrap();
+
+        assert_eq!(result.user_id, 1);
+        assert_eq!(result.username, "user");
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/user/whoami")
+                    .header("cookie", &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: LoginResponse = serde_json::from_slice(&body).unwrap();
+
+        assert_eq!(result.user_id, 1);
+        assert_eq!(result.username, "user");
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/logout")
+                    .header("cookie", &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/whoami")
+                    .header("cookie", &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 405);
+    }
+
     #[cfg(debug_assertions)]
-    #[sqlx::test]
+    #[test(sqlx::test)]
     async fn test_development_create_user(pool: SqlitePool) {
         let app = create_app(pool);
 
@@ -385,7 +538,7 @@ mod tests {
     }
 
     #[cfg(debug_assertions)]
-    #[sqlx::test]
+    #[test(sqlx::test)]
     async fn test_development_login(pool: SqlitePool) {
         let app = create_app(pool);
 
@@ -408,5 +561,147 @@ mod tests {
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
 
         assert_eq!(result.username, "user");
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_update_password(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/login")
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        serde_json::to_vec(&Credentials {
+                            username: "user".to_string(),
+                            password: "password".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+        assert!(response.headers().get("set-cookie").is_some());
+
+        let cookie = response
+            .headers()
+            .get("set-cookie")
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
+
+        // Call the change password endpoint
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/change-password")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header("cookie", &cookie)
+                    .body(Body::from(
+                        serde_json::to_vec(&ChangePasswordRequest {
+                            username: "user".to_string(),
+                            password: "password".to_string(),
+                            new_password: "new_password".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: LoginResponse = serde_json::from_slice(&body).unwrap();
+
+        assert_eq!(result.username, "user");
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/login")
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        serde_json::to_vec(&Credentials {
+                            username: "user".to_string(),
+                            password: "new_password".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_update_password_fail(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/login")
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        serde_json::to_vec(&Credentials {
+                            username: "user".to_string(),
+                            password: "password".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+        assert!(response.headers().get("set-cookie").is_some());
+
+        let cookie = response
+            .headers()
+            .get("set-cookie")
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
+
+        // Call the change password endpoint
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/change-password")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header("cookie", &cookie)
+                    .body(Body::from(
+                        serde_json::to_vec(&ChangePasswordRequest {
+                            username: "user".to_string(),
+                            password: "wrong_password".to_string(),
+                            new_password: "new_password".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 401);
     }
 }

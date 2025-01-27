@@ -141,6 +141,7 @@ export class ApiClient {
       const response = await fetch(path, {
         method,
         signal: abort?.signal,
+        // credentials: "same-origin",
         ...this.setRequestBodyAndHeaders(requestBody),
       });
 

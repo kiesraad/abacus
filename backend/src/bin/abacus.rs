@@ -1,5 +1,6 @@
 #[cfg(feature = "dev-database")]
-use abacus::{fixtures, router};
+use abacus::fixtures;
+use abacus::router;
 use axum::serve::ListenerExt;
 use clap::Parser;
 use sqlx::{sqlite::SqliteConnectOptions, SqlitePool};

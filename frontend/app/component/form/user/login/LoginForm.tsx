@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 
 import { AnyApiError, FatalError, isError, LOGIN_REQUEST_BODY, LOGIN_REQUEST_PATH, useApi } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { Alert, BottomBar, Button, InputField } from "@kiesraad/ui";
+import { Alert, BottomBar, Button, FormLayout, InputField } from "@kiesraad/ui";
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -41,23 +41,20 @@ export function LoginForm() {
 
   return (
     <>
-      {error && (
-        <Alert
-          type="error"
-          onClose={() => {
-            setError(null);
-          }}
-        >
-          {t(`error.api_error.${error.reference}`)}
-        </Alert>
-      )}
       <form
         className="no_footer"
         onSubmit={(e) => {
           void handleSubmit(e);
         }}
       >
-        <div>
+        <FormLayout>
+          {error && (
+            <FormLayout.Alert>
+              <Alert type="error" margin="mb-lg">
+                <h2>{t(`error.api_error.${error.reference}`)}</h2>
+              </Alert>
+            </FormLayout.Alert>
+          )}
           <InputField
             name="username"
             label={t("user.username")}
@@ -73,7 +70,7 @@ export function LoginForm() {
             readOnly={loading}
             required={true}
           />
-        </div>
+        </FormLayout>
         <BottomBar type="footer">
           <BottomBar.Row>
             <Button type="submit" size="lg" disabled={loading}>

@@ -2,7 +2,7 @@
 
 Doel van dit document is beschrijven welke tooling we voor welke tests gebruiken.
 
-De nadruk in dit document lijkt te liggen op testautomatisering, maar zoals in ons ["Testen en kwaliteit"](./testen-en-kwaliteit.md)-document staat: *"handmatig en automatisch testen gaan samen"*.
+De nadruk in dit document ligt op testautomatisering, maar zoals in ons ["Testen en kwaliteit"](./testen-en-kwaliteit.md)-document staat: *"handmatig en automatisch testen gaan samen"*.
 
 Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet opgenomen in dit document.
 
@@ -10,63 +10,61 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 ## Frontend
 
 ### Frontend "units"
-- Container componenten: zijn verantwoordelijk voor het ophalen en weergave van data, zoals pagina's    
-- Presentational componenten: zijn verantwoordelijk voor het weergeven van data
-- Overige units: bijvoorbeeld API code, utility functies
+- Container componenten: zijn verantwoordelijk voor het ophalen en weergave van data, zoals pagina's.
+- Presentational componenten: zijn verantwoordelijk voor het weergeven van data.
+- Overige units: bijvoorbeeld API code, utility functies.
 
 ### Tooling
 - [eslint][eslint]: Linting
 - [prettier][prettier]: Formatting 
-- [Vitest][vitest]: Test runner 
+- [Vitest][vitest]: Test runner voor alle tests behalve Playwright-tests
 - [Playwright][playwright]: Test framework inclusief runner tegen browser-engine
 - [Mock Service Worker][mock-service-worker]: Mock server
 - [React Testing Library][react-testing-library]: Library voor het testen van React componenten
 - [Ladle][ladle]: Library voor het ontwikkelen en testen van alleenstaande componenten (alternatief voor Storybook)
 
-### Testsoorten
+### Tests voor presentational componenten
 
-Presentational componenten:
-- Ladle met RTL
-- Ladle met Playwright
-
-
-- ... met MSW
-
+Omdat presentational componenten puur de data weergeven die ze krijgen, kunnen ze met ladle getest worden. Ze hebben geen backend of mock server nodig.
 
 ```mermaid
 ---
-title: Ladle Stories
+title: Presentational componenten
 ---
 flowchart LR
     rtl([React Testing Library])
-    ladle-story-1(Ladle Story)
-    ladle-story-2(Ladle Story)
-
     playwright([Playwright])
-    browser([Browser])
-    ladle-dev-server([Ladle dev server])
+    component(Component)
 
-    rtl --> ladle-story-1
+    subgraph ladle-story [Ladle story]
+        component
+    end
 
-    playwright --> ladle-story-2
-    browser --> ladle-story-2
-    ladle-story-2 ---> ladle-dev-server
+    style ladle-story fill:#ececff,stroke:#c5b9de
+
+    rtl --> component
+    playwright --> component
 ```
+Voor de tests met Playwright of een browser, wordt de story geserved door de ladle dev server.
 
 ---
+
+### Tests voor container componenten
+
+Container componenten hebben interacties met de backend voor hun data. Ze hebben dus de backend of een mock server nodig.
 
 ```mermaid
 ---
-title: React elementen
+title: Container componenten
 ---
 flowchart LR
-    react-component(React component)
+    component(Component)
 
     rtl([React Testing Library])
     msw([Mock Service Worker])
 
-    rtl --> react-component
-    react-component ---> msw
+    rtl --> component
+    component --> msw
 ```
 
 ---
@@ -81,31 +79,12 @@ flowchart LR
     rtl([React Testing Library])
     msw([Mock Service Worker])
 
-    rtl ---> fe
+    rtl --> fe
 
     fe --> msw
 ```
 
----
-
-```mermaid
----
-title: Frontend met mocked backend
----
-flowchart LR
-    fe(Frontend)
-
-    browser([Browser])
-    msw([Mock Service Worker])
-
-    browser ---> fe
-
-    subgraph app
-        fe
-    end
-
-    fe --> msw
-```
+Plan is om binnenkort deze tests te vervangen door Playwright tests. ([issue 898](https://github.com/kiesraad/abacus/issues/898))
 
 
 ## Backend
@@ -129,11 +108,9 @@ flowchart LR
 
     api-client([API client])
 
-    api-client ---> be
+    api-client --> be
 
-    subgraph app
-        be -.- db
-    end
+    be --> db
 ```
 
 
@@ -151,12 +128,10 @@ flowchart LR
     db[(Database)]
 
     playwright([Playwright])
-    browser([Browser])
 
-    playwright ---> fe
-    browser ---> fe
+    playwright --> fe
 
-    subgraph app
+    subgraph Abacus
         fe -.- be
         be -.- db
     end

@@ -8,12 +8,14 @@ import { getRouter, Router } from "./router";
 export const Providers = ({
   children,
   router = getRouter(children),
+  initialUser = false,
 }: {
   children?: React.ReactNode;
   router?: Router;
+  initialUser?: boolean;
 }) => {
   return (
-    <ApiProvider>
+    <ApiProvider initialUser={initialUser}>
       <RouterProvider router={router} />
     </ApiProvider>
   );

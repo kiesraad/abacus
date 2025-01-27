@@ -7,11 +7,12 @@ import useSessionState from "./useSessionState";
 
 export interface ApiProviderProps {
   children: ReactNode;
+  initialUser?: boolean;
 }
 
-export function ApiProvider({ children }: ApiProviderProps) {
+export function ApiProvider({ children, initialUser = true }: ApiProviderProps) {
   const client = new ApiClient();
-  const { user, setUser } = useSessionState();
+  const { user, setUser } = useSessionState(initialUser);
 
   const apiState: ApiState = {
     client,

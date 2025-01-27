@@ -1,13 +1,25 @@
+import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { overrideOnce, render, screen, waitFor } from "@kiesraad/test";
+import { ApiProvider } from "@kiesraad/api";
+import { WhoAmIRequestHandler } from "@kiesraad/api-mocks";
+import { overrideOnce, screen, server, waitFor } from "@kiesraad/test";
 
 import { ChangePasswordForm } from "./ChangePasswordForm";
 
 describe("ChangePasswordForm", () => {
+  beforeEach(() => {
+    server.use(WhoAmIRequestHandler);
+  });
+
   test("Successful change-password", async () => {
-    render(<ChangePasswordForm />);
+    render(
+      <ApiProvider initialUser={true}>
+        <ChangePasswordForm />
+      </ApiProvider>,
+    );
+
     let requestBody: object | null = null;
 
     overrideOnce(
@@ -26,6 +38,10 @@ describe("ChangePasswordForm", () => {
 
     const user = userEvent.setup();
 
+    await waitFor(() => {
+      expect(screen.getByText("Wachtwoord")).toBeVisible();
+    });
+
     const password = screen.getByLabelText("Wachtwoord");
     await user.type(password, "password");
     const newPassword = screen.getByLabelText("Kies nieuw wachtwoord");
@@ -37,12 +53,16 @@ describe("ChangePasswordForm", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(requestBody).toStrictEqual({ password: "password", newPassword: "password_new" });
+      expect(requestBody).toStrictEqual({ username: "user", password: "password", new_password: "password_new" });
     });
   });
 
   test("Unsuccessful change-password", async () => {
-    render(<ChangePasswordForm />);
+    render(
+      <ApiProvider initialUser={true}>
+        <ChangePasswordForm />
+      </ApiProvider>,
+    );
 
     overrideOnce("post", "/api/user/change-password", 401, {
       error: "Invalid username and/or password",
@@ -51,6 +71,10 @@ describe("ChangePasswordForm", () => {
     });
 
     const user = userEvent.setup();
+
+    await waitFor(() => {
+      expect(screen.getByText("Wachtwoord")).toBeVisible();
+    });
 
     const password = screen.getByLabelText("Wachtwoord");
     await user.type(password, "password-wrong");

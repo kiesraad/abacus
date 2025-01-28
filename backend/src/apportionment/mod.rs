@@ -470,7 +470,6 @@ pub struct HighestSurplusAssignedSeat {
 }
 
 /// Errors that can occur during apportionment
-// TODO: integrate this with the application-wide error.rs once the apportionment functionality is finished
 #[derive(Debug, PartialEq)]
 pub enum ApportionmentError {
     DrawingOfLotsNotImplemented,

@@ -1,7 +1,7 @@
 #[cfg(feature = "dev-database")]
+use axum::http::StatusCode; // this import needs to be separate because it's only needed for dev-database
 use axum::{
     extract::{Path, State},
-    http::StatusCode,
     response::{IntoResponse, Response},
     Json,
 };

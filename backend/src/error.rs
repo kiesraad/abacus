@@ -23,6 +23,7 @@ use zip::result::ZipError;
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub enum ErrorReference {
+    DrawingOfLotsRequired,
     EntryNumberNotSupported,
     EntryNotFound,
     PollingStationFirstEntryAlreadyFinalised,
@@ -45,7 +46,6 @@ pub enum ErrorReference {
     InvalidPoliticalGroup,
     InvalidUsernamePassword,
     InvalidSession,
-    DrawingOfLotsRequired,
 }
 
 /// Response structure for errors

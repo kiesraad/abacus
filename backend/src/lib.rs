@@ -1,6 +1,7 @@
+#[cfg(feature = "dev-database")]
+use axum::http::StatusCode; // this import needs to be separate because it's only needed for dev-database
 use axum::{
     extract::FromRef,
-    http::StatusCode,
     routing::{get, post},
     Router,
 };

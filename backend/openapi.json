@@ -1666,6 +1666,7 @@
         "type": "string",
         "description": "Error reference used to show the corresponding error message to the end-user",
         "enum": [
+          "DrawingOfLotsRequired",
           "EntryNumberNotSupported",
           "EntryNotFound",
           "PollingStationFirstEntryAlreadyFinalised",
@@ -1687,8 +1688,7 @@
           "PollingStationValidationErrors",
           "InvalidPoliticalGroup",
           "InvalidUsernamePassword",
-          "InvalidSession",
-          "DrawingOfLotsRequired"
+          "InvalidSession"
         ]
       },
       "ErrorResponse": {

@@ -13,7 +13,7 @@ export function useDataEntryContext(form?: FormSectionReference): DataEntryState
   // register the current form
   const register = context.register;
   useEffect(() => {
-    if (form && context.currentForm.id !== form.id) {
+    if (form && context.formState.current !== form.id) {
       register(form);
     }
   }, [form, register]);

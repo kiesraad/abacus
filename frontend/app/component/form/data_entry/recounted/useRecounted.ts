@@ -14,12 +14,13 @@ export function useRecounted() {
     type: "recounted",
   });
 
-  // derived state
-  const { errors, warnings, isSaved } = formState.sections.recounted;
-  const hasValidationError = errors.length > 0;
 
   // local state
   const [recounted, setRecounted] = useState<boolean | undefined>(pollingStationResults.recounted);
+
+  // derived state
+  const { errors, warnings, isSaved } = formState.sections.recounted;
+  const hasValidationError = errors.length > 0;
 
   // submit and save to form contents
   const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {

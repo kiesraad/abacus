@@ -2,6 +2,7 @@ import { Dispatch } from "react";
 
 import { AnyApiError, Election, GetDataEntryResponse, PollingStationResults, ValidationResult } from "@kiesraad/api";
 
+
 export interface DataEntryState {
   // state from providers
   election: Required<Election>;
@@ -17,7 +18,6 @@ export interface DataEntryState {
   // state of the forms excl. data
   formState: FormState;
   targetFormSectionId: FormSectionId | null;
-
   status: Status;
 
   cache: TemporaryCache | null;

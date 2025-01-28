@@ -16,11 +16,11 @@ const client = new ApiClient();
 export function ApiProvider({ children, initialUser = true }: ApiProviderProps) {
   const { user, setUser } = useSessionState(initialUser);
 
-  // Unset the current user when the API returns a 401,
+  // Unset the current user when the API returns a an invalid session error
   // indicating that the sessions has expired or the user is not authenticated anymore
   useEffect(() => {
     const callback = (error: ApiError) => {
-      if (error.code === 401 && user) {
+      if (error.reference === "InvalidSession" && user) {
         setUser(null);
       }
     };

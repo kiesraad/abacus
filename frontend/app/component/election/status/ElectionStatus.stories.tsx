@@ -26,8 +26,9 @@ export const PollingStationStatus: Story<StoryProps> = ({ navigate }) => (
       },
       {
         polling_station_id: 4,
-        status: "first_entry_in_progress",
-        first_data_entry_progress: 40,
+        status: "second_entry_in_progress",
+        first_data_entry_progress: 100,
+        second_data_entry_progress: 20,
       },
     ]}
     election={mockElection}
@@ -38,32 +39,6 @@ export const PollingStationStatus: Story<StoryProps> = ({ navigate }) => (
 
 export const Empty: Story<StoryProps> = ({ navigate }) => (
   <ElectionStatus statuses={[]} election={mockElection} pollingStations={[]} navigate={navigate} />
-);
-
-export const InProgress: Story<StoryProps> = ({ navigate }) => (
-  <ElectionStatus
-    statuses={[
-      {
-        polling_station_id: 1,
-        status: "first_entry_not_started",
-      },
-      {
-        polling_station_id: 2,
-        status: "first_entry_not_started",
-      },
-      {
-        polling_station_id: 3,
-        status: "first_entry_in_progress",
-      },
-      {
-        polling_station_id: 4,
-        status: "first_entry_in_progress",
-      },
-    ]}
-    election={mockElection}
-    pollingStations={mockPollingStations}
-    navigate={navigate}
-  />
 );
 
 export default {

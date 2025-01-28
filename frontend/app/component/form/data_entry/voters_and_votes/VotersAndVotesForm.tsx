@@ -24,19 +24,13 @@ export function VotersAndVotesForm() {
     pollingStationResults,
     currentValues,
     setValues,
-    errors,
-    hasValidationError,
-    warnings,
-    hasValidationWarning,
-    isSaving,
-    isSaved,
-    hasChanges,
-    acceptWarnings,
+    formSection,
+    status,
     setAcceptWarnings,
-    showAcceptWarnings,
-    warningsWarning,
     defaultProps,
   } = useVotersAndVotes();
+
+  const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
 
   return (
     <Form
@@ -51,14 +45,14 @@ export function VotersAndVotesForm() {
       <PollingStationFormNavigation
         onSubmit={onSubmit}
         currentValues={formValuesToValues(currentValues, pollingStationResults.recounted || false)}
-        hasChanges={hasChanges}
-        acceptWarnings={acceptWarnings}
+        hasChanges={formSection.hasChanges}
+        acceptWarnings={formSection.acceptWarnings}
       />
-      {isSaved && hasValidationError && (
-        <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />
+      {formSection.isSaved && formSection.errors.length > 0 && (
+        <Feedback id="feedback-error" type="error" data={formSection.errors.map((error) => error.code)} />
       )}
-      {isSaved && hasValidationWarning && !hasValidationError && (
-        <Feedback id="feedback-warning" type="warning" data={warnings.map((warning) => warning.code)} />
+      {formSection.isSaved && formSection.warnings.length > 0 && formSection.errors.length === 0 && (
+        <Feedback id="feedback-warning" type="warning" data={formSection.warnings.map((warning) => warning.code)} />
       )}
       <InputGrid key="voters-and-votes">
         <InputGrid.Header>
@@ -255,7 +249,7 @@ export function VotersAndVotesForm() {
         )}
       </InputGrid>
       <BottomBar type="input-grid">
-        {warningsWarning && (
+        {formSection.acceptWarningsError && (
           <BottomBar.Row>
             <Alert type="error" variant="small">
               <p>{t("voters_and_votes.continue_after_check")}</p>
@@ -266,8 +260,8 @@ export function VotersAndVotesForm() {
           <BottomBar.Row>
             <Checkbox
               id="voters_and_votes_form_accept_warnings"
-              checked={acceptWarnings}
-              hasError={warningsWarning}
+              checked={formSection.acceptWarnings}
+              hasError={formSection.acceptWarningsError}
               onChange={(e) => {
                 setAcceptWarnings(e.target.checked);
               }}
@@ -276,7 +270,7 @@ export function VotersAndVotesForm() {
           </BottomBar.Row>
         )}
         <BottomBar.Row>
-          <Button type="submit" size="lg" disabled={isSaving}>
+          <Button type="submit" size="lg" disabled={status === "saving"}>
             {t("next")}
           </Button>
           <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />

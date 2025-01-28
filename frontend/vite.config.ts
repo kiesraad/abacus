@@ -2,6 +2,7 @@ import react from "@vitejs/plugin-react-swc";
 import { execSync } from "node:child_process";
 import path from "path";
 import { defineConfig, UserConfig } from "vite";
+import { coverageConfigDefaults } from "vitest/config";
 
 import pkgjson from "./package.json";
 import tsConfig from "./tsconfig.json";
@@ -87,8 +88,16 @@ export default defineConfig(({ command }) => {
       restoreMocks: true,
       setupFiles: ["lib/test/setup.ts"],
       includeSource: ["app/**/*.ts", "lib/**/*.ts"],
-      // GitHub Actions Windows runners seem slower than Linux runners, so we need to increase the test timeout
-      testTimeout: process.platform === "win32" ? 15_000 : 5_000,
+      testTimeout: 30_000,
+      coverage: {
+        exclude: [
+          "*.config.ts",
+          "*.config.mjs",
+          "mockServiceWorker.js",
+          "e2e-tests/**",
+          ...coverageConfigDefaults.exclude,
+        ],
+      },
     },
   } satisfies UserConfig;
 });

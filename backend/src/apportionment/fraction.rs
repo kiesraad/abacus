@@ -1,4 +1,3 @@
-use crate::data_entry::Count;
 use serde::{Deserialize, Serialize};
 use std::{
     cmp::Ordering,
@@ -10,8 +9,10 @@ use utoipa::{
     PartialSchema, ToSchema,
 };
 
+use crate::data_entry::Count;
+
 #[derive(Clone, Copy, Serialize, Deserialize)]
-#[serde(into = "DisplayFraction")]
+#[serde(into = "DisplayFraction", from = "DisplayFraction")]
 pub struct Fraction {
     numerator: u64,
     denominator: u64,
@@ -157,7 +158,7 @@ impl PartialEq for DisplayFraction {
 }
 
 /// Fraction with the integer part split out for display purposes
-#[derive(Clone, Copy, Debug, Serialize, ToSchema)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, ToSchema)]
 #[schema(as = Fraction)]
 pub struct DisplayFraction {
     integer: u64,
@@ -172,6 +173,16 @@ impl From<Fraction> for DisplayFraction {
             integer: fraction.integer_part(),
             numerator: remainder.numerator,
             denominator: remainder.denominator,
+        }
+    }
+}
+
+impl From<DisplayFraction> for Fraction {
+    fn from(display_fraction: DisplayFraction) -> Self {
+        Self {
+            numerator: display_fraction.numerator
+                + display_fraction.integer * display_fraction.denominator,
+            denominator: display_fraction.denominator,
         }
     }
 }

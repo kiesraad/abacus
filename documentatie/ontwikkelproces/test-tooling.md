@@ -23,9 +23,9 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 - [React Testing Library][react-testing-library]: Library voor het testen van React componenten
 - [Ladle][ladle]: Library voor het ontwikkelen en testen van alleenstaande componenten (alternatief voor Storybook)
 
-### Tests voor presentational componenten
+### Tests voor presentatiecomponenten
 
-Omdat presentational componenten puur de data weergeven die ze krijgen, kunnen ze met ladle getest worden. Ze hebben geen backend of mock server nodig.
+Omdat presentatiecomponenten puur de data weergeven die ze krijgen, kunnen ze met ladle getest worden. Ze hebben geen backend of mock server nodig.
 
 ```mermaid
 ---
@@ -49,9 +49,9 @@ Voor de tests met Playwright of een browser, wordt de story geserved door de lad
 
 ---
 
-### Tests voor container componenten
+### Tests voor containercomponenten
 
-Container componenten hebben interacties met de backend voor hun data. Ze hebben dus de backend of een mock server nodig.
+Containercomponenten hebben interacties met de backend voor hun data. Ze hebben dus de backend of een mock server nodig.
 
 ```mermaid
 ---

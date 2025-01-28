@@ -3,7 +3,7 @@
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 
-use backend::router;
+use abacus::router;
 use sqlx::SqlitePool;
 
 pub async fn serve_api(pool: SqlitePool) -> SocketAddr {

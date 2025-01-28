@@ -3,6 +3,40 @@
 version = 3
 
 [[package]]
+name = "abacus"
+version = "0.1.0"
+dependencies = [
+ "argon2",
+ "axum",
+ "axum-extra",
+ "chrono",
+ "clap",
+ "cookie",
+ "http-body-util",
+ "hyper",
+ "memory-serve",
+ "password-hash",
+ "quick-xml 0.37.2",
+ "rand",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2",
+ "sqlx",
+ "test-log",
+ "tokio",
+ "tower",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "typst",
+ "typst-pdf",
+ "utoipa",
+ "utoipa-swagger-ui",
+ "zip",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -292,40 +326,6 @@ name = "az"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7b7e4c2464d97fe331d41de9d5db0def0a96f4d823b8b32a2efd503578988973"
-
-[[package]]
-name = "backend"
-version = "0.1.0"
-dependencies = [
- "argon2",
- "axum",
- "axum-extra",
- "chrono",
- "clap",
- "cookie",
- "http-body-util",
- "hyper",
- "memory-serve",
- "password-hash",
- "quick-xml 0.37.2",
- "rand",
- "reqwest",
- "serde",
- "serde_json",
- "sha2",
- "sqlx",
- "test-log",
- "tokio",
- "tower",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "typst",
- "typst-pdf",
- "utoipa",
- "utoipa-swagger-ui",
- "zip",
-]
 
 [[package]]
 name = "backtrace"
@@ -1837,9 +1837,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve"
-version = "1.0.0-beta.3"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e6d9acc9a1da61ff1cddd3c9e301d43986e4f9af3a9ac5380dbeb8ffec52320"
+checksum = "7a5c5f94a459669238bba6da44e04fea410d4b0607657af995fad73a53b559c4"
 dependencies = [
  "axum",
  "brotli",
@@ -1852,21 +1852,22 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-core"
-version = "1.0.0-beta.3"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "906955122968f374552374cef85ba628bcc0972a692ee09eec95aa4018dfe7b5"
+checksum = "f7a8bbb65a0707483ccfd9371f7eefff331fbd26589032efca782fbe465c8cdb"
 dependencies = [
  "brotli",
  "mime_guess",
  "sha256",
+ "urlencoding",
  "walkdir",
 ]
 
 [[package]]
 name = "memory-serve-macros"
-version = "1.0.0-beta.3"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "799c7dc7710151c7e8c8eb9345d58a548e36d11aacde60b7efebb0e45a9e3ffd"
+checksum = "92a4e0786f71bef7ebb80611af7e8c6184d63da6a3c59ef8223945bc9ef17fbf"
 dependencies = [
  "memory-serve-core",
 ]
@@ -3896,6 +3897,12 @@ dependencies = [
  "percent-encoding",
  "serde",
 ]
+
+[[package]]
+name = "urlencoding"
+version = "2.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
 
 [[package]]
 name = "usvg"

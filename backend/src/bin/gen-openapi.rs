@@ -1,6 +1,6 @@
 use std::fs;
 
-use backend::create_openapi;
+use abacus::create_openapi;
 
 /// Write OpenAPI JSON documentation to `openapi.json`.
 fn main() {

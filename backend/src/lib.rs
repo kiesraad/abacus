@@ -81,6 +81,14 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/login", post(authentication::login))
         .route("/logout", post(authentication::logout));
 
+    #[cfg(debug_assertions)]
+    let user_router = user_router
+        .route(
+            "/development/create",
+            post(authentication::development_create_user),
+        )
+        .route("/development/login", get(authentication::development_login));
+
     let app = Router::new()
         .nest("/api/user", user_router)
         .nest("/api/elections", election_routes)
@@ -154,7 +162,13 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         components(
             schemas(
                 ErrorResponse,
-                data_entry::DataEntry,
+                apportionment::DisplayFraction,
+                apportionment::ApportionmentResult,
+                apportionment::PoliticalGroupStanding,
+                apportionment::ApportionmentStep,
+                apportionment::AssignedSeat,
+                apportionment::HighestAverageAssignedSeat,
+                apportionment::HighestSurplusAssignedSeat,
                 authentication::Credentials,
                 authentication::LoginResponse,
                 data_entry::CandidateVotes,
@@ -163,7 +177,6 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 data_entry::GetDataEntryResponse,
                 data_entry::DifferencesCounts,
                 data_entry::PoliticalGroupVotes,
-                data_entry::status::DataEntryStatus,
                 data_entry::status::DataEntryStatusName,
                 data_entry::PollingStationResults,
                 data_entry::VotersCounts,

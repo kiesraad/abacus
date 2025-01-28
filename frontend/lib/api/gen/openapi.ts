@@ -299,6 +299,7 @@ export interface ElectionSummary {
  * Error reference used to show the corresponding error message to the end-user
  */
 export type ErrorReference =
+  | "DrawingOfLotsRequired"
   | "EntryNumberNotSupported"
   | "EntryNotFound"
   | "PollingStationFirstEntryAlreadyFinalised"
@@ -320,8 +321,7 @@ export type ErrorReference =
   | "PollingStationValidationErrors"
   | "InvalidPoliticalGroup"
   | "InvalidUsernamePassword"
-  | "InvalidSession"
-  | "DrawingOfLotsRequired";
+  | "InvalidSession";
 
 /**
  * Response structure for errors

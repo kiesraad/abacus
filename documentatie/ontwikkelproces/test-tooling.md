@@ -10,8 +10,8 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 ## Frontend
 
 ### Frontend "units"
-- Container componenten: zijn verantwoordelijk voor het ophalen en weergave van data, zoals pagina's.
-- Presentational componenten: zijn verantwoordelijk voor het weergeven van data.
+- Containercomponenten: zijn verantwoordelijk voor het ophalen en weergave van data, zoals pagina's.
+- Presentatiecomponenten: zijn verantwoordelijk voor het weergeven van data.
 - Overige units: bijvoorbeeld API code, utility functies.
 
 ### Tooling
@@ -29,7 +29,7 @@ Omdat presentational componenten puur de data weergeven die ze krijgen, kunnen z
 
 ```mermaid
 ---
-title: Presentational componenten
+title: Presentatiecomponenten
 ---
 flowchart LR
     rtl([React Testing Library])
@@ -55,7 +55,7 @@ Container componenten hebben interacties met de backend voor hun data. Ze hebben
 
 ```mermaid
 ---
-title: Container componenten
+title: Containercomponenten
 ---
 flowchart LR
     component(Component)

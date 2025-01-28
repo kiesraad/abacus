@@ -8,8 +8,8 @@
   },
   "scripts": {
     "dev": "cross-env API_MODE=mock vite",
-    "dev:server": "cross-env API_MODE=local vite",
-    "build": "cross-env API_MODE=local vite build",
+    "dev:server": "vite",
+    "build": "vite build",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
     "lint": "tsc && cross-env ESLINT_ENV=production ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettier": "prettier --ignore-unknown --write .",
@@ -30,7 +30,6 @@
   "dependencies": {
     "@vitejs/plugin-react-swc": "^3.7.2",
     "autoprefixer": "^10.4.20",
-    "cross-env": "^7.0.3",
     "postcss": "^8.5.1",
     "postcss-import": "^16.1.0",
     "postcss-nesting": "^13.0.1",
@@ -52,6 +51,7 @@
     "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.21.0",
+    "cross-env": "^7.0.3",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-import-resolver-typescript": "^3.7.0",

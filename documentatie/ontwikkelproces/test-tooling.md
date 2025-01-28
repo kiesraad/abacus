@@ -10,7 +10,7 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 ## Frontend
 
 ### Frontend "units"
-- Containercomponenten: zijn verantwoordelijk voor het ophalen en weergave van data, zoals pagina's.
+- Containercomponenten: zijn verantwoordelijk voor het ophalen en weergeven van data, zoals pagina's.
 - Presentatiecomponenten: zijn verantwoordelijk voor het weergeven van data.
 - Overige units: bijvoorbeeld API code, utility functies.
 
@@ -25,7 +25,7 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 
 ### Tests voor presentatiecomponenten
 
-Omdat presentatiecomponenten puur de data weergeven die ze krijgen, kunnen ze met ladle getest worden. Ze hebben geen backend of mock server nodig.
+Omdat presentatiecomponenten puur de data weergeven die ze krijgen, kunnen ze met Ladle getest worden. Ze hebben geen backend of mock server nodig.
 
 ```mermaid
 ---

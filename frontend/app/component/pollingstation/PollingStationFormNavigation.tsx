@@ -23,17 +23,8 @@ export function PollingStationFormNavigation({
   acceptWarnings,
   hasChanges,
 }: PollingStationFormNavigationProps) {
-  const {
-    status,
-    election,
-    pollingStationId,
-    formState,
-    error,
-    currentForm,
-    setCache,
-    entryNumber,
-    onDeleteDataEntry,
-  } = useDataEntryContext();
+  const { status, election, pollingStationId, formState, error, setCache, entryNumber, onDeleteDataEntry } =
+    useDataEntryContext();
 
   const navigate = useNavigate();
 
@@ -62,7 +53,7 @@ export function PollingStationFormNavigation({
     }
 
     const reasons: BlockReason[] = [];
-    const formSection = formState.sections[currentForm.id];
+    const formSection = formState.sections[formState.current];
     if (formSection) {
       if (formSection.errors.length > 0) {
         reasons.push("errors");
@@ -81,7 +72,7 @@ export function PollingStationFormNavigation({
     if (reasons.includes("changes")) {
       if (formState.current === formState.furthest) {
         setCache({
-          key: currentForm.id,
+          key: formState.current,
           data: currentValues,
         });
 
@@ -129,7 +120,7 @@ export function PollingStationFormNavigation({
     if (blocker.state === "blocked") {
       if (await onSubmit({ continueToNextSection: false })) {
         blocker.proceed();
-      } else{
+      } else {
         blocker.reset();
       }
     }
@@ -150,7 +141,12 @@ export function PollingStationFormNavigation({
       {blocker.state === "blocked" && (
         <>
           {!isPartOfDataEntryFlow(blocker.location.pathname) ? (
-            <Modal title={t("data_entry.abort.title")} onClose={() => { blocker.reset(); }}>
+            <Modal
+              title={t("data_entry.abort.title")}
+              onClose={() => {
+                blocker.reset();
+              }}
+            >
               {tx("data_entry.abort.description")}
               <nav>
                 <Button
@@ -190,7 +186,12 @@ export function PollingStationFormNavigation({
               </p>
               <p>{t("polling_station.save_changes")}</p>
               <nav>
-                <Button size="lg" onClick={() => { void onSave(); }}>
+                <Button
+                  size="lg"
+                  onClick={() => {
+                    void onSave();
+                  }}
+                >
                   {t("save_changes")}
                 </Button>
                 <Button

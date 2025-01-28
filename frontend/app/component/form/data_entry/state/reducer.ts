@@ -17,14 +17,13 @@ export function getInitialState(
   return {
     election,
     pollingStationId,
-    initialData: null,
+    // initialData: null,
     error: null,
     pollingStationResults: null,
     entryNumber,
     formState: getInitialFormState(election),
     targetFormSectionId: INITIAL_FORM_SECTION_ID,
     status: "idle",
-    currentForm: INITIAL_FORM_SECTION_REFERENCE,
     cache: null,
   };
 }
@@ -45,7 +44,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
           ...state,
           formState,
           targetFormSectionId,
-          initialData: action.dataEntry,
+          // initialData: action.dataEntry,
           pollingStationResults: action.dataEntry.data,
           error: null,
         };
@@ -55,7 +54,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         ...state,
         formState: getInitialFormState(state.election),
         targetFormSectionId: INITIAL_FORM_SECTION_ID,
-        initialData: action.dataEntry,
+        // initialData: action.dataEntry,
         pollingStationResults: action.dataEntry.data,
         error: null,
       };
@@ -104,31 +103,23 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         targetFormSectionId: null,
       };
     case "REGISTER_CURRENT_FORM":
-      if (state.currentForm !== null && action.form.id !== state.currentForm.id) {
-        return {
-          ...state,
-          formState: {
-            ...state.formState,
-            current: action.form.id,
-            sections: {
-              ...state.formState.sections,
-              ...(state.formState.sections[state.formState.current]
-                ? {
-                    [state.formState.current]: {
-                      ...state.formState.sections[state.formState.current],
-                      isSubmitted: false,
-                    },
-                  }
-                : {}),
-            },
-          },
-          currentForm: action.form,
-        };
-      }
-
       return {
         ...state,
-        currentForm: action.form,
+        formState: {
+          ...state.formState,
+          current: action.form.id,
+          sections: {
+            ...state.formState.sections,
+            ...(state.formState.sections[state.formState.current]
+              ? {
+                  [state.formState.current]: {
+                    ...state.formState.sections[state.formState.current],
+                    isSubmitted: false,
+                  },
+                }
+              : {}),
+          },
+        },
       };
     default:
       console.error("Unknown action", action);

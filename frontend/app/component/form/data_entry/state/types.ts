@@ -3,16 +3,23 @@ import { Dispatch } from "react";
 import { AnyApiError, Election, GetDataEntryResponse, PollingStationResults, ValidationResult } from "@kiesraad/api";
 
 export interface DataEntryState {
+  // state from providers
   election: Required<Election>;
   pollingStationId: number;
-  initialData: GetDataEntryResponse | null;
+  entryNumber: number;
+
+  // api error objects
   error: AnyApiError | null;
+
+  // backend data structure
   pollingStationResults: PollingStationResults | null;
+
+  // state of the forms excl. data
   formState: FormState;
   targetFormSectionId: FormSectionId | null;
+
   status: Status;
-  entryNumber: number;
-  currentForm: FormSectionReference;
+
   cache: TemporaryCache | null;
 }
 

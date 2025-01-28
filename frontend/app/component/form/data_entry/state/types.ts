@@ -1,7 +1,13 @@
 import { Dispatch } from "react";
 
-import { AnyApiError, Election, GetDataEntryResponse, PollingStationResults, ValidationResult } from "@kiesraad/api";
-
+import {
+  AnyApiError,
+  Election,
+  GetDataEntryResponse,
+  PollingStationResults,
+  ValidationResult,
+  ValidationResults,
+} from "@kiesraad/api";
 
 export interface DataEntryState {
   // state from providers
@@ -30,6 +36,7 @@ export interface DataEntryStateAndActions extends DataEntryState {
   onFinaliseDataEntry: () => Promise<boolean>;
   register: (form: FormSectionReference) => void;
   setCache: (cache: TemporaryCache) => void;
+  updateFormSection: (partialFormSection: Partial<FormSection>) => void;
 }
 
 export interface DataEntryStateAndActionsLoaded extends DataEntryStateAndActions {
@@ -61,7 +68,8 @@ export type DataEntryAction =
   | {
       type: "FORM_SAVED";
       data: PollingStationResults;
-      formState: FormState;
+      validationResults: ValidationResults;
+      aborting: boolean;
       continueToNextSection: boolean;
     }
   | {
@@ -71,6 +79,10 @@ export type DataEntryAction =
   | {
       type: "SET_CACHE";
       cache: TemporaryCache;
+    }
+  | {
+      type: "UPDATE_FORM_SECTION";
+      partialFormSection: Partial<FormSection>;
     }
   | {
       type: "RESET_TARGET_FORM_SECTION";
@@ -156,9 +168,11 @@ export type FormSection = {
   index: number; //fixate the order of filling in sections
   id: FormSectionId;
   title?: string;
+  hasChanges: boolean;
   isSaved: boolean; //whether this section has been sent to the server
   isSubmitted?: boolean; //whether this section has been submitted in the latest request
   acceptWarnings: boolean;
+  acceptWarningsError: boolean;
   errors: ValidationResult[];
   warnings: ValidationResult[];
 };

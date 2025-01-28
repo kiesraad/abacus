@@ -7,8 +7,15 @@ import {
   SaveDataEntryResponse,
 } from "@kiesraad/api";
 
-import { calculateDataEntryProgress, getClientState, updateFormStateAfterSubmit } from "./dataEntryUtils";
-import { DataEntryDispatch, DataEntryState, FormSectionReference, SubmitCurrentFormOptions, TemporaryCache } from "./types";
+import { calculateDataEntryProgress, getClientState } from "./dataEntryUtils";
+import {
+  DataEntryDispatch,
+  DataEntryState,
+  FormSection,
+  FormSectionReference,
+  SubmitCurrentFormOptions,
+  TemporaryCache,
+} from "./types";
 
 export function registerForm(dispatch: DataEntryDispatch) {
   return (form: FormSectionReference) => {
@@ -22,6 +29,12 @@ export function setCache(dispatch: DataEntryDispatch) {
   };
 }
 
+export function updateFormSection(dispatch: DataEntryDispatch) {
+  return (partialFormSection: Partial<FormSection>) => {
+    dispatch({ type: "UPDATE_FORM_SECTION", partialFormSection });
+  };
+}
+
 export function onSubmitForm(
   client: ApiClient,
   requestPath: string,
@@ -29,16 +42,27 @@ export function onSubmitForm(
   state: DataEntryState,
 ) {
   return async (
-    data: Partial<PollingStationResults>,
-    { acceptWarnings = false, aborting = false, continueToNextSection = true }: SubmitCurrentFormOptions = {},
+    partialPollingStationResults: Partial<PollingStationResults>,
+    { aborting = false, continueToNextSection = true }: SubmitCurrentFormOptions = {},
   ): Promise<boolean> => {
-    const newValues: PollingStationResults = {
-      ...state.pollingStationResults!,
-      ...data,
+    const currentSection = state.formState.sections[state.formState.current];
+
+    if (!currentSection || !state.pollingStationResults) {
+      return false;
+    }
+
+    if (currentSection.errors.length === 0 && currentSection.warnings.length > 0 && !currentSection.acceptWarnings) {
+      dispatch({ type: "UPDATE_FORM_SECTION", partialFormSection: { acceptWarningsError: true } });
+      return false;
+    }
+
+    const data: PollingStationResults = {
+      ...state.pollingStationResults,
+      ...partialPollingStationResults,
     };
 
     // prepare data to send to server
-    const clientState = getClientState(state.formState, acceptWarnings, continueToNextSection);
+    const clientState = getClientState(state.formState, currentSection.acceptWarnings, continueToNextSection);
     const progress = calculateDataEntryProgress(state.formState);
 
     // send data to server
@@ -46,7 +70,7 @@ export function onSubmitForm(
 
     const response: ApiResult<SaveDataEntryResponse> = await client.postRequest(requestPath, {
       progress,
-      data: newValues,
+      data,
       client_state: clientState,
     } satisfies DataEntry);
 
@@ -60,13 +84,9 @@ export function onSubmitForm(
 
     dispatch({
       type: "FORM_SAVED",
-      data: newValues,
-      formState: updateFormStateAfterSubmit(
-        state.formState,
-        response.data.validation_results,
-        acceptWarnings,
-        !aborting,
-      ),
+      data,
+      validationResults: response.data.validation_results,
+      aborting: aborting,
       continueToNextSection,
     });
 

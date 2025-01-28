@@ -1,10 +1,19 @@
+import { useReducer } from "react";
+
 import { Election, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH, useApi } from "@kiesraad/api";
-import { onDeleteDataEntry, onFinaliseDataEntry, onSubmitForm, registerForm, setCache } from "./actions";
+
+import {
+  onDeleteDataEntry,
+  onFinaliseDataEntry,
+  onSubmitForm,
+  registerForm,
+  setCache,
+  updateFormSection,
+} from "./actions";
 import dataEntryReducer, { getInitialState } from "./reducer";
 import { DataEntryStateAndActions } from "./types";
-import { useInitialDataEntryState } from "./useInitialDataEntryState";
 import useDataEntryNavigation from "./useDataEntryNavigation";
-import { useReducer } from "react";
+import { useInitialDataEntryState } from "./useInitialDataEntryState";
 
 export default function useDataEntry(
   election: Required<Election>,
@@ -28,6 +37,7 @@ export default function useDataEntry(
     onDeleteDataEntry: onDeleteDataEntry(client, requestPath, dispatch),
     onFinaliseDataEntry: onFinaliseDataEntry(client, requestPath, dispatch),
     register: registerForm(dispatch),
-    setCache: setCache(dispatch),
+    setCache: setCache(dispatch), // TODO naar FormSection?
+    updateFormSection: updateFormSection(dispatch),
   };
 }

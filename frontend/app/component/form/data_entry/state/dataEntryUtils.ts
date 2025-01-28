@@ -406,7 +406,6 @@ export function buildFormState(
 export function updateFormStateAfterSubmit(
   formState: FormState,
   validationResults: ValidationResults,
-  acceptWarnings: boolean,
   continueToNextSection: boolean = false,
 ): FormState {
   resetFormSectionState(formState);
@@ -419,7 +418,9 @@ export function updateFormStateAfterSubmit(
     //store that this section has been submitted, this resets on each request
     currentFormSection.isSubmitted = saved;
     //flag ignore warnings
-    currentFormSection.acceptWarnings = acceptWarnings;
+    currentFormSection.acceptWarnings = false;
+    // There are no changes after a successful submit
+    currentFormSection.hasChanges = false;
   }
 
   //distribute errors and warnings to sections

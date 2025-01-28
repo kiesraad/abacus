@@ -1,6 +1,12 @@
 import { Election } from "@kiesraad/api";
 
-import { buildFormState, getInitialFormState, getInitialValues, getNextSectionID } from "./dataEntryUtils";
+import {
+  buildFormState,
+  getInitialFormState,
+  getInitialValues,
+  getNextSectionID,
+  updateFormStateAfterSubmit,
+} from "./dataEntryUtils";
 import { ClientState, DataEntryAction, DataEntryState, FormSectionId, FormSectionReference } from "./types";
 
 export const INITIAL_FORM_SECTION_ID: FormSectionId = "recounted";
@@ -80,23 +86,41 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         ...state,
         cache: action.cache,
       };
+    case "UPDATE_FORM_SECTION":
+      return {
+        ...state,
+        formState: {
+          ...state.formState,
+          sections: {
+            ...state.formState.sections,
+            [state.formState.current]: {
+              ...state.formState.sections[state.formState.current],
+              ...action.partialFormSection,
+            },
+          },
+        },
+      };
     case "FORM_SAVE_FAILED":
       return {
         ...state,
         status: "idle",
         error: action.error,
       };
-    case "FORM_SAVED":
+    case "FORM_SAVED": {
+      const formState = updateFormStateAfterSubmit(
+        state.formState,
+        action.validationResults,
+        action.continueToNextSection,
+      );
       return {
         ...state,
         status: "idle",
         error: null,
         pollingStationResults: action.data,
-        formState: action.formState,
-        targetFormSectionId: action.continueToNextSection
-          ? getNextSectionID(action.formState)
-          : state.targetFormSectionId,
+        formState,
+        targetFormSectionId: action.continueToNextSection ? getNextSectionID(formState) : state.targetFormSectionId,
       };
+    }
     case "RESET_TARGET_FORM_SECTION":
       return {
         ...state,

@@ -143,6 +143,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         paths(
             authentication::login,
             authentication::logout,
+            authentication::list,
             election::election_list,
             election::election_create,
             election::election_details,
@@ -172,6 +173,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 apportionment::HighestSurplusAssignedSeat,
                 authentication::Credentials,
                 authentication::LoginResponse,
+                authentication::UserListResponse,
                 data_entry::CandidateVotes,
                 data_entry::DataEntry,
                 data_entry::SaveDataEntryResponse,

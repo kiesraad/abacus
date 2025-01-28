@@ -1,3 +1,10 @@
+use axum::{
+    extract::{Path, State},
+    Json,
+};
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use crate::{
     apportionment::{seat_allocation, ApportionmentResult},
     data_entry::repository::PollingStationResultsEntries,
@@ -6,12 +13,6 @@ use crate::{
     summary::ElectionSummary,
     APIError, ErrorResponse,
 };
-use axum::{
-    extract::{Path, State},
-    Json,
-};
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 /// Election details response, including the election's candidate list (political groups) and its polling stations
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -51,5 +52,3 @@ pub async fn election_apportionment(
         election_summary,
     }))
 }
-
-// TODO: Add tests

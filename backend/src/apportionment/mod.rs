@@ -1,7 +1,8 @@
-use crate::{data_entry::PoliticalGroupVotes, summary::ElectionSummary};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 use utoipa::ToSchema;
+
+use crate::{data_entry::PoliticalGroupVotes, summary::ElectionSummary};
 
 pub use self::api::*;
 pub use self::fraction::*;
@@ -15,10 +16,10 @@ mod fraction;
 /// number of seats per political group that was assigned after all seats were assigned.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApportionmentResult {
-    seats: u64,
-    quota: Fraction,
-    steps: Vec<ApportionmentStep>,
-    final_standing: Vec<PoliticalGroupSeatAssignment>,
+    pub seats: u64,
+    pub quota: Fraction,
+    pub steps: Vec<ApportionmentStep>,
+    pub final_standing: Vec<PoliticalGroupSeatAssignment>,
 }
 
 /// Contains information about the final assignment of seats for a specific political group.
@@ -37,7 +38,7 @@ pub struct PoliticalGroupSeatAssignment {
     /// The number of rest seats assigned to this group
     rest_seats: u64,
     /// The total number of seats assigned to this group
-    total_seats: u64,
+    pub total_seats: u64,
 }
 
 impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
@@ -480,10 +481,20 @@ fn political_group_numbers(standing: &[&PoliticalGroupStanding]) -> Vec<u8> {
     standing.iter().map(|s| s.pg_number).collect()
 }
 
+pub fn get_total_seats_from_apportionment_result(result: ApportionmentResult) -> Vec<u64> {
+    result
+        .final_standing
+        .iter()
+        .map(|p| p.total_seats)
+        .collect::<Vec<_>>()
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{
-        apportionment::{seat_allocation, ApportionmentError, ApportionmentResult},
+        apportionment::{
+            get_total_seats_from_apportionment_result, seat_allocation, ApportionmentError,
+        },
         data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts},
         summary::{ElectionSummary, SummaryDifferencesCounts},
     };
@@ -518,19 +529,11 @@ mod tests {
         }
     }
 
-    fn get_total_seats(result: ApportionmentResult) -> Vec<u64> {
-        result
-            .final_standing
-            .iter()
-            .map(|p| p.total_seats)
-            .collect::<Vec<_>>()
-    }
-
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_system() {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 60, 40]);
         let result = seat_allocation(15, &totals).unwrap();
-        let total_seats = get_total_seats(result);
+        let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
     }
 
@@ -539,7 +542,7 @@ mod tests {
     ) {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
         let result = seat_allocation(15, &totals).unwrap();
-        let total_seats = get_total_seats(result);
+        let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
     }
 
@@ -548,7 +551,7 @@ mod tests {
     ) {
         let totals = get_election_summary(vec![560, 160, 160, 80, 80, 80, 40, 40]);
         let result = seat_allocation(15, &totals).unwrap();
-        let total_seats = get_total_seats(result);
+        let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
     }
 
@@ -563,7 +566,7 @@ mod tests {
     fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
         let totals = get_election_summary(vec![600, 302, 98, 99, 101]);
         let result = seat_allocation(23, &totals).unwrap();
-        let total_seats = get_total_seats(result);
+        let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
     }
 

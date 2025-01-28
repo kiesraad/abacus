@@ -1,5 +1,7 @@
 #![cfg(test)]
 
+use axum::http::StatusCode;
+use reqwest::Client;
 use std::net::SocketAddr;
 
 use abacus::data_entry::{
@@ -7,7 +9,6 @@ use abacus::data_entry::{
     CandidateVotes, DataEntry, DifferencesCounts, ElectionStatusResponse, PoliticalGroupVotes,
     PollingStationResults, SaveDataEntryResponse, VotersCounts, VotesCounts,
 };
-use hyper::StatusCode;
 
 // example data entry for an election with one party with two candidates
 pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
@@ -77,12 +78,18 @@ pub async fn create_and_save_data_entry(
     polling_station_id: u32,
     entry_number: u32,
     client_state: Option<&str>,
+    data_entry: Option<DataEntry>,
 ) {
-    let request_body = example_data_entry(client_state);
+    let request_body: DataEntry;
+    if let Some(data_entry) = data_entry {
+        request_body = data_entry;
+    } else {
+        request_body = example_data_entry(client_state);
+    }
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}"
     );
-    let response = reqwest::Client::new()
+    let response = Client::new()
         .post(&url)
         .json(&request_body)
         .send()
@@ -90,11 +97,7 @@ pub async fn create_and_save_data_entry(
         .unwrap();
 
     // Ensure the response is what we expect
-    let status = response.status();
-    if status != StatusCode::OK {
-        println!("Response body: {:?}", &response.text().await.unwrap());
-        panic!("Unexpected response status: {:?}", status);
-    }
+    assert_eq!(response.status(), StatusCode::OK);
     let validation_results: SaveDataEntryResponse = response.json().await.unwrap();
     assert_eq!(validation_results.validation_results.errors.len(), 0);
     assert_eq!(validation_results.validation_results.warnings.len(), 0);
@@ -104,26 +107,31 @@ pub async fn create_and_finalise_data_entry(
     addr: &SocketAddr,
     polling_station_id: u32,
     entry_number: u32,
+    data_entry: Option<DataEntry>,
 ) {
-    create_and_save_data_entry(addr, polling_station_id, entry_number, None).await;
+    create_and_save_data_entry(addr, polling_station_id, entry_number, None, data_entry).await;
 
     // Finalise the data entry
     let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise");
-    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let response = Client::new().post(&url).send().await.unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
 }
 
-pub async fn create_result(addr: &SocketAddr, polling_station_id: u32) {
-    create_and_finalise_data_entry(addr, polling_station_id, 1).await;
-    create_and_finalise_data_entry(addr, polling_station_id, 2).await;
+pub async fn create_result(
+    addr: &SocketAddr,
+    polling_station_id: u32,
+    election_id: u32,
+    data_entry: Option<DataEntry>,
+) {
+    create_and_finalise_data_entry(addr, polling_station_id, 1, data_entry.clone()).await;
+    create_and_finalise_data_entry(addr, polling_station_id, 2, data_entry.clone()).await;
 
     // check that data entry status for this polling station is now Definitive
-    let url = format!("http://{addr}/api/elections/2/status");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    let status = response.status();
-    assert_eq!(status, StatusCode::OK);
+    let url = format!("http://{addr}/api/elections/{election_id}/status");
+    let response = Client::new().get(&url).send().await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionStatusResponse = response.json().await.unwrap();
     assert_eq!(
         body.statuses

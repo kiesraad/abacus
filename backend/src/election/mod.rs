@@ -1,7 +1,7 @@
 #[cfg(feature = "dev-database")]
-use axum::http::StatusCode;
 use axum::{
     extract::{Path, State},
+    http::StatusCode,
     response::{IntoResponse, Response},
     Json,
 };

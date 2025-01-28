@@ -1,7 +1,6 @@
-use axum::{extract::State, response::IntoResponse, Json};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use axum_extra::extract::CookieJar;
 use cookie::{Cookie, SameSite};
-use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use session::Sessions;
 use std::time::Duration;
@@ -231,7 +230,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
         assert!(response.headers().get("set-cookie").is_some());
 
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -263,7 +262,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 401);
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -289,7 +288,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
 
         let cookie = response
             .headers()
@@ -317,7 +316,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
 
         // Logout again, should return 200
         let response = app
@@ -332,7 +331,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[cfg(debug_assertions)]
@@ -360,7 +359,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 201);
+        assert_eq!(response.status(), StatusCode::CREATED);
 
         // test login
         let response = app
@@ -381,7 +380,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[cfg(debug_assertions)]
@@ -401,7 +400,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
         assert!(response.headers().get("set-cookie").is_some());
 
         let body = response.into_body().collect().await.unwrap().to_bytes();

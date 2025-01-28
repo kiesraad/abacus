@@ -1,12 +1,12 @@
 #![cfg(test)]
 
-use crate::{shared::create_result, utils::serve_api};
-#[cfg(feature = "dev-database")]
-use abacus::election::Election;
-use abacus::election::{ElectionDetailsResponse, ElectionListResponse};
-use hyper::StatusCode;
+use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
+
+use crate::{shared::create_result, utils::serve_api};
+#[cfg(feature = "dev-database")]
+use abacus::election::{Election, ElectionDetailsResponse, ElectionListResponse};
 
 pub mod shared;
 pub mod utils;
@@ -19,10 +19,8 @@ async fn test_election_list_works(pool: SqlitePool) {
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
     // Ensure the response is what we expect
-    let status = response.status();
+    assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionListResponse = response.json().await.unwrap();
-    println!("response body: {:?}", &body);
-    assert_eq!(status, StatusCode::OK);
     assert_eq!(body.elections.len(), 2);
 }
 
@@ -34,10 +32,8 @@ async fn test_election_details_works(pool: SqlitePool) {
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
     // Ensure the response is what we expect
-    let status = response.status();
+    assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionDetailsResponse = response.json().await.unwrap();
-    println!("response body: {:?}", &body);
-    assert_eq!(status, StatusCode::OK);
     assert_eq!(body.election.name, "Municipal Election");
     assert_eq!(body.polling_stations.len(), 2);
     assert!(body
@@ -93,8 +89,7 @@ async fn test_election_create_works(pool: SqlitePool) {
         .unwrap();
 
     // Ensure the response is what we expect
-    let status = response.status();
-    assert_eq!(status, StatusCode::CREATED);
+    assert_eq!(response.status(), StatusCode::CREATED);
     let body: Election = response.json().await.unwrap();
     assert_eq!(body.name, "Test Election");
 }
@@ -107,8 +102,7 @@ async fn test_election_details_not_found(pool: SqlitePool) {
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
     // Ensure the response is what we expect
-    let status = response.status();
-    assert_eq!(status, StatusCode::NOT_FOUND);
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
@@ -117,12 +111,11 @@ async fn test_election_pdf_download(pool: SqlitePool) {
 
     let url = format!("http://{addr}/api/elections/2/download_pdf_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    let status = response.status();
     let content_disposition = response.headers().get("Content-Disposition");
     let content_type = response.headers().get("Content-Type");
 
     // Ensure the response is what we expect
-    assert_eq!(status, StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::OK);
     assert_eq!(content_type.unwrap(), "application/pdf");
 
     // Check if the first 21 characters compare
@@ -140,16 +133,15 @@ async fn test_election_pdf_download(pool: SqlitePool) {
 async fn test_election_xml_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    create_result(&addr, 1).await;
-    create_result(&addr, 2).await;
+    create_result(&addr, 1, 2, None).await;
+    create_result(&addr, 2, 2, None).await;
 
     let url = format!("http://{addr}/api/elections/2/download_xml_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    let status = response.status();
     let content_type = response.headers().get("Content-Type");
 
     // Ensure the response is what we expect
-    assert_eq!(status, StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::OK);
     assert_eq!(content_type.unwrap(), "text/xml");
 
     let body = response.text().await.unwrap();
@@ -161,16 +153,15 @@ async fn test_election_xml_download(pool: SqlitePool) {
 async fn test_election_zip_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    create_result(&addr, 1).await;
-    create_result(&addr, 2).await;
+    create_result(&addr, 1, 2, None).await;
+    create_result(&addr, 2, 2, None).await;
 
     let url = format!("http://{addr}/api/elections/2/download_zip_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    let status = response.status();
     let content_disposition = response.headers().get("Content-Disposition");
     let content_type = response.headers().get("Content-Type");
 
-    assert_eq!(status, StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::OK);
     assert_eq!(content_type.unwrap(), "application/zip");
 
     let content_disposition_string = content_disposition.unwrap().to_str().unwrap();

@@ -1,5 +1,6 @@
 use axum::{
     extract::FromRef,
+    http::StatusCode,
     routing::{get, post},
     Router,
 };
@@ -113,7 +114,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             MemoryServe::from_env()
                 .index_file(Some("/index.html"))
                 .fallback(Some("/index.html"))
-                .fallback_status(axum::http::StatusCode::OK)
+                .fallback_status(StatusCode::OK)
                 .into_router(),
         )
     };

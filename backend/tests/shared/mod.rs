@@ -2,7 +2,7 @@
 
 use std::net::SocketAddr;
 
-use backend::data_entry::{
+use abacus::data_entry::{
     status::{ClientState, DataEntryStatusName},
     CandidateVotes, DataEntry, DifferencesCounts, ElectionStatusResponse, PoliticalGroupVotes,
     PollingStationResults, SaveDataEntryResponse, VotersCounts, VotesCounts,

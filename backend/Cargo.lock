@@ -3,6 +3,40 @@
 version = 3
 
 [[package]]
+name = "abacus"
+version = "0.1.0"
+dependencies = [
+ "argon2",
+ "axum",
+ "axum-extra",
+ "chrono",
+ "clap",
+ "cookie",
+ "http-body-util",
+ "hyper",
+ "memory-serve",
+ "password-hash",
+ "quick-xml 0.37.2",
+ "rand",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2",
+ "sqlx",
+ "test-log",
+ "tokio",
+ "tower",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "typst",
+ "typst-pdf",
+ "utoipa",
+ "utoipa-swagger-ui",
+ "zip",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -292,40 +326,6 @@ name = "az"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7b7e4c2464d97fe331d41de9d5db0def0a96f4d823b8b32a2efd503578988973"
-
-[[package]]
-name = "backend"
-version = "0.1.0"
-dependencies = [
- "argon2",
- "axum",
- "axum-extra",
- "chrono",
- "clap",
- "cookie",
- "http-body-util",
- "hyper",
- "memory-serve",
- "password-hash",
- "quick-xml 0.37.2",
- "rand",
- "reqwest",
- "serde",
- "serde_json",
- "sha2",
- "sqlx",
- "test-log",
- "tokio",
- "tower",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "typst",
- "typst-pdf",
- "utoipa",
- "utoipa-swagger-ui",
- "zip",
-]
 
 [[package]]
 name = "backtrace"

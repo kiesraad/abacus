@@ -8,7 +8,7 @@ use crate::{
     shared::{create_and_save_data_entry, create_result},
     utils::serve_api,
 };
-use backend::{
+use abacus::{
     polling_station::{
         PollingStation, PollingStationListResponse, PollingStationRequest, PollingStationType,
     },

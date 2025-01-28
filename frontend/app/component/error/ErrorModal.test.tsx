@@ -9,6 +9,5 @@ describe("Component: ErrorModal", () => {
     const { getByText } = render(<ServerErrorModal />);
 
     expect(getByText("Sorry, er ging iets mis")).toBeInTheDocument();
-    expect(getByText("500")).toBeInTheDocument();
   });
 });

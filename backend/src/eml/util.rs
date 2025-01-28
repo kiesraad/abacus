@@ -15,7 +15,7 @@
 ///
 /// ```
 /// mod example {
-///     # use backend::gen_wrap_list;
+///     # use abacus::gen_wrap_list;
 ///     #[derive(serde::Deserialize, serde::Serialize)]
 ///     pub struct Element {}
 ///

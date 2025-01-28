@@ -33,7 +33,9 @@
     "PollingStationRepeated": "Het stembureau is al ingevoerd",
     "PollingStationValidationErrors": "Er zijn fouten opgetreden bij het valideren van het stembureau",
     "InvalidPoliticalGroup": "De politieke partij is niet geldig",
-    "InvalidUsernamePassword": "De gebruikersnaam of het wachtwoord is onjuist",
-    "InvalidSession": "De sessie is ongeldig"
+    "InvalidUsernameOrPassword": "De gebruikersnaam of het wachtwoord is onjuist",
+    "InvalidSession": "De sessie is ongeldig",
+    "InvalidPassword": "Het opgegeven wachtwoord is onjuist",
+    "UserNotFound": "De gebruiker is niet gevonden"
   }
 }

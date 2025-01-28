@@ -75,8 +75,15 @@ pub async fn login(
 ) -> Result<impl IntoResponse, APIError> {
     let Credentials { username, password } = credentials;
 
-    // Check the username + password combination
-    let user = users.authenticate(&username, &password).await?;
+    // Check the username + password combination, do not leak information about usernames etc.
+    let user = users
+        .authenticate(&username, &password)
+        .await
+        .map_err(|e| match e {
+            AuthenticationError::UserNotFound => AuthenticationError::InvalidUsernameOrPassword,
+            AuthenticationError::InvalidPassword => AuthenticationError::InvalidUsernameOrPassword,
+            e => e,
+        })?;
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
     sessions.delete_expired_sessions().await?;
@@ -99,7 +106,7 @@ pub struct ChangePasswordRequest {
     new_password: String,
 }
 
-/// Change password endpoint, updates a user password
+/// Get current logged-in user endpoint
 #[utoipa::path(
   get,
   path = "/api/user/whoami",

@@ -1110,7 +1110,7 @@
         "tags": [
           "authentication"
         ],
-        "summary": "Change password endpoint, updates a user password",
+        "summary": "Get current logged-in user endpoint",
         "operationId": "whoami",
         "responses": {
           "200": {
@@ -1657,28 +1657,30 @@
         "type": "string",
         "description": "Error reference used to show the corresponding error message to the end-user",
         "enum": [
-          "EntryNumberNotSupported",
+          "DatabaseError",
           "EntryNotFound",
+          "EntryNotUnique",
+          "EntryNumberNotSupported",
+          "InternalServerError",
+          "InvalidData",
+          "InvalidDataEntryNumber",
+          "InvalidJson",
+          "InvalidPassword",
+          "InvalidPoliticalGroup",
+          "InvalidSession",
+          "InvalidStateTransition",
+          "InvalidUsernameOrPassword",
+          "InvalidVoteCandidate",
+          "InvalidVoteGroup",
+          "PdfGenerationError",
+          "PollingStationDataValidation",
           "PollingStationFirstEntryAlreadyFinalised",
           "PollingStationFirstEntryNotFinalised",
-          "PollingStationSecondEntryAlreadyFinalised",
-          "PollingStationResultsAlreadyFinalised",
-          "PollingStationDataValidation",
-          "InvalidVoteGroup",
-          "InvalidVoteCandidate",
-          "InvalidData",
-          "InvalidJson",
-          "InvalidDataEntryNumber",
-          "InvalidStateTransition",
-          "EntryNotUnique",
-          "DatabaseError",
-          "InternalServerError",
-          "PdfGenerationError",
           "PollingStationRepeated",
+          "PollingStationResultsAlreadyFinalised",
+          "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
-          "InvalidPoliticalGroup",
-          "InvalidUsernamePassword",
-          "InvalidSession"
+          "UserNotFound"
         ]
       },
       "ErrorResponse": {

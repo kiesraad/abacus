@@ -290,28 +290,30 @@ export interface ElectionStatusResponseEntry {
  * Error reference used to show the corresponding error message to the end-user
  */
 export type ErrorReference =
-  | "EntryNumberNotSupported"
+  | "DatabaseError"
   | "EntryNotFound"
+  | "EntryNotUnique"
+  | "EntryNumberNotSupported"
+  | "InternalServerError"
+  | "InvalidData"
+  | "InvalidDataEntryNumber"
+  | "InvalidJson"
+  | "InvalidPassword"
+  | "InvalidPoliticalGroup"
+  | "InvalidSession"
+  | "InvalidStateTransition"
+  | "InvalidUsernameOrPassword"
+  | "InvalidVoteCandidate"
+  | "InvalidVoteGroup"
+  | "PdfGenerationError"
+  | "PollingStationDataValidation"
   | "PollingStationFirstEntryAlreadyFinalised"
   | "PollingStationFirstEntryNotFinalised"
-  | "PollingStationSecondEntryAlreadyFinalised"
-  | "PollingStationResultsAlreadyFinalised"
-  | "PollingStationDataValidation"
-  | "InvalidVoteGroup"
-  | "InvalidVoteCandidate"
-  | "InvalidData"
-  | "InvalidJson"
-  | "InvalidDataEntryNumber"
-  | "InvalidStateTransition"
-  | "EntryNotUnique"
-  | "DatabaseError"
-  | "InternalServerError"
-  | "PdfGenerationError"
   | "PollingStationRepeated"
+  | "PollingStationResultsAlreadyFinalised"
+  | "PollingStationSecondEntryAlreadyFinalised"
   | "PollingStationValidationErrors"
-  | "InvalidPoliticalGroup"
-  | "InvalidUsernamePassword"
-  | "InvalidSession";
+  | "UserNotFound";
 
 /**
  * Response structure for errors

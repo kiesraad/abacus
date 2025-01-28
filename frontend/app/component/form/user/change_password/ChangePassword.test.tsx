@@ -67,7 +67,7 @@ describe("ChangePasswordForm", () => {
     overrideOnce("post", "/api/user/change-password", 401, {
       error: "Invalid username and/or password",
       fatal: false,
-      reference: "InvalidUsernamePassword",
+      reference: "InvalidPassword",
     });
 
     const user = userEvent.setup();
@@ -87,7 +87,7 @@ describe("ChangePasswordForm", () => {
     await user.click(submitButton);
 
     await waitFor(async () => {
-      expect(await screen.findByText("De gebruikersnaam of het wachtwoord is onjuist")).toBeVisible();
+      expect(await screen.findByText("Het opgegeven wachtwoord is onjuist")).toBeVisible();
     });
   });
 });

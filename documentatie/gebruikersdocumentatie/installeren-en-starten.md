@@ -56,7 +56,9 @@ Open een Command Prompt of Powershell en voer Abacus uit:
 start path\to\binary\abacus-windows-[version].exe --reset-database --seed-data
 ```
 
-Of gebruik de kortere versie van deze opdracht:
+De argumenten zorgen ervoor dat de database wordt gereset en wordt geladen met fixtures. Het is natuurlijk ook mogelijk om Abacus zonder argumenten te starten, maar als je dat doet bevat de app geen data en zie je op de pagina het bericht *'Verkiezingen niet gevonden'*.
+
+De kortere versie van deze opdracht is:
 
 ```sh
 start path\to\binary\abacus-windows-[version].exe -rs
@@ -105,7 +107,9 @@ Zie ook de [help](#help).
 start path\to\binary\abacus.exe --reset-database --seed-data
 ```
 
-Of gebruik de kortere versie:
+De argumenten zorgen ervoor dat de database wordt gereset en wordt geladen met fixtures. Het is natuurlijk ook mogelijk om Abacus zonder argumenten te starten, maar als je dat doet bevat de app geen data en zie je op de pagina het bericht *'Verkiezingen niet gevonden'*.
+
+De kortere versie van deze opdracht is:
 
 ```sh
 start path\to\binary\abacus.exe -rs

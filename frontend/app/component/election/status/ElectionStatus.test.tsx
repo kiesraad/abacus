@@ -4,7 +4,7 @@ import { render, screen, within } from "@kiesraad/test";
 
 import { Empty, PollingStationStatus } from "./ElectionStatus.stories";
 
-describe("ElectionStatusPage", () => {
+describe("ElectionStatus", () => {
   test("Render status of polling station data entries correctly", async () => {
     const navigate = vi.fn();
     render(<PollingStationStatus navigate={navigate} />);
@@ -54,10 +54,11 @@ describe("ElectionStatusPage", () => {
     expect(inProgressRows[1]).toHaveTextContent(/35/);
     expect(inProgressRows[1]).toHaveTextContent(/Testschool/);
     expect(inProgressRows[1]).toHaveTextContent(/1e invoer/);
+    expect(within(inProgressRows[1] as HTMLElement).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "60");
     expect(inProgressRows[2]).toHaveTextContent(/36/);
     expect(inProgressRows[2]).toHaveTextContent(/Testbuurthuis/);
-    expect(inProgressRows[2]).toHaveTextContent(/1e invoer/);
-    expect(within(inProgressRows[2] as HTMLElement).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "40");
+    expect(inProgressRows[2]).toHaveTextContent(/2e invoer/);
+    expect(within(inProgressRows[2] as HTMLElement).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "20");
 
     expect(tables[1]).toContain(screen.getByRole("heading", { level: 3, name: "Eerste invoer klaar (1)" }));
     const firstEntryFinishedTable = within(tables[1] as HTMLElement).getByTestId("first_entry_finished");

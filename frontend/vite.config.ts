@@ -3,7 +3,6 @@ import react from "@vitejs/plugin-react-swc";
 import { execSync } from "node:child_process";
 import path from "path";
 import { defineConfig, UserConfig } from "vite";
-import { coverageConfigDefaults } from "vitest/config";
 
 import pkgjson from "./package.json";
 import tsConfig from "./tsconfig.json";
@@ -89,22 +88,6 @@ export default defineConfig(({ command }) => {
           target: apiHost,
           changeOrigin: true,
         },
-      },
-    },
-    test: {
-      environment: "jsdom",
-      restoreMocks: true,
-      setupFiles: ["lib/test/setup.ts"],
-      includeSource: ["app/**/*.ts", "lib/**/*.ts"],
-      testTimeout: 30_000,
-      coverage: {
-        exclude: [
-          "*.config.ts",
-          "*.config.mjs",
-          "mockServiceWorker.js",
-          "e2e-tests/**",
-          ...coverageConfigDefaults.exclude,
-        ],
       },
     },
   } satisfies UserConfig;

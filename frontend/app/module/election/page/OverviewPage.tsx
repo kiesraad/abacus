@@ -1,12 +1,13 @@
-import { Link, To, useLocation, useNavigate } from "react-router";
+import { To, useLocation, useNavigate } from "react-router";
 
 import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
 import { Footer } from "app/component/footer/Footer";
-import { NavBar } from "app/component/navbar/NavBar";
 
 import { Election, useElectionList } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, PageTitle, Table, WorkStationNumber } from "@kiesraad/ui";
+
+import { NavBar } from "../../../component/navbar/NavBar";
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -14,11 +15,11 @@ export function OverviewPage() {
   const { electionList } = useElectionList();
 
   const isNewAccount = location.hash === "#new-account";
-  const isAdministrator = location.hash.includes("administrator");
+  const isAdminOrCoordinator = location.hash.includes("administrator") || location.hash.includes("coordinator");
 
   function electionLink(election: Election): To {
-    if (isAdministrator) {
-      return `/elections/${election.id}#coordinator`;
+    if (isAdminOrCoordinator) {
+      return `/elections/${election.id}#administratorcoordinator`;
     } else {
       return `/elections/${election.id}/data-entry`;
     }
@@ -31,23 +32,12 @@ export function OverviewPage() {
   return (
     <>
       <PageTitle title={`${t("election.title.overview")} - Abacus`} />
-      <NavBar>
-        <span className={isAdministrator ? "active" : ""}>
-          {isAdministrator ? t("election.title.plural") : t("overview")}
-        </span>
-        {isAdministrator && (
-          <>
-            <Link to={"/users#administratorcoordinator"}>{t("users")}</Link>
-            <Link to={"/workstations#administrator"}>{t("workstations.workstations")}</Link>
-            <Link to={"/logs#administratorcoordinator"}>{t("logs")}</Link>
-          </>
-        )}
-      </NavBar>
+      <NavBar />
       <header>
         <section>
-          <h1>{isAdministrator ? t("election.manage") : t("election.title.plural")}</h1>
+          <h1>{isAdminOrCoordinator ? t("election.manage") : t("election.title.plural")}</h1>
         </section>
-        {!isAdministrator && (
+        {!isAdminOrCoordinator && (
           <section>
             <WorkStationNumber>16</WorkStationNumber>
           </section>
@@ -65,7 +55,7 @@ export function OverviewPage() {
             <Table.Header>
               <Table.Column>{t("election.title.singular")}</Table.Column>
               <Table.Column>
-                {!isAdministrator ? t("election.location") : t("election.level_polling_station")}
+                {!isAdminOrCoordinator ? t("election.location") : t("election.level_polling_station")}
               </Table.Column>
               <Table.Column>{t("election_status.label")}</Table.Column>
             </Table.Header>
@@ -73,11 +63,11 @@ export function OverviewPage() {
               {electionList.map((election) => (
                 <Table.LinkRow key={election.id} to={electionLink(election)}>
                   <Table.Cell className="fs-body">{election.name}</Table.Cell>
-                  <Table.Cell>{!isAdministrator ? election.location : ""}</Table.Cell>
+                  <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
                   <Table.Cell>
                     <ElectionStatusWithIcon
                       status={election.status}
-                      userRole={isAdministrator ? "coordinator" : "typist"}
+                      userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
                     />
                   </Table.Cell>
                 </Table.LinkRow>

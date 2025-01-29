@@ -4,8 +4,6 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 
 import { ApiProvider } from "@kiesraad/api";
 
-// ignore in prod
-import { startMockAPI } from "./msw-mock-api";
 import { routes } from "./routes";
 
 const rootDiv = document.getElementById("root");
@@ -29,8 +27,17 @@ function render() {
 }
 
 if (__API_MSW__) {
-  startMockAPI()
-    .then(render)
+  // import msw-mock-api here instead of at the top of the file,
+  // so that we only use MSW in development and don't need it in production
+  import("./msw-mock-api")
+    .then((mockAPI) =>
+      mockAPI
+        .startMockAPI()
+        .then(render)
+        .catch((e: unknown) => {
+          console.error(e);
+        }),
+    )
     .catch((e: unknown) => {
       console.error(e);
     });

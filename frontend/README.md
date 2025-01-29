@@ -78,7 +78,7 @@ Prerequisites:
 
 - [Node](https://nodejs.org) v22
 
-Install npm dependencies, skippping development dependencies:
+Install npm dependencies, skipping development dependencies:
 
 ```sh
 npm clean-install --omit=dev
@@ -106,6 +106,7 @@ The application uses the following dependencies:
 
 #### Development dependencies
 
+- `typescript`: Strongly typed layer on top of JavaScript
 - `msw`: Mock Service Worker for mocking the server, client side
 - `ladle`: simple development and test environment for UI components
 - `lefthook`: git hook automation

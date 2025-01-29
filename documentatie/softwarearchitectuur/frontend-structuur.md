@@ -17,7 +17,7 @@
         - `generated.tsx` - generated icon components
     - `test/` - Vitest/RTL test setup and utils
         - `Providers.tsx` - Provider with real ApiProvider for Vitest/RTL tests
-        - `router.ts` - getRouter() for Vitest/RTL tests
+        - `router.tsx` - getRouter() for Vitest/RTL tests
         - `server.ts` - Mock server setup for Vitest/RTL tests, overrideOnce()
         - `setup.ts` - vitest/RTL setup
         - `test-utils.ts` - customRender with providers, setupTestRouter, reusable functions

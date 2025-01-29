@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "cross-env API_MODE=mock vite",
     "dev:server": "vite",
-    "build": "vite build",
+    "build": "vite build --config vite-prod.config.ts",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
     "lint": "tsc && cross-env ESLINT_ENV=production ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettier": "prettier --ignore-unknown --write .",
@@ -28,8 +28,6 @@
     "serve": "npm run build:msw && npx serve dist"
   },
   "dependencies": {
-    "@codecov/vite-plugin": "^1.8.0",
-    "@vitejs/plugin-react-swc": "^3.7.2",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.1",
     "postcss-import": "^16.1.0",
@@ -40,6 +38,7 @@
     "vite": "^6.0.11"
   },
   "devDependencies": {
+    "@codecov/vite-plugin": "^1.8.0",
     "@ladle/react": "^5.0.1",
     "@playwright/test": "^1.50.0",
     "@testing-library/dom": "^10.4.0",
@@ -52,6 +51,7 @@
     "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.21.0",
+    "@vitejs/plugin-react-swc": "^3.7.2",
     "@vitest/coverage-v8": "^3.0.4",
     "cross-env": "^7.0.3",
     "eslint": "^9.19.0",

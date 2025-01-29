@@ -72,6 +72,26 @@ npm run ladle
 
 And open Ladle at http://localhost:61000/.
 
+## Production build
+
+Prerequisites:
+
+- [Node](https://nodejs.org) v22
+
+Install npm dependencies, skippping development dependencies:
+
+```sh
+npm clean-install --omit=dev
+```
+
+Build the frontend:
+
+```sh
+npm run build
+```
+
+The built frontend is located in the `dist` directory.
+
 ## Structure
 
 ### Dependencies
@@ -81,14 +101,13 @@ The application uses the following dependencies:
 - `react`: creating efficient, declarative, and component-based web applications.
 - `react-dom`: DOM implementation for rendering UI
 - `react-router`: Handling browser routing for React applications
+- `vite`: frontend build tool
+- `postcss` and `autoprefixer`: CSS post processors
 
 #### Development dependencies
 
-- `typescript`: Strongly typed layer on top of JavaScript
 - `msw`: Mock Service Worker for mocking the server, client side
-- `vite`: frontend build tool
 - `ladle`: simple development and test environment for UI components
-- `postcss` and `autoprefixer`: CSS post processors
 - `lefthook`: git hook automation
 - `cross-env`: for building on Windows
 

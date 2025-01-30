@@ -1,10 +1,10 @@
 use axum::{extract::State, response::IntoResponse, Json};
 use axum_extra::extract::CookieJar;
+use chrono::TimeDelta;
 use cookie::{Cookie, SameSite};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use session::Sessions;
-use std::time::Duration;
 use user::{ListedUser, User, Users};
 use utoipa::ToSchema;
 
@@ -19,7 +19,7 @@ mod util;
 pub use error::AuthenticationError;
 
 /// Session lifetime, for both cookie and database
-pub const SESSION_LIFE_TIME: Duration = Duration::from_secs(60 * 60 * 2); // 2 hours
+pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 60 * 2); // 2 hours
 
 /// Session cookie name
 pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";

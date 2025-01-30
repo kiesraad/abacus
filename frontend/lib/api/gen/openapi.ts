@@ -350,9 +350,9 @@ export interface HighestSurplusAssignedSeat {
 }
 
 export interface ListedUser {
-  created_at: number;
+  created_at: string;
   id: number;
-  updated_at: number;
+  updated_at: string;
   username: string;
 }
 

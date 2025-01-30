@@ -213,13 +213,11 @@ impl FromRef<AppState> for Users {
 
 #[cfg(test)]
 mod tests {
+    use chrono::{TimeDelta, Utc};
     use sqlx::SqlitePool;
-    use std::time::Duration;
     use test_log::test;
 
-    use crate::authentication::{
-        error::AuthenticationError, session::Sessions, user::Users, util::get_current_unix_time,
-    };
+    use crate::authentication::{error::AuthenticationError, session::Sessions, user::Users};
 
     #[test(sqlx::test)]
     async fn test_create_user(pool: SqlitePool) {
@@ -227,7 +225,7 @@ mod tests {
 
         let user = users.create("test_user", "password").await.unwrap();
 
-        assert!(get_current_unix_time().unwrap() - user.created_at.timestamp() as u64 <= 1);
+        assert!(Utc::now().timestamp() - user.created_at.timestamp() <= 1);
         assert_eq!(user.username, "test_user");
 
         let fetched_user = users.get_by_id(user.id).await.unwrap().unwrap();
@@ -277,7 +275,7 @@ mod tests {
 
         let user = users.create("test_user", "password").await.unwrap();
         let session = sessions
-            .create(user.id, Duration::from_secs(60))
+            .create(user.id, TimeDelta::seconds(60))
             .await
             .unwrap();
 

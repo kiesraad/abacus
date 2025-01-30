@@ -1,5 +1,4 @@
-use std::time::{Duration, SystemTime};
-
+use chrono::{DateTime, TimeDelta, Utc};
 use rand::{distributions::Alphanumeric, Rng};
 
 use super::error::AuthenticationError;
@@ -14,22 +13,11 @@ pub(super) fn create_new_session_key() -> String {
         .collect()
 }
 
-/// Get the current time as a unix timestamp in seconds
-pub(super) fn get_current_unix_time() -> Result<u64, AuthenticationError> {
-    Ok(SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)
-        .map_err(|_| AuthenticationError::BackwardTimeTravel)?
-        .as_secs())
-}
-
 /// Get the time when the session expires as a unix timestamp in seconds
-pub(super) fn get_expires_at(duration: Duration) -> Result<u64, AuthenticationError> {
-    Ok(SystemTime::now()
-        .checked_add(duration)
-        .ok_or(AuthenticationError::InvalidSessionDuration)?
-        .duration_since(SystemTime::UNIX_EPOCH)
-        .map_err(|_| AuthenticationError::BackwardTimeTravel)?
-        .as_secs())
+pub(super) fn get_expires_at(duration: TimeDelta) -> Result<DateTime<Utc>, AuthenticationError> {
+    Utc::now()
+        .checked_add_signed(duration)
+        .ok_or(AuthenticationError::BackwardTimeTravel)
 }
 
 #[cfg(test)]
@@ -47,18 +35,18 @@ mod tests {
 
     #[test]
     fn test_get_current_time() {
-        let current_time = get_current_unix_time().unwrap();
-        let current_time2 = get_current_unix_time().unwrap();
+        let current_time = Utc::now();
+        let current_time2 = Utc::now();
 
         assert!(current_time <= current_time2);
     }
 
     #[test]
     fn test_get_expires_at() {
-        let current_time = get_current_unix_time().unwrap();
-        let expires_at = get_expires_at(Duration::from_secs(60)).unwrap();
+        let current_time = Utc::now();
+        let expires_at = get_expires_at(TimeDelta::seconds(60)).unwrap();
 
         assert!(expires_at > current_time);
-        assert_eq!(expires_at - current_time, 60);
+        assert_eq!((expires_at - current_time).num_seconds(), 60);
     }
 }

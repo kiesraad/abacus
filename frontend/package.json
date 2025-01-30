@@ -8,10 +8,10 @@
   },
   "scripts": {
     "dev": "cross-env API_MODE=mock vite",
-    "dev:server": "cross-env API_MODE=local vite",
-    "build": "tsc && cross-env API_MODE=local vite build",
+    "dev:server": "vite",
+    "build": "vite build --config vite-prod.config.ts",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
-    "lint": "cross-env ESLINT_ENV=production ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "tsc && cross-env ESLINT_ENV=production ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettier": "prettier --ignore-unknown --write .",
     "preview": "vite preview",
     "test": "vitest",
@@ -28,11 +28,17 @@
     "serve": "npm run build:msw && npx serve dist"
   },
   "dependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1",
+    "postcss-import": "^16.1.0",
+    "postcss-nesting": "^13.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router": "^7.1.3"
+    "react-router": "^7.1.3",
+    "vite": "^6.0.11"
   },
   "devDependencies": {
+    "@codecov/vite-plugin": "^1.8.0",
     "@ladle/react": "^5.0.1",
     "@playwright/test": "^1.50.0",
     "@testing-library/dom": "^10.4.0",
@@ -46,7 +52,7 @@
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.21.0",
     "@vitejs/plugin-react-swc": "^3.7.2",
-    "autoprefixer": "^10.4.20",
+    "@vitest/coverage-v8": "^3.0.4",
     "cross-env": "^7.0.3",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
@@ -61,14 +67,10 @@
     "jsdom": "^26.0.0",
     "lefthook": "^1.10.10",
     "msw": "^2.7.0",
-    "postcss": "^8.5.1",
-    "postcss-import": "^16.1.0",
-    "postcss-nesting": "^13.0.1",
     "prettier": "^3.4.2",
     "typescript": "^5.7.3",
-    "vite": "^6.0.11",
-    "vite-node": "^3.0.3",
-    "vitest": "^3.0.3",
+    "vite-node": "^3.0.4",
+    "vitest": "^3.0.4",
     "vitest-fail-on-console": "^0.7.1"
   },
   "msw": {

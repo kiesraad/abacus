@@ -39,6 +39,8 @@
     "playwright.e2e.config.ts",
     "playwright.ladle.config.ts",
     "vite.config.ts",
+    "vite-prod.config.ts",
+    "vitest.config.ts",
     "e2e-tests/**/*"
   ]
 }

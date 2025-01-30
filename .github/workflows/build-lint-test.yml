@@ -9,11 +9,6 @@ on:
     branches:
       - main
 
-env:
-  CARGO_TERM_COLOR: always
-  ASSET_DIR: ${{ github.workspace }}/frontend/dist
-  SQLX_OFFLINE: "true"
-
 jobs:
   backend:
     name: Backend (${{ matrix.target.os }})
@@ -33,6 +28,11 @@ jobs:
     defaults:
       run:
         working-directory: ./backend
+    env:
+      CARGO_TERM_COLOR: always
+      ASSET_DIR: ${{ github.workspace }}/frontend/dist
+      SQLX_OFFLINE: "true"
+      NODE_ENV: production
     steps:
       - uses: actions/checkout@v4
       # Build frontend so that it can be included in the backend build

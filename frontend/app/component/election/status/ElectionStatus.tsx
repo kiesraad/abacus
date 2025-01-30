@@ -209,7 +209,10 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
     <Table.Cell key={`${polling_station.id}-progress`}>
       <ProgressBar
         id={`${polling_station.id}-progressbar`}
-        data={{ percentage: polling_station.first_data_entry_progress ?? 0, class: "default" }}
+        data={{
+          percentage: polling_station.second_data_entry_progress ?? polling_station.first_data_entry_progress ?? 0,
+          class: "default",
+        }}
         showPercentage
       />
     </Table.Cell>

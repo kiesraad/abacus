@@ -9,7 +9,7 @@ use crate::AppState;
 
 use super::{
     error::AuthenticationError,
-    util::{create_new_session_key, get_current_time, get_expires_at},
+    util::{create_new_session_key, get_current_unix_time, get_expires_at},
     SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
 };
 
@@ -27,7 +27,7 @@ impl Session {
     pub(super) fn new(user_id: u32, life_time: Duration) -> Result<Self, AuthenticationError> {
         let session_key = create_new_session_key();
         let expires_at = get_expires_at(life_time)? as i64;
-        let created_at = get_current_time()? as i64;
+        let created_at = get_current_unix_time()? as i64;
 
         Ok(Self {
             session_key,
@@ -130,7 +130,7 @@ impl Sessions {
     /// Delete all sessions that have expired
     pub async fn delete_expired_sessions(&self) -> Result<(), AuthenticationError> {
         sqlx::query("DELETE FROM sessions WHERE expires_at <= ?")
-            .bind(get_current_time()? as i64)
+            .bind(get_current_unix_time()? as i64)
             .execute(&self.0)
             .await?;
 

@@ -15,7 +15,7 @@ pub(super) fn create_new_session_key() -> String {
 }
 
 /// Get the current time as a unix timestamp in seconds
-pub(super) fn get_current_time() -> Result<u64, AuthenticationError> {
+pub(super) fn get_current_unix_time() -> Result<u64, AuthenticationError> {
     Ok(SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
         .map_err(|_| AuthenticationError::BackwardTimeTravel)?
@@ -47,15 +47,15 @@ mod tests {
 
     #[test]
     fn test_get_current_time() {
-        let current_time = get_current_time().unwrap();
-        let current_time2 = get_current_time().unwrap();
+        let current_time = get_current_unix_time().unwrap();
+        let current_time2 = get_current_unix_time().unwrap();
 
         assert!(current_time <= current_time2);
     }
 
     #[test]
     fn test_get_expires_at() {
-        let current_time = get_current_time().unwrap();
+        let current_time = get_current_unix_time().unwrap();
         let expires_at = get_expires_at(Duration::from_secs(60)).unwrap();
 
         assert!(expires_at > current_time);

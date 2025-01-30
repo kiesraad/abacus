@@ -1747,8 +1747,7 @@
         ],
         "properties": {
           "created_at": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string"
           },
           "id": {
             "type": "integer",
@@ -1756,8 +1755,7 @@
             "minimum": 0
           },
           "updated_at": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string"
           },
           "username": {
             "type": "string"

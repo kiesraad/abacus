@@ -3,6 +3,7 @@ use axum::{
     http::request::Parts,
 };
 use axum_extra::extract::CookieJar;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{query_as, Error, FromRow, SqlitePool};
 use utoipa::ToSchema;
@@ -22,8 +23,10 @@ pub struct User {
     id: u32,
     username: String,
     password_hash: String,
-    updated_at: i64,
-    created_at: i64,
+    #[schema(value_type = String)]
+    updated_at: DateTime<Utc>,
+    #[schema(value_type = String)]
+    created_at: DateTime<Utc>,
 }
 
 impl User {
@@ -64,8 +67,10 @@ where
 pub struct ListedUser {
     id: u32,
     username: String,
-    updated_at: i64,
-    created_at: i64,
+    #[schema(value_type = String)]
+    updated_at: DateTime<Utc>,
+    #[schema(value_type = String)]
+    created_at: DateTime<Utc>,
 }
 
 pub struct Users(SqlitePool);
@@ -127,8 +132,8 @@ impl Users {
                 id as "id: u32",
                 username,
                 password_hash,
-                updated_at,
-                created_at
+                updated_at as "updated_at: _",
+                created_at as "created_at: _"
             "#,
             username,
             password_hash
@@ -151,8 +156,8 @@ impl Users {
                 id as "id: u32",
                 username,
                 password_hash,
-                updated_at,
-                created_at
+                updated_at as "updated_at: _",
+                created_at as "created_at: _"
             FROM users WHERE username = ?
             "#,
             username
@@ -172,8 +177,8 @@ impl Users {
                 id as "id: u32",
                 username,
                 password_hash,
-                updated_at,
-                created_at
+                updated_at as "updated_at: _",
+                created_at as "created_at: _"
             FROM users WHERE id = ?
             "#,
             id
@@ -190,8 +195,8 @@ impl Users {
             r#"SELECT
                 id as "id: u32",
                 username,
-                updated_at,
-                created_at
+                updated_at as "updated_at: _",
+                created_at as "created_at: _"
             FROM users"#
         )
         .fetch_all(&self.0)
@@ -213,7 +218,7 @@ mod tests {
     use test_log::test;
 
     use crate::authentication::{
-        error::AuthenticationError, session::Sessions, user::Users, util::get_current_time,
+        error::AuthenticationError, session::Sessions, user::Users, util::get_current_unix_time,
     };
 
     #[test(sqlx::test)]
@@ -222,7 +227,7 @@ mod tests {
 
         let user = users.create("test_user", "password").await.unwrap();
 
-        assert!(get_current_time().unwrap() - user.created_at as u64 <= 1);
+        assert!(get_current_unix_time().unwrap() - user.created_at.timestamp() as u64 <= 1);
         assert_eq!(user.username, "test_user");
 
         let fetched_user = users.get_by_id(user.id).await.unwrap().unwrap();

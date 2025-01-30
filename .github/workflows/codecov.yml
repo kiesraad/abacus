@@ -55,6 +55,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: backend/target/nextest/ci/junit.xml
+          disable_search: true
           fail_ci_if_error: true
       - name: Create code coverage report
         run: cargo llvm-cov report --cobertura --output-path ./target/llvm-cov-target/codecov.json
@@ -62,7 +63,8 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: backend/target/llvm-cov/codecov.json
+          files: backend/target/llvm-cov-target/codecov.json
+          disable_search: true
           fail_ci_if_error: true
 
   frontend:
@@ -88,12 +90,18 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Run tests with coverage
         run: npx vitest run --coverage --reporter=junit --outputFile=test-report.junit.xml
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: frontend/test-report.junit.xml
+          disable_search: true
+          fail_ci_if_error: true
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: frontend/coverage/coverage-final.json
+          disable_search: true
+          fail_ci_if_error: true

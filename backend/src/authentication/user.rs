@@ -99,6 +99,10 @@ where
 pub struct ListedUser {
     id: u32,
     username: String,
+    fullname: Option<String>,
+    role: Role,
+    #[schema(value_type = String)]
+    last_activity_at: DateTime<Utc>,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
@@ -255,6 +259,9 @@ impl Users {
             r#"SELECT
                 id as "id: u32",
                 username,
+                fullname,
+                role,
+                last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
             FROM users"#

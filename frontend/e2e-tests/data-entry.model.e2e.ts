@@ -182,15 +182,8 @@ test.describe("Data entry", () => {
         const abortModal = new AbortInputModal(page);
 
         await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
-
-        await expect(pollingStationChoicePage.fieldset).toBeVisible();
-        await pollingStationChoicePage.pollingStationNumber.fill(pollingStation.number.toString());
-        await expect(pollingStationChoicePage.pollingStationFeedback).toContainText(pollingStation.name);
-        await pollingStationChoicePage.clickStart();
-
-        await expect(recountedPage.fieldset).toBeVisible();
-        await recountedPage.no.check();
-        await recountedPage.next.click();
+        await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
+        await recountedPage.checkNoAndClickNext();
 
         await path.test({
           states: {

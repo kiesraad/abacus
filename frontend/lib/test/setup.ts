@@ -1,8 +1,9 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup, configure } from "@testing-library/react";
-import { afterEach, beforeAll, vi } from "vitest";
+import { afterEach, beforeAll, expect, vi } from "vitest";
 import failOnConsole from "vitest-fail-on-console";
 
+import { matchers } from "./matchers";
 import { server } from "./server";
 
 window.scrollTo = () => {};
@@ -12,6 +13,8 @@ configure({
 });
 
 failOnConsole();
+
+expect.extend(matchers);
 
 beforeAll(() => {
   server.listen({

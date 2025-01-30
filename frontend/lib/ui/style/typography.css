@@ -82,11 +82,11 @@ a {
   }
 
   &:hover {
-    color: var(--link-hover) !important;
+    color: var(--link-hover);
   }
 
   &:active {
-    color: var(--link-active) !important;
+    color: var(--link-active);
   }
 }
 

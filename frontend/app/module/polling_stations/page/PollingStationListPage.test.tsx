@@ -19,30 +19,15 @@ describe("PollingStationListPage", () => {
       </ElectionProvider>,
     );
 
-    expect(await screen.findByRole("table")).toBeVisible();
-
-    const rows = screen.getAllByRole("row");
-    expect(rows.length).toBe(5);
-
-    expect(rows[0]).toHaveTextContent(/Nummer/);
-    expect(rows[0]).toHaveTextContent(/Naam/);
-    expect(rows[0]).toHaveTextContent(/Soort/);
-
-    expect(rows[1]).toHaveTextContent(/33/);
-    expect(rows[1]).toHaveTextContent(/Op Rolletjes/);
-    expect(rows[1]).toHaveTextContent(/Mobiel/);
-
-    expect(rows[2]).toHaveTextContent(/34/);
-    expect(rows[2]).toHaveTextContent(/Testplek/);
-    expect(rows[2]).toHaveTextContent(/Bijzonder/);
-
-    expect(rows[3]).toHaveTextContent(/35/);
-    expect(rows[3]).toHaveTextContent(/Testschool/);
-    expect(rows[3]).toHaveTextContent(/Vaste locatie/);
-
-    expect(rows[4]).toHaveTextContent(/36/);
-    expect(rows[4]).toHaveTextContent(/Testbuurthuis/);
-    expect(rows[4]).toHaveTextContent(/Vaste locatie/);
+    const table = await screen.findByRole("table");
+    expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Nummer", "Naam", "Soort"],
+      ["33", "Op Rolletjes", "Mobiel"],
+      ["34", "Testplek", "Bijzonder"],
+      ["35", "Testschool", "Vaste locatie"],
+      ["36", "Testbuurthuis", "Vaste locatie"],
+    ]);
   });
 
   test("Show no polling stations message", async () => {

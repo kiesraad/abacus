@@ -301,7 +301,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
         assert!(response.headers().get("set-cookie").is_some());
 
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -333,7 +333,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 401);
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -359,7 +359,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
 
         let cookie = response
             .headers()
@@ -387,7 +387,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
 
         // Logout again, should return 200
         let response = app
@@ -402,7 +402,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -428,7 +428,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
 
         let cookie = response
             .headers()
@@ -456,7 +456,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
 
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
@@ -478,7 +478,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
 
         // try to get the current user again, should return 401
         let response = app
@@ -494,7 +494,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 401);
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 
         // try to the current without any cookie, should return 401
         let response = app
@@ -509,7 +509,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 401);
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
 
     #[cfg(debug_assertions)]
@@ -537,7 +537,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 201);
+        assert_eq!(response.status(), StatusCode::CREATED);
 
         // test login
         let response = app
@@ -558,7 +558,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[cfg(debug_assertions)]
@@ -578,7 +578,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
         assert!(response.headers().get("set-cookie").is_some());
 
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -610,7 +610,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
         assert!(response.headers().get("set-cookie").is_some());
 
         let cookie = response
@@ -643,7 +643,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
 
@@ -667,7 +667,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -693,7 +693,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
         assert!(response.headers().get("set-cookie").is_some());
 
         let cookie = response
@@ -726,7 +726,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 401);
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 
         // Call the change password endpoint with incorrect ucer
         let response = app
@@ -750,6 +750,6 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 401);
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
 }

@@ -464,6 +464,7 @@ mod tests {
         assert_eq!(result.user_id, 1);
         assert_eq!(result.username, "user");
 
+        // logout the current user
         let response = app
             .clone()
             .oneshot(
@@ -479,11 +480,12 @@ mod tests {
 
         assert_eq!(response.status(), 200);
 
+        // try to get the current user again, should return 401
         let response = app
             .clone()
             .oneshot(
                 Request::builder()
-                    .method(Method::POST)
+                    .method(Method::GET)
                     .uri("/api/user/whoami")
                     .header("cookie", &cookie)
                     .body(Body::empty())
@@ -492,7 +494,22 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 405);
+        assert_eq!(response.status(), 401);
+
+        // try to the current without any cookie, should return 401
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/user/whoami")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 401);
     }
 
     #[cfg(debug_assertions)]
@@ -687,7 +704,7 @@ mod tests {
             .unwrap()
             .to_string();
 
-        // Call the change password endpoint
+        // Call the change password endpoint with incorrect password
         let response = app
             .clone()
             .oneshot(
@@ -700,6 +717,30 @@ mod tests {
                         serde_json::to_vec(&ChangePasswordRequest {
                             username: "user".to_string(),
                             password: "wrong_password".to_string(),
+                            new_password: "new_password".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 401);
+
+        // Call the change password endpoint with incorrect ucer
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/change-password")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header("cookie", &cookie)
+                    .body(Body::from(
+                        serde_json::to_vec(&ChangePasswordRequest {
+                            username: "wrong_user".to_string(),
+                            password: "password".to_string(),
                             new_password: "new_password".to_string(),
                         })
                         .unwrap(),

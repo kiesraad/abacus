@@ -8,13 +8,13 @@ import useSessionState from "./useSessionState";
 
 export interface ApiProviderProps {
   children: ReactNode;
-  initialUser?: boolean;
+  fetchInitialUser?: boolean;
 }
 
 const client = new ApiClient();
 
-export function ApiProvider({ children, initialUser = true }: ApiProviderProps) {
-  const { user, setUser } = useSessionState(initialUser);
+export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderProps) {
+  const { user, setUser } = useSessionState(fetchInitialUser);
 
   // Unset the current user when the API returns a an invalid session error
   // indicating that the sessions has expired or the user is not authenticated anymore

@@ -12,11 +12,11 @@ export interface SessionState {
 // Keep track of the currently logged-in user
 // By initially fetching the user data from the server
 // and then updating it when the user logs in or out
-export default function useSessionState(initialUser: boolean): SessionState {
+export default function useSessionState(fetchInitialUser: boolean): SessionState {
   const [user, setUser] = useState<LoginResponse | null>(null);
 
   useEffect(() => {
-    if (initialUser) {
+    if (fetchInitialUser) {
       const abortController = new AbortController();
 
       void (async () => {
@@ -35,7 +35,7 @@ export default function useSessionState(initialUser: boolean): SessionState {
         abortController.abort(DEFAULT_CANCEL_REASON);
       };
     }
-  }, [initialUser]);
+  }, [fetchInitialUser]);
 
   return { user, setUser };
 }

@@ -8,14 +8,14 @@ import { getRouter, Router } from "./router";
 export const Providers = ({
   children,
   router = getRouter(children),
-  initialUser = false,
+  fetchInitialUser = false,
 }: {
   children?: React.ReactNode;
   router?: Router;
-  initialUser?: boolean;
+  fetchInitialUser?: boolean;
 }) => {
   return (
-    <ApiProvider initialUser={initialUser}>
+    <ApiProvider fetchInitialUser={fetchInitialUser}>
       <RouterProvider router={router} />
     </ApiProvider>
   );

@@ -15,7 +15,7 @@ describe("ChangePasswordForm", () => {
 
   test("Successful change-password", async () => {
     render(
-      <ApiProvider initialUser={true}>
+      <ApiProvider fetchInitialUser={true}>
         <ChangePasswordForm />
       </ApiProvider>,
     );
@@ -57,9 +57,43 @@ describe("ChangePasswordForm", () => {
     });
   });
 
+  test("Incorrect password repeat in change-password form", async () => {
+    render(
+      <ApiProvider fetchInitialUser={true}>
+        <ChangePasswordForm />
+      </ApiProvider>,
+    );
+
+    overrideOnce("post", "/api/user/change-password", 401, {
+      error: "Invalid username and/or password",
+      fatal: false,
+      reference: "InvalidPassword",
+    });
+
+    const user = userEvent.setup();
+
+    await waitFor(() => {
+      expect(screen.getByText("Wachtwoord")).toBeVisible();
+    });
+
+    const password = screen.getByLabelText("Wachtwoord");
+    await user.type(password, "password");
+    const newPassword = screen.getByLabelText("Kies nieuw wachtwoord");
+    await user.type(newPassword, "password_new");
+    const repeatPassword = screen.getByLabelText("Herhaal het wachtwoord dat je net hebt ingevuld");
+    await user.type(repeatPassword, "password_new_wrong");
+
+    const submitButton = screen.getByRole("button", { name: "Opslaan" });
+    await user.click(submitButton);
+
+    await waitFor(async () => {
+      expect(await screen.findByText("De wachtwoorden komen niet overeen")).toBeVisible();
+    });
+  });
+
   test("Unsuccessful change-password", async () => {
     render(
-      <ApiProvider initialUser={true}>
+      <ApiProvider fetchInitialUser={true}>
         <ChangePasswordForm />
       </ApiProvider>,
     );

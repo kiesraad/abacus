@@ -23,29 +23,31 @@ use zip::result::ZipError;
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub enum ErrorReference {
+    DatabaseError,
     DrawingOfLotsRequired,
-    EntryNumberNotSupported,
     EntryNotFound,
+    EntryNotUnique,
+    EntryNumberNotSupported,
+    InternalServerError,
+    InvalidData,
+    InvalidDataEntryNumber,
+    InvalidJson,
+    InvalidPassword,
+    InvalidPoliticalGroup,
+    InvalidSession,
+    InvalidStateTransition,
+    InvalidUsernameOrPassword,
+    InvalidVoteCandidate,
+    InvalidVoteGroup,
+    PdfGenerationError,
+    PollingStationDataValidation,
     PollingStationFirstEntryAlreadyFinalised,
     PollingStationFirstEntryNotFinalised,
-    PollingStationSecondEntryAlreadyFinalised,
-    PollingStationResultsAlreadyFinalised,
-    PollingStationDataValidation,
-    InvalidVoteGroup,
-    InvalidVoteCandidate,
-    InvalidData,
-    InvalidJson,
-    InvalidDataEntryNumber,
-    InvalidStateTransition,
-    EntryNotUnique,
-    DatabaseError,
-    InternalServerError,
-    PdfGenerationError,
     PollingStationRepeated,
+    PollingStationResultsAlreadyFinalised,
+    PollingStationSecondEntryAlreadyFinalised,
     PollingStationValidationErrors,
-    InvalidPoliticalGroup,
-    InvalidUsernamePassword,
-    InvalidSession,
+    UserNotFound,
 }
 
 /// Response structure for errors
@@ -185,18 +187,30 @@ impl IntoResponse for APIError {
 
                 match err {
                     // client errors
-                    AuthenticationError::UserNotFound | AuthenticationError::InvalidPassword => (
+                    AuthenticationError::InvalidUsernameOrPassword => (
                         StatusCode::UNAUTHORIZED,
                         to_error(
                             "Invalid username and/or password",
-                            ErrorReference::InvalidUsernamePassword,
+                            ErrorReference::InvalidUsernameOrPassword,
+                            false,
+                        ),
+                    ),
+                    AuthenticationError::UserNotFound => (
+                        StatusCode::UNAUTHORIZED,
+                        to_error("User not found", ErrorReference::UserNotFound, false),
+                    ),
+                    AuthenticationError::InvalidPassword => (
+                        StatusCode::UNAUTHORIZED,
+                        to_error(
+                            "Invalid password provided",
+                            ErrorReference::InvalidPassword,
                             false,
                         ),
                     ),
                     AuthenticationError::SessionKeyNotFound
                     | AuthenticationError::NoSessionCookie => (
                         StatusCode::UNAUTHORIZED,
-                        to_error("Invalid session key", ErrorReference::InvalidSession, false),
+                        to_error("Invalid session", ErrorReference::InvalidSession, false),
                     ),
                     // server errors
                     AuthenticationError::Database(_)

@@ -1074,6 +1074,57 @@
         }
       }
     },
+    "/api/user/change-password": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Change password endpoint, updates a user password",
+        "operationId": "change_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The current user name and id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/user/login": {
       "post": {
         "tags": [
@@ -1135,6 +1186,47 @@
         "responses": {
           "200": {
             "description": "Successful logout, or user was already logged out"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/whoami": {
+      "get": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Get current logged-in user endpoint",
+        "operationId": "whoami",
+        "responses": {
+          "200": {
+            "description": "The current user name and id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid user session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error",
@@ -1319,6 +1411,25 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "password",
+          "new_password"
+        ],
+        "properties": {
+          "new_password": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
           }
         }
       },
@@ -1697,29 +1808,31 @@
         "type": "string",
         "description": "Error reference used to show the corresponding error message to the end-user",
         "enum": [
+          "DatabaseError",
           "DrawingOfLotsRequired",
-          "EntryNumberNotSupported",
           "EntryNotFound",
+          "EntryNotUnique",
+          "EntryNumberNotSupported",
+          "InternalServerError",
+          "InvalidData",
+          "InvalidDataEntryNumber",
+          "InvalidJson",
+          "InvalidPassword",
+          "InvalidPoliticalGroup",
+          "InvalidSession",
+          "InvalidStateTransition",
+          "InvalidUsernameOrPassword",
+          "InvalidVoteCandidate",
+          "InvalidVoteGroup",
+          "PdfGenerationError",
+          "PollingStationDataValidation",
           "PollingStationFirstEntryAlreadyFinalised",
           "PollingStationFirstEntryNotFinalised",
-          "PollingStationSecondEntryAlreadyFinalised",
-          "PollingStationResultsAlreadyFinalised",
-          "PollingStationDataValidation",
-          "InvalidVoteGroup",
-          "InvalidVoteCandidate",
-          "InvalidData",
-          "InvalidJson",
-          "InvalidDataEntryNumber",
-          "InvalidStateTransition",
-          "EntryNotUnique",
-          "DatabaseError",
-          "InternalServerError",
-          "PdfGenerationError",
           "PollingStationRepeated",
+          "PollingStationResultsAlreadyFinalised",
+          "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
-          "InvalidPoliticalGroup",
-          "InvalidUsernamePassword",
-          "InvalidSession"
+          "UserNotFound"
         ]
       },
       "ErrorResponse": {

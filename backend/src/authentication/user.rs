@@ -1,5 +1,5 @@
 use axum::{
-    extract::{FromRef, FromRequestParts},
+    extract::{FromRef, FromRequestParts, OptionalFromRequestParts},
     http::request::Parts,
 };
 use axum_extra::extract::CookieJar;
@@ -43,15 +43,13 @@ impl User {
 /// using the user repository and the session cookie
 impl<S> FromRequestParts<S> for User
 where
-    Users: FromRequestParts<S>,
+    Users: FromRef<S>,
     S: Send + Sync,
 {
     type Rejection = APIError;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let Ok(users) = Users::from_request_parts(parts, state).await else {
-            return Err(AuthenticationError::UserNotFound.into());
-        };
+        let users = Users::from_ref(state);
 
         let jar = CookieJar::from_headers(&parts.headers);
         let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
@@ -59,6 +57,35 @@ where
         };
 
         Ok(users.get_by_session_key(session_cookie.value()).await?)
+    }
+}
+
+/// Implement the OptionalFromRequestParts trait for User, this allows us to extract a Option<User> from a request
+/// using the user repository and the session cookie
+impl<S> OptionalFromRequestParts<S> for User
+where
+    Users: FromRef<S>,
+    S: Send + Sync,
+{
+    type Rejection = APIError;
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &S,
+    ) -> Result<Option<Self>, Self::Rejection> {
+        let users = Users::from_ref(state);
+        let jar = CookieJar::from_headers(&parts.headers);
+
+        let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
+            return Ok(None);
+        };
+
+        match users.get_by_session_key(session_cookie.value()).await {
+            Ok(user) => Ok(Some(user)),
+            Err(AuthenticationError::UserNotFound)
+            | Err(AuthenticationError::SessionKeyNotFound) => Ok(None),
+            Err(e) => Err(e.into()),
+        }
     }
 }
 
@@ -142,6 +169,25 @@ impl Users {
         .await?;
 
         Ok(user)
+    }
+
+    /// Update a user's password
+    pub async fn update_password(
+        &self,
+        user_id: u32,
+        new_password: &str,
+    ) -> Result<(), AuthenticationError> {
+        let password_hash = hash_password(new_password)?;
+
+        sqlx::query!(
+            r#"UPDATE users SET password_hash = ? WHERE id = ?"#,
+            password_hash,
+            user_id
+        )
+        .execute(&self.0)
+        .await?;
+
+        Ok(())
     }
 
     /// Get a user by their username
@@ -296,6 +342,35 @@ mod tests {
         assert!(matches!(
             fetched_user,
             AuthenticationError::SessionKeyNotFound
+        ));
+    }
+
+    #[test(sqlx::test)]
+    async fn test_change_password(pool: SqlitePool) {
+        let users = Users::new(pool.clone());
+
+        let user = users.create("test_user", "password").await.unwrap();
+
+        users
+            .update_password(user.id, "new_password")
+            .await
+            .unwrap();
+
+        let authenticated_user = users
+            .authenticate("test_user", "new_password")
+            .await
+            .unwrap();
+
+        assert_eq!(user.id(), authenticated_user.id());
+
+        let authenticated_user = users
+            .authenticate("test_user", "password")
+            .await
+            .unwrap_err();
+
+        assert!(matches!(
+            authenticated_user,
+            AuthenticationError::InvalidPassword
         ));
     }
 }

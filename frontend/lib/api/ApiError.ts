@@ -6,6 +6,13 @@ import { ErrorReference } from "./gen/openapi";
 
 export class FatalError extends Error {}
 
+export class ApiErrorEvent extends Event {
+  constructor(public error: ApiError) {
+    super("apiError");
+    this.error = error;
+  }
+}
+
 // Error that should allow the user to retry the request
 export class ApiError extends Error {
   constructor(

@@ -199,15 +199,15 @@ test.describe("Data entry", () => {
             },
             pollingStationsPageFilledSaved: async () => {
               await expect(pollingStationChoicePage.fieldset).toBeVisible();
-              await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
+              await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
                 `${pollingStation.number} - ${pollingStation.name}`,
-              );
+              ]);
             },
             pollingStationsPageChangedSaved: async () => {
               await expect(pollingStationChoicePage.fieldset).toBeVisible();
-              await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
+              await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
                 `${pollingStation.number} - ${pollingStation.name}`,
-              );
+              ]);
             },
             recountedPageEmpty: async () => {
               await expect(recountedPage.fieldset).toBeVisible();

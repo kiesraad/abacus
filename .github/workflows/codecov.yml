@@ -22,16 +22,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Setup Rust Nightly
+      - name: Setup Rust
         shell: bash
         run: >
-          rustup update nightly &&
-          rustup default nightly &&
-          echo RUST_VERSION=$(rustc --version | awk -F '[( ]' '{print $4}') >> $GITHUB_ENV
+          rustup update stable &&
+          rustup default stable &&
+          echo RUST_VERSION=$(rustc --version | cut -d' ' -f2) >> $GITHUB_ENV
       - name: Install Binstall
         uses: cargo-bins/cargo-binstall@main
-      - name: Install Tarpaulin
-        run: cargo binstall cargo-tarpaulin
+      - name: Install cargo-llvm-cov
+        run: cargo binstall cargo-llvm-cov
       - name: Install Nextest
         run: cargo binstall cargo-nextest
       - name: Cargo cache
@@ -46,20 +46,23 @@ jobs:
             ./backend/target/
           key: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-
-      - name: Run tests
-        run: cargo nextest run --profile ci
+      - name: Run tests with coverage
+        run: cargo llvm-cov nextest --profile ci
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./target/nextest/ci/junit.xml
-      - name: Generate code coverage
-        run: cargo --verbose --locked tarpaulin --timeout 120 --out xml
+          files: backend/target/nextest/ci/junit.xml
+          fail_ci_if_error: true
+      - name: Create code coverage report
+        run: cargo llvm-cov report --cobertura --output-path ./target/llvm-cov-target/codecov.json
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: backend/target/llvm-cov/codecov.json
+          fail_ci_if_error: true
 
   frontend:
     name: Frontend

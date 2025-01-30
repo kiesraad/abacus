@@ -528,9 +528,10 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_without_remainder_seats() {
+    fn test_seat_allocation_less_than_19_seats_without_remaining_seats() {
         let totals = get_election_summary(vec![480, 160, 160, 160, 80, 80, 80]);
         let result = seat_allocation(15, &totals).unwrap();
+        assert_eq!(result.steps.len(), 0);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![6, 2, 2, 2, 1, 1, 1]);
     }
@@ -539,6 +540,7 @@ mod tests {
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_system() {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 60, 40]);
         let result = seat_allocation(15, &totals).unwrap();
+        assert_eq!(result.steps.len(), 2);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
     }
@@ -548,6 +550,7 @@ mod tests {
     ) {
         let totals = get_election_summary(vec![808, 59, 58, 57, 56, 55, 54, 53]);
         let result = seat_allocation(15, &totals).unwrap();
+        assert_eq!(result.steps.len(), 5);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
     }
@@ -570,6 +573,7 @@ mod tests {
     fn test_seat_allocation_19_or_more_seats_without_remaining_seats() {
         let totals = get_election_summary(vec![576, 288, 96, 96, 96, 48]);
         let result = seat_allocation(25, &totals).unwrap();
+        assert_eq!(result.steps.len(), 0);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![12, 6, 2, 2, 2, 1]);
     }
@@ -578,6 +582,7 @@ mod tests {
     fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
         let totals = get_election_summary(vec![600, 302, 98, 99, 101]);
         let result = seat_allocation(23, &totals).unwrap();
+        assert_eq!(result.steps.len(), 4);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
     }

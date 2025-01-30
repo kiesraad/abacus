@@ -6,6 +6,6 @@ export class PollingStationListPgObj {
 
   constructor(protected readonly page: Page) {
     this.alert = page.locator("role=alert");
-    this.createPollingStation = page.getByRole("button", { name: "Stembureau toevoegen" });
+    this.createPollingStation = page.getByRole("link", { name: "Stembureau toevoegen" });
   }
 }

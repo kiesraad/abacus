@@ -1,10 +1,12 @@
-.button {
+button.button,
+a.button {
   --button-border-width: 1px;
 
   color: var(--base-white);
   border-radius: var(--rounded-default);
   border: var(--button-border-width) solid var(--button-color-primary);
   background: var(--button-color-primary);
+  text-decoration: none;
 
   font-size: var(--font-size-body);
   font-weight: bold;
@@ -39,12 +41,6 @@
     border-color: var(--button-color-primary-active);
   }
 
-  &:disabled {
-    background: var(--button-color-bg-disabled);
-    border-color: var(--button-color-bg-disabled);
-    color: var(--button-color-disabled);
-  }
-
   svg {
     height: 1.25rem;
     fill: currentColor;
@@ -77,12 +73,6 @@
     &:active {
       border-color: var(--border-color-default);
       background-color: var(--button-color-secondary-active);
-    }
-
-    &:disabled {
-      background: var(--button-color-bg-disabled);
-      border-color: var(--button-color-bg-disabled);
-      color: var(--button-color-disabled);
     }
   }
 
@@ -122,13 +112,15 @@
       border-color: var(--red-100);
       background-color: var(--red-100);
     }
+  }
 
-    &:disabled {
-      box-shadow: none;
-      background: var(--button-color-bg-disabled);
-      border-color: var(--button-color-bg-disabled);
-      color: var(--button-color-disabled);
-    }
+  /* Below variants to be able to override styling */
+  &:disabled,
+  &.disabled {
+    background: var(--button-color-bg-disabled);
+    border-color: var(--button-color-bg-disabled);
+    color: var(--button-color-disabled);
+    pointer-events: none;
   }
 
   &.xs {

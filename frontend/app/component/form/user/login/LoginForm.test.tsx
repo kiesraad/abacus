@@ -45,7 +45,7 @@ describe("LoginForm", () => {
     overrideOnce("post", "/api/user/login", 401, {
       error: "Invalid username and/or password",
       fatal: false,
-      reference: "InvalidUsernamePassword",
+      reference: "InvalidUsernameOrPassword",
     });
 
     const user = userEvent.setup();

@@ -1,5 +1,5 @@
 import { createContext } from "react";
 
-import { ApiClient } from "./ApiClient";
+import { ApiState } from "./api.types";
 
-export const ApiProviderContext = createContext<ApiClient | null>(null);
+export const ApiProviderContext = createContext<ApiState | null>(null);

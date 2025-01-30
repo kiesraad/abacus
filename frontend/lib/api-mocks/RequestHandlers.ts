@@ -2,6 +2,7 @@ import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
   ErrorResponse,
+  LoginResponse,
   POLLING_STATION_CREATE_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS,
@@ -38,6 +39,11 @@ export const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBo
     pong,
   });
 });
+
+// get user handler
+export const WhoAmIRequestHandler = http.get("/api/user/whoami", () =>
+  HttpResponse.json({ user_id: 1, username: "user" } satisfies LoginResponse, { status: 200 }),
+);
 
 // get election list handler
 export const ElectionListRequestHandler = http.get("/api/elections", () =>
@@ -113,6 +119,7 @@ export const PollingStationGetHandler = http.get<ParamsToString<POLLING_STATION_
 
 export const handlers: HttpHandler[] = [
   pingHandler,
+  WhoAmIRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,

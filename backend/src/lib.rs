@@ -80,7 +80,9 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let user_router = Router::new()
         .route("/", get(authentication::list))
         .route("/login", post(authentication::login))
-        .route("/logout", post(authentication::logout));
+        .route("/logout", post(authentication::logout))
+        .route("/whoami", get(authentication::whoami))
+        .route("/change-password", post(authentication::change_password));
 
     #[cfg(debug_assertions)]
     let user_router = user_router
@@ -143,6 +145,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         paths(
             authentication::login,
             authentication::logout,
+            authentication::whoami,
+            authentication::change_password,
             authentication::list,
             election::election_list,
             election::election_create,
@@ -173,6 +177,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 apportionment::HighestSurplusAssignedSeat,
                 authentication::Credentials,
                 authentication::LoginResponse,
+                authentication::ChangePasswordRequest,
                 authentication::UserListResponse,
                 data_entry::CandidateVotes,
                 data_entry::DataEntry,

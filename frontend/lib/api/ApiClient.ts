@@ -2,7 +2,7 @@ import { type ErrorResponse } from "@kiesraad/api";
 import { TranslationPath } from "@kiesraad/i18n";
 
 import { ApiResult, RequestMethod, ServerError } from "./api.types";
-import { ApiError, FatalApiError, NetworkError, NotFoundError } from "./ApiError";
+import { ApiError, ApiErrorEvent, FatalApiError, NetworkError, NotFoundError } from "./ApiError";
 import { ApiResponseStatus } from "./ApiResponseStatus";
 
 const MIME_JSON = "application/json";
@@ -20,7 +20,23 @@ function isErrorResponse(object: unknown): object is ErrorResponse {
 /**
  * Abstraction over the browser fetch API to handle JSON responses and errors.
  */
-export class ApiClient {
+export class ApiClient extends EventTarget {
+  // subscribe to API errors
+  subscribeToApiErrors(callback: (error: ApiError) => void): () => void {
+    const listener = (event: Event) => {
+      if (event instanceof ApiErrorEvent) {
+        callback(event.error);
+      }
+    };
+
+    this.addEventListener("apiError", listener);
+
+    // return unsubscribe function
+    return () => {
+      this.removeEventListener("apiError", listener);
+    };
+  }
+
   // encode an optional JSON body
   setRequestBodyAndHeaders(requestBody?: object): RequestInit {
     if (requestBody) {
@@ -146,11 +162,17 @@ export class ApiClient {
 
       const isJson = response.headers.get(HEADER_CONTENT_TYPE) === MIME_JSON;
 
-      if (isJson) {
-        return await this.handleJsonBody<T>(response);
+      // handle the response, and return an error when state there is a non-2xx status
+      const apiResult: ApiResult<T> = isJson
+        ? await this.handleJsonBody<T>(response)
+        : await this.handleEmptyBody(response);
+
+      // dispatch error events to subscribers
+      if (apiResult instanceof ApiError) {
+        this.dispatchEvent(new ApiErrorEvent(apiResult));
       }
 
-      return await this.handleEmptyBody(response);
+      return apiResult;
     } catch (e: unknown) {
       if (e === DEFAULT_CANCEL_REASON) {
         // ignore cancel by unmounted component

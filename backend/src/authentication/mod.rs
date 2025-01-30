@@ -1,10 +1,10 @@
 use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use axum_extra::extract::CookieJar;
+use chrono::TimeDelta;
 use cookie::{Cookie, SameSite};
 use serde::{Deserialize, Serialize};
 use session::Sessions;
-use std::time::Duration;
-use user::{User, Users};
+use user::{ListedUser, User, Users};
 use utoipa::ToSchema;
 
 use crate::{APIError, ErrorResponse};
@@ -18,7 +18,7 @@ mod util;
 pub use error::AuthenticationError;
 
 /// Session lifetime, for both cookie and database
-pub const SESSION_LIFE_TIME: Duration = Duration::from_secs(60 * 60 * 2); // 2 hours
+pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 60 * 2); // 2 hours
 
 /// Session cookie name
 pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
@@ -174,6 +174,27 @@ pub async fn development_login(
     Ok((updated_jar, Json(LoginResponse::from(&user))))
 }
 
+#[derive(Serialize, ToSchema)]
+#[cfg_attr(test, derive(Deserialize))]
+pub struct UserListResponse {
+    users: Vec<ListedUser>,
+}
+
+/// Lists all users
+#[utoipa::path(
+    get,
+    path = "/api/user",
+    responses(
+        (status = 200, description = "User list", body = UserListResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+pub async fn list(State(users_repo): State<Users>) -> Result<Json<UserListResponse>, APIError> {
+    Ok(Json(UserListResponse {
+        users: users_repo.list().await?,
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use axum::{
@@ -194,6 +215,7 @@ mod tests {
         let state = AppState { pool };
 
         let router = Router::new()
+            .route("/api/user", get(list))
             .route("/api/user/login", post(login))
             .route("/api/user/logout", post(logout));
 
@@ -407,5 +429,27 @@ mod tests {
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
 
         assert_eq!(result.username, "user");
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_list(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/user")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), 200);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: UserListResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.users.len(), 1);
     }
 }

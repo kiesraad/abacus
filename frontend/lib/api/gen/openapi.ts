@@ -100,6 +100,10 @@ export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
 export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
+// /api/user
+export type LIST_REQUEST_PARAMS = Record<string, never>;
+export type LIST_REQUEST_PATH = `/api/user`;
+
 // /api/user/login
 export type LOGIN_REQUEST_PARAMS = Record<string, never>;
 export type LOGIN_REQUEST_PATH = `/api/user/login`;
@@ -370,6 +374,13 @@ export interface HighestSurplusAssignedSeat {
   surplus_votes: Fraction;
 }
 
+export interface ListedUser {
+  created_at: string;
+  id: number;
+  updated_at: string;
+  username: string;
+}
+
 export interface LoginResponse {
   user_id: number;
   username: string;
@@ -502,6 +513,10 @@ export interface SummaryDifferencesCounts {
   too_few_ballots_handed_out_count: SumCount;
   too_many_ballots_handed_out_count: SumCount;
   unreturned_ballots_count: SumCount;
+}
+
+export interface UserListResponse {
+  users: ListedUser[];
 }
 
 export interface ValidationResult {

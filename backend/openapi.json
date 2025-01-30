@@ -1043,6 +1043,37 @@
         }
       }
     },
+    "/api/user": {
+      "get": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Lists all users",
+        "operationId": "list",
+        "responses": {
+          "200": {
+            "description": "User list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/user/login": {
       "post": {
         "tags": [
@@ -1827,6 +1858,31 @@
           }
         }
       },
+      "ListedUser": {
+        "type": "object",
+        "required": [
+          "id",
+          "username",
+          "updated_at",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
       "LoginResponse": {
         "type": "object",
         "required": [
@@ -2213,6 +2269,20 @@
           },
           "unreturned_ballots_count": {
             "$ref": "#/components/schemas/SumCount"
+          }
+        }
+      },
+      "UserListResponse": {
+        "type": "object",
+        "required": [
+          "users"
+        ],
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListedUser"
+            }
           }
         }
       },

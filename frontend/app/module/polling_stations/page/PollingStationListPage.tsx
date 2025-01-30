@@ -1,4 +1,4 @@
-import { Link, useNavigate, useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import { NavBar } from "app/component/navbar/NavBar";
 
@@ -10,7 +10,6 @@ import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
 export function PollingStationListPage() {
   const { election } = useElection();
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
   const { requestState } = usePollingStationListRequest(election.id);
 
   if (requestState.status === "loading") {
@@ -94,16 +93,9 @@ export function PollingStationListPage() {
 
             <Toolbar>
               <Toolbar.Section pos="start">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  leftIcon={<IconPlus />}
-                  onClick={() => {
-                    void navigate("create");
-                  }}
-                >
-                  {t("manual_input")}
-                </Button>
+                <Button.Link variant="secondary" size="sm" to="./create">
+                  <IconPlus /> {t("manual_input")}
+                </Button.Link>
               </Toolbar.Section>
             </Toolbar>
           </article>
@@ -111,16 +103,9 @@ export function PollingStationListPage() {
           <article>
             <Toolbar>
               <Toolbar.Section pos="end">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  leftIcon={<IconPlus />}
-                  onClick={() => {
-                    void navigate("create");
-                  }}
-                >
-                  {t("polling_station.form.create")}
-                </Button>
+                <Button.Link variant="secondary" size="sm" to="./create">
+                  <IconPlus /> {t("polling_station.form.create")}
+                </Button.Link>
               </Toolbar.Section>
             </Toolbar>
 

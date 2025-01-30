@@ -13,6 +13,7 @@ use crate::{APIError, AppState};
 use super::{
     error::AuthenticationError,
     password::{hash_password, verify_password},
+    role::Role,
     session::Sessions,
     SESSION_COOKIE_NAME,
 };
@@ -22,6 +23,8 @@ use super::{
 pub struct User {
     id: u32,
     username: String,
+    fullname: Option<String>,
+    role: Role,
     password_hash: String,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
@@ -158,6 +161,8 @@ impl Users {
             RETURNING
                 id as "id: u32",
                 username,
+                fullname,
+                role,
                 password_hash,
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
@@ -201,6 +206,8 @@ impl Users {
             SELECT
                 id as "id: u32",
                 username,
+                fullname,
+                role,
                 password_hash,
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
@@ -222,6 +229,8 @@ impl Users {
             SELECT
                 id as "id: u32",
                 username,
+                fullname,
+                role,
                 password_hash,
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"

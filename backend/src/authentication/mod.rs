@@ -11,6 +11,7 @@ use crate::{APIError, ErrorResponse};
 
 mod error;
 mod password;
+mod role;
 mod session;
 mod user;
 mod util;

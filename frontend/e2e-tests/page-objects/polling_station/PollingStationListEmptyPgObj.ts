@@ -6,6 +6,6 @@ export class PollingStationListEmptyPgObj {
 
   constructor(protected readonly page: Page) {
     this.alert = page.locator("role=alert");
-    this.createPollingStation = page.getByRole("button", { name: "Handmatig invullen" });
+    this.createPollingStation = page.getByRole("link", { name: "Handmatig invullen" });
   }
 }

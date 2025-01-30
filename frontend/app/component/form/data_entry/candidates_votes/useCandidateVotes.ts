@@ -6,39 +6,50 @@ import { getErrorsAndWarnings } from "../state/dataEntryUtils";
 import { SubmitCurrentFormOptions } from "../state/types";
 import { useDataEntryContext } from "../state/useDataEntryContext";
 import {
+  CandidateVotesFormValues,
+  CandidateVotesValues,
   formValuesToValues,
   valuesToFormValues,
-  VotersAndVotesFormValues,
-  VotersAndVotesValues,
-} from "./votersAndVotesValues";
+} from "./candidatesVotesValues";
 
-export function useVotersAndVotes() {
+export function useCandidateVotes(political_group_number: number) {
   const { cache, status, pollingStationResults, formState, onSubmitForm, updateFormSection } = useDataEntryContext({
     id: "voters_votes_counts",
     type: "voters_and_votes",
   });
 
+  const politicalGroupVotes = pollingStationResults.political_group_votes.find(
+    (pg) => pg.number === political_group_number,
+  );
+  if (!politicalGroupVotes) {
+    throw new Error(`Political group votes not found for number ${political_group_number}`);
+  }
+
   // local form state
   const defaultValues =
-    cache?.key === "voters_votes_counts"
-      ? (cache.data as VotersAndVotesValues)
-      : {
-          voters_counts: pollingStationResults.voters_counts,
-          votes_counts: pollingStationResults.votes_counts,
-          voters_recounts: pollingStationResults.voters_recounts || undefined,
-        };
+    cache?.key === `political_group_votes_${political_group_number}`
+      ? (cache.data as CandidateVotesValues)
+      : (pollingStationResults.political_group_votes.find(
+          (pg) => pg.number === political_group_number,
+        ) as CandidateVotesValues);
 
-  const [currentValues, setCurrentValues] = useState<VotersAndVotesFormValues>(valuesToFormValues(defaultValues));
+  const [currentValues, setCurrentValues] = useState<CandidateVotesFormValues>(valuesToFormValues(defaultValues));
 
   // derived state
-  const { errors, warnings, isSaved, acceptWarnings, hasChanges } = formState.sections.voters_votes_counts;
+  const section = formState.sections[`political_group_votes_${political_group_number}`];
+  if (!section) {
+    throw new Error(`Form section not found for political group number ${political_group_number}`);
+  }
+
+  const { errors, warnings, isSaved, acceptWarnings, hasChanges } = section;
+
   const defaultProps = {
     errorsAndWarnings: isSaved ? getErrorsAndWarnings(errors, warnings) : undefined,
     warningsAccepted: acceptWarnings,
   };
 
   // register changes when fields change
-  const setValues = (values: VotersAndVotesFormValues) => {
+  const setValues = (values: CandidateVotesFormValues) => {
     if (!hasChanges) {
       updateFormSection({ hasChanges: true, acceptWarnings: false, acceptWarningsError: false });
     }
@@ -55,9 +66,15 @@ export function useVotersAndVotes() {
 
   // submit and save to form contents
   const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {
-    const data: VotersAndVotesValues = formValuesToValues(currentValues, pollingStationResults.recounted || false);
-
-    return await onSubmitForm(data, options);
+    const data: CandidateVotesValues = formValuesToValues(currentValues);
+    return await onSubmitForm(
+      {
+        political_group_votes: pollingStationResults.political_group_votes.map((pg) =>
+          pg.number === political_group_number ? data : pg,
+        ),
+      },
+      options,
+    );
   };
 
   // scroll to top when saved
@@ -72,7 +89,7 @@ export function useVotersAndVotes() {
     onSubmit,
     pollingStationResults,
     currentValues,
-    formSection: formState.sections.voters_votes_counts,
+    formSection: section,
     setValues,
     status,
     setAcceptWarnings,

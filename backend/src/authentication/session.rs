@@ -1,15 +1,15 @@
 use axum::extract::FromRef;
 use axum_extra::extract::cookie::Cookie;
+use chrono::{DateTime, TimeDelta, Utc};
 use cookie::CookieBuilder;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqlitePool};
-use std::time::Duration;
 
 use crate::AppState;
 
 use super::{
     error::AuthenticationError,
-    util::{create_new_session_key, get_current_time, get_expires_at},
+    util::{create_new_session_key, get_expires_at},
     SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
 };
 
@@ -18,16 +18,16 @@ use super::{
 pub(super) struct Session {
     session_key: String,
     user_id: u32,
-    expires_at: i64,
-    created_at: i64,
+    expires_at: DateTime<Utc>,
+    created_at: DateTime<Utc>,
 }
 
 impl Session {
     // Create a new session for a specific user
-    pub(super) fn new(user_id: u32, life_time: Duration) -> Result<Self, AuthenticationError> {
+    pub(super) fn new(user_id: u32, life_time: TimeDelta) -> Result<Self, AuthenticationError> {
         let session_key = create_new_session_key();
-        let expires_at = get_expires_at(life_time)? as i64;
-        let created_at = get_current_time()? as i64;
+        let expires_at = get_expires_at(life_time)?;
+        let created_at = Utc::now();
 
         Ok(Self {
             session_key,
@@ -52,7 +52,7 @@ impl Session {
     pub(super) fn get_cookie(&self) -> Cookie<'static> {
         CookieBuilder::new(SESSION_COOKIE_NAME, self.session_key.clone())
             .max_age(cookie::time::Duration::seconds(
-                SESSION_LIFE_TIME.as_secs() as i64
+                SESSION_LIFE_TIME.num_seconds(),
             ))
             .build()
     }
@@ -70,7 +70,7 @@ impl Sessions {
     pub(super) async fn create(
         &self,
         user_id: u32,
-        life_time: Duration,
+        life_time: TimeDelta,
     ) -> Result<Session, AuthenticationError> {
         let session = Session::new(user_id, life_time)?;
 
@@ -81,8 +81,8 @@ impl Sessions {
             RETURNING
                 session_key,
                 user_id as "user_id: u32",
-                expires_at,
-                created_at
+                expires_at as "expires_at: _",
+                created_at as "created_at: _"
             "#,
             session.session_key,
             session.user_id,
@@ -106,8 +106,8 @@ impl Sessions {
             SELECT
                 session_key,
                 user_id as "user_id: u32",
-                expires_at,
-                created_at
+                expires_at as "expires_at: _",
+                created_at as "created_at: _"
             FROM sessions WHERE session_key = ?
             "#,
             session_key
@@ -130,7 +130,7 @@ impl Sessions {
     /// Delete all sessions that have expired
     pub async fn delete_expired_sessions(&self) -> Result<(), AuthenticationError> {
         sqlx::query("DELETE FROM sessions WHERE expires_at <= ?")
-            .bind(get_current_time()? as i64)
+            .bind(Utc::now())
             .execute(&self.0)
             .await?;
 
@@ -146,8 +146,8 @@ impl FromRef<AppState> for Sessions {
 
 #[cfg(test)]
 mod test {
+    use chrono::TimeDelta;
     use sqlx::SqlitePool;
-    use std::time::Duration;
     use test_log::test;
 
     use crate::authentication::session::Sessions;
@@ -156,7 +156,7 @@ mod test {
     async fn test_create_and_get_session(pool: SqlitePool) {
         let sessions = Sessions::new(pool);
 
-        let session = sessions.create(1, Duration::from_secs(60)).await.unwrap();
+        let session = sessions.create(1, TimeDelta::seconds(60)).await.unwrap();
 
         let session_from_db = sessions
             .get_by_key(&session.session_key)
@@ -170,7 +170,7 @@ mod test {
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_session(pool: SqlitePool) {
         let sessions = Sessions::new(pool);
-        let session = sessions.create(1, Duration::from_secs(60)).await.unwrap();
+        let session = sessions.create(1, TimeDelta::seconds(60)).await.unwrap();
 
         let session_from_db = sessions.get_by_key(&session.session_key).await.unwrap();
         assert_eq!(session_from_db, Some(session.clone()));
@@ -186,7 +186,7 @@ mod test {
     async fn test_delete_old_sessions(pool: SqlitePool) {
         let sessions = Sessions::new(pool);
 
-        let session = sessions.create(1, Duration::from_secs(0)).await.unwrap();
+        let session = sessions.create(1, TimeDelta::seconds(0)).await.unwrap();
 
         sessions.delete_expired_sessions().await.unwrap();
 

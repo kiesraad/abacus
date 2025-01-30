@@ -791,7 +791,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), 200);
+        assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: UserListResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.users.len(), 1);

@@ -91,6 +91,13 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     };
   }
 
+  async getVotersAndVotesCounts(): Promise<{ voters: VotersCounts; votes: VotesCounts }> {
+    return {
+      voters: await this.getVotersCounts(),
+      votes: await this.getVotesCounts(),
+    };
+  }
+
   async inputVotersRecounts(votersRecounts: VotersCounts) {
     await this.pollCardRecount.fill(votersRecounts.poll_card_count.toString());
     await this.proxyCertificateRecount.fill(votersRecounts.proxy_certificate_count.toString());

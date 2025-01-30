@@ -234,66 +234,48 @@ test.describe("Data entry", () => {
             },
             voterVotesPageCached: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(voters);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votes);
+              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(fields).toStrictEqual({ voters, votes });
             },
             voterVotesPageEmpty: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(votersEmpty);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votesEmpty);
+              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(fields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
             },
             votersVotesPageFilled: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(voters);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votes);
+              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(fields).toStrictEqual({ voters, votes });
             },
             votersVotesPageSubmitted: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(voters);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votes);
+              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(fields).toStrictEqual({ voters, votes });
             },
             votersVotesPageChangedSubmitted: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(votersChanged);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votes);
+              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(fields).toStrictEqual({ voters: votersChanged, votes });
             },
             votersVotesPageChangedFilled: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(votersChanged);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votes);
+              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(fields).toStrictEqual({ voters: votersChanged, votes });
             },
             votersVotesPageAfterResumeSaved: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(voters);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votes);
+              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(fields).toStrictEqual({ voters, votes });
             },
             votersVotesPageAfterResumeChanged: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(votersChanged);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votes);
+              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(fields).toStrictEqual({ voters: votersChanged, votes });
             },
             votersVotesPageAfterResumeEmpty: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const votersFields = await votersAndVotesPage.getVotersCounts();
-              expect(votersFields).toStrictEqual(votersEmpty);
-              const votesFields = await votersAndVotesPage.getVotesCounts();
-              expect(votesFields).toStrictEqual(votesEmpty);
+              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(fields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
             },
             differencesPage: async () => {
               await expect(differencesPage.fieldset).toBeVisible();

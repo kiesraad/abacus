@@ -337,8 +337,7 @@ fn political_groups_qualifying_for_highest_surplus<'a>(
     previous: &'a [ApportionmentStep],
 ) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
     standing.iter().filter(move |p| {
-        p.surplus_votes > Fraction::ZERO
-            && p.meets_surplus_threshold
+        p.meets_surplus_threshold
             && !previous.iter().any(|prev| {
                 prev.change.is_assigned_by_surplus()
                     && prev.change.political_group_number() == p.pg_number
@@ -529,6 +528,14 @@ mod tests {
     }
 
     #[test]
+    fn test_seat_allocation_less_than_19_seats_without_remainder_seats() {
+        let totals = get_election_summary(vec![480, 160, 160, 160, 80, 80, 80]);
+        let result = seat_allocation(15, &totals).unwrap();
+        let total_seats = get_total_seats_from_apportionment_result(result);
+        assert_eq!(total_seats, vec![6, 2, 2, 2, 1, 1, 1]);
+    }
+
+    #[test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_system() {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 60, 40]);
         let result = seat_allocation(15, &totals).unwrap();
@@ -537,21 +544,19 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system(
+    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_only_1_surplus_meets_threshold(
     ) {
-        let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
+        let totals = get_election_summary(vec![808, 59, 58, 57, 56, 55, 54, 53]);
         let result = seat_allocation(15, &totals).unwrap();
         let total_seats = get_total_seats_from_apportionment_result(result);
-        assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
+        assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_no_surpluses(
-    ) {
-        let totals = get_election_summary(vec![560, 160, 160, 80, 80, 80, 40, 40]);
-        let result = seat_allocation(15, &totals).unwrap();
-        let total_seats = get_total_seats_from_apportionment_result(result);
-        assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
+    fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error_with_0_surpluses() {
+        let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
+        let result = seat_allocation(15, &totals);
+        assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
@@ -559,6 +564,14 @@ mod tests {
         let totals = get_election_summary(vec![500, 140, 140, 140, 140, 140]);
         let result = seat_allocation(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+    }
+
+    #[test]
+    fn test_seat_allocation_19_or_more_seats_without_remaining_seats() {
+        let totals = get_election_summary(vec![576, 288, 96, 96, 96, 48]);
+        let result = seat_allocation(25, &totals).unwrap();
+        let total_seats = get_total_seats_from_apportionment_result(result);
+        assert_eq!(total_seats, vec![12, 6, 2, 2, 2, 1]);
     }
 
     #[test]

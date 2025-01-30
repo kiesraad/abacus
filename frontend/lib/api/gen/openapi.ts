@@ -94,6 +94,10 @@ export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
 export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
+// /api/user
+export type LIST_REQUEST_PARAMS = Record<string, never>;
+export type LIST_REQUEST_PATH = `/api/user`;
+
 // /api/user/change-password
 export type CHANGE_PASSWORD_REQUEST_PARAMS = Record<string, never>;
 export type CHANGE_PASSWORD_REQUEST_PATH = `/api/user/change-password`;
@@ -362,6 +366,13 @@ export interface HighestSurplusAssignedSeat {
   surplus_votes: Fraction;
 }
 
+export interface ListedUser {
+  created_at: string;
+  id: number;
+  updated_at: string;
+  username: string;
+}
+
 export interface LoginResponse {
   user_id: number;
   username: string;
@@ -474,6 +485,10 @@ export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
+}
+
+export interface UserListResponse {
+  users: ListedUser[];
 }
 
 export interface ValidationResult {

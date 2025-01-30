@@ -174,7 +174,7 @@ test.describe("Data entry", () => {
     .getSimplePaths()
     .forEach((path) => {
       // eslint-disable-next-line playwright/valid-title
-      test(path.description, async ({ page, pollingStation }) => {
+      test(path.description, async ({ page, pollingStation, election }) => {
         const pollingStationChoicePage = new PollingStationChoicePage(page);
         const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
@@ -200,9 +200,9 @@ test.describe("Data entry", () => {
             },
             pollingStationsPageEmptySaved: async () => {
               await expect(pollingStationChoicePage.fieldset).toBeVisible();
-              await expect(pollingStationChoicePage.alertDataEntryInProgress).toContainText(
+              await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
                 `${pollingStation.number} - ${pollingStation.name}`,
-              );
+              ]);
             },
             pollingStationsPageFilledSaved: async () => {
               await expect(pollingStationChoicePage.fieldset).toBeVisible();
@@ -234,48 +234,48 @@ test.describe("Data entry", () => {
             },
             voterVotesPageCached: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
-              expect(fields).toStrictEqual({ voters, votes });
+              const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(votersVotesFields).toStrictEqual({ voters, votes });
             },
             voterVotesPageEmpty: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
-              expect(fields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
+              const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(votersVotesFields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
             },
             votersVotesPageFilled: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
-              expect(fields).toStrictEqual({ voters, votes });
+              const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(votersVotesFields).toStrictEqual({ voters, votes });
             },
             votersVotesPageSubmitted: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
-              expect(fields).toStrictEqual({ voters, votes });
+              const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(votersVotesFields).toStrictEqual({ voters, votes });
             },
             votersVotesPageChangedSubmitted: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
-              expect(fields).toStrictEqual({ voters: votersChanged, votes });
+              const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(votersVotesFields).toStrictEqual({ voters: votersChanged, votes });
             },
             votersVotesPageChangedFilled: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
-              expect(fields).toStrictEqual({ voters: votersChanged, votes });
+              const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(votersVotesFields).toStrictEqual({ voters: votersChanged, votes });
             },
             votersVotesPageAfterResumeSaved: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
-              expect(fields).toStrictEqual({ voters, votes });
+              const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(votersVotesFields).toStrictEqual({ voters, votes });
             },
             votersVotesPageAfterResumeChanged: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
-              expect(fields).toStrictEqual({ voters: votersChanged, votes });
+              const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(votersVotesFields).toStrictEqual({ voters: votersChanged, votes });
             },
             votersVotesPageAfterResumeEmpty: async () => {
               await expect(votersAndVotesPage.fieldset).toBeVisible();
-              const fields = await votersAndVotesPage.getVotersAndVotesCounts();
-              expect(fields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
+              const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+              expect(votersVotesFields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
             },
             differencesPage: async () => {
               await expect(differencesPage.fieldset).toBeVisible();
@@ -305,8 +305,7 @@ test.describe("Data entry", () => {
               await votersAndVotesPage.abortInput.click();
             },
             NAV_TO_POLLING_STATION_PAGE: async () => {
-              // TODO: add to page object
-              await page.getByRole("link", { name: "Test Location" }).click();
+              await votersAndVotesPage.clickElectionInNavBar(election.election.location, election.election.name);
             },
             GO_TO_RECOUNTED_PAGE: async () => {
               await votersAndVotesPage.navPanel.recounted.click();
@@ -330,10 +329,7 @@ test.describe("Data entry", () => {
               await recountedPage.unsavedChangesModal.discardInput.click();
             },
             RESUME_DATA_ENTRY: async () => {
-              // TODO: add to page object
-              await pollingStationChoicePage.alertDataEntryInProgress
-                .getByRole("link", { name: `${pollingStation.number} - ${pollingStation.name}` })
-                .click();
+              await pollingStationChoicePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
             },
           },
         });

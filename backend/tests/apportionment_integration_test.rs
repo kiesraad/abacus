@@ -4,6 +4,7 @@ use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
 
+use crate::shared::create_result_with_non_example_data_entry;
 use crate::{shared::create_result, utils::serve_api};
 use abacus::{
     apportionment::{
@@ -23,8 +24,8 @@ pub mod utils;
 async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    create_result(&addr, 1, 2, None).await;
-    create_result(&addr, 2, 2, None).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/apportionment");
     let response = reqwest::Client::new().post(&url).send().await.unwrap();
@@ -43,7 +44,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
 async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    create_result(&addr, 3, 3, None).await;
+    create_result(&addr, 3, 3).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
     let response = reqwest::Client::new().post(&url).send().await.unwrap();
@@ -122,7 +123,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
         client_state: ClientState::new_from_str(None).unwrap(),
     };
 
-    create_result(&addr, 3, 3, Some(data_entry)).await;
+    create_result_with_non_example_data_entry(&addr, 3, 3, data_entry).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
     let response = reqwest::Client::new().post(&url).send().await.unwrap();

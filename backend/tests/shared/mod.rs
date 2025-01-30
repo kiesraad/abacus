@@ -10,7 +10,7 @@ use abacus::data_entry::{
     PollingStationResults, SaveDataEntryResponse, VotersCounts, VotesCounts,
 };
 
-// example data entry for an election with one party with two candidates
+// example data entry for an election with two parties with two candidates
 pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     DataEntry {
         progress: 60,
@@ -73,25 +73,18 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     }
 }
 
-pub async fn create_and_save_data_entry(
+async fn post_data_entry(
     addr: &SocketAddr,
     polling_station_id: u32,
     entry_number: u32,
-    client_state: Option<&str>,
-    data_entry: Option<DataEntry>,
+    data_entry: DataEntry,
 ) {
-    let request_body: DataEntry;
-    if let Some(data_entry) = data_entry {
-        request_body = data_entry;
-    } else {
-        request_body = example_data_entry(client_state);
-    }
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}"
     );
     let response = Client::new()
         .post(&url)
-        .json(&request_body)
+        .json(&data_entry)
         .send()
         .await
         .unwrap();
@@ -103,14 +96,31 @@ pub async fn create_and_save_data_entry(
     assert_eq!(validation_results.validation_results.warnings.len(), 0);
 }
 
-pub async fn create_and_finalise_data_entry(
+pub async fn create_and_save_data_entry(
     addr: &SocketAddr,
     polling_station_id: u32,
     entry_number: u32,
-    data_entry: Option<DataEntry>,
+    client_state: Option<&str>,
 ) {
-    create_and_save_data_entry(addr, polling_station_id, entry_number, None, data_entry).await;
+    post_data_entry(
+        addr,
+        polling_station_id,
+        entry_number,
+        example_data_entry(client_state),
+    )
+    .await;
+}
 
+pub async fn create_and_save_non_example_data_entry(
+    addr: &SocketAddr,
+    polling_station_id: u32,
+    entry_number: u32,
+    data_entry: DataEntry,
+) {
+    post_data_entry(addr, polling_station_id, entry_number, data_entry).await;
+}
+
+async fn finalise_data_entry(addr: &SocketAddr, polling_station_id: u32, entry_number: u32) {
     // Finalise the data entry
     let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise");
     let response = Client::new().post(&url).send().await.unwrap();
@@ -119,15 +129,31 @@ pub async fn create_and_finalise_data_entry(
     assert_eq!(response.status(), StatusCode::OK);
 }
 
-pub async fn create_result(
+pub async fn create_and_finalise_data_entry(
+    addr: &SocketAddr,
+    polling_station_id: u32,
+    entry_number: u32,
+) {
+    create_and_save_data_entry(addr, polling_station_id, entry_number, None).await;
+    finalise_data_entry(addr, polling_station_id, entry_number).await;
+}
+
+pub async fn create_and_finalise_non_example_data_entry(
+    addr: &SocketAddr,
+    polling_station_id: u32,
+    entry_number: u32,
+    data_entry: DataEntry,
+) {
+    create_and_save_non_example_data_entry(addr, polling_station_id, entry_number, data_entry)
+        .await;
+    finalise_data_entry(addr, polling_station_id, entry_number).await;
+}
+
+async fn check_data_entry_status_is_definitive(
     addr: &SocketAddr,
     polling_station_id: u32,
     election_id: u32,
-    data_entry: Option<DataEntry>,
 ) {
-    create_and_finalise_data_entry(addr, polling_station_id, 1, data_entry.clone()).await;
-    create_and_finalise_data_entry(addr, polling_station_id, 2, data_entry.clone()).await;
-
     // check that data entry status for this polling station is now Definitive
     let url = format!("http://{addr}/api/elections/{election_id}/status");
     let response = Client::new().get(&url).send().await.unwrap();
@@ -141,4 +167,23 @@ pub async fn create_result(
             .status,
         DataEntryStatusName::Definitive
     );
+}
+
+pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: u32) {
+    create_and_finalise_data_entry(addr, polling_station_id, 1).await;
+    create_and_finalise_data_entry(addr, polling_station_id, 2).await;
+    check_data_entry_status_is_definitive(addr, polling_station_id, election_id).await;
+}
+
+pub async fn create_result_with_non_example_data_entry(
+    addr: &SocketAddr,
+    polling_station_id: u32,
+    election_id: u32,
+    data_entry: DataEntry,
+) {
+    create_and_finalise_non_example_data_entry(addr, polling_station_id, 1, data_entry.clone())
+        .await;
+    create_and_finalise_non_example_data_entry(addr, polling_station_id, 2, data_entry.clone())
+        .await;
+    check_data_entry_status_is_definitive(addr, polling_station_id, election_id).await;
 }

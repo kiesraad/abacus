@@ -134,8 +134,8 @@ async fn test_election_pdf_download(pool: SqlitePool) {
 async fn test_election_xml_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    create_result(&addr, 1, 2, None).await;
-    create_result(&addr, 2, 2, None).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/download_xml_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
@@ -154,8 +154,8 @@ async fn test_election_xml_download(pool: SqlitePool) {
 async fn test_election_zip_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    create_result(&addr, 1, 2, None).await;
-    create_result(&addr, 2, 2, None).await;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/download_zip_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();

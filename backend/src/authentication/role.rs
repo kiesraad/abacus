@@ -12,9 +12,9 @@ pub enum Role {
 impl From<String> for Role {
     fn from(s: String) -> Self {
         match s.as_str() {
-            "Administrator" => Self::Administrator,
-            "Typist" => Self::Typist,
-            "Coordinator" => Self::Coordinator,
+            "administrator" => Self::Administrator,
+            "typist" => Self::Typist,
+            "coordinator" => Self::Coordinator,
             _ => unreachable!(),
         }
     }

@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "INSERT INTO users (username, password_hash)\n            VALUES (?, ?)\n            RETURNING\n                id as \"id: u32\",\n                username,\n                fullname,\n                role,\n                password_hash,\n                updated_at as \"updated_at: _\",\n                created_at as \"created_at: _\"\n            ",
+  "query": "INSERT INTO users (username, password_hash)\n            VALUES (?, ?)\n            RETURNING\n                id as \"id: u32\",\n                username,\n                fullname,\n                role,\n                password_hash,\n                last_activity_at as \"last_activity_at: _\",\n                updated_at as \"updated_at: _\",\n                created_at as \"created_at: _\"\n            ",
   "describe": {
     "columns": [
       {
@@ -29,13 +29,18 @@
         "type_info": "Text"
       },
       {
-        "name": "updated_at: _",
+        "name": "last_activity_at: _",
         "ordinal": 5,
         "type_info": "Datetime"
       },
       {
-        "name": "created_at: _",
+        "name": "updated_at: _",
         "ordinal": 6,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "created_at: _",
+        "ordinal": 7,
         "type_info": "Datetime"
       }
     ],
@@ -49,8 +54,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "f36cdac2f6cc0283c5636fbeeed44c72909aac5931ad7bad0b1ea274b7de4bd9"
+  "hash": "85074a52bb2e0bd8f2bdce0d53ccca8667b1938ab8da684c48279e1985bbc97f"
 }

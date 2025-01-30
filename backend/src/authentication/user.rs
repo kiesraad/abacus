@@ -27,6 +27,8 @@ pub struct User {
     role: Role,
     password_hash: String,
     #[schema(value_type = String)]
+    last_activity_at: DateTime<Utc>,
+    #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
     created_at: DateTime<Utc>,
@@ -164,6 +166,7 @@ impl Users {
                 fullname,
                 role,
                 password_hash,
+                last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
             "#,
@@ -209,6 +212,7 @@ impl Users {
                 fullname,
                 role,
                 password_hash,
+                last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
             FROM users WHERE username = ?
@@ -232,6 +236,7 @@ impl Users {
                 fullname,
                 role,
                 password_hash,
+                last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
             FROM users WHERE id = ?

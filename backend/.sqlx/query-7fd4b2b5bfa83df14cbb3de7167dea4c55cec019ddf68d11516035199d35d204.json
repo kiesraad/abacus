@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                id as \"id: u32\",\n                username,\n                fullname,\n                role,\n                password_hash,\n                updated_at as \"updated_at: _\",\n                created_at as \"created_at: _\"\n            FROM users WHERE id = ?\n            ",
+  "query": "\n            SELECT\n                id as \"id: u32\",\n                username,\n                fullname,\n                role,\n                password_hash,\n                last_activity_at as \"last_activity_at: _\",\n                updated_at as \"updated_at: _\",\n                created_at as \"created_at: _\"\n            FROM users WHERE id = ?\n            ",
   "describe": {
     "columns": [
       {
@@ -29,13 +29,18 @@
         "type_info": "Text"
       },
       {
-        "name": "updated_at: _",
+        "name": "last_activity_at: _",
         "ordinal": 5,
         "type_info": "Datetime"
       },
       {
-        "name": "created_at: _",
+        "name": "updated_at: _",
         "ordinal": 6,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "created_at: _",
+        "ordinal": 7,
         "type_info": "Datetime"
       }
     ],
@@ -49,8 +54,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "50b53bbb640e1f74db7b93d5dc313eac8544d613ba90a90eddfb8f5b2305c6c9"
+  "hash": "7fd4b2b5bfa83df14cbb3de7167dea4c55cec019ddf68d11516035199d35d204"
 }

@@ -1,5 +1,5 @@
 #[cfg(feature = "memory-serve")]
-use axum::http::StatusCode; // this import needs to be separate because it's only needed for memory-serve
+use axum::http::StatusCode;
 use axum::{
     extract::FromRef,
     routing::{get, post},

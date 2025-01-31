@@ -1,8 +1,10 @@
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
 
 import { Election, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
+
+type NavBarLinksProps = { location: { pathname: string; hash: string } };
 
 function ElectionBreadcrumb({ election }: { election: Election }) {
   return (
@@ -14,8 +16,7 @@ function ElectionBreadcrumb({ election }: { election: Election }) {
   );
 }
 
-function DataEntryLinks() {
-  const location = useLocation();
+function DataEntryLinks({ location }: NavBarLinksProps) {
   const { election } = useElection();
 
   return (
@@ -37,8 +38,7 @@ function DataEntryLinks() {
   );
 }
 
-function ElectionManagementLinks() {
-  const location = useLocation();
+function ElectionManagementLinks({ location }: NavBarLinksProps) {
   const { election } = useElection();
 
   // TODO: Add left side menu, #920
@@ -55,7 +55,7 @@ function ElectionManagementLinks() {
         <Link to={`/elections/${election.id}#administratorcoordinator`}>
           <ElectionBreadcrumb election={election} />
         </Link>
-        {location.pathname.match(/^\/elections\/\d+\/polling-stations\/\d+\//) && (
+        {location.pathname.match(/^\/elections\/\d+\/polling-stations\/(create|\d+\/update)$/) && (
           <>
             <IconChevronRight />
             <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_stations")}</Link>
@@ -66,9 +66,7 @@ function ElectionManagementLinks() {
   }
 }
 
-function TopLevelManagementLinks() {
-  const location = useLocation();
-
+function TopLevelManagementLinks({ location }: NavBarLinksProps) {
   const links = [];
   if (location.pathname.startsWith("/elections")) {
     links.push(
@@ -126,23 +124,21 @@ function TopLevelManagementLinks() {
   return <>{links}</>;
 }
 
-export function NavBarLinks() {
-  const location = useLocation();
-
+export function NavBarLinks({ location }: NavBarLinksProps) {
   const isAdministrator = location.hash.includes("administrator");
   const isCoordinator = location.hash.includes("coordinator");
 
   if (location.pathname.match(/^\/elections\/\d+\/data-entry/)) {
-    return <DataEntryLinks />;
+    return <DataEntryLinks location={location} />;
   } else if (location.pathname.match(/^\/elections\/\d+/)) {
-    return <ElectionManagementLinks />;
+    return <ElectionManagementLinks location={location} />;
   } else if (
     (location.pathname === "/elections" && (isAdministrator || isCoordinator)) ||
     location.pathname === "/users" ||
     location.pathname === "/workstations" ||
     location.pathname === "/logs"
   ) {
-    return <TopLevelManagementLinks />;
+    return <TopLevelManagementLinks location={location} />;
   } else {
     return <></>;
   }

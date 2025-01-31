@@ -4,7 +4,9 @@ import { IconUser } from "@kiesraad/icon";
 import styles from "./NavBar.module.css";
 import { NavBarLinks } from "./NavBarLinks";
 
-export function NavBar({ showLinks = true }) {
+type NavBarProps = { location?: { pathname: string; hash: string } };
+
+export function NavBar({ location = window.location }: NavBarProps) {
   const isAdministrator = location.hash.includes("administrator");
   const isCoordinator = location.hash.includes("coordinator");
 
@@ -22,7 +24,9 @@ export function NavBar({ showLinks = true }) {
 
   return (
     <nav aria-label="primary-navigation" className={styles.navBar}>
-      <div className={styles.links}>{showLinks && <NavBarLinks />}</div>
+      <div className={styles.links}>
+        <NavBarLinks location={location} />
+      </div>
       <div className={styles.userInfo}>
         <IconUser />
         <span>{role.join("/")}</span>

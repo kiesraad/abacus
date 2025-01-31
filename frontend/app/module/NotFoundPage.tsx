@@ -13,8 +13,8 @@ export interface NotFoundPageProps {
 export function NotFoundPage({ message, path }: NotFoundPageProps) {
   return (
     <AppLayout>
-      {/* Do not show NavBar links to avoid call to useElection outside ElectionProvider */}
-      <NavBar showLinks={false} />
+      {/* Show NavBar for / to avoid call to useElection outside ElectionProvider */}
+      <NavBar location={{ pathname: "/", hash: "" }} />
       <Error title={t(message)}>
         {path && <p>{tx("error.page_not_found", undefined, { path })}</p>}
         <p>{t("error.not_found_feedback")}</p>

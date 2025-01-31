@@ -48,7 +48,7 @@
 .apportionment_table {
   tr {
     th {
-      /* Number or Fraction */
+      /* Number */
       &:first-of-type,
       &:nth-of-type(3),
       &:nth-of-type(4),
@@ -57,12 +57,12 @@
       }
     }
     td {
-      /* Number or Fraction */
+      /* Number */
       &:first-of-type,
       &:nth-of-type(3),
       &:nth-of-type(4),
       &:nth-of-type(5) {
-        width: 8.675rem;
+        width: 7.65rem;
         text-align: right;
         font-size: var(--font-size-md);
         color: var(--gray-900);
@@ -92,6 +92,9 @@
       td {
         font-weight: bold;
         border-bottom: none;
+        &:nth-of-type(2) {
+          text-align: right;
+        }
       }
     }
   }

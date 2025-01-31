@@ -393,7 +393,10 @@ export interface HighestSurplusAssignedSeat {
 
 export interface ListedUser {
   created_at: string;
+  fullname?: unknown;
   id: number;
+  last_activity_at: string;
+  role: Role;
   updated_at: string;
   username: string;
 }
@@ -502,6 +505,8 @@ export interface PollingStationResults {
  * Type of Polling station
  */
 export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
+
+export type Role = "administrator" | "typist" | "coordinator";
 
 /**
  * Response structure for saving data entry of polling station results

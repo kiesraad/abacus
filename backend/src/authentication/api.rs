@@ -12,14 +12,14 @@ use utoipa::ToSchema;
 use crate::{APIError, ErrorResponse};
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Credentials {
-    username: String,
-    password: String,
+    pub username: String,
+    pub password: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct LoginResponse {
-    user_id: u32,
-    username: String,
+    pub user_id: u32,
+    pub username: String,
 }
 
 impl From<&User> for LoginResponse {
@@ -84,9 +84,9 @@ pub async fn login(
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct ChangePasswordRequest {
-    username: String,
-    password: String,
-    new_password: String,
+    pub username: String,
+    pub password: String,
+    pub new_password: String,
 }
 
 /// Get current logged-in user endpoint
@@ -186,10 +186,14 @@ pub async fn development_create_user(
     State(users): State<Users>,
     Json(credentials): Json<Credentials>,
 ) -> Result<impl IntoResponse, APIError> {
+    use super::role::Role;
+
     let Credentials { username, password } = credentials;
 
     // Create a new user
-    users.create(&username, &password).await?;
+    users
+        .create(&username, &password, Role::Administrator)
+        .await?;
 
     Ok(StatusCode::CREATED)
 }
@@ -210,9 +214,15 @@ pub async fn development_login(
     jar: CookieJar,
 ) -> Result<impl IntoResponse, APIError> {
     // Get or create the test user
+
+    use super::role::Role;
     let user = match users.get_by_username("user").await? {
         Some(u) => u,
-        None => users.create("user", "password").await?,
+        None => {
+            users
+                .create("user", "password", Role::Administrator)
+                .await?
+        }
     };
 
     // Create a new session and cookie
@@ -229,7 +239,7 @@ pub async fn development_login(
 #[derive(Serialize, ToSchema)]
 #[cfg_attr(test, derive(Deserialize))]
 pub struct UserListResponse {
-    users: Vec<ListedUser>,
+    pub users: Vec<ListedUser>,
 }
 
 /// Lists all users

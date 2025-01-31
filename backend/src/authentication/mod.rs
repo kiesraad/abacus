@@ -19,10 +19,10 @@ pub const SECURE_COOKIES: bool = false;
 
 #[cfg(test)]
 mod tests {
-    use api::{Credentials, LoginResponse, UserListResponse};
+    use api::{ChangePasswordRequest, Credentials, LoginResponse, UserListResponse};
     use axum::{
         body::Body,
-        http::Request,
+        http::{Request, StatusCode},
         routing::{get, post},
         Router,
     };

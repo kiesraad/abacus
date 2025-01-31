@@ -147,7 +147,7 @@
     "/api/elections/{election_id}/apportionment": {
       "get": {
         "tags": [
-          "apportionment"
+          "apportionment::api"
         ],
         "summary": "Get the seat allocation for an election",
         "operationId": "election_apportionment",
@@ -1077,7 +1077,7 @@
     "/api/user/change-password": {
       "post": {
         "tags": [
-          "authentication"
+          "authentication::api"
         ],
         "summary": "Change password endpoint, updates a user password",
         "operationId": "change_password",
@@ -1203,7 +1203,7 @@
     "/api/user/whoami": {
       "get": {
         "tags": [
-          "authentication"
+          "authentication::api"
         ],
         "summary": "Get current logged-in user endpoint",
         "operationId": "whoami",
@@ -2332,9 +2332,9 @@
       "Role": {
         "type": "string",
         "enum": [
-          "Administrator",
-          "Typist",
-          "Coordinator"
+          "administrator",
+          "typist",
+          "coordinator"
         ]
       },
       "SaveDataEntryResponse": {

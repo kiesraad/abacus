@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
+use sqlx::Type;
 use utoipa::ToSchema;
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, ToSchema)]
-#[serde(rename = "snake_case")]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, ToSchema, Type)]
+#[serde(rename_all = "lowercase")]
+#[sqlx(rename_all = "snake_case")]
 pub enum Role {
     Administrator,
     Typist,

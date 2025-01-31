@@ -79,5 +79,11 @@
         width: 5rem;
       }
     }
+    &:last-of-type {
+      td {
+        font-weight: bold;
+        border-bottom: none;
+      }
+    }
   }
 }

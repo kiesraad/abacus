@@ -84,19 +84,22 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let election_routes = election_routes.route("/", post(election::election_create));
 
     let user_router = Router::new()
-        .route("/", get(authentication::list))
-        .route("/login", post(authentication::login))
-        .route("/logout", post(authentication::logout))
-        .route("/whoami", get(authentication::whoami))
-        .route("/change-password", post(authentication::change_password));
+        .route("/", get(authentication::api::list))
+        .route("/login", post(authentication::api::login))
+        .route("/logout", post(authentication::api::logout))
+        .route("/whoami", get(authentication::api::whoami))
+        .route("/change-password", post(authentication::api::change_password));
 
     #[cfg(debug_assertions)]
     let user_router = user_router
         .route(
             "/development/create",
-            post(authentication::development_create_user),
+            post(authentication::api::development_create_user),
         )
-        .route("/development/login", get(authentication::development_login));
+        .route(
+            "/development/login",
+            get(authentication::api::development_login),
+        );
 
     let app = Router::new()
         .nest("/api/user", user_router)
@@ -149,12 +152,12 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[derive(OpenApi)]
     #[openapi(
         paths(
-            apportionment::election_apportionment,
-            authentication::login,
-            authentication::logout,
-            authentication::whoami,
-            authentication::change_password,
-            authentication::list,
+            apportionment::api::election_apportionment,
+            authentication::api::login,
+            authentication::api::logout,
+            authentication::api::whoami,
+            authentication::api::change_password,
+            authentication::api::list,
             election::election_list,
             election::election_create,
             election::election_details,
@@ -182,10 +185,10 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 apportionment::AssignedSeat,
                 apportionment::HighestAverageAssignedSeat,
                 apportionment::HighestSurplusAssignedSeat,
-                authentication::Credentials,
-                authentication::LoginResponse,
-                authentication::ChangePasswordRequest,
-                authentication::UserListResponse,
+                authentication::api::Credentials,
+                authentication::api::LoginResponse,
+                authentication::api::ChangePasswordRequest,
+                authentication::api::UserListResponse,
                 data_entry::CandidateVotes,
                 data_entry::DataEntry,
                 data_entry::SaveDataEntryResponse,

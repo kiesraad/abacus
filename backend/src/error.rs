@@ -1,9 +1,7 @@
 use std::error::Error;
 
 use crate::{
-    apportionment::ApportionmentError,
-    authentication::AuthenticationError,
-    data_entry::{status::DataEntryTransitionError, DataError},
+    apportionment::ApportionmentError, authentication::error::AuthenticationError, data_entry::{status::DataEntryTransitionError, DataError}
 };
 use axum::{
     extract::rejection::JsonRejection,

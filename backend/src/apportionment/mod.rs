@@ -7,7 +7,7 @@ use crate::{data_entry::PoliticalGroupVotes, summary::ElectionSummary};
 pub use self::api::*;
 pub use self::fraction::*;
 
-mod api;
+pub mod api;
 mod fraction;
 
 /// The result of the apportionment procedure. This contains the number of seats and the quota

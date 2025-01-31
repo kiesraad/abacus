@@ -28,7 +28,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
     create_result(&addr, 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/apportionment");
-    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
@@ -47,7 +47,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     create_result(&addr, 3, 3).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
-    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
@@ -126,7 +126,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
     create_result_with_non_example_data_entry(&addr, 3, 3, data_entry).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
-    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
@@ -139,7 +139,7 @@ async fn test_election_apportionment_election_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/1/apportionment");
-    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::NOT_FOUND);

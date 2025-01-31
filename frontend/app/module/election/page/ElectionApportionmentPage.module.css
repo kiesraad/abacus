@@ -1,0 +1,83 @@
+.article {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.table_title {
+  margin-bottom: 2rem;
+}
+
+.table {
+  width: 51.8rem;
+}
+
+.election_summary_table {
+  tr {
+    &:first-of-type {
+      td {
+        border-top: 1px solid var(--gray-300);
+      }
+    }
+    td {
+      &:first-of-type {
+        font-size: var(--font-size-md);
+        color: var(--base-black);
+        line-height: 1.5rem;
+      }
+
+      /* Number or Fraction */
+      &:nth-of-type(2) {
+        width: 10.625rem;
+        text-align: right;
+        font-size: var(--font-size-md);
+        font-weight: normal;
+        color: var(--gray-900);
+        line-height: 1.75rem;
+      }
+
+      &:last-of-type {
+        font-size: var(--font-size-sm);
+        color: var(--gray-600);
+      }
+    }
+  }
+}
+
+.apportionment_table {
+  tr {
+    td {
+      /* Number or Fraction */
+      &:first-of-type,
+      &:nth-of-type(3),
+      &:nth-of-type(4),
+      &:nth-of-type(5) {
+        width: 8.675rem;
+        text-align: right;
+        font-size: var(--font-size-md);
+        color: var(--gray-900);
+        line-height: 1.75rem;
+      }
+
+      &:first-of-type,
+      &:nth-of-type(3),
+      &:nth-of-type(4) {
+        font-weight: normal;
+      }
+
+      &:first-of-type {
+        width: 4.75rem;
+      }
+
+      &:nth-of-type(2) {
+        font-size: var(--font-size-md);
+        line-height: 1.5rem;
+      }
+
+      &:last-of-type {
+        width: 5rem;
+      }
+    }
+  }
+}

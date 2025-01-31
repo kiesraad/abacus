@@ -3,7 +3,7 @@
   width: 100%;
   border-spacing: 0;
   th {
-    border-bottom: 1px solid var(--bg-gray-darkest);
+    border-bottom: 1px solid var(--gray-300);
     font-size: var(--font-size-xs);
     text-align: right;
     padding: 0.75rem 1.5rem;
@@ -31,7 +31,7 @@
 
   tr {
     td {
-      border-bottom: 1px solid var(--bg-gray-darkest);
+      border-bottom: 1px solid var(--gray-300);
       padding: 0.5rem 1.5rem;
       line-height: 1.25rem;
       &:first-of-type {
@@ -70,7 +70,7 @@
 
       &:global(.sep) {
         border: 0;
-        border-bottom: 1px solid var(--bg-gray-darkest);
+        border-bottom: 1px solid var(--gray-300);
         height: 1.5rem;
       }
     }

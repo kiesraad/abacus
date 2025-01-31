@@ -8,11 +8,12 @@ import cls from "./Table.module.css";
 export interface TableProps {
   id?: string;
   children?: React.ReactNode;
+  className?: string;
 }
 
-export function Table({ id, children }: TableProps) {
+export function Table({ id, children, className }: TableProps) {
   return (
-    <table id={id} className={cls.table}>
+    <table id={id} className={`${cls.table} ${className}`}>
       {children}
     </table>
   );
@@ -34,7 +35,7 @@ function Header({ children, className }: { children: React.ReactNode[]; classNam
   );
 }
 
-function Column({ children, className }: { children: React.ReactNode; className?: string }) {
+function Column({ children, className }: { children?: React.ReactNode; className?: string }) {
   return <th className={className}>{children}</th>;
 }
 

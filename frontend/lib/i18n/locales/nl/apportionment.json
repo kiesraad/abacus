@@ -1,0 +1,16 @@
+{
+  "election_summary": "Kengetallen",
+  "number_of_seats": "Aantal raadszetels",
+  "preference_threshold": "Voorkeursdrempel",
+  "preference_threshold_description": "25% van de kiesdeler",
+  "quota": "Kiesdeler",
+  "quota_description": "Benodigde stemmen per volle zetel",
+  "remainder_seats": "Restzetels",
+  "title": "Zetelverdeling",
+  "total": "Totaal",
+  "total_seats": "Totaal zetels",
+  "total_votes_cast_count": "Getelde stembiljetten",
+  "turnout": "Opkomst",
+  "voters": "Kiesgerechtigden",
+  "whole_seats": "Volle zetels"
+}

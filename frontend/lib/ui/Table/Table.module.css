@@ -11,7 +11,7 @@
 
   th,
   td {
-    border-bottom: 1px solid var(--bg-gray-darkest);
+    border-bottom: 1px solid var(--gray-300);
   }
 
   th {

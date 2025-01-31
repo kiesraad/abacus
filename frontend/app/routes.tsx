@@ -3,6 +3,8 @@ import { createRoutesFromElements, Navigate, Route } from "react-router";
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AdministratorLayout } from "app/module/AdministratorLayout";
 import {
+  ElectionApportionmentLayout,
+  ElectionApportionmentPage,
   ElectionHomePage,
   ElectionLayout,
   ElectionReportPage,
@@ -49,6 +51,9 @@ export const routes = createRoutesFromElements(
       <Route index element={<OverviewPage />} />
       <Route path=":electionId" element={<ElectionLayout />}>
         <Route index element={<ElectionHomePage />} />
+        <Route path="apportionment" element={<ElectionApportionmentLayout />}>
+          <Route index element={<ElectionApportionmentPage />} />
+        </Route>
         <Route
           path="report"
           element={

@@ -50,6 +50,10 @@
 }
 
 /* Width */
+.w-10 {
+  width: 10.625rem;
+}
+
 .w-13 {
   width: 13rem;
 }

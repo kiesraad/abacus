@@ -4,8 +4,8 @@ import { NavBar } from "app/component/navbar/NavBar";
 
 import { PoliticalGroupSeatAssignment, useElection, useElectionApportionment } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { PageTitle, Table } from "@kiesraad/ui";
-import { cn } from "@kiesraad/util";
+import { DisplayFraction, PageTitle, Table } from "@kiesraad/ui";
+import { cn, formatNumber } from "@kiesraad/util";
 
 import cls from "./ElectionApportionmentPage.module.css";
 
@@ -13,8 +13,22 @@ export function ElectionApportionmentPage() {
   const { election } = useElection();
   const { apportionment, election_summary } = useElectionApportionment();
 
-  let whole_seats = 0;
-  let rest_seats = 0;
+  let total_whole_seats = 0;
+  let total_rest_seats = 0;
+
+  function convert_zero_to_dash(number: number): string {
+    if (number === 0) {
+      return "-";
+    }
+    return number.toString();
+  }
+
+  function get_number_of_seats_assigned_sentence(seats: number, type: "rest_seat" | "whole_seat"): string {
+    return t(`apportionment.seats_assigned.${seats > 1 ? "plural" : "singular"}`, {
+      num_seat: seats,
+      type_seat: t(`apportionment.${type}.singular`),
+    });
+  }
 
   return (
     <>
@@ -39,12 +53,16 @@ export function ElectionApportionmentPage() {
               <Table.Body>
                 <Table.Row>
                   <Table.Cell>{t("apportionment.voters")}</Table.Cell>
-                  <Table.NumberCell>{election.number_of_voters ? election.number_of_voters : ""}</Table.NumberCell>
+                  <Table.NumberCell>
+                    {election.number_of_voters ? formatNumber(election.number_of_voters) : ""}
+                  </Table.NumberCell>
                   <Table.Cell />
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>{t("apportionment.total_votes_cast_count")}</Table.Cell>
-                  <Table.NumberCell>{election_summary.votes_counts.total_votes_cast_count}</Table.NumberCell>
+                  <Table.NumberCell>
+                    {formatNumber(election_summary.votes_counts.total_votes_cast_count)}
+                  </Table.NumberCell>
                   <Table.Cell>
                     {election.number_of_voters
                       ? `${t("apportionment.turnout")}: ${(election_summary.votes_counts.total_votes_cast_count / election.number_of_voters) * 100}%`
@@ -53,21 +71,23 @@ export function ElectionApportionmentPage() {
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>{t("voters_and_votes.blank_votes_count")}</Table.Cell>
-                  <Table.NumberCell>{election_summary.votes_counts.blank_votes_count}</Table.NumberCell>
+                  <Table.NumberCell>{formatNumber(election_summary.votes_counts.blank_votes_count)}</Table.NumberCell>
                   <Table.Cell>
                     {`${Number((election_summary.votes_counts.blank_votes_count / election_summary.votes_counts.total_votes_cast_count) * 100).toFixed(2)}%`}
                   </Table.Cell>
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>{t("voters_and_votes.invalid_votes_count")}</Table.Cell>
-                  <Table.NumberCell>{election_summary.votes_counts.invalid_votes_count}</Table.NumberCell>
+                  <Table.NumberCell>{formatNumber(election_summary.votes_counts.invalid_votes_count)}</Table.NumberCell>
                   <Table.Cell>
                     {`${Number((election_summary.votes_counts.invalid_votes_count / election_summary.votes_counts.total_votes_cast_count) * 100).toFixed(2)}%`}
                   </Table.Cell>
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>{t("voters_and_votes.votes_candidates_count")}</Table.Cell>
-                  <Table.NumberCell>{election_summary.votes_counts.votes_candidates_count}</Table.NumberCell>
+                  <Table.NumberCell>
+                    {formatNumber(election_summary.votes_counts.votes_candidates_count)}
+                  </Table.NumberCell>
                   <Table.Cell />
                 </Table.Row>
                 <Table.Row>
@@ -77,12 +97,14 @@ export function ElectionApportionmentPage() {
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>{t("apportionment.quota")}</Table.Cell>
-                  <Table.NumberCell className="w-13">{`${apportionment.quota.integer} ${apportionment.quota.numerator}/${apportionment.quota.denominator}`}</Table.NumberCell>
+                  <Table.NumberCell className="w-13">
+                    <DisplayFraction fraction={apportionment.quota} />
+                  </Table.NumberCell>
                   <Table.Cell>{t("apportionment.quota_description")}</Table.Cell>
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>{t("apportionment.preference_threshold")}</Table.Cell>
-                  <Table.NumberCell>{/*apportionment.preference_threshold*/}</Table.NumberCell>
+                  <Table.NumberCell>{/* TODO: Add apportionment.preference_threshold */}</Table.NumberCell>
                   <Table.Cell>{t("apportionment.preference_threshold_description")}</Table.Cell>
                 </Table.Row>
               </Table.Body>
@@ -95,22 +117,23 @@ export function ElectionApportionmentPage() {
               <Table.Header>
                 <Table.Column>{t("list")}</Table.Column>
                 <Table.Column>{t("party_name")}</Table.Column>
-                <Table.Column>{t("apportionment.whole_seats")}</Table.Column>
-                <Table.Column>{t("apportionment.remainder_seats")}</Table.Column>
+                <Table.Column>{t("apportionment.whole_seat.plural")}</Table.Column>
+                <Table.Column>{t("apportionment.rest_seat.plural")}</Table.Column>
                 <Table.Column>{t("apportionment.total_seats")}</Table.Column>
                 <Table.Column />
               </Table.Header>
               <Table.Body>
                 {apportionment.final_standing.map((standing: PoliticalGroupSeatAssignment) => {
-                  whole_seats += standing.whole_seats;
-                  rest_seats += standing.rest_seats;
+                  total_whole_seats += standing.whole_seats;
+                  total_rest_seats += standing.rest_seats;
                   return (
+                    /* TODO: Add row link */
                     <Table.LinkRow key={standing.pg_number} to=".">
                       <Table.Cell>{standing.pg_number}</Table.Cell>
                       <Table.Cell>{election.political_groups[standing.pg_number - 1]?.name || ""}</Table.Cell>
-                      <Table.NumberCell>{standing.whole_seats}</Table.NumberCell>
-                      <Table.NumberCell>{standing.rest_seats}</Table.NumberCell>
-                      <Table.NumberCell>{standing.total_seats}</Table.NumberCell>
+                      <Table.NumberCell>{convert_zero_to_dash(standing.whole_seats)}</Table.NumberCell>
+                      <Table.NumberCell>{convert_zero_to_dash(standing.rest_seats)}</Table.NumberCell>
+                      <Table.NumberCell>{convert_zero_to_dash(standing.total_seats)}</Table.NumberCell>
                       <Table.Cell />
                     </Table.LinkRow>
                   );
@@ -118,13 +141,23 @@ export function ElectionApportionmentPage() {
                 <Table.Row>
                   <Table.Cell />
                   <Table.Cell>{t("apportionment.total")}</Table.Cell>
-                  <Table.NumberCell>{whole_seats}</Table.NumberCell>
-                  <Table.NumberCell>{rest_seats}</Table.NumberCell>
+                  <Table.NumberCell>{total_whole_seats}</Table.NumberCell>
+                  <Table.NumberCell>{total_rest_seats}</Table.NumberCell>
                   <Table.NumberCell>{apportionment.seats}</Table.NumberCell>
                   <Table.Cell />
                 </Table.Row>
               </Table.Body>
             </Table>
+            <ul>
+              <li>
+                {get_number_of_seats_assigned_sentence(total_whole_seats, "whole_seat")} (
+                <Link to=".">{t("apportionment.view_details")}</Link>) {/* TODO: Add details link */}
+              </li>
+              <li>
+                {get_number_of_seats_assigned_sentence(total_rest_seats, "rest_seat")} (
+                <Link to=".">{t("apportionment.view_details")}</Link>) {/* TODO: Add details link */}
+              </li>
+            </ul>
           </div>
         </article>
       </main>

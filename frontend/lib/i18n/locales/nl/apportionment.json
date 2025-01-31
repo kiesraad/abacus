@@ -5,12 +5,23 @@
   "preference_threshold_description": "25% van de kiesdeler",
   "quota": "Kiesdeler",
   "quota_description": "Benodigde stemmen per volle zetel",
-  "remainder_seats": "Restzetels",
+  "rest_seat": {
+    "singular": "restzetel",
+    "plural": "Restzetels"
+  },
+  "seats_assigned": {
+    "singular": "{num_seat} zetel werd als {type_seat} toegewezen",
+    "plural": "{num_seat} zetels werden als {type_seat} toegewezen"
+  },
   "title": "Zetelverdeling",
   "total": "Totaal",
   "total_seats": "Totaal zetels",
   "total_votes_cast_count": "Getelde stembiljetten",
   "turnout": "Opkomst",
+  "view_details": "bekijk details",
   "voters": "Kiesgerechtigden",
-  "whole_seats": "Volle zetels"
+  "whole_seat": {
+    "singular": "volle zetel",
+    "plural": "Volle zetels"
+  }
 }

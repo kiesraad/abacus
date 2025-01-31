@@ -27,7 +27,7 @@
         line-height: 1.5rem;
       }
 
-      /* Number or Fraction */
+      /* Number or DisplayFraction */
       &:nth-of-type(2) {
         width: 10.625rem;
         text-align: right;

@@ -7,6 +7,7 @@ export * from "./Badge";
 export * from "./BottomBar/BottomBar";
 export * from "./Button/Button";
 export * from "./CheckboxAndRadio";
+export * from "./DisplayFraction/DisplayFraction";
 export * from "./Feedback";
 export * from "./Form";
 export * from "./FormField/FormField";

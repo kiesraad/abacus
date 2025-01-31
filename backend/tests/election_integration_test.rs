@@ -6,7 +6,7 @@ use test_log::test;
 
 use crate::{shared::create_result, utils::serve_api};
 #[cfg(feature = "dev-database")]
-use abacus::election::Election; // this import needs to be separate because it's only needed for dev-database
+use abacus::election::Election; // this import needs to be separate because it's only needed for development/test usage
 use abacus::election::{ElectionDetailsResponse, ElectionListResponse};
 
 pub mod shared;

@@ -1,6 +1,6 @@
 #![cfg(test)]
 
-use reqwest::StatusCode;
+use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
 
@@ -25,11 +25,12 @@ async fn test_polling_station_listing(pool: SqlitePool) {
     let url = format!("http://{addr}/api/elections/2/polling_stations");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
-    let status = response.status();
-    assert_eq!(status, StatusCode::OK, "Unexpected response status");
-
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
     let body: PollingStationListResponse = response.json().await.unwrap();
-    println!("response body: {:?}", &body);
     assert_eq!(body.polling_stations.len(), 2);
     assert!(body
         .polling_stations
@@ -58,12 +59,12 @@ async fn test_polling_station_creation(pool: SqlitePool) {
         .await
         .unwrap();
 
-    let status = response.status();
-    assert_eq!(status, StatusCode::CREATED, "Unexpected response status");
-
+    assert_eq!(
+        response.status(),
+        StatusCode::CREATED,
+        "Unexpected response status"
+    );
     let body: PollingStation = response.json().await.unwrap();
-
-    println!("response body: {:?}", &body);
     assert_eq!(body.election_id, election_id);
     assert_eq!(body.name, "New Polling Station");
     assert_eq!(
@@ -80,12 +81,12 @@ async fn test_polling_station_get(pool: SqlitePool) {
 
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
-    let status = response.status();
-    assert_eq!(status, StatusCode::OK, "Unexpected response status");
-
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
     let body: PollingStation = response.json().await.unwrap();
-
-    println!("response body: {:?}", &body);
     assert_eq!(body.election_id, election_id);
     assert_eq!(body.name, "Testplek");
     assert_eq!(body.polling_station_type, Some(PollingStationType::Special));
@@ -111,8 +112,11 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
         .await
         .unwrap();
 
-    let status = response.status();
-    assert_eq!(status, StatusCode::OK, "Unexpected response status");
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
 
     let updated = reqwest::Client::new().get(&url).send().await.unwrap();
 
@@ -147,8 +151,11 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
         .await
         .unwrap();
 
-    let status = response.status();
-    assert_eq!(status, StatusCode::OK, "Unexpected response status");
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
 
     let updated = reqwest::Client::new().get(&url).send().await.unwrap();
 
@@ -183,8 +190,11 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
         .await
         .unwrap();
 
-    let status = response.status();
-    assert_eq!(status, StatusCode::NOT_FOUND, "Unexpected response status");
+    assert_eq!(
+        response.status(),
+        StatusCode::NOT_FOUND,
+        "Unexpected response status"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
@@ -194,8 +204,11 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
 
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
 
-    let status = response.status();
-    assert_eq!(status, StatusCode::OK, "Unexpected response status");
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
 
     let gone = reqwest::Client::new().get(&url).send().await.unwrap();
 
@@ -215,9 +228,8 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
 
-    let status = response.status();
     assert_eq!(
-        status,
+        response.status(),
         StatusCode::UNPROCESSABLE_ENTITY,
         "Unexpected response status"
     );
@@ -229,14 +241,13 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
 async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    create_result(&addr, 1).await;
+    create_result(&addr, 1, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/polling_stations/1");
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
 
-    let status = response.status();
     assert_eq!(
-        status,
+        response.status(),
         StatusCode::UNPROCESSABLE_ENTITY,
         "Unexpected response status"
     );
@@ -251,8 +262,11 @@ async fn test_polling_station_delete_not_found(pool: SqlitePool) {
 
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
 
-    let status = response.status();
-    assert_eq!(status, StatusCode::NOT_FOUND, "Unexpected response status");
+    assert_eq!(
+        response.status(),
+        StatusCode::NOT_FOUND,
+        "Unexpected response status"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
@@ -276,8 +290,11 @@ async fn test_polling_station_non_unique(pool: SqlitePool) {
         .await
         .unwrap();
 
-    let status = response.status();
-    assert_eq!(status, StatusCode::CONFLICT, "Unexpected response status");
+    assert_eq!(
+        response.status(),
+        StatusCode::CONFLICT,
+        "Unexpected response status"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
@@ -286,6 +303,5 @@ async fn test_polling_station_list_invalid_election(pool: SqlitePool) {
     let url = format!("http://{addr}/api/elections/1234/polling_stations");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
 
-    let status = response.status();
-    assert_eq!(status, StatusCode::NOT_FOUND);
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }

@@ -36,6 +36,7 @@
     "InvalidUsernameOrPassword": "De gebruikersnaam of het wachtwoord is onjuist",
     "InvalidSession": "De sessie is ongeldig",
     "InvalidPassword": "Het opgegeven wachtwoord is onjuist",
-    "UserNotFound": "De gebruiker is niet gevonden"
+    "UserNotFound": "De gebruiker is niet gevonden",
+    "DrawingOfLotsRequired": "Loting is noodzakelijk"
   }
 }

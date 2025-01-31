@@ -24,6 +24,27 @@ VALUES (3, 'Municipal Re-election', 'Heemdamseburg', 100, 'Municipal', 29, '2024
                 "gender": null
               }
             ]
+          },{
+            "number": 2,
+            "name": "Political Group B",
+            "candidates": [
+              {
+                "number": 1,
+                "initials": "A.",
+                "first_name": "Alice",
+                "last_name": "Foo",
+                "locality": "Amsterdam",
+                "gender": "Female"
+              },
+              {
+                "number": 2,
+                "initials": "C.",
+                "first_name": "Charlie",
+                "last_name": "Doe",
+                "locality": "Rotterdam",
+                "gender": null
+              }
+            ]
           }
         ]');
 

@@ -1,3 +1,5 @@
+#[cfg(feature = "memory-serve")]
+use axum::http::StatusCode;
 use axum::{
     extract::FromRef,
     routing::{get, post},
@@ -61,6 +63,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/", get(election::election_list))
         .route("/{election_id}", get(election::election_details))
         .route(
+            "/{election_id}/apportionment",
+            post(apportionment::election_apportionment),
+        )
+        .route(
             "/{election_id}/download_zip_results",
             get(election::election_download_zip_results),
         )
@@ -112,7 +118,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             MemoryServe::from_env()
                 .index_file(Some("/index.html"))
                 .fallback(Some("/index.html"))
-                .fallback_status(axum::http::StatusCode::OK)
+                .fallback_status(StatusCode::OK)
                 .into_router(),
         )
     };
@@ -143,6 +149,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[derive(OpenApi)]
     #[openapi(
         paths(
+            apportionment::election_apportionment,
             authentication::login,
             authentication::logout,
             authentication::whoami,
@@ -206,6 +213,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 polling_station::PollingStationListResponse,
                 polling_station::PollingStationType,
                 polling_station::PollingStationRequest,
+                summary::ElectionSummary,
+                summary::SummaryDifferencesCounts,
             ),
         ),
         tags(

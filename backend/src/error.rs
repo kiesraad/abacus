@@ -1,6 +1,7 @@
 use std::error::Error;
 
 use crate::{
+    apportionment::ApportionmentError,
     authentication::AuthenticationError,
     data_entry::{status::DataEntryTransitionError, DataError},
 };
@@ -23,6 +24,7 @@ use zip::result::ZipError;
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub enum ErrorReference {
     DatabaseError,
+    DrawingOfLotsRequired,
     EntryNotFound,
     EntryNotUnique,
     EntryNumberNotSupported,
@@ -77,9 +79,10 @@ pub enum APIError {
     PdfGenError(Vec<SourceDiagnostic>),
     StdError(Box<dyn Error>),
     AddError(String, ErrorReference),
-    XmlError(quick_xml::se::SeError),
+    XmlError(SeError),
     Authentication(AuthenticationError),
     ZipError(ZipError),
+    Apportionment(ApportionmentError),
 }
 
 impl IntoResponse for APIError {
@@ -234,6 +237,20 @@ impl IntoResponse for APIError {
                     ),
                 )
             }
+            APIError::Apportionment(err) => {
+                error!("Apportionment error: {:?}", err);
+
+                match err {
+                    ApportionmentError::DrawingOfLotsNotImplemented => (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        to_error(
+                            "Drawing of lots is required",
+                            ErrorReference::DrawingOfLotsRequired,
+                            false,
+                        ),
+                    ),
+                }
+            }
         };
 
         (status, response).into_response()
@@ -255,7 +272,7 @@ impl From<serde_json::Error> for APIError {
 impl From<sqlx::Error> for APIError {
     fn from(err: sqlx::Error) -> Self {
         match &err {
-            sqlx::Error::RowNotFound => {
+            RowNotFound => {
                 APIError::NotFound("Item not found".to_string(), ErrorReference::EntryNotFound)
             }
             sqlx::Error::Database(db_error) => match db_error.kind() {
@@ -309,6 +326,12 @@ impl From<AuthenticationError> for APIError {
 impl From<ZipError> for APIError {
     fn from(err: ZipError) -> Self {
         APIError::ZipError(err)
+    }
+}
+
+impl From<ApportionmentError> for APIError {
+    fn from(err: ApportionmentError) -> Self {
+        APIError::Apportionment(err)
     }
 }
 

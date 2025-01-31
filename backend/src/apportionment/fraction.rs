@@ -1,20 +1,25 @@
-use crate::data_entry::Count;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{
+    cmp::Ordering,
     fmt::{Debug, Display, Formatter, Result},
     ops::{Add, Div, Mul, Sub},
 };
-use utoipa::{PartialSchema, ToSchema};
+use utoipa::{
+    openapi::{schema::Schema, RefOr},
+    PartialSchema, ToSchema,
+};
 
-#[derive(Clone, Copy, Serialize)]
-#[serde(into = "DisplayFraction")]
+use crate::data_entry::Count;
+
+#[derive(Clone, Copy, Serialize, Deserialize)]
+#[serde(into = "DisplayFraction", from = "DisplayFraction")]
 pub struct Fraction {
     numerator: u64,
     denominator: u64,
 }
 
 impl PartialSchema for Fraction {
-    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+    fn schema() -> RefOr<Schema> {
         DisplayFraction::schema()
     }
 }
@@ -98,13 +103,13 @@ impl Div for Fraction {
 }
 
 impl PartialOrd for Fraction {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
 impl Ord for Fraction {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         // compare using integer math
         let lhs = self.numerator * other.denominator;
         let rhs = self.denominator * other.numerator;
@@ -153,7 +158,7 @@ impl PartialEq for DisplayFraction {
 }
 
 /// Fraction with the integer part split out for display purposes
-#[derive(Clone, Copy, Debug, Serialize, ToSchema)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, ToSchema)]
 #[schema(as = Fraction)]
 pub struct DisplayFraction {
     integer: u64,
@@ -172,10 +177,22 @@ impl From<Fraction> for DisplayFraction {
     }
 }
 
+impl From<DisplayFraction> for Fraction {
+    fn from(display_fraction: DisplayFraction) -> Self {
+        Self {
+            numerator: display_fraction.numerator
+                + display_fraction.integer * display_fraction.denominator,
+            denominator: display_fraction.denominator,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::apportionment::fraction::Fraction;
+    use crate::{
+        apportionment::{DisplayFraction, Fraction},
+        data_entry::Count,
+    };
     use test_log::test;
 
     #[test]

@@ -1,8 +1,7 @@
-use axum::{extract::State, response::IntoResponse, Json};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use axum_extra::extract::CookieJar;
 use chrono::TimeDelta;
 use cookie::{Cookie, SameSite};
-use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use session::Sessions;
 use user::{ListedUser, User, Users};

@@ -105,7 +105,7 @@ export function ElectionApportionmentPage() {
                   whole_seats += standing.whole_seats;
                   rest_seats += standing.rest_seats;
                   return (
-                    <Table.LinkRow to=".">
+                    <Table.LinkRow key={standing.pg_number} to=".">
                       <Table.Cell>{standing.pg_number}</Table.Cell>
                       <Table.Cell>{election.political_groups[standing.pg_number - 1]?.name || ""}</Table.Cell>
                       <Table.NumberCell>{standing.whole_seats}</Table.NumberCell>

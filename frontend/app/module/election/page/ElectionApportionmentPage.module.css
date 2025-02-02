@@ -29,6 +29,7 @@
 
       /* Number or DisplayFraction */
       &:nth-of-type(2) {
+        font-family: var(--font-number);
         width: 10.625rem;
         text-align: right;
         font-size: var(--font-size-md);
@@ -62,11 +63,18 @@
       &:nth-of-type(3),
       &:nth-of-type(4),
       &:nth-of-type(5) {
-        width: 7.65rem;
         text-align: right;
         font-size: var(--font-size-md);
         color: var(--gray-900);
         line-height: 1.75rem;
+      }
+
+      /* Seats */
+      &:nth-of-type(3),
+      &:nth-of-type(4),
+      &:nth-of-type(5) {
+        font-family: var(--font-number);
+        width: 7.65rem;
       }
 
       &:first-of-type,
@@ -75,15 +83,18 @@
         font-weight: normal;
       }
 
+      /* Political group number */
       &:first-of-type {
         width: 4.75rem;
       }
 
+      /* Political group name */
       &:nth-of-type(2) {
         font-size: var(--font-size-md);
         line-height: 1.5rem;
       }
 
+      /* Link chevron */
       &:last-of-type {
         width: 5rem;
       }

@@ -1,9 +1,10 @@
-.fraction {
+.display-fraction {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 0.5rem;
 
+  /* Fraction part */
   span:last-of-type {
     font-size: var(--font-size-xs);
     color: var(--gray-600);

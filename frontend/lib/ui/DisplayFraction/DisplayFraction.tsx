@@ -7,7 +7,7 @@ import cls from "./DisplayFraction.module.css";
 
 export function DisplayFraction({ fraction }: { fraction: Fraction }): ReactNode {
   return (
-    <div className={cls.fraction}>
+    <div className={cls.displayFraction}>
       <span>{fraction.integer ? formatNumber(fraction.integer) : ""}</span>
       <span>
         {fraction.numerator}/{fraction.denominator}

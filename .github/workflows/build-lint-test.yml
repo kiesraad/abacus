@@ -180,14 +180,18 @@ jobs:
       contents: read
       deployments: write
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Download abacus
         uses: actions/download-artifact@v4
         with:
           name: abacus-ubuntu-latest
+      - name: Strip debug symbols
+        run: strip abacus
       - name: Upload binary to test server
         run: |
           curl -s \
+          --fail \
           -H "Authorization: Bearer ${{ secrets.ABACUS_TEST_API_KEY }}" \
           -T ./abacus \
           https://abacus-test.nl/etes/api/v1/executable/${{ github.event.pull_request.head.sha || github.sha }}/${{ github.sha }}

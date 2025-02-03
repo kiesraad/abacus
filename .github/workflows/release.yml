@@ -91,6 +91,8 @@ jobs:
         if: runner.os != 'Windows'
       - name: Run Playwright e2e tests
         run: npm run test:e2e -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        env:
+          BACKEND_BUILD: release
 
   release:
     name: Release

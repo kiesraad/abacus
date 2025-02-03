@@ -49,6 +49,10 @@
   background-color: var(--bg-gray);
 }
 
+.bg-yellow {
+  background-color: var(--yellow-200);
+}
+
 /* Width */
 .w-13 {
   width: 13rem;

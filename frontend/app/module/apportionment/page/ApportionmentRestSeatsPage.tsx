@@ -1,0 +1,161 @@
+import { Link } from "react-router";
+
+import { NavBar } from "app/component/navbar/NavBar";
+
+import { ApportionmentStep, PoliticalGroupSeatAssignment, useApportionment, useElection } from "@kiesraad/api";
+import { t, tx } from "@kiesraad/i18n";
+import { IconChevronRight } from "@kiesraad/icon";
+import { DisplayFraction, PageTitle, Table } from "@kiesraad/ui";
+import { cn } from "@kiesraad/util";
+
+import cls from "./ApportionmentPage.module.css";
+
+export function ApportionmentRestSeatsPage() {
+  const { election } = useElection();
+  const { apportionment } = useApportionment();
+
+  function render_largest_averages_table() {
+    return (
+      <Table id="details_largest_averages" className={cn(cls.table, cls.largest_averages_table)}>
+        <Table.Header>
+          <Table.Column>{t("list")}</Table.Column>
+          <Table.Column>{t("party_name")}</Table.Column>
+          {apportionment.steps.map((step: ApportionmentStep) => {
+            return (
+              <Table.Column key={step.rest_seat_number}>
+                {t("apportionment.rest_seat.singular")} {step.rest_seat_number}
+              </Table.Column>
+            );
+          })}
+          <Table.Column>{t("apportionment.rest_seats_count")}</Table.Column>
+        </Table.Header>
+        <Table.Body>
+          {apportionment.final_standing.map((final_standing: PoliticalGroupSeatAssignment) => {
+            return (
+              <Table.Row key={final_standing.pg_number}>
+                <Table.Cell>{final_standing.pg_number}</Table.Cell>
+                <Table.Cell>{election.political_groups[final_standing.pg_number - 1]?.name || ""}</Table.Cell>
+                {apportionment.steps.map((step: ApportionmentStep) => {
+                  const average = step.standing[final_standing.pg_number - 1]?.next_votes_per_seat;
+                  if (average) {
+                    return (
+                      <Table.NumberCell
+                        key={`${final_standing.pg_number}-${step.rest_seat_number}`}
+                        className={step.change.pg_options.includes(final_standing.pg_number) ? "bg-yellow bold" : ""}
+                      >
+                        <DisplayFraction fraction={average} />
+                      </Table.NumberCell>
+                    );
+                  }
+                })}
+                <Table.NumberCell>{final_standing.rest_seats}</Table.NumberCell>
+              </Table.Row>
+            );
+          })}
+          <Table.Row>
+            <Table.Cell />
+            <Table.Cell>{t("apportionment.rest_seat_assigned_to_list")}</Table.Cell>
+            {apportionment.steps.map((step: ApportionmentStep) => {
+              return <Table.NumberCell key={step.rest_seat_number}>{step.change.selected_pg_number}</Table.NumberCell>;
+            })}
+            <Table.Cell />
+          </Table.Row>
+        </Table.Body>
+      </Table>
+    );
+  }
+
+  function render_largest_surpluses_table() {
+    return (
+      <Table id="details_largest_surpluses" className={cn(cls.table, cls.largest_surpluses_table)}>
+        <Table.Header>
+          <Table.Column>{t("list")}</Table.Column>
+          <Table.Column>{t("party_name")}</Table.Column>
+          <Table.Column>{t("apportionment.whole_seats_count")}</Table.Column>
+          <Table.Column>{t("apportionment.surplus")}</Table.Column>
+          <Table.Column>{t("apportionment.rest_seats_count")}</Table.Column>
+        </Table.Header>
+        <Table.Body>
+          {apportionment.steps.map((step: ApportionmentStep) => {
+            const surplus = step.standing[step.change.selected_pg_number - 1]?.surplus_votes;
+            if (surplus) {
+              return (
+                <Table.Row key={step.change.selected_pg_number}>
+                  <Table.Cell>{step.change.selected_pg_number}</Table.Cell>
+                  <Table.Cell>{election.political_groups[step.change.selected_pg_number - 1]?.name || ""}</Table.Cell>
+                  <Table.NumberCell>
+                    {apportionment.final_standing[step.change.selected_pg_number - 1]?.whole_seats}
+                  </Table.NumberCell>
+                  <Table.NumberCell>
+                    <DisplayFraction fraction={surplus} />
+                  </Table.NumberCell>
+                  <Table.NumberCell>1</Table.NumberCell>
+                </Table.Row>
+              );
+            }
+          })}
+        </Table.Body>
+      </Table>
+    );
+  }
+
+  return (
+    <>
+      <PageTitle title={`${t("apportionment.title")} - Abacus`} />
+      <NavBar>
+        <Link to={`/elections/${election.id}#coordinator`}>
+          <span className="bold">{election.location}</span>
+          <span>&mdash;</span>
+          <span>{election.name}</span>
+        </Link>
+        <IconChevronRight />
+        <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
+      </NavBar>
+      <header>
+        <section>
+          <h1>{t("apportionment.details_rest_seats")}</h1>
+        </section>
+      </header>
+      <main>
+        <article className={cls.article}>
+          {apportionment.seats >= 19 ? (
+            <div>
+              <h2 className={cls.table_title}>{t("apportionment.rest_seats_largest_averages")}</h2>
+              <span className={cls.table_information}>
+                {tx(
+                  `apportionment.whole_seats_information_link.${apportionment.rest_seats > 1 ? "plural" : "singular"}`,
+                  {
+                    link: (title) => <Link to="../details-whole-seats">{title}</Link>,
+                  },
+                  { num_rest_seats: apportionment.rest_seats },
+                )}
+                <br />
+                <br />
+                {tx("apportionment.information_largest_averages")}
+              </span>
+              {render_largest_averages_table()}
+            </div>
+          ) : (
+            <div>
+              <h2 className={cls.table_title}>{t("apportionment.rest_seats_largest_surpluses")}</h2>
+              <span className={cls.table_information}>
+                {tx(
+                  `apportionment.whole_seats_information_link.${apportionment.rest_seats > 1 ? "plural" : "singular"}`,
+                  {
+                    link: (title) => <Link to="../details-whole-seats">{title}</Link>,
+                  },
+                  { num_rest_seats: apportionment.rest_seats },
+                )}
+                <br />
+                <br />
+                {tx("apportionment.information_largest_surpluses")}
+              </span>
+              {render_largest_surpluses_table()}
+              {/* TODO: Add largest averages table when needed */}
+            </div>
+          )}
+        </article>
+      </main>
+    </>
+  );
+}

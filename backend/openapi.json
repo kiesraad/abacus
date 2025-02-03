@@ -1249,6 +1249,8 @@
         "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after whole seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
         "required": [
           "seats",
+          "whole_seats",
+          "rest_seats",
           "quota",
           "steps",
           "final_standing"
@@ -1263,6 +1265,11 @@
           "quota": {
             "$ref": "#/components/schemas/Fraction"
           },
+          "rest_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
           "seats": {
             "type": "integer",
             "format": "int64",
@@ -1273,6 +1280,11 @@
             "items": {
               "$ref": "#/components/schemas/ApportionmentStep"
             }
+          },
+          "whole_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           }
         }
       },

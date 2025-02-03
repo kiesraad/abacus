@@ -21,7 +21,12 @@ import { t } from "@kiesraad/i18n";
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
 import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
-import { ApportionmentLayout, ApportionmentPage } from "./module/apportionment";
+import {
+  ApportionmentLayout,
+  ApportionmentPage,
+  ApportionmentRestSeatsPage,
+  ApportionmentWholeSeatsPage,
+} from "./module/apportionment";
 import {
   CandidatesVotesPage,
   DataEntryHomePage,
@@ -52,6 +57,8 @@ export const routes = createRoutesFromElements(
         <Route index element={<ElectionHomePage />} />
         <Route path="apportionment" element={<ApportionmentLayout />}>
           <Route index element={<ApportionmentPage />} />
+          <Route path="details-rest-seats" element={<ApportionmentRestSeatsPage />} />
+          <Route path="details-whole-seats" element={<ApportionmentWholeSeatsPage />} />
         </Route>
         <Route
           path="report"

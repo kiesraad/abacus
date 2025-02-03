@@ -17,6 +17,8 @@ mod fraction;
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApportionmentResult {
     pub seats: u64,
+    pub whole_seats: u64,
+    pub rest_seats: u64,
     pub quota: Fraction,
     pub steps: Vec<ApportionmentStep>,
     pub final_standing: Vec<PoliticalGroupSeatAssignment>,
@@ -254,6 +256,8 @@ pub fn seat_allocation(
 
     Ok(ApportionmentResult {
         seats,
+        whole_seats: whole_seats_count,
+        rest_seats: remaining_seats,
         quota,
         steps,
         final_standing: final_standing.into_iter().map(Into::into).collect(),

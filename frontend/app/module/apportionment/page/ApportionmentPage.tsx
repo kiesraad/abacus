@@ -13,9 +13,6 @@ export function ApportionmentPage() {
   const { election } = useElection();
   const { apportionment, election_summary } = useApportionment();
 
-  let total_whole_seats = 0;
-  let total_rest_seats = 0;
-
   function convert_zero_to_dash(number: number): string {
     if (number === 0) {
       return "-";
@@ -26,7 +23,7 @@ export function ApportionmentPage() {
   function get_number_of_seats_assigned_sentence(seats: number, type: "rest_seat" | "whole_seat"): string {
     return t(`apportionment.seats_assigned.${seats > 1 ? "plural" : "singular"}`, {
       num_seat: seats,
-      type_seat: t(`apportionment.${type}.singular`),
+      type_seat: t(`apportionment.${type}.singular`).toLowerCase(),
     });
   }
 
@@ -124,8 +121,6 @@ export function ApportionmentPage() {
               </Table.Header>
               <Table.Body>
                 {apportionment.final_standing.map((standing: PoliticalGroupSeatAssignment) => {
-                  total_whole_seats += standing.whole_seats;
-                  total_rest_seats += standing.rest_seats;
                   return (
                     /* TODO: Add row link */
                     <Table.LinkRow key={standing.pg_number} to=".">
@@ -141,8 +136,8 @@ export function ApportionmentPage() {
                 <Table.Row>
                   <Table.Cell />
                   <Table.Cell>{t("apportionment.total")}</Table.Cell>
-                  <Table.NumberCell>{total_whole_seats}</Table.NumberCell>
-                  <Table.NumberCell>{total_rest_seats}</Table.NumberCell>
+                  <Table.NumberCell>{apportionment.whole_seats}</Table.NumberCell>
+                  <Table.NumberCell>{apportionment.rest_seats}</Table.NumberCell>
                   <Table.NumberCell>{apportionment.seats}</Table.NumberCell>
                   <Table.Cell />
                 </Table.Row>
@@ -150,12 +145,12 @@ export function ApportionmentPage() {
             </Table>
             <ul>
               <li>
-                {get_number_of_seats_assigned_sentence(total_whole_seats, "whole_seat")} (
-                <Link to=".">{t("apportionment.view_details")}</Link>) {/* TODO: Add details link */}
+                {get_number_of_seats_assigned_sentence(apportionment.whole_seats, "whole_seat")} (
+                <Link to="./details-whole-seats">{t("apportionment.view_details")}</Link>)
               </li>
               <li>
-                {get_number_of_seats_assigned_sentence(total_rest_seats, "rest_seat")} (
-                <Link to=".">{t("apportionment.view_details")}</Link>) {/* TODO: Add details link */}
+                {get_number_of_seats_assigned_sentence(apportionment.rest_seats, "rest_seat")} (
+                <Link to="./details-rest-seats">{t("apportionment.view_details")}</Link>)
               </li>
             </ul>
           </div>

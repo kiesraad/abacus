@@ -133,8 +133,10 @@ number of seats per political group that was assigned after all seats were assig
 export interface ApportionmentResult {
   final_standing: PoliticalGroupSeatAssignment[];
   quota: Fraction;
+  rest_seats: number;
   seats: number;
   steps: ApportionmentStep[];
+  whole_seats: number;
 }
 
 /**

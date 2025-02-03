@@ -32,7 +32,7 @@ export function OverviewPage() {
   return (
     <>
       <PageTitle title={`${t("election.title.overview")} - Abacus`} />
-      <NavBar />
+      <NavBar location={location} />
       <header>
         <section>
           <h1>{isAdminOrCoordinator ? t("election.manage") : t("election.title.plural")}</h1>

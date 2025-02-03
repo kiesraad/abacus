@@ -4,9 +4,9 @@ import { IconUser } from "@kiesraad/icon";
 import styles from "./NavBar.module.css";
 import { NavBarLinks } from "./NavBarLinks";
 
-type NavBarProps = { location?: { pathname: string; hash: string } };
+type NavBarProps = { location: { pathname: string; hash: string } };
 
-export function NavBar({ location = window.location }: NavBarProps) {
+export function NavBar({ location }: NavBarProps) {
   const isAdministrator = location.hash.includes("administrator");
   const isCoordinator = location.hash.includes("coordinator");
 

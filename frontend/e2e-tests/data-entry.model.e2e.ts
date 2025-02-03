@@ -12,6 +12,12 @@ import { createMachine } from "xstate";
 import { VotersCounts, VotesCounts } from "@kiesraad/api";
 
 import { test } from "./fixtures";
+import {
+  getStatesAndEventsFromMachineDefinition,
+  getStatesAndEventsFromTest,
+  TestEvents,
+  TestStates,
+} from "./xstate-helpers";
 
 /*
 Not covered in the model:
@@ -29,7 +35,7 @@ changed the initial input on the voters and votes page, and we have saved it as 
 to the polling stations page.
 */
 
-const machineDefinition = {
+const dataEntryMachineDefinition = {
   initial: "voterVotesPageEmpty",
   states: {
     pollingStationsPageDiscarded: {},
@@ -134,22 +140,8 @@ const machineDefinition = {
   },
 };
 
-const machineStates = Object.keys(machineDefinition.states);
-
-function getEventsFromMachineDef(machineDef) {
-  let events: string[] = [];
-  Object.keys(machineDef.states).forEach((key) => {
-    const state = machineDef.states[key as keyof typeof machineDef.states];
-    if ("on" in state) {
-      events = [...events, ...Object.keys(state.on)];
-    }
-  });
-  return events;
-}
-
-const machineEvents = getEventsFromMachineDef(machineDefinition);
-
-const machine = createMachine(machineDefinition);
+const machine = createMachine(dataEntryMachineDefinition);
+const { machineStates, machineEvents } = getStatesAndEventsFromMachineDefinition(dataEntryMachineDefinition);
 
 const voters: VotersCounts = {
   poll_card_count: 90,
@@ -186,7 +178,7 @@ const votesEmpty: VotesCounts = {
   total_votes_cast_count: 0,
 };
 
-test.describe("Data entry", () => {
+test.describe("Data entry model test", () => {
   createTestModel(machine)
     .getSimplePaths()
     .forEach((path) => {
@@ -198,7 +190,7 @@ test.describe("Data entry", () => {
         const differencesPage = new DifferencesPage(page);
         const abortModal = new AbortInputModal(page);
 
-        const pollingStationsPageStates = {
+        const pollingStationsPageStates: TestStates = {
           pollingStationsPageDiscarded: async () => {
             await expect(pollingStationChoicePage.fieldset).toBeVisible();
             await expect(pollingStationChoicePage.alertDataEntryInProgress).toBeHidden();
@@ -222,13 +214,14 @@ test.describe("Data entry", () => {
             ]);
           },
         };
-        const PollingStationsPageEvents = {
+
+        const PollingStationsPageEvents: TestEvents = {
           RESUME_DATA_ENTRY: async () => {
             await pollingStationChoicePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
           },
         };
 
-        const recountedPageStates = {
+        const recountedPageStates: TestStates = {
           recountedPageEmpty: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
@@ -249,7 +242,8 @@ test.describe("Data entry", () => {
             await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
           },
         };
-        const recountedPageEvents = {
+
+        const recountedPageEvents: TestEvents = {
           SAVE_UNSUBMITTED_CHANGES: async () => {
             await recountedPage.unsavedChangesModal.saveInput.click();
           },
@@ -258,7 +252,7 @@ test.describe("Data entry", () => {
           },
         };
 
-        const votersVotesPageStates = {
+        const votersVotesPageStates: TestStates = {
           voterVotesPageCached: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
@@ -305,7 +299,8 @@ test.describe("Data entry", () => {
             expect(votersVotesFields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
           },
         };
-        const votersAndVotesPageEvents = {
+
+        const votersAndVotesPageEvents: TestEvents = {
           FILL_WITH_VALID_DATA: async () => {
             await votersAndVotesPage.inputVotersCounts(voters);
             await votersAndVotesPage.inputVotesCounts(votes);
@@ -327,18 +322,19 @@ test.describe("Data entry", () => {
           },
         };
 
-        const differencesPageStates = {
+        const differencesPageStates: TestStates = {
           differencesPage: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
           },
         };
-        const differencesPageEvents = {
+
+        const differencesPageEvents: TestEvents = {
           GO_TO_VOTERS_VOTES_PAGE: async () => {
             await differencesPage.navPanel.votersAndVotes.click();
           },
         };
 
-        const abortInputModalStates = {
+        const abortInputModalStates: TestStates = {
           abortInputModalFilled: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
@@ -349,7 +345,7 @@ test.describe("Data entry", () => {
             await expect(abortModal.heading).toBeVisible();
           },
         };
-        const abortInputModalEvents = {
+        const abortInputModalEvents: TestEvents = {
           SAVE_INPUT: async () => {
             await abortModal.saveInput.click();
           },
@@ -358,25 +354,26 @@ test.describe("Data entry", () => {
           },
         };
 
-        function getStatesfromStates(theStates) {
-          let states: string[] = [];
-          theStates.forEach((element) => {
-            states = [...states, ...Object.keys(element)];
-          });
-          return states;
-        }
-
-        const allStates = getStatesfromStates([
-          pollingStationsPageStates,
-          recountedPageStates,
-          votersVotesPageStates,
-          differencesPageStates,
-          abortInputModalStates,
-        ]);
-
-        expect(new Set(allStates)).toEqual(new Set(machineStates));
-
-        // TODO: do the same for Events as above for States
+        // check that events and states used by the machine are equal to
+        // the events and states specified in the test
+        const { states, events } = getStatesAndEventsFromTest(
+          [
+            pollingStationsPageStates,
+            recountedPageStates,
+            votersVotesPageStates,
+            differencesPageStates,
+            abortInputModalStates,
+          ],
+          [
+            PollingStationsPageEvents,
+            recountedPageEvents,
+            votersAndVotesPageEvents,
+            differencesPageEvents,
+            abortInputModalEvents,
+          ],
+        );
+        expect(new Set(states)).toEqual(new Set(machineStates));
+        expect(new Set(events)).toEqual(new Set(machineEvents));
 
         await page.goto(`/elections/${pollingStation.election_id}/data-entry`);
         await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);

@@ -8,10 +8,11 @@ import { useDataEntryContext } from "../state/useDataEntryContext";
 import { DifferencesFormValues, DifferencesValues, formValuesToValues, valuesToFormValues } from "./differencesValues";
 
 export function useDifferences() {
-  const { cache, status, pollingStationResults, formState, onSubmitForm, updateFormSection } = useDataEntryContext({
-    id: "differences_counts",
-    type: "differences",
-  });
+  const { error, cache, status, pollingStationResults, formState, onSubmitForm, updateFormSection } =
+    useDataEntryContext({
+      id: "differences_counts",
+      type: "differences",
+    });
 
   // local form state
   const defaultValues =
@@ -56,12 +57,13 @@ export function useDifferences() {
 
   // scroll to top when saved
   useEffect(() => {
-    if (isSaved) {
+    if (isSaved || error) {
       window.scrollTo(0, 0);
     }
-  }, [isSaved]);
+  }, [isSaved, error]);
 
   return {
+    error,
     formRef,
     onSubmit,
     pollingStationResults,

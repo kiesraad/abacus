@@ -1,5 +1,7 @@
+import { ErrorModal } from "app/component/error";
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 
+import { ApiError } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import {
   Alert,
@@ -19,6 +21,7 @@ import { formValuesToValues } from "./votersAndVotesValues";
 
 export function VotersAndVotesForm() {
   const {
+    error,
     formRef,
     onSubmit,
     pollingStationResults,
@@ -45,9 +48,8 @@ export function VotersAndVotesForm() {
       <PollingStationFormNavigation
         onSubmit={onSubmit}
         currentValues={formValuesToValues(currentValues, pollingStationResults.recounted || false)}
-        hasChanges={formSection.hasChanges}
-        acceptWarnings={formSection.acceptWarnings}
       />
+      {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && formSection.errors.length > 0 && (
         <Feedback id="feedback-error" type="error" data={formSection.errors.map((error) => error.code)} />
       )}
@@ -67,12 +69,12 @@ export function VotersAndVotesForm() {
             field="A"
             id="poll_card_count"
             title={t("voters_and_votes.poll_card_count")}
-            value={currentValues.poll_card_count || ''}
+            value={currentValues.poll_card_count || ""}
             onChange={(e) => {
               setValues({
                 ...currentValues,
                 poll_card_count: e.target.value,
-              })
+              });
             }}
             {...defaultProps}
           />
@@ -81,12 +83,12 @@ export function VotersAndVotesForm() {
             field="B"
             id="proxy_certificate_count"
             title={t("voters_and_votes.proxy_certificate_count")}
-            value={currentValues.proxy_certificate_count || ''}
+            value={currentValues.proxy_certificate_count || ""}
             onChange={(e) => {
               setValues({
                 ...currentValues,
                 proxy_certificate_count: e.target.value,
-              })
+              });
             }}
             {...defaultProps}
           />
@@ -95,12 +97,12 @@ export function VotersAndVotesForm() {
             field="C"
             id="voter_card_count"
             title={t("voters_and_votes.voter_card_count")}
-            value={currentValues.voter_card_count || ''}
+            value={currentValues.voter_card_count || ""}
             onChange={(e) => {
               setValues({
                 ...currentValues,
                 voter_card_count: e.target.value,
-              })
+              });
             }}
             {...defaultProps}
           />
@@ -111,12 +113,12 @@ export function VotersAndVotesForm() {
             title={t("voters_and_votes.total_admitted_voters_count")}
             isTotal
             addSeparator
-            value={currentValues.total_admitted_voters_count || ''}
+            value={currentValues.total_admitted_voters_count || ""}
             onChange={(e) => {
               setValues({
                 ...currentValues,
                 total_admitted_voters_count: e.target.value,
-              })
+              });
             }}
             {...defaultProps}
           />
@@ -125,12 +127,12 @@ export function VotersAndVotesForm() {
             field="E"
             id="votes_candidates_count"
             title={t("voters_and_votes.votes_candidates_count")}
-            value={currentValues.votes_candidates_count || ''}
+            value={currentValues.votes_candidates_count || ""}
             onChange={(e) => {
               setValues({
                 ...currentValues,
                 votes_candidates_count: e.target.value,
-              })
+              });
             }}
             {...defaultProps}
           />
@@ -139,12 +141,12 @@ export function VotersAndVotesForm() {
             field="F"
             id="blank_votes_count"
             title={t("voters_and_votes.blank_votes_count")}
-            value={currentValues.blank_votes_count || ''}
+            value={currentValues.blank_votes_count || ""}
             onChange={(e) => {
               setValues({
                 ...currentValues,
                 blank_votes_count: e.target.value,
-              })
+              });
             }}
             {...defaultProps}
           />
@@ -153,12 +155,12 @@ export function VotersAndVotesForm() {
             field="G"
             id="invalid_votes_count"
             title={t("voters_and_votes.invalid_votes_count")}
-            value={currentValues.invalid_votes_count || ''}
+            value={currentValues.invalid_votes_count || ""}
             onChange={(e) => {
               setValues({
                 ...currentValues,
                 invalid_votes_count: e.target.value,
-              })
+              });
             }}
             {...defaultProps}
           />
@@ -167,12 +169,12 @@ export function VotersAndVotesForm() {
             field="H"
             id="total_votes_cast_count"
             title={t("voters_and_votes.total_votes_cast_count")}
-            value={currentValues.total_votes_cast_count || ''}
+            value={currentValues.total_votes_cast_count || ""}
             onChange={(e) => {
               setValues({
                 ...currentValues,
                 total_votes_cast_count: e.target.value,
-              })
+              });
             }}
             isTotal
             {...defaultProps}
@@ -192,12 +194,12 @@ export function VotersAndVotesForm() {
                 field="A.2"
                 id="poll_card_recount"
                 title={t("voters_and_votes.poll_card_recount")}
-                value={currentValues.poll_card_recount || ''}
+                value={currentValues.poll_card_recount || ""}
                 onChange={(e) => {
                   setValues({
                     ...currentValues,
                     poll_card_recount: e.target.value,
-                  })
+                  });
                 }}
                 {...defaultProps}
               />
@@ -206,12 +208,12 @@ export function VotersAndVotesForm() {
                 field="B.2"
                 id="proxy_certificate_recount"
                 title={t("voters_and_votes.proxy_certificate_recount")}
-                value={currentValues.proxy_certificate_recount || ''}
+                value={currentValues.proxy_certificate_recount || ""}
                 onChange={(e) => {
                   setValues({
                     ...currentValues,
                     proxy_certificate_recount: e.target.value,
-                  })
+                  });
                 }}
                 {...defaultProps}
               />
@@ -220,12 +222,12 @@ export function VotersAndVotesForm() {
                 field="C.2"
                 id="voter_card_recount"
                 title={t("voters_and_votes.voter_card_recount")}
-                value={currentValues.voter_card_recount || ''}
+                value={currentValues.voter_card_recount || ""}
                 onChange={(e) => {
                   setValues({
                     ...currentValues,
                     voter_card_recount: e.target.value,
-                  })
+                  });
                 }}
                 {...defaultProps}
               />
@@ -234,12 +236,12 @@ export function VotersAndVotesForm() {
                 field="D.2"
                 id="total_admitted_voters_recount"
                 title={t("voters_and_votes.total_admitted_voters_recount")}
-                value={currentValues.total_admitted_voters_recount || ''}
+                value={currentValues.total_admitted_voters_recount || ""}
                 onChange={(e) => {
                   setValues({
                     ...currentValues,
                     total_admitted_voters_recount: e.target.value,
-                  })
+                  });
                 }}
                 isTotal
                 {...defaultProps}

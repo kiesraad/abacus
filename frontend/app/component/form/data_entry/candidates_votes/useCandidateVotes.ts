@@ -13,11 +13,12 @@ import {
 } from "./candidatesVotesValues";
 
 export function useCandidateVotes(political_group_number: number) {
-  const { cache, status, pollingStationResults, formState, onSubmitForm, updateFormSection } = useDataEntryContext({
-    id: `political_group_votes_${political_group_number}`,
-    type: "political_group_votes",
-    number: political_group_number,
-  });
+  const { error, cache, status, pollingStationResults, formState, onSubmitForm, updateFormSection } =
+    useDataEntryContext({
+      id: `political_group_votes_${political_group_number}`,
+      type: "political_group_votes",
+      number: political_group_number,
+    });
 
   const politicalGroupVotes = pollingStationResults.political_group_votes.find(
     (pg) => pg.number === political_group_number,
@@ -80,12 +81,13 @@ export function useCandidateVotes(political_group_number: number) {
 
   // scroll to top when saved
   useEffect(() => {
-    if (isSaved) {
+    if (isSaved || error) {
       window.scrollTo(0, 0);
     }
-  }, [isSaved]);
+  }, [isSaved, error]);
 
   return {
+    error,
     formRef,
     onSubmit,
     pollingStationResults,

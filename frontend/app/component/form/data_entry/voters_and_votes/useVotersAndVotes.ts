@@ -13,10 +13,11 @@ import {
 } from "./votersAndVotesValues";
 
 export function useVotersAndVotes() {
-  const { cache, status, pollingStationResults, formState, onSubmitForm, updateFormSection } = useDataEntryContext({
-    id: "voters_votes_counts",
-    type: "voters_and_votes",
-  });
+  const { error, cache, status, pollingStationResults, formState, onSubmitForm, updateFormSection } =
+    useDataEntryContext({
+      id: "voters_votes_counts",
+      type: "voters_and_votes",
+    });
 
   // local form state
   const defaultValues =
@@ -62,12 +63,13 @@ export function useVotersAndVotes() {
 
   // scroll to top when saved
   useEffect(() => {
-    if (isSaved) {
+    if (isSaved || error) {
       window.scrollTo(0, 0);
     }
-  }, [isSaved]);
+  }, [isSaved, error]);
 
   return {
+    error,
     formRef,
     onSubmit,
     pollingStationResults,

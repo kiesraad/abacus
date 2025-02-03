@@ -3,17 +3,16 @@ import { useEffect, useRef, useState } from "react";
 import { PollingStationResults } from "@kiesraad/api";
 import { useFormKeyboardNavigation } from "@kiesraad/ui";
 
-import { useDataEntryContext } from "../state/useDataEntryContext";
 import { SubmitCurrentFormOptions } from "../state/types";
+import { useDataEntryContext } from "../state/useDataEntryContext";
 
 export type RecountedValue = Pick<PollingStationResults, "recounted">;
 
 export function useRecounted() {
-  const { status, pollingStationResults, formState, onSubmitForm } = useDataEntryContext({
+  const { error, status, pollingStationResults, formState, onSubmitForm } = useDataEntryContext({
     id: "recounted",
     type: "recounted",
   });
-
 
   // local state
   const [recounted, setRecounted] = useState<boolean | undefined>(pollingStationResults.recounted);
@@ -44,12 +43,13 @@ export function useRecounted() {
 
   // scroll to top when saved
   useEffect(() => {
-    if (isSaved) {
+    if (isSaved || error) {
       window.scrollTo(0, 0);
     }
-  }, [isSaved, warnings, errors]);
+  }, [isSaved, error]);
 
   return {
+    error,
     status,
     formRef,
     recounted,

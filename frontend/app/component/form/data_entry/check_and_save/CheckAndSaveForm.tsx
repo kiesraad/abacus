@@ -2,7 +2,9 @@ import * as React from "react";
 import { ReactElement } from "react";
 import { Link, useNavigate } from "react-router";
 
-import { useElection } from "@kiesraad/api";
+import { ErrorModal } from "app/component/error";
+
+import { ApiError, useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import {
   BottomBar,
@@ -18,7 +20,6 @@ import {
 import { getUrlForFormSectionID } from "../../../pollingstation/utils";
 import { getPollingStationSummary, PollingStationFormSectionStatus } from "../state/dataEntryUtils";
 import { FormSectionId } from "../state/types";
-import useDataEntry from "../state/useDataEntry";
 import { useDataEntryContext } from "../state/useDataEntryContext";
 
 export function CheckAndSaveForm() {
@@ -27,7 +28,7 @@ export function CheckAndSaveForm() {
 
   const navigate = useNavigate();
   const { election } = useElection();
-  const { formState, status, onFinaliseDataEntry, pollingStationId, entryNumber } = useDataEntryContext({
+  const { error, formState, status, onFinaliseDataEntry, pollingStationId, entryNumber } = useDataEntryContext({
     id: "save",
     type: "save",
   });
@@ -58,6 +59,7 @@ export function CheckAndSaveForm() {
 
   return (
     <Form onSubmit={handleSubmit} id="check_save_form" title={t("check_and_save.title")} ref={formRef}>
+      {error instanceof ApiError && <ErrorModal error={error} />}
       <section className="md" id="save-form-summary-text">
         {!summary.hasBlocks && summary.countsAddUp && (
           <p className="md">{t("check_and_save.counts_add_up.no_warnings")}</p>

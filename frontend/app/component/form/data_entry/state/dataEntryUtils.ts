@@ -391,7 +391,7 @@ export function buildFormState(
     (sectionID: FormSectionId) => sectionID === newFormState.current,
   );
 
-  updateFormStateAfterSubmit(newFormState, validationResults, acceptWarnings, clientState.continue);
+  updateFormStateAfterSubmit(newFormState, validationResults, acceptWarnings);
 
   let targetFormSectionId: FormSectionId;
   if (clientState.continue) {

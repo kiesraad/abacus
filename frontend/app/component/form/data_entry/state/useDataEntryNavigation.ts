@@ -1,8 +1,11 @@
-import { getBaseUrl, getUrlForFormSectionID } from "app/component/pollingstation/utils";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { DataEntryState } from "./types";
+
+import { getBaseUrl, getUrlForFormSectionID } from "app/component/pollingstation/utils";
+
 import { Election } from "@kiesraad/api";
+
+import { DataEntryState } from "./types";
 
 export default function useDataEntryNavigation(
   state: DataEntryState,
@@ -12,17 +15,30 @@ export default function useDataEntryNavigation(
   entryNumber: number,
 ) {
   const navigate = useNavigate();
-  
-    const pathname = location.pathname;
-    useEffect(() => {
-      if (state.targetFormSectionId) {
-        const url = getUrlForFormSectionID(election.id, pollingStationId, entryNumber, state.targetFormSectionId);
-        if (pathname === getBaseUrl(election.id, pollingStationId, entryNumber)) {
-          void navigate(url, { replace: true });
-        } else if (pathname !== url) {
-          void navigate(url);
-        }
-        dispatch({ type: "RESET_TARGET_FORM_SECTION" });
+
+  // navigate to the target form section
+  const pathname = location.pathname;
+  useEffect(() => {
+    if (state.targetFormSectionId) {
+      const url = getUrlForFormSectionID(election.id, pollingStationId, entryNumber, state.targetFormSectionId);
+      if (pathname === getBaseUrl(election.id, pollingStationId, entryNumber)) {
+        void navigate(url, { replace: true });
+      } else if (pathname !== url) {
+        void navigate(url);
       }
-    }, [state.targetFormSectionId, navigate, election.id, pollingStationId, entryNumber, pathname]);
+      dispatch({ type: "RESET_TARGET_FORM_SECTION" });
+    }
+  }, [state.targetFormSectionId, navigate, election.id, pollingStationId, entryNumber, pathname]);
+
+  // prevent navigating to sections that are not yet active
+  useEffect(() => {
+    const currentSection = state.formState.sections[state.formState.current];
+    const furthestSection = state.formState.sections[state.formState.furthest];
+    if (currentSection && furthestSection) {
+      if (currentSection.index > furthestSection.index) {
+        const url = getUrlForFormSectionID(election.id, pollingStationId, entryNumber, furthestSection.id);
+        void navigate(url);
+      }
+    }
+  }, [state.formState, navigate, election.id, pollingStationId, entryNumber]);
 }

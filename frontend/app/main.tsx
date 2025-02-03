@@ -18,11 +18,12 @@ function render() {
   const router = createBrowserRouter(routes);
 
   root.render(
-    // <StrictMode>
-    <ApiProvider>
-      <RouterProvider router={router} />
-    </ApiProvider>,
-    // </StrictMode>,
+    <StrictMode>
+      <ApiProvider>
+        <RouterProvider router={router} />
+      </ApiProvider>
+      ,
+    </StrictMode>,
   );
 }
 

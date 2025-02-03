@@ -1,42 +1,27 @@
-import * as React from "react";
 import { useBlocker, useNavigate } from "react-router";
 
-import { ApiError, PollingStationResults } from "@kiesraad/api";
+import { PollingStationResults } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
-import { ErrorModal } from "../error";
-import { FormSectionId, SubmitCurrentFormOptions } from "../form/data_entry/state/types";
+import { SubmitCurrentFormOptions } from "../form/data_entry/state/types";
 import { useDataEntryContext } from "../form/data_entry/state/useDataEntryContext";
-import { getUrlForFormSectionID } from "./utils";
 
 export interface PollingStationFormNavigationProps {
   onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>;
   currentValues: Partial<PollingStationResults>;
-  hasChanges: boolean;
-  acceptWarnings: boolean;
 }
 
-export function PollingStationFormNavigation({
-  onSubmit,
-  currentValues,
-  acceptWarnings,
-  hasChanges,
-}: PollingStationFormNavigationProps) {
-  const { status, election, pollingStationId, formState, error, setCache, entryNumber, onDeleteDataEntry } =
+export function PollingStationFormNavigation({ onSubmit, currentValues }: PollingStationFormNavigationProps) {
+  const navigate = useNavigate();
+  const { status, election, pollingStationId, formState, setCache, entryNumber, onDeleteDataEntry } =
     useDataEntryContext();
 
-  const navigate = useNavigate();
+  // path check to see if the current location is part of the data entry flow
+  const isPartOfDataEntryFlow = (pathname: string) =>
+    pathname.startsWith(`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}`);
 
-  const isPartOfDataEntryFlow = React.useCallback(
-    (pathname: string) =>
-      pathname.startsWith(`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}`),
-    [election, pollingStationId, entryNumber],
-  );
-
-  const getUrlForFormSection = (id: FormSectionId) =>
-    getUrlForFormSectionID(election.id, pollingStationId, entryNumber, id);
-
+  // block navigation if there are unsaved changes
   const blocker = useBlocker(({ currentLocation, nextLocation }) => {
     if (
       status === "deleted" ||
@@ -47,29 +32,13 @@ export function PollingStationFormNavigation({
       return false;
     }
 
-    //check if nextLocation is outside the data entry flow
+    // check if nextLocation is outside the data entry flow
     if (!isPartOfDataEntryFlow(nextLocation.pathname)) {
       return true;
     }
 
-    const reasons: BlockReason[] = [];
     const formSection = formState.sections[formState.current];
-    if (formSection) {
-      if (formSection.errors.length > 0) {
-        reasons.push("errors");
-      }
-
-      if (formSection.warnings.length > 0 && !formSection.acceptWarnings) {
-        reasons.push("warnings");
-      }
-
-      if (formSection.acceptWarnings !== acceptWarnings || hasChanges) {
-        reasons.push("changes");
-      }
-    }
-
-    //currently only block on changes
-    if (reasons.includes("changes")) {
+    if (formSection?.hasChanges) {
       if (formState.current === formState.furthest) {
         setCache({
           key: formState.current,
@@ -85,25 +54,11 @@ export function PollingStationFormNavigation({
     return false;
   });
 
-  //prevent navigating to sections that are not yet active
-  React.useEffect(() => {
-    const currentSection = formState.sections[formState.current];
-    const furthestSection = formState.sections[formState.furthest];
-    if (currentSection && furthestSection) {
-      if (currentSection.index > furthestSection.index) {
-        const url = getUrlForFormSection(furthestSection.id);
-        void navigate(url);
-      }
-    }
-  }, [formState, navigate, getUrlForFormSection]);
+  if (blocker.state !== "blocked") {
+    return null;
+  }
 
-  // scroll up when an error occurs
-  React.useEffect(() => {
-    if (error) {
-      window.scrollTo(0, 0);
-    }
-  }, [error]);
-
+  // save when navigation within data entry flow
   async function onSave() {
     await onSubmit({ continueToNextSection: false });
 
@@ -116,6 +71,47 @@ export function PollingStationFormNavigation({
     }
   }
 
+  // when unsaved changes are detected and navigating within the data entry flow
+  if (isPartOfDataEntryFlow(blocker.location.pathname)) {
+    return (
+      <Modal
+        title={t("polling_station.unsaved_changes_title")}
+        onClose={() => {
+          blocker.reset();
+        }}
+      >
+        <p>
+          {tx(
+            "polling_station.unsaved_changes_message",
+            {},
+            { name: formState.sections[formState.current]?.title || t("polling_station.current_form") },
+          )}
+        </p>
+        <p>{t("polling_station.save_changes")}</p>
+        <nav>
+          <Button
+            size="lg"
+            onClick={() => {
+              void onSave();
+            }}
+          >
+            {t("save_changes")}
+          </Button>
+          <Button
+            size="lg"
+            variant="secondary"
+            onClick={() => {
+              blocker.proceed();
+            }}
+          >
+            {t("do_not_save")}
+          </Button>
+        </nav>
+      </Modal>
+    );
+  }
+
+  // when save is chosen in the abort dialog
   const onAbortModalSave = async () => {
     if (blocker.state === "blocked") {
       if (await onSubmit({ continueToNextSection: false })) {
@@ -126,6 +122,7 @@ export function PollingStationFormNavigation({
     }
   };
 
+  // when discard is chosen in the abort dialog
   const onAbortModalDelete = async () => {
     if (blocker.state === "blocked") {
       if (await onDeleteDataEntry()) {
@@ -136,81 +133,36 @@ export function PollingStationFormNavigation({
     }
   };
 
+  // when unsaved changes are detected and navigating outside the data entry flow
   return (
-    <>
-      {blocker.state === "blocked" && (
-        <>
-          {!isPartOfDataEntryFlow(blocker.location.pathname) ? (
-            <Modal
-              title={t("data_entry.abort.title")}
-              onClose={() => {
-                blocker.reset();
-              }}
-            >
-              {tx("data_entry.abort.description")}
-              <nav>
-                <Button
-                  size="lg"
-                  onClick={() => {
-                    void onAbortModalSave();
-                  }}
-                  disabled={status === "saving"}
-                >
-                  {t("data_entry.abort.save_input")}
-                </Button>
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  onClick={() => {
-                    void onAbortModalDelete();
-                  }}
-                  disabled={status === "deleting"}
-                >
-                  {t("data_entry.abort.discard_input")}
-                </Button>
-              </nav>
-            </Modal>
-          ) : (
-            <Modal
-              title={t("polling_station.unsaved_changes_title")}
-              onClose={() => {
-                blocker.reset();
-              }}
-            >
-              <p>
-                {tx(
-                  "polling_station.unsaved_changes_message",
-                  {},
-                  { name: formState.sections[formState.current]?.title || t("polling_station.current_form") },
-                )}
-              </p>
-              <p>{t("polling_station.save_changes")}</p>
-              <nav>
-                <Button
-                  size="lg"
-                  onClick={() => {
-                    void onSave();
-                  }}
-                >
-                  {t("save_changes")}
-                </Button>
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  onClick={() => {
-                    blocker.proceed();
-                  }}
-                >
-                  {t("do_not_save")}
-                </Button>
-              </nav>
-            </Modal>
-          )}
-        </>
-      )}
-      {error instanceof ApiError && <ErrorModal error={error} />}
-    </>
+    <Modal
+      title={t("data_entry.abort.title")}
+      onClose={() => {
+        blocker.reset();
+      }}
+    >
+      {tx("data_entry.abort.description")}
+      <nav>
+        <Button
+          size="lg"
+          onClick={() => {
+            void onAbortModalSave();
+          }}
+          disabled={status === "saving"}
+        >
+          {t("data_entry.abort.save_input")}
+        </Button>
+        <Button
+          size="lg"
+          variant="secondary"
+          onClick={() => {
+            void onAbortModalDelete();
+          }}
+          disabled={status === "deleting"}
+        >
+          {t("data_entry.abort.discard_input")}
+        </Button>
+      </nav>
+    </Modal>
   );
 }
-
-type BlockReason = "errors" | "warnings" | "changes";

@@ -1,4 +1,6 @@
-import { PoliticalGroup } from "@kiesraad/api";
+import { ErrorModal } from "app/component/error";
+
+import { ApiError, PoliticalGroup } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import {
   Alert,
@@ -20,7 +22,7 @@ export interface CandidatesVotesFormProps {
 }
 
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
-  const { formRef, onSubmit, currentValues, setValues, formSection, status, setAcceptWarnings, defaultProps } =
+  const { error, formRef, onSubmit, currentValues, setValues, formSection, status, setAcceptWarnings, defaultProps } =
     useCandidateVotes(group.number);
 
   const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
@@ -37,13 +39,11 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       id={`candidates_form_${group.number}`}
       title={`${t("list")} ${group.number} - ${group.name}`}
     >
+      {error instanceof ApiError && <ErrorModal error={error} />}
       {/* <PollingStationFormNavigation
-              onSubmit={onSubmit}
-              currentValues={formValuesToValues(currentValues)}
-              hasChanges={formSection.hasChanges}
-              acceptWarnings={formSection.acceptWarnings}
-            /> */}
-
+        onSubmit={onSubmit}
+        currentValues={formValuesToValues(currentValues)}
+      /> */}
       {formSection.isSaved && formSection.errors.length > 0 && (
         <Feedback id="feedback-error" type="error" data={formSection.errors.map((error) => error.code)} />
       )}

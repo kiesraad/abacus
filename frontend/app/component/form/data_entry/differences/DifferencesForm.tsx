@@ -1,5 +1,7 @@
+import { ErrorModal } from "app/component/error";
 import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 
+import { ApiError } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import {
   Alert,
@@ -18,7 +20,7 @@ import { formValuesToValues } from "./differencesValues";
 import { useDifferences } from "./useDifferences";
 
 export function DifferencesForm() {
-  const { formRef, onSubmit, currentValues, setValues, formSection, status, setAcceptWarnings, defaultProps } =
+  const { error, formRef, onSubmit, currentValues, setValues, formSection, status, setAcceptWarnings, defaultProps } =
     useDifferences();
   const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
 
@@ -35,10 +37,8 @@ export function DifferencesForm() {
       <PollingStationFormNavigation
         onSubmit={onSubmit}
         currentValues={{ differences_counts: formValuesToValues(currentValues) }}
-        hasChanges={formSection.hasChanges}
-        acceptWarnings={formSection.acceptWarnings}
       />
-
+      {error instanceof ApiError && <ErrorModal error={error} />}
       {formSection.isSaved && formSection.errors.length > 0 && (
         <Feedback id="feedback-error" type="error" data={formSection.errors.map((error) => error.code)} />
       )}

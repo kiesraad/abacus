@@ -9,8 +9,6 @@ import {
 import { electionMockData } from "@kiesraad/api-mocks";
 import { screen, within } from "@kiesraad/test";
 
-import { FormState } from "./data_entry/PollingStationFormController";
-
 export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(fields: Array<string>, feedbackMessage: string) {
   fields.forEach((field) => {
     const inputField = within(screen.getByTestId(`cell-${field}`)).getByRole("textbox");
@@ -126,61 +124,6 @@ export const errorWarningMocks: ErrorWarningsMap<"F101" | "F201" | "F301" | "F20
       "data.differences_counts.no_explanation_count",
     ],
     code: "W302",
-  },
-};
-
-export const defaultFormState: FormState = {
-  current: "recounted",
-  furthest: "recounted",
-  sections: {
-    recounted: {
-      index: 0,
-      id: "recounted",
-      isSaved: false,
-      acceptWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    voters_votes_counts: {
-      index: 1,
-      id: "voters_votes_counts",
-      isSaved: false,
-      acceptWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    differences_counts: {
-      index: 2,
-      id: "differences_counts",
-      isSaved: false,
-      acceptWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    political_group_votes_1: {
-      index: 3,
-      id: "political_group_votes_1",
-      isSaved: false,
-      acceptWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    political_group_votes_2: {
-      index: 4,
-      id: "political_group_votes_2",
-      isSaved: false,
-      acceptWarnings: false,
-      errors: [],
-      warnings: [],
-    },
-    save: {
-      index: 5,
-      id: "save",
-      isSaved: false,
-      acceptWarnings: false,
-      errors: [],
-      warnings: [],
-    },
   },
 };
 

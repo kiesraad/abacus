@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Election } from "../../gen/openapi";
+import { Election } from "../gen/openapi";
 import { DataEntryController, DataEntryState, initialState } from "./DataEntryController";
 import { DataEntryControllerContext } from "./DataEntryControllerContext";
 

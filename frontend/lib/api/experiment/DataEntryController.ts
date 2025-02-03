@@ -12,7 +12,6 @@ import { ApiResult } from "../api.types";
 import { ApiClient } from "../ApiClient";
 import { ApiResponseStatus } from "../ApiResponseStatus";
 import {
-  FormSection,
   FormSectionRecount,
   FormSectionState,
   FormSectionVotersAndVotes,

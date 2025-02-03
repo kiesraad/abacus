@@ -30,6 +30,7 @@
       /* Number or DisplayFraction */
       &:nth-of-type(2) {
         font-family: var(--font-number);
+        font-feature-settings: "ss09" on;
         width: 10.625rem;
         text-align: right;
         font-size: var(--font-size-md);
@@ -74,6 +75,7 @@
       &:nth-of-type(4),
       &:nth-of-type(5) {
         font-family: var(--font-number);
+        font-feature-settings: "ss09" on;
         width: 7.65rem;
       }
 
@@ -99,6 +101,7 @@
         width: 5rem;
       }
     }
+    /* Total row */
     &:last-of-type {
       td {
         font-weight: bold;

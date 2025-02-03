@@ -19,9 +19,10 @@ import { t } from "@kiesraad/i18n";
 
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
-import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
 import {
+  CandidatesVotesPage,
   DataEntryHomePage,
+  DifferencesPage,
   PollingStationLayout,
   RecountedPage,
   VotersAndVotesPage,
@@ -31,6 +32,7 @@ import { NotFoundPage } from "./module/NotFoundPage";
 import { PollingStationCreatePage } from "./module/polling_stations/page/PollingStationCreatePage";
 import { PollingStationUpdatePage } from "./module/polling_stations/page/PollingStationUpdatePage";
 import { RootLayout } from "./module/RootLayout";
+import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />} errorElement={<ErrorBoundary />}>
@@ -69,9 +71,9 @@ export const routes = createRoutesFromElements(
             <Route index element={null} />
             <Route path="recounted" element={<RecountedPage />} />
             <Route path="voters-and-votes" element={<VotersAndVotesPage />} />
-            {/* <Route path="differences" element={<DifferencesPage />} />
+            <Route path="differences" element={<DifferencesPage />} />
             <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-            <Route path="save" element={<CheckAndSaveForm />} /> */}
+            {/* <Route path="save" element={<CheckAndSaveForm />} />  */}
           </Route>
         </Route>
       </Route>

@@ -92,6 +92,12 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             id="total"
             title={t("totals_list", { group_number: group.number })}
             value={currentValues.total}
+            onChange={(e) => {
+              setValues({
+                ...currentValues,
+                total: parseInt(e.target.value, 10),
+              });
+            }}
             isListTotal
             {...defaultProps}
             errorMessageId={missingTotalError ? "missing-total-error" : undefined}

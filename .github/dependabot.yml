@@ -35,8 +35,9 @@ updates:
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
       # React Router major upgrades usually have breaking changes
+      # React Router 7.1.4 causes DataEntryHomePage.test.tsx to fail, investigate in issue #953
       - dependency-name: "react-router"
-        update-types: ["version-update:semver-major"]
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
       # React major upgrades usually have breaking changes, see #716 for React 19
       - dependency-name: "react"
         update-types: ["version-update:semver-major"]

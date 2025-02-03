@@ -8,6 +8,4 @@ export interface iElectionApportionmentProviderContext {
   refetch: (controller?: AbortController) => Promise<ApiResult<ElectionApportionmentResponse>>;
 }
 
-export const ElectionApportionmentProviderContext = createContext<iElectionApportionmentProviderContext | undefined>(
-  undefined,
-);
+export const ApportionmentProviderContext = createContext<iElectionApportionmentProviderContext | undefined>(undefined);

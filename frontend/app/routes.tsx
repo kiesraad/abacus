@@ -3,8 +3,6 @@ import { createRoutesFromElements, Navigate, Route } from "react-router";
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AdministratorLayout } from "app/module/AdministratorLayout";
 import {
-  ElectionApportionmentLayout,
-  ElectionApportionmentPage,
   ElectionHomePage,
   ElectionLayout,
   ElectionReportPage,
@@ -23,6 +21,7 @@ import { t } from "@kiesraad/i18n";
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
 import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
+import { ApportionmentLayout, ApportionmentPage } from "./module/apportionment";
 import {
   CandidatesVotesPage,
   DataEntryHomePage,
@@ -51,8 +50,8 @@ export const routes = createRoutesFromElements(
       <Route index element={<OverviewPage />} />
       <Route path=":electionId" element={<ElectionLayout />}>
         <Route index element={<ElectionHomePage />} />
-        <Route path="apportionment" element={<ElectionApportionmentLayout />}>
-          <Route index element={<ElectionApportionmentPage />} />
+        <Route path="apportionment" element={<ApportionmentLayout />}>
+          <Route index element={<ApportionmentPage />} />
         </Route>
         <Route
           path="report"

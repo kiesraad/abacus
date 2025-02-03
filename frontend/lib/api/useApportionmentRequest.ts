@@ -4,7 +4,7 @@ import {
   useApiRequestWithErrors,
 } from "@kiesraad/api";
 
-export function useElectionApportionmentRequest(electionId: number) {
+export function useApportionmentRequest(electionId: number) {
   const path: ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${electionId}/apportionment`;
   return useApiRequestWithErrors<ElectionApportionmentResponse>(path);
 }

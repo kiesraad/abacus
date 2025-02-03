@@ -1,3 +1,4 @@
+export * from "./apportionment";
 export * from "./election";
 export * from "./gen/openapi";
 export * from "./polling_station";
@@ -9,7 +10,7 @@ export * from "./ApiResponseStatus";
 export * from "./useApi";
 export * from "./useApiRequest";
 export * from "./useApiState";
-export * from "./useElectionApportionmentRequest";
+export * from "./useApportionmentRequest";
 export * from "./useCrud";
 export * from "./useElectionDataRequest";
 export * from "./useElectionListRequest";

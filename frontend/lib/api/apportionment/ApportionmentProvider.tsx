@@ -1,27 +1,27 @@
 import * as React from "react";
 
 import RequestStateHandler from "../RequestStateHandler";
-import { useElectionApportionmentRequest } from "../useElectionApportionmentRequest";
-import { ElectionApportionmentProviderContext } from "./ElectionApportionmentProviderContext";
+import { useApportionmentRequest } from "../useApportionmentRequest";
+import { ApportionmentProviderContext } from "./ApportionmentProviderContext";
 
 export interface ElectionApportionmentProviderProps {
   children: React.ReactNode;
   electionId: number;
 }
 
-export function ElectionApportionmentProvider({ children, electionId }: ElectionApportionmentProviderProps) {
-  const { requestState, refetch } = useElectionApportionmentRequest(electionId);
+export function ApportionmentProvider({ children, electionId }: ElectionApportionmentProviderProps) {
+  const { requestState, refetch } = useApportionmentRequest(electionId);
 
   return (
     <RequestStateHandler
       requestState={requestState}
       notFoundMessage="error.election_not_found"
       renderOnSuccess={(data) => (
-        <ElectionApportionmentProviderContext.Provider
+        <ApportionmentProviderContext.Provider
           value={{ apportionment: data.apportionment, election_summary: data.election_summary, refetch }}
         >
           {children}
-        </ElectionApportionmentProviderContext.Provider>
+        </ApportionmentProviderContext.Provider>
       )}
     />
   );

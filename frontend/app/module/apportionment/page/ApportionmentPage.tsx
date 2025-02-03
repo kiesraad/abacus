@@ -2,16 +2,16 @@ import { Link } from "react-router";
 
 import { NavBar } from "app/component/navbar/NavBar";
 
-import { PoliticalGroupSeatAssignment, useElection, useElectionApportionment } from "@kiesraad/api";
+import { PoliticalGroupSeatAssignment, useApportionment, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { DisplayFraction, PageTitle, Table } from "@kiesraad/ui";
 import { cn, formatNumber } from "@kiesraad/util";
 
-import cls from "./ElectionApportionmentPage.module.css";
+import cls from "./ApportionmentPage.module.css";
 
-export function ElectionApportionmentPage() {
+export function ApportionmentPage() {
   const { election } = useElection();
-  const { apportionment, election_summary } = useElectionApportionment();
+  const { apportionment, election_summary } = useApportionment();
 
   let total_whole_seats = 0;
   let total_rest_seats = 0;

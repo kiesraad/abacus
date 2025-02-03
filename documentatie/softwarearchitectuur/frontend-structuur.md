@@ -25,3 +25,10 @@
         - `style/` - Generic CSS
         - `util/` - almost components
     - `util/` - Reusable bits and pieces: functions, hooks, (env) constants
+- `scripts` - scripts that can be run with `npm` to generate several files
+  - `openapi/*` - library to generate TypeScript types from an OpenAPI spec
+  - `gen_icons.js` - script to generate icon components from separate svg icons in `lib/icon/svg`
+  - `gen_openapi_types.ts` - script to generate `openapi.ts` TypeScript types from `openapi.json` OpenAPI spec
+  - `gen_po.js` - script to generate PO translation files from our i18n json files
+  - `gen_translation-json.js` script to generate our i18n json files from PO translation files
+- `static` - static web files: fonts and `favicon.svg`

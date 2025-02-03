@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, NavLink } from "react-router";
 
 import { Election, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -66,62 +66,15 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
   }
 }
 
-function TopLevelManagementLinks({ location }: NavBarLinksProps) {
-  const links = [];
-  if (location.pathname.startsWith("/elections")) {
-    links.push(
-      <span key="elections" className="active">
-        {t("election.title.plural")}
-      </span>,
-    );
-  } else {
-    links.push(
-      <Link key="elections-link" to={`/elections#administratorcoordinator`}>
-        {t("election.title.plural")}
-      </Link>,
-    );
-  }
-  if (location.pathname.startsWith("/users")) {
-    links.push(
-      <span key="users" className="active">
-        {t("users")}
-      </span>,
-    );
-  } else {
-    links.push(
-      <Link key="users-link" to={`/users#administratorcoordinator`}>
-        {t("users")}
-      </Link>,
-    );
-  }
-  if (location.pathname.startsWith("/workstations")) {
-    links.push(
-      <span key="workstations" className="active">
-        {t("workstations.workstations")}
-      </span>,
-    );
-  } else {
-    links.push(
-      <Link key="workstations-link" to={`/workstations#administrator`}>
-        {t("workstations.workstations")}
-      </Link>,
-    );
-  }
-  if (location.pathname.startsWith("/logs")) {
-    links.push(
-      <span key="logs" className="active">
-        {t("logs")}
-      </span>,
-    );
-  } else {
-    links.push(
-      <Link key="logs-link" to={`/logs#administratorcoordinator`}>
-        {t("logs")}
-      </Link>,
-    );
-  }
-
-  return <>{links}</>;
+function TopLevelManagementLinks() {
+  return (
+    <>
+      <NavLink to={"/elections"}>{t("election.title.plural")}</NavLink>
+      <NavLink to={"/users"}>{t("users")}</NavLink>
+      <NavLink to={"/workstations"}>{t("workstations.workstations")}</NavLink>
+      <NavLink to={"/logs"}>{t("logs")}</NavLink>
+    </>
+  );
 }
 
 export function NavBarLinks({ location }: NavBarLinksProps) {
@@ -138,7 +91,7 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
     location.pathname === "/workstations" ||
     location.pathname === "/logs"
   ) {
-    return <TopLevelManagementLinks location={location} />;
+    return <TopLevelManagementLinks />;
   } else {
     return <></>;
   }

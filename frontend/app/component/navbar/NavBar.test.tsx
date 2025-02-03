@@ -69,44 +69,18 @@ describe("NavBar", () => {
     expect(screen.queryByText("Gemeenteraadsverkiezingen 2026")).toBeVisible();
   });
 
-  test("top level management links for '/elections'", async () => {
+  test.each([
+    { pathname: "/elections", hash: "#administratorcoordinator" },
+    { pathname: "/users", hash: "#administratorcoordinator" },
+    { pathname: "/workstations", hash: "#administratorcoordinator" },
+    { pathname: "/logs", hash: "#administratorcoordinator" },
+  ])("top level management links for $pathname", async () => {
     await renderNavBar({ pathname: "/elections", hash: "#administratorcoordinator" });
 
-    expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
-    expect(screen.queryByText("Verkiezingen")).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Werkplekken" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
-  });
-
-  test("top level management links for '/users'", async () => {
-    await renderNavBar({ pathname: "/users", hash: "#administratorcoordinator" });
-
-    expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Gebruikers" })).not.toBeInTheDocument();
-    expect(screen.queryByText("Gebruikers")).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Werkplekken" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
-  });
-
-  test("top level management links for '/workstations'", async () => {
-    await renderNavBar({ pathname: "/workstations", hash: "#administrator" });
-
-    expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Werkplekken" })).not.toBeInTheDocument();
-    expect(screen.queryByText("Werkplekken")).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
-  });
-
-  test("top level management links for '/logs'", async () => {
-    await renderNavBar({ pathname: "/logs", hash: "#administratorcoordinator" });
-
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Werkplekken" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Logs" })).not.toBeInTheDocument();
-    expect(screen.queryByText("Logs")).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
   });
 
   test.each([

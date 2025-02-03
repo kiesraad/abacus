@@ -39,7 +39,7 @@
       padding-left: 0;
     }
 
-    > span:global(.active) {
+    > :global(.active) {
       border-bottom: 4px solid var(--accent-orange);
       padding-bottom: calc(0.5rem - 4px);
       font-weight: bold;

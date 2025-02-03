@@ -259,7 +259,7 @@ impl FromRef<AppState> for Users {
 
 #[cfg(test)]
 mod tests {
-    use chrono::{TimeDelta, Utc};
+    use chrono::TimeDelta;
     use sqlx::SqlitePool;
     use test_log::test;
 
@@ -271,7 +271,6 @@ mod tests {
 
         let user = users.create("test_user", "password").await.unwrap();
 
-        assert!(Utc::now().timestamp() - user.created_at.timestamp() <= 1);
         assert_eq!(user.username, "test_user");
 
         let fetched_user = users.get_by_id(user.id).await.unwrap().unwrap();

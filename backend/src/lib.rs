@@ -88,7 +88,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/login", post(authentication::api::login))
         .route("/logout", post(authentication::api::logout))
         .route("/whoami", get(authentication::api::whoami))
-        .route("/change-password", post(authentication::api::change_password));
+        .route(
+            "/change-password",
+            post(authentication::api::change_password),
+        );
 
     #[cfg(debug_assertions)]
     let user_router = user_router

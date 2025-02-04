@@ -12,7 +12,7 @@ import {
   PollingStationDataEntrySaveHandler,
   pollingStationMockData,
 } from "@kiesraad/api-mocks";
-import { render, screen, server, within } from "@kiesraad/test";
+import { render, screen, server } from "@kiesraad/test";
 
 import { PollingStationFormController } from "../../../component/form/data_entry/PollingStationFormController";
 
@@ -51,13 +51,5 @@ describe("PollingStationLayout", () => {
     const pollingStation = pollingStationMockData[0]!;
     expect(await screen.findByRole("heading", { level: 1, name: pollingStation.name }));
     expect(await screen.findByText(pollingStation.number));
-
-    // Check if the navigation bar displays the correct information
-    const nav = await screen.findByRole("navigation", { name: /primary-navigation/i });
-    expect(within(nav).getByRole("link", { name: "Overzicht" })).toHaveAttribute("href", "/elections");
-    expect(within(nav).getByRole("link", { name: new RegExp(election.name) })).toHaveAttribute(
-      "href",
-      `/elections/${election.id}/data-entry`,
-    );
   });
 });

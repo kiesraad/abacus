@@ -1986,10 +1986,7 @@
             "type": "string"
           },
           "fullname": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "id": {
             "type": "integer",

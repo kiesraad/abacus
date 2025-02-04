@@ -393,7 +393,7 @@ export interface HighestSurplusAssignedSeat {
 
 export interface ListedUser {
   created_at: string;
-  fullname?: unknown;
+  fullname?: string;
   id: number;
   last_activity_at: string;
   role: Role;

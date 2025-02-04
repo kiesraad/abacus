@@ -99,6 +99,8 @@ where
 pub struct ListedUser {
     id: u32,
     username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     fullname: Option<String>,
     role: Role,
     #[schema(value_type = String)]

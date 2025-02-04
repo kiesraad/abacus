@@ -35,6 +35,8 @@ export function VotersAndVotesForm() {
 
   const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
 
+  console.log("TESTSTSTSRTS", pollingStationResults.recounted);
+
   return (
     <Form
       onSubmit={(e) => {

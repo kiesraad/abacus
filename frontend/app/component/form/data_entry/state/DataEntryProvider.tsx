@@ -11,17 +11,10 @@ export interface DataEntryProviderProps {
   pollingStationId: number;
   entryNumber: number;
   children: ReactNode;
-  overrideState?: DataEntryState;
 }
 
-export function DataEntryProvider({
-  election,
-  pollingStationId,
-  entryNumber,
-  children,
-  overrideState,
-}: DataEntryProviderProps) {
-  const stateAndActions = useDataEntry(election, pollingStationId, entryNumber, overrideState);
+export function DataEntryProvider({ election, pollingStationId, entryNumber, children }: DataEntryProviderProps) {
+  const stateAndActions = useDataEntry(election, pollingStationId, entryNumber);
 
   if (!stateAndActions.pollingStationResults) {
     return null;

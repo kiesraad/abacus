@@ -1,4 +1,5 @@
 import { userEvent } from "@testing-library/user-event";
+import { warn } from "console";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { mockElection } from "app/component/election/status/mockData";
@@ -10,7 +11,11 @@ import {
   expectFieldsToNotHaveIcon,
 } from "app/component/form/testHelperFunctions";
 
-import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@kiesraad/api";
+import {
+  GetDataEntryResponse,
+  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  PollingStationResults,
+} from "@kiesraad/api";
 import {
   electionMockData,
   PollingStationDataEntryGetHandler,
@@ -19,6 +24,7 @@ import {
 import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs, waitFor } from "@kiesraad/test";
 
 import { DataEntryProvider } from "../state/DataEntryProvider";
+import { getClientState } from "../state/dataEntryUtils";
 import { DataEntryState, FormSection } from "../state/types";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
@@ -105,18 +111,7 @@ const defaultFormState: DataEntryState = {
 
 function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
   return render(
-    <DataEntryProvider
-      election={electionMockData}
-      pollingStationId={1}
-      entryNumber={1}
-      overrideState={{
-        ...defaultFormState,
-        pollingStationResults: {
-          ...initialValues,
-          ...defaultValues,
-        },
-      }}
-    >
+    <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
       <VotersAndVotesForm />
     </DataEntryProvider>,
   );
@@ -149,7 +144,7 @@ describe("Test VotersAndVotesForm", () => {
   });
 
   describe("VotersAndVotesForm user interactions", () => {
-    test.only("hitting enter key does not result in api call", async () => {
+    test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
 
       renderForm({ recounted: false });
@@ -934,12 +929,22 @@ describe("Test VotersAndVotesForm", () => {
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
-    test("W.209 EqualInput voters recounts and votes counts", async () => {
+    test.only("W.209 EqualInput voters recounts and votes counts", async () => {
       const user = userEvent.setup();
-
-      renderForm({ recounted: true });
+      overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
+        client_state: getClientState(defaultFormState.formState, false, true),
+        data: {
+          ...initialValues,
+          recounted: true,
+        },
+        progress: 1,
+        updated_at: "",
+        validation_results: { errors: [], warnings: [] },
+      } satisfies GetDataEntryResponse);
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
+
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {
           errors: [],
@@ -991,3 +996,16 @@ describe("Test VotersAndVotesForm", () => {
     });
   });
 });
+
+// function overrideGetDataEntryState() {
+//   overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
+//     client_state: getClientState(defaultFormState.formState, false, true),
+//     data: {
+//       ...initialValues,
+//       recounted: true,
+//     },
+//     progress: 1,
+//     updated_at: "",
+//     validation_results: { errors: [], warnings: [] },
+//   } satisfies GetDataEntryResponse);
+// }

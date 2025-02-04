@@ -1,12 +1,12 @@
 use chrono::{DateTime, TimeDelta, Utc};
-use rand::{distributions::Alphanumeric, Rng};
+use rand::{distr::Alphanumeric, Rng};
 
 use super::error::AuthenticationError;
 
 /// Create a new session key, a secure random alphanumeric string of 24 characters
 /// Which corresponds to ~142 bits of entropy
 pub(super) fn create_new_session_key() -> String {
-    rand::thread_rng()
+    rand::rng()
         .sample_iter(&Alphanumeric)
         .take(24)
         .map(char::from)

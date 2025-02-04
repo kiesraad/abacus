@@ -1,0 +1,34 @@
+- `app/` - "main" app files and routes
+    - `component/` - reused components
+    - `module/` - functional modules
+    - `msw-mock-api.ts` - Mock server setup for frontend preview
+- `e2e-tests/` - e2e tests and fixtures 
+    - `helpers-utils/` - utils
+    - `page-objects/` - page objects
+    - `test-data/` - test data
+- `lib/`
+    - `api/` - generic and app specific API code
+        - `gen/openapi.ts` - generated types
+    - `api-mocks/` - Mock server handlers and test data, for both Vitest/RTL tests and frontend preview
+    - `i18n/` - Internationalisation code
+        - `locales/nl/` - translation files
+    - `icon/`
+        - `svg/` - icon (source) files
+        - `generated.tsx` - generated icon components
+    - `test/` - Vitest/RTL test setup and utils
+        - `Providers.tsx` - Provider with real ApiProvider for Vitest/RTL tests
+        - `router.tsx` - getRouter() for Vitest/RTL tests
+        - `server.ts` - Mock server setup for Vitest/RTL tests, overrideOnce()
+        - `setup.ts` - vitest/RTL setup
+        - `test-utils.ts` - customRender with providers, setupTestRouter, reusable functions
+    - `ui/` - Generic UI components
+        - `style/` - Generic CSS
+        - `util/` - almost components
+    - `util/` - Reusable bits and pieces: functions, hooks, (env) constants
+- `scripts` - scripts that can be run with `npm` to generate several files
+  - `openapi/*` - library to generate TypeScript types from an OpenAPI spec
+  - `gen_icons.js` - script to generate icon components from separate svg icons in `lib/icon/svg`
+  - `gen_openapi_types.ts` - script to generate `openapi.ts` TypeScript types from `openapi.json` OpenAPI spec
+  - `gen_po.js` - script to generate PO translation files from our i18n json files
+  - `gen_translation-json.js` script to generate our i18n json files from PO translation files
+- `static` - static web files: fonts and `favicon.svg`

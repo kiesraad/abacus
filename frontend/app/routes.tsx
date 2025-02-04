@@ -18,7 +18,9 @@ import { WorkstationsHomePage } from "app/module/workstations";
 import { t } from "@kiesraad/i18n";
 
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
+import { CheckAndSaveForm } from "./component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
+import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
 import {
   CandidatesVotesPage,
   DataEntryHomePage,
@@ -32,7 +34,6 @@ import { NotFoundPage } from "./module/NotFoundPage";
 import { PollingStationCreatePage } from "./module/polling_stations/page/PollingStationCreatePage";
 import { PollingStationUpdatePage } from "./module/polling_stations/page/PollingStationUpdatePage";
 import { RootLayout } from "./module/RootLayout";
-import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />} errorElement={<ErrorBoundary />}>
@@ -73,7 +74,7 @@ export const routes = createRoutesFromElements(
             <Route path="voters-and-votes" element={<VotersAndVotesPage />} />
             <Route path="differences" element={<DifferencesPage />} />
             <Route path="list/:listNumber" element={<CandidatesVotesPage />} />
-            {/* <Route path="save" element={<CheckAndSaveForm />} />  */}
+            <Route path="save" element={<CheckAndSaveForm />} />
           </Route>
         </Route>
       </Route>

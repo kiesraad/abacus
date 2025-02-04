@@ -2,12 +2,11 @@ import { To, useLocation, useNavigate } from "react-router";
 
 import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
 import { Footer } from "app/component/footer/Footer";
+import { NavBar } from "app/component/navbar/NavBar";
 
 import { Election, useElectionList } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, PageTitle, Table, WorkStationNumber } from "@kiesraad/ui";
-
-import { NavBar } from "../../../component/navbar/NavBar";
 
 export function OverviewPage() {
   const navigate = useNavigate();

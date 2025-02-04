@@ -69,10 +69,10 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
 function TopLevelManagementLinks() {
   return (
     <>
-      <NavLink to={"/elections"}>{t("election.title.plural")}</NavLink>
-      <NavLink to={"/users"}>{t("users")}</NavLink>
-      <NavLink to={"/workstations"}>{t("workstations.workstations")}</NavLink>
-      <NavLink to={"/logs"}>{t("logs")}</NavLink>
+      <NavLink to={"/elections#administrator"}>{t("election.title.plural")}</NavLink>
+      <NavLink to={"/users#administratorcoordinator"}>{t("users")}</NavLink>
+      <NavLink to={"/workstations#administrator"}>{t("workstations.workstations")}</NavLink>
+      <NavLink to={"/logs#administratorcoordinator"}>{t("logs")}</NavLink>
     </>
   );
 }

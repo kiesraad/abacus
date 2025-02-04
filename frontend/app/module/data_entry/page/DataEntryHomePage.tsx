@@ -1,10 +1,9 @@
 import { useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { ElectionProgress } from "app/component/election/ElectionProgress";
 import { Footer } from "app/component/footer/Footer";
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
-import { NavBar } from "app/component/navbar/NavBar";
 
 import { DEFAULT_CANCEL_REASON, useElection, useElectionStatus } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -38,9 +37,6 @@ export function DataEntryHomePage() {
   return (
     <>
       <PageTitle title={`${t("data_entry.pick_polling_station")} - Abacus`} />
-      <NavBar>
-        <Link to={"/elections"}>{t("overview")}</Link>
-      </NavBar>
       <header>
         <section>
           <h1>{election.name}</h1>

@@ -152,7 +152,7 @@ impl Sessions {
           SET expires_at = ?
           WHERE expires_at < ?
           AND session_key = ?
-          AND expires_at < ?
+          AND expires_at > ?
           RETURNING
               session_key,
               user_id as "user_id: u32",

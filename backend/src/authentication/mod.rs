@@ -12,7 +12,7 @@ use hyper::header::SET_COOKIE;
 use serde::{Deserialize, Serialize};
 use session::Sessions;
 use sqlx::SqlitePool;
-use tracing::info;
+use tracing::debug;
 use user::{ListedUser, User, Users};
 use utoipa::ToSchema;
 
@@ -286,20 +286,16 @@ pub async fn extend_session(State(pool): State<SqlitePool>, req: Request, next: 
 
     let sessions = Sessions::new(pool);
 
-    info!(
-        "Checking to extend lifetime of session: {}",
-        session_cookie.value()
-    );
-
+    // extend lifetime of session and set new cookie if the session is still valid and will soon be expired
     if let Ok(Some(session)) = sessions.extend_session(session_cookie.value()).await {
-        info!("Session extended: {:?}", session_cookie);
+        debug!("Session extended: {:?}", session_cookie);
 
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
         let updated_jar = jar.add(cookie);
 
         for cookie in updated_jar.iter() {
-            info!("Setting cookie: {:?}", cookie);
+            debug!("Setting cookie: {:?}", cookie);
 
             if let Ok(header_value) = cookie.encoded().to_string().parse() {
                 res.headers_mut().append(SET_COOKIE, header_value);
@@ -849,6 +845,7 @@ mod tests {
     async fn test_extend_session(pool: SqlitePool) {
         let app = create_app(pool.clone());
 
+        // with a normal long-valid session the user should not get a new cookie
         let sessions = Sessions::new(pool);
         let session = sessions.create(1, SESSION_LIFE_TIME).await.unwrap();
         let mut cookie = session.get_cookie();
@@ -868,11 +865,11 @@ mod tests {
             .unwrap();
 
         assert_eq!(response.status(), StatusCode::OK);
-        let body = response.into_body().collect().await.unwrap().to_bytes();
-        let response: LoginResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(response.user_id, 1);
+        assert_eq!(response.headers().get("set-cookie"), None);
 
-        let session = sessions.create(1, SESSION_MIN_LIFE_TIME / 2).await.unwrap();
+        // with a session that is about to expire the user should get a new cookie, and the session lifetime should be extended
+        let session: session::Session =
+            sessions.create(1, SESSION_MIN_LIFE_TIME / 2).await.unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
 
@@ -896,6 +893,6 @@ mod tests {
             .to_str()
             .unwrap();
 
-        dbg!(response_cookie);
+        assert!(response_cookie.contains("Max-Age=1800"));
     }
 }

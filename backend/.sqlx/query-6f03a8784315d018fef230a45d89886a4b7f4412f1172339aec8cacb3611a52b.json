@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n          UPDATE sessions\n          SET expires_at = ?\n          WHERE expires_at < ?\n          AND session_key = ?\n          AND expires_at < ?\n          RETURNING\n              session_key,\n              user_id as \"user_id: u32\",\n              expires_at as \"expires_at: _\",\n              created_at as \"created_at: _\"\n          ",
+  "query": "\n          UPDATE sessions\n          SET expires_at = ?\n          WHERE expires_at < ?\n          AND session_key = ?\n          AND expires_at > ?\n          RETURNING\n              session_key,\n              user_id as \"user_id: u32\",\n              expires_at as \"expires_at: _\",\n              created_at as \"created_at: _\"\n          ",
   "describe": {
     "columns": [
       {
@@ -34,5 +34,5 @@
       false
     ]
   },
-  "hash": "c372e21b272a402879d184b14ccb11fc41fd415d1bdcd824c0400664c9f50ceb"
+  "hash": "6f03a8784315d018fef230a45d89886a4b7f4412f1172339aec8cacb3611a52b"
 }

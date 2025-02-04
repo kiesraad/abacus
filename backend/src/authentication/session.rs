@@ -48,6 +48,12 @@ impl Session {
         &self.session_key
     }
 
+    /// Get the session expiration time
+    #[cfg(test)]
+    pub(super) fn expires_at(&self) -> DateTime<Utc> {
+        self.expires_at
+    }
+
     /// Get a cookie containing this session key
     pub(super) fn get_cookie(&self) -> Cookie<'static> {
         CookieBuilder::new(SESSION_COOKIE_NAME, self.session_key.clone())
@@ -226,5 +232,30 @@ mod test {
         let session_from_db = sessions.get_by_key(session.session_key()).await.unwrap();
 
         assert_eq!(None, session_from_db);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_extend_session(pool: SqlitePool) {
+        let sessions = Sessions::new(pool);
+
+        let session: crate::authentication::session::Session = sessions
+            .create(1, TimeDelta::seconds(60 * 60 * 60))
+            .await
+            .unwrap();
+        let session_from_db = sessions
+            .extend_session(session.session_key())
+            .await
+            .unwrap();
+        assert_eq!(session_from_db, None);
+
+        let session = sessions.create(1, TimeDelta::seconds(60)).await.unwrap();
+        let session_from_db = sessions
+            .extend_session(session.session_key())
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(session.user_id(), session_from_db.user_id());
+        assert_eq!(session.session_key(), session_from_db.session_key());
+        assert!(session.expires_at() < session_from_db.expires_at());
     }
 }

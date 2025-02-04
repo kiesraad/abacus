@@ -94,19 +94,33 @@ where
     }
 }
 
-#[derive(Serialize, FromRow, ToSchema)]
+#[derive(Debug, Serialize, FromRow, PartialEq, ToSchema)]
 #[cfg_attr(test, derive(Deserialize))]
 pub struct ListedUser {
-    id: u32,
-    username: String,
-    fullname: Option<String>,
-    role: Role,
+    pub id: u32,
+    pub username: String,
+    pub fullname: Option<String>,
+    pub role: Role,
     #[schema(value_type = String)]
     last_activity_at: DateTime<Utc>,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
     created_at: DateTime<Utc>,
+}
+
+impl From<User> for ListedUser {
+    fn from(user: User) -> Self {
+        Self {
+            id: user.id,
+            username: user.username,
+            fullname: user.fullname,
+            role: user.role,
+            last_activity_at: user.last_activity_at,
+            updated_at: user.updated_at,
+            created_at: user.created_at,
+        }
+    }
 }
 
 pub struct Users(SqlitePool);
@@ -152,7 +166,6 @@ impl Users {
     }
 
     /// Create a new user, save an Argon2id v19 hash of the password
-    #[allow(unused)]
     pub async fn create(
         &self,
         username: &str,
@@ -169,8 +182,8 @@ impl Users {
                 id as "id: u32",
                 username,
                 fullname,
-                role,
                 password_hash,
+                role,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"

@@ -1,4 +1,5 @@
 use super::error::AuthenticationError;
+use super::role::Role;
 use super::session::Sessions;
 use super::user::{ListedUser, User, Users};
 use super::{SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME};
@@ -255,4 +256,35 @@ pub async fn list(State(users_repo): State<Users>) -> Result<Json<UserListRespon
     Ok(Json(UserListResponse {
         users: users_repo.list().await?,
     }))
+}
+
+#[derive(Serialize, Deserialize, ToSchema)]
+pub struct CreateUserRequest {
+    pub username: String,
+    pub fullname: Option<String>,
+    pub temp_password: String,
+    pub role: Role,
+}
+
+/// Lists all users
+#[utoipa::path(
+    post,
+    path = "/api/user",
+    responses(
+        (status = 201, description = "User created", body = ListedUser),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+pub async fn create(
+    State(users_repo): State<Users>,
+    Json(create_user_req): Json<CreateUserRequest>,
+) -> Result<(StatusCode, Json<ListedUser>), APIError> {
+    let user = users_repo
+        .create(
+            &create_user_req.username,
+            &create_user_req.temp_password,
+            create_user_req.role,
+        )
+        .await?;
+    Ok((StatusCode::CREATED, Json(user.into())))
 }

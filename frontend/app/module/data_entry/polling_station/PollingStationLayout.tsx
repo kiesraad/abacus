@@ -1,4 +1,5 @@
 import { Outlet } from "react-router";
+
 import { DataEntryProvider } from "app/component/form/data_entry/state/DataEntryProvider";
 import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 import { AbortDataEntryControl } from "app/module/data_entry";

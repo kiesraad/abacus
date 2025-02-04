@@ -1,7 +1,5 @@
 import { Link } from "react-router";
 
-import { NavBar } from "app/component/navbar/NavBar";
-
 import { PoliticalGroupSeatAssignment, useApportionment, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { DisplayFraction, PageTitle, Table } from "@kiesraad/ui";
@@ -30,13 +28,6 @@ export function ApportionmentPage() {
   return (
     <>
       <PageTitle title={`${t("apportionment.title")} - Abacus`} />
-      <NavBar>
-        <Link to={`/elections/${election.id}#coordinator`}>
-          <span className="bold">{election.location}</span>
-          <span>&mdash;</span>
-          <span>{election.name}</span>
-        </Link>
-      </NavBar>
       <header>
         <section>
           <h1>{t("apportionment.title")}</h1>

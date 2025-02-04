@@ -1,6 +1,4 @@
-import { Link, useSearchParams } from "react-router";
-
-import { NavBar } from "app/component/navbar/NavBar";
+import { useSearchParams } from "react-router";
 
 import { useElection, usePollingStationListRequest } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -44,13 +42,6 @@ export function PollingStationListPage() {
   return (
     <>
       <PageTitle title={`${t("polling_stations")} - Abacus`} />
-      <NavBar>
-        <Link to={`/elections/${election.id}#coordinator`}>
-          <span className="bold">{election.location}</span>
-          <span>&mdash;</span>
-          <span>{election.name}</span>
-        </Link>
-      </NavBar>
       <header>
         <section>
           <h1>{t("polling_station.title.plural")}</h1>

@@ -19,6 +19,8 @@ export default defineConfig((configEnv) =>
             "*.config.mjs",
             "mockServiceWorker.js",
             "e2e-tests/**",
+            "**/*.stories.tsx",
+            "**/*.e2e.ts",
             ...coverageConfigDefaults.exclude,
           ],
         },

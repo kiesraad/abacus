@@ -1,10 +1,7 @@
 import { Link } from "react-router";
 
-import { NavBar } from "app/component/navbar/NavBar";
-
 import { ApportionmentStep, PoliticalGroupSeatAssignment, useApportionment, useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
-import { IconChevronRight } from "@kiesraad/icon";
 import { DisplayFraction, PageTitle, Table } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
 
@@ -128,15 +125,6 @@ export function ApportionmentRestSeatsPage() {
   return (
     <>
       <PageTitle title={`${t("apportionment.title")} - Abacus`} />
-      <NavBar>
-        <Link to={`/elections/${election.id}#coordinator`}>
-          <span className="bold">{election.location}</span>
-          <span>&mdash;</span>
-          <span>{election.name}</span>
-        </Link>
-        <IconChevronRight />
-        <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
-      </NavBar>
       <header>
         <section>
           <h1>{t("apportionment.details_rest_seats")}</h1>

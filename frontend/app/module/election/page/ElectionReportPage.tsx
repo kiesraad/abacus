@@ -1,7 +1,4 @@
-import { Link } from "react-router";
-
 import { Footer } from "app/component/footer/Footer";
-import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
@@ -66,13 +63,6 @@ export function ElectionReportPage() {
   return (
     <>
       <PageTitle title={`${t("election.title.finish_data_entry")} - Abacus`} />
-      <NavBar>
-        <Link to={`/elections/${election.id}#coordinator`}>
-          <span className="bold">{election.location}</span>
-          <span>&mdash;</span>
-          <span>{election.name}</span>
-        </Link>
-      </NavBar>
       <header>
         <section>
           <h1>{t("election_status.finish_data_entry_first_session")}</h1>

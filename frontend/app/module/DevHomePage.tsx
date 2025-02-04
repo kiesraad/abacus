@@ -1,7 +1,6 @@
 import { Link } from "react-router";
 
 import { MockTest } from "app/component/MockTest";
-import { NavBar } from "app/component/navbar/NavBar";
 
 import { ElectionListProvider, useElectionList } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -87,7 +86,6 @@ export function DevHomePage() {
   return (
     <AppLayout>
       <PageTitle title="Dev Homepage - Abacus" />
-      <NavBar />
       <header>
         <section>
           <h1>Abacus 🧮</h1>

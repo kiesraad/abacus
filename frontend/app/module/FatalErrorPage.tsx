@@ -17,7 +17,8 @@ interface FatalErrorPageProps {
 export function FatalErrorPage({ message, code, reference, error }: FatalErrorPageProps) {
   return (
     <AppLayout>
-      <NavBar />
+      {/* Show NavBar for / to avoid call to useElection outside ElectionProvider */}
+      <NavBar location={{ pathname: "/", hash: "" }} />
       <Error title={t("error.title")} error={error}>
         {(code || reference) && (
           <p>

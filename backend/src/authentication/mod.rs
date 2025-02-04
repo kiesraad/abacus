@@ -1,9 +1,18 @@
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use axum::{
+    extract::{Request, State},
+    http::StatusCode,
+    middleware::Next,
+    response::{IntoResponse, Response},
+    Json,
+};
 use axum_extra::extract::CookieJar;
 use chrono::TimeDelta;
 use cookie::{Cookie, SameSite};
+use hyper::header::SET_COOKIE;
 use serde::{Deserialize, Serialize};
 use session::Sessions;
+use sqlx::SqlitePool;
+use tracing::info;
 use user::{ListedUser, User, Users};
 use utoipa::ToSchema;
 
@@ -18,7 +27,10 @@ mod util;
 pub use error::AuthenticationError;
 
 /// Session lifetime, for both cookie and database
-pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 60 * 2); // 2 hours
+pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 30); // 30 minutes (extended every)
+
+/// Minimum session lifetime, refresh if only this much time is left
+pub const SESSION_MIN_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 15); // 15 minutes
 
 /// Session cookie name
 pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
@@ -263,11 +275,47 @@ pub async fn list(State(users_repo): State<Users>) -> Result<Json<UserListRespon
     }))
 }
 
+/// Middleware to extend the session lifetime
+pub async fn extend_session(State(pool): State<SqlitePool>, req: Request, next: Next) -> Response {
+    let jar = CookieJar::from_headers(req.headers());
+    let mut res = next.run(req).await;
+
+    let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
+        return res;
+    };
+
+    let sessions = Sessions::new(pool);
+
+    info!(
+        "Checking to extend lifetime of session: {}",
+        session_cookie.value()
+    );
+
+    if let Ok(Some(session)) = sessions.extend_session(session_cookie.value()).await {
+        info!("Session extended: {:?}", session_cookie);
+
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
+        let updated_jar = jar.add(cookie);
+
+        for cookie in updated_jar.iter() {
+            info!("Setting cookie: {:?}", cookie);
+
+            if let Ok(header_value) = cookie.encoded().to_string().parse() {
+                res.headers_mut().append(SET_COOKIE, header_value);
+            }
+        }
+    }
+
+    res
+}
+
 #[cfg(test)]
 mod tests {
     use axum::{
         body::Body,
         http::Request,
+        middleware,
         routing::{get, post},
         Router,
     };
@@ -280,14 +328,15 @@ mod tests {
     use crate::{authentication::*, AppState};
 
     fn create_app(pool: SqlitePool) -> Router {
-        let state = AppState { pool };
+        let state = AppState { pool: pool.clone() };
 
         let router = Router::new()
             .route("/api/user", get(list))
             .route("/api/user/login", post(login))
             .route("/api/user/logout", post(logout))
             .route("/api/user/whoami", get(whoami))
-            .route("/api/user/change-password", post(change_password));
+            .route("/api/user/change-password", post(change_password))
+            .layer(middleware::from_fn_with_state(pool, extend_session));
 
         #[cfg(debug_assertions)]
         let router = router
@@ -794,5 +843,59 @@ mod tests {
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: UserListResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.users.len(), 1);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_extend_session(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+
+        let sessions = Sessions::new(pool);
+        let session = sessions.create(1, SESSION_LIFE_TIME).await.unwrap();
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/user/whoami")
+                    .header("cookie", &cookie.encoded().to_string())
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let response: LoginResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(response.user_id, 1);
+
+        let session = sessions.create(1, SESSION_MIN_LIFE_TIME / 2).await.unwrap();
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/user/whoami")
+                    .header("cookie", &cookie.encoded().to_string())
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let response_cookie = response
+            .headers()
+            .get("set-cookie")
+            .unwrap()
+            .to_str()
+            .unwrap();
+
+        dbg!(response_cookie);
     }
 }

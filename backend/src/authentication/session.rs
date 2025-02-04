@@ -10,7 +10,7 @@ use crate::AppState;
 use super::{
     error::AuthenticationError,
     util::{create_new_session_key, get_expires_at},
-    SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+    SESSION_COOKIE_NAME, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME,
 };
 
 /// A session object, corresponds to a row in the sessions table
@@ -135,6 +135,39 @@ impl Sessions {
             .await?;
 
         Ok(())
+    }
+
+    pub(super) async fn extend_session(
+        &self,
+        session_key: &str,
+    ) -> Result<Option<Session>, AuthenticationError> {
+        let new_expires_at = get_expires_at(SESSION_LIFE_TIME)?;
+        let min_life_time = get_expires_at(SESSION_MIN_LIFE_TIME)?;
+        let now = Utc::now();
+
+        let session = sqlx::query_as!(
+            Session,
+            r#"
+          UPDATE sessions
+          SET expires_at = ?
+          WHERE expires_at < ?
+          AND session_key = ?
+          AND expires_at < ?
+          RETURNING
+              session_key,
+              user_id as "user_id: u32",
+              expires_at as "expires_at: _",
+              created_at as "created_at: _"
+          "#,
+            new_expires_at,
+            min_life_time,
+            session_key,
+            now
+        )
+        .fetch_optional(&self.0)
+        .await?;
+
+        Ok(session)
     }
 }
 

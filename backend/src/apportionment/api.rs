@@ -6,8 +6,11 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use crate::{
-    apportionment::{seat_allocation, ApportionmentResult},
-    data_entry::repository::PollingStationResultsEntries,
+    apportionment::{seat_allocation, ApportionmentError, ApportionmentResult},
+    data_entry::{
+        repository::{PollingStationDataEntries, PollingStationResultsEntries},
+        status::DataEntryStatusName,
+    },
     election::repository::Elections,
     polling_station::repository::PollingStations,
     summary::ElectionSummary,
@@ -37,18 +40,31 @@ pub struct ElectionApportionmentResponse {
 )]
 pub async fn election_apportionment(
     State(elections_repo): State<Elections>,
+    State(data_entry_repo): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionApportionmentResponse>, APIError> {
     let election = elections_repo.get(id).await?;
-    let results = polling_station_results_entries_repo
-        .list_with_polling_stations(polling_stations_repo, election.id)
-        .await?;
-    let election_summary = ElectionSummary::from_results(&election, &results)?;
-    let apportionment = seat_allocation(election.number_of_seats.into(), &election_summary)?;
-    Ok(Json(ElectionApportionmentResponse {
-        apportionment,
-        election_summary,
-    }))
+    let statuses = data_entry_repo.statuses(id).await?;
+    if statuses
+        .iter()
+        .filter(|data_entry_status| data_entry_status.status != DataEntryStatusName::Definitive)
+        .collect::<Vec<_>>()
+        .is_empty()
+    {
+        let results = polling_station_results_entries_repo
+            .list_with_polling_stations(polling_stations_repo, election.id)
+            .await?;
+        let election_summary = ElectionSummary::from_results(&election, &results)?;
+        let apportionment = seat_allocation(election.number_of_seats.into(), &election_summary)?;
+        Ok(Json(ElectionApportionmentResponse {
+            apportionment,
+            election_summary,
+        }))
+    } else {
+        Err(APIError::Apportionment(
+            ApportionmentError::ApportionmentNotAvailableUntilDataEntryFinalised,
+        ))
+    }
 }

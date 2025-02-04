@@ -7,23 +7,23 @@ import { cn, formatNumber } from "@kiesraad/util";
 
 import cls from "./ApportionmentPage.module.css";
 
+function convert_zero_to_dash(number: number): string {
+  if (number === 0) {
+    return "-";
+  }
+  return number.toString();
+}
+
+function get_number_of_seats_assigned_sentence(seats: number, type: "rest_seat" | "whole_seat"): string {
+  return t(`apportionment.seats_assigned.${seats > 1 ? "plural" : "singular"}`, {
+    num_seat: seats,
+    type_seat: t(`apportionment.${type}.singular`).toLowerCase(),
+  });
+}
+
 export function ApportionmentPage() {
   const { election } = useElection();
   const { apportionment, election_summary } = useApportionment();
-
-  function convert_zero_to_dash(number: number): string {
-    if (number === 0) {
-      return "-";
-    }
-    return number.toString();
-  }
-
-  function get_number_of_seats_assigned_sentence(seats: number, type: "rest_seat" | "whole_seat"): string {
-    return t(`apportionment.seats_assigned.${seats > 1 ? "plural" : "singular"}`, {
-      num_seat: seats,
-      type_seat: t(`apportionment.${type}.singular`).toLowerCase(),
-    });
-  }
 
   return (
     <>

@@ -475,6 +475,7 @@ pub struct HighestSurplusAssignedSeat {
 /// Errors that can occur during apportionment
 #[derive(Debug, PartialEq)]
 pub enum ApportionmentError {
+    ApportionmentNotAvailableUntilDataEntryFinalised,
     DrawingOfLotsNotImplemented,
 }
 

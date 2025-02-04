@@ -320,6 +320,7 @@ export interface ElectionSummary {
  * Error reference used to show the corresponding error message to the end-user
  */
 export type ErrorReference =
+  | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "DatabaseError"
   | "DrawingOfLotsRequired"
   | "EntryNotFound"

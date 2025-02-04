@@ -76,7 +76,6 @@ export function useInitialDataEntryState(
 
     const getDataEntry = async () => {
       const result = await client.getRequest<GetDataEntryResponse>(requestPath);
-      console.log("AAS", result);
 
       if (isSuccess(result)) {
         const dataEntry = result.data;

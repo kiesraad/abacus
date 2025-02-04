@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { Election } from "@kiesraad/api";
 
 import { DataEntryContext } from "./DataEntryContext";
-import { DataEntryState, DataEntryStateAndActionsLoaded } from "./types";
+import { DataEntryStateAndActionsLoaded } from "./types";
 import useDataEntry from "./useDataEntry";
 
 export interface DataEntryProviderProps {

@@ -59,7 +59,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
         <InputGrid.Body>
           {group.candidates.map((candidate, index) => {
             const addSeparator = (index + 1) % 25 === 0 && index + 1 !== group.candidates.length;
-            const defaultValue = currentValues?.candidate_votes[index] || "";
+            const defaultValue = currentValues.candidate_votes[index] || "";
             const candidateFullName = candidate.first_name
               ? `${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`
               : `${candidate.last_name}, ${candidate.initials}`;
@@ -125,7 +125,9 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
               id={`candidates_votes_form_accept_warnings_${group.number}`}
               checked={formSection.acceptWarnings}
               hasError={formSection.acceptWarningsError}
-              onChange={(e) => setAcceptWarnings(e.target.checked)}
+              onChange={(e) => {
+                setAcceptWarnings(e.target.checked);
+              }}
               label={t("candidates_votes.confirm_counts")}
             />
           </BottomBar.Row>

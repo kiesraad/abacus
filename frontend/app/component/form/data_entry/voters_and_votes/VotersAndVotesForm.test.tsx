@@ -1,5 +1,4 @@
 import { userEvent } from "@testing-library/user-event";
-import { warn } from "console";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { mockElection } from "app/component/election/status/mockData";
@@ -109,7 +108,7 @@ const defaultFormState: DataEntryState = {
   cache: null,
 };
 
-function renderForm(defaultValues: Partial<PollingStationResults> = {}) {
+function renderForm() {
   return render(
     <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
       <VotersAndVotesForm />
@@ -147,7 +146,7 @@ describe("Test VotersAndVotesForm", () => {
     test("hitting enter key does not result in api call", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
 
       const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       await user.type(pollCards, "12345");
@@ -163,7 +162,7 @@ describe("Test VotersAndVotesForm", () => {
     test("hitting shift+enter does result in api call", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
       const spy = vi.spyOn(global, "fetch");
 
       const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
@@ -178,7 +177,7 @@ describe("Test VotersAndVotesForm", () => {
     test("Form field entry and keybindings", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: true });
+      renderForm();
 
       const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
       expect(pollCards.closest("fieldset")).toHaveAccessibleName("Toegelaten kiezers en uitgebrachte stemmen");
@@ -295,7 +294,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
 
       await userTypeInputs(user, {
         ...expectedRequest.data.voters_counts,
@@ -345,7 +344,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
 
-      renderForm({ recounted: true });
+      renderForm();
 
       await userTypeInputs(user, {
         ...expectedRequest.data.voters_counts,
@@ -375,7 +374,7 @@ describe("Test VotersAndVotesForm", () => {
     test("F.201 IncorrectTotal Voters counts", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -423,7 +422,7 @@ describe("Test VotersAndVotesForm", () => {
     test("F.202 IncorrectTotal Votes counts", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -471,7 +470,7 @@ describe("Test VotersAndVotesForm", () => {
     test("F.203 IncorrectTotal Voters recounts", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: true });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -526,7 +525,7 @@ describe("Test VotersAndVotesForm", () => {
     test("clicking next without accepting warning results in alert shown and then accept warning", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -612,7 +611,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.201 high number of blank votes", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -648,7 +647,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.202 high number of invalid votes", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -684,7 +683,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.203 voters counts and votes counts difference above threshold", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -724,7 +723,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.204 votes counts and voters recounts difference above threshold", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: true });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -772,7 +771,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.205 total votes cast should not be zero", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -808,7 +807,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.206 total admitted voters and total votes cast should not exceed polling stations number of eligible voters", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -848,7 +847,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.207 total votes cast and total admitted voters recount should not exceed polling stations number of eligible voters", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: true });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
@@ -892,7 +891,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.208 EqualInput voters counts and votes counts", async () => {
       const user = userEvent.setup();
 
-      renderForm({ recounted: false });
+      renderForm();
 
       await screen.findByTestId("voters_and_votes_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {

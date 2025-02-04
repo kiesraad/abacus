@@ -5,11 +5,11 @@ import { getBaseUrl, getUrlForFormSectionID } from "app/component/pollingstation
 
 import { Election } from "@kiesraad/api";
 
-import { DataEntryState } from "./types";
+import { DataEntryDispatch, DataEntryState } from "./types";
 
 export default function useDataEntryNavigation(
   state: DataEntryState,
-  dispatch: React.Dispatch<any>,
+  dispatch: DataEntryDispatch,
   election: Required<Election>,
   pollingStationId: number,
   entryNumber: number,
@@ -28,7 +28,7 @@ export default function useDataEntryNavigation(
       }
       dispatch({ type: "RESET_TARGET_FORM_SECTION" });
     }
-  }, [state.targetFormSectionId, navigate, election.id, pollingStationId, entryNumber, pathname]);
+  }, [dispatch, state.targetFormSectionId, navigate, election.id, pollingStationId, entryNumber, pathname]);
 
   // prevent navigating to sections that are not yet active
   useEffect(() => {

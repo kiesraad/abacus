@@ -113,23 +113,19 @@ export function PollingStationFormNavigation({ onSubmit, currentValues }: Pollin
 
   // when save is chosen in the abort dialog
   const onAbortModalSave = async () => {
-    if (blocker.state === "blocked") {
-      if (await onSubmit({ continueToNextSection: false })) {
-        blocker.proceed();
-      } else {
-        blocker.reset();
-      }
+    if (await onSubmit({ continueToNextSection: false })) {
+      blocker.proceed();
+    } else {
+      blocker.reset();
     }
   };
 
   // when discard is chosen in the abort dialog
   const onAbortModalDelete = async () => {
-    if (blocker.state === "blocked") {
-      if (await onDeleteDataEntry()) {
-        blocker.proceed();
-      } else {
-        blocker.reset();
-      }
+    if (await onDeleteDataEntry()) {
+      blocker.proceed();
+    } else {
+      blocker.reset();
     }
   };
 

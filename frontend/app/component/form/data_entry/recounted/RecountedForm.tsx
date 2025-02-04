@@ -35,7 +35,9 @@ export function RecountedForm() {
             name="recounted"
             autoFocus
             checked={recounted === true}
-            onChange={(e) => setRecounted(e.target.checked)}
+            onChange={(e) => {
+              setRecounted(e.target.checked);
+            }}
             label={t("recounted.recounted_yes")}
           />
           <ChoiceList.Radio
@@ -43,7 +45,9 @@ export function RecountedForm() {
             value="no"
             name="recounted"
             checked={recounted === false}
-            onChange={(e) => setRecounted(!e.target.checked)}
+            onChange={(e) => {
+              setRecounted(!e.target.checked);
+            }}
             label={t("recounted.recounted_no")}
           />
         </ChoiceList>

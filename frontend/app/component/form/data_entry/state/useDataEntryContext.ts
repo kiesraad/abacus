@@ -16,7 +16,7 @@ export function useDataEntryContext(form?: FormSectionReference): DataEntryState
     if (form && context.formState.current !== form.id) {
       register(form);
     }
-  }, [form, register]);
+  }, [form, context.formState, register]);
 
   return context;
 }

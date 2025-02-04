@@ -155,6 +155,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             authentication::whoami,
             authentication::change_password,
             authentication::list,
+            authentication::create,
             election::election_list,
             election::election_create,
             election::election_details,

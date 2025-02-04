@@ -395,7 +395,7 @@ export interface ListedUser {
   created_at: string;
   fullname?: string;
   id: number;
-  last_activity_at: string;
+  last_activity_at?: string;
   role: Role;
   updated_at: string;
   username: string;

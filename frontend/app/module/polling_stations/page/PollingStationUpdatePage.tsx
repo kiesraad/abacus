@@ -1,13 +1,12 @@
 import * as React from "react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 import { PollingStationForm } from "app/component/form/polling_station/PollingStationForm";
-import { NavBar } from "app/component/navbar/NavBar";
 import { PollingStationDeleteModal } from "app/module/polling_stations/page/PollingStationDeleteModal";
 
 import { useElection, usePollingStationGet } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { IconChevronRight, IconTrash } from "@kiesraad/icon";
+import { IconTrash } from "@kiesraad/icon";
 import { Alert, Button, Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
@@ -59,17 +58,6 @@ export function PollingStationUpdatePage() {
   return (
     <>
       <PageTitle title={`${t("polling_stations")} - Abacus`} />
-      <NavBar>
-        <Link to={`/elections/${election.id}#coordinator`}>
-          <span className="bold">{election.location}</span>
-          <span>&mdash;</span>
-          <span>{election.name}</span>
-        </Link>
-        <IconChevronRight />
-        <Link to={`..`}>
-          <span>{t("polling_stations")}</span>
-        </Link>
-      </NavBar>
       <header>
         <section>
           <h1>{t("polling_station.update")}</h1>

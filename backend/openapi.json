@@ -1976,6 +1976,8 @@
         "required": [
           "id",
           "username",
+          "role",
+          "last_activity_at",
           "updated_at",
           "created_at"
         ],
@@ -1983,10 +1985,22 @@
           "created_at": {
             "type": "string"
           },
+          "fullname": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "id": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "last_activity_at": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
           },
           "updated_at": {
             "type": "string"
@@ -2313,6 +2327,14 @@
           "FixedLocation",
           "Special",
           "Mobile"
+        ]
+      },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "administrator",
+          "typist",
+          "coordinator"
         ]
       },
       "SaveDataEntryResponse": {

@@ -2,10 +2,11 @@ use super::error::AuthenticationError;
 use super::session::Sessions;
 use super::user::{ListedUser, User, Users};
 use super::{SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME};
-use axum::extract::Request;
-use axum::middleware::Next;
-use axum::response::Response;
-use axum::{extract::State, response::IntoResponse, Json};
+use axum::{
+  extract::{Request, State},
+  middleware::Next,
+  response::{IntoResponse, Json, Response}
+};
 use axum_extra::extract::CookieJar;
 use cookie::{Cookie, SameSite};
 use hyper::header::SET_COOKIE;

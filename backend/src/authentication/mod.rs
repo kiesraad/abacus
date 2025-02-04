@@ -1,6 +1,8 @@
 use chrono::TimeDelta;
 
-pub mod api;
+pub use self::api::*;
+
+mod api;
 pub mod error;
 mod password;
 mod role;

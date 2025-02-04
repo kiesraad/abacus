@@ -147,7 +147,7 @@
     "/api/elections/{election_id}/apportionment": {
       "get": {
         "tags": [
-          "apportionment::api"
+          "apportionment"
         ],
         "summary": "Get the seat allocation for an election",
         "operationId": "election_apportionment",
@@ -1046,7 +1046,7 @@
     "/api/user": {
       "get": {
         "tags": [
-          "authentication::api"
+          "authentication"
         ],
         "summary": "Lists all users",
         "operationId": "list",
@@ -1077,7 +1077,7 @@
     "/api/user/change-password": {
       "post": {
         "tags": [
-          "authentication::api"
+          "authentication"
         ],
         "summary": "Change password endpoint, updates a user password",
         "operationId": "change_password",
@@ -1128,7 +1128,7 @@
     "/api/user/login": {
       "post": {
         "tags": [
-          "authentication::api"
+          "authentication"
         ],
         "summary": "Login endpoint, authenticates a user and creates a new session + session cookie",
         "operationId": "login",
@@ -1179,7 +1179,7 @@
     "/api/user/logout": {
       "post": {
         "tags": [
-          "authentication::api"
+          "authentication"
         ],
         "summary": "Logout endpoint, deletes the session cookie",
         "operationId": "logout",
@@ -1203,7 +1203,7 @@
     "/api/user/whoami": {
       "get": {
         "tags": [
-          "authentication::api"
+          "authentication"
         ],
         "summary": "Get current logged-in user endpoint",
         "operationId": "whoami",

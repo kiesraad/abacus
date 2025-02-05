@@ -13,7 +13,7 @@ import {
 import { LogsHomePage } from "app/module/logs";
 import { NotAvailableInMock } from "app/module/NotAvailableInMock";
 import { PollingStationListPage, PollingStationsLayout } from "app/module/polling_stations";
-import { UsersHomePage } from "app/module/users";
+import { UserListPage } from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
 
 import { t } from "@kiesraad/i18n";
@@ -82,7 +82,9 @@ export const routes = createRoutesFromElements(
     <Route element={<AdministratorLayout />}>
       <Route path="dev" element={<DevHomePage />} />
       <Route path="logs" element={<LogsHomePage />} />
-      <Route path="users" element={<UsersHomePage />} />
+      <Route path="users">
+        <Route index element={<UserListPage />} />
+      </Route>
       <Route path="workstations" element={<WorkstationsHomePage />} />
     </Route>
   </Route>,

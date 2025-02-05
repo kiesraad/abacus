@@ -12,10 +12,14 @@ import {
   PollingStation,
   PollingStationListResponse,
   SaveDataEntryResponse,
+  USER_LIST_REQUEST_PARAMS,
+  USER_LIST_REQUEST_PATH,
+  UserListResponse,
 } from "@kiesraad/api";
 
 import { electionDetailsMockResponse, electionListMockResponse, electionStatusMockResponse } from "./ElectionMockData";
 import { pollingStationMockData } from "./PollingStationMockData";
+import { userMockData } from "./UserMockData";
 
 type ParamsToString<T> = {
   [P in keyof T]: string;
@@ -117,6 +121,13 @@ export const PollingStationGetHandler = http.get<ParamsToString<POLLING_STATION_
   () => HttpResponse.json(pollingStationMockData[0]! satisfies PollingStation, { status: 200 }),
 );
 
+export const UserListRequestHandler = http.get<
+  USER_LIST_REQUEST_PARAMS,
+  null,
+  UserListResponse,
+  USER_LIST_REQUEST_PATH
+>("/api/user", () => HttpResponse.json({ users: userMockData }, { status: 200 }));
+
 export const handlers: HttpHandler[] = [
   pingHandler,
   WhoAmIRequestHandler,
@@ -131,4 +142,5 @@ export const handlers: HttpHandler[] = [
   PollingStationCreateHandler,
   PollingStationGetHandler,
   PollingStationUpdateHandler,
+  UserListRequestHandler,
 ];

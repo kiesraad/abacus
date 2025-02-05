@@ -41,7 +41,7 @@ impl PdfWorld {
             main_source: Source::new(FileId::new(None, VirtualPath::new("empty.typ")), "".into()),
             input_data: (
                 FileId::new(None, VirtualPath::new("input.json")),
-                Bytes::from_static(&[]),
+                Bytes::new([]),
             ),
         }
     }
@@ -172,7 +172,7 @@ fn load_fonts() -> (Vec<Font>, FontBook) {
     macro_rules! include_font {
         ($path:literal) => {
             let fontdata = include_filedata!($path);
-            let font = Font::new(Bytes::from_static(fontdata), 0).expect("Error reading font file");
+            let font = Font::new(Bytes::new(fontdata), 0).expect("Error reading font file");
             fontbook.push(font.info().clone());
             fonts.push(font);
         };

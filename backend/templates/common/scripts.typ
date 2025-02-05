@@ -10,12 +10,11 @@
 /// Display a checkmark for usage in a checkbox
 #let checkmark() = {
   box(width: 6pt, height: 6pt, clip: true)[
-    #path(
+    #curve(
       stroke: black,
-      closed: false,
-      (0%, 50%),
-      (40%, 90%),
-      (100%, 0%),
+      curve.move((0%, 50%)),
+      curve.line((40%, 90%)),
+      curve.line((100%, 0%)),
     )
   ]
 }

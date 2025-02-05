@@ -15,12 +15,12 @@ import polling_station_choice from "./polling_station_choice.json";
 import recounted from "./recounted.json";
 import status from "./status.json";
 import user from "./user.json";
+import users from "./users.json";
 import voters_and_votes from "./voters_and_votes.json";
 import workstations from "./workstations.json";
 
 const nl = {
   ...generic,
-  form_errors,
   candidates_votes,
   check_and_save,
   data_entry,
@@ -30,12 +30,14 @@ const nl = {
   election_status,
   error,
   feedback,
+  form_errors,
   messages,
-  polling_station_choice,
   polling_station,
+  polling_station_choice,
   recounted,
   status,
   user,
+  users,
   voters_and_votes,
   workstations,
 };

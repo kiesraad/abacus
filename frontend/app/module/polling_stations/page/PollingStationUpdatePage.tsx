@@ -84,23 +84,25 @@ export function PollingStationUpdatePage() {
                 onCancel={handleCancel}
               />
 
-              <Button
-                type="button"
-                variant="tertiary-destructive"
-                leftIcon={<IconTrash />}
-                onClick={toggleShowDeleteModal}
-              >
-                {t("polling_station.delete")}
-              </Button>
-              {showDeleteModal && (
-                <PollingStationDeleteModal
-                  electionId={election.id}
-                  pollingStationId={pollingStationId}
-                  onCancel={toggleShowDeleteModal}
-                  onError={handleDeleteError}
-                  onDeleted={handleDeleted}
-                />
-              )}
+              <div className="mt-lg">
+                <Button
+                  type="button"
+                  variant="tertiary-destructive"
+                  leftIcon={<IconTrash />}
+                  onClick={toggleShowDeleteModal}
+                >
+                  {t("polling_station.delete")}
+                </Button>
+                {showDeleteModal && (
+                  <PollingStationDeleteModal
+                    electionId={election.id}
+                    pollingStationId={pollingStationId}
+                    onCancel={toggleShowDeleteModal}
+                    onError={handleDeleteError}
+                    onDeleted={handleDeleted}
+                  />
+                )}
+              </div>
             </>
           )}
         </article>

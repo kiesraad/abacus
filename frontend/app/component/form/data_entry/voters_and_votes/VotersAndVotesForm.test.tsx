@@ -24,7 +24,7 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInpu
 
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { getClientState } from "../state/dataEntryUtils";
-import { DataEntryState, FormSection } from "../state/types";
+import { DataEntryState, FormSection, FormState } from "../state/types";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
 const defaultFormSection: Omit<FormSection, "id" | "index"> = {
@@ -996,15 +996,28 @@ describe("Test VotersAndVotesForm", () => {
   });
 });
 
-// function overrideGetDataEntryState() {
-//   overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
-//     client_state: getClientState(defaultFormState.formState, false, true),
-//     data: {
-//       ...initialValues,
-//       recounted: true,
-//     },
-//     progress: 1,
-//     updated_at: "",
-//     validation_results: { errors: [], warnings: [] },
-//   } satisfies GetDataEntryResponse);
-// }
+interface OverrideServerDataEntryResponseProps {
+  formState?: FormState;
+  values: Partial<PollingStationResults>;
+  acceptWarnings?: boolean;
+  continueToNextSection?: boolean;
+  progress?: number;
+}
+function overrideServerDataEntryResponse({
+  formState,
+  values,
+  acceptWarnings = false,
+  continueToNextSection = true,
+  progress = 1,
+}: OverrideServerDataEntryResponseProps) {
+  overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
+    client_state: getClientState(formState || defaultFormState.formState, acceptWarnings, continueToNextSection),
+    data: {
+      ...initialValues,
+      ...values,
+    },
+    progress,
+    updated_at: "",
+    validation_results: { errors: [], warnings: [] },
+  } satisfies GetDataEntryResponse);
+}

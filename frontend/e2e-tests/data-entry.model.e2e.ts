@@ -12,12 +12,7 @@ import { createMachine } from "xstate";
 import { VotersCounts, VotesCounts } from "@kiesraad/api";
 
 import { test } from "./fixtures";
-import {
-  getStatesAndEventsFromMachineDefinition,
-  getStatesAndEventsFromTest,
-  TestEvents,
-  TestStates,
-} from "./xstate-helpers";
+import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
 
 /*
 Not covered in the model:
@@ -190,7 +185,7 @@ test.describe("Data entry model test", () => {
         const differencesPage = new DifferencesPage(page);
         const abortModal = new AbortInputModal(page);
 
-        const pollingStationsPageStates: TestStates = {
+        const pollingStationsPageStates = {
           pollingStationsPageDiscarded: async () => {
             await expect(pollingStationChoicePage.fieldset).toBeVisible();
             await expect(pollingStationChoicePage.alertDataEntryInProgress).toBeHidden();
@@ -215,13 +210,13 @@ test.describe("Data entry model test", () => {
           },
         };
 
-        const PollingStationsPageEvents: TestEvents = {
+        const PollingStationsPageEvents = {
           RESUME_DATA_ENTRY: async () => {
             await pollingStationChoicePage.clickDataEntryInProgress(pollingStation.number, pollingStation.name);
           },
         };
 
-        const recountedPageStates: TestStates = {
+        const recountedPageStates = {
           recountedPageEmpty: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
@@ -243,7 +238,7 @@ test.describe("Data entry model test", () => {
           },
         };
 
-        const recountedPageEvents: TestEvents = {
+        const recountedPageEvents = {
           SAVE_UNSUBMITTED_CHANGES: async () => {
             await recountedPage.unsavedChangesModal.saveInput.click();
           },
@@ -252,7 +247,7 @@ test.describe("Data entry model test", () => {
           },
         };
 
-        const votersVotesPageStates: TestStates = {
+        const votersVotesPageStates = {
           voterVotesPageCached: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
@@ -300,7 +295,7 @@ test.describe("Data entry model test", () => {
           },
         };
 
-        const votersAndVotesPageEvents: TestEvents = {
+        const votersAndVotesPageEvents = {
           FILL_WITH_VALID_DATA: async () => {
             await votersAndVotesPage.inputVotersCounts(voters);
             await votersAndVotesPage.inputVotesCounts(votes);
@@ -322,19 +317,19 @@ test.describe("Data entry model test", () => {
           },
         };
 
-        const differencesPageStates: TestStates = {
+        const differencesPageStates = {
           differencesPage: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
           },
         };
 
-        const differencesPageEvents: TestEvents = {
+        const differencesPageEvents = {
           GO_TO_VOTERS_VOTES_PAGE: async () => {
             await differencesPage.navPanel.votersAndVotes.click();
           },
         };
 
-        const abortInputModalStates: TestStates = {
+        const abortInputModalStates = {
           abortInputModalFilled: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
@@ -345,7 +340,7 @@ test.describe("Data entry model test", () => {
             await expect(abortModal.heading).toBeVisible();
           },
         };
-        const abortInputModalEvents: TestEvents = {
+        const abortInputModalEvents = {
           SAVE_INPUT: async () => {
             await abortModal.saveInput.click();
           },
@@ -379,6 +374,14 @@ test.describe("Data entry model test", () => {
         await pollingStationChoicePage.selectPollingStationAndClickStart(pollingStation.number);
         await recountedPage.checkNoAndClickNext();
 
+        type MachineStates = typeof dataEntryMachineDefinition.states;
+        type MachineStateKey = keyof MachineStates;
+        type MachineEventKey = {
+          [StateKey in MachineStateKey]: MachineStates[StateKey] extends { on: Record<infer EventKey, string> }
+            ? EventKey
+            : never;
+        }[MachineStateKey];
+
         await path.test({
           states: {
             ...pollingStationsPageStates,
@@ -386,14 +389,14 @@ test.describe("Data entry model test", () => {
             ...votersVotesPageStates,
             ...differencesPageStates,
             ...abortInputModalStates,
-          },
+          } satisfies Record<MachineStateKey, () => void>,
           events: {
             ...votersAndVotesPageEvents,
             ...recountedPageEvents,
             ...differencesPageEvents,
             ...abortInputModalEvents,
             ...PollingStationsPageEvents,
-          },
+          } satisfies Record<MachineEventKey, () => void>,
         });
       });
     });

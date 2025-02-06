@@ -261,6 +261,8 @@ pub async fn list(State(users_repo): State<Users>) -> Result<Json<UserListRespon
 #[derive(Serialize, Deserialize, ToSchema)]
 pub struct CreateUserRequest {
     pub username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub fullname: Option<String>,
     pub temp_password: String,
     pub role: Role,

@@ -71,7 +71,7 @@ mod tests {
         let state = AppState { pool: pool.clone() };
 
         let router = Router::new()
-            .route("/api/user", get(list))
+            .route("/api/user", get(user_list))
             .route("/api/user/login", post(login))
             .route("/api/user/logout", post(logout))
             .route("/api/user/whoami", get(whoami))

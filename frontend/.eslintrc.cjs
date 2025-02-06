@@ -36,7 +36,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["*.e2e.ts", "*PgObj.ts", "e2e-tests/**/fixtures.ts"],
+      files: ["*.e2e.ts", "e2e-tests/**/*"],
       extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended-type-checked",
@@ -49,6 +49,7 @@ module.exports = {
       rules: {
         "@typescript-eslint/no-floating-promises": "error",
         "react-hooks/rules-of-hooks": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
       },
     },
     {

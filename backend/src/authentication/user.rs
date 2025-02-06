@@ -26,8 +26,8 @@ pub struct User {
     fullname: Option<String>,
     role: Role,
     password_hash: String,
-    #[schema(value_type = String)]
-    last_activity_at: DateTime<Utc>,
+    #[schema(value_type = String, nullable = true)]
+    last_activity_at: Option<DateTime<Utc>>,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
@@ -103,8 +103,9 @@ pub struct ListedUser {
     #[schema(nullable = false)]
     fullname: Option<String>,
     role: Role,
-    #[schema(value_type = String)]
-    last_activity_at: DateTime<Utc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
+    last_activity_at: Option<DateTime<Utc>>,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]

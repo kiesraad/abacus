@@ -10,6 +10,8 @@ export class PollingStationChoicePage {
   readonly alertInputSaved: Locator;
   readonly dataEntrySuccess: Locator;
   readonly resumeDataEntry: Locator;
+  readonly alertDataEntryInProgress: Locator;
+  readonly allDataEntriesInProgress: Locator;
 
   constructor(protected readonly page: Page) {
     this.fieldset = page.getByRole("group", {
@@ -32,6 +34,10 @@ export class PollingStationChoicePage {
     this.resumeDataEntry = page.getByRole("heading", { level: 2, name: "Je hebt nog een openstaande invoer" });
 
     this.alertInputSaved = page.getByRole("alert").filter({ has: this.dataEntrySuccess });
+
+    this.alertDataEntryInProgress = page.getByRole("alert").filter({ has: this.resumeDataEntry });
+
+    this.allDataEntriesInProgress = this.alertDataEntryInProgress.getByRole("link");
   }
 
   async clickStart() {
@@ -44,5 +50,12 @@ export class PollingStationChoicePage {
   async selectPollingStationAndClickStart(pollingStationNumber: number) {
     await this.pollingStationNumber.fill(pollingStationNumber.toString());
     await this.clickStart();
+  }
+
+  async clickDataEntryInProgress(pollingStationNumber: number, pollingStationName: string) {
+    const dataEntryLink = this.alertDataEntryInProgress.getByRole("link", {
+      name: `${pollingStationNumber} - ${pollingStationName}`,
+    });
+    await dataEntryLink.click();
   }
 }

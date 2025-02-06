@@ -30,7 +30,7 @@ describe("routes", () => {
   test("Non existing route results in not found page", async () => {
     // Router sanity checks
     const router = renderWithRouter();
-    expect(router.state.location.pathname).toEqual("/elections");
+    expect(router.state.location.pathname).toEqual("/dev");
     await router.navigate("/elections/1/data-entry");
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
 

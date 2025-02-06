@@ -296,7 +296,7 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", None, "password", Role::Administrator)
+            .create("test_user", None, "password", Role::Typist)
             .await
             .unwrap();
 
@@ -316,7 +316,12 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", None, "password", Role::Administrator)
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Coordinator,
+            )
             .await
             .unwrap();
 
@@ -351,7 +356,12 @@ mod tests {
         let sessions = Sessions::new(pool.clone());
 
         let user = users
-            .create("test_user", None, "password", Role::Administrator)
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
             .await
             .unwrap();
         let session = sessions
@@ -384,7 +394,12 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", None, "password", Role::Administrator)
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
             .await
             .unwrap();
 
@@ -415,7 +430,12 @@ mod tests {
     async fn password_hash_does_not_serialize(pool: SqlitePool) {
         let users = Users::new(pool.clone());
         let user = users
-            .create("test_user", None, "password", Role::Administrator)
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
             .await
             .unwrap();
 

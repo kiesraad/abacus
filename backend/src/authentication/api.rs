@@ -193,7 +193,7 @@ pub async fn development_create_user(
 
     // Create a new user
     users
-        .create(&username, None, &password, Role::Administrator)
+        .create(&username, None, &password, Role::Typist)
         .await?;
 
     Ok(StatusCode::CREATED)

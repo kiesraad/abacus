@@ -67,7 +67,7 @@ function DevLinks() {
           ))}
         </ul>
         <li>
-          <Link to={`/users#administratorcoordinator`}>{t("user.manage")}</Link>
+          <Link to={`/users#administratorcoordinator`}>{t("user.management")}</Link>
         </li>
         <li>
           <Link to={`/workstations#administrator`}>{t("workstations.manage")}</Link>

@@ -101,8 +101,8 @@ export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
 // /api/user
-export type LIST_REQUEST_PARAMS = Record<string, never>;
-export type LIST_REQUEST_PATH = `/api/user`;
+export type USER_LIST_REQUEST_PARAMS = Record<string, never>;
+export type USER_LIST_REQUEST_PATH = `/api/user`;
 
 // /api/user/change-password
 export type CHANGE_PASSWORD_REQUEST_PARAMS = Record<string, never>;

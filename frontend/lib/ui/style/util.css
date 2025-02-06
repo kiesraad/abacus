@@ -49,6 +49,10 @@
   background-color: var(--bg-gray);
 }
 
+.text-muted {
+  color: var(--gray-400);
+}
+
 /* Width */
 .w-13 {
   width: 13rem;

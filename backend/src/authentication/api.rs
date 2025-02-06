@@ -277,7 +277,7 @@ pub struct CreateUserRequest {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn create(
+pub async fn user_create(
     State(users_repo): State<Users>,
     Json(create_user_req): Json<CreateUserRequest>,
 ) -> Result<(StatusCode, Json<ListedUser>), APIError> {

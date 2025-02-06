@@ -1077,8 +1077,8 @@
         "tags": [
           "authentication"
         ],
-        "summary": "Lists all users",
-        "operationId": "create",
+        "summary": "Create a new user",
+        "operationId": "user_create",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1481,10 +1481,7 @@
         ],
         "properties": {
           "fullname": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "role": {
             "$ref": "#/components/schemas/Role"

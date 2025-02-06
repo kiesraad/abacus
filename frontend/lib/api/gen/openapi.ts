@@ -103,6 +103,9 @@ export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
 // /api/user
 export type LIST_REQUEST_PARAMS = Record<string, never>;
 export type LIST_REQUEST_PATH = `/api/user`;
+export type USER_CREATE_REQUEST_PARAMS = Record<string, never>;
+export type USER_CREATE_REQUEST_PATH = `/api/user`;
+export type USER_CREATE_REQUEST_BODY = CreateUserRequest;
 
 // /api/user/change-password
 export type CHANGE_PASSWORD_REQUEST_PARAMS = Record<string, never>;
@@ -181,6 +184,13 @@ export interface CandidateVotes {
 export interface ChangePasswordRequest {
   new_password: string;
   password: string;
+  username: string;
+}
+
+export interface CreateUserRequest {
+  fullname?: string;
+  role: Role;
+  temp_password: string;
   username: string;
 }
 

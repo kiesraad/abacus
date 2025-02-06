@@ -134,6 +134,24 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
     assert_eq!(body.error, "Drawing of lots is required");
 }
 
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3"))))]
+async fn test_election_apportionment_error_apportionment_not_available_until_data_entry_finalised(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/elections/3/apportionment");
+    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+    let body: ErrorResponse = response.json().await.unwrap();
+    assert_eq!(
+        body.error,
+        "Election data entry first needs to be finalised"
+    );
+}
+
 #[test(sqlx::test)]
 async fn test_election_apportionment_election_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -143,4 +161,6 @@ async fn test_election_apportionment_election_not_found(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    let body: ErrorResponse = response.json().await.unwrap();
+    assert_eq!(body.error, "Item not found");
 }

@@ -49,9 +49,7 @@ pub async fn election_apportionment(
     let statuses = data_entry_repo.statuses(id).await?;
     if statuses
         .iter()
-        .filter(|data_entry_status| data_entry_status.status != DataEntryStatusName::Definitive)
-        .collect::<Vec<_>>()
-        .is_empty()
+        .all(|s| s.status == DataEntryStatusName::Definitive)
     {
         let results = polling_station_results_entries_repo
             .list_with_polling_stations(polling_stations_repo, election.id)

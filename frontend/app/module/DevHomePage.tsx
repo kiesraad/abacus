@@ -11,6 +11,7 @@ function DevLinks() {
 
   return (
     <>
+      <p>Dit is een ontwikkelversie van Abacus. Kies hieronder welk deel van de applicatie je wilt gebruiken.</p>
       <strong>{t("general")}</strong>
       <ul>
         <li>

@@ -193,7 +193,7 @@ pub async fn development_create_user(
 
     // Create a new user
     users
-        .create(&username, &password, Role::Administrator)
+        .create(&username, None, &password, Role::Administrator)
         .await?;
 
     Ok(StatusCode::CREATED)
@@ -221,7 +221,7 @@ pub async fn development_login(
         Some(u) => u,
         None => {
             users
-                .create("user", "password", Role::Administrator)
+                .create("user", Some("Full Name"), "password", Role::Administrator)
                 .await?
         }
     };
@@ -284,6 +284,7 @@ pub async fn user_create(
     let user = users_repo
         .create(
             &create_user_req.username,
+            create_user_req.fullname.as_deref(),
             &create_user_req.temp_password,
             create_user_req.role,
         )

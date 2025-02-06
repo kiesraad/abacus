@@ -171,6 +171,7 @@ impl Users {
     pub async fn create(
         &self,
         username: &str,
+        fullname: Option<&str>,
         password: &str,
         role: Role,
     ) -> Result<User, AuthenticationError> {
@@ -178,8 +179,8 @@ impl Users {
 
         let user = sqlx::query_as!(
             User,
-            r#"INSERT INTO users (username, password_hash, role)
-            VALUES (?, ?, ?)
+            r#"INSERT INTO users (username, fullname, password_hash, role)
+            VALUES (?, ?, ?, ?)
             RETURNING
                 id as "id: u32",
                 username,
@@ -191,6 +192,7 @@ impl Users {
                 created_at as "created_at: _"
             "#,
             username,
+            fullname,
             password_hash,
             role,
         )
@@ -310,7 +312,7 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", "password", Role::Administrator)
+            .create("test_user", None, "password", Role::Administrator)
             .await
             .unwrap();
 
@@ -330,7 +332,7 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", "password", Role::Administrator)
+            .create("test_user", None, "password", Role::Administrator)
             .await
             .unwrap();
 
@@ -365,7 +367,7 @@ mod tests {
         let sessions = Sessions::new(pool.clone());
 
         let user = users
-            .create("test_user", "password", Role::Administrator)
+            .create("test_user", None, "password", Role::Administrator)
             .await
             .unwrap();
         let session = sessions
@@ -398,7 +400,7 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", "password", Role::Administrator)
+            .create("test_user", None, "password", Role::Administrator)
             .await
             .unwrap();
 

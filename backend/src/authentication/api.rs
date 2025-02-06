@@ -266,7 +266,7 @@ pub struct CreateUserRequest {
     pub role: Role,
 }
 
-/// Lists all users
+/// Create a new user
 #[utoipa::path(
     post,
     path = "/api/user",

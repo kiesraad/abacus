@@ -91,6 +91,7 @@ export function resetFormSectionState(formState: FormState) {
     section.errors = [];
     section.warnings = [];
     section.isSubmitted = undefined;
+    section.acceptWarningsError = false;
   });
 }
 

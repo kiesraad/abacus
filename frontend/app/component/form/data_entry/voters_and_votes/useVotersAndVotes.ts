@@ -47,7 +47,7 @@ export function useVotersAndVotes() {
   };
 
   const setAcceptWarnings = (acceptWarnings: boolean) => {
-    updateFormSection({ acceptWarnings });
+    updateFormSection({ acceptWarningsError: false, acceptWarnings });
   };
 
   // form keyboard navigation

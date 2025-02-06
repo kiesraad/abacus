@@ -16,12 +16,12 @@ export function useDifferences() {
 
   // local form state
   const defaultValues =
-    cache?.key === "voters_votes_counts" ? (cache.data as DifferencesValues) : pollingStationResults.differences_counts;
+    cache?.key === "differences_counts" ? (cache.data as DifferencesValues) : pollingStationResults.differences_counts;
 
   const [currentValues, setCurrentValues] = useState<DifferencesFormValues>(valuesToFormValues(defaultValues));
 
   // derived state
-  const { errors, warnings, isSaved, acceptWarnings, hasChanges } = formState.sections.voters_votes_counts;
+  const { errors, warnings, isSaved, acceptWarnings, hasChanges } = formState.sections.differences_counts;
   const defaultProps = {
     errorsAndWarnings: isSaved ? getErrorsAndWarnings(errors, warnings) : undefined,
     warningsAccepted: acceptWarnings,
@@ -68,7 +68,7 @@ export function useDifferences() {
     onSubmit,
     pollingStationResults,
     currentValues,
-    formSection: formState.sections.voters_votes_counts,
+    formSection: formState.sections.differences_counts,
     setValues,
     status,
     setAcceptWarnings,

@@ -3,17 +3,7 @@ import { electionMockData } from "@kiesraad/api-mocks";
 import { overrideOnce } from "@kiesraad/test";
 
 import { getClientState } from "./state/dataEntryUtils";
-import { DataEntryState, FormSection, FormState } from "./state/types";
-
-const defaultFormSection: Omit<FormSection, "id" | "index"> = {
-  title: "Toegelaten kiezers en uitgebrachte stemmen",
-  isSaved: false,
-  acceptWarnings: false,
-  hasChanges: false,
-  acceptWarningsError: false,
-  errors: [],
-  warnings: [],
-};
+import { DataEntryState, FormSection, FormSectionId, FormState } from "./state/types";
 
 const initialValues: PollingStationResults = {
   recounted: undefined,
@@ -49,45 +39,18 @@ const initialValues: PollingStationResults = {
   })),
 };
 
-const defaultFormState: DataEntryState = {
-  election: electionMockData,
-  pollingStationId: 1,
-  error: null,
-  pollingStationResults: null,
-  entryNumber: 1,
-  formState: {
-    current: "voters_votes_counts",
-    furthest: "voters_votes_counts",
-    sections: {
-      recounted: {
-        id: "recounted",
-        index: 1,
-        ...defaultFormSection,
-      },
-      voters_votes_counts: {
-        id: "voters_votes_counts",
-        index: 2,
-        ...defaultFormSection,
-      },
-      differences_counts: {
-        id: "differences_counts",
-        index: 3,
-        ...defaultFormSection,
-      },
-      save: {
-        id: "save",
-        index: 4,
-        ...defaultFormSection,
-      },
-    },
-  },
-  targetFormSectionId: "recounted",
-  status: "idle",
-  cache: null,
+export const defaultFormSection: Omit<FormSection, "id" | "index"> = {
+  title: "Toegelaten kiezers en uitgebrachte stemmen",
+  isSaved: false,
+  acceptWarnings: false,
+  hasChanges: false,
+  acceptWarningsError: false,
+  errors: [],
+  warnings: [],
 };
 
 export interface OverrideServerGetDataEntryResponseProps {
-  formState?: FormState;
+  formState: FormState;
   pollingStationResults: Partial<PollingStationResults>;
   acceptWarnings?: boolean;
   continueToNextSection?: boolean;
@@ -102,7 +65,7 @@ export function overrideServerGetDataEntryResponse({
   progress = 1,
 }: OverrideServerGetDataEntryResponseProps) {
   overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
-    client_state: getClientState(formState || defaultFormState.formState, acceptWarnings, continueToNextSection),
+    client_state: getClientState(formState, acceptWarnings, continueToNextSection),
     data: {
       ...initialValues,
       ...pollingStationResults,

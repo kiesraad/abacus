@@ -25,18 +25,8 @@ import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInpu
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { getClientState } from "../state/dataEntryUtils";
 import { DataEntryState, FormSection, FormState } from "../state/types";
-import { overrideServerGetDataEntryResponse } from "../test.util";
+import { defaultFormSection, overrideServerGetDataEntryResponse } from "../test.util";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
-
-const defaultFormSection: Omit<FormSection, "id" | "index"> = {
-  title: "Toegelaten kiezers en uitgebrachte stemmen",
-  isSaved: false,
-  acceptWarnings: false,
-  hasChanges: false,
-  acceptWarningsError: false,
-  errors: [],
-  warnings: [],
-};
 
 const initialValues: PollingStationResults = {
   recounted: undefined,
@@ -72,7 +62,7 @@ const initialValues: PollingStationResults = {
   })),
 };
 
-const defaultFormState: DataEntryState = {
+const defaultDataEntryState: DataEntryState = {
   election: electionMockData,
   pollingStationId: 1,
   error: null,
@@ -178,6 +168,7 @@ describe("Test VotersAndVotesForm", () => {
     test("Form field entry and keybindings", async () => {
       const user = userEvent.setup();
       overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
         },
@@ -300,6 +291,7 @@ describe("Test VotersAndVotesForm", () => {
       const user = userEvent.setup();
       //TODO: is this a conceptual change? recounted is now undefined by default.
       overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: false,
         },
@@ -355,6 +347,7 @@ describe("Test VotersAndVotesForm", () => {
 
       const user = userEvent.setup();
       overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
         },
@@ -486,6 +479,7 @@ describe("Test VotersAndVotesForm", () => {
     test("F.203 IncorrectTotal Voters recounts", async () => {
       const user = userEvent.setup();
       overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
         },
@@ -745,6 +739,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.204 votes counts and voters recounts difference above threshold", async () => {
       const user = userEvent.setup();
       overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
         },
@@ -873,6 +868,7 @@ describe("Test VotersAndVotesForm", () => {
     test("W.207 total votes cast and total admitted voters recount should not exceed polling stations number of eligible voters", async () => {
       const user = userEvent.setup();
       overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
         },
@@ -961,12 +957,13 @@ describe("Test VotersAndVotesForm", () => {
     test("W.209 EqualInput voters recounts and votes counts", async () => {
       const user = userEvent.setup();
       overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
         pollingStationResults: {
           recounted: true,
         },
       });
       overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
-        client_state: getClientState(defaultFormState.formState, false, true),
+        client_state: getClientState(defaultDataEntryState.formState, false, true),
         data: {
           ...initialValues,
           recounted: true,

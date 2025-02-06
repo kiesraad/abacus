@@ -24,6 +24,8 @@ export function DifferencesForm() {
     useDifferences();
   const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
 
+  console.log("FS", JSON.stringify(formSection, null, 2));
+  console.log("WR", JSON.stringify(defaultProps, null, 2));
   return (
     <Form
       onSubmit={(e) => {

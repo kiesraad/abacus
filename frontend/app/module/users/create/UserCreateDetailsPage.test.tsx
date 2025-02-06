@@ -35,9 +35,11 @@ describe("UserCreateDetailsPage", () => {
 
   test("Show and fill fullname fields", async () => {
     const updateUser = vi.fn();
-    renderPage({ user: { role: "typist", type: "fullname" }, updateUser });
+    renderPage({ user: { role: "coordinator", type: "fullname" }, updateUser });
 
     const user = userEvent.setup();
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Coördinator toevoegen" })).toBeInTheDocument();
 
     expect(await screen.findByLabelText("Gebruikersnaam")).toHaveValue("");
     expect(await screen.findByLabelText("Volledige naam")).toHaveValue("");

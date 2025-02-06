@@ -27,6 +27,8 @@ describe("UserCreateRolePage", () => {
   test("Shows initial form", async () => {
     renderPage({ user: {} });
 
+    expect(await screen.findByRole("heading", { level: 1, name: "Gebruiker toevoegen" })).toBeInTheDocument();
+
     expect(await screen.findByLabelText("Beheerder")).not.toBeChecked();
     expect(await screen.findByLabelText("Coördinator")).not.toBeChecked();
     expect(await screen.findByLabelText("Invoerder")).not.toBeChecked();

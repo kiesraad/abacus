@@ -1,5 +1,6 @@
 {
   "add": "Gebruiker toevoegen",
+  "add_role": "{role} toevoegen",
   "details_title": "Details van het account",
   "fullname": "Volledige naam",
   "fullname_hint": "Deze is terug te zien in de logs",

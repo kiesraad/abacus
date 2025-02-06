@@ -36,6 +36,8 @@ describe("UserCreateTypePage", () => {
   test("Shows initial form", async () => {
     renderPage({ user: { role: "typist" } });
 
+    expect(await screen.findByRole("heading", { level: 1, name: "Invoerder toevoegen" })).toBeInTheDocument();
+
     expect(await screen.findByLabelText(/Op naam/)).toBeChecked();
     expect(await screen.findByLabelText(/Anonieme gebruikersnaam/)).not.toBeChecked();
   });

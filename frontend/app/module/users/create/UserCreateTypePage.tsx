@@ -32,7 +32,7 @@ export function UserCreateTypePage() {
       <PageTitle title={`${t("users.add")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("users.add")}</h1>
+          <h1>{t("users.add_role", { role: t(user.role) })}</h1>
         </section>
       </header>
       <main>

@@ -9,6 +9,7 @@
   "role_administrator_hint": "Verkiezingen voorbereiden, gebruikers aanmaken en uitslagen downloaden",
   "role_coordinator_hint": "Problemen en fouten tijdens het invoeren oplossen",
   "role_hint": "Kies de rol van de nieuwe gebruiker. De rol kan na het aanmaken van de gebruiker niet meer aangepast worden.",
+  "role_mandatory": "Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.",
   "role_title": "Welke rol krijgt de nieuwe gebruiker?",
   "role_typist_hint": "Tellingen invoeren",
   "temporary_password": "Tijdelijk wachtwoord",

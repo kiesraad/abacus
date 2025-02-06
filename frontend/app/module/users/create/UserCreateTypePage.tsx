@@ -1,14 +1,29 @@
 import { FormEvent } from "react";
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
+
+import { UserType } from "app/module/users/create/UserCreateContext";
+import { useUserCreateContext } from "app/module/users/create/useUserCreateContext";
 
 import { t } from "@kiesraad/i18n";
 import { Button, ChoiceList, Form, FormLayout, PageTitle } from "@kiesraad/ui";
 
 export function UserCreateTypePage() {
   const navigate = useNavigate();
+  const { user, updateUser } = useUserCreateContext();
 
-  function handleSubmit(event: FormEvent) {
+  if (!user.role) {
+    return <Navigate to="/users/create" />;
+  }
+
+  // Preselect fullname if there was nothing selected yet
+  const fullnameChecked = user.type ? user.type === "fullname" : true;
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const type = formData.get("type") as UserType;
+
+    updateUser({ type });
     void navigate("/users/create/details");
   }
 
@@ -27,15 +42,17 @@ export function UserCreateTypePage() {
               <ChoiceList>
                 <ChoiceList.Title>{t("users.type_title")}</ChoiceList.Title>
                 <ChoiceList.Radio
-                  id={`type-fullname`}
+                  id={"role-fullname"}
                   name={"type"}
-                  defaultValue={"type-fullname"}
+                  defaultValue={"fullname"}
+                  defaultChecked={fullnameChecked}
                   label={t("users.type_fullname")}
                 />
                 <ChoiceList.Radio
-                  id={`type-anonymous`}
+                  id={"role-anonymous"}
                   name={"type"}
-                  defaultValue={"type-anonymous"}
+                  defaultValue={"anonymous"}
+                  defaultChecked={!fullnameChecked}
                   label={t("users.type_anonymous")}
                 />
               </ChoiceList>

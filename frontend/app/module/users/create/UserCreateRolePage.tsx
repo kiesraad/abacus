@@ -1,15 +1,34 @@
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
+import { useUserCreateContext } from "app/module/users/create/useUserCreateContext";
+
+import { Role } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Button, ChoiceList, Form, FormLayout, PageTitle } from "@kiesraad/ui";
 
 export function UserCreateRolePage() {
   const navigate = useNavigate();
+  const [error, setError] = useState<string>("");
+  const { user, updateUser } = useUserCreateContext();
 
-  function handleSubmit(event: FormEvent) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    void navigate("/users/create/type");
+    const formData = new FormData(event.currentTarget);
+    const role = formData.get("role") as Role | null;
+
+    if (!role) {
+      setError(t("users.role_mandatory"));
+      return;
+    }
+
+    if (role === "typist") {
+      updateUser({ role });
+      void navigate("/users/create/type");
+    } else {
+      updateUser({ role, type: "fullname" });
+      void navigate("/users/create/details");
+    }
   }
 
   return (
@@ -26,23 +45,32 @@ export function UserCreateRolePage() {
             <FormLayout.Section>
               <ChoiceList>
                 <ChoiceList.Title>{t("users.role_title")}</ChoiceList.Title>
+                {error && <ChoiceList.Error>{error}</ChoiceList.Error>}
                 <ChoiceList.Radio
-                  id={`role-administrator`}
+                  id={"role-administrator"}
                   name={"role"}
                   defaultValue={"administrator"}
+                  defaultChecked={user.role === "administrator"}
                   label={t("administrator")}
                 >
                   {t("users.role_administrator_hint")}
                 </ChoiceList.Radio>
                 <ChoiceList.Radio
-                  id={`role-coordinator`}
+                  id={"role-coordinator"}
                   name={"role"}
                   defaultValue={"coordinator"}
+                  defaultChecked={user.role === "coordinator"}
                   label={t("coordinator")}
                 >
                   {t("users.role_coordinator_hint")}
                 </ChoiceList.Radio>
-                <ChoiceList.Radio id={`role-typist`} name={"role"} defaultValue={"typist"} label={t("typist")}>
+                <ChoiceList.Radio
+                  id={"role-typist"}
+                  name={"role"}
+                  defaultValue={"typist"}
+                  defaultChecked={user.role === "typist"}
+                  label={t("typist")}
+                >
                   {t("users.role_typist_hint")}
                 </ChoiceList.Radio>
               </ChoiceList>

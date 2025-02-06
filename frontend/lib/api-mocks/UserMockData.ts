@@ -3,8 +3,8 @@ import { ListedUser } from "@kiesraad/api";
 const today = new Date();
 today.setHours(10, 20);
 
-const yesterday = new Date(today);
-yesterday.setDate(today.getDate() - 1);
+const laterToday = new Date();
+laterToday.setHours(13, 37);
 
 const created_at = new Date().toISOString();
 const updated_at = new Date().toISOString();
@@ -24,7 +24,7 @@ export const userMockData: ListedUser[] = [
     username: "Jayden",
     role: "coordinator",
     fullname: "Jayden Ahmen",
-    last_activity_at: yesterday.toISOString(),
+    last_activity_at: laterToday.toISOString(),
     created_at,
     updated_at,
   },

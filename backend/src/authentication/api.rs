@@ -252,7 +252,9 @@ pub struct UserListResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
-pub async fn list(State(users_repo): State<Users>) -> Result<Json<UserListResponse>, APIError> {
+pub async fn user_list(
+    State(users_repo): State<Users>,
+) -> Result<Json<UserListResponse>, APIError> {
     Ok(Json(UserListResponse {
         users: users_repo.list().await?,
     }))

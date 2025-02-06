@@ -41,7 +41,7 @@ mod tests {
         let state = AppState { pool };
 
         let router = Router::new()
-            .route("/api/user", get(api::list).post(api::user_create))
+            .route("/api/user", get(api::user_list).post(api::user_create))
             .route("/api/user/login", post(api::login))
             .route("/api/user/logout", post(api::logout))
             .route("/api/user/whoami", get(api::whoami))

@@ -101,8 +101,8 @@ export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
 // /api/user
-export type LIST_REQUEST_PARAMS = Record<string, never>;
-export type LIST_REQUEST_PATH = `/api/user`;
+export type USER_LIST_REQUEST_PARAMS = Record<string, never>;
+export type USER_LIST_REQUEST_PATH = `/api/user`;
 export type USER_CREATE_REQUEST_PARAMS = Record<string, never>;
 export type USER_CREATE_REQUEST_PATH = `/api/user`;
 export type USER_CREATE_REQUEST_BODY = CreateUserRequest;
@@ -405,7 +405,7 @@ export interface ListedUser {
   created_at: string;
   fullname?: string;
   id: number;
-  last_activity_at: string;
+  last_activity_at?: string;
   role: Role;
   updated_at: string;
   username: string;

@@ -1049,7 +1049,7 @@
           "authentication"
         ],
         "summary": "Lists all users",
-        "operationId": "list",
+        "operationId": "user_list",
         "responses": {
           "200": {
             "description": "User list",
@@ -2038,7 +2038,6 @@
           "id",
           "username",
           "role",
-          "last_activity_at",
           "updated_at",
           "created_at"
         ],

@@ -20,6 +20,7 @@ import { t } from "@kiesraad/i18n";
 
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
+import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
 import {
   CandidatesVotesPage,
   DataEntryHomePage,
@@ -42,6 +43,7 @@ export const routes = createRoutesFromElements(
       <Route index element={<UserHomePage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="setup" element={<AccountSetupPage />} />
+      <Route path="change-password" element={<ChangePasswordPage />} />
     </Route>
     <Route path="elections" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />

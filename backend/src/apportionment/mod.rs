@@ -1,28 +1,29 @@
-use crate::{data_entry::PoliticalGroupVotes, summary::ElectionSummary};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 use utoipa::ToSchema;
 
+use crate::{data_entry::PoliticalGroupVotes, summary::ElectionSummary};
+
+pub use self::api::*;
 pub use self::fraction::*;
 
-pub mod fraction;
+mod api;
+mod fraction;
 
-/// The result of the apportionment procedure. This contains the number of
-/// seats and the quota that was used. It then contains the initial standing
-/// after whole seats were assigned, and each of the changes and intermediate
-/// standings. The final standing contains the number of seats per political
-/// group that was assigned after all seats were assigned.
-#[derive(Debug, PartialEq, Serialize, ToSchema)]
+/// The result of the apportionment procedure. This contains the number of seats and the quota
+/// that was used. It then contains the initial standing after whole seats were assigned,
+/// and each of the changes and intermediate standings. The final standing contains the
+/// number of seats per political group that was assigned after all seats were assigned.
+#[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApportionmentResult {
-    seats: u64,
-    quota: Fraction,
-    steps: Vec<ApportionmentStep>,
-    final_standing: Vec<PoliticalGroupSeatAssignment>,
+    pub seats: u64,
+    pub quota: Fraction,
+    pub steps: Vec<ApportionmentStep>,
+    pub final_standing: Vec<PoliticalGroupSeatAssignment>,
 }
 
-/// Contains information about the final assignment of seats for a specific
-/// political group.
-#[derive(Debug, PartialEq, Serialize, ToSchema)]
+/// Contains information about the final assignment of seats for a specific political group.
+#[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupSeatAssignment {
     /// Political group number for which this assigment applies
     pg_number: u8,
@@ -37,7 +38,7 @@ pub struct PoliticalGroupSeatAssignment {
     /// The number of rest seats assigned to this group
     rest_seats: u64,
     /// The total number of seats assigned to this group
-    total_seats: u64,
+    pub total_seats: u64,
 }
 
 impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
@@ -54,10 +55,9 @@ impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
     }
 }
 
-/// Contains the standing for a specific political group. This is all the
-/// information that is needed to compute the apportionment for that specific
-/// political group.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, ToSchema)]
+/// Contains the standing for a specific political group. This is all the information
+/// that is needed to compute the apportionment for that specific political group.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupStanding {
     /// Political group number for which this standing applies
     pg_number: u8,
@@ -76,8 +76,8 @@ pub struct PoliticalGroupStanding {
 }
 
 impl PoliticalGroupStanding {
-    /// Create a new instance computing the whole number of seats that were
-    /// assigned to a political group.
+    /// Create a new instance computing the whole number of seats that
+    /// were assigned to a political group.
     fn new(pg: &PoliticalGroupVotes, quota: Fraction) -> Self {
         let votes_cast = Fraction::from(pg.total);
         let pg_seats = (votes_cast / quota).integer_part();
@@ -260,8 +260,8 @@ pub fn seat_allocation(
     })
 }
 
-/// This function allocates the rest seats that remain after whole seat allocation
-/// is finished. These remainder seats are assigned through two different procedures,
+/// This function allocates the rest seats that remain after whole seat allocation is finished.
+/// These remainder seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
 fn allocate_remainder(
     initial_standing: &[PoliticalGroupStanding],
@@ -337,8 +337,7 @@ fn political_groups_qualifying_for_highest_surplus<'a>(
     previous: &'a [ApportionmentStep],
 ) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
     standing.iter().filter(move |p| {
-        p.surplus_votes > Fraction::ZERO
-            && p.meets_surplus_threshold
+        p.meets_surplus_threshold
             && !previous.iter().any(|prev| {
                 prev.change.is_assigned_by_surplus()
                     && prev.change.political_group_number() == p.pg_number
@@ -412,7 +411,7 @@ fn step_allocate_remainder_using_highest_surplus(
 
 /// Records the details for a specific remainder seat, and how the standing is
 /// once that remainder seat was assigned
-#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApportionmentStep {
     rest_seat_number: u64,
     change: AssignedSeat,
@@ -420,7 +419,7 @@ pub struct ApportionmentStep {
 }
 
 /// Records the political group and specific change for a specific remainder seat
-#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(tag = "assigned_by")]
 pub enum AssignedSeat {
     HighestAverage(HighestAverageAssignedSeat),
@@ -448,7 +447,7 @@ impl AssignedSeat {
 }
 
 /// Contains the details for an assigned seat, assigned through the highest average method.
-#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct HighestAverageAssignedSeat {
     /// The political group that was selected for this seat has this political group number
     selected_pg_number: u8,
@@ -459,7 +458,7 @@ pub struct HighestAverageAssignedSeat {
 }
 
 /// Contains the details for an assigned seat, assigned through the highest surplus method.
-#[derive(Clone, Debug, PartialEq, Serialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct HighestSurplusAssignedSeat {
     /// The political group that was selected for this seat has this political group number
     selected_pg_number: u8,
@@ -470,8 +469,7 @@ pub struct HighestSurplusAssignedSeat {
 }
 
 /// Errors that can occur during apportionment
-// TODO: integrate this with the application-wide error.rs once the apportionment functionality is finished
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ApportionmentError {
     DrawingOfLotsNotImplemented,
 }
@@ -481,10 +479,20 @@ fn political_group_numbers(standing: &[&PoliticalGroupStanding]) -> Vec<u8> {
     standing.iter().map(|s| s.pg_number).collect()
 }
 
+pub fn get_total_seats_from_apportionment_result(result: ApportionmentResult) -> Vec<u64> {
+    result
+        .final_standing
+        .iter()
+        .map(|p| p.total_seats)
+        .collect::<Vec<_>>()
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{
-        apportionment::{seat_allocation, ApportionmentError, ApportionmentResult},
+        apportionment::{
+            get_total_seats_from_apportionment_result, seat_allocation, ApportionmentError,
+        },
         data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts},
         summary::{ElectionSummary, SummaryDifferencesCounts},
     };
@@ -519,38 +527,39 @@ mod tests {
         }
     }
 
-    fn get_total_seats(result: ApportionmentResult) -> Vec<u64> {
-        result
-            .final_standing
-            .iter()
-            .map(|p| p.total_seats)
-            .collect::<Vec<_>>()
+    #[test]
+    fn test_seat_allocation_less_than_19_seats_without_remaining_seats() {
+        let totals = get_election_summary(vec![480, 160, 160, 160, 80, 80, 80]);
+        let result = seat_allocation(15, &totals).unwrap();
+        assert_eq!(result.steps.len(), 0);
+        let total_seats = get_total_seats_from_apportionment_result(result);
+        assert_eq!(total_seats, vec![6, 2, 2, 2, 1, 1, 1]);
     }
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_system() {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 60, 40]);
         let result = seat_allocation(15, &totals).unwrap();
-        let total_seats = get_total_seats(result);
+        assert_eq!(result.steps.len(), 2);
+        let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system(
+    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_only_1_surplus_meets_threshold(
     ) {
-        let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
+        let totals = get_election_summary(vec![808, 59, 58, 57, 56, 55, 54, 53]);
         let result = seat_allocation(15, &totals).unwrap();
-        let total_seats = get_total_seats(result);
-        assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
+        assert_eq!(result.steps.len(), 5);
+        let total_seats = get_total_seats_from_apportionment_result(result);
+        assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_no_surpluses(
-    ) {
-        let totals = get_election_summary(vec![560, 160, 160, 80, 80, 80, 40, 40]);
-        let result = seat_allocation(15, &totals).unwrap();
-        let total_seats = get_total_seats(result);
-        assert_eq!(total_seats, vec![8, 2, 2, 1, 1, 1, 0, 0]);
+    fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error_with_0_surpluses() {
+        let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
+        let result = seat_allocation(15, &totals);
+        assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
@@ -561,10 +570,20 @@ mod tests {
     }
 
     #[test]
+    fn test_seat_allocation_19_or_more_seats_without_remaining_seats() {
+        let totals = get_election_summary(vec![576, 288, 96, 96, 96, 48]);
+        let result = seat_allocation(25, &totals).unwrap();
+        assert_eq!(result.steps.len(), 0);
+        let total_seats = get_total_seats_from_apportionment_result(result);
+        assert_eq!(total_seats, vec![12, 6, 2, 2, 2, 1]);
+    }
+
+    #[test]
     fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
         let totals = get_election_summary(vec![600, 302, 98, 99, 101]);
         let result = seat_allocation(23, &totals).unwrap();
-        let total_seats = get_total_seats(result);
+        assert_eq!(result.steps.len(), 4);
+        let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
     }
 

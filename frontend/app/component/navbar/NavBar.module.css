@@ -35,12 +35,11 @@
       gap: 0.25rem;
     }
 
-    > a:first-of-type:not(:global(.active)),
-    > span:first-of-type:not(:global(.active)) {
+    :first-child:not(:global(.active)) {
       padding-left: 0;
     }
 
-    > span:global(.active) {
+    > :global(.active) {
       border-bottom: 4px solid var(--accent-orange);
       padding-bottom: calc(0.5rem - 4px);
       font-weight: bold;

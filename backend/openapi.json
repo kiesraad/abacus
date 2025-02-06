@@ -144,6 +144,70 @@
         }
       }
     },
+    "/api/elections/{election_id}/apportionment": {
+      "get": {
+        "tags": [
+          "apportionment"
+        ],
+        "summary": "Get the seat allocation for an election",
+        "operationId": "election_apportionment",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Election Apportionment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectionApportionmentResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Drawing of lots is required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/elections/{election_id}/download_pdf_results": {
       "get": {
         "tags": [
@@ -979,6 +1043,88 @@
         }
       }
     },
+    "/api/user": {
+      "get": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Lists all users",
+        "operationId": "list",
+        "responses": {
+          "200": {
+            "description": "User list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/change-password": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Change password endpoint, updates a user password",
+        "operationId": "change_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The current user name and id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/user/login": {
       "post": {
         "tags": [
@@ -1053,13 +1199,54 @@
           }
         }
       }
+    },
+    "/api/user/whoami": {
+      "get": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Get current logged-in user endpoint",
+        "operationId": "whoami",
+        "responses": {
+          "200": {
+            "description": "The current user name and id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid user session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
       "ApportionmentResult": {
         "type": "object",
-        "description": "The result of the apportionment procedure. This contains the number of\nseats and the quota that was used. It then contains the initial standing\nafter whole seats were assigned, and each of the changes and intermediate\nstandings. The final standing contains the number of seats per political\ngroup that was assigned after all seats were assigned.",
+        "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after whole seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
         "required": [
           "seats",
           "quota",
@@ -1224,6 +1411,25 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "password",
+          "new_password"
+        ],
+        "properties": {
+          "new_password": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
           }
         }
       },
@@ -1394,6 +1600,22 @@
           }
         }
       },
+      "ElectionApportionmentResponse": {
+        "type": "object",
+        "description": "Election details response, including the election's candidate list (political groups) and its polling stations",
+        "required": [
+          "apportionment",
+          "election_summary"
+        ],
+        "properties": {
+          "apportionment": {
+            "$ref": "#/components/schemas/ApportionmentResult"
+          },
+          "election_summary": {
+            "$ref": "#/components/schemas/ElectionSummary"
+          }
+        }
+      },
       "ElectionCategory": {
         "type": "string",
         "description": "Election category (limited for now)",
@@ -1542,32 +1764,75 @@
           }
         }
       },
+      "ElectionSummary": {
+        "type": "object",
+        "description": "Contains a summary of the election results, added up from the votes of all polling stations.",
+        "required": [
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "recounted_polling_stations",
+          "political_group_votes"
+        ],
+        "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/SummaryDifferencesCounts",
+            "description": "The differences between voters and votes"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupVotes"
+            },
+            "description": "The summary votes for each political group (and each candidate within)"
+          },
+          "recounted_polling_stations": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "A list of polling stations that were recounted"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "The total number of voters"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "The total number of votes"
+          }
+        }
+      },
       "ErrorReference": {
         "type": "string",
         "description": "Error reference used to show the corresponding error message to the end-user",
         "enum": [
-          "EntryNumberNotSupported",
+          "DatabaseError",
+          "DrawingOfLotsRequired",
           "EntryNotFound",
+          "EntryNotUnique",
+          "EntryNumberNotSupported",
+          "InternalServerError",
+          "InvalidData",
+          "InvalidDataEntryNumber",
+          "InvalidJson",
+          "InvalidPassword",
+          "InvalidPoliticalGroup",
+          "InvalidSession",
+          "InvalidStateTransition",
+          "InvalidUsernameOrPassword",
+          "InvalidVoteCandidate",
+          "InvalidVoteGroup",
+          "PdfGenerationError",
+          "PollingStationDataValidation",
           "PollingStationFirstEntryAlreadyFinalised",
           "PollingStationFirstEntryNotFinalised",
-          "PollingStationSecondEntryAlreadyFinalised",
-          "PollingStationResultsAlreadyFinalised",
-          "PollingStationDataValidation",
-          "InvalidVoteGroup",
-          "InvalidVoteCandidate",
-          "InvalidData",
-          "InvalidJson",
-          "InvalidDataEntryNumber",
-          "InvalidStateTransition",
-          "EntryNotUnique",
-          "DatabaseError",
-          "InternalServerError",
-          "PdfGenerationError",
           "PollingStationRepeated",
+          "PollingStationResultsAlreadyFinalised",
+          "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
-          "InvalidPoliticalGroup",
-          "InvalidUsernamePassword",
-          "InvalidSession"
+          "UserNotFound"
         ]
       },
       "ErrorResponse": {
@@ -1706,6 +1971,41 @@
           }
         }
       },
+      "ListedUser": {
+        "type": "object",
+        "required": [
+          "id",
+          "username",
+          "role",
+          "updated_at",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "fullname": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "last_activity_at": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
       "LoginResponse": {
         "type": "object",
         "required": [
@@ -1750,7 +2050,7 @@
       },
       "PoliticalGroupSeatAssignment": {
         "type": "object",
-        "description": "Contains information about the final assignment of seats for a specific\npolitical group.",
+        "description": "Contains information about the final assignment of seats for a specific political group.",
         "required": [
           "pg_number",
           "votes_cast",
@@ -1803,7 +2103,7 @@
       },
       "PoliticalGroupStanding": {
         "type": "object",
-        "description": "Contains the standing for a specific political group. This is all the\ninformation that is needed to compute the apportionment for that specific\npolitical group.",
+        "description": "Contains the standing for a specific political group. This is all the information\nthat is needed to compute the apportionment for that specific political group.",
         "required": [
           "pg_number",
           "votes_cast",
@@ -2025,6 +2325,14 @@
           "Mobile"
         ]
       },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "administrator",
+          "typist",
+          "coordinator"
+        ]
+      },
       "SaveDataEntryResponse": {
         "type": "object",
         "description": "Response structure for saving data entry of polling station results",
@@ -2034,6 +2342,78 @@
         "properties": {
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
+          }
+        }
+      },
+      "SumCount": {
+        "type": "object",
+        "description": "Contains a summary count, containing both the count and a list of polling\nstations that contributed to it.",
+        "required": [
+          "count",
+          "polling_stations"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "SummaryDifferencesCounts": {
+        "type": "object",
+        "description": "Contains a summary of the differences, containing which polling stations had differences.",
+        "required": [
+          "more_ballots_count",
+          "fewer_ballots_count",
+          "unreturned_ballots_count",
+          "too_few_ballots_handed_out_count",
+          "too_many_ballots_handed_out_count",
+          "other_explanation_count",
+          "no_explanation_count"
+        ],
+        "properties": {
+          "fewer_ballots_count": {
+            "$ref": "#/components/schemas/SumCount"
+          },
+          "more_ballots_count": {
+            "$ref": "#/components/schemas/SumCount"
+          },
+          "no_explanation_count": {
+            "$ref": "#/components/schemas/SumCount"
+          },
+          "other_explanation_count": {
+            "$ref": "#/components/schemas/SumCount"
+          },
+          "too_few_ballots_handed_out_count": {
+            "$ref": "#/components/schemas/SumCount"
+          },
+          "too_many_ballots_handed_out_count": {
+            "$ref": "#/components/schemas/SumCount"
+          },
+          "unreturned_ballots_count": {
+            "$ref": "#/components/schemas/SumCount"
+          }
+        }
+      },
+      "UserListResponse": {
+        "type": "object",
+        "required": [
+          "users"
+        ],
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListedUser"
+            }
           }
         }
       },

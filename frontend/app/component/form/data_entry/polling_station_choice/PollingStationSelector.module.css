@@ -13,7 +13,6 @@
 }
 
 .message {
-  margin-top: 2rem;
   padding: 1rem 1.5rem;
   background-color: var(--color-notify-bg);
   height: 4.5rem;

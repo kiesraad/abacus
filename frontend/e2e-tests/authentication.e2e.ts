@@ -2,6 +2,11 @@ import { expect, test } from "@playwright/test";
 import { webcrypto as crypto } from "crypto";
 
 test.describe("authentication", () => {
+  // These tests only run in development mode (non-release backend builds)
+  // TODO: create user with normal production flow when available
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(process.env.BACKEND_BUILD === "release");
+
   test("login happy path", async ({ page, request }) => {
     const array = new Uint32Array(1);
     crypto.getRandomValues(array);

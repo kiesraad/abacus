@@ -39,46 +39,34 @@ describe("ElectionStatus", () => {
     });
 
     const tablesRoot = screen.getByRole("article");
-    expect(within(tablesRoot).getAllByRole("heading", { level: 3 }).length).toBe(3);
-    expect(within(tablesRoot).getAllByRole("table").length).toBe(3);
+    const headings = within(tablesRoot).getAllByRole("heading", { level: 3 });
+    const tables = within(tablesRoot).getAllByRole("table");
 
-    const tables = [...tablesRoot.children];
+    expect(headings.length).toBe(3);
+    expect(tables.length).toBe(3);
 
-    expect(tables[0]).toContain(screen.getByRole("heading", { level: 3, name: "Invoer bezig (2)" }));
-    const inProgressTable = within(tables[0] as HTMLElement).getByTestId("in_progress");
-    const inProgressRows = within(inProgressTable).getAllByRole("row");
-    expect(inProgressRows.length).toBe(3);
-    expect(inProgressRows[0]).toHaveTextContent(/Nummer/);
-    expect(inProgressRows[0]).toHaveTextContent(/Stembureau/);
-    expect(inProgressRows[0]).toHaveTextContent(/Voortgang/);
-    expect(inProgressRows[1]).toHaveTextContent(/35/);
-    expect(inProgressRows[1]).toHaveTextContent(/Testschool/);
-    expect(inProgressRows[1]).toHaveTextContent(/1e invoer/);
-    expect(within(inProgressRows[1] as HTMLElement).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "60");
-    expect(inProgressRows[2]).toHaveTextContent(/36/);
-    expect(inProgressRows[2]).toHaveTextContent(/Testbuurthuis/);
-    expect(inProgressRows[2]).toHaveTextContent(/2e invoer/);
-    expect(within(inProgressRows[2] as HTMLElement).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "20");
+    expect(headings[0]).toHaveTextContent("Invoer bezig (2)");
+    expect(tables[0]).toHaveTableContent([
+      ["Nummer", "Stembureau", "Voortgang"],
+      ["35", "Testschool" + "1e invoer", "60%"],
+      ["36", "Testbuurthuis" + "2e invoer", "20%"],
+    ]);
 
-    expect(tables[1]).toContain(screen.getByRole("heading", { level: 3, name: "Eerste invoer klaar (1)" }));
-    const firstEntryFinishedTable = within(tables[1] as HTMLElement).getByTestId("first_entry_finished");
-    const firstEntryFinishedRows = within(firstEntryFinishedTable).getAllByRole("row");
-    expect(firstEntryFinishedRows.length).toBe(2);
-    expect(firstEntryFinishedRows[0]).toHaveTextContent(/Nummer/);
-    expect(firstEntryFinishedRows[0]).toHaveTextContent(/Stembureau/);
-    expect(firstEntryFinishedRows[0]).toHaveTextContent(/Afgerond op/);
-    expect(firstEntryFinishedRows[1]).toHaveTextContent(/34/);
-    expect(firstEntryFinishedRows[1]).toHaveTextContent(/Testplek/);
-    expect(firstEntryFinishedRows[1]).toHaveTextContent(/vandaag/);
+    const inProgressRows = within(tables[0]!).getAllByRole("row");
+    expect(within(inProgressRows[1]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "60");
+    expect(within(inProgressRows[2]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "20");
 
-    expect(tables[2]).toContain(screen.getByRole("heading", { level: 3, name: "Werkvoorraad (1)" }));
-    const notStartedTable = within(tables[2] as HTMLElement).getByTestId("not_started");
-    const notStartedRows = within(notStartedTable).getAllByRole("row");
-    expect(notStartedRows.length).toBe(2);
-    expect(notStartedRows[0]).toHaveTextContent(/Nummer/);
-    expect(notStartedRows[0]).toHaveTextContent(/Stembureau/);
-    expect(notStartedRows[1]).toHaveTextContent(/33/);
-    expect(notStartedRows[1]).toHaveTextContent(/Op Rolletjes/);
+    expect(headings[1]).toHaveTextContent("Eerste invoer klaar (1)");
+    expect(tables[1]).toHaveTableContent([
+      ["Nummer", "Stembureau", "Afgerond op"],
+      ["34", "Testplek", "vandaag 10:20"],
+    ]);
+
+    expect(headings[2]).toHaveTextContent("Werkvoorraad (1)");
+    expect(tables[2]).toHaveTableContent([
+      ["Nummer", "Stembureau"],
+      ["33", "Op Rolletjes"],
+    ]);
   });
 
   test("Show no polling stations text instead of tables", async () => {

@@ -15,6 +15,12 @@ export interface ELECTION_DETAILS_REQUEST_PARAMS {
 }
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
 
+// /api/elections/{election_id}/apportionment
+export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
+
 // /api/elections/{election_id}/download_pdf_results
 export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
   election_id: number;
@@ -94,6 +100,15 @@ export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
 export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
+// /api/user
+export type LIST_REQUEST_PARAMS = Record<string, never>;
+export type LIST_REQUEST_PATH = `/api/user`;
+
+// /api/user/change-password
+export type CHANGE_PASSWORD_REQUEST_PARAMS = Record<string, never>;
+export type CHANGE_PASSWORD_REQUEST_PATH = `/api/user/change-password`;
+export type CHANGE_PASSWORD_REQUEST_BODY = ChangePasswordRequest;
+
 // /api/user/login
 export type LOGIN_REQUEST_PARAMS = Record<string, never>;
 export type LOGIN_REQUEST_PATH = `/api/user/login`;
@@ -103,14 +118,17 @@ export type LOGIN_REQUEST_BODY = Credentials;
 export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
 export type LOGOUT_REQUEST_PATH = `/api/user/logout`;
 
+// /api/user/whoami
+export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
+export type WHOAMI_REQUEST_PATH = `/api/user/whoami`;
+
 /** TYPES **/
 
 /**
- * The result of the apportionment procedure. This contains the number of
-seats and the quota that was used. It then contains the initial standing
-after whole seats were assigned, and each of the changes and intermediate
-standings. The final standing contains the number of seats per political
-group that was assigned after all seats were assigned.
+ * The result of the apportionment procedure. This contains the number of seats and the quota
+that was used. It then contains the initial standing after whole seats were assigned,
+and each of the changes and intermediate standings. The final standing contains the
+number of seats per political group that was assigned after all seats were assigned.
  */
 export interface ApportionmentResult {
   final_standing: PoliticalGroupSeatAssignment[];
@@ -158,6 +176,12 @@ export type CandidateGender = "Male" | "Female" | "X";
 export interface CandidateVotes {
   number: number;
   votes: number;
+}
+
+export interface ChangePasswordRequest {
+  new_password: string;
+  password: string;
+  username: string;
 }
 
 export interface Credentials {
@@ -209,6 +233,14 @@ export interface Election {
   number_of_voters: number;
   political_groups?: PoliticalGroup[];
   status: ElectionStatus;
+}
+
+/**
+ * Election details response, including the election's candidate list (political groups) and its polling stations
+ */
+export interface ElectionApportionmentResponse {
+  apportionment: ApportionmentResult;
+  election_summary: ElectionSummary;
 }
 
 /**
@@ -272,31 +304,45 @@ export interface ElectionStatusResponseEntry {
 }
 
 /**
+ * Contains a summary of the election results, added up from the votes of all polling stations.
+ */
+export interface ElectionSummary {
+  differences_counts: SummaryDifferencesCounts;
+  political_group_votes: PoliticalGroupVotes[];
+  recounted_polling_stations: number[];
+  voters_counts: VotersCounts;
+  votes_counts: VotesCounts;
+}
+
+/**
  * Error reference used to show the corresponding error message to the end-user
  */
 export type ErrorReference =
-  | "EntryNumberNotSupported"
+  | "DatabaseError"
+  | "DrawingOfLotsRequired"
   | "EntryNotFound"
+  | "EntryNotUnique"
+  | "EntryNumberNotSupported"
+  | "InternalServerError"
+  | "InvalidData"
+  | "InvalidDataEntryNumber"
+  | "InvalidJson"
+  | "InvalidPassword"
+  | "InvalidPoliticalGroup"
+  | "InvalidSession"
+  | "InvalidStateTransition"
+  | "InvalidUsernameOrPassword"
+  | "InvalidVoteCandidate"
+  | "InvalidVoteGroup"
+  | "PdfGenerationError"
+  | "PollingStationDataValidation"
   | "PollingStationFirstEntryAlreadyFinalised"
   | "PollingStationFirstEntryNotFinalised"
-  | "PollingStationSecondEntryAlreadyFinalised"
-  | "PollingStationResultsAlreadyFinalised"
-  | "PollingStationDataValidation"
-  | "InvalidVoteGroup"
-  | "InvalidVoteCandidate"
-  | "InvalidData"
-  | "InvalidJson"
-  | "InvalidDataEntryNumber"
-  | "InvalidStateTransition"
-  | "EntryNotUnique"
-  | "DatabaseError"
-  | "InternalServerError"
-  | "PdfGenerationError"
   | "PollingStationRepeated"
+  | "PollingStationResultsAlreadyFinalised"
+  | "PollingStationSecondEntryAlreadyFinalised"
   | "PollingStationValidationErrors"
-  | "InvalidPoliticalGroup"
-  | "InvalidUsernamePassword"
-  | "InvalidSession";
+  | "UserNotFound";
 
 /**
  * Response structure for errors
@@ -345,6 +391,16 @@ export interface HighestSurplusAssignedSeat {
   surplus_votes: Fraction;
 }
 
+export interface ListedUser {
+  created_at: string;
+  fullname?: string;
+  id: number;
+  last_activity_at?: string;
+  role: Role;
+  updated_at: string;
+  username: string;
+}
+
 export interface LoginResponse {
   user_id: number;
   username: string;
@@ -360,8 +416,7 @@ export interface PoliticalGroup {
 }
 
 /**
- * Contains information about the final assignment of seats for a specific
-political group.
+ * Contains information about the final assignment of seats for a specific political group.
  */
 export interface PoliticalGroupSeatAssignment {
   meets_surplus_threshold: boolean;
@@ -374,9 +429,8 @@ export interface PoliticalGroupSeatAssignment {
 }
 
 /**
- * Contains the standing for a specific political group. This is all the
-information that is needed to compute the apportionment for that specific
-political group.
+ * Contains the standing for a specific political group. This is all the information
+that is needed to compute the apportionment for that specific political group.
  */
 export interface PoliticalGroupStanding {
   meets_surplus_threshold: boolean;
@@ -452,11 +506,39 @@ export interface PollingStationResults {
  */
 export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
 
+export type Role = "administrator" | "typist" | "coordinator";
+
 /**
  * Response structure for saving data entry of polling station results
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
+}
+
+/**
+ * Contains a summary count, containing both the count and a list of polling
+stations that contributed to it.
+ */
+export interface SumCount {
+  count: number;
+  polling_stations: number[];
+}
+
+/**
+ * Contains a summary of the differences, containing which polling stations had differences.
+ */
+export interface SummaryDifferencesCounts {
+  fewer_ballots_count: SumCount;
+  more_ballots_count: SumCount;
+  no_explanation_count: SumCount;
+  other_explanation_count: SumCount;
+  too_few_ballots_handed_out_count: SumCount;
+  too_many_ballots_handed_out_count: SumCount;
+  unreturned_ballots_count: SumCount;
+}
+
+export interface UserListResponse {
+  users: ListedUser[];
 }
 
 export interface ValidationResult {

@@ -334,20 +334,36 @@ pub mod tests {
                     other_explanation_count: 0,
                     no_explanation_count: 0,
                 },
-                political_group_votes: vec![PoliticalGroupVotes {
-                    number: 1,
-                    total: 96,
-                    candidate_votes: vec![
-                        CandidateVotes {
-                            number: 1,
-                            votes: 54,
-                        },
-                        CandidateVotes {
-                            number: 2,
-                            votes: 42,
-                        },
-                    ],
-                }],
+                political_group_votes: vec![
+                    PoliticalGroupVotes {
+                        number: 1,
+                        total: 56,
+                        candidate_votes: vec![
+                            CandidateVotes {
+                                number: 1,
+                                votes: 36,
+                            },
+                            CandidateVotes {
+                                number: 2,
+                                votes: 20,
+                            },
+                        ],
+                    },
+                    PoliticalGroupVotes {
+                        number: 2,
+                        total: 40,
+                        candidate_votes: vec![
+                            CandidateVotes {
+                                number: 1,
+                                votes: 30,
+                            },
+                            CandidateVotes {
+                                number: 2,
+                                votes: 10,
+                            },
+                        ],
+                    },
+                ],
             },
             client_state: ClientState(None),
         }

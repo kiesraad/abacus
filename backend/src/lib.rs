@@ -1,3 +1,5 @@
+#[cfg(feature = "memory-serve")]
+use axum::http::StatusCode;
 use axum::{
     extract::FromRef,
     routing::{get, post},
@@ -61,6 +63,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/", get(election::election_list))
         .route("/{election_id}", get(election::election_details))
         .route(
+            "/{election_id}/apportionment",
+            post(apportionment::election_apportionment),
+        )
+        .route(
             "/{election_id}/download_zip_results",
             get(election::election_download_zip_results),
         )
@@ -78,8 +84,11 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let election_routes = election_routes.route("/", post(election::election_create));
 
     let user_router = Router::new()
+        .route("/", get(authentication::list))
         .route("/login", post(authentication::login))
-        .route("/logout", post(authentication::logout));
+        .route("/logout", post(authentication::logout))
+        .route("/whoami", get(authentication::whoami))
+        .route("/change-password", post(authentication::change_password));
 
     #[cfg(debug_assertions)]
     let user_router = user_router
@@ -109,7 +118,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             MemoryServe::from_env()
                 .index_file(Some("/index.html"))
                 .fallback(Some("/index.html"))
-                .fallback_status(axum::http::StatusCode::OK)
+                .fallback_status(StatusCode::OK)
                 .into_router(),
         )
     };
@@ -140,8 +149,12 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
     #[derive(OpenApi)]
     #[openapi(
         paths(
+            apportionment::election_apportionment,
             authentication::login,
             authentication::logout,
+            authentication::whoami,
+            authentication::change_password,
+            authentication::list,
             election::election_list,
             election::election_create,
             election::election_details,
@@ -171,6 +184,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 apportionment::HighestSurplusAssignedSeat,
                 authentication::Credentials,
                 authentication::LoginResponse,
+                authentication::ChangePasswordRequest,
+                authentication::UserListResponse,
                 data_entry::CandidateVotes,
                 data_entry::DataEntry,
                 data_entry::SaveDataEntryResponse,
@@ -198,6 +213,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 polling_station::PollingStationListResponse,
                 polling_station::PollingStationType,
                 polling_station::PollingStationRequest,
+                summary::ElectionSummary,
+                summary::SummaryDifferencesCounts,
             ),
         ),
         tags(

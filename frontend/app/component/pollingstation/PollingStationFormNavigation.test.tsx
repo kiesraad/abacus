@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render as rtlRender, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { defaultFormState, emptyDataEntryRequest } from "app/component/form/testHelperFunctions";
@@ -51,7 +51,7 @@ describe("PollingStationFormNavigation", () => {
       location: { pathname: "/elections/1/data-entry/1/1" },
     });
 
-    render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
+    rtlRender(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
     const shouldBlock = mocks.useBlocker.mock.lastCall;
     if (Array.isArray(shouldBlock)) {
@@ -105,7 +105,7 @@ describe("PollingStationFormNavigation", () => {
       location: { pathname: "/elections/1/data-entry/1/1" },
     });
 
-    render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
+    rtlRender(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
     const shouldBlock = mocks.useBlocker.mock.lastCall;
     if (Array.isArray(shouldBlock)) {
@@ -154,7 +154,7 @@ describe("PollingStationFormNavigation", () => {
 
     mocks.useBlocker.mockReturnValue({ state: "unblocked" });
 
-    render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
+    rtlRender(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
     const feedbackServerError = await screen.findByTestId("error-modal");
     expect(feedbackServerError).toHaveTextContent("De JSON is niet geldig");
@@ -181,7 +181,7 @@ describe("PollingStationFormNavigation", () => {
 
     mocks.useBlocker.mockReturnValue({ state: "unblocked" });
 
-    render(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
+    rtlRender(<PollingStationFormNavigation pollingStationId={1} election={electionMockData} />);
 
     const feedbackServerError = await screen.findByTestId("error-modal");
 

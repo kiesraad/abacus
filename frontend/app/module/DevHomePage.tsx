@@ -1,7 +1,6 @@
 import { Link } from "react-router";
 
 import { MockTest } from "app/component/MockTest";
-import { NavBar } from "app/component/navbar/NavBar";
 
 import { ElectionListProvider, useElectionList } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -22,6 +21,9 @@ function DevLinks() {
             </li>
             <li>
               <Link to={`/account/setup`}>{t("user.account_setup")}</Link>
+            </li>
+            <li>
+              <Link to={`/account/change-password`}>{t("user.change_password")}</Link>
             </li>
           </ul>
         </li>
@@ -81,7 +83,6 @@ export function DevHomePage() {
   return (
     <AppLayout>
       <PageTitle title="Dev Homepage - Abacus" />
-      <NavBar />
       <header>
         <section>
           <h1>Abacus 🧮</h1>

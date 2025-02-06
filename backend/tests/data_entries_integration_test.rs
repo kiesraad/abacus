@@ -1,5 +1,15 @@
 #![cfg(test)]
 
+use reqwest::{Response, StatusCode};
+use serde_json::json;
+use sqlx::SqlitePool;
+use std::{collections::BTreeMap, net::SocketAddr};
+use test_log::test;
+
+use crate::{
+    shared::{create_and_finalise_data_entry, create_and_save_data_entry},
+    utils::serve_api,
+};
 use abacus::{
     data_entry::{
         status::DataEntryStatusName::*, ElectionStatusResponse, ElectionStatusResponseEntry,
@@ -7,12 +17,6 @@ use abacus::{
     },
     ErrorResponse,
 };
-use reqwest::{Response, StatusCode};
-use serde_json::json;
-use sqlx::SqlitePool;
-use std::{collections::BTreeMap, net::SocketAddr};
-use test_log::test;
-use utils::serve_api;
 
 pub mod shared;
 pub mod utils;
@@ -20,7 +24,7 @@ pub mod utils;
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
-    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
+    create_and_finalise_data_entry(&addr, 1, 1).await;
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
@@ -66,6 +70,20 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
                 "votes": 4
               }
             ]
+          },
+          {
+            "number": 2,
+            "total": 11,
+            "candidate_votes": [
+              {
+                "number": 1,
+                "votes": 6
+              },
+              {
+                "number": 2,
+                "votes": 4
+              }
+            ]
           }
         ]
       },
@@ -82,14 +100,10 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         .unwrap();
 
     // Ensure the response is what we expect
-    let status = response.status();
-    if status != StatusCode::OK {
-        println!("response body: {:?}", &response.text().await.unwrap());
-        panic!("Unexpected response status: {:?}", status);
-    }
+    assert_eq!(response.status(), StatusCode::OK);
     let body: SaveDataEntryResponse = response.json().await.unwrap();
     let errors = body.validation_results.errors;
-    assert_eq!(errors.len(), 4);
+    assert_eq!(errors.len(), 5);
     // error 1
     assert_eq!(errors[0].code, ValidationResultCode::F201);
     assert_eq!(
@@ -124,6 +138,10 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     // error 4
     assert_eq!(errors[3].code, ValidationResultCode::F401);
     assert_eq!(errors[3].fields, vec!["data.political_group_votes[0]"]);
+    // error 5
+    assert_eq!(errors[4].code, ValidationResultCode::F401);
+    assert_eq!(errors[4].fields, vec!["data.political_group_votes[1]"]);
+
     let warnings = body.validation_results.warnings;
     assert_eq!(warnings.len(), 1);
     // warning 1
@@ -151,10 +169,8 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
         .unwrap();
 
     // Ensure the response is what we expect
-    let status = response.status();
+    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
     let body: ErrorResponse = response.json().await.unwrap();
-    println!("response body: {:?}", &body);
-    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
     assert_eq!(
         body.error,
         "Failed to deserialize the JSON body into the target type: data: \
@@ -178,8 +194,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
         .unwrap();
 
     // Ensure the response is what we expect
-    let status = response.status();
-    assert_eq!(status, StatusCode::NOT_FOUND);
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
 
     // Check the same for finalising data entries
     let url = format!("http://{addr}/api/polling_stations/{invalid_id}/data_entries/1/finalise");
@@ -227,7 +242,7 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
-    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
+    create_and_finalise_data_entry(&addr, 1, 1).await;
 
     // get the data entry and expect 404 Not Found
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
@@ -267,8 +282,8 @@ async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
 async fn get_statuses(addr: &SocketAddr) -> BTreeMap<u32, ElectionStatusResponseEntry> {
     let url = format!("http://{addr}/api/elections/2/status");
     let response = reqwest::Client::new().get(url).send().await.unwrap();
-    let status = response.status();
-    assert_eq!(status, StatusCode::OK);
+
+    assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionStatusResponse = response.json().await.unwrap();
     assert!(!body.statuses.is_empty());
     body.statuses
@@ -293,8 +308,8 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_data_entry_progress, None);
 
     // Finalise the first entry of one and set the other in progress
-    shared::create_and_finalise_data_entry(&addr, 1, 1).await;
-    shared::create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": true}"#)).await;
+    create_and_finalise_data_entry(&addr, 1, 1).await;
+    create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": true}"#)).await;
 
     // polling station 1's first entry is now complete, polling station 2 is still incomplete and set to in progress
     let statuses = get_statuses(&addr).await;
@@ -306,8 +321,8 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_data_entry_progress, None);
 
     // Save the entries
-    shared::create_and_save_data_entry(&addr, 1, 2, Some(r#"{"continue": true}"#)).await;
-    shared::create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": false}"#)).await;
+    create_and_save_data_entry(&addr, 1, 2, Some(r#"{"continue": true}"#)).await;
+    create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": false}"#)).await;
 
     // polling station 1 should now be SecondEntryInProgress, polling station 2 is still in the FirstEntryInProgress state
     let statuses = get_statuses(&addr).await;
@@ -319,7 +334,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_data_entry_progress, None);
 
     // finalise second data entry for polling station 1
-    shared::create_and_finalise_data_entry(&addr, 1, 2).await;
+    create_and_finalise_data_entry(&addr, 1, 2).await;
 
     // polling station 1 should now be definitive
     let statuses = get_statuses(&addr).await;
@@ -336,16 +351,16 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
     let addr = serve_api(pool).await;
 
     // Save data entry for election 1, polling station 1
-    shared::create_and_save_data_entry(&addr, 1, 1, Some(r#"{"continue": true}"#)).await;
+    create_and_save_data_entry(&addr, 1, 1, Some(r#"{"continue": true}"#)).await;
 
     // Save data entry for election 2, polling station 3
-    shared::create_and_save_data_entry(&addr, 3, 1, Some(r#"{"continue": true}"#)).await;
+    create_and_save_data_entry(&addr, 3, 1, Some(r#"{"continue": true}"#)).await;
 
     // Get statuses for election 2
     let url = format!("http://{addr}/api/elections/3/status");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    let status = response.status();
-    assert_eq!(status, StatusCode::OK);
+
+    assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionStatusResponse = response.json().await.unwrap();
 
     assert_eq!(

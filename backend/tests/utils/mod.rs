@@ -1,10 +1,10 @@
 #![cfg(test)]
 
+use sqlx::SqlitePool;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 
 use abacus::router;
-use sqlx::SqlitePool;
 
 pub async fn serve_api(pool: SqlitePool) -> SocketAddr {
     let app = router(pool).unwrap();

@@ -1,6 +1,8 @@
 import * as React from "react";
+import { Link, LinkProps } from "react-router";
 
 import { ButtonVariant, Size } from "@kiesraad/ui";
+import { cn } from "@kiesraad/util";
 
 import cls from "./Button.module.css";
 
@@ -14,7 +16,6 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   children: React.ReactNode;
 }
 
-//TODO: add react router Link variant
 export function Button({
   isDisabled,
   isLoading,
@@ -37,3 +38,20 @@ export function Button({
     </button>
   );
 }
+
+export interface ButtonLinkProps extends LinkProps {
+  disabled?: boolean;
+  variant?: ButtonVariant;
+  size?: Size;
+}
+
+function ButtonLink({ disabled, variant = "primary", size = "md", children, ...linkProps }: ButtonLinkProps) {
+  const className = cn(cls.button, cls[variant], cls[size], disabled ? cls.disabled : undefined);
+  return (
+    <Link className={className} {...linkProps}>
+      {children}
+    </Link>
+  );
+}
+
+Button.Link = ButtonLink;

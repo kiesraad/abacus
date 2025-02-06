@@ -1,6 +1,4 @@
-import { Link, useNavigate, useSearchParams } from "react-router";
-
-import { NavBar } from "app/component/navbar/NavBar";
+import { useSearchParams } from "react-router";
 
 import { useElection, usePollingStationListRequest } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -10,7 +8,6 @@ import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
 export function PollingStationListPage() {
   const { election } = useElection();
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
   const { requestState } = usePollingStationListRequest(election.id);
 
   if (requestState.status === "loading") {
@@ -45,13 +42,6 @@ export function PollingStationListPage() {
   return (
     <>
       <PageTitle title={`${t("polling_stations")} - Abacus`} />
-      <NavBar>
-        <Link to={`/elections/${election.id}#coordinator`}>
-          <span className="bold">{election.location}</span>
-          <span>&mdash;</span>
-          <span>{election.name}</span>
-        </Link>
-      </NavBar>
       <header>
         <section>
           <h1>{t("polling_station.title.plural")}</h1>
@@ -94,16 +84,9 @@ export function PollingStationListPage() {
 
             <Toolbar>
               <Toolbar.Section pos="start">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  leftIcon={<IconPlus />}
-                  onClick={() => {
-                    void navigate("create");
-                  }}
-                >
-                  {t("manual_input")}
-                </Button>
+                <Button.Link variant="secondary" size="sm" to="./create">
+                  <IconPlus /> {t("manual_input")}
+                </Button.Link>
               </Toolbar.Section>
             </Toolbar>
           </article>
@@ -111,16 +94,9 @@ export function PollingStationListPage() {
           <article>
             <Toolbar>
               <Toolbar.Section pos="end">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  leftIcon={<IconPlus />}
-                  onClick={() => {
-                    void navigate("create");
-                  }}
-                >
-                  {t("polling_station.form.create")}
-                </Button>
+                <Button.Link variant="secondary" size="sm" to="./create">
+                  <IconPlus /> {t("polling_station.form.create")}
+                </Button.Link>
               </Toolbar.Section>
             </Toolbar>
 

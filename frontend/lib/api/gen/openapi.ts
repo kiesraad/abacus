@@ -401,16 +401,6 @@ export interface HighestSurplusAssignedSeat {
   surplus_votes: Fraction;
 }
 
-export interface ListedUser {
-  created_at: string;
-  fullname?: string;
-  id: number;
-  last_activity_at?: string;
-  role: Role;
-  updated_at: string;
-  username: string;
-}
-
 export interface LoginResponse {
   user_id: number;
   username: string;
@@ -547,8 +537,21 @@ export interface SummaryDifferencesCounts {
   unreturned_ballots_count: SumCount;
 }
 
+/**
+ * User object, corresponds to a row in the users table
+ */
+export interface User {
+  created_at: string;
+  fullname?: string;
+  id: number;
+  last_activity_at?: string;
+  role: Role;
+  updated_at: string;
+  username: string;
+}
+
 export interface UserListResponse {
-  users: ListedUser[];
+  users: User[];
 }
 
 export interface ValidationResult {

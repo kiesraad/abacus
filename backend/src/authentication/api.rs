@@ -1,7 +1,7 @@
 use super::error::AuthenticationError;
 use super::role::Role;
 use super::session::Sessions;
-use super::user::{ListedUser, User, Users};
+use super::user::{User, Users};
 use super::{SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME};
 use axum::{extract::State, response::IntoResponse, Json};
 use axum_extra::extract::CookieJar;
@@ -240,7 +240,7 @@ pub async fn development_login(
 #[derive(Serialize, ToSchema)]
 #[cfg_attr(test, derive(Deserialize))]
 pub struct UserListResponse {
-    pub users: Vec<ListedUser>,
+    pub users: Vec<User>,
 }
 
 /// Lists all users
@@ -275,14 +275,14 @@ pub struct CreateUserRequest {
     post,
     path = "/api/user",
     responses(
-        (status = 201, description = "User created", body = ListedUser),
+        (status = 201, description = "User created", body = User),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 pub async fn user_create(
     State(users_repo): State<Users>,
     Json(create_user_req): Json<CreateUserRequest>,
-) -> Result<(StatusCode, Json<ListedUser>), APIError> {
+) -> Result<(StatusCode, Json<User>), APIError> {
     let user = users_repo
         .create(
             &create_user_req.username,
@@ -291,5 +291,5 @@ pub async fn user_create(
             create_user_req.role,
         )
         .await?;
-    Ok((StatusCode::CREATED, Json(user.into())))
+    Ok((StatusCode::CREATED, Json(user)))
 }

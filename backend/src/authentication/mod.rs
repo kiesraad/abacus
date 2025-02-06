@@ -581,9 +581,9 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::CREATED);
         let body = response.into_body().collect().await.unwrap().to_bytes();
-        let result: user::ListedUser = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.username, "test_user");
-        assert!(result.fullname.is_none());
-        assert_eq!(result.role, Role::Administrator);
+        let result: user::User = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.username(), "test_user");
+        assert!(result.fullname().is_none());
+        assert_eq!(result.role(), Role::Administrator);
     }
 }

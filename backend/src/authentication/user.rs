@@ -23,10 +23,14 @@ use super::{
 pub struct User {
     id: u32,
     username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     fullname: Option<String>,
     role: Role,
+    #[serde(skip)]
     password_hash: String,
-    #[schema(value_type = String, nullable = true)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
     last_activity_at: Option<DateTime<Utc>>,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
@@ -41,6 +45,16 @@ impl User {
 
     pub fn username(&self) -> &str {
         &self.username
+    }
+
+    #[cfg(test)]
+    pub fn fullname(&self) -> Option<&str> {
+        self.fullname.as_deref()
+    }
+
+    #[cfg(test)]
+    pub fn role(&self) -> Role {
+        self.role
     }
 }
 
@@ -90,38 +104,6 @@ where
             Err(AuthenticationError::UserNotFound)
             | Err(AuthenticationError::SessionKeyNotFound) => Ok(None),
             Err(e) => Err(e.into()),
-        }
-    }
-}
-
-#[derive(Debug, Serialize, FromRow, PartialEq, ToSchema)]
-#[cfg_attr(test, derive(Deserialize))]
-pub struct ListedUser {
-    pub id: u32,
-    pub username: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub fullname: Option<String>,
-    pub role: Role,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
-    last_activity_at: Option<DateTime<Utc>>,
-    #[schema(value_type = String)]
-    updated_at: DateTime<Utc>,
-    #[schema(value_type = String)]
-    created_at: DateTime<Utc>,
-}
-
-impl From<User> for ListedUser {
-    fn from(user: User) -> Self {
-        Self {
-            id: user.id,
-            username: user.username,
-            fullname: user.fullname,
-            role: user.role,
-            last_activity_at: user.last_activity_at,
-            updated_at: user.updated_at,
-            created_at: user.created_at,
         }
     }
 }
@@ -273,13 +255,14 @@ impl Users {
         Ok(user)
     }
 
-    pub async fn list(&self) -> Result<Vec<ListedUser>, Error> {
+    pub async fn list(&self) -> Result<Vec<User>, Error> {
         let users = query_as!(
-            ListedUser,
+            User,
             r#"SELECT
                 id as "id: u32",
                 username,
                 fullname,
+                password_hash,
                 role,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
@@ -426,5 +409,18 @@ mod tests {
             authenticated_user,
             AuthenticationError::InvalidPassword
         ));
+    }
+
+    #[test(sqlx::test)]
+    async fn password_hash_does_not_serialize(pool: SqlitePool) {
+        let users = Users::new(pool.clone());
+        let user = users
+            .create("test_user", None, "password", Role::Administrator)
+            .await
+            .unwrap();
+
+        let serialized_user = serde_json::to_value(user).unwrap();
+        assert_eq!(serialized_user["username"], "test_user".to_string());
+        assert!(serialized_user.get("password_hash").is_none());
     }
 }

@@ -1095,7 +1095,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListedUser"
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
@@ -2032,41 +2032,6 @@
           }
         }
       },
-      "ListedUser": {
-        "type": "object",
-        "required": [
-          "id",
-          "username",
-          "role",
-          "updated_at",
-          "created_at"
-        ],
-        "properties": {
-          "created_at": {
-            "type": "string"
-          },
-          "fullname": {
-            "type": "string"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "last_activity_at": {
-            "type": "string"
-          },
-          "role": {
-            "$ref": "#/components/schemas/Role"
-          },
-          "updated_at": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          }
-        }
-      },
       "LoginResponse": {
         "type": "object",
         "required": [
@@ -2464,6 +2429,42 @@
           }
         }
       },
+      "User": {
+        "type": "object",
+        "description": "User object, corresponds to a row in the users table",
+        "required": [
+          "id",
+          "username",
+          "role",
+          "updated_at",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "fullname": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "last_activity_at": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
       "UserListResponse": {
         "type": "object",
         "required": [
@@ -2473,7 +2474,7 @@
           "users": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ListedUser"
+              "$ref": "#/components/schemas/User"
             }
           }
         }

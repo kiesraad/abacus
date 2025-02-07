@@ -34,7 +34,7 @@ Het GSB/SOL verwerkt de tellingen / processen-verbaal van stembureaus, en genere
 | **Zitting GSB afronden**                         |                     |             |           |
 | Bezwaren en bijzonderheden zitting GSB invoeren  |                     | X           |           |
 | Proces-verbaal maken                             |                     | X           |           |
-| **Zitting HSB**                                  |                     |             |           |
+| **Zitting CSB**                                  |                     |             |           |
 | Zetelverdeling vaststellen                       |                     | X           |           |
 | Proces-verbaal maken                             |                     | X           |           |
 | **Algemeen**                                     |                     |             |           |

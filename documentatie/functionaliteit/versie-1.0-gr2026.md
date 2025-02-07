@@ -38,14 +38,15 @@
 ### Ondersteunende functies
 
 - Er is ondersteuning voor het gebruik van Abacus op meerdere werkstations.
-- Er vindt logging van gebruikershandelingen plaats.
-- Abacus is beschikbaar voor één open source operating system (Linux) en Microsoft Windows
+- De Abacus-server kan de afwezigheid van een internetverbinding detecteren (airgapdetectie).
+- Abacus is beschikbaar voor één open source operating system (Linux) en Microsoft Windows.
 
 ## Versie 1.0: zeer gewenst (should have)
 
 *Deze punten zijn zeer gewenst en worden geïmplementeerd als het kan, maar zonder is de software ook bruikbaar.*
 
-- De uitslag GSB wordt voorzien van een cryptografische handtekening.
+- De Abacus-clients kunnen de afwezigheid van een internetverbinding detecteren (airgapdetectie).
+- Er vindt logging van gebruikershandelingen plaats.
 - Het PDF-bestand van het proces-verbaal voldoen aan de WCAG-toegankelijkheidseisen.
 - Verschillen kunnen worden opgelost door nieuwe invoer op lijstniveau.
 - Bijhouden van statistieken over gebruik.
@@ -55,6 +56,7 @@
 
 *Deze eisen zullen alleen aan bod komen als er tijd genoeg is.*
 
+- De uitslag GSB wordt voorzien van een cryptografische handtekening.
 - Invoer van bezwaren en bijzonderheden per stembureau (afhankelijk van ontwikkeling modellen).
 - Beheer van werkplekken (aanvullen, design).
 - De software biedt ondersteuning voor meerdere verkiezingen tegelijkertijd. Dit is een vereiste die we sowieso zullen uitwerken na de GSB-fase, maar hier kan al in deze fase al een aanzet toe worden gedaan.

@@ -1,1 +1,1 @@
-export * from "./UsersHomePage";
+export * from "./UserListPage";

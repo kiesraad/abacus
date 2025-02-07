@@ -1049,7 +1049,7 @@
           "authentication"
         ],
         "summary": "Lists all users",
-        "operationId": "list",
+        "operationId": "user_list",
         "responses": {
           "200": {
             "description": "User list",
@@ -1976,6 +1976,7 @@
         "required": [
           "id",
           "username",
+          "role",
           "updated_at",
           "created_at"
         ],
@@ -1983,10 +1984,19 @@
           "created_at": {
             "type": "string"
           },
+          "fullname": {
+            "type": "string"
+          },
           "id": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "last_activity_at": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
           },
           "updated_at": {
             "type": "string"
@@ -2313,6 +2323,14 @@
           "FixedLocation",
           "Special",
           "Mobile"
+        ]
+      },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "administrator",
+          "typist",
+          "coordinator"
         ]
       },
       "SaveDataEntryResponse": {

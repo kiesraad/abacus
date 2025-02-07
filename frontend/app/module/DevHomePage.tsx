@@ -1,7 +1,6 @@
 import { Link } from "react-router";
 
 import { MockTest } from "app/component/MockTest";
-import { NavBar } from "app/component/navbar/NavBar";
 
 import { ElectionListProvider, useElectionList } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -12,6 +11,7 @@ function DevLinks() {
 
   return (
     <>
+      <p>Dit is een ontwikkelversie van Abacus. Kies hieronder welk deel van de applicatie je wilt gebruiken.</p>
       <strong>{t("general")}</strong>
       <ul>
         <li>
@@ -67,7 +67,7 @@ function DevLinks() {
           ))}
         </ul>
         <li>
-          <Link to={`/users#administratorcoordinator`}>{t("user.manage")}</Link>
+          <Link to={`/users#administratorcoordinator`}>{t("user.management")}</Link>
         </li>
         <li>
           <Link to={`/workstations#administrator`}>{t("workstations.manage")}</Link>
@@ -84,7 +84,6 @@ export function DevHomePage() {
   return (
     <AppLayout>
       <PageTitle title="Dev Homepage - Abacus" />
-      <NavBar />
       <header>
         <section>
           <h1>Abacus 🧮</h1>

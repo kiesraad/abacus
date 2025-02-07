@@ -5,13 +5,15 @@ import { formatNumber } from "@kiesraad/util";
 
 import cls from "./DisplayFraction.module.css";
 
-export function DisplayFraction({ fraction }: { fraction: Fraction }): ReactNode {
+export function DisplayFraction({ id, fraction }: { id: string; fraction: Fraction }): ReactNode {
   return (
-    <div className={cls.displayFraction}>
-      <span>{fraction.integer ? formatNumber(fraction.integer) : ""}</span>
-      <span>
-        {fraction.numerator}/{fraction.denominator}
-      </span>
+    <div id={id} className={cls.displayFraction}>
+      <span>{fraction.integer ? formatNumber(fraction.integer) : fraction.numerator === 0 ? "0" : ""}</span>
+      {fraction.numerator > 0 && (
+        <span>
+          {fraction.numerator}/{fraction.denominator}
+        </span>
+      )}
     </div>
   );
 }

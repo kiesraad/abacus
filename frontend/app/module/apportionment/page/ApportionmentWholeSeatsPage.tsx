@@ -44,7 +44,7 @@ export function ApportionmentWholeSeatsPage() {
                       </Table.NumberCell>
                       <Table.Cell>:</Table.Cell>
                       <Table.NumberCell className="normal">
-                        <DisplayFraction fraction={apportionment.quota} />
+                        <DisplayFraction id={`${standing.pg_number}-quota`} fraction={apportionment.quota} />
                       </Table.NumberCell>
                       <Table.Cell>=</Table.Cell>
                       <Table.NumberCell>{standing.whole_seats}</Table.NumberCell>

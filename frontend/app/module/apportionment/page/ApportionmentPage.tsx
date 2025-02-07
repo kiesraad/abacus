@@ -92,7 +92,7 @@ export function ApportionmentPage() {
                 <Table.Row>
                   <Table.Column scope="row">{t("apportionment.quota")}</Table.Column>
                   <Table.NumberCell className="font-number normal">
-                    <DisplayFraction fraction={apportionment.quota} />
+                    <DisplayFraction id="quota" fraction={apportionment.quota} />
                   </Table.NumberCell>
                   <Table.Cell className="fs-sm">{t("apportionment.quota_description")}</Table.Cell>
                 </Table.Row>

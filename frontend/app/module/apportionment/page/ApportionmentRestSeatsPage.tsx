@@ -65,7 +65,7 @@ function render_largest_averages_table_19_or_more_seats(
                       key={`${pg_seat_assignment.pg_number}-${step.rest_seat_number}`}
                       className={step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow" : "normal"}
                     >
-                      <DisplayFraction fraction={average} />
+                      <DisplayFraction id={`${pg_seat_assignment.pg_number}-average`} fraction={average} />
                     </Table.NumberCell>
                   );
                 }
@@ -121,7 +121,10 @@ function render_largest_surpluses_table(
               <Table.Cell>{political_groups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
               <Table.NumberCell>{pg_seat_assignment.whole_seats}</Table.NumberCell>
               <Table.NumberCell className="normal">
-                <DisplayFraction fraction={pg_seat_assignment.surplus_votes} />
+                <DisplayFraction
+                  id={`${pg_seat_assignment.pg_number}-surplus`}
+                  fraction={pg_seat_assignment.surplus_votes}
+                />
               </Table.NumberCell>
               <Table.NumberCell>{rest_seats}</Table.NumberCell>
             </Table.Row>
@@ -160,7 +163,7 @@ function render_largest_averages_table_less_than_19_seats(
               <Table.Cell>{political_groups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
               <Table.NumberCell>{pg_seat_assignment.whole_seats}</Table.NumberCell>
               <Table.NumberCell className="normal">
-                {average && <DisplayFraction fraction={average} />}
+                {average && <DisplayFraction id={`${pg_seat_assignment.pg_number}-average`} fraction={average} />}
               </Table.NumberCell>
               <Table.NumberCell>{rest_seats}</Table.NumberCell>
             </Table.Row>

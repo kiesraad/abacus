@@ -57,6 +57,7 @@ export function OverviewPage() {
                 {!isAdminOrCoordinator ? t("election.location") : t("election.level_polling_station")}
               </Table.Column>
               <Table.Column>{t("election_status.label")}</Table.Column>
+              <Table.Column />
             </Table.Header>
             <Table.Body className="fs-md">
               {electionList.map((election) => (
@@ -69,6 +70,7 @@ export function OverviewPage() {
                       userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
                     />
                   </Table.Cell>
+                  <Table.Cell />
                 </Table.LinkRow>
               ))}
             </Table.Body>

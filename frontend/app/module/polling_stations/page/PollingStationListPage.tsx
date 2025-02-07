@@ -105,6 +105,7 @@ export function PollingStationListPage() {
                 <Table.Column>{t("number")}</Table.Column>
                 <Table.Column>{t("name")}</Table.Column>
                 <Table.Column>{t("type")}</Table.Column>
+                <Table.Column />
               </Table.Header>
               <Table.Body className="fs-md">
                 {data.polling_stations.map((station) => (
@@ -114,6 +115,7 @@ export function PollingStationListPage() {
                     <Table.Cell>
                       {station.polling_station_type && labelForPollingStationType[station.polling_station_type]}
                     </Table.Cell>
+                    <Table.Cell />
                   </Table.LinkRow>
                 ))}
               </Table.Body>

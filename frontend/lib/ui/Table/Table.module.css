@@ -52,7 +52,9 @@
       background: var(--color-hover);
     }
 
+    /* Chevron icon cell */
     td:last-of-type {
+      width: 5rem;
       padding-right: 2.75rem;
       background-image: url("../../icon/svg/chevronRight.svg");
       background-size: 1.25rem;

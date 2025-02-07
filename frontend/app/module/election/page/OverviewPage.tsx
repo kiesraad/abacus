@@ -49,33 +49,37 @@ export function OverviewPage() {
         </Alert>
       )}
       <main>
-        <article>
-          <Table id="overview">
-            <Table.Header>
-              <Table.Column>{t("election.title.singular")}</Table.Column>
-              <Table.Column>
-                {!isAdminOrCoordinator ? t("election.location") : t("election.level_polling_station")}
-              </Table.Column>
-              <Table.Column>{t("election_status.label")}</Table.Column>
-              <Table.Column />
-            </Table.Header>
-            <Table.Body className="fs-md">
-              {electionList.map((election) => (
-                <Table.LinkRow key={election.id} to={electionLink(election)}>
-                  <Table.Cell className="fs-body">{election.name}</Table.Cell>
-                  <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
-                  <Table.Cell>
-                    <ElectionStatusWithIcon
-                      status={election.status}
-                      userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
-                    />
-                  </Table.Cell>
-                  <Table.Cell />
-                </Table.LinkRow>
-              ))}
-            </Table.Body>
-          </Table>
-        </article>
+        {!electionList.length ? (
+          <p className="mb-lg">{t("election.no_elections")}</p>
+        ) : (
+          <article>
+            <Table id="overview">
+              <Table.Header>
+                <Table.Column>{t("election.title.singular")}</Table.Column>
+                <Table.Column>
+                  {!isAdminOrCoordinator ? t("election.location") : t("election.level_polling_station")}
+                </Table.Column>
+                <Table.Column>{t("election_status.label")}</Table.Column>
+                <Table.Column />
+              </Table.Header>
+              <Table.Body className="fs-md">
+                {electionList.map((election) => (
+                  <Table.LinkRow key={election.id} to={electionLink(election)}>
+                    <Table.Cell className="fs-body">{election.name}</Table.Cell>
+                    <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
+                    <Table.Cell>
+                      <ElectionStatusWithIcon
+                        status={election.status}
+                        userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
+                      />
+                    </Table.Cell>
+                    <Table.Cell />
+                  </Table.LinkRow>
+                ))}
+              </Table.Body>
+            </Table>
+          </article>
+        )}
       </main>
       <Footer />
     </>

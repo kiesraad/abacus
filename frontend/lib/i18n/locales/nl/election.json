@@ -9,6 +9,7 @@
   },
   "level_polling_station": "Niveau stembureau",
   "location": "Gebied",
+  "no_elections": "Er zijn nog geen verkiezingen.",
   "status": "Status",
   "start_when_count_list_received": "Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren."
 }

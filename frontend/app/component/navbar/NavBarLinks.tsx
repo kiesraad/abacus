@@ -4,6 +4,8 @@ import { Election, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
 
+import { NavBarMenuButton } from "./NavBarMenu";
+
 type NavBarLinksProps = { location: { pathname: string; hash: string } };
 
 function ElectionBreadcrumb({ election }: { election: Election }) {
@@ -41,17 +43,19 @@ function DataEntryLinks({ location }: NavBarLinksProps) {
 function ElectionManagementLinks({ location }: NavBarLinksProps) {
   const { election } = useElection();
 
-  // TODO: Add left side menu, #920
-
   if (location.pathname.match(/^\/elections\/\d+\/?$/)) {
     return (
-      <span>
-        <ElectionBreadcrumb election={election} />
-      </span>
+      <>
+        <NavBarMenuButton />
+        <span>
+          <ElectionBreadcrumb election={election} />
+        </span>
+      </>
     );
   } else {
     return (
       <>
+        <NavBarMenuButton />
         <Link to={`/elections/${election.id}#administratorcoordinator`}>
           <ElectionBreadcrumb election={election} />
         </Link>

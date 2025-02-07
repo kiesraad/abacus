@@ -1,3 +1,4 @@
+import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { ElectionProvider } from "@kiesraad/api";
@@ -103,5 +104,32 @@ describe("NavBar", () => {
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Stembureaus" })).toBeVisible();
+  });
+
+  test.each([
+    { pathname: "/elections/1/report", hash: "#administratorcoordinator" },
+    { pathname: "/elections/1/status", hash: "#administratorcoordinator" },
+    { pathname: "/elections/1/polling-stations", hash: "#administratorcoordinator" },
+    { pathname: "/elections/1/polling-stations/create", hash: "#administratorcoordinator" },
+    { pathname: "/elections/1/polling-stations/1/update", hash: "#administratorcoordinator" },
+  ])("menu works for $pathname", async (location) => {
+    const user = userEvent.setup();
+    await renderNavBar(location);
+
+    const menuButton = screen.getByRole("button", { name: "Menu" });
+    expect(menuButton).toBeVisible();
+
+    // menu should be invisible
+    expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Gebruikers" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Werkplekken" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Logs" })).not.toBeInTheDocument();
+
+    // menu should be visible after clicking button
+    await user.click(menuButton);
+    expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Werkplekken" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
   });
 });

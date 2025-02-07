@@ -159,7 +159,9 @@ function getTableHeaderForCategory(category: StatusCategory): React.ReactNode {
   function CategoryHeader({ children }: { children?: React.ReactNode[] }) {
     return (
       <Table.Header key={category} className="bg-gray">
-        <Table.Column key={`${category}-number`}>{t("number")}</Table.Column>
+        <Table.Column key={`${category}-number`} className="text-align-r">
+          {t("number")}
+        </Table.Column>
         <Table.Column key={`${category}-name`}>{t("polling_station.title.singular")}</Table.Column>
         {children}
       </Table.Header>
@@ -190,7 +192,9 @@ function getTableRowForCategory(category: StatusCategory, polling_station: Polli
   function CategoryPollingStationRow({ children }: { children?: React.ReactNode[] }) {
     return (
       <Table.Row>
-        <Table.NumberCell key={`${polling_station.id}-number`}>{polling_station.number}</Table.NumberCell>
+        <Table.NumberCell key={`${polling_station.id}-number`} className="text-align-r">
+          {polling_station.number}
+        </Table.NumberCell>
         <Table.Cell key={`${polling_station.id}-name`}>
           <span>{polling_station.name}</span>
           {showBadge.includes(polling_station.status) && <Badge type={polling_station.status} />}

@@ -102,18 +102,20 @@ export function PollingStationListPage() {
 
             <Table id="polling_stations">
               <Table.Header>
-                <Table.Column>{t("number")}</Table.Column>
+                <Table.Column className="text-align-r">{t("number")}</Table.Column>
                 <Table.Column>{t("name")}</Table.Column>
                 <Table.Column>{t("type")}</Table.Column>
+                <Table.Column />
               </Table.Header>
               <Table.Body className="fs-md">
                 {data.polling_stations.map((station) => (
                   <Table.LinkRow key={station.id} to={`${station.id}/update`}>
-                    <Table.NumberCell>{station.number}</Table.NumberCell>
+                    <Table.NumberCell className="text-align-r">{station.number}</Table.NumberCell>
                     <Table.Cell className="break-word">{station.name}</Table.Cell>
                     <Table.Cell>
                       {station.polling_station_type && labelForPollingStationType[station.polling_station_type]}
                     </Table.Cell>
+                    <Table.Cell />
                   </Table.LinkRow>
                 ))}
               </Table.Body>

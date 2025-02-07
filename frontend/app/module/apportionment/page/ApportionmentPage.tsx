@@ -111,7 +111,7 @@ export function ApportionmentPage() {
             <h2 className={cls.table_title}>{t("apportionment.title")}</h2>
             <Table id="apportionment" className={cn(cls.table, cls.apportionment_table)}>
               <Table.Header>
-                <Table.Column>{t("list")}</Table.Column>
+                <Table.Column className="text-align-r">{t("list")}</Table.Column>
                 <Table.Column>{t("list_name")}</Table.Column>
                 <Table.Column className="text-align-r">{t("apportionment.whole_seat.plural")}</Table.Column>
                 <Table.Column className="text-align-r">{t("apportionment.rest_seat.plural")}</Table.Column>
@@ -123,7 +123,9 @@ export function ApportionmentPage() {
                   return (
                     /* TODO: Add row link */
                     <Table.LinkRow key={standing.pg_number} to=".">
-                      <Table.Cell className={cn(cls.listNumberColumn, "font-number")}>{standing.pg_number}</Table.Cell>
+                      <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
+                        {standing.pg_number}
+                      </Table.Cell>
                       <Table.Cell>{election.political_groups[standing.pg_number - 1]?.name || ""}</Table.Cell>
                       <Table.NumberCell className="text-align-r font-number normal">
                         {convert_zero_to_dash(standing.whole_seats)}

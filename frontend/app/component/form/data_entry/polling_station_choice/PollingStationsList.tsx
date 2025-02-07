@@ -13,8 +13,9 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
   return (
     <Table id="polling_station_list">
       <Table.Header>
-        <Table.Column>{t("number")}</Table.Column>
+        <Table.Column className="text-align-r">{t("number")}</Table.Column>
         <Table.Column>{t("polling_station.title.singular")}</Table.Column>
+        <Table.Column />
       </Table.Header>
       <Table.Body>
         {pollingStations.map((pollingStation: PollingStation) => {
@@ -30,11 +31,12 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
               key={pollingStation.number}
               to={getUrlForDataEntry(pollingStation.election_id, pollingStation.id, status)}
             >
-              <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
+              <Table.NumberCell className="text-align-r">{pollingStation.number}</Table.NumberCell>
               <Table.Cell>
                 <span>{pollingStation.name}</span>
                 {status && <Badge type={status} showIcon />}
               </Table.Cell>
+              <Table.Cell />
             </Table.LinkRow>
           );
         })}

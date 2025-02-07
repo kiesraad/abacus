@@ -25,7 +25,7 @@ export function ApportionmentWholeSeatsPage() {
             <span className={cls.table_information}>{t("apportionment.whole_seats_information")}</span>
             <Table id="details_whole_seats_table" className={cn(cls.table, cls.details_whole_seats_table)}>
               <Table.Header>
-                <Table.Column>{t("list")}</Table.Column>
+                <Table.Column className="text-align-r">{t("list")}</Table.Column>
                 <Table.Column className="text-align-r">{t("vote_count")}</Table.Column>
                 <Table.Column>:</Table.Column>
                 <Table.Column className="text-align-r">{t("apportionment.quota")}</Table.Column>
@@ -36,7 +36,9 @@ export function ApportionmentWholeSeatsPage() {
                 {apportionment.final_standing.map((standing: PoliticalGroupSeatAssignment) => {
                   return (
                     <Table.Row key={standing.pg_number}>
-                      <Table.Cell className={cn(cls.listNumberColumn, "bold")}>{standing.pg_number}</Table.Cell>
+                      <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "bold")}>
+                        {standing.pg_number}
+                      </Table.Cell>
                       <Table.NumberCell className="normal">
                         {election_summary.political_group_votes[standing.pg_number - 1]?.total || ""}
                       </Table.NumberCell>

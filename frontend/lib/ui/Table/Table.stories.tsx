@@ -65,7 +65,8 @@ export const LinkTable: Story = () => {
       <Table.Header>
         <Table.Column>Number</Table.Column>
         <Table.Column>Click me</Table.Column>
-        <Table.Column>Look a chevron</Table.Column>
+        <Table.Column>Look a chevron right of here</Table.Column>
+        <Table.Column />
       </Table.Header>
       <Table.Body className="fs-md">
         {data.map((row) => (
@@ -73,6 +74,7 @@ export const LinkTable: Story = () => {
             <Table.NumberCell>{row[0]}</Table.NumberCell>
             <Table.Cell>{row[1]}</Table.Cell>
             <Table.Cell>{row[2]}</Table.Cell>
+            <Table.Cell />
           </Table.LinkRow>
         ))}
       </Table.Body>
@@ -86,6 +88,7 @@ export const IconBadgeTable: Story = () => (
       <Table.Column>Number</Table.Column>
       <Table.Column>With icon</Table.Column>
       <Table.Column>With badge</Table.Column>
+      <Table.Column />
     </Table.Header>
     <Table.Body>
       {data.map((row) => (
@@ -99,6 +102,7 @@ export const IconBadgeTable: Story = () => (
             <span>{row[2]}</span>
             <Badge type="first_entry_in_progress" showIcon />
           </Table.Cell>
+          <Table.Cell />
         </Table.LinkRow>
       ))}
     </Table.Body>

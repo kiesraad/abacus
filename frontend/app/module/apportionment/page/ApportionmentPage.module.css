@@ -17,36 +17,33 @@
 
 .table {
   width: 51.8rem;
+  color: var(--gray-900);
+  font-size: var(--font-size-md);
+  td {
+    line-height: 1.5rem;
+  }
+}
+
+.list-number-column {
+  width: 4.5rem;
+}
+
+.bt-1-gray {
+  border-top: 1px solid var(--gray-300);
 }
 
 .election_summary_table {
   tr {
-    &:first-of-type {
-      td {
-        border-top: 1px solid var(--gray-300);
-      }
+    th {
+      color: var(--base-black);
     }
     td {
-      &:first-of-type {
-        font-size: var(--font-size-md);
-        color: var(--base-black);
-        line-height: 1.5rem;
-      }
-
       /* Number or DisplayFraction */
-      &:nth-of-type(2) {
-        font-family: var(--font-number);
-        font-feature-settings: "ss09" on;
+      &:first-of-type {
         width: 10.625rem;
-        text-align: right;
-        font-size: var(--font-size-md);
-        font-weight: normal;
-        color: var(--gray-900);
-        line-height: 1.75rem;
       }
 
       &:last-of-type {
-        font-size: var(--font-size-sm);
         color: var(--gray-600);
       }
     }
@@ -55,66 +52,12 @@
 
 .apportionment_table {
   tr {
-    th {
-      /* Number */
-      &:first-of-type,
-      &:nth-of-type(3),
-      &:nth-of-type(4),
-      &:nth-of-type(5) {
-        text-align: right;
-      }
-    }
     td {
-      /* Number */
-      &:first-of-type,
-      &:nth-of-type(3),
-      &:nth-of-type(4),
-      &:nth-of-type(5) {
-        text-align: right;
-        font-size: var(--font-size-md);
-        color: var(--gray-900);
-        line-height: 1.75rem;
-      }
-
       /* Seats */
       &:nth-of-type(3),
       &:nth-of-type(4),
       &:nth-of-type(5) {
-        font-family: var(--font-number);
-        font-feature-settings: "ss09" on;
         width: 7.65rem;
-      }
-
-      &:first-of-type,
-      &:nth-of-type(3),
-      &:nth-of-type(4) {
-        font-weight: normal;
-      }
-
-      /* Political group number */
-      &:first-of-type {
-        width: 4.75rem;
-      }
-
-      /* Political group name */
-      &:nth-of-type(2) {
-        font-size: var(--font-size-md);
-        line-height: 1.5rem;
-      }
-
-      /* Link chevron */
-      &:last-of-type {
-        width: 5rem;
-      }
-    }
-    /* Total row */
-    &:last-of-type {
-      td {
-        font-weight: bold;
-        border-bottom: none;
-        &:nth-of-type(2) {
-          text-align: right;
-        }
       }
     }
   }
@@ -122,45 +65,7 @@
 
 .details_whole_seats_table {
   tr {
-    th {
-      /* Number */
-      &:nth-of-type(2),
-      &:nth-of-type(4),
-      &:last-of-type {
-        text-align: right;
-      }
-    }
     td {
-      /* Number */
-      &:first-of-type,
-      &:nth-of-type(2),
-      &:nth-of-type(4),
-      &:last-of-type {
-        font-size: var(--font-size-md);
-        color: var(--gray-900);
-        line-height: 1.75rem;
-      }
-
-      /* Seats */
-      &:nth-of-type(2),
-      &:nth-of-type(4),
-      &:last-of-type {
-        text-align: right;
-        font-family: var(--font-number);
-        font-feature-settings: "ss09" on;
-      }
-
-      &:nth-of-type(2),
-      &:nth-of-type(4) {
-        font-weight: normal;
-      }
-
-      /* Political group number */
-      &:first-of-type {
-        font-weight: bold;
-        width: 4.75rem;
-      }
-
       /* Signs (: and =) */
       &:nth-of-type(3),
       &:nth-of-type(5) {
@@ -169,7 +74,7 @@
 
       /* Total whole seats */
       &:last-of-type {
-        width: 9.7rem;
+        width: 9rem;
       }
     }
   }
@@ -179,138 +84,46 @@
   width: 32rem;
   tr {
     td {
-      font-size: var(--font-size-md);
-      line-height: 1.5rem;
-
       /* Seats */
       &:nth-of-type(2) {
-        color: var(--gray-900);
-        line-height: 1.75rem;
-        text-align: right;
         width: 5rem;
-        font-family: var(--font-number);
-        font-feature-settings: "ss09" on;
-        font-weight: normal;
       }
 
       &:last-of-type {
         width: 6.5rem;
       }
     }
-    &:first-of-type {
-      td {
-        border-bottom: none;
-      }
-    }
-    /* Total row */
-    &:last-of-type {
-      td {
-        font-weight: bold;
-        border-bottom: none;
-        &:nth-of-type(2) {
-          text-align: right;
-        }
-      }
-    }
   }
 }
 
-.largest_averages_table {
+.rest_seats_table_19_or_more_seats {
   tr {
-    th {
-      /* Number or Fraction */
-      &:nth-child(n + 3) {
-        text-align: right;
-      }
-    }
     td {
-      &:first-of-type,
-      &:nth-of-type(2) {
-        line-height: 1.5rem;
-        font-size: var(--font-size-md);
-      }
-
       /* Number or Fraction */
       &:nth-child(n + 3) {
         width: 9.25rem;
-        color: var(--gray-900);
-        line-height: 1.75rem;
-        text-align: right;
-        font-family: var(--font-number);
-        font-feature-settings: "ss09" on;
-        font-weight: normal;
-        font-size: var(--font-size-md);
-      }
-
-      /* Political group number */
-      &:first-of-type {
-        width: 4.75rem;
-      }
-
-      /* Total rest seats */
-      &:last-of-type {
-        font-weight: bold;
-      }
-    }
-    /* Rest seat assigned to pg row */
-    &:last-of-type {
-      td {
-        font-weight: bold;
-        border-bottom: none;
-        &:nth-of-type(2) {
-          text-align: right;
-        }
       }
     }
   }
 }
 
-.largest_surpluses_table {
+.rest_seats_table_less_than_19_seats {
   width: 51.75rem;
   tr {
-    th {
-      /* Number or Fraction */
-      &:nth-child(n + 3) {
-        text-align: right;
-      }
-    }
     td {
-      &:first-of-type,
-      &:nth-of-type(2) {
-        line-height: 1.5rem;
-        font-size: var(--font-size-md);
-      }
-
-      /* Number or Fraction */
-      &:nth-child(n + 3) {
-        width: 9.25rem;
-        color: var(--gray-900);
-        line-height: 1.75rem;
-        text-align: right;
-        font-family: var(--font-number);
-        font-feature-settings: "ss09" on;
-        font-weight: normal;
-        font-size: var(--font-size-md);
-      }
-
-      /* Political group number */
-      &:first-of-type {
-        width: 4.75rem;
-      }
-
       /* Whole seats */
       &:nth-of-type(3) {
         width: 9.7rem;
       }
 
+      /* Surplus or Average */
       &:nth-of-type(4) {
         width: 8.375rem;
       }
 
       /* Rest seats */
-      &:nth-of-type(3),
-      &:last-of-type {
-        font-weight: bold;
+      &:nth-of-type(5) {
+        width: 9.25rem;
       }
     }
   }

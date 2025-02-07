@@ -13,7 +13,7 @@ export interface TableProps {
 
 export function Table({ id, children, className }: TableProps) {
   return (
-    <table id={id} className={`${cls.table} ${className}`}>
+    <table id={id} className={cn(cls.table, className)}>
       {children}
     </table>
   );
@@ -24,6 +24,7 @@ Table.Column = Column;
 Table.Body = Body;
 Table.Row = Row;
 Table.LinkRow = LinkRow;
+Table.TotalRow = TotalRow;
 Table.Cell = Cell;
 Table.NumberCell = NumberCell;
 
@@ -35,19 +36,31 @@ function Header({ children, className }: { children: React.ReactNode[]; classNam
   );
 }
 
-function Column({ children, className }: { children?: React.ReactNode; className?: string }) {
-  return <th className={className}>{children}</th>;
+function Column({
+  children,
+  scope,
+  className,
+}: {
+  children?: React.ReactNode;
+  scope?: "col" | "row";
+  className?: string;
+}) {
+  return (
+    <th scope={scope || "col"} className={className}>
+      {children}
+    </th>
+  );
 }
 
 function Body({ children, className }: { children: React.ReactNode[]; className?: string }) {
   return <tbody className={className}>{children}</tbody>;
 }
 
-function Row({ children }: { children: React.ReactNode[] }) {
-  return <tr>{children}</tr>;
+function Row({ children, className }: { children: React.ReactNode[]; className?: string }) {
+  return <tr className={className}>{children}</tr>;
 }
 
-function LinkRow({ children, to }: { children: React.ReactNode[]; to: To }) {
+function LinkRow({ children, to, className }: { children: React.ReactNode[]; to: To; className?: string }) {
   const navigate = useNavigate();
 
   function handleClick() {
@@ -55,10 +68,14 @@ function LinkRow({ children, to }: { children: React.ReactNode[]; to: To }) {
   }
 
   return (
-    <tr className={cls.rowLink} onClick={handleClick}>
+    <tr className={cn(cls.rowLink, className)} onClick={handleClick}>
       {children}
     </tr>
   );
+}
+
+function TotalRow({ children, className }: { children?: React.ReactNode; className?: string }) {
+  return <tr className={cn(cls.rowTotal, className)}>{children}</tr>;
 }
 
 function Cell({ children, className }: { children?: React.ReactNode; className?: string }) {

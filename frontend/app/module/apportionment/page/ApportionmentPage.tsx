@@ -40,60 +40,68 @@ export function ApportionmentPage() {
             <Table id="election_summary" className={cn(cls.table, cls.election_summary_table)}>
               <Table.Body>
                 <Table.Row>
-                  <Table.Cell>{t("apportionment.voters")}</Table.Cell>
-                  <Table.NumberCell>
+                  <Table.Column scope="row" className={cls.bt1Gray}>
+                    {t("apportionment.voters")}
+                  </Table.Column>
+                  <Table.NumberCell className={cn(cls.bt1Gray, "font-number", "normal")}>
                     {election.number_of_voters ? formatNumber(election.number_of_voters) : ""}
                   </Table.NumberCell>
-                  <Table.Cell />
+                  <Table.Cell className={cn(cls.bt1Gray, "fs-sm")} />
                 </Table.Row>
                 <Table.Row>
-                  <Table.Cell>{t("apportionment.total_votes_cast_count")}</Table.Cell>
-                  <Table.NumberCell>
+                  <Table.Column scope="row">{t("apportionment.total_votes_cast_count")}</Table.Column>
+                  <Table.NumberCell className="font-number normal">
                     {formatNumber(election_summary.votes_counts.total_votes_cast_count)}
                   </Table.NumberCell>
-                  <Table.Cell>
+                  <Table.Cell className="fs-sm">
                     {election.number_of_voters
-                      ? `${t("apportionment.turnout")}: ${(election_summary.votes_counts.total_votes_cast_count / election.number_of_voters) * 100}%`
+                      ? `${t("apportionment.turnout")}: ${Number((election_summary.votes_counts.total_votes_cast_count / election.number_of_voters) * 100).toFixed(2)}%`
                       : ""}
                   </Table.Cell>
                 </Table.Row>
                 <Table.Row>
-                  <Table.Cell>{t("voters_and_votes.blank_votes_count")}</Table.Cell>
-                  <Table.NumberCell>{formatNumber(election_summary.votes_counts.blank_votes_count)}</Table.NumberCell>
-                  <Table.Cell>
+                  <Table.Column scope="row">{t("voters_and_votes.blank_votes_count")}</Table.Column>
+                  <Table.NumberCell className="font-number normal">
+                    {formatNumber(election_summary.votes_counts.blank_votes_count)}
+                  </Table.NumberCell>
+                  <Table.Cell className="fs-sm">
                     {`${Number((election_summary.votes_counts.blank_votes_count / election_summary.votes_counts.total_votes_cast_count) * 100).toFixed(2)}%`}
                   </Table.Cell>
                 </Table.Row>
                 <Table.Row>
-                  <Table.Cell>{t("voters_and_votes.invalid_votes_count")}</Table.Cell>
-                  <Table.NumberCell>{formatNumber(election_summary.votes_counts.invalid_votes_count)}</Table.NumberCell>
-                  <Table.Cell>
+                  <Table.Column scope="row">{t("voters_and_votes.invalid_votes_count")}</Table.Column>
+                  <Table.NumberCell className="font-number normal">
+                    {formatNumber(election_summary.votes_counts.invalid_votes_count)}
+                  </Table.NumberCell>
+                  <Table.Cell className="fs-sm">
                     {`${Number((election_summary.votes_counts.invalid_votes_count / election_summary.votes_counts.total_votes_cast_count) * 100).toFixed(2)}%`}
                   </Table.Cell>
                 </Table.Row>
                 <Table.Row>
-                  <Table.Cell>{t("voters_and_votes.votes_candidates_count")}</Table.Cell>
-                  <Table.NumberCell>
+                  <Table.Column scope="row">{t("voters_and_votes.votes_candidates_count")}</Table.Column>
+                  <Table.NumberCell className="font-number normal">
                     {formatNumber(election_summary.votes_counts.votes_candidates_count)}
                   </Table.NumberCell>
-                  <Table.Cell />
+                  <Table.Cell className="fs-sm" />
                 </Table.Row>
                 <Table.Row>
-                  <Table.Cell>{t("apportionment.number_of_seats")}</Table.Cell>
-                  <Table.NumberCell>{apportionment.seats}</Table.NumberCell>
-                  <Table.Cell />
+                  <Table.Column scope="row">{t("apportionment.number_of_seats")}</Table.Column>
+                  <Table.NumberCell className="font-number normal">{apportionment.seats}</Table.NumberCell>
+                  <Table.Cell className="fs-sm" />
                 </Table.Row>
                 <Table.Row>
-                  <Table.Cell>{t("apportionment.quota")}</Table.Cell>
-                  <Table.NumberCell className="w-13">
+                  <Table.Column scope="row">{t("apportionment.quota")}</Table.Column>
+                  <Table.NumberCell className="font-number normal">
                     <DisplayFraction fraction={apportionment.quota} />
                   </Table.NumberCell>
-                  <Table.Cell>{t("apportionment.quota_description")}</Table.Cell>
+                  <Table.Cell className="fs-sm">{t("apportionment.quota_description")}</Table.Cell>
                 </Table.Row>
                 <Table.Row>
-                  <Table.Cell>{t("apportionment.preference_threshold")}</Table.Cell>
-                  <Table.NumberCell>{/* TODO: Add apportionment.preference_threshold */}</Table.NumberCell>
-                  <Table.Cell>{t("apportionment.preference_threshold_description")}</Table.Cell>
+                  <Table.Column scope="row">{t("apportionment.preference_threshold")}</Table.Column>
+                  <Table.NumberCell className="font-number normal">
+                    {/* TODO: Add apportionment.preference_threshold */}
+                  </Table.NumberCell>
+                  <Table.Cell className="fs-sm">{t("apportionment.preference_threshold_description")}</Table.Cell>
                 </Table.Row>
               </Table.Body>
             </Table>
@@ -104,10 +112,10 @@ export function ApportionmentPage() {
             <Table id="apportionment" className={cn(cls.table, cls.apportionment_table)}>
               <Table.Header>
                 <Table.Column>{t("list")}</Table.Column>
-                <Table.Column>{t("party_name")}</Table.Column>
-                <Table.Column>{t("apportionment.whole_seat.plural")}</Table.Column>
-                <Table.Column>{t("apportionment.rest_seat.plural")}</Table.Column>
-                <Table.Column>{t("apportionment.total_seats")}</Table.Column>
+                <Table.Column>{t("list_name")}</Table.Column>
+                <Table.Column className="text-align-r">{t("apportionment.whole_seat.plural")}</Table.Column>
+                <Table.Column className="text-align-r">{t("apportionment.rest_seat.plural")}</Table.Column>
+                <Table.Column className="text-align-r">{t("apportionment.total_seats")}</Table.Column>
                 <Table.Column />
               </Table.Header>
               <Table.Body>
@@ -115,23 +123,29 @@ export function ApportionmentPage() {
                   return (
                     /* TODO: Add row link */
                     <Table.LinkRow key={standing.pg_number} to=".">
-                      <Table.Cell>{standing.pg_number}</Table.Cell>
+                      <Table.Cell className={cn(cls.listNumberColumn, "font-number")}>{standing.pg_number}</Table.Cell>
                       <Table.Cell>{election.political_groups[standing.pg_number - 1]?.name || ""}</Table.Cell>
-                      <Table.NumberCell>{convert_zero_to_dash(standing.whole_seats)}</Table.NumberCell>
-                      <Table.NumberCell>{convert_zero_to_dash(standing.rest_seats)}</Table.NumberCell>
-                      <Table.NumberCell>{convert_zero_to_dash(standing.total_seats)}</Table.NumberCell>
+                      <Table.NumberCell className="text-align-r font-number normal">
+                        {convert_zero_to_dash(standing.whole_seats)}
+                      </Table.NumberCell>
+                      <Table.NumberCell className="text-align-r font-number normal">
+                        {convert_zero_to_dash(standing.rest_seats)}
+                      </Table.NumberCell>
+                      <Table.NumberCell className="text-align-r font-number">
+                        {convert_zero_to_dash(standing.total_seats)}
+                      </Table.NumberCell>
                       <Table.Cell />
                     </Table.LinkRow>
                   );
                 })}
-                <Table.Row>
+                <Table.TotalRow>
                   <Table.Cell />
-                  <Table.Cell>{t("apportionment.total")}</Table.Cell>
-                  <Table.NumberCell>{apportionment.whole_seats}</Table.NumberCell>
-                  <Table.NumberCell>{apportionment.rest_seats}</Table.NumberCell>
-                  <Table.NumberCell>{apportionment.seats}</Table.NumberCell>
+                  <Table.Cell className="text-align-r">{t("apportionment.total")}</Table.Cell>
+                  <Table.NumberCell className="font-number">{apportionment.whole_seats}</Table.NumberCell>
+                  <Table.NumberCell className="font-number">{apportionment.rest_seats}</Table.NumberCell>
+                  <Table.NumberCell className="font-number">{apportionment.seats}</Table.NumberCell>
                   <Table.Cell />
-                </Table.Row>
+                </Table.TotalRow>
               </Table.Body>
             </Table>
             <ul>

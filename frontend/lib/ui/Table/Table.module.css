@@ -9,22 +9,29 @@
     font-size: var(--font-size-xs);
   }
 
-  th,
-  td {
+  th:not(:global(.bb-none)),
+  td:not(:global(.bb-none)) {
     border-bottom: 1px solid var(--gray-300);
   }
 
-  th {
-    text-align: left;
+  th[scope="col"] {
     height: 2.75rem;
     padding: 0.75rem 1.5rem;
     line-height: 1.125rem;
+    &:not(:global(.text-align-r)) {
+      text-align: left;
+    }
   }
 
+  th[scope="row"],
   td {
     height: 3.5rem;
     padding: 1rem 1.5rem;
     line-height: 1.25rem;
+    text-align: left;
+    &:not(:global(.bold)) {
+      font-weight: normal;
+    }
   }
 
   /* Vertical center child inline-blocks */
@@ -40,9 +47,11 @@
   td.number-cell {
     text-align: right;
     font-size: var(--font-size-body);
-    font-weight: bold;
     width: 6.5rem;
     line-height: 1.75rem;
+    &:not(:global(.normal)) {
+      font-weight: bold;
+    }
   }
 
   tr.row-link {
@@ -52,12 +61,21 @@
       background: var(--color-hover);
     }
 
+    /* Chevron icon cell */
     td:last-of-type {
+      width: 5rem;
       padding-right: 2.75rem;
       background-image: url("../../icon/svg/chevronRight.svg");
       background-size: 1.25rem;
       background-position: center right 1.5rem;
       background-repeat: no-repeat;
+    }
+  }
+
+  tr.row-total {
+    td {
+      font-weight: bold !important;
+      border-bottom: none;
     }
   }
 }

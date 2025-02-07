@@ -62,3 +62,14 @@
 .break-word {
   word-break: break-word;
 }
+
+.text-align-r,
+.text-align-r {
+  text-align: right;
+}
+
+/* Number styling */
+.font-number {
+  font-family: var(--font-number);
+  font-feature-settings: "ss09" on;
+}

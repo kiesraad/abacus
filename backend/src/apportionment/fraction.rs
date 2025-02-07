@@ -13,6 +13,7 @@ use crate::data_entry::Count;
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 #[serde(into = "DisplayFraction", from = "DisplayFraction")]
+// type invariant: denominator has to be nonzero
 pub struct Fraction {
     numerator: u64,
     denominator: u64,
@@ -29,6 +30,9 @@ impl Fraction {
     pub const ZERO: Fraction = Fraction::new(0, 1);
 
     pub const fn new(numerator: u64, denominator: u64) -> Self {
+        if denominator == 0 {
+            panic!("a Fraction denominator cannot be zero");
+        }
         Self {
             numerator,
             denominator,
@@ -62,6 +66,7 @@ impl Add for Fraction {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
+        // if no overflow happens, the product of two nonzero u64's is nonzero
         Self {
             numerator: self.numerator * other.denominator + other.numerator * self.denominator,
             denominator: self.denominator * other.denominator,
@@ -73,6 +78,7 @@ impl Sub for Fraction {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
+        // if no overflow happens, the product of two nonzero u64's is nonzero
         Self {
             numerator: self.numerator * other.denominator - other.numerator * self.denominator,
             denominator: self.denominator * other.denominator,
@@ -84,6 +90,7 @@ impl Mul for Fraction {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self {
+        // if no overflow happens, the product of two nonzero u64's is nonzero
         Self {
             numerator: self.numerator * other.numerator,
             denominator: self.denominator * other.denominator,
@@ -95,6 +102,10 @@ impl Div for Fraction {
     type Output = Self;
 
     fn div(self, other: Self) -> Self {
+        if other.numerator == 0 {
+            panic!("cannot divide a Fraction by zero");
+        }
+        // self.denominator is nonzero, so if no overflow happens the new denominator is nonzero
         Self {
             numerator: self.numerator * other.denominator,
             denominator: self.denominator * other.numerator,
@@ -128,7 +139,7 @@ impl Eq for Fraction {}
 impl Display for Fraction {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         if self.denominator == 0 {
-            return write!(f, "NaN");
+            unreachable!("a Fraction with denominator 0 cannot be constructed");
         }
         let integer = self.numerator / self.denominator;
         let remainder = self.numerator % self.denominator;
@@ -211,10 +222,10 @@ mod tests {
         assert_eq!(fraction.to_string(), "10")
     }
 
+    #[should_panic]
     #[test]
     fn test_nan() {
-        let fraction = Fraction::new(1, 0);
-        assert_eq!(fraction.to_string(), "NaN");
+        let _fraction = Fraction::new(1, 0);
     }
 
     #[test]

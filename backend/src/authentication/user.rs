@@ -13,6 +13,7 @@ use crate::{APIError, AppState};
 use super::{
     error::AuthenticationError,
     password::{hash_password, verify_password},
+    role::Role,
     session::Sessions,
     SESSION_COOKIE_NAME,
 };
@@ -22,7 +23,11 @@ use super::{
 pub struct User {
     id: u32,
     username: String,
+    fullname: Option<String>,
+    role: Role,
     password_hash: String,
+    #[schema(value_type = String, nullable = true)]
+    last_activity_at: Option<DateTime<Utc>>,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
@@ -94,6 +99,13 @@ where
 pub struct ListedUser {
     id: u32,
     username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    fullname: Option<String>,
+    role: Role,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
+    last_activity_at: Option<DateTime<Utc>>,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
@@ -148,22 +160,27 @@ impl Users {
         &self,
         username: &str,
         password: &str,
+        role: Role,
     ) -> Result<User, AuthenticationError> {
         let password_hash = hash_password(password)?;
 
         let user = sqlx::query_as!(
             User,
-            r#"INSERT INTO users (username, password_hash)
-            VALUES (?, ?)
+            r#"INSERT INTO users (username, password_hash, role)
+            VALUES (?, ?, ?)
             RETURNING
                 id as "id: u32",
                 username,
+                fullname,
+                role,
                 password_hash,
+                last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
             "#,
             username,
-            password_hash
+            password_hash,
+            role,
         )
         .fetch_one(&self.0)
         .await?;
@@ -201,7 +218,10 @@ impl Users {
             SELECT
                 id as "id: u32",
                 username,
+                fullname,
+                role,
                 password_hash,
+                last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
             FROM users WHERE username = ?
@@ -222,7 +242,10 @@ impl Users {
             SELECT
                 id as "id: u32",
                 username,
+                fullname,
+                role,
                 password_hash,
+                last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
             FROM users WHERE id = ?
@@ -241,6 +264,9 @@ impl Users {
             r#"SELECT
                 id as "id: u32",
                 username,
+                fullname,
+                role,
+                last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
             FROM users"#
@@ -263,13 +289,18 @@ mod tests {
     use sqlx::SqlitePool;
     use test_log::test;
 
-    use crate::authentication::{error::AuthenticationError, session::Sessions, user::Users};
+    use crate::authentication::{
+        error::AuthenticationError, role::Role, session::Sessions, user::Users,
+    };
 
     #[test(sqlx::test)]
     async fn test_create_user(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
-        let user = users.create("test_user", "password").await.unwrap();
+        let user = users
+            .create("test_user", "password", Role::Administrator)
+            .await
+            .unwrap();
 
         assert_eq!(user.username, "test_user");
 
@@ -286,7 +317,10 @@ mod tests {
     async fn test_authenticate_user(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
-        let user = users.create("test_user", "password").await.unwrap();
+        let user = users
+            .create("test_user", "password", Role::Administrator)
+            .await
+            .unwrap();
 
         let authenticated_user = users.authenticate("test_user", "password").await.unwrap();
 
@@ -318,7 +352,10 @@ mod tests {
         let users = Users::new(pool.clone());
         let sessions = Sessions::new(pool.clone());
 
-        let user = users.create("test_user", "password").await.unwrap();
+        let user = users
+            .create("test_user", "password", Role::Administrator)
+            .await
+            .unwrap();
         let session = sessions
             .create(user.id, TimeDelta::seconds(60))
             .await
@@ -348,7 +385,10 @@ mod tests {
     async fn test_change_password(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
-        let user = users.create("test_user", "password").await.unwrap();
+        let user = users
+            .create("test_user", "password", Role::Administrator)
+            .await
+            .unwrap();
 
         users
             .update_password(user.id, "new_password")

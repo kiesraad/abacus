@@ -32,8 +32,8 @@
 
 *Deze punten zijn zeer gewenst, maar zonder is de milestone wel geslaagd.*
 
-- Gebruikers kunnen inloggen met gebruikersnaam en wachtwoord (authenticatie/authz).
-- Gebruikers hebben een van de drie rollen beheerder, coördinator of invoerder (autorisatie/authn).
+- Gebruikers kunnen inloggen met gebruikersnaam en wachtwoord (authenticatie/authn).
+- Gebruikers hebben een van de drie rollen beheerder, coördinator of invoerder (autorisatie/authz).
 - De tweede invoerder is verplicht een andere gebruiker dan de eerste invoerder.
 - Er kan slechts één gebruiker hetzelfde stembureau invoeren.
 - De coördinator kan de zitting openen en afronden.

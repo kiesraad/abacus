@@ -2,7 +2,7 @@ use std::error::Error;
 
 use crate::{
     apportionment::ApportionmentError,
-    authentication::AuthenticationError,
+    authentication::error::AuthenticationError,
     data_entry::{status::DataEntryTransitionError, DataError},
 };
 use axum::{

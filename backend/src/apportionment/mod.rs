@@ -503,7 +503,7 @@ mod tests {
         let mut political_group_votes: Vec<PoliticalGroupVotes> = vec![];
         for (index, votes) in pg_votes.iter().enumerate() {
             political_group_votes.push(PoliticalGroupVotes::from_test_data_auto(
-                (index + 1) as u8,
+                u8::try_from(index + 1).unwrap(),
                 *votes,
                 &[],
             ))

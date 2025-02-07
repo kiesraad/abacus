@@ -33,6 +33,7 @@ export function UserListPage() {
               <Table.Column>{t("role")}</Table.Column>
               <Table.Column>{t("user.fullname")}</Table.Column>
               <Table.Column>{t("user.last_activity")}</Table.Column>
+              <Table.Column />
             </Table.Header>
             <Table.Body className="fs-md">
               {users.map((user) => (
@@ -43,6 +44,7 @@ export function UserListPage() {
                   <Table.Cell>
                     {user.last_activity_at ? formatDateTime(new Date(user.last_activity_at)) : "–"}
                   </Table.Cell>
+                  <Table.Cell />
                 </Table.LinkRow>
               ))}
             </Table.Body>

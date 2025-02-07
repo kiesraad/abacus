@@ -1,10 +1,9 @@
 import { GetDataEntryResponse, PollingStationResults } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 import { overrideOnce } from "@kiesraad/test";
-import { ValidationResult } from "@kiesraad/util";
 
 import { getClientState } from "./state/dataEntryUtils";
-import { DataEntryState, FormSection, FormSectionId, FormState } from "./state/types";
+import { FormSection, FormState } from "./state/types";
 
 const initialValues: PollingStationResults = {
   recounted: undefined,

@@ -20,11 +20,11 @@ import {
   PollingStationDataEntryGetHandler,
   PollingStationDataEntrySaveHandler,
 } from "@kiesraad/api-mocks";
-import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs, waitFor } from "@kiesraad/test";
+import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs } from "@kiesraad/test";
 
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { getClientState } from "../state/dataEntryUtils";
-import { DataEntryState, FormSection, FormState } from "../state/types";
+import { DataEntryState } from "../state/types";
 import { defaultFormSection, overrideServerGetDataEntryResponse } from "../test.util";
 import { VotersAndVotesForm } from "./VotersAndVotesForm";
 
@@ -558,7 +558,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
       const expectedInvalidFieldIds = [votesFieldIds.blankVotesCount];
-      let expectedValidFieldIds = [
+      const expectedValidFieldIds = [
         votersFieldIds.pollCardCount,
         votersFieldIds.proxyCertificateCount,
         votersFieldIds.voterCardCount,
@@ -611,7 +611,7 @@ describe("Test VotersAndVotesForm", () => {
       });
       expect(acceptFeedbackCheckbox).toBeVisible();
       expect(acceptFeedbackCheckbox).not.toBeChecked();
-      await acceptFeedbackCheckbox.click();
+      acceptFeedbackCheckbox.click();
       expect(acceptFeedbackCheckbox).toBeChecked();
 
       await user.click(submitButton);

@@ -1,12 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import {
-  Election,
-  PoliticalGroup,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
-  PollingStationResults,
-} from "@kiesraad/api";
+import { Election, PoliticalGroup, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@kiesraad/api";
 import {
   electionMockData,
   politicalGroupMockData,

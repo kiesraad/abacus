@@ -9,7 +9,7 @@
 ### Gebruikers en rollen
 
 - Gebruikers kunnen lokaal worden aangemaakt met eenvoudige authenticatie, dus alleen een gebruikersnaam en wachtwoord.
-- Gebruikers hebben verschillende autorisatieniveaus op basis van de toegewezen rol: Beheerder, Coördinator of Invoerder.
+- Gebruikers hebben verschillende autorisatieniveaus op basis van de toegewezen rol: Beheerder, Coördinator GSB, Coördinator CSB, Invoerder GSB en Invoerder CSB.
 
 ### Inrichting van de applicatie
 
@@ -19,21 +19,33 @@
 - Het EML_NL-bestand met de stembureaus van een gemeente kan worden geïmporteerd.
 - De beheerder kan stembureaus aanmaken.
 
-### Invoeren van resultaten
+### Invoeren van resultaten GSB
 
 - Invoerders kunnen uitslagen van stembureaus invoeren voor DSO en CSO.
 - Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders.
 - Verschillen tussen de twee invoeren worden opgelost door de coördinator.
 - Validatie en consistentiechecks (controleprotocol) worden uitgevoerd op de ingevoerde tellingen van stembureaus.
 
-### Uitslagbepaling
+### Uitslagbepaling GSB
 
 - De uitslagen per stembureau kunnen worden opgeteld en dit leidt vervolgens tot de uitslag van het gemeentelijk stembureau (GSB).
-- De zetelverdeling voor de gemeenteraad wordt uitgerekend.
 - De uitslagen kunnen worden geëxporteerd als XML-bestand volgens de EML_NL-standaard.
 - De uitslag van het GSB wordt gegenereerd als proces-verbaal in PDF-formaat.
 - De processen-verbaal kunnen worden gegenereerd in het Nederlands en Fries.
 - De uitslag kan na de eerste zitting worden gecorrigeerd met behulp van een corrigendum.
+
+### Invoeren van resultaten CSB
+
+- De uitslag van het GSB kan worden geïmporteerd als EML_NL-bestand.
+- Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders. Een import van een EML_NL-bestand telt ook als invoer, waardoor nog maar één handmatige invoer nodig is.
+- Verschillen tussen de twee invoeren worden opgelost door de coördinator.
+
+### Uitslagbepaling CSB
+
+- De zetelverdeling voor de gemeenteraad wordt uitgerekend.
+- De uitslagen kunnen worden geëxporteerd als XML-bestand volgens de EML_NL-standaard.
+- De uitslag van het CSB wordt gegenereerd als proces-verbaal in PDF-formaat.
+- De processen-verbaal kunnen worden gegenereerd in het Nederlands en Fries.
 
 ### Ondersteunende functies
 
@@ -51,6 +63,8 @@
 - Verschillen kunnen worden opgelost door nieuwe invoer op lijstniveau.
 - Bijhouden van statistieken over gebruik.
 - Aanmaken van geloofsbrieven.
+- De coördinator GSB kan invoerders van het GSB beheren,
+  en de coördinator CSB kan invoerders van het CSB beheren.
 
 ## Versie 1.0: gewenst (could have)
 

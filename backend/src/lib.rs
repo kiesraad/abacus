@@ -123,10 +123,6 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
     };
 
-    // Add a route to reset the database if the dev-database feature is enabled
-    #[cfg(feature = "dev-database")]
-    let app = app.route("/reset", post(fixtures::reset_database));
-
     // Add the state to the app
     let state = AppState { pool };
     let app = app.with_state(state);

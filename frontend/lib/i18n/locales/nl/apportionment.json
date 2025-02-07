@@ -7,6 +7,11 @@
   "how_often_is_quota_met": "Hoe vaak haalde elke partij de kiesdeler?",
   "information_largest_averages": "Er zijn 19 of meer zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste gemiddelden</strong>. De partij die na toewijzing van een restzetel het hoogste aantal stemmen per zetel heeft, krijgt de restzetel.\nIn de tabel is het gemiddeld aantal stemmen per zetel te vinden dat elke lijst zou krijgen als een restzetel zou worden toegekend.",
   "information_largest_surpluses": "Er zijn minder dan 19 zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste overschotten</strong>. De restzetels zijn één voor één toegewezen aan de lijsten die na verdeling van de zetels het grootste overschot aan stemmen hebben. Lijsten die minder dan 75% van de kiesdeler hebben gehaald, komen niet in aanmerking voor een restzetel.",
+  "leftover_rest_seats_assignment": "Verdeling overige restzetels",
+  "leftover_rest_seats_amount_and_information": {
+    "singular": "Hierna was er nog {num_seats} restzetel te verdelen. Deze zetel is toegewezen aan de lijst die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben. Hierbij heeft iedere lijst niet meer dan één zetel toegewezen gekregen.",
+    "plural": "Hierna waren er nog {num_seats} restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben. Hierbij heeft iedere lijst niet meer dan één zetel toegewezen gekregen."
+  },
   "minus": "min",
   "no_rest_seats_to_assign": "Er zijn geen restzetels te verdelen.",
   "number_of_seats": "Aantal raadszetels",

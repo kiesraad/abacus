@@ -108,7 +108,6 @@
 }
 
 .rest_seats_table_less_than_19_seats {
-  width: 51.75rem;
   tr {
     td {
       /* Whole seats */

@@ -29,12 +29,18 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const missingTotalError = currentValues.candidate_votes.some((v) => v !== "") && currentValues.total === 0;
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (missingTotalError) {
+      document.getElementById("total")?.focus();
+      return;
+    }
+    void onSubmit();
+  };
+
   return (
     <Form
-      onSubmit={(e) => {
-        e.preventDefault();
-        void onSubmit();
-      }}
+      onSubmit={handleSubmit}
       ref={formRef}
       id={`candidates_form_${group.number}`}
       title={`${t("list")} ${group.number} - ${group.name}`}

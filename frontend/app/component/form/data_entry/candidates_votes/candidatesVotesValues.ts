@@ -20,7 +20,7 @@ export function formValuesToValues(formData: CandidateVotesFormValues): Politica
     number: formData.number,
     total: formData.total,
     candidate_votes: formData.candidate_votes.map((votes, index) => ({
-      number: index,
+      number: index + 1,
       votes: deformatNumber(votes),
     })),
   };

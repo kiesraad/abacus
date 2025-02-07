@@ -131,5 +131,9 @@ describe("NavBar", () => {
     expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Werkplekken" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
+
+    // menu should hide after clicking outside it
+    await user.click(document.body);
+    expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
   });
 });

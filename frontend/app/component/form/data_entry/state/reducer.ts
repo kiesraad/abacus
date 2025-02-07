@@ -42,11 +42,14 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
   switch (action.type) {
     case "DATA_ENTRY_LOADED":
       if (action.dataEntry.client_state) {
+        console.log("AAA", JSON.stringify(action.dataEntry.client_state, null, 2));
         const { formState, targetFormSectionId } = buildFormState(
           action.dataEntry.client_state as ClientState,
           action.dataEntry.validation_results,
           state.election,
         );
+
+        console.log("BBB", JSON.stringify(formState, null, 2));
 
         return {
           ...state,

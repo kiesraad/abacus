@@ -43,9 +43,12 @@ export function CheckAndSaveForm() {
   const summary = React.useMemo(() => {
     return getPollingStationSummary(formState);
   }, [formState]);
+
   const finalisationAllowed = Object.values(formState.sections).every(
     (section) => section.errors.length === 0 && (section.warnings.length === 0 || section.acceptWarnings),
   );
+
+  console.log("FS", JSON.stringify(formState, null, 2));
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
     void (async (event: React.FormEvent<HTMLFormElement>) => {

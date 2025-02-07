@@ -1,6 +1,7 @@
 import { GetDataEntryResponse, PollingStationResults } from "@kiesraad/api";
 import { electionMockData } from "@kiesraad/api-mocks";
 import { overrideOnce } from "@kiesraad/test";
+import { ValidationResult } from "@kiesraad/util";
 
 import { getClientState } from "./state/dataEntryUtils";
 import { DataEntryState, FormSection, FormSectionId, FormState } from "./state/types";
@@ -55,6 +56,7 @@ export interface OverrideServerGetDataEntryResponseProps {
   acceptWarnings?: boolean;
   continueToNextSection?: boolean;
   progress?: number;
+  validationResults?: GetDataEntryResponse["validation_results"];
 }
 
 export function overrideServerGetDataEntryResponse({
@@ -63,6 +65,7 @@ export function overrideServerGetDataEntryResponse({
   acceptWarnings = false,
   continueToNextSection = true,
   progress = 1,
+  validationResults = { errors: [], warnings: [] },
 }: OverrideServerGetDataEntryResponseProps) {
   overrideOnce("get", "/api/polling_stations/1/data_entries/1", 200, {
     client_state: getClientState(formState, acceptWarnings, continueToNextSection),
@@ -72,6 +75,6 @@ export function overrideServerGetDataEntryResponse({
     },
     progress,
     updated_at: "",
-    validation_results: { errors: [], warnings: [] },
+    validation_results: validationResults,
   } satisfies GetDataEntryResponse);
 }

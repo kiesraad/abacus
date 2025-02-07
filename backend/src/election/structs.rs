@@ -63,7 +63,7 @@ pub enum ElectionStatus {
 /// Political group with its candidates
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PoliticalGroup {
-    pub number: u8,
+    pub number: u32,
     pub name: String,
     pub candidates: Vec<Candidate>,
 }
@@ -71,7 +71,7 @@ pub struct PoliticalGroup {
 /// Candidate
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Candidate {
-    pub number: u8,
+    pub number: u32,
     pub initials: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -108,12 +108,12 @@ pub(crate) mod tests {
     /// Create a test election with some political groups.
     /// The number of political groups is the length of the `political_groups_candidates` slice.
     /// The number of candidates in each political group is equal to the value in the slice at that index.
-    pub fn election_fixture(political_groups_candidates: &[u8]) -> Election {
+    pub fn election_fixture(political_groups_candidates: &[u32]) -> Election {
         let political_groups = political_groups_candidates
             .iter()
             .enumerate()
             .map(|(i, &candidates)| PoliticalGroup {
-                number: (i + 1) as u8,
+                number: u32::try_from(i + 1).unwrap(),
                 name: format!("Political group {}", i + 1),
                 candidates: (0..candidates)
                     .map(|j| Candidate {

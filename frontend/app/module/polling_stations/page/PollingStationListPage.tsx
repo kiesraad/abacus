@@ -110,7 +110,7 @@ export function PollingStationListPage() {
               <Table.Body className="fs-md">
                 {data.polling_stations.map((station) => (
                   <Table.LinkRow key={station.id} to={`${station.id}/update`}>
-                    <Table.NumberCell className="text-align-r">{station.number}</Table.NumberCell>
+                    <Table.NumberCell>{station.number}</Table.NumberCell>
                     <Table.Cell className="break-word">{station.name}</Table.Cell>
                     <Table.Cell>
                       {station.polling_station_type && labelForPollingStationType[station.polling_station_type]}

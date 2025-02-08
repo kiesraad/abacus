@@ -43,14 +43,14 @@ export function ApportionmentPage() {
                   <Table.Column scope="row" className={cls.bt1Gray}>
                     {t("apportionment.voters")}
                   </Table.Column>
-                  <Table.NumberCell className={cn(cls.bt1Gray, "font-number", "text-align-r", "normal")}>
+                  <Table.NumberCell className={cn(cls.bt1Gray, "font-number", "normal")}>
                     {election.number_of_voters ? formatNumber(election.number_of_voters) : ""}
                   </Table.NumberCell>
                   <Table.Cell className={cn(cls.bt1Gray, "fs-sm")} />
                 </Table.Row>
                 <Table.Row>
                   <Table.Column scope="row">{t("apportionment.total_votes_cast_count")}</Table.Column>
-                  <Table.NumberCell className="font-number text-align-r normal">
+                  <Table.NumberCell className="font-number normal">
                     {formatNumber(election_summary.votes_counts.total_votes_cast_count)}
                   </Table.NumberCell>
                   <Table.Cell className="fs-sm">
@@ -61,7 +61,7 @@ export function ApportionmentPage() {
                 </Table.Row>
                 <Table.Row>
                   <Table.Column scope="row">{t("voters_and_votes.blank_votes_count")}</Table.Column>
-                  <Table.NumberCell className="font-number text-align-r normal">
+                  <Table.NumberCell className="font-number normal">
                     {formatNumber(election_summary.votes_counts.blank_votes_count)}
                   </Table.NumberCell>
                   <Table.Cell className="fs-sm">
@@ -70,7 +70,7 @@ export function ApportionmentPage() {
                 </Table.Row>
                 <Table.Row>
                   <Table.Column scope="row">{t("voters_and_votes.invalid_votes_count")}</Table.Column>
-                  <Table.NumberCell className="font-number text-align-r normal">
+                  <Table.NumberCell className="font-number normal">
                     {formatNumber(election_summary.votes_counts.invalid_votes_count)}
                   </Table.NumberCell>
                   <Table.Cell className="fs-sm">
@@ -79,26 +79,26 @@ export function ApportionmentPage() {
                 </Table.Row>
                 <Table.Row>
                   <Table.Column scope="row">{t("voters_and_votes.votes_candidates_count")}</Table.Column>
-                  <Table.NumberCell className="font-number text-align-r normal">
+                  <Table.NumberCell className="font-number normal">
                     {formatNumber(election_summary.votes_counts.votes_candidates_count)}
                   </Table.NumberCell>
                   <Table.Cell className="fs-sm" />
                 </Table.Row>
                 <Table.Row>
                   <Table.Column scope="row">{t("apportionment.number_of_seats")}</Table.Column>
-                  <Table.NumberCell className="font-number text-align-r normal">{apportionment.seats}</Table.NumberCell>
+                  <Table.NumberCell className="font-number normal">{apportionment.seats}</Table.NumberCell>
                   <Table.Cell className="fs-sm" />
                 </Table.Row>
                 <Table.Row>
                   <Table.Column scope="row">{t("apportionment.quota")}</Table.Column>
-                  <Table.NumberCell className="font-number text-align-r normal">
+                  <Table.NumberCell className="font-number normal">
                     <DisplayFraction id="quota" fraction={apportionment.quota} />
                   </Table.NumberCell>
                   <Table.Cell className="fs-sm">{t("apportionment.quota_description")}</Table.Cell>
                 </Table.Row>
                 <Table.Row>
                   <Table.Column scope="row">{t("apportionment.preference_threshold")}</Table.Column>
-                  <Table.NumberCell className="font-number text-align-r normal">
+                  <Table.NumberCell className="font-number normal">
                     {/* TODO: Add apportionment.preference_threshold */}
                   </Table.NumberCell>
                   <Table.Cell className="fs-sm">{t("apportionment.preference_threshold_description")}</Table.Cell>
@@ -127,13 +127,13 @@ export function ApportionmentPage() {
                         {standing.pg_number}
                       </Table.Cell>
                       <Table.Cell>{election.political_groups[standing.pg_number - 1]?.name || ""}</Table.Cell>
-                      <Table.NumberCell className="text-align-r font-number normal">
+                      <Table.NumberCell className="font-number normal">
                         {convert_zero_to_dash(standing.whole_seats)}
                       </Table.NumberCell>
-                      <Table.NumberCell className="text-align-r font-number normal">
+                      <Table.NumberCell className="font-number normal">
                         {convert_zero_to_dash(standing.rest_seats)}
                       </Table.NumberCell>
-                      <Table.NumberCell className="text-align-r font-number">
+                      <Table.NumberCell className="font-number">
                         {convert_zero_to_dash(standing.total_seats)}
                       </Table.NumberCell>
                       <Table.Cell />
@@ -143,9 +143,9 @@ export function ApportionmentPage() {
                 <Table.TotalRow>
                   <Table.Cell />
                   <Table.Cell className="text-align-r bold">{t("apportionment.total")}</Table.Cell>
-                  <Table.NumberCell className="font-number text-align-r">{apportionment.whole_seats}</Table.NumberCell>
-                  <Table.NumberCell className="font-number text-align-r">{apportionment.rest_seats}</Table.NumberCell>
-                  <Table.NumberCell className="font-number text-align-r">{apportionment.seats}</Table.NumberCell>
+                  <Table.NumberCell className="font-number">{apportionment.whole_seats}</Table.NumberCell>
+                  <Table.NumberCell className="font-number">{apportionment.rest_seats}</Table.NumberCell>
+                  <Table.NumberCell className="font-number">{apportionment.seats}</Table.NumberCell>
                   <Table.Cell />
                 </Table.TotalRow>
               </Table.Body>

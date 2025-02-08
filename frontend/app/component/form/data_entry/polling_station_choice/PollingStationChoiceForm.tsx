@@ -77,6 +77,11 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       status: status.status,
     }));
 
+  const pollingStationsForDataEntry = pollingStations.filter((pollingStation: PollingStation) => {
+    const status = electionStatus.statuses.find((status) => status.polling_station_id === pollingStation.id)?.status;
+    return status !== "definitive" && status !== "entries_different";
+  });
+
   return (
     <form
       onSubmit={(e) => {
@@ -145,12 +150,12 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
             </span>
           </summary>
           <h2 className={cls.formTitle}>{t("polling_station_choice.choose_polling_station")}</h2>
-          {pollingStations.length === 0 ? (
+          {!pollingStationsForDataEntry.length ? (
             <Alert type="error" variant="small">
               <p>{t("polling_station_choice.no_polling_stations_found")}</p>
             </Alert>
           ) : (
-            <PollingStationsList pollingStations={pollingStations} />
+            <PollingStationsList pollingStations={pollingStationsForDataEntry} />
           )}
         </details>
       </div>

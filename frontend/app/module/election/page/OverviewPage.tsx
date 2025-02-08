@@ -50,7 +50,7 @@ export function OverviewPage() {
       )}
       <main>
         {!electionList.length ? (
-          <p className="mb-lg">{t("election.no_elections")}</p>
+          <h2>{t("election.no_elections_added")}</h2>
         ) : (
           <article>
             <Table id="overview">

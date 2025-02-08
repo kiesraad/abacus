@@ -10,7 +10,7 @@ export function DisplayFraction({ id, fraction }: { id: string; fraction: Fracti
     <div id={id} className={cls.displayFraction}>
       <span>{fraction.integer ? formatNumber(fraction.integer) : fraction.numerator === 0 ? "0" : ""}</span>
       {fraction.numerator > 0 && (
-        <span>
+        <span className={cls.fractionPart}>
           {fraction.numerator}/{fraction.denominator}
         </span>
       )}

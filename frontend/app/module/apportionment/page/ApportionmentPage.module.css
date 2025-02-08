@@ -16,20 +16,28 @@
 }
 
 .table {
-  width: 51.8rem;
+  max-width: 52rem;
   color: var(--gray-900);
   font-size: var(--font-size-md);
   td {
     line-height: 1.5rem;
+    padding: 0.5rem 1.5rem;
   }
 }
 
 .list-number-column {
-  width: 4.5rem;
+  min-width: 3.5rem;
+  width: 3.5rem;
+  max-width: 3.5rem;
 }
 
 .bt-1-gray {
-  border-top: 1px solid var(--gray-300);
+  border-top: 1px solid var(--bg-gray-darkest);
+}
+
+.overflow-x {
+  width: 52rem;
+  overflow-x: auto;
 }
 
 .election_summary_table {
@@ -42,7 +50,7 @@
       &:first-of-type {
         width: 10.625rem;
       }
-
+      /* Description or extra information */
       &:last-of-type {
         color: var(--gray-600);
       }
@@ -71,7 +79,6 @@
       &:nth-of-type(5) {
         width: 3.75rem;
       }
-
       /* Total whole seats */
       &:last-of-type {
         width: 9rem;
@@ -88,7 +95,6 @@
       &:nth-of-type(2) {
         width: 5rem;
       }
-
       &:last-of-type {
         width: 6.5rem;
       }
@@ -98,10 +104,38 @@
 
 .rest_seats_table_19_or_more_seats {
   tr {
+    /* List number sticky column */
+    td:first-child,
+    th:first-child {
+      position: sticky;
+      left: 0;
+    }
+    /* List name and 'rest seat added to list' text sticky column */
+    td:nth-child(2),
+    th:nth-child(2) {
+      position: sticky;
+      left: 4.525rem;
+    }
+    /* Number of rest seats sticky column*/
+    td:last-child,
+    th:last-child {
+      position: sticky;
+      right: 0;
+    }
     td {
-      /* Number or Fraction */
+      /* List name and 'rest seat added to list' text */
+      &:nth-child(2) {
+        min-width: 17rem;
+      }
+      /* Average */
       &:nth-child(n + 3) {
-        width: 9.25rem;
+        min-width: 7.5rem;
+        max-width: 10.25rem;
+      }
+      /* Number of rest seats */
+      &:last-child {
+        min-width: 9.25rem;
+        max-width: 10.25rem;
       }
     }
   }
@@ -114,12 +148,10 @@
       &:nth-of-type(3) {
         width: 9.7rem;
       }
-
       /* Surplus or Average */
       &:nth-of-type(4) {
         width: 8.375rem;
       }
-
       /* Rest seats */
       &:nth-of-type(5) {
         width: 9.25rem;

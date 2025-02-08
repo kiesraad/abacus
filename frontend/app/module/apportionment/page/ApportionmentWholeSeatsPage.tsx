@@ -39,15 +39,15 @@ export function ApportionmentWholeSeatsPage() {
                       <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "bold")}>
                         {standing.pg_number}
                       </Table.Cell>
-                      <Table.NumberCell className="normal">
+                      <Table.NumberCell className="text-align-r normal">
                         {election_summary.political_group_votes[standing.pg_number - 1]?.total || ""}
                       </Table.NumberCell>
                       <Table.Cell>:</Table.Cell>
-                      <Table.NumberCell className="normal">
+                      <Table.NumberCell className="text-align-r normal">
                         <DisplayFraction id={`${standing.pg_number}-quota`} fraction={apportionment.quota} />
                       </Table.NumberCell>
                       <Table.Cell>=</Table.Cell>
-                      <Table.NumberCell>{standing.whole_seats}</Table.NumberCell>
+                      <Table.NumberCell className="text-align-r">{standing.whole_seats}</Table.NumberCell>
                     </Table.Row>
                   );
                 })}
@@ -73,16 +73,16 @@ export function ApportionmentWholeSeatsPage() {
               <Table.Body>
                 <Table.Row>
                   <Table.Cell className="bb-none">{t("apportionment.total_number_seats")}</Table.Cell>
-                  <Table.NumberCell className="bb-none normal">{apportionment.seats}</Table.NumberCell>
+                  <Table.NumberCell className="text-align-r bb-none normal">{apportionment.seats}</Table.NumberCell>
                   <Table.Cell className="bb-none" />
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>{t("apportionment.total_number_assigned_whole_seats")}</Table.Cell>
-                  <Table.NumberCell className="normal">{apportionment.whole_seats}</Table.NumberCell>
+                  <Table.NumberCell className="text-align-r normal">{apportionment.whole_seats}</Table.NumberCell>
                   <Table.Cell>— {t("apportionment.minus")}</Table.Cell>
                 </Table.Row>
                 <Table.TotalRow>
-                  <Table.Cell>{t("apportionment.rest_seat.plural")}</Table.Cell>
+                  <Table.Cell className="bold">{t("apportionment.rest_seat.plural")}</Table.Cell>
                   <Table.NumberCell className="text-align-r">{apportionment.rest_seats}</Table.NumberCell>
                   <Table.Cell />
                 </Table.TotalRow>

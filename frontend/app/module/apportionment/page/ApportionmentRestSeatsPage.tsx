@@ -25,7 +25,7 @@ function render_information(seats: number, rest_seats: number) {
       )}
       <br />
       <br />
-      {t(`apportionment.information_largest_${seats >= 19 ? "averages" : "surpluses"}`)}
+      {tx(`apportionment.information_largest_${seats >= 19 ? "averages" : "surpluses"}`)}
     </span>
   );
 }
@@ -36,58 +36,114 @@ function render_largest_averages_table_19_or_more_seats(
   political_groups: PoliticalGroup[],
 ) {
   return (
-    <Table id="details_largest_averages" className={cn(cls.table, cls.rest_seats_table_19_or_more_seats)}>
-      <Table.Header>
-        <Table.Column className="text-align-r">{t("list")}</Table.Column>
-        <Table.Column>{t("list_name")}</Table.Column>
-        {highest_average_steps.map((step: ApportionmentStep) => {
-          return (
-            <Table.Column key={step.rest_seat_number} className="text-align-r">
-              {t("apportionment.rest_seat.singular")} {step.rest_seat_number}
-            </Table.Column>
-          );
-        })}
-        <Table.Column className="text-align-r">{t("apportionment.rest_seats_count")}</Table.Column>
-      </Table.Header>
-      <Table.Body>
-        {final_standing.map((pg_seat_assignment: PoliticalGroupSeatAssignment) => {
-          return (
-            <Table.Row key={pg_seat_assignment.pg_number}>
-              <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
-                {pg_seat_assignment.pg_number}
-              </Table.Cell>
-              <Table.Cell>{political_groups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
-              {highest_average_steps.map((step: ApportionmentStep) => {
-                const average = step.standing[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
-                if (average) {
-                  return (
-                    <Table.NumberCell
-                      key={`${pg_seat_assignment.pg_number}-${step.rest_seat_number}`}
-                      className={step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow" : "normal"}
-                    >
-                      <DisplayFraction id={`${pg_seat_assignment.pg_number}-average`} fraction={average} />
-                    </Table.NumberCell>
-                  );
-                }
-              })}
-              <Table.NumberCell>{pg_seat_assignment.rest_seats}</Table.NumberCell>
-            </Table.Row>
-          );
-        })}
-        <Table.TotalRow>
-          <Table.Cell />
-          <Table.Cell className="text-align-r">{t("apportionment.rest_seat_assigned_to_list")}</Table.Cell>
+    <div className={cls.overflowX}>
+      <Table id="details_largest_averages" className={cn(cls.table, cls.rest_seats_table_19_or_more_seats)}>
+        <Table.Header>
+          <Table.Column className="text-align-r">{t("list")}</Table.Column>
+          <Table.Column>{t("list_name")}</Table.Column>
           {highest_average_steps.map((step: ApportionmentStep) => {
             return (
-              <Table.NumberCell key={step.rest_seat_number} className="text-align-r">
-                {step.change.selected_pg_number}
-              </Table.NumberCell>
+              <Table.Column key={step.rest_seat_number} className="text-align-r">
+                {t("apportionment.rest_seat.singular")} {step.rest_seat_number}
+              </Table.Column>
             );
           })}
-          <Table.Cell />
-        </Table.TotalRow>
-      </Table.Body>
-    </Table>
+          {highest_average_steps.map((step: ApportionmentStep) => {
+            return (
+              <Table.Column key={step.rest_seat_number} className="text-align-r">
+                {t("apportionment.rest_seat.singular")} {step.rest_seat_number}
+              </Table.Column>
+            );
+          })}
+          {highest_average_steps.map((step: ApportionmentStep) => {
+            return (
+              <Table.Column key={step.rest_seat_number} className="text-align-r">
+                {t("apportionment.rest_seat.singular")} {step.rest_seat_number}
+              </Table.Column>
+            );
+          })}
+          <Table.Column className="text-align-r">{t("apportionment.rest_seats_count")}</Table.Column>
+        </Table.Header>
+        <Table.Body>
+          {final_standing.map((pg_seat_assignment: PoliticalGroupSeatAssignment) => {
+            return (
+              <Table.Row key={pg_seat_assignment.pg_number}>
+                <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
+                  {pg_seat_assignment.pg_number}
+                </Table.Cell>
+                <Table.Cell>{political_groups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
+                {highest_average_steps.map((step: ApportionmentStep) => {
+                  const average = step.standing[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
+                  if (average) {
+                    return (
+                      <Table.NumberCell
+                        key={`${pg_seat_assignment.pg_number}-${step.rest_seat_number}`}
+                        className={`text-align-r ${step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow" : "normal"}`}
+                      >
+                        <DisplayFraction id={`${pg_seat_assignment.pg_number}-average`} fraction={average} />
+                      </Table.NumberCell>
+                    );
+                  }
+                })}
+                {highest_average_steps.map((step: ApportionmentStep) => {
+                  const average = step.standing[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
+                  if (average) {
+                    return (
+                      <Table.NumberCell
+                        key={`${pg_seat_assignment.pg_number}-${step.rest_seat_number}`}
+                        className={`text-align-r ${step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow" : "normal"}`}
+                      >
+                        <DisplayFraction id={`${pg_seat_assignment.pg_number}-average`} fraction={average} />
+                      </Table.NumberCell>
+                    );
+                  }
+                })}
+                {highest_average_steps.map((step: ApportionmentStep) => {
+                  const average = step.standing[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
+                  if (average) {
+                    return (
+                      <Table.NumberCell
+                        key={`${pg_seat_assignment.pg_number}-${step.rest_seat_number}`}
+                        className={`text-align-r ${step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow" : "normal"}`}
+                      >
+                        <DisplayFraction id={`${pg_seat_assignment.pg_number}-average`} fraction={average} />
+                      </Table.NumberCell>
+                    );
+                  }
+                })}
+                <Table.NumberCell className="text-align-r">{pg_seat_assignment.rest_seats}</Table.NumberCell>
+              </Table.Row>
+            );
+          })}
+          <Table.TotalRow>
+            <Table.Cell />
+            <Table.Cell className="text-align-r bold">{t("apportionment.rest_seat_assigned_to_list")}</Table.Cell>
+            {highest_average_steps.map((step: ApportionmentStep) => {
+              return (
+                <Table.NumberCell key={step.rest_seat_number} className="text-align-r">
+                  {step.change.selected_pg_number}
+                </Table.NumberCell>
+              );
+            })}
+            {highest_average_steps.map((step: ApportionmentStep) => {
+              return (
+                <Table.NumberCell key={step.rest_seat_number} className="text-align-r">
+                  {step.change.selected_pg_number}
+                </Table.NumberCell>
+              );
+            })}
+            {highest_average_steps.map((step: ApportionmentStep) => {
+              return (
+                <Table.NumberCell key={step.rest_seat_number} className="text-align-r">
+                  {step.change.selected_pg_number}
+                </Table.NumberCell>
+              );
+            })}
+            <Table.Cell />
+          </Table.TotalRow>
+        </Table.Body>
+      </Table>
+    </div>
   );
 }
 
@@ -119,14 +175,14 @@ function render_largest_surpluses_table(
                 {pg_seat_assignment.pg_number}
               </Table.Cell>
               <Table.Cell>{political_groups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
-              <Table.NumberCell>{pg_seat_assignment.whole_seats}</Table.NumberCell>
-              <Table.NumberCell className="normal">
+              <Table.NumberCell className="text-align-r">{pg_seat_assignment.whole_seats}</Table.NumberCell>
+              <Table.NumberCell className={`text-align-r ${rest_seats > 0 ? "bg-yellow" : "normal"}`}>
                 <DisplayFraction
                   id={`${pg_seat_assignment.pg_number}-surplus`}
                   fraction={pg_seat_assignment.surplus_votes}
                 />
               </Table.NumberCell>
-              <Table.NumberCell>{rest_seats}</Table.NumberCell>
+              <Table.NumberCell className="text-align-r">{rest_seats}</Table.NumberCell>
             </Table.Row>
           );
         })}
@@ -161,11 +217,11 @@ function render_largest_averages_table_less_than_19_seats(
                 {pg_seat_assignment.pg_number}
               </Table.Cell>
               <Table.Cell>{political_groups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
-              <Table.NumberCell>{pg_seat_assignment.whole_seats}</Table.NumberCell>
-              <Table.NumberCell className="normal">
+              <Table.NumberCell className="text-align-r">{pg_seat_assignment.whole_seats}</Table.NumberCell>
+              <Table.NumberCell className={`text-align-r ${rest_seats > 0 ? "bg-yellow" : "normal"}`}>
                 {average && <DisplayFraction id={`${pg_seat_assignment.pg_number}-average`} fraction={average} />}
               </Table.NumberCell>
-              <Table.NumberCell>{rest_seats}</Table.NumberCell>
+              <Table.NumberCell className="text-align-r">{rest_seats}</Table.NumberCell>
             </Table.Row>
           );
         })}

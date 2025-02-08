@@ -11,7 +11,7 @@
 
   th:not(:global(.bb-none)),
   td:not(:global(.bb-none)) {
-    border-bottom: 1px solid var(--gray-300);
+    border-bottom: 1px solid var(--bg-gray-darkest);
   }
 
   th[scope="col"] {

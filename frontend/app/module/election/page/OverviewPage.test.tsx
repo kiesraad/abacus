@@ -38,7 +38,7 @@ describe("OverviewPage", () => {
       </ElectionListProvider>,
     );
 
-    expect(await screen.findByText(/Er zijn nog geen verkiezingen/)).toBeVisible();
+    expect(await screen.findByText(/Nog geen verkiezingen ingesteld/)).toBeVisible();
     expect(screen.queryByRole("table")).toBeNull();
   });
 });

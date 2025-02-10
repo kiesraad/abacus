@@ -9,7 +9,7 @@ In de onderstaande tabel is aangegeven welke partijen of instanties fungeren als
 | Tweede kamer               | 1-20                 | gemeentes                                | Den Haag, ACStM[^1] | gemeente | kieskring                                 | Kiesraad                  |
 | Europees Parlement         | 1 (heel NL)          | gemeentes                                | Den Haag, ACStM     | gemeente | 20 HSBs                                   | Kiesraad                  |
 | Provinciale Staten         | 1-19                 | gemeentes                                | nvt                 | gemeente | als meerdere kieskringen in één provincie | 1 gemeente per provincie  |
-| Waterschappen              | per waterschap       | gemeentes                                | nvt                 | gemeente | nvt                                       | 1 gemeente per waterschap |
+| Waterschappen              | per waterschap       | gemeentes                                | nvt                 | gemeente | nvt                                       | Waterschap                |
 | Kiescolleges Eerste Kamer  | per openbaar lichaam | openbare lichamen                        | nvt                 | nvt      | nvt                                       | per eiland                |
 |                            | buitenland           | nvt                                      | ja                  | nvt      | nvt                                       | Zuid-Holland              |
 | Eerste Kamer               | per provincie        | statenvergadering                        | nvt                 | nvt      | nvt                                       | Kiesraad                  |

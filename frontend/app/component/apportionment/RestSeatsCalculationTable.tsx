@@ -12,7 +12,7 @@ interface RestSeatsCalculationTableProps {
 
 export function RestSeatsCalculationTable({ seats, whole_seats, rest_seats }: RestSeatsCalculationTableProps) {
   return (
-    <Table id="calculation_rest_seats" className={cn(cls.table, cls.calculation_rest_seats)}>
+    <Table id="rest_seats_calculation_table" className={cn(cls.table, cls.rest_seats_calculation_table)}>
       <Table.Body>
         <Table.Row>
           <Table.Cell className="bb-none">{t("apportionment.total_number_seats")}</Table.Cell>

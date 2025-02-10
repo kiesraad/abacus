@@ -18,7 +18,10 @@ export function LargestAveragesFor19OrMoreSeatsTable({
 }: LargestAveragesFor19OrMoreSeatsTableProps) {
   return (
     <div className={cls.overflowX}>
-      <Table id="details_largest_averages" className={cn(cls.table, cls.rest_seats_table_19_or_more_seats)}>
+      <Table
+        id="largest_averages_for_19_or_more_seats_table"
+        className={cn(cls.table, cls.rest_seats_19_or_more_seats_table)}
+      >
         <Table.Header>
           <Table.Column className="text-align-r">{t("list")}</Table.Column>
           <Table.Column>{t("list_name")}</Table.Column>

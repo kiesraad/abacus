@@ -10,7 +10,7 @@ export interface ElectionApportionmentProviderProps {
 }
 
 export function ApportionmentProvider({ children, electionId }: ElectionApportionmentProviderProps) {
-  const { requestState, refetch } = useApportionmentRequest(electionId);
+  const { requestState } = useApportionmentRequest(electionId);
 
   return (
     <RequestStateHandler
@@ -18,7 +18,7 @@ export function ApportionmentProvider({ children, electionId }: ElectionApportio
       notFoundMessage="error.election_not_found"
       renderOnSuccess={(data) => (
         <ApportionmentProviderContext.Provider
-          value={{ apportionment: data.apportionment, election_summary: data.election_summary, refetch }}
+          value={{ apportionment: data.apportionment, election_summary: data.election_summary, requestState }}
         >
           {children}
         </ApportionmentProviderContext.Provider>

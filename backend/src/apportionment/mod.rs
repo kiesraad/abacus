@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 use utoipa::ToSchema;
 
+use crate::election::PGNumber;
 use crate::{data_entry::PoliticalGroupVotes, summary::ElectionSummary};
 
 pub use self::api::*;
@@ -26,7 +27,7 @@ pub struct ApportionmentResult {
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupSeatAssignment {
     /// Political group number for which this assigment applies
-    pg_number: u32,
+    pg_number: PGNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
     /// The surplus votes that were not used to get whole seats assigned to this political group
@@ -60,7 +61,7 @@ impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupStanding {
     /// Political group number for which this standing applies
-    pg_number: u32,
+    pg_number: PGNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
     /// The surplus of votes that was not used to get whole seats (does not have to be a whole number of votes)
@@ -428,7 +429,7 @@ pub enum AssignedSeat {
 
 impl AssignedSeat {
     /// Get the political group number for the group this step has assigned a seat
-    fn political_group_number(&self) -> u32 {
+    fn political_group_number(&self) -> PGNumber {
         match self {
             AssignedSeat::HighestAverage(highest_average) => highest_average.selected_pg_number,
             AssignedSeat::HighestSurplus(highest_surplus) => highest_surplus.selected_pg_number,
@@ -450,9 +451,11 @@ impl AssignedSeat {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct HighestAverageAssignedSeat {
     /// The political group that was selected for this seat has this political group number
-    selected_pg_number: u32,
+    #[schema(value_type = u32)]
+    selected_pg_number: PGNumber,
     /// The list from which the political group was selected, all of them having the same votes per seat
-    pg_options: Vec<u32>,
+    #[schema(value_type = Vec<u32>)]
+    pg_options: Vec<PGNumber>,
     /// This is the votes per seat achieved by the selected political group
     votes_per_seat: Fraction,
 }
@@ -461,9 +464,11 @@ pub struct HighestAverageAssignedSeat {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct HighestSurplusAssignedSeat {
     /// The political group that was selected for this seat has this political group number
-    selected_pg_number: u32,
+    #[schema(value_type = u32)]
+    selected_pg_number: PGNumber,
     /// The list from which the political group was selected, all of them having the same number of surplus votes
-    pg_options: Vec<u32>,
+    #[schema(value_type = Vec<u32>)]
+    pg_options: Vec<PGNumber>,
     /// The number of surplus votes achieved by the selected political group
     surplus_votes: Fraction,
 }
@@ -475,7 +480,7 @@ pub enum ApportionmentError {
 }
 
 /// Create a vector containing just the political group numbers from an iterator of the current standing
-fn political_group_numbers(standing: &[&PoliticalGroupStanding]) -> Vec<u32> {
+fn political_group_numbers(standing: &[&PoliticalGroupStanding]) -> Vec<PGNumber> {
     standing.iter().map(|s| s.pg_number).collect()
 }
 
@@ -494,6 +499,7 @@ mod tests {
             get_total_seats_from_apportionment_result, seat_allocation, ApportionmentError,
         },
         data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts},
+        election::PGNumber,
         summary::{ElectionSummary, SummaryDifferencesCounts},
     };
     use test_log::test;
@@ -503,7 +509,7 @@ mod tests {
         let mut political_group_votes: Vec<PoliticalGroupVotes> = vec![];
         for (index, votes) in pg_votes.iter().enumerate() {
             political_group_votes.push(PoliticalGroupVotes::from_test_data_auto(
-                u32::try_from(index + 1).unwrap(),
+                PGNumber::try_from(index + 1).unwrap(),
                 *votes,
                 &[],
             ))

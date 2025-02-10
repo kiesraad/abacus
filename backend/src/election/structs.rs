@@ -60,18 +60,24 @@ pub enum ElectionStatus {
     DataEntryFinished,
 }
 
+pub type PGNumber = u32;
+
 /// Political group with its candidates
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PoliticalGroup {
-    pub number: u32,
+    #[schema(value_type = u32)]
+    pub number: PGNumber,
     pub name: String,
     pub candidates: Vec<Candidate>,
 }
 
+pub type CandidateNumber = u32;
+
 /// Candidate
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Candidate {
-    pub number: u32,
+    #[schema(value_type = u32)]
+    pub number: CandidateNumber,
     pub initials: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]

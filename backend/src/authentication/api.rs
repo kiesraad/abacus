@@ -319,6 +319,7 @@ pub struct UpdateUserRequest {
 #[utoipa::path(
     post,
     path = "/api/user",
+    request_body = CreateUserRequest,
     responses(
         (status = 201, description = "User created", body = User),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -343,6 +344,7 @@ pub async fn user_create(
 #[utoipa::path(
     put,
     path = "/api/user/{user_id}",
+    request_body = UpdateUserRequest,
     responses(
         (status = 200, description = "User updated", body = User),
         (status = 404, description = "User not found", body = ErrorResponse),

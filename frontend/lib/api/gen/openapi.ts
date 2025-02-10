@@ -125,6 +125,13 @@ export type LOGOUT_REQUEST_PATH = `/api/user/logout`;
 export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
 export type WHOAMI_REQUEST_PATH = `/api/user/whoami`;
 
+// /api/user/{user_id}
+export interface USER_UPDATE_REQUEST_PARAMS {
+  user_id: number;
+}
+export type USER_UPDATE_REQUEST_PATH = `/api/user/${number}`;
+export type USER_UPDATE_REQUEST_BODY = UpdateUserRequest;
+
 /** TYPES **/
 
 /**
@@ -535,6 +542,12 @@ export interface SummaryDifferencesCounts {
   too_few_ballots_handed_out_count: SumCount;
   too_many_ballots_handed_out_count: SumCount;
   unreturned_ballots_count: SumCount;
+}
+
+export interface UpdateUserRequest {
+  fullname?: string;
+  role: Role;
+  username: string;
 }
 
 /**

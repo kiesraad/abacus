@@ -4,8 +4,7 @@ use utoipa::ToSchema;
 
 use crate::{data_entry::PoliticalGroupVotes, summary::ElectionSummary};
 
-pub use self::api::*;
-pub use self::fraction::*;
+pub use self::{api::*, fraction::*};
 
 mod api;
 mod fraction;

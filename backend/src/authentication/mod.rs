@@ -1,4 +1,7 @@
 use chrono::TimeDelta;
+use serde::{Deserialize, Serialize};
+use user::User;
+use utoipa::ToSchema;
 
 pub use self::api::*;
 
@@ -11,13 +14,37 @@ mod user;
 mod util;
 
 /// Session lifetime, for both cookie and database
-pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 60 * 2); // 2 hours
+pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 30); // 30 minutes
+
+/// Minimum session lifetime, refresh if only this much time or less is left before expiration
+pub const SESSION_MIN_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 15); // 15 minutes
 
 /// Session cookie name
 pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
 
 /// Only send cookies over a secure (https) connection
 pub const SECURE_COOKIES: bool = false;
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct Credentials {
+    username: String,
+    password: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct LoginResponse {
+    user_id: u32,
+    username: String,
+}
+
+impl From<&User> for LoginResponse {
+    fn from(user: &User) -> Self {
+        Self {
+            user_id: user.id(),
+            username: user.username().to_string(),
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -26,6 +53,7 @@ mod tests {
     use axum::{
         body::Body,
         http::{Request, StatusCode},
+        middleware,
         routing::{get, post},
         Router,
     };
@@ -35,17 +63,21 @@ mod tests {
     use test_log::test;
     use tower::ServiceExt;
 
-    use crate::{authentication::*, AppState};
+    use crate::{
+        authentication::{session::Sessions, *},
+        AppState,
+    };
 
     fn create_app(pool: SqlitePool) -> Router {
-        let state = AppState { pool };
+        let state = AppState { pool: pool.clone() };
 
         let router = Router::new()
             .route("/api/user", get(api::user_list).post(api::user_create))
             .route("/api/user/login", post(api::login))
             .route("/api/user/logout", post(api::logout))
             .route("/api/user/whoami", get(api::whoami))
-            .route("/api/user/change-password", post(api::change_password));
+            .route("/api/user/change-password", post(api::change_password))
+            .layer(middleware::from_fn_with_state(pool, extend_session));
 
         #[cfg(debug_assertions)]
         let router = router
@@ -552,6 +584,61 @@ mod tests {
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: UserListResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.users.len(), 1);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_extend_session(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+
+        // with a normal long-valid session the user should not get a new cookie
+        let sessions = Sessions::new(pool);
+        let session = sessions.create(1, SESSION_LIFE_TIME).await.unwrap();
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/user/whoami")
+                    .header("cookie", &cookie.encoded().to_string())
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(response.headers().get("set-cookie"), None);
+
+        // with a session that is about to expire the user should get a new cookie, and the session lifetime should be extended
+        let session: session::Session =
+            sessions.create(1, SESSION_MIN_LIFE_TIME / 2).await.unwrap();
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/user/whoami")
+                    .header("cookie", &cookie.encoded().to_string())
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let response_cookie = response
+            .headers()
+            .get("set-cookie")
+            .unwrap()
+            .to_str()
+            .unwrap();
+
+        assert!(response_cookie.contains("Max-Age=1800"));
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

@@ -1,13 +1,21 @@
-use super::error::AuthenticationError;
-use super::role::Role;
-use super::session::Sessions;
-use super::user::{User, Users};
-use super::{SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME};
-use axum::{extract::State, response::IntoResponse, Json};
+use super::{
+    error::AuthenticationError,
+    role::Role,
+    session::Sessions,
+    user::{User, Users},
+    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+};
+use axum::{
+    extract::{Request, State},
+    middleware::Next,
+    response::{IntoResponse, Json, Response},
+};
 use axum_extra::extract::CookieJar;
 use cookie::{Cookie, SameSite};
-use hyper::StatusCode;
+use hyper::{header::SET_COOKIE, StatusCode};
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
+use tracing::debug;
 use utoipa::ToSchema;
 
 use crate::{APIError, ErrorResponse};
@@ -33,7 +41,7 @@ impl From<&User> for LoginResponse {
 }
 
 /// Set default session cookie properties
-fn set_default_cookie_properties(cookie: &mut Cookie) {
+pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     cookie.set_path("/");
     cookie.set_http_only(true);
     cookie.set_secure(SECURE_COOKIES);
@@ -170,6 +178,34 @@ pub async fn logout(
     let updated_jar = jar.remove(cookie);
 
     Ok((updated_jar, StatusCode::OK))
+}
+
+/// Middleware to extend the session lifetime
+pub async fn extend_session(State(pool): State<SqlitePool>, req: Request, next: Next) -> Response {
+    let jar = CookieJar::from_headers(req.headers());
+    let mut res = next.run(req).await;
+
+    let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
+        return res;
+    };
+
+    let sessions = Sessions::new(pool);
+
+    // extend lifetime of session and set new cookie if the session is still valid and will soon be expired
+    if let Ok(Some(session)) = sessions.extend_session(session_cookie.value()).await {
+        debug!("Session extended: {:?}", session_cookie);
+
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
+
+        debug!("Setting cookie: {:?}", cookie);
+
+        if let Ok(header_value) = cookie.encoded().to_string().parse() {
+            res.headers_mut().append(SET_COOKIE, header_value);
+        }
+    }
+
+    res
 }
 
 /// Development endpoint: create a new user (unauthenticated)

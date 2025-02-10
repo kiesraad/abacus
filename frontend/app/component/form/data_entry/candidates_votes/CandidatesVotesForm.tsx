@@ -27,7 +27,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
 
-  const missingTotalError = currentValues.candidate_votes.some((v) => v !== "") && currentValues.total === 0;
+  const missingTotalError = currentValues.candidate_votes.some((v) => v !== "") && currentValues.total == "0";
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -69,6 +69,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             const candidateFullName = candidate.first_name
               ? `${candidate.last_name}, ${candidate.initials} (${candidate.first_name})`
               : `${candidate.last_name}, ${candidate.initials}`;
+
             return (
               <InputGridRow
                 autoFocusInput={index === 0}
@@ -101,7 +102,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
             onChange={(e) => {
               setValues({
                 ...currentValues,
-                total: parseInt(e.target.value, 10),
+                total: e.target.value,
               });
             }}
             isListTotal

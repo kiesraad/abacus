@@ -1,7 +1,8 @@
 import { PoliticalGroupVotes } from "@kiesraad/api";
 import { deformatNumber, formatNumber } from "@kiesraad/util";
 
-export interface CandidateVotesFormValues extends Omit<PoliticalGroupVotes, "candidate_votes"> {
+export interface CandidateVotesFormValues extends Omit<PoliticalGroupVotes, "total" | "candidate_votes"> {
+  total: string;
   candidate_votes: string[];
 }
 
@@ -10,7 +11,7 @@ export type CandidateVotesValues = PoliticalGroupVotes;
 export function valuesToFormValues(values: PoliticalGroupVotes): CandidateVotesFormValues {
   return {
     number: values.number,
-    total: values.total,
+    total: values.total.toString(),
     candidate_votes: values.candidate_votes.map((cv) => formatNumber(cv.votes)),
   };
 }
@@ -18,7 +19,7 @@ export function valuesToFormValues(values: PoliticalGroupVotes): CandidateVotesF
 export function formValuesToValues(formData: CandidateVotesFormValues): PoliticalGroupVotes {
   return {
     number: formData.number,
-    total: formData.total,
+    total: parseInt(formData.total),
     candidate_votes: formData.candidate_votes.map((votes, index) => ({
       number: index + 1,
       votes: deformatNumber(votes),

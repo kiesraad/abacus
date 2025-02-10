@@ -27,6 +27,7 @@ describe("NavBar", () => {
     { pathname: "/account/login", hash: "" },
     { pathname: "/account/setup", hash: "" },
     { pathname: "/elections", hash: "" },
+    { pathname: "/elections/1", hash: "" },
     { pathname: "/invalid-notfound", hash: "" },
   ])("no links for $pathname", async (location) => {
     await renderNavBar(location);
@@ -59,24 +60,14 @@ describe("NavBar", () => {
     expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
   });
 
-  test("current election name for '/elections/1'", async () => {
-    await renderNavBar({ pathname: "/elections/1", hash: "" });
-
-    expect(
-      screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" }),
-    ).not.toBeInTheDocument();
-
-    expect(screen.queryByText("Heemdamseburg")).toBeVisible();
-    expect(screen.queryByText("Gemeenteraadsverkiezingen 2026")).toBeVisible();
-  });
-
   test.each([
     { pathname: "/elections", hash: "#administratorcoordinator" },
     { pathname: "/users", hash: "#administratorcoordinator" },
     { pathname: "/workstations", hash: "#administratorcoordinator" },
     { pathname: "/logs", hash: "#administratorcoordinator" },
-  ])("top level management links for $pathname", async () => {
-    await renderNavBar({ pathname: "/elections", hash: "#administratorcoordinator" });
+    { pathname: "/elections/1", hash: "#administratorcoordinator" },
+  ])("top level management links for $pathname", async (location) => {
+    await renderNavBar(location);
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();

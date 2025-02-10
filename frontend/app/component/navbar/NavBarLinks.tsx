@@ -44,14 +44,7 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
   const { election } = useElection();
 
   if (location.pathname.match(/^\/elections\/\d+\/?$/)) {
-    return (
-      <>
-        <NavBarMenuButton />
-        <span>
-          <ElectionBreadcrumb election={election} />
-        </span>
-      </>
-    );
+    return <></>;
   } else {
     return (
       <>
@@ -85,17 +78,17 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
   const isAdministrator = location.hash.includes("administrator");
   const isCoordinator = location.hash.includes("coordinator");
 
-  if (location.pathname.match(/^\/elections\/\d+\/data-entry/)) {
-    return <DataEntryLinks location={location} />;
-  } else if (location.pathname.match(/^\/elections\/\d+/)) {
-    return <ElectionManagementLinks location={location} />;
-  } else if (
-    (location.pathname === "/elections" && (isAdministrator || isCoordinator)) ||
+  if (
+    (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||
     location.pathname === "/users" ||
     location.pathname === "/workstations" ||
     location.pathname === "/logs"
   ) {
     return <TopLevelManagementLinks />;
+  } else if (location.pathname.match(/^\/elections\/\d+\/data-entry/)) {
+    return <DataEntryLinks location={location} />;
+  } else if (location.pathname.match(/^\/elections\/\d+/)) {
+    return <ElectionManagementLinks location={location} />;
   } else {
     return <></>;
   }

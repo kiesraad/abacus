@@ -27,6 +27,7 @@ pub struct ApportionmentResult {
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupSeatAssignment {
     /// Political group number for which this assignment applies
+    #[schema(value_type = u32)]
     pg_number: PGNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
@@ -61,6 +62,7 @@ impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupStanding {
     /// Political group number for which this standing applies
+    #[schema(value_type = u32)]
     pg_number: PGNumber,
     /// The number of votes cast for this group
     votes_cast: u64,

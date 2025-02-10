@@ -2066,8 +2066,10 @@
             "description": "Whether this group met the threshold for surplus seat assignment"
           },
           "pg_number": {
-            "$ref": "#/components/schemas/u32",
-            "description": "Political group number for which this assignment applies"
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number for which this assignment applies",
+            "minimum": 0
           },
           "rest_seats": {
             "type": "integer",
@@ -2121,8 +2123,10 @@
             "description": "The number of votes per seat if a new seat would be added to the current rest seats"
           },
           "pg_number": {
-            "$ref": "#/components/schemas/u32",
-            "description": "Political group number for which this standing applies"
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number for which this standing applies",
+            "minimum": 0
           },
           "rest_seats": {
             "type": "integer",
@@ -2550,11 +2554,6 @@
             "minimum": 0
           }
         }
-      },
-      "u32": {
-        "type": "integer",
-        "format": "int32",
-        "minimum": 0
       }
     }
   },

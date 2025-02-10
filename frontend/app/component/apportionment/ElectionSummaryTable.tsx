@@ -76,7 +76,7 @@ export function ElectionSummaryTable({ votes_counts, seats, quota, number_of_vot
         <Table.Row>
           <Table.Column scope="row">{t("apportionment.preference_threshold")}</Table.Column>
           <Table.NumberCell className="font-number normal">
-            {/* TODO: Add apportionment.preference_threshold */}
+            {/* TODO: Add apportionment.preference_threshold in epic #787 */}
           </Table.NumberCell>
           <Table.Cell className="fs-sm">{t("apportionment.preference_threshold_description")}</Table.Cell>
         </Table.Row>

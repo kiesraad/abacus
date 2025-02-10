@@ -40,7 +40,13 @@ export function ApportionmentPage() {
           </div>
           <div>
             <h2 className={cls.table_title}>{t("apportionment.title")}</h2>
-            <ApportionmentTable apportionment={apportionment} political_groups={election.political_groups} />
+            <ApportionmentTable
+              final_standing={apportionment.final_standing}
+              political_groups={election.political_groups}
+              whole_seats={apportionment.whole_seats}
+              rest_seats={apportionment.rest_seats}
+              seats={apportionment.seats}
+            />
             <ul>
               <li>
                 {get_number_of_seats_assigned_sentence(apportionment.whole_seats, "whole_seat")} (

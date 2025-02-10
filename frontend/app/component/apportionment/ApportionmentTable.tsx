@@ -1,4 +1,4 @@
-import { ApportionmentResult, PoliticalGroup, PoliticalGroupSeatAssignment } from "@kiesraad/api";
+import { PoliticalGroup, PoliticalGroupSeatAssignment } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Table } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
@@ -6,8 +6,11 @@ import { cn } from "@kiesraad/util";
 import cls from "./Apportionment.module.css";
 
 interface ApportionmentTableProps {
-  apportionment: ApportionmentResult;
+  final_standing: PoliticalGroupSeatAssignment[];
   political_groups: PoliticalGroup[];
+  whole_seats: number;
+  rest_seats: number;
+  seats: number;
 }
 
 function convert_zero_to_dash(number: number): string {
@@ -17,7 +20,13 @@ function convert_zero_to_dash(number: number): string {
   return number.toString();
 }
 
-export function ApportionmentTable({ apportionment, political_groups }: ApportionmentTableProps) {
+export function ApportionmentTable({
+  final_standing,
+  political_groups,
+  whole_seats,
+  rest_seats,
+  seats,
+}: ApportionmentTableProps) {
   return (
     <Table id="apportionment" className={cn(cls.table, cls.apportionment_table)}>
       <Table.Header>
@@ -29,7 +38,7 @@ export function ApportionmentTable({ apportionment, political_groups }: Apportio
         <Table.Column />
       </Table.Header>
       <Table.Body>
-        {apportionment.final_standing.map((standing: PoliticalGroupSeatAssignment) => {
+        {final_standing.map((standing: PoliticalGroupSeatAssignment) => {
           return (
             /* TODO: Add row link */
             <Table.LinkRow key={standing.pg_number} to=".">
@@ -51,9 +60,9 @@ export function ApportionmentTable({ apportionment, political_groups }: Apportio
         <Table.TotalRow>
           <Table.Cell />
           <Table.Cell className="text-align-r bold">{t("apportionment.total")}</Table.Cell>
-          <Table.NumberCell className="font-number">{apportionment.whole_seats}</Table.NumberCell>
-          <Table.NumberCell className="font-number">{apportionment.rest_seats}</Table.NumberCell>
-          <Table.NumberCell className="font-number">{apportionment.seats}</Table.NumberCell>
+          <Table.NumberCell className="font-number">{whole_seats}</Table.NumberCell>
+          <Table.NumberCell className="font-number">{rest_seats}</Table.NumberCell>
+          <Table.NumberCell className="font-number">{seats}</Table.NumberCell>
           <Table.Cell />
         </Table.TotalRow>
       </Table.Body>

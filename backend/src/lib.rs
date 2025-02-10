@@ -89,7 +89,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             "/",
             get(authentication::user_list).post(authentication::user_create),
         )
-        .route("/{id})", put(authentication::user_update))
+        .route("/{user_id}", put(authentication::user_update))
         .route("/login", post(authentication::login))
         .route("/logout", post(authentication::logout))
         .route("/whoami", get(authentication::whoami))

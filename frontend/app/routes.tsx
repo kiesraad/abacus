@@ -13,7 +13,13 @@ import {
 import { LogsHomePage } from "app/module/logs";
 import { NotAvailableInMock } from "app/module/NotAvailableInMock";
 import { PollingStationListPage } from "app/module/polling_stations";
-import { UserListPage } from "app/module/users";
+import {
+  UserCreateDetailsPage,
+  UserCreateLayout,
+  UserCreateRolePage,
+  UserCreateTypePage,
+  UserListPage,
+} from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
 
 import { t } from "@kiesraad/i18n";
@@ -84,6 +90,11 @@ export const routes = createRoutesFromElements(
       <Route path="logs" element={<LogsHomePage />} />
       <Route path="users">
         <Route index element={<UserListPage />} />
+        <Route path="create" element={<UserCreateLayout />}>
+          <Route index element={<UserCreateRolePage />} />
+          <Route path="type" element={<UserCreateTypePage />} />
+          <Route path="details" element={<UserCreateDetailsPage />} />
+        </Route>
       </Route>
       <Route path="workstations" element={<WorkstationsHomePage />} />
     </Route>

@@ -14,6 +14,8 @@ interface UserDetails {
 
 type ValidationErrors = Partial<UserDetails>;
 
+const MIN_PASSWORD_LENGTH = 12;
+
 export function UserCreateDetailsPage() {
   const navigate = useNavigate();
   const { user, updateUser } = useUserCreateContext();
@@ -57,6 +59,8 @@ export function UserCreateDetailsPage() {
 
     if (details.password.length === 0) {
       errors.password = required;
+    } else if (details.password.length < MIN_PASSWORD_LENGTH) {
+      errors.password = t("users.temporary_password_error_min_length", { min_length: MIN_PASSWORD_LENGTH });
     }
 
     const isValid = Object.keys(errors).length === 0;
@@ -98,7 +102,7 @@ export function UserCreateDetailsPage() {
                 id="password"
                 name="password"
                 label={t("users.temporary_password")}
-                hint={t("users.temporary_password_hint")}
+                hint={t("users.temporary_password_hint", { min_length: MIN_PASSWORD_LENGTH })}
                 error={validationErrors?.password}
               />
             </FormLayout.Section>

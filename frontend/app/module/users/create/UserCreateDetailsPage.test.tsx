@@ -33,7 +33,35 @@ describe("UserCreateDetailsPage", () => {
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create");
   });
 
-  test("Show and fill fullname fields", async () => {
+  test("Show validation errors", async () => {
+    const updateUser = vi.fn();
+    renderPage({ user: { role: "coordinator", type: "fullname" }, updateUser });
+
+    const user = userEvent.setup();
+
+    const submit = await screen.findByRole("button", { name: "Opslaan" });
+    await user.click(submit);
+
+    const username = await screen.findByLabelText("Gebruikersnaam");
+    expect(username).toBeInvalid();
+    expect(username).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+
+    const fullname = await screen.findByLabelText("Volledige naam");
+    expect(fullname).toBeInvalid();
+    expect(fullname).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+
+    const password = await screen.findByLabelText("Tijdelijk wachtwoord");
+    expect(password).toBeInvalid();
+    expect(password).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+
+    await user.type(password, "mand");
+    await user.click(submit);
+
+    expect(password).toBeInvalid();
+    expect(password).toHaveAccessibleErrorMessage("Dit wachtwoord is niet lang genoeg. Gebruik minimaal 12 karakters");
+  });
+
+  test("Continue after filling in fullname fields", async () => {
     const updateUser = vi.fn();
     renderPage({ user: { role: "coordinator", type: "fullname" }, updateUser });
 
@@ -47,7 +75,7 @@ describe("UserCreateDetailsPage", () => {
 
     await user.type(await screen.findByLabelText("Gebruikersnaam"), "NieuweGebruiker");
     await user.type(await screen.findByLabelText("Volledige naam"), "Nieuwe Gebruiker");
-    await user.type(await screen.findByLabelText("Tijdelijk wachtwoord"), "geheim123");
+    await user.type(await screen.findByLabelText("Tijdelijk wachtwoord"), "Wachtwoord12");
 
     const submit = await screen.findByRole("button", { name: "Opslaan" });
     await user.click(submit);
@@ -55,7 +83,7 @@ describe("UserCreateDetailsPage", () => {
     expect(updateUser).toHaveBeenCalledExactlyOnceWith({
       username: "NieuweGebruiker",
       fullname: "Nieuwe Gebruiker",
-      password: "geheim123",
+      password: "Wachtwoord12",
     });
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users");
   });
@@ -71,14 +99,14 @@ describe("UserCreateDetailsPage", () => {
     expect(await screen.findByLabelText("Tijdelijk wachtwoord")).toHaveValue("");
 
     await user.type(await screen.findByLabelText("Gebruikersnaam"), "NieuweGebruiker");
-    await user.type(await screen.findByLabelText("Tijdelijk wachtwoord"), "geheim123");
+    await user.type(await screen.findByLabelText("Tijdelijk wachtwoord"), "Wachtwoord12");
 
     const submit = await screen.findByRole("button", { name: "Opslaan" });
     await user.click(submit);
 
     expect(updateUser).toHaveBeenCalledExactlyOnceWith({
       username: "NieuweGebruiker",
-      password: "geheim123",
+      password: "Wachtwoord12",
     });
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users");
   });

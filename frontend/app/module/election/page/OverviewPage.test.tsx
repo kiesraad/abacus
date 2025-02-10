@@ -22,8 +22,8 @@ describe("OverviewPage", () => {
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
-      ["Verkiezing", "Gebied", "Status", ""],
-      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Steminvoer bezig", ""],
+      ["Verkiezing", "Gebied", "Status"],
+      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Steminvoer bezig"],
     ]);
   });
 

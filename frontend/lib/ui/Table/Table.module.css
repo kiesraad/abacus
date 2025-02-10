@@ -54,8 +54,7 @@
 
     /* Chevron icon cell */
     td:last-of-type {
-      width: 5rem;
-      padding-right: 2.75rem;
+      padding-right: 4.5rem;
       background-image: url("../../icon/svg/chevronRight.svg");
       background-size: 1.25rem;
       background-position: center right 1.5rem;

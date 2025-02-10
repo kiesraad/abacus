@@ -29,11 +29,10 @@ export function UserListPage() {
         <article>
           <Table id="users">
             <Table.Header>
-              <Table.Column>{t("user.username")}</Table.Column>
-              <Table.Column>{t("role")}</Table.Column>
-              <Table.Column>{t("user.fullname")}</Table.Column>
-              <Table.Column>{t("user.last_activity")}</Table.Column>
-              <Table.Column />
+              <Table.HeaderCell>{t("user.username")}</Table.HeaderCell>
+              <Table.HeaderCell>{t("role")}</Table.HeaderCell>
+              <Table.HeaderCell>{t("user.fullname")}</Table.HeaderCell>
+              <Table.HeaderCell>{t("user.last_activity")}</Table.HeaderCell>
             </Table.Header>
             <Table.Body className="fs-md">
               {users.map((user) => (
@@ -44,7 +43,6 @@ export function UserListPage() {
                   <Table.Cell>
                     {user.last_activity_at ? formatDateTime(new Date(user.last_activity_at)) : "–"}
                   </Table.Cell>
-                  <Table.Cell />
                 </Table.LinkRow>
               ))}
             </Table.Body>

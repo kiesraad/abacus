@@ -22,11 +22,11 @@ describe("PollingStationListPage", () => {
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
-      ["Nummer", "Naam", "Soort", ""],
-      ["33", "Op Rolletjes", "Mobiel", ""],
-      ["34", "Testplek", "Bijzonder", ""],
-      ["35", "Testschool", "Vaste locatie", ""],
-      ["36", "Testbuurthuis", "Vaste locatie", ""],
+      ["Nummer", "Naam", "Soort"],
+      ["33", "Op Rolletjes", "Mobiel"],
+      ["34", "Testplek", "Bijzonder"],
+      ["35", "Testschool", "Vaste locatie"],
+      ["36", "Testbuurthuis", "Vaste locatie"],
     ]);
   });
 

@@ -13,9 +13,8 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
   return (
     <Table id="polling_station_list">
       <Table.Header>
-        <Table.Column>{t("number")}</Table.Column>
-        <Table.Column>{t("polling_station.title.singular")}</Table.Column>
-        <Table.Column />
+        <Table.HeaderCell>{t("number")}</Table.HeaderCell>
+        <Table.HeaderCell>{t("polling_station.title.singular")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
         {pollingStations.map((pollingStation: PollingStation) => {
@@ -33,7 +32,6 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
                 <span>{pollingStation.name}</span>
                 {status && <Badge type={status} showIcon />}
               </Table.Cell>
-              <Table.Cell />
             </Table.LinkRow>
           );
         })}

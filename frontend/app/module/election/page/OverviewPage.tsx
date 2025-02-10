@@ -55,12 +55,11 @@ export function OverviewPage() {
           <article>
             <Table id="overview">
               <Table.Header>
-                <Table.Column>{t("election.title.singular")}</Table.Column>
-                <Table.Column>
+                <Table.HeaderCell>{t("election.title.singular")}</Table.HeaderCell>
+                <Table.HeaderCell>
                   {!isAdminOrCoordinator ? t("election.location") : t("election.level_polling_station")}
-                </Table.Column>
-                <Table.Column>{t("election_status.label")}</Table.Column>
-                <Table.Column />
+                </Table.HeaderCell>
+                <Table.HeaderCell>{t("election_status.label")}</Table.HeaderCell>
               </Table.Header>
               <Table.Body className="fs-md">
                 {electionList.map((election) => (
@@ -73,7 +72,6 @@ export function OverviewPage() {
                         userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
                       />
                     </Table.Cell>
-                    <Table.Cell />
                   </Table.LinkRow>
                 ))}
               </Table.Body>

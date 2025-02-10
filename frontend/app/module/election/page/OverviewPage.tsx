@@ -1,7 +1,6 @@
 import { To, useLocation, useNavigate } from "react-router";
 
 import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWithIcon";
-import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
 import { Election, useElectionList } from "@kiesraad/api";
@@ -49,10 +48,18 @@ export function OverviewPage() {
         </Alert>
       )}
       <main>
-        {!electionList.length ? (
-          <h2>{t("election.no_elections_added")}</h2>
-        ) : (
-          <article>
+        <article>
+          {!electionList.length ? (
+            !isAdminOrCoordinator ? (
+              <>
+                <h2 className="mb-lg">{t("election.not_ready_for_use")}</h2>
+                <p className="md form-paragraph">{t("election.please_wait_for_coordinator")}</p>
+              </>
+            ) : (
+              <h2>{t("election.no_elections_added")}</h2>
+              // TODO: To be expanded in issue #888
+            )
+          ) : (
             <Table id="overview">
               <Table.Header>
                 <Table.HeaderCell>{t("election.title.singular")}</Table.HeaderCell>
@@ -76,10 +83,9 @@ export function OverviewPage() {
                 ))}
               </Table.Body>
             </Table>
-          </article>
-        )}
+          )}
+        </article>
       </main>
-      <Footer />
     </>
   );
 }

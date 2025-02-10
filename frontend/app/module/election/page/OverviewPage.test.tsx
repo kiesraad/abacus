@@ -38,7 +38,12 @@ describe("OverviewPage", () => {
       </ElectionListProvider>,
     );
 
-    expect(await screen.findByText(/Nog geen verkiezingen ingesteld/)).toBeVisible();
+    expect(await screen.findByText(/Abacus is nog niet klaar voor gebruik/)).toBeVisible();
+    expect(
+      await screen.findByText(
+        /Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten./,
+      ),
+    ).toBeVisible();
     expect(screen.queryByRole("table")).toBeNull();
   });
 });

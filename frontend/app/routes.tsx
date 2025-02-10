@@ -12,7 +12,7 @@ import {
 } from "app/module/election";
 import { LogsHomePage } from "app/module/logs";
 import { NotAvailableInMock } from "app/module/NotAvailableInMock";
-import { PollingStationListPage, PollingStationsLayout } from "app/module/polling_stations";
+import { PollingStationListPage } from "app/module/polling_stations";
 import { UserListPage } from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
 
@@ -60,7 +60,7 @@ export const routes = createRoutesFromElements(
           }
         />
         <Route path="status" element={<ElectionStatusPage />} />
-        <Route path="polling-stations" element={<PollingStationsLayout />}>
+        <Route path="polling-stations" element={null}>
           <Route index element={<PollingStationListPage />} />
           <Route path="create" element={<PollingStationCreatePage />} />
           <Route path=":pollingStationId/update" element={<PollingStationUpdatePage />} />

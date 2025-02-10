@@ -1,12 +1,21 @@
-use super::error::AuthenticationError;
-use super::session::Sessions;
-use super::user::{ListedUser, User, Users};
-use super::{SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME};
-use axum::{extract::State, response::IntoResponse, Json};
+use super::{
+    error::AuthenticationError,
+    role::Role,
+    session::Sessions,
+    user::{User, Users},
+    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+};
+use axum::{
+    extract::{Request, State},
+    middleware::Next,
+    response::{IntoResponse, Json, Response},
+};
 use axum_extra::extract::CookieJar;
 use cookie::{Cookie, SameSite};
-use hyper::StatusCode;
+use hyper::{header::SET_COOKIE, StatusCode};
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
+use tracing::debug;
 use utoipa::ToSchema;
 
 use crate::{APIError, ErrorResponse};
@@ -32,7 +41,7 @@ impl From<&User> for LoginResponse {
 }
 
 /// Set default session cookie properties
-fn set_default_cookie_properties(cookie: &mut Cookie) {
+pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     cookie.set_path("/");
     cookie.set_http_only(true);
     cookie.set_secure(SECURE_COOKIES);
@@ -171,6 +180,34 @@ pub async fn logout(
     Ok((updated_jar, StatusCode::OK))
 }
 
+/// Middleware to extend the session lifetime
+pub async fn extend_session(State(pool): State<SqlitePool>, req: Request, next: Next) -> Response {
+    let jar = CookieJar::from_headers(req.headers());
+    let mut res = next.run(req).await;
+
+    let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
+        return res;
+    };
+
+    let sessions = Sessions::new(pool);
+
+    // extend lifetime of session and set new cookie if the session is still valid and will soon be expired
+    if let Ok(Some(session)) = sessions.extend_session(session_cookie.value()).await {
+        debug!("Session extended: {:?}", session_cookie);
+
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
+
+        debug!("Setting cookie: {:?}", cookie);
+
+        if let Ok(header_value) = cookie.encoded().to_string().parse() {
+            res.headers_mut().append(SET_COOKIE, header_value);
+        }
+    }
+
+    res
+}
+
 /// Development endpoint: create a new user (unauthenticated)
 #[cfg(debug_assertions)]
 #[utoipa::path(
@@ -192,7 +229,7 @@ pub async fn development_create_user(
 
     // Create a new user
     users
-        .create(&username, &password, Role::Administrator)
+        .create(&username, None, &password, Role::Typist)
         .await?;
 
     Ok(StatusCode::CREATED)
@@ -220,7 +257,7 @@ pub async fn development_login(
         Some(u) => u,
         None => {
             users
-                .create("user", "password", Role::Administrator)
+                .create("user", Some("Full Name"), "password", Role::Administrator)
                 .await?
         }
     };
@@ -239,7 +276,7 @@ pub async fn development_login(
 #[derive(Serialize, ToSchema)]
 #[cfg_attr(test, derive(Deserialize))]
 pub struct UserListResponse {
-    pub users: Vec<ListedUser>,
+    pub users: Vec<User>,
 }
 
 /// Lists all users
@@ -257,4 +294,38 @@ pub async fn user_list(
     Ok(Json(UserListResponse {
         users: users_repo.list().await?,
     }))
+}
+
+#[derive(Serialize, Deserialize, ToSchema)]
+pub struct CreateUserRequest {
+    pub username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub fullname: Option<String>,
+    pub temp_password: String,
+    pub role: Role,
+}
+
+/// Create a new user
+#[utoipa::path(
+    post,
+    path = "/api/user",
+    responses(
+        (status = 201, description = "User created", body = User),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+pub async fn user_create(
+    State(users_repo): State<Users>,
+    Json(create_user_req): Json<CreateUserRequest>,
+) -> Result<(StatusCode, Json<User>), APIError> {
+    let user = users_repo
+        .create(
+            &create_user_req.username,
+            create_user_req.fullname.as_deref(),
+            &create_user_req.temp_password,
+            create_user_req.role,
+        )
+        .await?;
+    Ok((StatusCode::CREATED, Json(user)))
 }

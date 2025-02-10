@@ -1,5 +1,3 @@
-use crate::APIError;
-use axum::extract::State;
 use sqlx::SqlitePool;
 use tracing::info;
 
@@ -23,7 +21,7 @@ macro_rules! load_fixtures {
 ///
 /// This list should be updated manually when a new fixture is added that
 /// needs to be loaded when seeding fixtures.
-const FIXTURES: &[Fixture] = load_fixtures!(["reset", "election_1", "users"]);
+const FIXTURES: &[Fixture] = load_fixtures!(["election_1", "users"]);
 
 /// The data contained in a fixture file
 struct Fixture {
@@ -37,11 +35,5 @@ pub async fn seed_fixture_data(pool: &SqlitePool) -> Result<(), Box<dyn std::err
         sqlx::raw_sql(fixture.data).execute(pool).await?;
     }
     info!("loaded fixtures");
-    Ok(())
-}
-
-/// API endpoint to reset the database and seed it with fixture data
-pub async fn reset_database(State(pool): State<SqlitePool>) -> Result<(), APIError> {
-    seed_fixture_data(&pool).await?;
     Ok(())
 }

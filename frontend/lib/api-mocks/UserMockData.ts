@@ -1,4 +1,4 @@
-import { ListedUser } from "@kiesraad/api";
+import { User } from "@kiesraad/api";
 
 const today = new Date();
 today.setHours(10, 20);
@@ -9,7 +9,7 @@ laterToday.setHours(13, 37);
 const created_at = new Date().toISOString();
 const updated_at = new Date().toISOString();
 
-export const userMockData: ListedUser[] = [
+export const userMockData: User[] = [
   {
     id: 1,
     username: "Sanne",

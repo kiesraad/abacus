@@ -9,6 +9,7 @@
   "close_message": "Melding sluiten",
   "contains_error": "bevat een fout",
   "contains_warning": "bevat een waarschuwing",
+  "continue": "Verder",
   "coordinator": "Coördinator",
   "counted_number": "Geteld aantal",
   "date_locale": "nl-NL",
@@ -53,7 +54,6 @@
   "totals_list": "Totaal lijst {group_number}",
   "type": "Soort",
   "typist": "Invoerder",
-  "users": "Gebruikers",
   "version": "Versie",
   "vote_count": "Aantal stemmen",
   "you_are_here": "je bent hier"

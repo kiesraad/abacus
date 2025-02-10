@@ -15,7 +15,7 @@ export function NavBarMenu() {
       </NavLink>
       <NavLink to={"/users#administratorcoordinator"}>
         <IconUsers />
-        {t("users")}
+        {t("users.users")}
       </NavLink>
       <NavLink to={"/workstations#administrator"}>
         <IconLaptop />

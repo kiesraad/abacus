@@ -21,6 +21,7 @@ pub const SECURE_COOKIES: bool = false;
 
 #[cfg(test)]
 mod tests {
+    use super::role::Role;
     use api::{ChangePasswordRequest, Credentials, LoginResponse, UserListResponse};
     use axum::{
         body::Body,
@@ -40,7 +41,7 @@ mod tests {
         let state = AppState { pool };
 
         let router = Router::new()
-            .route("/api/user", get(api::user_list))
+            .route("/api/user", get(api::user_list).post(api::user_create))
             .route("/api/user/login", post(api::login))
             .route("/api/user/logout", post(api::logout))
             .route("/api/user/whoami", get(api::whoami))
@@ -551,5 +552,38 @@ mod tests {
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: UserListResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.users.len(), 1);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_create(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user")
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        serde_json::to_vec(&CreateUserRequest {
+                            username: "test_user".to_string(),
+                            fullname: None,
+                            temp_password: "temp pass".to_string(),
+                            role: Role::Administrator,
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::CREATED);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: user::User = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.username(), "test_user");
+        assert!(result.fullname().is_none());
+        assert_eq!(result.role(), Role::Administrator);
     }
 }

@@ -216,7 +216,7 @@ impl PoliticalGroupVotes {
             &candidate_votes
                 .iter()
                 .enumerate()
-                .map(|(i, votes)| (i as u8 + 1, *votes))
+                .map(|(i, votes)| (u8::try_from(i).unwrap() + 1, *votes))
                 .collect::<Vec<_>>(),
         )
     }

@@ -113,7 +113,7 @@ pub(crate) mod tests {
             .iter()
             .enumerate()
             .map(|(i, &candidates)| PoliticalGroup {
-                number: (i + 1) as u8,
+                number: u8::try_from(i + 1).unwrap(),
                 name: format!("Political group {}", i + 1),
                 candidates: (0..candidates)
                     .map(|j| Candidate {

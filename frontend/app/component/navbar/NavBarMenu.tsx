@@ -33,16 +33,18 @@ export function NavBarMenuButton() {
   const [isMenuVisible, setMenuVisible] = React.useState(false);
 
   React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (isMenuVisible && !document.querySelector(`.${styles.navBarMenu}`)?.contains(event.target as Node)) {
-        setMenuVisible(false);
-      }
-    };
+    if (isMenuVisible) {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (!document.querySelector(`.${styles.navBarMenu}`)?.contains(event.target as Node)) {
+          setMenuVisible(false);
+        }
+      };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
   }, [isMenuVisible]);
 
   const toggleMenu = () => {

@@ -90,9 +90,16 @@ jobs:
         run: chmod a+x ../builds/backend/abacus
         if: runner.os != 'Windows'
       - name: Run Playwright e2e tests
-        run: npm run test:e2e -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: npm run test:e2e -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --reporter=html
         env:
           BACKEND_BUILD: release
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
 
   release:
     name: Release

@@ -26,13 +26,13 @@ pub struct ApportionmentResult {
 /// Contains information about the final assignment of seats for a specific political group.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct PoliticalGroupSeatAssignment {
-    /// Political group number for which this assigment applies
+    /// Political group number for which this assignment applies
     pg_number: PGNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
     /// The surplus votes that were not used to get whole seats assigned to this political group
     surplus_votes: Fraction,
-    /// Whether this group met the threshold for surplus seat assigment
+    /// Whether this group met the threshold for surplus seat assignment
     meets_surplus_threshold: bool,
     /// The number of whole seats assigned to this group
     whole_seats: u64,
@@ -314,7 +314,7 @@ fn allocate_remainder(
 }
 
 /// Assign the next remainder seat, and return which group that seat was assigned to.
-/// This assigment is done according to the rules for elections with 19 seats or more.
+/// This assignment is done according to the rules for elections with 19 seats or more.
 fn step_allocate_remainder_using_highest_averages(
     standing: &[PoliticalGroupStanding],
     remaining_seats: u64,
@@ -362,7 +362,7 @@ fn political_groups_qualifying_for_unique_highest_average<'a>(
 }
 
 /// Assign the next remainder seat, and return which group that seat was assigned to.
-/// This assigment is done according to the rules for elections with less than 19 seats.
+/// This assignment is done according to the rules for elections with less than 19 seats.
 fn step_allocate_remainder_using_highest_surplus(
     assigned_seats: &[PoliticalGroupStanding],
     remaining_seats: u64,

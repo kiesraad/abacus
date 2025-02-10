@@ -84,7 +84,10 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
     let election_routes = election_routes.route("/", post(election::election_create));
 
     let user_router = Router::new()
-        .route("/", get(authentication::user_list))
+        .route(
+            "/",
+            get(authentication::user_list).post(authentication::user_create),
+        )
         .route("/login", post(authentication::login))
         .route("/logout", post(authentication::logout))
         .route("/whoami", get(authentication::whoami))
@@ -155,6 +158,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             authentication::whoami,
             authentication::change_password,
             authentication::user_list,
+            authentication::user_create,
             election::election_list,
             election::election_create,
             election::election_details,

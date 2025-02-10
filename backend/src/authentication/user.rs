@@ -23,10 +23,14 @@ use super::{
 pub struct User {
     id: u32,
     username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     fullname: Option<String>,
     role: Role,
+    #[serde(skip)]
     password_hash: String,
-    #[schema(value_type = String, nullable = true)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
     last_activity_at: Option<DateTime<Utc>>,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
@@ -41,6 +45,16 @@ impl User {
 
     pub fn username(&self) -> &str {
         &self.username
+    }
+
+    #[cfg(test)]
+    pub fn fullname(&self) -> Option<&str> {
+        self.fullname.as_deref()
+    }
+
+    #[cfg(test)]
+    pub fn role(&self) -> Role {
+        self.role
     }
 }
 
@@ -94,24 +108,6 @@ where
     }
 }
 
-#[derive(Serialize, FromRow, ToSchema)]
-#[cfg_attr(test, derive(Deserialize))]
-pub struct ListedUser {
-    id: u32,
-    username: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    fullname: Option<String>,
-    role: Role,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
-    last_activity_at: Option<DateTime<Utc>>,
-    #[schema(value_type = String)]
-    updated_at: DateTime<Utc>,
-    #[schema(value_type = String)]
-    created_at: DateTime<Utc>,
-}
-
 pub struct Users(SqlitePool);
 
 impl Users {
@@ -155,10 +151,10 @@ impl Users {
     }
 
     /// Create a new user, save an Argon2id v19 hash of the password
-    #[allow(unused)]
     pub async fn create(
         &self,
         username: &str,
+        fullname: Option<&str>,
         password: &str,
         role: Role,
     ) -> Result<User, AuthenticationError> {
@@ -166,19 +162,20 @@ impl Users {
 
         let user = sqlx::query_as!(
             User,
-            r#"INSERT INTO users (username, password_hash, role)
-            VALUES (?, ?, ?)
+            r#"INSERT INTO users (username, fullname, password_hash, role)
+            VALUES (?, ?, ?, ?)
             RETURNING
                 id as "id: u32",
                 username,
                 fullname,
-                role,
                 password_hash,
+                role,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
             "#,
             username,
+            fullname,
             password_hash,
             role,
         )
@@ -258,13 +255,14 @@ impl Users {
         Ok(user)
     }
 
-    pub async fn list(&self) -> Result<Vec<ListedUser>, Error> {
+    pub async fn list(&self) -> Result<Vec<User>, Error> {
         let users = query_as!(
-            ListedUser,
+            User,
             r#"SELECT
                 id as "id: u32",
                 username,
                 fullname,
+                password_hash,
                 role,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
@@ -298,7 +296,7 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", "password", Role::Administrator)
+            .create("test_user", None, "password", Role::Typist)
             .await
             .unwrap();
 
@@ -318,7 +316,12 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", "password", Role::Administrator)
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Coordinator,
+            )
             .await
             .unwrap();
 
@@ -353,7 +356,12 @@ mod tests {
         let sessions = Sessions::new(pool.clone());
 
         let user = users
-            .create("test_user", "password", Role::Administrator)
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
             .await
             .unwrap();
         let session = sessions
@@ -386,7 +394,12 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", "password", Role::Administrator)
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
             .await
             .unwrap();
 
@@ -411,5 +424,23 @@ mod tests {
             authenticated_user,
             AuthenticationError::InvalidPassword
         ));
+    }
+
+    #[test(sqlx::test)]
+    async fn password_hash_does_not_serialize(pool: SqlitePool) {
+        let users = Users::new(pool.clone());
+        let user = users
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
+            .await
+            .unwrap();
+
+        let serialized_user = serde_json::to_value(user).unwrap();
+        assert_eq!(serialized_user["username"], "test_user".to_string());
+        assert!(serialized_user.get("password_hash").is_none());
     }
 }

@@ -1,7 +1,10 @@
-use super::error::AuthenticationError;
-use super::session::Sessions;
-use super::user::{ListedUser, User, Users};
-use super::{SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME};
+use super::{
+    error::AuthenticationError,
+    role::Role,
+    session::Sessions,
+    user::{User, Users},
+    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+};
 use axum::{
     extract::{Request, State},
     middleware::Next,
@@ -9,8 +12,7 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use cookie::{Cookie, SameSite};
-use hyper::header::SET_COOKIE;
-use hyper::StatusCode;
+use hyper::{header::SET_COOKIE, StatusCode};
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use tracing::debug;
@@ -227,7 +229,7 @@ pub async fn development_create_user(
 
     // Create a new user
     users
-        .create(&username, &password, Role::Administrator)
+        .create(&username, None, &password, Role::Typist)
         .await?;
 
     Ok(StatusCode::CREATED)
@@ -255,7 +257,7 @@ pub async fn development_login(
         Some(u) => u,
         None => {
             users
-                .create("user", "password", Role::Administrator)
+                .create("user", Some("Full Name"), "password", Role::Administrator)
                 .await?
         }
     };
@@ -274,7 +276,7 @@ pub async fn development_login(
 #[derive(Serialize, ToSchema)]
 #[cfg_attr(test, derive(Deserialize))]
 pub struct UserListResponse {
-    pub users: Vec<ListedUser>,
+    pub users: Vec<User>,
 }
 
 /// Lists all users
@@ -292,4 +294,38 @@ pub async fn user_list(
     Ok(Json(UserListResponse {
         users: users_repo.list().await?,
     }))
+}
+
+#[derive(Serialize, Deserialize, ToSchema)]
+pub struct CreateUserRequest {
+    pub username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub fullname: Option<String>,
+    pub temp_password: String,
+    pub role: Role,
+}
+
+/// Create a new user
+#[utoipa::path(
+    post,
+    path = "/api/user",
+    responses(
+        (status = 201, description = "User created", body = User),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+pub async fn user_create(
+    State(users_repo): State<Users>,
+    Json(create_user_req): Json<CreateUserRequest>,
+) -> Result<(StatusCode, Json<User>), APIError> {
+    let user = users_repo
+        .create(
+            &create_user_req.username,
+            create_user_req.fullname.as_deref(),
+            &create_user_req.temp_password,
+            create_user_req.role,
+        )
+        .await?;
+    Ok((StatusCode::CREATED, Json(user)))
 }

@@ -48,6 +48,7 @@ impl From<&User> for LoginResponse {
 
 #[cfg(test)]
 mod tests {
+    use super::role::Role;
     use api::{ChangePasswordRequest, Credentials, LoginResponse, UserListResponse};
     use axum::{
         body::Body,
@@ -71,11 +72,11 @@ mod tests {
         let state = AppState { pool: pool.clone() };
 
         let router = Router::new()
-            .route("/api/user", get(user_list))
-            .route("/api/user/login", post(login))
-            .route("/api/user/logout", post(logout))
-            .route("/api/user/whoami", get(whoami))
-            .route("/api/user/change-password", post(change_password))
+            .route("/api/user", get(api::user_list).post(api::user_create))
+            .route("/api/user/login", post(api::login))
+            .route("/api/user/logout", post(api::logout))
+            .route("/api/user/whoami", get(api::whoami))
+            .route("/api/user/change-password", post(api::change_password))
             .layer(middleware::from_fn_with_state(pool, extend_session));
 
         #[cfg(debug_assertions)]
@@ -638,5 +639,38 @@ mod tests {
             .unwrap();
 
         assert!(response_cookie.contains("Max-Age=1800"));
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_create(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user")
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        serde_json::to_vec(&CreateUserRequest {
+                            username: "test_user".to_string(),
+                            fullname: None,
+                            temp_password: "temp pass".to_string(),
+                            role: Role::Administrator,
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::CREATED);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: user::User = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.username(), "test_user");
+        assert!(result.fullname().is_none());
+        assert_eq!(result.role(), Role::Administrator);
     }
 }

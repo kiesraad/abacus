@@ -1,14 +1,14 @@
 import * as React from "react";
 import { useState } from "react";
 
-import { ListedUser } from "@kiesraad/api";
+import { User } from "@kiesraad/api";
 
 import { IUserCreateContext, UserCreateContext } from "./UserCreateContext";
 
 export function UserCreateContextProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<Partial<ListedUser>>({});
+  const [user, setUser] = useState<Partial<User>>({});
 
-  function updateUser(update: Partial<ListedUser>) {
+  function updateUser(update: Partial<User>) {
     setUser((user) => ({ ...user, ...update }));
   }
 

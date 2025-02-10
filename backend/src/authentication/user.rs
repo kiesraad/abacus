@@ -4,8 +4,9 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use chrono::{DateTime, Utc};
+use hyper::Method;
 use serde::{Deserialize, Serialize};
-use sqlx::{query_as, Error, FromRow, SqlitePool};
+use sqlx::{query, query_as, Error, FromRow, SqlitePool};
 use utoipa::ToSchema;
 
 use crate::{APIError, AppState};
@@ -75,7 +76,14 @@ where
             return Err(AuthenticationError::NoSessionCookie.into());
         };
 
-        Ok(users.get_by_session_key(session_cookie.value()).await?)
+        let user = users.get_by_session_key(session_cookie.value()).await?;
+
+        // As a throttling measure, we don't update the activity on GET requests
+        if parts.method != Method::GET {
+            users.update_last_activity_at(user.id()).await?;
+        }
+
+        Ok(user)
     }
 }
 
@@ -272,6 +280,16 @@ impl Users {
         .fetch_all(&self.0)
         .await?;
         Ok(users)
+    }
+
+    pub async fn update_last_activity_at(&self, user_id: u32) -> Result<(), Error> {
+        query!(
+            r#"UPDATE users SET last_activity_at = CURRENT_TIMESTAMP WHERE id = ?"#,
+            user_id,
+        )
+        .fetch_all(&self.0)
+        .await?;
+        Ok(())
     }
 }
 

@@ -185,6 +185,45 @@ impl Users {
         Ok(user)
     }
 
+    /// Update a user
+    pub async fn update(
+        &self,
+        user_id: u32,
+        username: String,
+        fullname: Option<&str>,
+        role: Role,
+    ) -> Result<User, AuthenticationError> {
+        let updated_user = sqlx::query_as!(
+            User,
+            r#"
+              UPDATE
+                users
+              SET
+                username = ?,
+                fullname = ?,
+                role = ?
+              WHERE id = ?
+            RETURNING
+                id as "id: u32",
+                username,
+                fullname,
+                password_hash,
+                role,
+                last_activity_at as "last_activity_at: _",
+                updated_at as "updated_at: _",
+                created_at as "created_at: _"
+            "#,
+            username,
+            fullname,
+            role,
+            user_id
+        )
+        .fetch_one(&self.0)
+        .await?;
+
+        Ok(updated_user)
+    }
+
     /// Update a user's password
     pub async fn update_password(
         &self,

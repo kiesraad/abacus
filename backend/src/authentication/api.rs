@@ -6,7 +6,7 @@ use super::{
     SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
 };
 use axum::{
-    extract::{Request, State},
+    extract::{Path, Request, State},
     middleware::Next,
     response::{IntoResponse, Json, Response},
 };
@@ -306,6 +306,15 @@ pub struct CreateUserRequest {
     pub role: Role,
 }
 
+#[derive(Serialize, Deserialize, ToSchema)]
+pub struct UpdateUserRequest {
+    pub username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub fullname: Option<String>,
+    pub role: Role,
+}
+
 /// Create a new user
 #[utoipa::path(
     post,
@@ -328,4 +337,30 @@ pub async fn user_create(
         )
         .await?;
     Ok((StatusCode::CREATED, Json(user)))
+}
+
+/// Update a user
+#[utoipa::path(
+    put,
+    path = "/api/user/{user_id}",
+    responses(
+        (status = 200, description = "User updated", body = User),
+        (status = 404, description = "User not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+pub async fn user_update(
+    State(users_repo): State<Users>,
+    Path(user_id): Path<u32>,
+    Json(update_user_req): Json<UpdateUserRequest>,
+) -> Result<Json<User>, APIError> {
+    let user = users_repo
+        .update(
+            user_id,
+            update_user_req.username,
+            update_user_req.fullname.as_deref(),
+            update_user_req.role,
+        )
+        .await?;
+    Ok(Json(user))
 }

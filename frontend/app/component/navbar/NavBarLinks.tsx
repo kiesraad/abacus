@@ -76,7 +76,7 @@ function TopLevelManagementLinks() {
   return (
     <>
       <NavLink to={"/elections#administrator"}>{t("election.title.plural")}</NavLink>
-      <NavLink to={"/users#administratorcoordinator"}>{t("users")}</NavLink>
+      <NavLink to={"/users#administratorcoordinator"}>{t("users.users")}</NavLink>
       <NavLink to={"/workstations#administrator"}>{t("workstations.workstations")}</NavLink>
       <NavLink to={"/logs#administratorcoordinator"}>{t("logs")}</NavLink>
     </>

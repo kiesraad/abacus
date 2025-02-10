@@ -2,6 +2,7 @@
 use axum::http::StatusCode;
 use axum::{
     extract::FromRef,
+    middleware,
     routing::{get, post},
     Router,
 };
@@ -91,7 +92,11 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/login", post(authentication::login))
         .route("/logout", post(authentication::logout))
         .route("/whoami", get(authentication::whoami))
-        .route("/change-password", post(authentication::change_password));
+        .route("/change-password", post(authentication::change_password))
+        .layer(middleware::from_fn_with_state(
+            pool.clone(),
+            authentication::extend_session,
+        ));
 
     #[cfg(debug_assertions)]
     let user_router = user_router

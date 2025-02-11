@@ -1,88 +1,20 @@
 import { describe, expect, test } from "vitest";
 
+import { PoliticalGroup } from "@kiesraad/api";
 import { render, screen } from "@kiesraad/test";
 
 import { ApportionmentTable } from "./ApportionmentTable";
+import { apportionment, election } from "./test-data/19-or-more-seats";
 
 describe("ApportionmentTable", () => {
   test("renders a table with the apportionment", async () => {
     render(
       <ApportionmentTable
-        final_standing={[
-          {
-            pg_number: 1,
-            votes_cast: 66,
-            surplus_votes: {
-              integer: 0,
-              numerator: 14,
-              denominator: 29,
-            },
-            meets_surplus_threshold: true,
-            whole_seats: 19,
-            rest_seats: 0,
-            total_seats: 19,
-          },
-          {
-            pg_number: 2,
-            votes_cast: 34,
-            surplus_votes: {
-              integer: 2,
-              numerator: 28,
-              denominator: 29,
-            },
-            meets_surplus_threshold: true,
-            whole_seats: 9,
-            rest_seats: 1,
-            total_seats: 10,
-          },
-        ]}
-        political_groups={[
-          {
-            number: 1,
-            name: "Political Group A",
-            candidates: [
-              {
-                number: 1,
-                initials: "A.",
-                first_name: "Alice",
-                last_name: "Foo",
-                locality: "Amsterdam",
-                gender: "Female",
-              },
-              {
-                number: 2,
-                initials: "C.",
-                first_name: "Charlie",
-                last_name: "Doe",
-                locality: "Rotterdam",
-              },
-            ],
-          },
-          {
-            number: 2,
-            name: "Political Group B",
-            candidates: [
-              {
-                number: 1,
-                initials: "A.",
-                first_name: "Alice",
-                last_name: "Foo",
-                locality: "Amsterdam",
-                gender: "Female",
-              },
-              {
-                number: 2,
-                initials: "C.",
-                first_name: "Charlie",
-                last_name: "Doe",
-                locality: "Rotterdam",
-              },
-            ],
-          },
-        ]}
-        whole_seats={28}
-        rest_seats={1}
-        seats={29}
+        final_standing={apportionment.final_standing}
+        political_groups={election.political_groups as PoliticalGroup[]}
+        whole_seats={apportionment.whole_seats}
+        rest_seats={apportionment.rest_seats}
+        seats={apportionment.seats}
       />,
     );
 
@@ -90,9 +22,12 @@ describe("ApportionmentTable", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Volle zetels", "Restzetels", "Totaal zetels", ""],
-      ["1", "Political Group A", "19", "-", "19", ""],
-      ["2", "Political Group B", "9", "1", "10", ""],
-      ["", "Totaal", "28", "1", "29", ""],
+      ["1", "Political Group A", "11", "1", "12", ""],
+      ["2", "Political Group B", "5", "1", "6", ""],
+      ["3", "Political Group C", "1", "-", "1", ""],
+      ["4", "Political Group D", "1", "1", "2", ""],
+      ["5", "Political Group E", "1", "1", "2", ""],
+      ["", "Totaal", "19", "4", "23", ""],
     ]);
   });
 });

@@ -1,4 +1,5 @@
 import { ErrorModal } from "app/component/error";
+import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 
 import { ApiError, PoliticalGroup } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -15,6 +16,7 @@ import {
   KeyboardKeys,
 } from "@kiesraad/ui";
 
+import { formValuesToValues } from "./candidatesVotesValues";
 import { useCandidateVotes } from "./useCandidateVotes";
 
 export interface CandidatesVotesFormProps {
@@ -22,12 +24,22 @@ export interface CandidatesVotesFormProps {
 }
 
 export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
-  const { error, formRef, onSubmit, currentValues, setValues, formSection, status, setAcceptWarnings, defaultProps } =
-    useCandidateVotes(group.number);
+  const {
+    error,
+    formRef,
+    onSubmit,
+    currentValues,
+    setValues,
+    formSection,
+    status,
+    setAcceptWarnings,
+    defaultProps,
+    pollingStationResults,
+  } = useCandidateVotes(group.number);
 
   const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
 
-  const missingTotalError = currentValues.candidate_votes.some((v) => v !== "") && currentValues.total == "0";
+  const missingTotalError = currentValues.candidate_votes.some((v) => v !== "") && !currentValues.total;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,10 +58,14 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       title={`${t("list")} ${group.number} - ${group.name}`}
     >
       {error instanceof ApiError && <ErrorModal error={error} />}
-      {/* <PollingStationFormNavigation
+      <PollingStationFormNavigation
         onSubmit={onSubmit}
-        currentValues={formValuesToValues(currentValues)}
-      /> */}
+        currentValues={{
+          political_group_votes: pollingStationResults.political_group_votes.map((pg) =>
+            pg.number !== group.number ? pg : formValuesToValues(currentValues),
+          ),
+        }}
+      />
       {formSection.isSaved && formSection.errors.length > 0 && (
         <Feedback id="feedback-error" type="error" data={formSection.errors.map((error) => error.code)} />
       )}

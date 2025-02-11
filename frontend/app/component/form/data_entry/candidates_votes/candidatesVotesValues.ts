@@ -11,7 +11,7 @@ export type CandidateVotesValues = PoliticalGroupVotes;
 export function valuesToFormValues(values: PoliticalGroupVotes): CandidateVotesFormValues {
   return {
     number: values.number,
-    total: values.total.toString(),
+    total: formatNumber(values.total),
     candidate_votes: values.candidate_votes.map((cv) => formatNumber(cv.votes)),
   };
 }
@@ -19,7 +19,7 @@ export function valuesToFormValues(values: PoliticalGroupVotes): CandidateVotesF
 export function formValuesToValues(formData: CandidateVotesFormValues): PoliticalGroupVotes {
   return {
     number: formData.number,
-    total: parseInt(formData.total),
+    total: deformatNumber(formData.total),
     candidate_votes: formData.candidate_votes.map((votes, index) => ({
       number: index + 1,
       votes: deformatNumber(votes),

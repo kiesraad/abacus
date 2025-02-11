@@ -447,7 +447,7 @@ describe("Polling Station data entry integration tests", () => {
       await expectBlockerModal();
     });
 
-    test.only("Navigating with saved changes goes to correct form", async () => {
+    test("Navigating with saved changes goes to correct form", async () => {
       const router = renderWithRouter();
       await startPollingStationInput(router);
       await expectRecountedForm();

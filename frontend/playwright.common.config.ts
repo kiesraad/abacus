@@ -16,7 +16,8 @@ const commonConfig: PlaywrightTestConfig = defineConfig({
   reporter: "list",
   fullyParallel: true,
   use: {
-    trace: "retain-on-failure",
+    // Local runs don't have retries, so we have a trace of each failure. On CI we do have retries, so keeping the trace of the first failure allows us to investigate flaky tests.
+    trace: "retain-on-first-failure",
     testIdAttribute: "id",
   },
   projects: [

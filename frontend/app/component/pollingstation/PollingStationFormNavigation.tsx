@@ -7,6 +7,7 @@ import { Button, Modal } from "@kiesraad/ui";
 import { SubmitCurrentFormOptions } from "../form/data_entry/state/types";
 import { useDataEntryContext } from "../form/data_entry/state/useDataEntryContext";
 
+//TODO: rename to DataEntryNavigation
 export interface PollingStationFormNavigationProps {
   onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>;
   currentValues: Partial<PollingStationResults>;

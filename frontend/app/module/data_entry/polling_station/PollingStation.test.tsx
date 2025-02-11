@@ -447,7 +447,7 @@ describe("Polling Station data entry integration tests", () => {
       await expectBlockerModal();
     });
 
-    test("Navigating with saved changes goes to correct form", async () => {
+    test.only("Navigating with saved changes goes to correct form", async () => {
       const router = renderWithRouter();
       await startPollingStationInput(router);
       await expectRecountedForm();
@@ -486,7 +486,8 @@ describe("Polling Station data entry integration tests", () => {
 
       await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
       //TODO: this doesnt happen
-      //await expectRecountedForm();
+
+      await expectRecountedForm();
     });
 
     test("Changing recount generates an error for differences page", async () => {

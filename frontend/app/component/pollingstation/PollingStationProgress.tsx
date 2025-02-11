@@ -9,6 +9,8 @@ import { isFormSectionEmpty } from "../form/data_entry/state/dataEntryUtils";
 import { FormSection, FormSectionId } from "../form/data_entry/state/types";
 import { useDataEntryContext } from "../form/data_entry/state/useDataEntryContext";
 
+//TODO: Rename to DataEntryProgress
+
 export function PollingStationProgress() {
   const { pollingStationId } = useParams();
   const { election } = useElection();

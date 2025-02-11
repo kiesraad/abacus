@@ -1,6 +1,6 @@
 # Invoer eerste zitting
 
-## Het GSB voert de PV's en eventuele SB corrigenda (DSO) in de applicatie in (vlieger)
+## Het GSB voert de tellingen in de applicatie in (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
 
@@ -19,7 +19,6 @@ __Hoofdscenario:__
 3. De coördinator sluit de invoer af.
 4. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
 5. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
-6. De applicatie genereert de PV's en EML's etc.
 
 __Uitbreidingen:__  
 4a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
@@ -28,7 +27,6 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- Moet de applicatie een preview van het gegenereerde PV tonen, zodat de coördinator die kan controleren?
 - Welke controles willen we nog nadat de invoer is afgesloten? Of zijn die controles onderdeel van het afsluiten?
 
 

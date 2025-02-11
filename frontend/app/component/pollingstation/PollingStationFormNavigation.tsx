@@ -1,4 +1,4 @@
-import { useBlocker, useNavigate } from "react-router";
+import { useBlocker } from "react-router";
 
 import { PollingStationResults } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
@@ -13,7 +13,6 @@ export interface PollingStationFormNavigationProps {
 }
 
 export function PollingStationFormNavigation({ onSubmit, currentValues }: PollingStationFormNavigationProps) {
-  const navigate = useNavigate();
   const { status, election, pollingStationId, formState, setCache, entryNumber, onDeleteDataEntry } =
     useDataEntryContext();
 
@@ -58,18 +57,14 @@ export function PollingStationFormNavigation({ onSubmit, currentValues }: Pollin
     return null;
   }
 
-  // save when navigation within data entry flow
-  async function onSave() {
-    await onSubmit({ continueToNextSection: false });
-
-    if (blocker.location) {
-      void navigate(blocker.location.pathname);
-    }
-
-    if (blocker.reset) {
+  // when save is chosen in the abort dialog
+  const onAbortModalSave = async () => {
+    if (await onSubmit({ continueToNextSection: false })) {
+      blocker.proceed();
+    } else {
       blocker.reset();
     }
-  }
+  };
 
   // when unsaved changes are detected and navigating within the data entry flow
   if (isPartOfDataEntryFlow(blocker.location.pathname)) {
@@ -91,8 +86,9 @@ export function PollingStationFormNavigation({ onSubmit, currentValues }: Pollin
         <nav>
           <Button
             size="lg"
+            type="button"
             onClick={() => {
-              void onSave();
+              void onAbortModalSave();
             }}
           >
             {t("save_changes")}
@@ -100,6 +96,7 @@ export function PollingStationFormNavigation({ onSubmit, currentValues }: Pollin
           <Button
             size="lg"
             variant="secondary"
+            type="button"
             onClick={() => {
               blocker.proceed();
             }}
@@ -110,15 +107,6 @@ export function PollingStationFormNavigation({ onSubmit, currentValues }: Pollin
       </Modal>
     );
   }
-
-  // when save is chosen in the abort dialog
-  const onAbortModalSave = async () => {
-    if (await onSubmit({ continueToNextSection: false })) {
-      blocker.proceed();
-    } else {
-      blocker.reset();
-    }
-  };
 
   // when discard is chosen in the abort dialog
   const onAbortModalDelete = async () => {
@@ -144,6 +132,7 @@ export function PollingStationFormNavigation({ onSubmit, currentValues }: Pollin
           onClick={() => {
             void onAbortModalSave();
           }}
+          type="button"
           disabled={status === "saving"}
         >
           {t("data_entry.abort.save_input")}
@@ -154,6 +143,7 @@ export function PollingStationFormNavigation({ onSubmit, currentValues }: Pollin
           onClick={() => {
             void onAbortModalDelete();
           }}
+          type="button"
           disabled={status === "deleting"}
         >
           {t("data_entry.abort.discard_input")}

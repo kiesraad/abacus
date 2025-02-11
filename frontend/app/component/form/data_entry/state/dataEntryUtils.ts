@@ -428,8 +428,6 @@ export function updateFormStateAfterSubmit(
     currentFormSection.isSaved = saved;
     //store that this section has been submitted, this resets on each request
     currentFormSection.isSubmitted = saved;
-    //flag ignore warnings
-    currentFormSection.acceptWarnings = false;
     // There are no changes after a successful submit
     currentFormSection.hasChanges = false;
   }

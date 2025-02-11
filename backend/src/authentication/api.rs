@@ -273,8 +273,7 @@ pub async fn development_login(
     Ok((updated_jar, Json(LoginResponse::from(&user))))
 }
 
-#[derive(Serialize, ToSchema)]
-#[cfg_attr(test, derive(Deserialize))]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct UserListResponse {
     pub users: Vec<User>,
 }

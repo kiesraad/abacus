@@ -4,7 +4,6 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use chrono::{DateTime, Utc};
-use hyper::Method;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, Error, FromRow, SqlitePool};
 use utoipa::ToSchema;
@@ -50,6 +49,29 @@ impl User {
         &self.username
     }
 
+    pub fn last_activity_at(&self) -> Option<DateTime<Utc>> {
+        self.last_activity_at
+    }
+
+    /// Updates the `last_activity_at` field, but first checks if it has been
+    /// longer than `MIN_UPDATE_LAST_ACTIVITY_AT_SECS`, to prevent excessive
+    /// database writes.
+    pub async fn update_last_activity_at(&self, users: &Users) -> Result<(), sqlx::Error> {
+        match self.last_activity_at {
+            Some(last_activity_at)
+                if chrono::offset::Utc::now()
+                    .signed_duration_since(last_activity_at)
+                    .num_seconds()
+                    > MIN_UPDATE_LAST_ACTIVITY_AT_SECS =>
+            { /* Do nothing */ }
+            None | Some(_) => {
+                users.update_last_activity_at(self.id()).await?;
+            }
+        }
+
+        Ok(())
+    }
+
     #[cfg(test)]
     pub fn fullname(&self) -> Option<&str> {
         self.fullname.as_deref()
@@ -79,23 +101,7 @@ where
         };
 
         let user = users.get_by_session_key(session_cookie.value()).await?;
-
-        // Update the last_activity_at field when the method is something other than GET
-        // We also only update if it hasn't been updated in a while
-        if parts.method != Method::GET {
-            match user.last_activity_at {
-                Some(last_activity_at)
-                    if chrono::offset::Utc::now()
-                        .signed_duration_since(last_activity_at)
-                        .num_seconds()
-                        > MIN_UPDATE_LAST_ACTIVITY_AT_SECS =>
-                { /* Do nothing */ }
-                None | Some(_) => {
-                    users.update_last_activity_at(user.id()).await?;
-                }
-            }
-        }
-
+        user.update_last_activity_at(&users).await?;
         Ok(user)
     }
 }
@@ -121,7 +127,10 @@ where
         };
 
         match users.get_by_session_key(session_cookie.value()).await {
-            Ok(user) => Ok(Some(user)),
+            Ok(user) => {
+                user.update_last_activity_at(&users).await?;
+                Ok(Some(user))
+            }
             Err(AuthenticationError::UserNotFound)
             | Err(AuthenticationError::SessionKeyNotFound) => Ok(None),
             Err(e) => Err(e.into()),

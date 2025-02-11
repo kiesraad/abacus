@@ -31,6 +31,8 @@ test.describe("authentication", () => {
     await page.getByLabel("Wachtwoord").fill(password);
     await page.getByRole("button", { name: "Inloggen" }).click();
 
+    await page.waitForURL("/account/setup");
+
     // TODO: use new page object when we know which page to render
     await expect(page.getByRole("alert")).toContainText("Inloggen gelukt");
   });

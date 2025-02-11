@@ -15,7 +15,7 @@
   "api_error": {
     "ApportionmentNotAvailableUntilDataEntryFinalised": "De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd",
     "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
-    "DrawingOfLotsRequired": "Loting is noodzakelijk",
+    "DrawingOfLotsRequired": "Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus",
     "EntryNotFound": "De invoer is niet gevonden",
     "EntryNotUnique": "Deze invoer bestaat al",
     "EntryNumberNotSupported": "Ongeldige invoer voor dit stembureau",

@@ -28,6 +28,8 @@ pub struct User {
     fullname: Option<String>,
     role: Role,
     #[serde(skip)]
+    needs_password_change: bool,
+    #[serde(skip)]
     password_hash: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = String, nullable = false)]
@@ -169,6 +171,7 @@ impl Users {
                 username,
                 fullname,
                 password_hash,
+                needs_password_change,
                 role,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
@@ -209,6 +212,7 @@ impl Users {
                 username,
                 fullname,
                 password_hash,
+                needs_password_change,
                 role,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
@@ -232,7 +236,7 @@ impl Users {
         let password_hash = hash_password(new_password)?;
 
         sqlx::query!(
-            r#"UPDATE users SET password_hash = ? WHERE id = ?"#,
+            r#"UPDATE users SET password_hash = ?, needs_password_change = FALSE WHERE id = ?"#,
             password_hash,
             user_id
         )
@@ -249,9 +253,8 @@ impl Users {
         temp_password: &str,
     ) -> Result<(), AuthenticationError> {
         let password_hash = hash_password(temp_password)?;
-
         sqlx::query!(
-            r#"UPDATE users SET password_hash = ? WHERE id = ?"#,
+            r#"UPDATE users SET password_hash = ?, needs_password_change = TRUE WHERE id = ?"#,
             password_hash,
             user_id
         )
@@ -275,6 +278,7 @@ impl Users {
                 fullname,
                 role,
                 password_hash,
+                needs_password_change,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
@@ -299,6 +303,7 @@ impl Users {
                 fullname,
                 role,
                 password_hash,
+                needs_password_change,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
@@ -320,6 +325,7 @@ impl Users {
                 username,
                 fullname,
                 password_hash,
+                needs_password_change,
                 role,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",

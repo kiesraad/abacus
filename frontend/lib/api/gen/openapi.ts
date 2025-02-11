@@ -545,9 +545,8 @@ export interface SummaryDifferencesCounts {
 }
 
 export interface UpdateUserRequest {
-  fullname?: string;
-  role: Role;
-  username: string;
+  fullname: string;
+  temp_password: string;
 }
 
 /**

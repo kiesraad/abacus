@@ -7,7 +7,7 @@ __Niveau:__ hoog-over, vlieger, 🪁
 __Precondities:__
 
 - [De beheerder en de coördinator richten de applicatie in](./Installatie-en-inrichting-applicatie.md#de-beheerder-en-de-coördinator-richten-de-applicatie-in-vlieger)
-- [Het GSB voert de PV's en eventuele SB corrigenda (DSO) in de applicatie in](./Invoer-eerste-zitting.md#het-gsb-voert-de-pvs-en-eventuele-sb-corrigenda-dso-in-de-applicatie-in-vlieger)
+- [Het GSB voert de PV's en eventuele SB corrigenda (DSO) in de applicatie in](./invoer-eerste-zitting.md#het-gsb-voert-de-pvs-en-eventuele-sb-corrigenda-dso-in-de-applicatie-in-vlieger)
 
 ### Hoofdscenario en uitbreidingen
 

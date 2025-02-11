@@ -29,7 +29,7 @@ _Niveau:_ hoog-over, wolk, ☁️
 
 1. Het GSB opent de zitting.
 2. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatniveau en vult Na31-2 Bijlage 2 in.
-3. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./Invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
+3. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
 4. [Het GSB genereert het concept-PV en het elektronisch bestand in de applicatie.](./gsb-genereren-bestanden.md#het-gsb-genereert-het-concept-pv-en-het-elektronisch-bestand-in-de-applicatie-zee)
 5. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 6. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, eventuele bezwaren noteren, ondertekenen. En sluit daarmee de zitting.
@@ -91,7 +91,7 @@ __Hoofdscenario:__
 
 1. Het GSB opent de zitting.
 2. (voor elk te hertellen stembureau) Het GSB stelt de uitslag van een stembureau opnieuw vast.
-3. (voor elk herteld stembureau met gewijzigde uitslag) [Het GSB voert de corrigendum PV's in de applicatie in.](./Invoer-tweede-zitting.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in-vlieger)
+3. (voor elk herteld stembureau met gewijzigde uitslag) [Het GSB voert de corrigendum PV's in de applicatie in.](./invoer-tweede-zitting.md#het-gsb-voert-de-corrigendum-pvs-in-de-applicatie-in-vlieger)
 4. Het GSB sluit de zitting.
 5. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
 

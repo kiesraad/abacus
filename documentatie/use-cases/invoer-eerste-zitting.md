@@ -78,9 +78,9 @@ __Hoofdscenario:__
 2. De applicatie stelt vast dat er geen eerdere invoer voor het stembureau is opgeslagen.
 3. De invoerder vult de resultaten van de telling in.
 4. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
-   de [validatieregels voor fouten](./Validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten)
+   de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten)
 5. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
-   de [plausibiliteitschecks](./Validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
+   de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
 6. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
 
 __Uitbreidingen:__  
@@ -146,7 +146,7 @@ __Niveau:__ subfunctie, vis, 🐟
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ De controles geven een foutmelding vanwege de [validatieregels voor fouten](./Validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten).
+__Trigger:__ De controles geven een foutmelding vanwege de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten).
 
 *Foutmelding*: De ingevoerde waardes kunnen niet correct zijn. Bijvoorbeeld: het totaal van de stemmen op een lijst komt niet overeen met de som van de stemmen van de kandidaten op die lijst.
 
@@ -176,7 +176,7 @@ __Niveau:__ subfunctie, vis, 🐟
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ De controles geven een waarschuwing vanwege de [plausibiliteitschecks](./Validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
+__Trigger:__ De controles geven een waarschuwing vanwege de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
 
 *Waarschuwing*: De ingevoerde waardes zijn mogelijk niet correct. Bijvoorbeeld: er is een groot aantal blanco stemmen of de tweede invoer klopt niet met de eerste invoer.
 

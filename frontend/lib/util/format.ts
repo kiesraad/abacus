@@ -6,22 +6,22 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
 
 export function formatNumber(s: string | number | null | undefined | readonly string[]) {
   if (typeof s !== "string" && typeof s !== "number") return "";
-  let result = `${s}`.replace(/\D/g, "");
-  if (result === "") return "";
-  result = numberFormatter.format(Number(result));
-  return result;
+  const result = `${s}`.replace(/\D/g, "");
+  if (result === "") {
+    return "";
+  } else {
+    return numberFormatter.format(Number(result));
+  }
 }
 
 export function deformatNumber(s: string) {
-  const separator = numberFormatter.format(11111).replace(/\p{Number}/gu, "");
-  const escapedSeparator = separator.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
-
-  let cleaned = s.replace(new RegExp(escapedSeparator, "g"), "");
-  // Make sure empty value is converted to 0 instead of null
+  const cleaned = s.replace(/[.]/g, "");
   if (cleaned == "") {
-    cleaned = "0";
+    // An empty value should be parsed as 0
+    return 0;
+  } else {
+    return parseInt(cleaned);
   }
-  return parseInt(cleaned);
 }
 
 export function validateNumberString(s: string | null | undefined) {

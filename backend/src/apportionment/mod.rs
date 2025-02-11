@@ -5,8 +5,7 @@ use utoipa::ToSchema;
 use crate::election::PGNumber;
 use crate::{data_entry::PoliticalGroupVotes, summary::ElectionSummary};
 
-pub use self::api::*;
-pub use self::fraction::*;
+pub use self::{api::*, fraction::*};
 
 mod api;
 mod fraction;

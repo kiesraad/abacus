@@ -10,7 +10,7 @@ use crate::AppState;
 use super::{
     error::AuthenticationError,
     util::{create_new_session_key, get_expires_at},
-    SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+    SESSION_COOKIE_NAME, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME,
 };
 
 /// A session object, corresponds to a row in the sessions table
@@ -46,6 +46,12 @@ impl Session {
     #[cfg(test)]
     pub(super) fn session_key(&self) -> &str {
         &self.session_key
+    }
+
+    /// Get the session expiration time
+    #[cfg(test)]
+    pub(super) fn expires_at(&self) -> DateTime<Utc> {
+        self.expires_at
     }
 
     /// Get a cookie containing this session key
@@ -136,6 +142,39 @@ impl Sessions {
 
         Ok(())
     }
+
+    pub(super) async fn extend_session(
+        &self,
+        session_key: &str,
+    ) -> Result<Option<Session>, AuthenticationError> {
+        let new_expires_at = get_expires_at(SESSION_LIFE_TIME)?;
+        let min_life_time = get_expires_at(SESSION_MIN_LIFE_TIME)?;
+        let now = Utc::now();
+
+        let session = sqlx::query_as!(
+            Session,
+            r#"
+          UPDATE sessions
+          SET expires_at = ?
+          WHERE expires_at < ?
+          AND session_key = ?
+          AND expires_at > ?
+          RETURNING
+              session_key,
+              user_id as "user_id: u32",
+              expires_at as "expires_at: _",
+              created_at as "created_at: _"
+          "#,
+            new_expires_at,
+            min_life_time,
+            session_key,
+            now
+        )
+        .fetch_optional(&self.0)
+        .await?;
+
+        Ok(session)
+    }
 }
 
 impl FromRef<AppState> for Sessions {
@@ -193,5 +232,30 @@ mod test {
         let session_from_db = sessions.get_by_key(session.session_key()).await.unwrap();
 
         assert_eq!(None, session_from_db);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_extend_session(pool: SqlitePool) {
+        let sessions = Sessions::new(pool);
+
+        let session: crate::authentication::session::Session = sessions
+            .create(1, TimeDelta::seconds(60 * 60 * 60))
+            .await
+            .unwrap();
+        let session_from_db = sessions
+            .extend_session(session.session_key())
+            .await
+            .unwrap();
+        assert_eq!(session_from_db, None);
+
+        let session = sessions.create(1, TimeDelta::seconds(60)).await.unwrap();
+        let session_from_db = sessions
+            .extend_session(session.session_key())
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(session.user_id(), session_from_db.user_id());
+        assert_eq!(session.session_key(), session_from_db.session_key());
+        assert!(session.expires_at() < session_from_db.expires_at());
     }
 }

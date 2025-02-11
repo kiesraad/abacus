@@ -2089,12 +2089,12 @@
         "properties": {
           "meets_surplus_threshold": {
             "type": "boolean",
-            "description": "Whether this group met the threshold for surplus seat assigment"
+            "description": "Whether this group met the threshold for surplus seat assignment"
           },
           "pg_number": {
             "type": "integer",
             "format": "int32",
-            "description": "Political group number for which this assigment applies",
+            "description": "Political group number for which this assignment applies",
             "minimum": 0
           },
           "rest_seats": {

@@ -9,7 +9,7 @@ import { PageTitle } from "@kiesraad/ui";
 import cls from "./ApportionmentPage.module.css";
 
 export function ApportionmentWholeSeatsPage() {
-  const { apportionment, election_summary } = useApportionment();
+  const { apportionment } = useApportionment();
 
   return (
     <>
@@ -24,11 +24,7 @@ export function ApportionmentWholeSeatsPage() {
           <div>
             <h2 className={cls.table_title}>{t("apportionment.how_often_is_quota_met")}</h2>
             <span className={cls.table_information}>{t("apportionment.whole_seats_information")}</span>
-            <WholeSeatsTable
-              final_standing={apportionment.final_standing}
-              quota={apportionment.quota}
-              political_group_votes={election_summary.political_group_votes}
-            />
+            <WholeSeatsTable final_standing={apportionment.final_standing} quota={apportionment.quota} />
           </div>
 
           <div>

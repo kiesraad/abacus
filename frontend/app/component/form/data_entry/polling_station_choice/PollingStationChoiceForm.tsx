@@ -150,9 +150,13 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
             </span>
           </summary>
           <h2 className={cls.formTitle}>{t("polling_station_choice.choose_polling_station")}</h2>
-          {!pollingStationsForDataEntry.length ? (
+          {!pollingStations.length ? (
             <Alert type="error" variant="small">
               <p>{t("polling_station_choice.no_polling_stations_found")}</p>
+            </Alert>
+          ) : !pollingStationsForDataEntry.length ? (
+            <Alert type="notify" variant="small">
+              <p>{t("polling_station_choice.all_polling_stations_filled_in_twice")}</p>
             </Alert>
           ) : (
             <PollingStationsList pollingStations={pollingStationsForDataEntry} />

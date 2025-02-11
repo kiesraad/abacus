@@ -4,16 +4,15 @@ import { PollingStationResults } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Button, Modal } from "@kiesraad/ui";
 
-import { SubmitCurrentFormOptions } from "../form/data_entry/state/types";
-import { useDataEntryContext } from "../form/data_entry/state/useDataEntryContext";
+import { SubmitCurrentFormOptions } from "./state/types";
+import { useDataEntryContext } from "./state/useDataEntryContext";
 
-//TODO: rename to DataEntryNavigation
-export interface PollingStationFormNavigationProps {
+export interface DataEntryNavigationProps {
   onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>;
   currentValues: Partial<PollingStationResults>;
 }
 
-export function PollingStationFormNavigation({ onSubmit, currentValues }: PollingStationFormNavigationProps) {
+export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNavigationProps) {
   const { status, election, pollingStationId, formState, setCache, entryNumber, onDeleteDataEntry } =
     useDataEntryContext();
 

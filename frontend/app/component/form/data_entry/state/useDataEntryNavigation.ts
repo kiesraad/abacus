@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
-import { getBaseUrl, getUrlForFormSectionID } from "app/component/pollingstation/utils";
-
 import { Election } from "@kiesraad/api";
 
+import { getBaseUrl, getUrlForFormSectionID } from "../utils";
 import { DataEntryDispatch, DataEntryState } from "./types";
 
 export default function useDataEntryNavigation(

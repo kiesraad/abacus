@@ -17,10 +17,10 @@ import {
   useFormKeyboardNavigation,
 } from "@kiesraad/ui";
 
-import { getUrlForFormSectionID } from "../../../pollingstation/utils";
 import { getPollingStationSummary, PollingStationFormSectionStatus } from "../state/dataEntryUtils";
 import { FormSectionId } from "../state/types";
 import { useDataEntryContext } from "../state/useDataEntryContext";
+import { getUrlForFormSectionID } from "../utils";
 
 export function CheckAndSaveForm() {
   const formRef = React.useRef<HTMLFormElement>(null);

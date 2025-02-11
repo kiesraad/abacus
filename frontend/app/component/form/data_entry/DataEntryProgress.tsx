@@ -5,13 +5,11 @@ import { useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { MenuStatus, ProgressList } from "@kiesraad/ui";
 
-import { isFormSectionEmpty } from "../form/data_entry/state/dataEntryUtils";
-import { FormSection, FormSectionId } from "../form/data_entry/state/types";
-import { useDataEntryContext } from "../form/data_entry/state/useDataEntryContext";
+import { isFormSectionEmpty } from "./state/dataEntryUtils";
+import { FormSection, FormSectionId } from "./state/types";
+import { useDataEntryContext } from "./state/useDataEntryContext";
 
-//TODO: Rename to DataEntryProgress
-
-export function PollingStationProgress() {
+export function DataEntryProgress() {
   const { pollingStationId } = useParams();
   const { election } = useElection();
 

@@ -1,5 +1,4 @@
 import { ErrorModal } from "app/component/error";
-import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 
 import { ApiError } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -16,6 +15,7 @@ import {
   KeyboardKeys,
 } from "@kiesraad/ui";
 
+import { DataEntryNavigation } from "../DataEntryNavigation";
 import { formValuesToValues } from "./differencesValues";
 import { useDifferences } from "./useDifferences";
 
@@ -34,7 +34,7 @@ export function DifferencesForm() {
       id="differences_form"
       title={t("differences.differences_form_title")}
     >
-      <PollingStationFormNavigation
+      <DataEntryNavigation
         onSubmit={onSubmit}
         currentValues={{ differences_counts: formValuesToValues(currentValues) }}
       />

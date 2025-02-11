@@ -1,4 +1,4 @@
-import { FormSectionId } from "../form/data_entry/state/types";
+import { FormSectionId } from "./state/types";
 
 export function getBaseUrl(electionId: number, pollingStationId: number, entryNumber: number) {
   return `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}`;

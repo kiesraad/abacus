@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 
+import { DataEntryProgress } from "app/component/form/data_entry/DataEntryProgress";
 import { DataEntryProvider } from "app/component/form/data_entry/state/DataEntryProvider";
-import { PollingStationProgress } from "app/component/pollingstation/PollingStationProgress";
 import { AbortDataEntryControl } from "app/module/data_entry";
 
 import { NotFoundError, useElection } from "@kiesraad/api";
@@ -39,7 +39,7 @@ export function PollingStationLayout() {
       </header>
       <main>
         <StickyNav>
-          <PollingStationProgress />
+          <DataEntryProgress />
         </StickyNav>
         <article>
           <Outlet />

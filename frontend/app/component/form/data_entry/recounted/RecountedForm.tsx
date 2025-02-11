@@ -1,10 +1,10 @@
 import { ErrorModal } from "app/component/error";
-import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 
 import { ApiError } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { BottomBar, Button, ChoiceList, Feedback, Form, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
 
+import { DataEntryNavigation } from "../DataEntryNavigation";
 import { useRecounted } from "./useRecounted";
 
 export function RecountedForm() {
@@ -21,7 +21,7 @@ export function RecountedForm() {
       id="recounted_form"
       title={t("recounted.recounted_form_title")}
     >
-      <PollingStationFormNavigation onSubmit={onSubmit} currentValues={{ recounted }} />
+      <DataEntryNavigation onSubmit={onSubmit} currentValues={{ recounted }} />
       {error instanceof ApiError && <ErrorModal error={error} />}
       {isSaved && hasValidationError && (
         <Feedback id="feedback-error" type="error" data={errors.map((error) => error.code)} />

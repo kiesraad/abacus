@@ -1,5 +1,4 @@
 import { ErrorModal } from "app/component/error";
-import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 
 import { ApiError } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -16,6 +15,7 @@ import {
   KeyboardKeys,
 } from "@kiesraad/ui";
 
+import { DataEntryNavigation } from "../DataEntryNavigation";
 import { useVotersAndVotes } from "./useVotersAndVotes";
 import { formValuesToValues } from "./votersAndVotesValues";
 
@@ -45,7 +45,7 @@ export function VotersAndVotesForm() {
       id="voters_and_votes_form"
       title={t("voters_and_votes.form_title")}
     >
-      <PollingStationFormNavigation
+      <DataEntryNavigation
         onSubmit={onSubmit}
         currentValues={formValuesToValues(currentValues, pollingStationResults.recounted || false)}
       />

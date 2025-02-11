@@ -1,5 +1,4 @@
 import { ErrorModal } from "app/component/error";
-import { PollingStationFormNavigation } from "app/component/pollingstation/PollingStationFormNavigation";
 
 import { ApiError, PoliticalGroup } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -16,6 +15,7 @@ import {
   KeyboardKeys,
 } from "@kiesraad/ui";
 
+import { DataEntryNavigation } from "../DataEntryNavigation";
 import { formValuesToValues } from "./candidatesVotesValues";
 import { useCandidateVotes } from "./useCandidateVotes";
 
@@ -58,7 +58,7 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
       title={`${t("list")} ${group.number} - ${group.name}`}
     >
       {error instanceof ApiError && <ErrorModal error={error} />}
-      <PollingStationFormNavigation
+      <DataEntryNavigation
         onSubmit={onSubmit}
         currentValues={{
           political_group_votes: pollingStationResults.political_group_votes.map((pg) =>

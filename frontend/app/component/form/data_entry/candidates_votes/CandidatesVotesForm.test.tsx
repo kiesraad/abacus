@@ -244,10 +244,12 @@ describe("Test CandidatesVotesForm", () => {
 
       await user.keyboard("{enter}");
 
+      // this field contains 0 by default, adding '555' will result in '0555'
+      // that is why we need to use initialSelectionStart and initialSelectionEnd
       const total = screen.getByRole("textbox", { name: "Totaal lijst 1" });
       await user.click(total);
       expect(total).toHaveFocus();
-      await user.type(total, "555");
+      await user.type(total, "555", { initialSelectionStart: 0, initialSelectionEnd: 10 });
       expect(total).toHaveValue("555");
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });

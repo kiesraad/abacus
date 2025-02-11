@@ -5,7 +5,6 @@ import {
   getInitialFormState,
   getInitialValues,
   getNextSectionID,
-  resetFormSectionState,
   updateFormStateAfterSubmit,
 } from "./dataEntryUtils";
 import { ClientState, DataEntryAction, DataEntryState, FormSectionId, FormSectionReference } from "./types";
@@ -108,8 +107,6 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         error: action.error,
       };
     case "FORM_SAVED": {
-      //reset and then rebuild derived formSectionState
-      resetFormSectionState(state.formState);
       const formState = updateFormStateAfterSubmit(
         state.formState,
         action.validationResults,

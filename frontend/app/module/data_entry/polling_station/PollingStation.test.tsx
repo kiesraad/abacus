@@ -207,14 +207,14 @@ async function abortDelete() {
   await user.click(screen.getByRole("button", { name: "Niet bewaren" }));
 }
 
-// async function expectPollingStationChoicePage(router: Router) {
-//   await waitFor(() => {
-//     expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
-//   });
-//   await waitFor(() => {
-//     expect(screen.getByTestId("polling-station-choice-form")).toBeInTheDocument();
-//   });
-// }
+async function expectPollingStationChoicePage(router: Router) {
+  await waitFor(() => {
+    expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
+  });
+  await waitFor(() => {
+    expect(screen.getByTestId("polling-station-choice-form")).toBeInTheDocument();
+  });
+}
 
 async function submitWith422Response() {
   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
@@ -485,8 +485,6 @@ describe("Polling Station data entry integration tests", () => {
       await expectBlockerModal();
 
       await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
-      //TODO: this doesnt happen
-
       await expectRecountedForm();
     });
 
@@ -588,8 +586,7 @@ describe("Polling Station data entry integration tests", () => {
       await executeStepsForPendingChanges(router);
       await abortDataEntry();
       await abortSaveChanges();
-      //TODO: this doesnt happen
-      //await expectPollingStationChoicePage(router);
+      await expectPollingStationChoicePage(router);
     });
 
     test("Abort and delete with pending changes is possible", async () => {
@@ -597,8 +594,7 @@ describe("Polling Station data entry integration tests", () => {
       await executeStepsForPendingChanges(router);
       await abortDataEntry();
       await abortDelete();
-      //TODO: this doesnt happen
-      //await expectPollingStationChoicePage(router);
+      await expectPollingStationChoicePage(router);
     });
   });
 

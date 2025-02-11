@@ -19,6 +19,8 @@ use super::{
     SESSION_COOKIE_NAME,
 };
 
+const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
+
 /// User object, corresponds to a row in the users table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow, ToSchema)]
 pub struct User {
@@ -78,9 +80,20 @@ where
 
         let user = users.get_by_session_key(session_cookie.value()).await?;
 
-        // As a throttling measure, we don't update the activity on GET requests
+        // Update the last_activity_at field when the method is something other than GET
+        // We also only update if it hasn't been updated in a while
         if parts.method != Method::GET {
-            users.update_last_activity_at(user.id()).await?;
+            match user.last_activity_at {
+                Some(last_activity_at)
+                    if chrono::offset::Utc::now()
+                        .signed_duration_since(last_activity_at)
+                        .num_seconds()
+                        > MIN_UPDATE_LAST_ACTIVITY_AT_SECS =>
+                { /* Do nothing */ }
+                None | Some(_) => {
+                    users.update_last_activity_at(user.id()).await?;
+                }
+            }
         }
 
         Ok(user)

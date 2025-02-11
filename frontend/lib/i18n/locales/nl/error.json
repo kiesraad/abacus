@@ -13,7 +13,7 @@
     "content": "Neem contact op met de ontwikkelaars of rapporteer een bug via <link>https://github.com/kiesraad/abacus</link>"
   },
   "api_error": {
-    "ApportionmentNotAvailableUntilDataEntryFinalised": "Zetelverdeling is pas beschikbaar als alle stembureaus zijn ingevoerd",
+    "ApportionmentNotAvailableUntilDataEntryFinalised": "De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd",
     "DatabaseError": "Er is een fout opgetreden bij het opslaan van de invoer",
     "DrawingOfLotsRequired": "Loting is noodzakelijk",
     "EntryNotFound": "De invoer is niet gevonden",

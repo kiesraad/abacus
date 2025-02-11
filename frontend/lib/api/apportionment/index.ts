@@ -1,2 +1,2 @@
 export * from "./ApportionmentProvider";
-export * from "./useApportionment";
+export * from "./useApportionmentContext";

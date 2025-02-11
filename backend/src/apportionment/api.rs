@@ -26,7 +26,7 @@ pub struct ElectionApportionmentResponse {
 
 /// Get the seat allocation for an election
 #[utoipa::path(
-  get,
+  post,
   path = "/api/elections/{election_id}/apportionment",
   responses(
         (status = 200, description = "Election Apportionment", body = ElectionApportionmentResponse),
@@ -47,9 +47,10 @@ pub async fn election_apportionment(
 ) -> Result<Json<ElectionApportionmentResponse>, APIError> {
     let election = elections_repo.get(id).await?;
     let statuses = data_entry_repo.statuses(id).await?;
-    if statuses
-        .iter()
-        .all(|s| s.status == DataEntryStatusName::Definitive)
+    if !statuses.is_empty()
+        && statuses
+            .iter()
+            .all(|s| s.status == DataEntryStatusName::Definitive)
     {
         let results = polling_station_results_entries_repo
             .list_with_polling_stations(polling_stations_repo, election.id)

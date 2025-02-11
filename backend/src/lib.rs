@@ -65,7 +65,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/{election_id}", get(election::election_details))
         .route(
             "/{election_id}/apportionment",
-            get(apportionment::election_apportionment),
+            post(apportionment::election_apportionment),
         )
         .route(
             "/{election_id}/download_zip_results",

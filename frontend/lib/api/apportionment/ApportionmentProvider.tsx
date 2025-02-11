@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import RequestStateHandler from "../RequestStateHandler";
-import { useApportionmentRequest } from "../useApportionmentRequest";
+import { isFatalError } from "../ApiError";
 import { ApportionmentProviderContext } from "./ApportionmentProviderContext";
+import { useApportionmentRequest } from "./useApportionmentRequest";
 
 export interface ElectionApportionmentProviderProps {
   children: React.ReactNode;
@@ -10,19 +10,21 @@ export interface ElectionApportionmentProviderProps {
 }
 
 export function ApportionmentProvider({ children, electionId }: ElectionApportionmentProviderProps) {
-  const { requestState } = useApportionmentRequest(electionId);
+  const { apiError, data } = useApportionmentRequest(electionId);
+
+  if (apiError && isFatalError(apiError)) {
+    throw apiError;
+  }
 
   return (
-    <RequestStateHandler
-      requestState={requestState}
-      notFoundMessage="error.election_not_found"
-      renderOnSuccess={(data) => (
-        <ApportionmentProviderContext.Provider
-          value={{ apportionment: data.apportionment, election_summary: data.election_summary, requestState }}
-        >
-          {children}
-        </ApportionmentProviderContext.Provider>
-      )}
-    />
+    <ApportionmentProviderContext.Provider
+      value={{
+        apportionment: data?.apportionment,
+        election_summary: data?.election_summary,
+        error: apiError,
+      }}
+    >
+      {children}
+    </ApportionmentProviderContext.Provider>
   );
 }

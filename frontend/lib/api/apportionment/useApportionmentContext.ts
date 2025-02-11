@@ -2,7 +2,7 @@ import { useContext } from "react";
 
 import { ApportionmentProviderContext } from "./ApportionmentProviderContext";
 
-export function useApportionment() {
+export function useApportionmentContext() {
   const context = useContext(ApportionmentProviderContext);
 
   if (!context) {

@@ -145,7 +145,7 @@
       }
     },
     "/api/elections/{election_id}/apportionment": {
-      "get": {
+      "post": {
         "tags": [
           "apportionment"
         ],

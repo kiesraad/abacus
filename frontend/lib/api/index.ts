@@ -10,7 +10,6 @@ export * from "./ApiResponseStatus";
 export * from "./useApi";
 export * from "./useApiRequest";
 export * from "./useApiState";
-export * from "./useApportionmentRequest";
 export * from "./useCrud";
 export * from "./useElectionDataRequest";
 export * from "./useElectionListRequest";

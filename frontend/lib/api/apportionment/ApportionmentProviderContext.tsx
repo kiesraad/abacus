@@ -1,11 +1,11 @@
 import { createContext } from "react";
 
-import { ApiRequestState, ApportionmentResult, ElectionApportionmentResponse, ElectionSummary } from "../index";
+import { ApiError, ApportionmentResult, ElectionSummary } from "../index";
 
 export interface iElectionApportionmentProviderContext {
-  apportionment: Required<ApportionmentResult>;
-  election_summary: Required<ElectionSummary>;
-  requestState: Required<ApiRequestState<ElectionApportionmentResponse>>;
+  apportionment?: ApportionmentResult;
+  election_summary?: ElectionSummary;
+  error?: ApiError;
 }
 
 export const ApportionmentProviderContext = createContext<iElectionApportionmentProviderContext | undefined>(undefined);

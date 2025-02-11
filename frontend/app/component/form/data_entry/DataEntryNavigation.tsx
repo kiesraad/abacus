@@ -59,7 +59,7 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
 
   // when save is chosen in the abort dialog
   const onAbortModalSave = async () => {
-    if (await onSubmit({ continueToNextSection: false })) {
+    if (await onSubmit({ aborting: true, continueToNextSection: false, showAcceptWarnings: false })) {
       blocker.proceed();
     } else {
       blocker.reset();

@@ -103,6 +103,7 @@ export interface SubmitCurrentFormOptions {
   acceptWarnings?: boolean;
   aborting?: boolean;
   continueToNextSection?: boolean;
+  showAcceptWarnings?: boolean;
 }
 
 export type FormSectionId =

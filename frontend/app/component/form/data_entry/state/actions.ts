@@ -43,7 +43,7 @@ export function onSubmitForm(
 ) {
   return async (
     partialPollingStationResults: Partial<PollingStationResults>,
-    { aborting = false, continueToNextSection = true }: SubmitCurrentFormOptions = {},
+    { aborting = false, continueToNextSection = true, showAcceptWarnings = true }: SubmitCurrentFormOptions = {},
   ): Promise<boolean> => {
     const currentSection = state.formState.sections[state.formState.current];
 
@@ -51,7 +51,12 @@ export function onSubmitForm(
       return false;
     }
 
-    if (currentSection.errors.length === 0 && currentSection.warnings.length > 0 && !currentSection.acceptWarnings) {
+    if (
+      currentSection.errors.length === 0 &&
+      currentSection.warnings.length > 0 &&
+      showAcceptWarnings &&
+      !currentSection.acceptWarnings
+    ) {
       dispatch({ type: "UPDATE_FORM_SECTION", partialFormSection: { acceptWarningsError: true } });
       return false;
     }
@@ -86,7 +91,7 @@ export function onSubmitForm(
       type: "FORM_SAVED",
       data,
       validationResults: response.data.validation_results,
-      aborting: aborting,
+      aborting,
       continueToNextSection,
     });
 

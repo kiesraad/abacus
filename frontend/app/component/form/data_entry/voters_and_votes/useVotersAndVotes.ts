@@ -37,6 +37,8 @@ export function useVotersAndVotes() {
     errorsAndWarnings: isSaved ? getErrorsAndWarnings(errors, warnings) : undefined,
     warningsAccepted: acceptWarnings,
   };
+  const formSection = formState.sections.voters_votes_counts;
+  const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0 && !hasChanges;
 
   // register changes when fields change
   const setValues = (values: VotersAndVotesFormValues) => {
@@ -58,7 +60,7 @@ export function useVotersAndVotes() {
   const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {
     const data: VotersAndVotesValues = formValuesToValues(currentValues, pollingStationResults.recounted || false);
 
-    return await onSubmitForm(data, options);
+    return await onSubmitForm(data, { ...options, showAcceptWarnings });
   };
 
   // scroll to top when saved
@@ -74,10 +76,11 @@ export function useVotersAndVotes() {
     onSubmit,
     pollingStationResults,
     currentValues,
-    formSection: formState.sections.voters_votes_counts,
+    formSection,
     setValues,
     status,
     setAcceptWarnings,
     defaultProps,
+    showAcceptWarnings,
   };
 }

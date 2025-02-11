@@ -31,9 +31,8 @@ export function VotersAndVotesForm() {
     status,
     setAcceptWarnings,
     defaultProps,
+    showAcceptWarnings,
   } = useVotersAndVotes();
-
-  const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
 
   return (
     <Form

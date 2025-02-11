@@ -60,6 +60,9 @@ npm run test:ladle
 npm run test:e2e
 # run tests, expect builds and database to be available:
 npm run test:e2e-dev
+
+# view reports and traces, e.g. the ones saved by our pipeline:
+npx playwright show-report <path-to-unzipped-report-folder>
 ```
 
 ### UI Component development

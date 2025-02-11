@@ -688,9 +688,8 @@ mod tests {
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&UpdateUserRequest {
-                            username: "user".to_string(),
                             fullname: Some("Test Full Name".to_string()),
-                            role: Role::Administrator,
+                            temp_password: None,
                         })
                         .unwrap(),
                     ))

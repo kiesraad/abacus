@@ -308,11 +308,12 @@ pub struct CreateUserRequest {
 
 #[derive(Serialize, Deserialize, ToSchema)]
 pub struct UpdateUserRequest {
-    pub username: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub fullname: Option<String>,
-    pub role: Role,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub temp_password: Option<String>,
 }
 
 /// Create a new user
@@ -359,9 +360,8 @@ pub async fn user_update(
     let user = users_repo
         .update(
             user_id,
-            update_user_req.username,
             update_user_req.fullname.as_deref(),
-            update_user_req.role,
+            update_user_req.temp_password.as_deref(),
         )
         .await?;
     Ok(Json(user))

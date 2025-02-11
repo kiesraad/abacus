@@ -2494,18 +2494,11 @@
       },
       "UpdateUserRequest": {
         "type": "object",
-        "required": [
-          "username",
-          "role"
-        ],
         "properties": {
           "fullname": {
             "type": "string"
           },
-          "role": {
-            "$ref": "#/components/schemas/Role"
-          },
-          "username": {
+          "temp_password": {
             "type": "string"
           }
         }

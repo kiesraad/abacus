@@ -189,19 +189,20 @@ impl Users {
     pub async fn update(
         &self,
         user_id: u32,
-        username: String,
         fullname: Option<&str>,
-        role: Role,
+        temp_password: Option<&str>,
     ) -> Result<User, AuthenticationError> {
+        if let Some(pw) = temp_password {
+            self.set_temporary_password(user_id, pw).await?;
+        }
+
         let updated_user = sqlx::query_as!(
             User,
             r#"
               UPDATE
                 users
               SET
-                username = ?,
-                fullname = ?,
-                role = ?
+                fullname = ?
               WHERE id = ?
             RETURNING
                 id as "id: u32",
@@ -213,9 +214,7 @@ impl Users {
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
             "#,
-            username,
             fullname,
-            role,
             user_id
         )
         .fetch_one(&self.0)
@@ -231,6 +230,25 @@ impl Users {
         new_password: &str,
     ) -> Result<(), AuthenticationError> {
         let password_hash = hash_password(new_password)?;
+
+        sqlx::query!(
+            r#"UPDATE users SET password_hash = ? WHERE id = ?"#,
+            password_hash,
+            user_id
+        )
+        .execute(&self.0)
+        .await?;
+
+        Ok(())
+    }
+
+    /// Set a temporary password for a user
+    pub async fn set_temporary_password(
+        &self,
+        user_id: u32,
+        temp_password: &str,
+    ) -> Result<(), AuthenticationError> {
+        let password_hash = hash_password(temp_password)?;
 
         sqlx::query!(
             r#"UPDATE users SET password_hash = ? WHERE id = ?"#,

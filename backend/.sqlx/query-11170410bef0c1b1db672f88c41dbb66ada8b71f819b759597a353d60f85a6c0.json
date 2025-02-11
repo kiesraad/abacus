@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n              UPDATE\n                users\n              SET\n                username = ?,\n                fullname = ?,\n                role = ?\n              WHERE id = ?\n            RETURNING\n                id as \"id: u32\",\n                username,\n                fullname,\n                password_hash,\n                role,\n                last_activity_at as \"last_activity_at: _\",\n                updated_at as \"updated_at: _\",\n                created_at as \"created_at: _\"\n            ",
+  "query": "\n              UPDATE\n                users\n              SET\n                fullname = ?\n              WHERE id = ?\n            RETURNING\n                id as \"id: u32\",\n                username,\n                fullname,\n                password_hash,\n                role,\n                last_activity_at as \"last_activity_at: _\",\n                updated_at as \"updated_at: _\",\n                created_at as \"created_at: _\"\n            ",
   "describe": {
     "columns": [
       {
@@ -45,7 +45,7 @@
       }
     ],
     "parameters": {
-      "Right": 4
+      "Right": 2
     },
     "nullable": [
       false,
@@ -58,5 +58,5 @@
       false
     ]
   },
-  "hash": "44a94370e2de527efaf61ac17721c5c987f68ba8541a3d8205f4feab2b4b5cd0"
+  "hash": "11170410bef0c1b1db672f88c41dbb66ada8b71f819b759597a353d60f85a6c0"
 }

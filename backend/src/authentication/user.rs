@@ -27,7 +27,7 @@ pub struct User {
     #[schema(nullable = false)]
     fullname: Option<String>,
     role: Role,
-    #[serde(skip)]
+    #[serde(skip_deserializing)]
     needs_password_change: bool,
     #[serde(skip)]
     password_hash: String,

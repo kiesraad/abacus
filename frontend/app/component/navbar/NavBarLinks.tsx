@@ -80,7 +80,7 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
 
   if (
     (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||
-    location.pathname === "/users" ||
+    location.pathname.startsWith("/users") ||
     location.pathname === "/workstations" ||
     location.pathname === "/logs"
   ) {

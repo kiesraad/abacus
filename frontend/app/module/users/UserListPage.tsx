@@ -2,11 +2,12 @@ import { useUserListRequest } from "app/module/users/useUserListRequest";
 
 import { t } from "@kiesraad/i18n";
 import { IconPlus } from "@kiesraad/icon";
-import { Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
-import { formatDateTime } from "@kiesraad/util";
+import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
+import { formatDateTime, useQueryParam } from "@kiesraad/util";
 
 export function UserListPage() {
   const { requestState } = useUserListRequest();
+  const [createdMessage, clearCreatedMessage] = useQueryParam("created");
 
   if (requestState.status === "loading") {
     return <Loader />;
@@ -26,6 +27,14 @@ export function UserListPage() {
           <h1>{t("users.management")}</h1>
         </section>
       </header>
+
+      {createdMessage && (
+        <Alert type="success" onClose={clearCreatedMessage}>
+          <h2>{t("users.user_created")}</h2>
+          <p>{createdMessage}</p>
+        </Alert>
+      )}
+
       <main>
         <article>
           <Toolbar>

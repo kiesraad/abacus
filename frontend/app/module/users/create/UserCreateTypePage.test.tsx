@@ -29,7 +29,7 @@ function renderPage(context: Partial<IUserCreateContext>) {
 
 describe("UserCreateTypePage", () => {
   test("Redirect to start when no role in context", () => {
-    renderPage({ user: {} });
+    renderPage({});
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create");
   });
 

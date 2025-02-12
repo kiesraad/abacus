@@ -1,16 +1,12 @@
 import { FormEvent, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
+import { isSuccess } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { Button, Form, FormLayout, InputField, PageTitle } from "@kiesraad/ui";
+import { Alert, Button, Form, FormLayout, InputField, PageTitle } from "@kiesraad/ui";
 
+import { UserDetails } from "./UserCreateContext";
 import { useUserCreateContext } from "./useUserCreateContext";
-
-interface UserDetails {
-  username: string;
-  fullname?: string;
-  password: string;
-}
 
 type ValidationErrors = Partial<UserDetails>;
 
@@ -18,7 +14,7 @@ const MIN_PASSWORD_LENGTH = 12;
 
 export function UserCreateDetailsPage() {
   const navigate = useNavigate();
-  const { role, type, updateUser } = useUserCreateContext();
+  const { role, type, username, createUser, apiError } = useUserCreateContext();
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
 
   if (!role || !type) {
@@ -32,16 +28,22 @@ export function UserCreateDetailsPage() {
     const details: UserDetails = {
       username: (formData.get("username") as string).trim(),
       fullname: (formData.get("fullname") as string | undefined)?.trim(),
-      password: (formData.get("password") as string).trim(),
+      temp_password: (formData.get("temp_password") as string).trim(),
     };
 
     if (!validate(details)) {
       return;
     }
 
-    updateUser(details);
-
-    void navigate(`/users`);
+    void createUser(details).then((result) => {
+      if (isSuccess(result)) {
+        const { username, role } = result.data;
+        const createdMessage = t("users.user_created_details", { username, role: t(role) });
+        void navigate(`/users?created=${encodeURIComponent(createdMessage)}`);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    });
   }
 
   function validate(details: UserDetails): boolean {
@@ -57,16 +59,21 @@ export function UserCreateDetailsPage() {
       errors.fullname = required;
     }
 
-    if (details.password.length === 0) {
-      errors.password = required;
-    } else if (details.password.length < MIN_PASSWORD_LENGTH) {
-      errors.password = t("users.temporary_password_error_min_length", { min_length: MIN_PASSWORD_LENGTH });
+    if (details.temp_password.length === 0) {
+      errors.temp_password = required;
+    } else if (details.temp_password.length < MIN_PASSWORD_LENGTH) {
+      errors.temp_password = t("users.temporary_password_error_min_length", { min_length: MIN_PASSWORD_LENGTH });
     }
 
     const isValid = Object.keys(errors).length === 0;
     setValidationErrors(isValid ? null : errors);
     return isValid;
   }
+
+  const usernameUniqueError =
+    !validationErrors && apiError?.reference === "EntryNotUnique"
+      ? t("users.username_not_unique_error", { username: username ?? "" })
+      : undefined;
 
   return (
     <>
@@ -77,42 +84,59 @@ export function UserCreateDetailsPage() {
         </section>
       </header>
       <main>
-        <Form onSubmit={handleSubmit}>
-          <FormLayout width="medium">
-            <FormLayout.Section title={t("users.details_title")}>
-              <InputField
-                id="username"
-                name="username"
-                label={t("users.username")}
-                hint={t("users.username_hint")}
-                error={validationErrors?.username}
-              />
-
-              {type === "fullname" && (
-                <InputField
-                  id="fullname"
-                  name="fullname"
-                  label={t("users.fullname")}
-                  hint={t("users.fullname_hint")}
-                  error={validationErrors?.fullname}
-                />
+        <article>
+          {!validationErrors && apiError && (
+            <FormLayout.Alert>
+              {usernameUniqueError ? (
+                <Alert type="error">
+                  <h2>{usernameUniqueError}</h2>
+                  <p>{t("users.username_unique")}</p>
+                </Alert>
+              ) : (
+                <Alert type="error">
+                  {apiError.code}: {apiError.message}
+                </Alert>
               )}
+            </FormLayout.Alert>
+          )}
 
-              <InputField
-                id="password"
-                name="password"
-                label={t("users.temporary_password")}
-                hint={t("users.temporary_password_hint", { min_length: MIN_PASSWORD_LENGTH })}
-                error={validationErrors?.password}
-              />
-            </FormLayout.Section>
-          </FormLayout>
-          <FormLayout.Controls>
-            <Button size="xl" type="submit">
-              {t("save")}
-            </Button>
-          </FormLayout.Controls>
-        </Form>
+          <Form onSubmit={handleSubmit}>
+            <FormLayout width="medium">
+              <FormLayout.Section title={t("users.details_title")}>
+                <InputField
+                  id="username"
+                  name="username"
+                  label={t("users.username")}
+                  hint={t("users.username_hint")}
+                  error={validationErrors?.username || usernameUniqueError}
+                />
+
+                {type === "fullname" && (
+                  <InputField
+                    id="fullname"
+                    name="fullname"
+                    label={t("users.fullname")}
+                    hint={t("users.fullname_hint")}
+                    error={validationErrors?.fullname}
+                  />
+                )}
+
+                <InputField
+                  id="temp_password"
+                  name="temp_password"
+                  label={t("users.temporary_password")}
+                  hint={t("users.temporary_password_hint", { min_length: MIN_PASSWORD_LENGTH })}
+                  error={validationErrors?.temp_password}
+                />
+              </FormLayout.Section>
+            </FormLayout>
+            <FormLayout.Controls>
+              <Button size="xl" type="submit">
+                {t("save")}
+              </Button>
+            </FormLayout.Controls>
+          </Form>
+        </article>
       </main>
     </>
   );

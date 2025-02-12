@@ -8,11 +8,11 @@ _Niveau:_ hoog-over, wolk, ☁️
 
 1. [De beheerder installeert de applicatie.](./installeren-en-inrichten-applicatie.md#de-beheerder-installeert-de-applicatie-zee)
 
-2. De beheerder leest de verkeizingsdefinitie in.
+2. De beheerder leest de verkiezingsdefinitie in.
 
 3. De beheerder leest de kandidatenlijst in.
 
-4. [De beheerder maakt de stembureaus aan.](./installeren-en-inrichten-applicatie.md#de-beheerder-maakt-de-stembureaus-aan-in-de-applicatie-zee)
+4. [De beheerder maakt de stembureaus aan.](./installeren-en-inrichten-applicatie.md#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
 
 5. De beheerder maakt de gebruikers aan.
 
@@ -25,34 +25,35 @@ __Uitbreidingen:__
 
 _Niveau:_ hoog-over, wolk, ☁️
 
+Voor DSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting d.m.v. DSO (wolk)](#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-eerste-zitting-dmv-dso-wolk).
+
 ### Hoofdscenario en uitbreidingen
 
 1. Het GSB opent de zitting.
-2. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatniveau en vult Na31-2 Bijlage 2 in.
-3. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
-4. [Het GSB genereert het concept-PV en het elektronisch bestand in de applicatie.](./gsb-genereren-bestanden.md#het-gsb-genereert-het-concept-pv-en-het-elektronisch-bestand-in-de-applicatie-zee)
-5. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
-6. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, eventuele bezwaren noteren, ondertekenen. En sluit daarmee de zitting.
-7. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
-   
-8. Het GSB stelt de benodigde bestanden (PVs en stembescheiden, elektronisch bestand) beschikbaar aan de burgemeester.
+2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
+3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatniveau en vult Na31-2 Bijlage 2 in.
+4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
+5. [Het GSB genereert het concept-PV en het elektronisch bestand in de applicatie.](./gsb-genereren-bestanden.md#het-gsb-genereert-het-concept-pv-en-het-elektronisch-bestand-in-de-applicatie-zee)
+6. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
+7. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, eventuele bezwaren noteren, ondertekenen. En sluit daarmee de zitting.
+8. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.  
 
 __Uitbreidingen:__  
-3a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
+4a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
 
-3b. Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
+4b. Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
 &emsp; 3b1. Het GSB voert de hertelling uit.  
 &emsp; 3b2. Het GSB vult een nieuwe Bijlage 2 in.  
 &emsp; 3b3. Het GSB voert de nieuwe Bijlage 2 in de applicatie in.  
 &emsp; 3b4. Het GSB vermeldt het stembureau bij "extra onderzoeken van het GSB" in het concept-PV. (stap 4)
 
-5a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
+6a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
 &emsp; 5a1. Het GSB controleert de resultaten van het controleprotocol.  
 &emsp; 5a2. Het GSB vindt een fout en corrigeert de resultaten van het controleprotocol.  
 &emsp;&emsp; 5a2a. Het GSB vindt geen fout en bevestigt een verschil tussen de controles en de resultaten van de applicatie:  
 &emsp;&emsp;&emsp; 5a2a1. Het GSB neemt contact op met de Kiesraad.  
 
-6a. Het GSB stelt een probleem vast met het PV:  
+7a. Het GSB stelt een probleem vast met het concept-PV:  
 &emsp; 6a1. Het GSB stelt het bezwaar vast.  
 &emsp; 6a2. Het GSB gaat over tot hertelling. (zie uitbreiding 3b)
 
@@ -68,9 +69,11 @@ __Uitbreidingen:__
 
 _Niveau:_ hoog-over, wolk, ☁️
 
+Voor CSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting d.m.v. CSO (wolk)](#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-eerste-zitting-dmv-cso-wolk).
+
 ### Hoofdscenario en uitbreidingen
 
-Nog op te stellen obv Hoofscenario CSO.
+Nog op te stellen obv Hoofdscenario CSO.
 
 __Uitbreidingen:__
 
@@ -101,6 +104,7 @@ __Uitbreidingen:__
 
 ### Open punten
 
+- Maakt het voor de tweede zitting uit of een gemeente DSO of CSO doet?
 - Hoe ziet de trigger voor hertelling er precies uit voor gemeenteraadsverkiezingen? Het GSB (dus de gemeente) stelt de telling op gemeente-niveau vast, het CSB (ook de gemeente) controleert die telling en verzoekt als nodig om onderzoek en/of hertelling?
 
 
@@ -114,12 +118,11 @@ __Hoofdscenario:__
 
 1. Het CSB ontvangt de benodigde digitale bestanden (PV, onderliggende PVs, elektronische bestanden, corrigenda) van het GSB en controleert ze op volledigheid.
 2. Het CSB stelt vast dat het PV geen aanleiding geeft tot een terugverwijzing. (controleprotocol deel A)
-3. Het CSB leest het elektronisch bestand in als eerste invoer. (controle hashcode en importeren)
+3. Het CSB leest het elektronisch bestand in als eerste invoer. (controle hash-code en importeren)
 4. Het CSB voert de resultaten handmatig in als tweede invoer.
 5. Het CSB voert het controleprotocol optellingen uit. (controleprotocol deel B)
-6. De applicatie berekent de zetelverdeling.
-7. De applicatie wijst de zetels toe aan kandidaten.  
-8. De applicatie genereert de benodigde bestanden: concept-PV, digitaal bestand(en). Locatie en datum, namen stunbureauleden, bezwaren, opmerkelijkheden, ...?
+6. [Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan.](./csb-zetelverdeling-aanwijzing-kandidaten.md#het-csb-stelt-de-zetelverdeling-vast-en-wijst-de-gekozen-kandidaten-aan-vlieger)
+8. De applicatie genereert de benodigde bestanden: concept-PV, digitaal bestand(en). Locatie en datum, namen stembureauleden, bezwaren, opmerkelijkheden, ...?
 9. De applicatie geneert de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
 10. De voorzitter CSB (burgemeester) tekent de brieven.
 11. Het CSB voert het controleprotocol zetelverdeling uit. (controleprotocol deel C)

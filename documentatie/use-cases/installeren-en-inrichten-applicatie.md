@@ -13,15 +13,15 @@ __Hoofdscenario:__
 1. De beheerder bereidt één computer als Abacus-server voor.
 2. De beheerder downloadt de applicatie.
 3. De beheerder installeert de applicatie.
-4. (voor elke client) De beheerder bereidt de client-machine voor.
-5. (voor elke client) De beheerder zorgt dat de client met de server kan verbinden.
+4. (voor elk invoerstation) De beheerder bereidt de computer als invoerstation voor.
+5. (voor elk invoerstation) De beheerder zorgt dat het invoerstation met de server kan verbinden.
 
 __Uitbreidingen:__  
 1a. De beheerder bereidt één of meerdere reserve-servers voor:
 
 3a. De installatie van de applicatie geeft een foutmelding:
 
-4a. De server en client zijn dezelfde machine:
+4a. De server en het invoerstation zijn dezelfde machine:
 
 ### Open punten
 
@@ -30,7 +30,7 @@ __Uitbreidingen:__
 - Afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
 
 
-## De beheerder maakt de stembureaus aan in de applicatie (zee)
+## De beheerder zet de stembureaus in de applicatie (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 

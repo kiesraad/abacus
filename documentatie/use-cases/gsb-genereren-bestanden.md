@@ -13,9 +13,9 @@ __Precondities:__
 __Hoofdscenario:__
 
 1. De coördinator voert de datum en locatie van de zitting in.
-2. De coördinator voert de aanwezige leden in.
-3. De coördinator voert bezwaren van de keizers in.
-4. De coördinator voert onregelmatigheden of bijzonderheden in.
+2. De coördinator voert de aanwezige leden van het GSB in.
+3. De coördinator voert de bezwaren van kiezers tijdens de zitting in.
+4. De coördinator voert onregelmatigheden of bijzonderheden tijdens de zitting in.
 5. De coördinator voert extra onderzoeken van het GSB in.
 6. De coördinator genereert het concept-PV en het digitaal bestand.
 
@@ -23,3 +23,4 @@ __Hoofdscenario:__
 
 - Wat zit er precies in het digitaal bestand?
 - Moet de applicatie een preview van het gegenereerde PV tonen, zodat de coördinator die kan controleren?
+- Worden de extra onderzoeken van het GSB ingevuld in de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen"?

@@ -1,4 +1,9 @@
-use crate::{data_entry::status::DataEntryStatus, error::ErrorReference, APIError};
+use crate::{
+    data_entry::status::DataEntryStatus,
+    election::{CandidateNumber, PGNumber},
+    error::ErrorReference,
+    APIError,
+};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{types::Json, FromRow};
@@ -154,7 +159,8 @@ impl DifferencesCounts {
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct PoliticalGroupVotes {
-    pub number: u8,
+    #[schema(value_type = u32)]
+    pub number: PGNumber,
     #[schema(value_type = u32)]
     pub total: Count,
     pub candidate_votes: Vec<CandidateVotes>,
@@ -193,7 +199,11 @@ impl PoliticalGroupVotes {
 
     /// Create `PoliticalGroupVotes` from test data.
     #[cfg(test)]
-    pub fn from_test_data(number: u8, total_count: Count, candidate_votes: &[(u8, Count)]) -> Self {
+    pub fn from_test_data(
+        number: PGNumber,
+        total_count: Count,
+        candidate_votes: &[(CandidateNumber, Count)],
+    ) -> Self {
         PoliticalGroupVotes {
             number,
             total: total_count,
@@ -209,14 +219,18 @@ impl PoliticalGroupVotes {
 
     /// Create `PoliticalGroupVotes` from test data with candidate numbers automatically generated starting from 1.
     #[cfg(test)]
-    pub fn from_test_data_auto(number: u8, total_count: Count, candidate_votes: &[Count]) -> Self {
+    pub fn from_test_data_auto(
+        number: PGNumber,
+        total_count: Count,
+        candidate_votes: &[Count],
+    ) -> Self {
         Self::from_test_data(
             number,
             total_count,
             &candidate_votes
                 .iter()
                 .enumerate()
-                .map(|(i, votes)| (u8::try_from(i).unwrap() + 1, *votes))
+                .map(|(i, votes)| (CandidateNumber::try_from(i + 1).unwrap(), *votes))
                 .collect::<Vec<_>>(),
         )
     }
@@ -224,7 +238,8 @@ impl PoliticalGroupVotes {
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct CandidateVotes {
-    pub number: u8,
+    #[schema(value_type = u32)]
+    pub number: CandidateNumber,
     #[schema(value_type = u32)]
     pub votes: Count,
 }

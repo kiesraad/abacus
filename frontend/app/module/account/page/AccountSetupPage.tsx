@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AccountSetupForm } from "app/component/form/user/account_setup/AccountSetupForm";
 
 import { t } from "@kiesraad/i18n";
-import { Alert, PageTitle, WorkStationNumber } from "@kiesraad/ui";
+import { Alert, PageTitle } from "@kiesraad/ui";
 
 export function AccountSetupPage() {
   const [showAlert, setShowAlert] = useState(true);
@@ -18,9 +18,6 @@ export function AccountSetupPage() {
       <header>
         <section>
           <h1>{t("user.account_setup")}</h1>
-        </section>
-        <section>
-          <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
       {showAlert && (

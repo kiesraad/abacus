@@ -167,6 +167,13 @@ jobs:
         if: runner.os != 'Windows'
       - name: Run e2e playwright tests
         run: npm run test:e2e
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-${{ matrix.os }}
+          path: frontend/playwright-report/
+          retention-days: 30
 
   deploy:
     name: Deploy to abacus-test.nl

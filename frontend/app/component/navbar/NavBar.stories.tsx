@@ -7,6 +7,8 @@ import { ElectionProviderContext } from "lib/api/election/ElectionProviderContex
 import { Election } from "@kiesraad/api";
 
 import { NavBar } from "./NavBar";
+import styles from "./NavBar.module.css";
+import { NavBarMenu, NavBarMenuButton } from "./NavBarMenu";
 
 export default {
   title: "App / Navigation bar",
@@ -57,4 +59,18 @@ export const AllRoutes: Story = () => (
       </React.Fragment>
     ))}
   </ElectionProviderContext.Provider>
+);
+
+export const Menu: Story = () => (
+  <div className={styles.navBarMenuContainer}>
+    <NavBarMenu />
+  </div>
+);
+
+export const MenuButton: Story = () => (
+  <nav aria-label="primary-navigation" className={styles.navBar}>
+    <div className={styles.links}>
+      <NavBarMenuButton />
+    </div>
+  </nav>
 );

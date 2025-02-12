@@ -5,7 +5,7 @@ import { NavBar } from "app/component/navbar/NavBar";
 
 import { Election, useElectionList } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { Alert, PageTitle, Table, WorkStationNumber } from "@kiesraad/ui";
+import { Alert, PageTitle, Table } from "@kiesraad/ui";
 
 export function OverviewPage() {
   const navigate = useNavigate();
@@ -35,11 +35,6 @@ export function OverviewPage() {
         <section>
           <h1>{isAdminOrCoordinator ? t("election.manage") : t("election.title.plural")}</h1>
         </section>
-        {!isAdminOrCoordinator && (
-          <section>
-            <WorkStationNumber>16</WorkStationNumber>
-          </section>
-        )}
       </header>
       {isNewAccount && (
         <Alert type="success" onClose={closeNewAccountAlert}>

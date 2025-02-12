@@ -6,7 +6,7 @@ import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_
 
 import { DEFAULT_CANCEL_REASON, useElection, useElectionStatus } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { Alert, PageTitle, WorkStationNumber } from "@kiesraad/ui";
+import { Alert, PageTitle } from "@kiesraad/ui";
 
 export function DataEntryHomePage() {
   const navigate = useNavigate();
@@ -39,9 +39,6 @@ export function DataEntryHomePage() {
       <header>
         <section>
           <h1>{election.name}</h1>
-        </section>
-        <section>
-          <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
       {dataEntryDone && (

@@ -18,10 +18,10 @@ const MIN_PASSWORD_LENGTH = 12;
 
 export function UserCreateDetailsPage() {
   const navigate = useNavigate();
-  const { user, updateUser } = useUserCreateContext();
+  const { role, type, updateUser } = useUserCreateContext();
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
 
-  if (!user.role || !user.type) {
+  if (!role || !type) {
     return <Navigate to="/users/create" />;
   }
 
@@ -73,7 +73,7 @@ export function UserCreateDetailsPage() {
       <PageTitle title={`${t("users.add")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("users.add_role", { role: t(user.role) })}</h1>
+          <h1>{t("users.add_role", { role: t(role) })}</h1>
         </section>
       </header>
       <main>
@@ -88,7 +88,7 @@ export function UserCreateDetailsPage() {
                 error={validationErrors?.username}
               />
 
-              {user.type === "fullname" && (
+              {type === "fullname" && (
                 <InputField
                   id="fullname"
                   name="fullname"

@@ -35,7 +35,7 @@ describe("UserCreateDetailsPage", () => {
 
   test("Show validation errors", async () => {
     const updateUser = vi.fn();
-    renderPage({ user: { role: "coordinator", type: "fullname" }, updateUser });
+    renderPage({ role: "coordinator", type: "fullname", updateUser });
 
     const user = userEvent.setup();
 
@@ -63,7 +63,7 @@ describe("UserCreateDetailsPage", () => {
 
   test("Continue after filling in fullname fields", async () => {
     const updateUser = vi.fn();
-    renderPage({ user: { role: "coordinator", type: "fullname" }, updateUser });
+    renderPage({ role: "coordinator", type: "fullname", updateUser });
 
     const user = userEvent.setup();
 
@@ -90,7 +90,7 @@ describe("UserCreateDetailsPage", () => {
 
   test("Continue after filling in anonymous fields", async () => {
     const updateUser = vi.fn();
-    renderPage({ user: { role: "typist", type: "anonymous" }, updateUser });
+    renderPage({ role: "typist", type: "anonymous", updateUser });
 
     const user = userEvent.setup();
 

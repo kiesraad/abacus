@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n          UPDATE sessions\n          SET expires_at = ?\n          WHERE expires_at < ?\n          AND session_key = ?\n          AND expires_at > ?\n          RETURNING\n              session_key,\n              user_id as \"user_id: u32\",\n              expires_at as \"expires_at: _\",\n              created_at as \"created_at: _\"\n          ",
+  "describe": {
+    "columns": [
+      {
+        "name": "session_key",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_id: u32",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "expires_at: _",
+        "ordinal": 2,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "created_at: _",
+        "ordinal": 3,
+        "type_info": "Datetime"
+      }
+    ],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6f03a8784315d018fef230a45d89886a4b7f4412f1172339aec8cacb3611a52b"
+}

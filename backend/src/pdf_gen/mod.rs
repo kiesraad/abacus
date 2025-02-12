@@ -72,7 +72,7 @@ pub(crate) mod tests {
         for (i, voter_count) in polling_station_voter_count.iter().enumerate() {
             let idx = i + 1;
             polling_stations.push(PollingStation {
-                id: idx as u32,
+                id: u32::try_from(idx).unwrap(),
                 election_id: election.id,
                 name: format!("Testplek {idx}"),
                 number: idx as i64 + 30,

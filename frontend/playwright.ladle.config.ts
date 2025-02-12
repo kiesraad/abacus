@@ -4,6 +4,8 @@ import commonConfig from "./playwright.common.config";
 
 const config: PlaywrightTestConfig = defineConfig({
   ...commonConfig,
+  // Use the list reporter even on CI, to get immediate feedback
+  reporter: "list",
   testDir: "./lib/ui",
   outputDir: "./test-results/ladle",
   testMatch: /\.e2e\.ts/,

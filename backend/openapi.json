@@ -1049,7 +1049,7 @@
           "authentication"
         ],
         "summary": "Lists all users",
-        "operationId": "list",
+        "operationId": "user_list",
         "responses": {
           "200": {
             "description": "User list",
@@ -1057,6 +1057,45 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Create a new user",
+        "operationId": "user_create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
@@ -1426,6 +1465,28 @@
             "type": "string"
           },
           "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateUserRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "temp_password",
+          "role"
+        ],
+        "properties": {
+          "fullname": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "temp_password": {
             "type": "string"
           },
           "username": {
@@ -1971,42 +2032,6 @@
           }
         }
       },
-      "ListedUser": {
-        "type": "object",
-        "required": [
-          "id",
-          "username",
-          "role",
-          "last_activity_at",
-          "updated_at",
-          "created_at"
-        ],
-        "properties": {
-          "created_at": {
-            "type": "string"
-          },
-          "fullname": {
-            "type": "string"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "last_activity_at": {
-            "type": "string"
-          },
-          "role": {
-            "$ref": "#/components/schemas/Role"
-          },
-          "updated_at": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          }
-        }
-      },
       "LoginResponse": {
         "type": "object",
         "required": [
@@ -2064,12 +2089,12 @@
         "properties": {
           "meets_surplus_threshold": {
             "type": "boolean",
-            "description": "Whether this group met the threshold for surplus seat assigment"
+            "description": "Whether this group met the threshold for surplus seat assignment"
           },
           "pg_number": {
             "type": "integer",
             "format": "int32",
-            "description": "Political group number for which this assigment applies",
+            "description": "Political group number for which this assignment applies",
             "minimum": 0
           },
           "rest_seats": {
@@ -2404,6 +2429,42 @@
           }
         }
       },
+      "User": {
+        "type": "object",
+        "description": "User object, corresponds to a row in the users table",
+        "required": [
+          "id",
+          "username",
+          "role",
+          "updated_at",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "fullname": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "last_activity_at": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
       "UserListResponse": {
         "type": "object",
         "required": [
@@ -2413,7 +2474,7 @@
           "users": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ListedUser"
+              "$ref": "#/components/schemas/User"
             }
           }
         }

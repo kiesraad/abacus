@@ -101,8 +101,11 @@ export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
 // /api/user
-export type LIST_REQUEST_PARAMS = Record<string, never>;
-export type LIST_REQUEST_PATH = `/api/user`;
+export type USER_LIST_REQUEST_PARAMS = Record<string, never>;
+export type USER_LIST_REQUEST_PATH = `/api/user`;
+export type USER_CREATE_REQUEST_PARAMS = Record<string, never>;
+export type USER_CREATE_REQUEST_PATH = `/api/user`;
+export type USER_CREATE_REQUEST_BODY = CreateUserRequest;
 
 // /api/user/change-password
 export type CHANGE_PASSWORD_REQUEST_PARAMS = Record<string, never>;
@@ -181,6 +184,13 @@ export interface CandidateVotes {
 export interface ChangePasswordRequest {
   new_password: string;
   password: string;
+  username: string;
+}
+
+export interface CreateUserRequest {
+  fullname?: string;
+  role: Role;
+  temp_password: string;
   username: string;
 }
 
@@ -391,16 +401,6 @@ export interface HighestSurplusAssignedSeat {
   surplus_votes: Fraction;
 }
 
-export interface ListedUser {
-  created_at: string;
-  fullname?: string;
-  id: number;
-  last_activity_at: string;
-  role: Role;
-  updated_at: string;
-  username: string;
-}
-
 export interface LoginResponse {
   user_id: number;
   username: string;
@@ -537,8 +537,21 @@ export interface SummaryDifferencesCounts {
   unreturned_ballots_count: SumCount;
 }
 
+/**
+ * User object, corresponds to a row in the users table
+ */
+export interface User {
+  created_at: string;
+  fullname?: string;
+  id: number;
+  last_activity_at?: string;
+  role: Role;
+  updated_at: string;
+  username: string;
+}
+
 export interface UserListResponse {
-  users: ListedUser[];
+  users: User[];
 }
 
 export interface ValidationResult {

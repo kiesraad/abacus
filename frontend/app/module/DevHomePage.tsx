@@ -11,6 +11,7 @@ function DevLinks() {
 
   return (
     <>
+      <p>Dit is een ontwikkelversie van Abacus. Kies hieronder welk deel van de applicatie je wilt gebruiken.</p>
       <strong>{t("general")}</strong>
       <ul>
         <li>
@@ -66,7 +67,7 @@ function DevLinks() {
           ))}
         </ul>
         <li>
-          <Link to={`/users#administratorcoordinator`}>{t("user.manage")}</Link>
+          <Link to={`/users#administratorcoordinator`}>{t("users.management")}</Link>
         </li>
         <li>
           <Link to={`/workstations#administrator`}>{t("workstations.manage")}</Link>

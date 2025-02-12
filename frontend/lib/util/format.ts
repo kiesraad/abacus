@@ -4,15 +4,9 @@ const numberFormatter = new Intl.NumberFormat("nl-NL", {
   maximumFractionDigits: 0,
 });
 
-export function formatNumber(s: string | number | null | undefined | readonly string[]): string {
-  if (typeof s !== "string" && typeof s !== "number") {
-    return "";
-  }
 
-  if (typeof s === "number" && s === 0) {
-    return "";
-  }
-
+export function formatNumber(s: string | number | null | undefined | readonly string[]) {
+  if (typeof s !== "string" && typeof s !== "number") return "";
   const result = `${s}`.replace(/\D/g, "");
   if (result === "") {
     return "";
@@ -20,6 +14,7 @@ export function formatNumber(s: string | number | null | undefined | readonly st
     return numberFormatter.format(Number(result));
   }
 }
+
 
 const separator = numberFormatter.format(11111).replace(/\p{Number}/gu, "");
 const escapedSeparator = separator.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");

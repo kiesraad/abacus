@@ -4,6 +4,8 @@ import { Election, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
 
+import { NavBarMenuButton } from "./NavBarMenu";
+
 type NavBarLinksProps = { location: { pathname: string; hash: string } };
 
 function ElectionBreadcrumb({ election }: { election: Election }) {
@@ -41,17 +43,12 @@ function DataEntryLinks({ location }: NavBarLinksProps) {
 function ElectionManagementLinks({ location }: NavBarLinksProps) {
   const { election } = useElection();
 
-  // TODO: Add left side menu, #920
-
   if (location.pathname.match(/^\/elections\/\d+\/?$/)) {
-    return (
-      <span>
-        <ElectionBreadcrumb election={election} />
-      </span>
-    );
+    return <></>;
   } else {
     return (
       <>
+        <NavBarMenuButton />
         <Link to={`/elections/${election.id}#administratorcoordinator`}>
           <ElectionBreadcrumb election={election} />
         </Link>
@@ -70,7 +67,7 @@ function TopLevelManagementLinks() {
   return (
     <>
       <NavLink to={"/elections#administrator"}>{t("election.title.plural")}</NavLink>
-      <NavLink to={"/users#administratorcoordinator"}>{t("users")}</NavLink>
+      <NavLink to={"/users#administratorcoordinator"}>{t("users.users")}</NavLink>
       <NavLink to={"/workstations#administrator"}>{t("workstations.workstations")}</NavLink>
       <NavLink to={"/logs#administratorcoordinator"}>{t("logs")}</NavLink>
     </>
@@ -81,17 +78,17 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
   const isAdministrator = location.hash.includes("administrator");
   const isCoordinator = location.hash.includes("coordinator");
 
-  if (location.pathname.match(/^\/elections\/\d+\/data-entry/)) {
-    return <DataEntryLinks location={location} />;
-  } else if (location.pathname.match(/^\/elections\/\d+/)) {
-    return <ElectionManagementLinks location={location} />;
-  } else if (
-    (location.pathname === "/elections" && (isAdministrator || isCoordinator)) ||
+  if (
+    (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||
     location.pathname === "/users" ||
     location.pathname === "/workstations" ||
     location.pathname === "/logs"
   ) {
     return <TopLevelManagementLinks />;
+  } else if (location.pathname.match(/^\/elections\/\d+\/data-entry/)) {
+    return <DataEntryLinks location={location} />;
+  } else if (location.pathname.match(/^\/elections\/\d+/)) {
+    return <ElectionManagementLinks location={location} />;
   } else {
     return <></>;
   }

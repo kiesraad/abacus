@@ -1,6 +1,7 @@
 #import "common/style.typ": conf, title, mono
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2.json")
+#set text(lang: "nl")
 
 #show: doc => conf(input, doc, footer: [
   #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
@@ -97,7 +98,7 @@ was. Indien er meerdere zittingslocaties waren, vermeld dan per lid de locatie.]
       grid.cell(text(size: 8pt, [Locatie])),
       grid.cell()[]
     )),
-    table.cell(align: horizon, stack(dir: ltr, spacing: 3pt, time_input(time: ""), align(top, [-]), time_input(time: ""))),
+    table.cell(align: horizon, stack(dir: ltr, spacing: 3pt, time_input(time: ""), "-", time_input(time: ""))),
   )}).flatten(),
 )
 
@@ -117,7 +118,7 @@ was. Indien er meerdere zittingslocaties waren, vermeld dan per lid de locatie.]
     ..input.polling_stations.map(polling_station => {(
       [#polling_station.number],
       [
-        #if polling_station.polling_station_type == "Mobile" [
+        #if "polling_station_type" in polling_station and polling_station.polling_station_type == "Mobile" [
           _(Mobiel stembureau)_
         ] else [
           #polling_station.address \
@@ -340,8 +341,8 @@ Naam leden
   naam hebben genoteerd, ondertekenen het proces-verbaal. Houd hierbij de volgorde aan van rubriek 12.
 ]
 
-#block(width: 100%, align(right + horizon, stack(dir: ltr, spacing: 15pt,
-  [Datum: ],
+#block(width: 100%, align(right, stack(dir: ltr, spacing: 15pt,
+  align(horizon, [Datum: ]),
   date_input(date: none, top_label: ([Dag], [Maand], [Jaar])),
   time_input(time: none, top_label: "Tijd")
 )))

@@ -1,23 +1,21 @@
 import * as React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import { PollingStationForm } from "app/component/form/polling_station/PollingStationForm";
-import { NavBar } from "app/component/navbar/NavBar.tsx";
 import { PollingStationDeleteModal } from "app/module/polling_stations/page/PollingStationDeleteModal";
 
 import { useElection, usePollingStationGet } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { IconChevronRight, IconTrash } from "@kiesraad/icon";
+import { IconTrash } from "@kiesraad/icon";
 import { Alert, Button, Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationUpdatePage() {
-  const electionId = useNumericParam("electionId");
   const pollingStationId = useNumericParam("pollingStationId");
   const { election } = useElection();
   const navigate = useNavigate();
 
-  const { requestState } = usePollingStationGet(pollingStationId);
+  const { requestState } = usePollingStationGet(election.id, pollingStationId);
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
   function toggleShowDeleteModal() {
@@ -26,22 +24,24 @@ export function PollingStationUpdatePage() {
 
   const [error, setError] = React.useState<[string, string] | undefined>(undefined);
 
+  const parentUrl = `/elections/${election.id}/polling-stations`;
+
   function closeError() {
     setError(undefined);
   }
 
-  const handleSaved = () => {
-    navigate(`../?updated=${pollingStationId}`);
-  };
+  function handleSaved() {
+    void navigate(`${parentUrl}?updated=${pollingStationId}`);
+  }
 
-  const handleCancel = () => {
-    navigate("..");
-  };
+  function handleCancel() {
+    void navigate(parentUrl);
+  }
 
   function handleDeleted() {
     toggleShowDeleteModal();
     const pollingStation = "data" in requestState ? `${requestState.data.number} (${requestState.data.name})` : "";
-    navigate(`../?deleted=${encodeURIComponent(pollingStation)}`);
+    void navigate(`${parentUrl}?deleted=${encodeURIComponent(pollingStation)}`);
   }
 
   function handleDeleteError() {
@@ -58,17 +58,6 @@ export function PollingStationUpdatePage() {
   return (
     <>
       <PageTitle title={`${t("polling_stations")} - Abacus`} />
-      <NavBar>
-        <Link to={`/elections/${election.id}#coordinator`}>
-          <span className="bold">{election.location}</span>
-          <span>&mdash;</span>
-          <span>{election.name}</span>
-        </Link>
-        <IconChevronRight />
-        <Link to={`..`}>
-          <span>{t("polling_stations")}</span>
-        </Link>
-      </NavBar>
       <header>
         <section>
           <h1>{t("polling_station.update")}</h1>
@@ -89,28 +78,31 @@ export function PollingStationUpdatePage() {
           {requestState.status === "success" && (
             <>
               <PollingStationForm
-                electionId={electionId}
+                electionId={election.id}
                 pollingStation={requestState.data}
                 onSaved={handleSaved}
                 onCancel={handleCancel}
               />
 
-              <Button
-                type="button"
-                variant="tertiary-destructive"
-                leftIcon={<IconTrash />}
-                onClick={toggleShowDeleteModal}
-              >
-                {t("polling_station.delete")}
-              </Button>
-              {showDeleteModal && (
-                <PollingStationDeleteModal
-                  pollingStationId={pollingStationId}
-                  onCancel={toggleShowDeleteModal}
-                  onError={handleDeleteError}
-                  onDeleted={handleDeleted}
-                />
-              )}
+              <div className="mt-lg">
+                <Button
+                  type="button"
+                  variant="tertiary-destructive"
+                  leftIcon={<IconTrash />}
+                  onClick={toggleShowDeleteModal}
+                >
+                  {t("polling_station.delete")}
+                </Button>
+                {showDeleteModal && (
+                  <PollingStationDeleteModal
+                    electionId={election.id}
+                    pollingStationId={pollingStationId}
+                    onCancel={toggleShowDeleteModal}
+                    onError={handleDeleteError}
+                    onDeleted={handleDeleted}
+                  />
+                )}
+              </div>
             </>
           )}
         </article>

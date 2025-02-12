@@ -1,11 +1,15 @@
 import { describe, expect, test } from "vitest";
 
+import { pingHandler } from "@kiesraad/api-mocks";
+import { server } from "@kiesraad/test";
+
 type Response = {
   pong: string;
 };
 
 describe("Mock api works", () => {
   test("echos a value", async () => {
+    server.use(pingHandler);
     const resp = await fetch("/ping", {
       method: "POST",
       headers: {

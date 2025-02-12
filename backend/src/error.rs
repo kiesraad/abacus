@@ -1,11 +1,16 @@
 use std::error::Error;
 
-use crate::authentication::AuthenticationError;
-use crate::data_entry::DataError;
-use axum::extract::rejection::JsonRejection;
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
-use axum::Json;
+use crate::{
+    apportionment::ApportionmentError,
+    authentication::error::AuthenticationError,
+    data_entry::{status::DataEntryTransitionError, DataError},
+};
+use axum::{
+    extract::rejection::JsonRejection,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
+};
 use hyper::header::InvalidHeaderValue;
 use quick_xml::SeError;
 use serde::{Deserialize, Serialize};
@@ -18,27 +23,31 @@ use zip::result::ZipError;
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub enum ErrorReference {
-    EntryNumberNotSupported,
+    DatabaseError,
+    DrawingOfLotsRequired,
     EntryNotFound,
+    EntryNotUnique,
+    EntryNumberNotSupported,
+    InternalServerError,
+    InvalidData,
+    InvalidDataEntryNumber,
+    InvalidJson,
+    InvalidPassword,
+    InvalidPoliticalGroup,
+    InvalidSession,
+    InvalidStateTransition,
+    InvalidUsernameOrPassword,
+    InvalidVoteCandidate,
+    InvalidVoteGroup,
+    PdfGenerationError,
+    PollingStationDataValidation,
     PollingStationFirstEntryAlreadyFinalised,
     PollingStationFirstEntryNotFinalised,
-    PollingStationSecondEntryAlreadyFinalised,
-    PollingStationResultsAlreadyFinalised,
-    PollingStationDataValidation,
-    InvalidVoteGroup,
-    InvalidVoteCandidate,
-    InvalidData,
-    InvalidJson,
-    InvalidDataEntryNumber,
-    EntryNotUnique,
-    DatabaseError,
-    InternalServerError,
-    PdfGenerationError,
     PollingStationRepeated,
+    PollingStationResultsAlreadyFinalised,
+    PollingStationSecondEntryAlreadyFinalised,
     PollingStationValidationErrors,
-    InvalidPoliticalGroup,
-    InvalidUsernamePassword,
-    InvalidSession,
+    UserNotFound,
 }
 
 /// Response structure for errors
@@ -59,6 +68,7 @@ impl IntoResponse for ErrorResponse {
 /// trait implementation
 #[derive(Debug)]
 pub enum APIError {
+    BadRequest(String, ErrorReference),
     NotFound(String, ErrorReference),
     Conflict(String, ErrorReference),
     InvalidData(DataError),
@@ -69,9 +79,10 @@ pub enum APIError {
     PdfGenError(Vec<SourceDiagnostic>),
     StdError(Box<dyn Error>),
     AddError(String, ErrorReference),
-    XmlError(quick_xml::se::SeError),
+    XmlError(SeError),
     Authentication(AuthenticationError),
     ZipError(ZipError),
+    Apportionment(ApportionmentError),
 }
 
 impl IntoResponse for APIError {
@@ -85,6 +96,9 @@ impl IntoResponse for APIError {
         }
 
         let (status, response) = match self {
+            APIError::BadRequest(message, reference) => {
+                (StatusCode::BAD_REQUEST, to_error(&message, reference, true))
+            }
             APIError::NotFound(message, reference) => {
                 (StatusCode::NOT_FOUND, to_error(&message, reference, true))
             }
@@ -173,18 +187,30 @@ impl IntoResponse for APIError {
 
                 match err {
                     // client errors
-                    AuthenticationError::UserNotFound | AuthenticationError::InvalidPassword => (
+                    AuthenticationError::InvalidUsernameOrPassword => (
                         StatusCode::UNAUTHORIZED,
                         to_error(
                             "Invalid username and/or password",
-                            ErrorReference::InvalidUsernamePassword,
+                            ErrorReference::InvalidUsernameOrPassword,
+                            false,
+                        ),
+                    ),
+                    AuthenticationError::UserNotFound => (
+                        StatusCode::UNAUTHORIZED,
+                        to_error("User not found", ErrorReference::UserNotFound, false),
+                    ),
+                    AuthenticationError::InvalidPassword => (
+                        StatusCode::UNAUTHORIZED,
+                        to_error(
+                            "Invalid password provided",
+                            ErrorReference::InvalidPassword,
                             false,
                         ),
                     ),
                     AuthenticationError::SessionKeyNotFound
                     | AuthenticationError::NoSessionCookie => (
                         StatusCode::UNAUTHORIZED,
-                        to_error("Invalid session key", ErrorReference::InvalidSession, false),
+                        to_error("Invalid session", ErrorReference::InvalidSession, false),
                     ),
                     // server errors
                     AuthenticationError::Database(_)
@@ -211,6 +237,20 @@ impl IntoResponse for APIError {
                     ),
                 )
             }
+            APIError::Apportionment(err) => {
+                error!("Apportionment error: {:?}", err);
+
+                match err {
+                    ApportionmentError::DrawingOfLotsNotImplemented => (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        to_error(
+                            "Drawing of lots is required",
+                            ErrorReference::DrawingOfLotsRequired,
+                            false,
+                        ),
+                    ),
+                }
+            }
         };
 
         (status, response).into_response()
@@ -232,7 +272,7 @@ impl From<serde_json::Error> for APIError {
 impl From<sqlx::Error> for APIError {
     fn from(err: sqlx::Error) -> Self {
         match &err {
-            sqlx::Error::RowNotFound => {
+            RowNotFound => {
                 APIError::NotFound("Item not found".to_string(), ErrorReference::EntryNotFound)
             }
             sqlx::Error::Database(db_error) => match db_error.kind() {
@@ -271,6 +311,12 @@ impl From<SeError> for APIError {
     }
 }
 
+impl From<DataEntryTransitionError> for APIError {
+    fn from(err: DataEntryTransitionError) -> Self {
+        Self::Conflict(err.to_string(), ErrorReference::InvalidStateTransition)
+    }
+}
+
 impl From<AuthenticationError> for APIError {
     fn from(err: AuthenticationError) -> Self {
         APIError::Authentication(err)
@@ -280,6 +326,12 @@ impl From<AuthenticationError> for APIError {
 impl From<ZipError> for APIError {
     fn from(err: ZipError) -> Self {
         APIError::ZipError(err)
+    }
+}
+
+impl From<ApportionmentError> for APIError {
+    fn from(err: ApportionmentError) -> Self {
+        APIError::Apportionment(err)
     }
 }
 

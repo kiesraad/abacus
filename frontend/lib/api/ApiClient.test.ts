@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 
-import { overrideOnce } from "app/test/unit";
+import { overrideOnce } from "@kiesraad/test";
 
 import { ApiClient } from "./ApiClient";
 import { FatalApiError } from "./ApiError";
@@ -23,17 +23,17 @@ describe("ApiClient", () => {
   });
 
   test("422 response is parsed as client error", async () => {
-    const responseBody = { fizz: "buzz" };
-    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, responseBody);
-
-    const client = new ApiClient();
-    const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", {
-      data: null,
+    overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
+      error: "Error message",
+      fatal: true,
+      reference: "InternalServerError",
     });
 
-    expect(parsedResponse).toStrictEqual(
-      new FatalApiError(ApiResponseStatus.ClientError, 422, "Unexpected response status: 422"),
-    );
+    const client = new ApiClient();
+    const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", undefined);
+
+    const expectedResponse = new FatalApiError(ApiResponseStatus.ClientError, 422, "Error message");
+    expect(parsedResponse).toStrictEqual(expectedResponse);
   });
 
   test("500 response is parsed as server error", async () => {
@@ -60,9 +60,13 @@ describe("ApiClient", () => {
 
     const parsedResponse = await client.postRequest("/api/polling_stations/1/data_entries/1", { data: null });
 
-    expect(parsedResponse).toStrictEqual(
-      new FatalApiError(ApiResponseStatus.ServerError, responseStatus, `Unexpected response status: ${responseStatus}`),
+    const expectedResponse = new FatalApiError(
+      ApiResponseStatus.ServerError,
+      responseStatus,
+      `Unexpected response status: ${responseStatus}`,
+      "InvalidData",
     );
+    expect(parsedResponse).toStrictEqual(expectedResponse);
   });
 
   test("Get request returns expected data", async () => {
@@ -88,9 +92,12 @@ describe("ApiClient", () => {
 
     const parsedResponse = await client.getRequest("/api/test/1");
 
-    expect(parsedResponse).toStrictEqual(
-      new FatalApiError(ApiResponseStatus.ClientError, 200, "Unexpected data from server: invalid"),
+    const expectedResponse = new FatalApiError(
+      ApiResponseStatus.ServerError,
+      200,
+      "Unexpected data from server: invalid",
     );
+    expect(parsedResponse).toStrictEqual(expectedResponse);
 
     expect(console.error).toHaveBeenCalledWith("Unexpected data from server:", expect.any(String));
   });

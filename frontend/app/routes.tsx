@@ -1,4 +1,4 @@
-import { createRoutesFromElements, Navigate, Route } from "react-router-dom";
+import { createRoutesFromElements, Navigate, Route } from "react-router";
 
 import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AdministratorLayout } from "app/module/AdministratorLayout";
@@ -13,13 +13,20 @@ import {
 import { LogsHomePage } from "app/module/logs";
 import { NotAvailableInMock } from "app/module/NotAvailableInMock";
 import { PollingStationListPage, PollingStationsLayout } from "app/module/polling_stations";
-import { UsersHomePage } from "app/module/users";
+import {
+  UserCreateDetailsPage,
+  UserCreateLayout,
+  UserCreateRolePage,
+  UserCreateTypePage,
+  UserListPage,
+} from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
 
 import { t } from "@kiesraad/i18n";
 
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
+import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
 import {
   CandidatesVotesPage,
   DataEntryHomePage,
@@ -36,12 +43,13 @@ import { RootLayout } from "./module/RootLayout";
 
 export const routes = createRoutesFromElements(
   <Route element={<RootLayout />} errorElement={<ErrorBoundary />}>
-    <Route index path="/" element={<Navigate to="/elections" replace />} />
+    <Route index path="/" element={<Navigate to="/dev" replace />} />
     <Route path="*" element={<NotFoundPage message="error.not_found" path={window.location.pathname} />} />
     <Route path="account" element={<LoginLayout />}>
       <Route index element={<UserHomePage />} />
       <Route path="login" element={<LoginPage />} />
-      <Route path="account/setup" element={<AccountSetupPage />} />
+      <Route path="setup" element={<AccountSetupPage />} />
+      <Route path="change-password" element={<ChangePasswordPage />} />
     </Route>
     <Route path="elections" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />
@@ -80,7 +88,14 @@ export const routes = createRoutesFromElements(
     <Route element={<AdministratorLayout />}>
       <Route path="dev" element={<DevHomePage />} />
       <Route path="logs" element={<LogsHomePage />} />
-      <Route path="users" element={<UsersHomePage />} />
+      <Route path="users">
+        <Route index element={<UserListPage />} />
+        <Route path="create" element={<UserCreateLayout />}>
+          <Route index element={<UserCreateRolePage />} />
+          <Route path="type" element={<UserCreateTypePage />} />
+          <Route path="details" element={<UserCreateDetailsPage />} />
+        </Route>
+      </Route>
       <Route path="workstations" element={<WorkstationsHomePage />} />
     </Route>
   </Route>,

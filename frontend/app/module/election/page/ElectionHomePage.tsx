@@ -1,8 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import { Footer } from "app/component/footer/Footer";
-import { MockTest } from "app/component/MockTest";
-import { NavBar } from "app/component/navbar/NavBar";
 
 import { useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
@@ -14,13 +12,6 @@ export function ElectionHomePage() {
   return (
     <>
       <PageTitle title={`${t("election.title.details")} - Abacus`} />
-      <NavBar>
-        <span>
-          <span className="bold">{election.location}</span>
-          <span>&mdash;</span>
-          <span>{election.name}</span>
-        </span>
-      </NavBar>
       <header>
         <section>
           <h1>{election.name}</h1>
@@ -49,7 +40,6 @@ export function ElectionHomePage() {
               </ul>
             </li>
           </ul>
-          {__API_MSW__ && <MockTest />}
         </article>
       </main>
       <Footer />

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { render } from "app/test/unit";
+import { render } from "@kiesraad/test";
 
 import { ServerErrorModal } from "./ErrorModal.stories";
 
@@ -9,6 +9,5 @@ describe("Component: ErrorModal", () => {
     const { getByText } = render(<ServerErrorModal />);
 
     expect(getByText("Sorry, er ging iets mis")).toBeInTheDocument();
-    expect(getByText("500")).toBeInTheDocument();
   });
 });

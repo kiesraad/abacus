@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import { t, tx } from "@kiesraad/i18n";
 import { AlertType, FeedbackId, renderIconForType } from "@kiesraad/ui";

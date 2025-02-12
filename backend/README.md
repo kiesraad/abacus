@@ -27,7 +27,11 @@ In this version of `memory-serve`, the path must be absolute, since `build.rs`
 has no knowledge of the project it is currently built in. Example:
 
 ```shell
-ASSET_DIR=$PWD/frontend/dist cargo run --features memory-serve
+cd frontend
+npm run build
+cd ../backend
+sqlx database setup
+ASSET_DIR=$PWD/../frontend/dist cargo run --features memory-serve
 ```
 
 ### Linting
@@ -72,6 +76,7 @@ The following dependencies (crates) are used:
 
 Additionally, the following development dependencies are used:
 
+- `test-log`: show tracing messages while running tests
 - `reqwest`: HTTP client for testing the API.
 - `http-body-util`: trait used to extract a response body in some tests.
 

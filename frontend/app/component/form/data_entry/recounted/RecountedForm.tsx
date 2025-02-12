@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import { useRecounted } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import {
   BottomBar,
@@ -12,6 +11,8 @@ import {
   KeyboardKeys,
   useFormKeyboardNavigation,
 } from "@kiesraad/ui";
+
+import { useRecounted } from "./useRecounted";
 
 interface FormElements extends HTMLFormControlsCollection {
   yes: HTMLInputElement;

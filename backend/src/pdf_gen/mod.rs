@@ -55,11 +55,11 @@ pub fn generate_pdf(model: PdfModel) -> Result<PdfGenResult, APIError> {
 pub(crate) mod tests {
     use chrono::Utc;
     use models::ModelNa31_2Input;
+    use test_log::test;
 
     use super::*;
-    use crate::election::ElectionStatus;
     use crate::{
-        election::{tests::election_fixture, Election, ElectionCategory},
+        election::{tests::election_fixture, Election, ElectionCategory, ElectionStatus},
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
     };
@@ -72,7 +72,7 @@ pub(crate) mod tests {
         for (i, voter_count) in polling_station_voter_count.iter().enumerate() {
             let idx = i + 1;
             polling_stations.push(PollingStation {
-                id: idx as u32,
+                id: u32::try_from(idx).unwrap(),
                 election_id: election.id,
                 name: format!("Testplek {idx}"),
                 number: idx as i64 + 30,
@@ -81,14 +81,8 @@ pub(crate) mod tests {
                 } else {
                     Some(*voter_count)
                 },
-                polling_station_type: PollingStationType::Special,
-                street: "Teststraat".to_string(),
-                house_number: format!("{idx}"),
-                house_number_addition: if idx % 2 == 0 {
-                    Some("b".to_string())
-                } else {
-                    None
-                },
+                polling_station_type: Some(PollingStationType::Special),
+                address: "Teststraat 2a".to_string(),
                 postal_code: "1234 QY".to_string(),
                 locality: "Testdorp".to_string(),
             });

@@ -1,20 +1,8 @@
 import { type Locator, type Page } from "@playwright/test";
 
+import { VotersCounts, VotesCounts } from "@kiesraad/api";
+
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
-
-export interface VotersCounts {
-  poll_card_count: number;
-  proxy_certificate_count: number;
-  voter_card_count: number;
-  total_admitted_voters_count: number;
-}
-
-export interface VotesCounts {
-  votes_candidates_count: number;
-  blank_votes_count: number;
-  invalid_votes_count: number;
-  total_votes_cast_count: number;
-}
 
 export class VotersAndVotesPage extends DataEntryBasePage {
   readonly fieldset: Locator;
@@ -76,11 +64,38 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     await this.totalAdmittedVotersCount.fill(votersCounts.total_admitted_voters_count.toString());
   }
 
+  async getVotersCounts(): Promise<VotersCounts> {
+    return {
+      // using Number() so that "" is parsed to 0
+      poll_card_count: Number(await this.pollCardCount.inputValue()),
+      proxy_certificate_count: Number(await this.proxyCertificateCount.inputValue()),
+      voter_card_count: Number(await this.voterCardCount.inputValue()),
+      total_admitted_voters_count: Number(await this.totalAdmittedVotersCount.inputValue()),
+    };
+  }
+
   async inputVotesCounts(votesCounts: VotesCounts) {
     await this.votesCandidatesCount.fill(votesCounts.votes_candidates_count.toString());
     await this.blankVotesCount.fill(votesCounts.blank_votes_count.toString());
     await this.invalidVotesCount.fill(votesCounts.invalid_votes_count.toString());
     await this.totalVotesCastCount.fill(votesCounts.total_votes_cast_count.toString());
+  }
+
+  async getVotesCounts(): Promise<VotesCounts> {
+    return {
+      // using Number() so that "" is parsed to 0
+      votes_candidates_count: Number(await this.votesCandidatesCount.inputValue()),
+      blank_votes_count: Number(await this.blankVotesCount.inputValue()),
+      invalid_votes_count: Number(await this.invalidVotesCount.inputValue()),
+      total_votes_cast_count: Number(await this.totalVotesCastCount.inputValue()),
+    };
+  }
+
+  async getVotersAndVotesCounts(): Promise<{ voters: VotersCounts; votes: VotesCounts }> {
+    return {
+      voters: await this.getVotersCounts(),
+      votes: await this.getVotesCounts(),
+    };
   }
 
   async inputVotersRecounts(votersRecounts: VotersCounts) {

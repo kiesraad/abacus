@@ -1,29 +1,41 @@
 use axum::{
-    async_trait,
-    extract::{FromRef, FromRequestParts},
+    extract::{FromRef, FromRequestParts, OptionalFromRequestParts},
     http::request::Parts,
 };
 use axum_extra::extract::CookieJar;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, SqlitePool};
+use sqlx::{query_as, Error, FromRow, SqlitePool};
+use utoipa::ToSchema;
 
 use crate::{APIError, AppState};
 
 use super::{
     error::AuthenticationError,
     password::{hash_password, verify_password},
+    role::Role,
     session::Sessions,
     SESSION_COOKIE_NAME,
 };
 
 /// User object, corresponds to a row in the users table
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow, ToSchema)]
 pub struct User {
     id: u32,
     username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    fullname: Option<String>,
+    role: Role,
+    #[serde(skip)]
     password_hash: String,
-    updated_at: i64,
-    created_at: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
+    last_activity_at: Option<DateTime<Utc>>,
+    #[schema(value_type = String)]
+    updated_at: DateTime<Utc>,
+    #[schema(value_type = String)]
+    created_at: DateTime<Utc>,
 }
 
 impl User {
@@ -34,22 +46,29 @@ impl User {
     pub fn username(&self) -> &str {
         &self.username
     }
+
+    #[cfg(test)]
+    pub fn fullname(&self) -> Option<&str> {
+        self.fullname.as_deref()
+    }
+
+    #[cfg(test)]
+    pub fn role(&self) -> Role {
+        self.role
+    }
 }
 
 /// Implement the FromRequestParts trait for User, this allows us to extract a User from a request
 /// using the user repository and the session cookie
-#[async_trait]
 impl<S> FromRequestParts<S> for User
 where
-    Users: FromRequestParts<S>,
+    Users: FromRef<S>,
     S: Send + Sync,
 {
     type Rejection = APIError;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let Ok(users) = Users::from_request_parts(parts, state).await else {
-            return Err(AuthenticationError::UserNotFound.into());
-        };
+        let users = Users::from_ref(state);
 
         let jar = CookieJar::from_headers(&parts.headers);
         let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
@@ -57,6 +76,35 @@ where
         };
 
         Ok(users.get_by_session_key(session_cookie.value()).await?)
+    }
+}
+
+/// Implement the OptionalFromRequestParts trait for User, this allows us to extract a Option<User> from a request
+/// using the user repository and the session cookie
+impl<S> OptionalFromRequestParts<S> for User
+where
+    Users: FromRef<S>,
+    S: Send + Sync,
+{
+    type Rejection = APIError;
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &S,
+    ) -> Result<Option<Self>, Self::Rejection> {
+        let users = Users::from_ref(state);
+        let jar = CookieJar::from_headers(&parts.headers);
+
+        let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
+            return Ok(None);
+        };
+
+        match users.get_by_session_key(session_cookie.value()).await {
+            Ok(user) => Ok(Some(user)),
+            Err(AuthenticationError::UserNotFound)
+            | Err(AuthenticationError::SessionKeyNotFound) => Ok(None),
+            Err(e) => Err(e.into()),
+        }
     }
 }
 
@@ -102,33 +150,58 @@ impl Users {
         Ok(user)
     }
 
-    /// Create a new user, save a Argon2id v19 hash of the password
-    #[allow(unused)]
+    /// Create a new user, save an Argon2id v19 hash of the password
     pub async fn create(
         &self,
         username: &str,
+        fullname: Option<&str>,
         password: &str,
+        role: Role,
     ) -> Result<User, AuthenticationError> {
         let password_hash = hash_password(password)?;
 
         let user = sqlx::query_as!(
             User,
-            r#"INSERT INTO users (username, password_hash)
-            VALUES (?, ?)
+            r#"INSERT INTO users (username, fullname, password_hash, role)
+            VALUES (?, ?, ?, ?)
             RETURNING
                 id as "id: u32",
                 username,
+                fullname,
                 password_hash,
-                updated_at,
-                created_at
+                role,
+                last_activity_at as "last_activity_at: _",
+                updated_at as "updated_at: _",
+                created_at as "created_at: _"
             "#,
             username,
-            password_hash
+            fullname,
+            password_hash,
+            role,
         )
         .fetch_one(&self.0)
         .await?;
 
         Ok(user)
+    }
+
+    /// Update a user's password
+    pub async fn update_password(
+        &self,
+        user_id: u32,
+        new_password: &str,
+    ) -> Result<(), AuthenticationError> {
+        let password_hash = hash_password(new_password)?;
+
+        sqlx::query!(
+            r#"UPDATE users SET password_hash = ? WHERE id = ?"#,
+            password_hash,
+            user_id
+        )
+        .execute(&self.0)
+        .await?;
+
+        Ok(())
     }
 
     /// Get a user by their username
@@ -142,9 +215,12 @@ impl Users {
             SELECT
                 id as "id: u32",
                 username,
+                fullname,
+                role,
                 password_hash,
-                updated_at,
-                created_at
+                last_activity_at as "last_activity_at: _",
+                updated_at as "updated_at: _",
+                created_at as "created_at: _"
             FROM users WHERE username = ?
             "#,
             username
@@ -163,9 +239,12 @@ impl Users {
             SELECT
                 id as "id: u32",
                 username,
+                fullname,
+                role,
                 password_hash,
-                updated_at,
-                created_at
+                last_activity_at as "last_activity_at: _",
+                updated_at as "updated_at: _",
+                created_at as "created_at: _"
             FROM users WHERE id = ?
             "#,
             id
@@ -174,6 +253,25 @@ impl Users {
         .await?;
 
         Ok(user)
+    }
+
+    pub async fn list(&self) -> Result<Vec<User>, Error> {
+        let users = query_as!(
+            User,
+            r#"SELECT
+                id as "id: u32",
+                username,
+                fullname,
+                password_hash,
+                role,
+                last_activity_at as "last_activity_at: _",
+                updated_at as "updated_at: _",
+                created_at as "created_at: _"
+            FROM users"#
+        )
+        .fetch_all(&self.0)
+        .await?;
+        Ok(users)
     }
 }
 
@@ -185,20 +283,23 @@ impl FromRef<AppState> for Users {
 
 #[cfg(test)]
 mod tests {
+    use chrono::TimeDelta;
     use sqlx::SqlitePool;
-    use std::time::Duration;
+    use test_log::test;
 
     use crate::authentication::{
-        error::AuthenticationError, session::Sessions, user::Users, util::get_current_time,
+        error::AuthenticationError, role::Role, session::Sessions, user::Users,
     };
 
-    #[sqlx::test]
+    #[test(sqlx::test)]
     async fn test_create_user(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
-        let user = users.create("test_user", "password").await.unwrap();
+        let user = users
+            .create("test_user", None, "password", Role::Typist)
+            .await
+            .unwrap();
 
-        assert!(get_current_time().unwrap() - user.created_at as u64 <= 1);
         assert_eq!(user.username, "test_user");
 
         let fetched_user = users.get_by_id(user.id).await.unwrap().unwrap();
@@ -210,11 +311,19 @@ mod tests {
         assert_eq!(user, fetched_user);
     }
 
-    #[sqlx::test]
+    #[test(sqlx::test)]
     async fn test_authenticate_user(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
-        let user = users.create("test_user", "password").await.unwrap();
+        let user = users
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Coordinator,
+            )
+            .await
+            .unwrap();
 
         let authenticated_user = users.authenticate("test_user", "password").await.unwrap();
 
@@ -241,14 +350,22 @@ mod tests {
         ));
     }
 
-    #[sqlx::test]
+    #[test(sqlx::test)]
     async fn test_from_session_key(pool: SqlitePool) {
         let users = Users::new(pool.clone());
         let sessions = Sessions::new(pool.clone());
 
-        let user = users.create("test_user", "password").await.unwrap();
+        let user = users
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
+            .await
+            .unwrap();
         let session = sessions
-            .create(user.id, Duration::from_secs(60))
+            .create(user.id, TimeDelta::seconds(60))
             .await
             .unwrap();
 
@@ -270,5 +387,60 @@ mod tests {
             fetched_user,
             AuthenticationError::SessionKeyNotFound
         ));
+    }
+
+    #[test(sqlx::test)]
+    async fn test_change_password(pool: SqlitePool) {
+        let users = Users::new(pool.clone());
+
+        let user = users
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
+            .await
+            .unwrap();
+
+        users
+            .update_password(user.id, "new_password")
+            .await
+            .unwrap();
+
+        let authenticated_user = users
+            .authenticate("test_user", "new_password")
+            .await
+            .unwrap();
+
+        assert_eq!(user.id(), authenticated_user.id());
+
+        let authenticated_user = users
+            .authenticate("test_user", "password")
+            .await
+            .unwrap_err();
+
+        assert!(matches!(
+            authenticated_user,
+            AuthenticationError::InvalidPassword
+        ));
+    }
+
+    #[test(sqlx::test)]
+    async fn password_hash_does_not_serialize(pool: SqlitePool) {
+        let users = Users::new(pool.clone());
+        let user = users
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
+            .await
+            .unwrap();
+
+        let serialized_user = serde_json::to_value(user).unwrap();
+        assert_eq!(serialized_user["username"], "test_user".to_string());
+        assert!(serialized_user.get("password_hash").is_none());
     }
 }

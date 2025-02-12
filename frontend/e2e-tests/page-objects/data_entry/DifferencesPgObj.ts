@@ -1,21 +1,22 @@
 import { type Locator, type Page } from "@playwright/test";
 
+import { DifferencesCounts } from "@kiesraad/api";
+
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
-export interface MoreBallotsFields {
-  moreBallotsCount: number;
-  tooManyBallotsHandedOutCount: number;
-  otherExplanationCount: number;
-  noExplanationCount: number;
-}
+export type MoreBallotsFields = Pick<
+  DifferencesCounts,
+  "more_ballots_count" | "too_many_ballots_handed_out_count" | "other_explanation_count" | "no_explanation_count"
+>;
 
-export interface FewerBallotsFields {
-  fewerBallotsCount: number;
-  unreturnedBallotsCount: number;
-  tooFewBallotsHandedOutCount: number;
-  otherExplanationCount: number;
-  noExplanationCount: number;
-}
+export type FewerBallotsFields = Pick<
+  DifferencesCounts,
+  | "fewer_ballots_count"
+  | "unreturned_ballots_count"
+  | "too_few_ballots_handed_out_count"
+  | "other_explanation_count"
+  | "no_explanation_count"
+>;
 
 export class DifferencesPage extends DataEntryBasePage {
   readonly fieldset: Locator;
@@ -47,18 +48,29 @@ export class DifferencesPage extends DataEntryBasePage {
     this.next = page.getByRole("button", { name: "Volgende" });
   }
 
+  async fillInPageAndClickNext(fields: DifferencesCounts) {
+    await this.moreBallotsCount.fill(fields.more_ballots_count.toString());
+    await this.fewerBallotsCount.fill(fields.fewer_ballots_count.toString());
+    await this.unreturnedBallotsCount.fill(fields.unreturned_ballots_count.toString());
+    await this.tooFewBallotsHandedOutCount.fill(fields.too_few_ballots_handed_out_count.toString());
+    await this.tooManyBallotsHandedOutCount.fill(fields.too_many_ballots_handed_out_count.toString());
+    await this.otherExplanationCount.fill(fields.other_explanation_count.toString());
+    await this.noExplanationCount.fill(fields.no_explanation_count.toString());
+    await this.next.click();
+  }
+
   async fillMoreBallotsFields(fields: MoreBallotsFields) {
-    await this.moreBallotsCount.fill(fields.moreBallotsCount.toString());
-    await this.tooManyBallotsHandedOutCount.fill(fields.tooManyBallotsHandedOutCount.toString());
-    await this.otherExplanationCount.fill(fields.otherExplanationCount.toString());
-    await this.noExplanationCount.fill(fields.noExplanationCount.toString());
+    await this.moreBallotsCount.fill(fields.more_ballots_count.toString());
+    await this.tooManyBallotsHandedOutCount.fill(fields.too_many_ballots_handed_out_count.toString());
+    await this.otherExplanationCount.fill(fields.other_explanation_count.toString());
+    await this.noExplanationCount.fill(fields.no_explanation_count.toString());
   }
 
   async fillFewerBallotsFields(fields: FewerBallotsFields) {
-    await this.fewerBallotsCount.fill(fields.fewerBallotsCount.toString());
-    await this.unreturnedBallotsCount.fill(fields.unreturnedBallotsCount.toString());
-    await this.tooFewBallotsHandedOutCount.fill(fields.tooFewBallotsHandedOutCount.toString());
-    await this.otherExplanationCount.fill(fields.otherExplanationCount.toString());
-    await this.noExplanationCount.fill(fields.noExplanationCount.toString());
+    await this.fewerBallotsCount.fill(fields.fewer_ballots_count.toString());
+    await this.unreturnedBallotsCount.fill(fields.unreturned_ballots_count.toString());
+    await this.tooFewBallotsHandedOutCount.fill(fields.too_few_ballots_handed_out_count.toString());
+    await this.otherExplanationCount.fill(fields.other_explanation_count.toString());
+    await this.noExplanationCount.fill(fields.no_explanation_count.toString());
   }
 }

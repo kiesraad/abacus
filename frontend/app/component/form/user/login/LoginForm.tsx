@@ -1,35 +1,88 @@
-import { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router";
 
+import {
+  AnyApiError,
+  FatalError,
+  isError,
+  LOGIN_REQUEST_BODY,
+  LOGIN_REQUEST_PATH,
+  LoginResponse,
+  useApiState,
+} from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { BottomBar, Button, InputField } from "@kiesraad/ui";
-
-interface FormElements extends HTMLFormControlsCollection {
-  username: HTMLInputElement;
-  password: HTMLInputElement;
-}
-
-interface LoginFormElement extends HTMLFormElement {
-  readonly elements: FormElements;
-}
+import { Alert, BottomBar, Button, FormLayout, InputField } from "@kiesraad/ui";
 
 export function LoginForm() {
   const navigate = useNavigate();
+  const { client, setUser } = useApiState();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<AnyApiError | null>(null);
 
-  function handleSubmit(event: FormEvent<LoginFormElement>) {
+  // Handle form submission
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    navigate("../account/setup");
+    setLoading(true);
+
+    // Submit the credentials to the API
+    const formData = new FormData(event.currentTarget);
+    const requestPath: LOGIN_REQUEST_PATH = "/api/user/login";
+    const requestBody: LOGIN_REQUEST_BODY = {
+      username: formData.get("username") as string,
+      password: formData.get("password") as string,
+    };
+    const result = await client.postRequest<LoginResponse>(requestPath, requestBody);
+
+    // Handle the result
+    setLoading(false);
+    if (isError(result)) {
+      setError(result);
+    } else {
+      setUser(result.data);
+      // TODO: Handle successful login navigation here
+      void navigate("../setup");
+    }
+  }
+
+  // Propagate fatal errors to the error boundary, which will render an error page
+  if (error instanceof FatalError) {
+    throw error;
   }
 
   return (
-    <form className="no_footer" onSubmit={handleSubmit}>
-      <div>
-        <InputField name="username" label={t("user.username")} hint={t("user.username_login_hint")} />
-        <InputField name="password" label={t("user.password")} hint={t("user.password_login_hint")} type="password" />
-      </div>
+    <form
+      className="no_footer"
+      onSubmit={(e) => {
+        void handleSubmit(e);
+      }}
+    >
+      <FormLayout>
+        {error && (
+          <FormLayout.Alert>
+            <Alert type="error" margin="mb-lg">
+              <h2>{t(`error.api_error.${error.reference}`)}</h2>
+            </Alert>
+          </FormLayout.Alert>
+        )}
+        <InputField
+          name="username"
+          label={t("user.username")}
+          hint={t("user.username_login_hint")}
+          readOnly={loading}
+          required={true}
+        />
+        <InputField
+          name="password"
+          label={t("user.password")}
+          hint={t("user.password_login_hint")}
+          type="password"
+          readOnly={loading}
+          required={true}
+        />
+      </FormLayout>
       <BottomBar type="footer">
         <BottomBar.Row>
-          <Button type="submit" size="lg">
+          <Button type="submit" size="lg" disabled={loading}>
             {t("user.login")}
           </Button>
         </BottomBar.Row>

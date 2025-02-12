@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
-import { PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
+import { DataEntryStatusName, PollingStation, useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { IconError } from "@kiesraad/icon";
 import { Alert, BottomBar, Button, Icon, KeyboardKey, KeyboardKeys } from "@kiesraad/ui";
-import { cn, getUrlForDataEntry, parsePollingStationNumber, useDebouncedCallback } from "@kiesraad/util";
+import { cn, getUrlForDataEntry, parseIntUserInput, useDebouncedCallback } from "@kiesraad/util";
 
 import cls from "./PollingStationChoiceForm.module.css";
 import { PollingStationLink } from "./PollingStationLink";
@@ -37,7 +37,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   }, USER_INPUT_DEBOUNCE);
 
   useMemo(() => {
-    const parsedInt = parsePollingStationNumber(pollingStationNumber);
+    const parsedInt = parseIntUserInput(pollingStationNumber);
     setLoading(true);
     debouncedCallback(pollingStations.find((pollingStation: PollingStation) => pollingStation.number === parsedInt));
   }, [pollingStationNumber, pollingStations, debouncedCallback]);
@@ -48,18 +48,21 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
       return;
     }
 
-    const parsedStationNumber = parsePollingStationNumber(pollingStationNumber);
+    const parsedStationNumber = parseIntUserInput(pollingStationNumber);
     const pollingStation = pollingStations.find((pollingStation) => pollingStation.number === parsedStationNumber);
-    const pollingStationStatus = electionStatus.statuses.find((status) => status.id === pollingStation?.id)?.status;
+    const pollingStationStatus = electionStatus.statuses.find(
+      (status) => status.polling_station_id === pollingStation?.id,
+    )?.status;
+    const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
 
-    if (pollingStationStatus === "definitive") {
+    if (pollingStationStatus && firstAndSecondEntryFinished.includes(pollingStationStatus)) {
       setAlert(DEFINITIVE_POLLING_STATION_ALERT);
       setLoading(false);
       return;
     }
 
     if (pollingStation) {
-      navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStationStatus));
+      void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStationStatus));
     } else {
       setAlert(INVALID_POLLING_STATION_ALERT);
       setLoading(false);
@@ -68,16 +71,9 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   };
 
   const unfinished = electionStatus.statuses
-    .filter((status) =>
-      [
-        "first_entry_unfinished",
-        "first_entry_in_progress",
-        "second_entry_unfinished",
-        "second_entry_in_progress",
-      ].includes(status.status),
-    )
+    .filter((status) => ["first_entry_in_progress", "second_entry_in_progress"].includes(status.status))
     .map((status) => ({
-      pollingStation: pollingStations.find((ps) => ps.id === status.id),
+      pollingStation: pollingStations.find((ps) => ps.id === status.polling_station_id),
       status: status.status,
     }));
 

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import { t } from "@kiesraad/i18n";
 import { IconArrowLeft } from "@kiesraad/icon";
@@ -31,7 +31,7 @@ export function Error({ title, error, children }: ErrorProps) {
                 variant="secondary"
                 leftIcon={<IconArrowLeft />}
                 onClick={() => {
-                  navigate(-1);
+                  void navigate(-1);
                 }}
               >
                 {t("history_back")}

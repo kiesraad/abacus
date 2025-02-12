@@ -1,26 +1,50 @@
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { overrideOnce, Providers, screen, setupTestRouter, userTypeInputs, waitFor, within } from "app/test/unit";
+import { errorWarningMocks } from "app/component/form/testHelperFunctions";
+import { routes } from "app/routes";
 
-import { electionMockData } from "@kiesraad/api-mocks";
+import { SaveDataEntryResponse } from "@kiesraad/api";
+import {
+  ElectionListRequestHandler,
+  electionMockData,
+  ElectionRequestHandler,
+  ElectionStatusRequestHandler,
+  PollingStationDataEntryDeleteHandler,
+  PollingStationDataEntryGetHandler,
+  PollingStationDataEntrySaveHandler,
+} from "@kiesraad/api-mocks";
+import {
+  overrideOnce,
+  Providers,
+  Router,
+  screen,
+  server,
+  setupTestRouter,
+  userTypeInputs,
+  waitFor,
+  within,
+} from "@kiesraad/test";
 
-const router = setupTestRouter();
-const render = () => rtlRender(<Providers router={router} />);
+function renderWithRouter() {
+  const router = setupTestRouter(routes);
+  rtlRender(<Providers router={router} />);
+  return router;
+}
 
 const user = userEvent.setup();
 
-const submit = async () => {
+async function submit() {
   await user.click(screen.getByRole("button", { name: "Volgende" }));
-};
+}
 
-const startPollingStationInput = async () => {
+async function startPollingStationInput(router: Router) {
   await router.navigate("/elections/1/data-entry/1/1");
   expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/1");
-};
+}
 
-const expectRecountedForm = async (inputShouldHaveFocus = true) => {
+async function expectRecountedForm(inputShouldHaveFocus = true) {
   await waitFor(() => {
     expect(screen.getByTestId("recounted_form")).toBeInTheDocument();
   });
@@ -29,23 +53,23 @@ const expectRecountedForm = async (inputShouldHaveFocus = true) => {
       expect(screen.getByTestId("yes")).toHaveFocus();
     });
   }
-};
+}
 
-const fillRecountedFormNo = async () => {
+async function fillRecountedFormNo() {
   await user.click(await screen.findByLabelText("Nee, er was geen hertelling"));
   await waitFor(() => {
     expect(screen.getByLabelText("Nee, er was geen hertelling")).toBeChecked();
   });
-};
+}
 
-const fillRecountedFormYes = async () => {
+async function fillRecountedFormYes() {
   await user.click(await screen.findByLabelText("Ja, er was een hertelling"));
   await waitFor(() => {
     expect(screen.getByLabelText("Ja, er was een hertelling")).toBeChecked();
   });
-};
+}
 
-const expectVotersAndVotesForm = async (inputShouldHaveFocus = true) => {
+async function expectVotersAndVotesForm(inputShouldHaveFocus = true) {
   await waitFor(() => {
     expect(screen.getByTestId("voters_and_votes_form")).toBeInTheDocument();
   });
@@ -54,11 +78,11 @@ const expectVotersAndVotesForm = async (inputShouldHaveFocus = true) => {
       expect(screen.getByRole("textbox", { name: "A Stempassen" })).toHaveFocus();
     });
   }
-};
+}
 
 const total_votes = electionMockData.political_groups.length * 10;
 
-const fillVotersAndVotesForm = async (values?: Record<string, number>) => {
+async function fillVotersAndVotesForm(values?: Record<string, number>) {
   const userValues = values ?? {
     poll_card_count: total_votes,
     proxy_certificate_count: 0,
@@ -71,9 +95,9 @@ const fillVotersAndVotesForm = async (values?: Record<string, number>) => {
   };
 
   await userTypeInputs(user, userValues);
-};
+}
 
-const expectDifferencesForm = async (inputShouldHaveFocus = true) => {
+async function expectDifferencesForm(inputShouldHaveFocus = true) {
   await waitFor(() => {
     expect(screen.getByTestId("differences_form")).toBeInTheDocument();
   });
@@ -82,9 +106,9 @@ const expectDifferencesForm = async (inputShouldHaveFocus = true) => {
       expect(screen.getByRole("textbox", { name: "I Stembiljetten méér geteld" })).toHaveFocus();
     });
   }
-};
+}
 
-const fillDifferencesForm = async (values?: Record<string, number>) => {
+async function fillDifferencesForm(values?: Record<string, number>) {
   const userValues = values ?? {
     more_ballots_count: 0,
     fewer_ballots_count: 0,
@@ -96,9 +120,9 @@ const fillDifferencesForm = async (values?: Record<string, number>) => {
   };
 
   await userTypeInputs(user, userValues);
-};
+}
 
-const expectPoliticalGroupCandidatesForm = async (pgNumber: number, inputShouldHaveFocus = true) => {
+async function expectPoliticalGroupCandidatesForm(pgNumber: number, inputShouldHaveFocus = true) {
   await waitFor(() => {
     expect(screen.getByTestId(`candidates_form_${pgNumber}`)).toBeInTheDocument();
   });
@@ -107,17 +131,17 @@ const expectPoliticalGroupCandidatesForm = async (pgNumber: number, inputShouldH
       expect(screen.getByTestId(`candidate_votes[0].votes`)).toHaveFocus();
     });
   }
-};
+}
 
-const fillPoliticalGroupCandidatesVotesForm = async () => {
+async function fillPoliticalGroupCandidatesVotesForm() {
   await userTypeInputs(user, {
     "candidate_votes[0].votes": 5,
     "candidate_votes[1].votes": 5,
     total: 10,
   });
-};
+}
 
-const expectCheckAndSavePage = async (bodyShouldHaveFocus = true) => {
+async function expectCheckAndSavePage(router: Router, bodyShouldHaveFocus = true) {
   await waitFor(() => {
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry/1/1/save");
   });
@@ -126,276 +150,177 @@ const expectCheckAndSavePage = async (bodyShouldHaveFocus = true) => {
       expect(document.body).toHaveFocus();
     });
   }
-};
+}
 
-const expectFeedbackError = async (code?: string) => {
+async function expectFeedbackError(code: string) {
+  const error = screen.getByTestId("feedback-error");
   await waitFor(() => {
-    expect(screen.getByTestId("feedback-error")).toBeInTheDocument();
+    expect(error).toBeInTheDocument();
   });
   if (code) {
-    expect(screen.getByText(code)).toBeInTheDocument();
+    expect(within(error).getByText(code)).toBeInTheDocument();
   }
   await waitFor(() => {
-    expect(screen.getByRole("heading", { level: 3 })).toHaveFocus();
+    expect(within(error).getByRole("heading", { level: 3 })).toHaveFocus();
   });
-};
+}
 
-const expectFeedbackWarning = async (code?: string) => {
+async function expectFeedbackWarning(code: string) {
+  const warning = screen.getByTestId("feedback-warning");
   await waitFor(() => {
-    expect(screen.getByTestId("feedback-warning")).toBeInTheDocument();
+    expect(warning).toBeInTheDocument();
   });
   if (code) {
-    expect(screen.getByText(code)).toBeInTheDocument();
+    expect(within(warning).getByText(code)).toBeInTheDocument();
   }
   await waitFor(() => {
-    expect(screen.getByRole("heading", { level: 3 })).toHaveFocus();
+    expect(within(warning).getByRole("heading", { level: 3 })).toHaveFocus();
   });
-};
+}
 
-const acceptWarnings = async () => {
+async function acceptWarnings() {
   await user.click(screen.getByLabelText("Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."));
   expect(
     screen.getByLabelText("Ik heb de aantallen gecontroleerd met het papier en correct overgenomen."),
   ).toBeChecked();
-};
+}
 
-const expectBlockerModal = async () => {
+async function expectBlockerModal() {
   expect(await screen.findByTestId("modal-title")).toHaveFocus();
   expect(await screen.findByTestId("modal-title")).toHaveTextContent("Let op: niet opgeslagen wijzigingen");
-};
+}
 
-const expectElementContainsIcon = async (id: string, ariaLabel: string) => {
+async function expectElementContainsIcon(id: string, ariaLabel: string) {
   const el = await screen.findByTestId(id);
   expect(el).toBeInTheDocument();
   expect(within(el).getByRole("img")).toHaveAccessibleName(ariaLabel);
-};
+}
 
-const abortDataEntry = async () => {
+async function abortDataEntry() {
   await user.click(screen.getByRole("button", { name: "Invoer afbreken" }));
-};
+}
 
-const abortSaveChanges = async () => {
+async function abortSaveChanges() {
   await user.click(screen.getByRole("button", { name: "Invoer bewaren" }));
-};
+}
 
-const abortDelete = async () => {
+async function abortDelete() {
   await user.click(screen.getByRole("button", { name: "Niet bewaren" }));
-};
+}
 
-const expectPollingStationChoicePage = async () => {
+async function expectPollingStationChoicePage(router: Router) {
   await waitFor(() => {
     expect(router.state.location.pathname).toEqual("/elections/1/data-entry");
   });
   await waitFor(() => {
     expect(screen.getByTestId("polling-station-choice-form")).toBeInTheDocument();
   });
-};
+}
 
-const submitWith422Response = async () => {
+async function submitWith422Response() {
   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 422, {
     error: "JSON error or invalid data (Unprocessable Content)",
     fatal: false,
     reference: "InvalidJson",
   });
   await submit();
-};
+}
 
-const expect422ClientError = async () => {
+async function expect422ClientError() {
   const feedbackServerError = await screen.findByTestId("error-modal");
-  expect(feedbackServerError).toHaveTextContent("Foutcode: 422JSON error or invalid data (Unprocessable Content)");
-};
+  expect(feedbackServerError).toHaveTextContent("De JSON is niet geldig");
+}
 
-const submitWith500Response = async () => {
+async function submitWith500Response() {
   overrideOnce("post", "/api/polling_stations/1/data_entries/1", 500, {
     error: "Internal server error",
     fatal: false,
     reference: "InternalServerError",
   });
   await submit();
-};
+}
 
-const expect500ServerError = async () => {
+async function expect500ServerError() {
   const feedbackServerError = await screen.findByTestId("error-modal");
-  expect(feedbackServerError).toHaveTextContent("Foutcode: 500Internal server error");
-};
+  expect(feedbackServerError).toHaveTextContent("Er is een interne fout opgetreden");
+}
 
 type FormIdentifier = "recounted" | "voters_and_votes" | "differences" | `candidates_${number}`;
 
-const gotoForm = async (id: FormIdentifier, inputShouldHaveFocus = true) => {
+async function gotoForm(id: FormIdentifier, inputShouldHaveFocus = true) {
   if (id.startsWith("candidates_")) {
     const bits = id.split("_");
     if (bits.length === 2 && bits[1]) {
       const pgNumber = parseInt(bits[1]);
-      await userEvent.click(screen.getByRole("link", { name: `Lijst ${pgNumber}` }));
+      await user.click(screen.getByRole("link", { name: `Lijst ${pgNumber}` }));
       await expectPoliticalGroupCandidatesForm(pgNumber, inputShouldHaveFocus);
       return;
     }
   }
   switch (id) {
     case "recounted":
-      await userEvent.click(screen.getByRole("link", { name: "Is er herteld?" }));
+      await user.click(screen.getByRole("link", { name: "Is er herteld?" }));
       await expectRecountedForm(inputShouldHaveFocus);
       break;
     case "voters_and_votes":
-      await userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
+      await user.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
       await expectVotersAndVotesForm(inputShouldHaveFocus);
       break;
     case "differences":
-      await userEvent.click(screen.getByRole("link", { name: "Verschillen" }));
+      await user.click(screen.getByRole("link", { name: "Verschillen" }));
       await expectDifferencesForm(inputShouldHaveFocus);
       break;
   }
-};
+}
 
 // Steps to fill up to the 'voters and votes' form, submit, and leave pending changes
-const stepsForPendingChanges = [
-  startPollingStationInput,
-  expectRecountedForm,
-  fillRecountedFormNo,
-  submit,
-  expectVotersAndVotesForm,
-  fillVotersAndVotesForm,
-  submit,
-  expectDifferencesForm,
-  () => gotoForm("voters_and_votes"),
-  expectVotersAndVotesForm,
-  () =>
-    fillVotersAndVotesForm({
-      poll_card_count: 1,
-      proxy_certificate_count: 1,
-      voter_card_count: 1,
-      total_admitted_voters_count: 2,
-      votes_candidates_count: 1,
-      blank_votes_count: 1,
-      invalid_votes_count: 1,
-      total_votes_cast_count: 3,
-    }),
-  submit,
-  expectFeedbackError,
-  () =>
-    fillVotersAndVotesForm({
-      total_admitted_voters_count: 3,
-    }),
-];
+async function executeStepsForPendingChanges(router: Router) {
+  await startPollingStationInput(router);
+  await expectRecountedForm();
+  await fillRecountedFormNo();
+  await submit();
+  await expectVotersAndVotesForm();
+  await fillVotersAndVotesForm();
+  await submit();
+  await expectDifferencesForm();
+  await gotoForm("voters_and_votes");
+  await expectVotersAndVotesForm();
+  await fillVotersAndVotesForm({
+    poll_card_count: 1,
+    proxy_certificate_count: 1,
+    voter_card_count: 1,
+    total_admitted_voters_count: 2,
+    votes_candidates_count: 1,
+    blank_votes_count: 1,
+    invalid_votes_count: 1,
+    total_votes_cast_count: 3,
+  });
+
+  overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+    validation_results: { errors: [errorWarningMocks.F201], warnings: [] },
+  } as SaveDataEntryResponse);
+  await submit();
+  await expectFeedbackError("F.201");
+  await fillVotersAndVotesForm({
+    total_admitted_voters_count: 3,
+  });
+}
 
 describe("Polling Station data entry integration tests", () => {
+  beforeEach(() => {
+    server.use(
+      ElectionListRequestHandler,
+      ElectionRequestHandler,
+      ElectionStatusRequestHandler,
+      PollingStationDataEntryGetHandler,
+      PollingStationDataEntrySaveHandler,
+      PollingStationDataEntryDeleteHandler,
+    );
+  });
   describe("Navigation through the form", () => {
     test("Fill in complete form", async () => {
-      render();
-
-      const formFillingSteps = [
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submit,
-        expectVotersAndVotesForm,
-        fillVotersAndVotesForm,
-        submit,
-        expectDifferencesForm,
-        fillDifferencesForm,
-        submit,
-        ...electionMockData.political_groups.flatMap((pg) => [
-          () => expectPoliticalGroupCandidatesForm(pg.number),
-          fillPoliticalGroupCandidatesVotesForm,
-          submit,
-        ]),
-        expectCheckAndSavePage,
-      ];
-
-      for (const step of formFillingSteps) {
-        await step();
-      }
-    });
-
-    test("Error F204 navigates back to voters and votes page", async () => {
-      render();
-
-      const formFillingSteps = [
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submit,
-        expectVotersAndVotesForm,
-        () =>
-          fillVotersAndVotesForm({
-            poll_card_count: total_votes,
-            proxy_certificate_count: 1,
-            voter_card_count: 0,
-            total_admitted_voters_count: total_votes + 1,
-            // to get the F204 error, votes_candidates_count should not match total_votes
-            votes_candidates_count: total_votes + 1,
-            blank_votes_count: 0,
-            invalid_votes_count: 0,
-            total_votes_cast_count: total_votes + 1,
-          }),
-        submit,
-        expectDifferencesForm,
-        fillDifferencesForm,
-        submit,
-        ...electionMockData.political_groups.flatMap((pg) => [
-          () => expectPoliticalGroupCandidatesForm(pg.number),
-          fillPoliticalGroupCandidatesVotesForm,
-          submit,
-        ]),
-        () => expectVotersAndVotesForm(false),
-        () => expectFeedbackError("F.204"),
-      ];
-
-      for (const step of formFillingSteps) {
-        await step();
-      }
-    });
-
-    test("Navigate back", async () => {
-      render();
-
-      const steps = [
-        // fill up to and including the differences form
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submit,
-        expectVotersAndVotesForm,
-        fillVotersAndVotesForm,
-        submit,
-        expectDifferencesForm,
-        fillDifferencesForm,
-        submit,
-        // navigate back to the 'voters and votes' form
-        () => userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
-        expectVotersAndVotesForm,
-      ];
-
-      for (const step of steps) {
-        await step();
-      }
-    });
-
-    test("Navigate back with dirty state", async () => {
-      render();
-
-      const steps = [
-        // fill up to and including the voters and votes form
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submit,
-        expectVotersAndVotesForm,
-        fillVotersAndVotesForm,
-        // don't submit, and navigate back to the 'recounted' form
-        () => userEvent.click(screen.getByRole("link", { name: "Is er herteld?" })),
-        expectRecountedForm,
-      ];
-
-      for (const step of steps) {
-        await step();
-      }
-    });
-
-    test("Navigate to next page after navigating back one page submitting", async () => {
-      // https://github.com/kiesraad/abacus/issues/426
-      render();
-      await startPollingStationInput();
+      const router = renderWithRouter();
+      await startPollingStationInput(router);
       await expectRecountedForm();
       await fillRecountedFormNo();
       await submit();
@@ -403,223 +328,288 @@ describe("Polling Station data entry integration tests", () => {
       await fillVotersAndVotesForm();
       await submit();
       await expectDifferencesForm();
-      await userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
+      await fillDifferencesForm();
+      await submit();
+      for (const pg of electionMockData.political_groups) {
+        await expectPoliticalGroupCandidatesForm(pg.number);
+        await fillPoliticalGroupCandidatesVotesForm();
+        await submit();
+      }
+      await expectCheckAndSavePage(router);
+    });
+
+    test("Error F204 navigates back to voters and votes page", async () => {
+      const router = renderWithRouter();
+      await startPollingStationInput(router);
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submit();
+      await expectVotersAndVotesForm();
+      await fillVotersAndVotesForm({
+        poll_card_count: total_votes,
+        proxy_certificate_count: 1,
+        voter_card_count: 0,
+        total_admitted_voters_count: total_votes + 1,
+        // to get the F204 error, votes_candidates_count should not match total_votes
+        votes_candidates_count: total_votes + 1,
+        blank_votes_count: 0,
+        invalid_votes_count: 0,
+        total_votes_cast_count: total_votes + 1,
+      });
+      await submit();
+      await expectDifferencesForm();
+      await fillDifferencesForm();
+      await submit();
+
+      const lastGroup = electionMockData.political_groups[electionMockData.political_groups.length - 1];
+      for (const group of electionMockData.political_groups) {
+        await expectPoliticalGroupCandidatesForm(group.number);
+        await fillPoliticalGroupCandidatesVotesForm();
+
+        if (group === lastGroup) {
+          overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+            validation_results: { errors: [errorWarningMocks.F204], warnings: [] },
+          } as SaveDataEntryResponse);
+        }
+        await submit();
+      }
+      await expectVotersAndVotesForm(false);
+      await expectFeedbackError("F.204");
+    });
+
+    test("Navigate back", async () => {
+      const router = renderWithRouter();
+      await startPollingStationInput(router);
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submit();
+      await expectVotersAndVotesForm();
+      await fillVotersAndVotesForm();
+      await submit();
+      await expectDifferencesForm();
+      await fillDifferencesForm();
+      await submit();
+      await user.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
+      await expectVotersAndVotesForm();
+    });
+
+    test("Navigate back with dirty state", async () => {
+      const router = renderWithRouter();
+      await startPollingStationInput(router);
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submit();
+      await expectVotersAndVotesForm();
+      await fillVotersAndVotesForm();
+      await user.click(screen.getByRole("link", { name: "Is er herteld?" }));
+      await expectRecountedForm();
+    });
+
+    test("Navigate to next page after navigating back one page submitting", async () => {
+      // https://github.com/kiesraad/abacus/issues/426
+      const router = renderWithRouter();
+      await startPollingStationInput(router);
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submit();
+      await expectVotersAndVotesForm();
+      await fillVotersAndVotesForm();
+      await submit();
+      await expectDifferencesForm();
+      await user.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
       await expectVotersAndVotesForm();
       await submit();
       await expectDifferencesForm();
     });
 
     test("Navigate to next page after navigating back two pages and submitting", async () => {
-      render();
+      const router = renderWithRouter();
 
-      const steps = [
-        // fill up to and including the differences form
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submit,
-        expectVotersAndVotesForm,
-        fillVotersAndVotesForm,
-        submit,
-        expectDifferencesForm,
-        fillDifferencesForm,
-        submit,
-        // navigate back to the 'voters and votes' form and submit
-        () => userEvent.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })),
-        expectVotersAndVotesForm,
-        submit,
-        // expect to be on the 'differences' form
-        expectDifferencesForm,
-      ];
-
-      for (const step of steps) {
-        await step();
-      }
+      await startPollingStationInput(router);
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submit();
+      await expectVotersAndVotesForm();
+      await fillVotersAndVotesForm();
+      await submit();
+      await expectDifferencesForm();
+      await fillDifferencesForm();
+      await submit();
+      await user.click(screen.getByRole("link", { name: "Aantal kiezers en stemmen" }));
+      await expectVotersAndVotesForm();
+      await submit();
+      await expectDifferencesForm();
     });
 
     test("Navigating with changes triggers changes modal", async () => {
-      render();
-
-      const steps = [
-        ...stepsForPendingChanges,
-        () => userEvent.click(screen.getByRole("link", { name: "Verschillen" })),
-        expectBlockerModal,
-      ];
-
-      for (const step of steps) {
-        await step();
-      }
+      const router = renderWithRouter();
+      await executeStepsForPendingChanges(router);
+      await user.click(screen.getByRole("link", { name: "Verschillen" }));
+      await expectBlockerModal();
     });
 
     test("Navigating with saved changes goes to correct form", async () => {
-      render();
-
-      const steps = [
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submit,
-        expectVotersAndVotesForm,
-        fillVotersAndVotesForm,
-        submit,
-        expectDifferencesForm,
-        fillDifferencesForm,
-        submit,
-        ...electionMockData.political_groups.flatMap((pg) => [
-          () => expectPoliticalGroupCandidatesForm(pg.number),
-          fillPoliticalGroupCandidatesVotesForm,
-          submit,
-        ]),
-        expectCheckAndSavePage,
-
-        () => gotoForm("voters_and_votes"),
-        () =>
-          userTypeInputs(user, {
-            total_admitted_voters_count: 1,
-          }),
-        submit,
-        expectFeedbackError,
-        () =>
-          userTypeInputs(user, {
-            total_admitted_voters_count: total_votes,
-          }),
-        () => userEvent.click(screen.getByRole("link", { name: "Is er herteld?" })),
-        expectBlockerModal,
-        () => user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" })),
-        expectRecountedForm,
-      ];
-
-      for (const step of steps) {
-        await step();
+      const router = renderWithRouter();
+      await startPollingStationInput(router);
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submit();
+      await expectVotersAndVotesForm();
+      await fillVotersAndVotesForm();
+      await submit();
+      await expectDifferencesForm();
+      await fillDifferencesForm();
+      await submit();
+      for (const pg of electionMockData.political_groups) {
+        await expectPoliticalGroupCandidatesForm(pg.number);
+        await fillPoliticalGroupCandidatesVotesForm();
+        await submit();
       }
+      await expectCheckAndSavePage(router);
+
+      await gotoForm("voters_and_votes");
+      await userTypeInputs(user, {
+        total_admitted_voters_count: 1,
+      });
+
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [errorWarningMocks.F201], warnings: [] },
+      } as SaveDataEntryResponse);
+      await submit();
+      await expectFeedbackError("F.201");
+
+      await userTypeInputs(user, {
+        total_admitted_voters_count: total_votes,
+      });
+
+      await user.click(screen.getByRole("link", { name: "Is er herteld?" }));
+      await expectBlockerModal();
+
+      await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
+      await expectRecountedForm();
     });
 
     test("Changing recount generates an error for differences page", async () => {
-      render();
+      const router = renderWithRouter();
+      await startPollingStationInput(router);
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submit();
+      await expectVotersAndVotesForm();
+      await fillVotersAndVotesForm();
+      await submit();
+      await expectDifferencesForm();
+      await fillDifferencesForm();
+      await submit();
 
-      const steps = [
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submit,
-        expectVotersAndVotesForm,
-        fillVotersAndVotesForm,
-        submit,
-        expectDifferencesForm,
-        fillDifferencesForm,
-        submit,
-        ...electionMockData.political_groups.flatMap((pg) => [
-          () => expectPoliticalGroupCandidatesForm(pg.number),
-          fillPoliticalGroupCandidatesVotesForm,
-          submit,
-        ]),
-        expectCheckAndSavePage,
-        () => expectElementContainsIcon("list-item-save", "je bent hier"),
-        () => gotoForm("recounted"),
-        () => expectElementContainsIcon("list-item-save", "nog niet afgerond"),
-        fillRecountedFormYes,
-        submit,
-        expectVotersAndVotesForm,
-        () => expectElementContainsIcon("list-item-differences", "bevat een fout"),
-      ];
-
-      for (const step of steps) {
-        await step();
+      for (const pg of electionMockData.political_groups) {
+        await expectPoliticalGroupCandidatesForm(pg.number);
+        await fillPoliticalGroupCandidatesVotesForm();
+        await submit();
       }
+
+      await expectCheckAndSavePage(router);
+      await expectElementContainsIcon("list-item-save", "je bent hier");
+      await gotoForm("recounted");
+      await expectElementContainsIcon("list-item-save", "nog niet afgerond");
+      await fillRecountedFormYes();
+
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [errorWarningMocks.F301], warnings: [] },
+      } as SaveDataEntryResponse);
+      await submit();
+      await expectVotersAndVotesForm();
+      await expectElementContainsIcon("list-item-differences", "bevat een fout");
     });
 
     test("Progress list shows correct icons", async () => {
-      render();
+      const router = renderWithRouter();
+      await startPollingStationInput(router);
+      await expectRecountedForm();
+      await fillRecountedFormNo();
+      await submit();
+      await expectVotersAndVotesForm();
+      await fillVotersAndVotesForm();
+      await submit();
+      await expectDifferencesForm();
+      await gotoForm("voters_and_votes");
+      await expectElementContainsIcon("list-item-differences", "nog niet afgerond");
 
-      const steps = [
-        startPollingStationInput,
-        expectRecountedForm,
-        fillRecountedFormNo,
-        submit,
-        expectVotersAndVotesForm,
-        fillVotersAndVotesForm,
-        submit,
-        expectDifferencesForm,
-        () => gotoForm("voters_and_votes"),
-        () => expectElementContainsIcon("list-item-differences", "nog niet afgerond"),
+      await gotoForm("differences");
+      await fillDifferencesForm();
+      await submit();
 
-        () => gotoForm("differences"),
-        fillDifferencesForm,
-        submit,
-        ...electionMockData.political_groups.flatMap((pg) => [
-          () => expectPoliticalGroupCandidatesForm(pg.number),
-          fillPoliticalGroupCandidatesVotesForm,
-          submit,
-        ]),
-        expectCheckAndSavePage,
-        () => expectElementContainsIcon("list-item-recounted", "opgeslagen"),
-        () => expectElementContainsIcon("list-item-differences", "leeg"),
-
-        () => gotoForm("voters_and_votes"),
-        () => expectElementContainsIcon("list-item-voters-and-votes", "je bent hier"),
-        () =>
-          fillVotersAndVotesForm({
-            poll_card_count: total_votes + 1,
-            total_admitted_voters_count: total_votes + 1,
-            votes_candidates_count: total_votes,
-            total_votes_cast_count: total_votes,
-          }),
-        submit,
-        () => expectDifferencesForm(false),
-        () => fillDifferencesForm({ fewer_ballots_count: 1, no_explanation_count: 2 }),
-        submit,
-        () => expectFeedbackWarning("W.302"),
-        acceptWarnings,
-        submit,
-
-        () => expectPoliticalGroupCandidatesForm(1),
-        () => expectElementContainsIcon("list-item-differences", "opgeslagen"),
-
-        () => gotoForm("voters_and_votes"),
-        () =>
-          userTypeInputs(user, {
-            total_admitted_voters_count: 1,
-          }),
-        submit,
-        () => expectVotersAndVotesForm(false),
-        () => gotoForm("differences", false),
-        () => expectElementContainsIcon("list-item-voters-and-votes", "bevat een fout"),
-      ];
-
-      for (const step of steps) {
-        await step();
+      for (const pg of electionMockData.political_groups) {
+        await expectPoliticalGroupCandidatesForm(pg.number);
+        await fillPoliticalGroupCandidatesVotesForm();
+        await submit();
       }
+
+      await expectCheckAndSavePage(router);
+      await expectElementContainsIcon("list-item-recounted", "opgeslagen");
+      await expectElementContainsIcon("list-item-differences", "leeg");
+
+      await gotoForm("voters_and_votes");
+      await expectElementContainsIcon("list-item-voters-and-votes", "je bent hier");
+      await fillVotersAndVotesForm({
+        poll_card_count: total_votes + 1,
+        total_admitted_voters_count: total_votes + 1,
+        votes_candidates_count: total_votes,
+        total_votes_cast_count: total_votes,
+      });
+      await submit();
+      await expectDifferencesForm(false);
+      await fillDifferencesForm({ fewer_ballots_count: 1, no_explanation_count: 2 });
+
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [], warnings: [errorWarningMocks.W302] },
+      } as SaveDataEntryResponse);
+      await submit();
+      await expectFeedbackWarning("W.302");
+      await acceptWarnings();
+      await submit();
+
+      await expectPoliticalGroupCandidatesForm(1);
+      await expectElementContainsIcon("list-item-differences", "opgeslagen");
+
+      await gotoForm("voters_and_votes");
+      await userTypeInputs(user, {
+        total_admitted_voters_count: 1,
+      });
+
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [errorWarningMocks.F201], warnings: [] },
+      } as SaveDataEntryResponse);
+      await submit();
+      await expectVotersAndVotesForm(false);
+      await gotoForm("differences", false);
+      await expectElementContainsIcon("list-item-voters-and-votes", "bevat een fout");
     });
   });
 
   describe("Aborting data entry", () => {
     test("Aborting and save with pending changes is possible", async () => {
-      render();
-
-      const steps = [...stepsForPendingChanges, abortDataEntry, abortSaveChanges, expectPollingStationChoicePage];
-
-      for (const step of steps) {
-        await step();
-      }
+      const router = renderWithRouter();
+      await executeStepsForPendingChanges(router);
+      await abortDataEntry();
+      await abortSaveChanges();
+      await expectPollingStationChoicePage(router);
     });
 
     test("Abort and delete with pending changes is possible", async () => {
-      render();
-
-      const steps = [...stepsForPendingChanges, abortDataEntry, abortDelete, expectPollingStationChoicePage];
-
-      for (const step of steps) {
-        await step();
-      }
+      const router = renderWithRouter();
+      await executeStepsForPendingChanges(router);
+      await abortDataEntry();
+      await abortDelete();
+      await expectPollingStationChoicePage(router);
     });
   });
 
   describe("API error responses", () => {
     test("4xx response results in error shown", async () => {
       vi.spyOn(console, "error").mockImplementation(() => {});
-      render();
-
-      await startPollingStationInput();
+      const router = renderWithRouter();
+      await startPollingStationInput(router);
       await expectRecountedForm();
       await fillRecountedFormNo();
       await submitWith422Response();
@@ -628,9 +618,8 @@ describe("Polling Station data entry integration tests", () => {
 
     test("5xx response results in error shown", async () => {
       vi.spyOn(console, "error").mockImplementation(() => {});
-      render();
-
-      await startPollingStationInput();
+      const router = renderWithRouter();
+      await startPollingStationInput(router);
       await expectRecountedForm();
       await fillRecountedFormNo();
       await submitWith500Response();

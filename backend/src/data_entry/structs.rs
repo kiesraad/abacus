@@ -1,14 +1,29 @@
-use crate::error::ErrorReference;
-use crate::APIError;
+use crate::{
+    data_entry::status::DataEntryStatus,
+    election::{CandidateNumber, PGNumber},
+    error::ErrorReference,
+    APIError,
+};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::{types::Json, FromRow};
 use std::ops::AddAssign;
 use utoipa::ToSchema;
+
+#[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Default)]
+pub struct PollingStationDataEntry {
+    pub polling_station_id: u32,
+    #[schema(value_type = DataEntryStatus)]
+    pub state: Json<DataEntryStatus>,
+    #[schema(value_type = String)]
+    pub updated_at: DateTime<Utc>,
+}
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PollingStationResultsEntry {
     pub polling_station_id: u32,
     pub data: PollingStationResults,
-    pub created_at: i64,
+    pub created_at: DateTime<Utc>,
 }
 
 /// PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.
@@ -18,8 +33,7 @@ pub struct PollingStationResultsEntry {
 /// Bijlage 2: uitkomsten per stembureau" from the
 /// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
 /// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(test, derive(Default))]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct PollingStationResults {
     /// Recounted ("Is er herteld? - See form for official long description of the checkbox")
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,8 +64,7 @@ impl PollingStationResults {
 pub type Count = u32;
 
 /// Voters counts, part of the polling station results.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(test, derive(Default))]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct VotersCounts {
     /// Number of valid poll cards ("Aantal geldige stempassen")
     #[schema(value_type = u32)]
@@ -77,8 +90,7 @@ impl AddAssign<&VotersCounts> for VotersCounts {
 }
 
 /// Votes counts, part of the polling station results.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(test, derive(Default))]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct VotesCounts {
     /// Number of valid votes on candidates
     /// ("Aantal stembiljetten met een geldige stem op een kandidaat")
@@ -105,8 +117,7 @@ impl AddAssign<&VotesCounts> for VotesCounts {
 }
 
 /// Differences counts, part of the polling station results.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(test, derive(Default))]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct DifferencesCounts {
     /// Number of more counted ballots ("Er zijn méér stembiljetten geteld. Hoeveel stembiljetten zijn er meer geteld?")
     #[schema(value_type = u32)]
@@ -146,10 +157,10 @@ impl DifferencesCounts {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(test, derive(Default))]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct PoliticalGroupVotes {
-    pub number: u8,
+    #[schema(value_type = u32)]
+    pub number: PGNumber,
     #[schema(value_type = u32)]
     pub total: Count,
     pub candidate_votes: Vec<CandidateVotes>,
@@ -188,7 +199,11 @@ impl PoliticalGroupVotes {
 
     /// Create `PoliticalGroupVotes` from test data.
     #[cfg(test)]
-    pub fn from_test_data(number: u8, total_count: Count, candidate_votes: &[(u8, Count)]) -> Self {
+    pub fn from_test_data(
+        number: PGNumber,
+        total_count: Count,
+        candidate_votes: &[(CandidateNumber, Count)],
+    ) -> Self {
         PoliticalGroupVotes {
             number,
             total: total_count,
@@ -204,14 +219,18 @@ impl PoliticalGroupVotes {
 
     /// Create `PoliticalGroupVotes` from test data with candidate numbers automatically generated starting from 1.
     #[cfg(test)]
-    pub fn from_test_data_auto(number: u8, total_count: Count, candidate_votes: &[Count]) -> Self {
+    pub fn from_test_data_auto(
+        number: PGNumber,
+        total_count: Count,
+        candidate_votes: &[Count],
+    ) -> Self {
         Self::from_test_data(
             number,
             total_count,
             &candidate_votes
                 .iter()
                 .enumerate()
-                .map(|(i, votes)| (i as u8 + 1, *votes))
+                .map(|(i, votes)| (CandidateNumber::try_from(i + 1).unwrap(), *votes))
                 .collect::<Vec<_>>(),
         )
     }
@@ -219,7 +238,8 @@ impl PoliticalGroupVotes {
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct CandidateVotes {
-    pub number: u8,
+    #[schema(value_type = u32)]
+    pub number: CandidateNumber,
     #[schema(value_type = u32)]
     pub votes: Count,
 }
@@ -227,6 +247,7 @@ pub struct CandidateVotes {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test_log::test;
 
     #[test]
     fn test_votes_addition() {

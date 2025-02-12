@@ -1,19 +1,14 @@
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-
-import { NavBar } from "app/component/navbar/NavBar.tsx";
+import { useSearchParams } from "react-router";
 
 import { useElection, usePollingStationListRequest } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconPlus } from "@kiesraad/icon";
 import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
-import { useNumericParam } from "@kiesraad/util";
 
 export function PollingStationListPage() {
-  const electionId = useNumericParam("electionId");
   const { election } = useElection();
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const { requestState } = usePollingStationListRequest(electionId);
+  const { requestState } = usePollingStationListRequest(election.id);
 
   if (requestState.status === "loading") {
     return <Loader />;
@@ -33,9 +28,9 @@ export function PollingStationListPage() {
 
   const deletedPollingStation = searchParams.get("deleted");
 
-  const closeAlert = () => {
+  function closeAlert() {
     setSearchParams("");
-  };
+  }
 
   const labelForPollingStationType = {
     FixedLocation: t("polling_station.type.FixedLocation"),
@@ -47,13 +42,6 @@ export function PollingStationListPage() {
   return (
     <>
       <PageTitle title={`${t("polling_stations")} - Abacus`} />
-      <NavBar>
-        <Link to={`/elections/${election.id}#coordinator`}>
-          <span className="bold">{election.location}</span>
-          <span>&mdash;</span>
-          <span>{election.name}</span>
-        </Link>
-      </NavBar>
       <header>
         <section>
           <h1>{t("polling_station.title.plural")}</h1>
@@ -96,16 +84,9 @@ export function PollingStationListPage() {
 
             <Toolbar>
               <Toolbar.Section pos="start">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  leftIcon={<IconPlus />}
-                  onClick={() => {
-                    navigate("create");
-                  }}
-                >
-                  {t("manual_input")}
-                </Button>
+                <Button.Link variant="secondary" size="sm" to="./create">
+                  <IconPlus /> {t("manual_input")}
+                </Button.Link>
               </Toolbar.Section>
             </Toolbar>
           </article>
@@ -113,16 +94,9 @@ export function PollingStationListPage() {
           <article>
             <Toolbar>
               <Toolbar.Section pos="end">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  leftIcon={<IconPlus />}
-                  onClick={() => {
-                    navigate("create");
-                  }}
-                >
-                  {t("polling_station.form.create")}
-                </Button>
+                <Button.Link variant="secondary" size="sm" to="./create">
+                  <IconPlus /> {t("polling_station.form.create")}
+                </Button.Link>
               </Toolbar.Section>
             </Toolbar>
 
@@ -137,7 +111,9 @@ export function PollingStationListPage() {
                   <Table.LinkRow key={station.id} to={`${station.id}/update`}>
                     <Table.NumberCell>{station.number}</Table.NumberCell>
                     <Table.Cell className="break-word">{station.name}</Table.Cell>
-                    <Table.Cell>{labelForPollingStationType[station.polling_station_type]}</Table.Cell>
+                    <Table.Cell>
+                      {station.polling_station_type && labelForPollingStationType[station.polling_station_type]}
+                    </Table.Cell>
                   </Table.LinkRow>
                 ))}
               </Table.Body>

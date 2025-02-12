@@ -1,6 +1,7 @@
 #import "common/style.typ": conf, title, mono
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2.json")
+#set text(lang: "nl")
 
 #show: doc => conf(input, doc, footer: [
   #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
@@ -97,7 +98,7 @@ was. Indien er meerdere zittingslocaties waren, vermeld dan per lid de locatie.]
       grid.cell(text(size: 8pt, [Locatie])),
       grid.cell()[]
     )),
-    table.cell(align: horizon, stack(dir: ltr, spacing: 3pt, time_input(time: ""), align(top, [-]), time_input(time: ""))),
+    table.cell(align: horizon, stack(dir: ltr, spacing: 3pt, time_input(time: ""), "-", time_input(time: ""))),
   )}).flatten(),
 )
 
@@ -117,12 +118,10 @@ was. Indien er meerdere zittingslocaties waren, vermeld dan per lid de locatie.]
     ..input.polling_stations.map(polling_station => {(
       [#polling_station.number],
       [
-        #if polling_station.polling_station_type == "Mobile" [
+        #if "polling_station_type" in polling_station and polling_station.polling_station_type == "Mobile" [
           _(Mobiel stembureau)_
         ] else [
-          #polling_station.street #polling_station.house_number #if "house_number_addition" in polling_station and polling_station.house_number_addition != none [
-            #polling_station.house_number_addition
-          ] \
+          #polling_station.address \
           #polling_station.postal_code #polling_station.locality
         ]
       ]
@@ -226,7 +225,7 @@ Is bij alle afzonderlijke stembureaus het aantal uitgebrachte stemmen en het aan
 
 #pagebreak(weak: true)
 
-= Nieuwe telling aantal toeglaten kiezers bij overklaarde verschillen
+= Nieuwe telling aantal toegelaten kiezers bij onverklaarde verschillen
 
 Voor de stembureaus met de nummers #text_input(value: input.summary.recounted_polling_stations.map(str).join(", "), empty_width: 300pt) heeft het #is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 een nieuwe telling uitgevoerd van het aantal toegelaten kiezers, omdat er sprake was van een onverklaard verschil tussen
@@ -342,8 +341,8 @@ Naam leden
   naam hebben genoteerd, ondertekenen het proces-verbaal. Houd hierbij de volgorde aan van rubriek 12.
 ]
 
-#block(width: 100%, align(right + horizon, stack(dir: ltr, spacing: 15pt,
-  [Datum: ],
+#block(width: 100%, align(right, stack(dir: ltr, spacing: 15pt,
+  align(horizon, [Datum: ]),
   date_input(date: none, top_label: ([Dag], [Maand], [Jaar])),
   time_input(time: none, top_label: "Tijd")
 )))

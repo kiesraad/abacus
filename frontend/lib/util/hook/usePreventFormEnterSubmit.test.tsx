@@ -3,8 +3,7 @@ import * as React from "react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { render } from "app/test/unit";
-
+import { render } from "@kiesraad/test";
 import { usePreventFormEnterSubmit } from "@kiesraad/util";
 
 const TestComponent = ({ cb }: { cb: (event: React.FormEvent) => void }) => {
@@ -25,10 +24,11 @@ describe("usePreventFormEnterSubmit", () => {
       event.preventDefault();
     });
     const { getByTestId } = render(<TestComponent cb={fn} />);
+    const user = userEvent.setup();
 
     const input = getByTestId("input-test");
     input.focus();
-    await userEvent.type(input, "hello{enter}");
+    await user.type(input, "hello{enter}");
 
     expect(fn).not.toHaveBeenCalled();
   });

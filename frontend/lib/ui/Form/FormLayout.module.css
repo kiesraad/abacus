@@ -1,8 +1,19 @@
 .form-layout {
-  padding-bottom: var(--space-xl);
+  margin-bottom: var(--space-md);
 }
+
+.form-layout.medium-width {
+  max-width: 32rem;
+}
+
 .form-section {
-  padding-bottom: var(--space-md);
+  margin-bottom: var(--space-md);
+
+  h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    margin-bottom: var(--space-md-lg);
+  }
 }
 
 .form-row {

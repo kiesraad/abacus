@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-- [Node](https://nodejs.org) v20
+- [Node](https://nodejs.org) v22
 
 ### Building
 
@@ -52,17 +52,17 @@ Browser tests using Playwright:
 
 ```sh
 # tests for ui components using ladle:
-npm run e2e:lib-ui
-
-# tests for frontend with msw:
-npm run e2e:app
+npm run test:ladle
 
 # tests for frontend with backend and database
 # tests use database at backend/target/debug/playwright.sqlite
 # build frontend, build backend, setup fresh seeded database:
-npm run e2e:d2d
+npm run test:e2e
 # run tests, expect builds and database to be available:
-npm run e2e:d2d-dev
+npm run test:e2e-dev
+
+# view reports and traces, e.g. the ones saved by our pipeline:
+npx playwright show-report <path-to-unzipped-report-folder>
 ```
 
 ### UI Component development
@@ -75,6 +75,26 @@ npm run ladle
 
 And open Ladle at http://localhost:61000/.
 
+## Production build
+
+Prerequisites:
+
+- [Node](https://nodejs.org) v22
+
+Install npm dependencies, skipping development dependencies:
+
+```sh
+npm clean-install --omit=dev
+```
+
+Build the frontend:
+
+```sh
+npm run build
+```
+
+The built frontend is located in the `dist` directory.
+
 ## Structure
 
 ### Dependencies
@@ -83,15 +103,15 @@ The application uses the following dependencies:
 
 - `react`: creating efficient, declarative, and component-based web applications.
 - `react-dom`: DOM implementation for rendering UI
-- `react-dom-router`: Handling browser routing for React applications
+- `react-router`: Handling browser routing for React applications
+- `vite`: frontend build tool
+- `postcss` and `autoprefixer`: CSS post processors
 
 #### Development dependencies
 
 - `typescript`: Strongly typed layer on top of JavaScript
 - `msw`: Mock Service Worker for mocking the server, client side
-- `vite`: frontend build tool
 - `ladle`: simple development and test environment for UI components
-- `postcss` and `autoprefixer`: CSS post processors
 - `lefthook`: git hook automation
 - `cross-env`: for building on Windows
 

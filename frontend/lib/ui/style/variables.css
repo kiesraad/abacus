@@ -1,22 +1,22 @@
 @font-face {
   font-family: "SpaceGrotesk";
-  src: url("/static/font/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf") format("TrueType");
+  src: url("../../../static/font/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf") format("TrueType");
 }
 
 @font-face {
   font-family: "DMSans";
-  src: url("/static/font/DM_Sans/DMSans-VariableFont_opsz,wght.ttf") format("TrueType");
+  src: url("../../../static/font/DM_Sans/DMSans-VariableFont_opsz,wght.ttf") format("TrueType");
   font-weight: 1 1000;
 }
 
 @font-face {
   font-family: "DMSansItalic";
-  src: url("/static/font/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf") format("TrueType");
+  src: url("../../../static/font/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf") format("TrueType");
 }
 
 @font-face {
   font-family: "GeistMono";
-  src: url("/static/font/Geist_Mono/GeistMono-Regular.otf") format("opentype");
+  src: url("../../../static/font/Geist_Mono/GeistMono-Regular.otf") format("opentype");
   font-feature-settings: "ss09" on;
 }
 
@@ -32,7 +32,7 @@
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
-  --font-size-lg: 1.9rem;
+  --font-size-lg: 1.875rem;
   --font-size-xl: 3rem;
 
   /* SPACING */
@@ -100,8 +100,20 @@
   --red-100: #fbe9ed;
   --red-50: #fef9fa;
 
-  --text-color-header: #101828;
-  --text-color-body: #344054;
+  --gray-900: #101828;
+  --gray-800: #1d2939;
+  --gray-700: #344054;
+  --gray-600: #475467;
+  --gray-500: #667085;
+  --gray-400: #98a2b3;
+  --gray-300: #d0d5dd;
+  --gray-200: #eaecf0;
+  --gray-100: #f2f4f7;
+  --gray-50: #f9fafb;
+  --gray-25: #fcfcfd;
+
+  --text-color-header: var(--gray-900);
+  --text-color-body: var(--gray-700);
 
   --button-color-primary: var(--base-dark-blue);
   --button-color-primary-hover: #00447a;
@@ -114,7 +126,7 @@
   --button-color-disabled: #b3b3b3;
   --button-color-bg-disabled: #f2f2f2;
 
-  --checkbox-radio-color-border: var(--gray);
+  --checkbox-radio-color-border: var(--gray-400);
   --checkbox-radio-color-bg-default: var(--base-white);
   --checkbox-radio-color-bg-active: var(--bg-gray);
   --checkbox-radio-color-bg-hover: var(--bg-gray-darker);
@@ -156,13 +168,12 @@
   --color-success-bg: #e7f3ee;
   --color-success-hover: #b8ddca;
 
-  --color-help-text: #475467;
-  --color-hover: #eaecf0;
+  --color-help-text: var(--gray-600);
+  --color-hover: var(--gray-200);
 
-  --gray: #98a2b3;
   --bg-gray: #f9fafb;
-  --bg-gray-darker: #f2f4f7;
-  --bg-gray-darkest: #d0d5dd;
+  --bg-gray-darker: var(--gray-100);
+  --bg-gray-darkest: var(--gray-300);
   --bg-highlight: #eff4ff;
 
   --base-black: #000000;
@@ -177,7 +188,7 @@
   --link-active: #0040c1;
   --link-visited: #6927da;
 
-  --menu-empty: #667085;
+  --menu-empty: var(--gray-500);
   --menu-unsaved: var(--color-notify);
   --menu-active: var(--text-color-header);
   --menu-accept: var(--color-success);
@@ -199,7 +210,7 @@
   --badge-objections: #4a1fb8;
   --badge-objections-bg: #ebe9fe;
   --badge-difference: var(--base-white);
-  --badge-difference-bg: #d92d20;
+  --badge-difference-bg: var(--red-600);
   --badge-typist-busy: var(--link-active);
   --badge-typist-busy-bg: var(--shadow-color-focus);
   --badge-definitive: var(--base-white);
@@ -211,5 +222,5 @@
   --progress-bar-in-progress: #efc943;
   --progress-bar-first-entry-finished: #66c61c;
   --progress-bar-definitive: var(--color-success);
-  --progress-bar-not-started: #d0d5dd;
+  --progress-bar-not-started: var(--gray-300);
 }

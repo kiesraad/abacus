@@ -1,14 +1,13 @@
 import { useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 
 import { ElectionProgress } from "app/component/election/ElectionProgress";
 import { Footer } from "app/component/footer/Footer";
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
-import { NavBar } from "app/component/navbar/NavBar";
 
 import { DEFAULT_CANCEL_REASON, useElection, useElectionStatus } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { Alert, PageTitle, WorkStationNumber } from "@kiesraad/ui";
+import { Alert, PageTitle } from "@kiesraad/ui";
 
 export function DataEntryHomePage() {
   const navigate = useNavigate();
@@ -32,21 +31,15 @@ export function DataEntryHomePage() {
   const dataEntryDone = showFirstDataEntrySavedAlert || showSecondDataEntrySavedAlert;
 
   function closeDataEntrySavedAlert() {
-    navigate(location.pathname);
+    void navigate(location.pathname);
   }
 
   return (
     <>
       <PageTitle title={`${t("data_entry.pick_polling_station")} - Abacus`} />
-      <NavBar>
-        <Link to={"/elections"}>{t("overview")}</Link>
-      </NavBar>
       <header>
         <section>
           <h1>{election.name}</h1>
-        </section>
-        <section>
-          <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
       {dataEntryDone && (

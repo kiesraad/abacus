@@ -6,8 +6,7 @@ pre-commit:
     backend-sqlx-prepare:
       root: "backend/"
       glob: "*.rs"
-      run: cargo sqlx prepare -- --all-targets --all-features
-      stage_fixed: true
+      run: cargo sqlx prepare -- --all-targets --all-features && git add .sqlx
     backend-formatter:
       root: "backend/"
       glob: "*.rs"
@@ -20,15 +19,16 @@ pre-commit:
     backend-openapi:
       root: "backend/"
       glob: "*.rs"
-      run: cargo run --package backend --bin gen-openapi && git add openapi.json
+      run: >
+        cargo run --package abacus --bin gen-openapi && 
+        git add openapi.json &&
+        cd ../frontend &&
+        npm run gen:openapi &&
+        git add lib/api/gen/openapi.ts
     frontend-formatter:
       root: "frontend/"
       run: npx prettier --ignore-unknown --write {staged_files}
       stage_fixed: true
-    frontend-typescript:
-      root: "frontend/"
-      glob: "*.{ts,tsx}"
-      run: npx tsc
     frontend-linter:
       root: "frontend/"
       glob: "*.{ts,tsx}"

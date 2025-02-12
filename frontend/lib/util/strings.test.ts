@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { ellipsis, parseIntStrict, parsePollingStationNumber, removeLeadingZeros } from "./strings";
+import { ellipsis, parseIntStrict, parseIntUserInput, removeLeadingZeros } from "./strings";
 
 describe("Strings util", () => {
   test.each([
@@ -67,11 +67,11 @@ describe("Strings util", () => {
     ["/123/456"],
     ["'123456'"],
     ["six"],
-  ])("parsePollingStationNumber %s", (input: string, expected: number | undefined = undefined) => {
+  ])("parseIntUserInput %s", (input: string, expected: number | undefined = undefined) => {
     if (expected !== undefined) {
-      expect(parsePollingStationNumber(input)).toBe(expected);
+      expect(parseIntUserInput(input)).toBe(expected);
     } else {
-      expect(parsePollingStationNumber(input)).toBeUndefined();
+      expect(parseIntUserInput(input)).toBeUndefined();
     }
   });
 });

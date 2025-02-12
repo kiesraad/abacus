@@ -1,7 +1,9 @@
 import {
+  ApiClient,
   ApiError,
   ApiResponseStatus,
   FatalApiError,
+  LoginResponse,
   NetworkError,
   NotFoundError,
   type ValidationResultCode,
@@ -34,4 +36,10 @@ export interface ApiResponse<T> {
   status: ApiResponseStatus.Success;
   code: number;
   data: T;
+}
+
+export interface ApiState {
+  client: ApiClient;
+  user: LoginResponse | null;
+  setUser: (user: LoginResponse | null) => void;
 }

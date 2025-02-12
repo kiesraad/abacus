@@ -1,55 +1,39 @@
-import * as Router from "react-router";
-
 import { screen } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { PollingStationListPage } from "app/module/polling_stations";
-import { overrideOnce, render } from "app/test/unit";
 
 import { ElectionProvider, PollingStationListResponse } from "@kiesraad/api";
+import { ElectionRequestHandler, PollingStationListRequestHandler } from "@kiesraad/api-mocks";
+import { overrideOnce, render, server } from "@kiesraad/test";
 
 describe("PollingStationListPage", () => {
-  test("Show polling stations", async () => {
-    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1" });
+  beforeEach(() => {
+    server.use(ElectionRequestHandler, PollingStationListRequestHandler);
+  });
 
+  test("Show polling stations", async () => {
     render(
       <ElectionProvider electionId={1}>
         <PollingStationListPage />
       </ElectionProvider>,
     );
 
-    expect(await screen.findByRole("table")).toBeVisible();
-
-    const rows = screen.getAllByRole("row");
-    expect(rows.length).toBe(5);
-
-    expect(rows[0]).toHaveTextContent(/Nummer/);
-    expect(rows[0]).toHaveTextContent(/Naam/);
-    expect(rows[0]).toHaveTextContent(/Soort/);
-
-    expect(rows[1]).toHaveTextContent(/33/);
-    expect(rows[1]).toHaveTextContent(/Op Rolletjes/);
-    expect(rows[1]).toHaveTextContent(/Mobiel/);
-
-    expect(rows[2]).toHaveTextContent(/34/);
-    expect(rows[2]).toHaveTextContent(/Testplek/);
-    expect(rows[2]).toHaveTextContent(/Bijzonder/);
-
-    expect(rows[3]).toHaveTextContent(/35/);
-    expect(rows[3]).toHaveTextContent(/Testschool/);
-    expect(rows[3]).toHaveTextContent(/Vaste locatie/);
-
-    expect(rows[4]).toHaveTextContent(/36/);
-    expect(rows[4]).toHaveTextContent(/Testbuurthuis/);
-    expect(rows[4]).toHaveTextContent(/Vaste locatie/);
+    const table = await screen.findByRole("table");
+    expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Nummer", "Naam", "Soort"],
+      ["33", "Op Rolletjes", "Mobiel"],
+      ["34", "Testplek", "Bijzonder"],
+      ["35", "Testschool", "Vaste locatie"],
+      ["36", "Testbuurthuis", "Vaste locatie"],
+    ]);
   });
 
   test("Show no polling stations message", async () => {
     overrideOnce("get", "/api/elections/1/polling_stations", 200, {
       polling_stations: [],
     } satisfies PollingStationListResponse);
-
-    vi.spyOn(Router, "useParams").mockReturnValue({ electionId: "1" });
 
     render(
       <ElectionProvider electionId={1}>

@@ -5,10 +5,8 @@ CREATE TABLE polling_stations
     name                  TEXT                              NOT NULL,
     number                INTEGER                           NOT NULL,
     number_of_voters      INTEGER,
-    polling_station_type  TEXT                              NOT NULL,
-    street                TEXT                              NOT NULL,
-    house_number          TEXT                              NOT NULL,
-    house_number_addition TEXT,
+    polling_station_type  TEXT,
+    address               TEXT                              NOT NULL,
     postal_code           TEXT                              NOT NULL,
     locality              TEXT                              NOT NULL,
 

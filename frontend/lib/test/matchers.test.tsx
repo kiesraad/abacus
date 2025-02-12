@@ -28,6 +28,19 @@ describe("Custom matchers", () => {
               <tr>
                 <td colSpan={2}>Big Cell</td>
               </tr>
+              <tr>
+                <td>
+                  Text<span>badge</span>
+                </td>
+                <td>
+                  <div>
+                    <span>{52}</span>
+                    <span>
+                      {4}/{23}
+                    </span>
+                  </div>
+                </td>
+              </tr>
             </tbody>
           </table>
         </>,
@@ -36,7 +49,12 @@ describe("Custom matchers", () => {
 
     test("Expect to have table content", async () => {
       const table = await screen.findByRole("table");
-      expect(table).toHaveTableContent([["Column One", "Column Two"], ["Cell One", "Cell Two"], ["Big Cell"]]);
+      expect(table).toHaveTableContent([
+        ["Column One", "Column Two"],
+        ["Cell One", "Cell Two"],
+        ["Big Cell"],
+        ["Text badge", "52 4/23"],
+      ]);
     });
 
     test("Expect to have table content to fail", async () => {
@@ -52,7 +70,12 @@ describe("Custom matchers", () => {
     test("Expect not to have table content to fail", async () => {
       const table = await screen.findByRole("table");
       expect(() => {
-        expect(table).not.toHaveTableContent([["Column One", "Column Two"], ["Cell One", "Cell Two"], ["Big Cell"]]);
+        expect(table).not.toHaveTableContent([
+          ["Column One", "Column Two"],
+          ["Cell One", "Cell Two"],
+          ["Big Cell"],
+          ["Text badge", "52 4/23"],
+        ]);
       }).toThrowError(/Expected table not to have content/);
     });
 

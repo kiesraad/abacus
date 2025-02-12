@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { ElectionProgress } from "app/component/election/ElectionProgress";
+import { Footer } from "app/component/footer/Footer";
 import { PollingStationChoiceForm } from "app/component/form/data_entry/polling_station_choice/PollingStationChoiceForm";
 
 import { DEFAULT_CANCEL_REASON, useElection, useElectionStatus } from "@kiesraad/api";
@@ -69,6 +70,7 @@ export function DataEntryHomePage() {
         </article>
         <ElectionProgress />
       </main>
+      <Footer />
     </>
   );
 }

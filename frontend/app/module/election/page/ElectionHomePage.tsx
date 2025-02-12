@@ -1,5 +1,7 @@
 import { Link } from "react-router";
 
+import { Footer } from "app/component/footer/Footer";
+
 import { useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
@@ -40,6 +42,7 @@ export function ElectionHomePage() {
           </ul>
         </article>
       </main>
+      <Footer />
     </>
   );
 }

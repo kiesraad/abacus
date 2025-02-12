@@ -52,7 +52,10 @@ export function LargestAveragesFor19OrMoreSeatsTable({
                           step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow" : "normal"
                         }
                       >
-                        <DisplayFraction id={`${pg_seat_assignment.pg_number}-average`} fraction={average} />
+                        <DisplayFraction
+                          id={`${pg_seat_assignment.pg_number}-${step.rest_seat_number}-average`}
+                          fraction={average}
+                        />
                       </Table.NumberCell>
                     );
                   }

@@ -23,3 +23,4 @@ __Uitbreidingen:__
 
 ### Open punten
 - De Kieswet heeft het pas over het buiten beschouwing laten van overleden kandidaten tijdens de toewijzing van de gekozen kandidaten. Wat als een lijst evenveel zetels krijgt als kandidaten, maar één van die kandidaten is overleden?
+- Mogelijk wordt een wetswijziging goedgekeurd waardoor lijsten de kiesdeler moeten halen om een restzetel te kunnen krijgen.

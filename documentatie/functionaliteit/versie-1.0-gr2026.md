@@ -23,7 +23,7 @@
 
 - Invoerders kunnen uitslagen van stembureaus invoeren voor DSO en CSO.
 - Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders.
-- Verschillen tussen de twee invoeren: de coordinator kiest een van beide invoeren of laat dubbel herinvoeren
+- Verschillen tussen de twee invoeren oplossen: de coordinator kiest een van beide invoeren of laat dubbel herinvoeren.
 - Validatie en consistentiechecks (controleprotocol) worden uitgevoerd op de ingevoerde tellingen van stembureaus.
 
 ### Uitslagbepaling GSB

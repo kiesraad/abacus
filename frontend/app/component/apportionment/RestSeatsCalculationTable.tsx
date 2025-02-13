@@ -16,17 +16,17 @@ export function RestSeatsCalculationTable({ seats, whole_seats, rest_seats }: Re
       <Table.Body>
         <Table.Row>
           <Table.Cell className="bb-none">{t("apportionment.total_number_seats")}</Table.Cell>
-          <Table.NumberCell className="bb-none normal">{seats}</Table.NumberCell>
+          <Table.NumberCell className="font-number bb-none normal">{seats}</Table.NumberCell>
           <Table.Cell className="bb-none" />
         </Table.Row>
         <Table.Row>
           <Table.Cell>{t("apportionment.total_number_assigned_whole_seats")}</Table.Cell>
-          <Table.NumberCell className="normal">{whole_seats}</Table.NumberCell>
+          <Table.NumberCell className="font-number normal">{whole_seats}</Table.NumberCell>
           <Table.Cell>— {t("apportionment.minus")}</Table.Cell>
         </Table.Row>
         <Table.TotalRow>
           <Table.Cell className="bold">{t("apportionment.rest_seat.plural")}</Table.Cell>
-          <Table.NumberCell>{rest_seats}</Table.NumberCell>
+          <Table.NumberCell className="font-number">{rest_seats}</Table.NumberCell>
           <Table.Cell />
         </Table.TotalRow>
       </Table.Body>

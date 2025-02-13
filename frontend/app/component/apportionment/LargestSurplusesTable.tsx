@@ -39,14 +39,14 @@ export function LargestSurplusesTable({
                 {pg_seat_assignment.pg_number}
               </Table.Cell>
               <Table.Cell>{political_groups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
-              <Table.NumberCell>{pg_seat_assignment.whole_seats}</Table.NumberCell>
-              <Table.NumberCell className={rest_seats > 0 ? "bg-yellow" : "normal"}>
+              <Table.NumberCell className="font-number">{pg_seat_assignment.whole_seats}</Table.NumberCell>
+              <Table.NumberCell className={`font-number ${rest_seats > 0 ? "bg-yellow" : "normal"}`}>
                 <DisplayFraction
                   id={`${pg_seat_assignment.pg_number}-surplus`}
                   fraction={pg_seat_assignment.surplus_votes}
                 />
               </Table.NumberCell>
-              <Table.NumberCell>{rest_seats}</Table.NumberCell>
+              <Table.NumberCell className="font-number">{rest_seats}</Table.NumberCell>
             </Table.Row>
           );
         })}

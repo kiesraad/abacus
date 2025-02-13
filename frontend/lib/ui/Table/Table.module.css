@@ -51,6 +51,22 @@
     }
   }
 
+  td.integer-cell {
+    padding-right: 0.25rem;
+    text-align: right;
+    width: 0;
+    min-width: fit-content;
+  }
+
+  td.fraction-cell {
+    padding-left: 0.25rem;
+    text-align: left;
+    width: 0;
+    min-width: fit-content;
+    font-size: var(--font-size-xs);
+    color: var(--gray-600);
+  }
+
   tr.row-link {
     cursor: pointer;
 

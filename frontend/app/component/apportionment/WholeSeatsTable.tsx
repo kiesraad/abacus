@@ -26,13 +26,13 @@ export function WholeSeatsTable({ final_standing, quota }: WholeSeatsTableProps)
           return (
             <Table.Row key={standing.pg_number}>
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "bold")}>{standing.pg_number}</Table.Cell>
-              <Table.NumberCell className="normal">{standing.votes_cast}</Table.NumberCell>
+              <Table.NumberCell className="font-number normal">{standing.votes_cast}</Table.NumberCell>
               <Table.Cell>:</Table.Cell>
-              <Table.NumberCell className="normal">
+              <Table.NumberCell className="font-number normal">
                 <DisplayFraction id={`${standing.pg_number}-quota`} fraction={quota} />
               </Table.NumberCell>
               <Table.Cell>=</Table.Cell>
-              <Table.NumberCell>{standing.whole_seats}</Table.NumberCell>
+              <Table.NumberCell className="font-number">{standing.whole_seats}</Table.NumberCell>
             </Table.Row>
           );
         })}

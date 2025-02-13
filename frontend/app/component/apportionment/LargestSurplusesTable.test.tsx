@@ -4,14 +4,14 @@ import { PoliticalGroup } from "@kiesraad/api";
 import { render, screen } from "@kiesraad/test";
 
 import { LargestSurplusesTable } from "./LargestSurplusesTable";
-import { election, final_standing, highest_surplus_steps } from "./test-data/less-than-19-seats";
+import { apportionment, election, highest_surplus_steps } from "./test-data/less-than-19-seats";
 
 describe("LargestSurplusesTable", () => {
   test("renders a table with the rest seat allocation with largest surpluses system", async () => {
     render(
       <LargestSurplusesTable
         highest_surplus_steps={highest_surplus_steps}
-        final_standing={final_standing}
+        final_standing={apportionment.final_standing}
         political_groups={election.political_groups as PoliticalGroup[]}
       />,
     );

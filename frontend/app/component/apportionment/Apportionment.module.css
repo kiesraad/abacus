@@ -18,9 +18,15 @@
   border-top: 1px solid var(--bg-gray-darkest);
 }
 
-.overflow-x {
+.scrollable {
   width: 52rem;
   overflow-x: auto;
+}
+
+.sticky {
+  position: sticky;
+  z-index: 1;
+  background-color: var(--bg-gray);
 }
 
 .election_summary_table {
@@ -90,19 +96,16 @@
     /* List number sticky column */
     td:first-child,
     th:first-child {
-      position: sticky;
       left: 0;
     }
     /* List name and 'rest seat added to list' text sticky column */
     td:nth-child(2),
     th:nth-child(2) {
-      position: sticky;
       left: 4.525rem;
     }
     /* Number of rest seats sticky column*/
     td:last-child,
     th:last-child {
-      position: sticky;
       right: 0;
     }
     td {
@@ -111,9 +114,8 @@
         min-width: 17rem;
       }
       /* Average */
-      &:nth-child(n + 3) {
-        min-width: 7.5rem;
-        max-width: 10.25rem;
+      &:nth-child(2n + 3) {
+        min-width: 4.5rem;
       }
       /* Number of rest seats */
       &:last-child {

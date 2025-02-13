@@ -1,4 +1,4 @@
-import { ApportionmentStep, Election, PoliticalGroupSeatAssignment } from "@kiesraad/api";
+import { ApportionmentResult, ApportionmentStep, Election } from "@kiesraad/api";
 
 export const highest_surplus_steps: ApportionmentStep[] = [
   {
@@ -761,112 +761,123 @@ export const highest_average_steps: ApportionmentStep[] = [
   },
 ];
 
-export const final_standing: PoliticalGroupSeatAssignment[] = [
-  {
-    pg_number: 1,
-    votes_cast: 808,
-    surplus_votes: {
-      integer: 8,
-      numerator: 0,
-      denominator: 15,
-    },
-    meets_surplus_threshold: true,
-    whole_seats: 10,
-    rest_seats: 2,
-    total_seats: 12,
+export const apportionment: ApportionmentResult = {
+  seats: 15,
+  whole_seats: 10,
+  rest_seats: 5,
+  quota: {
+    integer: 80,
+    numerator: 0,
+    denominator: 15,
   },
-  {
-    pg_number: 2,
-    votes_cast: 60,
-    surplus_votes: {
-      integer: 60,
-      numerator: 0,
-      denominator: 15,
+  steps: highest_surplus_steps.concat(highest_average_steps),
+  final_standing: [
+    {
+      pg_number: 1,
+      votes_cast: 808,
+      surplus_votes: {
+        integer: 8,
+        numerator: 0,
+        denominator: 15,
+      },
+      meets_surplus_threshold: true,
+      whole_seats: 10,
+      rest_seats: 2,
+      total_seats: 12,
     },
-    meets_surplus_threshold: true,
-    whole_seats: 0,
-    rest_seats: 1,
-    total_seats: 1,
-  },
-  {
-    pg_number: 3,
-    votes_cast: 58,
-    surplus_votes: {
-      integer: 58,
-      numerator: 0,
-      denominator: 15,
+    {
+      pg_number: 2,
+      votes_cast: 60,
+      surplus_votes: {
+        integer: 60,
+        numerator: 0,
+        denominator: 15,
+      },
+      meets_surplus_threshold: true,
+      whole_seats: 0,
+      rest_seats: 1,
+      total_seats: 1,
     },
-    meets_surplus_threshold: false,
-    whole_seats: 0,
-    rest_seats: 1,
-    total_seats: 1,
-  },
-  {
-    pg_number: 4,
-    votes_cast: 57,
-    surplus_votes: {
-      integer: 57,
-      numerator: 0,
-      denominator: 15,
+    {
+      pg_number: 3,
+      votes_cast: 58,
+      surplus_votes: {
+        integer: 58,
+        numerator: 0,
+        denominator: 15,
+      },
+      meets_surplus_threshold: false,
+      whole_seats: 0,
+      rest_seats: 1,
+      total_seats: 1,
     },
-    meets_surplus_threshold: false,
-    whole_seats: 0,
-    rest_seats: 1,
-    total_seats: 1,
-  },
-  {
-    pg_number: 5,
-    votes_cast: 56,
-    surplus_votes: {
-      integer: 56,
-      numerator: 0,
-      denominator: 15,
+    {
+      pg_number: 4,
+      votes_cast: 57,
+      surplus_votes: {
+        integer: 57,
+        numerator: 0,
+        denominator: 15,
+      },
+      meets_surplus_threshold: false,
+      whole_seats: 0,
+      rest_seats: 1,
+      total_seats: 1,
     },
-    meets_surplus_threshold: false,
-    whole_seats: 0,
-    rest_seats: 0,
-    total_seats: 0,
-  },
-  {
-    pg_number: 6,
-    votes_cast: 55,
-    surplus_votes: {
-      integer: 55,
-      numerator: 0,
-      denominator: 15,
+    {
+      pg_number: 5,
+      votes_cast: 56,
+      surplus_votes: {
+        integer: 56,
+        numerator: 0,
+        denominator: 15,
+      },
+      meets_surplus_threshold: false,
+      whole_seats: 0,
+      rest_seats: 0,
+      total_seats: 0,
     },
-    meets_surplus_threshold: false,
-    whole_seats: 0,
-    rest_seats: 0,
-    total_seats: 0,
-  },
-  {
-    pg_number: 7,
-    votes_cast: 54,
-    surplus_votes: {
-      integer: 54,
-      numerator: 0,
-      denominator: 15,
+    {
+      pg_number: 6,
+      votes_cast: 55,
+      surplus_votes: {
+        integer: 55,
+        numerator: 0,
+        denominator: 15,
+      },
+      meets_surplus_threshold: false,
+      whole_seats: 0,
+      rest_seats: 0,
+      total_seats: 0,
     },
-    meets_surplus_threshold: false,
-    whole_seats: 0,
-    rest_seats: 0,
-    total_seats: 0,
-  },
-  {
-    pg_number: 8,
-    votes_cast: 52,
-    surplus_votes: {
-      integer: 52,
-      numerator: 0,
-      denominator: 15,
+    {
+      pg_number: 7,
+      votes_cast: 54,
+      surplus_votes: {
+        integer: 54,
+        numerator: 0,
+        denominator: 15,
+      },
+      meets_surplus_threshold: false,
+      whole_seats: 0,
+      rest_seats: 0,
+      total_seats: 0,
     },
-    meets_surplus_threshold: false,
-    whole_seats: 0,
-    rest_seats: 0,
-    total_seats: 0,
-  },
-];
+    {
+      pg_number: 8,
+      votes_cast: 52,
+      surplus_votes: {
+        integer: 52,
+        numerator: 0,
+        denominator: 15,
+      },
+      meets_surplus_threshold: false,
+      whole_seats: 0,
+      rest_seats: 0,
+      total_seats: 0,
+    },
+  ],
+};
 
 export const election: Election = {
   id: 2,

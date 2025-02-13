@@ -9,11 +9,8 @@ _Niveau:_ hoog-over, wolk, ☁️
 1. [De beheerder installeert de applicatie.](./installeren-en-inrichten-applicatie.md#de-beheerder-installeert-de-applicatie-zee)
 
 2. De beheerder leest de verkiezingsdefinitie in.
-
 3. De beheerder leest de kandidatenlijst in.
-
 4. [De beheerder maakt de stembureaus aan.](./installeren-en-inrichten-applicatie.md#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
-
 5. De beheerder maakt de gebruikers aan.
 
 __Uitbreidingen:__  
@@ -42,20 +39,20 @@ __Uitbreidingen:__
 4a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
 
 4b. Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
-&emsp; 3b1. Het GSB voert de hertelling uit.  
-&emsp; 3b2. Het GSB vult een nieuwe Bijlage 2 in.  
-&emsp; 3b3. Het GSB voert de nieuwe Bijlage 2 in de applicatie in.  
-&emsp; 3b4. Het GSB vermeldt het stembureau bij "extra onderzoeken van het GSB" in het concept-PV. (stap 4)
+&emsp; 4b1. Het GSB voert de hertelling uit.  
+&emsp; 4b2. Het GSB vult een nieuwe Bijlage 2 in.  
+&emsp; 4b3. Het GSB voert de nieuwe Bijlage 2 in de applicatie in.  
+&emsp; 4b4. Het GSB vermeldt het stembureau bij "extra onderzoeken van het GSB" in het concept-PV. (stap 4)
 
 6a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
-&emsp; 5a1. Het GSB controleert de resultaten van het controleprotocol.  
-&emsp; 5a2. Het GSB vindt een fout en corrigeert de resultaten van het controleprotocol.  
-&emsp;&emsp; 5a2a. Het GSB vindt geen fout en bevestigt een verschil tussen de controles en de resultaten van de applicatie:  
-&emsp;&emsp;&emsp; 5a2a1. Het GSB neemt contact op met de Kiesraad.  
+&emsp; 6a1. Het GSB controleert de resultaten van het controleprotocol.  
+&emsp; 6a2. Het GSB vindt een fout en corrigeert de resultaten van het controleprotocol.  
+&emsp;&emsp; 6a2a. Het GSB vindt geen fout en bevestigt een verschil tussen de controles en de resultaten van de applicatie:  
+&emsp;&emsp;&emsp; 6a2a1. Het GSB neemt contact op met de Kiesraad.  
 
 7a. Het GSB stelt een probleem vast met het concept-PV:  
 &emsp; 7a1. Het GSB stelt het bezwaar vast.  
-&emsp; 7a2. Het GSB gaat over tot hertelling. (zie uitbreiding 3b)
+&emsp; 7a2. Het GSB gaat over tot hertelling. (zie uitbreiding 4b)
 
 #### Open punten
 
@@ -122,15 +119,15 @@ __Hoofdscenario:__
 4. Het CSB voert de resultaten handmatig in als tweede invoer.
 5. Het CSB voert het controleprotocol optellingen uit. (controleprotocol deel B)
 6. [Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan.](./csb-zetelverdeling-aanwijzing-kandidaten.md#het-csb-stelt-de-zetelverdeling-vast-en-wijst-de-gekozen-kandidaten-aan-vlieger)
-8. De applicatie genereert de benodigde bestanden: concept-PV, digitaal bestand(en). Locatie en datum, namen stembureauleden, bezwaren, opmerkelijkheden, ...?
-9. De applicatie geneert de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
-10. De voorzitter CSB (burgemeester) tekent de brieven.
-11. Het CSB voert het controleprotocol zetelverdeling uit. (controleprotocol deel C)
-12. Het CSB opent de zitting.
-13. Het CSB stelt de uitslag vast obv het concept-PV: controleren op compleetheid, voorlezen, eventuele bezwaren noteren, ondertekenen. En sluit daarmee de zitting.
-14. Het CSB publiceert het digitaal bestand en het PV op de website van de gemeente.
-15. Het CSB stuurt alle PVs naar de gemeenteraad.
-16. Het CSB deelt het digitaal bestand met de Kiesraad.
+7. De applicatie genereert de benodigde bestanden: concept-PV, digitaal bestand(en). Locatie en datum, namen stembureauleden, bezwaren, opmerkelijkheden, ...?
+8. De applicatie geneert de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
+9. De voorzitter CSB (burgemeester) tekent de brieven.
+10. Het CSB voert het controleprotocol zetelverdeling uit. (controleprotocol deel C)
+11. Het CSB opent de zitting.
+12. Het CSB stelt de uitslag vast obv het concept-PV: controleren op compleetheid, voorlezen, eventuele bezwaren noteren, ondertekenen. En sluit daarmee de zitting.
+13. Het CSB publiceert het digitaal bestand en het PV op de website van de gemeente.
+14. Het CSB stuurt alle PVs naar de gemeenteraad.
+15. Het CSB deelt het digitale bestand met de Kiesraad.
 
 __Uitbreidingen:__
 
@@ -139,16 +136,16 @@ __Uitbreidingen:__
 &emsp;2a2. Het GSB doet onderzoek en gaat eventueel over tot hertelling.  
 &emsp;2a3. Het GSB deelt de resultaten van de terugverwijzing met het CSB.
 
-3a. Het is niet mogelijk het digitaal bestand te importeren:  
+3a. Het is niet mogelijk het digitale bestand te importeren:  
 &emsp;3a1. Het CSB doet de eerste invoer handmatig.
 
 4a. Er zijn verschillen tussen eerste en tweede invoer:
 
-13a. Er zijn bezwaren (kan alleen tijdens zitting):
+12a. Er zijn bezwaren (kan alleen tijdens zitting):
 
 ### Open punten
 
 - In [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting d.m.v. CSO (wolk)](#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-eerste-zitting-dmv-cso-wolk) stelt het GSB alleen de digitale bestanden ter beschikking aan het CSB, maar in stap 1 van deze use case lijkt het CSB ook beschikking te hebben over de papieren PVs.
 - Willen we de benoemingsbrieven en de kennisgevingen tot geloofsbrief door de applicatie laten genereren? Of doen we dat liever op een andere manier? Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
 - Moet de applicatie ook de resultaten ter publicatie genereren? Bijvoorbeeld het `.csv` tellingsbestand.
-- Als het niet mogelijk is het digitaal bestand te importeren, kan het CSB dan contact opnemen met het GSB om te proberen het probleem te verhelpen?
+- Als het niet mogelijk is het digitale bestand te importeren, kan het CSB dan contact opnemen met het GSB om te proberen het probleem te verhelpen?

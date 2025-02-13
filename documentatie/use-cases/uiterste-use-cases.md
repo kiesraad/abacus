@@ -33,7 +33,7 @@ Voor DSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatniveau en vult Na31-2 Bijlage 2 in.
 4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
-5. [Het GSB genereert het concept-PV en het elektronisch bestand in de applicatie.](./gsb-genereren-bestanden.md#het-gsb-genereert-het-concept-pv-en-het-elektronisch-bestand-in-de-applicatie-zee)
+5. [Het GSB genereert het concept-PV en het digitale bestand in de applicatie.](./gsb-genereren-bestanden.md#het-gsb-genereert-het-concept-pv-en-het-digitale-bestand-in-de-applicatie-zee)
 6. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 7. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, eventuele bezwaren noteren, ondertekenen. En sluit daarmee de zitting.
 8. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.  
@@ -60,7 +60,7 @@ __Uitbreidingen:__
 #### Open punten
 
 - Het CSB heeft dus niet de beschikking over het papieren PV met Bijlages 2?
-- Hoe ziet de overdracht van het elektronisch bestand van GSB naar CSB er precies uit? De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
+- Hoe ziet de overdracht van het digitale bestand van GSB naar CSB er precies uit? De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
 - Als een GSB tot hertelling overgaat vanwege foutmeldingen en/of waarschuwingen, corrigeren ze dan de Bijlage 2? Gooien ze de oude weg en stellen een nieuwe op? Iets anders?
 
 
@@ -116,9 +116,9 @@ __Niveau:__ hoog-over, wolk, ☁️
 
 __Hoofdscenario:__  
 
-1. Het CSB ontvangt de benodigde digitale bestanden (PV, onderliggende PVs, elektronische bestanden, corrigenda) van het GSB en controleert ze op volledigheid.
+1. Het CSB ontvangt de benodigde digitale bestanden (PV, onderliggende PVs, digitale bestanden, corrigenda) van het GSB en controleert ze op volledigheid.
 2. Het CSB stelt vast dat het PV geen aanleiding geeft tot een terugverwijzing. (controleprotocol deel A)
-3. Het CSB leest het elektronisch bestand in als eerste invoer. (controle hash-code en importeren)
+3. Het CSB leest het digitale bestand in als eerste invoer. (controle hash-code en importeren)
 4. Het CSB voert de resultaten handmatig in als tweede invoer.
 5. Het CSB voert het controleprotocol optellingen uit. (controleprotocol deel B)
 6. [Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan.](./csb-zetelverdeling-aanwijzing-kandidaten.md#het-csb-stelt-de-zetelverdeling-vast-en-wijst-de-gekozen-kandidaten-aan-vlieger)

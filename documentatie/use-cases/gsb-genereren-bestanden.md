@@ -1,6 +1,6 @@
 # GSB: genereren bestanden
 
-## Het GSB genereert het concept-PV en het elektronisch bestand in de applicatie (zee)
+## Het GSB genereert het concept-PV en het digitale bestand in de applicatie (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 

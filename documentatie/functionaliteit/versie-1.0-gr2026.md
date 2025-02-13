@@ -19,11 +19,11 @@
 - Het EML_NL-bestand met de stembureaus van een gemeente kan worden geïmporteerd.
 - De beheerder kan stembureaus aanmaken.
 
-### Invoeren van resultaten GSB
+### Invoeren van uitslagen GSB
 
 - Invoerders kunnen uitslagen van stembureaus invoeren voor DSO en CSO.
 - Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders.
-- Verschillen tussen de twee invoeren worden opgelost door de coördinator.
+- Verschillen tussen de twee invoeren: de coordinator kiest een van beide invoeren of laat dubbel herinvoeren
 - Validatie en consistentiechecks (controleprotocol) worden uitgevoerd op de ingevoerde tellingen van stembureaus.
 
 ### Uitslagbepaling GSB
@@ -31,21 +31,21 @@
 - De uitslagen per stembureau kunnen worden opgeteld en dit leidt vervolgens tot de uitslag van het gemeentelijk stembureau (GSB).
 - De uitslagen kunnen worden geëxporteerd als XML-bestand volgens de EML_NL-standaard.
 - De uitslag van het GSB wordt gegenereerd als proces-verbaal in PDF-formaat.
-- De processen-verbaal kunnen worden gegenereerd in het Nederlands en Fries.
-- De uitslag kan na de eerste zitting worden gecorrigeerd met behulp van een corrigendum.
+- De processen-verbaal kunnen worden gegenereerd aan de hand van de vastgestelde modellen
+- De uitslag kan worden gecorrigeerd met behulp van een corrigendum.
 
-### Invoeren van resultaten CSB
+### Invoeren van uitslagen CSB
 
-- De uitslag van het GSB kan worden geïmporteerd als EML_NL-bestand.
+- De uitslag van het GSB kan worden geïmporteerd als XML-bestand volgens de EML_NL-bestand.
 - Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders. Een import van een EML_NL-bestand telt ook als invoer, waardoor nog maar één handmatige invoer nodig is.
-- Verschillen tussen de twee invoeren worden opgelost door de coördinator.
+- Verschillen tussen de twee invoeren: de coordinator kiest een van beide invoeren of laat dubbel herinvoeren
 
 ### Uitslagbepaling CSB
 
-- De zetelverdeling voor de gemeenteraad wordt uitgerekend.
+- De zetelverdeling voor de gemeenteraad wordt uitgerekend en de zetels worden aan kandidaten toegewezen
 - De uitslagen kunnen worden geëxporteerd als XML-bestand volgens de EML_NL-standaard.
 - De uitslag van het CSB wordt gegenereerd als proces-verbaal in PDF-formaat.
-- De processen-verbaal kunnen worden gegenereerd in het Nederlands en Fries.
+- De processen-verbaal kunnen worden gegenereerd aan de hand van de vastgestelde modellen.
 
 ### Ondersteunende functies
 
@@ -62,7 +62,7 @@
 - Het PDF-bestand van het proces-verbaal voldoen aan de WCAG-toegankelijkheidseisen.
 - Verschillen kunnen worden opgelost door nieuwe invoer op lijstniveau.
 - Bijhouden van statistieken over gebruik.
-- Aanmaken van geloofsbrieven.
+- Aanmaken van benoemingsbrieven en kennisgevingen die strekken tot geloofsbrief.
 - De coördinator GSB kan invoerders van het GSB beheren,
   en de coördinator CSB kan invoerders van het CSB beheren.
 
@@ -74,7 +74,7 @@
 - Invoer van bezwaren en bijzonderheden per stembureau (afhankelijk van ontwikkeling modellen).
 - Beheer van werkplekken (aanvullen, design).
 - De software biedt ondersteuning voor meerdere verkiezingen tegelijkertijd. Dit is een vereiste die we sowieso zullen uitwerken na de GSB-fase, maar hier kan al in deze fase al een aanzet toe worden gedaan.
-- De interface is beschikbaar in meerdere talen: Nederlands, Engels, Fries en Papiaments.
+- De interface is beschikbaar in meerdere talen: Nederlands, Engels, Fries en Papiaments. 
 - Abacus is beschikbaar voor macOS.
 - Er is een installatieprogramma voor de Abacus-werkstations.
 

@@ -31,7 +31,7 @@
 - De uitslagen per stembureau kunnen worden opgeteld en dit leidt vervolgens tot de uitslag van het gemeentelijk stembureau (GSB).
 - De uitslagen kunnen worden geëxporteerd als XML-bestand volgens de EML_NL-standaard.
 - De uitslag van het GSB wordt gegenereerd als proces-verbaal in PDF-formaat.
-- De processen-verbaal kunnen worden gegenereerd aan de hand van de vastgestelde modellen
+- De processen-verbaal kunnen worden gegenereerd aan de hand van de vastgestelde modellen.
 - De uitslag kan worden gecorrigeerd met behulp van een corrigendum.
 
 ### Invoeren van uitslagen CSB

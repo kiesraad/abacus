@@ -165,7 +165,7 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
 
 function isRequired(k: string, req: string[] | undefined): string {
   if (!req) {
-    return "";
+    return "?";
   }
   return req.includes(k) ? "" : "?";
 }

@@ -135,7 +135,7 @@ __Hoofdscenario:__
 __Uitbreidingen:__
 
 2a. Het PV geeft aanleiding tot een terugverwijzing:  
-&emsp;2a1. Het CSB verwijst terug naar het CSB.  
+&emsp;2a1. Het CSB verwijst terug naar het GSB.  
 &emsp;2a2. Het GSB doet onderzoek en gaat eventueel over tot hertelling.  
 &emsp;2a3. Het GSB deelt de resultaten van de terugverwijzing met het CSB.
 

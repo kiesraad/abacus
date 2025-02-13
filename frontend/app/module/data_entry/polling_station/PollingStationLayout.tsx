@@ -6,7 +6,7 @@ import { AbortDataEntryControl } from "app/module/data_entry";
 
 import { NotFoundError, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { Badge, PageTitle, PollingStationNumber, StickyNav, WorkStationNumber } from "@kiesraad/ui";
+import { Badge, PageTitle, PollingStationNumber, StickyNav } from "@kiesraad/ui";
 import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";
 
 export function PollingStationLayout() {
@@ -34,7 +34,6 @@ export function PollingStationLayout() {
         </section>
         <section>
           <AbortDataEntryControl />
-          <WorkStationNumber>16</WorkStationNumber>
         </section>
       </header>
       <main>

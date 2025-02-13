@@ -281,6 +281,40 @@ describe("Test PollingStationChoiceForm", () => {
       expect(screen.getByText("Geen stembureaus gevonden")).toBeVisible();
     });
 
+    test("All data entries of polling stations are finished, polling station list shows message", async () => {
+      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+      overrideOnce("get", "/api/elections/1/status", 200, {
+        statuses: [
+          {
+            polling_station_id: 1,
+            status: "definitive",
+          },
+          {
+            polling_station_id: 2,
+            status: "definitive",
+          },
+          {
+            polling_station_id: 3,
+            status: "definitive",
+          },
+          {
+            polling_station_id: 4,
+            status: "entries_different",
+          },
+        ],
+      } satisfies ElectionStatusResponse);
+
+      const user = userEvent.setup();
+      renderPollingStationChoicePage();
+
+      const openPollingStationList = await screen.findByTestId("openPollingStationList");
+      await user.click(openPollingStationList);
+      expect(screen.getByText("Kies het stembureau")).toBeVisible();
+
+      // Check if the error message is visible
+      expect(screen.getByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
+    });
+
     test("Second data entry has correct link", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       overrideOnce("get", "/api/elections/1/status", 200, {

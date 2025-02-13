@@ -23,7 +23,7 @@
 
 - Invoerders kunnen uitslagen van stembureaus invoeren voor DSO en CSO.
 - Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders.
-- Verschillen tussen de twee invoeren oplossen: de coordinator kiest een van beide invoeren of laat dubbel herinvoeren.
+- Verschillen tussen de twee invoeren oplossen: de coördinator kiest een van beide invoeren of laat dubbel herinvoeren.
 - Validatie en consistentiechecks (controleprotocol) worden uitgevoerd op de ingevoerde tellingen van stembureaus.
 
 ### Uitslagbepaling GSB
@@ -38,7 +38,7 @@
 
 - De uitslag van het GSB kan worden geïmporteerd als XML-bestand volgens de EML_NL-standaard.
 - Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders. Een import van een EML_NL-bestand telt ook als invoer, waardoor nog maar één handmatige invoer nodig is.
-- Verschillen tussen de twee invoeren oplossen: de coordinator kiest een van beide invoeren of laat dubbel herinvoeren.
+- Verschillen tussen de twee invoeren oplossen: de coördinator kiest een van beide invoeren of laat dubbel herinvoeren.
 
 ### Uitslagbepaling CSB
 
@@ -59,7 +59,7 @@
 
 - De Abacus-clients kunnen de afwezigheid van een internetverbinding detecteren (airgapdetectie).
 - Er vindt logging van gebruikershandelingen plaats.
-- Het PDF-bestand van het proces-verbaal voldoen aan de WCAG-toegankelijkheidseisen.
+- Het PDF-bestand van het proces-verbaal voldoet aan de WCAG-toegankelijkheidseisen.
 - Verschillen kunnen worden opgelost door nieuwe invoer op lijstniveau.
 - Bijhouden van statistieken over gebruik.
 - Aanmaken van benoemingsbrieven en kennisgevingen die strekken tot geloofsbrief.

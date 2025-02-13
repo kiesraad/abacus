@@ -16,9 +16,9 @@ export const BasicTable: Story = () => (
     <div className="mb-lg">
       <Table id="basic_table">
         <Table.Header>
-          <Table.Column>Number</Table.Column>
-          <Table.Column className="w-13">Fixed width</Table.Column>
-          <Table.Column>Some value</Table.Column>
+          <Table.HeaderCell>Number</Table.HeaderCell>
+          <Table.HeaderCell className="w-13">Fixed width</Table.HeaderCell>
+          <Table.HeaderCell>Some value</Table.HeaderCell>
         </Table.Header>
         <Table.Body>
           {data.map((row) => (
@@ -35,8 +35,8 @@ export const BasicTable: Story = () => (
     <div className="mb-lg">
       <Table id="styled_table">
         <Table.Header className="bg-gray">
-          <Table.Column>Nummer</Table.Column>
-          <Table.Column>Stembureau</Table.Column>
+          <Table.HeaderCell>Nummer</Table.HeaderCell>
+          <Table.HeaderCell>Stembureau</Table.HeaderCell>
         </Table.Header>
         <Table.Body className="fs-sm">
           <Table.Row>
@@ -63,9 +63,9 @@ export const LinkTable: Story = () => {
   return (
     <Table id="link_table">
       <Table.Header>
-        <Table.Column>Number</Table.Column>
-        <Table.Column>Click me</Table.Column>
-        <Table.Column>Look a chevron</Table.Column>
+        <Table.HeaderCell>Number</Table.HeaderCell>
+        <Table.HeaderCell>Click me</Table.HeaderCell>
+        <Table.HeaderCell>Look a chevron right of here</Table.HeaderCell>
       </Table.Header>
       <Table.Body className="fs-md">
         {data.map((row) => (
@@ -83,9 +83,9 @@ export const LinkTable: Story = () => {
 export const IconBadgeTable: Story = () => (
   <Table id="icon_badge_table">
     <Table.Header>
-      <Table.Column>Number</Table.Column>
-      <Table.Column>With icon</Table.Column>
-      <Table.Column>With badge</Table.Column>
+      <Table.HeaderCell>Number</Table.HeaderCell>
+      <Table.HeaderCell>With icon</Table.HeaderCell>
+      <Table.HeaderCell>With badge</Table.HeaderCell>
     </Table.Header>
     <Table.Body>
       {data.map((row) => (

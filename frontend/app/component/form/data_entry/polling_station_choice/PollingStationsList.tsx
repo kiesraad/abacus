@@ -13,17 +13,14 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
   return (
     <Table id="polling_station_list">
       <Table.Header>
-        <Table.Column>{t("number")}</Table.Column>
-        <Table.Column>{t("polling_station.title.singular")}</Table.Column>
+        <Table.HeaderCell>{t("number")}</Table.HeaderCell>
+        <Table.HeaderCell>{t("polling_station.title.singular")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
         {pollingStations.map((pollingStation: PollingStation) => {
           const status = electionStatus.statuses.find(
             (status) => status.polling_station_id === pollingStation.id,
           )?.status;
-          if (status === "definitive" || status === "entries_different") {
-            return null;
-          }
 
           return (
             <Table.LinkRow

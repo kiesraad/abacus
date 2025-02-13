@@ -54,8 +54,8 @@ __Uitbreidingen:__
 &emsp;&emsp;&emsp; 5a2a1. Het GSB neemt contact op met de Kiesraad.  
 
 7a. Het GSB stelt een probleem vast met het concept-PV:  
-&emsp; 6a1. Het GSB stelt het bezwaar vast.  
-&emsp; 6a2. Het GSB gaat over tot hertelling. (zie uitbreiding 3b)
+&emsp; 7a1. Het GSB stelt het bezwaar vast.  
+&emsp; 7a2. Het GSB gaat over tot hertelling. (zie uitbreiding 3b)
 
 #### Open punten
 

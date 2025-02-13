@@ -22,5 +22,5 @@ __Hoofdscenario:__
 #### Open punten
 
 - Wat zit er precies in het digitaal bestand?
-- Moet de applicatie een preview van het gegenereerde PV tonen, zodat de coördinator die kan controleren?
+- Moet de applicatie een preview van het te genereren PV tonen, zodat de coördinator die kan controleren en eventuele fouten kan herstellen?
 - Worden de extra onderzoeken van het GSB ingevuld in de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen"?

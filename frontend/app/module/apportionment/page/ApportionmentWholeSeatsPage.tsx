@@ -43,7 +43,7 @@ export function ApportionmentWholeSeatsPage() {
                     {tx(
                       `apportionment.rest_seats_information_amount_and_link.${apportionment.rest_seats > 1 ? "plural" : "singular"}`,
                       {
-                        link: (title) => <Link to="../details-rest-seats">{title}</Link>,
+                        link: (title) => <Link to="../details-residual-seats">{title}</Link>,
                       },
                       { num_rest_seats: apportionment.rest_seats },
                     )}{" "}

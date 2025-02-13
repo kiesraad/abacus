@@ -1,4 +1,4 @@
-import { ApportionmentResult, ApportionmentStep, Election } from "@kiesraad/api";
+import { ApportionmentResult, ApportionmentStep, Election, ElectionSummary } from "@kiesraad/api";
 
 export const highest_surplus_steps: ApportionmentStep[] = [
   {
@@ -875,6 +875,166 @@ export const apportionment: ApportionmentResult = {
       whole_seats: 0,
       rest_seats: 0,
       total_seats: 0,
+    },
+  ],
+};
+
+export const election_summary: ElectionSummary = {
+  voters_counts: {
+    poll_card_count: 1200,
+    proxy_certificate_count: 2,
+    voter_card_count: 3,
+    total_admitted_voters_count: 1205,
+  },
+  votes_counts: {
+    votes_candidates_count: 1200,
+    blank_votes_count: 3,
+    invalid_votes_count: 2,
+    total_votes_cast_count: 1205,
+  },
+  differences_counts: {
+    more_ballots_count: {
+      count: 0,
+      polling_stations: [],
+    },
+    fewer_ballots_count: {
+      count: 0,
+      polling_stations: [],
+    },
+    unreturned_ballots_count: {
+      count: 0,
+      polling_stations: [],
+    },
+    too_few_ballots_handed_out_count: {
+      count: 0,
+      polling_stations: [],
+    },
+    too_many_ballots_handed_out_count: {
+      count: 0,
+      polling_stations: [],
+    },
+    other_explanation_count: {
+      count: 0,
+      polling_stations: [],
+    },
+    no_explanation_count: {
+      count: 0,
+      polling_stations: [],
+    },
+  },
+  recounted_polling_stations: [],
+  political_group_votes: [
+    {
+      number: 1,
+      total: 808,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 404,
+        },
+        {
+          number: 2,
+          votes: 404,
+        },
+      ],
+    },
+    {
+      number: 2,
+      total: 60,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 31,
+        },
+        {
+          number: 2,
+          votes: 29,
+        },
+      ],
+    },
+    {
+      number: 3,
+      total: 58,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 30,
+        },
+        {
+          number: 2,
+          votes: 28,
+        },
+      ],
+    },
+    {
+      number: 4,
+      total: 57,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 30,
+        },
+        {
+          number: 2,
+          votes: 27,
+        },
+      ],
+    },
+    {
+      number: 5,
+      total: 56,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 30,
+        },
+        {
+          number: 2,
+          votes: 26,
+        },
+      ],
+    },
+    {
+      number: 6,
+      total: 55,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 30,
+        },
+        {
+          number: 2,
+          votes: 25,
+        },
+      ],
+    },
+    {
+      number: 7,
+      total: 54,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 30,
+        },
+        {
+          number: 2,
+          votes: 24,
+        },
+      ],
+    },
+    {
+      number: 8,
+      total: 52,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 30,
+        },
+        {
+          number: 2,
+          votes: 22,
+        },
+      ],
     },
   ],
 };

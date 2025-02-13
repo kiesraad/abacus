@@ -65,7 +65,7 @@ export function ApportionmentPage() {
                     </li>
                     <li>
                       {get_number_of_seats_assigned_sentence(apportionment.rest_seats, "rest_seat")} (
-                      <Link to="./details-rest-seats">{t("apportionment.view_details")}</Link>)
+                      <Link to="./details-residual-seats">{t("apportionment.view_details")}</Link>)
                     </li>
                   </ul>
                 </div>

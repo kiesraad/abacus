@@ -100,7 +100,7 @@ describe("NavBar", () => {
 
   test.each([
     { pathname: "/elections/1/apportionment/details-whole-seats", hash: "#administratorcoordinator" },
-    { pathname: "/elections/1/apportionment/details-rest-seats", hash: "#administratorcoordinator" },
+    { pathname: "/elections/1/apportionment/details-residual-seats", hash: "#administratorcoordinator" },
   ])("polling station management links for $pathname", async (location) => {
     await renderNavBar(location);
 
@@ -116,7 +116,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/polling-stations/create", hash: "#administratorcoordinator" },
     { pathname: "/elections/1/polling-stations/1/update", hash: "#administratorcoordinator" },
     { pathname: "/elections/1/apportionment/details-whole-seats", hash: "#administratorcoordinator" },
-    { pathname: "/elections/1/apportionment/details-rest-seats", hash: "#administratorcoordinator" },
+    { pathname: "/elections/1/apportionment/details-residual-seats", hash: "#administratorcoordinator" },
   ])("menu works for $pathname", async (location) => {
     const user = userEvent.setup();
     await renderNavBar(location);

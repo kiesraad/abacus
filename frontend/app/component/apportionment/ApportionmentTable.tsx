@@ -28,7 +28,7 @@ export function ApportionmentTable({
   seats,
 }: ApportionmentTableProps) {
   return (
-    <Table id="apportionment" className={cn(cls.table, cls.apportionment_table)}>
+    <Table id="apportionment_table" className={cn(cls.table, cls.apportionment_table)}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>

@@ -1,10 +1,12 @@
-import { describe, expect, test } from "vitest";
+import { render as rtlRender } from "@testing-library/react";
+import { describe, expect, test, vi } from "vitest";
 
 import { apportionment, election, election_summary } from "app/component/apportionment/test-data/less-than-19-seats";
+import { routes } from "app/routes";
 
 import { ApportionmentProvider, ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@kiesraad/api";
 import { getElectionMockData } from "@kiesraad/api-mocks";
-import { overrideOnce, render, screen } from "@kiesraad/test";
+import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@kiesraad/test";
 
 import { ApportionmentWholeSeatsPage } from "./ApportionmentWholeSeatsPage";
 
@@ -73,8 +75,8 @@ describe("ApportionmentWholeSeatsPage", () => {
         await screen.findByText("De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd"),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("election_summary_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("apportionment_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("whole_seats_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("rest_seats_calculation_table")).not.toBeInTheDocument();
     });
 
     test("Not available because drawing of lots is not implemented yet", async () => {
@@ -95,8 +97,29 @@ describe("ApportionmentWholeSeatsPage", () => {
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("election_summary_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("apportionment_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("whole_seats_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("rest_seats_calculation_table")).not.toBeInTheDocument();
+    });
+
+    test("Internal Server Error renders error page", async () => {
+      // Since we test what happens after an error, we want vitest to ignore them
+      vi.spyOn(console, "error").mockImplementation(() => {
+        /* do nothing */
+      });
+      const router = setupTestRouter(routes);
+
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
+      overrideOnce("post", "/api/elections/1/apportionment", 500, {
+        error: "Internal Server Error",
+        fatal: true,
+        reference: "InternalServerError",
+      });
+
+      await router.navigate("/elections/1/apportionment/details-whole-seats");
+
+      rtlRender(<Providers router={router} />);
+
+      await expectErrorPage();
     });
   });
 });

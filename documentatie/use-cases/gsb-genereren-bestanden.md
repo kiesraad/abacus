@@ -14,7 +14,7 @@ __Hoofdscenario:__
 
 1. De coördinator voert de datum en locatie van de zitting in.
 2. De coördinator voert de aanwezige leden van het GSB in.
-3. De coördinator voert de bezwaren van kiezers tijdens de zitting in.
+3. De coördinator voert de bezwaren van kiezers/belangstellenden tijdens de zitting in.
 4. De coördinator voert onregelmatigheden of bijzonderheden tijdens de zitting in.
 5. De coördinator voert extra onderzoeken van het GSB in.
 6. De coördinator genereert het concept-PV en het digitaal bestand.

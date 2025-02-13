@@ -6,7 +6,7 @@ import { useApportionmentContext } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
-import cls from "./ApportionmentPage.module.css";
+import cls from "./Apportionment.module.css";
 
 export function ApportionmentWholeSeatsPage() {
   const { apportionment, error } = useApportionmentContext();

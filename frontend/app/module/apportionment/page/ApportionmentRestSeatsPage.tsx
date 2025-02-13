@@ -10,7 +10,7 @@ import { useApportionmentContext, useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
-import cls from "./ApportionmentPage.module.css";
+import cls from "./Apportionment.module.css";
 
 function render_title_and_header() {
   return (

@@ -185,8 +185,6 @@ async fn test_election_apportionment_error_apportionment_not_available_no_pollin
         .send()
         .await
         .unwrap();
-
-    // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::CREATED);
     let election: Election = response.json().await.unwrap();
 

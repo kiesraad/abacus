@@ -6,7 +6,7 @@ import { useApportionmentContext, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
-import cls from "./ApportionmentPage.module.css";
+import cls from "./Apportionment.module.css";
 
 function get_number_of_seats_assigned_sentence(seats: number, type: "rest_seat" | "whole_seat"): string {
   return t(`apportionment.seats_assigned.${seats > 1 ? "plural" : "singular"}`, {

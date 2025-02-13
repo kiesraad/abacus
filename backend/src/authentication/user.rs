@@ -23,21 +23,21 @@ const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
 /// User object, corresponds to a row in the users table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow, ToSchema)]
 pub struct User {
-    id: u32,
-    username: String,
+    pub id: u32,
+    pub username: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    fullname: Option<String>,
-    role: Role,
+    pub fullname: Option<String>,
+    pub role: Role,
     #[serde(skip)]
     password_hash: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = String, nullable = false)]
-    last_activity_at: Option<DateTime<Utc>>,
+    pub last_activity_at: Option<DateTime<Utc>>,
     #[schema(value_type = String)]
-    updated_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
-    created_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
 }
 
 impl User {

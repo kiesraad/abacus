@@ -64,7 +64,7 @@ describe("UserCreateRolePage", () => {
     renderPage({ setRole, setType });
 
     const user = userEvent.setup();
-    await user.click(await screen.findByLabelText("Beheerder"));
+    await user.click(await screen.findByLabelText(/Beheerder/));
     await user.click(await screen.findByRole("button", { name: "Verder" }));
 
     expect(setRole).toHaveBeenCalledExactlyOnceWith("administrator");
@@ -78,7 +78,7 @@ describe("UserCreateRolePage", () => {
     renderPage({ setRole, setType });
 
     const user = userEvent.setup();
-    await user.click(await screen.findByLabelText("Coördinator"));
+    await user.click(await screen.findByLabelText(/Coördinator/));
     await user.click(await screen.findByRole("button", { name: "Verder" }));
 
     expect(setRole).toHaveBeenCalledExactlyOnceWith("coordinator");
@@ -92,7 +92,7 @@ describe("UserCreateRolePage", () => {
     renderPage({ setRole, setType });
 
     const user = userEvent.setup();
-    await user.click(await screen.findByLabelText("Invoerder"));
+    await user.click(await screen.findByLabelText(/Invoerder/));
     await user.click(await screen.findByRole("button", { name: "Verder" }));
 
     expect(setRole).toHaveBeenCalledExactlyOnceWith("typist");

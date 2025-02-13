@@ -16,9 +16,9 @@ function renderWithRouter() {
 
 const rolePage = {
   radioGroup: () => screen.findByRole("group", { name: "Welke rol krijgt de nieuwe gebruiker?" }),
-  administrator: () => screen.getByLabelText("Beheerder"),
-  coordinator: () => screen.getByLabelText("Coördinator"),
-  typist: () => screen.getByLabelText("Invoerder"),
+  administrator: () => screen.getByLabelText(/Beheerder/),
+  coordinator: () => screen.getByLabelText(/Coördinator/),
+  typist: () => screen.getByLabelText(/Invoerder/),
   continue: () => screen.getByRole("button", { name: "Verder" }),
 };
 

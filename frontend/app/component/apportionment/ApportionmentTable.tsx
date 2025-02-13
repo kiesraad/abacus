@@ -30,12 +30,12 @@ export function ApportionmentTable({
   return (
     <Table id="apportionment" className={cn(cls.table, cls.apportionment_table)}>
       <Table.Header>
-        <Table.Column className="text-align-r">{t("list")}</Table.Column>
-        <Table.Column>{t("list_name")}</Table.Column>
-        <Table.Column className="text-align-r">{t("apportionment.whole_seat.plural")}</Table.Column>
-        <Table.Column className="text-align-r">{t("apportionment.rest_seat.plural")}</Table.Column>
-        <Table.Column className="text-align-r">{t("apportionment.total_seats")}</Table.Column>
-        <Table.Column />
+        <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
+        <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("apportionment.whole_seat.plural")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("apportionment.rest_seat.plural")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("apportionment.total_seats")}</Table.HeaderCell>
+        <Table.HeaderCell />
       </Table.Header>
       <Table.Body>
         {final_standing.map((standing: PoliticalGroupSeatAssignment) => {

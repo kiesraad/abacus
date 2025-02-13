@@ -45,31 +45,41 @@ export function OverviewPage() {
       )}
       <main>
         <article>
-          <Table id="overview">
-            <Table.Header>
-              <Table.Column>{t("election.title.singular")}</Table.Column>
-              <Table.Column>
-                {!isAdminOrCoordinator ? t("election.location") : t("election.level_polling_station")}
-              </Table.Column>
-              <Table.Column>{t("election_status.label")}</Table.Column>
-              <Table.Column />
-            </Table.Header>
-            <Table.Body className="fs-md">
-              {electionList.map((election) => (
-                <Table.LinkRow key={election.id} to={electionLink(election)}>
-                  <Table.Cell className="fs-body">{election.name}</Table.Cell>
-                  <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
-                  <Table.Cell>
-                    <ElectionStatusWithIcon
-                      status={election.status}
-                      userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
-                    />
-                  </Table.Cell>
-                  <Table.Cell />
-                </Table.LinkRow>
-              ))}
-            </Table.Body>
-          </Table>
+          {!electionList.length ? (
+            !isAdminOrCoordinator ? (
+              <>
+                <h2 className="mb-lg">{t("election.not_ready_for_use")}</h2>
+                <p className="md form-paragraph">{t("election.please_wait_for_coordinator")}</p>
+              </>
+            ) : (
+              <h2>{t("election.no_elections_added")}</h2>
+              // TODO: To be expanded in issue #888
+            )
+          ) : (
+            <Table id="overview">
+              <Table.Header>
+                <Table.HeaderCell>{t("election.title.singular")}</Table.HeaderCell>
+                <Table.HeaderCell>
+                  {!isAdminOrCoordinator ? t("election.location") : t("election.level_polling_station")}
+                </Table.HeaderCell>
+                <Table.HeaderCell>{t("election_status.label")}</Table.HeaderCell>
+              </Table.Header>
+              <Table.Body className="fs-md">
+                {electionList.map((election) => (
+                  <Table.LinkRow key={election.id} to={electionLink(election)}>
+                    <Table.Cell className="fs-body">{election.name}</Table.Cell>
+                    <Table.Cell>{!isAdminOrCoordinator ? election.location : ""}</Table.Cell>
+                    <Table.Cell>
+                      <ElectionStatusWithIcon
+                        status={election.status}
+                        userRole={isAdminOrCoordinator ? "coordinator" : "typist"}
+                      />
+                    </Table.Cell>
+                  </Table.LinkRow>
+                ))}
+              </Table.Body>
+            </Table>
+          )}
         </article>
       </main>
       <Footer />

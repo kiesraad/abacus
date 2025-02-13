@@ -20,7 +20,7 @@ export function Table({ id, children, className }: TableProps) {
 }
 
 Table.Header = Header;
-Table.Column = Column;
+Table.HeaderCell = HeaderCell;
 Table.Body = Body;
 Table.Row = Row;
 Table.LinkRow = LinkRow;
@@ -36,7 +36,7 @@ function Header({ children, className }: { children: React.ReactNode[]; classNam
   );
 }
 
-function Column({
+function HeaderCell({
   children,
   scope,
   className,

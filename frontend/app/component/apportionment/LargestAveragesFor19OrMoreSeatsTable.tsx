@@ -23,16 +23,16 @@ export function LargestAveragesFor19OrMoreSeatsTable({
         className={cn(cls.table, cls.rest_seats_19_or_more_seats_table)}
       >
         <Table.Header>
-          <Table.Column className="text-align-r">{t("list")}</Table.Column>
-          <Table.Column>{t("list_name")}</Table.Column>
+          <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
+          <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>
           {highest_average_steps.map((step: ApportionmentStep) => {
             return (
-              <Table.Column key={step.rest_seat_number} className="text-align-r">
+              <Table.HeaderCell key={step.rest_seat_number} className="text-align-r">
                 {t("apportionment.rest_seat.singular")} {step.rest_seat_number}
-              </Table.Column>
+              </Table.HeaderCell>
             );
           })}
-          <Table.Column className="text-align-r">{t("apportionment.rest_seats_count")}</Table.Column>
+          <Table.HeaderCell className="text-align-r">{t("apportionment.rest_seats_count")}</Table.HeaderCell>
         </Table.Header>
         <Table.Body>
           {final_standing.map((pg_seat_assignment: PoliticalGroupSeatAssignment) => {

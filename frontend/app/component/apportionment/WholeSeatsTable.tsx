@@ -14,12 +14,12 @@ export function WholeSeatsTable({ final_standing, quota }: WholeSeatsTableProps)
   return (
     <Table id="whole_seats_table" className={cn(cls.table, cls.whole_seats_table)}>
       <Table.Header>
-        <Table.Column className="text-align-r">{t("list")}</Table.Column>
-        <Table.Column className="text-align-r">{t("vote_count")}</Table.Column>
-        <Table.Column>:</Table.Column>
-        <Table.Column className="text-align-r">{t("apportionment.quota")}</Table.Column>
-        <Table.Column>=</Table.Column>
-        <Table.Column className="text-align-r">{t("apportionment.whole_seats_count")}</Table.Column>
+        <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("vote_count")}</Table.HeaderCell>
+        <Table.HeaderCell>:</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("apportionment.quota")}</Table.HeaderCell>
+        <Table.HeaderCell>=</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("apportionment.whole_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
         {final_standing.map((standing: PoliticalGroupSeatAssignment) => {

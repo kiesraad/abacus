@@ -22,11 +22,11 @@ export function LargestAveragesForLessThan19SeatsTable({
       className={cn(cls.table, cls.rest_seats_less_than_19_seats_table)}
     >
       <Table.Header>
-        <Table.Column className="text-align-r">{t("list")}</Table.Column>
-        <Table.Column>{t("list_name")}</Table.Column>
-        <Table.Column className="text-align-r">{t("apportionment.whole_seats_count")}</Table.Column>
-        <Table.Column className="text-align-r">{t("apportionment.average")}</Table.Column>
-        <Table.Column className="text-align-r">{t("apportionment.rest_seats_count")}</Table.Column>
+        <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
+        <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("apportionment.whole_seats_count")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("apportionment.average")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("apportionment.rest_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
         {final_standing.map((pg_seat_assignment) => {

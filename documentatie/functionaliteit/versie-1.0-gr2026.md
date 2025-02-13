@@ -36,7 +36,7 @@
 
 ### Invoeren van uitslagen CSB
 
-- De uitslag van het GSB kan worden geïmporteerd als XML-bestand volgens de EML_NL-bestand.
+- De uitslag van het GSB kan worden geïmporteerd als XML-bestand volgens de EML_NL-standaard.
 - Uitslagen worden ingevoerd volgens het vierogenprincipe. Dit betekent dat ze twee keer worden ingevoerd door twee verschillende invoerders. Een import van een EML_NL-bestand telt ook als invoer, waardoor nog maar één handmatige invoer nodig is.
 - Verschillen tussen de twee invoeren: de coordinator kiest een van beide invoeren of laat dubbel herinvoeren
 

@@ -42,7 +42,7 @@
 
 ### Uitslagbepaling CSB
 
-- De zetelverdeling voor de gemeenteraad wordt uitgerekend en de zetels worden aan kandidaten toegewezen
+- De zetelverdeling voor de gemeenteraad wordt uitgerekend en de zetels worden aan kandidaten toegewezen.
 - De uitslagen kunnen worden geëxporteerd als XML-bestand volgens de EML_NL-standaard.
 - De uitslag van het CSB wordt gegenereerd als proces-verbaal in PDF-formaat.
 - De processen-verbaal kunnen worden gegenereerd aan de hand van de vastgestelde modellen.

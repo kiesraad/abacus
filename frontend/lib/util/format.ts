@@ -32,16 +32,21 @@ export function validateNumberString(s: string | null | undefined) {
 
 export function formatDateTime(date: Date) {
   const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
   const timeString = date.toLocaleTimeString(t("date_locale"), { hour: "numeric", minute: "numeric" });
-  if (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
-  ) {
-    // Today
-    return `${t("today")} ${timeString}`;
-  } else if (Math.round(Math.abs(Number(today) - Number(date)) / (24 * 60 * 60 * 1000)) < 7) {
-    // Within the past 6 days
+  if (date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) {
+    if (date.getDate() === today.getDate()) {
+      // Today
+      return `${t("today")} ${timeString}`;
+    } else if (date.getDate() === yesterday.getDate()) {
+      // Yesterday
+      return `${t("yesterday")} ${timeString}`;
+    }
+  }
+  if (Math.round(Math.abs(Number(today) - Number(date)) / (24 * 60 * 60 * 1000)) < 7) {
+    // Within the past 3-6 days
     return date.toLocaleString(t("date_locale"), {
       weekday: "long",
       hour: "numeric",

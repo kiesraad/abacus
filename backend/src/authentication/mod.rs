@@ -54,7 +54,7 @@ mod tests {
         body::Body,
         http::{Request, StatusCode},
         middleware,
-        routing::{get, post},
+        routing::{get, post, put},
         Router,
     };
     use http_body_util::BodyExt;
@@ -73,6 +73,7 @@ mod tests {
 
         let router = Router::new()
             .route("/api/user", get(api::user_list).post(api::user_create))
+            .route("/api/user/{user_id}", put(api::user_update))
             .route("/api/user/login", post(api::login))
             .route("/api/user/logout", post(api::logout))
             .route("/api/user/whoami", get(api::whoami))
@@ -671,6 +672,37 @@ mod tests {
         let result: user::User = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.username(), "test_user");
         assert!(result.fullname().is_none());
+        assert_eq!(result.role(), Role::Administrator);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_update(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::PUT)
+                    .uri("/api/user/1")
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        serde_json::to_vec(&UpdateUserRequest {
+                            fullname: Some("Test Full Name".to_string()),
+                            temp_password: None,
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: user::User = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.username(), "user");
+        assert_eq!(result.fullname().unwrap(), "Test Full Name".to_string());
         assert_eq!(result.role(), Role::Administrator);
     }
 }

@@ -48,8 +48,8 @@ describe("ElectionStatus", () => {
     expect(headings[0]).toHaveTextContent("Invoer bezig (2)");
     expect(tables[0]).toHaveTableContent([
       ["Nummer", "Stembureau", "Voortgang"],
-      ["35", "Testschool" + "1e invoer", "60%"],
-      ["36", "Testbuurthuis" + "2e invoer", "20%"],
+      ["35", "Testschool 1e invoer", "60%"],
+      ["36", "Testbuurthuis 2e invoer", "20%"],
     ]);
 
     const inProgressRows = within(tables[0]!).getAllByRole("row");

@@ -136,7 +136,7 @@
     &:global(.error) {
       aside {
         svg {
-          fill: var(--color-error-darkest);
+          fill: var(--color-error-darker);
         }
       }
     }

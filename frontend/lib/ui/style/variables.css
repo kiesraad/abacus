@@ -109,6 +109,7 @@
   --gray-300: #d0d5dd;
   --gray-200: #eaecf0;
   --gray-100: #f2f4f7;
+  --gray-50: #f9fafb;
   --gray-25: #fcfcfd;
 
   --text-color-header: var(--gray-900);

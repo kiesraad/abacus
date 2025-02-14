@@ -36,8 +36,8 @@ pub struct PoliticalGroupSeatAssignment {
     meets_surplus_threshold: bool,
     /// The number of whole seats assigned to this group
     whole_seats: u64,
-    /// The number of rest seats assigned to this group
-    rest_seats: u64,
+    /// The number of residual seats assigned to this group
+    residual_seats: u64,
     /// The total number of seats assigned to this group
     pub total_seats: u64,
 }
@@ -50,7 +50,7 @@ impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
             surplus_votes: pg.surplus_votes,
             meets_surplus_threshold: pg.meets_surplus_threshold,
             whole_seats: pg.whole_seats,
-            rest_seats: pg.rest_seats,
+            residual_seats: pg.residual_seats,
             total_seats: pg.total_seats(),
         }
     }
@@ -69,12 +69,12 @@ pub struct PoliticalGroupStanding {
     surplus_votes: Fraction,
     /// Whether the surplus votes meet the threshold to be applicable for surplus seat assignment
     meets_surplus_threshold: bool,
-    /// The number of votes per seat if a new seat would be added to the current rest seats
+    /// The number of votes per seat if a new seat would be added to the current residual seats
     next_votes_per_seat: Fraction,
     /// The number of whole seats this political group got
     whole_seats: u64,
-    /// The current number of rest seats this political group got
-    rest_seats: u64,
+    /// The current number of residual seats this political group got
+    residual_seats: u64,
 }
 
 impl PoliticalGroupStanding {
@@ -100,15 +100,15 @@ impl PoliticalGroupStanding {
             next_votes_per_seat: votes_cast / Fraction::from(pg_seats + 1),
             pg_number: pg.number,
             whole_seats: pg_seats,
-            rest_seats: 0,
+            residual_seats: 0,
         }
     }
 
-    /// Add a rest seat to the political group and return the updated instance
-    fn add_rest_seat(self) -> Self {
-        info!("Adding rest seat to political group {}", self.pg_number);
+    /// Add a residual seat to the political group and return the updated instance
+    fn add_residual_seat(self) -> Self {
+        info!("Adding residual seat to political group {}", self.pg_number);
         PoliticalGroupStanding {
-            rest_seats: self.rest_seats + 1,
+            residual_seats: self.residual_seats + 1,
             next_votes_per_seat: Fraction::from(self.votes_cast)
                 / Fraction::from(self.total_seats() + 2),
             ..self
@@ -117,7 +117,7 @@ impl PoliticalGroupStanding {
 
     /// Returns the total number of seats assigned to this political group
     fn total_seats(&self) -> u64 {
-        self.whole_seats + self.rest_seats
+        self.whole_seats + self.residual_seats
     }
 }
 
@@ -237,12 +237,12 @@ pub fn seat_allocation(
     debug!("Totals {:#?}", totals);
     info!("Seats: {}", seats);
 
-    // calculate quota (kiesdeler) as a proper fraction
+    // Article P 5 Kieswet
+    // Calculate quota (kiesdeler) as a proper fraction
     let quota = Fraction::from(totals.votes_counts.votes_candidates_count) / Fraction::from(seats);
     info!("Quota: {}", quota);
 
-    // TODO: #787 check for lijstuitputting (allocated seats cannot be more than total candidates)
-
+    // Article P 6 Kieswet
     let initial_standing =
         initial_whole_seats_per_political_group(&totals.political_group_votes, quota);
     let whole_seats_count = initial_standing
@@ -254,9 +254,20 @@ pub fn seat_allocation(
     let (steps, final_standing) = if remaining_seats > 0 {
         allocate_remainder(&initial_standing, seats, remaining_seats)?
     } else {
-        info!("All seats have been allocated without any remainder seats");
+        info!("All seats have been allocated without any residual seats");
         (vec![], initial_standing.clone())
     };
+
+    // TODO: #785 Article P 9 Kieswet check for absolute majority
+    //  (list with absolute majority should have absolute majority of votes)
+
+    // TODO: #797 Article P 19a Kieswet mark deceased candidates
+
+    // TODO: #787 Article P 10 Kieswet check for list exhaustion
+    //  (allocated seats cannot be more than total candidates)
+    //  Article P 15 assignment of seats to candidates that exceeded preference threshold
+    //  Article P 17 assignment of seats to other candidates based on list position
+    //  Article P 19 reordering of political group candidate list if seats have been assigned
 
     Ok(ApportionmentResult {
         seats,
@@ -266,8 +277,8 @@ pub fn seat_allocation(
     })
 }
 
-/// This function allocates the rest seats that remain after whole seat allocation is finished.
-/// These remainder seats are assigned through two different procedures,
+/// This function allocates the residual seats that remain after whole seat allocation is finished.
+/// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
 fn allocate_remainder(
     initial_standing: &[PoliticalGroupStanding],
@@ -275,16 +286,18 @@ fn allocate_remainder(
     total_remaining_seats: u64,
 ) -> Result<(Vec<ApportionmentStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
     let mut steps = vec![];
-    let mut rest_seat_number = 0;
+    let mut residual_seat_number = 0;
 
     let mut current_standing = initial_standing.to_vec();
 
-    while rest_seat_number != total_remaining_seats {
-        let remaining_seats = total_remaining_seats - rest_seat_number;
-        rest_seat_number += 1;
+    while residual_seat_number != total_remaining_seats {
+        let remaining_seats = total_remaining_seats - residual_seat_number;
+        residual_seat_number += 1;
         let step = if seats >= 19 {
+            // Article P 7 Kieswet
             step_allocate_remainder_using_highest_averages(&current_standing, remaining_seats)?
         } else {
+            // Article P 8 Kieswet
             step_allocate_remainder_using_highest_surplus(
                 &current_standing,
                 remaining_seats,
@@ -294,13 +307,13 @@ fn allocate_remainder(
 
         let standing = current_standing.clone();
 
-        // update the current standing by finding the selected group and adding
-        // the remainder seat to their tally
+        // update the current standing by finding the selected group and
+        // adding the residual seat to their tally
         current_standing = current_standing
             .into_iter()
             .map(|p| {
                 if p.pg_number == step.political_group_number() {
-                    p.add_rest_seat()
+                    p.add_residual_seat()
                 } else {
                     p
                 }
@@ -310,7 +323,7 @@ fn allocate_remainder(
         // add the update to the remainder assignment steps
         steps.push(ApportionmentStep {
             standing,
-            rest_seat_number,
+            residual_seat_number,
             change: step,
         });
     }
@@ -318,7 +331,7 @@ fn allocate_remainder(
     Ok((steps, current_standing))
 }
 
-/// Assign the next remainder seat, and return which group that seat was assigned to.
+/// Assign the next residual seat, and return which group that seat was assigned to.
 /// This assignment is done according to the rules for elections with 19 seats or more.
 fn step_allocate_remainder_using_highest_averages(
     standing: &[PoliticalGroupStanding],
@@ -353,7 +366,7 @@ fn political_groups_qualifying_for_highest_surplus<'a>(
 
 /// Get an iterator that lists all the parties that qualify for unique highest average.
 /// This checks the previously assigned seats to make sure that every group that already
-/// got a remainder seat through the highest average procedure does not qualify.
+/// got a residual seat through the highest average procedure does not qualify.
 fn political_groups_qualifying_for_unique_highest_average<'a>(
     assigned_seats: &'a [PoliticalGroupStanding],
     previous: &'a [ApportionmentStep],
@@ -366,7 +379,7 @@ fn political_groups_qualifying_for_unique_highest_average<'a>(
     })
 }
 
-/// Assign the next remainder seat, and return which group that seat was assigned to.
+/// Assign the next residual seat, and return which group that seat was assigned to.
 /// This assignment is done according to the rules for elections with less than 19 seats.
 fn step_allocate_remainder_using_highest_surplus(
     assigned_seats: &[PoliticalGroupStanding],
@@ -389,8 +402,8 @@ fn step_allocate_remainder_using_highest_surplus(
         }))
     } else {
         // We've now exhausted the highest surplus seats, we now do unique highest average instead:
-        // we allow every group to get a seat, not allowing any group to get a second remainder seat
-        // while there are still parties that did not get a remainder seat.
+        // we allow every group to get a seat, not allowing any group to get a second residual seat
+        // while there are still parties that did not get a residual seat.
         let mut qualifying_for_unique_highest_average =
             political_groups_qualifying_for_unique_highest_average(assigned_seats, previous)
                 .peekable();
@@ -407,7 +420,7 @@ fn step_allocate_remainder_using_highest_surplus(
             }))
         } else {
             // We've now even exhausted unique highest average seats: every group that qualified
-            // got a highest surplus seat, and every group also had at least a single remainder seat
+            // got a highest surplus seat, and every group also had at least a single residual seat
             // assigned to them. We now allow any remaining seats to be assigned using the highest
             // averages procedure
             step_allocate_remainder_using_highest_averages(assigned_seats, remaining_seats)
@@ -415,16 +428,16 @@ fn step_allocate_remainder_using_highest_surplus(
     }
 }
 
-/// Records the details for a specific remainder seat, and how the standing is
-/// once that remainder seat was assigned
+/// Records the details for a specific residual seat, and how the standing is
+/// once that residual seat was assigned
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApportionmentStep {
-    rest_seat_number: u64,
+    residual_seat_number: u64,
     change: AssignedSeat,
     standing: Vec<PoliticalGroupStanding>,
 }
 
-/// Records the political group and specific change for a specific remainder seat
+/// Records the political group and specific change for a specific residual seat
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(tag = "assigned_by")]
 pub enum AssignedSeat {

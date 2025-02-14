@@ -141,17 +141,17 @@ export interface ApportionmentResult {
 }
 
 /**
- * Records the details for a specific remainder seat, and how the standing is
-once that remainder seat was assigned
+ * Records the details for a specific residual seat, and how the standing is
+once that residual seat was assigned
  */
 export interface ApportionmentStep {
   change: AssignedSeat;
-  rest_seat_number: number;
+  residual_seat_number: number;
   standing: PoliticalGroupStanding[];
 }
 
 /**
- * Records the political group and specific change for a specific remainder seat
+ * Records the political group and specific change for a specific residual seat
  */
 export type AssignedSeat =
   | (HighestAverageAssignedSeat & { assigned_by: "HighestAverage" })
@@ -421,7 +421,7 @@ export interface PoliticalGroup {
 export interface PoliticalGroupSeatAssignment {
   meets_surplus_threshold: boolean;
   pg_number: number;
-  rest_seats: number;
+  residual_seats: number;
   surplus_votes: Fraction;
   total_seats: number;
   votes_cast: number;
@@ -436,7 +436,7 @@ export interface PoliticalGroupStanding {
   meets_surplus_threshold: boolean;
   next_votes_per_seat: Fraction;
   pg_number: number;
-  rest_seats: number;
+  residual_seats: number;
   surplus_votes: Fraction;
   votes_cast: number;
   whole_seats: number;

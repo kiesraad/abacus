@@ -1317,9 +1317,9 @@
       },
       "ApportionmentStep": {
         "type": "object",
-        "description": "Records the details for a specific remainder seat, and how the standing is\nonce that remainder seat was assigned",
+        "description": "Records the details for a specific residual seat, and how the standing is\nonce that residual seat was assigned",
         "required": [
-          "rest_seat_number",
+          "residual_seat_number",
           "change",
           "standing"
         ],
@@ -1327,7 +1327,7 @@
           "change": {
             "$ref": "#/components/schemas/AssignedSeat"
           },
-          "rest_seat_number": {
+          "residual_seat_number": {
             "type": "integer",
             "format": "int64",
             "minimum": 0
@@ -1385,7 +1385,7 @@
             ]
           }
         ],
-        "description": "Records the political group and specific change for a specific remainder seat"
+        "description": "Records the political group and specific change for a specific residual seat"
       },
       "Candidate": {
         "type": "object",
@@ -2083,7 +2083,7 @@
           "surplus_votes",
           "meets_surplus_threshold",
           "whole_seats",
-          "rest_seats",
+          "residual_seats",
           "total_seats"
         ],
         "properties": {
@@ -2097,10 +2097,10 @@
             "description": "Political group number for which this assignment applies",
             "minimum": 0
           },
-          "rest_seats": {
+          "residual_seats": {
             "type": "integer",
             "format": "int64",
-            "description": "The number of rest seats assigned to this group",
+            "description": "The number of residual seats assigned to this group",
             "minimum": 0
           },
           "surplus_votes": {
@@ -2137,7 +2137,7 @@
           "meets_surplus_threshold",
           "next_votes_per_seat",
           "whole_seats",
-          "rest_seats"
+          "residual_seats"
         ],
         "properties": {
           "meets_surplus_threshold": {
@@ -2146,7 +2146,7 @@
           },
           "next_votes_per_seat": {
             "$ref": "#/components/schemas/Fraction",
-            "description": "The number of votes per seat if a new seat would be added to the current rest seats"
+            "description": "The number of votes per seat if a new seat would be added to the current residual seats"
           },
           "pg_number": {
             "type": "integer",
@@ -2154,10 +2154,10 @@
             "description": "Political group number for which this standing applies",
             "minimum": 0
           },
-          "rest_seats": {
+          "residual_seats": {
             "type": "integer",
             "format": "int64",
-            "description": "The current number of rest seats this political group got",
+            "description": "The current number of residual seats this political group got",
             "minimum": 0
           },
           "surplus_votes": {

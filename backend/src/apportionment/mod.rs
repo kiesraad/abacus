@@ -82,7 +82,11 @@ impl PoliticalGroupStanding {
     /// were assigned to a political group.
     fn new(pg: &PoliticalGroupVotes, quota: Fraction) -> Self {
         let votes_cast = Fraction::from(pg.total);
-        let pg_seats = (votes_cast / quota).integer_part();
+        let mut pg_seats = 0;
+        if votes_cast > Fraction::ZERO {
+            pg_seats = (votes_cast / quota).integer_part();
+        }
+
         let surplus_votes = votes_cast - (Fraction::from(pg_seats) * quota);
 
         debug!(
@@ -563,6 +567,24 @@ mod tests {
     }
 
     #[test]
+    fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system(
+    ) {
+        let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
+        let result = seat_allocation(10, &totals).unwrap();
+        assert_eq!(result.steps.len(), 10);
+        let total_seats = get_total_seats_from_apportionment_result(result);
+        assert_eq!(total_seats, vec![2, 2, 2, 2, 2]);
+    }
+
+    #[test]
+    fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system_drawing_of_lots_error_in_2nd_round_averages_system(
+    ) {
+        let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
+        let result = seat_allocation(15, &totals);
+        assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+    }
+
+    #[test]
     fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error_with_0_surpluses() {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
         let result = seat_allocation(15, &totals);
@@ -592,6 +614,22 @@ mod tests {
         assert_eq!(result.steps.len(), 4);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
+    }
+
+    #[test]
+    fn test_seat_allocation_19_or_more_seats_with_0_votes() {
+        let totals = get_election_summary(vec![0]);
+        let result = seat_allocation(19, &totals).unwrap();
+        assert_eq!(result.steps.len(), 19);
+        let total_seats = get_total_seats_from_apportionment_result(result);
+        assert_eq!(total_seats, vec![19]);
+    }
+
+    #[test]
+    fn test_seat_allocation_19_or_more_seats_with_0_votes_with_drawing_of_lots_error() {
+        let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
+        let result = seat_allocation(19, &totals);
+        assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]

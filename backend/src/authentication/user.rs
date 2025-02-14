@@ -13,7 +13,7 @@ use crate::{APIError, AppState};
 use super::{
     SESSION_COOKIE_NAME,
     error::AuthenticationError,
-    password::{hash_password, verify_password},
+    password::{hash_password, verify_password, HashedPassword},
     role::Role,
     session::Sessions,
 };
@@ -32,7 +32,7 @@ pub struct User {
     #[serde(skip_deserializing)]
     needs_password_change: bool,
     #[serde(skip)]
-    password_hash: String,
+    password_hash: HashedPassword,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = String, nullable = false)]
     last_activity_at: Option<DateTime<Utc>>,
@@ -207,7 +207,7 @@ impl Users {
         password: &str,
         role: Role,
     ) -> Result<User, AuthenticationError> {
-        let password_hash = hash_password(password)?;
+        let password_hash = hash_password(password.try_into()?)?;
 
         let user = sqlx::query_as!(
             User,
@@ -290,7 +290,7 @@ impl Users {
         user_id: u32,
         new_password: &str,
     ) -> Result<(), AuthenticationError> {
-        let password_hash = hash_password(new_password)?;
+        let password_hash = hash_password(new_password.try_into()?)?;
 
         sqlx::query!(
             r#"UPDATE users SET password_hash = ?, needs_password_change = FALSE WHERE id = ?"#,

@@ -11,9 +11,9 @@ pub use self::session::Sessions;
 mod api;
 pub mod error;
 mod password;
-mod role;
+pub mod role;
 mod session;
-mod user;
+pub mod user;
 mod util;
 
 /// Session lifetime, for both cookie and database

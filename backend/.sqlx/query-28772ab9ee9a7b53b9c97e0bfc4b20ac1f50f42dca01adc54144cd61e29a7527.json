@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                id as \"id: u32\",\n                username,\n                fullname,\n                role,\n                password_hash,\n                last_activity_at as \"last_activity_at: _\",\n                updated_at as \"updated_at: _\",\n                created_at as \"created_at: _\"\n            FROM users WHERE id = ?\n            ",
+  "query": "\n            SELECT\n                id as \"id: u32\",\n                username,\n                fullname,\n                role,\n                password_hash,\n                needs_password_change,\n                last_activity_at as \"last_activity_at: _\",\n                updated_at as \"updated_at: _\",\n                created_at as \"created_at: _\"\n            FROM users WHERE username = ?\n            ",
   "describe": {
     "columns": [
       {
@@ -29,18 +29,23 @@
         "type_info": "Text"
       },
       {
-        "name": "last_activity_at: _",
+        "name": "needs_password_change",
         "ordinal": 5,
-        "type_info": "Datetime"
+        "type_info": "Bool"
       },
       {
-        "name": "updated_at: _",
+        "name": "last_activity_at: _",
         "ordinal": 6,
         "type_info": "Datetime"
       },
       {
-        "name": "created_at: _",
+        "name": "updated_at: _",
         "ordinal": 7,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "created_at: _",
+        "ordinal": 8,
         "type_info": "Datetime"
       }
     ],
@@ -53,10 +58,11 @@
       true,
       false,
       false,
+      false,
       true,
       false,
       false
     ]
   },
-  "hash": "7fd4b2b5bfa83df14cbb3de7167dea4c55cec019ddf68d11516035199d35d204"
+  "hash": "28772ab9ee9a7b53b9c97e0bfc4b20ac1f50f42dca01adc54144cd61e29a7527"
 }

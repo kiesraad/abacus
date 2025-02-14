@@ -20,15 +20,21 @@
 
   th[scope="col"] {
     height: 2.75rem;
-    padding: 0.75rem 1.5rem;
     line-height: 1.125rem;
+    padding: 0.75rem 1.5rem;
+    &:global(.link-cell-padding) {
+      padding-right: 4.5rem;
+    }
   }
 
   th[scope="row"],
   td {
     height: 3.5rem;
-    padding: 1rem 1.5rem;
     line-height: 1.25rem;
+    padding: 1rem 1.5rem;
+    &:global(.link-cell-padding) {
+      padding-right: 4.5rem;
+    }
   }
 
   /* Vertical center child inline-blocks */

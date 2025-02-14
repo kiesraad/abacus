@@ -52,9 +52,12 @@
     td {
       /* Seats */
       &:nth-of-type(3),
-      &:nth-of-type(4),
-      &:nth-of-type(5) {
+      &:nth-of-type(4) {
         width: 7.65rem;
+      }
+      /* Total seats */
+      &:last-of-type {
+        width: 11rem;
       }
     }
   }

@@ -34,7 +34,7 @@ export function ApportionmentTable({
         <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>
         <Table.HeaderCell className="text-align-r">{t("apportionment.whole_seat.plural")}</Table.HeaderCell>
         <Table.HeaderCell className="text-align-r">{t("apportionment.rest_seat.plural")}</Table.HeaderCell>
-        <Table.HeaderCell className="text-align-r">{t("apportionment.total_seats")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r link-cell-padding">{t("apportionment.total_seats")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
         {final_standing.map((standing: PoliticalGroupSeatAssignment) => {
@@ -60,7 +60,7 @@ export function ApportionmentTable({
           <Table.Cell className="text-align-r bold">{t("apportionment.total")}</Table.Cell>
           <Table.NumberCell className="font-number">{whole_seats}</Table.NumberCell>
           <Table.NumberCell className="font-number">{rest_seats}</Table.NumberCell>
-          <Table.NumberCell className="font-number">{seats}</Table.NumberCell>
+          <Table.NumberCell className="font-number link-cell-padding">{seats}</Table.NumberCell>
         </Table.TotalRow>
       </Table.Body>
     </Table>

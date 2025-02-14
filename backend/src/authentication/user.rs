@@ -467,7 +467,7 @@ mod tests {
             .unwrap();
 
         users
-            .update_password(user.id, "new_password")
+            .update_password(user.id(), "new_password")
             .await
             .unwrap();
 
@@ -487,6 +487,44 @@ mod tests {
             authenticated_user,
             AuthenticationError::InvalidPassword
         ));
+    }
+
+    #[test(sqlx::test)]
+    async fn test_set_temp_password(pool: SqlitePool) {
+        let users = Users::new(pool.clone());
+
+        // Create new user, password needs change
+        let user = users
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
+            .await
+            .unwrap();
+
+        // User should need password change
+        assert!(user.needs_password_change);
+
+        users
+            .update_password(user.id(), "temp_password")
+            .await
+            .unwrap();
+
+        let user = users.get_by_id(user.id()).await.unwrap().unwrap();
+
+        // User now shouldn't need to change their password
+        assert!(!user.needs_password_change);
+
+        // Set a temporary password via update
+        let user = users
+            .update(user.id(), user.fullname(), Some("temp_password"))
+            .await
+            .unwrap();
+
+        // User needs to change their password again
+        assert!(user.needs_password_change);
     }
 
     #[test(sqlx::test)]

@@ -16,7 +16,7 @@ export function ResidualSeatsCalculationTable({
   residual_seats,
 }: ResidualSeatsCalculationTableProps) {
   return (
-    <Table id="residual_seats_calculation_table" className={cn(cls.table, cls.residual_seats_calculation_table)}>
+    <Table id="residual_seats_calculation_table" className={cn(cls.table, cls.residualSeatsCalculationTable)}>
       <Table.Body>
         <Table.Row>
           <Table.Cell className="bb-none">{t("apportionment.total_number_seats")}</Table.Cell>

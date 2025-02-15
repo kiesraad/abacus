@@ -32,14 +32,14 @@ export function ApportionmentWholeSeatsPage() {
             apportionment && (
               <>
                 <div>
-                  <h2 className={cls.table_title}>{t("apportionment.how_often_is_quota_met")}</h2>
-                  <span className={cls.table_information}>{t("apportionment.whole_seats_information")}</span>
+                  <h2 className={cls.tableTitle}>{t("apportionment.how_often_is_quota_met")}</h2>
+                  <span className={cls.tableInformation}>{t("apportionment.whole_seats_information")}</span>
                   <WholeSeatsTable final_standing={apportionment.final_standing} quota={apportionment.quota} />
                 </div>
 
                 <div>
-                  <h2 className={cls.table_title}>{t("apportionment.how_many_residual_seats")}</h2>
-                  <span className={cls.table_information}>
+                  <h2 className={cls.tableTitle}>{t("apportionment.how_many_residual_seats")}</h2>
+                  <span className={cls.tableInformation}>
                     {tx(
                       `apportionment.residual_seats_information_amount_and_link.${apportionment.residual_seats > 1 ? "plural" : "singular"}`,
                       {

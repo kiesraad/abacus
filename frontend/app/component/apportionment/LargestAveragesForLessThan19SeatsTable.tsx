@@ -19,7 +19,7 @@ export function LargestAveragesForLessThan19SeatsTable({
   return (
     <Table
       id="largest_averages_for_less_than_19_seats_table"
-      className={cn(cls.table, cls.residual_seats_less_than_19_seats_table)}
+      className={cn(cls.table, cls.residualSeatsLessThan19SeatsTable)}
     >
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>

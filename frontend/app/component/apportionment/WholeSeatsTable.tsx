@@ -12,7 +12,7 @@ interface WholeSeatsTableProps {
 
 export function WholeSeatsTable({ final_standing, quota }: WholeSeatsTableProps) {
   return (
-    <Table id="whole_seats_table" className={cn(cls.table, cls.whole_seats_table)}>
+    <Table id="whole_seats_table" className={cn(cls.table, cls.wholeSeatsTable)}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell className="text-align-r">{t("vote_count")}</Table.HeaderCell>

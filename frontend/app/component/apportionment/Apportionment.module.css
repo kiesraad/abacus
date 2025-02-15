@@ -29,7 +29,7 @@
   background-color: var(--bg-gray);
 }
 
-.election_summary_table {
+.election-summary-table {
   tr {
     th {
       color: var(--base-black);
@@ -47,7 +47,7 @@
   }
 }
 
-.apportionment_table {
+.apportionment-table {
   tr {
     td {
       /* Seats */
@@ -63,7 +63,7 @@
   }
 }
 
-.whole_seats_table {
+.whole-seats-table {
   tr {
     td {
       /* Signs (: and =) */
@@ -79,7 +79,7 @@
   }
 }
 
-.residual_seats_calculation_table {
+.residual-seats-calculation-table {
   width: 32rem;
   tr {
     td {
@@ -94,7 +94,7 @@
   }
 }
 
-.residual_seats_19_or_more_seats_table {
+.residual-seats-19-or-more-seats-table {
   tr {
     /* List number sticky column */
     td:first-child,
@@ -129,7 +129,7 @@
   }
 }
 
-.residual_seats_less_than_19_seats_table {
+.residual-seats-less-than-19-seats-table {
   tr {
     td {
       /* Whole seats */

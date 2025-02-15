@@ -41,7 +41,7 @@ export function ApportionmentPage() {
             election_summary && (
               <>
                 <div>
-                  <h2 className={cls.table_title}>{t("apportionment.election_summary")}</h2>
+                  <h2 className={cls.tableTitle}>{t("apportionment.election_summary")}</h2>
                   <ElectionSummaryTable
                     votes_counts={election_summary.votes_counts}
                     seats={apportionment.seats}
@@ -50,7 +50,7 @@ export function ApportionmentPage() {
                   />
                 </div>
                 <div>
-                  <h2 className={cls.table_title}>{t("apportionment.title")}</h2>
+                  <h2 className={cls.tableTitle}>{t("apportionment.title")}</h2>
                   <ApportionmentTable
                     final_standing={apportionment.final_standing}
                     political_groups={election.political_groups}

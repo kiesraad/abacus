@@ -14,7 +14,7 @@ interface ElectionSummaryTableProps {
 
 export function ElectionSummaryTable({ votes_counts, seats, quota, number_of_voters }: ElectionSummaryTableProps) {
   return (
-    <Table id="election_summary_table" className={cn(cls.table, cls.election_summary_table)}>
+    <Table id="election_summary_table" className={cn(cls.table, cls.electionSummaryTable)}>
       <Table.Body>
         <Table.Row>
           <Table.HeaderCell scope="row" className={cls.bt1Gray}>

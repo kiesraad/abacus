@@ -20,7 +20,7 @@ export function LargestAveragesFor19OrMoreSeatsTable({
     <div className={cls.scrollable}>
       <Table
         id="largest_averages_for_19_or_more_seats_table"
-        className={cn(cls.table, cls.residual_seats_19_or_more_seats_table)}
+        className={cn(cls.table, cls.residualSeats19OrMoreSeatsTable)}
       >
         <Table.Header>
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>{t("list")}</Table.HeaderCell>

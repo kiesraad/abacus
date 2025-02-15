@@ -18,18 +18,18 @@ import { ApportionmentProvider, ElectionApportionmentResponse, ElectionProvider,
 import { getElectionMockData } from "@kiesraad/api-mocks";
 import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@kiesraad/test";
 
-import { ApportionmentRestSeatsPage } from "./ApportionmentRestSeatsPage";
+import { ApportionmentResidualSeatsPage } from "./ApportionmentResidualSeatsPage";
 
-const renderApportionmentRestSeatsPage = () =>
+const renderApportionmentResidualSeatsPage = () =>
   render(
     <ElectionProvider electionId={1}>
       <ApportionmentProvider electionId={1}>
-        <ApportionmentRestSeatsPage />
+        <ApportionmentResidualSeatsPage />
       </ApportionmentProvider>
     </ElectionProvider>,
   );
 
-describe("ApportionmentRestSeatsPage", () => {
+describe("ApportionmentResidualSeatsPage", () => {
   test("Residual seats allocation table for 19 or more seats visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_19_or_more_seats));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
@@ -37,7 +37,7 @@ describe("ApportionmentRestSeatsPage", () => {
       election_summary: election_summary_19_or_more_seats,
     } satisfies ElectionApportionmentResponse);
 
-    renderApportionmentRestSeatsPage();
+    renderApportionmentResidualSeatsPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
 
@@ -72,7 +72,7 @@ describe("ApportionmentRestSeatsPage", () => {
       election_summary: election_summary_less_than_19_seats,
     } satisfies ElectionApportionmentResponse);
 
-    renderApportionmentRestSeatsPage();
+    renderApportionmentResidualSeatsPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
 
@@ -120,7 +120,7 @@ describe("ApportionmentRestSeatsPage", () => {
       election_summary: election_summary_less_than_19_seats,
     } satisfies ElectionApportionmentResponse);
 
-    renderApportionmentRestSeatsPage();
+    renderApportionmentResidualSeatsPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
 
@@ -151,7 +151,7 @@ describe("ApportionmentRestSeatsPage", () => {
         reference: "ApportionmentNotAvailableUntilDataEntryFinalised",
       } satisfies ErrorResponse);
 
-      renderApportionmentRestSeatsPage();
+      renderApportionmentResidualSeatsPage();
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));
@@ -174,7 +174,7 @@ describe("ApportionmentRestSeatsPage", () => {
         reference: "DrawingOfLotsRequired",
       } satisfies ErrorResponse);
 
-      renderApportionmentRestSeatsPage();
+      renderApportionmentResidualSeatsPage();
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de restzetels" }));

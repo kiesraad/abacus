@@ -1279,6 +1279,69 @@
           }
         }
       }
+    },
+    "/api/user/{user_id}": {
+      "put": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Update a user",
+        "operationId": "user_update",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "User updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1289,7 +1352,7 @@
         "required": [
           "seats",
           "whole_seats",
-          "rest_seats",
+          "residual_seats",
           "quota",
           "steps",
           "final_standing"
@@ -1304,7 +1367,7 @@
           "quota": {
             "$ref": "#/components/schemas/Fraction"
           },
-          "rest_seats": {
+          "residual_seats": {
             "type": "integer",
             "format": "int64",
             "minimum": 0
@@ -1329,9 +1392,9 @@
       },
       "ApportionmentStep": {
         "type": "object",
-        "description": "Records the details for a specific remainder seat, and how the standing is\nonce that remainder seat was assigned",
+        "description": "Records the details for a specific residual seat, and how the standing is\nonce that residual seat was assigned",
         "required": [
-          "rest_seat_number",
+          "residual_seat_number",
           "change",
           "standing"
         ],
@@ -1339,7 +1402,7 @@
           "change": {
             "$ref": "#/components/schemas/AssignedSeat"
           },
-          "rest_seat_number": {
+          "residual_seat_number": {
             "type": "integer",
             "format": "int64",
             "minimum": 0
@@ -1397,7 +1460,7 @@
             ]
           }
         ],
-        "description": "Records the political group and specific change for a specific remainder seat"
+        "description": "Records the political group and specific change for a specific residual seat"
       },
       "Candidate": {
         "type": "object",
@@ -2096,7 +2159,7 @@
           "surplus_votes",
           "meets_surplus_threshold",
           "whole_seats",
-          "rest_seats",
+          "residual_seats",
           "total_seats"
         ],
         "properties": {
@@ -2110,10 +2173,10 @@
             "description": "Political group number for which this assignment applies",
             "minimum": 0
           },
-          "rest_seats": {
+          "residual_seats": {
             "type": "integer",
             "format": "int64",
-            "description": "The number of rest seats assigned to this group",
+            "description": "The number of residual seats assigned to this group",
             "minimum": 0
           },
           "surplus_votes": {
@@ -2150,7 +2213,7 @@
           "meets_surplus_threshold",
           "next_votes_per_seat",
           "whole_seats",
-          "rest_seats"
+          "residual_seats"
         ],
         "properties": {
           "meets_surplus_threshold": {
@@ -2159,7 +2222,7 @@
           },
           "next_votes_per_seat": {
             "$ref": "#/components/schemas/Fraction",
-            "description": "The number of votes per seat if a new seat would be added to the current rest seats"
+            "description": "The number of votes per seat if a new seat would be added to the current residual seats"
           },
           "pg_number": {
             "type": "integer",
@@ -2167,10 +2230,10 @@
             "description": "Political group number for which this standing applies",
             "minimum": 0
           },
-          "rest_seats": {
+          "residual_seats": {
             "type": "integer",
             "format": "int64",
-            "description": "The current number of rest seats this political group got",
+            "description": "The current number of residual seats this political group got",
             "minimum": 0
           },
           "surplus_votes": {
@@ -2439,6 +2502,17 @@
           },
           "unreturned_ballots_count": {
             "$ref": "#/components/schemas/SumCount"
+          }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "fullname": {
+            "type": "string"
+          },
+          "temp_password": {
+            "type": "string"
           }
         }
       },

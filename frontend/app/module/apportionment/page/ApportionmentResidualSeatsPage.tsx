@@ -18,22 +18,22 @@ function render_title_and_header() {
       <PageTitle title={`${t("apportionment.title")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("apportionment.details_rest_seats")}</h1>
+          <h1>{t("apportionment.details_residual_seats")}</h1>
         </section>
       </header>
     </>
   );
 }
 
-function render_information(seats: number, rest_seats: number) {
+function render_information(seats: number, residual_seats: number) {
   return (
     <span className={cls.table_information}>
       {tx(
-        `apportionment.whole_seats_information_link.${rest_seats > 1 ? "plural" : "singular"}`,
+        `apportionment.whole_seats_information_link.${residual_seats > 1 ? "plural" : "singular"}`,
         {
           link: (title) => <Link to="../details-whole-seats">{title}</Link>,
         },
-        { num_rest_seats: rest_seats },
+        { num_residual_seats: residual_seats },
       )}
       <br />
       <br />
@@ -42,7 +42,7 @@ function render_information(seats: number, rest_seats: number) {
   );
 }
 
-export function ApportionmentRestSeatsPage() {
+export function ApportionmentResidualSeatsPage() {
   const { election } = useElection();
   const { apportionment, error } = useApportionmentContext();
 
@@ -71,11 +71,11 @@ export function ApportionmentRestSeatsPage() {
         {render_title_and_header()}
         <main>
           <article className={cls.article}>
-            {apportionment.rest_seats > 0 ? (
+            {apportionment.residual_seats > 0 ? (
               apportionment.seats >= 19 ? (
                 <div>
-                  <h2 className={cls.table_title}>{t("apportionment.rest_seats_largest_averages")}</h2>
-                  {render_information(apportionment.seats, apportionment.rest_seats)}
+                  <h2 className={cls.table_title}>{t("apportionment.residual_seats_largest_averages")}</h2>
+                  {render_information(apportionment.seats, apportionment.residual_seats)}
                   {highest_average_steps.length > 0 && (
                     <LargestAveragesFor19OrMoreSeatsTable
                       highest_average_steps={highest_average_steps}
@@ -87,8 +87,8 @@ export function ApportionmentRestSeatsPage() {
               ) : (
                 <>
                   <div>
-                    <h2 className={cls.table_title}>{t("apportionment.rest_seats_largest_surpluses")}</h2>
-                    {render_information(apportionment.seats, apportionment.rest_seats)}
+                    <h2 className={cls.table_title}>{t("apportionment.residual_seats_largest_surpluses")}</h2>
+                    {render_information(apportionment.seats, apportionment.residual_seats)}
                     {highest_surplus_steps.length > 0 && (
                       <LargestSurplusesTable
                         highest_surplus_steps={highest_surplus_steps}
@@ -99,10 +99,10 @@ export function ApportionmentRestSeatsPage() {
                   </div>
                   {highest_average_steps.length > 0 && (
                     <div>
-                      <h2 className={cls.table_title}>{t("apportionment.leftover_rest_seats_assignment")}</h2>
+                      <h2 className={cls.table_title}>{t("apportionment.leftover_residual_seats_assignment")}</h2>
                       <span className={cls.table_information}>
                         {t(
-                          `apportionment.leftover_rest_seats_amount_and_information.${highest_average_steps.length > 1 ? "plural" : "singular"}`,
+                          `apportionment.leftover_residual_seats_amount_and_information.${highest_average_steps.length > 1 ? "plural" : "singular"}`,
                           { num_seats: highest_average_steps.length },
                         )}
                       </span>
@@ -118,7 +118,7 @@ export function ApportionmentRestSeatsPage() {
                 </>
               )
             ) : (
-              <span>{t("apportionment.no_rest_seats_to_assign")}</span>
+              <span>{t("apportionment.no_residual_seats_to_assign")}</span>
             )}
           </article>
         </main>

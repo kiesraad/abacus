@@ -9,7 +9,7 @@ interface ApportionmentTableProps {
   final_standing: PoliticalGroupSeatAssignment[];
   political_groups: PoliticalGroup[];
   whole_seats: number;
-  rest_seats: number;
+  residual_seats: number;
   seats: number;
 }
 
@@ -24,7 +24,7 @@ export function ApportionmentTable({
   final_standing,
   political_groups,
   whole_seats,
-  rest_seats,
+  residual_seats,
   seats,
 }: ApportionmentTableProps) {
   return (
@@ -33,7 +33,7 @@ export function ApportionmentTable({
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>
         <Table.HeaderCell className="text-align-r">{t("apportionment.whole_seat.plural")}</Table.HeaderCell>
-        <Table.HeaderCell className="text-align-r">{t("apportionment.rest_seat.plural")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("apportionment.residual_seat.plural")}</Table.HeaderCell>
         <Table.HeaderCell className="text-align-r link-cell-padding">{t("apportionment.total_seats")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
@@ -49,7 +49,7 @@ export function ApportionmentTable({
                 {convert_zero_to_dash(standing.whole_seats)}
               </Table.NumberCell>
               <Table.NumberCell className="font-number normal">
-                {convert_zero_to_dash(standing.rest_seats)}
+                {convert_zero_to_dash(standing.residual_seats)}
               </Table.NumberCell>
               <Table.NumberCell className="font-number">{convert_zero_to_dash(standing.total_seats)}</Table.NumberCell>
             </Table.LinkRow>
@@ -59,7 +59,7 @@ export function ApportionmentTable({
           <Table.Cell />
           <Table.Cell className="text-align-r bold">{t("apportionment.total")}</Table.Cell>
           <Table.NumberCell className="font-number">{whole_seats}</Table.NumberCell>
-          <Table.NumberCell className="font-number">{rest_seats}</Table.NumberCell>
+          <Table.NumberCell className="font-number">{residual_seats}</Table.NumberCell>
           <Table.NumberCell className="font-number link-cell-padding">{seats}</Table.NumberCell>
         </Table.TotalRow>
       </Table.Body>

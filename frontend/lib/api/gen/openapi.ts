@@ -125,6 +125,13 @@ export type LOGOUT_REQUEST_PATH = `/api/user/logout`;
 export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
 export type WHOAMI_REQUEST_PATH = `/api/user/whoami`;
 
+// /api/user/{user_id}
+export interface USER_UPDATE_REQUEST_PARAMS {
+  user_id: number;
+}
+export type USER_UPDATE_REQUEST_PATH = `/api/user/${number}`;
+export type USER_UPDATE_REQUEST_BODY = UpdateUserRequest;
+
 /** TYPES **/
 
 /**
@@ -136,24 +143,24 @@ number of seats per political group that was assigned after all seats were assig
 export interface ApportionmentResult {
   final_standing: PoliticalGroupSeatAssignment[];
   quota: Fraction;
-  rest_seats: number;
+  residual_seats: number;
   seats: number;
   steps: ApportionmentStep[];
   whole_seats: number;
 }
 
 /**
- * Records the details for a specific remainder seat, and how the standing is
-once that remainder seat was assigned
+ * Records the details for a specific residual seat, and how the standing is
+once that residual seat was assigned
  */
 export interface ApportionmentStep {
   change: AssignedSeat;
-  rest_seat_number: number;
+  residual_seat_number: number;
   standing: PoliticalGroupStanding[];
 }
 
 /**
- * Records the political group and specific change for a specific remainder seat
+ * Records the political group and specific change for a specific residual seat
  */
 export type AssignedSeat =
   | (HighestAverageAssignedSeat & { assigned_by: "HighestAverage" })
@@ -424,7 +431,7 @@ export interface PoliticalGroup {
 export interface PoliticalGroupSeatAssignment {
   meets_surplus_threshold: boolean;
   pg_number: number;
-  rest_seats: number;
+  residual_seats: number;
   surplus_votes: Fraction;
   total_seats: number;
   votes_cast: number;
@@ -439,7 +446,7 @@ export interface PoliticalGroupStanding {
   meets_surplus_threshold: boolean;
   next_votes_per_seat: Fraction;
   pg_number: number;
-  rest_seats: number;
+  residual_seats: number;
   surplus_votes: Fraction;
   votes_cast: number;
   whole_seats: number;
@@ -538,6 +545,11 @@ export interface SummaryDifferencesCounts {
   too_few_ballots_handed_out_count: SumCount;
   too_many_ballots_handed_out_count: SumCount;
   unreturned_ballots_count: SumCount;
+}
+
+export interface UpdateUserRequest {
+  fullname?: string;
+  temp_password?: string;
 }
 
 /**

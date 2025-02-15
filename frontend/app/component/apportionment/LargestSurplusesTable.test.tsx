@@ -7,7 +7,7 @@ import { LargestSurplusesTable } from "./LargestSurplusesTable";
 import { apportionment, election, highest_surplus_steps } from "./test-data/less-than-19-seats";
 
 describe("LargestSurplusesTable", () => {
-  test("renders a table with the rest seat allocation with largest surpluses system", async () => {
+  test("renders a table with the residual seat allocation with largest surpluses system", async () => {
     render(
       <LargestSurplusesTable
         highest_surplus_steps={highest_surplus_steps}

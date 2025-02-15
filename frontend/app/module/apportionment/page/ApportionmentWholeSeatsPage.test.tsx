@@ -47,9 +47,9 @@ describe("ApportionmentWholeSeatsPage", () => {
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Hoeveel restzetels zijn er te verdelen?" }));
-    const rest_seats_calculation_table = await screen.findByTestId("rest_seats_calculation_table");
-    expect(rest_seats_calculation_table).toBeVisible();
-    expect(rest_seats_calculation_table).toHaveTableContent([
+    const residual_seats_calculation_table = await screen.findByTestId("residual_seats_calculation_table");
+    expect(residual_seats_calculation_table).toBeVisible();
+    expect(residual_seats_calculation_table).toHaveTableContent([
       ["Totaal aantal zetels", "15", ""],
       ["Totaal aantal toegewezen volle zetels", "10", "— min"],
       ["Restzetels", "5", ""],
@@ -76,7 +76,7 @@ describe("ApportionmentWholeSeatsPage", () => {
       ).toBeVisible();
 
       expect(screen.queryByTestId("whole_seats_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("rest_seats_calculation_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("residual_seats_calculation_table")).not.toBeInTheDocument();
     });
 
     test("Not available because drawing of lots is not implemented yet", async () => {
@@ -98,7 +98,7 @@ describe("ApportionmentWholeSeatsPage", () => {
       ).toBeVisible();
 
       expect(screen.queryByTestId("whole_seats_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("rest_seats_calculation_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("residual_seats_calculation_table")).not.toBeInTheDocument();
     });
 
     test("Internal Server Error renders error page", async () => {

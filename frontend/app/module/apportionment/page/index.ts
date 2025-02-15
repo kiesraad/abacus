@@ -1,3 +1,3 @@
 export * from "./ApportionmentPage";
-export * from "./ApportionmentRestSeatsPage";
+export * from "./ApportionmentResidualSeatsPage";
 export * from "./ApportionmentWholeSeatsPage";

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { RestSeatsCalculationTable, WholeSeatsTable } from "app/component/apportionment";
+import { ResidualSeatsCalculationTable, WholeSeatsTable } from "app/component/apportionment";
 
 import { useApportionmentContext } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
@@ -38,23 +38,23 @@ export function ApportionmentWholeSeatsPage() {
                 </div>
 
                 <div>
-                  <h2 className={cls.table_title}>{t("apportionment.how_many_rest_seats")}</h2>
+                  <h2 className={cls.table_title}>{t("apportionment.how_many_residual_seats")}</h2>
                   <span className={cls.table_information}>
                     {tx(
-                      `apportionment.rest_seats_information_amount_and_link.${apportionment.rest_seats > 1 ? "plural" : "singular"}`,
+                      `apportionment.residual_seats_information_amount_and_link.${apportionment.residual_seats > 1 ? "plural" : "singular"}`,
                       {
                         link: (title) => <Link to="../details-residual-seats">{title}</Link>,
                       },
-                      { num_rest_seats: apportionment.rest_seats },
+                      { num_residual_seats: apportionment.residual_seats },
                     )}{" "}
                     {t(
-                      `apportionment.rest_seats_information_largest_${apportionment.seats >= 19 ? "averages" : "surpluses"}`,
+                      `apportionment.residual_seats_information_largest_${apportionment.seats >= 19 ? "averages" : "surpluses"}`,
                     )}
                   </span>
-                  <RestSeatsCalculationTable
+                  <ResidualSeatsCalculationTable
                     seats={apportionment.seats}
                     whole_seats={apportionment.whole_seats}
-                    rest_seats={apportionment.rest_seats}
+                    residual_seats={apportionment.residual_seats}
                   />
                 </div>
               </>

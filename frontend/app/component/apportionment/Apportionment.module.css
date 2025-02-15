@@ -79,7 +79,7 @@
   }
 }
 
-.rest_seats_calculation_table {
+.residual_seats_calculation_table {
   width: 32rem;
   tr {
     td {
@@ -94,25 +94,25 @@
   }
 }
 
-.rest_seats_19_or_more_seats_table {
+.residual_seats_19_or_more_seats_table {
   tr {
     /* List number sticky column */
     td:first-child,
     th:first-child {
       left: 0;
     }
-    /* List name and 'rest seat added to list' text sticky column */
+    /* List name and 'residual seat added to list' text sticky column */
     td:nth-child(2),
     th:nth-child(2) {
       left: 4.525rem;
     }
-    /* Number of rest seats sticky column*/
+    /* Number of residual seats sticky column*/
     td:last-child,
     th:last-child {
       right: 0;
     }
     td {
-      /* List name and 'rest seat added to list' text */
+      /* List name and 'residual seat added to list' text */
       &:nth-child(2) {
         min-width: 17rem;
       }
@@ -120,7 +120,7 @@
       &:nth-child(2n + 3) {
         min-width: 4.5rem;
       }
-      /* Number of rest seats */
+      /* Number of residual seats */
       &:last-child {
         min-width: 9.25rem;
         max-width: 10.25rem;
@@ -129,7 +129,7 @@
   }
 }
 
-.rest_seats_less_than_19_seats_table {
+.residual_seats_less_than_19_seats_table {
   tr {
     td {
       /* Whole seats */
@@ -140,7 +140,7 @@
       &:nth-of-type(4) {
         width: 8.375rem;
       }
-      /* Rest seats */
+      /* Residual seats */
       &:nth-of-type(5) {
         width: 9.25rem;
       }

@@ -30,7 +30,7 @@ import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
 import {
   ApportionmentLayout,
   ApportionmentPage,
-  ApportionmentRestSeatsPage,
+  ApportionmentResidualSeatsPage,
   ApportionmentWholeSeatsPage,
 } from "./module/apportionment";
 import {
@@ -63,7 +63,7 @@ export const routes = createRoutesFromElements(
         <Route index element={<ElectionHomePage />} />
         <Route path="apportionment" element={<ApportionmentLayout />}>
           <Route index element={<ApportionmentPage />} />
-          <Route path="details-residual-seats" element={<ApportionmentRestSeatsPage />} />
+          <Route path="details-residual-seats" element={<ApportionmentResidualSeatsPage />} />
           <Route path="details-whole-seats" element={<ApportionmentWholeSeatsPage />} />
         </Route>
         <Route

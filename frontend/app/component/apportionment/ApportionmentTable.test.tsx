@@ -13,7 +13,7 @@ describe("ApportionmentTable", () => {
         final_standing={apportionment.final_standing}
         political_groups={election.political_groups as PoliticalGroup[]}
         whole_seats={apportionment.whole_seats}
-        rest_seats={apportionment.rest_seats}
+        residual_seats={apportionment.residual_seats}
         seats={apportionment.seats}
       />,
     );

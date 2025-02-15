@@ -2,7 +2,7 @@ import { ApportionmentResult, ApportionmentStep, Election, ElectionSummary } fro
 
 export const highest_surplus_steps: ApportionmentStep[] = [
   {
-    rest_seat_number: 1,
+    residual_seat_number: 1,
     change: {
       assigned_by: "HighestSurplus",
       selected_pg_number: 2,
@@ -29,7 +29,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 11,
         },
         whole_seats: 10,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 2,
@@ -46,7 +46,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 3,
@@ -63,7 +63,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 4,
@@ -80,7 +80,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 5,
@@ -97,7 +97,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 6,
@@ -114,7 +114,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 7,
@@ -131,7 +131,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 8,
@@ -148,12 +148,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
     ],
   },
   {
-    rest_seat_number: 2,
+    residual_seat_number: 2,
     change: {
       assigned_by: "HighestSurplus",
       selected_pg_number: 1,
@@ -180,7 +180,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 11,
         },
         whole_seats: 10,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 2,
@@ -197,7 +197,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 2,
         },
         whole_seats: 0,
-        rest_seats: 1,
+        residual_seats: 1,
       },
       {
         pg_number: 3,
@@ -214,7 +214,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 4,
@@ -231,7 +231,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 5,
@@ -248,7 +248,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 6,
@@ -265,7 +265,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 7,
@@ -282,7 +282,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 8,
@@ -299,7 +299,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
     ],
   },
@@ -307,7 +307,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
 
 export const highest_average_steps: ApportionmentStep[] = [
   {
-    rest_seat_number: 3,
+    residual_seat_number: 3,
     change: {
       assigned_by: "HighestAverage",
       selected_pg_number: 1,
@@ -334,7 +334,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 12,
         },
         whole_seats: 10,
-        rest_seats: 1,
+        residual_seats: 1,
       },
       {
         pg_number: 2,
@@ -351,7 +351,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 2,
         },
         whole_seats: 0,
-        rest_seats: 1,
+        residual_seats: 1,
       },
       {
         pg_number: 3,
@@ -368,7 +368,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 4,
@@ -385,7 +385,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 5,
@@ -402,7 +402,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 6,
@@ -419,7 +419,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 7,
@@ -436,7 +436,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 8,
@@ -453,12 +453,12 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
     ],
   },
   {
-    rest_seat_number: 4,
+    residual_seat_number: 4,
     change: {
       assigned_by: "HighestAverage",
       selected_pg_number: 3,
@@ -485,7 +485,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 13,
         },
         whole_seats: 10,
-        rest_seats: 2,
+        residual_seats: 2,
       },
       {
         pg_number: 2,
@@ -502,7 +502,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 2,
         },
         whole_seats: 0,
-        rest_seats: 1,
+        residual_seats: 1,
       },
       {
         pg_number: 3,
@@ -519,7 +519,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 4,
@@ -536,7 +536,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 5,
@@ -553,7 +553,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 6,
@@ -570,7 +570,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 7,
@@ -587,7 +587,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 8,
@@ -604,12 +604,12 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
     ],
   },
   {
-    rest_seat_number: 5,
+    residual_seat_number: 5,
     change: {
       assigned_by: "HighestAverage",
       selected_pg_number: 4,
@@ -636,7 +636,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 13,
         },
         whole_seats: 10,
-        rest_seats: 2,
+        residual_seats: 2,
       },
       {
         pg_number: 2,
@@ -653,7 +653,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 2,
         },
         whole_seats: 0,
-        rest_seats: 1,
+        residual_seats: 1,
       },
       {
         pg_number: 3,
@@ -670,7 +670,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 2,
         },
         whole_seats: 0,
-        rest_seats: 1,
+        residual_seats: 1,
       },
       {
         pg_number: 4,
@@ -687,7 +687,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 5,
@@ -704,7 +704,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 6,
@@ -721,7 +721,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 7,
@@ -738,7 +738,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
       {
         pg_number: 8,
@@ -755,7 +755,7 @@ export const highest_average_steps: ApportionmentStep[] = [
           denominator: 1,
         },
         whole_seats: 0,
-        rest_seats: 0,
+        residual_seats: 0,
       },
     ],
   },
@@ -764,7 +764,7 @@ export const highest_average_steps: ApportionmentStep[] = [
 export const apportionment: ApportionmentResult = {
   seats: 15,
   whole_seats: 10,
-  rest_seats: 5,
+  residual_seats: 5,
   quota: {
     integer: 80,
     numerator: 0,
@@ -782,7 +782,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: true,
       whole_seats: 10,
-      rest_seats: 2,
+      residual_seats: 2,
       total_seats: 12,
     },
     {
@@ -795,7 +795,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: true,
       whole_seats: 0,
-      rest_seats: 1,
+      residual_seats: 1,
       total_seats: 1,
     },
     {
@@ -808,7 +808,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: false,
       whole_seats: 0,
-      rest_seats: 1,
+      residual_seats: 1,
       total_seats: 1,
     },
     {
@@ -821,7 +821,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: false,
       whole_seats: 0,
-      rest_seats: 1,
+      residual_seats: 1,
       total_seats: 1,
     },
     {
@@ -834,7 +834,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: false,
       whole_seats: 0,
-      rest_seats: 0,
+      residual_seats: 0,
       total_seats: 0,
     },
     {
@@ -847,7 +847,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: false,
       whole_seats: 0,
-      rest_seats: 0,
+      residual_seats: 0,
       total_seats: 0,
     },
     {
@@ -860,7 +860,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: false,
       whole_seats: 0,
-      rest_seats: 0,
+      residual_seats: 0,
       total_seats: 0,
     },
     {
@@ -873,7 +873,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: false,
       whole_seats: 0,
-      rest_seats: 0,
+      residual_seats: 0,
       total_seats: 0,
     },
   ],

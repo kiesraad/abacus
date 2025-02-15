@@ -7,7 +7,7 @@ import { LargestAveragesForLessThan19SeatsTable } from "./LargestAveragesForLess
 import { apportionment, election, highest_average_steps } from "./test-data/less-than-19-seats";
 
 describe("LargestAveragesForLessThan19SeatsTable", () => {
-  test("renders a table with the rest seat allocation with largest averages system for less than 19 seats", async () => {
+  test("renders a table with the residual seat allocation with largest averages system for less than 19 seats", async () => {
     render(
       <LargestAveragesForLessThan19SeatsTable
         highest_average_steps={highest_average_steps}

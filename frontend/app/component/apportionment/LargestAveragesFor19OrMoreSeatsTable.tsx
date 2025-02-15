@@ -20,20 +20,20 @@ export function LargestAveragesFor19OrMoreSeatsTable({
     <div className={cls.scrollable}>
       <Table
         id="largest_averages_for_19_or_more_seats_table"
-        className={cn(cls.table, cls.rest_seats_19_or_more_seats_table)}
+        className={cn(cls.table, cls.residual_seats_19_or_more_seats_table)}
       >
         <Table.Header>
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>{t("list")}</Table.HeaderCell>
           <Table.HeaderCell className={cls.sticky}>{t("list_name")}</Table.HeaderCell>
           {highest_average_steps.map((step: ApportionmentStep) => {
             return (
-              <Table.HeaderCell key={step.rest_seat_number} className="text-align-r" span={2}>
-                {t("apportionment.rest_seat.singular")} {step.rest_seat_number}
+              <Table.HeaderCell key={step.residual_seat_number} className="text-align-r" span={2}>
+                {t("apportionment.residual_seat.singular")} {step.residual_seat_number}
               </Table.HeaderCell>
             );
           })}
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>
-            {t("apportionment.rest_seats_count")}
+            {t("apportionment.residual_seats_count")}
           </Table.HeaderCell>
         </Table.Header>
         <Table.Body>
@@ -51,7 +51,7 @@ export function LargestAveragesFor19OrMoreSeatsTable({
                   if (average) {
                     return (
                       <Table.DisplayFractionCells
-                        key={`${pg_seat_assignment.pg_number}-${step.rest_seat_number}`}
+                        key={`${pg_seat_assignment.pg_number}-${step.residual_seat_number}`}
                         className={
                           step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow" : "normal"
                         }
@@ -62,7 +62,7 @@ export function LargestAveragesFor19OrMoreSeatsTable({
                   }
                 })}
                 <Table.NumberCell className={cn(cls.sticky, "font-number")}>
-                  {pg_seat_assignment.rest_seats}
+                  {pg_seat_assignment.residual_seats}
                 </Table.NumberCell>
               </Table.Row>
             );
@@ -70,10 +70,10 @@ export function LargestAveragesFor19OrMoreSeatsTable({
           <Table.TotalRow>
             <Table.Cell className={cls.sticky} />
             <Table.Cell className={cn(cls.sticky, "text-align-r", "bold")}>
-              {t("apportionment.rest_seat_assigned_to_list")}
+              {t("apportionment.residual_seat_assigned_to_list")}
             </Table.Cell>
             {highest_average_steps.map((step: ApportionmentStep) => (
-              <Table.NumberCell key={step.rest_seat_number} colSpan={2}>
+              <Table.NumberCell key={step.residual_seat_number} colSpan={2}>
                 {step.change.selected_pg_number}
               </Table.NumberCell>
             ))}

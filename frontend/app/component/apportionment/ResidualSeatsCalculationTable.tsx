@@ -4,15 +4,19 @@ import { cn } from "@kiesraad/util";
 
 import cls from "./Apportionment.module.css";
 
-interface RestSeatsCalculationTableProps {
+interface ResidualSeatsCalculationTableProps {
   seats: number;
   whole_seats: number;
-  rest_seats: number;
+  residual_seats: number;
 }
 
-export function RestSeatsCalculationTable({ seats, whole_seats, rest_seats }: RestSeatsCalculationTableProps) {
+export function ResidualSeatsCalculationTable({
+  seats,
+  whole_seats,
+  residual_seats,
+}: ResidualSeatsCalculationTableProps) {
   return (
-    <Table id="rest_seats_calculation_table" className={cn(cls.table, cls.rest_seats_calculation_table)}>
+    <Table id="residual_seats_calculation_table" className={cn(cls.table, cls.residual_seats_calculation_table)}>
       <Table.Body>
         <Table.Row>
           <Table.Cell className="bb-none">{t("apportionment.total_number_seats")}</Table.Cell>
@@ -25,8 +29,8 @@ export function RestSeatsCalculationTable({ seats, whole_seats, rest_seats }: Re
           <Table.Cell>— {t("apportionment.minus")}</Table.Cell>
         </Table.Row>
         <Table.TotalRow>
-          <Table.Cell className="bold">{t("apportionment.rest_seat.plural")}</Table.Cell>
-          <Table.NumberCell className="font-number">{rest_seats}</Table.NumberCell>
+          <Table.Cell className="bold">{t("apportionment.residual_seat.plural")}</Table.Cell>
+          <Table.NumberCell className="font-number">{residual_seats}</Table.NumberCell>
           <Table.Cell />
         </Table.TotalRow>
       </Table.Body>

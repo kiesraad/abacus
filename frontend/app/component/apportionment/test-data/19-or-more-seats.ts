@@ -3,7 +3,7 @@ import { ApportionmentResult, Election, ElectionSummary } from "@kiesraad/api";
 export const apportionment: ApportionmentResult = {
   seats: 23,
   whole_seats: 19,
-  rest_seats: 4,
+  residual_seats: 4,
   quota: {
     integer: 52,
     numerator: 4,
@@ -11,7 +11,7 @@ export const apportionment: ApportionmentResult = {
   },
   steps: [
     {
-      rest_seat_number: 1,
+      residual_seat_number: 1,
       change: {
         assigned_by: "HighestAverage",
         selected_pg_number: 5,
@@ -38,7 +38,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 12,
           },
           whole_seats: 11,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 2,
@@ -55,7 +55,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 6,
           },
           whole_seats: 5,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 3,
@@ -72,7 +72,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 2,
           },
           whole_seats: 1,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 4,
@@ -89,7 +89,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 2,
           },
           whole_seats: 1,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 5,
@@ -106,12 +106,12 @@ export const apportionment: ApportionmentResult = {
             denominator: 2,
           },
           whole_seats: 1,
-          rest_seats: 0,
+          residual_seats: 0,
         },
       ],
     },
     {
-      rest_seat_number: 2,
+      residual_seat_number: 2,
       change: {
         assigned_by: "HighestAverage",
         selected_pg_number: 2,
@@ -138,7 +138,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 12,
           },
           whole_seats: 11,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 2,
@@ -155,7 +155,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 6,
           },
           whole_seats: 5,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 3,
@@ -172,7 +172,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 2,
           },
           whole_seats: 1,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 4,
@@ -189,7 +189,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 2,
           },
           whole_seats: 1,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 5,
@@ -206,12 +206,12 @@ export const apportionment: ApportionmentResult = {
             denominator: 3,
           },
           whole_seats: 1,
-          rest_seats: 1,
+          residual_seats: 1,
         },
       ],
     },
     {
-      rest_seat_number: 3,
+      residual_seat_number: 3,
       change: {
         assigned_by: "HighestAverage",
         selected_pg_number: 1,
@@ -238,7 +238,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 12,
           },
           whole_seats: 11,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 2,
@@ -255,7 +255,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 7,
           },
           whole_seats: 5,
-          rest_seats: 1,
+          residual_seats: 1,
         },
         {
           pg_number: 3,
@@ -272,7 +272,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 2,
           },
           whole_seats: 1,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 4,
@@ -289,7 +289,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 2,
           },
           whole_seats: 1,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 5,
@@ -306,12 +306,12 @@ export const apportionment: ApportionmentResult = {
             denominator: 3,
           },
           whole_seats: 1,
-          rest_seats: 1,
+          residual_seats: 1,
         },
       ],
     },
     {
-      rest_seat_number: 4,
+      residual_seat_number: 4,
       change: {
         assigned_by: "HighestAverage",
         selected_pg_number: 4,
@@ -338,7 +338,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 13,
           },
           whole_seats: 11,
-          rest_seats: 1,
+          residual_seats: 1,
         },
         {
           pg_number: 2,
@@ -355,7 +355,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 7,
           },
           whole_seats: 5,
-          rest_seats: 1,
+          residual_seats: 1,
         },
         {
           pg_number: 3,
@@ -372,7 +372,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 2,
           },
           whole_seats: 1,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 4,
@@ -389,7 +389,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 2,
           },
           whole_seats: 1,
-          rest_seats: 0,
+          residual_seats: 0,
         },
         {
           pg_number: 5,
@@ -406,7 +406,7 @@ export const apportionment: ApportionmentResult = {
             denominator: 3,
           },
           whole_seats: 1,
-          rest_seats: 1,
+          residual_seats: 1,
         },
       ],
     },
@@ -422,7 +422,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: true,
       whole_seats: 11,
-      rest_seats: 1,
+      residual_seats: 1,
       total_seats: 12,
     },
     {
@@ -435,7 +435,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: true,
       whole_seats: 5,
-      rest_seats: 1,
+      residual_seats: 1,
       total_seats: 6,
     },
     {
@@ -448,7 +448,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: true,
       whole_seats: 1,
-      rest_seats: 0,
+      residual_seats: 0,
       total_seats: 1,
     },
     {
@@ -461,7 +461,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: true,
       whole_seats: 1,
-      rest_seats: 1,
+      residual_seats: 1,
       total_seats: 2,
     },
     {
@@ -474,7 +474,7 @@ export const apportionment: ApportionmentResult = {
       },
       meets_surplus_threshold: true,
       whole_seats: 1,
-      rest_seats: 1,
+      residual_seats: 1,
       total_seats: 2,
     },
   ],

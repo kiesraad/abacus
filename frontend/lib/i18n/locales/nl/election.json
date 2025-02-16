@@ -9,6 +9,9 @@
   },
   "level_polling_station": "Niveau stembureau",
   "location": "Gebied",
+  "no_elections_added": "Nog geen verkiezingen ingesteld",
+  "not_ready_for_use": "Abacus is nog niet klaar voor gebruik",
+  "please_wait_for_coordinator": "Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten.",
   "status": "Status",
   "start_when_count_list_received": "Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren."
 }

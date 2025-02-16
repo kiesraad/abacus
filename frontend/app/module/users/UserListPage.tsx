@@ -36,10 +36,10 @@ export function UserListPage() {
 
           <Table id="users">
             <Table.Header>
-              <Table.Column>{t("users.username")}</Table.Column>
-              <Table.Column>{t("role")}</Table.Column>
-              <Table.Column>{t("users.fullname")}</Table.Column>
-              <Table.Column>{t("users.last_activity")}</Table.Column>
+              <Table.HeaderCell>{t("users.username")}</Table.HeaderCell>
+              <Table.HeaderCell>{t("role")}</Table.HeaderCell>
+              <Table.HeaderCell>{t("users.fullname")}</Table.HeaderCell>
+              <Table.HeaderCell>{t("users.last_activity")}</Table.HeaderCell>
             </Table.Header>
             <Table.Body className="fs-md">
               {users.map((user) => (

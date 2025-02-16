@@ -3,7 +3,7 @@ use axum::http::StatusCode;
 use axum::{
     extract::FromRef,
     middleware,
-    routing::{get, post},
+    routing::{get, post, put},
     Router,
 };
 #[cfg(feature = "memory-serve")]
@@ -89,6 +89,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
             "/",
             get(authentication::user_list).post(authentication::user_create),
         )
+        .route("/{user_id}", put(authentication::user_update))
         .route("/login", post(authentication::login))
         .route("/logout", post(authentication::logout))
         .route("/whoami", get(authentication::whoami))
@@ -160,6 +161,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             authentication::change_password,
             authentication::user_list,
             authentication::user_create,
+            authentication::user_update,
             election::election_list,
             election::election_create,
             election::election_details,
@@ -191,6 +193,8 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 authentication::LoginResponse,
                 authentication::ChangePasswordRequest,
                 authentication::UserListResponse,
+                authentication::UpdateUserRequest,
+                authentication::CreateUserRequest,
                 data_entry::CandidateVotes,
                 data_entry::DataEntry,
                 data_entry::SaveDataEntryResponse,

@@ -15,8 +15,6 @@ export function ElectionListProvider({ children }: ElectionListProviderProps) {
   return (
     <RequestStateHandler
       requestState={requestState}
-      notFoundMessage="error.elections_not_found"
-      isFoundCheck={(data) => data.elections.length > 0}
       renderOnSuccess={(data) => (
         <ElectionListProviderContext.Provider value={{ electionList: data.elections }}>
           {children}

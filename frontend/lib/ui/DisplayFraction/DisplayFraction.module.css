@@ -7,6 +7,5 @@
   /* Fraction part */
   .fraction-part {
     font-size: var(--font-size-xs);
-    color: var(--gray-600);
   }
 }

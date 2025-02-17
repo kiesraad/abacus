@@ -49,28 +49,26 @@
 
   td.number-cell {
     text-align: right;
-    font-size: var(--font-size-body);
     width: 6.5rem;
     line-height: 1.75rem;
-    &:not(:global(.normal)) {
-      font-weight: bold;
-    }
   }
 
   td.integer-cell {
-    padding-right: 0.25rem;
+    padding-right: 0;
     text-align: right;
     width: 0;
     min-width: fit-content;
   }
 
   td.fraction-cell {
-    padding-left: 0.25rem;
+    padding-left: 0.5rem;
     text-align: left;
     width: 0;
     min-width: fit-content;
     font-size: var(--font-size-xs);
-    color: var(--gray-600);
+  }
+  td.fraction-cell:empty {
+    padding-left: 0;
   }
 
   tr.row-link {
@@ -96,4 +94,9 @@
       border-bottom: none;
     }
   }
+}
+
+:where(.number-cell) {
+  font-weight: bold;
+  font-size: var(--font-size-body);
 }

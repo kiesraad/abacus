@@ -53,7 +53,7 @@ export function LargestAveragesFor19OrMoreSeatsTable({
                       <Table.DisplayFractionCells
                         key={`${pg_seat_assignment.pg_number}-${step.residual_seat_number}`}
                         className={
-                          step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow" : "normal"
+                          step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow bold" : undefined
                         }
                       >
                         {average}

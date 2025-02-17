@@ -64,6 +64,7 @@ __Uitbreidingen:__
   - Correctie is niet verboden, maar maak er geen rommeltje van.
   - Bijlage 2 wordt Bijlage 1 in nieuwe modellen.
 - Kunnen we het mogelijk maken om bezwaren en bijzonderheden in te voeren in de applicatie tijdens het voorlezen van het concept-PV?
+- Geen elektronische handtekening.
 
 
 
@@ -163,5 +164,6 @@ __Uitbreidingen:__
 
 - In [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting d.m.v. CSO (wolk)](#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-eerste-zitting-dmv-cso-wolk) stelt het GSB alleen de digitale bestanden ter beschikking aan het CSB, maar in stap 1 van deze use case lijkt het CSB ook beschikking te hebben over de papieren PVs. -> opgelost in GSB use cases
 - Willen we de benoemingsbrieven en de kennisgevingen tot geloofsbrief door de applicatie laten genereren? Of doen we dat liever op een andere manier? Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
-- Moet de applicatie ook de resultaten ter publicatie genereren? Bijvoorbeeld het `.csv` tellingsbestand.
+- Moet de applicatie ook de resultaten ter publicatie genereren? Bijvoorbeeld het `.csv` tellingsbestand. -> uitwisselplatform
 - Als het niet mogelijk is het digitale bestand te importeren, kan het CSB dan contact opnemen met het GSB om te proberen het probleem te verhelpen?
+- Geen elektronische handtekening.

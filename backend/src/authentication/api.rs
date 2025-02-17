@@ -260,11 +260,11 @@ pub async fn development_login(
     // Get or create the test user
 
     use super::role::Role;
-    let user = match users.get_by_username("user").await? {
+    let user = match users.get_by_username("admin").await? {
         Some(u) => u,
         None => {
             users
-                .create("user", Some("Full Name"), "password", Role::Administrator)
+                .create("admin", Some("Full Name"), "password", Role::Administrator)
                 .await?
         }
     };

@@ -38,8 +38,8 @@ describe("NavBar", () => {
     { pathname: "/elections", hash: "" },
     { pathname: "/elections/1", hash: "" },
     { pathname: "/invalid-notfound", hash: "" },
-  ])("no links for $pathname", async (location) => {
-    await renderNavBarLinks(location);
+  ])("no links for $pathname", (location) => {
+    renderNavBarLinks(location);
 
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });

@@ -16,7 +16,7 @@ describe("LoginForm", () => {
       200,
       {
         user_id: 1,
-        username: "user",
+        username: "admin",
       },
       undefined,
       async (request) => {

@@ -1,6 +1,6 @@
 # Uiterste use cases (GR)
 
-# De beheerder richt de applicatie in
+## De beheerder richt de applicatie in
 
 _Niveau:_ hoog-over, wolk, ☁️
 
@@ -32,8 +32,9 @@ Voor DSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
 4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
 5. [Het GSB genereert het concept-PV en het digitale bestand in de applicatie.](./gsb-genereren-bestanden.md#het-gsb-genereert-het-concept-pv-en-het-digitale-bestand-in-de-applicatie-zee)
 6. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
-7. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, eventuele bezwaren noteren, ondertekenen. En sluit daarmee de zitting.
-8. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.  
+7. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, eventuele additionele bezwaren en bijzonderheden worden handmatig aan het PV toegevoegd (pen! -> Uitbreiding), ondertekenen. En sluit daarmee de zitting.
+8. Het GSB stelt de benodigde digitale bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+9. Het PV GSB (incl. bijlagen) -> burgemeester, publiceren; overbrengen naar CSB.
 
 __Uitbreidingen:__  
 4a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
@@ -56,9 +57,13 @@ __Uitbreidingen:__
 
 #### Open punten
 
-- Het CSB heeft dus niet de beschikking over het papieren PV met Bijlages 2?
-- Hoe ziet de overdracht van het digitale bestand van GSB naar CSB er precies uit? De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
+- Hoe ziet de overdracht van het digitale bestand van GSB naar CSB binnen de applicatie er precies uit?
+  - De enige wettelijke eis is "er vindt overdracht plaats". Randvoorwaarden voor de oplossing zijn: de hash wordt gecontroleerd, overdracht blijft zo dicht mogelijk bij de applicatie, er zit ongeveer een week tussen de zittingen van GSB en CSB, overdracht moet meermaals kunnen (bij nieuwe zitting GSB).
+  - Proces via uitwisselplatform loopt in parallel.
 - Als een GSB tot hertelling overgaat vanwege foutmeldingen en/of waarschuwingen, corrigeren ze dan de Bijlage 2? Gooien ze de oude weg en stellen een nieuwe op? Iets anders?
+  - Correctie is niet verboden, maar maak er geen rommeltje van.
+  - Bijlage 2 wordt Bijlage 1 in nieuwe modellen.
+- Kunnen we het mogelijk maken om bezwaren en bijzonderheden in te voeren in de applicatie tijdens het voorlezen van het concept-PV?
 
 
 
@@ -71,6 +76,17 @@ Voor CSO zie [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting
 ### Hoofdscenario en uitbreidingen
 
 Nog op te stellen obv Hoofdscenario CSO.
+
+__Hoofdscenario:__
+
+Verschillen met CSO:
+
+- model van SB is anders dan Bijlage1/2 van CSO
+- toetsing van tellingen avond daarvoor, evt door foutopsporingsmodus
+  - extra feature foutopsporingsmodus: applicatie genereert corrigendum-template met oorpsronkelijke/oude telling
+- hertelling leidt tot corrigendum op SB PV -> PV en corrigendum worden samen ingevoerd
+- wenselijk om leeg corrigendum (wel ingevuld: kandidatenlijsten (keuze welke lijsten), stembureau(?), gemeente) te kunnen genereren in applicatie
+- nog meer?
 
 __Uitbreidingen:__
 
@@ -145,7 +161,7 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- In [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting d.m.v. CSO (wolk)](#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-eerste-zitting-dmv-cso-wolk) stelt het GSB alleen de digitale bestanden ter beschikking aan het CSB, maar in stap 1 van deze use case lijkt het CSB ook beschikking te hebben over de papieren PVs.
+- In [Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting d.m.v. CSO (wolk)](#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-eerste-zitting-dmv-cso-wolk) stelt het GSB alleen de digitale bestanden ter beschikking aan het CSB, maar in stap 1 van deze use case lijkt het CSB ook beschikking te hebben over de papieren PVs. -> opgelost in GSB use cases
 - Willen we de benoemingsbrieven en de kennisgevingen tot geloofsbrief door de applicatie laten genereren? Of doen we dat liever op een andere manier? Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
 - Moet de applicatie ook de resultaten ter publicatie genereren? Bijvoorbeeld het `.csv` tellingsbestand.
 - Als het niet mogelijk is het digitale bestand te importeren, kan het CSB dan contact opnemen met het GSB om te proberen het probleem te verhelpen?

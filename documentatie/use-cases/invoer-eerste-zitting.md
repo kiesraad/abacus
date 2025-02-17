@@ -76,12 +76,13 @@ __Hoofdscenario:__
 
 1. De invoerder selecteert het stembureau van het PV in de applicatie.
 2. De applicatie stelt vast dat er geen eerdere invoer voor het stembureau is opgeslagen.
-3. De invoerder vult de resultaten van de telling in.
-4. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
-   de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten)
+3. TODO De invoerder zet het vinkje "Is er herteld?". MAAR nieuwe modellen
+4. De invoerder vult de resultaten van de telling in.
 5. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
+   de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten)
+6. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
    de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
-6. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
+7. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
 
 __Uitbreidingen:__  
 1a. De invoerder kan het stembureau op het PV niet in de applicatie vinden:  

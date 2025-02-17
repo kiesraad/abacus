@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 
+import { AnyApiError } from "./api.types";
 import { ApiClient, DEFAULT_CANCEL_REASON } from "./ApiClient";
 import { isSuccess } from "./ApiError";
-import { LoginResponse, WHOAMI_REQUEST_PATH } from "./gen/openapi";
+import { LoginResponse, LOGOUT_REQUEST_PATH, WHOAMI_REQUEST_PATH } from "./gen/openapi";
 
 export interface SessionState {
   user: LoginResponse | null;
   setUser: (user: LoginResponse | null) => void;
+  logout: () => Promise<void>;
 }
 
 // Keep track of the currently logged-in user
@@ -14,7 +16,30 @@ export interface SessionState {
 // and then updating it when the user logs in or out
 export default function useSessionState(fetchInitialUser: boolean): SessionState {
   const [user, setUser] = useState<LoginResponse | null>(null);
+  const [error, setError] = useState<AnyApiError | null>(null);
 
+  // Propagate any unexpected API errors to the router
+  useEffect(() => {
+    if (error) {
+      throw error;
+      setError(null);
+    }
+  }, [error]);
+
+  // Log out the current user
+  const logout = async () => {
+    const path: LOGOUT_REQUEST_PATH = "/api/user/logout";
+    const client = new ApiClient();
+    const response = await client.postRequest(path);
+
+    if (isSuccess(response)) {
+      setUser(null);
+    } else {
+      setError(response);
+    }
+  };
+
+  // Fetch the user data from the server when the component mounts
   useEffect(() => {
     if (fetchInitialUser) {
       const abortController = new AbortController();
@@ -37,5 +62,5 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
     }
   }, [fetchInitialUser]);
 
-  return { user, setUser };
+  return { user, setUser, logout };
 }

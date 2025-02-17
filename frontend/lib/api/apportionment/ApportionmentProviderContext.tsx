@@ -4,7 +4,7 @@ import { ApiError, ApportionmentResult, ElectionSummary } from "../index";
 
 export interface iElectionApportionmentProviderContext {
   apportionment?: ApportionmentResult;
-  election_summary?: ElectionSummary;
+  electionSummary?: ElectionSummary;
   error?: ApiError;
 }
 

@@ -10,9 +10,9 @@ describe("LargestSurplusesTable", () => {
   test("renders a table with the residual seat allocation with largest surpluses system", async () => {
     render(
       <LargestSurplusesTable
-        highest_surplus_steps={highest_surplus_steps}
-        final_standing={apportionment.final_standing}
-        political_groups={election.political_groups as PoliticalGroup[]}
+        highestSurplusSteps={highest_surplus_steps}
+        finalStanding={apportionment.final_standing}
+        politicalGroups={election.political_groups as PoliticalGroup[]}
       />,
     );
 

@@ -6,13 +6,13 @@ import { cn, formatNumber } from "@kiesraad/util";
 import cls from "./Apportionment.module.css";
 
 interface ElectionSummaryTableProps {
-  votes_counts: VotesCounts;
+  votesCounts: VotesCounts;
   seats: number;
   quota: Fraction;
-  number_of_voters: number | undefined;
+  numberOfVoters: number | undefined;
 }
 
-export function ElectionSummaryTable({ votes_counts, seats, quota, number_of_voters }: ElectionSummaryTableProps) {
+export function ElectionSummaryTable({ votesCounts, seats, quota, numberOfVoters }: ElectionSummaryTableProps) {
   return (
     <Table id="election_summary_table" className={cn(cls.table, cls.electionSummaryTable)}>
       <Table.Body>
@@ -21,43 +21,43 @@ export function ElectionSummaryTable({ votes_counts, seats, quota, number_of_vot
             {t("apportionment.voters")}
           </Table.HeaderCell>
           <Table.NumberCell className={cn(cls.bt1Gray, "font-number", "normal")}>
-            {number_of_voters ? formatNumber(number_of_voters) : ""}
+            {numberOfVoters ? formatNumber(numberOfVoters) : ""}
           </Table.NumberCell>
           <Table.Cell className={cn(cls.bt1Gray, "fs-sm")} />
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row">{t("apportionment.total_votes_cast_count")}</Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
-            {formatNumber(votes_counts.total_votes_cast_count)}
+            {formatNumber(votesCounts.total_votes_cast_count)}
           </Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {number_of_voters
-              ? `${t("apportionment.turnout")}: ${Number((votes_counts.total_votes_cast_count / number_of_voters) * 100).toFixed(2)}%`
+            {numberOfVoters
+              ? `${t("apportionment.turnout")}: ${Number((votesCounts.total_votes_cast_count / numberOfVoters) * 100).toFixed(2)}%`
               : ""}
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row">{t("voters_and_votes.blank_votes_count")}</Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
-            {formatNumber(votes_counts.blank_votes_count)}
+            {formatNumber(votesCounts.blank_votes_count)}
           </Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {`${Number((votes_counts.blank_votes_count / votes_counts.total_votes_cast_count) * 100).toFixed(2)}%`}
+            {`${Number((votesCounts.blank_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row">{t("voters_and_votes.invalid_votes_count")}</Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
-            {formatNumber(votes_counts.invalid_votes_count)}
+            {formatNumber(votesCounts.invalid_votes_count)}
           </Table.NumberCell>
           <Table.Cell className="fs-sm">
-            {`${Number((votes_counts.invalid_votes_count / votes_counts.total_votes_cast_count) * 100).toFixed(2)}%`}
+            {`${Number((votesCounts.invalid_votes_count / votesCounts.total_votes_cast_count) * 100).toFixed(2)}%`}
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row">{t("voters_and_votes.votes_candidates_count")}</Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
-            {formatNumber(votes_counts.votes_candidates_count)}
+            {formatNumber(votesCounts.votes_candidates_count)}
           </Table.NumberCell>
           <Table.Cell className="fs-sm" />
         </Table.Row>

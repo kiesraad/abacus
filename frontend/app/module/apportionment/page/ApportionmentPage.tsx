@@ -17,7 +17,7 @@ function get_number_of_seats_assigned_sentence(seats: number, type: "residual_se
 
 export function ApportionmentPage() {
   const { election } = useElection();
-  const { apportionment, election_summary, error } = useApportionmentContext();
+  const { apportionment, electionSummary, error } = useApportionmentContext();
 
   return (
     <>
@@ -38,24 +38,24 @@ export function ApportionmentPage() {
             </FormLayout.Alert>
           ) : (
             apportionment &&
-            election_summary && (
+            electionSummary && (
               <>
                 <div>
                   <h2 className={cls.tableTitle}>{t("apportionment.election_summary")}</h2>
                   <ElectionSummaryTable
-                    votes_counts={election_summary.votes_counts}
+                    votesCounts={electionSummary.votes_counts}
                     seats={apportionment.seats}
                     quota={apportionment.quota}
-                    number_of_voters={election.number_of_voters}
+                    numberOfVoters={election.number_of_voters}
                   />
                 </div>
                 <div>
                   <h2 className={cls.tableTitle}>{t("apportionment.title")}</h2>
                   <ApportionmentTable
-                    final_standing={apportionment.final_standing}
-                    political_groups={election.political_groups}
-                    whole_seats={apportionment.whole_seats}
-                    residual_seats={apportionment.residual_seats}
+                    finalStanding={apportionment.final_standing}
+                    politicalGroups={election.political_groups}
+                    wholeSeats={apportionment.whole_seats}
+                    residualSeats={apportionment.residual_seats}
                     seats={apportionment.seats}
                   />
                   <ul>

@@ -6,14 +6,14 @@ import cls from "./Apportionment.module.css";
 
 interface ResidualSeatsCalculationTableProps {
   seats: number;
-  whole_seats: number;
-  residual_seats: number;
+  wholeSeats: number;
+  residualSeats: number;
 }
 
 export function ResidualSeatsCalculationTable({
   seats,
-  whole_seats,
-  residual_seats,
+  wholeSeats,
+  residualSeats,
 }: ResidualSeatsCalculationTableProps) {
   return (
     <Table id="residual_seats_calculation_table" className={cn(cls.table, cls.residualSeatsCalculationTable)}>
@@ -25,12 +25,12 @@ export function ResidualSeatsCalculationTable({
         </Table.Row>
         <Table.Row>
           <Table.Cell>{t("apportionment.total_number_assigned_whole_seats")}</Table.Cell>
-          <Table.NumberCell className="font-number normal">{whole_seats}</Table.NumberCell>
+          <Table.NumberCell className="font-number normal">{wholeSeats}</Table.NumberCell>
           <Table.Cell>— {t("apportionment.minus")}</Table.Cell>
         </Table.Row>
         <Table.TotalRow>
           <Table.Cell className="bold">{t("apportionment.residual_seat.plural")}</Table.Cell>
-          <Table.NumberCell className="font-number">{residual_seats}</Table.NumberCell>
+          <Table.NumberCell className="font-number">{residualSeats}</Table.NumberCell>
           <Table.Cell />
         </Table.TotalRow>
       </Table.Body>

@@ -20,7 +20,7 @@ export function ApportionmentProvider({ children, electionId }: ElectionApportio
     <ApportionmentProviderContext.Provider
       value={{
         apportionment: data?.apportionment,
-        election_summary: data?.election_summary,
+        electionSummary: data?.election_summary,
         error: apiError,
       }}
     >

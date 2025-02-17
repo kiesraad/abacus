@@ -10,10 +10,10 @@ describe("ApportionmentTable", () => {
   test("renders a table with the apportionment", async () => {
     render(
       <ApportionmentTable
-        final_standing={apportionment.final_standing}
-        political_groups={election.political_groups as PoliticalGroup[]}
-        whole_seats={apportionment.whole_seats}
-        residual_seats={apportionment.residual_seats}
+        finalStanding={apportionment.final_standing}
+        politicalGroups={election.political_groups as PoliticalGroup[]}
+        wholeSeats={apportionment.whole_seats}
+        residualSeats={apportionment.residual_seats}
         seats={apportionment.seats}
       />,
     );

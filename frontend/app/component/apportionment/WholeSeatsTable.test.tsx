@@ -7,7 +7,7 @@ import { WholeSeatsTable } from "./WholeSeatsTable";
 
 describe("WholeSeatsTable", () => {
   test("renders a table with the whole seats assignment", async () => {
-    render(<WholeSeatsTable final_standing={apportionment.final_standing} quota={apportionment.quota} />);
+    render(<WholeSeatsTable finalStanding={apportionment.final_standing} quota={apportionment.quota} />);
 
     const table = await screen.findByRole("table");
     expect(table).toBeVisible();

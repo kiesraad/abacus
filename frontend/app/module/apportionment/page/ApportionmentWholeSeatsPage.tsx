@@ -34,7 +34,7 @@ export function ApportionmentWholeSeatsPage() {
                 <div>
                   <h2 className={cls.tableTitle}>{t("apportionment.how_often_is_quota_met")}</h2>
                   <span className={cls.tableInformation}>{t("apportionment.whole_seats_information")}</span>
-                  <WholeSeatsTable final_standing={apportionment.final_standing} quota={apportionment.quota} />
+                  <WholeSeatsTable finalStanding={apportionment.final_standing} quota={apportionment.quota} />
                 </div>
 
                 <div>
@@ -53,8 +53,8 @@ export function ApportionmentWholeSeatsPage() {
                   </span>
                   <ResidualSeatsCalculationTable
                     seats={apportionment.seats}
-                    whole_seats={apportionment.whole_seats}
-                    residual_seats={apportionment.residual_seats}
+                    wholeSeats={apportionment.whole_seats}
+                    residualSeats={apportionment.residual_seats}
                   />
                 </div>
               </>

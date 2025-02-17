@@ -9,10 +9,10 @@ describe("ElectionSummaryTable", () => {
   test("renders a table with the election summary with number of voters", async () => {
     render(
       <ElectionSummaryTable
-        votes_counts={election_summary.votes_counts}
+        votesCounts={election_summary.votes_counts}
         seats={apportionment.seats}
         quota={apportionment.quota}
-        number_of_voters={election.number_of_voters}
+        numberOfVoters={election.number_of_voters}
       />,
     );
 
@@ -33,10 +33,10 @@ describe("ElectionSummaryTable", () => {
   test("renders a table with the election summary without number of voters", async () => {
     render(
       <ElectionSummaryTable
-        votes_counts={election_summary.votes_counts}
+        votesCounts={election_summary.votes_counts}
         seats={apportionment.seats}
         quota={apportionment.quota}
-        number_of_voters={undefined}
+        numberOfVoters={undefined}
       />,
     );
 

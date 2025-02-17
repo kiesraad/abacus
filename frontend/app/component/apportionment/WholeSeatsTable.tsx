@@ -6,11 +6,11 @@ import { cn } from "@kiesraad/util";
 import cls from "./Apportionment.module.css";
 
 interface WholeSeatsTableProps {
-  final_standing: PoliticalGroupSeatAssignment[];
+  finalStanding: PoliticalGroupSeatAssignment[];
   quota: Fraction;
 }
 
-export function WholeSeatsTable({ final_standing, quota }: WholeSeatsTableProps) {
+export function WholeSeatsTable({ finalStanding, quota }: WholeSeatsTableProps) {
   return (
     <Table id="whole_seats_table" className={cn(cls.table, cls.wholeSeatsTable)}>
       <Table.Header>
@@ -22,7 +22,7 @@ export function WholeSeatsTable({ final_standing, quota }: WholeSeatsTableProps)
         <Table.HeaderCell className="text-align-r">{t("apportionment.whole_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {final_standing.map((standing: PoliticalGroupSeatAssignment) => {
+        {finalStanding.map((standing: PoliticalGroupSeatAssignment) => {
           return (
             <Table.Row key={standing.pg_number}>
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "bold")}>{standing.pg_number}</Table.Cell>

@@ -6,10 +6,10 @@ import { cn } from "@kiesraad/util";
 import cls from "./Apportionment.module.css";
 
 interface ApportionmentTableProps {
-  final_standing: PoliticalGroupSeatAssignment[];
-  political_groups: PoliticalGroup[];
-  whole_seats: number;
-  residual_seats: number;
+  finalStanding: PoliticalGroupSeatAssignment[];
+  politicalGroups: PoliticalGroup[];
+  wholeSeats: number;
+  residualSeats: number;
   seats: number;
 }
 
@@ -21,10 +21,10 @@ function convert_zero_to_dash(number: number): string {
 }
 
 export function ApportionmentTable({
-  final_standing,
-  political_groups,
-  whole_seats,
-  residual_seats,
+  finalStanding,
+  politicalGroups,
+  wholeSeats,
+  residualSeats,
   seats,
 }: ApportionmentTableProps) {
   return (
@@ -37,14 +37,14 @@ export function ApportionmentTable({
         <Table.HeaderCell className="text-align-r link-cell-padding">{t("apportionment.total_seats")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {final_standing.map((standing: PoliticalGroupSeatAssignment) => {
+        {finalStanding.map((standing: PoliticalGroupSeatAssignment) => {
           return (
             /* TODO: Add row link */
             <Table.LinkRow key={standing.pg_number} to=".">
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>
                 {standing.pg_number}
               </Table.Cell>
-              <Table.Cell>{political_groups[standing.pg_number - 1]?.name || ""}</Table.Cell>
+              <Table.Cell>{politicalGroups[standing.pg_number - 1]?.name || ""}</Table.Cell>
               <Table.NumberCell className="font-number normal">
                 {convert_zero_to_dash(standing.whole_seats)}
               </Table.NumberCell>
@@ -58,8 +58,8 @@ export function ApportionmentTable({
         <Table.TotalRow>
           <Table.Cell />
           <Table.Cell className="text-align-r bold">{t("apportionment.total")}</Table.Cell>
-          <Table.NumberCell className="font-number">{whole_seats}</Table.NumberCell>
-          <Table.NumberCell className="font-number">{residual_seats}</Table.NumberCell>
+          <Table.NumberCell className="font-number">{wholeSeats}</Table.NumberCell>
+          <Table.NumberCell className="font-number">{residualSeats}</Table.NumberCell>
           <Table.NumberCell className="font-number link-cell-padding">{seats}</Table.NumberCell>
         </Table.TotalRow>
       </Table.Body>

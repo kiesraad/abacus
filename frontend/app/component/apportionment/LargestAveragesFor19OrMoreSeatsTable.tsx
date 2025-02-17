@@ -6,15 +6,15 @@ import { cn } from "@kiesraad/util";
 import cls from "./Apportionment.module.css";
 
 interface LargestAveragesFor19OrMoreSeatsTableProps {
-  highest_average_steps: ApportionmentStep[];
-  final_standing: PoliticalGroupSeatAssignment[];
-  political_groups: PoliticalGroup[];
+  highestAverageSteps: ApportionmentStep[];
+  finalStanding: PoliticalGroupSeatAssignment[];
+  politicalGroups: PoliticalGroup[];
 }
 
 export function LargestAveragesFor19OrMoreSeatsTable({
-  highest_average_steps,
-  final_standing,
-  political_groups,
+  highestAverageSteps,
+  finalStanding,
+  politicalGroups,
 }: LargestAveragesFor19OrMoreSeatsTableProps) {
   return (
     <div className={cls.scrollable}>
@@ -25,7 +25,7 @@ export function LargestAveragesFor19OrMoreSeatsTable({
         <Table.Header>
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>{t("list")}</Table.HeaderCell>
           <Table.HeaderCell className={cls.sticky}>{t("list_name")}</Table.HeaderCell>
-          {highest_average_steps.map((step: ApportionmentStep) => {
+          {highestAverageSteps.map((step: ApportionmentStep) => {
             return (
               <Table.HeaderCell key={step.residual_seat_number} className="text-align-r" span={2}>
                 {t("apportionment.residual_seat.singular")} {step.residual_seat_number}
@@ -37,16 +37,16 @@ export function LargestAveragesFor19OrMoreSeatsTable({
           </Table.HeaderCell>
         </Table.Header>
         <Table.Body>
-          {final_standing.map((pg_seat_assignment: PoliticalGroupSeatAssignment) => {
+          {finalStanding.map((pg_seat_assignment: PoliticalGroupSeatAssignment) => {
             return (
               <Table.Row key={pg_seat_assignment.pg_number}>
                 <Table.Cell className={cn(cls.listNumberColumn, cls.sticky, "text-align-r", "font-number")}>
                   {pg_seat_assignment.pg_number}
                 </Table.Cell>
                 <Table.Cell className={cls.sticky}>
-                  {political_groups[pg_seat_assignment.pg_number - 1]?.name || ""}
+                  {politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}
                 </Table.Cell>
-                {highest_average_steps.map((step: ApportionmentStep) => {
+                {highestAverageSteps.map((step: ApportionmentStep) => {
                   const average = step.standing[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
                   if (average) {
                     return (
@@ -72,7 +72,7 @@ export function LargestAveragesFor19OrMoreSeatsTable({
             <Table.Cell className={cn(cls.sticky, "text-align-r", "bold")}>
               {t("apportionment.residual_seat_assigned_to_list")}
             </Table.Cell>
-            {highest_average_steps.map((step: ApportionmentStep) => (
+            {highestAverageSteps.map((step: ApportionmentStep) => (
               <Table.NumberCell key={step.residual_seat_number} colSpan={2}>
                 {step.change.selected_pg_number}
               </Table.NumberCell>

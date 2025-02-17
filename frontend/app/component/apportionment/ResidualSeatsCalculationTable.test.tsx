@@ -9,9 +9,9 @@ describe("ResidualSeatsCalculationTable", () => {
   test("renders a table with the residual seats calculation", async () => {
     render(
       <ResidualSeatsCalculationTable
-        whole_seats={apportionment.whole_seats}
-        residual_seats={apportionment.residual_seats}
         seats={apportionment.seats}
+        wholeSeats={apportionment.whole_seats}
+        residualSeats={apportionment.residual_seats}
       />,
     );
 

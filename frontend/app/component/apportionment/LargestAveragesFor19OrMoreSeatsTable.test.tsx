@@ -10,9 +10,9 @@ describe("LargestAveragesFor19OrMoreSeatsTable", () => {
   test("renders a table with the residual seat allocation with largest averages system for 19 or more seats", async () => {
     render(
       <LargestAveragesFor19OrMoreSeatsTable
-        highest_average_steps={apportionment.steps}
-        final_standing={apportionment.final_standing}
-        political_groups={election.political_groups as PoliticalGroup[]}
+        highestAverageSteps={apportionment.steps}
+        finalStanding={apportionment.final_standing}
+        politicalGroups={election.political_groups as PoliticalGroup[]}
       />,
     );
 

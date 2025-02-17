@@ -1,0 +1,15 @@
+{
+  "cookies": [
+    {
+      "name": "ABACUS_SESSION",
+      "value": "bEcfMAjQeWuzQnkTLScUML4b",
+      "domain": "127.0.0.1",
+      "path": "/",
+      "expires": 1739894147.809631,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Strict"
+    }
+  ],
+  "origins": []
+}

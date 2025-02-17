@@ -83,7 +83,6 @@ impl User {
         self.fullname.as_deref()
     }
 
-    #[cfg(test)]
     pub fn role(&self) -> Role {
         self.role
     }

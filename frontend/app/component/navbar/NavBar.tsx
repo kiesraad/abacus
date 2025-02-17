@@ -1,5 +1,7 @@
+import { Link } from "react-router";
+
+import { useApiState } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { IconUser } from "@kiesraad/icon";
 
 import styles from "./NavBar.module.css";
 import { NavBarLinks } from "./NavBarLinks";
@@ -7,20 +9,7 @@ import { NavBarLinks } from "./NavBarLinks";
 type NavBarProps = { location: { pathname: string; hash: string } };
 
 export function NavBar({ location }: NavBarProps) {
-  const isAdministrator = location.hash.includes("administrator");
-  const isCoordinator = location.hash.includes("coordinator");
-
-  const role = [];
-  if (isAdministrator || isCoordinator) {
-    if (isAdministrator) {
-      role.push(t("administrator"));
-    }
-    if (isCoordinator) {
-      role.push(t("coordinator"));
-    }
-  } else {
-    role.push(t("typist"));
-  }
+  const { user, logout } = useApiState();
 
   return (
     <nav aria-label="primary-navigation" className={styles.navBar}>
@@ -28,8 +17,22 @@ export function NavBar({ location }: NavBarProps) {
         <NavBarLinks location={location} />
       </div>
       <div className={styles.userInfo}>
-        <IconUser />
-        <span>{role.join("/")}</span>
+        {user ? (
+          <>
+            <strong>{user.fullname}</strong>
+            <span className={styles.lower}>({t(user.role)})</span>
+            <Link
+              to={`/account/login`}
+              onClick={() => {
+                void logout();
+              }}
+            >
+              {t("user.logout")}
+            </Link>
+          </>
+        ) : (
+          <Link to={`/account/login`}>{t("user.login")}</Link>
+        )}
       </div>
     </nav>
   );

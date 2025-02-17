@@ -45,14 +45,15 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
 
   if (location.pathname.match(/^\/elections\/\d+\/?$/)) {
     return <></>;
-  } else {
-    return (
-      <>
-        <NavBarMenuButton />
-        <Link to={`/elections/${election.id}#administratorcoordinator`}>
-          <ElectionBreadcrumb election={election} />
-        </Link>
-        {location.pathname.match(/^\/elections\/\d+\/polling-stations\/(create|\d+\/update)$/) && (
+  }
+
+  return (
+    <>
+      <NavBarMenuButton />
+      <Link to={`/elections/${election.id}`}>
+        <ElectionBreadcrumb election={election} />
+      </Link>
+      {location.pathname.match(/^\/elections\/\d+\/polling-stations\/(create|\d+\/update)$/) && (
           <>
             <IconChevronRight />
             <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_stations")}</Link>
@@ -64,9 +65,8 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
             <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
           </>
         )}
-      </>
-    );
-  }
+    </>
+  );
 }
 
 function TopLevelManagementLinks() {
@@ -91,11 +91,15 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
     location.pathname === "/logs"
   ) {
     return <TopLevelManagementLinks />;
-  } else if (location.pathname.match(/^\/elections\/\d+\/data-entry/)) {
-    return <DataEntryLinks location={location} />;
-  } else if (location.pathname.match(/^\/elections\/\d+/)) {
-    return <ElectionManagementLinks location={location} />;
-  } else {
-    return <></>;
   }
+
+  if (location.pathname.match(/^\/elections\/\d+\/data-entry/)) {
+    return <DataEntryLinks location={location} />;
+  }
+
+  if (location.pathname.match(/^\/elections\/\d+/)) {
+    return <ElectionManagementLinks location={location} />;
+  }
+
+  return <></>;
 }

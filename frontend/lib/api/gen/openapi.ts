@@ -416,6 +416,8 @@ export interface HighestSurplusAssignedSeat {
 }
 
 export interface LoginResponse {
+  fullname: string;
+  role: Role;
   user_id: number;
   username: string;
 }

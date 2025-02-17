@@ -6,6 +6,7 @@ import { ElectionRequestHandler } from "@kiesraad/api-mocks";
 import { render, screen, server } from "@kiesraad/test";
 
 import { NavBar } from "./NavBar";
+import { NavBarLinks } from "./NavBarLinks";
 
 async function renderNavBar(location: { pathname: string; hash: string }) {
   render(
@@ -16,6 +17,14 @@ async function renderNavBar(location: { pathname: string; hash: string }) {
 
   // wait for the NavBar to be rendered
   expect(await screen.findByLabelText("primary-navigation")).toBeInTheDocument();
+}
+
+function renderNavBarLinks(location: { pathname: string; hash: string }) {
+  render(
+    <ElectionProvider electionId={1}>
+      <NavBarLinks location={location} />
+    </ElectionProvider>,
+  );
 }
 
 describe("NavBar", () => {
@@ -30,7 +39,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1", hash: "" },
     { pathname: "/invalid-notfound", hash: "" },
   ])("no links for $pathname", async (location) => {
-    await renderNavBar(location);
+    await renderNavBarLinks(location);
 
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });

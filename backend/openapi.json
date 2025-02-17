@@ -2164,9 +2164,17 @@
         "type": "object",
         "required": [
           "user_id",
-          "username"
+          "fullname",
+          "username",
+          "role"
         ],
         "properties": {
+          "fullname": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
           "user_id": {
             "type": "integer",
             "format": "int32",

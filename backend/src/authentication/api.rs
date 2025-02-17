@@ -28,14 +28,21 @@ pub struct Credentials {
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct LoginResponse {
     pub user_id: u32,
+    pub fullname: String,
     pub username: String,
+    pub role: Role,
 }
 
 impl From<&User> for LoginResponse {
     fn from(user: &User) -> Self {
         Self {
             user_id: user.id(),
+            fullname: user
+                .fullname()
+                .unwrap_or_else(|| user.username())
+                .to_string(),
             username: user.username().to_string(),
+            role: user.role(),
         }
     }
 }

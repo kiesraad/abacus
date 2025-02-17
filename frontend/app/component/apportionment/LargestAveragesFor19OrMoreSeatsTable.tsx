@@ -69,7 +69,7 @@ export function LargestAveragesFor19OrMoreSeatsTable({
           })}
           <Table.TotalRow>
             <Table.Cell className={cls.sticky} />
-            <Table.Cell className={cn(cls.sticky, "text-align-r", "bold")}>
+            <Table.Cell className={cn(cls.sticky, "text-align-r", "nowrap", "bold")}>
               {t("apportionment.residual_seat_assigned_to_list")}
             </Table.Cell>
             {highestAverageSteps.map((step: ApportionmentStep) => (

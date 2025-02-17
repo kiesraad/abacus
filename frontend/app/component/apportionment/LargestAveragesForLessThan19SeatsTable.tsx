@@ -17,10 +17,7 @@ export function LargestAveragesForLessThan19SeatsTable({
   politicalGroups,
 }: LargestAveragesForLessThan19SeatsTableProps) {
   return (
-    <Table
-      id="largest_averages_for_less_than_19_seats_table"
-      className={cn(cls.table, cls.residualSeatsLessThan19SeatsTable)}
-    >
+    <Table id="largest_averages_for_less_than_19_seats_table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>

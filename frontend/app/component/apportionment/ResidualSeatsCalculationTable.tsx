@@ -19,17 +19,23 @@ export function ResidualSeatsCalculationTable({
     <Table id="residual_seats_calculation_table" className={cn(cls.table, cls.residualSeatsCalculationTable)}>
       <Table.Body>
         <Table.Row>
-          <Table.Cell className="bb-none">{t("apportionment.total_number_seats")}</Table.Cell>
+          <Table.HeaderCell scope="row" className="bb-none normal">
+            {t("apportionment.total_number_seats")}
+          </Table.HeaderCell>
           <Table.NumberCell className="font-number bb-none normal">{seats}</Table.NumberCell>
           <Table.Cell className="bb-none" />
         </Table.Row>
         <Table.Row>
-          <Table.Cell>{t("apportionment.total_number_assigned_whole_seats")}</Table.Cell>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("apportionment.total_number_assigned_whole_seats")}
+          </Table.HeaderCell>
           <Table.NumberCell className="font-number normal">{wholeSeats}</Table.NumberCell>
-          <Table.Cell>— {t("apportionment.minus")}</Table.Cell>
+          <Table.Cell>— ({t("apportionment.minus")})</Table.Cell>
         </Table.Row>
         <Table.TotalRow>
-          <Table.Cell className="bold">{t("apportionment.residual_seat.plural")}</Table.Cell>
+          <Table.HeaderCell scope="row" className="bb-none">
+            {t("apportionment.residual_seat.plural")}
+          </Table.HeaderCell>
           <Table.NumberCell className="font-number">{residualSeats}</Table.NumberCell>
           <Table.Cell />
         </Table.TotalRow>

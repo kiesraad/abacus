@@ -19,7 +19,7 @@ describe("ResidualSeatsCalculationTable", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Totaal aantal zetels", "23", ""],
-      ["Totaal aantal toegewezen volle zetels", "19", "— min"],
+      ["Totaal aantal toegewezen volle zetels", "19", "— (min)"],
       ["Restzetels", "4", ""],
     ]);
   });

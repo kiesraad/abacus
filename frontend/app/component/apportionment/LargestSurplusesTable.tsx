@@ -20,7 +20,7 @@ export function LargestSurplusesTable({
     (pg_seat_assignment) => pg_seat_assignment.meets_surplus_threshold,
   );
   return (
-    <Table id="largest_surpluses_table" className={cn(cls.table, cls.residualSeatsLessThan19SeatsTable)}>
+    <Table id="largest_surpluses_table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>

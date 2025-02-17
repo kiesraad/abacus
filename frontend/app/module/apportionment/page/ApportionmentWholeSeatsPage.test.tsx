@@ -51,7 +51,7 @@ describe("ApportionmentWholeSeatsPage", () => {
     expect(residual_seats_calculation_table).toBeVisible();
     expect(residual_seats_calculation_table).toHaveTableContent([
       ["Totaal aantal zetels", "15", ""],
-      ["Totaal aantal toegewezen volle zetels", "10", "— min"],
+      ["Totaal aantal toegewezen volle zetels", "10", "— (min)"],
       ["Restzetels", "5", ""],
     ]);
   });

@@ -6,6 +6,9 @@
     line-height: 1.5rem;
     padding: 0.5rem 1.5rem;
   }
+  th {
+    text-wrap: nowrap;
+  }
 }
 
 .list-number-column {
@@ -19,7 +22,7 @@
 }
 
 .scrollable {
-  width: 52rem;
+  width: 68rem;
   overflow-x: auto;
 }
 
@@ -35,10 +38,6 @@
       color: var(--base-black);
     }
     td {
-      /* Number or DisplayFraction */
-      &:first-of-type {
-        width: 10.625rem;
-      }
       /* Description or extra information */
       &:last-of-type {
         color: var(--gray-600);
@@ -47,54 +46,29 @@
   }
 }
 
-.apportionment-table {
-  tr {
-    td {
-      /* Seats */
-      &:nth-of-type(3),
-      &:nth-of-type(4) {
-        width: 7.65rem;
-      }
-      /* Total seats */
-      &:last-of-type {
-        width: 11rem;
-      }
-    }
-  }
-}
-
 .whole-seats-table {
   tr {
-    td {
+    th {
       /* Signs (: and =) */
       &:nth-of-type(3),
       &:nth-of-type(5) {
-        width: 3.75rem;
+        width: 2rem;
       }
-      /* Total whole seats */
+      &:first-of-type,
       &:last-of-type {
-        width: 9rem;
+        max-width: fit-content;
       }
     }
   }
 }
 
 .residual-seats-calculation-table {
-  width: 32rem;
-  tr {
-    td {
-      /* Seats */
-      &:nth-of-type(2) {
-        width: 5rem;
-      }
-      &:last-of-type {
-        width: 6.5rem;
-      }
-    }
-  }
+  max-width: 34rem;
 }
 
 .residual-seats-19-or-more-seats-table {
+  max-width: 68rem;
+  width: fit-content;
   tr {
     /* List number sticky column */
     td:first-child,
@@ -104,46 +78,12 @@
     /* List name and 'residual seat added to list' text sticky column */
     td:nth-child(2),
     th:nth-child(2) {
-      left: 4.525rem;
+      left: 4.55rem;
     }
     /* Number of residual seats sticky column*/
     td:last-child,
     th:last-child {
       right: 0;
-    }
-    td {
-      /* List name and 'residual seat added to list' text */
-      &:nth-child(2) {
-        min-width: 17rem;
-      }
-      /* Average */
-      &:nth-child(2n + 3) {
-        min-width: 4.5rem;
-      }
-      /* Number of residual seats */
-      &:last-child {
-        min-width: 9.25rem;
-        max-width: 10.25rem;
-      }
-    }
-  }
-}
-
-.residual-seats-less-than-19-seats-table {
-  tr {
-    td {
-      /* Whole seats */
-      &:nth-of-type(3) {
-        width: 9.7rem;
-      }
-      /* Surplus or Average */
-      &:nth-of-type(4) {
-        width: 8.375rem;
-      }
-      /* Residual seats */
-      &:nth-of-type(5) {
-        width: 9.25rem;
-      }
     }
   }
 }

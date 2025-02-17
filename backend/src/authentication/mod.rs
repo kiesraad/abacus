@@ -399,7 +399,7 @@ mod tests {
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
 
-        assert_eq!(result.username, "user");
+        assert_eq!(result.username, "admin");
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

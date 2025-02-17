@@ -11,7 +11,7 @@ import {
 export function useApportionmentRequest(electionId: number) {
   const path: ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${electionId}/apportionment`;
   const [data, setData] = useState<ElectionApportionmentResponse>();
-  const [apiError, setApiError] = useState<AnyApiError>();
+  const [error, setError] = useState<AnyApiError>();
   const client = useApi();
 
   useEffect(() => {
@@ -19,10 +19,10 @@ export function useApportionmentRequest(electionId: number) {
       if (isSuccess(response)) {
         setData(response.data);
       } else {
-        setApiError(response);
+        setError(response);
       }
     });
   }, [client, path]);
 
-  return { apiError, data };
+  return { error, data };
 }

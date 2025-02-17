@@ -10,10 +10,10 @@ export interface ElectionApportionmentProviderProps {
 }
 
 export function ApportionmentProvider({ children, electionId }: ElectionApportionmentProviderProps) {
-  const { apiError, data } = useApportionmentRequest(electionId);
+  const { error, data } = useApportionmentRequest(electionId);
 
-  if (apiError && isFatalError(apiError)) {
-    throw apiError;
+  if (error && isFatalError(error)) {
+    throw error;
   }
 
   return (
@@ -21,7 +21,7 @@ export function ApportionmentProvider({ children, electionId }: ElectionApportio
       value={{
         apportionment: data?.apportionment,
         electionSummary: data?.election_summary,
-        error: apiError,
+        error,
       }}
     >
       {children}

@@ -29,7 +29,6 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
   useEffect(() => {
     if (error) {
       throw error;
-      setError(null);
     }
   }, [error]);
 

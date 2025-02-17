@@ -29,17 +29,17 @@ describe("UserCreateRolePage", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Gebruiker toevoegen" })).toBeInTheDocument();
 
-    expect(await screen.findByLabelText("Beheerder")).not.toBeChecked();
-    expect(await screen.findByLabelText("Coördinator")).not.toBeChecked();
-    expect(await screen.findByLabelText("Invoerder")).not.toBeChecked();
+    expect(await screen.findByLabelText(/Beheerder/)).not.toBeChecked();
+    expect(await screen.findByLabelText(/Coördinator/)).not.toBeChecked();
+    expect(await screen.findByLabelText(/Invoerder/)).not.toBeChecked();
   });
 
   test("Shows form previously selected", async () => {
     renderPage({ user: { role: "typist" } });
 
-    expect(await screen.findByLabelText("Beheerder")).not.toBeChecked();
-    expect(await screen.findByLabelText("Coördinator")).not.toBeChecked();
-    expect(await screen.findByLabelText("Invoerder")).toBeChecked();
+    expect(await screen.findByLabelText(/Beheerder/)).not.toBeChecked();
+    expect(await screen.findByLabelText(/Coördinator/)).not.toBeChecked();
+    expect(await screen.findByLabelText(/Invoerder/)).toBeChecked();
   });
 
   test("Shows validation error when nothing selected", async () => {
@@ -59,10 +59,10 @@ describe("UserCreateRolePage", () => {
   });
 
   test.each([
-    ["Beheerder", { role: "administrator", type: "fullname" }, "/users/create/details"],
-    ["Coördinator", { role: "coordinator", type: "fullname" }, "/users/create/details"],
-    ["Invoerder", { role: "typist" }, "/users/create/type"],
-  ])("Continue after selection as %s", async (label: string, update: unknown, newPath: string) => {
+    [/Beheerder/, { role: "administrator", type: "fullname" }, "/users/create/details"],
+    [/Coördinator/, { role: "coordinator", type: "fullname" }, "/users/create/details"],
+    [/Invoerder/, { role: "typist" }, "/users/create/type"],
+  ])("Continue after selection as %s", async (label: RegExp, update: unknown, newPath: string) => {
     const updateUser = vi.fn();
     renderPage({ user: {}, updateUser });
 

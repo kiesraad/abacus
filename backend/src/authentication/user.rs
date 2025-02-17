@@ -29,6 +29,8 @@ pub struct User {
     #[schema(nullable = false)]
     fullname: Option<String>,
     role: Role,
+    #[serde(skip_deserializing)]
+    needs_password_change: bool,
     #[serde(skip)]
     password_hash: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -199,6 +201,7 @@ impl Users {
                 username,
                 fullname,
                 password_hash,
+                needs_password_change,
                 role,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
@@ -215,6 +218,45 @@ impl Users {
         Ok(user)
     }
 
+    /// Update a user
+    pub async fn update(
+        &self,
+        user_id: u32,
+        fullname: Option<&str>,
+        temp_password: Option<&str>,
+    ) -> Result<User, AuthenticationError> {
+        if let Some(pw) = temp_password {
+            self.set_temporary_password(user_id, pw).await?;
+        }
+
+        let updated_user = sqlx::query_as!(
+            User,
+            r#"
+              UPDATE
+                users
+              SET
+                fullname = ?
+              WHERE id = ?
+            RETURNING
+                id as "id: u32",
+                username,
+                fullname,
+                password_hash,
+                needs_password_change,
+                role,
+                last_activity_at as "last_activity_at: _",
+                updated_at as "updated_at: _",
+                created_at as "created_at: _"
+            "#,
+            fullname,
+            user_id
+        )
+        .fetch_one(&self.0)
+        .await?;
+
+        Ok(updated_user)
+    }
+
     /// Update a user's password
     pub async fn update_password(
         &self,
@@ -224,7 +266,25 @@ impl Users {
         let password_hash = hash_password(new_password)?;
 
         sqlx::query!(
-            r#"UPDATE users SET password_hash = ? WHERE id = ?"#,
+            r#"UPDATE users SET password_hash = ?, needs_password_change = FALSE WHERE id = ?"#,
+            password_hash,
+            user_id
+        )
+        .execute(&self.0)
+        .await?;
+
+        Ok(())
+    }
+
+    /// Set a temporary password for a user
+    pub async fn set_temporary_password(
+        &self,
+        user_id: u32,
+        temp_password: &str,
+    ) -> Result<(), AuthenticationError> {
+        let password_hash = hash_password(temp_password)?;
+        sqlx::query!(
+            r#"UPDATE users SET password_hash = ?, needs_password_change = TRUE WHERE id = ?"#,
             password_hash,
             user_id
         )
@@ -248,6 +308,7 @@ impl Users {
                 fullname,
                 role,
                 password_hash,
+                needs_password_change,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
@@ -272,6 +333,7 @@ impl Users {
                 fullname,
                 role,
                 password_hash,
+                needs_password_change,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
@@ -293,6 +355,7 @@ impl Users {
                 username,
                 fullname,
                 password_hash,
+                needs_password_change,
                 role,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
@@ -444,7 +507,7 @@ mod tests {
             .unwrap();
 
         users
-            .update_password(user.id, "new_password")
+            .update_password(user.id(), "new_password")
             .await
             .unwrap();
 
@@ -464,6 +527,44 @@ mod tests {
             authenticated_user,
             AuthenticationError::InvalidPassword
         ));
+    }
+
+    #[test(sqlx::test)]
+    async fn test_set_temp_password(pool: SqlitePool) {
+        let users = Users::new(pool.clone());
+
+        // Create new user, password needs change
+        let user = users
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
+            .await
+            .unwrap();
+
+        // User should need password change
+        assert!(user.needs_password_change);
+
+        users
+            .update_password(user.id(), "temp_password")
+            .await
+            .unwrap();
+
+        let user = users.get_by_id(user.id()).await.unwrap().unwrap();
+
+        // User now shouldn't need to change their password
+        assert!(!user.needs_password_change);
+
+        // Set a temporary password via update
+        let user = users
+            .update(user.id(), user.fullname(), Some("temp_password"))
+            .await
+            .unwrap();
+
+        // User needs to change their password again
+        assert!(user.needs_password_change);
     }
 
     #[test(sqlx::test)]

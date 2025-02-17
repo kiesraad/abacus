@@ -1,7 +1,5 @@
 import * as React from "react";
 
-import { cn } from "@kiesraad/util";
-
 import cls from "./CheckboxAndRadio.module.css";
 
 export interface CheckboxAndRadioProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -34,7 +32,7 @@ export const CheckboxAndRadio = React.forwardRef<HTMLInputElement, CheckboxAndRa
     ref,
   ) => {
     return (
-      <div className={cn(cls["checkbox-and-radio"])} id={`${type}-container-${id}`}>
+      <div className={cls.checkboxAndRadio} id={`${type}-container-${id}`}>
         <input
           className={`${type}${indeterminate ? " indeterminate" : ""}`}
           type={type}
@@ -49,8 +47,10 @@ export const CheckboxAndRadio = React.forwardRef<HTMLInputElement, CheckboxAndRa
           {...inputProps}
         />
         <div className="labels">
-          <label htmlFor={id}>{label}</label>
-          {children !== undefined && <span className="description">{children}</span>}
+          <label htmlFor={id}>
+            {label}
+            {children !== undefined && <div className="description">{children}</div>}
+          </label>
         </div>
       </div>
     );

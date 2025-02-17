@@ -86,8 +86,8 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(largest_surpluses_table).toBeVisible();
     expect(largest_surpluses_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
-      ["1", "Political Group A", "10", "8", "1"],
-      ["2", "Political Group B", "0", "60", "1"],
+      ["1", "Political Group A", "10", "8", "", "1"],
+      ["2", "Political Group B", "0", "60", "", "1"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Verdeling overige restzetels" }));
@@ -97,14 +97,14 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(largest_averages_for_less_than_19_seats_table).toBeVisible();
     expect(largest_averages_for_less_than_19_seats_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Gemiddelde", "Aantal restzetels"],
-      ["1", "Political Group A", "10", "67 4/12", "1"],
-      ["2", "Political Group B", "0", "30", "0"],
-      ["3", "Political Group C", "0", "58", "1"],
-      ["4", "Political Group D", "0", "57", "1"],
-      ["5", "Political Group E", "0", "56", "0"],
-      ["6", "Political Group F", "0", "55", "0"],
-      ["7", "Political Group G", "0", "54", "0"],
-      ["8", "Political Group H", "0", "52", "0"],
+      ["1", "Political Group A", "10", "67", "4/12", "1"],
+      ["2", "Political Group B", "0", "30", "", "0"],
+      ["3", "Political Group C", "0", "58", "", "1"],
+      ["4", "Political Group D", "0", "57", "", "1"],
+      ["5", "Political Group E", "0", "56", "", "0"],
+      ["6", "Political Group F", "0", "55", "", "0"],
+      ["7", "Political Group G", "0", "54", "", "0"],
+      ["8", "Political Group H", "0", "52", "", "0"],
     ]);
 
     expect(screen.queryByTestId("largest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
@@ -134,8 +134,8 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(largest_surpluses_table).toBeVisible();
     expect(largest_surpluses_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
-      ["1", "Political Group A", "10", "8", "1"],
-      ["2", "Political Group B", "0", "60", "1"],
+      ["1", "Political Group A", "10", "8", "", "1"],
+      ["2", "Political Group B", "0", "60", "", "1"],
     ]);
 
     expect(screen.queryByTestId("largest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();

@@ -20,8 +20,8 @@ describe("LargestSurplusesTable", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
-      ["1", "Political Group A", "10", "8", "1"],
-      ["2", "Political Group B", "0", "60", "1"],
+      ["1", "Political Group A", "10", "8", "", "1"],
+      ["2", "Political Group B", "0", "60", "", "1"],
     ]);
   });
 });

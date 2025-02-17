@@ -2,16 +2,62 @@ import { Link } from "react-router";
 
 import { MockTest } from "app/component/MockTest";
 
-import { ElectionListProvider, useElectionList } from "@kiesraad/api";
+import { ElectionListProvider, useApiState, useElectionList } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { AppLayout, PageTitle } from "@kiesraad/ui";
 
 function DevLinks() {
   const { electionList } = useElectionList();
+  const { user, login, logout } = useApiState();
 
   return (
     <>
       <p>Dit is een ontwikkelversie van Abacus. Kies hieronder welk deel van de applicatie je wilt gebruiken.</p>
+      <strong>Inloggen als</strong>
+      <ul>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("admin", "password");
+            }}
+          >
+            {t("administrator")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("typist", "password");
+            }}
+          >
+            {t("typist")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("coordinator", "password");
+            }}
+          >
+            {t("coordinator")}
+          </Link>
+        </li>
+        {user && (
+          <li>
+            <Link
+              to="/dev"
+              onClick={() => {
+                void logout();
+              }}
+            >
+              {t("user.logout")}: {user.fullname} ({user.role})
+            </Link>
+          </li>
+        )}
+      </ul>
       <strong>{t("general")}</strong>
       <ul>
         <li>

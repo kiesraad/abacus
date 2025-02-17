@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
 
-import { AnyApiError } from "./api.types";
+import { AnyApiError, ApiResult } from "./api.types";
 import { ApiClient, DEFAULT_CANCEL_REASON } from "./ApiClient";
 import { isSuccess } from "./ApiError";
-import { LoginResponse, LOGOUT_REQUEST_PATH, WHOAMI_REQUEST_PATH } from "./gen/openapi";
+import {
+  LOGIN_REQUEST_BODY,
+  LOGIN_REQUEST_PATH,
+  LoginResponse,
+  LOGOUT_REQUEST_PATH,
+  WHOAMI_REQUEST_PATH,
+} from "./gen/openapi";
 
 export interface SessionState {
   user: LoginResponse | null;
   setUser: (user: LoginResponse | null) => void;
   logout: () => Promise<void>;
+  login: (username: string, password: string) => Promise<ApiResult<LoginResponse>>;
 }
 
 // Keep track of the currently logged-in user
@@ -39,6 +46,20 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
     }
   };
 
+  // Log in the user with the given credentials
+  const login = async (username: string, password: string) => {
+    const requestPath: LOGIN_REQUEST_PATH = "/api/user/login";
+    const requestBody: LOGIN_REQUEST_BODY = { username, password };
+    const client = new ApiClient();
+    const response = await client.postRequest<LoginResponse>(requestPath, requestBody);
+
+    if (isSuccess(response)) {
+      setUser(response.data);
+    }
+
+    return response;
+  };
+
   // Fetch the user data from the server when the component mounts
   useEffect(() => {
     if (fetchInitialUser) {
@@ -62,5 +83,5 @@ export default function useSessionState(fetchInitialUser: boolean): SessionState
     }
   }, [fetchInitialUser]);
 
-  return { user, setUser, logout };
+  return { user, setUser, login, logout };
 }

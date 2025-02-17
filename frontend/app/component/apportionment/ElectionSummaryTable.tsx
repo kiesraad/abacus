@@ -17,7 +17,7 @@ export function ElectionSummaryTable({ votesCounts, seats, quota, numberOfVoters
     <Table id="election_summary_table" className={cn(cls.table, cls.electionSummaryTable)}>
       <Table.Body>
         <Table.Row>
-          <Table.HeaderCell scope="row" className={cls.bt1Gray}>
+          <Table.HeaderCell scope="row" className={cn(cls.bt1Gray, "normal")}>
             {t("apportionment.voters")}
           </Table.HeaderCell>
           <Table.NumberCell className={cn(cls.bt1Gray, "font-number", "normal")}>
@@ -26,7 +26,9 @@ export function ElectionSummaryTable({ votesCounts, seats, quota, numberOfVoters
           <Table.Cell className={cn(cls.bt1Gray, "fs-sm")} />
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell scope="row">{t("apportionment.total_votes_cast_count")}</Table.HeaderCell>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("apportionment.total_votes_cast_count")}
+          </Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
             {formatNumber(votesCounts.total_votes_cast_count)}
           </Table.NumberCell>
@@ -37,7 +39,9 @@ export function ElectionSummaryTable({ votesCounts, seats, quota, numberOfVoters
           </Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell scope="row">{t("voters_and_votes.blank_votes_count")}</Table.HeaderCell>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("voters_and_votes.blank_votes_count")}
+          </Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
             {formatNumber(votesCounts.blank_votes_count)}
           </Table.NumberCell>
@@ -46,7 +50,9 @@ export function ElectionSummaryTable({ votesCounts, seats, quota, numberOfVoters
           </Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell scope="row">{t("voters_and_votes.invalid_votes_count")}</Table.HeaderCell>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("voters_and_votes.invalid_votes_count")}
+          </Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
             {formatNumber(votesCounts.invalid_votes_count)}
           </Table.NumberCell>
@@ -55,26 +61,34 @@ export function ElectionSummaryTable({ votesCounts, seats, quota, numberOfVoters
           </Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell scope="row">{t("voters_and_votes.votes_candidates_count")}</Table.HeaderCell>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("voters_and_votes.votes_candidates_count")}
+          </Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
             {formatNumber(votesCounts.votes_candidates_count)}
           </Table.NumberCell>
           <Table.Cell className="fs-sm" />
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell scope="row">{t("apportionment.number_of_seats")}</Table.HeaderCell>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("apportionment.number_of_seats")}
+          </Table.HeaderCell>
           <Table.NumberCell className="font-number normal">{seats}</Table.NumberCell>
           <Table.Cell className="fs-sm" />
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell scope="row">{t("apportionment.quota")}</Table.HeaderCell>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("apportionment.quota")}
+          </Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
             <DisplayFraction id="quota" fraction={quota} />
           </Table.NumberCell>
           <Table.Cell className="fs-sm">{t("apportionment.quota_description")}</Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell scope="row">{t("apportionment.preference_threshold")}</Table.HeaderCell>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("apportionment.preference_threshold")}
+          </Table.HeaderCell>
           <Table.NumberCell className="font-number normal">
             {/* TODO: Add apportionment.preference_threshold in epic #787 */}
           </Table.NumberCell>

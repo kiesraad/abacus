@@ -54,7 +54,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
 async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
     let typist_cookie = shared::typist_login(&addr).await;
     create_result(&addr, typist_cookie.clone(), 3, 3).await;
 

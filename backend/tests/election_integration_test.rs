@@ -12,12 +12,18 @@ use abacus::election::{ElectionDetailsResponse, ElectionListResponse};
 pub mod shared;
 pub mod utils;
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3", "users"))))]
 async fn test_election_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let typist_cookie = shared::typist_login(&addr).await;
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", typist_cookie)
+        .send()
+        .await
+        .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
@@ -25,12 +31,18 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body.elections.len(), 2);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/2");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let typist_cookie = shared::typist_login(&addr).await;
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", typist_cookie)
+        .send()
+        .await
+        .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
@@ -43,14 +55,16 @@ async fn test_election_details_works(pool: SqlitePool) {
         .any(|ps| ps.name == "Op Rolletjes"));
 }
 
-#[test(sqlx::test)]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 #[cfg(feature = "dev-database")]
 async fn test_election_create_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections");
+    let admin_cookie = shared::admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
+        .header("cookie", admin_cookie)
         .json(&serde_json::json!({
             "name": "Test Election",
             "location": "Test Location",
@@ -95,23 +109,35 @@ async fn test_election_create_works(pool: SqlitePool) {
     assert_eq!(body.name, "Test Election");
 }
 
-#[test(sqlx::test)]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_details_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/elections/1");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let url: String = format!("http://{addr}/api/elections/1");
+    let typist_cookie = shared::typist_login(&addr).await;
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", typist_cookie)
+        .send()
+        .await
+        .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_pdf_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/2/download_pdf_results");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
     let content_disposition = response.headers().get("Content-Disposition");
     let content_type = response.headers().get("Content-Type");
 
@@ -135,7 +161,7 @@ async fn test_election_xml_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     create_result(&addr, cookie.clone(), 1, 2).await;
-    create_result(&addr, cookie, 2, 2).await;
+    create_result(&addr, cookie.clone(), 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/download_xml_results");
     let response = reqwest::Client::new().get(&url).send().await.unwrap();

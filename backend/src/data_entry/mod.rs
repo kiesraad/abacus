@@ -43,6 +43,7 @@ pub struct GetDataEntryResponse {
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
     responses(
         (status = 200, description = "Data entry retrieved successfully", body = GetDataEntryResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -115,6 +116,7 @@ impl IntoResponse for SaveDataEntryResponse {
     request_body = DataEntry,
     responses(
         (status = 200, description = "Data entry saved successfully", body = SaveDataEntryResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -181,6 +183,7 @@ pub async fn polling_station_data_entry_save(
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
     responses(
         (status = 204, description = "Data entry deleted successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -211,6 +214,7 @@ pub async fn polling_station_data_entry_delete(
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise",
     responses(
         (status = 200, description = "Data entry finalised successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -289,6 +293,7 @@ pub struct ElectionStatusResponseEntry {
     path = "/api/elections/{election_id}/status",
     responses(
         (status = 200, description = "Election", body = ElectionStatusResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),

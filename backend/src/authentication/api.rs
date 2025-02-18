@@ -291,6 +291,7 @@ pub struct UserListResponse {
     path = "/api/user",
     responses(
         (status = 200, description = "User list", body = UserListResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -330,6 +331,7 @@ pub struct UpdateUserRequest {
     request_body = CreateUserRequest,
     responses(
         (status = 201, description = "User created", body = User),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -356,6 +358,7 @@ pub async fn user_create(
     request_body = UpdateUserRequest,
     responses(
         (status = 200, description = "User updated", body = User),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),

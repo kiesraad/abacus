@@ -55,6 +55,7 @@ impl IntoResponse for Election {
     path = "/api/elections",
     responses(
         (status = 200, description = "Election list", body = ElectionListResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -72,6 +73,7 @@ pub async fn election_list(
     path = "/api/elections/{election_id}",
     responses(
         (status = 200, description = "Election", body = ElectionDetailsResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -101,6 +103,7 @@ pub async fn election_details(
     responses(
         (status = 201, description = "Election created", body = Election),
         (status = 400, description = "Bad request", body = ErrorResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -209,6 +212,7 @@ impl ResultsInput {
                 ("Content-Disposition", description = "attachment; filename=\"filename.zip\"")
             )
         ),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -277,6 +281,7 @@ pub async fn election_download_zip_results(
                 ("Content-Disposition", description = "attachment; filename=\"filename.pdf\"")
             )
         ),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -319,6 +324,7 @@ pub async fn election_download_pdf_results(
             description = "XML",
             content_type = "text/xml",
         ),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),

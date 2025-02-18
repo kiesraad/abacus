@@ -8,15 +8,17 @@ We gebruiken deze termen onder andere voor variabelen, functienamen en teksten i
 - De Engelstalige website van de Kiesraad: <https://english.kiesraad.nl/>
 - De Engelstalige versie van de Kieswet: <https://english.kiesraad.nl/publications/publications/2019/4/english-version-electoral-act/english-version-electoral-act>
 - De Europese terminologiedatabase IATE (Interactive Terminology for Europe): <https://iate.europa.eu>
+- De Amerikaanse Glossary of Election Terminology: <https://www.eac.gov/sites/default/files/glossary_files/Glossary_of_Election_Terms_EAC.pdf>
 
 ## Kiesraad / wetten / juridisch
 
-| Nederlands                        | Afkorting | Engels                        | Opmerkingen   |
-|-----------------------------------|-----------|-------------------------------|---------------|
-| Kiesraad                          | KR        | Electoral Council             |               |
-| Kieswet / kiesrecht               |           | Elections Act / Electoral Act |               |
-| Kiesbesluit                       |           | Elections governmental decree |               |
-| Kiesregeling                      |           | Elections regulation          |               |
+| Nederlands                        | Afkorting | Engels                        | Opmerkingen                                   |
+|-----------------------------------|-----------|-------------------------------|-----------------------------------------------|
+| Kiesraad                          | KR        | Electoral Council             |                                               |
+| Kieswet                           |           | Elections Act / Electoral Act |                                               |
+| Kiesrecht                         |           | Franchise                     | zie <https://en.wikipedia.org/wiki/Suffrage>  |
+| Kiesbesluit                       |           | Elections governmental decree |                                               |
+| Kiesregeling                      |           | Elections regulation          |                                               |
 
 ## Verkiezingstypen / entiteiten
 
@@ -211,3 +213,139 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 | EML-standaard                    |           | EML standard                  |             |
 | EML-bestand                      |           | EML file                      |             |
 | invoerstatistieken               |           | input statistics              |             |
+
+## Uit andere bronnen
+
+Deze termen zijn afkomstig uit een Excel-sheet dat al eerder door collega's is opgesteld i.v.m. een WOO-verzoek. Ze zijn voornamelijk bedoeld ter referentie. Sommige termen kunnen anders vertaald zijn dan elders in dit document. In dat geval houden we de bovenstaande term aan.
+
+| Nederlands                                                            | Engels                                                                | Opmerkingen                                                           |
+|-----------------------------------------------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------------------|
+| Adviescommissie inrichting verkiezingsproces                          | Advisory Committee on the Voting Process Mechanism                    |                                                                       |
+| Adviesorgaan                                                          | Advisory committee                                                    |                                                                       |
+| Afdeling bestuursrechtspraak                                          | Administrative Law Division                                           |                                                                       |
+| Afdeling Strategische Kennisontwikkeling                              | Strategic Knowledge Development division                              |                                                                       |
+| Afdoening in der minne                                                | Amicable settlement                                                   |                                                                       |
+| Algemene wet bestuursrecht                                            | General Administrative Law Act                                        |                                                                       |
+| Ambtenaar                                                             | Public/civil servant                                                  |                                                                       |
+| Analfabeet                                                            | Illiterate person                                                     |                                                                       |
+| Bestuurlijke Vernieuwing en Koninkrijksrelaties                       | Administrative Reform and Kingdom Relations                           |                                                                       |
+| Bevolkingsregister                                                    | Population register /electoral register                               |                                                                       |
+| Bij loting vaststellen                                                | To determine by lot                                                   |                                                                       |
+| Binnenlandse Zaken en Koninkrijksrelaties                             | The ministry for Interior and Kingdom Relations                       |                                                                       |
+| Briefstemmen                                                          | Remote voting (i.e. postal voting)                                    |                                                                       |
+| Bureau voor Verkiezingsuitslagen                                      | Office for Election Results                                           |                                                                       |
+| Centrale stemopneming                                                 | Central vote counting                                                 |                                                                       |
+| Commissaris van de Koningin                                           | Provincial Governor                                                   |                                                                       |
+| Commissie Besluitvorming Stemmachines                                 | Voting Machines Decisions Committee                                   |                                                                       |
+| Commissie geloofsbrieven                                              | Committee research of nominations                                     |                                                                       |
+| Concernstaven                                                         | Group Staffs                                                          |                                                                       |
+| Corrigendum                                                           | Results to be corrected                                               |                                                                       |
+| De dag van de stemming                                                | Polling day, election day                                             |                                                                       |
+| De regels in acht nemen                                               | To observe the rules                                                  |                                                                       |
+| Decentrale stemopneming                                               | Decentralised vote counting                                           |                                                                       |
+| Definitieve uitslag                                                   | Final results                                                         |                                                                       |
+| Districten                                                            | Districts/Constituencies                                              |                                                                       |
+| Doorwerking                                                           | Extended effect                                                       |                                                                       |
+| Een lijst indienen                                                    | To submit a list                                                      |                                                                       |
+| Eerste Kamerverkiezing                                                | Senate election                                                       |                                                                       |
+| Eigen mandaat                                                         | Direct mandate                                                        |                                                                       |
+| stemmen bij afwezigheid                                               | Absentee voting                                                       |                                                                       |
+| Enkelvoudig kiesdistrict                                              | Single-member constituency                                            |                                                                       |
+| Enkelvoudige districten                                               | Single-member districts                                               |                                                                       |
+| Enkelvoudige voorkeurstem                                             | Single preferential vote                                              |                                                                       |
+| Evenredige vertegenwoordiging                                         | Proportional representation                                           |                                                                       |
+| Experimentenwet Kiezen op Afstand                                     | Electronic Remote Voting Experiments Act                              |                                                                       |
+| Geldigheid van de stemming                                            | Validity of the election                                              |                                                                       |
+| Gemeenteraad                                                          | Municipal council                                                     |                                                                       |
+| Gemengd systeem                                                       | Mixed system                                                          |                                                                       |
+| Gerechtshof                                                           | Court of Appeal                                                       |                                                                       |
+| Grenzen                                                               | Boundaries                                                            |                                                                       |
+| Grondwettelijke aspecten                                              | Constitutional demands                                                |                                                                       |
+| Hertelling der stemmen                                                | Recount of the ballot papers                                          |                                                                       |
+| Hertellingen                                                          | Recounts                                                              |                                                                       |
+| Het hokje achter de naam invullen                                     | To fill out the box against the name                                  |                                                                       |
+| Het verloop van de verkiezing                                         | The conduct of the election                                           |                                                                       |
+| Hoofdstembureau                                                       | District electoral committee                                          |                                                                       |
+| Identiteit aantonen                                                   | To furnish proof of identity                                          |                                                                       |
+| In (de stembus) steken                                                | To insert in                                                          |                                                                       |
+| Indienen bij                                                          | To submit to                                                          |                                                                       |
+| Informatiepunt Verkiezingen                                           | Elections Information Centre                                          |                                                                       |
+| Jurisprudentie                                                        | Case law                                                              |                                                                       |
+| Kaderwet adviescolleges                                               | Consultative Councils Framework Act                                   |                                                                       |
+| Kamerontbinding                                                       | Dissolution of parliament                                             |                                                                       |
+| Kantongerecht                                                         | Subdistrict Court                                                     |                                                                       |
+| Kennisgeving                                                          | Notification                                                          |                                                                       |
+| Kiesdeler                                                             | Electoral divisor                                                     | *electoral quota* is de beste term, zie boven                         |
+| Kiesdeler                                                             | Electoral quotient                                                    |                                                                       |
+| Kiesdeler                                                             | Quota                                                                 |                                                                       |
+| Kiesdrempel                                                           | Threshold                                                             |                                                                       |
+| Kiesgerechtigde leeftijd                                              | Voting age                                                            |                                                                       |
+| Kieskring                                                             | Voting district                                                       | of *electoral district*, zie boven                                    |
+| Kiezerpas                                                             | Pass to vote anywhere                                                 | of *poll card*, zie boven                                             |
+| Kiesrecht                                                             | Franchise                                                             | klopt, zie <https://en.wikipedia.org/wiki/Suffrage>                   |
+| Kieswet                                                               | Elections Act                                                         |                                                                       |
+| Klachtenregeling Kiesraad                                             | Electoral Council Complaints Handling Scheme                          |                                                                       |
+| Lijsttrekker                                                          | Party Leader                                                          |                                                                       |
+| Mandaatbesluit Kiesraad                                               | Electoral Council Mandate Decision                                    |                                                                       |
+| Meervoudige districten                                                | Multi-member districts                                                |                                                                       |
+| Meldingen van burgers                                                 | Notifications of voters                                               |                                                                       |
+| Mobiele stembureaus                                                   | Mobile polling stations                                               |                                                                       |
+| Officier van Justitie                                                 | Public Prosecutor                                                     |                                                                       |
+| Onafhankelijke Senaatsfractie                                         | Independent Senate Group                                              |                                                                       |
+| Ondernemingsraden                                                     | Works councils                                                        |                                                                       |
+| Ondersteunende Software Verkiezingen (OSV)                            | Election Supporting Software (ESS)                                    |                                                                       |
+| Onderzoek geloofsbrieven                                              | Examination of credentials                                            |                                                                       |
+| Ongeldige stemmen                                                     | Void ballots                                                          |                                                                       |
+| Onverenigbaarheid                                                     | Incompatibility                                                       |                                                                       |
+| Openbaar Ministerie                                                   | Public Prosecutor's Office                                            |                                                                       |
+| Opkomst                                                               | Turnout                                                               |                                                                       |
+| Opnemen in het kiezersregister                                        | To enter in the electoral register/role                               |                                                                       |
+| Opnemen in het register                                               | To enter on the register                                              |                                                                       |
+| Stempas                                                               | Voting pass                                                           |                                                                       |
+| Organisatie voor Veiligheid en Samenwerking in Europa                 | Organisation for Security and Cooperation in Europe                   |                                                                       |
+| Overschotzetels                                                       | Surplus seats                                                         |                                                                       |
+| Periodieke verkiezingen                                               | Regular elections                                                     |                                                                       |
+| Proces-verbaal                                                        | Polling station report result sheet                                   |                                                                       |
+| Project versterking Kiesraad                                          | Electoral Council Consolidation project                               |                                                                       |
+| Provinciale statenverkiezingen                                        | Provincial council elections                                          |                                                                       |
+| Provinciewet                                                          | Provinces Act                                                         |                                                                       |
+| Raad van State                                                        | Council of State                                                      |                                                                       |
+| Rechtbank                                                             | District Court                                                        |                                                                       |
+| Regeling voorwaarden en goedkeuring stemmachines 1997                 | Regulation on the requirements and approval of voting machines 1997   |                                                                       |
+| Ronselen van volmachtsstemmen                                         | Canvassing of proxy votes                                             |                                                                       |
+| Slippen van de lijsttrekker                                           | Coat-tails of the party leader                                        |                                                                       |
+| Staatscourant                                                         | Government Gazette                                                    |                                                                       |
+| Stembiljet                                                            | Ballot paper                                                          | *paper* alleen gebruiken als er specifiek naar papier verwezen wordt  |
+| Stembureauleden                                                       | Polling station staff                                                 |                                                                       |
+| Stembus                                                               | Ballot box                                                            |                                                                       |
+| Stemlokaal, stembureau                                                | Polling station                                                       |                                                                       |
+| Stemmachines                                                          | Voting Machines                                                       |                                                                       |
+| Stemmen bij volmacht                                                  | Proxy voting, voting by proxy                                         |                                                                       |
+| Stemmen in een willekeurig stemlokaal                                 | Voting in a polling station of your choice within the municipallity   |                                                                       |
+| Stemmen per brief                                                     | Postal voting                                                         |                                                                       |
+| Stemmen via internet                                                  | Voting through the internet / internet voting                         |                                                                       |
+| Stempas                                                               | Voting pass                                                           |                                                                       |
+| Stemplicht                                                            | Compulsory voting                                                     |                                                                       |
+| Terugverwijzingen                                                     | Referrals                                                             |                                                                       |
+| Toedeling zetels                                                      | Allocation of seats                                                   |                                                                       |
+| Tweede Kamer                                                          | House of Representatives                                              |                                                                       |
+| Uitslag verkiezingen bekendmaken                                      | To proclaim the result of the elections                               |                                                                       |
+| Uitslagvaststelling                                                   | Determination of election results                                     |                                                                       |
+| Uittreksel                                                            | Extract                                                               |                                                                       |
+| Verkiezingsdag                                                        | Polling day                                                           |                                                                       |
+| Verkiezingsuitslag                                                    | Election results                                                      |                                                                       |
+| Verzoek                                                               | Application                                                           |                                                                       |
+| Volgorde kandidaten                                                   | Order of candidates                                                   |                                                                       |
+| Voorkeursstem                                                         | Preferential vote                                                     |                                                                       |
+| Voorlopige uitslag                                                    | Preliminary results                                                   |                                                                       |
+| Voorzieningenrechter                                                  | Judge in Preliminary relief proceedings                               |                                                                       |
+| Voorzitter stembureau                                                 | Presiding officer                                                     |                                                                       |
+| Waarnemers                                                            | Observers                                                             |                                                                       |
+| Waterschapsbesluit                                                    | Water Boards Decree                                                   | *Water authority* is de betere term hier                              |
+| Wet openbaarheid van bestuur                                          | Government Information (Public Access) Act                            |                                                                       |
+| Wet openbaarmaking uit publieke middelen gefinancierde topinkomens    | Executives' Pay Financed from Public Funds (Disclosure) Act           |                                                                       |
+| Wet Wijziging Provinciewet                                            | Act Amending the Provinces Act                                        |                                                                       |
+| Wetboek van Strafrecht                                                | Criminal Code                                                         |                                                                       |
+| Zelfstandig bestuursorgaan                                            | Independent administrative body                                       |                                                                       |
+| Zetelverdeling                                                        | Division of seats                                                     |                                                                       |
+| Zitting                                                               | Session                                                               |                                                                       |

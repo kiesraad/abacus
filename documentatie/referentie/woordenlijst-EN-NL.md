@@ -29,11 +29,11 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 | Eerste Kamerverkiezing                  | EK        | election of the Senate                    |                                     |
 | gemeenteraadsverkiezingen               | GR        | elections of the municipal council        |                                     |
 | provinciale statenverkiezingen          | PS        | elections of the provincial council       |                                     |
-| waterschapsverkiezingen                 | WS        | elections of the Water authority          |                                     |
+| waterschapsverkiezingen                 | WS        | elections of the Water authority          | AB in EML_NL                        |
 | Europees Parlementsverkiezing           | EP        | election of the European Parliament       |                                     |
 | kiescolleges Eerste Kamer               |           | electoral colleges for the Senate         |                                     |
-| Eilandsraadsverkiezingen                |           | elections of the Island Councils          |                                     |
-| herindelingsverkiezingen                |           | redivision elections                      |                                     |
+| Eilandsraadsverkiezingen                |           | elections of the Island Councils          | ER in EML_NL                        |
+| herindelingsverkiezingen                | GRh       | redivision elections                      | GR in EML_NL                        |
 | college van burgemeester en wethouders | B&W       | municipal executive of mayor and aldermen |                                     |
 
 ## Stembureaus / locaties

@@ -383,8 +383,7 @@ impl DataEntryStatus {
         }
     }
 
-    /// Get the progress of the first entry (if there is a first entry), from
-    /// 0 - 100
+    /// Get the progress of the first entry (if there is a first entry), from 0 to 100
     pub fn get_first_entry_progress(&self) -> Option<u8> {
         match self {
             DataEntryStatus::FirstEntryNotStarted => None,
@@ -393,8 +392,7 @@ impl DataEntryStatus {
         }
     }
 
-    /// Get the progress of the second entry (if there is a second entry),
-    /// from 0 - 100
+    /// Get the progress of the second entry (if there is a second entry), from 0 to 100
     pub fn get_second_entry_progress(&self) -> Option<u8> {
         match self {
             DataEntryStatus::FirstEntryNotStarted
@@ -405,7 +403,7 @@ impl DataEntryStatus {
         }
     }
 
-    /// Get the total progress of the data entry process (from 0 - 100)
+    /// Get the total progress of the data entry process, from 0 to 100
     pub fn get_progress(&self) -> u8 {
         match self {
             DataEntryStatus::FirstEntryNotStarted => 0,
@@ -445,14 +443,6 @@ impl DataEntryStatus {
             DataEntryStatus::EntriesDifferent(_) => DataEntryStatusName::EntriesDifferent,
             DataEntryStatus::Definitive(_) => DataEntryStatusName::Definitive,
         }
-    }
-
-    /// Returns true if the first entry is finished
-    pub fn is_first_entry_finished(&self) -> bool {
-        matches!(
-            self,
-            DataEntryStatus::FirstEntryNotStarted | DataEntryStatus::FirstEntryInProgress(_)
-        )
     }
 
     /// Returns the timestamp at which point this data entry process was made definitive
@@ -541,8 +531,8 @@ mod tests {
             number_of_voters: 100,
             category: ElectionCategory::Municipal,
             number_of_seats: 18,
-            election_date: chrono::Utc::now().date_naive(),
-            nomination_date: chrono::Utc::now().date_naive(),
+            election_date: Utc::now().date_naive(),
+            nomination_date: Utc::now().date_naive(),
             status: ElectionStatus::DataEntryInProgress,
             political_groups: Some(vec![]),
         }
@@ -559,14 +549,14 @@ mod tests {
     fn second_entry_not_started() -> DataEntryStatus {
         DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
             finalised_first_entry: polling_station_result(),
-            first_entry_finished_at: chrono::Utc::now(),
+            first_entry_finished_at: Utc::now(),
         })
     }
 
     fn second_entry_in_progress() -> DataEntryStatus {
         DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
             finalised_first_entry: polling_station_result(),
-            first_entry_finished_at: chrono::Utc::now(),
+            first_entry_finished_at: Utc::now(),
             progress: 0,
             second_entry: polling_station_result(),
             client_state: ClientState::default(),
@@ -575,7 +565,7 @@ mod tests {
 
     fn definitive() -> DataEntryStatus {
         DataEntryStatus::Definitive(Definitive {
-            finished_at: chrono::Utc::now(),
+            finished_at: Utc::now(),
         })
     }
 
@@ -827,7 +817,7 @@ mod tests {
             },
             client_state: ClientState::new_from_str(Some("{}")).unwrap(),
             finalised_first_entry: polling_station_result(),
-            first_entry_finished_at: chrono::Utc::now(),
+            first_entry_finished_at: Utc::now(),
         });
         let next = initial.finalise_second_entry(&polling_station(), &election());
         assert!(matches!(
@@ -842,7 +832,7 @@ mod tests {
     fn second_entry_in_progress_finalise_not_equal() {
         let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
             finalised_first_entry: polling_station_result(),
-            first_entry_finished_at: chrono::Utc::now(),
+            first_entry_finished_at: Utc::now(),
             progress: 0,
             second_entry: PollingStationResults {
                 voters_counts: VotersCounts {

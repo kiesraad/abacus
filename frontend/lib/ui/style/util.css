@@ -49,6 +49,10 @@
   background-color: var(--bg-gray);
 }
 
+.bg-yellow {
+  background-color: var(--yellow-200);
+}
+
 .text-muted {
   color: var(--gray-400);
 }
@@ -58,7 +62,25 @@
   width: 13rem;
 }
 
+.w-full {
+  width: 100%;
+}
+
 /* Text wrap, transformations etc. */
 .break-word {
   word-break: break-word;
+}
+
+.nowrap {
+  text-wrap: nowrap;
+}
+
+.text-align-r {
+  text-align: right;
+}
+
+/* Number styling */
+.font-number {
+  font-family: var(--font-number);
+  font-feature-settings: "ss09" on;
 }

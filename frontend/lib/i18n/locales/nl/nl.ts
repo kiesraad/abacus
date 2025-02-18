@@ -1,3 +1,4 @@
+import apportionment from "./apportionment.json";
 import candidates_votes from "./candidates_votes.json";
 import check_and_save from "./check_and_save.json";
 import data_entry from "./data_entry.json";
@@ -21,6 +22,7 @@ import workstations from "./workstations.json";
 
 const nl = {
   ...generic,
+  apportionment,
   candidates_votes,
   check_and_save,
   data_entry,

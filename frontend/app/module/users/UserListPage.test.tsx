@@ -37,7 +37,7 @@ describe("PollingStationListPage", () => {
     expect(table).toHaveTableContent([
       ["Gebruikersnaam", "Rol", "Volledige naam", "Laatste activiteit"],
       ["Sanne", "Beheerder", "Sanne Molenaar", "vandaag 10:20"],
-      ["Jayden", "Coördinator", "Jayden Ahmen", "vandaag 13:37"],
+      ["Jayden", "Coördinator", "Jayden Ahmen", "gisteren 10:20"],
       ["Gebruiker01", "Invoerder", "Nog niet gebruikt", "–"],
       ["Gebruiker02", "Invoerder", "Nog niet gebruikt", "–"],
       ["Gebruiker03", "Invoerder", "Nog niet gebruikt", "–"],

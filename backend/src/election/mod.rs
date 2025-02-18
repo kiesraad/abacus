@@ -1,5 +1,3 @@
-#[cfg(feature = "dev-database")]
-use axum::http::StatusCode;
 use axum::{
     extract::{Path, State},
     response::{IntoResponse, Response},
@@ -13,7 +11,7 @@ use zip::{result::ZipError, write::SimpleFileOptions};
 use self::repository::Elections;
 pub use self::structs::*;
 use crate::{
-    authentication::{Admin, Coordinator, User},
+    authentication::{Coordinator, User},
     data_entry::{repository::PollingStationResultsEntries, PollingStationResults},
     eml::{axum::Eml, eml_document_hash, EMLDocument, EML510},
     pdf_gen::{
@@ -24,6 +22,12 @@ use crate::{
     summary::ElectionSummary,
     APIError, ErrorResponse,
 };
+
+#[cfg(feature = "dev-database")]
+use axum::http::StatusCode;
+
+#[cfg(feature = "dev-database")]
+use crate::authentication::Admin;
 
 pub(crate) mod repository;
 pub mod structs;

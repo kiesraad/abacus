@@ -197,6 +197,7 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 | voorkeursstem                       |           | preferential vote          | via <https://en.wikipedia.org/wiki/Preferential_voting> |
 | loting                              |           | draw                       |                                                         |
 | systeem van de grootste gemiddelden |           | system of largest averages |                                                         |
+| systeem van de grootste overschotten |           | system of largest remainders |  via <https://en.wikipedia.org/wiki/Quota_method> |
 
 ## Technisch / software
 

@@ -1,5 +1,5 @@
 use crate::{
-    authentication::Typist,
+    authentication::{Typist, User},
     data_entry::repository::PollingStationDataEntries,
     election::repository::Elections,
     error::{APIError, ErrorReference, ErrorResponse},
@@ -126,6 +126,7 @@ impl IntoResponse for SaveDataEntryResponse {
     ),
 )]
 pub async fn polling_station_data_entry_save(
+    _user: Typist,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
@@ -190,6 +191,7 @@ pub async fn polling_station_data_entry_save(
     ),
 )]
 pub async fn polling_station_data_entry_delete(
+    _user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<StatusCode, APIError> {
@@ -220,6 +222,7 @@ pub async fn polling_station_data_entry_delete(
     ),
 )]
 pub async fn polling_station_data_entry_finalise(
+    _user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
@@ -294,6 +297,7 @@ pub struct ElectionStatusResponseEntry {
     ),
 )]
 pub async fn election_status(
+    _user: User,
     State(data_entry_repo): State<PollingStationDataEntries>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
@@ -306,6 +310,8 @@ pub mod tests {
     use axum::http::StatusCode;
     use sqlx::{query, SqlitePool};
     use test_log::test;
+
+    use crate::authentication::Role;
 
     use super::*;
 
@@ -384,6 +390,7 @@ pub mod tests {
         entry_number: EntryNumber,
     ) -> Response {
         polling_station_data_entry_save(
+            Typist(User::test_user(Role::Typist)),
             Path((1, entry_number)),
             State(PollingStationDataEntries::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
@@ -396,6 +403,7 @@ pub mod tests {
 
     async fn delete(pool: SqlitePool, entry_number: EntryNumber) -> Response {
         polling_station_data_entry_delete(
+            Typist(User::test_user(Role::Typist)),
             State(PollingStationDataEntries::new(pool.clone())),
             Path((1, entry_number)),
         )
@@ -405,6 +413,7 @@ pub mod tests {
 
     async fn finalise(pool: SqlitePool, entry_number: EntryNumber) -> Response {
         polling_station_data_entry_finalise(
+            Typist(User::test_user(Role::Typist)),
             State(PollingStationDataEntries::new(pool.clone())),
             State(Elections::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
@@ -598,6 +607,7 @@ pub mod tests {
     async fn test_polling_station_data_entry_delete_nonexistent(pool: SqlitePool) {
         // check that deleting a non-existing data entry returns 404
         let response = polling_station_data_entry_delete(
+            Typist(User::test_user(Role::Typist)),
             State(PollingStationDataEntries::new(pool.clone())),
             Path((1, EntryNumber::FirstEntry)),
         )

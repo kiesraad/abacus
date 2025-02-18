@@ -7,6 +7,7 @@ use utoipa::ToSchema;
 
 use crate::{
     apportionment::{seat_allocation, ApportionmentResult},
+    authentication::Coordinator,
     data_entry::repository::PollingStationResultsEntries,
     election::repository::Elections,
     polling_station::repository::PollingStations,
@@ -36,6 +37,7 @@ pub struct ElectionApportionmentResponse {
   ),
 )]
 pub async fn election_apportionment(
+    _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,

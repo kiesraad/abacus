@@ -9,7 +9,11 @@ use utoipa::ToSchema;
 
 use self::repository::PollingStations;
 pub use self::structs::*;
-use crate::{election::repository::Elections, APIError, ErrorResponse};
+use crate::{
+    authentication::{AdminOrCoordinator, User},
+    election::repository::Elections,
+    APIError, ErrorResponse,
+};
 
 pub mod repository;
 pub mod structs;
@@ -40,6 +44,7 @@ impl IntoResponse for PollingStationListResponse {
     ),
 )]
 pub async fn polling_station_list(
+    _user: User,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
     Path(election_id): Path<u32>,
@@ -68,6 +73,7 @@ pub async fn polling_station_list(
     ),
 )]
 pub async fn polling_station_create(
+    _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
     Path(election_id): Path<u32>,
@@ -99,6 +105,7 @@ pub async fn polling_station_create(
     ),
 )]
 pub async fn polling_station_get(
+    _user: User,
     State(polling_stations): State<PollingStations>,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<(StatusCode, PollingStation), APIError> {
@@ -126,6 +133,7 @@ pub async fn polling_station_get(
     ),
 )]
 pub async fn polling_station_update(
+    _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
     polling_station_update: PollingStationRequest,
@@ -155,6 +163,7 @@ pub async fn polling_station_update(
     ),
 )]
 pub async fn polling_station_delete(
+    _user: AdminOrCoordinator,
     State(polling_stations): State<PollingStations>,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<StatusCode, APIError> {

@@ -13,6 +13,7 @@ use zip::{result::ZipError, write::SimpleFileOptions};
 use self::repository::Elections;
 pub use self::structs::*;
 use crate::{
+    authentication::{Admin, Coordinator, User},
     data_entry::{repository::PollingStationResultsEntries, PollingStationResults},
     eml::{axum::Eml, eml_document_hash, EMLDocument, EML510},
     pdf_gen::{
@@ -58,6 +59,7 @@ impl IntoResponse for Election {
     ),
 )]
 pub async fn election_list(
+    _user: User,
     State(elections_repo): State<Elections>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
     let elections = elections_repo.list().await?;
@@ -78,6 +80,7 @@ pub async fn election_list(
     ),
 )]
 pub async fn election_details(
+    _user: User,
     State(elections_repo): State<Elections>,
     State(polling_stations): State<PollingStations>,
     Path(id): Path<u32>,
@@ -103,6 +106,7 @@ pub async fn election_details(
 )]
 #[cfg(feature = "dev-database")]
 pub async fn election_create(
+    _user: Admin,
     State(elections_repo): State<Elections>,
     Json(new_election): Json<ElectionRequest>,
 ) -> Result<(StatusCode, Election), APIError> {
@@ -213,6 +217,7 @@ impl ResultsInput {
     ),
 )]
 pub async fn election_download_zip_results(
+    _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
@@ -280,6 +285,7 @@ pub async fn election_download_zip_results(
     ),
 )]
 pub async fn election_download_pdf_results(
+    _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
@@ -321,6 +327,7 @@ pub async fn election_download_pdf_results(
     ),
 )]
 pub async fn election_download_xml_results(
+    _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,

@@ -222,8 +222,8 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-
-    create_and_save_data_entry(&addr, 2, 1, None).await;
+    let cookie = shared::admin_login(&addr).await;
+    create_and_save_data_entry(&addr, cookie, 2, 1, None).await;
 
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
@@ -240,8 +240,8 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-
-    create_result(&addr, 1, 2).await;
+    let cookie = shared::admin_login(&addr).await;
+    create_result(&addr, cookie, 1, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/polling_stations/1");
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();

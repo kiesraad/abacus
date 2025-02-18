@@ -86,6 +86,7 @@ describe("UserCreateDetailsPage", () => {
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(createUser).toHaveBeenCalledExactlyOnceWith({
+      role: "typist",
       username: "NieuweGebruiker",
       temp_password: "Wachtwoord12",
     });
@@ -139,6 +140,7 @@ describe("UserCreateDetailsPage", () => {
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(createUser).toHaveBeenCalledExactlyOnceWith({
+      role: "coordinator",
       username: "NieuweGebruiker",
       fullname: "Nieuwe Gebruiker",
       temp_password: "Wachtwoord12",
@@ -170,6 +172,7 @@ describe("UserCreateDetailsPage", () => {
     await user.click(submit);
 
     expect(createUser).toHaveBeenCalledExactlyOnceWith({
+      role: "typist",
       username: "NieuweGebruiker",
       temp_password: "Wachtwoord12",
     });

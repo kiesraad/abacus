@@ -1,14 +1,13 @@
 import { FormEvent, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
-import { isSuccess } from "@kiesraad/api";
+import { CreateUserRequest, isSuccess, Role } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, Button, Form, FormLayout, InputField, PageTitle } from "@kiesraad/ui";
 
-import { UserDetails } from "./UserCreateContext";
 import { useUserCreateContext } from "./useUserCreateContext";
 
-type ValidationErrors = Partial<UserDetails>;
+type ValidationErrors = Partial<CreateUserRequest>;
 
 const MIN_PASSWORD_LENGTH = 12;
 
@@ -25,17 +24,18 @@ export function UserCreateDetailsPage() {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
-    const details: UserDetails = {
+    const user: CreateUserRequest = {
+      role: role as Role,
       username: (formData.get("username") as string).trim(),
       fullname: (formData.get("fullname") as string | undefined)?.trim(),
       temp_password: (formData.get("temp_password") as string).trim(),
     };
 
-    if (!validate(details)) {
+    if (!validate(user)) {
       return;
     }
 
-    void createUser(details).then((result) => {
+    void createUser(user).then((result) => {
       if (isSuccess(result)) {
         const { username, role } = result.data;
         const createdMessage = t("users.user_created_details", { username, role: t(role) });
@@ -46,22 +46,22 @@ export function UserCreateDetailsPage() {
     });
   }
 
-  function validate(details: UserDetails): boolean {
+  function validate(user: CreateUserRequest): boolean {
     const errors: ValidationErrors = {};
 
     const required = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
 
-    if (details.username.length === 0) {
+    if (user.username.length === 0) {
       errors.username = required;
     }
 
-    if (details.fullname !== undefined && details.fullname.length === 0) {
+    if (user.fullname !== undefined && user.fullname.length === 0) {
       errors.fullname = required;
     }
 
-    if (details.temp_password.length === 0) {
+    if (user.temp_password.length === 0) {
       errors.temp_password = required;
-    } else if (details.temp_password.length < MIN_PASSWORD_LENGTH) {
+    } else if (user.temp_password.length < MIN_PASSWORD_LENGTH) {
       errors.temp_password = t("users.temporary_password_error_min_length", { min_length: MIN_PASSWORD_LENGTH });
     }
 

@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { ApiResult, CreateUserRequest, Role, useCrud, User, USER_CREATE_REQUEST_PATH } from "@kiesraad/api";
 
-import { IUserCreateContext, UserCreateContext, UserDetails, UserType } from "./UserCreateContext";
+import { IUserCreateContext, UserCreateContext, UserType } from "./UserCreateContext";
 
 export function UserCreateContextProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<Role | undefined>(undefined);
@@ -13,13 +13,9 @@ export function UserCreateContextProvider({ children }: { children: React.ReactN
   const url: USER_CREATE_REQUEST_PATH = "/api/user";
   const userApi = useCrud<User>(url);
 
-  async function createUser(userDetails: UserDetails): Promise<ApiResult<User>> {
-    if (!role) {
-      throw new Error("Role was not set");
-    }
-
-    setUsername(userDetails.username);
-    return userApi.create({ role, ...userDetails } satisfies CreateUserRequest);
+  async function createUser(user: CreateUserRequest): Promise<ApiResult<User>> {
+    setUsername(user.username);
+    return userApi.create(user);
   }
 
   const apiError = userApi.requestState.status === "api-error" ? userApi.requestState.error : null;

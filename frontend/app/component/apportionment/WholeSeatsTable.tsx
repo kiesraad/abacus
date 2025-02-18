@@ -16,8 +16,8 @@ export function WholeSeatsTable({ finalStanding, politicalGroups, quota }: Whole
     <Table id="whole_seats_table" className={cn(cls.table, cls.wholeSeatsTable)}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
-        <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>
-        <Table.HeaderCell className="text-align-r w-full">{t("vote_count")}</Table.HeaderCell>
+        <Table.HeaderCell className="w-full">{t("list_name")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("vote_count")}</Table.HeaderCell>
         <Table.HeaderCell>:</Table.HeaderCell>
         <Table.HeaderCell span={2} className="text-align-r">
           {t("apportionment.quota")}

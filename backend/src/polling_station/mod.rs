@@ -36,6 +36,7 @@ impl IntoResponse for PollingStationListResponse {
     path = "/api/elections/{election_id}/polling_stations",
     responses(
         (status = 200, description = "Polling station listing successful", body = PollingStationListResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Election not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -64,6 +65,7 @@ pub async fn polling_station_list(
     request_body = PollingStationRequest,
     responses(
         (status = 201, description = "Polling station created successfully", body = PollingStation),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Election not found", body = ErrorResponse),
         (status = 409, description = "Polling station already exists", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -96,6 +98,7 @@ pub async fn polling_station_create(
     path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",
     responses(
         (status = 200, description = "Polling station found", body = PollingStation),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -124,6 +127,7 @@ pub async fn polling_station_get(
     request_body = PollingStationRequest,
     responses(
         (status = 200, description = "Polling station updated successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -154,6 +158,7 @@ pub async fn polling_station_update(
     path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",
     responses(
         (status = 200, description = "Polling station deleted successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),

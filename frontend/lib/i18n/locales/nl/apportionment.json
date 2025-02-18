@@ -17,7 +17,7 @@
   "no_residual_seats_to_assign": "Er zijn geen restzetels te verdelen.",
   "number_of_seats": "Aantal raadszetels",
   "preference_threshold": "Voorkeursdrempel",
-  "preference_threshold_description": "25% van de kiesdeler",
+  "preference_threshold_description": "{percentage}% van de kiesdeler",
   "quota": "Kiesdeler",
   "quota_description": "Benodigde stemmen per volle zetel",
   "residual_seat": {

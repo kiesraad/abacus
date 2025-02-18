@@ -59,12 +59,7 @@
       }
       &:first-of-type,
       &:last-of-type {
-        max-width: fit-content;
-      }
-    }
-    td {
-      &:last-of-type {
-        width: unset;
+        min-width: fit-content;
       }
     }
   }

@@ -2021,7 +2021,8 @@
           "PollingStationResultsAlreadyFinalised",
           "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
-          "UserNotFound"
+          "UserNotFound",
+          "Unauthorized"
         ]
       },
       "ErrorResponse": {

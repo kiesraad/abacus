@@ -7,7 +7,7 @@ import { test } from "./fixtures";
 
 test.describe("pdf rendering", () => {
   test("it downloads a pdf", async ({ page, completedElection }) => {
-    await page.goto(`/elections/${completedElection.id}/status#coordinator`);
+    await page.goto(`/elections/${completedElection.id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);
     await electionStatusPage.finish.click();

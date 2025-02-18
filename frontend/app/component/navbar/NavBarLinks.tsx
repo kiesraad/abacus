@@ -1,12 +1,12 @@
 import { Link, NavLink } from "react-router";
 
-import { Election, useElection } from "@kiesraad/api";
+import { Election, useElection, useUser } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
 
 import { NavBarMenuButton } from "./NavBarMenu";
 
-type NavBarLinksProps = { location: { pathname: string; hash: string } };
+type NavBarLinksProps = { location: { pathname: string } };
 
 function ElectionBreadcrumb({ election }: { election: Election }) {
   return (
@@ -72,17 +72,18 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
 function TopLevelManagementLinks() {
   return (
     <>
-      <NavLink to={"/elections#administrator"}>{t("election.title.plural")}</NavLink>
-      <NavLink to={"/users#administratorcoordinator"}>{t("users.users")}</NavLink>
-      <NavLink to={"/workstations#administrator"}>{t("workstations.workstations")}</NavLink>
-      <NavLink to={"/logs#administratorcoordinator"}>{t("logs")}</NavLink>
+      <NavLink to={"/elections"}>{t("election.title.plural")}</NavLink>
+      <NavLink to={"/users"}>{t("users.users")}</NavLink>
+      <NavLink to={"/workstations"}>{t("workstations.workstations")}</NavLink>
+      <NavLink to={"/logs"}>{t("logs")}</NavLink>
     </>
   );
 }
 
 export function NavBarLinks({ location }: NavBarLinksProps) {
-  const isAdministrator = location.hash.includes("administrator");
-  const isCoordinator = location.hash.includes("coordinator");
+  const user = useUser();
+  const isAdministrator = user?.role === "administrator";
+  const isCoordinator = user?.role === "coordinator";
 
   if (
     (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||

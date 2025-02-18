@@ -4,7 +4,7 @@ import { Story } from "@ladle/react";
 import { electionDetailsMockResponse } from "lib/api-mocks/ElectionMockData";
 import { ElectionProviderContext } from "lib/api/election/ElectionProviderContext";
 
-import { Election } from "@kiesraad/api";
+import { Election, Role, TestUserProvider } from "@kiesraad/api";
 
 import { NavBar } from "./NavBar";
 import styles from "./NavBar.module.css";
@@ -14,31 +14,31 @@ export default {
   title: "App / Navigation bar",
 };
 
-const locations = [
-  { pathname: "/account/login", hash: "" },
-  { pathname: "/account/setup", hash: "" },
-  { pathname: "/elections", hash: "" },
-  { pathname: "/elections/1", hash: "" },
-  { pathname: "/elections/1/data-entry", hash: "" },
-  { pathname: "/elections/1/data-entry/1/1", hash: "" },
-  { pathname: "/elections/1/data-entry/1/1/recounted", hash: "" },
-  { pathname: "/elections/1/data-entry/1/1/voters-and-votes", hash: "" },
-  { pathname: "/elections/1/data-entry/1/1/list/1", hash: "" },
-  { pathname: "/elections/1/data-entry/1/1/save", hash: "" },
-  { pathname: "/dev", hash: "" },
-  { pathname: "/elections", hash: "#administratorcoordinator" },
-  { pathname: "/users", hash: "#administratorcoordinator" },
-  { pathname: "/workstations", hash: "#administrator" },
-  { pathname: "/logs", hash: "#administratorcoordinator" },
-  { pathname: "/elections/1", hash: "#administratorcoordinator" },
-  { pathname: "/elections/1/report", hash: "#administratorcoordinator" },
-  { pathname: "/elections/1/status", hash: "#administratorcoordinator" },
-  { pathname: "/elections/1/polling-stations", hash: "#administratorcoordinator" },
-  { pathname: "/elections/1/polling-stations/create", hash: "#administratorcoordinator" },
-  { pathname: "/elections/1/polling-stations/1/update", hash: "#administratorcoordinator" },
-  { pathname: "/elections/1/apportionment", hash: "#administratorcoordinator" },
-  { pathname: "/elections/1/apportionment/details-whole-seats", hash: "#administratorcoordinator" },
-  { pathname: "/elections/1/apportionment/details-residual-seats", hash: "#administratorcoordinator" },
+const locations: { pathname: string; userRole: Role }[] = [
+  { pathname: "/account/login", userRole: "typist" },
+  { pathname: "/account/setup", userRole: "typist" },
+  { pathname: "/elections", userRole: "typist" },
+  { pathname: "/elections/1", userRole: "typist" },
+  { pathname: "/elections/1/data-entry", userRole: "typist" },
+  { pathname: "/elections/1/data-entry/1/1", userRole: "typist" },
+  { pathname: "/elections/1/data-entry/1/1/recounted", userRole: "typist" },
+  { pathname: "/elections/1/data-entry/1/1/voters-and-votes", userRole: "typist" },
+  { pathname: "/elections/1/data-entry/1/1/list/1", userRole: "typist" },
+  { pathname: "/elections/1/data-entry/1/1/save", userRole: "typist" },
+  { pathname: "/dev", userRole: "typist" },
+  { pathname: "/elections", userRole: "coordinator" },
+  { pathname: "/users", userRole: "coordinator" },
+  { pathname: "/workstations", userRole: "coordinator" },
+  { pathname: "/logs", userRole: "coordinator" },
+  { pathname: "/elections/1", userRole: "coordinator" },
+  { pathname: "/elections/1/report", userRole: "coordinator" },
+  { pathname: "/elections/1/status", userRole: "coordinator" },
+  { pathname: "/elections/1/polling-stations", userRole: "coordinator" },
+  { pathname: "/elections/1/polling-stations/create", userRole: "coordinator" },
+  { pathname: "/elections/1/polling-stations/1/update", userRole: "coordinator" },
+  { pathname: "/elections/1/apportionment", userRole: "coordinator" },
+  { pathname: "/elections/1/apportionment/details-whole-seats", userRole: "coordinator" },
+  { pathname: "/elections/1/apportionment/details-residual-seats", userRole: "coordinator" },
 ];
 
 export const AllRoutes: Story = () => (
@@ -49,13 +49,15 @@ export const AllRoutes: Story = () => (
     }}
   >
     {locations.map((location) => (
-      <React.Fragment key={location.pathname + location.hash}>
-        <code>
-          {location.pathname}
-          {location.hash}
-        </code>
-        <NavBar location={location} />
-        <br />
+      <React.Fragment key={location.pathname + location.userRole}>
+        <TestUserProvider userRole={location.userRole}>
+          <code>
+            {location.pathname}
+            {location.userRole}
+          </code>
+          <NavBar location={location} />
+          <br />
+        </TestUserProvider>
       </React.Fragment>
     ))}
   </ElectionProviderContext.Provider>

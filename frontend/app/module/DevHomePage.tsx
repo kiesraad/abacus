@@ -93,36 +93,34 @@ function DevLinks() {
       </strong>
       <ul>
         <li>
-          <Link to={"/elections#administrator"}>{t("election.manage")}</Link>
+          <Link to={"/elections"}>{t("election.manage")}</Link>
         </li>
         <ul>
           {electionList.map((election) => (
             <li key={election.id}>
-              <Link to={`/elections/${election.id}#coordinator`}>{election.name}</Link>
+              <Link to={`/elections/${election.id}`}>{election.name}</Link>
               <ul>
                 <li>
-                  <Link to={`/elections/${election.id}/apportionment#coordinator`}>{t("apportionment.title")}</Link>
+                  <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
                 </li>
                 <li>
-                  <Link to={`/elections/${election.id}/status#coordinator`}>{t("election_status.main_title")}</Link>
+                  <Link to={`/elections/${election.id}/status`}>{t("election_status.main_title")}</Link>
                 </li>
                 <li>
-                  <Link to={`/elections/${election.id}/polling-stations#coordinator`}>
-                    {t("polling_station.title.plural")}
-                  </Link>
+                  <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
                 </li>
               </ul>
             </li>
           ))}
         </ul>
         <li>
-          <Link to={`/users#administratorcoordinator`}>{t("users.management")}</Link>
+          <Link to={`/users`}>{t("users.management")}</Link>
         </li>
         <li>
-          <Link to={`/workstations#administrator`}>{t("workstations.manage")}</Link>
+          <Link to={`/workstations`}>{t("workstations.manage")}</Link>
         </li>
         <li>
-          <Link to={`/logs#administratorcoordinator`}>{t("activity_log")}</Link>
+          <Link to={`/logs`}>{t("activity_log")}</Link>
         </li>
       </ul>
     </>

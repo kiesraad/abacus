@@ -10,7 +10,7 @@ test.describe("Polling station CRUD", () => {
     page,
     emptyElection,
   }) => {
-    await page.goto(`/elections/${emptyElection.id}/polling-stations#coordinator`);
+    await page.goto(`/elections/${emptyElection.id}/polling-stations`);
 
     const pollingStationListEmptyPage = new PollingStationListEmptyPgObj(page);
     await pollingStationListEmptyPage.createPollingStation.click();
@@ -29,7 +29,7 @@ test.describe("Polling station CRUD", () => {
   });
 
   test("it redirects correctly after successful create of another polling station", async ({ page, election }) => {
-    await page.goto(`/elections/${election.election.id}/polling-stations#coordinator`);
+    await page.goto(`/elections/${election.election.id}/polling-stations`);
 
     const pollingStationListPage = new PollingStationListPgObj(page);
     await pollingStationListPage.createPollingStation.click();

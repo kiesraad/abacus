@@ -14,7 +14,7 @@ const MIN_PASSWORD_LENGTH = 12;
 
 export function UserCreateDetailsPage() {
   const navigate = useNavigate();
-  const { role, type, username, createUser, apiError } = useUserCreateContext();
+  const { role, type, username, createUser, apiError, loading } = useUserCreateContext();
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
 
   if (!role || !type) {
@@ -101,7 +101,7 @@ export function UserCreateDetailsPage() {
           )}
 
           <Form onSubmit={handleSubmit}>
-            <FormLayout width="medium">
+            <FormLayout width="medium" disabled={loading}>
               <FormLayout.Section title={t("users.details_title")}>
                 <InputField
                   id="username"
@@ -129,12 +129,12 @@ export function UserCreateDetailsPage() {
                   error={validationErrors?.temp_password}
                 />
               </FormLayout.Section>
+              <FormLayout.Controls>
+                <Button size="xl" type="submit">
+                  {t("save")}
+                </Button>
+              </FormLayout.Controls>
             </FormLayout>
-            <FormLayout.Controls>
-              <Button size="xl" type="submit">
-                {t("save")}
-              </Button>
-            </FormLayout.Controls>
           </Form>
         </article>
       </main>

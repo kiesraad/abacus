@@ -13,6 +13,7 @@ export interface IUserCreateContext {
   createUser: (user: UserDetails) => Promise<ApiResult<User>>;
   username?: string;
   apiError: ApiError | null;
+  loading: boolean;
 }
 
 export const UserCreateContext = createContext<IUserCreateContext | undefined>(undefined);

@@ -143,6 +143,7 @@ export const IconChevronRight = (props: React.SVGAttributes<SVGElement>) => (
     version="1.1"
     viewBox="0 0 20 20"
     role="img"
+    fill="#475467"
   >
     <path d="M7.5,15.8c-.2,0-.4,0-.6-.2-.3-.3-.3-.9,0-1.2l4.4-4.4-4.4-4.4c-.3-.3-.3-.9,0-1.2.3-.3.9-.3,1.2,0l5,5c.3.3.3.9,0,1.2l-5,5c-.2.2-.4.2-.6.2Z" />
   </svg>

@@ -102,9 +102,9 @@ export function PollingStationListPage() {
 
             <Table id="polling_stations">
               <Table.Header>
-                <Table.Column>{t("number")}</Table.Column>
-                <Table.Column>{t("name")}</Table.Column>
-                <Table.Column>{t("type")}</Table.Column>
+                <Table.HeaderCell>{t("number")}</Table.HeaderCell>
+                <Table.HeaderCell>{t("name")}</Table.HeaderCell>
+                <Table.HeaderCell>{t("type")}</Table.HeaderCell>
               </Table.Header>
               <Table.Body className="fs-md">
                 {data.polling_stations.map((station) => (

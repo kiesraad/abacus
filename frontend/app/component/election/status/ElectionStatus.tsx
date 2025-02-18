@@ -159,18 +159,18 @@ function getTableHeaderForCategory(category: StatusCategory): React.ReactNode {
   function CategoryHeader({ children }: { children?: React.ReactNode[] }) {
     return (
       <Table.Header key={category} className="bg-gray">
-        <Table.Column key={`${category}-number`}>{t("number")}</Table.Column>
-        <Table.Column key={`${category}-name`}>{t("polling_station.title.singular")}</Table.Column>
+        <Table.HeaderCell key={`${category}-number`}>{t("number")}</Table.HeaderCell>
+        <Table.HeaderCell key={`${category}-name`}>{t("polling_station.title.singular")}</Table.HeaderCell>
         {children}
       </Table.Header>
     );
   }
 
-  const finishedAtColumn = <Table.Column key={`${category}-time`}>{t("finished_at")}</Table.Column>;
+  const finishedAtColumn = <Table.HeaderCell key={`${category}-time`}>{t("finished_at")}</Table.HeaderCell>;
   const progressColumn = (
-    <Table.Column key={`${category}-progress`} className="w-13">
+    <Table.HeaderCell key={`${category}-progress`} className="w-13">
       {t("progress")}
-    </Table.Column>
+    </Table.HeaderCell>
   );
 
   switch (category) {

@@ -12,6 +12,18 @@ Op drie punten zijn er verschillen in het proces op basis van het aantal raadsze
 
 Op alle overige punten is het proces gelijk.
 
+## Context
+
+Het aantal zetels is minimaal 9 en maximaal 45. Het aantal zetels is altijd oneven. Gemeentes met 20.000 of minder inwoners hebben minder dan 19 zetels. Gemeentes met 6.000 of minder inwoners hebben minder dan 13 zetels. (Gemeentewet artikel 8)
+
+Van de 342 gemeentes in Nederland hebben er iets minder dan 20% minder dan 19 zetels. Er zijn 6 gemeentes met minder dan 13 zetels. ([bron](https://allecijfers.nl/ranglijst/grootste-en-kleinste-gemeenten-in-inwoners-in-nederland/))
+
+Het maximaal mogelijke aantal restzetels is het aantal lijsten - 1. De restzetels komen namelijk uit het getal achter de komma voor elke lijst bij de verdeling van de volle zetels. Dus het maximale mogelijke aantal restzetels is de som van een reeks getallen die als lengte het aantal lijsten heeft en als maximale waarde voor elk getal in de reeks een getal kleiner dan 1.
+
+Bij minder dan 19 zetels zijn er voor de restzetels mogelijk drie rondes: grootste overschotten, grootste gemiddelden (max 1 restzetel per lijst), grootste gemiddelden (meerdere restzetels per lijst toegestaan). Die derde ronde kan alleen gebeuren bij lijstuitputting. In de tweede ronde komt namelijk elke lijst in aanmerking voor een restzetel en het maximaal mogelijke aantal restzetels is het aantal partijen - 1. Dus zonder lijstuitputting worden alle restzetels ten laatste in die tweede ronde toegekend.
+
+In de gemeenteraadsverkiezingen van 2014 t/m 2024 zijn bij alle gemeentes met minder dan 19 zetels alle restzetels toegekend o.b.v. grootse overschotten. Er waren dus altijd meer partijen die minstens 75% van de kiesdeler haalden, dan dat er restzetels toe te wijzen waren. Er moest dus niet overgegaan worden op het stelsel van grootste gemiddelden na het toepassen van grootste overschotten.
+
 ---
 
 ## A. zetelverdeling
@@ -58,7 +70,6 @@ Het resultaat van delingen is een breuk, niet een decimaal.
 
 - Als een lijst wel volstrekte meerderheid aan stemmen heeft, maar niet volstrekte meerderheid aan zetels, dan een extra zetel
 - Een volstrekte meerderheid van stemmen en zetels wordt berekend als 50% + 1 (bij even totaal) of 50% + ½ (bij oneven totaal)
-  - N.B. de formele beschrijving vermeldt alleen 50% + 1, die moet nog aangepast worden
 - De zetel wordt afgenomen van de lijst waaraan de laatste restzetel is toegekend
   - Als twee of meer lijsten voor hetzelfde gemiddelde of overschot de laatste restzetels hebben gekregen, dan wordt in de zitting van het CSB door loting bepaald welke van die partijen een zetel af moet geven
   - Sectie 2.4.6 van "Determination of the Election Results" toont aan dat de laatste restzetel nooit van de partij met volstrekte meerderheid aan stemmen kan komen

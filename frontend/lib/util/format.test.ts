@@ -54,11 +54,14 @@ describe("Format util", () => {
   today.setHours(10, 20);
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
+  const day_before_yesterday = new Date(today);
+  day_before_yesterday.setDate(today.getDate() - 2);
   const one_week_ago = new Date(today);
   one_week_ago.setDate(today.getDate() - 7);
   test.each([
     [today, `${t("today")} 10:20`],
-    [yesterday, `${yesterday.toLocaleString(t("date_locale"), { weekday: "long" })} 10:20`],
+    [yesterday, `${t("yesterday")} 10:20`],
+    [day_before_yesterday, `${day_before_yesterday.toLocaleString(t("date_locale"), { weekday: "long" })} 10:20`],
     [one_week_ago, `${one_week_ago.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} 10:20`],
   ])("Date format string %s as %s", (input: Date, expected: string) => {
     expect(formatDateTime(input)).toEqual(expected);

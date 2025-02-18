@@ -5,7 +5,7 @@ use axum::{
 use axum_extra::extract::CookieJar;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{query_as, Error, FromRow, SqlitePool};
+use sqlx::{query, query_as, Error, FromRow, SqlitePool};
 use utoipa::ToSchema;
 
 use crate::{APIError, AppState};
@@ -18,6 +18,8 @@ use super::{
     SESSION_COOKIE_NAME,
 };
 
+const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
+
 /// User object, corresponds to a row in the users table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow, ToSchema)]
 pub struct User {
@@ -27,6 +29,8 @@ pub struct User {
     #[schema(nullable = false)]
     fullname: Option<String>,
     role: Role,
+    #[serde(skip_deserializing)]
+    needs_password_change: bool,
     #[serde(skip)]
     password_hash: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,6 +49,33 @@ impl User {
 
     pub fn username(&self) -> &str {
         &self.username
+    }
+
+    pub fn last_activity_at(&self) -> Option<DateTime<Utc>> {
+        self.last_activity_at
+    }
+
+    /// Updates the `last_activity_at` field, but first checks if it has been
+    /// longer than `MIN_UPDATE_LAST_ACTIVITY_AT_SECS`, to prevent excessive
+    /// database writes.
+    pub async fn update_last_activity_at(&self, users: &Users) -> Result<(), sqlx::Error> {
+        if self.should_update_last_activity_at() {
+            users.update_last_activity_at(self.id()).await?;
+        }
+
+        Ok(())
+    }
+
+    fn should_update_last_activity_at(&self) -> bool {
+        if let Some(last_activity_at) = self.last_activity_at {
+            chrono::Utc::now()
+                .signed_duration_since(last_activity_at)
+                .num_seconds()
+                > MIN_UPDATE_LAST_ACTIVITY_AT_SECS
+        } else {
+            // Also update when no timestamp is set yet
+            true
+        }
     }
 
     #[cfg(test)]
@@ -75,7 +106,9 @@ where
             return Err(AuthenticationError::NoSessionCookie.into());
         };
 
-        Ok(users.get_by_session_key(session_cookie.value()).await?)
+        let user = users.get_by_session_key(session_cookie.value()).await?;
+        user.update_last_activity_at(&users).await?;
+        Ok(user)
     }
 }
 
@@ -100,7 +133,10 @@ where
         };
 
         match users.get_by_session_key(session_cookie.value()).await {
-            Ok(user) => Ok(Some(user)),
+            Ok(user) => {
+                user.update_last_activity_at(&users).await?;
+                Ok(Some(user))
+            }
             Err(AuthenticationError::UserNotFound)
             | Err(AuthenticationError::SessionKeyNotFound) => Ok(None),
             Err(e) => Err(e.into()),
@@ -169,6 +205,7 @@ impl Users {
                 username,
                 fullname,
                 password_hash,
+                needs_password_change,
                 role,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
@@ -185,6 +222,45 @@ impl Users {
         Ok(user)
     }
 
+    /// Update a user
+    pub async fn update(
+        &self,
+        user_id: u32,
+        fullname: Option<&str>,
+        temp_password: Option<&str>,
+    ) -> Result<User, AuthenticationError> {
+        if let Some(pw) = temp_password {
+            self.set_temporary_password(user_id, pw).await?;
+        }
+
+        let updated_user = sqlx::query_as!(
+            User,
+            r#"
+              UPDATE
+                users
+              SET
+                fullname = ?
+              WHERE id = ?
+            RETURNING
+                id as "id: u32",
+                username,
+                fullname,
+                password_hash,
+                needs_password_change,
+                role,
+                last_activity_at as "last_activity_at: _",
+                updated_at as "updated_at: _",
+                created_at as "created_at: _"
+            "#,
+            fullname,
+            user_id
+        )
+        .fetch_one(&self.0)
+        .await?;
+
+        Ok(updated_user)
+    }
+
     /// Update a user's password
     pub async fn update_password(
         &self,
@@ -194,7 +270,25 @@ impl Users {
         let password_hash = hash_password(new_password)?;
 
         sqlx::query!(
-            r#"UPDATE users SET password_hash = ? WHERE id = ?"#,
+            r#"UPDATE users SET password_hash = ?, needs_password_change = FALSE WHERE id = ?"#,
+            password_hash,
+            user_id
+        )
+        .execute(&self.0)
+        .await?;
+
+        Ok(())
+    }
+
+    /// Set a temporary password for a user
+    pub async fn set_temporary_password(
+        &self,
+        user_id: u32,
+        temp_password: &str,
+    ) -> Result<(), AuthenticationError> {
+        let password_hash = hash_password(temp_password)?;
+        sqlx::query!(
+            r#"UPDATE users SET password_hash = ?, needs_password_change = TRUE WHERE id = ?"#,
             password_hash,
             user_id
         )
@@ -218,6 +312,7 @@ impl Users {
                 fullname,
                 role,
                 password_hash,
+                needs_password_change,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
@@ -242,6 +337,7 @@ impl Users {
                 fullname,
                 role,
                 password_hash,
+                needs_password_change,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
                 created_at as "created_at: _"
@@ -263,6 +359,7 @@ impl Users {
                 username,
                 fullname,
                 password_hash,
+                needs_password_change,
                 role,
                 last_activity_at as "last_activity_at: _",
                 updated_at as "updated_at: _",
@@ -272,6 +369,16 @@ impl Users {
         .fetch_all(&self.0)
         .await?;
         Ok(users)
+    }
+
+    pub async fn update_last_activity_at(&self, user_id: u32) -> Result<(), Error> {
+        query!(
+            r#"UPDATE users SET last_activity_at = CURRENT_TIMESTAMP WHERE id = ?"#,
+            user_id,
+        )
+        .fetch_all(&self.0)
+        .await?;
+        Ok(())
     }
 }
 
@@ -288,7 +395,10 @@ mod tests {
     use test_log::test;
 
     use crate::authentication::{
-        error::AuthenticationError, role::Role, session::Sessions, user::Users,
+        error::AuthenticationError,
+        role::Role,
+        session::Sessions,
+        user::{User, Users},
     };
 
     #[test(sqlx::test)]
@@ -404,7 +514,7 @@ mod tests {
             .unwrap();
 
         users
-            .update_password(user.id, "new_password")
+            .update_password(user.id(), "new_password")
             .await
             .unwrap();
 
@@ -427,6 +537,44 @@ mod tests {
     }
 
     #[test(sqlx::test)]
+    async fn test_set_temp_password(pool: SqlitePool) {
+        let users = Users::new(pool.clone());
+
+        // Create new user, password needs change
+        let user = users
+            .create(
+                "test_user",
+                Some("Full Name"),
+                "password",
+                Role::Administrator,
+            )
+            .await
+            .unwrap();
+
+        // User should need password change
+        assert!(user.needs_password_change);
+
+        users
+            .update_password(user.id(), "temp_password")
+            .await
+            .unwrap();
+
+        let user = users.get_by_id(user.id()).await.unwrap().unwrap();
+
+        // User now shouldn't need to change their password
+        assert!(!user.needs_password_change);
+
+        // Set a temporary password via update
+        let user = users
+            .update(user.id(), user.fullname(), Some("temp_password"))
+            .await
+            .unwrap();
+
+        // User needs to change their password again
+        assert!(user.needs_password_change);
+    }
+
+    #[test(sqlx::test)]
     async fn password_hash_does_not_serialize(pool: SqlitePool) {
         let users = Users::new(pool.clone());
         let user = users
@@ -442,5 +590,31 @@ mod tests {
         let serialized_user = serde_json::to_value(user).unwrap();
         assert_eq!(serialized_user["username"], "test_user".to_string());
         assert!(serialized_user.get("password_hash").is_none());
+    }
+
+    #[test]
+    fn test_should_update_last_activity_at() {
+        let mut user = User {
+            id: 2,
+            username: "user1".to_string(),
+            fullname: Some("Full Name".to_string()),
+            role: Role::Typist,
+            needs_password_change: false,
+            password_hash: "h4sh".to_string(),
+            last_activity_at: None,
+            updated_at: chrono::Utc::now(),
+            created_at: chrono::Utc::now(),
+        };
+
+        // Should update when no timestamp is net
+        assert!(user.should_update_last_activity_at());
+
+        // Should not update when trying to update too soon
+        user.last_activity_at = Some(chrono::Utc::now());
+        assert!(!user.should_update_last_activity_at());
+
+        // Should update when `last_activity_at` was 2 minutes ago
+        user.last_activity_at = Some(chrono::Utc::now() - chrono::Duration::minutes(2));
+        assert!(user.should_update_last_activity_at());
     }
 }

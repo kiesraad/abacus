@@ -1,3 +1,5 @@
+import { Footer } from "app/component/footer/Footer";
+
 import { useElection, useElectionStatus } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Button, FormLayout, PageTitle } from "@kiesraad/ui";
@@ -82,6 +84,7 @@ export function ElectionReportPage() {
           </FormLayout.Controls>
         </article>
       </main>
+      <Footer />
     </>
   );
 }

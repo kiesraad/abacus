@@ -34,7 +34,7 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 | kiescolleges Eerste Kamer               |           | electoral colleges for the Senate         |                                     |
 | Eilandsraadsverkiezingen                |           | elections of the Island Councils          |                                     |
 | herindelingsverkiezingen                |           | redivision elections                      |                                     |
-| college van burgemeesters en wethouders | B&W       | municipal executive of mayor and aldermen |                                     |
+| college van burgemeester en wethouders | B&W       | municipal executive of mayor and aldermen |                                     |
 
 ## Stembureaus / locaties
 
@@ -156,7 +156,8 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 | onverklaard                         |           | unaccounted for                    | *explain* is alleen uitleggen, je moet hier ook verantwoorden |
 | verklaring                          |           | declaration                        |                                                               |
 | verklaren                           |           | account for                        |                                                               |
-| controleprotocol optellingen        |           | monitoring protocol for totals     | optellingen zijn hier eigenlijk totalen                       |
+| controleprotocol optellingen        |           | monitoring protocol for tabulation |                                                               |
+| optelling                           |           | tabulation                         |                                                               |
 | opmerkelijke uitslagen              |           | remarkable results                 | controleprotocol                                              |
 | corrigendum                         |           | corrigendum                        | via <https://iate.europa.eu/search/result/1739295007347/1>    |
 | stempassen                          |           | poll cards                         | PV veld A                                                     |

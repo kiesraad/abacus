@@ -80,7 +80,7 @@ export const LinkTable: Story = () => {
 export const TotalTableWithFractions: Story = () => {
   const data: [number, string, Fraction, number][] = [
     [1, "Political Group A", { integer: 3, numerator: 149, denominator: 150 }, 15],
-    [2, "Political Group B", { integer: 5, numerator: 0, denominator: 0 }, 11],
+    [2, "Political Group B", { integer: 5, numerator: 0, denominator: 1 }, 11],
     [3, "Political Group C", { integer: 8, numerator: 1, denominator: 150 }, 4],
   ];
   let total = 0;

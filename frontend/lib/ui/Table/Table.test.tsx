@@ -59,7 +59,7 @@ describe("Table", () => {
     expect(table).toHaveTableContent([
       ["Number", "List name", "Fractions", "Seats"],
       ["1", "Political Group A", "3", "149/150", "15"],
-      ["2", "Political Group B", "5", "12/150", "11"],
+      ["2", "Political Group B", "5", "", "11"],
       ["3", "Political Group C", "8", "1/150", "4"],
       ["", "", "Total", "30"],
     ]);

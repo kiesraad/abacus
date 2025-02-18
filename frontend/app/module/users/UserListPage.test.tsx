@@ -1,10 +1,9 @@
 import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { UserListRequestHandler } from "@kiesraad/api-mocks";
+import { UserListRequestHandler, userMockData } from "@kiesraad/api-mocks";
 import { overrideOnce, render, server } from "@kiesraad/test";
 
-import { userMockData } from "../../../lib/api-mocks/UserMockData";
 import { UserListPage } from "./UserListPage";
 
 describe("PollingStationListPage", () => {

@@ -137,13 +137,13 @@ fn initial_whole_seats_per_political_group(
 /// per seat if one additional seat would be assigned to each political group.
 ///
 /// It then returns all the political groups for which this fraction is the highest.
-/// If there are more political groups than there are remaining seats to be assigned,
+/// If there are more political groups than there are residual seats to be assigned,
 /// a drawing of lots is required.
 ///
 /// This function will always return at least one group.
 fn political_groups_with_largest_average<'a>(
     assigned_seats: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
-    remaining_seats: u64,
+    residual_seats: u64,
 ) -> Result<Vec<&'a PoliticalGroupStanding>, ApportionmentError> {
     // We are now going to find the political groups that have the highest average
     // votes per seat if we would were to add one additional seat to them
@@ -173,10 +173,10 @@ fn political_groups_with_largest_average<'a>(
     );
 
     // Check if we can actually assign all these political groups a seat, otherwise we would need to draw lots
-    if political_groups.len() as u64 > remaining_seats {
-        // TODO: #788 if multiple political groups have the same highest average and not enough remaining seats are available, use drawing of lots
+    if political_groups.len() as u64 > residual_seats {
+        // TODO: #788 if multiple political groups have the same highest average and not enough residual seats are available, use drawing of lots
         debug!(
-            "Drawing of lots is required for political groups: {:?}, only {remaining_seats} seats available",
+            "Drawing of lots is required for political groups: {:?}, only {residual_seats} seats available",
             political_group_numbers(&political_groups)
         );
         Err(ApportionmentError::DrawingOfLotsNotImplemented)
@@ -187,7 +187,7 @@ fn political_groups_with_largest_average<'a>(
 
 fn political_groups_with_highest_surplus<'a>(
     assigned_seats: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
-    remaining_seats: u64,
+    residual_seats: u64,
 ) -> Result<Vec<&'a PoliticalGroupStanding>, ApportionmentError> {
     // We are now going to find the political groups that have the highest surplus
     let (max_surplus, political_groups) = assigned_seats.into_iter().fold(
@@ -216,10 +216,10 @@ fn political_groups_with_highest_surplus<'a>(
     );
 
     // Check if we can actually assign all these political groups
-    if political_groups.len() as u64 > remaining_seats {
-        // TODO: #788 if multiple political groups have the same highest surplus and not enough remaining seats are available, use drawing of lots
+    if political_groups.len() as u64 > residual_seats {
+        // TODO: #788 if multiple political groups have the same highest surplus and not enough residual seats are available, use drawing of lots
         debug!(
-            "Drawing of lots is required for political groups: {:?}, only {remaining_seats} seats available",
+            "Drawing of lots is required for political groups: {:?}, only {residual_seats} seats available",
             political_group_numbers(&political_groups)
         );
         Err(ApportionmentError::DrawingOfLotsNotImplemented)
@@ -245,14 +245,14 @@ pub fn seat_allocation(
     // Article P 6 Kieswet
     let initial_standing =
         initial_whole_seats_per_political_group(&totals.political_group_votes, quota);
-    let whole_seats_count = initial_standing
+    let whole_seats = initial_standing
         .iter()
         .map(|pg| pg.whole_seats)
         .sum::<u64>();
-    let remaining_seats = seats - whole_seats_count;
+    let residual_seats = seats - whole_seats;
 
-    let (steps, final_standing) = if remaining_seats > 0 {
-        allocate_remainder(&initial_standing, seats, remaining_seats)?
+    let (steps, final_standing) = if residual_seats > 0 {
+        allocate_remainder(&initial_standing, seats, residual_seats)?
     } else {
         info!("All seats have been allocated without any residual seats");
         (vec![], initial_standing.clone())
@@ -283,24 +283,24 @@ pub fn seat_allocation(
 fn allocate_remainder(
     initial_standing: &[PoliticalGroupStanding],
     seats: u64,
-    total_remaining_seats: u64,
+    total_residual_seats: u64,
 ) -> Result<(Vec<ApportionmentStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
     let mut steps = vec![];
     let mut residual_seat_number = 0;
 
     let mut current_standing = initial_standing.to_vec();
 
-    while residual_seat_number != total_remaining_seats {
-        let remaining_seats = total_remaining_seats - residual_seat_number;
+    while residual_seat_number != total_residual_seats {
+        let residual_seats = total_residual_seats - residual_seat_number;
         residual_seat_number += 1;
         let step = if seats >= 19 {
             // Article P 7 Kieswet
-            step_allocate_remainder_using_highest_averages(&current_standing, remaining_seats)?
+            step_allocate_remainder_using_highest_averages(&current_standing, residual_seats)?
         } else {
             // Article P 8 Kieswet
             step_allocate_remainder_using_highest_surplus(
                 &current_standing,
-                remaining_seats,
+                residual_seats,
                 &steps,
             )?
         };
@@ -335,9 +335,9 @@ fn allocate_remainder(
 /// This assignment is done according to the rules for elections with 19 seats or more.
 fn step_allocate_remainder_using_highest_averages(
     standing: &[PoliticalGroupStanding],
-    remaining_seats: u64,
+    residual_seats: u64,
 ) -> Result<AssignedSeat, ApportionmentError> {
-    let selected_pgs = political_groups_with_largest_average(standing, remaining_seats)?;
+    let selected_pgs = political_groups_with_largest_average(standing, residual_seats)?;
     let selected_pg = selected_pgs[0];
     Ok(AssignedSeat::HighestAverage(HighestAverageAssignedSeat {
         selected_pg_number: selected_pg.pg_number,
@@ -383,7 +383,7 @@ fn political_groups_qualifying_for_unique_highest_average<'a>(
 /// This assignment is done according to the rules for elections with less than 19 seats.
 fn step_allocate_remainder_using_highest_surplus(
     assigned_seats: &[PoliticalGroupStanding],
-    remaining_seats: u64,
+    residual_seats: u64,
     previous: &[ApportionmentStep],
 ) -> Result<AssignedSeat, ApportionmentError> {
     // first we check if there are any political groups that still qualify for a highest surplus allocated seat
@@ -393,7 +393,7 @@ fn step_allocate_remainder_using_highest_surplus(
     // If there is at least one element in the iterator, we know we can still do a highest surplus allocation
     if qualifying_for_surplus.peek().is_some() {
         let selected_pgs =
-            political_groups_with_highest_surplus(qualifying_for_surplus, remaining_seats)?;
+            political_groups_with_highest_surplus(qualifying_for_surplus, residual_seats)?;
         let selected_pg = selected_pgs[0];
         Ok(AssignedSeat::HighestSurplus(HighestSurplusAssignedSeat {
             selected_pg_number: selected_pg.pg_number,
@@ -410,7 +410,7 @@ fn step_allocate_remainder_using_highest_surplus(
         if qualifying_for_unique_highest_average.peek().is_some() {
             let selected_pgs = political_groups_with_largest_average(
                 qualifying_for_unique_highest_average,
-                remaining_seats,
+                residual_seats,
             )?;
             let selected_pg = selected_pgs[0];
             Ok(AssignedSeat::HighestAverage(HighestAverageAssignedSeat {
@@ -421,9 +421,9 @@ fn step_allocate_remainder_using_highest_surplus(
         } else {
             // We've now even exhausted unique highest average seats: every group that qualified
             // got a highest surplus seat, and every group also had at least a single residual seat
-            // assigned to them. We now allow any remaining seats to be assigned using the highest
+            // assigned to them. We now allow any residual seats to be assigned using the highest
             // averages procedure
-            step_allocate_remainder_using_highest_averages(assigned_seats, remaining_seats)
+            step_allocate_remainder_using_highest_averages(assigned_seats, residual_seats)
         }
     }
 }
@@ -552,7 +552,7 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_without_remaining_seats() {
+    fn test_seat_allocation_less_than_19_seats_without_residual_seats() {
         let totals = get_election_summary(vec![480, 160, 160, 160, 80, 80, 80]);
         let result = seat_allocation(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 0);
@@ -561,7 +561,7 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_system() {
+    fn test_seat_allocation_less_than_19_seats_with_residual_seats_assigned_with_surplus_system() {
         let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 60, 40]);
         let result = seat_allocation(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 2);
@@ -570,7 +570,7 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_only_1_surplus_meets_threshold(
+    fn test_seat_allocation_less_than_19_seats_with_residual_seats_assigned_with_surplus_and_averages_system_only_1_surplus_meets_threshold(
     ) {
         let totals = get_election_summary(vec![808, 59, 58, 57, 56, 55, 54, 53]);
         let result = seat_allocation(15, &totals).unwrap();
@@ -612,7 +612,7 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_19_or_more_seats_without_remaining_seats() {
+    fn test_seat_allocation_19_or_more_seats_without_residual_seats() {
         let totals = get_election_summary(vec![576, 288, 96, 96, 96, 48]);
         let result = seat_allocation(25, &totals).unwrap();
         assert_eq!(result.steps.len(), 0);
@@ -621,7 +621,7 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
+    fn test_seat_allocation_19_or_more_seats_with_residual_seats() {
         let totals = get_election_summary(vec![600, 302, 98, 99, 101]);
         let result = seat_allocation(23, &totals).unwrap();
         assert_eq!(result.steps.len(), 4);

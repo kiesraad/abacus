@@ -80,6 +80,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
       return {
         ...state,
         status: action.status,
+        cache: action.status === "saving" && state.cache?.key === state.formState.current ? null : state.cache,
       };
     case "SET_CACHE":
       return {

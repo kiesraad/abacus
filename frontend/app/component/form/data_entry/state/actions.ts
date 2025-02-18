@@ -52,6 +52,7 @@ export function onSubmitForm(
     }
 
     if (
+      !aborting &&
       currentSection.errors.length === 0 &&
       currentSection.warnings.length > 0 &&
       showAcceptWarnings &&
@@ -61,11 +62,21 @@ export function onSubmitForm(
       return false;
     }
 
-    const data: PollingStationResults = {
-      ...state.pollingStationResults,
-      ...partialPollingStationResults,
-    };
+    const data: PollingStationResults = aborting
+      ? {
+          ...state.pollingStationResults,
+          ...partialPollingStationResults,
+          ...state.cache?.data,
+        }
+      : {
+          ...state.pollingStationResults,
+          ...partialPollingStationResults,
+        };
 
+    if (data.recounted === false) {
+      // remove recount if recount has changed to no
+      data.voters_recounts = undefined;
+    }
     // prepare data to send to server
     const clientState = getClientState(state.formState, currentSection.acceptWarnings, continueToNextSection);
     const progress = calculateDataEntryProgress(state.formState);

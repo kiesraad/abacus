@@ -43,13 +43,10 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
           key: formState.current,
           data: currentValues,
         });
-
         return false;
       }
-
       return true;
     }
-
     return false;
   });
 
@@ -62,7 +59,11 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
     if (await onSubmit({ aborting: true, continueToNextSection: false, showAcceptWarnings: false })) {
       blocker.proceed();
     } else {
-      blocker.reset();
+      if (status === "aborted") {
+        blocker.proceed();
+      } else {
+        blocker.reset();
+      }
     }
   };
 

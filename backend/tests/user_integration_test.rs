@@ -1,8 +1,7 @@
 #![cfg(test)]
 
 use abacus::authentication::UserListResponse;
-use hyper::{header::CONTENT_TYPE, StatusCode};
-use reqwest::Body;
+use hyper::StatusCode;
 use serde_json::{json, Value};
 use sqlx::SqlitePool;
 use test_log::test;
@@ -14,38 +13,27 @@ pub mod utils;
 async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     // Assert the user has no last activity timestamp yet
     let addr = serve_api(pool).await;
+    let admin_cookie = shared::admin_login(&addr).await;
     let url = format!("http://{addr}/api/user");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    assert_eq!(response.status(), StatusCode::OK);
-    let body: UserListResponse = response.json().await.unwrap();
-    let user = body.users.first().unwrap();
-    assert!(user.last_activity_at().is_none());
-
-    // Login, so we can call the whoami endpoint
-    let url = format!("http://{addr}/api/user/login");
     let response = reqwest::Client::new()
-        .post(&url)
-        .header(CONTENT_TYPE, "application/json")
-        .body(Body::from(
-            json!({
-                "username": "user",
-                "password": "password",
-            })
-            .to_string(),
-        ))
+        .get(&url)
+        .header("cookie", admin_cookie.clone())
         .send()
         .await
         .unwrap();
-
     assert_eq!(response.status(), StatusCode::OK);
+    let body: UserListResponse = response.json().await.unwrap();
+    let typist_user = body.users.iter().find(|u| u.id() == 2).unwrap();
+    assert!(typist_user.last_activity_at().is_none());
 
-    let cookie = shared::typist_login(&addr).await;
+    // Log in as the typist and call whoami to trigger an update
+    let typist_cookie = shared::typist_login(&addr).await;
 
     // Call an endpoint using the `FromRequestParts` for `User`
     let url = format!("http://{addr}/api/user/whoami");
     let response = reqwest::Client::new()
         .get(&url)
-        .header("cookie", &cookie)
+        .header("cookie", &typist_cookie)
         .send()
         .await
         .unwrap();
@@ -53,7 +41,12 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
 
     // Test that a timestamp is present
     let url = format!("http://{addr}/api/user");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", admin_cookie)
+        .send()
+        .await
+        .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
     let body: UserListResponse = response.json().await.unwrap();
     let user = body.users.first().unwrap();

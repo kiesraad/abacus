@@ -5,6 +5,10 @@ import { test } from "./fixtures";
 import { PollingStationListEmptyPgObj } from "./page-objects/polling_station/PollingStationListEmptyPgObj";
 import { PollingStationListPgObj } from "./page-objects/polling_station/PollingStationListPgObj";
 
+test.use({
+  storageState: "e2e-tests/state/admin.json",
+});
+
 test.describe("Polling station CRUD", () => {
   test("it redirects correctly after successful create of first polling station of an election", async ({
     page,

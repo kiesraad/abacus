@@ -359,7 +359,8 @@ export type ErrorReference =
   | "PollingStationResultsAlreadyFinalised"
   | "PollingStationSecondEntryAlreadyFinalised"
   | "PollingStationValidationErrors"
-  | "UserNotFound";
+  | "UserNotFound"
+  | "Unauthorized";
 
 /**
  * Response structure for errors

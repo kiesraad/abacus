@@ -2,8 +2,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 use utoipa::ToSchema;
 
-use crate::election::PGNumber;
-use crate::{data_entry::PoliticalGroupVotes, summary::ElectionSummary};
+use crate::{data_entry::PoliticalGroupVotes, election::PGNumber, summary::ElectionSummary};
 
 pub use self::{api::*, fraction::*};
 

@@ -62,6 +62,10 @@
   width: 13rem;
 }
 
+.w-full {
+  width: 100%;
+}
+
 /* Text wrap, transformations etc. */
 .break-word {
   word-break: break-word;

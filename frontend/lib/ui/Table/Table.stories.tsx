@@ -80,40 +80,78 @@ export const LinkTable: Story = () => {
 export const TotalTableWithFractions: Story = () => {
   const data: [number, string, Fraction, number][] = [
     [1, "Political Group A", { integer: 3, numerator: 149, denominator: 150 }, 15],
-    [2, "Political Group B", { integer: 5, numerator: 12, denominator: 150 }, 11],
+    [2, "Political Group B", { integer: 5, numerator: 0, denominator: 0 }, 11],
     [3, "Political Group C", { integer: 8, numerator: 1, denominator: 150 }, 4],
   ];
   let total = 0;
   return (
-    <Table id="total_table_with_fractions">
-      <Table.Header>
-        <Table.HeaderCell className="text-align-r">Number</Table.HeaderCell>
-        <Table.HeaderCell>List name</Table.HeaderCell>
-        <Table.HeaderCell span={2} className="text-align-r">
-          Fractions
-        </Table.HeaderCell>
-        <Table.HeaderCell className="text-align-r">Seats</Table.HeaderCell>
-      </Table.Header>
-      <Table.Body>
-        {data.map((row) => {
-          total += row[3];
-          return (
-            <Table.Row key={row[0]}>
-              <Table.NumberCell>{row[0]}</Table.NumberCell>
-              <Table.Cell>{row[1]}</Table.Cell>
-              <Table.DisplayFractionCells>{row[2]}</Table.DisplayFractionCells>
-              <Table.NumberCell>{row[3]}</Table.NumberCell>
-            </Table.Row>
-          );
-        })}
-        <Table.TotalRow>
-          <Table.Cell />
-          <Table.Cell colSpan={2} />
-          <Table.Cell className="text-align-r">Total</Table.Cell>
-          <Table.NumberCell>{total}</Table.NumberCell>
-        </Table.TotalRow>
-      </Table.Body>
-    </Table>
+    <>
+      <h2>Fractions</h2>
+      <Table id="total_table_with_fractions">
+        <Table.Header>
+          <Table.HeaderCell className="text-align-r">Number</Table.HeaderCell>
+          <Table.HeaderCell className="w-full">List name</Table.HeaderCell>
+          <Table.HeaderCell span={2} className="text-align-r">
+            Fractions
+          </Table.HeaderCell>
+          <Table.HeaderCell className="text-align-r">Seats</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
+          {data.map((row) => {
+            total += row[3];
+            return (
+              <Table.Row key={row[0]}>
+                <Table.NumberCell>{row[0]}</Table.NumberCell>
+                <Table.Cell>{row[1]}</Table.Cell>
+                <Table.DisplayFractionCells>{row[2]}</Table.DisplayFractionCells>
+                <Table.NumberCell>{row[3]}</Table.NumberCell>
+              </Table.Row>
+            );
+          })}
+          <Table.TotalRow>
+            <Table.Cell />
+            <Table.Cell />
+            <Table.Cell colSpan={2} className="text-align-r">
+              Total
+            </Table.Cell>
+            <Table.NumberCell>{total}</Table.NumberCell>
+          </Table.TotalRow>
+        </Table.Body>
+      </Table>
+
+      <h2 className="mt-lg">Fractions with only whole numbers</h2>
+      <Table id="total_table_with_fractions_whole_numbers">
+        <Table.Header>
+          <Table.HeaderCell className="text-align-r">Number</Table.HeaderCell>
+          <Table.HeaderCell className="w-full">List name</Table.HeaderCell>
+          <Table.HeaderCell span={2} className="text-align-r">
+            Fractions
+          </Table.HeaderCell>
+          <Table.HeaderCell className="text-align-r">Seats</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
+          {data.map((row) => {
+            total += row[3];
+            return (
+              <Table.Row key={row[0]}>
+                <Table.NumberCell>{row[0]}</Table.NumberCell>
+                <Table.Cell>{row[1]}</Table.Cell>
+                <Table.DisplayFractionCells>{{ ...row[2], numerator: 0, denominator: 0 }}</Table.DisplayFractionCells>
+                <Table.NumberCell>{row[3]}</Table.NumberCell>
+              </Table.Row>
+            );
+          })}
+          <Table.TotalRow>
+            <Table.Cell />
+            <Table.Cell />
+            <Table.Cell colSpan={2} className="text-align-r">
+              Total
+            </Table.Cell>
+            <Table.NumberCell>{total}</Table.NumberCell>
+          </Table.TotalRow>
+        </Table.Body>
+      </Table>
+    </>
   );
 };
 

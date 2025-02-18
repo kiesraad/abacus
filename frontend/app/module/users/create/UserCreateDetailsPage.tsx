@@ -13,7 +13,7 @@ const MIN_PASSWORD_LENGTH = 12;
 
 export function UserCreateDetailsPage() {
   const navigate = useNavigate();
-  const { role, type, username, createUser, apiError, loading } = useUserCreateContext();
+  const { role, type, username, createUser, apiError, saving } = useUserCreateContext();
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
 
   if (!role || !type) {
@@ -101,7 +101,7 @@ export function UserCreateDetailsPage() {
           )}
 
           <Form onSubmit={handleSubmit}>
-            <FormLayout width="medium" disabled={loading}>
+            <FormLayout width="medium" disabled={saving}>
               <FormLayout.Section title={t("users.details_title")}>
                 <InputField
                   id="username"

@@ -19,8 +19,8 @@ export function UserCreateContextProvider({ children }: { children: React.ReactN
   }
 
   const apiError = userApi.requestState.status === "api-error" ? userApi.requestState.error : null;
-  const loading = userApi.requestState.status === "loading";
+  const saving = userApi.requestState.status === "loading";
 
-  const context: IUserCreateContext = { role, setRole, type, setType, createUser, username, apiError, loading };
+  const context: IUserCreateContext = { role, setRole, type, setType, createUser, username, apiError, saving };
   return <UserCreateContext.Provider value={context}>{children}</UserCreateContext.Provider>;
 }

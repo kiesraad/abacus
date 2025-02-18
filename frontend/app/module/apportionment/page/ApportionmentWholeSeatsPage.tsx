@@ -2,13 +2,14 @@ import { Link } from "react-router";
 
 import { ResidualSeatsCalculationTable, WholeSeatsTable } from "app/component/apportionment";
 
-import { useApportionmentContext } from "@kiesraad/api";
+import { useApportionmentContext, useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
 import cls from "./Apportionment.module.css";
 
 export function ApportionmentWholeSeatsPage() {
+  const { election } = useElection();
   const { apportionment, error } = useApportionmentContext();
 
   return (
@@ -34,7 +35,11 @@ export function ApportionmentWholeSeatsPage() {
                 <div>
                   <h2 className={cls.tableTitle}>{t("apportionment.how_often_is_quota_met")}</h2>
                   <span className={cls.tableInformation}>{t("apportionment.whole_seats_information")}</span>
-                  <WholeSeatsTable finalStanding={apportionment.final_standing} quota={apportionment.quota} />
+                  <WholeSeatsTable
+                    finalStanding={apportionment.final_standing}
+                    politicalGroups={election.political_groups}
+                    quota={apportionment.quota}
+                  />
                 </div>
 
                 <div>

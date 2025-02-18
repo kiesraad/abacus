@@ -35,15 +35,15 @@ describe("ApportionmentWholeSeatsPage", () => {
     const whole_seats_table = await screen.findByTestId("whole_seats_table");
     expect(whole_seats_table).toBeVisible();
     expect(whole_seats_table).toHaveTableContent([
-      ["Lijst", "Aantal stemmen", ":", "Kiesdeler", "=", "Aantal volle zetels"],
-      ["1", "808", ":", "80", "=", "10"],
-      ["2", "60", ":", "80", "=", "0"],
-      ["3", "58", ":", "80", "=", "0"],
-      ["4", "57", ":", "80", "=", "0"],
-      ["5", "56", ":", "80", "=", "0"],
-      ["6", "55", ":", "80", "=", "0"],
-      ["7", "54", ":", "80", "=", "0"],
-      ["8", "52", ":", "80", "=", "0"],
+      ["Lijst", "Lijstnaam", "Aantal stemmen", ":", "Kiesdeler", "=", "Aantal volle zetels"],
+      ["1", "Political Group A", "808", ":", "80", "", "=", "10"],
+      ["2", "Political Group B", "60", ":", "80", "", "=", "0"],
+      ["3", "Political Group C", "58", ":", "80", "", "=", "0"],
+      ["4", "Political Group D", "57", ":", "80", "", "=", "0"],
+      ["5", "Political Group E", "56", ":", "80", "", "=", "0"],
+      ["6", "Political Group F", "55", ":", "80", "", "=", "0"],
+      ["7", "Political Group G", "54", ":", "80", "", "=", "0"],
+      ["8", "Political Group H", "52", ":", "80", "", "=", "0"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Hoeveel restzetels zijn er te verdelen?" }));

@@ -62,6 +62,11 @@
         max-width: fit-content;
       }
     }
+    td {
+      &:last-of-type {
+        width: unset;
+      }
+    }
   }
 }
 

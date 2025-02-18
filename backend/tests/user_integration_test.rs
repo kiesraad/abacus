@@ -39,7 +39,7 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let cookie = shared::login(&addr).await.unwrap();
+    let cookie = shared::typist_login(&addr).await;
 
     // Call an endpoint using the `FromRequestParts` for `User`
     let url = format!("http://{addr}/api/user/whoami");

@@ -6,16 +6,16 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use crate::{
-    apportionment::{seat_allocation, ApportionmentError, ApportionmentResult},
-    data_entry::{
-        repository::{PollingStationDataEntries, PollingStationResultsEntries},
-        status::DataEntryStatusName,
-    },
+    apportionment::{seat_allocation, ApportionmentResult},
+    authentication::Coordinator,
+    data_entry::{repository::{PollingStationDataEntries, PollingStationResultsEntries}, status::DataEntryStatusName},
     election::repository::Elections,
     polling_station::repository::PollingStations,
     summary::ElectionSummary,
     APIError, ErrorResponse,
 };
+
+use super::ApportionmentError;
 
 /// Election details response, including the election's candidate list (political groups) and its polling stations
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
@@ -39,6 +39,7 @@ pub struct ElectionApportionmentResponse {
   ),
 )]
 pub async fn election_apportionment(
+    _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(data_entry_repo): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,

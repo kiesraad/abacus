@@ -24,7 +24,8 @@ pub mod utils;
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
-    create_and_finalise_data_entry(&addr, 1, 1).await;
+    let cookie = shared::typist_login(&addr).await;
+    create_and_finalise_data_entry(&addr, cookie, 1, 1).await;
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
@@ -242,7 +243,8 @@ async fn test_polling_station_data_entry_get(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_polling_station_data_entry_get_finalised(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
-    create_and_finalise_data_entry(&addr, 1, 1).await;
+    let cookie = shared::typist_login(&addr).await;
+    create_and_finalise_data_entry(&addr, cookie, 1, 1).await;
 
     // get the data entry and expect 404 Not Found
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
@@ -297,6 +299,7 @@ async fn get_statuses(addr: &SocketAddr) -> BTreeMap<u32, ElectionStatusResponse
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
 
     // Ensure the statuses are "NotStarted"
     let statuses = get_statuses(&addr).await;
@@ -308,8 +311,8 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_data_entry_progress, None);
 
     // Finalise the first entry of one and set the other in progress
-    create_and_finalise_data_entry(&addr, 1, 1).await;
-    create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": true}"#)).await;
+    create_and_finalise_data_entry(&addr, cookie.clone(), 1, 1).await;
+    create_and_save_data_entry(&addr, cookie.clone(), 2, 1, Some(r#"{"continue": true}"#)).await;
 
     // polling station 1's first entry is now complete, polling station 2 is still incomplete and set to in progress
     let statuses = get_statuses(&addr).await;
@@ -321,8 +324,8 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_data_entry_progress, None);
 
     // Save the entries
-    create_and_save_data_entry(&addr, 1, 2, Some(r#"{"continue": true}"#)).await;
-    create_and_save_data_entry(&addr, 2, 1, Some(r#"{"continue": false}"#)).await;
+    create_and_save_data_entry(&addr, cookie.clone(), 1, 2, Some(r#"{"continue": true}"#)).await;
+    create_and_save_data_entry(&addr, cookie.clone(), 2, 1, Some(r#"{"continue": false}"#)).await;
 
     // polling station 1 should now be SecondEntryInProgress, polling station 2 is still in the FirstEntryInProgress state
     let statuses = get_statuses(&addr).await;
@@ -334,7 +337,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_data_entry_progress, None);
 
     // finalise second data entry for polling station 1
-    create_and_finalise_data_entry(&addr, 1, 2).await;
+    create_and_finalise_data_entry(&addr, cookie.clone(), 1, 2).await;
 
     // polling station 1 should now be definitive
     let statuses = get_statuses(&addr).await;
@@ -346,15 +349,16 @@ async fn test_election_details_status(pool: SqlitePool) {
     assert_eq!(statuses[&2].second_data_entry_progress, None);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3", "users"))))]
 async fn test_election_details_status_no_other_election_statuses(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
 
     // Save data entry for election 1, polling station 1
-    create_and_save_data_entry(&addr, 1, 1, Some(r#"{"continue": true}"#)).await;
+    create_and_save_data_entry(&addr, cookie.clone(), 1, 1, Some(r#"{"continue": true}"#)).await;
 
     // Save data entry for election 2, polling station 3
-    create_and_save_data_entry(&addr, 3, 1, Some(r#"{"continue": true}"#)).await;
+    create_and_save_data_entry(&addr, cookie.clone(), 3, 1, Some(r#"{"continue": true}"#)).await;
 
     // Get statuses for election 2
     let url = format!("http://{addr}/api/elections/3/status");

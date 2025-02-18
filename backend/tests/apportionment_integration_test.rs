@@ -25,12 +25,12 @@ use abacus::{
 pub mod shared;
 pub mod utils;
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-
-    create_result(&addr, 1, 2).await;
-    create_result(&addr, 2, 2).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, cookie.clone(), 1, 2).await;
+    create_result(&addr, cookie, 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/apportionment");
     let response = reqwest::Client::new().post(&url).send().await.unwrap();
@@ -45,11 +45,11 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
     assert_eq!(total_seats, vec![9, 6]);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
 async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-
-    create_result(&addr, 3, 3).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    create_result(&addr, cookie, 3, 3).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
     let response = reqwest::Client::new().post(&url).send().await.unwrap();
@@ -64,10 +64,10 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     assert_eq!(total_seats, vec![17, 12]);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
 async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-
+    let cookie = shared::coordinator_login(&addr).await;
     let data_entry = DataEntry {
         progress: 60,
         data: PollingStationResults {
@@ -128,7 +128,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
         client_state: ClientState::new_from_str(None).unwrap(),
     };
 
-    create_result_with_non_example_data_entry(&addr, 3, 3, data_entry).await;
+    create_result_with_non_example_data_entry(&addr, cookie, 3, 3, data_entry).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
     let response = reqwest::Client::new().post(&url).send().await.unwrap();
@@ -139,7 +139,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
     assert_eq!(body.error, "Drawing of lots is required");
 }
 
-#[test(sqlx::test)]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_apportionment_error_apportionment_not_available_no_polling_stations(
     pool: SqlitePool,
 ) {
@@ -203,7 +203,7 @@ async fn test_election_apportionment_error_apportionment_not_available_no_pollin
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users", "election_3"))))]
 async fn test_election_apportionment_error_apportionment_not_available_until_data_entries_finalised(
     pool: SqlitePool,
 ) {
@@ -224,12 +224,18 @@ async fn test_election_apportionment_error_apportionment_not_available_until_dat
     );
 }
 
-#[test(sqlx::test)]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_apportionment_election_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
 
     let url = format!("http://{addr}/api/elections/1/apportionment");
-    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::NOT_FOUND);

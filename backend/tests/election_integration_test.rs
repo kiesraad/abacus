@@ -156,15 +156,21 @@ async fn test_election_pdf_download(pool: SqlitePool) {
     assert!(content_disposition_string.contains(".pdf"));
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_xml_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    create_result(&addr, cookie.clone(), 1, 2).await;
-    create_result(&addr, cookie.clone(), 2, 2).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    create_result(&addr, typist_cookie.clone(), 1, 2).await;
+    create_result(&addr, typist_cookie.clone(), 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/download_xml_results");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
     let content_type = response.headers().get("Content-Type");
 
     // Ensure the response is what we expect
@@ -176,15 +182,21 @@ async fn test_election_xml_download(pool: SqlitePool) {
     assert!(body.contains("<TotalCounted>204</TotalCounted>"));
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_zip_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    create_result(&addr, cookie.clone(), 1, 2).await;
-    create_result(&addr, cookie, 2, 2).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    create_result(&addr, typist_cookie.clone(), 1, 2).await;
+    create_result(&addr, typist_cookie, 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/download_zip_results");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
     let content_disposition = response.headers().get("Content-Disposition");
     let content_type = response.headers().get("Content-Type");
 

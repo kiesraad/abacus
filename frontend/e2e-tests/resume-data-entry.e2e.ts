@@ -11,6 +11,7 @@ import {
 import { PollingStation, VotersCounts, VotesCounts } from "@kiesraad/api";
 
 import { test } from "./fixtures";
+import { loginAs } from "./setup";
 import { emptyDataEntryResponse } from "./test-data/request-response-templates";
 
 test.use({
@@ -133,6 +134,7 @@ test.describe("resume data entry flow", () => {
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
       await expect(pollingStationChoicePage.resumeDataEntry).toBeVisible();
 
+      await loginAs(request, "typist");
       const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
@@ -206,6 +208,7 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
+      await loginAs(request, "typist");
       const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
@@ -358,6 +361,7 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
+      await loginAs(request, "typist");
       const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(404);
     });
@@ -398,6 +402,7 @@ test.describe("resume data entry flow", () => {
       const pollingStationChoicePage = new PollingStationChoicePage(page);
       await expect(pollingStationChoicePage.fieldset).toBeVisible();
 
+      await loginAs(request, "typist");
       const dataEntryResponse = await request.get(`/api/polling_stations/${pollingStation.id}/data_entries/1`);
       expect(dataEntryResponse.status()).toBe(404);
     });

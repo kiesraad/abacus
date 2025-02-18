@@ -1,5 +1,5 @@
 /* eslint-disable playwright/no-standalone-expect */
-import { APIRequestContext, test as base, expect } from "@playwright/test";
+import { test as base, expect } from "@playwright/test";
 
 import {
   Election,
@@ -13,6 +13,7 @@ import {
   PollingStation,
 } from "@kiesraad/api";
 
+import { loginAs } from "./setup";
 import {
   electionRequest,
   noRecountNoDifferencesRequest,
@@ -32,15 +33,6 @@ type Fixtures = {
   // Election with polling stations and two completed data entries for each
   completedElection: Election;
 };
-
-async function loginAs(request: APIRequestContext, username: string) {
-  await request.post("/api/user/login", {
-    data: {
-      username,
-      password: "password",
-    },
-  });
-}
 
 export const test = base.extend<Fixtures>({
   emptyElection: async ({ request }, use) => {
@@ -94,7 +86,7 @@ export const test = base.extend<Fixtures>({
     await use(pollingStation);
   },
   completedElection: async ({ request, election }, use) => {
-    await loginAs(request, "coordinator");
+    await loginAs(request, "typist");
     // finalise both data entries for all polling stations
     for (const pollingStationId of election.polling_stations.map((ps) => ps.id)) {
       for (const entryNumber of [1, 2]) {

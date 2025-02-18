@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { TestUserProvider } from "@kiesraad/api";
 import { ElectionListRequestHandler } from "@kiesraad/api-mocks";
 import { render, screen, server } from "@kiesraad/test";
 
@@ -11,7 +12,11 @@ describe("DevHomePage", () => {
   });
 
   test("renders DevHomePage with election links", async () => {
-    render(<DevHomePage />);
+    render(
+      <TestUserProvider userRole="typist">
+        <DevHomePage />
+      </TestUserProvider>,
+    );
 
     expect(await screen.findByRole("heading", { level: 1, name: "Abacus 🧮" })).toBeVisible();
     expect(screen.getAllByRole("link", { name: "Gemeenteraadsverkiezingen 2026" })[0]).toBeVisible();

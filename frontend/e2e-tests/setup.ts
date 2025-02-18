@@ -1,30 +1,26 @@
-import { chromium, type FullConfig } from "@playwright/test";
+import { APIRequestContext, type FullConfig, request } from "@playwright/test";
+
+export async function loginAs(request: APIRequestContext, username: string) {
+  await request.post("/api/user/login", {
+    data: {
+      username,
+      password: "password",
+    },
+  });
+}
 
 async function globalSetup(config: FullConfig) {
   const baseUrl = config.projects[0]?.use.baseURL;
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
+  const session = await request.newContext({ baseURL: baseUrl });
 
-  await page.goto(`${baseUrl}/account/login`);
-  await page.getByLabel("Gebruikersnaam").fill("admin");
-  await page.getByLabel("Wachtwoord").fill("password");
-  await page.getByRole("button", { name: "Inloggen" }).click();
-  await page.locator("role=alert").waitFor();
-  await page.context().storageState({ path: "e2e-tests/state/admin.json" });
+  await loginAs(session, "admin");
+  await session.storageState({ path: "e2e-tests/state/admin.json" });
 
-  await page.goto(`${baseUrl}/account/login`);
-  await page.getByLabel("Gebruikersnaam").fill("coordinator");
-  await page.getByLabel("Wachtwoord").fill("password");
-  await page.getByRole("button", { name: "Inloggen" }).click();
-  await page.locator("role=alert").waitFor();
-  await page.context().storageState({ path: "e2e-tests/state/coordinator.json" });
+  await loginAs(session, "coordinator");
+  await session.storageState({ path: "e2e-tests/state/coordinator.json" });
 
-  await page.goto(`${baseUrl}/account/login`);
-  await page.getByLabel("Gebruikersnaam").fill("typist");
-  await page.getByLabel("Wachtwoord").fill("password");
-  await page.getByRole("button", { name: "Inloggen" }).click();
-  await page.locator("role=alert").waitFor();
-  await page.context().storageState({ path: "e2e-tests/state/typist.json" });
+  await loginAs(session, "typist");
+  await session.storageState({ path: "e2e-tests/state/typist.json" });
 }
 
 export default globalSetup;

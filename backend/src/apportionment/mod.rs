@@ -751,6 +751,7 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error(
     ) {
+        // This test triggers Kieswet Article P 9
         let totals = get_election_summary(vec![2552, 511, 511, 511, 509, 509]);
         let result = apportionment(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));

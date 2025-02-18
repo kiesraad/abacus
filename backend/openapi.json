@@ -1346,6 +1346,28 @@
   },
   "components": {
     "schemas": {
+      "AbsoluteMajorityChange": {
+        "type": "object",
+        "description": "Contains information about the enactment of article P 9 of the Kieswet.",
+        "required": [
+          "pg_retracted_seat",
+          "pg_assigned_seat"
+        ],
+        "properties": {
+          "pg_assigned_seat": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number which the residual seat is assigned to",
+            "minimum": 0
+          },
+          "pg_retracted_seat": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Political group number which the residual seat is retracted from",
+            "minimum": 0
+          }
+        }
+      },
       "ApportionmentResult": {
         "type": "object",
         "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after whole seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
@@ -1356,6 +1378,9 @@
           "final_standing"
         ],
         "properties": {
+          "absolute_majority_change": {
+            "$ref": "#/components/schemas/AbsoluteMajorityChange"
+          },
           "final_standing": {
             "type": "array",
             "items": {
@@ -2041,9 +2066,19 @@
         "required": [
           "selected_pg_number",
           "pg_options",
+          "pg_assigned",
           "votes_per_seat"
         ],
         "properties": {
+          "pg_assigned": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "The list of political groups with the same average, that have been assigned a seat"
+          },
           "pg_options": {
             "type": "array",
             "items": {
@@ -2051,7 +2086,7 @@
               "format": "int32",
               "minimum": 0
             },
-            "description": "The list from which the political group was selected, all of them having the same votes per seat"
+            "description": "The list of political groups with the same average, that have not been assigned a seat"
           },
           "selected_pg_number": {
             "type": "integer",
@@ -2071,9 +2106,19 @@
         "required": [
           "selected_pg_number",
           "pg_options",
+          "pg_assigned",
           "surplus_votes"
         ],
         "properties": {
+          "pg_assigned": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "The list of political groups with the same surplus, that have been assigned a seat"
+          },
           "pg_options": {
             "type": "array",
             "items": {
@@ -2081,7 +2126,7 @@
               "format": "int32",
               "minimum": 0
             },
-            "description": "The list from which the political group was selected, all of them having the same number of surplus votes"
+            "description": "The list of political groups with the same surplus, that have not been assigned a seat"
           },
           "selected_pg_number": {
             "type": "integer",

@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use crate::{
-    apportionment::{seat_allocation, ApportionmentResult},
+    apportionment::{apportionment, ApportionmentResult},
     data_entry::repository::PollingStationResultsEntries,
     election::repository::Elections,
     polling_station::repository::PollingStations,
@@ -46,7 +46,7 @@ pub async fn election_apportionment(
         .list_with_polling_stations(polling_stations_repo, election.id)
         .await?;
     let election_summary = ElectionSummary::from_results(&election, &results)?;
-    let apportionment = seat_allocation(election.number_of_seats.into(), &election_summary)?;
+    let apportionment = apportionment(election.number_of_seats.into(), &election_summary)?;
     Ok(Json(ElectionApportionmentResponse {
         apportionment,
         election_summary,

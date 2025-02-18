@@ -47,18 +47,36 @@ export function validateNumberString(s: string | null | undefined) {
   return !!result.match(/^(\d*\.?)$|^(\d{1,3}(\.\d{3})+\.?)$/g);
 }
 
-export function formatDateTime(date: Date) {
+function isToday(date: Date): boolean {
   const today = new Date();
-  const timeString = date.toLocaleTimeString(t("date_locale"), { hour: "numeric", minute: "numeric" });
-  if (
+  return (
     date.getDate() === today.getDate() &&
     date.getMonth() === today.getMonth() &&
     date.getFullYear() === today.getFullYear()
-  ) {
+  );
+}
+
+function isYesterday(date: Date): boolean {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return (
+    date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear()
+  );
+}
+
+export function formatDateTime(date: Date) {
+  const today = new Date();
+  const timeString = date.toLocaleTimeString(t("date_locale"), { hour: "numeric", minute: "numeric" });
+  if (isToday(date)) {
     // Today
     return `${t("today")} ${timeString}`;
+  } else if (isYesterday(date)) {
+    // Yesterday
+    return `${t("yesterday")} ${timeString}`;
   } else if (Math.round(Math.abs(Number(today) - Number(date)) / (24 * 60 * 60 * 1000)) < 7) {
-    // Within the past 6 days
+    // Within the past 3-6 days
     return date.toLocaleString(t("date_locale"), {
       weekday: "long",
       hour: "numeric",

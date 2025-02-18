@@ -21,6 +21,10 @@ import {
   noRecountNoDifferencesRequest,
 } from "./test-data/request-response-templates";
 
+test.use({
+  storageState: "e2e-tests/state/typist.json",
+});
+
 test.describe("full data entry flow", () => {
   test("no recount, no differences", async ({ page, pollingStation }) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry`);

@@ -13,6 +13,10 @@ import { PollingStation, VotersCounts, VotesCounts } from "@kiesraad/api";
 import { test } from "./fixtures";
 import { emptyDataEntryResponse } from "./test-data/request-response-templates";
 
+test.use({
+  storageState: "e2e-tests/state/typist.json",
+});
+
 test.describe("resume data entry flow", () => {
   const fillFirstTwoPagesAndAbort = async (page: Page, pollingStation: PollingStation) => {
     await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1/recounted`);

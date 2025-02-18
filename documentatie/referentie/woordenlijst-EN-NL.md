@@ -34,7 +34,7 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 | kiescolleges Eerste Kamer               |           | electoral colleges for the Senate         |                                     |
 | Eilandsraadsverkiezingen                |           | elections of the Island Councils          | ER in EML_NL                        |
 | herindelingsverkiezingen                | GRh       | redivision elections                      | GR in EML_NL                        |
-| college van burgemeester en wethouders | B&W       | municipal executive of mayor and aldermen |                                     |
+| college van burgemeester en wethouders  | B&W       | municipal executive of mayor and aldermen |                                     |
 
 ## Stembureaus / locaties
 
@@ -81,53 +81,53 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 
 | Nederlands                    | Afkorting | Engels                           | Opmerkingen                                                                                               |
 |-------------------------------|-----------|----------------------------------|-----------------------------------------------------------------------------------------------------------|
-| stemmen / stemming            |           | vote                             |                                                                                                           |
-| tellen / telling              |           | count                            |                                                                                                           |
-| hertellen / hertelling        |           | recount                          |                                                                                                           |
-| inleveren                     |           | hand in                          | voorbeeld: *stembiljet inleveren*                                                                         |
-| uitreiken                     |           | hand out                         | voorbeeld: *stembiljet uitreiken*                                                                         |
-| beheren                       |           | manage                           |                                                                                                           |
-| toevoegen                     |           | add                              |                                                                                                           |
-| verwijderen                   |           | delete                           |                                                                                                           |
-| importeren                    |           | import                           |                                                                                                           |
-| exporteren                    |           | export                           |                                                                                                           |
-| opschorten / opgeschort       |           | suspend / suspended              | onduidelijk wanneer schorsen en wanneer opschorten wordt gebruikt                                         |
-| schorsen / geschorst          |           | adjourn / adjourned              |                                                                                                           |
-| onderzoeken                   |           | investigate                      |                                                                                                           |
-| hervatten                     |           | resume                           |                                                                                                           |
 | aanmaken / aangemaakt         |           | generate / generated             |                                                                                                           |
-| controleren                   |           | check                            |                                                                                                           |
-| opslaan                       |           | save                             |                                                                                                           |
-| voorbereiden                  |           | prepare                          |                                                                                                           |
-| inloggen                      |           | log in                           | wanneer gebruiken we inloggen en wanneer aanmelden?                                                       |
 | aanmelden                     |           | sign in                          |                                                                                                           |
-| afmelden                      |           | sign out                         |                                                                                                           |
+| aanwezig tot                  |           | shift ended                      |                                                                                                           |
+| aanwezig van                  |           | shift started                    |                                                                                                           |
 | account instellen             |           | set up account                   |                                                                                                           |
-| invoeren                      |           | input                            |                                                                                                           |
-| ingevoerd                     |           | input complete                   |                                                                                                           |
-| invoer                        |           | input                            |                                                                                                           |
-| invoerfase                    |           | (data) input phase               |                                                                                                           |
-| (stem)invoer bezig            |           | input (of votes) in progress     |                                                                                                           |
+| afmelden                      |           | sign out                         |                                                                                                           |
+| afronden / afgerond           |           | complete / completed             |                                                                                                           |
+| beheren                       |           | manage                           |                                                                                                           |
+| controleren                   |           | check                            |                                                                                                           |
 | eerste invoer klaar           |           | first input completed            |                                                                                                           |
 | eerste en tweede invoer klaar |           | first and second input completed |                                                                                                           |
+| exporteren                    |           | export                           |                                                                                                           |
+| fouten                        |           | errors and warnings              |                                                                                                           |
+| geldig / ongeldig             |           | valid / invalid                  |                                                                                                           |
+| hertellen / hertelling        |           | recount                          |                                                                                                           |
+| importeren                    |           | import                           |                                                                                                           |
+| ingevoerd                     |           | input complete                   |                                                                                                           |
+| inleveren                     |           | hand in                          | voorbeeld: *stembiljet inleveren*                                                                         |
+| inloggen                      |           | log in                           | wanneer gebruiken we inloggen en wanneer aanmelden?                                                       |
+| in onderzoek                  |           | under investigation              |                                                                                                           |
+| invoeren                      |           | input                            |                                                                                                           |
+| invoer                        |           | input                            |                                                                                                           |
+| invoerfase                    |           | (data) input phase               |                                                                                                           |
+| kiezen (bestand/optie)        |           | select                           |                                                                                                           |
 | klaar voor                    |           | ready for                        |                                                                                                           |
 | klaar                         |           | completed                        | deze term kan verwarrend zijn want kan ook 'klaar voor invoeren' betekenen, *afgerond* is een betere term |
-| afronden / afgerond           |           | complete / completed             |                                                                                                           |
+| niet afgeronde invoer         |           | input not completed              |                                                                                                           |
+| onderzoeken                   |           | investigate                      |                                                                                                           |
+| opschorten / opgeschort       |           | suspend / suspended              | onduidelijk wanneer schorsen en wanneer opschorten wordt gebruikt                                         |
+| opslaan                       |           | save                             |                                                                                                           |
+| schorsen / geschorst          |           | adjourn / adjourned              |                                                                                                           |
 | status                        |           | status                           |                                                                                                           |
 | statusoverzicht               |           | status overview                  |                                                                                                           |
-| volgende                      |           | next                             |                                                                                                           |
-| vorige                        |           | previous                         |                                                                                                           |
-| kiezen (bestand/optie)        |           | select                           |                                                                                                           |
-| (on)geldig                    |           | (in)valid                        |                                                                                                           |
-| wijzigingen                   |           | changes                          |                                                                                                           |
-| fouten en waarschuwingen      |           | errors and warnings              |                                                                                                           |
-| niet afgeronde invoer         |           | input not completed              |                                                                                                           |
-| in onderzoek                  |           | under investigation              |                                                                                                           |
+| (stem)invoer bezig            |           | input (of votes) in progress     |                                                                                                           |
+| stemmen / stemming            |           | vote                             |                                                                                                           |
+| tellen / telling              |           | count                            |                                                                                                           |
+| toevoegen                     |           | add                              |                                                                                                           |
+| uitreiken                     |           | hand out                         | voorbeeld: *stembiljet uitreiken*                                                                         |
 | verwacht                      |           | expected                         |                                                                                                           |
-| werkvoorraad                  |           | workload                         |                                                                                                           |
+| verwijderen                   |           | delete                           |                                                                                                           |
+| volgende                      |           | next                             |                                                                                                           |
+| voorbereiden                  |           | prepare                          |                                                                                                           |
 | voortgang                     |           | progress                         |                                                                                                           |
-| aanwezig van                  |           | shift started                    |                                                                                                           |
-| aanwezig tot                  |           | shift ended                      |                                                                                                           |
+| vorige                        |           | previous                         |                                                                                                           |
+| waarschuwingen                |           | warnings                         |                                                                                                           |
+| werkvoorraad                  |           | workload                         |                                                                                                           |
+| wijzigingen                   |           | changes                          |                                                                                                           |
 | zitting                       |           | session                          | eerste/tweede/derde zitting                                                                               |
 
 ## Stemmen / tellen / proces-verbaal
@@ -178,26 +178,26 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 
 ## Zetelverdeling
 
-| Nederlands                          | Afkorting | Engels                     | Opmerkingen                                             |
-|-------------------------------------|-----------|----------------------------|---------------------------------------------------------|
-| zetel                               |           | seat                       |                                                         |
-| volle zetel                         |           | full seat                  |                                                         |
-| restzetel                           |           | residual seat              | via https://english.kiesraad.nl/  - NIET 'rest seat'    |
-| raadszetel                          |           | council seat               |                                                         |
-| zetelverdeling                      |           | apportionment              |                                                         |
-| zeteltoewijzing                     |           | seat assignment            |                                                         |
-| lijstuitputting                     |           | list exhaustion            | nog op zoek naar een betere term                        |
-| kandidatenlijst                     |           | list of candidates         |                                                         |
-| kandidaat                           |           | candidate                  |                                                         |
-| partijloos                          |           | non-party                  | *non-party candidate*                                   |
-| onafhankelijk                       |           | independent                | *independent candidate*                                 |
-| overleden                           |           | deceased                   | *deceased candidate*                                    |
-| kiesdeler                           |           | electoral quota            | via <https://en.wikipedia.org/wiki/Electoral_quota> |
-| voorkeursdrempel                    |           | preference threshold       | via EML_NL-standaard                                    |
-| voorkeursstem                       |           | preferential vote          | via <https://en.wikipedia.org/wiki/Preferential_voting> |
-| loting                              |           | draw                       |                                                         |
-| systeem van de grootste gemiddelden |           | system of largest averages |                                                         |
-| systeem van de grootste overschotten |           | system of largest remainders |  via <https://en.wikipedia.org/wiki/Quota_method> |
+| Nederlands                            | Afkorting | Engels                        | Opmerkingen                                               |
+|---------------------------------------|-----------|-------------------------------|-----------------------------------------------------------|
+| zetel                                 |           | seat                          |                                                           |
+| volle zetel                           |           | full seat                     |                                                           |
+| restzetel                             |           | residual seat                 | via https://english.kiesraad.nl/  - NIET 'rest seat'      |
+| raadszetel                            |           | council seat                  |                                                           |
+| zetelverdeling                        |           | apportionment                 |                                                           |
+| zeteltoewijzing                       |           | seat assignment               |                                                           |
+| lijstuitputting                       |           | list exhaustion               | nog op zoek naar een betere term                          |
+| kandidatenlijst                       |           | list of candidates            |                                                           |
+| kandidaat                             |           | candidate                     |                                                           |
+| partijloos                            |           | non-party                     | *non-party candidate*                                     |
+| onafhankelijk                         |           | independent                   | *independent candidate*                                   |
+| overleden                             |           | deceased                      | *deceased candidate*                                      |
+| kiesdeler                             |           | electoral quota               | via <https://en.wikipedia.org/wiki/Electoral_quota>       |
+| voorkeursdrempel                      |           | preference threshold          | via EML_NL-standaard                                      |
+| voorkeursstem                         |           | preferential vote             | via <https://en.wikipedia.org/wiki/Preferential_voting>   |
+| loting                                |           | draw                          |                                                           |
+| systeem van de grootste gemiddelden   |           | system of largest averages    |                                                           |
+| systeem van de grootste overschotten  |           | system of largest remainders  |  via <https://en.wikipedia.org/wiki/Quota_method>         |
 
 ## Technisch / software
 

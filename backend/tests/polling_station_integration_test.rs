@@ -18,12 +18,17 @@ use abacus::{
 pub mod shared;
 pub mod utils;
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_listing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-
+    let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(
         response.status(),
@@ -38,9 +43,10 @@ async fn test_polling_station_listing(pool: SqlitePool) {
         .any(|ps| ps.name == "Op Rolletjes"))
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_creation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
 
@@ -55,6 +61,7 @@ async fn test_polling_station_creation(pool: SqlitePool) {
             postal_code: "1234 QY".to_string(),
             locality: "Heemdamseburg".to_string(),
         })
+        .header("cookie", cookie)
         .send()
         .await
         .unwrap();
@@ -73,13 +80,19 @@ async fn test_polling_station_creation(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/2");
 
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(
         response.status(),
@@ -92,9 +105,10 @@ async fn test_polling_station_get(pool: SqlitePool) {
     assert_eq!(body.polling_station_type, Some(PollingStationType::Special));
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_update_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
 
     let response = reqwest::Client::new()
@@ -108,6 +122,7 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
             postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         })
+        .header("cookie", cookie.clone())
         .send()
         .await
         .unwrap();
@@ -118,7 +133,12 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let updated = reqwest::Client::new().get(&url).send().await.unwrap();
+    let updated = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(
         updated.status(),
@@ -131,9 +151,10 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
     assert_eq!(updated_body.address, "Teststraat 2a");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
 
     let response = reqwest::Client::new()
@@ -147,6 +168,7 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
             postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         })
+        .header("cookie", cookie.clone())
         .send()
         .await
         .unwrap();
@@ -157,7 +179,12 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let updated = reqwest::Client::new().get(&url).send().await.unwrap();
+    let updated = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(
         updated.status(),
@@ -170,9 +197,10 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
     assert_eq!(updated_body.polling_station_type, None);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_update_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/40404");
 
     let response = reqwest::Client::new()
@@ -186,6 +214,7 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
             postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         })
+        .header("cookie", cookie)
         .send()
         .await
         .unwrap();
@@ -197,12 +226,18 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_delete_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
 
-    let response = reqwest::Client::new().delete(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", cookie.clone())
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(
         response.status(),
@@ -210,7 +245,12 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let gone = reqwest::Client::new().get(&url).send().await.unwrap();
+    let gone = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(
         gone.status(),
@@ -219,14 +259,20 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::admin_login(&addr).await;
-    create_and_save_data_entry(&addr, cookie, 2, 1, None).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    let admin_cookie = shared::admin_login(&addr).await;
+    create_and_save_data_entry(&addr, typist_cookie, 2, 1, None).await;
 
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
-    let response = reqwest::Client::new().delete(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", admin_cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(
         response.status(),
@@ -237,14 +283,20 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     assert_eq!(body.error, "Invalid data");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::admin_login(&addr).await;
-    create_result(&addr, cookie, 1, 2).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    let admin_cookie = shared::admin_login(&addr).await;
+    create_result(&addr, typist_cookie, 1, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/polling_stations/1");
-    let response = reqwest::Client::new().delete(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", admin_cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(
         response.status(),
@@ -255,12 +307,18 @@ async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
     assert_eq!(body.error, "Invalid data");
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/40404");
 
-    let response = reqwest::Client::new().delete(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(
         response.status(),
@@ -269,9 +327,10 @@ async fn test_polling_station_delete_not_found(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_non_unique(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
 
@@ -286,6 +345,7 @@ async fn test_polling_station_non_unique(pool: SqlitePool) {
             postal_code: "1234 QY".to_string(),
             locality: "Heemdamseburg".to_string(),
         })
+        .header("cookie", cookie)
         .send()
         .await
         .unwrap();
@@ -297,11 +357,17 @@ async fn test_polling_station_non_unique(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_list_invalid_election(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/1234/polling_stations");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }

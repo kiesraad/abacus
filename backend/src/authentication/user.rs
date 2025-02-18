@@ -71,8 +71,9 @@ impl User {
             chrono::Utc::now()
                 .signed_duration_since(last_activity_at)
                 .num_seconds()
-                > MIN_UPDATE_LAST_ACTIVITY_AT_SECS
+                < MIN_UPDATE_LAST_ACTIVITY_AT_SECS
         } else {
+            // Also update when no timestamp is set yet
             true
         }
     }

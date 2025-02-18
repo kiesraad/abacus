@@ -57,28 +57,5 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
     let body: UserListResponse = response.json().await.unwrap();
     let user = body.users.first().unwrap();
-
-    // Panics (thus fails) when timestamp was not set
-    let first_timestamp = user.last_activity_at().unwrap();
-
-    // Test that the timestamp is not updated when we
-    // immediately call the same endpoint again
-
-    // Call an endpoint using the `FromRequestParts` for `User`
-    let url = format!("http://{addr}/api/user/whoami");
-    let response = reqwest::Client::new()
-        .get(&url)
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
-    assert_eq!(response.status(), StatusCode::OK);
-
-    // Test that the timestamps are the same
-    let url = format!("http://{addr}/api/user");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
-    assert_eq!(response.status(), StatusCode::OK);
-    let body: UserListResponse = response.json().await.unwrap();
-    let user = body.users.first().unwrap();
-    assert_eq!(user.last_activity_at().unwrap(), first_timestamp);
+    assert!(user.last_activity_at().is_some());
 }

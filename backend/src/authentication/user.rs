@@ -59,19 +59,22 @@ impl User {
     /// longer than `MIN_UPDATE_LAST_ACTIVITY_AT_SECS`, to prevent excessive
     /// database writes.
     pub async fn update_last_activity_at(&self, users: &Users) -> Result<(), sqlx::Error> {
-        match self.last_activity_at {
-            Some(last_activity_at)
-                if chrono::offset::Utc::now()
-                    .signed_duration_since(last_activity_at)
-                    .num_seconds()
-                    > MIN_UPDATE_LAST_ACTIVITY_AT_SECS =>
-            { /* Do nothing */ }
-            None | Some(_) => {
-                users.update_last_activity_at(self.id()).await?;
-            }
+        if self.should_update_last_activity_at() {
+            users.update_last_activity_at(self.id()).await?;
         }
 
         Ok(())
+    }
+
+    fn should_update_last_activity_at(&self) -> bool {
+        if let Some(last_activity_at) = self.last_activity_at {
+            chrono::Utc::now()
+                .signed_duration_since(last_activity_at)
+                .num_seconds()
+                > MIN_UPDATE_LAST_ACTIVITY_AT_SECS
+        } else {
+            true
+        }
     }
 
     #[cfg(test)]
@@ -391,7 +394,10 @@ mod tests {
     use test_log::test;
 
     use crate::authentication::{
-        error::AuthenticationError, role::Role, session::Sessions, user::Users,
+        error::AuthenticationError,
+        role::Role,
+        session::Sessions,
+        user::{User, Users},
     };
 
     #[test(sqlx::test)]
@@ -583,5 +589,31 @@ mod tests {
         let serialized_user = serde_json::to_value(user).unwrap();
         assert_eq!(serialized_user["username"], "test_user".to_string());
         assert!(serialized_user.get("password_hash").is_none());
+    }
+
+    #[test]
+    fn test_should_update_last_activity_at() {
+        let mut user = User {
+            id: 2,
+            username: "user1".to_string(),
+            fullname: Some("Full Name".to_string()),
+            role: Role::Typist,
+            needs_password_change: false,
+            password_hash: "h4sh".to_string(),
+            last_activity_at: None,
+            updated_at: chrono::Utc::now(),
+            created_at: chrono::Utc::now(),
+        };
+
+        // Should update when no timestamp is net
+        assert!(user.should_update_last_activity_at());
+
+        // Should not update when trying to update too soon
+        user.last_activity_at = Some(chrono::Utc::now());
+        assert!(!user.should_update_last_activity_at());
+
+        // Should update when `last_activity_at` was 2 minutes ago
+        user.last_activity_at = Some(chrono::Utc::now() - chrono::Duration::minutes(2));
+        assert!(user.should_update_last_activity_at());
     }
 }

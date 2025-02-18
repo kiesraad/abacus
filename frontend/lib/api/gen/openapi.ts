@@ -135,12 +135,21 @@ export type USER_UPDATE_REQUEST_BODY = UpdateUserRequest;
 /** TYPES **/
 
 /**
+ * Contains information about the enactment of article P 9 of the Kieswet.
+ */
+export interface AbsoluteMajorityChange {
+  pg_assigned_seat: number;
+  pg_retracted_seat: number;
+}
+
+/**
  * The result of the apportionment procedure. This contains the number of seats and the quota
 that was used. It then contains the initial standing after whole seats were assigned,
 and each of the changes and intermediate standings. The final standing contains the
 number of seats per political group that was assigned after all seats were assigned.
  */
 export interface ApportionmentResult {
+  absolute_majority_change?: AbsoluteMajorityChange;
   final_standing: PoliticalGroupSeatAssignment[];
   quota: Fraction;
   seats: number;
@@ -394,6 +403,7 @@ export interface GetDataEntryResponse {
  * Contains the details for an assigned seat, assigned through the highest average method.
  */
 export interface HighestAverageAssignedSeat {
+  pg_assigned: number[];
   pg_options: number[];
   selected_pg_number: number;
   votes_per_seat: Fraction;
@@ -403,6 +413,7 @@ export interface HighestAverageAssignedSeat {
  * Contains the details for an assigned seat, assigned through the highest surplus method.
  */
 export interface HighestSurplusAssignedSeat {
+  pg_assigned: number[];
   pg_options: number[];
   selected_pg_number: number;
   surplus_votes: Fraction;

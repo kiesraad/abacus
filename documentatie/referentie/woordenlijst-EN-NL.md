@@ -192,7 +192,7 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 | partijloos                          |           | non-party                  | *non-party candidate*                                   |
 | onafhankelijk                       |           | independent                | *independent candidate*                                 |
 | overleden                           |           | deceased                   | *deceased candidate*                                    |
-| kiesdeler                           |           | electoral divisor          | gevonden in een Engels jaarverslag van de KR uit 2007   |
+| kiesdeler                           |           | electoral quota            | via <https://en.wikipedia.org/wiki/Electoral_quota> |
 | voorkeursdrempel                    |           | preference threshold       | via EML_NL-standaard                                    |
 | voorkeursstem                       |           | preferential vote          | via <https://en.wikipedia.org/wiki/Preferential_voting> |
 | loting                              |           | draw                       |                                                         |

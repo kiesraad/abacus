@@ -1,4 +1,5 @@
 use crate::{
+    authentication::Typist,
     data_entry::repository::PollingStationDataEntries,
     election::repository::Elections,
     error::{APIError, ErrorReference, ErrorResponse},
@@ -51,6 +52,7 @@ pub struct GetDataEntryResponse {
     ),
 )]
 pub async fn polling_station_data_entry_get(
+    _user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,

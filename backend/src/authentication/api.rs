@@ -3,7 +3,7 @@ use super::{
     role::Role,
     session::Sessions,
     user::{User, Users},
-    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+    Admin, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
 };
 use axum::{
     extract::{Path, Request, State},
@@ -133,8 +133,8 @@ pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   ),
 )]
 pub async fn change_password(
-    State(users): State<Users>,
     user: User,
+    State(users): State<Users>,
     Json(credentials): Json<ChangePasswordRequest>,
 ) -> Result<impl IntoResponse, APIError> {
     if user.username() != credentials.username {
@@ -295,6 +295,7 @@ pub struct UserListResponse {
     ),
 )]
 pub async fn user_list(
+    _user: Admin,
     State(users_repo): State<Users>,
 ) -> Result<Json<UserListResponse>, APIError> {
     Ok(Json(UserListResponse {
@@ -333,6 +334,7 @@ pub struct UpdateUserRequest {
     ),
 )]
 pub async fn user_create(
+    _user: Admin,
     State(users_repo): State<Users>,
     Json(create_user_req): Json<CreateUserRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
@@ -380,6 +382,7 @@ pub async fn user_get(
     ),
 )]
 pub async fn user_update(
+    _user: Admin,
     State(users_repo): State<Users>,
     Path(user_id): Path<u32>,
     Json(update_user_req): Json<UpdateUserRequest>,

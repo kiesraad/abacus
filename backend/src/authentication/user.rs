@@ -78,7 +78,6 @@ impl User {
         }
     }
 
-    #[cfg(test)]
     pub fn fullname(&self) -> Option<&str> {
         self.fullname.as_deref()
     }

@@ -11,13 +11,13 @@ import {
 } from "@kiesraad/api-mocks";
 import { getUrlMethodAndBody, overrideOnce, render, screen, server } from "@kiesraad/test";
 
-import { PollingStationFormController } from "../PollingStationFormController";
+import { DataEntryProvider } from "../state/DataEntryProvider";
 import { RecountedForm } from "./RecountedForm";
 
 const Component = (
-  <PollingStationFormController election={electionMockData} pollingStationId={1} entryNumber={1}>
+  <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
     <RecountedForm />
-  </PollingStationFormController>
+  </DataEntryProvider>
 );
 
 describe("Test RecountedForm", () => {

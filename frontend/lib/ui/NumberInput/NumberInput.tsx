@@ -9,7 +9,7 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
     maxLength: 9,
     autoComplete: "off",
     ...inputProps,
-    defaultValue: inputProps.defaultValue ? formatNumber(inputProps.defaultValue) : "",
+    defaultValue: inputProps.defaultValue ? formatNumber(inputProps.defaultValue) : undefined,
     type: "text",
   };
 

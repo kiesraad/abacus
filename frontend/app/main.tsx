@@ -22,6 +22,7 @@ function render() {
       <ApiProvider>
         <RouterProvider router={router} />
       </ApiProvider>
+      ,
     </StrictMode>,
   );
 }

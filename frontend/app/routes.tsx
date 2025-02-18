@@ -1,6 +1,5 @@
 import { createRoutesFromElements, Navigate, Route } from "react-router";
 
-import { CheckAndSaveForm } from "app/component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AdministratorLayout } from "app/module/AdministratorLayout";
 import {
   ElectionHomePage,
@@ -25,6 +24,7 @@ import { WorkstationsHomePage } from "app/module/workstations";
 import { t } from "@kiesraad/i18n";
 
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
+import { CheckAndSaveForm } from "./component/form/data_entry/check_and_save/CheckAndSaveForm";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
 import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
 import {

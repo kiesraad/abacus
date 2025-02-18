@@ -10,7 +10,6 @@ use crate::{
     },
     utils::serve_api,
 };
-use abacus::election::Election;
 use abacus::{
     apportionment::{
         get_total_seats_from_apportionment_result, ElectionApportionmentResponse, Fraction,
@@ -19,6 +18,7 @@ use abacus::{
         status::ClientState, CandidateVotes, DataEntry, DifferencesCounts, PoliticalGroupVotes,
         PollingStationResults, VotersCounts, VotesCounts,
     },
+    election::Election,
     ErrorResponse,
 };
 

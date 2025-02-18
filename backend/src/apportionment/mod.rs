@@ -749,6 +749,14 @@ mod tests {
     }
 
     #[test]
+    fn test_seat_allocation_less_than_19_seats_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error(
+    ) {
+        let totals = get_election_summary(vec![2552, 511, 511, 511, 509, 509]);
+        let result = apportionment(15, &totals);
+        assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
+    }
+
+    #[test]
     fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system_drawing_of_lots_error_in_2nd_round_averages_system(
     ) {
         let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
@@ -796,6 +804,15 @@ mod tests {
         assert_eq!(result.steps.len(), 6);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![13, 2, 2, 2, 2, 2, 1, 0]);
+    }
+
+    #[test]
+    fn test_seat_allocation_19_or_more_seats_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error(
+    ) {
+        // This test triggers Kieswet Article P 9
+        let totals = get_election_summary(vec![7501, 1249, 1249, 1249, 1249, 1248, 1248, 8]);
+        let result = apportionment(24, &totals);
+        assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]

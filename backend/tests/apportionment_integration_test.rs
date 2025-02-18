@@ -28,12 +28,18 @@ pub mod utils;
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    create_result(&addr, cookie.clone(), 1, 2).await;
-    create_result(&addr, cookie, 2, 2).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    create_result(&addr, typist_cookie.clone(), 1, 2).await;
+    create_result(&addr, typist_cookie.clone(), 2, 2).await;
 
     let url = format!("http://{addr}/api/elections/2/apportionment");
-    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
@@ -48,11 +54,17 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
 async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    create_result(&addr, cookie, 3, 3).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    create_result(&addr, typist_cookie.clone(), 3, 3).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
-    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
@@ -67,7 +79,8 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
 async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
     let data_entry = DataEntry {
         progress: 60,
         data: PollingStationResults {
@@ -128,10 +141,15 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
         client_state: ClientState::new_from_str(None).unwrap(),
     };
 
-    create_result_with_non_example_data_entry(&addr, cookie, 3, 3, data_entry).await;
+    create_result_with_non_example_data_entry(&addr, typist_cookie, 3, 3, data_entry).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
-    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);

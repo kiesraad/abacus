@@ -359,7 +359,8 @@ export type ErrorReference =
   | "PollingStationResultsAlreadyFinalised"
   | "PollingStationSecondEntryAlreadyFinalised"
   | "PollingStationValidationErrors"
-  | "UserNotFound";
+  | "UserNotFound"
+  | "Unauthorized";
 
 /**
  * Response structure for errors
@@ -409,6 +410,8 @@ export interface HighestSurplusAssignedSeat {
 }
 
 export interface LoginResponse {
+  fullname: string;
+  role: Role;
   user_id: number;
   username: string;
 }

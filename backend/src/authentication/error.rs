@@ -9,6 +9,7 @@ pub enum AuthenticationError {
     Database(sqlx::Error),
     HashPassword(password_hash::Error),
     BackwardTimeTravel,
+    Unauthorized,
 }
 
 impl From<password_hash::Error> for AuthenticationError {

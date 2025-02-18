@@ -1,44 +1,33 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import {
-  AnyApiError,
-  FatalError,
-  isError,
-  LOGIN_REQUEST_BODY,
-  LOGIN_REQUEST_PATH,
-  LoginResponse,
-  useApiState,
-} from "@kiesraad/api";
+import { AnyApiError, FatalError, isError, useApiState } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, BottomBar, Button, FormLayout, InputField } from "@kiesraad/ui";
 
 export function LoginForm() {
   const navigate = useNavigate();
-  const { client, setUser } = useApiState();
+  const { login } = useApiState();
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<AnyApiError | null>(null);
 
   // Handle form submission
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setLoading(true);
 
-    // Submit the credentials to the API
-    const formData = new FormData(event.currentTarget);
-    const requestPath: LOGIN_REQUEST_PATH = "/api/user/login";
-    const requestBody: LOGIN_REQUEST_BODY = {
-      username: formData.get("username") as string,
-      password: formData.get("password") as string,
-    };
-    const result = await client.postRequest<LoginResponse>(requestPath, requestBody);
+    setLoading(true);
+    const result = await login(username, password);
 
     // Handle the result
     setLoading(false);
     if (isError(result)) {
       setError(result);
     } else {
-      setUser(result.data);
+      setError(null);
+      setUsername("");
+      setPassword("");
       // TODO: Handle successful login navigation here
       void navigate("../setup");
     }
@@ -70,6 +59,10 @@ export function LoginForm() {
           hint={t("user.username_login_hint")}
           readOnly={loading}
           required={true}
+          value={username}
+          onChange={(e) => {
+            setUsername(e.target.value);
+          }}
         />
         <InputField
           name="password"
@@ -78,6 +71,10 @@ export function LoginForm() {
           type="password"
           readOnly={loading}
           required={true}
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
         />
       </FormLayout>
       <BottomBar type="footer">

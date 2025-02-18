@@ -19,7 +19,7 @@ describe("ChangePasswordPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Gebruikersnaam: user")).toBeVisible();
+      expect(screen.getByText("Gebruikersnaam: admin")).toBeVisible();
     });
   });
 });

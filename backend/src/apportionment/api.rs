@@ -7,6 +7,7 @@ use utoipa::ToSchema;
 
 use crate::{
     apportionment::{seat_allocation, ApportionmentResult},
+    authentication::Coordinator,
     data_entry::repository::PollingStationResultsEntries,
     election::repository::Elections,
     polling_station::repository::PollingStations,
@@ -27,6 +28,7 @@ pub struct ElectionApportionmentResponse {
   path = "/api/elections/{election_id}/apportionment",
   responses(
         (status = 200, description = "Election Apportionment", body = ElectionApportionmentResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 422, description = "Drawing of lots is required", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -36,6 +38,7 @@ pub struct ElectionApportionmentResponse {
   ),
 )]
 pub async fn election_apportionment(
+    _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,

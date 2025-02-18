@@ -5,9 +5,13 @@ import { stat } from "node:fs/promises";
 
 import { test } from "./fixtures";
 
+test.use({
+  storageState: "e2e-tests/state/coordinator.json",
+});
+
 test.describe("election results zip", () => {
   test("it downloads a zip", async ({ page, completedElection }) => {
-    await page.goto(`/elections/${completedElection.id}/status#coordinator`);
+    await page.goto(`/elections/${completedElection.id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);
     await electionStatusPage.finish.click();

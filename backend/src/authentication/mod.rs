@@ -4,6 +4,7 @@ use user::User;
 use utoipa::ToSchema;
 
 pub use self::api::*;
+pub use self::role::{Admin, Coordinator, Typist};
 
 #[cfg(test)]
 pub use self::session::Sessions;

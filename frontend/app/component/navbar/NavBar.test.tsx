@@ -14,7 +14,6 @@ async function renderNavBar(location: { pathname: string }, userRole: Role) {
       <ElectionProvider electionId={1}>
         <NavBar location={location} />
       </ElectionProvider>
-      ,
     </TestUserProvider>,
   );
 

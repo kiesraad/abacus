@@ -62,7 +62,7 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     let first_timestamp = user.last_activity_at().unwrap();
 
     // Test that the timestamp is not updated when we
-    // immediately call the same enpoint againg
+    // immediately call the same endpoint again
 
     // Call an endpoint using the `FromRequestParts` for `User`
     let url = format!("http://{addr}/api/user/whoami");

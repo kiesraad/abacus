@@ -2,8 +2,9 @@ import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { UserListRequestHandler } from "@kiesraad/api-mocks";
-import { render, server } from "@kiesraad/test";
+import { overrideOnce, render, server } from "@kiesraad/test";
 
+import { userMockData } from "../../../lib/api-mocks/UserMockData";
 import { UserListPage } from "./UserListPage";
 
 describe("PollingStationListPage", () => {
@@ -20,6 +21,23 @@ describe("PollingStationListPage", () => {
       ["Gebruikersnaam", "Rol", "Volledige naam", "Laatste activiteit"],
       ["Sanne", "Beheerder", "Sanne Molenaar", "vandaag 10:20"],
       ["Jayden", "Coördinator", "Jayden Ahmen", "gisteren 10:20"],
+      ["Gebruiker01", "Invoerder", "Nog niet gebruikt", "–"],
+      ["Gebruiker02", "Invoerder", "Nog niet gebruikt", "–"],
+      ["Gebruiker03", "Invoerder", "Nog niet gebruikt", "–"],
+    ]);
+  });
+
+  test("Show users", async () => {
+    const users = [userMockData[2], userMockData[1], userMockData[4], userMockData[0], userMockData[3]];
+    overrideOnce("get", "/api/user", 200, { users });
+    render(<UserListPage />);
+
+    const table = await screen.findByRole("table");
+    expect(table).toBeVisible();
+    expect(table).toHaveTableContent([
+      ["Gebruikersnaam", "Rol", "Volledige naam", "Laatste activiteit"],
+      ["Sanne", "Beheerder", "Sanne Molenaar", "vandaag 10:20"],
+      ["Jayden", "Coördinator", "Jayden Ahmen", "vandaag 13:37"],
       ["Gebruiker01", "Invoerder", "Nog niet gebruikt", "–"],
       ["Gebruiker02", "Invoerder", "Nog niet gebruikt", "–"],
       ["Gebruiker03", "Invoerder", "Nog niet gebruikt", "–"],

@@ -1,5 +1,6 @@
 import { useUserListRequest } from "app/module/users/useUserListRequest";
 
+import { Role } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconPlus } from "@kiesraad/icon";
 import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
@@ -18,6 +19,15 @@ export function UserListPage() {
   }
 
   const users = requestState.data.users;
+
+  const sortedRoles: Role[] = ["administrator", "coordinator", "typist"];
+  users.sort((a, b) => {
+    const roleCompare = sortedRoles.indexOf(a.role) - sortedRoles.indexOf(b.role);
+    if (roleCompare !== 0) {
+      return roleCompare;
+    }
+    return a.username.localeCompare(b.username);
+  });
 
   return (
     <>

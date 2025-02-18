@@ -6,7 +6,7 @@ import { t } from "@kiesraad/i18n";
 import styles from "./NavBar.module.css";
 import { NavBarLinks } from "./NavBarLinks";
 
-type NavBarProps = { location: { pathname: string; hash: string } };
+type NavBarProps = { location: { pathname: string } };
 
 export function NavBar({ location }: NavBarProps) {
   const { user, logout } = useApiState();

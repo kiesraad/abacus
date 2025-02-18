@@ -6,6 +6,8 @@ export * from "./ApiResponseStatus";
 export * from "./ApiError";
 export * from "./ApiClient";
 export * from "./ApiProvider";
+export * from "./ApiProviderContext";
+export * from "./TestUserProvider";
 export * from "./useApi";
 export * from "./useUser";
 export * from "./useApiState";

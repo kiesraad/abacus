@@ -24,10 +24,10 @@ export function ElectionHomePage() {
               {t("coordinator")}:
               <ul>
                 <li>
-                  <Link to={`status#coordinator`}>{t("election.status")}</Link>
+                  <Link to={`status`}>{t("election.status")}</Link>
                 </li>
                 <li>
-                  <Link to={`polling-stations#coordinator`}>{t("polling_station.title.plural")}</Link>
+                  <Link to={`polling-stations`}>{t("polling_station.title.plural")}</Link>
                 </li>
               </ul>
             </li>

@@ -9,19 +9,19 @@ import styles from "./NavBar.module.css";
 export function NavBarMenu() {
   return (
     <div className={styles.navBarMenu}>
-      <NavLink to={"/elections#administrator"}>
+      <NavLink to={"/elections"}>
         <IconCompass />
         {t("election.title.plural")}
       </NavLink>
-      <NavLink to={"/users#administratorcoordinator"}>
+      <NavLink to={"/users"}>
         <IconUsers />
         {t("users.users")}
       </NavLink>
-      <NavLink to={"/workstations#administrator"}>
+      <NavLink to={"/workstations"}>
         <IconLaptop />
         {t("workstations.workstations")}
       </NavLink>
-      <NavLink to={"/logs#administratorcoordinator"}>
+      <NavLink to={"/logs"}>
         <IconFile />
         {t("logs")}
       </NavLink>

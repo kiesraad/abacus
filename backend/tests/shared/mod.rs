@@ -127,10 +127,20 @@ pub async fn create_and_save_non_example_data_entry(
     post_data_entry(addr, cookie, polling_station_id, entry_number, data_entry).await;
 }
 
-async fn finalise_data_entry(addr: &SocketAddr, polling_station_id: u32, entry_number: u32) {
+async fn finalise_data_entry(
+    addr: &SocketAddr,
+    cookie: HeaderValue,
+    polling_station_id: u32,
+    entry_number: u32,
+) {
     // Finalise the data entry
     let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise");
-    let response = Client::new().post(&url).send().await.unwrap();
+    let response = Client::new()
+        .post(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
@@ -142,8 +152,8 @@ pub async fn create_and_finalise_data_entry(
     polling_station_id: u32,
     entry_number: u32,
 ) {
-    create_and_save_data_entry(addr, cookie, polling_station_id, entry_number, None).await;
-    finalise_data_entry(addr, polling_station_id, entry_number).await;
+    create_and_save_data_entry(addr, cookie.clone(), polling_station_id, entry_number, None).await;
+    finalise_data_entry(addr, cookie, polling_station_id, entry_number).await;
 }
 
 pub async fn create_and_finalise_non_example_data_entry(
@@ -155,13 +165,13 @@ pub async fn create_and_finalise_non_example_data_entry(
 ) {
     create_and_save_non_example_data_entry(
         addr,
-        cookie,
+        cookie.clone(),
         polling_station_id,
         entry_number,
         data_entry,
     )
     .await;
-    finalise_data_entry(addr, polling_station_id, entry_number).await;
+    finalise_data_entry(addr, cookie, polling_station_id, entry_number).await;
 }
 
 async fn check_data_entry_status_is_definitive(
@@ -171,7 +181,13 @@ async fn check_data_entry_status_is_definitive(
 ) {
     // check that data entry status for this polling station is now Definitive
     let url = format!("http://{addr}/api/elections/{election_id}/status");
-    let response = Client::new().get(&url).send().await.unwrap();
+    let cookie = typist_login(addr).await;
+    let response = Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionStatusResponse = response.json().await.unwrap();
     assert_eq!(

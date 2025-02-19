@@ -6,7 +6,7 @@ __Niveau:__ hoog-over, vlieger, 🪁
 
 __Precondities:__
 
-- [De beheerder en de coördinator richten de applicatie in](./beheerder.md#de-beheerder-en-de-coördinator-richten-de-applicatie-in-vlieger)
+- [De beheerder richt de applicatie in](./beheerder.md#de-beheerder-richt-de-applicatie-in-wolk)
 
 ### Hoofdscenario en uitbreidingen
 

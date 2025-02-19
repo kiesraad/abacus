@@ -1,4 +1,4 @@
-# Invoer eerste zitting
+# GSB: Invoer eerste zitting
 
 ## Het GSB voert de tellingen in de applicatie in (vlieger)
 
@@ -6,7 +6,7 @@ __Niveau:__ hoog-over, vlieger, 🪁
 
 __Precondities:__
 
-- [De beheerder en de coördinator richten de applicatie in](./Installatie-en-inrichting-applicatie.md#de-beheerder-en-de-coördinator-richten-de-applicatie-in-vlieger)
+- [De beheerder richt de applicatie in](./beheerder.md#de-beheerder-richt-de-applicatie-in-wolk)
 
 ### Hoofdscenario en uitbreidingen
 
@@ -28,6 +28,7 @@ __Uitbreidingen:__
 ### Open punten
 
 - Welke controles willen we nog nadat de invoer is afgesloten? Of zijn die controles onderdeel van het afsluiten?
+
 
 
 ## De invoerders vullen de resultaten van de tellingen in (vlieger)
@@ -60,6 +61,7 @@ __Uitbreidingen:__
 - Waar in het scenario kan de coördinator verklaringen maken over de waarschuwingen, zodat het CSB deze beter kan beoordelen? Na de eerste of tweede invoer? Of pas nadat het resultaat van een stembureau definitief is?
 
 
+
 ## De eerste of tweede invoerder voert de resultaten van de telling in (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
@@ -76,12 +78,13 @@ __Hoofdscenario:__
 
 1. De invoerder selecteert het stembureau van het PV in de applicatie.
 2. De applicatie stelt vast dat er geen eerdere invoer voor het stembureau is opgeslagen.
-3. De invoerder vult de resultaten van de telling in.
-4. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
-   de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten)
+3. De invoerder voert in of er herteld is.
+4. De invoerder vult de resultaten van de telling in.
 5. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
+   de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten)
+6. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
    de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
-6. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
+7. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
 
 __Uitbreidingen:__  
 1a. De invoerder kan het stembureau op het PV niet in de applicatie vinden:  
@@ -99,21 +102,23 @@ __Uitbreidingen:__
 2a. De applicatie stelt vast dat de invoerder eerdere invoer voor het stembureau heeft opgeslagen:  
 &emsp; 2a1. De applicatie laadt de eerder ingevoerde data.
 
-4a. De invoer voldoet niet aan de validatieregels voor fouten:  
-&emsp; 4a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel.  
-&emsp; 4a2. [De invoerder handelt de fout(en) af.](#de-invoerder-handelt-de-fouten-af-vis)  
+5a. De invoer voldoet niet aan de validatieregels voor fouten:  
+&emsp; 5a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel.  
+&emsp; 5a2. [De invoerder handelt de fout(en) af.](#de-invoerder-handelt-de-fouten-af-vis)  
 
-5a. De invoer voldoet niet aan de plausibiliteitschecks:  
-&emsp; 5a1. De applicatie toont een waarschuwing voor elke gefaalde plausibiliteitscheck.  
-&emsp;
-5a2. [De invoerder handelt de waarschuwing(en) af.](#de-invoerder-handelt-de-waarschuwingen-af-vis)
+6a. De invoer voldoet niet aan de plausibiliteitschecks:  
+&emsp; 6a1. De applicatie toont een waarschuwing voor elke gefaalde plausibiliteitscheck.  
+&emsp; 6a2. [De invoerder handelt de waarschuwing(en) af.](#de-invoerder-handelt-de-waarschuwingen-af-vis)
 
-6a. De invoerder breekt de invoer af en bewaart de invoer:  
-&emsp; 6a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  
-&emsp; 6a2. De applicatie laadt de pagina voor het selecteren van een stembureau.  
-6b. De invoerder breekt de invoer af en bewaart de invoer niet:  
-&emsp; 6b1. De applicatie verwijdert de invoer voor het stembureau.  
-&emsp; 6b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
+7a. De invoerder breekt de invoer af en bewaart de invoer:  
+&emsp; 7a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  
+&emsp; 7a2. De applicatie laadt de pagina voor het selecteren van een stembureau.  
+7b. De invoerder breekt de invoer af en bewaart de invoer niet:  
+&emsp; 7b1. De applicatie verwijdert de invoer voor het stembureau.  
+&emsp; 7b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
+
+### Open punten
+- De use case beschrijft de oude modellen, met daarin alleen de vraag "Is er herteld?" In de nieuwe modellen zijn er drie vragen.
 
 
 ## De coördinator lost de verschillen tussen de twee invoeren op (zee)
@@ -138,6 +143,7 @@ __Uitbreidingen:__
 ### Open punten
 
 - Als gebruiksvriendelijker alternatief op de uitbreiding waar geen van beide invoeren correct zijn: "De coördinator laat alleen de afwijkende lijsten opnieuw twee keer invoeren."
+
 
 
 ## De invoerder handelt de fout(en) af (vis)
@@ -168,6 +174,7 @@ __Uitbreidingen:__
 
 - Moet de coördinator de optie hebben om ondanks een foutmelding de invoerder het hele PV in te laten voeren, zodat een complete lijst met alle fouten kan worden gemaakt? Die lijst moet dan geprint kunnen worden, zodat die meekan met het PV.
 - Als de coördinator het PV terugstuurt in het proces, naar welk punt dan precies?
+
 
 
 ## De invoerder handelt de waarschuwing(en) af (vis)

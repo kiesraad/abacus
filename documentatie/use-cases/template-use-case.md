@@ -22,6 +22,11 @@ __Uitbreidingen:__
 1a. Conditie van de uitbreiding:  
 &emsp; 1a1: eerste actie  
 
+### Niet in scope
+
+- ...
+
+
 ### Open punten
 
 - ...  

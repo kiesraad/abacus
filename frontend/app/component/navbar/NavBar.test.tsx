@@ -63,6 +63,8 @@ describe("NavBar", () => {
   test.each([
     { pathname: "/elections", hash: "#administratorcoordinator" },
     { pathname: "/users", hash: "#administratorcoordinator" },
+    { pathname: "/users/create", hash: "#administratorcoordinator" },
+    { pathname: "/users/create/details", hash: "#administratorcoordinator" },
     { pathname: "/workstations", hash: "#administratorcoordinator" },
     { pathname: "/logs", hash: "#administratorcoordinator" },
     { pathname: "/elections/1", hash: "#administratorcoordinator" },

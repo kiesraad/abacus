@@ -9,21 +9,21 @@ import { Button, ChoiceList, Form, FormLayout, PageTitle } from "@kiesraad/ui";
 
 export function UserCreateTypePage() {
   const navigate = useNavigate();
-  const { user, updateUser } = useUserCreateContext();
+  const { role, type, setType } = useUserCreateContext();
 
-  if (!user.role) {
+  if (!role) {
     return <Navigate to="/users/create" />;
   }
 
   // Preselect fullname if there was nothing selected yet
-  const fullnameChecked = user.type ? user.type === "fullname" : true;
+  const fullnameChecked = type ? type === "fullname" : true;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const type = formData.get("type") as UserType;
 
-    updateUser({ type });
+    setType(type);
     void navigate("/users/create/details");
   }
 
@@ -32,7 +32,7 @@ export function UserCreateTypePage() {
       <PageTitle title={`${t("users.add")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("users.add_role", { role: t(user.role) })}</h1>
+          <h1>{t("users.add_role", { role: t(role) })}</h1>
         </section>
       </header>
       <main>

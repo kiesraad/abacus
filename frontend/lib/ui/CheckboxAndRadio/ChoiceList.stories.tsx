@@ -26,6 +26,7 @@ export const DefaultChoiceListCheckbox: Story<Props> = ({ label, error }) => (
 
 DefaultChoiceListCheckbox.args = {
   label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+  error: "Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.",
 };
 
 export const DefaultChoiceListRadio: Story<Props> = ({ label, error }) => (
@@ -47,6 +48,7 @@ export const DefaultChoiceListRadio: Story<Props> = ({ label, error }) => (
 
 DefaultChoiceListRadio.args = {
   label: "Ik heb de aantallen gecontroleerd met het papier en correct overgenomen.",
+  error: "Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.",
 };
 
 export default {

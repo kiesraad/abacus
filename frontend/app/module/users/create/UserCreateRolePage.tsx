@@ -10,23 +10,24 @@ import { Button, ChoiceList, Form, FormLayout, PageTitle } from "@kiesraad/ui";
 export function UserCreateRolePage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string>("");
-  const { user, updateUser } = useUserCreateContext();
+  const { role, setRole, setType } = useUserCreateContext();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const role = formData.get("role") as Role | null;
+    const roleValue = formData.get("role") as Role | null;
 
-    if (!role) {
+    if (!roleValue) {
       setError(t("users.role_mandatory"));
       return;
     }
 
-    if (role === "typist") {
-      updateUser({ role });
+    if (roleValue === "typist") {
+      setRole(roleValue);
       void navigate("/users/create/type");
     } else {
-      updateUser({ role, type: "fullname" });
+      setRole(roleValue);
+      setType("fullname");
       void navigate("/users/create/details");
     }
   }
@@ -50,7 +51,7 @@ export function UserCreateRolePage() {
                   id={"role-administrator"}
                   name={"role"}
                   defaultValue={"administrator"}
-                  defaultChecked={user.role === "administrator"}
+                  defaultChecked={role === "administrator"}
                   label={t("administrator")}
                 >
                   {t("users.role_administrator_hint")}
@@ -59,7 +60,7 @@ export function UserCreateRolePage() {
                   id={"role-coordinator"}
                   name={"role"}
                   defaultValue={"coordinator"}
-                  defaultChecked={user.role === "coordinator"}
+                  defaultChecked={role === "coordinator"}
                   label={t("coordinator")}
                 >
                   {t("users.role_coordinator_hint")}
@@ -68,7 +69,7 @@ export function UserCreateRolePage() {
                   id={"role-typist"}
                   name={"role"}
                   defaultValue={"typist"}
-                  defaultChecked={user.role === "typist"}
+                  defaultChecked={role === "typist"}
                   label={t("typist")}
                 >
                   {t("users.role_typist_hint")}

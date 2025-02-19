@@ -1,12 +1,14 @@
 import { useUserListRequest } from "app/module/users/useUserListRequest";
 
+import { Role } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconPlus } from "@kiesraad/icon";
-import { Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
-import { formatDateTime } from "@kiesraad/util";
+import { Alert, Button, Loader, PageTitle, Table, Toolbar } from "@kiesraad/ui";
+import { formatDateTime, useQueryParam } from "@kiesraad/util";
 
 export function UserListPage() {
   const { requestState } = useUserListRequest();
+  const [createdMessage, clearCreatedMessage] = useQueryParam("created");
 
   if (requestState.status === "loading") {
     return <Loader />;
@@ -18,6 +20,15 @@ export function UserListPage() {
 
   const users = requestState.data.users;
 
+  const sortedRoles: Role[] = ["administrator", "coordinator", "typist"];
+  users.sort((a, b) => {
+    const roleCompare = sortedRoles.indexOf(a.role) - sortedRoles.indexOf(b.role);
+    if (roleCompare !== 0) {
+      return roleCompare;
+    }
+    return a.username.localeCompare(b.username);
+  });
+
   return (
     <>
       <PageTitle title={`${t("users.management")} - Abacus`} />
@@ -26,6 +37,14 @@ export function UserListPage() {
           <h1>{t("users.management")}</h1>
         </section>
       </header>
+
+      {createdMessage && (
+        <Alert type="success" onClose={clearCreatedMessage}>
+          <h2>{t("users.user_created")}</h2>
+          <p>{createdMessage}</p>
+        </Alert>
+      )}
+
       <main>
         <article>
           <Toolbar>

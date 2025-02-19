@@ -29,12 +29,12 @@ function renderPage(context: Partial<IUserCreateContext>) {
 
 describe("UserCreateTypePage", () => {
   test("Redirect to start when no role in context", () => {
-    renderPage({ user: {} });
+    renderPage({});
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create");
   });
 
   test("Shows initial form", async () => {
-    renderPage({ user: { role: "typist" } });
+    renderPage({ role: "typist" });
 
     expect(await screen.findByRole("heading", { level: 1, name: "Invoerder toevoegen" })).toBeInTheDocument();
 
@@ -43,15 +43,15 @@ describe("UserCreateTypePage", () => {
   });
 
   test("Shows form previously selected", async () => {
-    renderPage({ user: { role: "typist", type: "anonymous" } });
+    renderPage({ role: "typist", type: "anonymous" });
 
     expect(await screen.findByLabelText(/Op naam/)).not.toBeChecked();
     expect(await screen.findByLabelText(/Anonieme gebruikersnaam/)).toBeChecked();
   });
 
   test("Continue after selecting fullname", async () => {
-    const updateUser = vi.fn();
-    renderPage({ user: { role: "typist" }, updateUser });
+    const setType = vi.fn();
+    renderPage({ role: "typist", setType });
 
     const user = userEvent.setup();
 
@@ -61,13 +61,13 @@ describe("UserCreateTypePage", () => {
     const submit = await screen.findByRole("button", { name: "Verder" });
     await user.click(submit);
 
-    expect(updateUser).toHaveBeenCalledExactlyOnceWith({ type: "fullname" });
+    expect(setType).toHaveBeenCalledExactlyOnceWith("fullname");
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/details");
   });
 
   test("Continue after selecting anonymous", async () => {
-    const updateUser = vi.fn();
-    renderPage({ user: { role: "typist" }, updateUser });
+    const setType = vi.fn();
+    renderPage({ role: "typist", setType });
 
     const user = userEvent.setup();
 
@@ -77,7 +77,7 @@ describe("UserCreateTypePage", () => {
     const submit = await screen.findByRole("button", { name: "Verder" });
     await user.click(submit);
 
-    expect(updateUser).toHaveBeenCalledExactlyOnceWith({ type: "anonymous" });
+    expect(setType).toHaveBeenCalledExactlyOnceWith("anonymous");
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/details");
   });
 });

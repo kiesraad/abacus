@@ -20,7 +20,11 @@
   "type_fullname": "Op naam (bijvoorbeeld 'MariekeDeJager')",
   "type_hint": "Gebruikers met een anoniem account moeten bij de eerste keer inloggen hun echte naam invoeren. Anonieme accounts zijn vooral handig als je veel invoerders verwacht, en nog niet precies weet wie wel en wie niet aanwezig zal zijn.",
   "type_title": "Type account",
+  "user_created": "Gebruiker toegevoegd",
+  "user_created_details": "{username} is toegevoegd met de rol {role}",
   "username": "Gebruikersnaam",
   "username_hint": "Dit is de naam waarmee de gebruiker kan inloggen. De invoer is niet hoofdlettergevoelig",
+  "username_not_unique_error": "Er bestaat al een gebruiker met gebruikersnaam {username}",
+  "username_unique": "De gebruikersnaam moet uniek zijn",
   "users": "Gebruikers"
 }

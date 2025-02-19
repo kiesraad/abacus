@@ -25,7 +25,7 @@ function renderPage(context: Partial<IUserCreateContext>) {
 
 describe("UserCreateRolePage", () => {
   test("Shows initial form", async () => {
-    renderPage({ user: {} });
+    renderPage({});
 
     expect(await screen.findByRole("heading", { level: 1, name: "Gebruiker toevoegen" })).toBeInTheDocument();
 
@@ -35,7 +35,7 @@ describe("UserCreateRolePage", () => {
   });
 
   test("Shows form previously selected", async () => {
-    renderPage({ user: { role: "typist" } });
+    renderPage({ role: "typist" });
 
     expect(await screen.findByLabelText(/Beheerder/)).not.toBeChecked();
     expect(await screen.findByLabelText(/Coördinator/)).not.toBeChecked();
@@ -43,8 +43,8 @@ describe("UserCreateRolePage", () => {
   });
 
   test("Shows validation error when nothing selected", async () => {
-    const updateUser = vi.fn();
-    renderPage({ user: {}, updateUser });
+    const setRole = vi.fn();
+    renderPage({ setRole });
 
     const user = userEvent.setup();
 
@@ -54,27 +54,49 @@ describe("UserCreateRolePage", () => {
     const errorMessage = screen.getByText(/Dit is een verplichte vraag./);
     expect(errorMessage).toBeInTheDocument();
 
-    expect(updateUser).not.toHaveBeenCalled();
+    expect(setRole).not.toHaveBeenCalled();
     expect(navigate).not.toHaveBeenCalled();
   });
 
-  test.each([
-    [/Beheerder/, { role: "administrator", type: "fullname" }, "/users/create/details"],
-    [/Coördinator/, { role: "coordinator", type: "fullname" }, "/users/create/details"],
-    [/Invoerder/, { role: "typist" }, "/users/create/type"],
-  ])("Continue after selection as %s", async (label: RegExp, update: unknown, newPath: string) => {
-    const updateUser = vi.fn();
-    renderPage({ user: {}, updateUser });
+  test("Continue with administrator", async () => {
+    const setRole = vi.fn();
+    const setType = vi.fn();
+    renderPage({ setRole, setType });
 
     const user = userEvent.setup();
+    await user.click(await screen.findByLabelText(/Beheerder/));
+    await user.click(await screen.findByRole("button", { name: "Verder" }));
 
-    const role = await screen.findByLabelText(label);
-    await user.click(role);
+    expect(setRole).toHaveBeenCalledExactlyOnceWith("administrator");
+    expect(setType).toHaveBeenCalledExactlyOnceWith("fullname");
+    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/details");
+  });
 
-    const submit = await screen.findByRole("button", { name: "Verder" });
-    await user.click(submit);
+  test("Continue with coordinator", async () => {
+    const setRole = vi.fn();
+    const setType = vi.fn();
+    renderPage({ setRole, setType });
 
-    expect(updateUser).toHaveBeenCalledExactlyOnceWith(update);
-    expect(navigate).toHaveBeenCalledExactlyOnceWith(newPath);
+    const user = userEvent.setup();
+    await user.click(await screen.findByLabelText(/Coördinator/));
+    await user.click(await screen.findByRole("button", { name: "Verder" }));
+
+    expect(setRole).toHaveBeenCalledExactlyOnceWith("coordinator");
+    expect(setType).toHaveBeenCalledExactlyOnceWith("fullname");
+    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/details");
+  });
+
+  test("Continue with typist", async () => {
+    const setRole = vi.fn();
+    const setType = vi.fn();
+    renderPage({ setRole, setType });
+
+    const user = userEvent.setup();
+    await user.click(await screen.findByLabelText(/Invoerder/));
+    await user.click(await screen.findByRole("button", { name: "Verder" }));
+
+    expect(setRole).toHaveBeenCalledExactlyOnceWith("typist");
+    expect(setType).not.toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/type");
   });
 });

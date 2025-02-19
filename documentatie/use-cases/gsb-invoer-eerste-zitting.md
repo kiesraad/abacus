@@ -6,7 +6,7 @@ __Niveau:__ hoog-over, vlieger, 🪁
 
 __Precondities:__
 
-- [De beheerder en de coördinator richten de applicatie in](./Installatie-en-inrichting-applicatie.md#de-beheerder-en-de-coördinator-richten-de-applicatie-in-vlieger)
+- [De beheerder en de coördinator richten de applicatie in](./beheerder.md#de-beheerder-en-de-coördinator-richten-de-applicatie-in-vlieger)
 
 ### Hoofdscenario en uitbreidingen
 
@@ -28,6 +28,7 @@ __Uitbreidingen:__
 ### Open punten
 
 - Welke controles willen we nog nadat de invoer is afgesloten? Of zijn die controles onderdeel van het afsluiten?
+
 
 
 ## De invoerders vullen de resultaten van de tellingen in (vlieger)
@@ -58,6 +59,7 @@ __Uitbreidingen:__
 
 ### Open punten
 - Waar in het scenario kan de coördinator verklaringen maken over de waarschuwingen, zodat het CSB deze beter kan beoordelen? Na de eerste of tweede invoer? Of pas nadat het resultaat van een stembureau definitief is?
+
 
 
 ## De eerste of tweede invoerder voert de resultaten van de telling in (zee)
@@ -116,6 +118,7 @@ __Uitbreidingen:__
 &emsp; 7b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
 
 
+
 ## De coördinator lost de verschillen tussen de twee invoeren op (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
@@ -138,6 +141,7 @@ __Uitbreidingen:__
 ### Open punten
 
 - Als gebruiksvriendelijker alternatief op de uitbreiding waar geen van beide invoeren correct zijn: "De coördinator laat alleen de afwijkende lijsten opnieuw twee keer invoeren."
+
 
 
 ## De invoerder handelt de fout(en) af (vis)
@@ -168,6 +172,7 @@ __Uitbreidingen:__
 
 - Moet de coördinator de optie hebben om ondanks een foutmelding de invoerder het hele PV in te laten voeren, zodat een complete lijst met alle fouten kan worden gemaakt? Die lijst moet dan geprint kunnen worden, zodat die meekan met het PV.
 - Als de coördinator het PV terugstuurt in het proces, naar welk punt dan precies?
+
 
 
 ## De invoerder handelt de waarschuwing(en) af (vis)

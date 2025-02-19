@@ -39,6 +39,11 @@ __Uitbreidingen:__
 
 13a. Er zijn bezwaren (kan alleen tijdens zitting):
 
+### Niet in scope
+
+- Moet de applicatie ook de resultaten ter publicatie genereren? Bijvoorbeeld het `.csv` tellingsbestand. -> uitwisselplatform
+- Elektronische handtekening van documenten.
+
 ### Open punten
 
 - Willen we de benoemingsbrieven en de kennisgevingen tot geloofsbrief door de applicatie laten genereren? Of doen we dat liever op een andere manier? Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
@@ -46,11 +51,6 @@ __Uitbreidingen:__
 - Geen elektronische handtekening.
 - CSB kan tijdens de zitting overgaan tot spontane hertelling? Moet niets mee gedaan worden in software. Nieuwe P22 in de oude plakken (sandwich)? Niet applicatie, in proces. Maar wel nieuwe GR GSB en CSB nodig in Abacus.
 - Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
-
-### Niet in scope
-
-- Moet de applicatie ook de resultaten ter publicatie genereren? Bijvoorbeeld het `.csv` tellingsbestand. -> uitwisselplatform
-- Elektronische handtekening van documenten.
 
 
 
@@ -73,7 +73,6 @@ __Uitbreidingen:__
 
 3a. Er zijn minder beschikbare zetels dan kandidaten met gelijke behaalde (voorkeur)stemmen:  
 &emsp;3a1. De zetel wordt bij loting toegekend.
-
 
 ### Open punten
 

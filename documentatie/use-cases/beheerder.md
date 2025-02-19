@@ -7,10 +7,9 @@ _Niveau:_ hoog-over, wolk, ☁️
 ### Hoofdscenario en uitbreidingen
 
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
-
 2. De beheerder leest de verkiezingsdefinitie in.
 3. De beheerder leest de kandidatenlijst in. (niet: de totalenlijst)
-4. [De beheerder zet de stembureaus in de applicatie.](de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
+4. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
 5. De beheerder maakt de gebruikers aan.
 
 __Uitbreidingen:__  

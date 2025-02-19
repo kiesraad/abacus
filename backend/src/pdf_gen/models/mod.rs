@@ -40,7 +40,7 @@ impl PdfModel {
             Self::ModelNa31_2(input) => serde_json::to_string(input),
         }?;
 
-        Ok(Bytes::from(data.as_bytes()))
+        Ok(Bytes::from_string(data))
     }
 
     pub fn from_name_with_input(name: &str, input: &str) -> Result<PdfModel, Box<dyn Error>> {

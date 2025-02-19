@@ -1,4 +1,4 @@
-# Invoer tweede zitting
+# GSB: Invoer tweede zitting
 
 ## Het GSB voert de corrigendum PV's in de applicatie in (vlieger)
 

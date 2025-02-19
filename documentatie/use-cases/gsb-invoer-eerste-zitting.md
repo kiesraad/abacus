@@ -1,4 +1,4 @@
-# Invoer eerste zitting
+# GSB: Invoer eerste zitting
 
 ## Het GSB voert de tellingen in de applicatie in (vlieger)
 
@@ -100,21 +100,20 @@ __Uitbreidingen:__
 2a. De applicatie stelt vast dat de invoerder eerdere invoer voor het stembureau heeft opgeslagen:  
 &emsp; 2a1. De applicatie laadt de eerder ingevoerde data.
 
-4a. De invoer voldoet niet aan de validatieregels voor fouten:  
-&emsp; 4a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel.  
-&emsp; 4a2. [De invoerder handelt de fout(en) af.](#de-invoerder-handelt-de-fouten-af-vis)  
+5a. De invoer voldoet niet aan de validatieregels voor fouten:  
+&emsp; 5a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel.  
+&emsp; 5a2. [De invoerder handelt de fout(en) af.](#de-invoerder-handelt-de-fouten-af-vis)  
 
-5a. De invoer voldoet niet aan de plausibiliteitschecks:  
-&emsp; 5a1. De applicatie toont een waarschuwing voor elke gefaalde plausibiliteitscheck.  
-&emsp;
-5a2. [De invoerder handelt de waarschuwing(en) af.](#de-invoerder-handelt-de-waarschuwingen-af-vis)
+6a. De invoer voldoet niet aan de plausibiliteitschecks:  
+&emsp; 6a1. De applicatie toont een waarschuwing voor elke gefaalde plausibiliteitscheck.  
+&emsp; 6a2. [De invoerder handelt de waarschuwing(en) af.](#de-invoerder-handelt-de-waarschuwingen-af-vis)
 
-6a. De invoerder breekt de invoer af en bewaart de invoer:  
-&emsp; 6a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  
-&emsp; 6a2. De applicatie laadt de pagina voor het selecteren van een stembureau.  
-6b. De invoerder breekt de invoer af en bewaart de invoer niet:  
-&emsp; 6b1. De applicatie verwijdert de invoer voor het stembureau.  
-&emsp; 6b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
+7a. De invoerder breekt de invoer af en bewaart de invoer:  
+&emsp; 7a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  
+&emsp; 7a2. De applicatie laadt de pagina voor het selecteren van een stembureau.  
+7b. De invoerder breekt de invoer af en bewaart de invoer niet:  
+&emsp; 7b1. De applicatie verwijdert de invoer voor het stembureau.  
+&emsp; 7b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
 
 
 ## De coördinator lost de verschillen tussen de twee invoeren op (zee)

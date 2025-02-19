@@ -1,4 +1,24 @@
-# Installatie en inrichting van de applicatie
+# Beheerder
+
+## De beheerder richt de applicatie in
+
+_Niveau:_ hoog-over, wolk, ☁️
+
+### Hoofdscenario en uitbreidingen
+
+1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
+
+2. De beheerder leest de verkiezingsdefinitie in.
+3. De beheerder leest de kandidatenlijst in. (niet: de totalenlijst)
+4. [De beheerder zet de stembureaus in de applicatie.](de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
+5. De beheerder maakt de gebruikers aan.
+
+__Uitbreidingen:__  
+2a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
+
+3a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
+
+
 
 ## De beheerder installeert de applicatie (zee)
 

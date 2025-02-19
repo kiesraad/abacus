@@ -13,7 +13,7 @@ __Hoofdscenario:__
 2. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 3. (voor elk stembureau) Het GSB doet de telling op lijst- en kandidaatniveau en vult Na31-2 Bijlage 2 in.
 4. (voor elk stembureau) [Het GSB voert de tellingen uit Bijlage 2 in de applicatie in.](./gsb-invoer-eerste-zitting.md#het-gsb-voert-de-tellingen-in-de-applicatie-in-vlieger)
-5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. in.]() TODO
+5. (parallel aan invoer stembureaus) [De coördinator voert bezwaren, bijzonderheden, etc. in.](#de-coördinator-voert-bezwaren-bijzonderheden-etc-in-zee)
 6. De coördinator genereert het concept-PV en het digitale bestand. En voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
 7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
 8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het concept-PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
@@ -28,7 +28,7 @@ __Uitbreidingen:__
 &emsp; 4b1. Het GSB voert de hertelling uit.  
 &emsp; 4b2. Het GSB corrigeert de Bijlage 2 of vult een nieuwe Bijlage 2 in.  
 &emsp; 4b3. Het GSB voert de nieuwe Bijlage 2 in de applicatie in.  
-&emsp; 4b4. Het GSB vermeldt het stembureau bij "extra onderzoeken van het GSB" in het concept-PV. (stap 4)
+&emsp; 4b4. Het GSB vermeldt het stembureau bij "extra onderzoeken van het GSB" in het concept-PV.
 
 7a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
 &emsp; 7a1. Het GSB controleert de resultaten van het controleprotocol.  
@@ -55,12 +55,14 @@ __Uitbreidingen:__
 - Na31-2 Bijlage 2 wordt Bijlage 1 in nieuwe modellen.
 - Kunnen we het mogelijk maken om bezwaren en bijzonderheden in te voeren in de applicatie tijdens het voorlezen van het concept-PV?
 - Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Gaan we dit faciliteren in de applicatie?
-- Resultaat controleprotocol in applicatie invoeren? Of met pen? Of in bijlage? Niet in ODT. Maar protocol na genereren concept-PV (na oplossen van evt problemen obv protocol)?? Verslag uitkomst controleprotocol. ==> met pen invullen
-  - "verschillen geconstateerd": dan mag je PV weggooien en alles handmatig doen
-  - dus met applicatie laten aanvinken: geen verschillen geconstateerd
-  - controle voor concept-PV of vinkje + handtekening is definitief PV
-
-- Ondertekenen is bijlage. Waar komt die vandaan?
+- Willen we het invoeren van het resultaat controleprotocol (handmatige controle optellingen software) in de applicatie doen?
+  - Protocol wordt uitgevoerd na het afdrukken van het concept-PV, dus lastig om in applicatie te doen.
+  - Alternatieven: met pen, in een bijlage.
+  - Geen alternatief: in een ODT-bestand.
+  - Overweging: Als het resultaat is "verschillen geconstateerd", dan moet alles handmatig overgedaan worden en komt er een nieuw 'handmatig' PV. Dus als het PV dat uit de applicatie komt, geldig is, dan staat er een vinkje bij "geen verschillen geconstateerd".
+- Ondertekenen gebeurt in een bijlage. Waar komt die vandaan?
+- Wat zit er precies in het digitale bestand?
+- Moet de applicatie een preview van het te genereren PV tonen, zodat de coördinator die kan controleren en eventuele fouten kan herstellen?
 
 
 
@@ -111,7 +113,6 @@ __Hoofdscenario:__
 2. De coördinator voert de aanwezige leden van het GSB in.
 3. De coördinator voert de bezwaren van kiezers/belangstellenden tijdens de zitting in.
 4. De coördinator voert onregelmatigheden of bijzonderheden tijdens de zitting in.
-5. De coördinator voert extra onderzoeken op stembureau-niveau van het GSB in.
 
 __Uitbreidingen:__
 
@@ -119,11 +120,8 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- Wat zit er precies in het digitale bestand?
-- Moet de applicatie een preview van het te genereren PV tonen, zodat de coördinator die kan controleren en eventuele fouten kan herstellen?
-- Worden de extra onderzoeken van het GSB ingevuld in de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen"?
-  - ja
-  - nieuw model PV GSB: drie vinkjes: toegelaten kiezers opnieuw vastgesteld, onderzocht vanwege andere redenen, stembiljetten (deels) herteld?
-  - nieuw Bijlage 2: tekst en vinkje, dus moeilijk voor invoerder
-  - applicatie: vinkje Is er herteld?
-  - onderscheid CSO en DSO
+- Voert de coördinator de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen" in? Of doet de coördinator dat?
+  - Nieuw model GSB PV heeft drie vinkjes: toegelaten kiezers opnieuw vastgesteld, onderzocht vanwege andere redenen, stembiljetten (deels) herteld.
+  - De SB PVs verschillen hierin tussen DSO en CSO.
+  - Als de applicatie dit moet doen, moeten de invoerders dit over kunnen nemen van het SB PV.
+  - De applicatie gaat nog uit van de oude modellen, met alleen de vraag "Is er herteld?"

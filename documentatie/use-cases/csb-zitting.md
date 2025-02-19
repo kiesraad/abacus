@@ -11,19 +11,17 @@ __Hoofdscenario:__
 1. Het CSB ontvangt het GSB PV (incl. bijlagen) van de burgemeester.
 2. Het CSB ontvangt de benodigde digitale bestanden (PV, onderliggende PVs, digitale bestanden, corrigenda) van het GSB en controleert ze op volledigheid.
 3. Het CSB stelt vast dat het PV geen aanleiding geeft tot een terugverwijzing. (controleprotocol deel A)
-4. Het CSB leest het digitale bestand in als eerste invoer. (controle hash-code en importeren)
-5. Het CSB voert de resultaten handmatig in als tweede invoer.
-6. Het CSB voert het controleprotocol optellingen uit. (controleprotocol deel B)
-7. [Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan.](#het-csb-stelt-de-zetelverdeling-vast-en-wijst-de-gekozen-kandidaten-aan-vlieger)
-8. De applicatie genereert de benodigde bestanden: concept-PV, digitaal bestand(en). Locatie en datum, namen stembureauleden, ~~bezwaren~~, opmerkelijkheden, ...?
-9. De applicatie geneert de benoemingsbrieven en de kennisgevingen tot geloofsbrief. => open punt
-10. De voorzitter CSB (burgemeester) tekent de brieven.
-11. Het CSB voert het controleprotocol zetelverdeling uit. (controleprotocol deel C)
-12. Het CSB opent de zitting.
-13. Het CSB stelt de uitslag vast obv het concept-PV: controleren op compleetheid, voorlezen, er zijn geen bezwaren, ondertekenen. En sluit daarmee de zitting.
-14. Het CSB publiceert het digitaal bestand en het PV op de website van de gemeente.
-15. Het CSB stuurt alle PVs naar de gemeenteraad.
-16. Het CSB deelt het digitale bestand met de Kiesraad.
+4. [Het CSB voert de tellingen van het GSB in.](#het-csb-voert-de-tellingen-van-het-gsb-in-vlieger)
+5. Het CSB voert het controleprotocol optellingen uit. (controleprotocol deel B)
+6. [Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan.](#het-csb-stelt-de-zetelverdeling-vast-en-wijst-de-gekozen-kandidaten-aan-vlieger)
+7. De applicatie genereert de benodigde bestanden: concept-PV, digitaal bestand(en). Locatie en datum, namen stembureauleden, opmerkelijkheden, ...?
+8. De voorzitter CSB (burgemeester) tekent de brieven.
+9. Het CSB voert het controleprotocol zetelverdeling uit. (controleprotocol deel C)
+10. Het CSB opent de zitting.
+11. Het CSB stelt de uitslag vast obv het concept-PV: controleren op compleetheid, voorlezen, er zijn geen bezwaren, ondertekenen. En sluit daarmee de zitting.
+12. Het CSB publiceert het digitaal bestand en het PV op de website van de gemeente.
+13. Het CSB stuurt alle PVs naar de gemeenteraad.
+14. Het CSB deelt het digitale bestand met de Kiesraad.
 
 __Uitbreidingen:__
 
@@ -32,26 +30,46 @@ __Uitbreidingen:__
 &emsp;3a2. Het GSB doet onderzoek en gaat eventueel over tot hertelling.  
 &emsp;3a3. Het GSB deelt de resultaten van de terugverwijzing met het CSB.
 
-4a. Het is niet mogelijk het digitale bestand te importeren:  
-&emsp;4a1. Het CSB doet de eerste invoer handmatig.
-
-5a. Er zijn verschillen tussen eerste en tweede invoer:
-
-13a. Er zijn bezwaren (kan alleen tijdens zitting):
+11a. Er zijn bezwaren (kan alleen tijdens zitting):
 
 ### Niet in scope
 
-- Moet de applicatie ook de resultaten ter publicatie genereren? Bijvoorbeeld het `.csv` tellingsbestand. -> uitwisselplatform
+- Tellingsbestand in `csv`-formaat. Dit zal door het uitwisselplatform gedaan worden.
 - Elektronische handtekening van documenten.
+- CSB besluit tijdens de zitting tot spontane hertelling. Resulteert in samenvoegen van oud en nieuw P22. Vereist wel aanmaken van nieuwe verkiezingen (GR GSB en GR CSB) in Abacus.
 
 ### Open punten
 
-- Willen we de benoemingsbrieven en de kennisgevingen tot geloofsbrief door de applicatie laten genereren? Of doen we dat liever op een andere manier? Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
+- Willen we de benoemingsbrieven en de kennisgevingen tot geloofsbrief door de applicatie laten genereren? Of doen we dat liever op een andere manier?
+    - Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
+    - Als de applicatie deze moet genereren, dan moeten we ook de totalenlijst i.p.v. de kandidatenlijst importeren.
 - Als het niet mogelijk is het digitale bestand te importeren, kan het CSB dan contact opnemen met het GSB om te proberen het probleem te verhelpen?
-- Geen elektronische handtekening.
-- CSB kan tijdens de zitting overgaan tot spontane hertelling? Moet niets mee gedaan worden in software. Nieuwe P22 in de oude plakken (sandwich)? Niet applicatie, in proces. Maar wel nieuwe GR GSB en CSB nodig in Abacus.
 - Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
 
+
+
+## Het CSB voert de tellingen van het GSB in (vlieger)
+
+__Niveau:__ hoog-over, vlieger, 🪁
+
+__Hoofdscenario:__  
+
+1. Het CSB leest het digitale bestand in als eerste invoer. (controle hash-code en importeren)
+2. Het CSB voert de resultaten handmatig in als tweede invoer.
+3. De applicatie stelt vast dat beide invoeren gelijk zijn.
+4. De applicatie slaat het definitieve resultaat op.
+
+__Uitbreidingen:__
+
+1a. Het is niet mogelijk het digitale bestand te importeren:  
+&emsp;1a1. Het CSB doet de eerste invoer handmatig.
+
+3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
+&emsp; 3a1. De coördinator vergelijkt de eerste en tweede invoer met het papieren PV.  
+&emsp; 3a2. De coördinator stelt vast dat de tweede (handmatige) invoer correct is.  
+&emsp;&emsp; 3a2a. De coördinator stelt vast dat de tweede (handmatige) invoer niet correct is:  
+&emsp;&emsp;&emsp; 3a2a1. De coördinator gooit beide invoeren weg en laat beide opnieuw handmatig invoeren.  
+&emsp; 3a3. De coördinator markeert de tweede (handmatige) invoer als correct.
 
 
 ## Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan (vlieger)

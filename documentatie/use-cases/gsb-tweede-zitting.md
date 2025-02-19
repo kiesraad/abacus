@@ -27,5 +27,3 @@ __Uitbreidingen:__
 
 - Maakt het voor de tweede zitting uit of een gemeente DSO of CSO doet?
 - Hoe ziet de trigger voor hertelling er precies uit voor gemeenteraadsverkiezingen? Het GSB (dus de gemeente) stelt de telling op gemeente-niveau vast, het CSB (ook de gemeente) controleert die telling en verzoekt als nodig om onderzoek en/of hertelling?
-
-- 

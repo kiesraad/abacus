@@ -78,7 +78,7 @@ __Hoofdscenario:__
 
 1. De invoerder selecteert het stembureau van het PV in de applicatie.
 2. De applicatie stelt vast dat er geen eerdere invoer voor het stembureau is opgeslagen.
-3. TODO De invoerder zet het vinkje "Is er herteld?". MAAR nieuwe modellen
+3. De invoerder voert in of er herteld is.
 4. De invoerder vult de resultaten van de telling in.
 5. (tijdens invoer) De applicatie stelt vast dat de invoer voldoet aan
    de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten)
@@ -117,6 +117,8 @@ __Uitbreidingen:__
 &emsp; 7b1. De applicatie verwijdert de invoer voor het stembureau.  
 &emsp; 7b2. De applicatie laadt de pagina voor het selecteren van een stembureau.
 
+### Open punten
+- De use case beschrijft de oude modellen, met daarin alleen de vraag "Is er herteld?" In de nieuwe modellen zijn er drie vragen.
 
 
 ## De coördinator lost de verschillen tussen de twee invoeren op (zee)

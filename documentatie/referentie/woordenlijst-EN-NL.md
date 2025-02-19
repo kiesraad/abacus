@@ -104,7 +104,7 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 | inloggen                      |           | log in                           | wanneer gebruiken we inloggen en wanneer aanmelden?                                                       |
 | in onderzoek                  |           | under investigation              |                                                                                                           |
 | invoeren                      |           | input                            |                                                                                                           |
-| invoer                        |           | input                            |                                                                                                           |
+| invoer                        |           | input                            | betreft het invoeren van resultaten, invoer in de code is *data entry*                                     |
 | invoerfase                    |           | (data) input phase               |                                                                                                           |
 | kiezen (bestand/optie)        |           | select                           |                                                                                                           |
 | klaar voor                    |           | ready for                        |                                                                                                           |
@@ -150,7 +150,7 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 | bezwaren                            |           | objections                         |                                                               |
 | klachten                            |           | complaints                         |                                                               |
 | onregelmatigheden                   |           | irregularities                     |                                                               |
-| bijzonderheden                      |           | circumstances                      |                                                               |
+| bijzonderheden                      |           | details                            |                                                               |
 | telresultaten                       |           | counting results                   |                                                               |
 | turven                              |           | tally                              |                                                               |
 | turfformulier                       |           | tally form                         |                                                               |

@@ -55,6 +55,9 @@ function DevLinks() {
               <Link to={`/elections/${election.id}#coordinator`}>{election.name}</Link>
               <ul>
                 <li>
+                  <Link to={`/elections/${election.id}/apportionment#coordinator`}>{t("apportionment.title")}</Link>
+                </li>
+                <li>
                   <Link to={`/elections/${election.id}/status#coordinator`}>{t("election_status.main_title")}</Link>
                 </li>
                 <li>

@@ -45,7 +45,7 @@ pub struct PoliticalGroupSeatAssignment {
     votes_cast: u64,
     /// The remainder votes that were not used to get full seats assigned to this political group
     remainder_votes: Fraction,
-    /// Whether this group met the threshold for remainder seat assignment
+    /// Whether this group met the threshold for largest remainder seat assignment
     meets_remainder_threshold: bool,
     /// The number of full seats assigned to this group
     full_seats: u64,
@@ -80,13 +80,13 @@ pub struct PoliticalGroupStanding {
     votes_cast: u64,
     /// The remainder of votes that was not used to get full seats (does not have to be a whole number of votes)
     remainder_votes: Fraction,
-    /// Whether the remainder votes meet the threshold to be applicable for remainder seat assignment
+    /// Whether the remainder votes meet the threshold to be applicable for largest remainder seat assignment
     meets_remainder_threshold: bool,
     /// The number of votes per seat if a new seat would be added to the current residual seats
     next_votes_per_seat: Fraction,
-    /// The number of full seats this political group got
+    /// The number of full seats this political group got assigned
     full_seats: u64,
-    /// The current number of residual seats this political group got
+    /// The current number of residual seats this political group got assigned
     residual_seats: u64,
 }
 

@@ -2286,7 +2286,7 @@
           },
           "meets_remainder_threshold": {
             "type": "boolean",
-            "description": "Whether this group met the threshold for remainder seat assignment"
+            "description": "Whether this group met the threshold for largest remainder seat assignment"
           },
           "pg_number": {
             "type": "integer",
@@ -2334,12 +2334,12 @@
           "full_seats": {
             "type": "integer",
             "format": "int64",
-            "description": "The number of full seats this political group got",
+            "description": "The number of full seats this political group got assigned",
             "minimum": 0
           },
           "meets_remainder_threshold": {
             "type": "boolean",
-            "description": "Whether the remainder votes meet the threshold to be applicable for remainder seat assignment"
+            "description": "Whether the remainder votes meet the threshold to be applicable for largest remainder seat assignment"
           },
           "next_votes_per_seat": {
             "$ref": "#/components/schemas/Fraction",
@@ -2358,7 +2358,7 @@
           "residual_seats": {
             "type": "integer",
             "format": "int64",
-            "description": "The current number of residual seats this political group got",
+            "description": "The current number of residual seats this political group got assigned",
             "minimum": 0
           },
           "votes_cast": {

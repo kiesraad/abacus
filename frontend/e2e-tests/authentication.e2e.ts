@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { webcrypto as crypto } from "crypto";
+
+import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 
 test.describe("authentication", () => {
   // These tests only run in development mode (non-release backend builds)
@@ -8,10 +9,7 @@ test.describe("authentication", () => {
   test.skip(process.env.BACKEND_BUILD === "release");
 
   test("login happy path", async ({ page, request }) => {
-    const array = new Uint32Array(1);
-    crypto.getRandomValues(array);
-    const random = array.toString();
-    const username = `user_${random}`;
+    const username = createRandomUsername();
     const password = "password_test";
     // create a test user
     const createUserResponse = await request.post("/api/user/development/create", {

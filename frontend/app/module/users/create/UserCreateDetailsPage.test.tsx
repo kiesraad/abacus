@@ -1,14 +1,17 @@
+import { within } from "@testing-library/dom";
 import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { UserCreateDetailsPage } from "app/module/users";
 
+import { ApiError, ApiResponseStatus, ApiResult, User } from "@kiesraad/api";
 import { render } from "@kiesraad/test";
 
 import { IUserCreateContext, UserCreateContext } from "./UserCreateContext";
 
 const navigate = vi.fn();
+const createUser = vi.fn();
 
 vi.mock(import("react-router"), async (importOriginal) => ({
   ...(await importOriginal()),
@@ -18,6 +21,8 @@ vi.mock(import("react-router"), async (importOriginal) => ({
   },
   useNavigate: () => navigate,
 }));
+
+const API_ERROR_NOT_UNIQUE = new ApiError(ApiResponseStatus.ServerError, 409, "Item is not unique", "EntryNotUnique");
 
 function renderPage(context: Partial<IUserCreateContext>) {
   return render(
@@ -29,13 +34,22 @@ function renderPage(context: Partial<IUserCreateContext>) {
 
 describe("UserCreateDetailsPage", () => {
   test("Redirect to start when no role in context", () => {
-    renderPage({ user: {} });
+    renderPage({});
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create");
   });
 
+  test("Render empty form", async () => {
+    renderPage({ role: "coordinator", type: "fullname" });
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Coördinator toevoegen" })).toBeInTheDocument();
+
+    expect(await screen.findByLabelText("Gebruikersnaam")).toHaveValue("");
+    expect(await screen.findByLabelText("Volledige naam")).toHaveValue("");
+    expect(await screen.findByLabelText("Tijdelijk wachtwoord")).toHaveValue("");
+  });
+
   test("Show validation errors", async () => {
-    const updateUser = vi.fn();
-    renderPage({ user: { role: "coordinator", type: "fullname" }, updateUser });
+    renderPage({ role: "coordinator", type: "fullname" });
 
     const user = userEvent.setup();
 
@@ -61,36 +75,89 @@ describe("UserCreateDetailsPage", () => {
     expect(password).toHaveAccessibleErrorMessage("Dit wachtwoord is niet lang genoeg. Gebruik minimaal 12 karakters");
   });
 
-  test("Continue after filling in fullname fields", async () => {
-    const updateUser = vi.fn();
-    renderPage({ user: { role: "coordinator", type: "fullname" }, updateUser });
+  test("Do not return to user list if the create is unsuccessful", async () => {
+    createUser.mockResolvedValue(API_ERROR_NOT_UNIQUE satisfies ApiResult<User>);
+
+    renderPage({ role: "typist", type: "anonymous", createUser });
 
     const user = userEvent.setup();
+    await user.type(await screen.findByLabelText("Gebruikersnaam"), "NieuweGebruiker");
+    await user.type(await screen.findByLabelText("Tijdelijk wachtwoord"), "Wachtwoord12");
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Coördinator toevoegen" })).toBeInTheDocument();
+    expect(createUser).toHaveBeenCalledExactlyOnceWith({
+      role: "typist",
+      username: "NieuweGebruiker",
+      temp_password: "Wachtwoord12",
+    });
 
-    expect(await screen.findByLabelText("Gebruikersnaam")).toHaveValue("");
-    expect(await screen.findByLabelText("Volledige naam")).toHaveValue("");
-    expect(await screen.findByLabelText("Tijdelijk wachtwoord")).toHaveValue("");
+    expect(navigate).not.toHaveBeenCalled();
+  });
 
+  test("Show api error", async () => {
+    renderPage({ role: "typist", type: "anonymous", apiError: API_ERROR_NOT_UNIQUE, username: "dubbel" });
+
+    const user = userEvent.setup();
+    const username = await screen.findByLabelText("Gebruikersnaam");
+    const password = await screen.findByLabelText("Tijdelijk wachtwoord");
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toBeInTheDocument();
+
+    const errorMessage = "Er bestaat al een gebruiker met gebruikersnaam dubbel";
+    expect(within(alert).getByText(errorMessage)).toBeInTheDocument();
+    expect(within(alert).getByText("De gebruikersnaam moet uniek zijn")).toBeInTheDocument();
+
+    expect(username).toBeInvalid();
+    expect(username).toHaveAccessibleErrorMessage(errorMessage);
+
+    // Do not show error when there are validation errors
+    await user.type(username, "dubbel");
+    await user.type(password, "mand");
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
+
+    expect(password).toBeInvalid();
+    expect(password).toHaveAccessibleErrorMessage(/Dit wachtwoord is niet lang genoeg/);
+
+    expect(alert).not.toBeInTheDocument();
+    expect(username).not.toBeInvalid();
+    expect(username).not.toHaveAccessibleErrorMessage(errorMessage);
+  });
+
+  test("Navigate to user list after submitting fullname fields", async () => {
+    createUser.mockResolvedValue({
+      status: ApiResponseStatus.Success,
+      code: 200,
+      data: { username: "NieuweGebruiker", role: "coordinator" } as User,
+    } satisfies ApiResult<User>);
+
+    renderPage({ role: "coordinator", type: "fullname", createUser });
+
+    const user = userEvent.setup();
     await user.type(await screen.findByLabelText("Gebruikersnaam"), "NieuweGebruiker");
     await user.type(await screen.findByLabelText("Volledige naam"), "Nieuwe Gebruiker");
     await user.type(await screen.findByLabelText("Tijdelijk wachtwoord"), "Wachtwoord12");
+    await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
-    const submit = await screen.findByRole("button", { name: "Opslaan" });
-    await user.click(submit);
-
-    expect(updateUser).toHaveBeenCalledExactlyOnceWith({
+    expect(createUser).toHaveBeenCalledExactlyOnceWith({
+      role: "coordinator",
       username: "NieuweGebruiker",
       fullname: "Nieuwe Gebruiker",
-      password: "Wachtwoord12",
+      temp_password: "Wachtwoord12",
     });
-    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users");
+
+    const message = "NieuweGebruiker is toegevoegd met de rol Coördinator";
+    expect(navigate).toHaveBeenCalledExactlyOnceWith(`/users?created=${encodeURIComponent(message)}`);
   });
 
-  test("Continue after filling in anonymous fields", async () => {
-    const updateUser = vi.fn();
-    renderPage({ user: { role: "typist", type: "anonymous" }, updateUser });
+  test("Navigate to user list after submitting anonymous fields", async () => {
+    createUser.mockResolvedValue({
+      status: ApiResponseStatus.Success,
+      code: 200,
+      data: { username: "NieuweGebruiker", role: "typist" } as User,
+    } satisfies ApiResult<User>);
+
+    renderPage({ role: "typist", type: "anonymous", createUser });
 
     const user = userEvent.setup();
 
@@ -104,10 +171,13 @@ describe("UserCreateDetailsPage", () => {
     const submit = await screen.findByRole("button", { name: "Opslaan" });
     await user.click(submit);
 
-    expect(updateUser).toHaveBeenCalledExactlyOnceWith({
+    expect(createUser).toHaveBeenCalledExactlyOnceWith({
+      role: "typist",
       username: "NieuweGebruiker",
-      password: "Wachtwoord12",
+      temp_password: "Wachtwoord12",
     });
-    expect(navigate).toHaveBeenCalledExactlyOnceWith("/users");
+
+    const message = "NieuweGebruiker is toegevoegd met de rol Invoerder";
+    expect(navigate).toHaveBeenCalledExactlyOnceWith(`/users?created=${encodeURIComponent(message)}`);
   });
 });

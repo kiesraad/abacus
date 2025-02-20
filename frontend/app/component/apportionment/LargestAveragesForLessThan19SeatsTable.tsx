@@ -25,7 +25,7 @@ export function LargestAveragesForLessThan19SeatsTable({
     <Table id="largest_averages_for_less_than_19_seats_table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
-        <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>
+        <Table.HeaderCell className="w-full">{t("list_name")}</Table.HeaderCell>
         <Table.HeaderCell className="text-align-r">{t("apportionment.full_seats_count")}</Table.HeaderCell>
         <Table.HeaderCell span={2} className="text-align-r">
           {t("apportionment.average")}
@@ -47,9 +47,7 @@ export function LargestAveragesForLessThan19SeatsTable({
               <Table.Cell>{politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
               <Table.NumberCell className="font-number">{pg_seat_assignment.full_seats}</Table.NumberCell>
               {average && (
-                <Table.DisplayFractionCells
-                  className={`font-number ${residual_seats > 0 ? "bg-yellow bold" : undefined}`}
-                >
+                <Table.DisplayFractionCells className={residual_seats > 0 ? "bg-yellow bold" : ""}>
                   {average}
                 </Table.DisplayFractionCells>
               )}

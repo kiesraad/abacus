@@ -319,7 +319,10 @@ impl From<DataEntryTransitionError> for APIError {
 
 impl From<AuthenticationError> for APIError {
     fn from(err: AuthenticationError) -> Self {
-        APIError::Authentication(err)
+        match err {
+            AuthenticationError::Database(sqlx_error) => APIError::from(sqlx_error),
+            _ => APIError::Authentication(err),
+        }
     }
 }
 

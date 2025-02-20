@@ -74,6 +74,20 @@ p.md {
   line-height: 1.5rem;
 }
 
+p.form-paragraph {
+  width: 37.5rem;
+  margin-top: 1rem;
+}
+
+section.md {
+  margin-bottom: 2rem;
+
+  p {
+    max-width: 38rem;
+  }
+}
+
+/* Link styling */
 a {
   color: var(--link-default);
 
@@ -90,6 +104,7 @@ a {
   }
 }
 
+/* Font weight */
 .bold {
   font-weight: bold;
 }
@@ -98,15 +113,38 @@ a {
   font-weight: normal;
 }
 
-p.form-paragraph {
-  width: 37.5rem;
-  margin-top: 1rem;
+/* Font size */
+.fs-xs {
+  font-size: var(--font-size-xs);
 }
 
-section.md {
-  margin-bottom: 2rem;
+.fs-sm {
+  font-size: var(--font-size-sm);
+}
 
-  p {
-    max-width: 38rem;
-  }
+.fs-md {
+  font-size: var(--font-size-md);
+}
+
+.fs-body {
+  font-size: var(--font-size-body);
+}
+
+/* Text wrap, transformations etc. */
+.break-word {
+  word-break: break-word;
+}
+
+.nowrap {
+  text-wrap: nowrap;
+}
+
+.text-align-r {
+  text-align: right;
+}
+
+/* Number styling */
+.font-number {
+  font-family: var(--font-number);
+  font-feature-settings: "ss09" on;
 }

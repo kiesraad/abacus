@@ -14,7 +14,6 @@
   font-family: "GeistMono";
   src: url("../../../static/font/Geist_Mono/GeistMono[wght].woff2") format("woff2");
   font-weight: 100 900;
-  font-feature-settings: "ss09" on;
 }
 
 :root {

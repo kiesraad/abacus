@@ -5,15 +5,11 @@ Deze lijst heeft tot doel het verzamelen van opties en mogelijkheden voor Abacus
 
 ## Gebruikersinterface
 
-### Coordinatorscherm
+### Statusoverzicht steminvoer
 
 - Sorteren op stembureaunummer
 - Numerieke aantallen per stap anders sorteren: fouten en meldingen bovenaan, verder op volgorde van het werkproces
 - Eenvoudig voortgangsscherm om de stand van zaken op een beamer of monitor te laten zien, zodat iedereen dat makkelijk kan volgen
-
-### Vrije tekstvelden
-
-- Invoeren van andere gegevens, zoals GSB-leden etc.
 
 ### Import/export
 

@@ -52,9 +52,9 @@ const dataEntryMachineDefinition = {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChanged",
       },
     },
-    pollingStationsPageErrorCachedSaved: {
+    pollingStationsPageErrorSubmittedSaved: {
       on: {
-        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeErrorCached",
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeErrorSubmitted",
       },
     },
     recountedPageEmpty: {},
@@ -73,9 +73,9 @@ const dataEntryMachineDefinition = {
         GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageCached",
       },
     },
-    recountedPageErrorCached: {
+    recountedPageErrorSubmitted: {
       on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageErrorCached",
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageSubmittedError",
       },
     },
     voterVotesPageCached: {
@@ -83,7 +83,6 @@ const dataEntryMachineDefinition = {
         SUBMIT: "differencesPage",
       },
     },
-    votersVotesPageErrorCached: {},
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageFilled",
@@ -103,6 +102,7 @@ const dataEntryMachineDefinition = {
     },
     VotersVotesPageError: {
       on: {
+        // only SUBMIT here, because without submit this case is the same as Filled
         SUBMIT: "votersVotesPageSubmittedError",
       },
     },
@@ -114,9 +114,9 @@ const dataEntryMachineDefinition = {
     votersVotesPageSubmittedError: {
       on: {
         CORRECT_ERROR_DATA: "votersVotesPageFilled",
-        CLICK_ABORT: "abortInputModalErrorCached",
-        NAV_TO_POLLING_STATION_PAGE: "abortInputModalErrorCached",
-        GO_TO_RECOUNTED_PAGE: "recountedPageErrorCached",
+        CLICK_ABORT: "abortInputModalErrorSubmitted",
+        NAV_TO_POLLING_STATION_PAGE: "abortInputModalErrorSubmitted",
+        GO_TO_RECOUNTED_PAGE: "recountedPageErrorSubmitted",
       },
     },
     votersVotesPageChangedSubmitted: {},
@@ -131,7 +131,7 @@ const dataEntryMachineDefinition = {
     votersVotesPageAfterResumeSaved: {},
     votersVotesPageAfterResumeChanged: {},
     votersVotesPageAfterResumeEmpty: {},
-    votersVotesPageAfterResumeErrorCached: {},
+    votersVotesPageAfterResumeErrorSubmitted: {},
     differencesPage: {
       on: {
         GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageSubmitted",
@@ -155,9 +155,9 @@ const dataEntryMachineDefinition = {
         DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
-    abortInputModalErrorCached: {
+    abortInputModalErrorSubmitted: {
       on: {
-        SAVE_INPUT: "pollingStationsPageErrorCachedSaved",
+        SAVE_INPUT: "pollingStationsPageErrorSubmittedSaved",
         DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
@@ -250,7 +250,7 @@ test.describe("Data entry model test", () => {
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
-          pollingStationsPageErrorCachedSaved: async () => {
+          pollingStationsPageErrorSubmittedSaved: async () => {
             await expect(pollingStationChoicePage.fieldset).toBeVisible();
             await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
               `${pollingStation.number} - ${pollingStation.name}`,
@@ -281,7 +281,7 @@ test.describe("Data entry model test", () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
           },
-          recountedPageErrorCached: async () => {
+          recountedPageErrorSubmitted: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
@@ -321,16 +321,10 @@ test.describe("Data entry model test", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
           },
-          votersVotesPageErrorCached: async () => {
+          votersVotesPageSubmittedError: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
-            await expect(votersAndVotesPage.error).toContainText(
-              "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
-            );
-          },
-          votersVotesPageSubmittedError: async () => {
-            await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.error).toContainText(
               "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
             );
@@ -365,7 +359,7 @@ test.describe("Data entry model test", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
           },
-          votersVotesPageAfterResumeErrorCached: async () => {
+          votersVotesPageAfterResumeErrorSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
@@ -424,7 +418,7 @@ test.describe("Data entry model test", () => {
           abortInputModalChanged: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
-          abortInputModalErrorCached: async () => {
+          abortInputModalErrorSubmitted: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
         };

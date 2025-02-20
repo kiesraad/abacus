@@ -14,7 +14,7 @@ use axum_extra::extract::CookieJar;
 use cookie::{Cookie, SameSite};
 use hyper::{header::SET_COOKIE, StatusCode};
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
+use sqlx::{Error, SqlitePool};
 use tracing::debug;
 use utoipa::ToSchema;
 
@@ -338,6 +338,27 @@ pub async fn user_create(
         )
         .await?;
     Ok((StatusCode::CREATED, Json(user)))
+}
+
+/// Get a user
+#[utoipa::path(
+    get,
+    path = "/api/user/{user_id}",
+    responses(
+        (status = 200, description = "User found", body = User),
+        (status = 404, description = "User not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("user_id" = u32, description = "User id"),
+    ),
+)]
+pub async fn user_get(
+    State(users_repo): State<Users>,
+    Path(user_id): Path<u32>,
+) -> Result<Json<User>, APIError> {
+    let user = users_repo.get_by_id(user_id).await?;
+    Ok(Json(user.ok_or(Error::RowNotFound)?))
 }
 
 /// Update a user

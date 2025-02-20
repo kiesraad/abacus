@@ -75,8 +75,8 @@
 - Verschillen kunnen worden opgelost door nieuwe invoer op lijstniveau.
 - Beheer van werkplekken (aanvullen, design).
 - De software biedt ondersteuning voor meerdere verkiezingen tegelijkertijd. Dit is een vereiste die we sowieso zullen uitwerken na de GSB-fase, maar hier kan al in deze fase al een aanzet toe worden gedaan.
-- De interface is beschikbaar in meerdere talen: Nederlands, Engels, Fries en Papiaments.
-- Abacus is beschikbaar voor macOS.
+- De interface is beschikbaar in meerdere talen: Nederlands, Engels, Fries en Papiaments, Nedersaksisch
+- Abacus is officieel beschikbaar voor macOS.
 - Er is een installatieprogramma voor de Abacus-werkstations.
 
 ## Versie 1.0: niet binnen scope (won't have)

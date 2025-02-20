@@ -16,7 +16,7 @@
 - Er is een installatieprogramma/-instructie voor de Abacus-server.
 - Het EML_NL-bestand met de verkiezingsdefinitie voor de betreffende verkiezing kan worden geïmporteerd.
 - Het EML_NL-bestand met de kandidatenlijst voor de betreffende verkiezing kan worden geïmporteerd.
-- Het EML_NL-bestand met de stembureaus van een gemeente kan worden geïmporteerd en ge-exporteerd.
+- Het EML_NL-bestand met de stembureaus van een gemeente kan worden geïmporteerd en geëxporteerd.
 - De beheerder kan stembureaus aanmaken, aanpassen, verwijderen.
 
 ### Invoeren van uitslagen GSB

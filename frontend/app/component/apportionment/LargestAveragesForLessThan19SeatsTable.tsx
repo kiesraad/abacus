@@ -47,7 +47,7 @@ export function LargestAveragesForLessThan19SeatsTable({
               <Table.Cell>{politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}</Table.Cell>
               <Table.NumberCell className="font-number">{pg_seat_assignment.full_seats}</Table.NumberCell>
               {average && (
-                <Table.DisplayFractionCells className={residual_seats > 0 ? "bg-yellow bold" : ""}>
+                <Table.DisplayFractionCells className={residual_seats > 0 ? "bg-yellow bold" : undefined}>
                   {average}
                 </Table.DisplayFractionCells>
               )}

@@ -58,8 +58,8 @@ pub struct PoliticalGroupSeatAssignment {
     pub total_seats: u64,
 }
 
-impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
-    fn from(pg: PoliticalGroupStanding) -> Self {
+impl From<&mut PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
+    fn from(pg: &mut PoliticalGroupStanding) -> Self {
         PoliticalGroupSeatAssignment {
             pg_number: pg.pg_number,
             votes_cast: pg.votes_cast,
@@ -254,49 +254,62 @@ fn political_groups_with_highest_surplus<'a>(
 /// If a political group got the absolute majority of votes but not the absolute majority of seats,
 /// re-assign the last residual seat to the political group with the absolute majority.
 /// This re-assignment is done according to article P 9 of the Kieswet.
-fn reallocate_residual_seat_for_absolute_majority(
+fn reallocate_residual_seat_for_absolute_majority<'fs>(
     seats: u64,
     totals: &ElectionSummary,
-    steps: &[ApportionmentStep],
-    mut final_standing: Vec<PoliticalGroupStanding>,
-) -> Result<(Vec<PoliticalGroupStanding>, Option<AbsoluteMajorityChange>), ApportionmentError> {
+    pgs_last_residual_seat: &[PGNumber],
+    final_standing: &'fs mut Vec<PoliticalGroupStanding>,
+) -> Result<
+    (
+        &'fs mut Vec<PoliticalGroupStanding>,
+        Option<AbsoluteMajorityChange>,
+    ),
+    ApportionmentError,
+> {
     let half_of_votes_count: Fraction =
         Fraction::from(totals.votes_counts.votes_candidates_count) * Fraction::new(1, 2);
-    let majority_votes_pg_votes = totals
+
+    // Find political group with an absolute majority of votes. Return early if we find none
+    let Some(majority_pg_votes) = totals
         .political_group_votes
         .iter()
-        .find(|pg| Fraction::from(pg.total) > half_of_votes_count);
-    if let Some(majority_pg_votes) = majority_votes_pg_votes {
-        let half_of_seats_count: Fraction = Fraction::from(seats) * Fraction::new(1, 2);
-        let pg_final_standing_majority_votes = final_standing
-            .iter()
-            .find(|pg_standing| pg_standing.pg_number == majority_pg_votes.number)
-            .expect("PG exists");
-        let pg_seats = Fraction::from(pg_final_standing_majority_votes.total_seats());
-        if pg_seats <= half_of_seats_count {
-            if let Some(last_step) = steps.last() {
-                let pgs_last_residual_seat = last_step.change.pg_assigned();
-                if pgs_last_residual_seat.len() > 1 {
-                    debug!(
-                    "Drawing of lots is required for political groups: {:?} to pick a political group which the residual seat gets retracted from",
-                    pgs_last_residual_seat
-                );
-                    return Err(ApportionmentError::DrawingOfLotsNotImplemented);
-                }
-                final_standing[pgs_last_residual_seat[0] as usize - 1].residual_seats -= 1;
-                final_standing[majority_pg_votes.number as usize - 1].residual_seats += 1;
-                info!("Residual seat first allocated to list {} has been re-allocated to list {} in accordance with Article P 9 Kieswet", pgs_last_residual_seat[0], majority_pg_votes.number);
-                return Ok((
-                    final_standing,
-                    Some(AbsoluteMajorityChange {
-                        pg_retracted_seat: pgs_last_residual_seat[0],
-                        pg_assigned_seat: majority_pg_votes.number,
-                    }),
-                ));
-            }
+        .find(|pg| Fraction::from(pg.total) > half_of_votes_count)
+    else {
+        return Ok((final_standing, None));
+    };
+
+    let half_of_seats_count: Fraction = Fraction::from(seats) * Fraction::new(1, 2);
+    let pg_final_standing_majority_votes = final_standing
+        .iter()
+        .find(|pg_standing| pg_standing.pg_number == majority_pg_votes.number)
+        .expect("PG exists");
+
+    let pg_seats = Fraction::from(pg_final_standing_majority_votes.total_seats());
+
+    if pg_seats <= half_of_seats_count {
+        if pgs_last_residual_seat.len() > 1 {
+            debug!(
+                "Drawing of lots is required for political groups: {:?} to pick a political group which the residual seat gets retracted from",
+                pgs_last_residual_seat
+            );
+            return Err(ApportionmentError::DrawingOfLotsNotImplemented);
         }
+
+        // Do the reassignment of the seat
+        final_standing[pgs_last_residual_seat[0] as usize - 1].residual_seats -= 1;
+        final_standing[majority_pg_votes.number as usize - 1].residual_seats += 1;
+
+        info!("Residual seat first allocated to list {} has been re-allocated to list {} in accordance with Article P 9 Kieswet", pgs_last_residual_seat[0], majority_pg_votes.number);
+        Ok((
+            final_standing,
+            Some(AbsoluteMajorityChange {
+                pg_retracted_seat: pgs_last_residual_seat[0],
+                pg_assigned_seat: majority_pg_votes.number,
+            }),
+        ))
+    } else {
+        Ok((final_standing, None))
     }
-    Ok((final_standing, None))
 }
 
 /// Apportionment
@@ -322,16 +335,24 @@ pub fn apportionment(
         .sum::<u64>();
     let residual_seats = seats - whole_seats;
 
-    let (steps, final_standing) = if residual_seats > 0 {
+    let (steps, mut final_standing) = if residual_seats > 0 {
         allocate_remainder(&initial_standing, seats, residual_seats)?
     } else {
         info!("All seats have been allocated without any residual seats");
         (vec![], initial_standing.clone())
     };
 
-    // Article P 9 Kieswet
-    let (final_standing, absolute_majority_change) =
-        reallocate_residual_seat_for_absolute_majority(seats, totals, &steps, final_standing)?;
+    // Only apply Article P 9 Kieswet when there are remainder seats
+    let (final_standing, absolute_majority_change) = if let Some(last_step) = steps.last() {
+        reallocate_residual_seat_for_absolute_majority(
+            seats,
+            totals,
+            &last_step.change.pg_assigned(),
+            &mut final_standing,
+        )?
+    } else {
+        (&mut final_standing, None)
+    };
 
     // TODO: #797 Article P 19a Kieswet mark deceased candidates
 
@@ -348,7 +369,10 @@ pub fn apportionment(
         quota,
         steps,
         absolute_majority_change,
-        final_standing: final_standing.into_iter().map(Into::into).collect(),
+        final_standing: final_standing
+            .iter_mut()
+            .map(PoliticalGroupSeatAssignment::from)
+            .collect(),
     })
 }
 

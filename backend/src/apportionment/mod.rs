@@ -535,20 +535,12 @@ fn step_allocate_remainder_using_highest_surplus(
         let mut qualifying_for_unique_highest_average =
             political_groups_qualifying_for_unique_highest_average(assigned_seats, previous)
                 .peekable();
-        if qualifying_for_unique_highest_average.peek().is_some() {
-            // TODO: Can I somehow call step_allocate_remainder_using_highest_averages with
-            //  qualifying_for_unique_highest_average to prevent duplicate code?
-            let selected_pgs = political_groups_with_largest_average(
-                qualifying_for_unique_highest_average,
+        if let Some(&&assigned_seats) = qualifying_for_unique_highest_average.peek() {
+            step_allocate_remainder_using_highest_averages(
+                &[assigned_seats],
                 residual_seats,
-            )?;
-            let selected_pg = selected_pgs[0];
-            Ok(AssignedSeat::HighestAverage(HighestAverageAssignedSeat {
-                selected_pg_number: selected_pg.pg_number,
-                pg_assigned: pg_assigned_from_previous_average_step(selected_pg, previous),
-                pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
-                votes_per_seat: selected_pg.next_votes_per_seat,
-            }))
+                previous,
+            )
         } else {
             // We've now even exhausted unique highest average seats: every group that qualified
             // got a highest surplus seat, and every group also had at least a single residual seat

@@ -16,6 +16,9 @@ import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } f
 
 /*
 Not covered in the model:
+- errors
+  - fill latest page with error data -> can't proceed, can go back
+  - return to votersvotes and fill with error data -> can go forward
 - fill in page with error data, then fix, nav, abort
 - fill in page with warning data, then fix, accept, nav abort
 */
@@ -73,6 +76,7 @@ const dataEntryMachineDefinition = {
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageFilled",
+        FILL_WITH_ERROR_DATA: "VotersVotesPageError",
         CLICK_ABORT: "abortInputModalEmpty",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModalEmpty",
         GO_TO_RECOUNTED_PAGE: "recountedPageEmpty",
@@ -86,9 +90,19 @@ const dataEntryMachineDefinition = {
         GO_TO_RECOUNTED_PAGE: "recountedPageCached",
       },
     },
+    VotersVotesPageError: {
+      on: {
+        SUBMIT: "votersVotesPageSubmittedError",
+      },
+    },
     votersVotesPageSubmitted: {
       on: {
         CHANGE_VALID_DATA: "votersVotesPageChangedFilled",
+      },
+    },
+    votersVotesPageSubmittedError: {
+      on: {
+        CORRECT_ERROR_DATA: "votersVotesPageFilled",
       },
     },
     votersVotesPageChangedSubmitted: {},
@@ -157,6 +171,13 @@ const votersEmpty: VotersCounts = {
   proxy_certificate_count: 0,
   voter_card_count: 0,
   total_admitted_voters_count: 0,
+};
+
+const votersError: VotersCounts = {
+  poll_card_count: 70,
+  proxy_certificate_count: 30,
+  voter_card_count: 0,
+  total_admitted_voters_count: 90, // incorrect total
 };
 
 const votes: VotesCounts = {
@@ -263,6 +284,17 @@ test.describe("Data entry model test", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes });
           },
+          VotersVotesPageError: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
+          },
+          votersVotesPageSubmittedError: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.error).toContainText(
+              "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
+            );
+          },
           votersVotesPageSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
@@ -299,6 +331,13 @@ test.describe("Data entry model test", () => {
           FILL_WITH_VALID_DATA: async () => {
             await votersAndVotesPage.inputVotersCounts(voters);
             await votersAndVotesPage.inputVotesCounts(votes);
+          },
+          FILL_WITH_ERROR_DATA: async () => {
+            await votersAndVotesPage.inputVotersCounts(votersError);
+            await votersAndVotesPage.inputVotesCounts(votes);
+          },
+          CORRECT_ERROR_DATA: async () => {
+            await votersAndVotesPage.inputVotersCounts(voters);
           },
           CHANGE_VALID_DATA: async () => {
             await votersAndVotesPage.inputVotersCounts(votersChanged);

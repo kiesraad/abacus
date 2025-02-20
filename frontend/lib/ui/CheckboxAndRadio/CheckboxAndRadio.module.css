@@ -20,6 +20,7 @@
   .error {
     padding: 0;
     margin: -0.75rem 0 0 0;
+    font-size: var(--font-size-md);
     color: var(--color-error-darker);
     font-weight: normal;
   }
@@ -141,6 +142,7 @@
   > div:global(.labels) {
     display: flex;
     flex-direction: column;
+    color: var(--base-black);
 
     > * {
       padding-left: 0.5rem;
@@ -150,7 +152,7 @@
       cursor: pointer;
     }
 
-    span:global(.description) {
+    div:global(.description) {
       color: var(--color-help-text);
     }
   }

@@ -1,20 +1,18 @@
 import { createContext } from "react";
 
-import { Role } from "@kiesraad/api";
+import { ApiError, ApiResult, CreateUserRequest, Role, User } from "@kiesraad/api";
 
 export type UserType = "fullname" | "anonymous";
 
-export interface CreateUser {
-  role?: Role;
-  type?: UserType;
-  username?: string;
-  fullname?: string;
-  password?: string;
-}
-
 export interface IUserCreateContext {
-  user: CreateUser;
-  updateUser: (user: CreateUser) => void;
+  role?: Role;
+  setRole: (role: Role) => void;
+  type?: UserType;
+  setType: (type: UserType) => void;
+  createUser: (user: CreateUserRequest) => Promise<ApiResult<User>>;
+  username?: string;
+  apiError: ApiError | null;
+  saving: boolean;
 }
 
 export const UserCreateContext = createContext<IUserCreateContext | undefined>(undefined);

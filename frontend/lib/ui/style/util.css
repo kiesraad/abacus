@@ -27,26 +27,13 @@
   margin-bottom: var(--space-lg);
 }
 
-/* Font size */
-.fs-xs {
-  font-size: var(--font-size-xs);
-}
-
-.fs-sm {
-  font-size: var(--font-size-sm);
-}
-
-.fs-md {
-  font-size: var(--font-size-md);
-}
-
-.fs-body {
-  font-size: var(--font-size-body);
-}
-
 /* Color */
 .bg-gray {
   background-color: var(--bg-gray);
+}
+
+.bg-yellow {
+  background-color: var(--yellow-200);
 }
 
 .text-muted {
@@ -58,7 +45,6 @@
   width: 13rem;
 }
 
-/* Text wrap, transformations etc. */
-.break-word {
-  word-break: break-word;
+.w-full {
+  width: 100%;
 }

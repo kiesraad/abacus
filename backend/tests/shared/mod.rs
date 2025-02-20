@@ -1,7 +1,9 @@
 #![cfg(test)]
 
-use axum::http::StatusCode;
-use reqwest::Client;
+use axum::http::{HeaderValue, StatusCode};
+use hyper::header::CONTENT_TYPE;
+use reqwest::{Body, Client};
+use serde_json::json;
 use std::net::SocketAddr;
 
 use abacus::data_entry::{
@@ -186,4 +188,26 @@ pub async fn create_result_with_non_example_data_entry(
     create_and_finalise_non_example_data_entry(addr, polling_station_id, 2, data_entry.clone())
         .await;
     check_data_entry_status_is_definitive(addr, polling_station_id, election_id).await;
+}
+
+/// Calls the login endpoint and returns the session cookie
+pub async fn login(addr: &SocketAddr) -> Option<HeaderValue> {
+    let url = format!("http://{addr}/api/user/login");
+
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header(CONTENT_TYPE, "application/json")
+        .body(Body::from(
+            json!({
+                "username": "user",
+                "password": "password",
+            })
+            .to_string(),
+        ))
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    response.headers().get("set-cookie").cloned()
 }

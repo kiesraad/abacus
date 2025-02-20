@@ -1,27 +1,22 @@
 import { FormEvent, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
+import { CreateUserRequest, isSuccess, Role } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
-import { Button, Form, FormLayout, InputField, PageTitle } from "@kiesraad/ui";
+import { Alert, Button, Form, FormLayout, InputField, PageTitle } from "@kiesraad/ui";
 
 import { useUserCreateContext } from "./useUserCreateContext";
 
-interface UserDetails {
-  username: string;
-  fullname?: string;
-  password: string;
-}
-
-type ValidationErrors = Partial<UserDetails>;
+type ValidationErrors = Partial<CreateUserRequest>;
 
 const MIN_PASSWORD_LENGTH = 12;
 
 export function UserCreateDetailsPage() {
   const navigate = useNavigate();
-  const { user, updateUser } = useUserCreateContext();
+  const { role, type, username, createUser, apiError, saving } = useUserCreateContext();
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
 
-  if (!user.role || !user.type) {
+  if (!role || !type) {
     return <Navigate to="/users/create" />;
   }
 
@@ -29,38 +24,45 @@ export function UserCreateDetailsPage() {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
-    const details: UserDetails = {
+    const user: CreateUserRequest = {
+      role: role as Role,
       username: (formData.get("username") as string).trim(),
       fullname: (formData.get("fullname") as string | undefined)?.trim(),
-      password: (formData.get("password") as string).trim(),
+      temp_password: (formData.get("temp_password") as string).trim(),
     };
 
-    if (!validate(details)) {
+    if (!validate(user)) {
       return;
     }
 
-    updateUser(details);
-
-    void navigate(`/users`);
+    void createUser(user).then((result) => {
+      if (isSuccess(result)) {
+        const { username, role } = result.data;
+        const createdMessage = t("users.user_created_details", { username, role: t(role) });
+        void navigate(`/users?created=${encodeURIComponent(createdMessage)}`);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    });
   }
 
-  function validate(details: UserDetails): boolean {
+  function validate(user: CreateUserRequest): boolean {
     const errors: ValidationErrors = {};
 
     const required = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
 
-    if (details.username.length === 0) {
+    if (user.username.length === 0) {
       errors.username = required;
     }
 
-    if (details.fullname !== undefined && details.fullname.length === 0) {
+    if (user.fullname !== undefined && user.fullname.length === 0) {
       errors.fullname = required;
     }
 
-    if (details.password.length === 0) {
-      errors.password = required;
-    } else if (details.password.length < MIN_PASSWORD_LENGTH) {
-      errors.password = t("users.temporary_password_error_min_length", { min_length: MIN_PASSWORD_LENGTH });
+    if (user.temp_password.length === 0) {
+      errors.temp_password = required;
+    } else if (user.temp_password.length < MIN_PASSWORD_LENGTH) {
+      errors.temp_password = t("users.temporary_password_error_min_length", { min_length: MIN_PASSWORD_LENGTH });
     }
 
     const isValid = Object.keys(errors).length === 0;
@@ -68,51 +70,73 @@ export function UserCreateDetailsPage() {
     return isValid;
   }
 
+  const usernameUniqueError =
+    !validationErrors && apiError?.reference === "EntryNotUnique"
+      ? t("users.username_not_unique_error", { username: username ?? "" })
+      : undefined;
+
   return (
     <>
       <PageTitle title={`${t("users.add")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("users.add_role", { role: t(user.role) })}</h1>
+          <h1>{t("users.add_role", { role: t(role) })}</h1>
         </section>
       </header>
       <main>
-        <Form onSubmit={handleSubmit}>
-          <FormLayout width="medium">
-            <FormLayout.Section title={t("users.details_title")}>
-              <InputField
-                id="username"
-                name="username"
-                label={t("users.username")}
-                hint={t("users.username_hint")}
-                error={validationErrors?.username}
-              />
-
-              {user.type === "fullname" && (
-                <InputField
-                  id="fullname"
-                  name="fullname"
-                  label={t("users.fullname")}
-                  hint={t("users.fullname_hint")}
-                  error={validationErrors?.fullname}
-                />
+        <article>
+          {!validationErrors && apiError && (
+            <FormLayout.Alert>
+              {usernameUniqueError ? (
+                <Alert type="error">
+                  <h2>{usernameUniqueError}</h2>
+                  <p>{t("users.username_unique")}</p>
+                </Alert>
+              ) : (
+                <Alert type="error">
+                  {apiError.code}: {apiError.message}
+                </Alert>
               )}
+            </FormLayout.Alert>
+          )}
 
-              <InputField
-                id="password"
-                name="password"
-                label={t("users.temporary_password")}
-                hint={t("users.temporary_password_hint", { min_length: MIN_PASSWORD_LENGTH })}
-                error={validationErrors?.password}
-              />
-            </FormLayout.Section>
-          </FormLayout>
-          <FormLayout.Controls>
-            <Button size="xl" type="submit">
-              {t("save")}
-            </Button>
-          </FormLayout.Controls>
-        </Form>
+          <Form onSubmit={handleSubmit}>
+            <FormLayout width="medium" disabled={saving}>
+              <FormLayout.Section title={t("users.details_title")}>
+                <InputField
+                  id="username"
+                  name="username"
+                  label={t("users.username")}
+                  hint={t("users.username_hint")}
+                  error={validationErrors?.username || usernameUniqueError}
+                />
+
+                {type === "fullname" && (
+                  <InputField
+                    id="fullname"
+                    name="fullname"
+                    label={t("users.fullname")}
+                    hint={t("users.fullname_hint")}
+                    error={validationErrors?.fullname}
+                  />
+                )}
+
+                <InputField
+                  id="temp_password"
+                  name="temp_password"
+                  label={t("users.temporary_password")}
+                  hint={t("users.temporary_password_hint", { min_length: MIN_PASSWORD_LENGTH })}
+                  error={validationErrors?.temp_password}
+                />
+              </FormLayout.Section>
+              <FormLayout.Controls>
+                <Button size="xl" type="submit">
+                  {t("save")}
+                </Button>
+              </FormLayout.Controls>
+            </FormLayout>
+          </Form>
+        </article>
       </main>
     </>
   );

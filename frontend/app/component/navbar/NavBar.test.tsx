@@ -63,6 +63,8 @@ describe("NavBar", () => {
   test.each([
     { pathname: "/elections", hash: "#administratorcoordinator" },
     { pathname: "/users", hash: "#administratorcoordinator" },
+    { pathname: "/users/create", hash: "#administratorcoordinator" },
+    { pathname: "/users/create/details", hash: "#administratorcoordinator" },
     { pathname: "/workstations", hash: "#administratorcoordinator" },
     { pathname: "/logs", hash: "#administratorcoordinator" },
     { pathname: "/elections/1", hash: "#administratorcoordinator" },
@@ -79,6 +81,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/report", hash: "#administratorcoordinator" },
     { pathname: "/elections/1/status", hash: "#administratorcoordinator" },
     { pathname: "/elections/1/polling-stations", hash: "#administratorcoordinator" },
+    { pathname: "/elections/1/apportionment", hash: "#administratorcoordinator" },
   ])("election management links for $pathname", async (location) => {
     await renderNavBar(location);
 
@@ -98,11 +101,24 @@ describe("NavBar", () => {
   });
 
   test.each([
+    { pathname: "/elections/1/apportionment/details-whole-seats", hash: "#administratorcoordinator" },
+    { pathname: "/elections/1/apportionment/details-residual-seats", hash: "#administratorcoordinator" },
+  ])("polling station management links for $pathname", async (location) => {
+    await renderNavBar(location);
+
+    expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Zetelverdeling" })).toBeVisible();
+  });
+
+  test.each([
     { pathname: "/elections/1/report", hash: "#administratorcoordinator" },
     { pathname: "/elections/1/status", hash: "#administratorcoordinator" },
     { pathname: "/elections/1/polling-stations", hash: "#administratorcoordinator" },
     { pathname: "/elections/1/polling-stations/create", hash: "#administratorcoordinator" },
     { pathname: "/elections/1/polling-stations/1/update", hash: "#administratorcoordinator" },
+    { pathname: "/elections/1/apportionment/details-whole-seats", hash: "#administratorcoordinator" },
+    { pathname: "/elections/1/apportionment/details-residual-seats", hash: "#administratorcoordinator" },
   ])("menu works for $pathname", async (location) => {
     const user = userEvent.setup();
     await renderNavBar(location);

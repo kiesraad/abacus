@@ -148,17 +148,17 @@ export interface AbsoluteMajorityChange {
 
 /**
  * The result of the apportionment procedure. This contains the number of seats and the quota
-that was used. It then contains the initial standing after whole seats were assigned,
+that was used. It then contains the initial standing after full seats were assigned,
 and each of the changes and intermediate standings. The final standing contains the
 number of seats per political group that was assigned after all seats were assigned.
  */
 export interface ApportionmentResult {
   final_standing: PoliticalGroupSeatAssignment[];
+  full_seats: number;
   quota: Fraction;
   residual_seats: number;
   seats: number;
   steps: ApportionmentStep[];
-  whole_seats: number;
 }
 
 /**
@@ -444,13 +444,13 @@ export interface PoliticalGroup {
  * Contains information about the final assignment of seats for a specific political group.
  */
 export interface PoliticalGroupSeatAssignment {
+  full_seats: number;
   meets_surplus_threshold: boolean;
   pg_number: number;
   residual_seats: number;
   surplus_votes: Fraction;
   total_seats: number;
   votes_cast: number;
-  whole_seats: number;
 }
 
 /**
@@ -458,13 +458,13 @@ export interface PoliticalGroupSeatAssignment {
 that is needed to compute the apportionment for that specific political group.
  */
 export interface PoliticalGroupStanding {
+  full_seats: number;
   meets_surplus_threshold: boolean;
   next_votes_per_seat: Fraction;
   pg_number: number;
   residual_seats: number;
   surplus_votes: Fraction;
   votes_cast: number;
-  whole_seats: number;
 }
 
 export interface PoliticalGroupVotes {

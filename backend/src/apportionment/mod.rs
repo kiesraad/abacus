@@ -11,13 +11,13 @@ mod api;
 mod fraction;
 
 /// The result of the apportionment procedure. This contains the number of seats and the quota
-/// that was used. It then contains the initial standing after whole seats were assigned,
+/// that was used. It then contains the initial standing after full seats were assigned,
 /// and each of the changes and intermediate standings. The final standing contains the
 /// number of seats per political group that was assigned after all seats were assigned.
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApportionmentResult {
     pub seats: u64,
-    pub whole_seats: u64,
+    pub full_seats: u64,
     pub residual_seats: u64,
     pub quota: Fraction,
     pub steps: Vec<ApportionmentStep>,
@@ -43,12 +43,12 @@ pub struct PoliticalGroupSeatAssignment {
     pg_number: PGNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
-    /// The surplus votes that were not used to get whole seats assigned to this political group
+    /// The surplus votes that were not used to get full seats assigned to this political group
     surplus_votes: Fraction,
     /// Whether this group met the threshold for surplus seat assignment
     meets_surplus_threshold: bool,
-    /// The number of whole seats assigned to this group
-    whole_seats: u64,
+    /// The number of full seats assigned to this group
+    full_seats: u64,
     /// The number of residual seats assigned to this group
     residual_seats: u64,
     /// The total number of seats assigned to this group
@@ -62,7 +62,7 @@ impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
             votes_cast: pg.votes_cast,
             surplus_votes: pg.surplus_votes,
             meets_surplus_threshold: pg.meets_surplus_threshold,
-            whole_seats: pg.whole_seats,
+            full_seats: pg.full_seats,
             residual_seats: pg.residual_seats,
             total_seats: pg.total_seats(),
         }
@@ -78,14 +78,14 @@ pub struct PoliticalGroupStanding {
     pg_number: PGNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
-    /// The surplus of votes that was not used to get whole seats (does not have to be a whole number of votes)
+    /// The surplus of votes that was not used to get full seats (does not have to be a whole number of votes)
     surplus_votes: Fraction,
     /// Whether the surplus votes meet the threshold to be applicable for surplus seat assignment
     meets_surplus_threshold: bool,
     /// The number of votes per seat if a new seat would be added to the current residual seats
     next_votes_per_seat: Fraction,
-    /// The number of whole seats this political group got
-    whole_seats: u64,
+    /// The number of full seats this political group got
+    full_seats: u64,
     /// The current number of residual seats this political group got
     residual_seats: u64,
 }
@@ -103,7 +103,7 @@ impl PoliticalGroupStanding {
         let surplus_votes = votes_cast - (Fraction::from(pg_seats) * quota);
 
         debug!(
-            "Political group {} has {pg_seats} whole seats with {} votes",
+            "Political group {} has {pg_seats} full seats with {} votes",
             pg.number, pg.total
         );
         PoliticalGroupStanding {
@@ -112,7 +112,7 @@ impl PoliticalGroupStanding {
             meets_surplus_threshold: votes_cast >= quota * Fraction::new(3, 4),
             next_votes_per_seat: votes_cast / Fraction::from(pg_seats + 1),
             pg_number: pg.number,
-            whole_seats: pg_seats,
+            full_seats: pg_seats,
             residual_seats: 0,
         }
     }
@@ -130,12 +130,12 @@ impl PoliticalGroupStanding {
 
     /// Returns the total number of seats assigned to this political group
     fn total_seats(&self) -> u64 {
-        self.whole_seats + self.residual_seats
+        self.full_seats + self.residual_seats
     }
 }
 
 /// Initial construction of the data required per political group
-fn initial_whole_seats_per_political_group(
+fn initial_full_seats_per_political_group(
     pg_votes: &[PoliticalGroupVotes],
     quota: Fraction,
 ) -> Vec<PoliticalGroupStanding> {
@@ -325,12 +325,9 @@ pub fn apportionment(
 
     // Article P 6 Kieswet
     let initial_standing =
-        initial_whole_seats_per_political_group(&totals.political_group_votes, quota);
-    let whole_seats = initial_standing
-        .iter()
-        .map(|pg| pg.whole_seats)
-        .sum::<u64>();
-    let residual_seats = seats - whole_seats;
+        initial_full_seats_per_political_group(&totals.political_group_votes, quota);
+    let full_seats = initial_standing.iter().map(|pg| pg.full_seats).sum::<u64>();
+    let residual_seats = seats - full_seats;
 
     let (steps, final_standing) = if residual_seats > 0 {
         allocate_remainder(&initial_standing, totals, seats, residual_seats)?
@@ -349,7 +346,7 @@ pub fn apportionment(
 
     Ok(ApportionmentResult {
         seats,
-        whole_seats,
+        full_seats,
         residual_seats,
         quota,
         steps,
@@ -357,7 +354,7 @@ pub fn apportionment(
     })
 }
 
-/// This function allocates the residual seats that remain after whole seat allocation is finished.
+/// This function allocates the residual seats that remain after full seat allocation is finished.
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
 fn allocate_remainder(

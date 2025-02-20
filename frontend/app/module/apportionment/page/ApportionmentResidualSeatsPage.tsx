@@ -29,9 +29,9 @@ function render_information(seats: number, residualSeats: number) {
   return (
     <span className={cls.tableInformation}>
       {tx(
-        `apportionment.whole_seats_information_link.${residualSeats > 1 ? "plural" : "singular"}`,
+        `apportionment.full_seats_information_link.${residualSeats > 1 ? "plural" : "singular"}`,
         {
-          link: (title) => <Link to="../details-whole-seats">{title}</Link>,
+          link: (title) => <Link to="../details-full-seats">{title}</Link>,
         },
         { num_residual_seats: residualSeats },
       )}

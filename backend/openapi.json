@@ -1422,10 +1422,10 @@
       },
       "ApportionmentResult": {
         "type": "object",
-        "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after whole seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
+        "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after full seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
         "required": [
           "seats",
-          "whole_seats",
+          "full_seats",
           "residual_seats",
           "quota",
           "steps",
@@ -1437,6 +1437,11 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroupSeatAssignment"
             }
+          },
+          "full_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           },
           "quota": {
             "$ref": "#/components/schemas/Fraction"
@@ -1456,11 +1461,6 @@
             "items": {
               "$ref": "#/components/schemas/ApportionmentStep"
             }
-          },
-          "whole_seats": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
           }
         }
       },
@@ -2273,11 +2273,17 @@
           "votes_cast",
           "surplus_votes",
           "meets_surplus_threshold",
-          "whole_seats",
+          "full_seats",
           "residual_seats",
           "total_seats"
         ],
         "properties": {
+          "full_seats": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of full seats assigned to this group",
+            "minimum": 0
+          },
           "meets_surplus_threshold": {
             "type": "boolean",
             "description": "Whether this group met the threshold for surplus seat assignment"
@@ -2296,7 +2302,7 @@
           },
           "surplus_votes": {
             "$ref": "#/components/schemas/Fraction",
-            "description": "The surplus votes that were not used to get whole seats assigned to this political group"
+            "description": "The surplus votes that were not used to get full seats assigned to this political group"
           },
           "total_seats": {
             "type": "integer",
@@ -2308,12 +2314,6 @@
             "type": "integer",
             "format": "int64",
             "description": "The number of votes cast for this group",
-            "minimum": 0
-          },
-          "whole_seats": {
-            "type": "integer",
-            "format": "int64",
-            "description": "The number of whole seats assigned to this group",
             "minimum": 0
           }
         }
@@ -2327,10 +2327,16 @@
           "surplus_votes",
           "meets_surplus_threshold",
           "next_votes_per_seat",
-          "whole_seats",
+          "full_seats",
           "residual_seats"
         ],
         "properties": {
+          "full_seats": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of full seats this political group got",
+            "minimum": 0
+          },
           "meets_surplus_threshold": {
             "type": "boolean",
             "description": "Whether the surplus votes meet the threshold to be applicable for surplus seat assignment"
@@ -2353,18 +2359,12 @@
           },
           "surplus_votes": {
             "$ref": "#/components/schemas/Fraction",
-            "description": "The surplus of votes that was not used to get whole seats (does not have to be a whole number of votes)"
+            "description": "The surplus of votes that was not used to get full seats (does not have to be a whole number of votes)"
           },
           "votes_cast": {
             "type": "integer",
             "format": "int64",
             "description": "The number of votes cast for this group",
-            "minimum": 0
-          },
-          "whole_seats": {
-            "type": "integer",
-            "format": "int64",
-            "description": "The number of whole seats this political group got",
             "minimum": 0
           }
         }

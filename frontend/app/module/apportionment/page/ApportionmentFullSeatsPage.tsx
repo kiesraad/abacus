@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { ResidualSeatsCalculationTable, WholeSeatsTable } from "app/component/apportionment";
+import { FullSeatsTable, ResidualSeatsCalculationTable } from "app/component/apportionment";
 
 import { useApportionmentContext, useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
@@ -8,7 +8,7 @@ import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
 import cls from "./Apportionment.module.css";
 
-export function ApportionmentWholeSeatsPage() {
+export function ApportionmentFullSeatsPage() {
   const { election } = useElection();
   const { apportionment, error } = useApportionmentContext();
 
@@ -17,7 +17,7 @@ export function ApportionmentWholeSeatsPage() {
       <PageTitle title={`${t("apportionment.title")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("apportionment.details_whole_seats")}</h1>
+          <h1>{t("apportionment.details_full_seats")}</h1>
         </section>
       </header>
       <main>
@@ -34,8 +34,8 @@ export function ApportionmentWholeSeatsPage() {
               <>
                 <div>
                   <h2 className={cls.tableTitle}>{t("apportionment.how_often_is_quota_met")}</h2>
-                  <span className={cls.tableInformation}>{t("apportionment.whole_seats_information")}</span>
-                  <WholeSeatsTable
+                  <span className={cls.tableInformation}>{t("apportionment.full_seats_information")}</span>
+                  <FullSeatsTable
                     finalStanding={apportionment.final_standing}
                     politicalGroups={election.political_groups}
                     quota={apportionment.quota}
@@ -58,7 +58,7 @@ export function ApportionmentWholeSeatsPage() {
                   </span>
                   <ResidualSeatsCalculationTable
                     seats={apportionment.seats}
-                    wholeSeats={apportionment.whole_seats}
+                    fullSeats={apportionment.full_seats}
                     residualSeats={apportionment.residual_seats}
                   />
                 </div>

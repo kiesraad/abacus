@@ -8,18 +8,18 @@ import { ApportionmentProvider, ElectionApportionmentResponse, ElectionProvider,
 import { getElectionMockData } from "@kiesraad/api-mocks";
 import { expectErrorPage, overrideOnce, Providers, render, screen, setupTestRouter } from "@kiesraad/test";
 
-import { ApportionmentWholeSeatsPage } from "./ApportionmentWholeSeatsPage";
+import { ApportionmentFullSeatsPage } from "./ApportionmentFullSeatsPage";
 
-const renderApportionmentWholeSeatsPage = () =>
+const renderApportionmentFullSeatsPage = () =>
   render(
     <ElectionProvider electionId={1}>
       <ApportionmentProvider electionId={1}>
-        <ApportionmentWholeSeatsPage />
+        <ApportionmentFullSeatsPage />
       </ApportionmentProvider>
     </ElectionProvider>,
   );
 
-describe("ApportionmentWholeSeatsPage", () => {
+describe("ApportionmentFullSeatsPage", () => {
   test("Whole seats allocation and residual seats calculation tables visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
@@ -27,14 +27,14 @@ describe("ApportionmentWholeSeatsPage", () => {
       election_summary: election_summary,
     } satisfies ElectionApportionmentResponse);
 
-    renderApportionmentWholeSeatsPage();
+    renderApportionmentFullSeatsPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" }));
 
     expect(await screen.findByRole("heading", { level: 2, name: "Hoe vaak haalde elke partij de kiesdeler?" }));
-    const whole_seats_table = await screen.findByTestId("whole_seats_table");
-    expect(whole_seats_table).toBeVisible();
-    expect(whole_seats_table).toHaveTableContent([
+    const full_seats_table = await screen.findByTestId("full_seats_table");
+    expect(full_seats_table).toBeVisible();
+    expect(full_seats_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal stemmen", ":", "Kiesdeler", "=", "Aantal volle zetels"],
       ["1", "Political Group A", "808", ":", "80", "", "=", "10"],
       ["2", "Political Group B", "60", ":", "80", "", "=", "0"],
@@ -65,7 +65,7 @@ describe("ApportionmentWholeSeatsPage", () => {
         reference: "ApportionmentNotAvailableUntilDataEntryFinalised",
       } satisfies ErrorResponse);
 
-      renderApportionmentWholeSeatsPage();
+      renderApportionmentFullSeatsPage();
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" }));
@@ -75,7 +75,7 @@ describe("ApportionmentWholeSeatsPage", () => {
         await screen.findByText("De zetelverdeling kan pas gemaakt worden als alle stembureaus zijn ingevoerd"),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("whole_seats_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("full_seats_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("residual_seats_calculation_table")).not.toBeInTheDocument();
     });
 
@@ -87,7 +87,7 @@ describe("ApportionmentWholeSeatsPage", () => {
         reference: "DrawingOfLotsRequired",
       } satisfies ErrorResponse);
 
-      renderApportionmentWholeSeatsPage();
+      renderApportionmentFullSeatsPage();
 
       // Wait for the page to be loaded
       expect(await screen.findByRole("heading", { level: 1, name: "Verdeling van de volle zetels" }));
@@ -97,7 +97,7 @@ describe("ApportionmentWholeSeatsPage", () => {
         await screen.findByText("Loting is noodzakelijk, maar nog niet beschikbaar in deze versie van Abacus"),
       ).toBeVisible();
 
-      expect(screen.queryByTestId("whole_seats_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("full_seats_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("residual_seats_calculation_table")).not.toBeInTheDocument();
     });
 
@@ -115,7 +115,7 @@ describe("ApportionmentWholeSeatsPage", () => {
         reference: "InternalServerError",
       });
 
-      await router.navigate("/elections/1/apportionment/details-whole-seats");
+      await router.navigate("/elections/1/apportionment/details-full-seats");
 
       rtlRender(<Providers router={router} />);
 

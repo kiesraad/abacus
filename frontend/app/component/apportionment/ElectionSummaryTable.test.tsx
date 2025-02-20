@@ -26,7 +26,6 @@ describe("ElectionSummaryTable", () => {
       ["Stemmen op kandidaten", "1.200", ""],
       ["Aantal raadszetels", "23", ""],
       ["Kiesdeler", "52 4/23", "Benodigde stemmen per volle zetel"],
-      ["Voorkeursdrempel", "", "25% van de kiesdeler"],
     ]);
   });
 
@@ -50,7 +49,6 @@ describe("ElectionSummaryTable", () => {
       ["Stemmen op kandidaten", "1.200", ""],
       ["Aantal raadszetels", "23", ""],
       ["Kiesdeler", "52 4/23", "Benodigde stemmen per volle zetel"],
-      ["Voorkeursdrempel", "", "25% van de kiesdeler"],
     ]);
   });
 });

@@ -42,7 +42,6 @@ describe("ApportionmentPage", () => {
       ["Stemmen op kandidaten", "1.200", ""],
       ["Aantal raadszetels", "15", ""],
       ["Kiesdeler", "80", "Benodigde stemmen per volle zetel"],
-      ["Voorkeursdrempel", "", "50% van de kiesdeler"],
     ]);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Zetelverdeling" }));

@@ -85,17 +85,7 @@ export function ElectionSummaryTable({ votesCounts, seats, quota, numberOfVoters
           </Table.NumberCell>
           <Table.Cell className="fs-sm">{t("apportionment.quota_description")}</Table.Cell>
         </Table.Row>
-        <Table.Row>
-          <Table.HeaderCell scope="row" className="normal">
-            {t("apportionment.preference_threshold")}
-          </Table.HeaderCell>
-          <Table.NumberCell className="font-number normal">
-            {/* TODO: Add apportionment.preference_threshold in epic #787 */}
-          </Table.NumberCell>
-          <Table.Cell className="fs-sm">
-            {t("apportionment.preference_threshold_description", { percentage: seats < 19 ? 50 : 25 })}
-          </Table.Cell>
-        </Table.Row>
+        {/* TODO: Add apportionment.preference_threshold in epic #787 */}
       </Table.Body>
     </Table>
   );

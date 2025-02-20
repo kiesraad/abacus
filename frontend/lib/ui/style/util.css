@@ -27,23 +27,6 @@
   margin-bottom: var(--space-lg);
 }
 
-/* Font size */
-.fs-xs {
-  font-size: var(--font-size-xs);
-}
-
-.fs-sm {
-  font-size: var(--font-size-sm);
-}
-
-.fs-md {
-  font-size: var(--font-size-md);
-}
-
-.fs-body {
-  font-size: var(--font-size-body);
-}
-
 /* Color */
 .bg-gray {
   background-color: var(--bg-gray);
@@ -64,23 +47,4 @@
 
 .w-full {
   width: 100%;
-}
-
-/* Text wrap, transformations etc. */
-.break-word {
-  word-break: break-word;
-}
-
-.nowrap {
-  text-wrap: nowrap;
-}
-
-.text-align-r {
-  text-align: right;
-}
-
-/* Number styling */
-.font-number {
-  font-family: var(--font-number);
-  font-feature-settings: "ss09" on;
 }

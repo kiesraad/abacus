@@ -1,4 +1,30 @@
-# Installatie en inrichting van de applicatie
+# Beheerder
+
+## De beheerder richt de applicatie in (wolk)
+
+_Niveau:_ hoog-over, wolk, ☁️
+
+### Hoofdscenario en uitbreidingen
+
+1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
+2. De beheerder leest de verkiezingsdefinitie in.
+3. De beheerder leest de kandidatenlijst in.
+4. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
+5. De beheerder maakt de gebruikers aan.
+
+__Uitbreidingen:__  
+2a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
+
+3a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
+
+### Niet in scope
+
+- Inlezen totalenlijst (kandidatenlijst met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
+
+### Open punten
+- Hoe precies krijgt de beheerder de beschikking over de verkiezingsdefinitie (met hash-code) en de kandidatenlijst (met hash-code)?
+  - Zowel de verkiezingsdefinitie als de kandidatenlijst worden door het CSB aangemaakt met OSV KS.
+
 
 ## De beheerder installeert de applicatie (zee)
 
@@ -26,8 +52,7 @@ __Uitbreidingen:__
 ### Open punten
 
 - Het is te verwachten dat de server ook als client gebruikt wordt door de coördinator.
-- OSV richt de server ook gelijk als client in. Willen wij dit ook?
-- Afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
+- Downloaden van een sleutel o.i.d. voor afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
 
 
 ## De beheerder zet de stembureaus in de applicatie (zee)

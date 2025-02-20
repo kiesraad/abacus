@@ -27,12 +27,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 1,
           votes_cast: 600,
-          surplus_votes: {
+          remainder_votes: {
             integer: 26,
             numerator: 2,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 0,
@@ -44,12 +44,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 2,
           votes_cast: 302,
-          surplus_votes: {
+          remainder_votes: {
             integer: 41,
             numerator: 3,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 2,
@@ -61,12 +61,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 3,
           votes_cast: 98,
-          surplus_votes: {
+          remainder_votes: {
             integer: 45,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 0,
@@ -78,12 +78,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 4,
           votes_cast: 99,
-          surplus_votes: {
+          remainder_votes: {
             integer: 46,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 1,
@@ -95,12 +95,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 5,
           votes_cast: 101,
-          surplus_votes: {
+          remainder_votes: {
             integer: 48,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 1,
@@ -128,12 +128,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 1,
           votes_cast: 600,
-          surplus_votes: {
+          remainder_votes: {
             integer: 26,
             numerator: 2,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 0,
@@ -145,12 +145,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 2,
           votes_cast: 302,
-          surplus_votes: {
+          remainder_votes: {
             integer: 41,
             numerator: 3,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 2,
@@ -162,12 +162,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 3,
           votes_cast: 98,
-          surplus_votes: {
+          remainder_votes: {
             integer: 45,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 0,
@@ -179,12 +179,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 4,
           votes_cast: 99,
-          surplus_votes: {
+          remainder_votes: {
             integer: 46,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 1,
@@ -196,12 +196,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 5,
           votes_cast: 101,
-          surplus_votes: {
+          remainder_votes: {
             integer: 48,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 33,
             numerator: 2,
@@ -229,12 +229,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 1,
           votes_cast: 600,
-          surplus_votes: {
+          remainder_votes: {
             integer: 26,
             numerator: 2,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 0,
@@ -246,12 +246,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 2,
           votes_cast: 302,
-          surplus_votes: {
+          remainder_votes: {
             integer: 41,
             numerator: 3,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 43,
             numerator: 1,
@@ -263,12 +263,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 3,
           votes_cast: 98,
-          surplus_votes: {
+          remainder_votes: {
             integer: 45,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 0,
@@ -280,12 +280,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 4,
           votes_cast: 99,
-          surplus_votes: {
+          remainder_votes: {
             integer: 46,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 1,
@@ -297,12 +297,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 5,
           votes_cast: 101,
-          surplus_votes: {
+          remainder_votes: {
             integer: 48,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 33,
             numerator: 2,
@@ -330,12 +330,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 1,
           votes_cast: 600,
-          surplus_votes: {
+          remainder_votes: {
             integer: 26,
             numerator: 2,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 46,
             numerator: 2,
@@ -347,12 +347,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 2,
           votes_cast: 302,
-          surplus_votes: {
+          remainder_votes: {
             integer: 41,
             numerator: 3,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 43,
             numerator: 1,
@@ -364,12 +364,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 3,
           votes_cast: 98,
-          surplus_votes: {
+          remainder_votes: {
             integer: 45,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 0,
@@ -381,12 +381,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 4,
           votes_cast: 99,
-          surplus_votes: {
+          remainder_votes: {
             integer: 46,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 1,
@@ -398,12 +398,12 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 5,
           votes_cast: 101,
-          surplus_votes: {
+          remainder_votes: {
             integer: 48,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 33,
             numerator: 2,
@@ -419,12 +419,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 1,
       votes_cast: 600,
-      surplus_votes: {
+      remainder_votes: {
         integer: 26,
         numerator: 2,
         denominator: 23,
       },
-      meets_surplus_threshold: true,
+      meets_remainder_threshold: true,
       full_seats: 11,
       residual_seats: 1,
       total_seats: 12,
@@ -432,12 +432,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 2,
       votes_cast: 302,
-      surplus_votes: {
+      remainder_votes: {
         integer: 41,
         numerator: 3,
         denominator: 23,
       },
-      meets_surplus_threshold: true,
+      meets_remainder_threshold: true,
       full_seats: 5,
       residual_seats: 1,
       total_seats: 6,
@@ -445,12 +445,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 3,
       votes_cast: 98,
-      surplus_votes: {
+      remainder_votes: {
         integer: 45,
         numerator: 19,
         denominator: 23,
       },
-      meets_surplus_threshold: true,
+      meets_remainder_threshold: true,
       full_seats: 1,
       residual_seats: 0,
       total_seats: 1,
@@ -458,12 +458,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 4,
       votes_cast: 99,
-      surplus_votes: {
+      remainder_votes: {
         integer: 46,
         numerator: 19,
         denominator: 23,
       },
-      meets_surplus_threshold: true,
+      meets_remainder_threshold: true,
       full_seats: 1,
       residual_seats: 1,
       total_seats: 2,
@@ -471,12 +471,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 5,
       votes_cast: 101,
-      surplus_votes: {
+      remainder_votes: {
         integer: 48,
         numerator: 19,
         denominator: 23,
       },
-      meets_surplus_threshold: true,
+      meets_remainder_threshold: true,
       full_seats: 1,
       residual_seats: 1,
       total_seats: 2,

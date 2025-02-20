@@ -1,6 +1,6 @@
 import {
   ApportionmentStep,
-  HighestSurplusAssignedSeat,
+  HighestRemainderAssignedSeat,
   PoliticalGroup,
   PoliticalGroupSeatAssignment,
 } from "@kiesraad/api";
@@ -10,36 +10,36 @@ import { cn } from "@kiesraad/util";
 
 import cls from "./Apportionment.module.css";
 
-interface LargestSurplusesTableProps {
-  highestSurplusSteps: ApportionmentStep[];
+interface LargestRemaindersTableProps {
+  highestRemainderSteps: ApportionmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
-export function LargestSurplusesTable({
-  highestSurplusSteps,
+export function LargestRemaindersTable({
+  highestRemainderSteps,
   finalStanding,
   politicalGroups,
-}: LargestSurplusesTableProps) {
+}: LargestRemaindersTableProps) {
   const finalStandingPgsMeetingThreshold = finalStanding.filter(
-    (pg_seat_assignment) => pg_seat_assignment.meets_surplus_threshold,
+    (pg_seat_assignment) => pg_seat_assignment.meets_remainder_threshold,
   );
   return (
-    <Table id="largest_surpluses_table" className={cls.table}>
+    <Table id="largest_remainders_table" className={cls.table}>
       <Table.Header>
         <Table.HeaderCell className="text-align-r">{t("list")}</Table.HeaderCell>
         <Table.HeaderCell>{t("list_name")}</Table.HeaderCell>
         <Table.HeaderCell className="text-align-r">{t("apportionment.full_seats_count")}</Table.HeaderCell>
         <Table.HeaderCell span={2} className="text-align-r">
-          {t("apportionment.surplus")}
+          {t("apportionment.remainder")}
         </Table.HeaderCell>
         <Table.HeaderCell className="text-align-r">{t("apportionment.residual_seats_count")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
         {finalStandingPgsMeetingThreshold.map((pg_seat_assignment) => {
           const residual_seats =
-            highestSurplusSteps.filter((step) => {
-              const change = step.change as HighestSurplusAssignedSeat;
+            highestRemainderSteps.filter((step) => {
+              const change = step.change as HighestRemainderAssignedSeat;
               return change.selected_pg_number == pg_seat_assignment.pg_number;
             }).length || 0;
           return (
@@ -52,7 +52,7 @@ export function LargestSurplusesTable({
               <Table.DisplayFractionCells
                 className={`font-number ${residual_seats > 0 ? "bg-yellow bold" : undefined}`}
               >
-                {pg_seat_assignment.surplus_votes}
+                {pg_seat_assignment.remainder_votes}
               </Table.DisplayFractionCells>
               <Table.NumberCell className="font-number">{residual_seats}</Table.NumberCell>
             </Table.Row>

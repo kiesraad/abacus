@@ -3,14 +3,14 @@ import { describe, expect, test } from "vitest";
 import { PoliticalGroup } from "@kiesraad/api";
 import { render, screen } from "@kiesraad/test";
 
-import { LargestSurplusesTable } from "./LargestSurplusesTable";
-import { apportionment, election, highest_surplus_steps } from "./test-data/less-than-19-seats";
+import { LargestRemaindersTable } from "./LargestRemaindersTable";
+import { apportionment, election, highest_remainder_steps } from "./test-data/less-than-19-seats";
 
-describe("LargestSurplusesTable", () => {
-  test("renders a table with the residual seat allocation with largest surpluses system", async () => {
+describe("LargestRemaindersTable", () => {
+  test("renders a table with the residual seat allocation with largest remainders system", async () => {
     render(
-      <LargestSurplusesTable
-        highestSurplusSteps={highest_surplus_steps}
+      <LargestRemaindersTable
+        highestRemainderSteps={highest_remainder_steps}
         finalStanding={apportionment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
       />,

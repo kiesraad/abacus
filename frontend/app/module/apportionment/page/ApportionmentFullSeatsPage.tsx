@@ -53,7 +53,7 @@ export function ApportionmentFullSeatsPage() {
                       { num_residual_seats: apportionment.residual_seats },
                     )}{" "}
                     {t(
-                      `apportionment.residual_seats_information_largest_${apportionment.seats >= 19 ? "averages" : "surpluses"}`,
+                      `apportionment.residual_seats_information_largest_${apportionment.seats >= 19 ? "averages" : "remainders"}`,
                     )}
                   </span>
                   <ResidualSeatsCalculationTable

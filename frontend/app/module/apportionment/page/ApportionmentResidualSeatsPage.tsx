@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import {
   LargestAveragesFor19OrMoreSeatsTable,
   LargestAveragesForLessThan19SeatsTable,
-  LargestSurplusesTable,
+  LargestRemaindersTable,
 } from "app/component/apportionment";
 
 import { AbsoluteMajorityChange, useApportionmentContext, useElection } from "@kiesraad/api";
@@ -37,7 +37,7 @@ function render_information(seats: number, residualSeats: number) {
       )}
       <br />
       <br />
-      {tx(`apportionment.information_largest_${seats >= 19 ? "averages" : "surpluses"}`)}
+      {tx(`apportionment.information_largest_${seats >= 19 ? "averages" : "remainders"}`)}
     </span>
   );
 }
@@ -64,7 +64,7 @@ export function ApportionmentResidualSeatsPage() {
     );
   }
   if (apportionment) {
-    const highestSurplusSteps = apportionment.steps.filter((step) => step.change.assigned_by === "HighestSurplus");
+    const highestRemainderSteps = apportionment.steps.filter((step) => step.change.assigned_by === "HighestRemainder");
     const highestAverageSteps = apportionment.steps.filter((step) => step.change.assigned_by === "HighestAverage");
     const absoluteMajorityChange = apportionment.steps
       .map((step) => step.change)
@@ -91,11 +91,11 @@ export function ApportionmentResidualSeatsPage() {
                 ) : (
                   <>
                     <div>
-                      <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_surpluses")}</h2>
+                      <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_remainders")}</h2>
                       {render_information(apportionment.seats, apportionment.residual_seats)}
-                      {highestSurplusSteps.length > 0 && (
-                        <LargestSurplusesTable
-                          highestSurplusSteps={highestSurplusSteps}
+                      {highestRemainderSteps.length > 0 && (
+                        <LargestRemaindersTable
+                          highestRemainderSteps={highestRemainderSteps}
                           finalStanding={apportionment.final_standing}
                           politicalGroups={election.political_groups}
                         />
@@ -103,10 +103,10 @@ export function ApportionmentResidualSeatsPage() {
                     </div>
                     {highestAverageSteps.length > 0 && (
                       <div>
-                        <h2 className={cls.tableTitle}>{t("apportionment.leftover_residual_seats_assignment")}</h2>
+                        <h2 className={cls.tableTitle}>{t("apportionment.remaining_residual_seats_assignment")}</h2>
                         <span className={cls.tableInformation}>
                           {t(
-                            `apportionment.leftover_residual_seats_amount_and_information.${highestAverageSteps.length > 1 ? "plural" : "singular"}`,
+                            `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length > 1 ? "plural" : "singular"}`,
                             { num_seats: highestAverageSteps.length },
                           )}
                         </span>

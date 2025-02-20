@@ -192,7 +192,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 apportionment::ApportionmentStep,
                 apportionment::AssignedSeat,
                 apportionment::HighestAverageAssignedSeat,
-                apportionment::HighestSurplusAssignedSeat,
+                apportionment::HighestRemainderAssignedSeat,
                 authentication::Credentials,
                 authentication::LoginResponse,
                 authentication::ChangePasswordRequest,

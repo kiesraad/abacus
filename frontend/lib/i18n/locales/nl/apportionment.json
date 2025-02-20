@@ -4,15 +4,20 @@
   "details_residual_seats": "Verdeling van de restzetels",
   "details_full_seats": "Verdeling van de volle zetels",
   "election_summary": "Kengetallen",
+  "full_seat": {
+    "singular": "volle zetel",
+    "plural": "Volle zetels"
+  },
+  "full_seats_count": "Aantal volle zetels",
+  "full_seats_information": "Per politieke groepering wordt berekend hoe vaak de kiesdeler in het aantal stemmen past. Het resultaat van deze deling geeft het aantal volle zetels dat is behaald.",
+  "full_seats_information_link": {
+    "singular": "Na het <link>verdelen van de volle zetels</link> is er nog {num_residual_seats} restzetel.",
+    "plural": "Na het <link>verdelen van de volle zetels</link> zijn er nog {num_residual_seats} restzetels."
+  },
   "how_many_residual_seats": "Hoeveel restzetels zijn er te verdelen?",
   "how_often_is_quota_met": "Hoe vaak haalde elke partij de kiesdeler?",
   "information_largest_averages": "Er zijn 19 of meer zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste gemiddelden</strong>. De partij die na toewijzing van een restzetel het hoogste aantal stemmen per zetel heeft, krijgt de restzetel.\nIn de tabel is het gemiddeld aantal stemmen per zetel te vinden dat elke lijst zou krijgen als een restzetel zou worden toegekend.",
-  "information_largest_surpluses": "Er zijn minder dan 19 zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste overschotten</strong>. De restzetels zijn één voor één toegewezen aan de lijsten die na verdeling van de zetels het grootste overschot aan stemmen hebben. Lijsten die minder dan 75% van de kiesdeler hebben gehaald, komen niet in aanmerking voor een restzetel.",
-  "leftover_residual_seats_assignment": "Verdeling overige restzetels",
-  "leftover_residual_seats_amount_and_information": {
-    "singular": "Hierna was er nog {num_seats} restzetel te verdelen. Deze zetel is toegewezen aan de lijst die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben. Hierbij heeft iedere lijst niet meer dan één zetel toegewezen gekregen.",
-    "plural": "Hierna waren er nog {num_seats} restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben. Hierbij heeft iedere lijst niet meer dan één zetel toegewezen gekregen."
-  },
+  "information_largest_remainders": "Er zijn minder dan 19 zetels. Daarom worden restzetels toegewezen volgens het <strong>systeem van de grootste overschotten</strong>. De restzetels zijn één voor één toegewezen aan de lijsten die na verdeling van de zetels het grootste overschot aan stemmen hebben. Lijsten die minder dan 75% van de kiesdeler hebben gehaald, komen niet in aanmerking voor een restzetel.",
   "minus": "min",
   "not_available": "Zetelverdeling is nog niet beschikbaar",
   "no_residual_seats_to_assign": "Er zijn geen restzetels te verdelen.",
@@ -21,6 +26,12 @@
   "preference_threshold_description": "{percentage}% van de kiesdeler",
   "quota": "Kiesdeler",
   "quota_description": "Benodigde stemmen per volle zetel",
+  "remainder": "Overschot",
+  "remaining_residual_seats_assignment": "Verdeling overige restzetels",
+  "remaining_residual_seats_amount_and_information": {
+    "singular": "Hierna was er nog {num_seats} restzetel te verdelen. Deze zetel is toegewezen aan de lijst die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben. Hierbij heeft iedere lijst niet meer dan één zetel toegewezen gekregen.",
+    "plural": "Hierna waren er nog {num_seats} restzetels te verdelen. Deze zetels zijn toegewezen aan de lijsten die met een zetel erbij het grootste gemiddelde aantal stemmen per zetel zouden hebben. Hierbij heeft iedere lijst niet meer dan één zetel toegewezen gekregen."
+  },
   "residual_seat": {
     "singular": "Restzetel",
     "plural": "Restzetels"
@@ -32,14 +43,13 @@
     "plural": "Er zijn <link>{num_residual_seats} restzetels te verdelen</link>."
   },
   "residual_seats_information_largest_averages": "Omdat het totaal aantal zetels groter of gelijk is aan 19, gebeurt dat via het systeem van de grootste gemiddelden.",
-  "residual_seats_information_largest_surpluses": "Omdat het totaal aantal zetels kleiner is dan 19, gebeurt dat via het systeem van de grootste overschotten.",
+  "residual_seats_information_largest_remainders": "Omdat het totaal aantal zetels kleiner is dan 19, gebeurt dat via het systeem van de grootste overschotten.",
   "residual_seats_largest_averages": "De restzetels gaan naar de partijen met de grootste gemiddelden",
-  "residual_seats_largest_surpluses": "De restzetels gaan naar de partijen met de grootste overschotten",
+  "residual_seats_largest_remainders": "De restzetels gaan naar de partijen met de grootste overschotten",
   "seats_assigned": {
     "singular": "{num_seat} zetel werd als {type_seat} toegewezen",
     "plural": "{num_seat} zetels werden als {type_seat} toegewezen"
   },
-  "surplus": "Overschot",
   "title": "Zetelverdeling",
   "total": "Totaal",
   "total_number_seats": "Totaal aantal zetels",
@@ -48,15 +58,5 @@
   "total_votes_cast_count": "Getelde stembiljetten",
   "turnout": "Opkomst",
   "view_details": "bekijk details",
-  "voters": "Kiesgerechtigden",
-  "full_seat": {
-    "singular": "volle zetel",
-    "plural": "Volle zetels"
-  },
-  "full_seats_count": "Aantal volle zetels",
-  "full_seats_information": "Per politieke groepering wordt berekend hoe vaak de kiesdeler in het aantal stemmen past. Het resultaat van deze deling geeft het aantal volle zetels dat is behaald.",
-  "full_seats_information_link": {
-    "singular": "Na het <link>verdelen van de volle zetels</link> is er nog {num_residual_seats} restzetel.",
-    "plural": "Na het <link>verdelen van de volle zetels</link> zijn er nog {num_residual_seats} restzetels."
-  }
+  "voters": "Kiesgerechtigden"
 }

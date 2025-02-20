@@ -15,7 +15,7 @@ import {
   apportionment as apportionment_less_than_19_seats,
   election as election_less_than_19_seats,
   election_summary as election_summary_less_than_19_seats,
-  highest_surplus_steps,
+  highest_remainder_steps,
 } from "app/component/apportionment/test-data/less-than-19-seats";
 import { routes } from "app/routes";
 
@@ -66,7 +66,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["", "Restzetel toegekend aan lijst", "5", "2", "1", "4", ""],
     ]);
 
-    expect(screen.queryByTestId("largest_surpluses_table")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("largest_remainders_table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("largest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
@@ -88,9 +88,9 @@ describe("ApportionmentResidualSeatsPage", () => {
         name: "De restzetels gaan naar de partijen met de grootste overschotten",
       }),
     );
-    const largest_surpluses_table = await screen.findByTestId("largest_surpluses_table");
-    expect(largest_surpluses_table).toBeVisible();
-    expect(largest_surpluses_table).toHaveTableContent([
+    const largest_remainders_table = await screen.findByTestId("largest_remainders_table");
+    expect(largest_remainders_table).toBeVisible();
+    expect(largest_remainders_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
       ["1", "Political Group A", "10", "8", "", "1"],
       ["2", "Political Group B", "0", "60", "", "1"],
@@ -117,12 +117,12 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats allocation tables for less than 19 seats with only surplus system visible", async () => {
+  test("Residual seats allocation tables for less than 19 seats with only remainder system visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_less_than_19_seats));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       apportionment: {
         ...apportionment_less_than_19_seats,
-        steps: highest_surplus_steps,
+        steps: highest_remainder_steps,
       },
       election_summary: election_summary_less_than_19_seats,
     } satisfies ElectionApportionmentResponse);
@@ -137,9 +137,9 @@ describe("ApportionmentResidualSeatsPage", () => {
         name: "De restzetels gaan naar de partijen met de grootste overschotten",
       }),
     );
-    const largest_surpluses_table = await screen.findByTestId("largest_surpluses_table");
-    expect(largest_surpluses_table).toBeVisible();
-    expect(largest_surpluses_table).toHaveTableContent([
+    const largest_remainders_table = await screen.findByTestId("largest_remainders_table");
+    expect(largest_remainders_table).toBeVisible();
+    expect(largest_remainders_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
       ["1", "Political Group A", "10", "8", "", "1"],
       ["2", "Political Group B", "0", "60", "", "1"],
@@ -206,7 +206,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       ).toBeVisible();
 
       expect(screen.queryByTestId("largest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("largest_surpluses_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("largest_remainders_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
     });
@@ -230,7 +230,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       ).toBeVisible();
 
       expect(screen.queryByTestId("largest_averages_for_19_or_more_seats_table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("largest_surpluses_table")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("largest_remainders_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest_averages_for_less_than_19_seats_table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
     });

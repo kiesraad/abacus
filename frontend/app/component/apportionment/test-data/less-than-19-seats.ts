@@ -1,14 +1,14 @@
 import { ApportionmentResult, ApportionmentStep, Election, ElectionSummary } from "@kiesraad/api";
 
-export const highest_surplus_steps: ApportionmentStep[] = [
+export const highest_remainder_steps: ApportionmentStep[] = [
   {
     residual_seat_number: 1,
     change: {
-      assigned_by: "HighestSurplus",
+      assigned_by: "HighestRemainder",
       selected_pg_number: 2,
       pg_options: [2],
       pg_assigned: [2],
-      surplus_votes: {
+      remainder_votes: {
         integer: 60,
         numerator: 0,
         denominator: 15,
@@ -18,12 +18,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 1,
         votes_cast: 808,
-        surplus_votes: {
+        remainder_votes: {
           integer: 8,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: true,
+        meets_remainder_threshold: true,
         next_votes_per_seat: {
           integer: 73,
           numerator: 5,
@@ -35,12 +35,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 2,
         votes_cast: 60,
-        surplus_votes: {
+        remainder_votes: {
           integer: 60,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: true,
+        meets_remainder_threshold: true,
         next_votes_per_seat: {
           integer: 60,
           numerator: 0,
@@ -52,12 +52,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 3,
         votes_cast: 58,
-        surplus_votes: {
+        remainder_votes: {
           integer: 58,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 58,
           numerator: 0,
@@ -69,12 +69,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 4,
         votes_cast: 57,
-        surplus_votes: {
+        remainder_votes: {
           integer: 57,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 57,
           numerator: 0,
@@ -86,12 +86,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 5,
         votes_cast: 56,
-        surplus_votes: {
+        remainder_votes: {
           integer: 56,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 56,
           numerator: 0,
@@ -103,12 +103,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 6,
         votes_cast: 55,
-        surplus_votes: {
+        remainder_votes: {
           integer: 55,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 55,
           numerator: 0,
@@ -120,12 +120,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 7,
         votes_cast: 54,
-        surplus_votes: {
+        remainder_votes: {
           integer: 54,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 54,
           numerator: 0,
@@ -137,12 +137,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 8,
         votes_cast: 52,
-        surplus_votes: {
+        remainder_votes: {
           integer: 52,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 52,
           numerator: 0,
@@ -156,11 +156,11 @@ export const highest_surplus_steps: ApportionmentStep[] = [
   {
     residual_seat_number: 2,
     change: {
-      assigned_by: "HighestSurplus",
+      assigned_by: "HighestRemainder",
       selected_pg_number: 1,
       pg_options: [1],
       pg_assigned: [1],
-      surplus_votes: {
+      remainder_votes: {
         integer: 8,
         numerator: 0,
         denominator: 15,
@@ -170,12 +170,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 1,
         votes_cast: 808,
-        surplus_votes: {
+        remainder_votes: {
           integer: 8,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: true,
+        meets_remainder_threshold: true,
         next_votes_per_seat: {
           integer: 73,
           numerator: 5,
@@ -187,12 +187,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 2,
         votes_cast: 60,
-        surplus_votes: {
+        remainder_votes: {
           integer: 60,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: true,
+        meets_remainder_threshold: true,
         next_votes_per_seat: {
           integer: 30,
           numerator: 0,
@@ -204,12 +204,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 3,
         votes_cast: 58,
-        surplus_votes: {
+        remainder_votes: {
           integer: 58,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 58,
           numerator: 0,
@@ -221,12 +221,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 4,
         votes_cast: 57,
-        surplus_votes: {
+        remainder_votes: {
           integer: 57,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 57,
           numerator: 0,
@@ -238,12 +238,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 5,
         votes_cast: 56,
-        surplus_votes: {
+        remainder_votes: {
           integer: 56,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 56,
           numerator: 0,
@@ -255,12 +255,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 6,
         votes_cast: 55,
-        surplus_votes: {
+        remainder_votes: {
           integer: 55,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 55,
           numerator: 0,
@@ -272,12 +272,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 7,
         votes_cast: 54,
-        surplus_votes: {
+        remainder_votes: {
           integer: 54,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 54,
           numerator: 0,
@@ -289,12 +289,12 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       {
         pg_number: 8,
         votes_cast: 52,
-        surplus_votes: {
+        remainder_votes: {
           integer: 52,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 52,
           numerator: 0,
@@ -325,12 +325,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 1,
         votes_cast: 808,
-        surplus_votes: {
+        remainder_votes: {
           integer: 8,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: true,
+        meets_remainder_threshold: true,
         next_votes_per_seat: {
           integer: 67,
           numerator: 4,
@@ -342,12 +342,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 2,
         votes_cast: 60,
-        surplus_votes: {
+        remainder_votes: {
           integer: 60,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: true,
+        meets_remainder_threshold: true,
         next_votes_per_seat: {
           integer: 30,
           numerator: 0,
@@ -359,12 +359,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 3,
         votes_cast: 58,
-        surplus_votes: {
+        remainder_votes: {
           integer: 58,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 58,
           numerator: 0,
@@ -376,12 +376,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 4,
         votes_cast: 57,
-        surplus_votes: {
+        remainder_votes: {
           integer: 57,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 57,
           numerator: 0,
@@ -393,12 +393,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 5,
         votes_cast: 56,
-        surplus_votes: {
+        remainder_votes: {
           integer: 56,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 56,
           numerator: 0,
@@ -410,12 +410,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 6,
         votes_cast: 55,
-        surplus_votes: {
+        remainder_votes: {
           integer: 55,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 55,
           numerator: 0,
@@ -427,12 +427,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 7,
         votes_cast: 54,
-        surplus_votes: {
+        remainder_votes: {
           integer: 54,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 54,
           numerator: 0,
@@ -444,12 +444,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 8,
         votes_cast: 52,
-        surplus_votes: {
+        remainder_votes: {
           integer: 52,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 52,
           numerator: 0,
@@ -477,12 +477,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 1,
         votes_cast: 808,
-        surplus_votes: {
+        remainder_votes: {
           integer: 8,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: true,
+        meets_remainder_threshold: true,
         next_votes_per_seat: {
           integer: 62,
           numerator: 2,
@@ -494,12 +494,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 2,
         votes_cast: 60,
-        surplus_votes: {
+        remainder_votes: {
           integer: 60,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: true,
+        meets_remainder_threshold: true,
         next_votes_per_seat: {
           integer: 30,
           numerator: 0,
@@ -511,12 +511,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 3,
         votes_cast: 58,
-        surplus_votes: {
+        remainder_votes: {
           integer: 58,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 58,
           numerator: 0,
@@ -528,12 +528,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 4,
         votes_cast: 57,
-        surplus_votes: {
+        remainder_votes: {
           integer: 57,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 57,
           numerator: 0,
@@ -545,12 +545,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 5,
         votes_cast: 56,
-        surplus_votes: {
+        remainder_votes: {
           integer: 56,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 56,
           numerator: 0,
@@ -562,12 +562,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 6,
         votes_cast: 55,
-        surplus_votes: {
+        remainder_votes: {
           integer: 55,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 55,
           numerator: 0,
@@ -579,12 +579,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 7,
         votes_cast: 54,
-        surplus_votes: {
+        remainder_votes: {
           integer: 54,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 54,
           numerator: 0,
@@ -596,12 +596,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 8,
         votes_cast: 52,
-        surplus_votes: {
+        remainder_votes: {
           integer: 52,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 52,
           numerator: 0,
@@ -629,12 +629,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 1,
         votes_cast: 808,
-        surplus_votes: {
+        remainder_votes: {
           integer: 8,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: true,
+        meets_remainder_threshold: true,
         next_votes_per_seat: {
           integer: 62,
           numerator: 2,
@@ -646,12 +646,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 2,
         votes_cast: 60,
-        surplus_votes: {
+        remainder_votes: {
           integer: 60,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: true,
+        meets_remainder_threshold: true,
         next_votes_per_seat: {
           integer: 30,
           numerator: 0,
@@ -663,12 +663,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 3,
         votes_cast: 58,
-        surplus_votes: {
+        remainder_votes: {
           integer: 58,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 29,
           numerator: 0,
@@ -680,12 +680,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 4,
         votes_cast: 57,
-        surplus_votes: {
+        remainder_votes: {
           integer: 57,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 57,
           numerator: 0,
@@ -697,12 +697,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 5,
         votes_cast: 56,
-        surplus_votes: {
+        remainder_votes: {
           integer: 56,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 56,
           numerator: 0,
@@ -714,12 +714,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 6,
         votes_cast: 55,
-        surplus_votes: {
+        remainder_votes: {
           integer: 55,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 55,
           numerator: 0,
@@ -731,12 +731,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 7,
         votes_cast: 54,
-        surplus_votes: {
+        remainder_votes: {
           integer: 54,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 54,
           numerator: 0,
@@ -748,12 +748,12 @@ export const highest_average_steps: ApportionmentStep[] = [
       {
         pg_number: 8,
         votes_cast: 52,
-        surplus_votes: {
+        remainder_votes: {
           integer: 52,
           numerator: 0,
           denominator: 15,
         },
-        meets_surplus_threshold: false,
+        meets_remainder_threshold: false,
         next_votes_per_seat: {
           integer: 52,
           numerator: 0,
@@ -775,17 +775,17 @@ export const apportionment: ApportionmentResult = {
     numerator: 0,
     denominator: 15,
   },
-  steps: highest_surplus_steps.concat(highest_average_steps),
+  steps: highest_remainder_steps.concat(highest_average_steps),
   final_standing: [
     {
       pg_number: 1,
       votes_cast: 808,
-      surplus_votes: {
+      remainder_votes: {
         integer: 8,
         numerator: 0,
         denominator: 15,
       },
-      meets_surplus_threshold: true,
+      meets_remainder_threshold: true,
       full_seats: 10,
       residual_seats: 2,
       total_seats: 12,
@@ -793,12 +793,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 2,
       votes_cast: 60,
-      surplus_votes: {
+      remainder_votes: {
         integer: 60,
         numerator: 0,
         denominator: 15,
       },
-      meets_surplus_threshold: true,
+      meets_remainder_threshold: true,
       full_seats: 0,
       residual_seats: 1,
       total_seats: 1,
@@ -806,12 +806,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 3,
       votes_cast: 58,
-      surplus_votes: {
+      remainder_votes: {
         integer: 58,
         numerator: 0,
         denominator: 15,
       },
-      meets_surplus_threshold: false,
+      meets_remainder_threshold: false,
       full_seats: 0,
       residual_seats: 1,
       total_seats: 1,
@@ -819,12 +819,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 4,
       votes_cast: 57,
-      surplus_votes: {
+      remainder_votes: {
         integer: 57,
         numerator: 0,
         denominator: 15,
       },
-      meets_surplus_threshold: false,
+      meets_remainder_threshold: false,
       full_seats: 0,
       residual_seats: 1,
       total_seats: 1,
@@ -832,12 +832,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 5,
       votes_cast: 56,
-      surplus_votes: {
+      remainder_votes: {
         integer: 56,
         numerator: 0,
         denominator: 15,
       },
-      meets_surplus_threshold: false,
+      meets_remainder_threshold: false,
       full_seats: 0,
       residual_seats: 0,
       total_seats: 0,
@@ -845,12 +845,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 6,
       votes_cast: 55,
-      surplus_votes: {
+      remainder_votes: {
         integer: 55,
         numerator: 0,
         denominator: 15,
       },
-      meets_surplus_threshold: false,
+      meets_remainder_threshold: false,
       full_seats: 0,
       residual_seats: 0,
       total_seats: 0,
@@ -858,12 +858,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 7,
       votes_cast: 54,
-      surplus_votes: {
+      remainder_votes: {
         integer: 54,
         numerator: 0,
         denominator: 15,
       },
-      meets_surplus_threshold: false,
+      meets_remainder_threshold: false,
       full_seats: 0,
       residual_seats: 0,
       total_seats: 0,
@@ -871,12 +871,12 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 8,
       votes_cast: 52,
-      surplus_votes: {
+      remainder_votes: {
         integer: 52,
         numerator: 0,
         denominator: 15,
       },
-      meets_surplus_threshold: false,
+      meets_remainder_threshold: false,
       full_seats: 0,
       residual_seats: 0,
       total_seats: 0,

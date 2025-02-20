@@ -77,7 +77,7 @@ async fn test_user_listing(pool: SqlitePool) {
     assert!(body.users.iter().any(|ps| ps.username() == "user"))
 }
 
-#[test(sqlx::test())]
+#[test(sqlx::test)]
 async fn test_user_creation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/user");
@@ -109,7 +109,7 @@ async fn test_user_creation(pool: SqlitePool) {
     assert!(body.get("temp_password").is_none());
 }
 
-#[test(sqlx::test())]
+#[test(sqlx::test)]
 async fn test_user_creation_anonymous(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/user");
@@ -158,7 +158,7 @@ async fn test_user_get(pool: SqlitePool) {
     assert_eq!(body["fullname"], "Sanne Molenaar");
 }
 
-#[test(sqlx::test())]
+#[test(sqlx::test)]
 async fn test_user_get_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/user/40404");

@@ -5,6 +5,9 @@ use utoipa::ToSchema;
 
 pub use self::api::*;
 
+#[cfg(test)]
+pub use self::session::Sessions;
+
 mod api;
 pub mod error;
 mod password;

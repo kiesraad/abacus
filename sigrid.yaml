@@ -163,6 +163,7 @@ languages:
       - ".*/lib/api-mocks/.*[.]tsx"
       - ".*[.]e2e[.]ts"
       - ".*.stories[.]tsx"
+      - ".*/test-data/.*[.]ts"
     generated:
       include:
       - ".*/gen/.*[.]ts"

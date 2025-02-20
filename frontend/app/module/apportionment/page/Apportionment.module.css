@@ -1,0 +1,16 @@
+.article {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.table-title {
+  margin-bottom: 2rem;
+}
+
+.table-information {
+  display: block;
+  width: 39rem;
+  margin-bottom: 2rem;
+}

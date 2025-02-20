@@ -23,6 +23,7 @@ use zip::result::ZipError;
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub enum ErrorReference {
+    ApportionmentNotAvailableUntilDataEntryFinalised,
     DatabaseError,
     DrawingOfLotsRequired,
     EntryNotFound,
@@ -241,6 +242,14 @@ impl IntoResponse for APIError {
                 error!("Apportionment error: {:?}", err);
 
                 match err {
+                    ApportionmentError::ApportionmentNotAvailableUntilDataEntryFinalised => (
+                        StatusCode::PRECONDITION_FAILED,
+                        to_error(
+                            "Election data entry first needs to be finalised",
+                            ErrorReference::ApportionmentNotAvailableUntilDataEntryFinalised,
+                            false,
+                        ),
+                    ),
                     ApportionmentError::DrawingOfLotsNotImplemented => (
                         StatusCode::UNPROCESSABLE_ENTITY,
                         to_error(

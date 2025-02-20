@@ -17,6 +17,8 @@ mod fraction;
 #[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct ApportionmentResult {
     pub seats: u64,
+    pub whole_seats: u64,
+    pub residual_seats: u64,
     pub quota: Fraction,
     pub steps: Vec<ApportionmentStep>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -341,6 +343,8 @@ pub fn apportionment(
 
     Ok(ApportionmentResult {
         seats,
+        whole_seats,
+        residual_seats,
         quota,
         steps,
         absolute_majority_change,
@@ -643,6 +647,7 @@ pub struct HighestSurplusAssignedSeat {
 /// Errors that can occur during apportionment
 #[derive(Debug, PartialEq)]
 pub enum ApportionmentError {
+    ApportionmentNotAvailableUntilDataEntryFinalised,
     DrawingOfLotsNotImplemented,
 }
 

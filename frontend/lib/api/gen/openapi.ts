@@ -152,8 +152,10 @@ export interface ApportionmentResult {
   absolute_majority_change?: AbsoluteMajorityChange;
   final_standing: PoliticalGroupSeatAssignment[];
   quota: Fraction;
+  residual_seats: number;
   seats: number;
   steps: ApportionmentStep[];
+  whole_seats: number;
 }
 
 /**
@@ -344,6 +346,7 @@ export interface ElectionSummary {
  * Error reference used to show the corresponding error message to the end-user
  */
 export type ErrorReference =
+  | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "DatabaseError"
   | "DrawingOfLotsRequired"
   | "EntryNotFound"

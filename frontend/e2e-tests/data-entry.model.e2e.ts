@@ -52,6 +52,11 @@ const dataEntryMachineDefinition = {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeChanged",
       },
     },
+    pollingStationsPageErrorCachedSaved: {
+      on: {
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeErrorCached",
+      },
+    },
     recountedPageEmpty: {},
     recountedPageSaved: {
       on: {
@@ -68,11 +73,17 @@ const dataEntryMachineDefinition = {
         GO_TO_VOTERS_VOTES_PAGE: "voterVotesPageCached",
       },
     },
+    recountedPageErrorCached: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageErrorCached",
+      },
+    },
     voterVotesPageCached: {
       on: {
         SUBMIT: "differencesPage",
       },
     },
+    votersVotesPageErrorCached: {},
     voterVotesPageEmpty: {
       on: {
         FILL_WITH_VALID_DATA: "votersVotesPageFilled",
@@ -103,6 +114,9 @@ const dataEntryMachineDefinition = {
     votersVotesPageSubmittedError: {
       on: {
         CORRECT_ERROR_DATA: "votersVotesPageFilled",
+        CLICK_ABORT: "abortInputModalErrorCached",
+        NAV_TO_POLLING_STATION_PAGE: "abortInputModalErrorCached",
+        GO_TO_RECOUNTED_PAGE: "recountedPageErrorCached",
       },
     },
     votersVotesPageChangedSubmitted: {},
@@ -117,6 +131,7 @@ const dataEntryMachineDefinition = {
     votersVotesPageAfterResumeSaved: {},
     votersVotesPageAfterResumeChanged: {},
     votersVotesPageAfterResumeEmpty: {},
+    votersVotesPageAfterResumeErrorCached: {},
     differencesPage: {
       on: {
         GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageSubmitted",
@@ -137,6 +152,12 @@ const dataEntryMachineDefinition = {
     abortInputModalChanged: {
       on: {
         SAVE_INPUT: "pollingStationsPageChangedSaved",
+        DISCARD_INPUT: "pollingStationsPageDiscarded",
+      },
+    },
+    abortInputModalErrorCached: {
+      on: {
+        SAVE_INPUT: "pollingStationsPageErrorCachedSaved",
         DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
@@ -229,6 +250,12 @@ test.describe("Data entry model test", () => {
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
+          pollingStationsPageErrorCachedSaved: async () => {
+            await expect(pollingStationChoicePage.fieldset).toBeVisible();
+            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
+              `${pollingStation.number} - ${pollingStation.name}`,
+            ]);
+          },
         };
 
         const PollingStationsPageEvents = {
@@ -253,6 +280,11 @@ test.describe("Data entry model test", () => {
           recountedPageCached: async () => {
             await expect(recountedPage.fieldset).toBeVisible();
             await expect(recountedPage.no).toBeChecked();
+          },
+          recountedPageErrorCached: async () => {
+            await expect(recountedPage.fieldset).toBeVisible();
+            await expect(recountedPage.no).toBeChecked();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("bevat een fout");
           },
           unsavedChangesModalChanged: async () => {
             await expect(recountedPage.unsavedChangesModal.heading).toBeVisible();
@@ -289,6 +321,14 @@ test.describe("Data entry model test", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
           },
+          votersVotesPageErrorCached: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
+            await expect(votersAndVotesPage.error).toContainText(
+              "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
+            );
+          },
           votersVotesPageSubmittedError: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.error).toContainText(
@@ -324,6 +364,12 @@ test.describe("Data entry model test", () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
+          },
+          votersVotesPageAfterResumeErrorCached: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
+            await expect(votersAndVotesPage.error).toBeHidden();
           },
         };
 
@@ -376,6 +422,9 @@ test.describe("Data entry model test", () => {
             await expect(abortModal.heading).toBeVisible();
           },
           abortInputModalChanged: async () => {
+            await expect(abortModal.heading).toBeVisible();
+          },
+          abortInputModalErrorCached: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
         };

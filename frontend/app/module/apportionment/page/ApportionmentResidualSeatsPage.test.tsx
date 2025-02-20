@@ -167,9 +167,9 @@ describe("ApportionmentResidualSeatsPage", () => {
         name: "De restzetels gaan naar de partijen met de grootste overschotten",
       }),
     );
-    const largest_surpluses_table = await screen.findByTestId("largest_surpluses_table");
-    expect(largest_surpluses_table).toBeVisible();
-    expect(largest_surpluses_table).toHaveTableContent([
+    const largest_remainders_table = await screen.findByTestId("largest_remainders_table");
+    expect(largest_remainders_table).toBeVisible();
+    expect(largest_remainders_table).toHaveTableContent([
       ["Lijst", "Lijstnaam", "Aantal volle zetels", "Overschot", "Aantal restzetels"],
       ["1", "Political Group A", "7", "189", "2/15", "0"],
       ["2", "Political Group B", "2", "296", "7/15", "1"],

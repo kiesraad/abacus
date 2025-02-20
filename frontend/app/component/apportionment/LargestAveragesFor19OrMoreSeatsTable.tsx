@@ -1,6 +1,6 @@
 import {
   ApportionmentStep,
-  HighestAverageAssignedSeat,
+  LargestAverageAssignedSeat,
   PoliticalGroup,
   PoliticalGroupSeatAssignment,
 } from "@kiesraad/api";
@@ -11,13 +11,13 @@ import { cn } from "@kiesraad/util";
 import cls from "./Apportionment.module.css";
 
 interface LargestAveragesFor19OrMoreSeatsTableProps {
-  highestAverageSteps: ApportionmentStep[];
+  largestAverageSteps: ApportionmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
 export function LargestAveragesFor19OrMoreSeatsTable({
-  highestAverageSteps,
+  largestAverageSteps,
   finalStanding,
   politicalGroups,
 }: LargestAveragesFor19OrMoreSeatsTableProps) {
@@ -30,7 +30,7 @@ export function LargestAveragesFor19OrMoreSeatsTable({
         <Table.Header>
           <Table.HeaderCell className={cn(cls.sticky, "text-align-r")}>{t("list")}</Table.HeaderCell>
           <Table.HeaderCell className={cls.sticky}>{t("list_name")}</Table.HeaderCell>
-          {highestAverageSteps.map((step: ApportionmentStep) => {
+          {largestAverageSteps.map((step: ApportionmentStep) => {
             return (
               <Table.HeaderCell key={step.residual_seat_number} className="text-align-r" span={2}>
                 {t("apportionment.residual_seat.singular")} {step.residual_seat_number}
@@ -51,8 +51,8 @@ export function LargestAveragesFor19OrMoreSeatsTable({
                 <Table.Cell className={cls.sticky}>
                   {politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}
                 </Table.Cell>
-                {highestAverageSteps.map((step: ApportionmentStep) => {
-                  const change = step.change as HighestAverageAssignedSeat;
+                {largestAverageSteps.map((step: ApportionmentStep) => {
+                  const change = step.change as LargestAverageAssignedSeat;
                   const average = step.standing[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
                   if (average) {
                     return (
@@ -78,8 +78,8 @@ export function LargestAveragesFor19OrMoreSeatsTable({
             <Table.Cell className={cn(cls.sticky, "text-align-r", "nowrap", "bold")}>
               {t("apportionment.residual_seat_assigned_to_list")}
             </Table.Cell>
-            {highestAverageSteps.map((step: ApportionmentStep) => {
-              const change = step.change as HighestAverageAssignedSeat;
+            {largestAverageSteps.map((step: ApportionmentStep) => {
+              const change = step.change as LargestAverageAssignedSeat;
               return (
                 <Table.NumberCell key={step.residual_seat_number} colSpan={2}>
                   {change.selected_pg_number}

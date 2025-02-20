@@ -175,8 +175,8 @@ export interface ApportionmentStep {
  * Records the political group and specific change for a specific residual seat
  */
 export type AssignedSeat =
-  | (HighestAverageAssignedSeat & { assigned_by: "HighestAverage" })
-  | (HighestRemainderAssignedSeat & { assigned_by: "HighestRemainder" })
+  | (LargestAverageAssignedSeat & { assigned_by: "LargestAverage" })
+  | (LargestRemainderAssignedSeat & { assigned_by: "LargestRemainder" })
   | (AbsoluteMajorityChange & { assigned_by: "AbsoluteMajorityChange" });
 
 /**
@@ -407,9 +407,9 @@ export interface GetDataEntryResponse {
 }
 
 /**
- * Contains the details for an assigned seat, assigned through the highest average method.
+ * Contains the details for an assigned seat, assigned through the largest average method.
  */
-export interface HighestAverageAssignedSeat {
+export interface LargestAverageAssignedSeat {
   pg_assigned: number[];
   pg_options: number[];
   selected_pg_number: number;
@@ -417,9 +417,9 @@ export interface HighestAverageAssignedSeat {
 }
 
 /**
- * Contains the details for an assigned seat, assigned through the highest remainder method.
+ * Contains the details for an assigned seat, assigned through the largest remainder method.
  */
-export interface HighestRemainderAssignedSeat {
+export interface LargestRemainderAssignedSeat {
   pg_assigned: number[];
   pg_options: number[];
   remainder_votes: Fraction;

@@ -1,10 +1,10 @@
 import { ApportionmentResult, ApportionmentStep, Election, ElectionSummary } from "@kiesraad/api";
 
-export const highest_remainder_steps: ApportionmentStep[] = [
+export const largest_remainder_steps: ApportionmentStep[] = [
   {
     residual_seat_number: 1,
     change: {
-      assigned_by: "HighestRemainder",
+      assigned_by: "LargestRemainder",
       selected_pg_number: 2,
       pg_options: [2],
       pg_assigned: [2],
@@ -156,7 +156,7 @@ export const highest_remainder_steps: ApportionmentStep[] = [
   {
     residual_seat_number: 2,
     change: {
-      assigned_by: "HighestRemainder",
+      assigned_by: "LargestRemainder",
       selected_pg_number: 1,
       pg_options: [1],
       pg_assigned: [1],
@@ -307,11 +307,11 @@ export const highest_remainder_steps: ApportionmentStep[] = [
   },
 ];
 
-export const highest_average_steps: ApportionmentStep[] = [
+export const largest_average_steps: ApportionmentStep[] = [
   {
     residual_seat_number: 3,
     change: {
-      assigned_by: "HighestAverage",
+      assigned_by: "LargestAverage",
       selected_pg_number: 1,
       pg_options: [1],
       pg_assigned: [1],
@@ -463,7 +463,7 @@ export const highest_average_steps: ApportionmentStep[] = [
   {
     residual_seat_number: 4,
     change: {
-      assigned_by: "HighestAverage",
+      assigned_by: "LargestAverage",
       selected_pg_number: 3,
       pg_options: [3],
       pg_assigned: [3],
@@ -615,7 +615,7 @@ export const highest_average_steps: ApportionmentStep[] = [
   {
     residual_seat_number: 5,
     change: {
-      assigned_by: "HighestAverage",
+      assigned_by: "LargestAverage",
       selected_pg_number: 4,
       pg_options: [4],
       pg_assigned: [4],
@@ -775,7 +775,7 @@ export const apportionment: ApportionmentResult = {
     numerator: 0,
     denominator: 15,
   },
-  steps: highest_remainder_steps.concat(highest_average_steps),
+  steps: largest_remainder_steps.concat(largest_average_steps),
   final_standing: [
     {
       pg_number: 1,

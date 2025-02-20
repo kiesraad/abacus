@@ -15,7 +15,7 @@ import {
   apportionment as apportionment_less_than_19_seats,
   election as election_less_than_19_seats,
   election_summary as election_summary_less_than_19_seats,
-  highest_remainder_steps,
+  largest_remainder_steps,
 } from "app/component/apportionment/test-data/less-than-19-seats";
 import { routes } from "app/routes";
 
@@ -122,7 +122,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       apportionment: {
         ...apportionment_less_than_19_seats,
-        steps: highest_remainder_steps,
+        steps: largest_remainder_steps,
       },
       election_summary: election_summary_less_than_19_seats,
     } satisfies ElectionApportionmentResponse);

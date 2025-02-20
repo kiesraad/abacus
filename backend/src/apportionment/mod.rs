@@ -149,7 +149,7 @@ fn initial_full_seats_per_political_group(
 /// This is determined based on seeing what would happen to the average votes
 /// per seat if one additional seat would be assigned to each political group.
 ///
-/// It then returns all the political groups for which this fraction is the highest.
+/// It then returns all the political groups for which this fraction is the largest.
 /// If there are more political groups than there are residual seats to be assigned,
 /// a drawing of lots is required.
 ///
@@ -158,7 +158,7 @@ fn political_groups_with_largest_average<'a>(
     assigned_seats: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
     residual_seats: u64,
 ) -> Result<Vec<&'a PoliticalGroupStanding>, ApportionmentError> {
-    // We are now going to find the political groups that have the highest average
+    // We are now going to find the political groups that have the largest average
     // votes per seat if we would were to add one additional seat to them
     let (max_average, political_groups) = assigned_seats.into_iter().fold(
         (Fraction::ZERO, vec![]),
@@ -187,7 +187,7 @@ fn political_groups_with_largest_average<'a>(
 
     // Check if we can actually assign all these political groups a seat, otherwise we would need to draw lots
     if political_groups.len() as u64 > residual_seats {
-        // TODO: #788 if multiple political groups have the same highest average and not enough residual seats are available, use drawing of lots
+        // TODO: #788 if multiple political groups have the same largest average and not enough residual seats are available, use drawing of lots
         debug!(
             "Drawing of lots is required for political groups: {:?}, only {residual_seats} seats available",
             political_group_numbers(&political_groups)
@@ -200,16 +200,16 @@ fn political_groups_with_largest_average<'a>(
 
 /// Compute the political groups with the largest votes remainder.
 ///
-/// It returns all the political groups for which this remainder fraction is the highest.
+/// It returns all the political groups for which this remainder fraction is the largest.
 /// If there are more political groups than there are residual seats to be assigned,
 /// a drawing of lots is required.
 ///
 /// This function will always return at least one group.
-fn political_groups_with_highest_remainder<'a>(
+fn political_groups_with_largest_remainder<'a>(
     assigned_seats: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
     residual_seats: u64,
 ) -> Result<Vec<&'a PoliticalGroupStanding>, ApportionmentError> {
-    // We are now going to find the political groups that have the highest remainder
+    // We are now going to find the political groups that have the largest remainder
     let (max_remainder, political_groups) = assigned_seats.into_iter().fold(
         (Fraction::ZERO, vec![]),
         |(current_max, mut max_groups), pg| {
@@ -237,7 +237,7 @@ fn political_groups_with_highest_remainder<'a>(
 
     // Check if we can actually assign all these political groups
     if political_groups.len() as u64 > residual_seats {
-        // TODO: #788 if multiple political groups have the same highest remainder and not enough residual seats are available, use drawing of lots
+        // TODO: #788 if multiple political groups have the same largest remainder and not enough residual seats are available, use drawing of lots
         debug!(
             "Drawing of lots is required for political groups: {:?}, only {residual_seats} seats available",
             political_group_numbers(&political_groups)
@@ -373,14 +373,14 @@ fn allocate_remainder(
         residual_seat_number += 1;
         let step = if seats >= 19 {
             // Article P 7 Kieswet
-            step_allocate_remainder_using_highest_averages(
+            step_allocate_remainder_using_largest_averages(
                 &current_standing,
                 residual_seats,
                 &steps,
             )?
         } else {
             // Article P 8 Kieswet
-            step_allocate_remainder_using_highest_remainder(
+            step_allocate_remainder_using_largest_remainder(
                 &current_standing,
                 residual_seats,
                 &steps,
@@ -444,7 +444,7 @@ fn pg_assigned_from_previous_remainder_step(
 ) -> Vec<PGNumber> {
     let mut pg_assigned = Vec::new();
     if let Some(previous_step) = previous.last() {
-        if previous_step.change.is_assigned_by_highest_remainder()
+        if previous_step.change.is_assigned_by_largest_remainder()
             && previous_step
                 .change
                 .pg_options()
@@ -467,7 +467,7 @@ fn pg_assigned_from_previous_average_step(
 ) -> Vec<PGNumber> {
     let mut pg_assigned = Vec::new();
     if let Some(previous_step) = previous.last() {
-        if previous_step.change.is_assigned_by_highest_average()
+        if previous_step.change.is_assigned_by_largest_average()
             && previous_step
                 .change
                 .pg_options()
@@ -482,14 +482,14 @@ fn pg_assigned_from_previous_average_step(
 
 /// Assign the next residual seat, and return which group that seat was assigned to.
 /// This assignment is done according to the rules for elections with 19 seats or more.
-fn step_allocate_remainder_using_highest_averages(
+fn step_allocate_remainder_using_largest_averages(
     standing: &[PoliticalGroupStanding],
     residual_seats: u64,
     previous: &[ApportionmentStep],
 ) -> Result<AssignedSeat, ApportionmentError> {
     let selected_pgs = political_groups_with_largest_average(standing, residual_seats)?;
     let selected_pg = selected_pgs[0];
-    Ok(AssignedSeat::HighestAverage(HighestAverageAssignedSeat {
+    Ok(AssignedSeat::LargestAverage(LargestAverageAssignedSeat {
         selected_pg_number: selected_pg.pg_number,
         pg_assigned: pg_assigned_from_previous_average_step(selected_pg, previous),
         pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
@@ -498,33 +498,33 @@ fn step_allocate_remainder_using_highest_averages(
 }
 
 /// Get an iterator that lists all the parties that qualify for getting a seat through
-/// the highest remainder process. This checks the previously assigned seats to make sure
+/// the largest remainder process. This checks the previously assigned seats to make sure
 /// that only parties that didn't previously get a seat assigned are allowed to still
 /// get a seat through the remainder process. Additionally only political parties that
 /// met the threshold are considered for this process.
-fn political_groups_qualifying_for_highest_remainder<'a>(
+fn political_groups_qualifying_for_largest_remainder<'a>(
     standing: &'a [PoliticalGroupStanding],
     previous: &'a [ApportionmentStep],
 ) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
     standing.iter().filter(move |p| {
         p.meets_remainder_threshold
             && !previous.iter().any(|prev| {
-                prev.change.is_assigned_by_highest_remainder()
+                prev.change.is_assigned_by_largest_remainder()
                     && prev.change.political_group_number() == p.pg_number
             })
     })
 }
 
-/// Get an iterator that lists all the parties that qualify for unique highest average.
+/// Get an iterator that lists all the parties that qualify for unique largest average.
 /// This checks the previously assigned seats to make sure that every group that already
-/// got a residual seat through the highest average procedure does not qualify.
-fn political_groups_qualifying_for_unique_highest_average<'a>(
+/// got a residual seat through the largest average procedure does not qualify.
+fn political_groups_qualifying_for_unique_largest_average<'a>(
     assigned_seats: &'a [PoliticalGroupStanding],
     previous: &'a [ApportionmentStep],
 ) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
     assigned_seats.iter().filter(|p| {
         !previous.iter().any(|prev| {
-            prev.change.is_assigned_by_highest_average()
+            prev.change.is_assigned_by_largest_average()
                 && prev.change.political_group_number() == p.pg_number
         })
     })
@@ -532,22 +532,22 @@ fn political_groups_qualifying_for_unique_highest_average<'a>(
 
 /// Assign the next residual seat, and return which group that seat was assigned to.
 /// This assignment is done according to the rules for elections with less than 19 seats.
-fn step_allocate_remainder_using_highest_remainder(
+fn step_allocate_remainder_using_largest_remainder(
     assigned_seats: &[PoliticalGroupStanding],
     residual_seats: u64,
     previous: &[ApportionmentStep],
 ) -> Result<AssignedSeat, ApportionmentError> {
-    // first we check if there are any political groups that still qualify for a highest remainder allocated seat
+    // first we check if there are any political groups that still qualify for a largest remainder allocated seat
     let mut qualifying_for_remainder =
-        political_groups_qualifying_for_highest_remainder(assigned_seats, previous).peekable();
+        political_groups_qualifying_for_largest_remainder(assigned_seats, previous).peekable();
 
-    // If there is at least one element in the iterator, we know we can still do a highest remainder allocation
+    // If there is at least one element in the iterator, we know we can still do a largest remainder allocation
     if qualifying_for_remainder.peek().is_some() {
         let selected_pgs =
-            political_groups_with_highest_remainder(qualifying_for_remainder, residual_seats)?;
+            political_groups_with_largest_remainder(qualifying_for_remainder, residual_seats)?;
         let selected_pg = selected_pgs[0];
-        Ok(AssignedSeat::HighestRemainder(
-            HighestRemainderAssignedSeat {
+        Ok(AssignedSeat::LargestRemainder(
+            LargestRemainderAssignedSeat {
                 selected_pg_number: selected_pg.pg_number,
                 pg_assigned: pg_assigned_from_previous_remainder_step(selected_pg, previous),
                 pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
@@ -555,24 +555,24 @@ fn step_allocate_remainder_using_highest_remainder(
             },
         ))
     } else {
-        // We've now exhausted the highest remainder seats, we now do unique highest average instead:
+        // We've now exhausted the largest remainder seats, we now do unique largest average instead:
         // we allow every group to get a seat, not allowing any group to get a second residual seat
         // while there are still parties that did not get a residual seat.
-        let mut qualifying_for_unique_highest_average =
-            political_groups_qualifying_for_unique_highest_average(assigned_seats, previous)
+        let mut qualifying_for_unique_largest_average =
+            political_groups_qualifying_for_unique_largest_average(assigned_seats, previous)
                 .peekable();
-        if let Some(&&assigned_seats) = qualifying_for_unique_highest_average.peek() {
-            step_allocate_remainder_using_highest_averages(
+        if let Some(&&assigned_seats) = qualifying_for_unique_largest_average.peek() {
+            step_allocate_remainder_using_largest_averages(
                 &[assigned_seats],
                 residual_seats,
                 previous,
             )
         } else {
-            // We've now even exhausted unique highest average seats: every group that qualified
-            // got a highest remainder seat, and every group also had at least a single residual seat
-            // assigned to them. We now allow any residual seats to be assigned using the highest
+            // We've now even exhausted unique largest average seats: every group that qualified
+            // got a largest remainder seat, and every group also had at least a single residual seat
+            // assigned to them. We now allow any residual seats to be assigned using the largest
             // averages procedure
-            step_allocate_remainder_using_highest_averages(assigned_seats, residual_seats, previous)
+            step_allocate_remainder_using_largest_averages(assigned_seats, residual_seats, previous)
         }
     }
 }
@@ -590,8 +590,8 @@ pub struct ApportionmentStep {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(tag = "assigned_by")]
 pub enum AssignedSeat {
-    HighestAverage(HighestAverageAssignedSeat),
-    HighestRemainder(HighestRemainderAssignedSeat),
+    LargestAverage(LargestAverageAssignedSeat),
+    LargestRemainder(LargestRemainderAssignedSeat),
     AbsoluteMajorityChange(AbsoluteMajorityChange),
 }
 
@@ -599,8 +599,8 @@ impl AssignedSeat {
     /// Get the political group number for the group this step has assigned a seat to
     fn political_group_number(&self) -> PGNumber {
         match self {
-            AssignedSeat::HighestAverage(highest_average) => highest_average.selected_pg_number,
-            AssignedSeat::HighestRemainder(highest_remainder) => highest_remainder.selected_pg_number,
+            AssignedSeat::LargestAverage(largest_average) => largest_average.selected_pg_number,
+            AssignedSeat::LargestRemainder(largest_remainder) => largest_remainder.selected_pg_number,
             AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
         }
     }
@@ -608,8 +608,8 @@ impl AssignedSeat {
     /// Get the list of political groups with the same average, that have not been assigned a seat
     fn pg_options(&self) -> Vec<PGNumber> {
         match self {
-            AssignedSeat::HighestAverage(highest_average) => highest_average.pg_options.clone(),
-            AssignedSeat::HighestRemainder(highest_remainder) => highest_remainder.pg_options.clone(),
+            AssignedSeat::LargestAverage(largest_average) => largest_average.pg_options.clone(),
+            AssignedSeat::LargestRemainder(largest_remainder) => largest_remainder.pg_options.clone(),
             AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
         }
     }
@@ -617,20 +617,20 @@ impl AssignedSeat {
     /// Get the list of political groups with the same average, that have been assigned a seat
     fn pg_assigned(&self) -> Vec<PGNumber> {
         match self {
-            AssignedSeat::HighestAverage(highest_average) => highest_average.pg_assigned.clone(),
-            AssignedSeat::HighestRemainder(highest_remainder) => highest_remainder.pg_assigned.clone(),
+            AssignedSeat::LargestAverage(largest_average) => largest_average.pg_assigned.clone(),
+            AssignedSeat::LargestRemainder(largest_remainder) => largest_remainder.pg_assigned.clone(),
             AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
         }
     }
 
-    /// Returns true if the seat was assigned through the highest remainder
-    pub fn is_assigned_by_highest_remainder(&self) -> bool {
-        matches!(self, AssignedSeat::HighestRemainder(_))
+    /// Returns true if the seat was assigned through the largest remainder
+    pub fn is_assigned_by_largest_remainder(&self) -> bool {
+        matches!(self, AssignedSeat::LargestRemainder(_))
     }
 
-    /// Returns true if the seat was assigned through the highest average
-    pub fn is_assigned_by_highest_average(&self) -> bool {
-        matches!(self, AssignedSeat::HighestAverage(_))
+    /// Returns true if the seat was assigned through the largest average
+    pub fn is_assigned_by_largest_average(&self) -> bool {
+        matches!(self, AssignedSeat::LargestAverage(_))
     }
 
     /// Returns true if the seat was reassigned through the absolute majority change
@@ -639,9 +639,9 @@ impl AssignedSeat {
     }
 }
 
-/// Contains the details for an assigned seat, assigned through the highest average method.
+/// Contains the details for an assigned seat, assigned through the largest average method.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
-pub struct HighestAverageAssignedSeat {
+pub struct LargestAverageAssignedSeat {
     /// The political group that was selected for this seat has this political group number
     #[schema(value_type = u32)]
     selected_pg_number: PGNumber,
@@ -655,9 +655,9 @@ pub struct HighestAverageAssignedSeat {
     votes_per_seat: Fraction,
 }
 
-/// Contains the details for an assigned seat, assigned through the highest remainder method.
+/// Contains the details for an assigned seat, assigned through the largest remainder method.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
-pub struct HighestRemainderAssignedSeat {
+pub struct LargestRemainderAssignedSeat {
     /// The political group that was selected for this seat has this political group number
     #[schema(value_type = u32)]
     selected_pg_number: PGNumber,

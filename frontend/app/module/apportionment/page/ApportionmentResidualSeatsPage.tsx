@@ -64,8 +64,8 @@ export function ApportionmentResidualSeatsPage() {
     );
   }
   if (apportionment) {
-    const highestRemainderSteps = apportionment.steps.filter((step) => step.change.assigned_by === "HighestRemainder");
-    const highestAverageSteps = apportionment.steps.filter((step) => step.change.assigned_by === "HighestAverage");
+    const largestRemainderSteps = apportionment.steps.filter((step) => step.change.assigned_by === "LargestRemainder");
+    const largestAverageSteps = apportionment.steps.filter((step) => step.change.assigned_by === "LargestAverage");
     const absoluteMajorityChange = apportionment.steps
       .map((step) => step.change)
       .find((change) => change.assigned_by === "AbsoluteMajorityChange") as AbsoluteMajorityChange | undefined;
@@ -80,9 +80,9 @@ export function ApportionmentResidualSeatsPage() {
                   <div>
                     <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_averages")}</h2>
                     {render_information(apportionment.seats, apportionment.residual_seats)}
-                    {highestAverageSteps.length > 0 && (
+                    {largestAverageSteps.length > 0 && (
                       <LargestAveragesFor19OrMoreSeatsTable
-                        highestAverageSteps={highestAverageSteps}
+                        largestAverageSteps={largestAverageSteps}
                         finalStanding={apportionment.final_standing}
                         politicalGroups={election.political_groups}
                       />
@@ -93,26 +93,26 @@ export function ApportionmentResidualSeatsPage() {
                     <div>
                       <h2 className={cls.tableTitle}>{t("apportionment.residual_seats_largest_remainders")}</h2>
                       {render_information(apportionment.seats, apportionment.residual_seats)}
-                      {highestRemainderSteps.length > 0 && (
+                      {largestRemainderSteps.length > 0 && (
                         <LargestRemaindersTable
-                          highestRemainderSteps={highestRemainderSteps}
+                          largestRemainderSteps={largestRemainderSteps}
                           finalStanding={apportionment.final_standing}
                           politicalGroups={election.political_groups}
                         />
                       )}
                     </div>
-                    {highestAverageSteps.length > 0 && (
+                    {largestAverageSteps.length > 0 && (
                       <div>
                         <h2 className={cls.tableTitle}>{t("apportionment.remaining_residual_seats_assignment")}</h2>
                         <span className={cls.tableInformation}>
                           {t(
-                            `apportionment.remaining_residual_seats_amount_and_information.${highestAverageSteps.length > 1 ? "plural" : "singular"}`,
-                            { num_seats: highestAverageSteps.length },
+                            `apportionment.remaining_residual_seats_amount_and_information.${largestAverageSteps.length > 1 ? "plural" : "singular"}`,
+                            { num_seats: largestAverageSteps.length },
                           )}
                         </span>
                         {
                           <LargestAveragesForLessThan19SeatsTable
-                            highestAverageSteps={highestAverageSteps}
+                            largestAverageSteps={largestAverageSteps}
                             finalStanding={apportionment.final_standing}
                             politicalGroups={election.political_groups}
                           />

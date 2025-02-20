@@ -1,6 +1,6 @@
 import {
   ApportionmentStep,
-  HighestRemainderAssignedSeat,
+  LargestRemainderAssignedSeat,
   PoliticalGroup,
   PoliticalGroupSeatAssignment,
 } from "@kiesraad/api";
@@ -11,13 +11,13 @@ import { cn } from "@kiesraad/util";
 import cls from "./Apportionment.module.css";
 
 interface LargestRemaindersTableProps {
-  highestRemainderSteps: ApportionmentStep[];
+  largestRemainderSteps: ApportionmentStep[];
   finalStanding: PoliticalGroupSeatAssignment[];
   politicalGroups: PoliticalGroup[];
 }
 
 export function LargestRemaindersTable({
-  highestRemainderSteps,
+  largestRemainderSteps,
   finalStanding,
   politicalGroups,
 }: LargestRemaindersTableProps) {
@@ -38,8 +38,8 @@ export function LargestRemaindersTable({
       <Table.Body>
         {finalStandingPgsMeetingThreshold.map((pg_seat_assignment) => {
           const residual_seats =
-            highestRemainderSteps.filter((step) => {
-              const change = step.change as HighestRemainderAssignedSeat;
+            largestRemainderSteps.filter((step) => {
+              const change = step.change as LargestRemainderAssignedSeat;
               return change.selected_pg_number == pg_seat_assignment.pg_number;
             }).length || 0;
           return (

@@ -4,13 +4,13 @@ import { PoliticalGroup } from "@kiesraad/api";
 import { render, screen } from "@kiesraad/test";
 
 import { LargestRemaindersTable } from "./LargestRemaindersTable";
-import { apportionment, election, highest_remainder_steps } from "./test-data/less-than-19-seats";
+import { apportionment, election, largest_remainder_steps } from "./test-data/less-than-19-seats";
 
 describe("LargestRemaindersTable", () => {
   test("renders a table with the residual seat allocation with largest remainders system", async () => {
     render(
       <LargestRemaindersTable
-        highestRemainderSteps={highest_remainder_steps}
+        largestRemainderSteps={largest_remainder_steps}
         finalStanding={apportionment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
       />,

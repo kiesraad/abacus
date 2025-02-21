@@ -600,7 +600,9 @@ impl AssignedSeat {
     fn political_group_number(&self) -> PGNumber {
         match self {
             AssignedSeat::LargestAverage(largest_average) => largest_average.selected_pg_number,
-            AssignedSeat::LargestRemainder(largest_remainder) => largest_remainder.selected_pg_number,
+            AssignedSeat::LargestRemainder(largest_remainder) => {
+                largest_remainder.selected_pg_number
+            }
             AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
         }
     }
@@ -609,7 +611,9 @@ impl AssignedSeat {
     fn pg_options(&self) -> Vec<PGNumber> {
         match self {
             AssignedSeat::LargestAverage(largest_average) => largest_average.pg_options.clone(),
-            AssignedSeat::LargestRemainder(largest_remainder) => largest_remainder.pg_options.clone(),
+            AssignedSeat::LargestRemainder(largest_remainder) => {
+                largest_remainder.pg_options.clone()
+            }
             AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
         }
     }
@@ -618,7 +622,9 @@ impl AssignedSeat {
     fn pg_assigned(&self) -> Vec<PGNumber> {
         match self {
             AssignedSeat::LargestAverage(largest_average) => largest_average.pg_assigned.clone(),
-            AssignedSeat::LargestRemainder(largest_remainder) => largest_remainder.pg_assigned.clone(),
+            AssignedSeat::LargestRemainder(largest_remainder) => {
+                largest_remainder.pg_assigned.clone()
+            }
             AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
         }
     }

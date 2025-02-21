@@ -2,14 +2,15 @@ import { Outlet } from "react-router";
 
 import { DataEntryProgress } from "app/component/form/data_entry/DataEntryProgress";
 import { DataEntryProvider } from "app/component/form/data_entry/state/DataEntryProvider";
-import { AbortDataEntryControl } from "app/module/data_entry";
 
 import { NotFoundError, useElection } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Badge, PageTitle, PollingStationNumber, StickyNav } from "@kiesraad/ui";
 import { useNumericParam, usePollingStationStatus } from "@kiesraad/util";
 
-export function PollingStationLayout() {
+import { AbortDataEntryControl } from "./AbortDataEntryControl";
+
+export function DataEntryLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
   const entryNumber = useNumericParam("entryNumber");
   const { election, pollingStation } = useElection(pollingStationId);

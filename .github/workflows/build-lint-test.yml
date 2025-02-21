@@ -176,6 +176,7 @@ jobs:
           retention-days: 30
 
   deploy:
+    if: "github.repository == 'kiesraad/abacus' && !github.event.pull_request.head.repo.fork"
     name: Deploy to abacus-test.nl
     needs:
       - backend

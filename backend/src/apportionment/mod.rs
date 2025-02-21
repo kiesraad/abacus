@@ -527,14 +527,14 @@ mod tests {
     };
     use test_log::test;
 
-    fn get_election_summary(pg_votes: Vec<Count>) -> ElectionSummary {
-        let total_votes = pg_votes.iter().sum();
+    fn get_election_summary(candidate_votes: Vec<Vec<Count>>) -> ElectionSummary {
+        let total_votes = candidate_votes.iter().flatten().sum();
         let mut political_group_votes: Vec<PoliticalGroupVotes> = vec![];
-        for (index, votes) in pg_votes.iter().enumerate() {
+        for (pg_index, pg_candidate_votes) in candidate_votes.iter().enumerate() {
             political_group_votes.push(PoliticalGroupVotes::from_test_data_auto(
-                PGNumber::try_from(index + 1).unwrap(),
-                *votes,
-                &[],
+                PGNumber::try_from(pg_index + 1).unwrap(),
+                pg_candidate_votes.iter().sum(),
+                pg_candidate_votes,
             ))
         }
         ElectionSummary {
@@ -558,7 +558,15 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_without_remaining_seats() {
-        let totals = get_election_summary(vec![480, 160, 160, 160, 80, 80, 80]);
+        let totals = get_election_summary(vec![
+            vec![80, 80, 80, 80, 80, 80],
+            vec![80, 80],
+            vec![80, 80],
+            vec![80, 80],
+            vec![80],
+            vec![80],
+            vec![80],
+        ]);
         let result = seat_allocation(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 0);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -567,7 +575,16 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_system() {
-        let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 60, 40]);
+        let totals = get_election_summary(vec![
+            vec![80, 80, 80, 80, 80, 80, 60],
+            vec![80, 80],
+            vec![80, 80],
+            vec![80],
+            vec![80],
+            vec![80],
+            vec![60],
+            vec![40],
+        ]);
         let result = seat_allocation(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 2);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -577,7 +594,16 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_only_1_surplus_meets_threshold(
     ) {
-        let totals = get_election_summary(vec![808, 59, 58, 57, 56, 55, 54, 53]);
+        let totals = get_election_summary(vec![
+            vec![67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 4],
+            vec![59],
+            vec![58],
+            vec![57],
+            vec![56],
+            vec![55],
+            vec![54],
+            vec![53],
+        ]);
         let result = seat_allocation(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 5);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -587,7 +613,13 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system(
     ) {
-        let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
+        let totals = get_election_summary(vec![
+            vec![0, 0],
+            vec![0, 0],
+            vec![0, 0],
+            vec![0, 0],
+            vec![0, 0],
+        ]);
         let result = seat_allocation(10, &totals).unwrap();
         assert_eq!(result.steps.len(), 10);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -597,28 +629,57 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system_drawing_of_lots_error_in_2nd_round_averages_system(
     ) {
-        let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
+        let totals = get_election_summary(vec![
+            vec![0, 0, 0, 0, 0, 0, 0],
+            vec![0, 0, 0, 0, 0, 0, 0],
+            vec![0, 0, 0, 0, 0, 0, 0],
+            vec![0, 0, 0, 0, 0, 0, 0],
+            vec![0, 0, 0, 0, 0, 0, 0],
+        ]);
         let result = seat_allocation(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error_with_0_surpluses() {
-        let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
+        let totals = get_election_summary(vec![
+            vec![80, 80, 80, 80, 80, 80, 60],
+            vec![80, 60, 20],
+            vec![80, 60, 20],
+            vec![60, 20],
+            vec![60, 20],
+            vec![60, 20],
+            vec![55],
+            vec![45],
+        ]);
         let result = seat_allocation(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error() {
-        let totals = get_election_summary(vec![500, 140, 140, 140, 140, 140]);
+        let totals = get_election_summary(vec![
+            vec![80, 80, 80, 80, 80, 80, 20],
+            vec![80, 60],
+            vec![80, 60],
+            vec![80, 60],
+            vec![80, 60],
+            vec![80, 60],
+        ]);
         let result = seat_allocation(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_without_remaining_seats() {
-        let totals = get_election_summary(vec![576, 288, 96, 96, 96, 48]);
+        let totals = get_election_summary(vec![
+            vec![48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48],
+            vec![48, 48, 48, 48, 48, 48],
+            vec![48, 48],
+            vec![48, 48],
+            vec![48, 48],
+            vec![48],
+        ]);
         let result = seat_allocation(25, &totals).unwrap();
         assert_eq!(result.steps.len(), 0);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -627,7 +688,13 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
-        let totals = get_election_summary(vec![600, 302, 98, 99, 101]);
+        let totals = get_election_summary(vec![
+            vec![50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+            vec![52, 50, 50, 50, 50, 50],
+            vec![50, 48],
+            vec![50, 49],
+            vec![51, 50],
+        ]);
         let result = seat_allocation(23, &totals).unwrap();
         assert_eq!(result.steps.len(), 4);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -636,7 +703,7 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_with_0_votes() {
-        let totals = get_election_summary(vec![0]);
+        let totals = get_election_summary(vec![vec![0]]);
         let result = seat_allocation(19, &totals).unwrap();
         assert_eq!(result.steps.len(), 19);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -645,14 +712,27 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_with_0_votes_with_drawing_of_lots_error() {
-        let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
+        let totals = get_election_summary(vec![
+            vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        ]);
         let result = seat_allocation(19, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_with_drawing_of_lots_error() {
-        let totals = get_election_summary(vec![500, 140, 140, 140, 140, 140]);
+        let totals = get_election_summary(vec![
+            vec![60, 60, 60, 60, 60, 60, 60, 40, 20, 20],
+            vec![80, 40, 20],
+            vec![80, 40, 20],
+            vec![80, 40, 20],
+            vec![80, 40, 20],
+            vec![80, 40, 20],
+        ]);
         let result = seat_allocation(23, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }

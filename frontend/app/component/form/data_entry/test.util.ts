@@ -3,9 +3,9 @@ import { electionMockData } from "@kiesraad/api-mocks";
 import { overrideOnce } from "@kiesraad/test";
 
 import { getClientState } from "./state/dataEntryUtils";
-import { FormSection, FormState } from "./state/types";
+import { DataEntryState, FormSection, FormState } from "./state/types";
 
-const initialValues: PollingStationResults = {
+export const initialValues: PollingStationResults = {
   recounted: undefined,
   voters_counts: {
     poll_card_count: 0,
@@ -47,6 +47,48 @@ export const defaultFormSection: Omit<FormSection, "id" | "index"> = {
   acceptWarningsError: false,
   errors: [],
   warnings: [],
+};
+
+export const defaultDataEntryState: DataEntryState = {
+  election: electionMockData,
+  pollingStationId: 1,
+  error: null,
+  pollingStationResults: null,
+  entryNumber: 1,
+  formState: {
+    current: "recounted",
+    furthest: "recounted",
+    sections: {
+      recounted: {
+        id: "recounted",
+        index: 1,
+        ...defaultFormSection,
+      },
+      voters_votes_counts: {
+        id: "voters_votes_counts",
+        index: 2,
+        ...defaultFormSection,
+      },
+      differences_counts: {
+        id: "differences_counts",
+        index: 3,
+        ...defaultFormSection,
+      },
+      political_group_votes_1: {
+        id: "political_group_votes_1",
+        index: 4,
+        ...defaultFormSection,
+      },
+      save: {
+        id: "save",
+        index: 5,
+        ...defaultFormSection,
+      },
+    },
+  },
+  targetFormSectionId: "recounted",
+  status: "idle",
+  cache: null,
 };
 
 export interface OverrideServerGetDataEntryResponseProps {

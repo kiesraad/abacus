@@ -6,7 +6,7 @@ import {
   LargestSurplusesTable,
 } from "app/component/apportionment";
 
-import { useApportionmentContext, useElection } from "@kiesraad/api";
+import { AbsoluteMajorityChange, useApportionmentContext, useElection } from "@kiesraad/api";
 import { t, tx } from "@kiesraad/i18n";
 import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
@@ -66,6 +66,13 @@ export function ApportionmentResidualSeatsPage() {
   if (apportionment) {
     const highestSurplusSteps = apportionment.steps.filter((step) => step.change.assigned_by === "HighestSurplus");
     const highestAverageSteps = apportionment.steps.filter((step) => step.change.assigned_by === "HighestAverage");
+    const absoluteMajorityChangeSteps = apportionment.steps.filter(
+      (step) => step.change.assigned_by === "AbsoluteMajorityChange",
+    );
+    const absoluteMajorityChange =
+      absoluteMajorityChangeSteps.length > 0
+        ? (absoluteMajorityChangeSteps[0]?.change as AbsoluteMajorityChange)
+        : undefined;
     return (
       <>
         {render_title_and_header()}
@@ -118,11 +125,11 @@ export function ApportionmentResidualSeatsPage() {
                     )}
                   </>
                 )}
-                {apportionment.absolute_majority_change && (
+                {absoluteMajorityChange && (
                   <span id="absolute_majority_change_information" className={cls.absoluteMajorityChangeInformation}>
                     {t("apportionment.absolute_majority_change", {
-                      pg_assigned_seat: apportionment.absolute_majority_change.pg_assigned_seat,
-                      pg_retracted_seat: apportionment.absolute_majority_change.pg_retracted_seat,
+                      pg_assigned_seat: absoluteMajorityChange.pg_assigned_seat,
+                      pg_retracted_seat: absoluteMajorityChange.pg_retracted_seat,
                     })}
                   </span>
                 )}

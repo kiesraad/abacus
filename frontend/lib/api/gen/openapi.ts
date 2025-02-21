@@ -149,7 +149,6 @@ and each of the changes and intermediate standings. The final standing contains 
 number of seats per political group that was assigned after all seats were assigned.
  */
 export interface ApportionmentResult {
-  absolute_majority_change?: AbsoluteMajorityChange;
   final_standing: PoliticalGroupSeatAssignment[];
   quota: Fraction;
   residual_seats: number;
@@ -173,7 +172,8 @@ export interface ApportionmentStep {
  */
 export type AssignedSeat =
   | (HighestAverageAssignedSeat & { assigned_by: "HighestAverage" })
-  | (HighestSurplusAssignedSeat & { assigned_by: "HighestSurplus" });
+  | (HighestSurplusAssignedSeat & { assigned_by: "HighestSurplus" })
+  | (AbsoluteMajorityChange & { assigned_by: "AbsoluteMajorityChange" });
 
 /**
  * Candidate

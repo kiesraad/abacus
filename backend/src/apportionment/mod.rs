@@ -21,14 +21,11 @@ pub struct ApportionmentResult {
     pub residual_seats: u64,
     pub quota: Fraction,
     pub steps: Vec<ApportionmentStep>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub absolute_majority_change: Option<AbsoluteMajorityChange>,
     pub final_standing: Vec<PoliticalGroupSeatAssignment>,
 }
 
 /// Contains information about the enactment of article P 9 of the Kieswet.
-#[derive(Debug, PartialEq, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct AbsoluteMajorityChange {
     /// Political group number which the residual seat is retracted from
     #[schema(value_type = u32)]
@@ -259,7 +256,7 @@ fn reallocate_residual_seat_for_absolute_majority(
     totals: &ElectionSummary,
     pgs_last_residual_seat: &[PGNumber],
     standing: Vec<PoliticalGroupStanding>,
-) -> Result<(Vec<PoliticalGroupStanding>, Option<AbsoluteMajorityChange>), ApportionmentError> {
+) -> Result<(Vec<PoliticalGroupStanding>, Option<AssignedSeat>), ApportionmentError> {
     let half_of_votes_count: Fraction =
         Fraction::from(totals.votes_counts.votes_candidates_count) * Fraction::new(1, 2);
 
@@ -297,10 +294,12 @@ fn reallocate_residual_seat_for_absolute_majority(
         info!("Residual seat first allocated to list {} has been re-allocated to list {} in accordance with Article P 9 Kieswet", pgs_last_residual_seat[0], majority_pg_votes.number);
         Ok((
             standing,
-            Some(AbsoluteMajorityChange {
-                pg_retracted_seat: pgs_last_residual_seat[0],
-                pg_assigned_seat: majority_pg_votes.number,
-            }),
+            Some(AssignedSeat::AbsoluteMajorityChange(
+                AbsoluteMajorityChange {
+                    pg_retracted_seat: pgs_last_residual_seat[0],
+                    pg_assigned_seat: majority_pg_votes.number,
+                },
+            )),
         ))
     } else {
         Ok((standing, None))
@@ -330,11 +329,11 @@ pub fn apportionment(
         .sum::<u64>();
     let residual_seats = seats - whole_seats;
 
-    let (steps, final_standing, absolute_majority_change) = if residual_seats > 0 {
+    let (steps, final_standing) = if residual_seats > 0 {
         allocate_remainder(&initial_standing, totals, seats, residual_seats)?
     } else {
         info!("All seats have been allocated without any residual seats");
-        (vec![], initial_standing, None)
+        (vec![], initial_standing)
     };
 
     // TODO: #797 Article P 19a Kieswet mark deceased candidates
@@ -351,7 +350,6 @@ pub fn apportionment(
         residual_seats,
         quota,
         steps,
-        absolute_majority_change,
         final_standing: final_standing.into_iter().map(Into::into).collect(),
     })
 }
@@ -364,14 +362,7 @@ fn allocate_remainder(
     totals: &ElectionSummary,
     seats: u64,
     total_residual_seats: u64,
-) -> Result<
-    (
-        Vec<ApportionmentStep>,
-        Vec<PoliticalGroupStanding>,
-        Option<AbsoluteMajorityChange>,
-    ),
-    ApportionmentError,
-> {
+) -> Result<(Vec<ApportionmentStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
     let mut steps = vec![];
     let mut residual_seat_number = 0;
 
@@ -420,7 +411,7 @@ fn allocate_remainder(
     }
 
     // Apply Article P 9 Kieswet
-    let (current_standing, absolute_majority_change) = if let Some(last_step) = steps.last() {
+    let (current_standing, assigned_seat) = if let Some(last_step) = steps.last() {
         reallocate_residual_seat_for_absolute_majority(
             seats,
             totals,
@@ -431,7 +422,16 @@ fn allocate_remainder(
         (current_standing, None)
     };
 
-    Ok((steps, current_standing, absolute_majority_change))
+    if let Some(assigned_seat) = assigned_seat {
+        // add the absolute majority change to the remainder assignment steps
+        steps.push(ApportionmentStep {
+            standing: current_standing.clone(),
+            residual_seat_number,
+            change: assigned_seat,
+        });
+    }
+
+    Ok((steps, current_standing))
 }
 
 /// Get a vector with the political group number that was assigned the last residual seat.
@@ -590,6 +590,7 @@ pub struct ApportionmentStep {
 pub enum AssignedSeat {
     HighestAverage(HighestAverageAssignedSeat),
     HighestSurplus(HighestSurplusAssignedSeat),
+    AbsoluteMajorityChange(AbsoluteMajorityChange),
 }
 
 impl AssignedSeat {
@@ -598,6 +599,7 @@ impl AssignedSeat {
         match self {
             AssignedSeat::HighestAverage(highest_average) => highest_average.selected_pg_number,
             AssignedSeat::HighestSurplus(highest_surplus) => highest_surplus.selected_pg_number,
+            AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
         }
     }
 
@@ -606,6 +608,7 @@ impl AssignedSeat {
         match self {
             AssignedSeat::HighestAverage(highest_average) => highest_average.pg_options.clone(),
             AssignedSeat::HighestSurplus(highest_surplus) => highest_surplus.pg_options.clone(),
+            AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
         }
     }
 
@@ -614,6 +617,7 @@ impl AssignedSeat {
         match self {
             AssignedSeat::HighestAverage(highest_average) => highest_average.pg_assigned.clone(),
             AssignedSeat::HighestSurplus(highest_surplus) => highest_surplus.pg_assigned.clone(),
+            AssignedSeat::AbsoluteMajorityChange(_) => unimplemented!(),
         }
     }
 
@@ -625,6 +629,11 @@ impl AssignedSeat {
     /// Returns true if the seat was assigned through the highest average
     pub fn is_assigned_by_highest_average(&self) -> bool {
         matches!(self, AssignedSeat::HighestAverage(_))
+    }
+
+    /// Returns true if the seat was reassigned through the absolute majority change
+    pub fn is_assigned_by_absolute_majority_change(&self) -> bool {
+        matches!(self, AssignedSeat::AbsoluteMajorityChange(_))
     }
 }
 
@@ -764,7 +773,7 @@ mod tests {
         // This test triggers Kieswet Article P 9 (Actual case from GR2022)
         let totals = get_election_summary(vec![2571, 977, 567, 536, 453]);
         let result = apportionment(15, &totals).unwrap();
-        assert_eq!(result.steps.len(), 3);
+        assert_eq!(result.steps.len(), 4);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![8, 3, 2, 1, 1]);
     }
@@ -823,7 +832,7 @@ mod tests {
         // This test triggers Kieswet Article P 9
         let totals = get_election_summary(vec![7501, 1249, 1249, 1249, 1249, 1249, 1248, 7]);
         let result = apportionment(24, &totals).unwrap();
-        assert_eq!(result.steps.len(), 6);
+        assert_eq!(result.steps.len(), 7);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![13, 2, 2, 2, 2, 2, 1, 0]);
     }

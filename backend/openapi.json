@@ -1380,9 +1380,6 @@
           "final_standing"
         ],
         "properties": {
-          "absolute_majority_change": {
-            "$ref": "#/components/schemas/AbsoluteMajorityChange"
-          },
           "final_standing": {
             "type": "array",
             "items": {
@@ -1478,6 +1475,27 @@
                     "type": "string",
                     "enum": [
                       "HighestSurplus"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AbsoluteMajorityChange"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "assigned_by"
+                ],
+                "properties": {
+                  "assigned_by": {
+                    "type": "string",
+                    "enum": [
+                      "AbsoluteMajorityChange"
                     ]
                   }
                 }

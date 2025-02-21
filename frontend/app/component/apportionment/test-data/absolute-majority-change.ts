@@ -313,11 +313,102 @@ export const apportionment: ApportionmentResult = {
         },
       ],
     },
+    {
+      residual_seat_number: 3,
+      change: {
+        assigned_by: "AbsoluteMajorityChange",
+        pg_retracted_seat: 4,
+        pg_assigned_seat: 1,
+      },
+      standing: [
+        {
+          pg_number: 1,
+          votes_cast: 2571,
+          surplus_votes: {
+            integer: 189,
+            numerator: 2,
+            denominator: 15,
+          },
+          meets_surplus_threshold: true,
+          next_votes_per_seat: {
+            integer: 321,
+            numerator: 3,
+            denominator: 8,
+          },
+          whole_seats: 7,
+          residual_seats: 1,
+        },
+        {
+          pg_number: 2,
+          votes_cast: 977,
+          surplus_votes: {
+            integer: 296,
+            numerator: 7,
+            denominator: 15,
+          },
+          meets_surplus_threshold: true,
+          next_votes_per_seat: {
+            integer: 244,
+            numerator: 1,
+            denominator: 4,
+          },
+          whole_seats: 2,
+          residual_seats: 1,
+        },
+        {
+          pg_number: 3,
+          votes_cast: 567,
+          surplus_votes: {
+            integer: 226,
+            numerator: 11,
+            denominator: 15,
+          },
+          meets_surplus_threshold: true,
+          next_votes_per_seat: {
+            integer: 189,
+            numerator: 0,
+            denominator: 3,
+          },
+          whole_seats: 1,
+          residual_seats: 1,
+        },
+        {
+          pg_number: 4,
+          votes_cast: 536,
+          surplus_votes: {
+            integer: 195,
+            numerator: 11,
+            denominator: 15,
+          },
+          meets_surplus_threshold: true,
+          next_votes_per_seat: {
+            integer: 178,
+            numerator: 2,
+            denominator: 3,
+          },
+          whole_seats: 1,
+          residual_seats: 0,
+        },
+        {
+          pg_number: 5,
+          votes_cast: 453,
+          surplus_votes: {
+            integer: 112,
+            numerator: 11,
+            denominator: 15,
+          },
+          meets_surplus_threshold: true,
+          next_votes_per_seat: {
+            integer: 226,
+            numerator: 1,
+            denominator: 2,
+          },
+          whole_seats: 1,
+          residual_seats: 0,
+        },
+      ],
+    },
   ],
-  absolute_majority_change: {
-    pg_retracted_seat: 4,
-    pg_assigned_seat: 1,
-  },
   final_standing: [
     {
       pg_number: 1,

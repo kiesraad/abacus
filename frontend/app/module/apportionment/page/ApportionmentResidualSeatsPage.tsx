@@ -66,13 +66,9 @@ export function ApportionmentResidualSeatsPage() {
   if (apportionment) {
     const highestSurplusSteps = apportionment.steps.filter((step) => step.change.assigned_by === "HighestSurplus");
     const highestAverageSteps = apportionment.steps.filter((step) => step.change.assigned_by === "HighestAverage");
-    const absoluteMajorityChangeSteps = apportionment.steps.filter(
-      (step) => step.change.assigned_by === "AbsoluteMajorityChange",
-    );
-    const absoluteMajorityChange =
-      absoluteMajorityChangeSteps.length > 0
-        ? (absoluteMajorityChangeSteps[0]?.change as AbsoluteMajorityChange)
-        : undefined;
+    const absoluteMajorityChange = apportionment.steps
+      .map((step) => step.change)
+      .find((change) => change.assigned_by === "AbsoluteMajorityChange") as AbsoluteMajorityChange | undefined;
     return (
       <>
         {render_title_and_header()}

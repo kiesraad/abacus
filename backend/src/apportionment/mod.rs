@@ -58,8 +58,8 @@ pub struct PoliticalGroupSeatAssignment {
     pub total_seats: u64,
 }
 
-impl From<&mut PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
-    fn from(pg: &mut PoliticalGroupStanding) -> Self {
+impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
+    fn from(pg: PoliticalGroupStanding) -> Self {
         PoliticalGroupSeatAssignment {
             pg_number: pg.pg_number,
             votes_cast: pg.votes_cast,
@@ -254,18 +254,12 @@ fn political_groups_with_highest_surplus<'a>(
 /// If a political group got the absolute majority of votes but not the absolute majority of seats,
 /// re-assign the last residual seat to the political group with the absolute majority.
 /// This re-assignment is done according to article P 9 of the Kieswet.
-fn reallocate_residual_seat_for_absolute_majority<'fs>(
+fn reallocate_residual_seat_for_absolute_majority(
     seats: u64,
     totals: &ElectionSummary,
     pgs_last_residual_seat: &[PGNumber],
-    final_standing: &'fs mut Vec<PoliticalGroupStanding>,
-) -> Result<
-    (
-        &'fs mut Vec<PoliticalGroupStanding>,
-        Option<AbsoluteMajorityChange>,
-    ),
-    ApportionmentError,
-> {
+    standing: Vec<PoliticalGroupStanding>,
+) -> Result<(Vec<PoliticalGroupStanding>, Option<AbsoluteMajorityChange>), ApportionmentError> {
     let half_of_votes_count: Fraction =
         Fraction::from(totals.votes_counts.votes_candidates_count) * Fraction::new(1, 2);
 
@@ -275,11 +269,11 @@ fn reallocate_residual_seat_for_absolute_majority<'fs>(
         .iter()
         .find(|pg| Fraction::from(pg.total) > half_of_votes_count)
     else {
-        return Ok((final_standing, None));
+        return Ok((standing, None));
     };
 
     let half_of_seats_count: Fraction = Fraction::from(seats) * Fraction::new(1, 2);
-    let pg_final_standing_majority_votes = final_standing
+    let pg_final_standing_majority_votes = standing
         .iter()
         .find(|pg_standing| pg_standing.pg_number == majority_pg_votes.number)
         .expect("PG exists");
@@ -296,19 +290,20 @@ fn reallocate_residual_seat_for_absolute_majority<'fs>(
         }
 
         // Do the reassignment of the seat
-        final_standing[pgs_last_residual_seat[0] as usize - 1].residual_seats -= 1;
-        final_standing[majority_pg_votes.number as usize - 1].residual_seats += 1;
+        let mut standing = standing.clone();
+        standing[pgs_last_residual_seat[0] as usize - 1].residual_seats -= 1;
+        standing[majority_pg_votes.number as usize - 1].residual_seats += 1;
 
         info!("Residual seat first allocated to list {} has been re-allocated to list {} in accordance with Article P 9 Kieswet", pgs_last_residual_seat[0], majority_pg_votes.number);
         Ok((
-            final_standing,
+            standing,
             Some(AbsoluteMajorityChange {
                 pg_retracted_seat: pgs_last_residual_seat[0],
                 pg_assigned_seat: majority_pg_votes.number,
             }),
         ))
     } else {
-        Ok((final_standing, None))
+        Ok((standing, None))
     }
 }
 
@@ -335,11 +330,11 @@ pub fn apportionment(
         .sum::<u64>();
     let residual_seats = seats - whole_seats;
 
-    let (steps, mut final_standing, absolute_majority_change) = if residual_seats > 0 {
+    let (steps, final_standing, absolute_majority_change) = if residual_seats > 0 {
         allocate_remainder(&initial_standing, totals, seats, residual_seats)?
     } else {
         info!("All seats have been allocated without any residual seats");
-        (vec![], &mut initial_standing.clone(), None)
+        (vec![], initial_standing, None)
     };
 
     // TODO: #797 Article P 19a Kieswet mark deceased candidates
@@ -357,17 +352,14 @@ pub fn apportionment(
         quota,
         steps,
         absolute_majority_change,
-        final_standing: final_standing
-            .iter_mut()
-            .map(PoliticalGroupSeatAssignment::from)
-            .collect(),
+        final_standing: final_standing.into_iter().map(Into::into).collect(),
     })
 }
 
 /// This function allocates the residual seats that remain after whole seat allocation is finished.
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
-fn allocate_remainder<'fs>(
+fn allocate_remainder(
     initial_standing: &[PoliticalGroupStanding],
     totals: &ElectionSummary,
     seats: u64,
@@ -375,7 +367,7 @@ fn allocate_remainder<'fs>(
 ) -> Result<
     (
         Vec<ApportionmentStep>,
-        &'fs mut Vec<PoliticalGroupStanding>,
+        Vec<PoliticalGroupStanding>,
         Option<AbsoluteMajorityChange>,
     ),
     ApportionmentError,
@@ -433,10 +425,10 @@ fn allocate_remainder<'fs>(
             seats,
             totals,
             &last_step.change.pg_assigned(),
-            &mut current_standing,
+            current_standing,
         )?
     } else {
-        (&mut current_standing.clone(), None)
+        (current_standing, None)
     };
 
     Ok((steps, current_standing, absolute_majority_change))

@@ -335,23 +335,11 @@ pub fn apportionment(
         .sum::<u64>();
     let residual_seats = seats - whole_seats;
 
-    let (steps, mut final_standing) = if residual_seats > 0 {
-        allocate_remainder(&initial_standing, seats, residual_seats)?
+    let (steps, mut final_standing, absolute_majority_change) = if residual_seats > 0 {
+        allocate_remainder(&initial_standing, totals, seats, residual_seats)?
     } else {
         info!("All seats have been allocated without any residual seats");
-        (vec![], initial_standing.clone())
-    };
-
-    // Only apply Article P 9 Kieswet when there are remainder seats
-    let (final_standing, absolute_majority_change) = if let Some(last_step) = steps.last() {
-        reallocate_residual_seat_for_absolute_majority(
-            seats,
-            totals,
-            &last_step.change.pg_assigned(),
-            &mut final_standing,
-        )?
-    } else {
-        (&mut final_standing, None)
+        (vec![], &mut initial_standing.clone(), None)
     };
 
     // TODO: #797 Article P 19a Kieswet mark deceased candidates
@@ -379,11 +367,19 @@ pub fn apportionment(
 /// This function allocates the residual seats that remain after whole seat allocation is finished.
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
-fn allocate_remainder(
+fn allocate_remainder<'fs>(
     initial_standing: &[PoliticalGroupStanding],
+    totals: &ElectionSummary,
     seats: u64,
     total_residual_seats: u64,
-) -> Result<(Vec<ApportionmentStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
+) -> Result<
+    (
+        Vec<ApportionmentStep>,
+        &'fs mut Vec<PoliticalGroupStanding>,
+        Option<AbsoluteMajorityChange>,
+    ),
+    ApportionmentError,
+> {
     let mut steps = vec![];
     let mut residual_seat_number = 0;
 
@@ -431,7 +427,19 @@ fn allocate_remainder(
         });
     }
 
-    Ok((steps, current_standing))
+    // Apply Article P 9 Kieswet
+    let (current_standing, absolute_majority_change) = if let Some(last_step) = steps.last() {
+        reallocate_residual_seat_for_absolute_majority(
+            seats,
+            totals,
+            &last_step.change.pg_assigned(),
+            &mut current_standing,
+        )?
+    } else {
+        (&mut current_standing.clone(), None)
+    };
+
+    Ok((steps, current_standing, absolute_majority_change))
 }
 
 /// Get a vector with the political group number that was assigned the last residual seat.

@@ -12,7 +12,7 @@ import { expect } from "@playwright/test";
 import { createTestModel } from "@xstate/graph";
 import {
   //   AbortInputModal,
-  //   DifferencesPage,
+  DifferencesPage,
   PollingStationChoicePage,
   RecountedPage,
   VotersAndVotesPage,
@@ -39,9 +39,16 @@ const dataEntryMachineDefinition = {
     },
     votersVotesPageWarning: {
       on: {
-        SUBMIT_WITH_UNACCEPTED_WARNING: "votersVotesPageWarningReminder",
+        SUBMIT: "votersVotesPageWarningReminder",
+        ACCEPT_WARNING: "voterVotesPageWarningAccepted",
       },
     },
+    voterVotesPageWarningAccepted: {
+      on: {
+        SUBMIT: "differencesPageWarningAccepted",
+      },
+    },
+    differencesPageWarningAccepted: {},
     votersVotesPageWarningReminder: {},
   },
 };
@@ -86,7 +93,7 @@ test.describe("Data entry model test", () => {
         const pollingStationChoicePage = new PollingStationChoicePage(page);
         const recountedPage = new RecountedPage(page);
         const votersAndVotesPage = new VotersAndVotesPage(page);
-        // const differencesPage = new DifferencesPage(page);
+        const differencesPage = new DifferencesPage(page);
         // const abortModal = new AbortInputModal(page);
 
         const pollingStationsPageStates = {};
@@ -113,6 +120,14 @@ test.describe("Data entry model test", () => {
             );
             await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
           },
+          voterVotesPageWarningAccepted: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.warning).toContainText(
+              "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
+            );
+            await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+            await expect(votersAndVotesPage.acceptWarnings).toBeChecked();
+          },
           votersVotesPageWarningReminder: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             await expect(votersAndVotesPage.warning).toContainText(
@@ -132,12 +147,17 @@ test.describe("Data entry model test", () => {
           SUBMIT: async () => {
             await votersAndVotesPage.next.click();
           },
-          SUBMIT_WITH_UNACCEPTED_WARNING: async () => {
-            await votersAndVotesPage.next.click();
+          ACCEPT_WARNING: async () => {
+            await votersAndVotesPage.acceptWarnings.check();
           },
         };
 
-        const differencesPageStates = {};
+        const differencesPageStates = {
+          differencesPageWarningAccepted: async () => {
+            await expect(differencesPage.fieldset).toBeVisible();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+          },
+        };
         const differencesPageEvents = {};
 
         const abortInputModalStates = {};

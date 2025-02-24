@@ -1,9 +1,9 @@
 use super::{
+    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
     error::AuthenticationError,
     role::Role,
     session::Sessions,
     user::{User, Users},
-    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
 };
 use axum::{
     extract::{Path, Request, State},
@@ -12,7 +12,7 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use cookie::{Cookie, SameSite};
-use hyper::{header::SET_COOKIE, StatusCode};
+use hyper::{StatusCode, header::SET_COOKIE};
 use serde::{Deserialize, Serialize};
 use sqlx::{Error, SqlitePool};
 use tracing::debug;

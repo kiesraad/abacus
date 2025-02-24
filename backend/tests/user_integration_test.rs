@@ -1,9 +1,9 @@
 #![cfg(test)]
 
 use abacus::authentication::UserListResponse;
-use hyper::{header::CONTENT_TYPE, StatusCode};
+use hyper::{StatusCode, header::CONTENT_TYPE};
 use reqwest::Body;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
 use utils::serve_api;

@@ -1,5 +1,5 @@
 use chrono::{DateTime, TimeDelta, Utc};
-use rand::{distr::Alphanumeric, Rng};
+use rand::{Rng, distr::Alphanumeric};
 
 use super::error::AuthenticationError;
 

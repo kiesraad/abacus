@@ -1,7 +1,7 @@
 use axum::{
+    Json,
     extract::FromRequest,
     response::{IntoResponse, Response},
-    Json,
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};

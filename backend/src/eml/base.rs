@@ -1,10 +1,10 @@
 use std::io::BufRead;
 
 use quick_xml::{
-    se::{Serializer, WriteResult},
     DeError, SeError,
+    se::{Serializer, WriteResult},
 };
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
 /// Base EML XML document that contains all the mostly irrelevant for our logic
 /// XML tags and setup.

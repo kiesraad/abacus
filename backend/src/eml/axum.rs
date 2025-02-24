@@ -1,5 +1,5 @@
 use axum::{http::HeaderValue, response::IntoResponse};
-use hyper::{header, StatusCode};
+use hyper::{StatusCode, header};
 
 use crate::eml::EMLDocument;
 

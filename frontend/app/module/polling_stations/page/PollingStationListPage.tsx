@@ -102,7 +102,7 @@ export function PollingStationListPage() {
 
             <Table id="polling_stations">
               <Table.Header>
-                <Table.HeaderCell>{t("number")}</Table.HeaderCell>
+                <Table.HeaderCell className="text-align-r">{t("number")}</Table.HeaderCell>
                 <Table.HeaderCell>{t("name")}</Table.HeaderCell>
                 <Table.HeaderCell>{t("type")}</Table.HeaderCell>
               </Table.Header>

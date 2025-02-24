@@ -145,7 +145,7 @@
       }
     },
     "/api/elections/{election_id}/apportionment": {
-      "get": {
+      "post": {
         "tags": [
           "apportionment"
         ],
@@ -1281,6 +1281,58 @@
       }
     },
     "/api/user/{user_id}": {
+      "get": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Get a user",
+        "operationId": "user_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "User id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "authentication"
@@ -1351,6 +1403,8 @@
         "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after whole seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
         "required": [
           "seats",
+          "whole_seats",
+          "residual_seats",
           "quota",
           "steps",
           "final_standing"
@@ -1365,6 +1419,11 @@
           "quota": {
             "$ref": "#/components/schemas/Fraction"
           },
+          "residual_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
           "seats": {
             "type": "integer",
             "format": "int64",
@@ -1375,6 +1434,11 @@
             "items": {
               "$ref": "#/components/schemas/ApportionmentStep"
             }
+          },
+          "whole_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           }
         }
       },
@@ -1932,6 +1996,7 @@
         "type": "string",
         "description": "Error reference used to show the corresponding error message to the end-user",
         "enum": [
+          "ApportionmentNotAvailableUntilDataEntryFinalised",
           "DatabaseError",
           "DrawingOfLotsRequired",
           "EntryNotFound",

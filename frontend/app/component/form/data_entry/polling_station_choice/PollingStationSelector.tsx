@@ -34,7 +34,7 @@ export function PollingStationSelector({
     <div className={cls.container}>
       <InputField
         id="pollingStation"
-        className={cls.input}
+        className={cn(cls.input, "font-number")}
         name="number"
         value={pollingStationNumber}
         label={t("polling_station_choice.insert_number")}

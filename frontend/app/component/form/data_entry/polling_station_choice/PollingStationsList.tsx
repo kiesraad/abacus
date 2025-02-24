@@ -13,7 +13,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
   return (
     <Table id="polling_station_list">
       <Table.Header>
-        <Table.HeaderCell>{t("number")}</Table.HeaderCell>
+        <Table.HeaderCell className="text-align-r">{t("number")}</Table.HeaderCell>
         <Table.HeaderCell>{t("polling_station.title.singular")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>

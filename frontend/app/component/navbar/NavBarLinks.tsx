@@ -58,6 +58,12 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
             <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_stations")}</Link>
           </>
         )}
+        {location.pathname.match(/^\/elections\/\d+\/apportionment\/(details-whole-seats|details-residual-seats)$/) && (
+          <>
+            <IconChevronRight />
+            <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
+          </>
+        )}
       </>
     );
   }
@@ -80,7 +86,7 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
 
   if (
     (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||
-    location.pathname === "/users" ||
+    location.pathname.startsWith("/users") ||
     location.pathname === "/workstations" ||
     location.pathname === "/logs"
   ) {

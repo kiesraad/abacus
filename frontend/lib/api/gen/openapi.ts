@@ -126,6 +126,10 @@ export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
 export type WHOAMI_REQUEST_PATH = `/api/user/whoami`;
 
 // /api/user/{user_id}
+export interface USER_GET_REQUEST_PARAMS {
+  user_id: number;
+}
+export type USER_GET_REQUEST_PATH = `/api/user/${number}`;
 export interface USER_UPDATE_REQUEST_PARAMS {
   user_id: number;
 }
@@ -143,8 +147,10 @@ number of seats per political group that was assigned after all seats were assig
 export interface ApportionmentResult {
   final_standing: PoliticalGroupSeatAssignment[];
   quota: Fraction;
+  residual_seats: number;
   seats: number;
   steps: ApportionmentStep[];
+  whole_seats: number;
 }
 
 /**
@@ -335,6 +341,7 @@ export interface ElectionSummary {
  * Error reference used to show the corresponding error message to the end-user
  */
 export type ErrorReference =
+  | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "DatabaseError"
   | "DrawingOfLotsRequired"
   | "EntryNotFound"

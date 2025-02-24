@@ -37,7 +37,12 @@ const dataEntryMachineDefinition = {
         SUBMIT: "votersVotesPageWarning",
       },
     },
-    votersVotesPageWarning: {},
+    votersVotesPageWarning: {
+      on: {
+        SUBMIT_WITH_UNACCEPTED_WARNING: "votersVotesPageWarningReminder",
+      },
+    },
+    votersVotesPageWarningReminder: {},
   },
 };
 
@@ -108,6 +113,16 @@ test.describe("Data entry model test", () => {
             );
             await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
           },
+          votersVotesPageWarningReminder: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.warning).toContainText(
+              "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
+            );
+            await expect(votersAndVotesPage.acceptWarnings).toBeVisible();
+            await expect(votersAndVotesPage.acceptWarningsReminder).toHaveText(
+              "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
+            );
+          },
         };
         const votersAndVotesPageEvents = {
           FILL_WITH_WARNING: async () => {
@@ -115,6 +130,9 @@ test.describe("Data entry model test", () => {
             await votersAndVotesPage.inputVotesCounts(votesWarning);
           },
           SUBMIT: async () => {
+            await votersAndVotesPage.next.click();
+          },
+          SUBMIT_WITH_UNACCEPTED_WARNING: async () => {
             await votersAndVotesPage.next.click();
           },
         };

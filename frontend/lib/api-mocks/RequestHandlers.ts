@@ -16,6 +16,8 @@ import {
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PARAMS,
   USER_CREATE_REQUEST_PATH,
+  USER_GET_REQUEST_PARAMS,
+  USER_GET_REQUEST_PATH,
   USER_LIST_REQUEST_PARAMS,
   USER_LIST_REQUEST_PATH,
   UserListResponse,
@@ -131,6 +133,13 @@ export const UserCreateRequestHandler = http.post<
   User,
   USER_CREATE_REQUEST_PATH
 >("/api/user", () => HttpResponse.json(userMockData[userMockData.length - 1], { status: 200 }));
+
+export const UserGetRequestHandler = http.get<
+  ParamsToString<USER_GET_REQUEST_PARAMS>,
+  null,
+  User,
+  USER_GET_REQUEST_PATH
+>("/api/user/1", () => HttpResponse.json(userMockData[0], { status: 200 }));
 
 export const UserListRequestHandler = http.get<
   USER_LIST_REQUEST_PARAMS,

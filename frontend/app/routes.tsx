@@ -19,6 +19,7 @@ import {
   UserCreateRolePage,
   UserCreateTypePage,
   UserListPage,
+  UserUpdatePage,
 } from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
 
@@ -106,6 +107,7 @@ export const routes = createRoutesFromElements(
           <Route path="type" element={<UserCreateTypePage />} />
           <Route path="details" element={<UserCreateDetailsPage />} />
         </Route>
+        <Route path=":userId/update" element={<UserUpdatePage />} />
       </Route>
       <Route path="workstations" element={<WorkstationsHomePage />} />
     </Route>

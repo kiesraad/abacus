@@ -2,8 +2,8 @@ import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { UserGetRequestHandler, userMockData } from "@kiesraad/api-mocks";
-import { overrideOnce, render, server } from "@kiesraad/test";
+import { UserGetRequestHandler, UserUpdateRequestHandler } from "@kiesraad/api-mocks";
+import { render, server } from "@kiesraad/test";
 
 import { UserUpdatePage } from "./UserUpdatePage";
 
@@ -21,11 +21,10 @@ vi.mock(import("react-router"), async (importOriginal) => ({
 
 describe("UserUpdatePage", () => {
   beforeEach(() => {
-    server.use(UserGetRequestHandler);
+    server.use(UserGetRequestHandler, UserUpdateRequestHandler);
   });
 
   test("update user", async () => {
-    overrideOnce("put", "/api/user/1", 200, userMockData[0]);
     render(<UserUpdatePage></UserUpdatePage>);
     expect(await screen.findByRole("heading", { name: "Details van het account" })).toBeInTheDocument();
 

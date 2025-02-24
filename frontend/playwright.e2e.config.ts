@@ -20,7 +20,9 @@ function returnWebserverCommand(): string {
 
 const config: PlaywrightTestConfig = defineConfig({
   ...commonConfig,
-  reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
+  reporter: process.env.CI
+    ? [["list"], ["github"], ["junit", { outputFile: "playwright.ladle.junit.xml" }], ["html", { open: "never" }]]
+    : "list",
   testDir: "./e2e-tests",
   outputDir: "./test-results/e2e-tests",
   testMatch: /\.e2e\.ts/,

@@ -134,6 +134,15 @@ jobs:
         run: npx playwright install --with-deps --no-shell
       - name: Run ladle playwright tests
         run: npm run test:ladle
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          name: "Playwright Ladle ${{ matrix.os }}"
+          files: frontend/playwright.ladle.junit.xml
+          disable_search: true
+          fail_ci_if_error: true
 
   playwright-e2e:
     name: Playwright e2e tests (${{ matrix.os }})
@@ -174,8 +183,18 @@ jobs:
           name: playwright-report-${{ matrix.os }}
           path: frontend/playwright-report/
           retention-days: 30
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          name: "Playwright e2e ${{ matrix.os }}"
+          files: frontend/playwright.e2e.junit.xml
+          disable_search: true
+          fail_ci_if_error: true
 
   deploy:
+    if: "github.repository == 'kiesraad/abacus' && !github.event.pull_request.head.repo.fork"
     name: Deploy to abacus-test.nl
     needs:
       - backend

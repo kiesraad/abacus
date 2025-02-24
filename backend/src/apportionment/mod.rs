@@ -569,9 +569,8 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_without_remaining_seats() {
-        let totals = get_election_summary_with_default_50_candidates(vec![
-            480, 160, 160, 160, 80, 80, 80
-        ]);
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![480, 160, 160, 160, 80, 80, 80]);
         let result = seat_allocation(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 0);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -592,9 +591,8 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_only_1_surplus_meets_threshold()
      {
-        let totals = get_election_summary_with_default_50_candidates(vec![
-            808, 59, 58, 57, 56, 55, 54, 53
-        ]);
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![808, 59, 58, 57, 56, 55, 54, 53]);
         let result = seat_allocation(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 5);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -630,18 +628,16 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error() {
-        let totals = get_election_summary_with_default_50_candidates(vec![
-            500, 140, 140, 140, 140, 140
-        ]);
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![500, 140, 140, 140, 140, 140]);
         let result = seat_allocation(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_without_remaining_seats() {
-        let totals = get_election_summary_with_default_50_candidates(vec![
-            576, 288, 96, 96, 96, 48
-        ]);
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![576, 288, 96, 96, 96, 48]);
         let result = seat_allocation(25, &totals).unwrap();
         assert_eq!(result.steps.len(), 0);
         let total_seats = get_total_seats_from_apportionment_result(result);

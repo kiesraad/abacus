@@ -24,42 +24,48 @@ const dataEntryMachineDefinition = {
         RESUME_DATA_ENTRY: "votersVotesPageAfterResumeErrorSubmitted",
       },
     },
+    pollingStationsPageChangedErrorSaved: {
+      on: {
+        RESUME_DATA_ENTRY: "votersVotesPageAfterResumeErrorChanged",
+      },
+    },
     pollingStationsPageDiscarded: {},
     recountedPageErrorSubmitted: {
       on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageSubmittedError",
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageErrorSubmitted",
       },
     },
     voterVotesPageEmpty: {
       on: {
-        FILL_WITH_VALID_DATA: "votersVotesPageFilled",
-        FILL_WITH_ERROR_DATA: "VotersVotesPageError",
+        FILL_WITH_VALID_DATA: "votersVotesPageFilledValid",
+        FILL_WITH_ERROR_DATA: "VotersVotesPageFilledError",
       },
     },
-    votersVotesPageFilled: {
+    votersVotesPageFilledValid: {
       on: {
         // valid states are tested in other file
         SUBMIT: "differencesPage",
       },
     },
-    votersVotesPageSubmitted: {
+    votersVotesPageValidSubmitted: {
       on: {
         CHANGE_TO_ERROR_DATA: "votersVotesPageChangedError",
       },
     },
     votersVotesPageChangedError: {
       on: {
-        SUBMIT: "votersVotesPageSubmittedError",
+        SUBMIT: "votersVotesPageChangedErrorSubmitted",
         // TODO: anything more? similar enough to original error and changed?
       },
     },
-    VotersVotesPageError: {
+    VotersVotesPageFilledError: {
       on: {
         // only SUBMIT here, because without submit this state is the same as Filled
-        SUBMIT: "votersVotesPageSubmittedError",
+        SUBMIT: "votersVotesPageErrorSubmitted",
       },
     },
-    votersVotesPageSubmittedError: {
+    votersVotesPageErrorSubmitted: {
+      // submit error, so no error is shown on save and resume
       on: {
         CORRECT_ERROR_DATA: "votersVotesPageChangedFilled",
         CLICK_ABORT: "abortInputModalErrorSubmitted",
@@ -67,21 +73,36 @@ const dataEntryMachineDefinition = {
         GO_TO_RECOUNTED_PAGE: "recountedPageErrorSubmitted",
       },
     },
-    votersVotesPageChangedFilled: {
-      // TODO: causes failing tests in later states
-      // on: {
-      //   SUBMIT: "differencesPage"
-      // }
-    },
-    votersVotesPageAfterResumeErrorSubmitted: {},
-    differencesPage: {
+    votersVotesPageChangedErrorSubmitted: {
+      // submitted valid, then changed to error, so error is shown on save and resume
       on: {
-        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageSubmitted",
+        CORRECT_ERROR_DATA: "votersVotesPageChangedFilled",
+        CLICK_ABORT: "abortInputModalChangedErrorSubmitted",
+        NAV_TO_POLLING_STATION_PAGE: "abortInputModalChangedErrorSubmitted",
       },
     },
+    votersVotesPageChangedFilled: {
+      on: {
+        SUBMIT: "differencesPageChanged",
+      },
+    },
+    votersVotesPageAfterResumeErrorSubmitted: {},
+    votersVotesPageAfterResumeErrorChanged: {},
+    differencesPage: {
+      on: {
+        GO_TO_VOTERS_VOTES_PAGE: "votersVotesPageValidSubmitted",
+      },
+    },
+    differencesPageChanged: {},
     abortInputModalErrorSubmitted: {
       on: {
         SAVE_INPUT: "pollingStationsPageErrorSubmittedSaved",
+        DISCARD_INPUT: "pollingStationsPageDiscarded",
+      },
+    },
+    abortInputModalChangedErrorSubmitted: {
+      on: {
+        SAVE_INPUT: "pollingStationsPageChangedErrorSaved",
         DISCARD_INPUT: "pollingStationsPageDiscarded",
       },
     },
@@ -152,6 +173,12 @@ test.describe("Data entry model test", () => {
               `${pollingStation.number} - ${pollingStation.name}`,
             ]);
           },
+          pollingStationsPageChangedErrorSaved: async () => {
+            await expect(pollingStationChoicePage.fieldset).toBeVisible();
+            await expect(pollingStationChoicePage.allDataEntriesInProgress).toHaveText([
+              `${pollingStation.number} - ${pollingStation.name}`,
+            ]);
+          },
           pollingStationsPageDiscarded: async () => {
             await expect(pollingStationChoicePage.fieldset).toBeVisible();
             await expect(pollingStationChoicePage.alertDataEntryInProgress).toBeHidden();
@@ -182,12 +209,12 @@ test.describe("Data entry model test", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersEmpty, votes: votesEmpty });
           },
-          votersVotesPageFilled: async () => {
+          votersVotesPageFilledValid: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes });
           },
-          votersVotesPageSubmitted: async () => {
+          votersVotesPageValidSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters, votes });
@@ -197,12 +224,20 @@ test.describe("Data entry model test", () => {
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
           },
-          VotersVotesPageError: async () => {
+          VotersVotesPageFilledError: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
           },
-          votersVotesPageSubmittedError: async () => {
+          votersVotesPageErrorSubmitted: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
+            await expect(votersAndVotesPage.error).toContainText(
+              "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
+            );
+          },
+          votersVotesPageChangedErrorSubmitted: async () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
@@ -219,9 +254,15 @@ test.describe("Data entry model test", () => {
             await expect(votersAndVotesPage.fieldset).toBeVisible();
             const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
             expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
-            // TODO: figure out what to do with this assert
-            // passes if furthest page is VotersAndVotes, fails if furthest page is Differences
-            // await expect(votersAndVotesPage.error).toBeHidden();
+            await expect(votersAndVotesPage.error).toBeHidden();
+          },
+          votersVotesPageAfterResumeErrorChanged: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters: votersError, votes });
+            await expect(votersAndVotesPage.error).toContainText(
+              "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
+            );
           },
         };
         const votersAndVotesPageEvents = {
@@ -257,6 +298,9 @@ test.describe("Data entry model test", () => {
           differencesPage: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
           },
+          differencesPageChanged: async () => {
+            await expect(differencesPage.fieldset).toBeVisible();
+          },
         };
         const differencesPageEvents = {
           GO_TO_VOTERS_VOTES_PAGE: async () => {
@@ -266,6 +310,9 @@ test.describe("Data entry model test", () => {
 
         const abortInputModalStates = {
           abortInputModalErrorSubmitted: async () => {
+            await expect(abortModal.heading).toBeVisible();
+          },
+          abortInputModalChangedErrorSubmitted: async () => {
             await expect(abortModal.heading).toBeVisible();
           },
         };

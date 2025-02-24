@@ -15,6 +15,7 @@ use tower_http::trace::TraceLayer;
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod apportionment;
+mod audit_log;
 pub mod authentication;
 pub mod data_entry;
 pub mod election;

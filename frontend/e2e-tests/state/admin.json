@@ -2,10 +2,10 @@
   "cookies": [
     {
       "name": "ABACUS_SESSION",
-      "value": "Aw7kRD1HBoWOPeL1JIhSZ3XT",
+      "value": "uxE9NtjCVBzmvyrKflLR345W",
       "domain": "127.0.0.1",
       "path": "/",
-      "expires": 1739894146.94418,
+      "expires": 1740390878.916,
       "httpOnly": true,
       "secure": false,
       "sameSite": "Strict"

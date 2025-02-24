@@ -8,7 +8,10 @@ use utoipa::ToSchema;
 use crate::{
     apportionment::{seat_allocation, ApportionmentResult},
     authentication::Coordinator,
-    data_entry::{repository::{PollingStationDataEntries, PollingStationResultsEntries}, status::DataEntryStatusName},
+    data_entry::{
+        repository::{PollingStationDataEntries, PollingStationResultsEntries},
+        status::DataEntryStatusName,
+    },
     election::repository::Elections,
     polling_station::repository::PollingStations,
     summary::ElectionSummary,

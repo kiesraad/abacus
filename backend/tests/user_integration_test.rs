@@ -56,9 +56,15 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_listing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let admin_cookie = shared::admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/user");
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", admin_cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(
         response.status(),
@@ -66,14 +72,20 @@ async fn test_user_listing(pool: SqlitePool) {
         "Unexpected response status"
     );
     let body: UserListResponse = response.json().await.unwrap();
-    assert_eq!(body.users.len(), 1);
-    assert!(body.users.iter().any(|ps| ps.username() == "user"))
+    assert_eq!(body.users.len(), 3);
+    assert!(body
+        .users
+        .iter()
+        .any(|ps| ["admin", "coordinator", "typist"]
+            .iter()
+            .any(|u| ps.username() == *u)))
 }
 
-#[test(sqlx::test)]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_creation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/user");
+    let admin_cookie = shared::admin_login(&addr).await;
 
     let response = reqwest::Client::new()
         .post(&url)
@@ -83,6 +95,7 @@ async fn test_user_creation(pool: SqlitePool) {
             "fullname": "fullname",
             "temp_password": "MyLongPassword13"
         }))
+        .header("cookie", admin_cookie)
         .send()
         .await
         .unwrap();
@@ -94,7 +107,6 @@ async fn test_user_creation(pool: SqlitePool) {
     );
 
     let body: Value = response.json().await.unwrap();
-    dbg!(&body);
 
     assert_eq!(body["role"], "administrator");
     assert_eq!(body["username"], "username");
@@ -102,10 +114,11 @@ async fn test_user_creation(pool: SqlitePool) {
     assert!(body.get("temp_password").is_none());
 }
 
-#[test(sqlx::test)]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_creation_anonymous(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/user");
+    let admin_cookie = shared::admin_login(&addr).await;
 
     let response = reqwest::Client::new()
         .post(&url)
@@ -114,6 +127,7 @@ async fn test_user_creation_anonymous(pool: SqlitePool) {
             "username": "username",
             "temp_password": "MyLongPassword13"
         }))
+        .header("cookie", admin_cookie)
         .send()
         .await
         .unwrap();
@@ -125,7 +139,6 @@ async fn test_user_creation_anonymous(pool: SqlitePool) {
     );
 
     let body: Value = response.json().await.unwrap();
-    dbg!(&body);
 
     assert_eq!(body["role"], "typist");
     assert_eq!(body["username"], "username");
@@ -137,17 +150,22 @@ async fn test_user_creation_anonymous(pool: SqlitePool) {
 async fn test_user_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/user/1");
+    let admin_cookie = shared::admin_login(&addr).await;
 
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", admin_cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
 
     let body: Value = response.json().await.unwrap();
-    dbg!(&body);
 
     assert_eq!(body["id"], 1);
     assert_eq!(body["role"], "administrator");
-    assert_eq!(body["username"], "user");
+    assert_eq!(body["username"], "admin");
     assert_eq!(body["fullname"], "Sanne Molenaar");
 }
 

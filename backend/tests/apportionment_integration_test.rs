@@ -161,11 +161,13 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
 async fn test_election_apportionment_error_apportionment_not_available_no_polling_stations(
     pool: SqlitePool,
 ) {
-    let addr = serve_api(pool).await;
+    let addr: std::net::SocketAddr = serve_api(pool).await;
+    let cookie = shared::admin_login(&addr).await;
 
     // Create election without polling stations
     let response = reqwest::Client::new()
         .post(format!("http://{addr}/api/elections"))
+        .header("cookie", cookie.clone())
         .json(&serde_json::json!({
             "name": "Test Election",
             "location": "Test Location",
@@ -206,11 +208,17 @@ async fn test_election_apportionment_error_apportionment_not_available_no_pollin
     assert_eq!(response.status(), StatusCode::CREATED);
     let election: Election = response.json().await.unwrap();
 
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
     let url = format!(
         "http://{}/api/elections/{}/apportionment",
         addr, election.id
     );
-    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
@@ -226,12 +234,19 @@ async fn test_election_apportionment_error_apportionment_not_available_until_dat
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
+    let typist_cookie: axum::http::HeaderValue = shared::typist_login(&addr).await;
+    let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
 
     // Add and finalise first data entry
-    create_and_finalise_data_entry(&addr, 3, 1).await;
+    create_and_finalise_data_entry(&addr, typist_cookie, 3, 1).await;
 
     let url = format!("http://{addr}/api/elections/3/apportionment");
-    let response = reqwest::Client::new().post(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);

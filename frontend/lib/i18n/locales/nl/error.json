@@ -38,13 +38,7 @@
     "PollingStationResultsAlreadyFinalised": "De invoer voor dit stembureau is al definitief",
     "PollingStationSecondEntryAlreadyFinalised": "De tweede invoer voor dit stembureau is al definitief",
     "PollingStationValidationErrors": "Er zijn fouten opgetreden bij het valideren van het stembureau",
-    "UserNotFound": "De gebruiker is niet gevonden",
-    "InvalidPoliticalGroup": "De politieke partij is niet geldig",
-    "InvalidUsernameOrPassword": "De gebruikersnaam of het wachtwoord is onjuist",
-    "InvalidSession": "De sessie is ongeldig",
-    "InvalidPassword": "Het opgegeven wachtwoord is onjuist",
-    "UserNotFound": "De gebruiker is niet gevonden",
-    "DrawingOfLotsRequired": "Loting is noodzakelijk",
-    "Unauthorized": "Je hebt geen toestemming om deze actie uit te voeren"
+    "Unauthorized": "Je hebt geen toestemming om deze actie uit te voeren",
+    "UserNotFound": "De gebruiker is niet gevonden"
   }
 }

@@ -1,12 +1,12 @@
 use crate::{
+    APIError,
     data_entry::status::DataEntryStatus,
     election::{CandidateNumber, PGNumber},
     error::ErrorReference,
-    APIError,
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{types::Json, FromRow};
+use sqlx::{FromRow, types::Json};
 use std::ops::AddAssign;
 use utoipa::ToSchema;
 
@@ -187,7 +187,10 @@ impl PoliticalGroupVotes {
                 .find(|c| c.number == cv.number)
             else {
                 return Err(APIError::AddError(
-                    format!("Attempted to add candidate '{}' votes in group '{}', but no such candidate exists", cv.number, self.number),
+                    format!(
+                        "Attempted to add candidate '{}' votes in group '{}', but no such candidate exists",
+                        cv.number, self.number
+                    ),
                     ErrorReference::InvalidVoteCandidate,
                 ));
             };

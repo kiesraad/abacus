@@ -11,15 +11,15 @@ use crate::{
     utils::serve_api,
 };
 use abacus::{
+    ErrorResponse,
     apportionment::{
-        get_total_seats_from_apportionment_result, ElectionApportionmentResponse, Fraction,
+        ElectionApportionmentResponse, Fraction, get_total_seats_from_apportionment_result,
     },
     data_entry::{
-        status::ClientState, CandidateVotes, DataEntry, DifferencesCounts, PoliticalGroupVotes,
-        PollingStationResults, VotersCounts, VotesCounts,
+        CandidateVotes, DataEntry, DifferencesCounts, PoliticalGroupVotes, PollingStationResults,
+        VotersCounts, VotesCounts, status::ClientState,
     },
     election::Election,
-    ErrorResponse,
 };
 
 pub mod shared;

@@ -1,12 +1,13 @@
 use axum::{
-    extract::{Path, State},
     Json,
+    extract::{Path, State},
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use crate::{
-    apportionment::{seat_allocation, ApportionmentResult},
+    APIError, ErrorResponse,
+    apportionment::{ApportionmentResult, seat_allocation},
     authentication::Coordinator,
     data_entry::{
         repository::{PollingStationDataEntries, PollingStationResultsEntries},
@@ -15,7 +16,6 @@ use crate::{
     election::repository::Elections,
     polling_station::repository::PollingStations,
     summary::ElectionSummary,
-    APIError, ErrorResponse,
 };
 
 use super::ApportionmentError;

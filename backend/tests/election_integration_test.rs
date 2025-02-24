@@ -49,10 +49,11 @@ async fn test_election_details_works(pool: SqlitePool) {
     let body: ElectionDetailsResponse = response.json().await.unwrap();
     assert_eq!(body.election.name, "Municipal Election");
     assert_eq!(body.polling_stations.len(), 2);
-    assert!(body
-        .polling_stations
-        .iter()
-        .any(|ps| ps.name == "Op Rolletjes"));
+    assert!(
+        body.polling_stations
+            .iter()
+            .any(|ps| ps.name == "Op Rolletjes")
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

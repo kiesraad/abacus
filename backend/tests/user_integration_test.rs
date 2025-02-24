@@ -2,7 +2,7 @@
 
 use abacus::authentication::UserListResponse;
 use hyper::StatusCode;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
 use utils::serve_api;
@@ -73,12 +73,11 @@ async fn test_user_listing(pool: SqlitePool) {
     );
     let body: UserListResponse = response.json().await.unwrap();
     assert_eq!(body.users.len(), 3);
-    assert!(body
-        .users
-        .iter()
-        .any(|ps| ["admin", "coordinator", "typist"]
+    assert!(body.users.iter().any(|ps| {
+        ["admin", "coordinator", "typist"]
             .iter()
-            .any(|u| ps.username() == *u)))
+            .any(|u| ps.username() == *u)
+    }))
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

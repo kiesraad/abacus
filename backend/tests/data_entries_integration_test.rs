@@ -12,11 +12,11 @@ use crate::{
     utils::serve_api,
 };
 use abacus::{
-    data_entry::{
-        status::DataEntryStatusName::*, ElectionStatusResponse, ElectionStatusResponseEntry,
-        GetDataEntryResponse, SaveDataEntryResponse, ValidationResultCode,
-    },
     ErrorResponse,
+    data_entry::{
+        ElectionStatusResponse, ElectionStatusResponseEntry, GetDataEntryResponse,
+        SaveDataEntryResponse, ValidationResultCode, status::DataEntryStatusName::*,
+    },
 };
 
 pub mod shared;

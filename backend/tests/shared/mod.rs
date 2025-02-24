@@ -7,9 +7,9 @@ use serde_json::json;
 use std::net::SocketAddr;
 
 use abacus::data_entry::{
-    status::{ClientState, DataEntryStatusName},
     CandidateVotes, DataEntry, DifferencesCounts, ElectionStatusResponse, PoliticalGroupVotes,
     PollingStationResults, SaveDataEntryResponse, VotersCounts, VotesCounts,
+    status::{ClientState, DataEntryStatusName},
 };
 
 // example data entry for an election with two parties with two candidates
@@ -134,7 +134,9 @@ async fn finalise_data_entry(
     entry_number: u32,
 ) {
     // Finalise the data entry
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise");
+    let url = format!(
+        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise"
+    );
     let response = Client::new()
         .post(&url)
         .header("cookie", cookie)

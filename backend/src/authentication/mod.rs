@@ -54,21 +54,21 @@ mod tests {
     use super::role::Role;
     use api::{ChangePasswordRequest, Credentials, LoginResponse, UserListResponse};
     use axum::{
+        Router,
         body::Body,
         http::{HeaderValue, Request, StatusCode},
         middleware,
         routing::{get, post, put},
-        Router,
     };
     use http_body_util::BodyExt;
-    use hyper::{header::CONTENT_TYPE, Method};
+    use hyper::{Method, header::CONTENT_TYPE};
     use sqlx::SqlitePool;
     use test_log::test;
     use tower::ServiceExt;
 
     use crate::{
-        authentication::{session::Sessions, *},
         AppState,
+        authentication::{session::Sessions, *},
     };
 
     fn create_app(pool: SqlitePool) -> Router {

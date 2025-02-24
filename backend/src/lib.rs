@@ -1,10 +1,10 @@
 #[cfg(feature = "memory-serve")]
 use axum::http::StatusCode;
 use axum::{
+    Router,
     extract::FromRef,
     middleware,
     routing::{get, post},
-    Router,
 };
 #[cfg(feature = "memory-serve")]
 use memory_serve::MemoryServe;

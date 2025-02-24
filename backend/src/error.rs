@@ -3,13 +3,13 @@ use std::error::Error;
 use crate::{
     apportionment::ApportionmentError,
     authentication::error::AuthenticationError,
-    data_entry::{status::DataEntryTransitionError, DataError},
+    data_entry::{DataError, status::DataEntryTransitionError},
 };
 use axum::{
+    Json,
     extract::rejection::JsonRejection,
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json,
 };
 use hyper::header::InvalidHeaderValue;
 use quick_xml::SeError;

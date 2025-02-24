@@ -1,7 +1,7 @@
 use axum::{
+    Json,
     extract::{Path, State},
     response::{IntoResponse, Response},
-    Json,
 };
 use axum_extra::response::Attachment;
 use serde::{Deserialize, Serialize};
@@ -11,16 +11,16 @@ use zip::{result::ZipError, write::SimpleFileOptions};
 use self::repository::Elections;
 pub use self::structs::*;
 use crate::{
+    APIError, ErrorResponse,
     authentication::{Coordinator, User},
-    data_entry::{repository::PollingStationResultsEntries, PollingStationResults},
-    eml::{axum::Eml, eml_document_hash, EMLDocument, EML510},
+    data_entry::{PollingStationResults, repository::PollingStationResultsEntries},
+    eml::{EML510, EMLDocument, axum::Eml, eml_document_hash},
     pdf_gen::{
         generate_pdf,
         models::{ModelNa31_2Input, PdfModel},
     },
     polling_station::{repository::PollingStations, structs::PollingStation},
     summary::ElectionSummary,
-    APIError, ErrorResponse,
 };
 
 #[cfg(feature = "dev-database")]

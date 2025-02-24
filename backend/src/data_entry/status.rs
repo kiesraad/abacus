@@ -6,12 +6,12 @@ use sqlx::Type;
 use utoipa::ToSchema;
 
 use crate::{
-    data_entry::{entry_number::EntryNumber, PollingStationResults},
+    data_entry::{PollingStationResults, entry_number::EntryNumber},
     election::Election,
     polling_station::PollingStation,
 };
 
-use super::{validate_polling_station_results, DataError, ValidationResults};
+use super::{DataError, ValidationResults, validate_polling_station_results};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DataEntryTransitionError {

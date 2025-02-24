@@ -5,10 +5,10 @@ use crate::{
     polling_station::{repository::PollingStations, structs::PollingStation},
 };
 use axum::{
+    Json,
     extract::{FromRequest, Path, State},
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json,
 };
 use chrono::{DateTime, Utc};
 use entry_number::EntryNumber;
@@ -302,7 +302,7 @@ pub async fn election_status(
 #[cfg(test)]
 pub mod tests {
     use axum::http::StatusCode;
-    use sqlx::{query, SqlitePool};
+    use sqlx::{SqlitePool, query};
     use test_log::test;
 
     use super::*;

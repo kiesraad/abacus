@@ -1,9 +1,9 @@
 [package]
 name = "abacus"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 license = "EUPL-1.2"
-rust-version = "1.75"
+rust-version = "1.85"
 default-run = "abacus"
 
 [features]
@@ -35,8 +35,8 @@ tower = "0.5"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 tracing = "0.1.41"
 tower-http = { version = "0.6.2", features = ["trace"] }
-typst = "0.12.0"
-typst-pdf = "0.12.0"
+typst = "0.13.0"
+typst-pdf = "0.13.0"
 quick-xml = { version = "0.37.2", features = ["serialize"] }
 sha2 = "0.10.8"
 argon2 = "0.5.3"

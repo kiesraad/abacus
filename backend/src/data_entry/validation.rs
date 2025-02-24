@@ -350,18 +350,22 @@ impl Validate for PollingStationResults {
                 != self.differences_counts.more_ballots_count
             {
                 validation_results.errors.push(ValidationResult {
-                    fields: vec![differences_counts_path
-                        .field("more_ballots_count")
-                        .to_string()],
+                    fields: vec![
+                        differences_counts_path
+                            .field("more_ballots_count")
+                            .to_string(),
+                    ],
                     code: ValidationResultCode::F301,
                 });
             }
             // F.302 validate that fewer ballots counted is empty
             if self.differences_counts.fewer_ballots_count != 0 {
                 validation_results.errors.push(ValidationResult {
-                    fields: vec![differences_counts_path
-                        .field("fewer_ballots_count")
-                        .to_string()],
+                    fields: vec![
+                        differences_counts_path
+                            .field("fewer_ballots_count")
+                            .to_string(),
+                    ],
                     code: ValidationResultCode::F302,
                 });
             }
@@ -373,18 +377,22 @@ impl Validate for PollingStationResults {
                 != self.differences_counts.fewer_ballots_count
             {
                 validation_results.errors.push(ValidationResult {
-                    fields: vec![differences_counts_path
-                        .field("fewer_ballots_count")
-                        .to_string()],
+                    fields: vec![
+                        differences_counts_path
+                            .field("fewer_ballots_count")
+                            .to_string(),
+                    ],
                     code: ValidationResultCode::F303,
                 });
             }
             // F.304 validate that more ballots counted is empty
             if self.differences_counts.more_ballots_count != 0 {
                 validation_results.errors.push(ValidationResult {
-                    fields: vec![differences_counts_path
-                        .field("more_ballots_count")
-                        .to_string()],
+                    fields: vec![
+                        differences_counts_path
+                            .field("more_ballots_count")
+                            .to_string(),
+                    ],
                     code: ValidationResultCode::F304,
                 });
             }

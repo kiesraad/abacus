@@ -5,8 +5,8 @@ use std::{
     ops::{Add, Div, Mul, Sub},
 };
 use utoipa::{
-    openapi::{schema::Schema, RefOr},
     PartialSchema, ToSchema,
+    openapi::{RefOr, schema::Schema},
 };
 
 use crate::data_entry::Count;

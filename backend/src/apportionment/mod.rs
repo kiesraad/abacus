@@ -291,7 +291,10 @@ fn reallocate_residual_seat_for_absolute_majority(
         standing[pgs_last_residual_seat[0] as usize - 1].residual_seats -= 1;
         standing[majority_pg_votes.number as usize - 1].residual_seats += 1;
 
-        info!("Residual seat first allocated to list {} has been re-allocated to list {} in accordance with Article P 9 Kieswet", pgs_last_residual_seat[0], majority_pg_votes.number);
+        info!(
+            "Residual seat first allocated to list {} has been re-allocated to list {} in accordance with Article P 9 Kieswet",
+            pgs_last_residual_seat[0], majority_pg_votes.number
+        );
         Ok((
             standing,
             Some(AssignedSeat::AbsoluteMajorityChange(
@@ -693,7 +696,7 @@ pub fn get_total_seats_from_apportionment_result(result: ApportionmentResult) ->
 mod tests {
     use crate::{
         apportionment::{
-            apportionment, get_total_seats_from_apportionment_result, ApportionmentError,
+            ApportionmentError, apportionment, get_total_seats_from_apportionment_result,
         },
         data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts},
         election::PGNumber,
@@ -749,8 +752,8 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_residual_seats_assigned_with_surplus_and_averages_system_only_1_surplus_meets_threshold(
-    ) {
+    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_only_1_surplus_meets_threshold()
+     {
         let totals = get_election_summary(vec![808, 59, 58, 57, 56, 55, 54, 53]);
         let result = apportionment(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 5);
@@ -759,8 +762,8 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system(
-    ) {
+    fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system()
+     {
         let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
         let result = apportionment(10, &totals).unwrap();
         assert_eq!(result.steps.len(), 10);
@@ -779,8 +782,8 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error(
-    ) {
+    fn test_seat_allocation_less_than_19_seats_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error()
+     {
         // This test triggers Kieswet Article P 9
         let totals = get_election_summary(vec![2552, 511, 511, 511, 509, 509]);
         let result = apportionment(15, &totals);
@@ -788,8 +791,8 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system_drawing_of_lots_error_in_2nd_round_averages_system(
-    ) {
+    fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system_drawing_of_lots_error_in_2nd_round_averages_system()
+     {
         let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
         let result = apportionment(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
@@ -838,8 +841,8 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_19_or_more_seats_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error(
-    ) {
+    fn test_seat_allocation_19_or_more_seats_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error()
+     {
         // This test triggers Kieswet Article P 9
         let totals = get_election_summary(vec![7501, 1249, 1249, 1249, 1249, 1248, 1248, 8]);
         let result = apportionment(24, &totals);

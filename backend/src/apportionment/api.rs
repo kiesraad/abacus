@@ -1,12 +1,13 @@
 use axum::{
-    extract::{Path, State},
     Json,
+    extract::{Path, State},
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use crate::{
-    apportionment::{apportionment, ApportionmentError, ApportionmentResult},
+    APIError, ErrorResponse,
+    apportionment::{ApportionmentError, ApportionmentResult, apportionment},
     data_entry::{
         repository::{PollingStationDataEntries, PollingStationResultsEntries},
         status::DataEntryStatusName,
@@ -14,7 +15,6 @@ use crate::{
     election::repository::Elections,
     polling_station::repository::PollingStations,
     summary::ElectionSummary,
-    APIError, ErrorResponse,
 };
 
 /// Election details response, including the election's candidate list (political groups) and its polling stations

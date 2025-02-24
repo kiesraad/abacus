@@ -12,6 +12,10 @@ import {
   PollingStation,
   PollingStationListResponse,
   SaveDataEntryResponse,
+  User,
+  USER_CREATE_REQUEST_BODY,
+  USER_CREATE_REQUEST_PARAMS,
+  USER_CREATE_REQUEST_PATH,
   USER_LIST_REQUEST_PARAMS,
   USER_LIST_REQUEST_PATH,
   UserListResponse,
@@ -121,6 +125,13 @@ export const PollingStationGetHandler = http.get<ParamsToString<POLLING_STATION_
   () => HttpResponse.json(pollingStationMockData[0]! satisfies PollingStation, { status: 200 }),
 );
 
+export const UserCreateRequestHandler = http.post<
+  USER_CREATE_REQUEST_PARAMS,
+  USER_CREATE_REQUEST_BODY,
+  User,
+  USER_CREATE_REQUEST_PATH
+>("/api/user", () => HttpResponse.json(userMockData[userMockData.length - 1], { status: 200 }));
+
 export const UserListRequestHandler = http.get<
   USER_LIST_REQUEST_PARAMS,
   null,
@@ -142,5 +153,6 @@ export const handlers: HttpHandler[] = [
   PollingStationCreateHandler,
   PollingStationGetHandler,
   PollingStationUpdateHandler,
+  UserCreateRequestHandler,
   UserListRequestHandler,
 ];

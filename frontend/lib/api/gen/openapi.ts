@@ -126,6 +126,10 @@ export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
 export type WHOAMI_REQUEST_PATH = `/api/user/whoami`;
 
 // /api/user/{user_id}
+export interface USER_GET_REQUEST_PARAMS {
+  user_id: number;
+}
+export type USER_GET_REQUEST_PATH = `/api/user/${number}`;
 export interface USER_UPDATE_REQUEST_PARAMS {
   user_id: number;
 }

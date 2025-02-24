@@ -68,6 +68,7 @@ const dataEntryMachineDefinition = {
     votersVotesPageErrorSubmitted: {
       on: {
         CORRECT_ERROR_DATA: "votersVotesPageCorrected",
+        CHANGE_TO_WARNING_AND_SUBMIT: "votersVotesPageWarningSubmitted",
         CLICK_ABORT: "abortInputModalErrorSubmitted",
         NAV_TO_POLLING_STATION_PAGE: "abortInputModalErrorSubmitted",
         GO_TO_RECOUNTED_PAGE: "recountedPageErrorSubmitted",
@@ -88,6 +89,7 @@ const dataEntryMachineDefinition = {
         SUBMIT: "differencesPageCorrected",
       },
     },
+    votersVotesPageWarningSubmitted: {},
     votersVotesPageAfterResumeError: {},
     votersVotesPageAfterResumeErrorChanged: {},
     differencesPageValid: {
@@ -152,6 +154,13 @@ const votersError: VotersCounts = {
 const votes: VotesCounts = {
   votes_candidates_count: 100,
   blank_votes_count: 0,
+  invalid_votes_count: 0,
+  total_votes_cast_count: 100,
+};
+
+const votesWarning: VotesCounts = {
+  votes_candidates_count: 60,
+  blank_votes_count: 40,
   invalid_votes_count: 0,
   total_votes_cast_count: 100,
 };
@@ -286,6 +295,14 @@ test.describe("Data entry model test", () => {
               "Controleer toegelaten kiezersF.201De invoer bij A, B, C of D klopt niet.",
             );
           },
+          votersVotesPageWarningSubmitted: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters, votes: votesWarning });
+            await expect(votersAndVotesPage.warning).toContainText(
+              "Controleer aantal blanco stemmenW.201Het aantal blanco stemmen is erg hoog.",
+            );
+          },
           unsavedChangesModalChanged: async () => {
             await expect(votersAndVotesPage.unsavedChangesModal.heading).toBeVisible();
           },
@@ -307,6 +324,11 @@ test.describe("Data entry model test", () => {
           },
           CHANGE_TO_ERROR_DATA: async () => {
             await votersAndVotesPage.inputVotersCounts(votersError);
+          },
+          CHANGE_TO_WARNING_AND_SUBMIT: async () => {
+            await votersAndVotesPage.inputVotersCounts(voters);
+            await votersAndVotesPage.inputVotesCounts(votesWarning);
+            await votersAndVotesPage.next.click();
           },
           CLICK_ABORT: async () => {
             await votersAndVotesPage.abortInput.click();

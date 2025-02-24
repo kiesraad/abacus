@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
-    apportionment::{ApportionmentResult, seat_allocation},
+    apportionment::{ApportionmentError, ApportionmentResult, seat_allocation},
     authentication::Coordinator,
     data_entry::{
         repository::{PollingStationDataEntries, PollingStationResultsEntries},
@@ -17,8 +17,6 @@ use crate::{
     polling_station::repository::PollingStations,
     summary::ElectionSummary,
 };
-
-use super::ApportionmentError;
 
 /// Election details response, including the election's candidate list (political groups) and its polling stations
 #[derive(Serialize, Deserialize, ToSchema, Debug)]

@@ -2371,7 +2371,10 @@
         ],
         "properties": {
           "fullname": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "role": {
             "$ref": "#/components/schemas/Role"
@@ -2792,7 +2795,10 @@
             "type": "string"
           },
           "fullname": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "type": "integer",

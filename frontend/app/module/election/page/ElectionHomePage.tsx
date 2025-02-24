@@ -2,15 +2,15 @@ import { Link, Navigate } from "react-router";
 
 import { Footer } from "app/component/footer/Footer";
 
-import { useElection, useUser } from "@kiesraad/api";
+import { useElection, useUserRole } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
 
 export function ElectionHomePage() {
-  const user = useUser();
+  const { isTypist } = useUserRole();
   const { election } = useElection();
 
-  if (user?.role === "typist") {
+  if (isTypist) {
     return <Navigate to="data-entry" />;
   }
 

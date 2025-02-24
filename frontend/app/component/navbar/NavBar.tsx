@@ -19,7 +19,7 @@ export function NavBar({ location }: NavBarProps) {
       <div className={styles.userInfo}>
         {user ? (
           <>
-            <strong>{user.fullname}</strong>
+            <strong>{user.fullname || user.username}</strong>
             <span className={styles.lower}>({t(user.role)})</span>
             <Link
               to={`/account/login`}

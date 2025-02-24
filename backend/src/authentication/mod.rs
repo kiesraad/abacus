@@ -84,12 +84,10 @@ mod tests {
             .layer(middleware::from_fn_with_state(pool, extend_session));
 
         #[cfg(debug_assertions)]
-        let router = router
-            .route(
-                "/api/user/development/create",
-                post(api::development_create_user),
-            )
-            .route("/api/user/development/login", get(api::development_login));
+        let router = router.route(
+            "/api/user/development/create",
+            post(api::development_create_user),
+        );
 
         router.with_state(state)
     }
@@ -396,32 +394,6 @@ mod tests {
             .unwrap();
 
         assert_eq!(response.status(), StatusCode::OK);
-    }
-
-    #[cfg(debug_assertions)]
-    #[test(sqlx::test)]
-    async fn test_development_login(pool: SqlitePool) {
-        let app = create_app(pool);
-
-        // test login
-        let response = app
-            .oneshot(
-                Request::builder()
-                    .method(Method::GET)
-                    .uri("/api/user/development/login")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-
-        assert_eq!(response.status(), StatusCode::OK);
-        assert!(response.headers().get("set-cookie").is_some());
-
-        let body = response.into_body().collect().await.unwrap().to_bytes();
-        let result: LoginResponse = serde_json::from_slice(&body).unwrap();
-
-        assert_eq!(result.username, "admin");
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

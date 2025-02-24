@@ -1,6 +1,6 @@
 import { Link, NavLink } from "react-router";
 
-import { Election, useElection, useUser } from "@kiesraad/api";
+import { Election, useElection, useUserRole } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { IconChevronRight } from "@kiesraad/icon";
 
@@ -85,9 +85,7 @@ function TopLevelManagementLinks({ isAdministrator }: { isAdministrator: boolean
 }
 
 export function NavBarLinks({ location }: NavBarLinksProps) {
-  const user = useUser();
-  const isAdministrator = user?.role === "administrator";
-  const isCoordinator = user?.role === "coordinator";
+  const { isAdministrator, isCoordinator } = useUserRole();
 
   if (
     (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||

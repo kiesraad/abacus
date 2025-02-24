@@ -417,7 +417,7 @@ export interface HighestSurplusAssignedSeat {
 }
 
 export interface LoginResponse {
-  fullname: string;
+  fullname: string | null;
   role: Role;
   user_id: number;
   username: string;
@@ -564,7 +564,7 @@ export interface UpdateUserRequest {
  */
 export interface User {
   created_at: string;
-  fullname?: string;
+  fullname?: string | null;
   id: number;
   last_activity_at?: string;
   role: Role;

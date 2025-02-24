@@ -1,7 +1,14 @@
 import assert from "assert";
 import { format, resolveConfig, resolveConfigFile } from "prettier";
 
-import { OpenAPIV3, OperationObject, PathsObject, ReferenceObject, SchemaObject } from "./openapi";
+import {
+  NonArraySchemaObjectType,
+  OpenAPIV3,
+  OperationObject,
+  PathsObject,
+  ReferenceObject,
+  SchemaObject,
+} from "./openapi";
 
 export async function generate(openApiString: string): Promise<string> {
   const spec = JSON.parse(openApiString) as OpenAPIV3;
@@ -134,6 +141,7 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
   }
 
   let type = "unknown";
+
   switch (s.type) {
     case "string":
     case "boolean":
@@ -160,6 +168,19 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
   if (s.nullable) {
     type += " | null";
   }
+
+  if (Array.isArray(s.type)) {
+    type = s.type
+      .map((t: NonArraySchemaObjectType | "null") => {
+        if (t === "null") {
+          return "null";
+        }
+
+        return tsType({ type: t });
+      })
+      .join(" | ");
+  }
+
   return type;
 }
 

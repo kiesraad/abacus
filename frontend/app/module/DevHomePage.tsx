@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 import { MockTest } from "app/component/MockTest";
 
-import { ElectionListProvider, useApiState, useElectionList } from "@kiesraad/api";
+import { ElectionListProvider, useApiState, useElectionList, useUserRole } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { AppLayout, PageTitle } from "@kiesraad/ui";
 
@@ -74,6 +74,7 @@ function AdministratorCoordinatorLinks() {
 
 function DevLinks() {
   const { user, login, logout } = useApiState();
+  const { isTypist, isAdministrator, isCoordinator } = useUserRole();
 
   return (
     <>
@@ -118,7 +119,7 @@ function DevLinks() {
                 void logout();
               }}
             >
-              {t("user.logout")}: {user.fullname} ({user.role})
+              {t("user.logout")}: {user.fullname || user.username} ({user.role})
             </Link>
           </li>
         )}
@@ -140,12 +141,12 @@ function DevLinks() {
           </ul>
         </li>
       </ul>
-      {user?.role === "typist" && (
+      {isTypist && (
         <ElectionListProvider>
           <TypistLinks />
         </ElectionListProvider>
       )}
-      {(user?.role === "administrator" || user?.role === "coordinator") && (
+      {(isAdministrator || isCoordinator) && (
         <ElectionListProvider>
           <AdministratorCoordinatorLinks />
         </ElectionListProvider>

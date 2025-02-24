@@ -4,7 +4,7 @@ import { ElectionStatusWithIcon } from "app/component/election/ElectionStatusWit
 import { Footer } from "app/component/footer/Footer";
 import { NavBar } from "app/component/navbar/NavBar";
 
-import { Election, useElectionList, useUser } from "@kiesraad/api";
+import { Election, useElectionList, useUserRole } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, PageTitle, Table } from "@kiesraad/ui";
 
@@ -12,10 +12,10 @@ export function OverviewPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { electionList } = useElectionList();
-  const user = useUser();
+  const { isAdministrator, isCoordinator } = useUserRole();
 
   const isNewAccount = location.hash === "#new-account";
-  const isAdminOrCoordinator = user?.role === "administrator" || user?.role === "coordinator";
+  const isAdminOrCoordinator = isAdministrator || isCoordinator;
 
   function electionLink(election: Election): To {
     if (isAdminOrCoordinator) {

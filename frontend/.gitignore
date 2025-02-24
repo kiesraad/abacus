@@ -35,4 +35,5 @@ playwright-report/
 mockServiceWorker.js
 
 # playwright state
-state/
+e2e-tests/state/
+!e2e-tests/state/.gitkeep

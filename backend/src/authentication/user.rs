@@ -26,7 +26,7 @@ pub struct User {
     id: u32,
     username: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
+    #[schema(value_type = String, nullable = true)]
     fullname: Option<String>,
     role: Role,
     #[serde(skip_deserializing)]

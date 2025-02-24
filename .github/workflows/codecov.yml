@@ -54,6 +54,7 @@ jobs:
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          name: Backend Nextest Results
           files: backend/target/nextest/ci/junit.xml
           disable_search: true
           fail_ci_if_error: true
@@ -63,6 +64,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          name: Backend Nextest Coverage
           files: backend/target/llvm-cov-target/codecov.json
           disable_search: true
           fail_ci_if_error: true
@@ -95,6 +97,7 @@ jobs:
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          name: Frontend Vitest Results
           files: frontend/test-report.junit.xml
           disable_search: true
           fail_ci_if_error: true
@@ -102,6 +105,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          name: Frontend Vitest Coverage
           files: frontend/coverage/coverage-final.json
           disable_search: true
           fail_ci_if_error: true

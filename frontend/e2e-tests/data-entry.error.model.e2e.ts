@@ -14,8 +14,6 @@ import { VotersCounts, VotesCounts } from "@kiesraad/api";
 import { test } from "./fixtures";
 import { getStatesAndEventsFromMachineDefinition, getStatesAndEventsFromTest } from "./xstate-helpers";
 
-// TODO: check icon of VotersVotes page in other model tests?
-
 const dataEntryMachineDefinition = {
   initial: "voterVotesPageEmpty",
   states: {
@@ -46,7 +44,6 @@ const dataEntryMachineDefinition = {
     },
     votersVotesPageFilledValid: {
       on: {
-        // valid states are tested in other file
         SUBMIT: "differencesPageValid",
       },
     },
@@ -60,14 +57,12 @@ const dataEntryMachineDefinition = {
         SUBMIT: "votersVotesPageChangedErrorSubmitted",
         CLICK_ABORT: "abortInputModalChangedErrorSubmitted",
         GO_TO_RECOUNTED_PAGE: "unsavedChangesModalChanged",
-        // nav away -> save -> recounted page with error icon
       },
     },
     VotersVotesPageFilledError: {
       on: {
         SUBMIT: "votersVotesPageErrorSubmitted",
         GO_TO_RECOUNTED_PAGE: "recountedPageFilledError",
-        // TODO: nav to Recounted page just caches the data
       },
     },
     votersVotesPageErrorSubmitted: {

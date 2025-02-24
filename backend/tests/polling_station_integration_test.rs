@@ -9,10 +9,10 @@ use crate::{
     utils::serve_api,
 };
 use abacus::{
+    ErrorResponse,
     polling_station::{
         PollingStation, PollingStationListResponse, PollingStationRequest, PollingStationType,
     },
-    ErrorResponse,
 };
 
 pub mod shared;
@@ -32,10 +32,11 @@ async fn test_polling_station_listing(pool: SqlitePool) {
     );
     let body: PollingStationListResponse = response.json().await.unwrap();
     assert_eq!(body.polling_stations.len(), 2);
-    assert!(body
-        .polling_stations
-        .iter()
-        .any(|ps| ps.name == "Op Rolletjes"))
+    assert!(
+        body.polling_stations
+            .iter()
+            .any(|ps| ps.name == "Op Rolletjes")
+    )
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2"))))]

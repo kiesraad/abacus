@@ -1,15 +1,15 @@
 use axum::{
+    Json,
     extract::{Path, State},
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json,
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use self::repository::PollingStations;
 pub use self::structs::*;
-use crate::{election::repository::Elections, APIError, ErrorResponse};
+use crate::{APIError, ErrorResponse, election::repository::Elections};
 
 pub mod repository;
 pub mod structs;
@@ -171,7 +171,7 @@ pub async fn polling_station_delete(
 
 #[cfg(test)]
 mod tests {
-    use sqlx::{query, SqlitePool};
+    use sqlx::{SqlitePool, query};
     use test_log::test;
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]

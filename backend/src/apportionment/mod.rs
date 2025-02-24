@@ -519,7 +519,7 @@ pub fn get_total_seats_from_apportionment_result(result: ApportionmentResult) ->
 mod tests {
     use crate::{
         apportionment::{
-            get_total_seats_from_apportionment_result, seat_allocation, ApportionmentError,
+            ApportionmentError, get_total_seats_from_apportionment_result, seat_allocation,
         },
         data_entry::{Count, PoliticalGroupVotes, VotersCounts, VotesCounts},
         election::PGNumber,
@@ -575,8 +575,8 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_only_1_surplus_meets_threshold(
-    ) {
+    fn test_seat_allocation_less_than_19_seats_with_remaining_seats_assigned_with_surplus_and_averages_system_only_1_surplus_meets_threshold()
+     {
         let totals = get_election_summary(vec![808, 59, 58, 57, 56, 55, 54, 53]);
         let result = seat_allocation(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 5);
@@ -585,8 +585,8 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system(
-    ) {
+    fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system()
+     {
         let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
         let result = seat_allocation(10, &totals).unwrap();
         assert_eq!(result.steps.len(), 10);
@@ -595,8 +595,8 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system_drawing_of_lots_error_in_2nd_round_averages_system(
-    ) {
+    fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_surplus_and_averages_system_drawing_of_lots_error_in_2nd_round_averages_system()
+     {
         let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
         let result = seat_allocation(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));

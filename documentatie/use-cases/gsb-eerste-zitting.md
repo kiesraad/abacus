@@ -97,6 +97,36 @@ Nog op te stellen o.b.v. Uitbreidingen CSO.
 
 
 
+## De coördinator GSB bewerkt de stembureaus tijdens de zitting
+
+TODO: uitwerken
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario:__
+
+1. SB kan niet open gaan. => ander scenario dan correctie op lijst in applicatie, dus andere feature
+   1. meer dingen op stembureau mogelijk, bijv halverwege gesloten => "Bijzonderheden" use case, niet deze
+   2. niet open gegaan -> coördinator GSB
+   3. toevoegen, verwijderen, aanpassen -> coördinator __GSB__, beheerder
+2. Verkiezingsteam (dus coördinator) wordt op de hoogte gebracht.
+3. Coördinator voert dit in. -> wat is "dit" precies?
+   1. dit: wijziging + reden
+   2. toevoegen, verwijderen, aanpassen
+4. Applicatie verwijdert (of verandert status?) van stembureau.
+5. Applicatie neemt "dit" op in PV bij "Bijzonderheden"
+
+### Open punten
+
+- Hoe belangrijk is dit? Should have.
+- MVP: waarschuwing dat wijziging opgenomen moet worden in PV (alleen als afwijking tov gepubliceerde lijst!)
+- Feature: exporteren van lijst stembureaus
+- Belang gepubliceerde lijst: CSB onderzoek - welke SBs zijn er in welke gemeentes? groter en meer onderzoek
+  - Wet: je moet vantevoren publiceren. Geen ruimte voor andere lijst. (risico: twee bronnen van waarheid)
+- Tijdens eerste zitting GSB of nieuwe zitting GSB.
+  - Terug gaan in fase zoals OSV? Nee. "Weet je het zeker?" Ja.
+- Wat als lijst die beheerder in applicatie heeft gezet niet helemaal klopt met wat online staat? Dus coördinator moet corrigeren.
+
 ## De coördinator voert bezwaren, bijzonderheden, etc. in. (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊

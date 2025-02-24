@@ -22,6 +22,9 @@ __Uitbreidingen:__
 - Inlezen totalenlijst (kandidatenlijst met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
 
 ### Open punten
+- Verder uitwerken hoe GSB en CSB apart aangemaakt worden.
+  - Bijv. bij GSB zet je stembureaus in de applicatie, bij CSB komen die uit de verkiezingsdefinitie.
+
 - Hoe precies krijgt de beheerder de beschikking over de verkiezingsdefinitie (met hash-code) en de kandidatenlijst (met hash-code)?
   - Zowel de verkiezingsdefinitie als de kandidatenlijst worden door het CSB aangemaakt met OSV KS.
 

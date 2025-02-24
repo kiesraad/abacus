@@ -28,6 +28,19 @@ __Uitbreidingen:__
 ### Open punten
 
 - Welke controles willen we nog nadat de invoer is afgesloten? Of zijn die controles onderdeel van het afsluiten?
+- Invoer pauzeren staat hier nog niet in.
+  - In geval van nood (bijv. brandalarm) wil je de invoer kunnen ~~schorsen~~ pauzeren.
+  - Kiesraad als beheerder programmatuur kan adviseren te stoppen met gebruik programmatuur.
+  - Status invoer staat los van status zitting (openen, schorsen, etc)
+
+- Zitting afsluiten is na afsluiten invoer, want ander acties voor genereren concept-PV.
+- 'Fases': installatie, coördinator voorbereidende handelingen, eerste zitting + invoer, ...
+  - moet je terugkunnen in fases? want er ongeluk klikt
+  - invoer vrijgeven kan alleen na start fase eerste zitting
+  - in welke fase voert de coördinator de overige informatie voor het PV in?
+    - moet niet invoerders blokkeren, bijv door heel veel vragen te stellen aan start opening zitting
+    - parallel aan invoerders
+
 
 
 

@@ -25,15 +25,15 @@ die de zetelverdeling vaststelt en daarvoor een proces-verbaal genereert.
 ## Rollen en rechten
 
 | Functionaliteit \ Rol                            | Beheerder | Coördinator GSB | Coördinator CSB | Invoerder GSB | Invoerder CSB |
-|--------------------------------------------------|:---------:|:---------------:|:---------------:|:-------------:|:-------------:|
+| ------------------------------------------------ | :-------: | :-------------: | :-------------: | :-----------: | :-----------: |
 | **Voorbereiding**                                |           |                 |                 |               |               |
 | Applicatie installeren                           |     X     |                 |                 |               |               |
 | Verkiezing configureren                          |     X     |                 |                 |               |               |
 | Invoerstations beheren                           |     X     |                 |                 |               |               |
-| Stembureaus beheren                              |     X     |        X        |                 |               |               |
+| Stembureaus beheren [^1]                         |     X     |        X        |                 |               |               |
 | Gebruikers beheren: alle gebruikers              |     X     |                 |                 |               |               |
-| Gebruikers beheren: invoerders GSB [^1]          |           |        X        |                 |               |               |
-| Gebruikers beheren: invoerders CSB [^1]          |           |                 |        X        |               |               |
+| Gebruikers beheren: invoerders GSB [^2]          |           |        X        |                 |               |               |
+| Gebruikers beheren: invoerders CSB [^2]          |           |                 |        X        |               |               |
 | **Tijdens de zitting GSB**                       |           |                 |                 |               |               |
 | Een nieuwe zitting openen                        |           |        X        |                 |               |               |
 | Invoer starten/schorsen/stoppen                  |           |        X        |                 |               |               |
@@ -53,4 +53,5 @@ die de zetelverdeling vaststelt en daarvoor een proces-verbaal genereert.
 | **Algemeen**                                     |           |                 |                 |               |               |
 | Logs raadplegen                                  |     X     |        X        |        X        |               |               |
 
-[^1]: Zeer gewenst (should have), initieel nog geen gebruikersbeheer voor coördinator. 
+[^1]: Stembureaus binnen de gemeente waar gestemd kan worden. Niet GSB(s) of CSB.
+[^2]: Zeer gewenst (should have), initieel nog geen gebruikersbeheer voor coördinator. 

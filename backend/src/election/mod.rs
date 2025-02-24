@@ -1,9 +1,9 @@
 #[cfg(feature = "dev-database")]
 use axum::http::StatusCode;
 use axum::{
+    Json,
     extract::{Path, State},
     response::{IntoResponse, Response},
-    Json,
 };
 use axum_extra::response::Attachment;
 use serde::{Deserialize, Serialize};
@@ -13,15 +13,15 @@ use zip::{result::ZipError, write::SimpleFileOptions};
 use self::repository::Elections;
 pub use self::structs::*;
 use crate::{
-    data_entry::{repository::PollingStationResultsEntries, PollingStationResults},
-    eml::{axum::Eml, eml_document_hash, EMLDocument, EML510},
+    APIError, ErrorResponse,
+    data_entry::{PollingStationResults, repository::PollingStationResultsEntries},
+    eml::{EML510, EMLDocument, axum::Eml, eml_document_hash},
     pdf_gen::{
         generate_pdf,
         models::{ModelNa31_2Input, PdfModel},
     },
     polling_station::{repository::PollingStations, structs::PollingStation},
     summary::ElectionSummary,
-    APIError, ErrorResponse,
 };
 
 pub(crate) mod repository;

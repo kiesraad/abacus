@@ -59,7 +59,7 @@ pub(crate) mod tests {
 
     use super::*;
     use crate::{
-        election::{tests::election_fixture, Election, ElectionCategory, ElectionStatus},
+        election::{Election, ElectionCategory, ElectionStatus, tests::election_fixture},
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
     };

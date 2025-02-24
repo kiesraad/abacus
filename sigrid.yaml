@@ -50,6 +50,9 @@ components:
       - ".*/frontend/app/main.tsx"
       - ".*/frontend/app/routes.test.tsx"
       - ".*/frontend/app/routes.tsx"
+  - name: "(Frontend) Components/apportionment"
+    include:
+      - ".*/frontend/app/component/apportionment/.*"
   - name: "(Frontend) Components/election"
     include:
       - ".*/frontend/app/component/election/.*"
@@ -85,6 +88,9 @@ components:
   - name: "(Frontend) Modules/account"
     include:
       - ".*/frontend/app/module/account/.*"
+  - name: "(Frontend) Modules/apportionment"
+    include:
+      - ".*/frontend/app/module/apportionment/.*"
   - name: "(Frontend) Modules/data_entry"
     include:
       - ".*/frontend/app/module/data_entry/.*"

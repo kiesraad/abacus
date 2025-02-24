@@ -5,17 +5,17 @@ use axum::{
 use axum_extra::extract::CookieJar;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{query, query_as, Error, FromRow, SqlitePool};
+use sqlx::{Error, FromRow, SqlitePool, query, query_as};
 use utoipa::ToSchema;
 
 use crate::{APIError, AppState};
 
 use super::{
+    SESSION_COOKIE_NAME,
     error::AuthenticationError,
     password::{hash_password, verify_password},
     role::Role,
     session::Sessions,
-    SESSION_COOKIE_NAME,
 };
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute

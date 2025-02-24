@@ -81,7 +81,7 @@ describe("NavBar", () => {
     { pathname: "/logs" },
     { pathname: "/elections/1" },
   ])("top level management links for $pathname", async (location) => {
-    await renderNavBar(location, "coordinator");
+    await renderNavBar(location, "administrator");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
@@ -133,7 +133,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/apportionment/details-residual-seats" },
   ])("menu works for $pathname", async (location) => {
     const user = userEvent.setup();
-    await renderNavBar(location, "coordinator");
+    await renderNavBar(location, "administrator");
 
     const menuButton = screen.getByRole("button", { name: "Menu" });
     expect(menuButton).toBeVisible();

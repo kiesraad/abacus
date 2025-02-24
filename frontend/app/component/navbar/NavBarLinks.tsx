@@ -54,27 +54,31 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
         <ElectionBreadcrumb election={election} />
       </Link>
       {location.pathname.match(/^\/elections\/\d+\/polling-stations\/(create|\d+\/update)$/) && (
-          <>
-            <IconChevronRight />
-            <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_stations")}</Link>
-          </>
-        )}
-        {location.pathname.match(/^\/elections\/\d+\/apportionment\/(details-whole-seats|details-residual-seats)$/) && (
-          <>
-            <IconChevronRight />
-            <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
-          </>
-        )}
+        <>
+          <IconChevronRight />
+          <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_stations")}</Link>
+        </>
+      )}
+      {location.pathname.match(/^\/elections\/\d+\/apportionment\/(details-whole-seats|details-residual-seats)$/) && (
+        <>
+          <IconChevronRight />
+          <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
+        </>
+      )}
     </>
   );
 }
 
-function TopLevelManagementLinks() {
+function TopLevelManagementLinks({ isAdministrator }: { isAdministrator: boolean }) {
   return (
     <>
       <NavLink to={"/elections"}>{t("election.title.plural")}</NavLink>
-      <NavLink to={"/users"}>{t("users.users")}</NavLink>
-      <NavLink to={"/workstations"}>{t("workstations.workstations")}</NavLink>
+      {isAdministrator && (
+        <>
+          <NavLink to={"/users"}>{t("users.users")}</NavLink>
+          <NavLink to={"/workstations"}>{t("workstations.workstations")}</NavLink>
+        </>
+      )}
       <NavLink to={"/logs"}>{t("logs")}</NavLink>
     </>
   );
@@ -91,7 +95,7 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
     location.pathname === "/workstations" ||
     location.pathname === "/logs"
   ) {
-    return <TopLevelManagementLinks />;
+    return <TopLevelManagementLinks isAdministrator={isAdministrator} />;
   }
 
   if (location.pathname.match(/^\/elections\/\d+\/data-entry/)) {

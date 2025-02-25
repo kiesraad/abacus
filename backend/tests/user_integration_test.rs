@@ -168,12 +168,18 @@ async fn test_user_get(pool: SqlitePool) {
     assert_eq!(body["fullname"], "Sanne Molenaar");
 }
 
-#[test(sqlx::test)]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_get_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/user/40404");
+    let admin_cookie = shared::admin_login(&addr).await;
 
-    let response = reqwest::Client::new().get(&url).send().await.unwrap();
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", admin_cookie)
+        .send()
+        .await
+        .unwrap();
 
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }

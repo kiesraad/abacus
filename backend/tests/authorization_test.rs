@@ -1,10 +1,9 @@
 #![cfg(test)]
+#![cfg(feature = "openapi")]
 
 use hyper::{Method, StatusCode};
 use sqlx::SqlitePool;
 use test_log::test;
-
-use abacus::create_openapi;
 
 use crate::utils::serve_api;
 
@@ -20,7 +19,7 @@ fn expected_response_code(path: &str) -> StatusCode {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_route_authorization(pool: SqlitePool) {
-    let openapi = create_openapi();
+    let openapi = abacus::create_openapi();
     let addr = serve_api(pool).await;
 
     // loop through all the paths in the openapi spec

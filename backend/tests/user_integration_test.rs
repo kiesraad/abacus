@@ -167,3 +167,15 @@ async fn test_user_get_not_found(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_user_delete(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let url = format!("http://{addr}/api/user/1");
+
+    let response = reqwest::Client::new().delete(&url).send().await.unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let response = reqwest::Client::new().delete(&url).send().await.unwrap();
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}

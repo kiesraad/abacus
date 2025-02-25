@@ -135,6 +135,10 @@ export interface USER_UPDATE_REQUEST_PARAMS {
 }
 export type USER_UPDATE_REQUEST_PATH = `/api/user/${number}`;
 export type USER_UPDATE_REQUEST_BODY = UpdateUserRequest;
+export interface USER_DELETE_REQUEST_PARAMS {
+  user_id: number;
+}
+export type USER_DELETE_REQUEST_PATH = `/api/user/${number}`;
 
 /** TYPES **/
 

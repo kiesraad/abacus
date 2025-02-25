@@ -326,6 +326,7 @@ pub async fn user_create(
     ),
 )]
 pub async fn user_get(
+    _user: Admin,
     State(users_repo): State<Users>,
     Path(user_id): Path<u32>,
 ) -> Result<Json<User>, APIError> {

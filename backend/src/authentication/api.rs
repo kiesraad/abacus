@@ -28,7 +28,8 @@ pub struct Credentials {
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct LoginResponse {
     pub user_id: u32,
-    #[schema(value_type = String, nullable = true)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
     pub fullname: Option<String>,
     pub username: String,
     pub role: Role,

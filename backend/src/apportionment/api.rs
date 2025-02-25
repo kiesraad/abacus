@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
-    apportionment::{ApportionmentError, ApportionmentResult, apportionment, seat_allocation},
+    apportionment::{ApportionmentError, ApportionmentResult, apportionment},
     authentication::Coordinator,
     data_entry::{
         repository::{PollingStationDataEntries, PollingStationResultsEntries},

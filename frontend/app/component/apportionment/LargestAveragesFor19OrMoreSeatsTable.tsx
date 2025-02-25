@@ -1,4 +1,9 @@
-import { ApportionmentStep, PoliticalGroup, PoliticalGroupSeatAssignment } from "@kiesraad/api";
+import {
+  ApportionmentStep,
+  HighestAverageAssignedSeat,
+  PoliticalGroup,
+  PoliticalGroupSeatAssignment,
+} from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Table } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
@@ -47,13 +52,14 @@ export function LargestAveragesFor19OrMoreSeatsTable({
                   {politicalGroups[pg_seat_assignment.pg_number - 1]?.name || ""}
                 </Table.Cell>
                 {highestAverageSteps.map((step: ApportionmentStep) => {
+                  const change = step.change as HighestAverageAssignedSeat;
                   const average = step.standing[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
                   if (average) {
                     return (
                       <Table.DisplayFractionCells
                         key={`${pg_seat_assignment.pg_number}-${step.residual_seat_number}`}
                         className={
-                          step.change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow bold" : undefined
+                          change.pg_options.includes(pg_seat_assignment.pg_number) ? "bg-yellow bold" : undefined
                         }
                       >
                         {average}
@@ -72,11 +78,14 @@ export function LargestAveragesFor19OrMoreSeatsTable({
             <Table.Cell className={cn(cls.sticky, "text-align-r", "nowrap", "bold")}>
               {t("apportionment.residual_seat_assigned_to_list")}
             </Table.Cell>
-            {highestAverageSteps.map((step: ApportionmentStep) => (
-              <Table.NumberCell key={step.residual_seat_number} colSpan={2}>
-                {step.change.selected_pg_number}
-              </Table.NumberCell>
-            ))}
+            {highestAverageSteps.map((step: ApportionmentStep) => {
+              const change = step.change as HighestAverageAssignedSeat;
+              return (
+                <Table.NumberCell key={step.residual_seat_number} colSpan={2}>
+                  {change.selected_pg_number}
+                </Table.NumberCell>
+              );
+            })}
             <Table.Cell className={cls.sticky} />
           </Table.TotalRow>
         </Table.Body>

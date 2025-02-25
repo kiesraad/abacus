@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
-    apportionment::{ApportionmentError, ApportionmentResult, seat_allocation},
+    apportionment::{ApportionmentError, ApportionmentResult, apportionment, seat_allocation},
     authentication::Coordinator,
     data_entry::{
         repository::{PollingStationDataEntries, PollingStationResultsEntries},
@@ -59,7 +59,7 @@ pub async fn election_apportionment(
             .list_with_polling_stations(polling_stations_repo, election.id)
             .await?;
         let election_summary = ElectionSummary::from_results(&election, &results)?;
-        let apportionment = seat_allocation(election.number_of_seats.into(), &election_summary)?;
+        let apportionment = apportionment(election.number_of_seats.into(), &election_summary)?;
         Ok(Json(ElectionApportionmentResponse {
             apportionment,
             election_summary,

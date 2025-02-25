@@ -1,4 +1,9 @@
-import { ApportionmentStep, PoliticalGroup, PoliticalGroupSeatAssignment } from "@kiesraad/api";
+import {
+  ApportionmentStep,
+  HighestSurplusAssignedSeat,
+  PoliticalGroup,
+  PoliticalGroupSeatAssignment,
+} from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Table } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
@@ -33,8 +38,10 @@ export function LargestSurplusesTable({
       <Table.Body>
         {finalStandingPgsMeetingThreshold.map((pg_seat_assignment) => {
           const residual_seats =
-            highestSurplusSteps.filter((step) => step.change.selected_pg_number == pg_seat_assignment.pg_number)
-              .length || 0;
+            highestSurplusSteps.filter((step) => {
+              const change = step.change as HighestSurplusAssignedSeat;
+              return change.selected_pg_number == pg_seat_assignment.pg_number;
+            }).length || 0;
           return (
             <Table.Row key={pg_seat_assignment.pg_number}>
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>

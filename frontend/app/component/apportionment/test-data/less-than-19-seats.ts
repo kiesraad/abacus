@@ -7,6 +7,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       assigned_by: "HighestSurplus",
       selected_pg_number: 2,
       pg_options: [2],
+      pg_assigned: [2],
       surplus_votes: {
         integer: 60,
         numerator: 0,
@@ -158,6 +159,7 @@ export const highest_surplus_steps: ApportionmentStep[] = [
       assigned_by: "HighestSurplus",
       selected_pg_number: 1,
       pg_options: [1],
+      pg_assigned: [1],
       surplus_votes: {
         integer: 8,
         numerator: 0,
@@ -312,6 +314,7 @@ export const highest_average_steps: ApportionmentStep[] = [
       assigned_by: "HighestAverage",
       selected_pg_number: 1,
       pg_options: [1],
+      pg_assigned: [1],
       votes_per_seat: {
         integer: 67,
         numerator: 4,
@@ -463,6 +466,7 @@ export const highest_average_steps: ApportionmentStep[] = [
       assigned_by: "HighestAverage",
       selected_pg_number: 3,
       pg_options: [3],
+      pg_assigned: [3],
       votes_per_seat: {
         integer: 58,
         numerator: 0,
@@ -614,6 +618,7 @@ export const highest_average_steps: ApportionmentStep[] = [
       assigned_by: "HighestAverage",
       selected_pg_number: 4,
       pg_options: [4],
+      pg_assigned: [4],
       votes_per_seat: {
         integer: 57,
         numerator: 0,

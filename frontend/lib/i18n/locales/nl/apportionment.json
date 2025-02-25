@@ -1,4 +1,5 @@
 {
+  "absolute_majority_change": "Overeenkomstig artikel P 9 van de Kieswet (volstrekte meerderheid) wordt aan lijst {pg_assigned_seat} alsnog één zetel toegewezen en vervalt daartegenover één zetel, die eerder was toegewezen aan lijst {pg_retracted_seat}.",
   "average": "Gemiddelde",
   "details_residual_seats": "Verdeling van de restzetels",
   "details_whole_seats": "Verdeling van de volle zetels",

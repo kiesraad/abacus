@@ -1,4 +1,9 @@
-import { ApportionmentStep, PoliticalGroup, PoliticalGroupSeatAssignment } from "@kiesraad/api";
+import {
+  ApportionmentStep,
+  HighestAverageAssignedSeat,
+  PoliticalGroup,
+  PoliticalGroupSeatAssignment,
+} from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Table } from "@kiesraad/ui";
 import { cn } from "@kiesraad/util";
@@ -30,9 +35,10 @@ export function LargestAveragesForLessThan19SeatsTable({
       <Table.Body>
         {finalStanding.map((pg_seat_assignment) => {
           const average = highestAverageSteps[0]?.standing[pg_seat_assignment.pg_number - 1]?.next_votes_per_seat;
-          const residual_seats = highestAverageSteps.filter(
-            (step) => step.change.selected_pg_number == pg_seat_assignment.pg_number,
-          ).length;
+          const residual_seats = highestAverageSteps.filter((step) => {
+            const change = step.change as HighestAverageAssignedSeat;
+            return change.selected_pg_number == pg_seat_assignment.pg_number;
+          }).length;
           return (
             <Table.Row key={pg_seat_assignment.pg_number}>
               <Table.Cell className={cn(cls.listNumberColumn, "text-align-r", "font-number")}>

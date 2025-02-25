@@ -11,6 +11,27 @@ use super::error::AuthenticationError;
 
 pub(super) struct ValidatedPassword<'a>(&'a str);
 
+const MIN_PASSWORD_LEN: usize = 13;
+
+impl<'pw> ValidatedPassword<'pw> {
+    pub fn new(
+        password: &'pw str,
+        old_password: Option<&HashedPassword>,
+    ) -> Result<Self, AuthenticationError> {
+        // Total length
+        if password.len() < MIN_PASSWORD_LEN {
+            return Err(AuthenticationError::InvalidPassword);
+        }
+
+        match old_password {
+            Some(old_pw) if verify_password(password, old_pw) => {
+                Err(AuthenticationError::InvalidPassword)
+            }
+            Some(_) | None => Ok(Self(password)),
+        }
+    }
+}
+
 #[derive(Deserialize, Default, PartialEq, Eq, Clone, Debug, Hash, Type)]
 #[sqlx(transparent)]
 pub(super) struct HashedPassword(String);
@@ -57,29 +78,6 @@ pub(super) fn verify_password(password: &str, password_hash: &HashedPassword) ->
     argon2
         .verify_password(password.as_bytes(), &parsed_hash)
         .is_ok()
-}
-
-const MIN_PASSWORD_LEN: usize = 13;
-const MIN_NUMERICAL_CHARS: usize = 2;
-
-impl<'pw> TryFrom<&'pw str> for ValidatedPassword<'pw> {
-    type Error = AuthenticationError;
-
-    fn try_from(password: &'pw str) -> Result<Self, Self::Error> {
-        // Total length
-        if password.len() < MIN_PASSWORD_LEN {
-            return Err(Self::Error::InvalidPassword);
-        }
-
-        // Amount of numerical characters
-        let numerical_chars = password.chars().filter(|c| c.is_numeric()).count();
-
-        if numerical_chars < MIN_NUMERICAL_CHARS {
-            return Err(Self::Error::InvalidPassword);
-        }
-
-        Ok(Self(password))
-    }
 }
 
 #[cfg(test)]

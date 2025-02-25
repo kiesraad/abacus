@@ -13,7 +13,7 @@ use crate::{APIError, AppState};
 use super::{
     SESSION_COOKIE_NAME,
     error::AuthenticationError,
-    password::{hash_password, verify_password, HashedPassword},
+    password::{hash_password, verify_password, HashedPassword, ValidatedPassword},
     role::Role,
     session::Sessions,
 };
@@ -207,7 +207,7 @@ impl Users {
         password: &str,
         role: Role,
     ) -> Result<User, AuthenticationError> {
-        let password_hash = hash_password(password.try_into()?)?;
+        let password_hash = hash_password(ValidatedPassword::new(password, None)?)?;
 
         let user = sqlx::query_as!(
             User,
@@ -290,16 +290,25 @@ impl Users {
         user_id: u32,
         new_password: &str,
     ) -> Result<(), AuthenticationError> {
-        let password_hash = hash_password(new_password.try_into()?)?;
+        let mut tx = self.0.begin().await?;
+        let old_password = sqlx::query!("SELECT password_hash FROM users WHERE id = ?", user_id)
+            .fetch_one(tx.as_mut())
+            .await?
+            .password_hash
+            .into();
+
+        let password_hash =
+            hash_password(ValidatedPassword::new(new_password, Some(&old_password))?)?;
 
         sqlx::query!(
             r#"UPDATE users SET password_hash = ?, needs_password_change = FALSE WHERE id = ?"#,
             password_hash,
             user_id
         )
-        .execute(&self.0)
+        .execute(tx.as_mut())
         .await?;
 
+        tx.commit().await?;
         Ok(())
     }
 
@@ -309,7 +318,7 @@ impl Users {
         user_id: u32,
         temp_password: &str,
     ) -> Result<(), AuthenticationError> {
-        let password_hash = hash_password(temp_password)?;
+        let password_hash = hash_password(ValidatedPassword::new(temp_password, None)?)?;
         sqlx::query!(
             r#"UPDATE users SET password_hash = ?, needs_password_change = TRUE WHERE id = ?"#,
             password_hash,

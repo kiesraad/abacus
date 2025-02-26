@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("bottom bar with button and button hint is visible", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=bottom-bar--bottom-bar-form");
+  await page.goto("/?story=bottom-bar--bottom-bar-form");
   await page.waitForSelector("[data-storyloaded]");
 
   const buttonElement = page.getByRole("button", { name: "Click me" });

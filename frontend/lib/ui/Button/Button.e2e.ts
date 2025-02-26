@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("buttons are visible and enabled", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=button--buttons");
+  await page.goto("/?story=button--buttons");
   await page.waitForSelector("[data-storyloaded]");
 
   const buttons = await page
@@ -19,7 +19,7 @@ test("buttons are visible and enabled", async ({ page }) => {
 });
 
 test("click disabled button does nothing", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=button--buttons&arg-disabled=true");
+  await page.goto("/?story=button--buttons&arg-disabled=true");
   await page.waitForSelector("[data-storyloaded]");
 
   const buttons = await page

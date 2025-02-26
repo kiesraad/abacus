@@ -39,7 +39,8 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
 
   const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
 
-  const missingTotalError = currentValues.candidate_votes.some((v) => v !== "") && !currentValues.total;
+  const missingTotalError =
+    formSection.isSaved && currentValues.candidate_votes.some((v) => v !== "") && !currentValues.total;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

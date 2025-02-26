@@ -16,8 +16,13 @@ import {
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PARAMS,
   USER_CREATE_REQUEST_PATH,
+  USER_GET_REQUEST_PARAMS,
+  USER_GET_REQUEST_PATH,
   USER_LIST_REQUEST_PARAMS,
   USER_LIST_REQUEST_PATH,
+  USER_UPDATE_REQUEST_BODY,
+  USER_UPDATE_REQUEST_PARAMS,
+  USER_UPDATE_REQUEST_PATH,
   UserListResponse,
 } from "@kiesraad/api";
 
@@ -132,12 +137,26 @@ export const UserCreateRequestHandler = http.post<
   USER_CREATE_REQUEST_PATH
 >("/api/user", () => HttpResponse.json(userMockData[userMockData.length - 1], { status: 200 }));
 
+export const UserGetRequestHandler = http.get<
+  ParamsToString<USER_GET_REQUEST_PARAMS>,
+  null,
+  User,
+  USER_GET_REQUEST_PATH
+>("/api/user/1", () => HttpResponse.json(userMockData[0], { status: 200 }));
+
 export const UserListRequestHandler = http.get<
   USER_LIST_REQUEST_PARAMS,
   null,
   UserListResponse,
   USER_LIST_REQUEST_PATH
 >("/api/user", () => HttpResponse.json({ users: userMockData }, { status: 200 }));
+
+export const UserUpdateRequestHandler = http.put<
+  ParamsToString<USER_UPDATE_REQUEST_PARAMS>,
+  USER_UPDATE_REQUEST_BODY,
+  User,
+  USER_UPDATE_REQUEST_PATH
+>("/api/user/1", () => HttpResponse.json(userMockData[0], { status: 200 }));
 
 export const handlers: HttpHandler[] = [
   pingHandler,
@@ -154,5 +173,7 @@ export const handlers: HttpHandler[] = [
   PollingStationGetHandler,
   PollingStationUpdateHandler,
   UserCreateRequestHandler,
+  UserGetRequestHandler,
   UserListRequestHandler,
+  UserUpdateRequestHandler,
 ];

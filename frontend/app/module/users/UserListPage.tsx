@@ -9,6 +9,7 @@ import { formatDateTime, useQueryParam } from "@kiesraad/util";
 export function UserListPage() {
   const { requestState } = useUserListRequest();
   const [createdMessage, clearCreatedMessage] = useQueryParam("created");
+  const [updatedMessage, clearUpdatedMessage] = useQueryParam("updated");
 
   if (requestState.status === "loading") {
     return <Loader />;
@@ -42,6 +43,13 @@ export function UserListPage() {
         <Alert type="success" onClose={clearCreatedMessage}>
           <h2>{t("users.user_created")}</h2>
           <p>{createdMessage}</p>
+        </Alert>
+      )}
+
+      {updatedMessage && (
+        <Alert type="success" onClose={clearUpdatedMessage}>
+          <h2>{t("users.user_updated")}</h2>
+          <p>{updatedMessage}</p>
         </Alert>
       )}
 

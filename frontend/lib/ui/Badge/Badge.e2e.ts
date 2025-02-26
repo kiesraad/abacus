@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 test("badges are visible", async ({ page }) => {
-  await page.goto("http://localhost:61000/?story=badge--all-badges");
+  await page.goto("/?story=badge--all-badges");
+  await page.waitForSelector("[data-storyloaded]");
 
   const notStartedBadge = page.getByTestId("first_entry_not_started");
   await expect(notStartedBadge).toBeVisible();

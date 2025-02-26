@@ -11,12 +11,12 @@ const config: PlaywrightTestConfig = defineConfig({
   testMatch: /\.e2e\.ts/,
   use: {
     ...commonConfig.use,
-    baseURL: "http://localhost:61000",
+    baseURL: "http://localhost:61000/ladle/",
   },
   webServer: [
     {
       command: "npm run ladle",
-      port: 61000,
+      url: "http://localhost:61000/ladle/",
     },
   ],
 });

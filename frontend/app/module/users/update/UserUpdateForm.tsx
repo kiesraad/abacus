@@ -84,9 +84,9 @@ export function UserUpdateForm({ user, onSave, onAbort, saving }: UserUpdateForm
                 error={validationErrors?.temp_password}
               />
             ) : (
-              <div className="mb-lg">
-                <div className="bold mb-md">{t("user.password")}</div>
-                <div className="mb-md">{t("users.change_password_hint")}</div>
+              <FormLayout.Field label={t("user.password")}>
+                {t("users.change_password_hint")}
+
                 <Button
                   type="button"
                   variant="secondary"
@@ -98,13 +98,10 @@ export function UserUpdateForm({ user, onSave, onAbort, saving }: UserUpdateForm
                   <IconPencil />
                   {t("users.change_password")}
                 </Button>
-              </div>
+              </FormLayout.Field>
             )}
 
-            <div className="mb-lg">
-              <div className="bold mb-md">{t("role")}</div>
-              {t(user.role)}
-            </div>
+            <FormLayout.Field label={t("role")}>{t(user.role)}</FormLayout.Field>
 
             <FormLayout.Controls>
               <Button type="submit">{t("save_changes")}</Button>

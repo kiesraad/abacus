@@ -33,8 +33,13 @@ function FormRow({ children }: { children: React.ReactNode }) {
   return <div className={cls.formRow}>{children}</div>;
 }
 
-function FormField({ children }: { children: React.ReactNode }) {
-  return <div className={cls.formField}>{children}</div>;
+function FormField({ label, children }: { children: React.ReactNode; label?: string }) {
+  return (
+    <div className={cls.formField}>
+      {label && <label>{label}</label>}
+      {children}
+    </div>
+  );
 }
 
 function FormControls({ children }: { children: React.ReactNode }) {

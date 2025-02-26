@@ -40,7 +40,7 @@ export function UserUpdatePage() {
       <PageTitle title={`${user.username} - Abacus`} />
       <header>
         <section>
-          <h1>{user.username}</h1>
+          <h1>{user.fullname || user.username}</h1>
         </section>
       </header>
 

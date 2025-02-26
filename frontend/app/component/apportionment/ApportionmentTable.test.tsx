@@ -12,7 +12,7 @@ describe("ApportionmentTable", () => {
       <ApportionmentTable
         finalStanding={apportionment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
-        wholeSeats={apportionment.whole_seats}
+        fullSeats={apportionment.full_seats}
         residualSeats={apportionment.residual_seats}
         seats={apportionment.seats}
       />,

@@ -148,17 +148,17 @@ export interface AbsoluteMajorityChange {
 
 /**
  * The result of the apportionment procedure. This contains the number of seats and the quota
-that was used. It then contains the initial standing after whole seats were assigned,
+that was used. It then contains the initial standing after full seats were assigned,
 and each of the changes and intermediate standings. The final standing contains the
 number of seats per political group that was assigned after all seats were assigned.
  */
 export interface ApportionmentResult {
   final_standing: PoliticalGroupSeatAssignment[];
+  full_seats: number;
   quota: Fraction;
   residual_seats: number;
   seats: number;
   steps: ApportionmentStep[];
-  whole_seats: number;
 }
 
 /**
@@ -175,8 +175,8 @@ export interface ApportionmentStep {
  * Records the political group and specific change for a specific residual seat
  */
 export type AssignedSeat =
-  | (HighestAverageAssignedSeat & { assigned_by: "HighestAverage" })
-  | (HighestSurplusAssignedSeat & { assigned_by: "HighestSurplus" })
+  | (LargestAverageAssignedSeat & { assigned_by: "LargestAverage" })
+  | (LargestRemainderAssignedSeat & { assigned_by: "LargestRemainder" })
   | (AbsoluteMajorityChange & { assigned_by: "AbsoluteMajorityChange" });
 
 /**
@@ -407,9 +407,9 @@ export interface GetDataEntryResponse {
 }
 
 /**
- * Contains the details for an assigned seat, assigned through the highest average method.
+ * Contains the details for an assigned seat, assigned through the largest average method.
  */
-export interface HighestAverageAssignedSeat {
+export interface LargestAverageAssignedSeat {
   pg_assigned: number[];
   pg_options: number[];
   selected_pg_number: number;
@@ -417,13 +417,13 @@ export interface HighestAverageAssignedSeat {
 }
 
 /**
- * Contains the details for an assigned seat, assigned through the highest surplus method.
+ * Contains the details for an assigned seat, assigned through the largest remainder method.
  */
-export interface HighestSurplusAssignedSeat {
+export interface LargestRemainderAssignedSeat {
   pg_assigned: number[];
   pg_options: number[];
+  remainder_votes: Fraction;
   selected_pg_number: number;
-  surplus_votes: Fraction;
 }
 
 export interface LoginResponse {
@@ -444,13 +444,13 @@ export interface PoliticalGroup {
  * Contains information about the final assignment of seats for a specific political group.
  */
 export interface PoliticalGroupSeatAssignment {
-  meets_surplus_threshold: boolean;
+  full_seats: number;
+  meets_remainder_threshold: boolean;
   pg_number: number;
+  remainder_votes: Fraction;
   residual_seats: number;
-  surplus_votes: Fraction;
   total_seats: number;
   votes_cast: number;
-  whole_seats: number;
 }
 
 /**
@@ -458,13 +458,13 @@ export interface PoliticalGroupSeatAssignment {
 that is needed to compute the apportionment for that specific political group.
  */
 export interface PoliticalGroupStanding {
-  meets_surplus_threshold: boolean;
+  full_seats: number;
+  meets_remainder_threshold: boolean;
   next_votes_per_seat: Fraction;
   pg_number: number;
+  remainder_votes: Fraction;
   residual_seats: number;
-  surplus_votes: Fraction;
   votes_cast: number;
-  whole_seats: number;
 }
 
 export interface PoliticalGroupVotes {

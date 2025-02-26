@@ -1422,10 +1422,10 @@
       },
       "ApportionmentResult": {
         "type": "object",
-        "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after whole seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
+        "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after full seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
         "required": [
           "seats",
-          "whole_seats",
+          "full_seats",
           "residual_seats",
           "quota",
           "steps",
@@ -1437,6 +1437,11 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroupSeatAssignment"
             }
+          },
+          "full_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           },
           "quota": {
             "$ref": "#/components/schemas/Fraction"
@@ -1456,11 +1461,6 @@
             "items": {
               "$ref": "#/components/schemas/ApportionmentStep"
             }
-          },
-          "whole_seats": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
           }
         }
       },
@@ -1494,7 +1494,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+                "$ref": "#/components/schemas/LargestAverageAssignedSeat"
               },
               {
                 "type": "object",
@@ -1505,7 +1505,7 @@
                   "assigned_by": {
                     "type": "string",
                     "enum": [
-                      "HighestAverage"
+                      "LargestAverage"
                     ]
                   }
                 }
@@ -1515,7 +1515,7 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/HighestSurplusAssignedSeat"
+                "$ref": "#/components/schemas/LargestRemainderAssignedSeat"
               },
               {
                 "type": "object",
@@ -1526,7 +1526,7 @@
                   "assigned_by": {
                     "type": "string",
                     "enum": [
-                      "HighestSurplus"
+                      "LargestRemainder"
                     ]
                   }
                 }
@@ -2143,9 +2143,9 @@
           }
         }
       },
-      "HighestAverageAssignedSeat": {
+      "LargestAverageAssignedSeat": {
         "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the highest average method.",
+        "description": "Contains the details for an assigned seat, assigned through the largest average method.",
         "required": [
           "selected_pg_number",
           "pg_options",
@@ -2183,14 +2183,14 @@
           }
         }
       },
-      "HighestSurplusAssignedSeat": {
+      "LargestRemainderAssignedSeat": {
         "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the highest surplus method.",
+        "description": "Contains the details for an assigned seat, assigned through the largest remainder method.",
         "required": [
           "selected_pg_number",
           "pg_options",
           "pg_assigned",
-          "surplus_votes"
+          "remainder_votes"
         ],
         "properties": {
           "pg_assigned": {
@@ -2200,7 +2200,7 @@
               "format": "int32",
               "minimum": 0
             },
-            "description": "The list of political groups with the same surplus, that have been assigned a seat"
+            "description": "The list of political groups with the same remainder, that have been assigned a seat"
           },
           "pg_options": {
             "type": "array",
@@ -2209,17 +2209,17 @@
               "format": "int32",
               "minimum": 0
             },
-            "description": "The list of political groups with the same surplus, that have not been assigned a seat"
+            "description": "The list of political groups with the same remainder, that have not been assigned a seat"
+          },
+          "remainder_votes": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The number of remainder votes achieved by the selected political group"
           },
           "selected_pg_number": {
             "type": "integer",
             "format": "int32",
             "description": "The political group that was selected for this seat has this political group number",
             "minimum": 0
-          },
-          "surplus_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The number of surplus votes achieved by the selected political group"
           }
         }
       },
@@ -2271,16 +2271,22 @@
         "required": [
           "pg_number",
           "votes_cast",
-          "surplus_votes",
-          "meets_surplus_threshold",
-          "whole_seats",
+          "remainder_votes",
+          "meets_remainder_threshold",
+          "full_seats",
           "residual_seats",
           "total_seats"
         ],
         "properties": {
-          "meets_surplus_threshold": {
+          "full_seats": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of full seats assigned to this group",
+            "minimum": 0
+          },
+          "meets_remainder_threshold": {
             "type": "boolean",
-            "description": "Whether this group met the threshold for surplus seat assignment"
+            "description": "Whether this group met the threshold for largest remainder seat assignment"
           },
           "pg_number": {
             "type": "integer",
@@ -2288,15 +2294,15 @@
             "description": "Political group number for which this assignment applies",
             "minimum": 0
           },
+          "remainder_votes": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The remainder votes that were not used to get full seats assigned to this political group"
+          },
           "residual_seats": {
             "type": "integer",
             "format": "int64",
             "description": "The number of residual seats assigned to this group",
             "minimum": 0
-          },
-          "surplus_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The surplus votes that were not used to get whole seats assigned to this political group"
           },
           "total_seats": {
             "type": "integer",
@@ -2309,12 +2315,6 @@
             "format": "int64",
             "description": "The number of votes cast for this group",
             "minimum": 0
-          },
-          "whole_seats": {
-            "type": "integer",
-            "format": "int64",
-            "description": "The number of whole seats assigned to this group",
-            "minimum": 0
           }
         }
       },
@@ -2324,16 +2324,22 @@
         "required": [
           "pg_number",
           "votes_cast",
-          "surplus_votes",
-          "meets_surplus_threshold",
+          "remainder_votes",
+          "meets_remainder_threshold",
           "next_votes_per_seat",
-          "whole_seats",
+          "full_seats",
           "residual_seats"
         ],
         "properties": {
-          "meets_surplus_threshold": {
+          "full_seats": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of full seats this political group got assigned",
+            "minimum": 0
+          },
+          "meets_remainder_threshold": {
             "type": "boolean",
-            "description": "Whether the surplus votes meet the threshold to be applicable for surplus seat assignment"
+            "description": "Whether the remainder votes meet the threshold to be applicable for largest remainder seat assignment"
           },
           "next_votes_per_seat": {
             "$ref": "#/components/schemas/Fraction",
@@ -2345,26 +2351,20 @@
             "description": "Political group number for which this standing applies",
             "minimum": 0
           },
+          "remainder_votes": {
+            "$ref": "#/components/schemas/Fraction",
+            "description": "The remainder of votes that was not used to get full seats (does not have to be a whole number of votes)"
+          },
           "residual_seats": {
             "type": "integer",
             "format": "int64",
-            "description": "The current number of residual seats this political group got",
+            "description": "The current number of residual seats this political group got assigned",
             "minimum": 0
-          },
-          "surplus_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The surplus of votes that was not used to get whole seats (does not have to be a whole number of votes)"
           },
           "votes_cast": {
             "type": "integer",
             "format": "int64",
             "description": "The number of votes cast for this group",
-            "minimum": 0
-          },
-          "whole_seats": {
-            "type": "integer",
-            "format": "int64",
-            "description": "The number of whole seats this political group got",
             "minimum": 0
           }
         }

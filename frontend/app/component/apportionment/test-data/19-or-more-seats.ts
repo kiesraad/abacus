@@ -2,7 +2,7 @@ import { ApportionmentResult, Election, ElectionSummary } from "@kiesraad/api";
 
 export const apportionment: ApportionmentResult = {
   seats: 23,
-  whole_seats: 19,
+  full_seats: 19,
   residual_seats: 4,
   quota: {
     integer: 52,
@@ -13,7 +13,7 @@ export const apportionment: ApportionmentResult = {
     {
       residual_seat_number: 1,
       change: {
-        assigned_by: "HighestAverage",
+        assigned_by: "LargestAverage",
         selected_pg_number: 5,
         pg_options: [5],
         pg_assigned: [5],
@@ -27,86 +27,86 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 1,
           votes_cast: 600,
-          surplus_votes: {
+          remainder_votes: {
             integer: 26,
             numerator: 2,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 0,
             denominator: 12,
           },
-          whole_seats: 11,
+          full_seats: 11,
           residual_seats: 0,
         },
         {
           pg_number: 2,
           votes_cast: 302,
-          surplus_votes: {
+          remainder_votes: {
             integer: 41,
             numerator: 3,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 2,
             denominator: 6,
           },
-          whole_seats: 5,
+          full_seats: 5,
           residual_seats: 0,
         },
         {
           pg_number: 3,
           votes_cast: 98,
-          surplus_votes: {
+          remainder_votes: {
             integer: 45,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 0,
             denominator: 2,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 0,
         },
         {
           pg_number: 4,
           votes_cast: 99,
-          surplus_votes: {
+          remainder_votes: {
             integer: 46,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 1,
             denominator: 2,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 0,
         },
         {
           pg_number: 5,
           votes_cast: 101,
-          surplus_votes: {
+          remainder_votes: {
             integer: 48,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 1,
             denominator: 2,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 0,
         },
       ],
@@ -114,7 +114,7 @@ export const apportionment: ApportionmentResult = {
     {
       residual_seat_number: 2,
       change: {
-        assigned_by: "HighestAverage",
+        assigned_by: "LargestAverage",
         selected_pg_number: 2,
         pg_options: [2],
         pg_assigned: [2],
@@ -128,86 +128,86 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 1,
           votes_cast: 600,
-          surplus_votes: {
+          remainder_votes: {
             integer: 26,
             numerator: 2,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 0,
             denominator: 12,
           },
-          whole_seats: 11,
+          full_seats: 11,
           residual_seats: 0,
         },
         {
           pg_number: 2,
           votes_cast: 302,
-          surplus_votes: {
+          remainder_votes: {
             integer: 41,
             numerator: 3,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 2,
             denominator: 6,
           },
-          whole_seats: 5,
+          full_seats: 5,
           residual_seats: 0,
         },
         {
           pg_number: 3,
           votes_cast: 98,
-          surplus_votes: {
+          remainder_votes: {
             integer: 45,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 0,
             denominator: 2,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 0,
         },
         {
           pg_number: 4,
           votes_cast: 99,
-          surplus_votes: {
+          remainder_votes: {
             integer: 46,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 1,
             denominator: 2,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 0,
         },
         {
           pg_number: 5,
           votes_cast: 101,
-          surplus_votes: {
+          remainder_votes: {
             integer: 48,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 33,
             numerator: 2,
             denominator: 3,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 1,
         },
       ],
@@ -215,7 +215,7 @@ export const apportionment: ApportionmentResult = {
     {
       residual_seat_number: 3,
       change: {
-        assigned_by: "HighestAverage",
+        assigned_by: "LargestAverage",
         selected_pg_number: 1,
         pg_options: [1],
         pg_assigned: [1],
@@ -229,86 +229,86 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 1,
           votes_cast: 600,
-          surplus_votes: {
+          remainder_votes: {
             integer: 26,
             numerator: 2,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 50,
             numerator: 0,
             denominator: 12,
           },
-          whole_seats: 11,
+          full_seats: 11,
           residual_seats: 0,
         },
         {
           pg_number: 2,
           votes_cast: 302,
-          surplus_votes: {
+          remainder_votes: {
             integer: 41,
             numerator: 3,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 43,
             numerator: 1,
             denominator: 7,
           },
-          whole_seats: 5,
+          full_seats: 5,
           residual_seats: 1,
         },
         {
           pg_number: 3,
           votes_cast: 98,
-          surplus_votes: {
+          remainder_votes: {
             integer: 45,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 0,
             denominator: 2,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 0,
         },
         {
           pg_number: 4,
           votes_cast: 99,
-          surplus_votes: {
+          remainder_votes: {
             integer: 46,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 1,
             denominator: 2,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 0,
         },
         {
           pg_number: 5,
           votes_cast: 101,
-          surplus_votes: {
+          remainder_votes: {
             integer: 48,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 33,
             numerator: 2,
             denominator: 3,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 1,
         },
       ],
@@ -316,7 +316,7 @@ export const apportionment: ApportionmentResult = {
     {
       residual_seat_number: 4,
       change: {
-        assigned_by: "HighestAverage",
+        assigned_by: "LargestAverage",
         selected_pg_number: 4,
         pg_options: [4],
         pg_assigned: [4],
@@ -330,86 +330,86 @@ export const apportionment: ApportionmentResult = {
         {
           pg_number: 1,
           votes_cast: 600,
-          surplus_votes: {
+          remainder_votes: {
             integer: 26,
             numerator: 2,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 46,
             numerator: 2,
             denominator: 13,
           },
-          whole_seats: 11,
+          full_seats: 11,
           residual_seats: 1,
         },
         {
           pg_number: 2,
           votes_cast: 302,
-          surplus_votes: {
+          remainder_votes: {
             integer: 41,
             numerator: 3,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 43,
             numerator: 1,
             denominator: 7,
           },
-          whole_seats: 5,
+          full_seats: 5,
           residual_seats: 1,
         },
         {
           pg_number: 3,
           votes_cast: 98,
-          surplus_votes: {
+          remainder_votes: {
             integer: 45,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 0,
             denominator: 2,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 0,
         },
         {
           pg_number: 4,
           votes_cast: 99,
-          surplus_votes: {
+          remainder_votes: {
             integer: 46,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 49,
             numerator: 1,
             denominator: 2,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 0,
         },
         {
           pg_number: 5,
           votes_cast: 101,
-          surplus_votes: {
+          remainder_votes: {
             integer: 48,
             numerator: 19,
             denominator: 23,
           },
-          meets_surplus_threshold: true,
+          meets_remainder_threshold: true,
           next_votes_per_seat: {
             integer: 33,
             numerator: 2,
             denominator: 3,
           },
-          whole_seats: 1,
+          full_seats: 1,
           residual_seats: 1,
         },
       ],
@@ -419,65 +419,65 @@ export const apportionment: ApportionmentResult = {
     {
       pg_number: 1,
       votes_cast: 600,
-      surplus_votes: {
+      remainder_votes: {
         integer: 26,
         numerator: 2,
         denominator: 23,
       },
-      meets_surplus_threshold: true,
-      whole_seats: 11,
+      meets_remainder_threshold: true,
+      full_seats: 11,
       residual_seats: 1,
       total_seats: 12,
     },
     {
       pg_number: 2,
       votes_cast: 302,
-      surplus_votes: {
+      remainder_votes: {
         integer: 41,
         numerator: 3,
         denominator: 23,
       },
-      meets_surplus_threshold: true,
-      whole_seats: 5,
+      meets_remainder_threshold: true,
+      full_seats: 5,
       residual_seats: 1,
       total_seats: 6,
     },
     {
       pg_number: 3,
       votes_cast: 98,
-      surplus_votes: {
+      remainder_votes: {
         integer: 45,
         numerator: 19,
         denominator: 23,
       },
-      meets_surplus_threshold: true,
-      whole_seats: 1,
+      meets_remainder_threshold: true,
+      full_seats: 1,
       residual_seats: 0,
       total_seats: 1,
     },
     {
       pg_number: 4,
       votes_cast: 99,
-      surplus_votes: {
+      remainder_votes: {
         integer: 46,
         numerator: 19,
         denominator: 23,
       },
-      meets_surplus_threshold: true,
-      whole_seats: 1,
+      meets_remainder_threshold: true,
+      full_seats: 1,
       residual_seats: 1,
       total_seats: 2,
     },
     {
       pg_number: 5,
       votes_cast: 101,
-      surplus_votes: {
+      remainder_votes: {
         integer: 48,
         numerator: 19,
         denominator: 23,
       },
-      meets_surplus_threshold: true,
-      whole_seats: 1,
+      meets_remainder_threshold: true,
+      full_seats: 1,
       residual_seats: 1,
       total_seats: 2,
     },

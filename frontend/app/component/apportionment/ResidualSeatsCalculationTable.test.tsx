@@ -10,7 +10,7 @@ describe("ResidualSeatsCalculationTable", () => {
     render(
       <ResidualSeatsCalculationTable
         seats={apportionment.seats}
-        wholeSeats={apportionment.whole_seats}
+        fullSeats={apportionment.full_seats}
         residualSeats={apportionment.residual_seats}
       />,
     );

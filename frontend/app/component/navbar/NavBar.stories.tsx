@@ -37,7 +37,7 @@ const locations = [
   { pathname: "/elections/1/polling-stations/create", hash: "#administratorcoordinator" },
   { pathname: "/elections/1/polling-stations/1/update", hash: "#administratorcoordinator" },
   { pathname: "/elections/1/apportionment", hash: "#administratorcoordinator" },
-  { pathname: "/elections/1/apportionment/details-whole-seats", hash: "#administratorcoordinator" },
+  { pathname: "/elections/1/apportionment/details-full-seats", hash: "#administratorcoordinator" },
   { pathname: "/elections/1/apportionment/details-residual-seats", hash: "#administratorcoordinator" },
 ];
 

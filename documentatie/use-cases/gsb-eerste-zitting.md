@@ -97,35 +97,36 @@ Nog op te stellen o.b.v. Uitbreidingen CSO.
 
 
 
-## De coördinator GSB bewerkt de stembureaus tijdens de zitting
+## De coördinator GSB bewerkt de stembureaus tijdens de eerste of nieuwe zitting (zee)
 
-TODO: uitwerken
+__Niveau:__ gebruikersdoel, zee, 🌊
+
+__Priotiteit__: Should Have
 
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__
 
-1. SB kan niet open gaan. => ander scenario dan correctie op lijst in applicatie, dus andere feature
-   1. meer dingen op stembureau mogelijk, bijv halverwege gesloten => "Bijzonderheden" use case, niet deze
-   2. niet open gegaan -> coördinator GSB
-   3. toevoegen, verwijderen, aanpassen -> coördinator __GSB__, beheerder
-2. Verkiezingsteam (dus coördinator) wordt op de hoogte gebracht.
-3. Coördinator voert dit in. -> wat is "dit" precies?
-   1. dit: wijziging + reden
-   2. toevoegen, verwijderen, aanpassen
-4. Applicatie verwijdert (of verandert status?) van stembureau.
-5. Applicatie neemt "dit" op in PV bij "Bijzonderheden"
+1. De coördinator GSB verneemt dat een stembureau niet open is gegaan.
+2. De coördinator stelt vast dat het stembureau op de gepubliceerde lijst staat en in de applicatie staat.
+3. De coördinator GSB verwijdert het stembureau.
+4. De applicatie toont een waarschuwing dat deze wijziging opgenomen moet worden in het PV.
+
+__Uitbreidingen__:
+
+1a. De coördinator GSB stelt vast dat de stembureaus in de applicatie niet kloppen met de gepubliceerde lijst:
+&emsp; 1a1. De coördinator GSB corrigeert de stembureaus in de applicatie.
+
+### Niet in scope
+
+- Bij verwijderen stembureau kan de coördinator GSB de reden invoeren, die dan automatisch wordt opgenomen in het PV dat door de applicatie wordt gegenereerd.
+- Het opnemen van andere bijzonderheden i.v.m. stembureaus in het PV, bijv. stembureau dat halverwege de dag werd gesloten. Dit is een andere use case en feature.
 
 ### Open punten
 
-- Hoe belangrijk is dit? Should have.
-- MVP: waarschuwing dat wijziging opgenomen moet worden in PV (alleen als afwijking tov gepubliceerde lijst!)
-- Feature: exporteren van lijst stembureaus
-- Belang gepubliceerde lijst: CSB onderzoek - welke SBs zijn er in welke gemeentes? groter en meer onderzoek
+- Kan de beheerder ook tijdens de eerste zitting de lijst met stembureaus corrigeren?
+- Belang gepubliceerde lijst: CSB onderzoek - welke SBs zijn er in welke gemeentes? groter en meer onderzoek *TODO*
   - Wet: je moet vantevoren publiceren. Geen ruimte voor andere lijst. (risico: twee bronnen van waarheid)
-- Tijdens eerste zitting GSB of nieuwe zitting GSB.
-  - Terug gaan in fase zoals OSV? Nee. "Weet je het zeker?" Ja.
-- Wat als lijst die beheerder in applicatie heeft gezet niet helemaal klopt met wat online staat? Dus coördinator moet corrigeren.
 
 ## De coördinator voert bezwaren, bijzonderheden, etc. in. (zee)
 

@@ -44,7 +44,7 @@ export function ChangePasswordForm() {
 
     // Validate the form
     if (formState.newPassword !== formState.newPasswordRepeat) {
-      setError("user.password_mismatch");
+      setError("account.password_mismatch");
       return;
     }
 
@@ -104,17 +104,17 @@ export function ChangePasswordForm() {
               }}
               margin="mb-lg"
             >
-              <h2>{t("user.password_changed")}</h2>
+              <h2>{t("account.password_changed")}</h2>
             </Alert>
           </FormLayout.Alert>
         )}
         <h2 className="mb-lg">
-          {t("user.username")}: {user.username}
+          {t("account.username")}: {user.username}
         </h2>
         <InputField
           name="password"
-          label={t("user.password")}
-          hint={t("user.current_password_hint")}
+          label={t("account.password")}
+          hint={t("account.current_password_hint")}
           type="password"
           value={formState.password}
           onChange={(e) => {
@@ -123,8 +123,8 @@ export function ChangePasswordForm() {
         />
         <InputField
           name="new_password"
-          label={t("user.password_new")}
-          hint={t("user.password_new")}
+          label={t("account.password_new")}
+          hint={t("account.password_new")}
           type="password"
           value={formState.newPassword}
           onChange={(e) => {
@@ -133,7 +133,7 @@ export function ChangePasswordForm() {
         />
         <InputField
           name="new_password_repeat"
-          label={t("user.password_repeat")}
+          label={t("account.password_repeat")}
           type="password"
           value={formState.newPasswordRepeat}
           onChange={(e) => {

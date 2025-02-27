@@ -55,8 +55,8 @@ export function LoginForm() {
         )}
         <InputField
           name="username"
-          label={t("user.username")}
-          hint={t("user.username_login_hint")}
+          label={t("account.username")}
+          hint={t("account.username_login_hint")}
           readOnly={loading}
           required={true}
           value={username}
@@ -66,8 +66,8 @@ export function LoginForm() {
         />
         <InputField
           name="password"
-          label={t("user.password")}
-          hint={t("user.password_login_hint")}
+          label={t("account.password")}
+          hint={t("account.password_login_hint")}
           type="password"
           readOnly={loading}
           required={true}
@@ -80,7 +80,7 @@ export function LoginForm() {
       <BottomBar type="footer">
         <BottomBar.Row>
           <Button type="submit" size="lg" disabled={loading}>
-            {t("user.login")}
+            {t("account.login")}
           </Button>
         </BottomBar.Row>
       </BottomBar>

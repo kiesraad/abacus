@@ -13,17 +13,17 @@ export function UserHomePage() {
 
   return (
     <>
-      <PageTitle title={`${t("user.account")} - Abacus`} />
+      <PageTitle title={`${t("account.account")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("user.account")}</h1>
+          <h1>{t("account.account")}</h1>
         </section>
       </header>
       <main>
         <article>
           <ul>
             <li>
-              <Link to={`login`}>{t("user.login")}</Link>
+              <Link to={`login`}>{t("account.login")}</Link>
             </li>
           </ul>
         </article>

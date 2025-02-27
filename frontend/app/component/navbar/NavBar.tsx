@@ -21,10 +21,10 @@ export function NavBar({ location }: NavBarProps) {
           <>
             <strong>{user.fullname || user.username}</strong>
             <span className={styles.lower}>({t(user.role)})</span>
-            <Link to={`/account/logout`}>{t("user.logout")}</Link>
+            <Link to={`/account/logout`}>{t("account.logout")}</Link>
           </>
         ) : (
-          <Link to={`/account/login`}>{t("user.login")}</Link>
+          <Link to={`/account/login`}>{t("account.login")}</Link>
         )}
       </div>
     </nav>

@@ -22,5 +22,17 @@ export function useUserUpdate(userId: number) {
     });
   }
 
-  return { error, update, saving };
+  function remove(): Promise<void> {
+    return api.remove().then((result) => {
+      if (!isSuccess(result)) {
+        setError(result);
+        window.scrollTo(0, 0);
+
+        // Do not resolve Promise, error has been handled
+        throw result;
+      }
+    });
+  }
+
+  return { error, update, remove, saving };
 }

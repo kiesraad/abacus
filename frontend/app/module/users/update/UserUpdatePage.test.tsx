@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { UserGetRequestHandler, UserUpdateRequestHandler } from "@kiesraad/api-mocks";
+import { UserDeleteRequestHandler, UserGetRequestHandler, UserUpdateRequestHandler } from "@kiesraad/api-mocks";
 import { render, server } from "@kiesraad/test";
 
 import { UserUpdatePage } from "./UserUpdatePage";
@@ -21,7 +21,7 @@ vi.mock(import("react-router"), async (importOriginal) => ({
 
 describe("UserUpdatePage", () => {
   beforeEach(() => {
-    server.use(UserGetRequestHandler, UserUpdateRequestHandler);
+    server.use(UserGetRequestHandler, UserUpdateRequestHandler, UserDeleteRequestHandler);
   });
 
   test("update user", async () => {
@@ -31,7 +31,21 @@ describe("UserUpdatePage", () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
 
-    const expectedMessage = "De wijzigingen in het account van Sanne zijn opgeslagen";
+    const expectedMessage = "De wijzigingen in het account van Sanne Molenaar zijn opgeslagen";
     expect(navigate).toHaveBeenCalledExactlyOnceWith(`/users?updated=${encodeURIComponent(expectedMessage)}`);
+  });
+
+  test("delete user", async () => {
+    render(<UserUpdatePage></UserUpdatePage>);
+    expect(await screen.findByRole("heading", { name: "Details van het account" })).toBeInTheDocument();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Gebruiker verwijderen" }));
+    expect(await screen.findByRole("dialog")).toBeVisible();
+
+    await user.click(screen.getByRole("button", { name: "Verwijderen" }));
+
+    const expectedMessage = "Het account van Sanne Molenaar is verwijderd";
+    expect(navigate).toHaveBeenCalledExactlyOnceWith(`/users?deleted=${encodeURIComponent(expectedMessage)}`);
   });
 });

@@ -113,7 +113,7 @@ describe("NavBar", () => {
   });
 
   test.each([
-    { pathname: "/elections/1/apportionment/details-whole-seats" },
+    { pathname: "/elections/1/apportionment/details-full-seats" },
     { pathname: "/elections/1/apportionment/details-residual-seats" },
   ])("polling station management links for $pathname", async (location) => {
     await renderNavBar(location, "coordinator");
@@ -129,7 +129,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/polling-stations" },
     { pathname: "/elections/1/polling-stations/create" },
     { pathname: "/elections/1/polling-stations/1/update" },
-    { pathname: "/elections/1/apportionment/details-whole-seats" },
+    { pathname: "/elections/1/apportionment/details-full-seats" },
     { pathname: "/elections/1/apportionment/details-residual-seats" },
   ])("menu works for $pathname", async (location) => {
     const user = userEvent.setup();

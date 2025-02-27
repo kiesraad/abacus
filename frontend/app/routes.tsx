@@ -19,6 +19,7 @@ import {
   UserCreateRolePage,
   UserCreateTypePage,
   UserListPage,
+  UserUpdatePage,
 } from "app/module/users";
 import { WorkstationsHomePage } from "app/module/workstations";
 
@@ -28,10 +29,10 @@ import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
 import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
 import {
+  ApportionmentFullSeatsPage,
   ApportionmentLayout,
   ApportionmentPage,
   ApportionmentResidualSeatsPage,
-  ApportionmentWholeSeatsPage,
 } from "./module/apportionment";
 import {
   CandidatesVotesPage,
@@ -64,7 +65,7 @@ export const routes = createRoutesFromElements(
         <Route path="apportionment" element={<ApportionmentLayout />}>
           <Route index element={<ApportionmentPage />} />
           <Route path="details-residual-seats" element={<ApportionmentResidualSeatsPage />} />
-          <Route path="details-whole-seats" element={<ApportionmentWholeSeatsPage />} />
+          <Route path="details-full-seats" element={<ApportionmentFullSeatsPage />} />
         </Route>
         <Route
           path="report"
@@ -106,6 +107,7 @@ export const routes = createRoutesFromElements(
           <Route path="type" element={<UserCreateTypePage />} />
           <Route path="details" element={<UserCreateDetailsPage />} />
         </Route>
+        <Route path=":userId/update" element={<UserUpdatePage />} />
       </Route>
       <Route path="workstations" element={<WorkstationsHomePage />} />
     </Route>

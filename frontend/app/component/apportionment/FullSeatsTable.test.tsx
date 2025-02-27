@@ -2,13 +2,13 @@ import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@kiesraad/test";
 
+import { FullSeatsTable } from "./FullSeatsTable";
 import { apportionment, election } from "./test-data/19-or-more-seats";
-import { WholeSeatsTable } from "./WholeSeatsTable";
 
-describe("WholeSeatsTable", () => {
-  test("renders a table with the whole seats assignment", async () => {
+describe("FullSeatsTable", () => {
+  test("renders a table with the full seats assignment", async () => {
     render(
-      <WholeSeatsTable
+      <FullSeatsTable
         finalStanding={apportionment.final_standing}
         politicalGroups={election.political_groups!}
         quota={apportionment.quota}

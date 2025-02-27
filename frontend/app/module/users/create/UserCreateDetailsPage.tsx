@@ -5,11 +5,10 @@ import { CreateUserRequest, isSuccess, Role } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, Button, Form, FormLayout, InputField, PageTitle } from "@kiesraad/ui";
 
+import { MIN_PASSWORD_LENGTH, validatePassword } from "../validatePassword";
 import { useUserCreateContext } from "./useUserCreateContext";
 
 type ValidationErrors = Partial<CreateUserRequest>;
-
-const MIN_PASSWORD_LENGTH = 12;
 
 export function UserCreateDetailsPage() {
   const navigate = useNavigate();
@@ -59,10 +58,9 @@ export function UserCreateDetailsPage() {
       errors.fullname = required;
     }
 
-    if (user.temp_password.length === 0) {
-      errors.temp_password = required;
-    } else if (user.temp_password.length < MIN_PASSWORD_LENGTH) {
-      errors.temp_password = t("users.temporary_password_error_min_length", { min_length: MIN_PASSWORD_LENGTH });
+    const passwordError = validatePassword(user.temp_password);
+    if (passwordError) {
+      errors.temp_password = passwordError;
     }
 
     const isValid = Object.keys(errors).length === 0;

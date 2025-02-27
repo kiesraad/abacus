@@ -241,49 +241,6 @@ pub async fn development_create_user(
     Ok(StatusCode::CREATED)
 }
 
-/// Development endpoint: login as a user (unauthenticated)
-#[cfg(debug_assertions)]
-#[utoipa::path(
-  get,
-  path = "/api/user/development/login",
-  responses(
-    (status = 200, description = "The logged in user id and user name", body = LoginResponse),
-    (status = 500, description = "Internal server error", body = ErrorResponse),
-  ),
-)]
-pub async fn development_login(
-    State(users): State<Users>,
-    State(sessions): State<Sessions>,
-    jar: CookieJar,
-) -> Result<impl IntoResponse, APIError> {
-    // Get or create the test user
-
-    use super::role::Role;
-    let user = match users.get_by_username("user").await? {
-        Some(u) => u,
-        None => {
-            users
-                .create(
-                    "user",
-                    Some("Full Name"),
-                    "DevelopmentPassword",
-                    Role::Administrator,
-                )
-                .await?
-        }
-    };
-
-    // Create a new session and cookie
-    let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;
-
-    // Add the session cookie to the response
-    let mut cookie = session.get_cookie();
-    set_default_cookie_properties(&mut cookie);
-    let updated_jar = jar.add(cookie);
-
-    Ok((updated_jar, Json(LoginResponse::from(&user))))
-}
-
 #[derive(Serialize, Deserialize, ToSchema)]
 pub struct UserListResponse {
     pub users: Vec<User>,

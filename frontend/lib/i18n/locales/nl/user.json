@@ -16,6 +16,7 @@
   "password_changed": "Je wachtwoord is succesvol gewijzigd",
   "login": "Inloggen",
   "login_success": "Inloggen gelukt",
+  "logout": "Afmelden",
   "account": "Account",
   "account_setup": "Account instellen",
   "change_password": "Wachtwoord wijzigen",

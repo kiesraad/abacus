@@ -7,6 +7,10 @@ import { UserCreateRolePgObj } from "./page-objects/users/UserCreateRolePgObj";
 import { UserCreateTypePgObj } from "./page-objects/users/UserCreateTypePgObj";
 import { UserListPgObj } from "./page-objects/users/UserListPgObj";
 
+test.use({
+  storageState: "e2e-tests/state/admin.json",
+});
+
 test.describe("Users", () => {
   test("create a user with role administrator", async ({ page }) => {
     const username = createRandomUsername("Beheerder");

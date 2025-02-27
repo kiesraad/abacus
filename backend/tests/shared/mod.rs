@@ -77,6 +77,7 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
 
 async fn post_data_entry(
     addr: &SocketAddr,
+    cookie: HeaderValue,
     polling_station_id: u32,
     entry_number: u32,
     data_entry: DataEntry,
@@ -86,6 +87,7 @@ async fn post_data_entry(
     );
     let response = Client::new()
         .post(&url)
+        .header("cookie", cookie)
         .json(&data_entry)
         .send()
         .await
@@ -100,12 +102,14 @@ async fn post_data_entry(
 
 pub async fn create_and_save_data_entry(
     addr: &SocketAddr,
+    cookie: HeaderValue,
     polling_station_id: u32,
     entry_number: u32,
     client_state: Option<&str>,
 ) {
     post_data_entry(
         addr,
+        cookie,
         polling_station_id,
         entry_number,
         example_data_entry(client_state),
@@ -115,19 +119,30 @@ pub async fn create_and_save_data_entry(
 
 pub async fn create_and_save_non_example_data_entry(
     addr: &SocketAddr,
+    cookie: HeaderValue,
     polling_station_id: u32,
     entry_number: u32,
     data_entry: DataEntry,
 ) {
-    post_data_entry(addr, polling_station_id, entry_number, data_entry).await;
+    post_data_entry(addr, cookie, polling_station_id, entry_number, data_entry).await;
 }
 
-async fn finalise_data_entry(addr: &SocketAddr, polling_station_id: u32, entry_number: u32) {
+async fn finalise_data_entry(
+    addr: &SocketAddr,
+    cookie: HeaderValue,
+    polling_station_id: u32,
+    entry_number: u32,
+) {
     // Finalise the data entry
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise"
     );
-    let response = Client::new().post(&url).send().await.unwrap();
+    let response = Client::new()
+        .post(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
@@ -135,22 +150,30 @@ async fn finalise_data_entry(addr: &SocketAddr, polling_station_id: u32, entry_n
 
 pub async fn create_and_finalise_data_entry(
     addr: &SocketAddr,
+    cookie: HeaderValue,
     polling_station_id: u32,
     entry_number: u32,
 ) {
-    create_and_save_data_entry(addr, polling_station_id, entry_number, None).await;
-    finalise_data_entry(addr, polling_station_id, entry_number).await;
+    create_and_save_data_entry(addr, cookie.clone(), polling_station_id, entry_number, None).await;
+    finalise_data_entry(addr, cookie, polling_station_id, entry_number).await;
 }
 
 pub async fn create_and_finalise_non_example_data_entry(
     addr: &SocketAddr,
+    cookie: HeaderValue,
     polling_station_id: u32,
     entry_number: u32,
     data_entry: DataEntry,
 ) {
-    create_and_save_non_example_data_entry(addr, polling_station_id, entry_number, data_entry)
-        .await;
-    finalise_data_entry(addr, polling_station_id, entry_number).await;
+    create_and_save_non_example_data_entry(
+        addr,
+        cookie.clone(),
+        polling_station_id,
+        entry_number,
+        data_entry,
+    )
+    .await;
+    finalise_data_entry(addr, cookie, polling_station_id, entry_number).await;
 }
 
 async fn check_data_entry_status_is_definitive(
@@ -160,7 +183,13 @@ async fn check_data_entry_status_is_definitive(
 ) {
     // check that data entry status for this polling station is now Definitive
     let url = format!("http://{addr}/api/elections/{election_id}/status");
-    let response = Client::new().get(&url).send().await.unwrap();
+    let cookie = typist_login(addr).await;
+    let response = Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionStatusResponse = response.json().await.unwrap();
     assert_eq!(
@@ -173,27 +202,45 @@ async fn check_data_entry_status_is_definitive(
     );
 }
 
-pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: u32) {
-    create_and_finalise_data_entry(addr, polling_station_id, 1).await;
-    create_and_finalise_data_entry(addr, polling_station_id, 2).await;
+pub async fn create_result(
+    addr: &SocketAddr,
+    cookie: HeaderValue,
+    polling_station_id: u32,
+    election_id: u32,
+) {
+    create_and_finalise_data_entry(addr, cookie.clone(), polling_station_id, 1).await;
+    create_and_finalise_data_entry(addr, cookie, polling_station_id, 2).await;
     check_data_entry_status_is_definitive(addr, polling_station_id, election_id).await;
 }
 
 pub async fn create_result_with_non_example_data_entry(
     addr: &SocketAddr,
+    cookie: HeaderValue,
     polling_station_id: u32,
     election_id: u32,
     data_entry: DataEntry,
 ) {
-    create_and_finalise_non_example_data_entry(addr, polling_station_id, 1, data_entry.clone())
-        .await;
-    create_and_finalise_non_example_data_entry(addr, polling_station_id, 2, data_entry.clone())
-        .await;
+    create_and_finalise_non_example_data_entry(
+        addr,
+        cookie.clone(),
+        polling_station_id,
+        1,
+        data_entry.clone(),
+    )
+    .await;
+    create_and_finalise_non_example_data_entry(
+        addr,
+        cookie,
+        polling_station_id,
+        2,
+        data_entry.clone(),
+    )
+    .await;
     check_data_entry_status_is_definitive(addr, polling_station_id, election_id).await;
 }
 
-/// Calls the login endpoint and returns the session cookie
-pub async fn login(addr: &SocketAddr) -> Option<HeaderValue> {
+/// Calls the login endpoint for an Admin user and returns the session cookie
+pub async fn admin_login(addr: &SocketAddr) -> HeaderValue {
     let url = format!("http://{addr}/api/user/login");
 
     let response = reqwest::Client::new()
@@ -201,7 +248,7 @@ pub async fn login(addr: &SocketAddr) -> Option<HeaderValue> {
         .header(CONTENT_TYPE, "application/json")
         .body(Body::from(
             json!({
-                "username": "user",
+                "username": "admin",
                 "password": "password",
             })
             .to_string(),
@@ -211,5 +258,49 @@ pub async fn login(addr: &SocketAddr) -> Option<HeaderValue> {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    response.headers().get("set-cookie").cloned()
+    response.headers().get("set-cookie").cloned().unwrap()
+}
+
+/// Calls the login endpoint for a Coordinator user and returns the session cookie
+pub async fn coordinator_login(addr: &SocketAddr) -> HeaderValue {
+    let url = format!("http://{addr}/api/user/login");
+
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header(CONTENT_TYPE, "application/json")
+        .body(Body::from(
+            json!({
+                "username": "coordinator",
+                "password": "password",
+            })
+            .to_string(),
+        ))
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    response.headers().get("set-cookie").cloned().unwrap()
+}
+
+/// Calls the login endpoint for a Typist user and returns the session cookie
+pub async fn typist_login(addr: &SocketAddr) -> HeaderValue {
+    let url = format!("http://{addr}/api/user/login");
+
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header(CONTENT_TYPE, "application/json")
+        .body(Body::from(
+            json!({
+                "username": "typist",
+                "password": "password",
+            })
+            .to_string(),
+        ))
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    response.headers().get("set-cookie").cloned().unwrap()
 }

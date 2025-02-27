@@ -28,7 +28,7 @@ describe("ChangePasswordForm", () => {
       200,
       {
         user_id: 1,
-        username: "user",
+        username: "admin",
       },
       undefined,
       async (request) => {
@@ -53,7 +53,7 @@ describe("ChangePasswordForm", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(requestBody).toStrictEqual({ username: "user", password: "password", new_password: "password_new" });
+      expect(requestBody).toStrictEqual({ username: "admin", password: "password", new_password: "password_new" });
     });
   });
 

@@ -13,6 +13,7 @@ import {
   PollingStation,
 } from "@kiesraad/api";
 
+import { loginAs } from "./setup";
 import {
   electionRequest,
   noRecountNoDifferencesRequest,
@@ -35,6 +36,8 @@ type Fixtures = {
 
 export const test = base.extend<Fixtures>({
   emptyElection: async ({ request }, use) => {
+    await loginAs(request, "admin");
+    // overide the current storage state
     // create an election with no polling stations
     const url: ELECTION_CREATE_REQUEST_PATH = `/api/elections`;
     const electionResponse = await request.post(url, { data: electionRequest });
@@ -44,6 +47,7 @@ export const test = base.extend<Fixtures>({
     await use(election);
   },
   election: async ({ request, emptyElection }, use) => {
+    await loginAs(request, "admin");
     // create polling stations in the existing emptyElection
     const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${emptyElection.id}/polling_stations`;
     for (const pollingStationRequest of pollingStationRequests) {
@@ -60,6 +64,7 @@ export const test = base.extend<Fixtures>({
     await use(election);
   },
   pollingStation: async ({ request, election }, use) => {
+    await loginAs(request, "admin");
     // get the first polling station of the existing election
     const url: POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${election.election.id}/polling_stations/${election.polling_stations[0]?.id ?? 0}`;
     const response = await request.get(url);
@@ -69,6 +74,7 @@ export const test = base.extend<Fixtures>({
     await use(pollingStation);
   },
   pollingStationFirstEntryDone: async ({ request, pollingStation }, use) => {
+    await loginAs(request, "typist");
     // first data entry of the existing polling station
     const saveResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1`, {
       data: noRecountNoDifferencesRequest,
@@ -80,6 +86,7 @@ export const test = base.extend<Fixtures>({
     await use(pollingStation);
   },
   completedElection: async ({ request, election }, use) => {
+    await loginAs(request, "typist");
     // finalise both data entries for all polling stations
     for (const pollingStationId of election.polling_stations.map((ps) => ps.id)) {
       for (const entryNumber of [1, 2]) {

@@ -73,7 +73,7 @@ export function UserListPage() {
                 <Table.LinkRow key={user.id} to={`${user.id}/update`}>
                   <Table.Cell>{user.username}</Table.Cell>
                   <Table.Cell>{t(user.role)}</Table.Cell>
-                  <Table.Cell>{user.fullname ?? <span className="text-muted">{t("users.not_used")}</span>}</Table.Cell>
+                  <Table.Cell>{user.fullname || <span className="text-muted">{t("users.not_used")}</span>}</Table.Cell>
                   <Table.Cell>
                     {user.last_activity_at ? formatDateTime(new Date(user.last_activity_at)) : "–"}
                   </Table.Cell>

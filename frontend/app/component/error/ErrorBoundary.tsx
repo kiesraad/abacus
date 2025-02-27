@@ -1,4 +1,4 @@
-import { useRouteError } from "react-router";
+import { Navigate, useRouteError } from "react-router";
 
 import { FatalErrorPage } from "app/module/FatalErrorPage";
 import { NotFoundPage } from "app/module/NotFoundPage";
@@ -7,6 +7,12 @@ import { ApiError, FatalApiError, NetworkError, NotFoundError } from "@kiesraad/
 
 export function ErrorBoundary() {
   const error = useRouteError() as Error;
+
+  // redirect to login page if the user is not authenticated
+  if (error instanceof ApiError && error.code === 401) {
+    // redirect to login page
+    return <Navigate to="/account/login" />;
+  }
 
   // debug print the error to the console
   console.error(error);

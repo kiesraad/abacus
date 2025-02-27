@@ -1,12 +1,19 @@
 import { useState } from "react";
+import { Navigate } from "react-router";
 
 import { AccountSetupForm } from "app/component/form/user/account_setup/AccountSetupForm";
 
+import { useUser } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { Alert, PageTitle } from "@kiesraad/ui";
 
 export function AccountSetupPage() {
   const [showAlert, setShowAlert] = useState(true);
+  const user = useUser();
+
+  if (!user) {
+    return <Navigate to="/account/login" />;
+  }
 
   function hideAlert() {
     setShowAlert(!showAlert);

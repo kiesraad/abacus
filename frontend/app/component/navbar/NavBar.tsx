@@ -9,7 +9,7 @@ import { NavBarLinks } from "./NavBarLinks";
 type NavBarProps = { location: { pathname: string } };
 
 export function NavBar({ location }: NavBarProps) {
-  const { user, logout } = useApiState();
+  const { user } = useApiState();
 
   return (
     <nav aria-label="primary-navigation" className={styles.navBar}>
@@ -21,14 +21,7 @@ export function NavBar({ location }: NavBarProps) {
           <>
             <strong>{user.fullname || user.username}</strong>
             <span className={styles.lower}>({t(user.role)})</span>
-            <Link
-              to={`/account/login`}
-              onClick={() => {
-                void logout();
-              }}
-            >
-              {t("user.logout")}
-            </Link>
+            <Link to={`/account/logout`}>{t("user.logout")}</Link>
           </>
         ) : (
           <Link to={`/account/login`}>{t("user.login")}</Link>

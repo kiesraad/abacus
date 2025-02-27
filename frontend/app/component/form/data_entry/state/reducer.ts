@@ -23,7 +23,6 @@ export function getInitialState(
   return {
     election,
     pollingStationId,
-    // initialData: null,
     error: null,
     pollingStationResults: null,
     entryNumber,
@@ -50,7 +49,6 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
           ...state,
           formState,
           targetFormSectionId,
-          // initialData: action.dataEntry,
           pollingStationResults: action.dataEntry.data,
           error: null,
         };
@@ -60,7 +58,6 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         ...state,
         formState: getInitialFormState(state.election),
         targetFormSectionId: INITIAL_FORM_SECTION_ID,
-        // initialData: action.dataEntry,
         pollingStationResults: action.dataEntry.data,
         error: null,
       };

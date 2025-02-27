@@ -20,7 +20,7 @@ import {
   PollingStationDataEntryGetHandler,
   PollingStationDataEntrySaveHandler,
 } from "@kiesraad/api-mocks";
-import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs } from "@kiesraad/test";
+import { getUrlMethodAndBody, overrideOnce, render, screen, server, userTypeInputs, waitFor } from "@kiesraad/test";
 
 import { DataEntryProvider } from "../state/DataEntryProvider";
 import { getClientState } from "../state/dataEntryUtils";
@@ -610,8 +610,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(screen.getByTestId("blank_votes_count"), "100").toHaveValue("100");
       await user.clear(screen.getByTestId("blank_votes_count"));
 
-      //TODO: check
-      //await waitFor(() => expect(acceptFeedbackCheckbox).not.toBeInTheDocument());
+      await waitFor(() => expect(acceptFeedbackCheckbox).not.toBeInTheDocument());
 
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
         validation_results: {

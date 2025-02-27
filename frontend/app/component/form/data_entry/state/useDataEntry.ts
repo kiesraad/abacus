@@ -37,7 +37,7 @@ export default function useDataEntry(
     onDeleteDataEntry: onDeleteDataEntry(client, requestPath, dispatch),
     onFinaliseDataEntry: onFinaliseDataEntry(client, requestPath, dispatch),
     register: registerForm(dispatch),
-    setCache: setCache(dispatch), // TODO naar FormSection?
+    setCache: setCache(dispatch),
     updateFormSection: updateFormSection(dispatch),
   };
 }

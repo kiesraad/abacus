@@ -1,10 +1,10 @@
 import { FormEvent, useState } from "react";
 
 import {
+  ACCOUNT_UPDATE_REQUEST_BODY,
+  ACCOUNT_UPDATE_REQUEST_PATH,
   AnyApiError,
   ApiError,
-  CHANGE_PASSWORD_REQUEST_BODY,
-  CHANGE_PASSWORD_REQUEST_PATH,
   FatalApiError,
   isError,
   LoginResponse,
@@ -50,8 +50,8 @@ export function ChangePasswordForm() {
 
     // Submit the credentials to the API
     setLoading(true);
-    const requestPath: CHANGE_PASSWORD_REQUEST_PATH = "/api/user/change-password";
-    const requestBody: CHANGE_PASSWORD_REQUEST_BODY = {
+    const requestPath: ACCOUNT_UPDATE_REQUEST_PATH = "/api/user/account";
+    const requestBody: ACCOUNT_UPDATE_REQUEST_BODY = {
       username: user?.username as string,
       password: formState.password,
       new_password: formState.newPassword,

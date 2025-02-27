@@ -24,7 +24,7 @@ describe("ChangePasswordForm", () => {
 
     overrideOnce(
       "post",
-      "/api/user/change-password",
+      "/api/user/account",
       200,
       {
         user_id: 1,
@@ -64,7 +64,7 @@ describe("ChangePasswordForm", () => {
       </ApiProvider>,
     );
 
-    overrideOnce("post", "/api/user/change-password", 401, {
+    overrideOnce("post", "/api/user/account", 401, {
       error: "Invalid username and/or password",
       fatal: false,
       reference: "InvalidPassword",
@@ -98,7 +98,7 @@ describe("ChangePasswordForm", () => {
       </ApiProvider>,
     );
 
-    overrideOnce("post", "/api/user/change-password", 401, {
+    overrideOnce("post", "/api/user/account", 401, {
       error: "Invalid username and/or password",
       fatal: false,
       reference: "InvalidPassword",

@@ -100,7 +100,7 @@ pub async fn login(
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct ChangePasswordRequest {
+pub struct AccountUpdateRequest {
     pub username: String,
     pub password: String,
     pub new_password: String,
@@ -122,21 +122,21 @@ pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
     Ok(Json(LoginResponse::from(&user)))
 }
 
-/// Change password endpoint, updates a user password
+/// Update the user's account with a new password
 #[utoipa::path(
   post,
-  path = "/api/user/change-password",
-  request_body = ChangePasswordRequest,
+  path = "/api/user/account",
+  request_body = AccountUpdateRequest,
   responses(
       (status = 200, description = "The current user name and id", body = LoginResponse),
       (status = 401, description = "Invalid credentials", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
-pub async fn change_password(
+pub async fn account_update(
     user: User,
     State(users): State<Users>,
-    Json(credentials): Json<ChangePasswordRequest>,
+    Json(credentials): Json<AccountUpdateRequest>,
 ) -> Result<impl IntoResponse, APIError> {
     if user.username() != credentials.username {
         return Err(AuthenticationError::UserNotFound.into());

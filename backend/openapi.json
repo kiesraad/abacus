@@ -1303,18 +1303,18 @@
         }
       }
     },
-    "/api/user/change-password": {
+    "/api/user/account": {
       "post": {
         "tags": [
           "authentication"
         ],
-        "summary": "Change password endpoint, updates a user password",
-        "operationId": "change_password",
+        "summary": "Update the user's account with a new password",
+        "operationId": "account_update",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePasswordRequest"
+                "$ref": "#/components/schemas/AccountUpdateRequest"
               }
             }
           },
@@ -1664,6 +1664,25 @@
           }
         }
       },
+      "AccountUpdateRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "password",
+          "new_password"
+        ],
+        "properties": {
+          "new_password": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
       "ApportionmentResult": {
         "type": "object",
         "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after full seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
@@ -1864,25 +1883,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          }
-        }
-      },
-      "ChangePasswordRequest": {
-        "type": "object",
-        "required": [
-          "username",
-          "password",
-          "new_password"
-        ],
-        "properties": {
-          "new_password": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
           }
         }
       },

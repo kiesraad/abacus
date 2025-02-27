@@ -52,7 +52,7 @@ impl From<&User> for LoginResponse {
 #[cfg(test)]
 mod tests {
     use super::role::Role;
-    use api::{ChangePasswordRequest, Credentials, LoginResponse, UserListResponse};
+    use api::{AccountUpdateRequest, Credentials, LoginResponse, UserListResponse};
     use axum::{
         Router,
         body::Body,
@@ -80,7 +80,7 @@ mod tests {
             .route("/api/user/login", post(api::login))
             .route("/api/user/logout", post(api::logout))
             .route("/api/user/whoami", get(api::whoami))
-            .route("/api/user/change-password", post(api::change_password))
+            .route("/api/user/account", post(api::account_update))
             .layer(middleware::from_fn_with_state(pool, extend_session));
 
         #[cfg(debug_assertions)]
@@ -430,17 +430,17 @@ mod tests {
             .unwrap()
             .to_string();
 
-        // Call the change password endpoint
+        // Call the account update endpoint
         let response = app
             .clone()
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/change-password")
+                    .uri("/api/user/account")
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", &cookie)
                     .body(Body::from(
-                        serde_json::to_vec(&ChangePasswordRequest {
+                        serde_json::to_vec(&AccountUpdateRequest {
                             username: "admin".to_string(),
                             password: "password".to_string(),
                             new_password: "new_password".to_string(),
@@ -519,11 +519,11 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/change-password")
+                    .uri("/api/user/account")
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", &cookie)
                     .body(Body::from(
-                        serde_json::to_vec(&ChangePasswordRequest {
+                        serde_json::to_vec(&AccountUpdateRequest {
                             username: "admin".to_string(),
                             password: "wrong_password".to_string(),
                             new_password: "new_password".to_string(),
@@ -543,11 +543,11 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/change-password")
+                    .uri("/api/user/account")
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", &cookie)
                     .body(Body::from(
-                        serde_json::to_vec(&ChangePasswordRequest {
+                        serde_json::to_vec(&AccountUpdateRequest {
                             username: "wrong_user".to_string(),
                             password: "password".to_string(),
                             new_password: "new_password".to_string(),

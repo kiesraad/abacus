@@ -88,7 +88,7 @@ mod tests {
     #[test]
     fn test_hash_password_and_verify() {
         let password = "password";
-        let hash = hash_password(password.try_into().unwrap()).unwrap();
+        let hash = hash_password(ValidatedPassword(password)).unwrap();
 
         assert!(verify_password(password, &hash));
         assert!(!verify_password("wrong_password", &hash));
@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn test_password_hash_format() {
-        let password = "password".try_into().unwrap();
+        let password = ValidatedPassword("password");
         let hash = hash_password(password).unwrap();
 
         dbg!(&hash);

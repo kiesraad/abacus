@@ -428,6 +428,7 @@ mod tests {
 
     use crate::authentication::{
         error::AuthenticationError,
+        password,
         role::Role,
         session::Sessions,
         user::{User, Users},
@@ -438,7 +439,7 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", None, "password", Role::Typist)
+            .create("test_user", None, "TotalyValidP4ssW0rd", Role::Typist)
             .await
             .unwrap();
 
@@ -461,13 +462,16 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "password",
+                "TotalyValidP4ssW0rd",
                 Role::Coordinator,
             )
             .await
             .unwrap();
 
-        let authenticated_user = users.authenticate("test_user", "password").await.unwrap();
+        let authenticated_user = users
+            .authenticate("test_user", "TotalyValidP4ssW0rd")
+            .await
+            .unwrap();
 
         assert_eq!(user, authenticated_user);
 
@@ -482,7 +486,7 @@ mod tests {
         ));
 
         let authenticated_user = users
-            .authenticate("other_user", "password")
+            .authenticate("other_user", "TotalyValidP4ssW0rd")
             .await
             .unwrap_err();
 
@@ -501,7 +505,7 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "password",
+                "TotalyValidP4ssW0rd",
                 Role::Administrator,
             )
             .await
@@ -535,30 +539,30 @@ mod tests {
     async fn test_change_password(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
+        let old_password = "TotalyValidP4ssW0rd";
+        let new_password = "TotalyValidNewP4ssW0rd";
+
         let user = users
             .create(
                 "test_user",
                 Some("Full Name"),
-                "password",
+                old_password,
                 Role::Administrator,
             )
             .await
             .unwrap();
 
         users
-            .update_password(user.id(), "new_password")
+            .update_password(user.id(), new_password)
             .await
             .unwrap();
 
-        let authenticated_user = users
-            .authenticate("test_user", "new_password")
-            .await
-            .unwrap();
+        let authenticated_user = users.authenticate("test_user", new_password).await.unwrap();
 
         assert_eq!(user.id(), authenticated_user.id());
 
         let authenticated_user = users
-            .authenticate("test_user", "password")
+            .authenticate("test_user", old_password)
             .await
             .unwrap_err();
 
@@ -577,7 +581,7 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "password",
+                "TotalyValidP4ssW0rd",
                 Role::Administrator,
             )
             .await
@@ -613,7 +617,7 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "password",
+                "TotalyValidP4ssW0rd",
                 Role::Administrator,
             )
             .await
@@ -632,7 +636,10 @@ mod tests {
             fullname: Some("Full Name".to_string()),
             role: Role::Typist,
             needs_password_change: false,
-            password_hash: "h4sh".to_string(),
+            password_hash: password::hash_password(
+                password::ValidatedPassword::new("TotalyValidP4ssW0rd", None).unwrap(),
+            )
+            .unwrap(),
             last_activity_at: None,
             updated_at: chrono::Utc::now(),
             created_at: chrono::Utc::now(),

@@ -443,7 +443,7 @@ mod tests {
                         serde_json::to_vec(&ChangePasswordRequest {
                             username: "admin".to_string(),
                             password: "password".to_string(),
-                            new_password: "new_password".to_string(),
+                            new_password: "TotalyValidNewP4ssW0rd".to_string(),
                         })
                         .unwrap(),
                     ))
@@ -467,7 +467,7 @@ mod tests {
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
                             username: "admin".to_string(),
-                            password: "new_password".to_string(),
+                            password: "TotalyValidNewP4ssW0rd".to_string(),
                         })
                         .unwrap(),
                     ))
@@ -659,7 +659,7 @@ mod tests {
                         serde_json::to_vec(&CreateUserRequest {
                             username: "test_user".to_string(),
                             fullname: None,
-                            temp_password: "temp pass".to_string(),
+                            temp_password: "TotalyValidP4ssW0rd".to_string(),
                             role: Role::Administrator,
                         })
                         .unwrap(),

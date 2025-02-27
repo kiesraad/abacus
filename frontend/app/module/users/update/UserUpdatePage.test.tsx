@@ -31,7 +31,7 @@ describe("UserUpdatePage", () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
 
-    const expectedMessage = "De wijzigingen in het account van Sanne zijn opgeslagen";
+    const expectedMessage = "De wijzigingen in het account van Sanne Molenaar zijn opgeslagen";
     expect(navigate).toHaveBeenCalledExactlyOnceWith(`/users?updated=${encodeURIComponent(expectedMessage)}`);
   });
 });

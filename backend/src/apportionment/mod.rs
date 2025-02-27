@@ -188,7 +188,7 @@ fn political_groups_with_largest_average<'a>(
     if political_groups.len() as u64 > residual_seats {
         // TODO: #788 if multiple political groups have the same largest average and not enough residual seats are available, use drawing of lots
         debug!(
-            "Drawing of lots is required for political groups: {:?}, only {residual_seats} seats available",
+            "Drawing of lots is required for political groups: {:?}, only {residual_seats} seat(s) available",
             political_group_numbers(&political_groups)
         );
         Err(ApportionmentError::DrawingOfLotsNotImplemented)
@@ -238,7 +238,7 @@ fn political_groups_with_largest_remainder<'a>(
     if political_groups.len() as u64 > residual_seats {
         // TODO: #788 if multiple political groups have the same largest remainder and not enough residual seats are available, use drawing of lots
         debug!(
-            "Drawing of lots is required for political groups: {:?}, only {residual_seats} seats available",
+            "Drawing of lots is required for political groups: {:?}, only {residual_seats} seat(s) available",
             political_group_numbers(&political_groups)
         );
         Err(ApportionmentError::DrawingOfLotsNotImplemented)
@@ -313,8 +313,7 @@ pub fn apportionment(
     seats: u64,
     totals: &ElectionSummary,
 ) -> Result<ApportionmentResult, ApportionmentError> {
-    info!("Seat allocation");
-    debug!("Totals {:#?}", totals);
+    info!("Apportionment");
     info!("Seats: {}", seats);
 
     // Article P 5 Kieswet
@@ -748,8 +747,10 @@ mod tests {
         get_election_summary(total_votes, political_group_votes)
     }
 
+    // Tests apportionment for councils with less than 19 seats
     #[test]
-    fn test_seat_allocation_less_than_19_seats_without_remaining_seats() {
+    fn test_seat_allocation_less_than_19_seats_without_remainder_seats() {
+        // Full seats: [6, 2, 2, 2, 1, 1, 1] - Remainder seats: 0
         let totals =
             get_election_summary_with_default_50_candidates(vec![480, 160, 160, 160, 80, 80, 80]);
         let result = apportionment(15, &totals).unwrap();
@@ -761,11 +762,17 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_residual_seats_assigned_with_remainder_system()
     {
+        // Full seats: [6, 2, 2, 1, 1, 1, 0, 0] - Remainder seats: 2
+        // Remainders: [60, 0/15, 0/15, 0/15, 0/15, 0/15, 60, 40]
+        // 1 - largest remainder: seat assigned to list 1
+        // 2 - largest remainder: seat assigned to list 7
         let totals = get_election_summary_with_default_50_candidates(vec![
             540, 160, 160, 80, 80, 80, 60, 40,
         ]);
         let result = apportionment(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 2);
+        assert_eq!(result.steps[0].change.political_group_number(), 1);
+        assert_eq!(result.steps[1].change.political_group_number(), 7);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
     }
@@ -773,20 +780,94 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_residual_seats_assigned_with_remainder_and_averages_system_only_1_remainder_meets_threshold()
      {
+        // Full seats: [10, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 5
+        // Remainders: [8, 59, 58, 57, 56, 55, 54, 53], only votes of list 1 meet the threshold of 75% of the quota
+        // 1 - largest remainder: seat assigned to list 1
+        // 1st round of largest averages system (assignment to unique political groups):
+        // 2 - largest average: [67 4/12, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 1
+        // 3 - largest average: [62 2/13, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 2,
+        // 4 - largest average: [62 2/13, 29 1/2, 58, 57, 56, 55, 54, 53] seat assigned to list 3
+        // 5 - largest average: [62 2/13, 29 1/2, 29, 57, 56, 55, 54, 53] seat assigned to list 4
         let totals =
             get_election_summary_with_default_50_candidates(vec![808, 59, 58, 57, 56, 55, 54, 53]);
         let result = apportionment(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 5);
+        assert_eq!(result.steps[0].change.political_group_number(), 1);
+        assert_eq!(result.steps[1].change.political_group_number(), 1);
+        assert_eq!(result.steps[2].change.political_group_number(), 2);
+        assert_eq!(result.steps[3].change.political_group_number(), 3);
+        assert_eq!(result.steps[4].change.political_group_number(), 4);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
     }
 
     #[test]
+    fn test_seat_allocation_less_than_19_seats_with_3_lists_that_meet_threshold_0_remainders() {
+        // Full seats: [6, 3, 3, 0, 0, 0, 0] - Remainder seats: 3
+        // Remainders: [0/15, 0/15, 0/15, 55, 50, 45, 45, 45], only votes of lists [1, 2, 3] meet the threshold of 75% of the quota
+        // 1 - largest remainder: seat assigned to list 1
+        // 2 - largest remainder: seat assigned to list 2
+        // 3 - largest remainder: seat assigned to list 3
+        let totals = get_election_summary_with_default_50_candidates(vec![
+            480, 240, 240, 55, 50, 45, 45, 45,
+        ]);
+        let result = apportionment(15, &totals).unwrap();
+        assert_eq!(result.steps.len(), 3);
+        assert_eq!(result.steps[0].change.political_group_number(), 1);
+        assert_eq!(result.steps[1].change.political_group_number(), 2);
+        assert_eq!(result.steps[2].change.political_group_number(), 3);
+        let total_seats = get_total_seats_from_apportionment_result(result);
+        assert_eq!(total_seats, vec![7, 4, 4, 0, 0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn test_seat_allocation_less_than_19_seats_with_0_lists_that_meet_threshold() {
+        // Full seats: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 3
+        // Remainders: [8, 7, 6, 5, 4, 3, 2, 1, 1, 1], no lists meet the threshold of 75% of the quota
+        // 1st round of largest averages system (assignment to unique political groups):
+        // 1 - largest average: [8, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 1
+        // 2 - largest average: [4, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 2
+        // 3 - largest average: [4, 3 1/2, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 3
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![8, 7, 6, 5, 4, 3, 2, 1, 1, 1]);
+        let result = apportionment(3, &totals).unwrap();
+        assert_eq!(result.steps.len(), 3);
+        assert_eq!(result.steps[0].change.political_group_number(), 1);
+        assert_eq!(result.steps[1].change.political_group_number(), 2);
+        assert_eq!(result.steps[2].change.political_group_number(), 3);
+        let total_seats = get_total_seats_from_apportionment_result(result);
+        assert_eq!(total_seats, vec![1, 1, 1, 0, 0, 0, 0, 0, 0, 0]);
+    }
+
+    #[test]
     fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_remainder_and_averages_system()
      {
+        // Full seats: [0, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 10
+        // Remainders: [0/10, 0/10, 0/10, 0/10, 0/10]
+        //  1 - largest remainder: seat assigned to list 1
+        //  2 - largest remainder: seat assigned to list 2
+        //  3 - largest remainder: seat assigned to list 3
+        //  4 - largest remainder: seat assigned to list 4
+        //  5 - largest remainder: seat assigned to list 5
+        // 1st round of largest averages system (assignment to unique political groups):
+        //  6 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 1
+        //  7 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 2,
+        //  8 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 3
+        //  9 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 4
+        // 10 - largest average: [0/2, 0/2, 0/2, 0/2, 0/2] seat assigned to list 5
         let totals = get_election_summary_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
         let result = apportionment(10, &totals).unwrap();
         assert_eq!(result.steps.len(), 10);
+        assert_eq!(result.steps[0].change.political_group_number(), 1);
+        assert_eq!(result.steps[1].change.political_group_number(), 2);
+        assert_eq!(result.steps[2].change.political_group_number(), 3);
+        assert_eq!(result.steps[3].change.political_group_number(), 4);
+        assert_eq!(result.steps[4].change.political_group_number(), 5);
+        assert_eq!(result.steps[5].change.political_group_number(), 1);
+        assert_eq!(result.steps[6].change.political_group_number(), 2);
+        assert_eq!(result.steps[7].change.political_group_number(), 3);
+        assert_eq!(result.steps[8].change.political_group_number(), 4);
+        assert_eq!(result.steps[9].change.political_group_number(), 5);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![2, 2, 2, 2, 2]);
     }
@@ -794,10 +875,24 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_absolute_majority_of_votes_but_not_seats() {
         // This test triggers Kieswet Article P 9 (Actual case from GR2022)
+        // Full seats: [7, 2, 1, 1, 1] - Remainder seats: 3
+        // Remainders: [189 2/15, 296 7/15, 226 11/15, 195 11/15, 112 11/15]
+        // 1 - largest remainder: seat assigned to list 2
+        // 2 - largest remainder: seat assigned to list 3
+        // 3 - largest remainder: seat assigned to list 4
+        // 4 - Residual seat first allocated to list 4 has been re-allocated to list 1 in accordance with Article P 9 Kieswet
         let totals =
             get_election_summary_with_default_50_candidates(vec![2571, 977, 567, 536, 453]);
         let result = apportionment(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 4);
+        assert_eq!(result.steps[0].change.political_group_number(), 2);
+        assert_eq!(result.steps[1].change.political_group_number(), 3);
+        assert_eq!(result.steps[2].change.political_group_number(), 4);
+        assert!(
+            result.steps[3]
+                .change
+                .is_assigned_by_absolute_majority_change()
+        );
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![8, 3, 2, 1, 1]);
     }
@@ -806,6 +901,12 @@ mod tests {
     fn test_seat_allocation_less_than_19_seats_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error()
      {
         // This test triggers Kieswet Article P 9
+        // Full seats: [7, 1, 1, 1, 1, 1] - Remainder seats: 3
+        // Remainders: [170 9/15, 170 12/15, 170 12/15, 170 12/15, 168 12/15, 168 12/15]
+        // 1 - largest remainder: seat assigned to list 2
+        // 2 - largest remainder: seat assigned to list 3
+        // 3 - largest remainder: seat assigned to list 4
+        // 4 - Drawing of lots is required for political groups: [2, 3, 4] to pick a political group which the residual seat gets retracted from
         let totals =
             get_election_summary_with_default_50_candidates(vec![2552, 511, 511, 511, 509, 509]);
         let result = apportionment(15, &totals);
@@ -815,6 +916,22 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_remainder_and_averages_system_drawing_of_lots_error_in_2nd_round_averages_system()
      {
+        // Full seats: [0, 0, 0, 0, 0] - Remainder seats: 15
+        // Remainders: [0/10, 0/10, 0/10, 0/10, 0/10]
+        //  1 - largest remainder: seat assigned to list 1
+        //  2 - largest remainder: seat assigned to list 2
+        //  3 - largest remainder: seat assigned to list 3
+        //  4 - largest remainder: seat assigned to list 4
+        //  5 - largest remainder: seat assigned to list 5
+        // 1st round of largest averages system (assignment to unique political groups):
+        //  6 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1
+        //  7 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 2
+        //  8 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 3
+        //  9 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 4
+        // 10 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 5
+        // 2nd round of largest averages system (assignment to any political group):
+        // 11 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1
+        // 12 - Drawing of lots is required for political groups: [1, 2, 3, 4, 5], only 4 seats available
         let totals = get_election_summary_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
         let result = apportionment(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
@@ -822,6 +939,10 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error_with_0_remainders() {
+        // Full seats: [6, 2, 2, 1, 1, 1, 0, 0] - Remainder seats: 2
+        // Remainders: [60, 0/15, 0/15, 0/15, 0/15, 0/15, 55, 45]
+        // 1 - largest remainder: seat assigned to list 1
+        // 2 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 1 seat available
         let totals = get_election_summary_with_default_50_candidates(vec![
             540, 160, 160, 80, 80, 80, 55, 45,
         ]);
@@ -831,14 +952,19 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error() {
+        // Full seats: [6, 1, 1, 1, 1, 1] - Remainder seats: 4
+        // Remainders: [20, 60, 60, 60, 60, 60]
+        // 1 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 4 seats available
         let totals =
             get_election_summary_with_default_50_candidates(vec![500, 140, 140, 140, 140, 140]);
         let result = apportionment(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
+    // Tests apportionment for councils with 19 or more seats
     #[test]
-    fn test_seat_allocation_19_or_more_seats_without_remaining_seats() {
+    fn test_seat_allocation_19_or_more_seats_without_remainder_seats() {
+        // Full seats: [12, 6, 2, 2, 2, 1] - Remainder seats: 0
         let totals =
             get_election_summary_with_default_50_candidates(vec![576, 288, 96, 96, 96, 48]);
         let result = apportionment(25, &totals).unwrap();
@@ -848,22 +974,71 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
+    fn test_seat_allocation_19_or_more_seats_with_remainder_seats() {
+        // Full seats: [11, 5, 1, 1, 1] - Remainder seats: 4
+        // 1 - largest average: [50, 50 2/6, 49, 49 1/2, 50 1/2] seat assigned to list 5
+        // 2 - largest average: [50, 50 2/6, 49, 49 1/2, 33 2/3] seat assigned to list 2
+        // 3 - largest average: [50, 43 1/7, 49, 49 1/2, 33 2/3] seat assigned to list 1
+        // 4 - largest average: [46 2/13, 43 1/7, 49, 49 1/2, 33 2/3] seat assigned to list 4
         let totals = get_election_summary_with_default_50_candidates(vec![600, 302, 98, 99, 101]);
         let result = apportionment(23, &totals).unwrap();
         assert_eq!(result.steps.len(), 4);
+        assert_eq!(result.steps[0].change.political_group_number(), 5);
+        assert_eq!(result.steps[1].change.political_group_number(), 2);
+        assert_eq!(result.steps[2].change.political_group_number(), 1);
+        assert_eq!(result.steps[3].change.political_group_number(), 4);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
     }
 
     #[test]
+    fn test_seat_allocation_19_or_more_seats_with_multiple_remainder_seats_assigned_to_one_list() {
+        // Full seats: [15, 0, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 7
+        // 1 - largest average: [62 2/13, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 1
+        // 2 - largest average: [57 10/14, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 1
+        // 3 - largest average: [53 13/15, 57, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 2
+        // 4 - largest average: [53 13/15, 28 1/2, 56, 55, 54, 53, 52, 51, 14] seat assigned to list 3
+        // 5 - largest average: [53 13/15, 28 1/2, 28, 55, 54, 53, 52, 51, 14] seat assigned to list 4
+        // 6 - largest average: [53 13/15, 28 1/2, 28, 27 1/2, 54, 53, 52, 51, 14] seat assigned to list 5
+        // 7 - largest average: [53 13/15, 28 1/2, 28, 27 1/2, 27, 53, 52, 51, 14] seat assigned to list 1
+        let totals = get_election_summary_with_default_50_candidates(vec![
+            808, 57, 56, 55, 54, 53, 52, 51, 14,
+        ]);
+        let result = apportionment(19, &totals).unwrap();
+        assert_eq!(result.steps.len(), 7);
+        assert_eq!(result.steps[0].change.political_group_number(), 1);
+        assert_eq!(result.steps[1].change.political_group_number(), 1);
+        assert_eq!(result.steps[2].change.political_group_number(), 2);
+        assert_eq!(result.steps[3].change.political_group_number(), 3);
+        assert_eq!(result.steps[4].change.political_group_number(), 4);
+        assert_eq!(result.steps[5].change.political_group_number(), 5);
+        assert_eq!(result.steps[6].change.political_group_number(), 1);
+        let total_seats = get_total_seats_from_apportionment_result(result);
+        assert_eq!(total_seats, vec![15, 1, 1, 1, 1, 0, 0, 0, 0]);
+    }
+
+    #[test]
     fn test_seat_allocation_19_or_more_seats_with_absolute_majority_of_votes_but_not_seats() {
         // This test triggers Kieswet Article P 9
+        // Full seats: [12, 1, 1, 1, 1, 1, 1, 0] - Remainder seats: 6
+        // 1 - largest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 2
+        // 2 - largest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 3
+        // 3 - largest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 7] seat assigned to list 4
+        // 4 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 7] seat assigned to list 5
+        // 5 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 7] seat assigned to list 6
+        // 6 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 7] seat assigned to list 7
+        // 7 - Residual seat first allocated to list 7 has been re-allocated to list 1 in accordance with Article P 9 Kieswet
         let totals = get_election_summary_with_default_50_candidates(vec![
             7501, 1249, 1249, 1249, 1249, 1249, 1248, 7,
         ]);
         let result = apportionment(24, &totals).unwrap();
         assert_eq!(result.steps.len(), 7);
+        assert_eq!(result.steps[0].change.political_group_number(), 2);
+        assert_eq!(result.steps[1].change.political_group_number(), 3);
+        assert_eq!(result.steps[2].change.political_group_number(), 4);
+        assert_eq!(result.steps[3].change.political_group_number(), 5);
+        assert_eq!(result.steps[4].change.political_group_number(), 6);
+        assert_eq!(result.steps[5].change.political_group_number(), 7);
         let total_seats = get_total_seats_from_apportionment_result(result);
         assert_eq!(total_seats, vec![13, 2, 2, 2, 2, 2, 1, 0]);
     }
@@ -872,6 +1047,14 @@ mod tests {
     fn test_seat_allocation_19_or_more_seats_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error()
      {
         // This test triggers Kieswet Article P 9
+        // Full seats: [12, 1, 1, 1, 1, 1, 1, 0] - Remainder seats: 6
+        // 1 - largest average: [577, 624 1/2, 624 1/2, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 2
+        // 2 - largest average: [577, 416 1/3, 624 1/2, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 3
+        // 3 - largest average: [577, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 624, 8] seat assigned to list 4
+        // 4 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 624, 8] seat assigned to list 5
+        // 5 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 624, 8] seat assigned to list 6
+        // 6 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416, 624, 8] seat assigned to list 7
+        // 7 - Drawing of lots is required for political groups: [6, 7] to pick a political group which the residual seat gets retracted from
         let totals = get_election_summary_with_default_50_candidates(vec![
             7501, 1249, 1249, 1249, 1249, 1248, 1248, 8,
         ]);
@@ -881,6 +1064,8 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_with_0_votes() {
+        // Full seats: [0] - Remainder seats: 19
+        // 1-19 - largest average: [0/1] seat assigned to list 1
         let totals = get_election_summary_with_default_50_candidates(vec![0]);
         let result = apportionment(19, &totals).unwrap();
         assert_eq!(result.steps.len(), 19);
@@ -890,6 +1075,9 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_with_0_votes_with_drawing_of_lots_error() {
+        // Full seats: [0, 0, 0, 0, 0] - Remainder seats: 19
+        // 1-15 - largest average: [0/1, 0/1, 0/1, 0/1, 0/1] seat assigned to list 1
+        // 16 - Drawing of lots is required for political groups: [1, 2, 3, 4, 5], only 4 seats available
         let totals = get_election_summary_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
         let result = apportionment(19, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
@@ -897,6 +1085,9 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_with_drawing_of_lots_error() {
+        // Full seats: [9, 2, 2, 2, 2, 2] - Remainder seats: 4
+        // 1 - largest average: [50, 46 2/3, 46 2/3, 46 2/3, 46 2/3, 46 2/3] seat assigned to list 1
+        // 2 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 3 seats available
         let totals =
             get_election_summary_with_default_50_candidates(vec![500, 140, 140, 140, 140, 140]);
         let result = apportionment(23, &totals);

@@ -318,6 +318,7 @@ pub async fn user_create(
     path = "/api/user/{user_id}",
     responses(
         (status = 200, description = "User found", body = User),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -368,6 +369,7 @@ pub async fn user_update(
     path = "/api/user/{user_id}",
     responses(
         (status = 200, description = "User deleted successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),

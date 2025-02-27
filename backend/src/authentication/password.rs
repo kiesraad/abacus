@@ -20,12 +20,12 @@ impl<'pw> ValidatedPassword<'pw> {
     ) -> Result<Self, AuthenticationError> {
         // Total length
         if password.len() < MIN_PASSWORD_LEN {
-            return Err(AuthenticationError::InvalidPassword);
+            return Err(AuthenticationError::PasswordRejection);
         }
 
         match old_password {
             Some(old_pw) if verify_password(password, old_pw) => {
-                Err(AuthenticationError::InvalidPassword)
+                Err(AuthenticationError::PasswordRejection)
             }
             Some(_) | None => Ok(Self(password)),
         }

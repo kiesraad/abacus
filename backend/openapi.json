@@ -2309,7 +2309,8 @@
           "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
           "UserNotFound",
-          "Unauthorized"
+          "Unauthorized",
+          "PasswordRejection"
         ]
       },
       "ErrorResponse": {

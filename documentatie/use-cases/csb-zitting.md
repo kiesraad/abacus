@@ -92,8 +92,9 @@ __Uitbreidingen:__
 3a. Er zijn minder beschikbare zetels dan kandidaten met gelijke behaalde (voorkeur)stemmen:  
 &emsp;3a1. De zetel wordt bij loting toegekend.
 
-### Open punten
-
-- De Kieswet heeft het pas over het buiten beschouwing laten van overleden kandidaten tijdens de toewijzing van de gekozen kandidaten. Wat als een lijst evenveel zetels krijgt als kandidaten, maar één van die kandidaten is overleden?
+### Buiten scope
 - Er is een voorgestelde wetswijziging dat lijsten de kiesdeler moeten halen om een restzetel te kunnen krijgen. De minister is voornemens de vragen in het verslag wetsvoorstel te beantwoorden na de gemeenteraadsverkiezingen van 2026. Deze wetswijziging gaat dus niet in vóór GR 2026.
 
+### Open punten
+- De Kieswet heeft het pas over het buiten beschouwing laten van overleden kandidaten tijdens de toewijzing van de gekozen kandidaten. Wat als een lijst evenveel zetels krijgt als kandidaten, maar één van die kandidaten is overleden?
+    - lijstuitputting is pas van toepassing bij aanwijzing kandidaten. TODO

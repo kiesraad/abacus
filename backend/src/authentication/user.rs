@@ -261,6 +261,16 @@ impl Users {
         Ok(updated_user)
     }
 
+    /// Delete a user
+    pub async fn delete(&self, user_id: u32) -> Result<bool, AuthenticationError> {
+        let rows_affected = sqlx::query_as!(User, r#" DELETE FROM users WHERE id = ?"#, user_id)
+            .execute(&self.0)
+            .await?
+            .rows_affected();
+
+        Ok(rows_affected > 0)
+    }
+
     /// Update a user's password
     pub async fn update_password(
         &self,

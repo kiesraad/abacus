@@ -386,3 +386,26 @@ pub async fn user_update(
         .await?;
     Ok(Json(user))
 }
+
+/// Delete a user
+#[utoipa::path(
+    delete,
+    path = "/api/user/{user_id}",
+    responses(
+        (status = 200, description = "User deleted successfully"),
+        (status = 404, description = "User not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+)]
+pub async fn user_delete(
+    State(users_repo): State<Users>,
+    Path(user_id): Path<u32>,
+) -> Result<StatusCode, APIError> {
+    let deleted = users_repo.delete(user_id).await?;
+
+    if deleted {
+        Ok(StatusCode::OK)
+    } else {
+        Ok(StatusCode::NOT_FOUND)
+    }
+}

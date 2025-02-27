@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn test_password_hash_format() {
-        let password = ValidatedPassword("password");
+        let password = ValidatedPassword("CoordinatorPassword01");
         let hash = hash_password(password).unwrap();
 
         dbg!(&hash);

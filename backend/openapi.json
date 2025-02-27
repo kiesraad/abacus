@@ -2473,11 +2473,15 @@
         "required": [
           "user_id",
           "username",
-          "role"
+          "role",
+          "needs_password_change"
         ],
         "properties": {
           "fullname": {
             "type": "string"
+          },
+          "needs_password_change": {
+            "type": "boolean"
           },
           "role": {
             "$ref": "#/components/schemas/Role"

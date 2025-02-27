@@ -86,6 +86,10 @@ impl User {
         self.role
     }
 
+    pub fn needs_password_change(&self) -> bool {
+        self.needs_password_change
+    }
+
     #[cfg(test)]
     pub fn test_user(role: Role) -> Self {
         Self {

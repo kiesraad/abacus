@@ -433,6 +433,7 @@ export interface LargestRemainderAssignedSeat {
 
 export interface LoginResponse {
   fullname?: string;
+  needs_password_change: boolean;
   role: Role;
   user_id: number;
   username: string;

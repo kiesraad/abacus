@@ -54,12 +54,16 @@ export const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBo
 });
 
 // get user handler
-export const WhoAmIRequestHandler = http.get("/api/user/whoami", () =>
-  HttpResponse.json(
-    { user_id: 1, fullname: "Example Name", username: "admin", role: "administrator" } satisfies LoginResponse,
-    { status: 200 },
-  ),
-);
+export const WhoAmIRequestHandler = http.get("/api/user/whoami", () => {
+  const loginResponse: LoginResponse = {
+    user_id: 1,
+    fullname: "Example Name",
+    username: "admin",
+    role: "administrator",
+    needs_password_change: false,
+  };
+  return HttpResponse.json(loginResponse, { status: 200 });
+});
 
 // get election list handler
 export const ElectionListRequestHandler = http.get("/api/elections", () =>

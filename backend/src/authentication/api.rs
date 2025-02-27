@@ -33,6 +33,7 @@ pub struct LoginResponse {
     pub fullname: Option<String>,
     pub username: String,
     pub role: Role,
+    pub needs_password_change: bool,
 }
 
 impl From<&User> for LoginResponse {
@@ -42,6 +43,7 @@ impl From<&User> for LoginResponse {
             fullname: user.fullname().map(|u| u.to_string()),
             username: user.username().to_string(),
             role: user.role(),
+            needs_password_change: user.needs_password_change(),
         }
     }
 }

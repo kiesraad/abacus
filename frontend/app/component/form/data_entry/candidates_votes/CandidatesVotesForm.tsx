@@ -1,3 +1,5 @@
+import * as React from "react";
+
 import { ErrorModal } from "app/component/error";
 
 import { ApiError, PoliticalGroup } from "@kiesraad/api";
@@ -35,19 +37,19 @@ export function CandidatesVotesForm({ group }: CandidatesVotesFormProps) {
     setAcceptWarnings,
     defaultProps,
     pollingStationResults,
+    missingTotalError,
   } = useCandidateVotes(group.number);
 
   const showAcceptWarnings = formSection.warnings.length > 0 && formSection.errors.length === 0;
 
-  const missingTotalError =
-    formSection.isSaved && currentValues.candidate_votes.some((v) => v !== "") && !currentValues.total;
+  React.useEffect(() => {
+    if (missingTotalError) {
+      document.getElementById("total")?.focus();
+    }
+  }, [missingTotalError]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (missingTotalError) {
-      document.getElementById("total")?.focus();
-      return;
-    }
     void onSubmit();
   };
 

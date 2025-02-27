@@ -36,6 +36,7 @@ export function useCandidateVotes(political_group_number: number) {
         ) as CandidateVotesValues);
 
   const [currentValues, setCurrentValues] = useState<CandidateVotesFormValues>(valuesToFormValues(defaultValues));
+  const [missingTotalError, setMissingTotalError] = useState(false);
 
   // derived state
   const section = formState.sections[`political_group_votes_${political_group_number}`];
@@ -69,6 +70,11 @@ export function useCandidateVotes(political_group_number: number) {
   // submit and save to form contents
   const onSubmit = async (options?: SubmitCurrentFormOptions): Promise<boolean> => {
     const data: CandidateVotesValues = formValuesToValues(currentValues);
+    const isMissingTotal = currentValues.candidate_votes.some((v) => v !== "") && !currentValues.total;
+    setMissingTotalError(isMissingTotal);
+    if (isMissingTotal) {
+      return false;
+    }
     return await onSubmitForm(
       {
         political_group_votes: pollingStationResults.political_group_votes.map((pg) =>
@@ -97,5 +103,6 @@ export function useCandidateVotes(political_group_number: number) {
     status,
     setAcceptWarnings,
     defaultProps,
+    missingTotalError,
   };
 }

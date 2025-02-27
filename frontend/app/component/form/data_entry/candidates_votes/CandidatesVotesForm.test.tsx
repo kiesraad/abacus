@@ -153,6 +153,24 @@ describe("Test CandidatesVotesForm", () => {
       expect(spy).not.toHaveBeenCalled();
     });
 
+    test("Starting input doesn't render totals warning", async () => {
+      const user = userEvent.setup();
+      overrideServerGetDataEntryResponse({
+        formState: defaultDataEntryState.formState,
+        pollingStationResults: {
+          recounted: false,
+        },
+      });
+
+      renderForm({});
+
+      const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
+
+      const candidate1 = await screen.findByRole("textbox", { name: `1 ${candidateNames[0]}` });
+      await user.type(candidate1, "12345");
+      expect(screen.queryByTestId("missing-total-error")).not.toBeInTheDocument();
+    });
+
     test("hitting shift+enter does result in api call", async () => {
       const user = userEvent.setup();
       overrideServerGetDataEntryResponse({

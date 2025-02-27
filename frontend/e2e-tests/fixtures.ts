@@ -11,8 +11,12 @@ import {
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
   POLLING_STATION_GET_REQUEST_PATH,
   PollingStation,
+  User,
+  USER_CREATE_REQUEST_BODY,
+  USER_CREATE_REQUEST_PATH,
 } from "@kiesraad/api";
 
+import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import {
   electionRequest,
   noRecountNoDifferencesRequest,
@@ -31,6 +35,8 @@ type Fixtures = {
   pollingStationFirstEntryDone: PollingStation;
   // Election with polling stations and two completed data entries for each
   completedElection: Election;
+  // Newly created User
+  user: User;
 };
 
 export const test = base.extend<Fixtures>({
@@ -95,5 +101,19 @@ export const test = base.extend<Fixtures>({
     }
 
     await use(election.election);
+  },
+  user: async ({ request }, use) => {
+    // create a new user
+    const url: USER_CREATE_REQUEST_PATH = "/api/user";
+    const data: USER_CREATE_REQUEST_BODY = {
+      role: "typist",
+      username: createRandomUsername(),
+      fullname: "Gebruiker met Achternaam",
+      temp_password: "temp_password_9876",
+    };
+    const userResponse = await request.post(url, { data });
+    expect(userResponse.ok()).toBeTruthy();
+
+    await use((await userResponse.json()) as User);
   },
 });

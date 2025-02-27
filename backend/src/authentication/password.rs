@@ -107,4 +107,27 @@ mod tests {
 
         assert!(hash.starts_with("$argon2id$v=19$m="));
     }
+
+    #[test]
+    fn test_password_too_short_error() {
+        assert!(ValidatedPassword::new("too_short", None).is_err());
+    }
+
+    #[test]
+    fn test_password_same_error() {
+        let unhashed = "TotalyValidP4ssW0rd";
+        let hashed = hash_password(ValidatedPassword(unhashed)).unwrap();
+        assert!(ValidatedPassword::new(unhashed, Some(&hashed)).is_err());
+    }
+
+    #[test]
+    fn test_password_valid() {
+        assert!(ValidatedPassword::new("TotalyValidP4ssW0rd", None).is_ok());
+    }
+
+    #[test]
+    fn test_password_not_same_valid() {
+        let old_password = hash_password(ValidatedPassword("TotalyValidP4ssW0rd")).unwrap();
+        assert!(ValidatedPassword::new("TotalyValidNewP4ssW0rd", Some(&old_password)).is_ok());
+    }
 }

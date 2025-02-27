@@ -94,7 +94,10 @@ impl User {
             fullname: Some("Full Name".to_string()),
             role,
             needs_password_change: false,
-            password_hash: "h4sh".to_string(),
+            password_hash: hash_password(
+                ValidatedPassword::new("TotalyValidP4ssW0rd", None).unwrap(),
+            )
+            .unwrap(),
             last_activity_at: None,
             updated_at: chrono::Utc::now(),
             created_at: chrono::Utc::now(),

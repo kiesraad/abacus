@@ -137,16 +137,12 @@ async fn finalise_data_entry(
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise"
     );
-<<<<<<< HEAD
     let response = Client::new()
         .post(&url)
         .header("cookie", cookie)
         .send()
         .await
         .unwrap();
-=======
-    let response = Client::new().post(&url).send().await.unwrap();
->>>>>>> f7af98d9 (Rust 2024 import shenanigans?)
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);

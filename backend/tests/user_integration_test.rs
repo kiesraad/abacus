@@ -1,12 +1,7 @@
 #![cfg(test)]
 
 use abacus::authentication::UserListResponse;
-<<<<<<< HEAD
 use hyper::StatusCode;
-=======
-use hyper::{StatusCode, header::CONTENT_TYPE};
-use reqwest::Body;
->>>>>>> f7af98d9 (Rust 2024 import shenanigans?)
 use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;

@@ -151,7 +151,7 @@ pub async fn change_password(
 
     // Update the password
     users
-        .update_password(user.id(), &credentials.new_password)
+        .update_password(user.id(), &credentials.username, &credentials.new_password)
         .await?;
 
     Ok(Json(LoginResponse::from(&user)))

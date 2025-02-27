@@ -95,7 +95,7 @@ impl User {
             role,
             needs_password_change: false,
             password_hash: hash_password(
-                ValidatedPassword::new("TotalyValidP4ssW0rd", None).unwrap(),
+                ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None).unwrap(),
             )
             .unwrap(),
             last_activity_at: None,
@@ -210,7 +210,7 @@ impl Users {
         password: &str,
         role: Role,
     ) -> Result<User, AuthenticationError> {
-        let password_hash = hash_password(ValidatedPassword::new(password, None)?)?;
+        let password_hash = hash_password(ValidatedPassword::new(username, password, None)?)?;
 
         let user = sqlx::query_as!(
             User,
@@ -291,6 +291,7 @@ impl Users {
     pub async fn update_password(
         &self,
         user_id: u32,
+        username: &str,
         new_password: &str,
     ) -> Result<(), AuthenticationError> {
         let mut tx = self.0.begin().await?;
@@ -300,8 +301,11 @@ impl Users {
             .password_hash
             .into();
 
-        let password_hash =
-            hash_password(ValidatedPassword::new(new_password, Some(&old_password))?)?;
+        let password_hash = hash_password(ValidatedPassword::new(
+            username,
+            new_password,
+            Some(&old_password),
+        )?)?;
 
         sqlx::query!(
             r#"UPDATE users SET password_hash = ?, needs_password_change = FALSE WHERE id = ?"#,
@@ -321,7 +325,8 @@ impl Users {
         user_id: u32,
         temp_password: &str,
     ) -> Result<(), AuthenticationError> {
-        let password_hash = hash_password(ValidatedPassword::new(temp_password, None)?)?;
+        let username = self.username_by_id(user_id).await?;
+        let password_hash = hash_password(ValidatedPassword::new(&username, temp_password, None)?)?;
         sqlx::query!(
             r#"UPDATE users SET password_hash = ?, needs_password_change = TRUE WHERE id = ?"#,
             password_hash,
@@ -406,6 +411,15 @@ impl Users {
         Ok(users)
     }
 
+    pub async fn username_by_id(&self, user_id: u32) -> Result<String, Error> {
+        Ok(
+            sqlx::query!("SELECT username FROM users WHERE id = ?", user_id)
+                .fetch_one(&self.0)
+                .await?
+                .username,
+        )
+    }
+
     pub async fn update_last_activity_at(&self, user_id: u32) -> Result<(), Error> {
         query!(
             r#"UPDATE users SET last_activity_at = CURRENT_TIMESTAMP WHERE id = ?"#,
@@ -442,7 +456,7 @@ mod tests {
         let users = Users::new(pool.clone());
 
         let user = users
-            .create("test_user", None, "TotalyValidP4ssW0rd", Role::Typist)
+            .create("test_user", None, "TotallyValidP4ssW0rd", Role::Typist)
             .await
             .unwrap();
 
@@ -465,14 +479,14 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "TotalyValidP4ssW0rd",
+                "TotallyValidP4ssW0rd",
                 Role::Coordinator,
             )
             .await
             .unwrap();
 
         let authenticated_user = users
-            .authenticate("test_user", "TotalyValidP4ssW0rd")
+            .authenticate("test_user", "TotallyValidP4ssW0rd")
             .await
             .unwrap();
 
@@ -489,7 +503,7 @@ mod tests {
         ));
 
         let authenticated_user = users
-            .authenticate("other_user", "TotalyValidP4ssW0rd")
+            .authenticate("other_user", "TotallyValidP4ssW0rd")
             .await
             .unwrap_err();
 
@@ -508,7 +522,7 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "TotalyValidP4ssW0rd",
+                "TotallyValidP4ssW0rd",
                 Role::Administrator,
             )
             .await
@@ -542,8 +556,8 @@ mod tests {
     async fn test_change_password(pool: SqlitePool) {
         let users = Users::new(pool.clone());
 
-        let old_password = "TotalyValidP4ssW0rd";
-        let new_password = "TotalyValidNewP4ssW0rd";
+        let old_password = "TotallyValidP4ssW0rd";
+        let new_password = "TotallyValidNewP4ssW0rd";
 
         let user = users
             .create(
@@ -556,7 +570,7 @@ mod tests {
             .unwrap();
 
         users
-            .update_password(user.id(), new_password)
+            .update_password(user.id(), "test_user", new_password)
             .await
             .unwrap();
 
@@ -584,7 +598,7 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "TotalyValidP4ssW0rd",
+                "TotallyValidP4ssW0rd",
                 Role::Administrator,
             )
             .await
@@ -594,7 +608,7 @@ mod tests {
         assert!(user.needs_password_change);
 
         users
-            .update_password(user.id(), "temp_password")
+            .update_password(user.id(), "test_user", "temp_password")
             .await
             .unwrap();
 
@@ -620,7 +634,7 @@ mod tests {
             .create(
                 "test_user",
                 Some("Full Name"),
-                "TotalyValidP4ssW0rd",
+                "TotallyValidP4ssW0rd",
                 Role::Administrator,
             )
             .await
@@ -640,7 +654,8 @@ mod tests {
             role: Role::Typist,
             needs_password_change: false,
             password_hash: password::hash_password(
-                password::ValidatedPassword::new("TotalyValidP4ssW0rd", None).unwrap(),
+                password::ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None)
+                    .unwrap(),
             )
             .unwrap(),
             last_activity_at: None,

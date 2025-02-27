@@ -15,11 +15,17 @@ const MIN_PASSWORD_LEN: usize = 13;
 
 impl<'pw> ValidatedPassword<'pw> {
     pub fn new(
+        username: &str,
         password: &'pw str,
         old_password: Option<&HashedPassword>,
     ) -> Result<Self, AuthenticationError> {
         // Total length
         if password.len() < MIN_PASSWORD_LEN {
+            return Err(AuthenticationError::PasswordRejection);
+        }
+
+        // Password cannot be the same as the username
+        if username == password {
             return Err(AuthenticationError::PasswordRejection);
         }
 
@@ -110,24 +116,40 @@ mod tests {
 
     #[test]
     fn test_password_too_short_error() {
-        assert!(ValidatedPassword::new("too_short", None).is_err());
+        assert!(ValidatedPassword::new("test_user", "too_short", None).is_err());
     }
 
     #[test]
     fn test_password_same_error() {
-        let unhashed = "TotalyValidP4ssW0rd";
+        let unhashed = "TotallyValidP4ssW0rd";
         let hashed = hash_password(ValidatedPassword(unhashed)).unwrap();
-        assert!(ValidatedPassword::new(unhashed, Some(&hashed)).is_err());
+        assert!(ValidatedPassword::new("test_user", unhashed, Some(&hashed)).is_err());
     }
 
     #[test]
     fn test_password_valid() {
-        assert!(ValidatedPassword::new("TotalyValidP4ssW0rd", None).is_ok());
+        assert!(ValidatedPassword::new("test_user", "TotallyValidP4ssW0rd", None).is_ok());
     }
 
     #[test]
     fn test_password_not_same_valid() {
-        let old_password = hash_password(ValidatedPassword("TotalyValidP4ssW0rd")).unwrap();
-        assert!(ValidatedPassword::new("TotalyValidNewP4ssW0rd", Some(&old_password)).is_ok());
+        let old_password = hash_password(ValidatedPassword("TotallyValidP4ssW0rd")).unwrap();
+        assert!(
+            ValidatedPassword::new("test_user", "TotallyValidNewP4ssW0rd", Some(&old_password))
+                .is_ok()
+        );
+    }
+
+    #[test]
+    fn test_password_same_as_username_error() {
+        let old_password = hash_password(ValidatedPassword("TotallyValidP4ssW0rd")).unwrap();
+        assert!(
+            ValidatedPassword::new(
+                "UsernameButAlsoValidPassword01",
+                "UsernameButAlsoValidPassword01",
+                Some(&old_password)
+            )
+            .is_err()
+        );
     }
 }

@@ -13,7 +13,7 @@ use crate::{APIError, AppState};
 use super::{
     SESSION_COOKIE_NAME,
     error::AuthenticationError,
-    password::{hash_password, verify_password, HashedPassword, ValidatedPassword},
+    password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     role::Role,
     session::Sessions,
 };

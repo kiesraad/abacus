@@ -10,6 +10,7 @@ pub enum AuthenticationError {
     HashPassword(password_hash::Error),
     BackwardTimeTravel,
     Unauthorized,
+    PasswordRejection,
 }
 
 impl From<password_hash::Error> for AuthenticationError {

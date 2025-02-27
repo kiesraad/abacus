@@ -50,6 +50,7 @@ pub enum ErrorReference {
     PollingStationValidationErrors,
     UserNotFound,
     Unauthorized,
+    PasswordRejection,
 }
 
 /// Response structure for errors
@@ -217,6 +218,10 @@ impl IntoResponse for APIError {
                     AuthenticationError::Unauthorized => (
                         StatusCode::UNAUTHORIZED,
                         to_error("Unauthorized", ErrorReference::Unauthorized, false),
+                    ),
+                    AuthenticationError::PasswordRejection => (
+                        StatusCode::BAD_REQUEST,
+                        to_error("Invalid password", ErrorReference::PasswordRejection, false),
                     ),
                     // server errors
                     AuthenticationError::Database(_)

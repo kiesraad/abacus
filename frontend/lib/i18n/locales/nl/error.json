@@ -39,6 +39,7 @@
     "PollingStationSecondEntryAlreadyFinalised": "De tweede invoer voor dit stembureau is al definitief",
     "PollingStationValidationErrors": "Er zijn fouten opgetreden bij het valideren van het stembureau",
     "Unauthorized": "Je hebt geen toestemming om deze actie uit te voeren",
-    "UserNotFound": "De gebruiker is niet gevonden"
+    "UserNotFound": "De gebruiker is niet gevonden",
+    "PasswordRejection": "Het opgegeven wachtwoord voldoet niet aan de eisen"
   }
 }

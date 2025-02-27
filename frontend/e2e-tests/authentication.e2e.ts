@@ -5,7 +5,7 @@ test.describe("authentication", () => {
     await page.goto("/account/login");
 
     await page.getByLabel("Gebruikersnaam").fill("admin");
-    await page.getByLabel("Wachtwoord").fill("password");
+    await page.getByLabel("Wachtwoord").fill("AdminPassword01");
     await page.getByRole("button", { name: "Inloggen" }).click();
 
     await page.waitForURL("/account/setup");

@@ -43,17 +43,21 @@ describe("ChangePasswordForm", () => {
     });
 
     const password = screen.getByLabelText("Wachtwoord");
-    await user.type(password, "password");
+    await user.type(password, "AdminPassword01");
     const newPassword = screen.getByLabelText("Kies nieuw wachtwoord");
-    await user.type(newPassword, "password_new");
+    await user.type(newPassword, "AdminNewPassword01");
     const repeatPassword = screen.getByLabelText("Herhaal het wachtwoord dat je net hebt ingevuld");
-    await user.type(repeatPassword, "password_new");
+    await user.type(repeatPassword, "AdminNewPassword01");
 
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(requestBody).toStrictEqual({ username: "admin", password: "password", new_password: "password_new" });
+      expect(requestBody).toStrictEqual({
+        username: "admin",
+        password: "AdminPassword01",
+        new_password: "AdminNewPassword01",
+      });
     });
   });
 
@@ -77,11 +81,11 @@ describe("ChangePasswordForm", () => {
     });
 
     const password = screen.getByLabelText("Wachtwoord");
-    await user.type(password, "password");
+    await user.type(password, "AdminPassword01");
     const newPassword = screen.getByLabelText("Kies nieuw wachtwoord");
-    await user.type(newPassword, "password_new");
+    await user.type(newPassword, "AdminNewPassword01");
     const repeatPassword = screen.getByLabelText("Herhaal het wachtwoord dat je net hebt ingevuld");
-    await user.type(repeatPassword, "password_new_wrong");
+    await user.type(repeatPassword, "AdminNewPasswordWrong");
 
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
@@ -113,9 +117,9 @@ describe("ChangePasswordForm", () => {
     const password = screen.getByLabelText("Wachtwoord");
     await user.type(password, "password-wrong");
     const newPassword = screen.getByLabelText("Kies nieuw wachtwoord");
-    await user.type(newPassword, "password_new");
+    await user.type(newPassword, "AdminNewPassword01");
     const repeatPassword = screen.getByLabelText("Herhaal het wachtwoord dat je net hebt ingevuld");
-    await user.type(repeatPassword, "password_new");
+    await user.type(repeatPassword, "AdminNewPassword01");
 
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);

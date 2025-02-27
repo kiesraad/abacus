@@ -151,7 +151,7 @@ pub async fn change_password(
 
     // Update the password
     users
-        .update_password(user.id(), &credentials.new_password)
+        .update_password(user.id(), &credentials.username, &credentials.new_password)
         .await?;
 
     Ok(Json(LoginResponse::from(&user)))
@@ -276,6 +276,7 @@ pub struct CreateUserRequest {
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateUserRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]

@@ -249,7 +249,7 @@ pub async fn admin_login(addr: &SocketAddr) -> HeaderValue {
         .body(Body::from(
             json!({
                 "username": "admin",
-                "password": "password",
+                "password": "AdminPassword01",
             })
             .to_string(),
         ))
@@ -271,7 +271,7 @@ pub async fn coordinator_login(addr: &SocketAddr) -> HeaderValue {
         .body(Body::from(
             json!({
                 "username": "coordinator",
-                "password": "password",
+                "password": "CoordinatorPassword01",
             })
             .to_string(),
         ))
@@ -293,7 +293,7 @@ pub async fn typist_login(addr: &SocketAddr) -> HeaderValue {
         .body(Body::from(
             json!({
                 "username": "typist",
-                "password": "password",
+                "password": "TypistPassword01",
             })
             .to_string(),
         ))

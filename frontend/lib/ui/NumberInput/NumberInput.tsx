@@ -27,7 +27,7 @@ export function NumberInput({ id, ...inputProps }: NumberInputProps) {
       {...props}
       onPaste={onPaste}
       onFocus={onFocus}
-      onBlur={onBlur}
+      onBlur={onBlur(props.onChange)}
       onKeyDown={onKeyDown}
       id={id}
       name={props.name || id}
@@ -49,10 +49,13 @@ function onFocus(event: React.FocusEvent<HTMLInputElement>) {
     input.setSelectionRange(0, event.currentTarget.value.length);
   }
 }
-//format number on blur
-function onBlur(event: React.FocusEvent<HTMLInputElement>) {
-  if (event.target.value === "") return;
-  event.target.value = formatNumber(event.target.value);
+//format number on blur and call onChange if provided
+function onBlur(onChange?: React.ChangeEventHandler<HTMLInputElement>) {
+  return function (event: React.FocusEvent<HTMLInputElement>) {
+    if (event.target.value === "") return;
+    event.target.value = formatNumber(event.target.value);
+    if (onChange) onChange(event);
+  };
 }
 
 //only accept numbers

@@ -9,6 +9,7 @@ use sqlx::Type;
 
 use super::error::AuthenticationError;
 
+/// Helper newtype for password validation. Makes sure that password rules are followed when constructed with `new()`.
 pub(super) struct ValidatedPassword<'a>(&'a str);
 
 const MIN_PASSWORD_LEN: usize = 13;
@@ -29,6 +30,7 @@ impl<'pw> ValidatedPassword<'pw> {
             return Err(AuthenticationError::PasswordRejection);
         }
 
+        // Password cannot be the same as the old password
         match old_password {
             Some(old_pw) if verify_password(password, old_pw) => {
                 Err(AuthenticationError::PasswordRejection)
@@ -38,6 +40,9 @@ impl<'pw> ValidatedPassword<'pw> {
     }
 }
 
+/// Helper newtype indicating the containing string is hashed with `hash_password`.
+/// Note that this newtype doesn't give any guarantees, as it is easily constructible
+/// because of the From<String> impl.
 #[derive(Deserialize, Default, PartialEq, Eq, Clone, Debug, Hash, Type)]
 #[sqlx(transparent)]
 pub(super) struct HashedPassword(String);

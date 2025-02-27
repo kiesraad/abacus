@@ -709,16 +709,10 @@ mod tests {
     };
     use test_log::test;
 
-    fn get_election_summary(pg_votes: Vec<Count>) -> ElectionSummary {
-        let total_votes = pg_votes.iter().sum();
-        let mut political_group_votes: Vec<PoliticalGroupVotes> = vec![];
-        for (index, votes) in pg_votes.iter().enumerate() {
-            political_group_votes.push(PoliticalGroupVotes::from_test_data_auto(
-                PGNumber::try_from(index + 1).unwrap(),
-                *votes,
-                &[],
-            ))
-        }
+    fn get_election_summary(
+        total_votes: Count,
+        political_group_votes: Vec<PoliticalGroupVotes>,
+    ) -> ElectionSummary {
         ElectionSummary {
             voters_counts: VotersCounts {
                 poll_card_count: total_votes,
@@ -738,9 +732,27 @@ mod tests {
         }
     }
 
+    fn get_election_summary_with_default_50_candidates(pg_votes: Vec<Count>) -> ElectionSummary {
+        let total_votes = pg_votes.iter().sum();
+        let mut political_group_votes: Vec<PoliticalGroupVotes> = vec![];
+        for (index, votes) in pg_votes.iter().enumerate() {
+            // Create list with 50 candidates with 0 votes
+            let mut candidate_votes: Vec<Count> = vec![0; 50];
+            // Set votes to first candidate
+            candidate_votes[0] = *votes;
+            political_group_votes.push(PoliticalGroupVotes::from_test_data_auto(
+                PGNumber::try_from(index + 1).unwrap(),
+                *votes,
+                &candidate_votes,
+            ))
+        }
+        get_election_summary(total_votes, political_group_votes)
+    }
+
     #[test]
-    fn test_seat_allocation_less_than_19_seats_without_residual_seats() {
-        let totals = get_election_summary(vec![480, 160, 160, 160, 80, 80, 80]);
+    fn test_seat_allocation_less_than_19_seats_without_remaining_seats() {
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![480, 160, 160, 160, 80, 80, 80]);
         let result = apportionment(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 0);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -750,7 +762,9 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_residual_seats_assigned_with_remainder_system()
     {
-        let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 60, 40]);
+        let totals = get_election_summary_with_default_50_candidates(vec![
+            540, 160, 160, 80, 80, 80, 60, 40,
+        ]);
         let result = apportionment(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 2);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -760,7 +774,8 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_residual_seats_assigned_with_remainder_and_averages_system_only_1_remainder_meets_threshold()
      {
-        let totals = get_election_summary(vec![808, 59, 58, 57, 56, 55, 54, 53]);
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![808, 59, 58, 57, 56, 55, 54, 53]);
         let result = apportionment(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 5);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -770,7 +785,7 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_remainder_and_averages_system()
      {
-        let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
+        let totals = get_election_summary_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
         let result = apportionment(10, &totals).unwrap();
         assert_eq!(result.steps.len(), 10);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -780,7 +795,8 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_absolute_majority_of_votes_but_not_seats() {
         // This test triggers Kieswet Article P 9 (Actual case from GR2022)
-        let totals = get_election_summary(vec![2571, 977, 567, 536, 453]);
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![2571, 977, 567, 536, 453]);
         let result = apportionment(15, &totals).unwrap();
         assert_eq!(result.steps.len(), 4);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -791,7 +807,8 @@ mod tests {
     fn test_seat_allocation_less_than_19_seats_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error()
      {
         // This test triggers Kieswet Article P 9
-        let totals = get_election_summary(vec![2552, 511, 511, 511, 509, 509]);
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![2552, 511, 511, 511, 509, 509]);
         let result = apportionment(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
@@ -799,28 +816,32 @@ mod tests {
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_0_votes_assigned_with_remainder_and_averages_system_drawing_of_lots_error_in_2nd_round_averages_system()
      {
-        let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
+        let totals = get_election_summary_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
         let result = apportionment(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error_with_0_remainders() {
-        let totals = get_election_summary(vec![540, 160, 160, 80, 80, 80, 55, 45]);
+        let totals = get_election_summary_with_default_50_candidates(vec![
+            540, 160, 160, 80, 80, 80, 55, 45,
+        ]);
         let result = apportionment(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
     fn test_seat_allocation_less_than_19_seats_with_drawing_of_lots_error() {
-        let totals = get_election_summary(vec![500, 140, 140, 140, 140, 140]);
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![500, 140, 140, 140, 140, 140]);
         let result = apportionment(15, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
-    fn test_seat_allocation_19_or_more_seats_without_residual_seats() {
-        let totals = get_election_summary(vec![576, 288, 96, 96, 96, 48]);
+    fn test_seat_allocation_19_or_more_seats_without_remaining_seats() {
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![576, 288, 96, 96, 96, 48]);
         let result = apportionment(25, &totals).unwrap();
         assert_eq!(result.steps.len(), 0);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -828,8 +849,8 @@ mod tests {
     }
 
     #[test]
-    fn test_seat_allocation_19_or_more_seats_with_residual_seats() {
-        let totals = get_election_summary(vec![600, 302, 98, 99, 101]);
+    fn test_seat_allocation_19_or_more_seats_with_remaining_seats() {
+        let totals = get_election_summary_with_default_50_candidates(vec![600, 302, 98, 99, 101]);
         let result = apportionment(23, &totals).unwrap();
         assert_eq!(result.steps.len(), 4);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -839,7 +860,9 @@ mod tests {
     #[test]
     fn test_seat_allocation_19_or_more_seats_with_absolute_majority_of_votes_but_not_seats() {
         // This test triggers Kieswet Article P 9
-        let totals = get_election_summary(vec![7501, 1249, 1249, 1249, 1249, 1249, 1248, 7]);
+        let totals = get_election_summary_with_default_50_candidates(vec![
+            7501, 1249, 1249, 1249, 1249, 1249, 1248, 7,
+        ]);
         let result = apportionment(24, &totals).unwrap();
         assert_eq!(result.steps.len(), 7);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -850,14 +873,16 @@ mod tests {
     fn test_seat_allocation_19_or_more_seats_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error()
      {
         // This test triggers Kieswet Article P 9
-        let totals = get_election_summary(vec![7501, 1249, 1249, 1249, 1249, 1248, 1248, 8]);
+        let totals = get_election_summary_with_default_50_candidates(vec![
+            7501, 1249, 1249, 1249, 1249, 1248, 1248, 8,
+        ]);
         let result = apportionment(24, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_with_0_votes() {
-        let totals = get_election_summary(vec![0]);
+        let totals = get_election_summary_with_default_50_candidates(vec![0]);
         let result = apportionment(19, &totals).unwrap();
         assert_eq!(result.steps.len(), 19);
         let total_seats = get_total_seats_from_apportionment_result(result);
@@ -866,14 +891,15 @@ mod tests {
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_with_0_votes_with_drawing_of_lots_error() {
-        let totals = get_election_summary(vec![0, 0, 0, 0, 0]);
+        let totals = get_election_summary_with_default_50_candidates(vec![0, 0, 0, 0, 0]);
         let result = apportionment(19, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }
 
     #[test]
     fn test_seat_allocation_19_or_more_seats_with_drawing_of_lots_error() {
-        let totals = get_election_summary(vec![500, 140, 140, 140, 140, 140]);
+        let totals =
+            get_election_summary_with_default_50_candidates(vec![500, 140, 140, 140, 140, 140]);
         let result = apportionment(23, &totals);
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }

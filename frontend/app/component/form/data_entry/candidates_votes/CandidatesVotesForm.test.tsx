@@ -189,6 +189,9 @@ describe("Test CandidatesVotesForm", () => {
       await user.type(candidate1, "12345");
       expect(candidate1).toHaveValue("12345");
 
+      const total = screen.getByRole("textbox", { name: "Totaal lijst 1" });
+      await user.type(total, "12345");
+
       await user.keyboard("{shift>}{enter}{/shift}");
 
       expect(spy).toHaveBeenCalled();

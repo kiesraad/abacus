@@ -47,7 +47,6 @@ __Uitbreidingen:__
 - Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
 
 
-
 ## Het CSB voert de tellingen van het GSB in (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
@@ -92,8 +91,10 @@ __Uitbreidingen:__
 3a. Er zijn minder beschikbare zetels dan kandidaten met gelijke behaalde (voorkeur)stemmen:  
 &emsp;3a1. De zetel wordt bij loting toegekend.
 
-### Open punten
+3b. Er zijn meer zetels aan een lijst toegekend dan dat er kandidaten op de lijst staan (lijstuitputting):  
+&emsp; 3b1. De zetelverdeling wordt opnieuw berekend met inachtneming van de lijstuitputting.  
+&emsp; 3b2. De kandidaten worden o.b.v. de nieuwe zetelverdeling aangewezen.
 
-- De Kieswet heeft het pas over het buiten beschouwing laten van overleden kandidaten tijdens de toewijzing van de gekozen kandidaten. Wat als een lijst evenveel zetels krijgt als kandidaten, maar één van die kandidaten is overleden?
+
+### Buiten scope
 - Er is een voorgestelde wetswijziging dat lijsten de kiesdeler moeten halen om een restzetel te kunnen krijgen. De minister is voornemens de vragen in het verslag wetsvoorstel te beantwoorden na de gemeenteraadsverkiezingen van 2026. Deze wetswijziging gaat dus niet in vóór GR 2026.
-

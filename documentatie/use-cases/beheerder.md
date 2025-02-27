@@ -8,9 +8,10 @@ _Niveau:_ hoog-over, wolk, ☁️
 
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
 2. De beheerder leest de verkiezingsdefinitie in.
-3. De beheerder leest de kandidatenlijst in.
-4. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
-5. De beheerder maakt de gebruikers aan.
+3. De applicatie maakt de verkiezing GSB, verkiezing CSB, en GSB als stembureau voor CSB aan.
+4. De beheerder leest de kandidatenlijst in.
+5. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
+6. De beheerder maakt de gebruikers aan.
 
 __Uitbreidingen:__  
 2a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
@@ -22,6 +23,8 @@ __Uitbreidingen:__
 - Inlezen totalenlijst (kandidatenlijst met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
 
 ### Open punten
+- Verder uitwerken hoe GSB en CSB apart aangemaakt worden.
+  
 - Hoe precies krijgt de beheerder de beschikking over de verkiezingsdefinitie (met hash-code) en de kandidatenlijst (met hash-code)?
   - Zowel de verkiezingsdefinitie als de kandidatenlijst worden door het CSB aangemaakt met OSV KS.
 
@@ -97,3 +100,19 @@ __Uitbreidingen:__
 - Zodra invoer gestart is, mag het niet mogelijk zijn om stembureaus aan te passen of te verwijderen. Verwijderen wordt nu
   afgedwongen d.m.v. foreign keys in de database. Checks voor aanpassen en checks o.b.v. de fases van de verkiezing in de
   applicatie moeten nog uitgewerkt worden.
+
+
+## De beheerder exporteert de stembureaus (zee)
+
+__Niveau:__ gebruikersdoel, zee, 🌊
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario__:
+
+1. De beheerder exporteert de stembureaus.
+2. De beheerder slaat de geëxporteerde stembureaus op, zodat ze geïmporteerd kunnen worden bij een volgende verkiezing.
+
+### Open punten
+
+- Is dit eigenlijk de use case voor het opschonen van de gebruikte machines?

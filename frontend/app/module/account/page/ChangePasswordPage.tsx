@@ -15,10 +15,10 @@ export function ChangePasswordPage() {
 
   return (
     <>
-      <PageTitle title={`${t("user.change_password")} - Abacus`} />
+      <PageTitle title={`${t("account.change_password")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("user.change_password")}</h1>
+          <h1>{t("account.change_password")}</h1>
         </section>
       </header>
       <main>

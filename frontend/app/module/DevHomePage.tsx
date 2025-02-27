@@ -119,7 +119,7 @@ function DevLinks() {
                 void logout();
               }}
             >
-              {t("user.logout")}: {user.fullname || user.username} ({user.role})
+              {t("account.logout")}: {user.fullname || user.username} ({user.role})
             </Link>
           </li>
         )}
@@ -127,16 +127,16 @@ function DevLinks() {
       <strong>{t("general")}</strong>
       <ul>
         <li>
-          <Link to={`/account`}>{t("user.account")}</Link>
+          <Link to={`/account`}>{t("account.account")}</Link>
           <ul>
             <li>
-              <Link to={`/account/login`}>{t("user.login")}</Link>
+              <Link to={`/account/login`}>{t("account.login")}</Link>
             </li>
             <li>
-              <Link to={`/account/setup`}>{t("user.account_setup")}</Link>
+              <Link to={`/account/setup`}>{t("account.account_setup")}</Link>
             </li>
             <li>
-              <Link to={`/account/change-password`}>{t("user.change_password")}</Link>
+              <Link to={`/account/change-password`}>{t("account.change_password")}</Link>
             </li>
           </ul>
         </li>

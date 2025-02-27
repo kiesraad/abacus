@@ -21,16 +21,16 @@ export function AccountSetupPage() {
 
   return (
     <>
-      <PageTitle title={`${t("user.account_setup")} - Abacus`} />
+      <PageTitle title={`${t("account.account_setup")} - Abacus`} />
       <header>
         <section>
-          <h1>{t("user.account_setup")}</h1>
+          <h1>{t("account.account_setup")}</h1>
         </section>
       </header>
       {showAlert && (
         <Alert type="success" onClose={hideAlert}>
-          <h2>{t("user.login_success")}</h2>
-          <p>{t("user.phrases.setting_up_account")}</p>
+          <h2>{t("account.login_success")}</h2>
+          <p>{t("account.setting_up_account")}</p>
         </Alert>
       )}
       <main>

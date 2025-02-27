@@ -23,32 +23,42 @@
 - Er vindt logging van gebruikershandelingen plaats.
 
 - De zetelverdeling voor de gemeenteraad wordt uitgerekend voor de meest voorkomende gevallen (meest voorkomende scenario, bijv. geen loting), en wordt weergegeven op een placeholder-pagina.
-- De toewijzing van kandidaten aan de zetels kan worden bepaald (meest voorkomende scenario, bijv. nog geen registratie van overleden kandidaten).
-
-- De tweede invoerder is verplicht een andere gebruiker dan de eerste invoerder.
-- Er kan slechts één gebruiker tegelijkertijd hetzelfde stembureau invoeren.
-
-- Het EML_NL-bestand met de verkiezingsdefinitie voor de gemeenteraadsverkiezing kan worden geïmporteerd.
-- Het EML_NL-bestand met de kandidatenlijst voor de gemeenteraadsverkiezing kan worden geïmporteerd.
-
-- De coördinator kan de eerste zitting openen, schorsen en afronden.
+- [L] De toewijzing van kandidaten aan de zetels kan worden bepaald (meest voorkomende scenario, bijv. nog geen registratie van overleden kandidaten).
 
 ## maart-april 2025
 
-- _Nieuwe modellen implementeren?_
+_Een deel moet nog worden doorgeschoven naar latere iteraties._
 
-- Invoer van lotingsresultaten tijdens de zetelverdeling.
-- Het markeren van overleden kandidaten voor het starten van de zetelverdeling.
-- De zetelverdeling kan als EML_NL-bestand (520) worden geëxporteerd.
+- [S] Er kan slechts één gebruiker tegelijkertijd hetzelfde stembureau invoeren.
+- [S] De tweede invoerder is verplicht een andere gebruiker dan de eerste invoerder.
 
-- Verschillen tussen de eerste en tweede invoer worden weergegeven en kunnen worden opgelost.
-- Ondersteuning voor het invoeren in gemeenten met een decentrale stemopneming (DSO).
+- [M] Basis in de backend voor alle EML_NL formaten opzetten
+- [M] Het EML_NL-bestand met de verkiezingsdefinitie voor de gemeenteraadsverkiezing kan worden geïmporteerd.
+- [M] Het EML_NL-bestand met de kandidatenlijst voor de gemeenteraadsverkiezing kan worden geïmporteerd.
 
-- De uitslag kan in een tweede of volgende zitting worden gecorrigeerd met behulp van een corrigendum.
-  - _uitsplitsen in meerdere punten?_
+- [?] De coördinator kan de eerste zitting openen, schorsen en afronden.
+  - _Eerst use cases uitwerken_
 
-- Het EML_NL-bestand met de stembureaus van een gemeente kan worden geïmporteerd.
-- Het EML_NL-bestand met de stembureaus van een gemeente kan worden geëxporteerd.
+- [XL] Nieuwe modellen implementeren
+  - _Nog opsplitsen_
+
+- [L] Invoer van lotingsresultaten tijdens de zetelverdeling.
+- [L] Het markeren van overleden kandidaten voor de toewijzing van kandidaten.
+- [M] De zetelverdeling kan als EML_NL-bestand (520) worden geëxporteerd.
+
+- [M] Verschillen tussen de eerste en tweede invoer worden weergegeven en kunnen worden opgelost door de coördinator.
+- [XL] Ondersteuning voor het invoeren in gemeenten met een decentrale stemopneming (DSO).
+  - _Nog opsplitsen: invoer DSO PV, output GSB PV, ..._
+
+- [M] De tweede invoerder krijgt een waarschuwing te zien voor verschillen met de eerste invoer.
+
+- [XL] De uitslag kan in een tweede of volgende zitting worden gecorrigeerd met behulp van een corrigendum.
+  - _Nog opsplitsen: template stembureau PV, output corrigendum PV voor GSB_
+
+- [M] Het EML_NL-bestand (110b) met de stembureaus van een gemeente kan worden geïmporteerd.
+- [S] Het EML_NL-bestand (110b) met de stembureaus van een gemeente kan worden geëxporteerd.
+
+- [S] Code signing van Windows executables
 
 ## mei-juni 2025
 

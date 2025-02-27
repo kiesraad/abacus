@@ -373,6 +373,7 @@ pub async fn user_update(
     ),
 )]
 pub async fn user_delete(
+    _user: Admin,
     State(users_repo): State<Users>,
     Path(user_id): Path<u32>,
 ) -> Result<StatusCode, APIError> {

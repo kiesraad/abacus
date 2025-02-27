@@ -10,6 +10,7 @@ export function UserListPage() {
   const { requestState } = useUserListRequest();
   const [createdMessage, clearCreatedMessage] = useQueryParam("created");
   const [updatedMessage, clearUpdatedMessage] = useQueryParam("updated");
+  const [deletedMessage, clearDeletedMessage] = useQueryParam("deleted");
 
   if (requestState.status === "loading") {
     return <Loader />;
@@ -50,6 +51,13 @@ export function UserListPage() {
         <Alert type="success" onClose={clearUpdatedMessage}>
           <h2>{t("users.user_updated")}</h2>
           <p>{updatedMessage}</p>
+        </Alert>
+      )}
+
+      {deletedMessage && (
+        <Alert type="success" onClose={clearDeletedMessage}>
+          <h2>{t("users.user_deleted")}</h2>
+          <p>{deletedMessage}</p>
         </Alert>
       )}
 

@@ -5,6 +5,7 @@ import { t } from "@kiesraad/i18n";
 import { Alert, FormLayout, Loader, PageTitle } from "@kiesraad/ui";
 import { useNumericParam } from "@kiesraad/util";
 
+import { UserDelete } from "./UserDelete";
 import { UserUpdateForm } from "./UserUpdateForm";
 import { useUserUpdate } from "./useUserUpdate";
 
@@ -12,7 +13,7 @@ export function UserUpdatePage() {
   const navigate = useNavigate();
   const userId = useNumericParam("userId");
   const { requestState: getUser } = useApiRequest<User>(`/api/user/${userId}` satisfies USER_GET_REQUEST_PATH);
-  const { error, update, saving } = useUserUpdate(userId);
+  const { error, update, remove, saving } = useUserUpdate(userId);
 
   if (getUser.status === "api-error") {
     throw getUser.error;
@@ -25,9 +26,16 @@ export function UserUpdatePage() {
   const user = getUser.data;
 
   function handleSave(userUpdate: UpdateUserRequest) {
-    void update(userUpdate).then(({ username }) => {
-      const updatedMessage = t("users.user_updated_details", { username });
+    void update(userUpdate).then(({ fullname, username }) => {
+      const updatedMessage = t("users.user_updated_details", { fullname: fullname || username });
       void navigate(`/users?updated=${encodeURIComponent(updatedMessage)}`);
+    });
+  }
+
+  function handleDelete() {
+    void remove().then(() => {
+      const deletedMessage = t("users.user_deleted_details", { fullname: user.fullname || user.username });
+      void navigate(`/users?deleted=${encodeURIComponent(deletedMessage)}`);
     });
   }
 
@@ -45,13 +53,16 @@ export function UserUpdatePage() {
       </header>
 
       <main>
-        {error && (
-          <FormLayout.Alert>
-            <Alert type="error">{error.message}</Alert>
-          </FormLayout.Alert>
-        )}
+        <article>
+          {error && (
+            <FormLayout.Alert>
+              <Alert type="error">{error.message}</Alert>
+            </FormLayout.Alert>
+          )}
 
-        <UserUpdateForm user={user} onSave={handleSave} onAbort={handleAbort} saving={saving} />
+          <UserUpdateForm user={user} onSave={handleSave} onAbort={handleAbort} saving={saving} />
+          <UserDelete onDelete={handleDelete} saving={saving} />
+        </article>
       </main>
     </>
   );

@@ -135,9 +135,6 @@ function DevLinks() {
             <li>
               <Link to={`/account/setup`}>{t("account.account_setup")}</Link>
             </li>
-            <li>
-              <Link to={`/account/change-password`}>{t("account.change_password")}</Link>
-            </li>
           </ul>
         </li>
       </ul>

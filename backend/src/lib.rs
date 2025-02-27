@@ -98,7 +98,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/login", post(authentication::login))
         .route("/logout", post(authentication::logout))
         .route("/whoami", get(authentication::whoami))
-        .route("/change-password", post(authentication::change_password))
+        .route("/account", post(authentication::account_update))
         .layer(middleware::from_fn_with_state(
             pool.clone(),
             authentication::extend_session,
@@ -161,7 +161,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             authentication::login,
             authentication::logout,
             authentication::whoami,
-            authentication::change_password,
+            authentication::account_update,
             authentication::user_list,
             authentication::user_create,
             authentication::user_get,
@@ -196,7 +196,7 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 apportionment::LargestRemainderAssignedSeat,
                 authentication::Credentials,
                 authentication::LoginResponse,
-                authentication::ChangePasswordRequest,
+                authentication::AccountUpdateRequest,
                 authentication::UserListResponse,
                 authentication::UpdateUserRequest,
                 authentication::CreateUserRequest,

@@ -102,12 +102,11 @@ __Uitbreidingen:__
   applicatie moeten nog uitgewerkt worden.
 
 
-
 ## De beheerder exporteert de stembureaus (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
-### Hoofscenario en uitbreidingen
+### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario__:
 

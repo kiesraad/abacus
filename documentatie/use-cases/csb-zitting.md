@@ -47,7 +47,6 @@ __Uitbreidingen:__
 - Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
 
 
-
 ## Het CSB voert de tellingen van het GSB in (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
@@ -92,8 +91,8 @@ __Uitbreidingen:__
 3a. Er zijn minder beschikbare zetels dan kandidaten met gelijke behaalde (voorkeur)stemmen:  
 &emsp;3a1. De zetel wordt bij loting toegekend.
 
-3b. Er zijn meer zetels aan een lijst toegekend dan dat er kandidaten op de lijst staan (lijstuitputting):
-&emsp; 3b1. De zetelverdeling wordt opnieuw berekend met inachtneming van de lijstuitputting.
+3b. Er zijn meer zetels aan een lijst toegekend dan dat er kandidaten op de lijst staan (lijstuitputting):  
+&emsp; 3b1. De zetelverdeling wordt opnieuw berekend met inachtneming van de lijstuitputting.  
 &emsp; 3b2. De kandidaten worden o.b.v. de nieuwe zetelverdeling aangewezen.
 
 

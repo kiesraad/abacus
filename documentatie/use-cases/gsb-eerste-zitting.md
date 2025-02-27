@@ -116,7 +116,6 @@ __Hoofdscenario 2:__
 2. De coördinator GSB corrigeert de stembureaus in de applicatie.
 3. applicatie toont een waarschuwing dat elke aanpassing op een stembureau, waardoor die afwijkt van de gepubliceerde lijst, opgenomen moet worden in het PV.
 
-
 ### Niet in scope
 
 - Bij verwijderen stembureau kan de coördinator GSB de reden invoeren, die dan automatisch wordt opgenomen in het PV dat door de applicatie wordt gegenereerd.
@@ -125,6 +124,7 @@ __Hoofdscenario 2:__
 ### Open punten
 
 - Kan ook de beheerder tijdens een zitting de lijst met stembureaus corrigeren?
+
 
 
 ## De coördinator voert bezwaren, bijzonderheden, etc. in. (zee)

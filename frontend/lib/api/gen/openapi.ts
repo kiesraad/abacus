@@ -151,7 +151,7 @@ export interface AbsoluteMajorityChange {
 }
 
 export interface AccountUpdateRequest {
-  new_password: string;
+  fullname?: string;
   password: string;
   username: string;
 }

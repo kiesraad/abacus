@@ -442,8 +442,8 @@ mod tests {
                     .body(Body::from(
                         serde_json::to_vec(&AccountUpdateRequest {
                             username: "admin".to_string(),
-                            password: "password".to_string(),
-                            new_password: "new_password".to_string(),
+                            password: "new_password".to_string(),
+                            fullname: None,
                         })
                         .unwrap(),
                     ))
@@ -513,31 +513,7 @@ mod tests {
             .unwrap()
             .to_string();
 
-        // Call the change password endpoint with incorrect password
-        let response = app
-            .clone()
-            .oneshot(
-                Request::builder()
-                    .method(Method::POST)
-                    .uri("/api/user/account")
-                    .header(CONTENT_TYPE, "application/json")
-                    .header("cookie", &cookie)
-                    .body(Body::from(
-                        serde_json::to_vec(&AccountUpdateRequest {
-                            username: "admin".to_string(),
-                            password: "wrong_password".to_string(),
-                            new_password: "new_password".to_string(),
-                        })
-                        .unwrap(),
-                    ))
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-
-        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
-
-        // Call the change password endpoint with incorrect ucer
+        // Call the change password endpoint with incorrect user
         let response = app
             .clone()
             .oneshot(
@@ -549,8 +525,8 @@ mod tests {
                     .body(Body::from(
                         serde_json::to_vec(&AccountUpdateRequest {
                             username: "wrong_user".to_string(),
-                            password: "password".to_string(),
-                            new_password: "new_password".to_string(),
+                            password: "new_password".to_string(),
+                            fullname: Some("Wrong User".to_string()),
                         })
                         .unwrap(),
                     ))

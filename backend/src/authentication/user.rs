@@ -307,6 +307,23 @@ impl Users {
         Ok(())
     }
 
+    /// Update a user's fullname
+    pub async fn update_fullname(
+        &self,
+        user_id: u32,
+        fullname: &str,
+    ) -> Result<(), AuthenticationError> {
+        sqlx::query!(
+            r#"UPDATE users SET fullname = ? WHERE id = ?"#,
+            fullname,
+            user_id
+        )
+        .execute(&self.0)
+        .await?;
+
+        Ok(())
+    }
+
     /// Set a temporary password for a user
     pub async fn set_temporary_password(
         &self,

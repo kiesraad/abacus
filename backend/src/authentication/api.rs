@@ -103,7 +103,9 @@ pub async fn login(
 pub struct AccountUpdateRequest {
     pub username: String,
     pub password: String,
-    pub new_password: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
+    pub fullname: Option<String>,
 }
 
 /// Get current logged-in user endpoint
@@ -128,35 +130,32 @@ pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   path = "/api/user/account",
   request_body = AccountUpdateRequest,
   responses(
-      (status = 200, description = "The current user name and id", body = LoginResponse),
-      (status = 401, description = "Invalid credentials", body = ErrorResponse),
+      (status = 200, description = "The logged in user", body = LoginResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
 )]
 pub async fn account_update(
     user: User,
     State(users): State<Users>,
-    Json(credentials): Json<AccountUpdateRequest>,
+    Json(account): Json<AccountUpdateRequest>,
 ) -> Result<impl IntoResponse, APIError> {
-    if user.username() != credentials.username {
+    if user.username() != account.username {
         return Err(AuthenticationError::UserNotFound.into());
     }
 
-    // Check the username + password combination
-    let authenticated = users
-        .authenticate(&credentials.username, &credentials.password)
-        .await?;
+    // Update the password
+    users.update_password(user.id(), &account.password).await?;
 
-    if authenticated.id() != user.id() {
-        return Err(AuthenticationError::InvalidPassword.into());
+    // Update the fullname
+    if let Some(fullname) = account.fullname {
+        users.update_fullname(user.id(), &fullname).await?;
     }
 
-    // Update the password
-    users
-        .update_password(user.id(), &credentials.new_password)
-        .await?;
+    let Some(updated_user) = users.get_by_username(user.username()).await? else {
+        return Err(AuthenticationError::UserNotFound.into());
+    };
 
-    Ok(Json(LoginResponse::from(&user)))
+    Ok(Json(LoginResponse::from(&updated_user)))
 }
 
 /// Logout endpoint, deletes the session cookie

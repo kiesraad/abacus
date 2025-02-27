@@ -1,12 +1,12 @@
 use chrono::TimeDelta;
 use serde::{Deserialize, Serialize};
-use user::User;
 use utoipa::ToSchema;
 
-pub use self::api::*;
-
-#[cfg(test)]
-pub use self::session::Sessions;
+pub use self::{
+    api::*,
+    role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist},
+    user::User,
+};
 
 mod api;
 pub mod error;
@@ -56,7 +56,7 @@ mod tests {
     use axum::{
         Router,
         body::Body,
-        http::{Request, StatusCode},
+        http::{HeaderValue, Request, StatusCode},
         middleware,
         routing::{get, post, put},
     };
@@ -84,14 +84,34 @@ mod tests {
             .layer(middleware::from_fn_with_state(pool, extend_session));
 
         #[cfg(debug_assertions)]
-        let router = router
-            .route(
-                "/api/user/development/create",
-                post(api::development_create_user),
-            )
-            .route("/api/user/development/login", get(api::development_login));
+        let router = router.route(
+            "/api/user/development/create",
+            post(api::development_create_user),
+        );
 
         router.with_state(state)
+    }
+
+    async fn login(app: Router) -> HeaderValue {
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/user/login")
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        serde_json::to_vec(&Credentials {
+                            username: "admin".to_string(),
+                            password: "password".to_string(),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        response.headers().get("set-cookie").unwrap().clone()
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -106,7 +126,7 @@ mod tests {
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
-                            username: "user".to_string(),
+                            username: "admin".to_string(),
                             password: "password".to_string(),
                         })
                         .unwrap(),
@@ -123,7 +143,7 @@ mod tests {
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
 
         assert_eq!(result.user_id, 1);
-        assert_eq!(result.username, "user");
+        assert_eq!(result.username, "admin");
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -138,7 +158,7 @@ mod tests {
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
-                            username: "user".to_string(),
+                            username: "admin".to_string(),
                             password: "wrong".to_string(),
                         })
                         .unwrap(),
@@ -164,7 +184,7 @@ mod tests {
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
-                            username: "user".to_string(),
+                            username: "admin".to_string(),
                             password: "password".to_string(),
                         })
                         .unwrap(),
@@ -187,7 +207,7 @@ mod tests {
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
 
         assert_eq!(result.user_id, 1);
-        assert_eq!(result.username, "user");
+        assert_eq!(result.username, "admin");
 
         let response = app
             .clone()
@@ -233,7 +253,7 @@ mod tests {
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
-                            username: "user".to_string(),
+                            username: "admin".to_string(),
                             password: "password".to_string(),
                         })
                         .unwrap(),
@@ -256,7 +276,7 @@ mod tests {
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
 
         assert_eq!(result.user_id, 1);
-        assert_eq!(result.username, "user");
+        assert_eq!(result.username, "admin");
 
         let response = app
             .clone()
@@ -277,7 +297,7 @@ mod tests {
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
 
         assert_eq!(result.user_id, 1);
-        assert_eq!(result.username, "user");
+        assert_eq!(result.username, "admin");
 
         // logout the current user
         let response = app
@@ -376,32 +396,6 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
     }
 
-    #[cfg(debug_assertions)]
-    #[test(sqlx::test)]
-    async fn test_development_login(pool: SqlitePool) {
-        let app = create_app(pool);
-
-        // test login
-        let response = app
-            .oneshot(
-                Request::builder()
-                    .method(Method::GET)
-                    .uri("/api/user/development/login")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-
-        assert_eq!(response.status(), StatusCode::OK);
-        assert!(response.headers().get("set-cookie").is_some());
-
-        let body = response.into_body().collect().await.unwrap().to_bytes();
-        let result: LoginResponse = serde_json::from_slice(&body).unwrap();
-
-        assert_eq!(result.username, "user");
-    }
-
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_update_password(pool: SqlitePool) {
         let app = create_app(pool);
@@ -415,7 +409,7 @@ mod tests {
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
-                            username: "user".to_string(),
+                            username: "admin".to_string(),
                             password: "password".to_string(),
                         })
                         .unwrap(),
@@ -447,7 +441,7 @@ mod tests {
                     .header("cookie", &cookie)
                     .body(Body::from(
                         serde_json::to_vec(&ChangePasswordRequest {
-                            username: "user".to_string(),
+                            username: "admin".to_string(),
                             password: "password".to_string(),
                             new_password: "new_password".to_string(),
                         })
@@ -462,7 +456,7 @@ mod tests {
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
 
-        assert_eq!(result.username, "user");
+        assert_eq!(result.username, "admin");
 
         let response = app
             .oneshot(
@@ -472,7 +466,7 @@ mod tests {
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
-                            username: "user".to_string(),
+                            username: "admin".to_string(),
                             password: "new_password".to_string(),
                         })
                         .unwrap(),
@@ -498,7 +492,7 @@ mod tests {
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
-                            username: "user".to_string(),
+                            username: "admin".to_string(),
                             password: "password".to_string(),
                         })
                         .unwrap(),
@@ -530,7 +524,7 @@ mod tests {
                     .header("cookie", &cookie)
                     .body(Body::from(
                         serde_json::to_vec(&ChangePasswordRequest {
-                            username: "user".to_string(),
+                            username: "admin".to_string(),
                             password: "wrong_password".to_string(),
                             new_password: "new_password".to_string(),
                         })
@@ -570,14 +564,18 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_list(pool: SqlitePool) {
-        let app = create_app(pool);
-
+        let app = create_app(pool.clone());
+        let sessions = Sessions::new(pool);
+        let session = sessions.create(1, SESSION_LIFE_TIME).await.unwrap();
+        let mut cookie = session.get_cookie();
+        set_default_cookie_properties(&mut cookie);
         let response = app
             .clone()
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
                     .uri("/api/user")
+                    .header("cookie", &cookie.encoded().to_string())
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -587,7 +585,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: UserListResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.users.len(), 1);
+        assert_eq!(result.users.len(), 3);
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -647,8 +645,8 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_create(pool: SqlitePool) {
-        let app = create_app(pool);
-
+        let app = create_app(pool.clone());
+        let cookie = login(app.clone()).await;
         let response = app
             .clone()
             .oneshot(
@@ -656,6 +654,7 @@ mod tests {
                     .method(Method::POST)
                     .uri("/api/user")
                     .header(CONTENT_TYPE, "application/json")
+                    .header("cookie", cookie)
                     .body(Body::from(
                         serde_json::to_vec(&CreateUserRequest {
                             username: "test_user".to_string(),
@@ -679,9 +678,9 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
-    async fn test_update(pool: SqlitePool) {
-        let app = create_app(pool);
-
+    async fn test_update_user(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+        let cookie = login(app.clone()).await;
         let response = app
             .clone()
             .oneshot(
@@ -689,6 +688,7 @@ mod tests {
                     .method(Method::PUT)
                     .uri("/api/user/1")
                     .header(CONTENT_TYPE, "application/json")
+                    .header("cookie", cookie)
                     .body(Body::from(
                         serde_json::to_vec(&UpdateUserRequest {
                             fullname: Some("Test Full Name".to_string()),
@@ -704,7 +704,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: user::User = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.username(), "user");
+        assert_eq!(result.username(), "admin");
         assert_eq!(result.fullname().unwrap(), "Test Full Name".to_string());
         assert_eq!(result.role(), Role::Administrator);
     }

@@ -14,7 +14,7 @@ export interface ApiProviderProps {
 const client = new ApiClient();
 
 export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderProps) {
-  const { user, setUser } = useSessionState(fetchInitialUser);
+  const { user, setUser, login, logout } = useSessionState(fetchInitialUser);
 
   // Unset the current user when the API returns an invalid session error
   // indicating that the sessions has expired or the user is not authenticated anymore
@@ -32,6 +32,8 @@ export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderPr
     client,
     user,
     setUser,
+    logout,
+    login,
   };
 
   return <ApiProviderContext.Provider value={apiState}>{children}</ApiProviderContext.Provider>;

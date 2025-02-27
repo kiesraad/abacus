@@ -1,5 +1,5 @@
 use super::{
-    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+    Admin, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
     error::AuthenticationError,
     role::Role,
     session::Sessions,
@@ -28,14 +28,20 @@ pub struct Credentials {
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct LoginResponse {
     pub user_id: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
+    pub fullname: Option<String>,
     pub username: String,
+    pub role: Role,
 }
 
 impl From<&User> for LoginResponse {
     fn from(user: &User) -> Self {
         Self {
             user_id: user.id(),
+            fullname: user.fullname().map(|u| u.to_string()),
             username: user.username().to_string(),
+            role: user.role(),
         }
     }
 }
@@ -126,8 +132,8 @@ pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   ),
 )]
 pub async fn change_password(
-    State(users): State<Users>,
     user: User,
+    State(users): State<Users>,
     Json(credentials): Json<ChangePasswordRequest>,
 ) -> Result<impl IntoResponse, APIError> {
     if user.username() != credentials.username {
@@ -235,44 +241,6 @@ pub async fn development_create_user(
     Ok(StatusCode::CREATED)
 }
 
-/// Development endpoint: login as a user (unauthenticated)
-#[cfg(debug_assertions)]
-#[utoipa::path(
-  get,
-  path = "/api/user/development/login",
-  responses(
-    (status = 200, description = "The logged in user id and user name", body = LoginResponse),
-    (status = 500, description = "Internal server error", body = ErrorResponse),
-  ),
-)]
-pub async fn development_login(
-    State(users): State<Users>,
-    State(sessions): State<Sessions>,
-    jar: CookieJar,
-) -> Result<impl IntoResponse, APIError> {
-    // Get or create the test user
-
-    use super::role::Role;
-    let user = match users.get_by_username("user").await? {
-        Some(u) => u,
-        None => {
-            users
-                .create("user", Some("Full Name"), "password", Role::Administrator)
-                .await?
-        }
-    };
-
-    // Create a new session and cookie
-    let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;
-
-    // Add the session cookie to the response
-    let mut cookie = session.get_cookie();
-    set_default_cookie_properties(&mut cookie);
-    let updated_jar = jar.add(cookie);
-
-    Ok((updated_jar, Json(LoginResponse::from(&user))))
-}
-
 #[derive(Serialize, Deserialize, ToSchema)]
 pub struct UserListResponse {
     pub users: Vec<User>,
@@ -284,10 +252,12 @@ pub struct UserListResponse {
     path = "/api/user",
     responses(
         (status = 200, description = "User list", body = UserListResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 pub async fn user_list(
+    _user: Admin,
     State(users_repo): State<Users>,
 ) -> Result<Json<UserListResponse>, APIError> {
     Ok(Json(UserListResponse {
@@ -322,10 +292,12 @@ pub struct UpdateUserRequest {
     request_body = CreateUserRequest,
     responses(
         (status = 201, description = "User created", body = User),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 pub async fn user_create(
+    _user: Admin,
     State(users_repo): State<Users>,
     Json(create_user_req): Json<CreateUserRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
@@ -354,6 +326,7 @@ pub async fn user_create(
     ),
 )]
 pub async fn user_get(
+    _user: Admin,
     State(users_repo): State<Users>,
     Path(user_id): Path<u32>,
 ) -> Result<Json<User>, APIError> {
@@ -368,11 +341,13 @@ pub async fn user_get(
     request_body = UpdateUserRequest,
     responses(
         (status = 200, description = "User updated", body = User),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 pub async fn user_update(
+    _user: Admin,
     State(users_repo): State<Users>,
     Path(user_id): Path<u32>,
     Json(update_user_req): Json<UpdateUserRequest>,

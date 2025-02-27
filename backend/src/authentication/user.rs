@@ -26,7 +26,7 @@ pub struct User {
     id: u32,
     username: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
+    #[schema(value_type = String, nullable = false)]
     fullname: Option<String>,
     role: Role,
     #[serde(skip_deserializing)]
@@ -78,14 +78,27 @@ impl User {
         }
     }
 
-    #[cfg(test)]
     pub fn fullname(&self) -> Option<&str> {
         self.fullname.as_deref()
     }
 
-    #[cfg(test)]
     pub fn role(&self) -> Role {
         self.role
+    }
+
+    #[cfg(test)]
+    pub fn test_user(role: Role) -> Self {
+        Self {
+            id: 1,
+            username: "test_user_1".to_string(),
+            fullname: Some("Full Name".to_string()),
+            role,
+            needs_password_change: false,
+            password_hash: "h4sh".to_string(),
+            last_activity_at: None,
+            updated_at: chrono::Utc::now(),
+            created_at: chrono::Utc::now(),
+        }
     }
 }
 

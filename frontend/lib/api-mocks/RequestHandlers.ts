@@ -57,7 +57,10 @@ export const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBo
 
 // get user handler
 export const WhoAmIRequestHandler = http.get("/api/user/whoami", () =>
-  HttpResponse.json({ user_id: 1, username: "user" } satisfies LoginResponse, { status: 200 }),
+  HttpResponse.json(
+    { user_id: 1, fullname: "Example Name", username: "admin", role: "administrator" } satisfies LoginResponse,
+    { status: 200 },
+  ),
 );
 
 // get election list handler

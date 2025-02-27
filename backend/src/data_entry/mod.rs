@@ -1,4 +1,5 @@
 use crate::{
+    authentication::{Typist, User},
     data_entry::repository::PollingStationDataEntries,
     election::repository::Elections,
     error::{APIError, ErrorReference, ErrorResponse},
@@ -42,6 +43,7 @@ pub struct GetDataEntryResponse {
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
     responses(
         (status = 200, description = "Data entry retrieved successfully", body = GetDataEntryResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -51,6 +53,7 @@ pub struct GetDataEntryResponse {
     ),
 )]
 pub async fn polling_station_data_entry_get(
+    _user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations): State<PollingStations>,
     State(elections): State<Elections>,
@@ -113,6 +116,7 @@ impl IntoResponse for SaveDataEntryResponse {
     request_body = DataEntry,
     responses(
         (status = 200, description = "Data entry saved successfully", body = SaveDataEntryResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -124,6 +128,7 @@ impl IntoResponse for SaveDataEntryResponse {
     ),
 )]
 pub async fn polling_station_data_entry_save(
+    _user: Typist,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(polling_stations_repo): State<PollingStations>,
@@ -178,6 +183,7 @@ pub async fn polling_station_data_entry_save(
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}",
     responses(
         (status = 204, description = "Data entry deleted successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -188,6 +194,7 @@ pub async fn polling_station_data_entry_save(
     ),
 )]
 pub async fn polling_station_data_entry_delete(
+    _user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     Path((id, entry_number)): Path<(u32, EntryNumber)>,
 ) -> Result<StatusCode, APIError> {
@@ -207,6 +214,7 @@ pub async fn polling_station_data_entry_delete(
     path = "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise",
     responses(
         (status = 200, description = "Data entry finalised successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 422, description = "JSON error or invalid data (Unprocessable Content)", body = ErrorResponse),
@@ -218,6 +226,7 @@ pub async fn polling_station_data_entry_delete(
     ),
 )]
 pub async fn polling_station_data_entry_finalise(
+    _user: Typist,
     State(polling_station_data_entries): State<PollingStationDataEntries>,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
@@ -284,6 +293,7 @@ pub struct ElectionStatusResponseEntry {
     path = "/api/elections/{election_id}/status",
     responses(
         (status = 200, description = "Election", body = ElectionStatusResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -292,6 +302,7 @@ pub struct ElectionStatusResponseEntry {
     ),
 )]
 pub async fn election_status(
+    _user: User,
     State(data_entry_repo): State<PollingStationDataEntries>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
@@ -304,6 +315,8 @@ pub mod tests {
     use axum::http::StatusCode;
     use sqlx::{SqlitePool, query};
     use test_log::test;
+
+    use crate::authentication::Role;
 
     use super::*;
 
@@ -382,6 +395,7 @@ pub mod tests {
         entry_number: EntryNumber,
     ) -> Response {
         polling_station_data_entry_save(
+            Typist(User::test_user(Role::Typist)),
             Path((1, entry_number)),
             State(PollingStationDataEntries::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
@@ -394,6 +408,7 @@ pub mod tests {
 
     async fn delete(pool: SqlitePool, entry_number: EntryNumber) -> Response {
         polling_station_data_entry_delete(
+            Typist(User::test_user(Role::Typist)),
             State(PollingStationDataEntries::new(pool.clone())),
             Path((1, entry_number)),
         )
@@ -403,6 +418,7 @@ pub mod tests {
 
     async fn finalise(pool: SqlitePool, entry_number: EntryNumber) -> Response {
         polling_station_data_entry_finalise(
+            Typist(User::test_user(Role::Typist)),
             State(PollingStationDataEntries::new(pool.clone())),
             State(Elections::new(pool.clone())),
             State(PollingStations::new(pool.clone())),
@@ -596,6 +612,7 @@ pub mod tests {
     async fn test_polling_station_data_entry_delete_nonexistent(pool: SqlitePool) {
         // check that deleting a non-existing data entry returns 404
         let response = polling_station_data_entry_delete(
+            Typist(User::test_user(Role::Typist)),
             State(PollingStationDataEntries::new(pool.clone())),
             Path((1, EntryNumber::FirstEntry)),
         )

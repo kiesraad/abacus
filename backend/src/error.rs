@@ -49,6 +49,7 @@ pub enum ErrorReference {
     PollingStationSecondEntryAlreadyFinalised,
     PollingStationValidationErrors,
     UserNotFound,
+    Unauthorized,
 }
 
 /// Response structure for errors
@@ -212,6 +213,10 @@ impl IntoResponse for APIError {
                     | AuthenticationError::NoSessionCookie => (
                         StatusCode::UNAUTHORIZED,
                         to_error("Invalid session", ErrorReference::InvalidSession, false),
+                    ),
+                    AuthenticationError::Unauthorized => (
+                        StatusCode::UNAUTHORIZED,
+                        to_error("Unauthorized", ErrorReference::Unauthorized, false),
                     ),
                     // server errors
                     AuthenticationError::Database(_)

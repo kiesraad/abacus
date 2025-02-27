@@ -1,5 +1,3 @@
-#[cfg(feature = "dev-database")]
-use axum::http::StatusCode;
 use axum::{
     Json,
     extract::{Path, State},
@@ -14,6 +12,7 @@ use self::repository::Elections;
 pub use self::structs::*;
 use crate::{
     APIError, ErrorResponse,
+    authentication::{Coordinator, User},
     data_entry::{PollingStationResults, repository::PollingStationResultsEntries},
     eml::{EML510, EMLDocument, axum::Eml, eml_document_hash},
     pdf_gen::{
@@ -23,6 +22,12 @@ use crate::{
     polling_station::{repository::PollingStations, structs::PollingStation},
     summary::ElectionSummary,
 };
+
+#[cfg(feature = "dev-database")]
+use axum::http::StatusCode;
+
+#[cfg(feature = "dev-database")]
+use crate::authentication::Admin;
 
 pub(crate) mod repository;
 pub mod structs;
@@ -54,10 +59,12 @@ impl IntoResponse for Election {
     path = "/api/elections",
     responses(
         (status = 200, description = "Election list", body = ElectionListResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 pub async fn election_list(
+    _user: User,
     State(elections_repo): State<Elections>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
     let elections = elections_repo.list().await?;
@@ -70,6 +77,7 @@ pub async fn election_list(
     path = "/api/elections/{election_id}",
     responses(
         (status = 200, description = "Election", body = ElectionDetailsResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -78,6 +86,7 @@ pub async fn election_list(
     ),
 )]
 pub async fn election_details(
+    _user: User,
     State(elections_repo): State<Elections>,
     State(polling_stations): State<PollingStations>,
     Path(id): Path<u32>,
@@ -98,11 +107,13 @@ pub async fn election_details(
     responses(
         (status = 201, description = "Election created", body = Election),
         (status = 400, description = "Bad request", body = ErrorResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
 #[cfg(feature = "dev-database")]
 pub async fn election_create(
+    _user: Admin,
     State(elections_repo): State<Elections>,
     Json(new_election): Json<ElectionRequest>,
 ) -> Result<(StatusCode, Election), APIError> {
@@ -205,6 +216,7 @@ impl ResultsInput {
                 ("Content-Disposition", description = "attachment; filename=\"filename.zip\"")
             )
         ),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -213,6 +225,7 @@ impl ResultsInput {
     ),
 )]
 pub async fn election_download_zip_results(
+    _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
@@ -272,6 +285,7 @@ pub async fn election_download_zip_results(
                 ("Content-Disposition", description = "attachment; filename=\"filename.pdf\"")
             )
         ),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -280,6 +294,7 @@ pub async fn election_download_zip_results(
     ),
 )]
 pub async fn election_download_pdf_results(
+    _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,
@@ -313,6 +328,7 @@ pub async fn election_download_pdf_results(
             description = "XML",
             content_type = "text/xml",
         ),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 404, description = "Not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -321,6 +337,7 @@ pub async fn election_download_pdf_results(
     ),
 )]
 pub async fn election_download_xml_results(
+    _user: Coordinator,
     State(elections_repo): State<Elections>,
     State(polling_stations_repo): State<PollingStations>,
     State(polling_station_results_entries_repo): State<PollingStationResultsEntries>,

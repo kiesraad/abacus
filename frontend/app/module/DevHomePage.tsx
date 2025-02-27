@@ -2,16 +2,128 @@ import { Link } from "react-router";
 
 import { MockTest } from "app/component/MockTest";
 
-import { ElectionListProvider, useElectionList } from "@kiesraad/api";
+import { ElectionListProvider, useApiState, useElectionList, useUserRole } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { AppLayout, PageTitle } from "@kiesraad/ui";
 
-function DevLinks() {
+function TypistLinks() {
   const { electionList } = useElectionList();
 
   return (
     <>
+      <strong>{t("typist")}</strong>
+      <ul>
+        <li>
+          <Link to={"/elections"}>{t("election.title.plural")}</Link>
+        </li>
+        <ul>
+          {electionList.map((election) => (
+            <li key={election.id}>
+              <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
+            </li>
+          ))}
+        </ul>
+      </ul>
+    </>
+  );
+}
+
+function AdministratorCoordinatorLinks() {
+  const { electionList } = useElectionList();
+
+  return (
+    <>
+      <strong>
+        {t("administrator")} / {t("coordinator")}
+      </strong>
+      <ul>
+        <li>
+          <Link to={"/elections"}>{t("election.manage")}</Link>
+        </li>
+        <ul>
+          {electionList.map((election) => (
+            <li key={election.id}>
+              <Link to={`/elections/${election.id}`}>{election.name}</Link>
+              <ul>
+                <li>
+                  <Link to={`/elections/${election.id}/status`}>{t("election_status.main_title")}</Link>
+                </li>
+                <li>
+                  <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
+                </li>
+                <li>
+                  <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
+                </li>
+              </ul>
+            </li>
+          ))}
+        </ul>
+        <li>
+          <Link to={`/users`}>{t("users.management")}</Link>
+        </li>
+        <li>
+          <Link to={`/workstations`}>{t("workstations.manage")}</Link>
+        </li>
+        <li>
+          <Link to={`/logs`}>{t("activity_log")}</Link>
+        </li>
+      </ul>
+    </>
+  );
+}
+
+function DevLinks() {
+  const { user, login, logout } = useApiState();
+  const { isTypist, isAdministrator, isCoordinator } = useUserRole();
+
+  return (
+    <>
       <p>Dit is een ontwikkelversie van Abacus. Kies hieronder welk deel van de applicatie je wilt gebruiken.</p>
+      <strong>Inloggen als</strong>
+      <ul>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("admin", "password");
+            }}
+          >
+            {t("administrator")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("typist", "password");
+            }}
+          >
+            {t("typist")}
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/dev"
+            onClick={() => {
+              void login("coordinator", "password");
+            }}
+          >
+            {t("coordinator")}
+          </Link>
+        </li>
+        {user && (
+          <li>
+            <Link
+              to="/dev"
+              onClick={() => {
+                void logout();
+              }}
+            >
+              {t("user.logout")}: {user.fullname || user.username} ({user.role})
+            </Link>
+          </li>
+        )}
+      </ul>
       <strong>{t("general")}</strong>
       <ul>
         <li>
@@ -29,56 +141,16 @@ function DevLinks() {
           </ul>
         </li>
       </ul>
-      <strong>{t("typist")}</strong>
-      <ul>
-        <li>
-          <Link to={"/elections"}>{t("election.title.plural")}</Link>
-        </li>
-        <ul>
-          {electionList.map((election) => (
-            <li key={election.id}>
-              <Link to={`/elections/${election.id}/data-entry`}>{election.name}</Link>
-            </li>
-          ))}
-        </ul>
-      </ul>
-      <strong>
-        {t("administrator")} / {t("coordinator")}
-      </strong>
-      <ul>
-        <li>
-          <Link to={"/elections#administrator"}>{t("election.manage")}</Link>
-        </li>
-        <ul>
-          {electionList.map((election) => (
-            <li key={election.id}>
-              <Link to={`/elections/${election.id}#coordinator`}>{election.name}</Link>
-              <ul>
-                <li>
-                  <Link to={`/elections/${election.id}/apportionment#coordinator`}>{t("apportionment.title")}</Link>
-                </li>
-                <li>
-                  <Link to={`/elections/${election.id}/status#coordinator`}>{t("election_status.main_title")}</Link>
-                </li>
-                <li>
-                  <Link to={`/elections/${election.id}/polling-stations#coordinator`}>
-                    {t("polling_station.title.plural")}
-                  </Link>
-                </li>
-              </ul>
-            </li>
-          ))}
-        </ul>
-        <li>
-          <Link to={`/users#administratorcoordinator`}>{t("users.management")}</Link>
-        </li>
-        <li>
-          <Link to={`/workstations#administrator`}>{t("workstations.manage")}</Link>
-        </li>
-        <li>
-          <Link to={`/logs#administratorcoordinator`}>{t("activity_log")}</Link>
-        </li>
-      </ul>
+      {isTypist && (
+        <ElectionListProvider>
+          <TypistLinks />
+        </ElectionListProvider>
+      )}
+      {(isAdministrator || isCoordinator) && (
+        <ElectionListProvider>
+          <AdministratorCoordinatorLinks />
+        </ElectionListProvider>
+      )}
     </>
   );
 }
@@ -94,9 +166,7 @@ export function DevHomePage() {
       </header>
       <main>
         <article>
-          <ElectionListProvider>
-            <DevLinks />
-          </ElectionListProvider>
+          <DevLinks />
           {__API_MSW__ && <MockTest />}
         </article>
       </main>

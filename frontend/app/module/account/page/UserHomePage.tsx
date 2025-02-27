@@ -1,9 +1,16 @@
-import { Link } from "react-router";
+import { Link, Navigate } from "react-router";
 
+import { useUser } from "@kiesraad/api";
 import { t } from "@kiesraad/i18n";
 import { PageTitle } from "@kiesraad/ui";
 
 export function UserHomePage() {
+  const user = useUser();
+
+  if (!user) {
+    return <Navigate to="/account/login" />;
+  }
+
   return (
     <>
       <PageTitle title={`${t("user.account")} - Abacus`} />

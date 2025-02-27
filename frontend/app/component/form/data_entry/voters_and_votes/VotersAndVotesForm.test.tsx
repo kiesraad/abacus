@@ -165,6 +165,22 @@ describe("Test VotersAndVotesForm", () => {
       expect(spy).toHaveBeenCalled();
     });
 
+    //TODO: duplicate test for other forms?
+    test("Inputs show formatted numbers when blurred", async () => {
+      const user = userEvent.setup();
+
+      renderForm();
+
+      const pollCards = await screen.findByRole("textbox", { name: "A Stempassen" });
+      await user.type(pollCards, "12345");
+
+      await user.keyboard("{enter}");
+      const proxyCertificates = screen.getByRole("textbox", { name: "B Volmachtbewijzen" });
+      expect(proxyCertificates).toHaveFocus();
+
+      expect(pollCards).toHaveValue("12.345");
+    });
+
     test("Form field entry and keybindings", async () => {
       const user = userEvent.setup();
       overrideServerGetDataEntryResponse({

@@ -13,7 +13,7 @@ export interface DataEntryNavigationProps {
 }
 
 export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNavigationProps) {
-  const { status, election, pollingStationId, formState, setCache, entryNumber, onDeleteDataEntry } =
+  const { status, election, pollingStationId, formState, setCache, entryNumber, onDeleteDataEntry, updateFormSection } =
     useDataEntryContext();
 
   // path check to see if the current location is part of the data entry flow
@@ -67,6 +67,11 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
     }
   };
 
+  const onAbortModalDoNoSave = () => {
+    updateFormSection({ hasChanges: false });
+    blocker.proceed();
+  };
+
   // when unsaved changes are detected and navigating within the data entry flow
   if (isPartOfDataEntryFlow(blocker.location.pathname)) {
     return (
@@ -99,7 +104,7 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
             variant="secondary"
             type="button"
             onClick={() => {
-              blocker.proceed();
+              onAbortModalDoNoSave();
             }}
           >
             {t("do_not_save")}

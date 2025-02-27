@@ -53,8 +53,15 @@ function onFocus(event: React.FocusEvent<HTMLInputElement>) {
 function onBlur(onChange?: React.ChangeEventHandler<HTMLInputElement>) {
   return function (event: React.FocusEvent<HTMLInputElement>) {
     if (event.target.value === "") return;
-    event.target.value = formatNumber(event.target.value);
-    if (onChange) onChange(event);
+    const oldValue = event.target.value;
+    const newValue = formatNumber(event.target.value);
+    event.target.value = newValue;
+    if (onChange) {
+      //only call onChange if the value has changed
+      if (oldValue !== newValue) {
+        onChange(event);
+      }
+    }
   };
 }
 

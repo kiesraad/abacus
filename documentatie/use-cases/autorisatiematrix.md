@@ -54,4 +54,5 @@ die de zetelverdeling vaststelt en daarvoor een proces-verbaal genereert.
 | Logs raadplegen                                  |     X     |        X        |        X        |               |               |
 
 [^1]: Stembureaus binnen de gemeente waar gestemd kan worden. Niet GSB(s) of CSB.
+
 [^2]: Zeer gewenst (should have), initieel nog geen gebruikersbeheer voor coördinator. 

@@ -101,21 +101,21 @@ Nog op te stellen o.b.v. Uitbreidingen CSO.
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
-__Priotiteit__: Should Have
-
 ### Hoofdscenario en uitbreidingen
 
-__Hoofdscenario:__
+__Hoofdscenario 1:__
 
 1. De coördinator GSB verneemt dat een stembureau niet open is gegaan.
 2. De coördinator stelt vast dat het stembureau op de gepubliceerde lijst staat en in de applicatie staat.
 3. De coördinator GSB verwijdert het stembureau.
-4. De applicatie toont een waarschuwing dat deze wijziging opgenomen moet worden in het PV.
+4. De applicatie toont een waarschuwing dat elke aanpassing op een stembureau, waardoor die afwijkt van de gepubliceerde lijst, opgenomen moet worden in het PV.
 
-__Uitbreidingen__:
+__Hoofdscenario 2:__
 
-1a. De coördinator GSB stelt vast dat de stembureaus in de applicatie niet kloppen met de gepubliceerde lijst:
-&emsp; 1a1. De coördinator GSB corrigeert de stembureaus in de applicatie.
+1. De coördinator GSB stelt vast dat de stembureaus in de applicatie niet kloppen met de gepubliceerde lijst.
+2. De coördinator GSB corrigeert de stembureaus in de applicatie.
+3. applicatie toont een waarschuwing dat elke aanpassing op een stembureau, waardoor die afwijkt van de gepubliceerde lijst, opgenomen moet worden in het PV.
+
 
 ### Niet in scope
 
@@ -124,9 +124,8 @@ __Uitbreidingen__:
 
 ### Open punten
 
-- Kan de beheerder ook tijdens de eerste zitting de lijst met stembureaus corrigeren?
-- Belang gepubliceerde lijst: CSB onderzoek - welke SBs zijn er in welke gemeentes? groter en meer onderzoek *TODO*
-  - Wet: je moet vantevoren publiceren. Geen ruimte voor andere lijst. (risico: twee bronnen van waarheid)
+- Kan ook de beheerder tijdens een zitting de lijst met stembureaus corrigeren?
+
 
 ## De coördinator voert bezwaren, bijzonderheden, etc. in. (zee)
 
@@ -147,11 +146,13 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__
 
-3a. De coördinator vult in: "zie bijlage". (ook voor 4)
+3a. De coördinator vult in: "zie bijlage".
+
+4a. De coördinator vult in: "zie bijlage".
 
 ### Open punten
 
-- Voert de coördinator de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen" in? Of doet de coördinator dat?
+- Voert de coördinator de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen" in? Of doet de applicatie dat?
   - Nieuw model GSB PV heeft drie vinkjes: toegelaten kiezers opnieuw vastgesteld, onderzocht vanwege andere redenen, stembiljetten (deels) herteld.
   - De SB PVs verschillen hierin tussen DSO en CSO.
   - Als de applicatie dit moet doen, moeten de invoerders dit over kunnen nemen van het SB PV.

@@ -116,4 +116,4 @@ __Hoofdscenario__:
 
 ### Open punten
 
-1. Is dit eigenlijk de use case voor het opschonen van de gebruikte machines?
+- Is dit eigenlijk de use case voor het opschonen van de gebruikte machines?

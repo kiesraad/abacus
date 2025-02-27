@@ -21,27 +21,22 @@ __Hoofdscenario:__
 5. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
 
 __Uitbreidingen:__  
+
+2a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
+&emsp; 2a1. De coördinator pauzeert de invoer.  
+&emsp; 2a2. De applicatie blokkeert verdere invoer.
+
 4a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
 
 5a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
 
+### Niet in scope
+- Verschillende fases in de applicatie, zoals inrichten, invoer, voorbereiden concept-PV. Reden hiervoor is dat we de coördinator niet willen beperken in wat deze wanneer kan doen. We zouden fases kunnen implementeren waartussen de coördinator vrij kan bewegen, maar dan is het gebruiksvriendelijker om bij bepaalde acties een waarschuwing te laten zien. De coördinator heeft wel de mogelijkheid om invoer open te zetten en te stoppen. Eventueel ook om invoer te pauzeren.
+
 ### Open punten
 
 - Welke controles willen we nog nadat de invoer is afgesloten? Of zijn die controles onderdeel van het afsluiten?
-- Invoer pauzeren staat hier nog niet in. *TODO*
-  - In geval van nood (bijv. brandalarm) wil je de invoer kunnen ~~schorsen~~ pauzeren.
-  - Kiesraad als beheerder programmatuur kan adviseren te stoppen met gebruik programmatuur.
-  - Status invoer staat los van status zitting (openen, schorsen, etc)
-
-- Zitting afsluiten is na afsluiten invoer, want ander acties voor genereren concept-PV. *TODO*
-- 'Fases': installatie, coördinator voorbereidende handelingen, eerste zitting + invoer, ... *TODO*
-  - moet je terugkunnen in fases? want er ongeluk klikt
-  - invoer vrijgeven kan alleen na start fase eerste zitting
-  - in welke fase voert de coördinator de overige informatie voor het PV in?
-    - moet niet invoerders blokkeren, bijv door heel veel vragen te stellen aan start opening zitting
-    - parallel aan invoerders
-
-
+- Hoe ziet het stoppen/blokkeren van invoer er precies uit?
 
 
 ## De invoerders vullen de resultaten van de tellingen in (vlieger)

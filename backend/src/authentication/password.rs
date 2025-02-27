@@ -12,6 +12,7 @@ use super::error::AuthenticationError;
 /// Helper newtype for password validation. Makes sure that password rules are followed when constructed with `new()`.
 pub(super) struct ValidatedPassword<'a>(&'a str);
 
+/// Minimum length of a password
 const MIN_PASSWORD_LEN: usize = 13;
 
 impl<'pw> ValidatedPassword<'pw> {

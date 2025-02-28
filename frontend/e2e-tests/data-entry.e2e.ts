@@ -57,7 +57,7 @@ test.describe("full data entry flow", () => {
     };
     await votersAndVotesPage.inputVotersCounts(voters);
     await votersAndVotesPage.inputVotesCounts(votes);
-    await expect(votersAndVotesPage.pollCardCount).toHaveValue(formatNumber(voters.poll_card_count));
+    await expect(votersAndVotesPage.pollCardCount).toHaveValue("1.000");
     await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);

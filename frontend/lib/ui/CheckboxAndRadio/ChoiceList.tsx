@@ -48,6 +48,7 @@ ChoiceList.Radio = ({
   id,
   name,
   label,
+  checked,
   children,
   disabled,
   autoFocus,
@@ -55,17 +56,22 @@ ChoiceList.Radio = ({
   defaultValue,
   hasError,
   reference,
+  value,
+  onChange,
 }: ChoiceListOptionProps) => (
   <Radio
     id={id}
     name={name}
     label={label}
+    checked={checked}
     disabled={disabled}
     autoFocus={autoFocus}
     defaultChecked={defaultChecked}
     hasError={hasError}
     ref={reference}
     defaultValue={defaultValue}
+    value={value}
+    onChange={onChange}
   >
     {children}
   </Radio>

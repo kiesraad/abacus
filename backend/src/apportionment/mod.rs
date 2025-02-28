@@ -731,9 +731,9 @@ mod tests {
 
     /// Tests apportionment for councils with less than 19 seats
     mod lt_19_seats {
-        use crate::apportionment::tests::get_election_summary_with_default_50_candidates;
         use crate::apportionment::{
             ApportionmentError, apportionment, get_total_seats_from_apportionment_result,
+            tests::get_election_summary_with_default_50_candidates,
         };
 
         /// Apportionment without remainder seats
@@ -972,9 +972,9 @@ mod tests {
 
     /// Tests apportionment for councils with 19 or more seats
     mod gte_19_seats {
-        use crate::apportionment::tests::get_election_summary_with_default_50_candidates;
         use crate::apportionment::{
             ApportionmentError, apportionment, get_total_seats_from_apportionment_result,
+            tests::get_election_summary_with_default_50_candidates,
         };
 
         /// Apportionment without remainder seats

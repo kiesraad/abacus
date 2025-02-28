@@ -433,39 +433,17 @@ fn allocate_remainder(
 }
 
 /// Get a vector with the political group number that was assigned the last residual seat.
-/// If the last residual seat was assigned to a political group with the same remainder
-/// as political groups assigned a seat in previous steps,
-/// return all political group numbers that had the same remainder.
-fn pg_assigned_from_previous_remainder_step(
+/// If the last residual seat was assigned to a political group with the same
+/// remainder/votes per seat as political groups assigned a seat in previous steps,
+/// return all political group numbers that had the same remainder/votes per seat.
+fn pg_assigned_from_previous_step(
     selected_pg: &PoliticalGroupStanding,
     previous: &[ApportionmentStep],
+    matcher: fn(&AssignedSeat) -> bool,
 ) -> Vec<PGNumber> {
     let mut pg_assigned = Vec::new();
     if let Some(previous_step) = previous.last() {
-        if previous_step.change.is_assigned_by_largest_remainder()
-            && previous_step
-                .change
-                .pg_options()
-                .contains(&selected_pg.pg_number)
-        {
-            pg_assigned = previous_step.change.pg_assigned()
-        }
-    }
-    pg_assigned.push(selected_pg.pg_number);
-    pg_assigned
-}
-
-/// Get a vector with the political group number that was assigned the last residual seat.
-/// If the last residual seat was assigned to a political group with the same votes per seat
-/// as political groups assigned a seat in previous steps,
-/// return all political group numbers that had the same votes per seat.
-fn pg_assigned_from_previous_average_step(
-    selected_pg: &PoliticalGroupStanding,
-    previous: &[ApportionmentStep],
-) -> Vec<PGNumber> {
-    let mut pg_assigned = Vec::new();
-    if let Some(previous_step) = previous.last() {
-        if previous_step.change.is_assigned_by_largest_average()
+        if matcher(&previous_step.change)
             && previous_step
                 .change
                 .pg_options()
@@ -489,7 +467,11 @@ fn step_allocate_remainder_using_largest_averages(
     let selected_pg = selected_pgs[0];
     Ok(AssignedSeat::LargestAverage(LargestAverageAssignedSeat {
         selected_pg_number: selected_pg.pg_number,
-        pg_assigned: pg_assigned_from_previous_average_step(selected_pg, previous),
+        pg_assigned: pg_assigned_from_previous_step(
+            selected_pg,
+            previous,
+            AssignedSeat::is_assigned_by_largest_average,
+        ),
         pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
         votes_per_seat: selected_pg.next_votes_per_seat,
     }))
@@ -547,7 +529,11 @@ fn step_allocate_remainder_using_largest_remainder(
         Ok(AssignedSeat::LargestRemainder(
             LargestRemainderAssignedSeat {
                 selected_pg_number: selected_pg.pg_number,
-                pg_assigned: pg_assigned_from_previous_remainder_step(selected_pg, previous),
+                pg_assigned: pg_assigned_from_previous_step(
+                    selected_pg,
+                    previous,
+                    AssignedSeat::is_assigned_by_largest_remainder,
+                ),
                 pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
                 remainder_votes: selected_pg.remainder_votes,
             },

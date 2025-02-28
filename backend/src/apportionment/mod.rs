@@ -735,6 +735,7 @@ mod tests {
             ApportionmentError, apportionment, get_total_seats_from_apportionment_result,
             tests::get_election_summary_with_default_50_candidates,
         };
+        use test_log::test;
 
         /// Apportionment without remainder seats
         ///
@@ -976,6 +977,7 @@ mod tests {
             ApportionmentError, apportionment, get_total_seats_from_apportionment_result,
             tests::get_election_summary_with_default_50_candidates,
         };
+        use test_log::test;
 
         /// Apportionment without remainder seats
         ///
@@ -1039,6 +1041,19 @@ mod tests {
             assert_eq!(total_seats, vec![15, 1, 1, 1, 1, 0, 0, 0, 0]);
         }
 
+        /// Apportionment with residual seats assigned with averages system
+        ///
+        /// Full seats: [0] - Remainder seats: 19  
+        /// 1-19 - largest average: [0/1] seat assigned to list 1
+        #[test]
+        fn test_with_0_votes() {
+            let totals = get_election_summary_with_default_50_candidates(vec![0]);
+            let result = apportionment(19, &totals).unwrap();
+            assert_eq!(result.steps.len(), 19);
+            let total_seats = get_total_seats_from_apportionment_result(result);
+            assert_eq!(total_seats, vec![19]);
+        }
+
         /// Apportionment with residual seats assigned with averages system  
         /// This test triggers Kieswet Article P 9
         ///
@@ -1085,19 +1100,6 @@ mod tests {
             ]);
             let result = apportionment(24, &totals);
             assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
-        }
-
-        /// Apportionment with residual seats assigned with averages system
-        ///
-        /// Full seats: [0] - Remainder seats: 19  
-        /// 1-19 - largest average: [0/1] seat assigned to list 1
-        #[test]
-        fn test_with_0_votes() {
-            let totals = get_election_summary_with_default_50_candidates(vec![0]);
-            let result = apportionment(19, &totals).unwrap();
-            assert_eq!(result.steps.len(), 19);
-            let total_seats = get_total_seats_from_apportionment_result(result);
-            assert_eq!(total_seats, vec![19]);
         }
 
         /// Apportionment with residual seats assigned with averages system

@@ -41,6 +41,7 @@ const dataEntryMachineDefinition = {
       on: {
         SUBMIT: "votersVotesPageWarningReminder",
         ACCEPT_WARNING: "voterVotesPageWarningAccepted",
+        CORRECT_WARNING: "voterVotesPageWarningCorrected",
       },
     },
     voterVotesPageWarningAccepted: {
@@ -48,7 +49,13 @@ const dataEntryMachineDefinition = {
         SUBMIT: "differencesPageWarningAccepted",
       },
     },
+    voterVotesPageWarningCorrected: {
+      on: {
+        SUBMIT: "differencesPageCorrected",
+      },
+    },
     differencesPageWarningAccepted: {},
+    differencesPageCorrected: {},
     votersVotesPageWarningReminder: {},
   },
 };
@@ -74,6 +81,13 @@ const votesWarning: VotesCounts = {
   votes_candidates_count: 65,
   blank_votes_count: 0,
   invalid_votes_count: 35,
+  total_votes_cast_count: 100,
+};
+
+const votesValid: VotesCounts = {
+  votes_candidates_count: 99,
+  blank_votes_count: 1,
+  invalid_votes_count: 0,
   total_votes_cast_count: 100,
 };
 
@@ -138,7 +152,17 @@ test.describe("Data entry model test", () => {
               "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
             );
           },
+          voterVotesPageWarningCorrected: async () => {
+            await expect(votersAndVotesPage.fieldset).toBeVisible();
+            await expect(votersAndVotesPage.warning).toContainText(
+              "Controleer aantal ongeldige stemmenW.202Het aantal ongeldige stemmen is erg hoog.",
+            );
+            await expect(votersAndVotesPage.acceptWarnings).toBeHidden();
+            const votersVotesFields = await votersAndVotesPage.getVotersAndVotesCounts();
+            expect(votersVotesFields).toStrictEqual({ voters, votes: votesValid });
+          },
         };
+
         const votersAndVotesPageEvents = {
           FILL_WITH_WARNING: async () => {
             await votersAndVotesPage.inputVotersCounts(voters);
@@ -150,10 +174,19 @@ test.describe("Data entry model test", () => {
           ACCEPT_WARNING: async () => {
             await votersAndVotesPage.acceptWarnings.check();
           },
+          CORRECT_WARNING: async () => {
+            await votersAndVotesPage.inputVotesCounts(votesValid);
+            // Tab press needed for page to register change after Playwright's fill()
+            await votersAndVotesPage.totalAdmittedVotersCount.press("Tab");
+          },
         };
 
         const differencesPageStates = {
           differencesPageWarningAccepted: async () => {
+            await expect(differencesPage.fieldset).toBeVisible();
+            await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
+          },
+          differencesPageCorrected: async () => {
             await expect(differencesPage.fieldset).toBeVisible();
             await expect(recountedPage.navPanel.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
           },

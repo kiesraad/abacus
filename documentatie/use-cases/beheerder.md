@@ -7,14 +7,12 @@ _Niveau:_ hoog-over, wolk, ☁️
 ### Hoofdscenario en uitbreidingen
 
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
-2. De beheerder leest de verkiezingsdefinitie in.
-3. De applicatie maakt op basis van de verkiezingsdefinitie de verkiezing GSB, verkiezing CSB, en GSB als stembureau voor CSB aan.
-4. De beheerder leest de kandidatenlijst in.
-5. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
-6. De beheerder maakt de gebruikers aan.
+2. [De beheerder zet de verkiezingen in de applicatie.](#de-beheerder-zet-de-verkiezingen-in-de-applicatie-zee)
+3. De beheerder leest de kandidatenlijst in.
+4. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
+5. De beheerder maakt de gebruikers aan.
 
 __Uitbreidingen:__  
-2a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
 
 3a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
 
@@ -23,8 +21,6 @@ __Uitbreidingen:__
 - Inlezen totalenlijst (kandidatenlijst met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
 
 ### Open punten
-- Verder uitwerken hoe GSB en CSB apart aangemaakt worden.
-  
 - Hoe precies krijgt de beheerder de beschikking over de verkiezingsdefinitie (met hash-code) en de kandidatenlijst (met hash-code)?
   - Zowel de verkiezingsdefinitie als de kandidatenlijst worden door het CSB aangemaakt met OSV KS.
 
@@ -56,6 +52,26 @@ __Uitbreidingen:__
 
 - Het is te verwachten dat de server ook als client gebruikt wordt door de coördinator.
 - Downloaden van een sleutel o.i.d. voor afzenderverificatie ontbreekt nog, want nog geen beslissing over oplossing.
+
+
+## De beheerder zet de verkiezingen in de applicatie (zee)
+
+__Niveau:__ gebruikersdoel, zee, 🌊
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario:__  
+1. De beheerder leest de verkiezingsdefinitie in.
+2. De beheerder stelt vast dat de hash van de verkiezingsdefinitie klopt.
+3. De applicatie maakt op basis van de verkiezingsdefinitie de verkiezing GSB, de verkiezing CSB, en het GSB als stembureau voor het CSB aan.
+
+__Uitbreidingen:__  
+1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
+
+2a. De hash van de verkiezingsdefinitie klopt niet.
+
+### Open punten
+- Verder uitwerken hoe GSB en CSB apart aangemaakt worden.
 
 
 ## De beheerder zet de stembureaus in de applicatie (zee)

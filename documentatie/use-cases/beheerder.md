@@ -8,7 +8,7 @@ _Niveau:_ hoog-over, wolk, ☁️
 
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
 2. De beheerder leest de verkiezingsdefinitie in.
-3. De applicatie maakt de verkiezing GSB, verkiezing CSB, en GSB als stembureau voor CSB aan.
+3. De applicatie maakt op basis van de verkiezingsdefinitie de verkiezing GSB, verkiezing CSB, en GSB als stembureau voor CSB aan.
 4. De beheerder leest de kandidatenlijst in.
 5. [De beheerder zet de stembureaus in de applicatie.](#de-beheerder-zet-de-stembureaus-in-de-applicatie-zee)
 6. De beheerder maakt de gebruikers aan.

@@ -248,7 +248,7 @@ fn political_groups_with_largest_remainder<'a>(
 /// If a political group got the absolute majority of votes but not the absolute majority of seats,
 /// re-assign the last residual seat to the political group with the absolute majority.
 /// This re-assignment is done according to article P 9 of the Kieswet.
-fn reallocate_residual_seat_for_absolute_majority(
+fn reassign_residual_seat_for_absolute_majority(
     seats: u64,
     totals: &ElectionSummary,
     pgs_last_residual_seat: &[PGNumber],
@@ -289,7 +289,7 @@ fn reallocate_residual_seat_for_absolute_majority(
         standing[majority_pg_votes.number as usize - 1].residual_seats += 1;
 
         info!(
-            "Residual seat first allocated to list {} has been re-allocated to list {} in accordance with Article P 9 Kieswet",
+            "Residual seat first assigned to list {} has been re-assigned to list {} in accordance with Article P 9 Kieswet",
             pgs_last_residual_seat[0], majority_pg_votes.number
         );
         Ok((
@@ -326,9 +326,9 @@ pub fn seat_assignment(
     let residual_seats = seats - full_seats;
 
     let (steps, final_standing) = if residual_seats > 0 {
-        allocate_remainder(&initial_standing, totals, seats, residual_seats)?
+        assign_remainder(&initial_standing, totals, seats, residual_seats)?
     } else {
-        info!("All seats have been allocated without any residual seats");
+        info!("All seats have been assigned without any residual seats");
         (vec![], initial_standing)
     };
 
@@ -336,7 +336,7 @@ pub fn seat_assignment(
     //  mark deceased candidates
 
     // TODO: #1044 [Artikel P 10 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_10&z=2025-02-12&g=2025-02-12)
-    //  check for list exhaustion (allocated seats cannot be more than total candidates)
+    //  check for list exhaustion (assigned seats cannot be more than total candidates)
 
     Ok(SeatAssignmentResult {
         seats,
@@ -348,10 +348,10 @@ pub fn seat_assignment(
     })
 }
 
-/// This function allocates the residual seats that remain after full seat allocation is finished.
+/// This function assigns the residual seats that remain after full seat assignment is finished.
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
-fn allocate_remainder(
+fn assign_remainder(
     initial_standing: &[PoliticalGroupStanding],
     totals: &ElectionSummary,
     seats: u64,
@@ -367,14 +367,10 @@ fn allocate_remainder(
         residual_seat_number += 1;
         let step = if seats >= 19 {
             // [Artikel P 7 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_7&z=2025-02-12&g=2025-02-12)
-            step_allocate_remainder_using_largest_averages(
-                &current_standing,
-                residual_seats,
-                &steps,
-            )?
+            step_assign_remainder_using_largest_averages(&current_standing, residual_seats, &steps)?
         } else {
             // [Artikel P 8 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_8&z=2025-02-12&g=2025-02-12)
-            step_allocate_remainder_using_largest_remainder(
+            step_assign_remainder_using_largest_remainder(
                 &current_standing,
                 residual_seats,
                 &steps,
@@ -406,7 +402,7 @@ fn allocate_remainder(
 
     // [Artikel P 9 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_9&z=2025-02-12&g=2025-02-12)
     let (current_standing, assigned_seat) = if let Some(last_step) = steps.last() {
-        reallocate_residual_seat_for_absolute_majority(
+        reassign_residual_seat_for_absolute_majority(
             seats,
             totals,
             &last_step.change.pg_assigned(),
@@ -454,7 +450,7 @@ fn pg_assigned_from_previous_step(
 
 /// Assign the next residual seat, and return which group that seat was assigned to.
 /// This assignment is done according to the rules for elections with 19 seats or more.
-fn step_allocate_remainder_using_largest_averages(
+fn step_assign_remainder_using_largest_averages(
     standing: &[PoliticalGroupStanding],
     residual_seats: u64,
     previous: &[SeatAssignmentStep],
@@ -508,16 +504,16 @@ fn political_groups_qualifying_for_unique_largest_average<'a>(
 
 /// Assign the next residual seat, and return which group that seat was assigned to.
 /// This assignment is done according to the rules for elections with less than 19 seats.
-fn step_allocate_remainder_using_largest_remainder(
+fn step_assign_remainder_using_largest_remainder(
     assigned_seats: &[PoliticalGroupStanding],
     residual_seats: u64,
     previous: &[SeatAssignmentStep],
 ) -> Result<AssignedSeat, ApportionmentError> {
-    // first we check if there are any political groups that still qualify for a largest remainder allocated seat
+    // first we check if there are any political groups that still qualify for a largest remainder assigned seat
     let mut qualifying_for_remainder =
         political_groups_qualifying_for_largest_remainder(assigned_seats, previous).peekable();
 
-    // If there is at least one element in the iterator, we know we can still do a largest remainder allocation
+    // If there is at least one element in the iterator, we know we can still do a largest remainder assignment
     if qualifying_for_remainder.peek().is_some() {
         let selected_pgs =
             political_groups_with_largest_remainder(qualifying_for_remainder, residual_seats)?;
@@ -542,7 +538,7 @@ fn step_allocate_remainder_using_largest_remainder(
             political_groups_qualifying_for_unique_largest_average(assigned_seats, previous)
                 .peekable();
         if let Some(&&assigned_seats) = qualifying_for_unique_largest_average.peek() {
-            step_allocate_remainder_using_largest_averages(
+            step_assign_remainder_using_largest_averages(
                 &[assigned_seats],
                 residual_seats,
                 previous,
@@ -552,7 +548,7 @@ fn step_allocate_remainder_using_largest_remainder(
             // got a largest remainder seat, and every group also had at least a single residual seat
             // assigned to them. We now allow any residual seats to be assigned using the largest
             // averages procedure
-            step_allocate_remainder_using_largest_averages(assigned_seats, residual_seats, previous)
+            step_assign_remainder_using_largest_averages(assigned_seats, residual_seats, previous)
         }
     }
 }
@@ -876,7 +872,7 @@ mod tests {
         /// 1 - largest remainder: seat assigned to list 2
         /// 2 - largest remainder: seat assigned to list 3
         /// 3 - largest remainder: seat assigned to list 4
-        /// 4 - Residual seat first allocated to list 4 has been re-allocated to list 1 in accordance with Article P 9 Kieswet
+        /// 4 - Residual seat first assigned to list 4 has been re-assigned to list 1 in accordance with Article P 9 Kieswet
         #[test]
         fn test_with_absolute_majority_of_votes_but_not_seats() {
             let totals =
@@ -1060,7 +1056,7 @@ mod tests {
         /// 4 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624 1/2, 624, 7] seat assigned to list 5
         /// 5 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 7] seat assigned to list 6
         /// 6 - largest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 7] seat assigned to list 7
-        /// 7 - Residual seat first allocated to list 7 has been re-allocated to list 1 in accordance with Article P 9 Kieswet
+        /// 7 - Residual seat first assigned to list 7 has been re-assigned to list 1 in accordance with Article P 9 Kieswet
         #[test]
         fn test_with_absolute_majority_of_votes_but_not_seats() {
             let totals = get_election_summary_with_default_50_candidates(vec![

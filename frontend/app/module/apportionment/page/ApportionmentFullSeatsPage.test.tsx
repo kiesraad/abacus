@@ -20,7 +20,7 @@ const renderApportionmentFullSeatsPage = () =>
   );
 
 describe("ApportionmentFullSeatsPage", () => {
-  test("Full seats allocation and residual seats calculation tables visible", async () => {
+  test("Full seats assignment and residual seats calculation tables visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment,

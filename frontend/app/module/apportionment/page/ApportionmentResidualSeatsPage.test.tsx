@@ -35,7 +35,7 @@ const renderApportionmentResidualSeatsPage = () =>
   );
 
 describe("ApportionmentResidualSeatsPage", () => {
-  test("Residual seats allocation table for 19 or more seats visible", async () => {
+  test("Residual seats assignment table for 19 or more seats visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_19_or_more_seats));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment_19_or_more_seats,
@@ -71,7 +71,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats allocation tables for less than 19 seats with both systems visible", async () => {
+  test("Residual seats assignment tables for less than 19 seats with both systems visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_less_than_19_seats));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment_less_than_19_seats,
@@ -117,7 +117,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats allocation tables for less than 19 seats with only remainder system visible", async () => {
+  test("Residual seats assignment tables for less than 19 seats with only remainder system visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_less_than_19_seats));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: {
@@ -150,7 +150,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats allocation table for less than 19 seats and absolute majority change information visible", async () => {
+  test("Residual seats assignment table for less than 19 seats and absolute majority change information visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_absolute_majority_change));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
       seat_assignment: seat_assignment_absolute_majority_change,

@@ -25,7 +25,7 @@ pub struct ElectionApportionmentResponse {
     pub election_summary: ElectionSummary,
 }
 
-/// Get the seat allocation for an election
+/// Get the apportionment for an election
 #[utoipa::path(
   post,
   path = "/api/elections/{election_id}/apportionment",

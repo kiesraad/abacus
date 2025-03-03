@@ -179,7 +179,7 @@
         "tags": [
           "apportionment"
         ],
-        "summary": "Get the seat allocation for an election",
+        "summary": "Get the apportionment for an election",
         "operationId": "election_apportionment",
         "parameters": [
           {

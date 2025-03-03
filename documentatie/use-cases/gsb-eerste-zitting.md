@@ -114,7 +114,7 @@ __Hoofdscenario 2:__
 
 1. De coördinator GSB stelt vast dat de stembureaus in de applicatie niet kloppen met de gepubliceerde lijst.
 2. De coördinator GSB corrigeert de stembureaus in de applicatie.
-3. applicatie toont een waarschuwing dat elke aanpassing op een stembureau, waardoor die afwijkt van de gepubliceerde lijst, opgenomen moet worden in het PV.
+3. De applicatie toont een waarschuwing dat elke aanpassing op een stembureau, waardoor die afwijkt van de gepubliceerde lijst, opgenomen moet worden in het PV.
 
 ### Niet in scope
 

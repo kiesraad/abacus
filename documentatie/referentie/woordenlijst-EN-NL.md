@@ -187,7 +187,8 @@ Deze termen zijn allemaal te vinden op <https://english.kiesraad.nl/>.
 | restzetel                            |           | residual seat                | via https://english.kiesraad.nl/  - NIET 'rest seat'    |
 | raadszetel                           |           | council seat                 |                                                         |
 | zetelverdeling                       |           | apportionment                |                                                         |
-| zeteltoewijzing                      |           | seat assignment              |                                                         |
+| zeteltoewijzing                      |           | seat assignment              | toewijzing van een zetel aan een politieke groepering   |
+| aanwijzing van de gekozen kandidaat  |           | candidate nomination         | aanwijzing van de gekozen kandidaat aan een zetel       |
 | lijstuitputting                      |           | list exhaustion              | nog op zoek naar een betere term                        |
 | kandidatenlijst                      |           | list of candidates           |                                                         |
 | kandidaat                            |           | candidate                    |                                                         |

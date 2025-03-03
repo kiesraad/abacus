@@ -187,13 +187,13 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
         components(
             schemas(
                 ErrorResponse,
-                apportionment::DisplayFraction,
-                apportionment::ApportionmentResult,
-                apportionment::PoliticalGroupStanding,
-                apportionment::ApportionmentStep,
                 apportionment::AssignedSeat,
+                apportionment::DisplayFraction,
                 apportionment::LargestAverageAssignedSeat,
                 apportionment::LargestRemainderAssignedSeat,
+                apportionment::PoliticalGroupStanding,
+                apportionment::SeatAssignmentResult,
+                apportionment::SeatAssignmentStep,
                 authentication::Credentials,
                 authentication::LoginResponse,
                 authentication::ChangePasswordRequest,

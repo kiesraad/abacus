@@ -10,7 +10,7 @@ import cls from "./Apportionment.module.css";
 
 export function ApportionmentFullSeatsPage() {
   const { election } = useElection();
-  const { apportionment, error } = useApportionmentContext();
+  const { seatAssignment, error } = useApportionmentContext();
 
   return (
     <>
@@ -30,15 +30,15 @@ export function ApportionmentFullSeatsPage() {
               </Alert>
             </FormLayout.Alert>
           ) : (
-            apportionment && (
+            seatAssignment && (
               <>
                 <div>
                   <h2 className={cls.tableTitle}>{t("apportionment.how_often_is_quota_met")}</h2>
                   <span className={cls.tableInformation}>{t("apportionment.full_seats_information")}</span>
                   <FullSeatsTable
-                    finalStanding={apportionment.final_standing}
+                    finalStanding={seatAssignment.final_standing}
                     politicalGroups={election.political_groups}
-                    quota={apportionment.quota}
+                    quota={seatAssignment.quota}
                   />
                 </div>
 
@@ -46,20 +46,20 @@ export function ApportionmentFullSeatsPage() {
                   <h2 className={cls.tableTitle}>{t("apportionment.how_many_residual_seats")}</h2>
                   <span className={cls.tableInformation}>
                     {tx(
-                      `apportionment.residual_seats_information_amount_and_link.${apportionment.residual_seats > 1 ? "plural" : "singular"}`,
+                      `apportionment.residual_seats_information_amount_and_link.${seatAssignment.residual_seats > 1 ? "plural" : "singular"}`,
                       {
                         link: (title) => <Link to="../details-residual-seats">{title}</Link>,
                       },
-                      { num_residual_seats: apportionment.residual_seats },
+                      { num_residual_seats: seatAssignment.residual_seats },
                     )}{" "}
                     {t(
-                      `apportionment.residual_seats_information_largest_${apportionment.seats >= 19 ? "averages" : "remainders"}`,
+                      `apportionment.residual_seats_information_largest_${seatAssignment.seats >= 19 ? "averages" : "remainders"}`,
                     )}
                   </span>
                   <ResidualSeatsCalculationTable
-                    seats={apportionment.seats}
-                    fullSeats={apportionment.full_seats}
-                    residualSeats={apportionment.residual_seats}
+                    seats={seatAssignment.seats}
+                    fullSeats={seatAssignment.full_seats}
+                    residualSeats={seatAssignment.residual_seats}
                   />
                 </div>
               </>

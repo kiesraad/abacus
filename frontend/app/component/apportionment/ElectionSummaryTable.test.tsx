@@ -3,15 +3,15 @@ import { describe, expect, test } from "vitest";
 import { render, screen } from "@kiesraad/test";
 
 import { ElectionSummaryTable } from "./ElectionSummaryTable";
-import { apportionment, election, election_summary } from "./test-data/19-or-more-seats";
+import { election, election_summary, seat_assignment } from "./test-data/19-or-more-seats";
 
 describe("ElectionSummaryTable", () => {
   test("renders a table with the election summary with number of voters", async () => {
     render(
       <ElectionSummaryTable
         votesCounts={election_summary.votes_counts}
-        seats={apportionment.seats}
-        quota={apportionment.quota}
+        seats={seat_assignment.seats}
+        quota={seat_assignment.quota}
         numberOfVoters={election.number_of_voters}
       />,
     );
@@ -33,8 +33,8 @@ describe("ElectionSummaryTable", () => {
     render(
       <ElectionSummaryTable
         votesCounts={election_summary.votes_counts}
-        seats={apportionment.seats}
-        quota={apportionment.quota}
+        seats={seat_assignment.seats}
+        quota={seat_assignment.quota}
         numberOfVoters={undefined}
       />,
     );

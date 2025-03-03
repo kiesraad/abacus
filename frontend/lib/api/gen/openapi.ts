@@ -151,31 +151,6 @@ export interface AbsoluteMajorityChange {
 }
 
 /**
- * The result of the apportionment procedure. This contains the number of seats and the quota
-that was used. It then contains the initial standing after full seats were assigned,
-and each of the changes and intermediate standings. The final standing contains the
-number of seats per political group that was assigned after all seats were assigned.
- */
-export interface ApportionmentResult {
-  final_standing: PoliticalGroupSeatAssignment[];
-  full_seats: number;
-  quota: Fraction;
-  residual_seats: number;
-  seats: number;
-  steps: ApportionmentStep[];
-}
-
-/**
- * Records the details for a specific residual seat, and how the standing is
-once that residual seat was assigned
- */
-export interface ApportionmentStep {
-  change: AssignedSeat;
-  residual_seat_number: number;
-  standing: PoliticalGroupStanding[];
-}
-
-/**
  * Records the political group and specific change for a specific residual seat
  */
 export type AssignedSeat =
@@ -275,8 +250,8 @@ export interface Election {
  * Election details response, including the election's candidate list (political groups) and its polling stations
  */
 export interface ElectionApportionmentResponse {
-  apportionment: ApportionmentResult;
   election_summary: ElectionSummary;
+  seat_assignment: SeatAssignmentResult;
 }
 
 /**
@@ -545,6 +520,31 @@ export type Role = "administrator" | "typist" | "coordinator";
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
+}
+
+/**
+ * The result of the seat assignment procedure. This contains the number of seats and the quota
+that was used. It then contains the initial standing after full seats were assigned,
+and each of the changes and intermediate standings. The final standing contains the
+number of seats per political group that was assigned after all seats were assigned.
+ */
+export interface SeatAssignmentResult {
+  final_standing: PoliticalGroupSeatAssignment[];
+  full_seats: number;
+  quota: Fraction;
+  residual_seats: number;
+  seats: number;
+  steps: SeatAssignmentStep[];
+}
+
+/**
+ * Records the details for a specific residual seat, and how the standing is
+once that residual seat was assigned
+ */
+export interface SeatAssignmentStep {
+  change: AssignedSeat;
+  residual_seat_number: number;
+  standing: PoliticalGroupStanding[];
 }
 
 /**

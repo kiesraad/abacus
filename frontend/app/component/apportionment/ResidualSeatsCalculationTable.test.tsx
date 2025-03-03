@@ -3,15 +3,15 @@ import { describe, expect, test } from "vitest";
 import { render, screen } from "@kiesraad/test";
 
 import { ResidualSeatsCalculationTable } from "./ResidualSeatsCalculationTable";
-import { apportionment } from "./test-data/19-or-more-seats";
+import { seat_assignment } from "./test-data/19-or-more-seats";
 
 describe("ResidualSeatsCalculationTable", () => {
   test("renders a table with the residual seats calculation", async () => {
     render(
       <ResidualSeatsCalculationTable
-        seats={apportionment.seats}
-        fullSeats={apportionment.full_seats}
-        residualSeats={apportionment.residual_seats}
+        seats={seat_assignment.seats}
+        fullSeats={seat_assignment.full_seats}
+        residualSeats={seat_assignment.residual_seats}
       />,
     );
 

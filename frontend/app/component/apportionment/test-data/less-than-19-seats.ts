@@ -1,6 +1,6 @@
-import { ApportionmentResult, ApportionmentStep, Election, ElectionSummary } from "@kiesraad/api";
+import { Election, ElectionSummary, SeatAssignmentResult, SeatAssignmentStep } from "@kiesraad/api";
 
-export const largest_remainder_steps: ApportionmentStep[] = [
+export const largest_remainder_steps: SeatAssignmentStep[] = [
   {
     residual_seat_number: 1,
     change: {
@@ -307,7 +307,7 @@ export const largest_remainder_steps: ApportionmentStep[] = [
   },
 ];
 
-export const largest_average_steps: ApportionmentStep[] = [
+export const largest_average_steps: SeatAssignmentStep[] = [
   {
     residual_seat_number: 3,
     change: {
@@ -766,7 +766,7 @@ export const largest_average_steps: ApportionmentStep[] = [
   },
 ];
 
-export const apportionment: ApportionmentResult = {
+export const seat_assignment: SeatAssignmentResult = {
   seats: 15,
   full_seats: 10,
   residual_seats: 5,

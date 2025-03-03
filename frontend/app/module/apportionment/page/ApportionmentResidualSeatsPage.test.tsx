@@ -2,20 +2,20 @@ import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import {
-  apportionment as apportionment_19_or_more_seats,
   election as election_19_or_more_seats,
   election_summary as election_summary_19_or_more_seats,
+  seat_assignment as seat_assignment_19_or_more_seats,
 } from "app/component/apportionment/test-data/19-or-more-seats";
 import {
-  apportionment as apportionment_absolute_majority_change,
   election as election_absolute_majority_change,
   election_summary as election_summary_absolute_majority_change,
+  seat_assignment as seat_assignment_absolute_majority_change,
 } from "app/component/apportionment/test-data/absolute-majority-change";
 import {
-  apportionment as apportionment_less_than_19_seats,
   election as election_less_than_19_seats,
   election_summary as election_summary_less_than_19_seats,
   largest_remainder_steps,
+  seat_assignment as seat_assignment_less_than_19_seats,
 } from "app/component/apportionment/test-data/less-than-19-seats";
 import { routes } from "app/routes";
 
@@ -35,10 +35,10 @@ const renderApportionmentResidualSeatsPage = () =>
   );
 
 describe("ApportionmentResidualSeatsPage", () => {
-  test("Residual seats allocation table for 19 or more seats visible", async () => {
+  test("Residual seats assignment table for 19 or more seats visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_19_or_more_seats));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      apportionment: apportionment_19_or_more_seats,
+      seat_assignment: seat_assignment_19_or_more_seats,
       election_summary: election_summary_19_or_more_seats,
     } satisfies ElectionApportionmentResponse);
 
@@ -71,10 +71,10 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats allocation tables for less than 19 seats with both systems visible", async () => {
+  test("Residual seats assignment tables for less than 19 seats with both systems visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_less_than_19_seats));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      apportionment: apportionment_less_than_19_seats,
+      seat_assignment: seat_assignment_less_than_19_seats,
       election_summary: election_summary_less_than_19_seats,
     } satisfies ElectionApportionmentResponse);
 
@@ -117,11 +117,11 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats allocation tables for less than 19 seats with only remainder system visible", async () => {
+  test("Residual seats assignment tables for less than 19 seats with only remainder system visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_less_than_19_seats));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      apportionment: {
-        ...apportionment_less_than_19_seats,
+      seat_assignment: {
+        ...seat_assignment_less_than_19_seats,
         steps: largest_remainder_steps,
       },
       election_summary: election_summary_less_than_19_seats,
@@ -150,10 +150,10 @@ describe("ApportionmentResidualSeatsPage", () => {
     expect(screen.queryByTestId("absolute_majority_change_information")).not.toBeInTheDocument();
   });
 
-  test("Residual seats allocation table for less than 19 seats and absolute majority change information visible", async () => {
+  test("Residual seats assignment table for less than 19 seats and absolute majority change information visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election_absolute_majority_change));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      apportionment: apportionment_absolute_majority_change,
+      seat_assignment: seat_assignment_absolute_majority_change,
       election_summary: election_summary_absolute_majority_change,
     } satisfies ElectionApportionmentResponse);
 

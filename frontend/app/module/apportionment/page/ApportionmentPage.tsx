@@ -17,7 +17,7 @@ function get_number_of_seats_assigned_sentence(seats: number, type: "residual_se
 
 export function ApportionmentPage() {
   const { election } = useElection();
-  const { apportionment, electionSummary, error } = useApportionmentContext();
+  const { seatAssignment, electionSummary, error } = useApportionmentContext();
 
   return (
     <>
@@ -37,34 +37,34 @@ export function ApportionmentPage() {
               </Alert>
             </FormLayout.Alert>
           ) : (
-            apportionment &&
+            seatAssignment &&
             electionSummary && (
               <>
                 <div>
                   <h2 className={cls.tableTitle}>{t("apportionment.election_summary")}</h2>
                   <ElectionSummaryTable
                     votesCounts={electionSummary.votes_counts}
-                    seats={apportionment.seats}
-                    quota={apportionment.quota}
+                    seats={seatAssignment.seats}
+                    quota={seatAssignment.quota}
                     numberOfVoters={election.number_of_voters}
                   />
                 </div>
                 <div>
                   <h2 className={cls.tableTitle}>{t("apportionment.title")}</h2>
                   <ApportionmentTable
-                    finalStanding={apportionment.final_standing}
+                    finalStanding={seatAssignment.final_standing}
                     politicalGroups={election.political_groups}
-                    fullSeats={apportionment.full_seats}
-                    residualSeats={apportionment.residual_seats}
-                    seats={apportionment.seats}
+                    fullSeats={seatAssignment.full_seats}
+                    residualSeats={seatAssignment.residual_seats}
+                    seats={seatAssignment.seats}
                   />
                   <ul>
                     <li>
-                      {get_number_of_seats_assigned_sentence(apportionment.full_seats, "full_seat")} (
+                      {get_number_of_seats_assigned_sentence(seatAssignment.full_seats, "full_seat")} (
                       <Link to="./details-full-seats">{t("apportionment.view_details")}</Link>)
                     </li>
                     <li>
-                      {get_number_of_seats_assigned_sentence(apportionment.residual_seats, "residual_seat")} (
+                      {get_number_of_seats_assigned_sentence(seatAssignment.residual_seats, "residual_seat")} (
                       <Link to="./details-residual-seats">{t("apportionment.view_details")}</Link>)
                     </li>
                   </ul>

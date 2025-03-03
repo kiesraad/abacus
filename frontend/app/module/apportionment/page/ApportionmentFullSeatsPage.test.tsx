@@ -1,7 +1,7 @@
 import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { apportionment, election, election_summary } from "app/component/apportionment/test-data/less-than-19-seats";
+import { election, election_summary, seat_assignment } from "app/component/apportionment/test-data/less-than-19-seats";
 import { routes } from "app/routes";
 
 import { ApportionmentProvider, ElectionApportionmentResponse, ElectionProvider, ErrorResponse } from "@kiesraad/api";
@@ -23,7 +23,7 @@ describe("ApportionmentFullSeatsPage", () => {
   test("Full seats allocation and residual seats calculation tables visible", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData(election));
     overrideOnce("post", "/api/elections/1/apportionment", 200, {
-      apportionment: apportionment,
+      seat_assignment: seat_assignment,
       election_summary: election_summary,
     } satisfies ElectionApportionmentResponse);
 

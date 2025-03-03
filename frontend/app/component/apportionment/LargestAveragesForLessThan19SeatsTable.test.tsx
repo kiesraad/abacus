@@ -4,14 +4,14 @@ import { PoliticalGroup } from "@kiesraad/api";
 import { render, screen } from "@kiesraad/test";
 
 import { LargestAveragesForLessThan19SeatsTable } from "./LargestAveragesForLessThan19SeatsTable";
-import { apportionment, election, largest_average_steps } from "./test-data/less-than-19-seats";
+import { election, largest_average_steps, seat_assignment } from "./test-data/less-than-19-seats";
 
 describe("LargestAveragesForLessThan19SeatsTable", () => {
   test("renders a table with the residual seat allocation with largest averages system for less than 19 seats", async () => {
     render(
       <LargestAveragesForLessThan19SeatsTable
         largestAverageSteps={largest_average_steps}
-        finalStanding={apportionment.final_standing}
+        finalStanding={seat_assignment.final_standing}
         politicalGroups={election.political_groups as PoliticalGroup[]}
       />,
     );

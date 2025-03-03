@@ -1664,75 +1664,6 @@
           }
         }
       },
-      "ApportionmentResult": {
-        "type": "object",
-        "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after full seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
-        "required": [
-          "seats",
-          "full_seats",
-          "residual_seats",
-          "quota",
-          "steps",
-          "final_standing"
-        ],
-        "properties": {
-          "final_standing": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupSeatAssignment"
-            }
-          },
-          "full_seats": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "quota": {
-            "$ref": "#/components/schemas/Fraction"
-          },
-          "residual_seats": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "seats": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "steps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ApportionmentStep"
-            }
-          }
-        }
-      },
-      "ApportionmentStep": {
-        "type": "object",
-        "description": "Records the details for a specific residual seat, and how the standing is\nonce that residual seat was assigned",
-        "required": [
-          "residual_seat_number",
-          "change",
-          "standing"
-        ],
-        "properties": {
-          "change": {
-            "$ref": "#/components/schemas/AssignedSeat"
-          },
-          "residual_seat_number": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "standing": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupStanding"
-            }
-          }
-        }
-      },
       "AssignedSeat": {
         "oneOf": [
           {
@@ -2079,15 +2010,15 @@
         "type": "object",
         "description": "Election details response, including the election's candidate list (political groups) and its polling stations",
         "required": [
-          "apportionment",
+          "seat_assignment",
           "election_summary"
         ],
         "properties": {
-          "apportionment": {
-            "$ref": "#/components/schemas/ApportionmentResult"
-          },
           "election_summary": {
             "$ref": "#/components/schemas/ElectionSummary"
+          },
+          "seat_assignment": {
+            "$ref": "#/components/schemas/SeatAssignmentResult"
           }
         }
       },
@@ -2811,6 +2742,75 @@
         "properties": {
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
+          }
+        }
+      },
+      "SeatAssignmentResult": {
+        "type": "object",
+        "description": "The result of the seat assignment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after full seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
+        "required": [
+          "seats",
+          "full_seats",
+          "residual_seats",
+          "quota",
+          "steps",
+          "final_standing"
+        ],
+        "properties": {
+          "final_standing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupSeatAssignment"
+            }
+          },
+          "full_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "quota": {
+            "$ref": "#/components/schemas/Fraction"
+          },
+          "residual_seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "seats": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeatAssignmentStep"
+            }
+          }
+        }
+      },
+      "SeatAssignmentStep": {
+        "type": "object",
+        "description": "Records the details for a specific residual seat, and how the standing is\nonce that residual seat was assigned",
+        "required": [
+          "residual_seat_number",
+          "change",
+          "standing"
+        ],
+        "properties": {
+          "change": {
+            "$ref": "#/components/schemas/AssignedSeat"
+          },
+          "residual_seat_number": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "standing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupStanding"
+            }
           }
         }
       },

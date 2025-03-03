@@ -52,7 +52,7 @@ impl From<&User> for LoginResponse {
 #[cfg(test)]
 mod tests {
     use super::role::Role;
-    use api::{ChangePasswordRequest, Credentials, LoginResponse, UserListResponse};
+    use api::{AccountUpdateRequest, Credentials, LoginResponse, UserListResponse};
     use axum::{
         Router,
         body::Body,
@@ -80,7 +80,7 @@ mod tests {
             .route("/api/user/login", post(api::login))
             .route("/api/user/logout", post(api::logout))
             .route("/api/user/whoami", get(api::whoami))
-            .route("/api/user/change-password", post(api::change_password))
+            .route("/api/user/account", put(api::account_update))
             .layer(middleware::from_fn_with_state(pool, extend_session));
 
         #[cfg(debug_assertions)]
@@ -430,20 +430,20 @@ mod tests {
             .unwrap()
             .to_string();
 
-        // Call the change password endpoint
+        // Call the account update endpoint
         let response = app
             .clone()
             .oneshot(
                 Request::builder()
-                    .method(Method::POST)
-                    .uri("/api/user/change-password")
+                    .method(Method::PUT)
+                    .uri("/api/user/account")
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", &cookie)
                     .body(Body::from(
-                        serde_json::to_vec(&ChangePasswordRequest {
+                        serde_json::to_vec(&AccountUpdateRequest {
                             username: "admin".to_string(),
-                            password: "password".to_string(),
-                            new_password: "new_password".to_string(),
+                            password: "new_password".to_string(),
+                            fullname: None,
                         })
                         .unwrap(),
                     ))
@@ -513,44 +513,20 @@ mod tests {
             .unwrap()
             .to_string();
 
-        // Call the change password endpoint with incorrect password
+        // Call the account update endpoint with incorrect user
         let response = app
             .clone()
             .oneshot(
                 Request::builder()
-                    .method(Method::POST)
-                    .uri("/api/user/change-password")
+                    .method(Method::PUT)
+                    .uri("/api/user/account")
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", &cookie)
                     .body(Body::from(
-                        serde_json::to_vec(&ChangePasswordRequest {
-                            username: "admin".to_string(),
-                            password: "wrong_password".to_string(),
-                            new_password: "new_password".to_string(),
-                        })
-                        .unwrap(),
-                    ))
-                    .unwrap(),
-            )
-            .await
-            .unwrap();
-
-        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
-
-        // Call the change password endpoint with incorrect ucer
-        let response = app
-            .clone()
-            .oneshot(
-                Request::builder()
-                    .method(Method::POST)
-                    .uri("/api/user/change-password")
-                    .header(CONTENT_TYPE, "application/json")
-                    .header("cookie", &cookie)
-                    .body(Body::from(
-                        serde_json::to_vec(&ChangePasswordRequest {
+                        serde_json::to_vec(&AccountUpdateRequest {
                             username: "wrong_user".to_string(),
-                            password: "password".to_string(),
-                            new_password: "new_password".to_string(),
+                            password: "new_password".to_string(),
+                            fullname: Some("Wrong User".to_string()),
                         })
                         .unwrap(),
                     ))

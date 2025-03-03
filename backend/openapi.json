@@ -1303,18 +1303,18 @@
         }
       }
     },
-    "/api/user/change-password": {
-      "post": {
+    "/api/user/account": {
+      "put": {
         "tags": [
           "authentication"
         ],
-        "summary": "Change password endpoint, updates a user password",
-        "operationId": "change_password",
+        "summary": "Update the user's account with a new password and optionally new fullname",
+        "operationId": "account_update",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePasswordRequest"
+                "$ref": "#/components/schemas/AccountUpdateRequest"
               }
             }
           },
@@ -1322,21 +1322,11 @@
         },
         "responses": {
           "200": {
-            "description": "The current user name and id",
+            "description": "The logged in user",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1664,6 +1654,24 @@
           }
         }
       },
+      "AccountUpdateRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "fullname": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
       "ApportionmentResult": {
         "type": "object",
         "description": "The result of the apportionment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after full seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
@@ -1864,25 +1872,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          }
-        }
-      },
-      "ChangePasswordRequest": {
-        "type": "object",
-        "required": [
-          "username",
-          "password",
-          "new_password"
-        ],
-        "properties": {
-          "new_password": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
           }
         }
       },
@@ -2473,11 +2462,15 @@
         "required": [
           "user_id",
           "username",
-          "role"
+          "role",
+          "needs_password_change"
         ],
         "properties": {
           "fullname": {
             "type": "string"
+          },
+          "needs_password_change": {
+            "type": "boolean"
           },
           "role": {
             "$ref": "#/components/schemas/Role"

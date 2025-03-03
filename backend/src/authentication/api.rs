@@ -124,7 +124,7 @@ pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
     Ok(Json(LoginResponse::from(&user)))
 }
 
-/// Update the user's account with a new password
+/// Update the user's account with a new password and optionally new fullname
 #[utoipa::path(
   post,
   path = "/api/user/account",

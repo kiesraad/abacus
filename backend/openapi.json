@@ -1308,7 +1308,7 @@
         "tags": [
           "authentication"
         ],
-        "summary": "Update the user's account with a new password",
+        "summary": "Update the user's account with a new password and optionally new fullname",
         "operationId": "account_update",
         "requestBody": {
           "content": {

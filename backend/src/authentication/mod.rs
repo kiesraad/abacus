@@ -513,7 +513,7 @@ mod tests {
             .unwrap()
             .to_string();
 
-        // Call the change password endpoint with incorrect user
+        // Call the account update endpoint with incorrect user
         let response = app
             .clone()
             .oneshot(

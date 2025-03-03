@@ -34,7 +34,7 @@ _Een deel moet nog worden doorgeschoven naar latere iteraties._
 
 - [M] Basis in de backend voor alle EML_NL formaten opzetten - [#1094](https://github.com/kiesraad/abacus/issues/1094)
 - [M] Het EML_NL-bestand met de verkiezingsdefinitie voor de gemeenteraadsverkiezing kan worden geïmporteerd. - [#700](https://github.com/kiesraad/abacus/issues/700)
-- [M] Het EML_NL-bestand met de kandidatenlijst voor de gemeenteraadsverkiezing kan worden geïmporteerd.
+- [M] Het EML_NL-bestand met de kandidatenlijst voor de gemeenteraadsverkiezing kan worden geïmporteerd. - [#794](https://github.com/kiesraad/abacus/issues/794)
 
 - [?] De coördinator kan de eerste zitting openen, schorsen en afronden. - [#795](https://github.com/kiesraad/abacus/issues/795)
   - _Eerst use cases uitwerken_
@@ -52,7 +52,7 @@ _Een deel moet nog worden doorgeschoven naar latere iteraties._
 
 - [M] De tweede invoerder krijgt een waarschuwing te zien voor verschillen met de eerste invoer. - [#1095](https://github.com/kiesraad/abacus/issues/1095)
 
-- [XL] De uitslag kan in een tweede of volgende zitting worden gecorrigeerd met behulp van een corrigendum.
+- [XL] De uitslag kan in een tweede of volgende zitting worden gecorrigeerd met behulp van een corrigendum. - [#1109](https://github.com/kiesraad/abacus/issues/1109)
   - _Nog opsplitsen: template stembureau PV, output corrigendum PV voor GSB_
 
 - [M] Het EML_NL-bestand (110b) met de stembureaus van een gemeente kan worden geïmporteerd. - [#800](https://github.com/kiesraad/abacus/issues/800)

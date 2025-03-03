@@ -126,7 +126,7 @@ pub async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
 
 /// Update the user's account with a new password and optionally new fullname
 #[utoipa::path(
-  post,
+  put,
   path = "/api/user/account",
   request_body = AccountUpdateRequest,
   responses(

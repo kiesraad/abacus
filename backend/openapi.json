@@ -1304,7 +1304,7 @@
       }
     },
     "/api/user/account": {
-      "post": {
+      "put": {
         "tags": [
           "authentication"
         ],

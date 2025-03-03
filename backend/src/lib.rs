@@ -4,7 +4,7 @@ use axum::{
     Router,
     extract::FromRef,
     middleware,
-    routing::{get, post},
+    routing::{get, post, put},
 };
 #[cfg(feature = "memory-serve")]
 use memory_serve::MemoryServe;
@@ -98,7 +98,7 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         .route("/login", post(authentication::login))
         .route("/logout", post(authentication::logout))
         .route("/whoami", get(authentication::whoami))
-        .route("/account", post(authentication::account_update))
+        .route("/account", put(authentication::account_update))
         .layer(middleware::from_fn_with_state(
             pool.clone(),
             authentication::extend_session,

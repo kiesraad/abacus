@@ -80,7 +80,7 @@ mod tests {
             .route("/api/user/login", post(api::login))
             .route("/api/user/logout", post(api::logout))
             .route("/api/user/whoami", get(api::whoami))
-            .route("/api/user/account", post(api::account_update))
+            .route("/api/user/account", put(api::account_update))
             .layer(middleware::from_fn_with_state(pool, extend_session));
 
         #[cfg(debug_assertions)]
@@ -435,7 +435,7 @@ mod tests {
             .clone()
             .oneshot(
                 Request::builder()
-                    .method(Method::POST)
+                    .method(Method::PUT)
                     .uri("/api/user/account")
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", &cookie)
@@ -518,7 +518,7 @@ mod tests {
             .clone()
             .oneshot(
                 Request::builder()
-                    .method(Method::POST)
+                    .method(Method::PUT)
                     .uri("/api/user/account")
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", &cookie)

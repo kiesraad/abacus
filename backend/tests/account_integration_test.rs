@@ -16,7 +16,7 @@ async fn test_account_update(pool: SqlitePool) {
     let admin_cookie = shared::admin_login(&addr).await;
 
     let response = reqwest::Client::new()
-        .post(&url)
+        .put(&url)
         .json(&json!({
             "username": "admin",
             "fullname": "Saartje Molenaar",

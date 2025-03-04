@@ -2298,6 +2298,7 @@
           "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
           "UserNotFound",
+          "UsernameNotUnique",
           "Unauthorized",
           "PasswordRejection"
         ]

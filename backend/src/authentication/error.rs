@@ -4,6 +4,7 @@ pub enum AuthenticationError {
     InvalidUsernameOrPassword,
     InvalidPassword,
     InvalidSessionDuration,
+    UsernameAlreadyExists,
     SessionKeyNotFound,
     NoSessionCookie,
     Database(sqlx::Error),

@@ -9,5 +9,5 @@ CREATE TABLE users
     last_activity_at       DATETIME        ,
     updated_at             DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_at             DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(username)
+    UNIQUE(username COLLATE NOCASE)
 );

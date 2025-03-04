@@ -8,9 +8,9 @@ use sqlx::{FromRow, SqlitePool};
 use crate::AppState;
 
 use super::{
+    SESSION_COOKIE_NAME, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME,
     error::AuthenticationError,
     util::{create_new_session_key, get_expires_at},
-    SESSION_COOKIE_NAME, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME,
 };
 
 /// A session object, corresponds to a row in the sessions table

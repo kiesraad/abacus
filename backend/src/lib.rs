@@ -1,10 +1,10 @@
 #[cfg(feature = "memory-serve")]
 use axum::http::StatusCode;
 use axum::{
+    Router,
     extract::FromRef,
     middleware,
-    routing::{get, post},
-    Router,
+    routing::{get, post, put},
 };
 #[cfg(feature = "memory-serve")]
 use memory_serve::MemoryServe;
@@ -92,24 +92,24 @@ pub fn router(pool: SqlitePool) -> Result<Router, Box<dyn Error>> {
         )
         .route(
             "/{user_id}",
-            get(authentication::user_get).put(authentication::user_update),
+            get(authentication::user_get)
+                .put(authentication::user_update)
+                .delete(authentication::user_delete),
         )
         .route("/login", post(authentication::login))
         .route("/logout", post(authentication::logout))
         .route("/whoami", get(authentication::whoami))
-        .route("/change-password", post(authentication::change_password))
+        .route("/account", put(authentication::account_update))
         .layer(middleware::from_fn_with_state(
             pool.clone(),
             authentication::extend_session,
         ));
 
     #[cfg(debug_assertions)]
-    let user_router = user_router
-        .route(
-            "/development/create",
-            post(authentication::development_create_user),
-        )
-        .route("/development/login", get(authentication::development_login));
+    let user_router = user_router.route(
+        "/development/create",
+        post(authentication::development_create_user),
+    );
 
     let app = Router::new()
         .nest("/api/user", user_router)
@@ -162,11 +162,12 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
             authentication::login,
             authentication::logout,
             authentication::whoami,
-            authentication::change_password,
+            authentication::account_update,
             authentication::user_list,
             authentication::user_create,
             authentication::user_get,
             authentication::user_update,
+            authentication::user_delete,
             election::election_list,
             election::election_create,
             election::election_details,
@@ -192,11 +193,11 @@ pub fn create_openapi() -> utoipa::openapi::OpenApi {
                 apportionment::PoliticalGroupStanding,
                 apportionment::ApportionmentStep,
                 apportionment::AssignedSeat,
-                apportionment::HighestAverageAssignedSeat,
-                apportionment::HighestSurplusAssignedSeat,
+                apportionment::LargestAverageAssignedSeat,
+                apportionment::LargestRemainderAssignedSeat,
                 authentication::Credentials,
                 authentication::LoginResponse,
-                authentication::ChangePasswordRequest,
+                authentication::AccountUpdateRequest,
                 authentication::UserListResponse,
                 authentication::UpdateUserRequest,
                 authentication::CreateUserRequest,

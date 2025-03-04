@@ -3,7 +3,7 @@ use abacus::fixtures;
 use abacus::router;
 use axum::serve::ListenerExt;
 use clap::Parser;
-use sqlx::{sqlite::SqliteConnectOptions, SqlitePool};
+use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
 use std::{
     error::Error,
     net::{Ipv4Addr, SocketAddr},

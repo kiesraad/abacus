@@ -1,11 +1,11 @@
 use axum::extract::FromRef;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{prelude::FromRow, SqlitePool, Type};
+use sqlx::{SqlitePool, Type, prelude::FromRow};
 use std::{fmt, net::IpAddr};
 use utoipa::ToSchema;
 
-use crate::{authentication::User, APIError, AppState};
+use crate::{APIError, AppState, authentication::User};
 
 #[derive(Serialize, Deserialize, Clone, Debug, ToSchema)]
 pub struct UserLoggedInDetails {
@@ -92,7 +92,7 @@ impl AuditLog {
         event: AuditEvent,
         event_type: AuditEventType,
         message: Option<String>,
-        ip: IpAddr,
+        ip: Option<IpAddr>,
     ) -> Result<AuditLogEvent, APIError> {
         // TODO: set workstation id once we have one
         let workstation: Option<u32> = None;
@@ -100,7 +100,7 @@ impl AuditLog {
         let event = serde_json::to_value(event)?;
         let user_id = user.id();
         let username = user.username();
-        let ip = ip.to_string();
+        let ip = ip.map(|ip| ip.to_string());
 
         let event = sqlx::query_as!(
             AuditLogEvent,

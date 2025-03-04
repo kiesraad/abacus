@@ -16,8 +16,15 @@ import {
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PARAMS,
   USER_CREATE_REQUEST_PATH,
+  USER_DELETE_REQUEST_PARAMS,
+  USER_DELETE_REQUEST_PATH,
+  USER_GET_REQUEST_PARAMS,
+  USER_GET_REQUEST_PATH,
   USER_LIST_REQUEST_PARAMS,
   USER_LIST_REQUEST_PATH,
+  USER_UPDATE_REQUEST_BODY,
+  USER_UPDATE_REQUEST_PARAMS,
+  USER_UPDATE_REQUEST_PATH,
   UserListResponse,
 } from "@kiesraad/api";
 
@@ -49,9 +56,16 @@ export const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBo
 });
 
 // get user handler
-export const WhoAmIRequestHandler = http.get("/api/user/whoami", () =>
-  HttpResponse.json({ user_id: 1, username: "user" } satisfies LoginResponse, { status: 200 }),
-);
+export const WhoAmIRequestHandler = http.get("/api/user/whoami", () => {
+  const loginResponse: LoginResponse = {
+    user_id: 1,
+    fullname: "Example Name",
+    username: "admin",
+    role: "administrator",
+    needs_password_change: false,
+  };
+  return HttpResponse.json(loginResponse, { status: 200 });
+});
 
 // get election list handler
 export const ElectionListRequestHandler = http.get("/api/elections", () =>
@@ -132,12 +146,33 @@ export const UserCreateRequestHandler = http.post<
   USER_CREATE_REQUEST_PATH
 >("/api/user", () => HttpResponse.json(userMockData[userMockData.length - 1], { status: 200 }));
 
+export const UserGetRequestHandler = http.get<
+  ParamsToString<USER_GET_REQUEST_PARAMS>,
+  null,
+  User,
+  USER_GET_REQUEST_PATH
+>("/api/user/1", () => HttpResponse.json(userMockData[0], { status: 200 }));
+
 export const UserListRequestHandler = http.get<
   USER_LIST_REQUEST_PARAMS,
   null,
   UserListResponse,
   USER_LIST_REQUEST_PATH
 >("/api/user", () => HttpResponse.json({ users: userMockData }, { status: 200 }));
+
+export const UserUpdateRequestHandler = http.put<
+  ParamsToString<USER_UPDATE_REQUEST_PARAMS>,
+  USER_UPDATE_REQUEST_BODY,
+  User,
+  USER_UPDATE_REQUEST_PATH
+>("/api/user/1", () => HttpResponse.json(userMockData[0], { status: 200 }));
+
+export const UserDeleteRequestHandler = http.delete<
+  ParamsToString<USER_DELETE_REQUEST_PARAMS>,
+  null,
+  undefined,
+  USER_DELETE_REQUEST_PATH
+>("/api/user/1", () => new HttpResponse(null, { status: 200 }));
 
 export const handlers: HttpHandler[] = [
   pingHandler,
@@ -154,5 +189,8 @@ export const handlers: HttpHandler[] = [
   PollingStationGetHandler,
   PollingStationUpdateHandler,
   UserCreateRequestHandler,
+  UserGetRequestHandler,
   UserListRequestHandler,
+  UserUpdateRequestHandler,
+  UserDeleteRequestHandler,
 ];

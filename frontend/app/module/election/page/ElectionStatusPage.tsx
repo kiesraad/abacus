@@ -14,7 +14,7 @@ export function ElectionStatusPage() {
   const { statuses } = useElectionStatus();
 
   function finishInput() {
-    void navigate("../report#coordinator");
+    void navigate("../report");
   }
 
   return (

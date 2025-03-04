@@ -8,7 +8,7 @@ import { Alert, FormLayout, PageTitle } from "@kiesraad/ui";
 
 import cls from "./Apportionment.module.css";
 
-function get_number_of_seats_assigned_sentence(seats: number, type: "residual_seat" | "whole_seat"): string {
+function get_number_of_seats_assigned_sentence(seats: number, type: "residual_seat" | "full_seat"): string {
   return t(`apportionment.seats_assigned.${seats > 1 ? "plural" : "singular"}`, {
     num_seat: seats,
     type_seat: t(`apportionment.${type}.singular`).toLowerCase(),
@@ -54,14 +54,14 @@ export function ApportionmentPage() {
                   <ApportionmentTable
                     finalStanding={apportionment.final_standing}
                     politicalGroups={election.political_groups}
-                    wholeSeats={apportionment.whole_seats}
+                    fullSeats={apportionment.full_seats}
                     residualSeats={apportionment.residual_seats}
                     seats={apportionment.seats}
                   />
                   <ul>
                     <li>
-                      {get_number_of_seats_assigned_sentence(apportionment.whole_seats, "whole_seat")} (
-                      <Link to="./details-whole-seats">{t("apportionment.view_details")}</Link>)
+                      {get_number_of_seats_assigned_sentence(apportionment.full_seats, "full_seat")} (
+                      <Link to="./details-full-seats">{t("apportionment.view_details")}</Link>)
                     </li>
                     <li>
                       {get_number_of_seats_assigned_sentence(apportionment.residual_seats, "residual_seat")} (

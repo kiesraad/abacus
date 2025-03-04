@@ -6,14 +6,13 @@ use std::net::{IpAddr, SocketAddr};
 
 use super::audit_log_events::{AuditEvent, AuditEventType, AuditLog, AuditLogEvent};
 use crate::{
-    authentication::{error::AuthenticationError, User, Users},
-    error::ErrorReference,
     APIError,
+    authentication::{User, Users, error::AuthenticationError},
 };
 
 pub struct AuditService {
     log: AuditLog,
-    ip: IpAddr,
+    ip: Option<IpAddr>,
     user: Option<User>,
 }
 
@@ -28,20 +27,12 @@ where
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, APIError> {
         let log = AuditLog::from_ref(state);
         let user: Option<User> = User::from_request_parts(parts, state).await.ok();
-        let socker_address = ConnectInfo::<SocketAddr>::from_request_parts(parts, state)
+        let ip = ConnectInfo::<SocketAddr>::from_request_parts(parts, state)
             .await
-            .map_err(|_| {
-                APIError::BadRequest(
-                    "Could not determine client IP address".to_string(),
-                    ErrorReference::CouldNotDetermineClientIP,
-                )
-            })?;
+            .ok()
+            .map(|a| a.ip());
 
-        Ok(Self {
-            log,
-            ip: socker_address.ip(),
-            user,
-        })
+        Ok(Self { log, ip, user })
     }
 }
 

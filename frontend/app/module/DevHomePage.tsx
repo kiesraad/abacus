@@ -85,7 +85,7 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
-              void login("admin", "password");
+              void login("admin", "AdminPassword01");
             }}
           >
             {t("administrator")}
@@ -95,7 +95,7 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
-              void login("typist", "password");
+              void login("typist", "TypistPassword01");
             }}
           >
             {t("typist")}
@@ -105,7 +105,7 @@ function DevLinks() {
           <Link
             to="/dev"
             onClick={() => {
-              void login("coordinator", "password");
+              void login("coordinator", "CoordinatorPassword01");
             }}
           >
             {t("coordinator")}
@@ -134,9 +134,6 @@ function DevLinks() {
             </li>
             <li>
               <Link to={`/account/setup`}>{t("account.account_setup")}</Link>
-            </li>
-            <li>
-              <Link to={`/account/change-password`}>{t("account.change_password")}</Link>
             </li>
           </ul>
         </li>

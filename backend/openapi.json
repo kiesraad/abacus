@@ -1303,18 +1303,18 @@
         }
       }
     },
-    "/api/user/change-password": {
-      "post": {
+    "/api/user/account": {
+      "put": {
         "tags": [
           "authentication"
         ],
-        "summary": "Change password endpoint, updates a user password",
-        "operationId": "change_password",
+        "summary": "Update the user's account with a new password and optionally new fullname",
+        "operationId": "account_update",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePasswordRequest"
+                "$ref": "#/components/schemas/AccountUpdateRequest"
               }
             }
           },
@@ -1322,21 +1322,11 @@
         },
         "responses": {
           "200": {
-            "description": "The current user name and id",
+            "description": "The logged in user",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1664,6 +1654,24 @@
           }
         }
       },
+      "AccountUpdateRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "fullname": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
       "AssignedSeat": {
         "oneOf": [
           {
@@ -1795,25 +1803,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          }
-        }
-      },
-      "ChangePasswordRequest": {
-        "type": "object",
-        "required": [
-          "username",
-          "password",
-          "new_password"
-        ],
-        "properties": {
-          "new_password": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
           }
         }
       },
@@ -2240,7 +2229,8 @@
           "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
           "UserNotFound",
-          "Unauthorized"
+          "Unauthorized",
+          "PasswordRejection"
         ]
       },
       "ErrorResponse": {
@@ -2404,11 +2394,15 @@
         "required": [
           "user_id",
           "username",
-          "role"
+          "role",
+          "needs_password_change"
         ],
         "properties": {
           "fullname": {
             "type": "string"
+          },
+          "needs_password_change": {
+            "type": "boolean"
           },
           "role": {
             "$ref": "#/components/schemas/Role"
@@ -2881,7 +2875,8 @@
           "temp_password": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "User": {
         "type": "object",

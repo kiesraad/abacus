@@ -146,6 +146,66 @@ async fn test_user_creation_anonymous(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_user_creation_invalid_password(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let admin_cookie = shared::admin_login(&addr).await;
+    let url = format!("http://{addr}/api/user");
+
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&json!({
+            "role": "typist",
+            "username": "username",
+            "temp_password": "too_short"
+        }))
+        .header("cookie", admin_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_user_update_password_invalid(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let admin_cookie = shared::admin_login(&addr).await;
+    let url = format!("http://{addr}/api/user/2");
+
+    let response = reqwest::Client::new()
+        .put(&url)
+        .json(&json!({
+            "temp_password": "too_short"
+        }))
+        .header("cookie", admin_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_user_change_to_same_password_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    let url = format!("http://{addr}/api/user/account");
+
+    let response = reqwest::Client::new()
+        .put(&url)
+        .json(&json!({
+            "username": "typist",
+            "password": "TypistPassword01",
+        }))
+        .header("cookie", typist_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/user/1");

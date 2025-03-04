@@ -144,7 +144,9 @@ pub async fn account_update(
     }
 
     // Update the password
-    users.update_password(user.id(), &account.password).await?;
+    users
+        .update_password(user.id(), &account.username, &account.password)
+        .await?;
 
     // Update the fullname
     if let Some(fullname) = account.fullname {
@@ -277,6 +279,7 @@ pub struct CreateUserRequest {
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct UpdateUserRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]

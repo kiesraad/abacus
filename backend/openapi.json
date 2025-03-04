@@ -2298,7 +2298,8 @@
           "PollingStationSecondEntryAlreadyFinalised",
           "PollingStationValidationErrors",
           "UserNotFound",
-          "Unauthorized"
+          "Unauthorized",
+          "PasswordRejection"
         ]
       },
       "ErrorResponse": {
@@ -2874,7 +2875,8 @@
           "temp_password": {
             "type": "string"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "User": {
         "type": "object",

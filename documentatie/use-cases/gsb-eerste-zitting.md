@@ -46,6 +46,12 @@ __Uitbreidingen:__
 ### Niet in scope
 
 - Elektronische handtekening van documenten.
+- Nooit in scope: Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Gaan we dit faciliteren in de applicatie? Nee.
+- Willen we het invoeren van het resultaat controleprotocol (handmatige controle optellingen software) in de applicatie doen?
+  - Protocol wordt uitgevoerd na het afdrukken van het concept-PV, dus lastig om in applicatie te doen.
+  - Alternatieven: met pen, in een bijlage.
+  - Geen alternatief: in een ODT-bestand.
+  - Overweging: Als het resultaat is "verschillen geconstateerd", dan moet alles handmatig overgedaan worden en komt er een nieuw 'handmatig' PV. Dus als het PV dat uit de applicatie komt, geldig is, dan staat er een vinkje bij "geen verschillen geconstateerd". Wel gek: vinkje zetten vóór controle.
 
 ### Open punten
 
@@ -54,15 +60,16 @@ __Uitbreidingen:__
   - Proces via uitwisselplatform loopt parallel.
 - Na31-2 Bijlage 2 wordt Bijlage 1 in nieuwe modellen.
 - Kunnen we het mogelijk maken om bezwaren en bijzonderheden in te voeren in de applicatie tijdens het voorlezen van het concept-PV?
-- Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Gaan we dit faciliteren in de applicatie?
-- Willen we het invoeren van het resultaat controleprotocol (handmatige controle optellingen software) in de applicatie doen?
-  - Protocol wordt uitgevoerd na het afdrukken van het concept-PV, dus lastig om in applicatie te doen.
-  - Alternatieven: met pen, in een bijlage.
-  - Geen alternatief: in een ODT-bestand.
-  - Overweging: Als het resultaat is "verschillen geconstateerd", dan moet alles handmatig overgedaan worden en komt er een nieuw 'handmatig' PV. Dus als het PV dat uit de applicatie komt, geldig is, dan staat er een vinkje bij "geen verschillen geconstateerd".
-- Ondertekenen gebeurt in een bijlage. Waar komt die vandaan?
-- Wat zit er precies in het digitale bestand?
+- Ondertekenen gebeurt in een bijlage. Waar komt die vandaan? Applicatie genereert die als onderdeel van het concept-PV.
+- Wat zit er precies in het digitale bestand? -> het zip-bestand
+  - niet: csv met tellingen (doet uitwisselplatform)
+  - wel: EML_NL (enige verplichte onderdeel), PV als pdf
+
 - Moet de applicatie een preview van het te genereren PV tonen, zodat de coördinator die kan controleren en eventuele fouten kan herstellen?
+  - preview om te voorkomen dat er meerdere versies zijn van het concept-PV
+  - onderscheid: ingevuld PV tonen als pdf vs zip/digitaal bestand genereren
+  - waterwerk en filename: "concept"
+
 
 
 
@@ -94,6 +101,12 @@ Nog op te stellen o.b.v. Uitbreidingen CSO.
 #### Open punten
 
 - Is het wenselijk om een 'leeg' corrigendum (wel ingevuld: kandidatenlijsten (keuze welke lijsten), stembureau(?), gemeente, oorspronkelijke resultaten?) te kunnen genereren in applicatie?
+  - N 10-1 (PV SB DSO) en Na 14-1 (corrigendum op PV SB DSO)
+  - Ja.
+  - Meerdere opties mogelijk:
+    - minimaal kandidatenlijst en gemeente
+    - extra: stembureau en oorspronkelijke resultaten SB
+
 
 
 

@@ -44,6 +44,9 @@ __Uitbreidingen:__
     - Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
     - Als de applicatie deze moet genereren, dan moeten we ook de totalenlijst i.p.v. de kandidatenlijst importeren.
 - Als het niet mogelijk is het digitale bestand te importeren, kan het CSB dan contact opnemen met het GSB om te proberen het probleem te verhelpen?
+    - Zodra WPV: verplicht digitaal bestand. Dus ja, dat mag.
+    - Als niet op te lossen, twee keer handmatig invoeren.
+
 - Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
 
 
@@ -64,6 +67,15 @@ __Uitbreidingen:__
 &emsp;1a1. Het CSB doet de eerste invoer handmatig.
 
 3a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
+
+liefst: handmatig klopt niet, handmatig weggooien, handmatig opnieuw invoeren, zodat twee volledige invoeren met elkaar kloppen  
+als dat niet kan: invoer die klopt (bestand of handmatig) als correct markeren  
+zou niet anders moeten zijn dan invoer GSB (impliceert verwijderen invoer 1 of invoer 2)
+
+als niet geliJk: je hebt een groter probleem, hoewel: is wel voorgekomen: verschil omdat digitaal wel gecorrigeerd, maar correctie op papier niet mogelijk; ontbrekende velden zijn meegenomen in nieuwe velden, dus zou niet meer voor mogen komen
+
+de wet: digitaal bestand mag je niet kiezen, want één invoer moet handmatig (en invoer als onderdeel van resultaat)
+
 &emsp; 3a1. De coördinator vergelijkt de eerste en tweede invoer met het papieren PV.  
 &emsp; 3a2. De coördinator stelt vast dat de tweede (handmatige) invoer correct is.  
 &emsp;&emsp; 3a2a. De coördinator stelt vast dat de tweede (handmatige) invoer niet correct is:  

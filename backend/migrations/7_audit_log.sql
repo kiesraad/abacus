@@ -1,3 +1,4 @@
+-- Note: we do not want a foreign key constraint on the user_id field, as we want to keep the audit log even if the user is deleted
 CREATE TABLE audit_log
 (
     id                 INTEGER         PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -11,6 +12,5 @@ CREATE TABLE audit_log
     username           TEXT            NOT NULL,
     time               DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_id) REFERENCES users (id),
     UNIQUE(id)
 );

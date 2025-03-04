@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT COUNT(*) AS \"count: u32\" FROM sessions WHERE expires_at <= ?",
+  "query": "SELECT COUNT(*) AS \"count: u32\" FROM sessions WHERE expires_at > ?",
   "describe": {
     "columns": [
       {
@@ -16,5 +16,5 @@
       false
     ]
   },
-  "hash": "0bcf9ea7e7a24637c326033f0cd59716e12e6cfda162cf962717b4e36e815eca"
+  "hash": "56d9e7bf5531c9d88dd4c40dd1d70699c14ded9a134fd299e08bac6d7b579f86"
 }

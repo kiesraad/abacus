@@ -147,7 +147,7 @@ impl Sessions {
     pub async fn count(&self) -> Result<u32, AuthenticationError> {
         let now = Utc::now();
         let count = sqlx::query_scalar!(
-            r#"SELECT COUNT(*) AS "count: u32" FROM sessions WHERE expires_at <= ?"#,
+            r#"SELECT COUNT(*) AS "count: u32" FROM sessions WHERE expires_at > ?"#,
             now
         )
         .fetch_one(&self.0)

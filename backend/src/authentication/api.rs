@@ -71,7 +71,7 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     ),
 )]
 pub async fn login(
-    TypedHeader(user_agent): TypedHeader<UserAgent>,
+    user_agent: Option<TypedHeader<UserAgent>>,
     State(users): State<Users>,
     State(sessions): State<Sessions>,
     jar: CookieJar,
@@ -92,10 +92,11 @@ pub async fn login(
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
     sessions.delete_expired_sessions().await?;
-    let user_agent = user_agent.to_string();
+    let user_agent = user_agent.map(|ua| ua.to_string()).unwrap_or_default();
 
     // Log the login event
     audit_service
+        .with_user(user.clone())
         .log_success(
             AuditEvent::UserLoggedIn(UserLoggedInDetails {
                 user_agent,

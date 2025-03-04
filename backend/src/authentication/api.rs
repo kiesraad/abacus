@@ -20,7 +20,7 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
-    audit_log::{AuditEvent, AuditService, UserLoggedInDetails},
+    audit_log::{AuditEvent, AuditService, UserLoggedInDetails, UserLoggedOutDetails},
 };
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Credentials {
@@ -189,6 +189,8 @@ pub async fn account_update(
 )]
 pub async fn logout(
     State(sessions): State<Sessions>,
+    State(users): State<Users>,
+    audit_service: AuditService,
     jar: CookieJar,
 ) -> Result<impl IntoResponse, APIError> {
     let Some(mut cookie) = jar.get(SESSION_COOKIE_NAME).cloned() else {
@@ -196,8 +198,26 @@ pub async fn logout(
         return Ok((jar, StatusCode::OK));
     };
 
-    // Remove session from the database
+    // Get the session key from the cookie
     let session_key = cookie.value();
+
+    // Log audit event when a valid session exists
+    if let Some(session) = sessions.get_by_key(session_key).await.ok().flatten() {
+        if let Some(user) = users.get_by_id(session.user_id()).await.ok().flatten() {
+            // Log the logout event
+            audit_service
+                .with_user(user)
+                .log_success(
+                    AuditEvent::UserLoggedOut(UserLoggedOutDetails {
+                        session_duration: session.duration().as_secs(),
+                    }),
+                    None,
+                )
+                .await?;
+        }
+    }
+
+    // Remove session from the database
     sessions.delete(session_key).await?;
 
     // Set cookie parameters, these are not present in the request, and have to match in order to clear the cookie

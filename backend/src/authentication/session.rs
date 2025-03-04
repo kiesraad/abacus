@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use axum::extract::FromRef;
 use axum_extra::extract::cookie::Cookie;
 use chrono::{DateTime, TimeDelta, Utc};
@@ -52,6 +54,14 @@ impl Session {
     #[cfg(test)]
     pub(super) fn expires_at(&self) -> DateTime<Utc> {
         self.expires_at
+    }
+
+    /// Get the age of a session
+    pub(super) fn duration(&self) -> Duration {
+        self.created_at
+            .signed_duration_since(Utc::now())
+            .to_std()
+            .unwrap_or_default()
     }
 
     /// Get a cookie containing this session key

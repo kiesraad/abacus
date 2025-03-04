@@ -7,18 +7,18 @@ use utoipa::ToSchema;
 
 use crate::{APIError, AppState, authentication::User};
 
-#[derive(Serialize, Deserialize, Clone, Debug, ToSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
 pub struct UserLoggedInDetails {
     pub user_agent: String,
     pub logged_in_users_count: u32,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, ToSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema)]
 pub struct UserLoggedOutDetails {
-    session_duration: u32,
+    pub session_duration: u64,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, ToSchema, Default)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, ToSchema, Default)]
 #[serde(rename_all = "lowercase", tag = "event_type")]
 pub enum AuditEvent {
     UserLoggedIn(UserLoggedInDetails),
@@ -77,6 +77,42 @@ pub struct AuditLogEvent {
     #[schema(value_type = String)]
     ip: Ip,
 }
+
+#[cfg(test)]
+impl AuditLogEvent {
+    pub fn time(&self) -> DateTime<Utc> {
+        self.time
+    }
+
+    pub fn event(&self) -> &AuditEvent {
+        &self.event
+    }
+
+    pub fn event_type(&self) -> &AuditEventType {
+        &self.event_type
+    }
+
+    pub fn message(&self) -> Option<&String> {
+        self.message.as_ref()
+    }
+
+    pub fn workstation(&self) -> Option<u32> {
+        self.workstation
+    }
+
+    pub fn user_id(&self) -> u32 {
+        self.user_id
+    }
+
+    pub fn username(&self) -> &str {
+        &self.username
+    }
+
+    pub fn ip(&self) -> Option<IpAddr> {
+        self.ip.0
+    }
+}
+
 pub struct AuditLog(SqlitePool);
 
 impl FromRef<AppState> for AuditLog {
@@ -86,6 +122,11 @@ impl FromRef<AppState> for AuditLog {
 }
 
 impl AuditLog {
+    #[cfg(test)]
+    pub fn new(pool: SqlitePool) -> Self {
+        Self(pool)
+    }
+
     pub async fn create(
         &self,
         user: User,

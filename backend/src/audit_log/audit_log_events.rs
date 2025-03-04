@@ -80,10 +80,6 @@ pub struct AuditLogEvent {
 
 #[cfg(test)]
 impl AuditLogEvent {
-    pub fn time(&self) -> DateTime<Utc> {
-        self.time
-    }
-
     pub fn event(&self) -> &AuditEvent {
         &self.event
     }
@@ -94,10 +90,6 @@ impl AuditLogEvent {
 
     pub fn message(&self) -> Option<&String> {
         self.message.as_ref()
-    }
-
-    pub fn workstation(&self) -> Option<u32> {
-        self.workstation
     }
 
     pub fn user_id(&self) -> u32 {

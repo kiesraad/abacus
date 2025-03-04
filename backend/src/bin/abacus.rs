@@ -35,6 +35,30 @@ struct Args {
     reset_database: bool,
 }
 
+/// Start the API server on the given port, using the given database pool.
+async fn start_server(pool: SqlitePool, port: u16) -> Result<(), Box<dyn Error>> {
+    let app = router(pool)?;
+
+    let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
+    let listener = TcpListener::bind(&address).await?;
+
+    info!("Starting API server on http://{}", listener.local_addr()?);
+    let listener = listener.tap_io(|tcp_stream| {
+        if let Err(err) = tcp_stream.set_nodelay(true) {
+            trace!("failed to set TCP_NODELAY on incoming connection: {err:#}");
+        }
+    });
+
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .with_graceful_shutdown(shutdown_signal())
+    .await?;
+
+    Ok(())
+}
+
 /// Main entry point for the application. Sets up the database, and starts the
 /// API server and in-memory file router on port 8080.
 #[tokio::main]
@@ -50,23 +74,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
     let pool = create_sqlite_pool(&args).await?;
 
-    let app = router(pool)?;
-
-    let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
-    let listener = TcpListener::bind(&address).await?;
-    info!("Starting API server on http://{}", listener.local_addr()?);
-    let listener = listener.tap_io(|tcp_stream| {
-        if let Err(err) = tcp_stream.set_nodelay(true) {
-            trace!("failed to set TCP_NODELAY on incoming connection: {err:#}");
-        }
-    });
-    axum::serve(
-        listener,
-        app.into_make_service_with_connect_info::<SocketAddr>(),
-    )
-    .with_graceful_shutdown(shutdown_signal())
-    .await?;
-    Ok(())
+    start_server(pool, args.port).await
 }
 
 /// Create a SQLite database if needed, then connect to it and run migrations.
@@ -121,5 +129,37 @@ async fn shutdown_signal() {
     tokio::select! {
         _ = ctrl_c => {},
         _ = terminate => {},
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use rand::Rng;
+    use sqlx::SqlitePool;
+    use test_log::test;
+
+    use super::start_server;
+
+    pub fn random_port() -> u16 {
+        let mut rng = rand::rng();
+
+        rng.random_range(10_000..30_000)
+    }
+
+    #[test(sqlx::test)]
+    async fn test_abacus_starts(pool: SqlitePool) {
+        let random_port = random_port();
+        let task = tokio::spawn(async move {
+            start_server(pool, random_port).await.unwrap();
+        });
+
+        let result = reqwest::get(format!("http://localhost:{random_port}/api/user/whoami"))
+            .await
+            .unwrap();
+
+        assert_eq!(result.status(), 401);
+
+        task.abort();
+        let _ = task.await;
     }
 }

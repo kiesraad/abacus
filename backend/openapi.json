@@ -2013,6 +2013,7 @@
           "InvalidUsernameOrPassword",
           "InvalidVoteCandidate",
           "InvalidVoteGroup",
+          "CouldNotDetermineClientIP",
           "PdfGenerationError",
           "PollingStationDataValidation",
           "PollingStationFirstEntryAlreadyFinalised",

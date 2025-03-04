@@ -107,7 +107,9 @@ where
         };
 
         let user = users.get_by_session_key(session_cookie.value()).await?;
+
         user.update_last_activity_at(&users).await?;
+
         Ok(user)
     }
 }

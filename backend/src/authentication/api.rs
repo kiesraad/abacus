@@ -10,7 +10,7 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Json, Response},
 };
-use axum_extra::extract::CookieJar;
+use axum_extra::{extract::CookieJar, headers::UserAgent, TypedHeader};
 use cookie::{Cookie, SameSite};
 use hyper::{header::SET_COOKIE, StatusCode};
 use serde::{Deserialize, Serialize};
@@ -18,7 +18,10 @@ use sqlx::{Error, SqlitePool};
 use tracing::debug;
 use utoipa::ToSchema;
 
-use crate::{APIError, ErrorResponse};
+use crate::{
+    audit_log::{AuditEvent, AuditService, UserLoggedInDetails},
+    APIError, ErrorResponse,
+};
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Credentials {
     pub username: String,
@@ -60,9 +63,11 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     ),
 )]
 pub async fn login(
+    TypedHeader(user_agent): TypedHeader<UserAgent>,
     State(users): State<Users>,
     State(sessions): State<Sessions>,
     jar: CookieJar,
+    audit_service: AuditService,
     Json(credentials): Json<Credentials>,
 ) -> Result<impl IntoResponse, APIError> {
     let Credentials { username, password } = credentials;
@@ -79,6 +84,18 @@ pub async fn login(
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
     sessions.delete_expired_sessions().await?;
+    let user_agent = user_agent.to_string();
+
+    // Log the login event
+    audit_service
+        .log_success(
+            AuditEvent::UserLoggedIn(UserLoggedInDetails {
+                user_agent,
+                logged_in_users_count: sessions.count().await?,
+            }),
+            None,
+        )
+        .await?;
 
     // Create a new session and cookie
     let session = sessions.create(user.id(), SESSION_LIFE_TIME).await?;

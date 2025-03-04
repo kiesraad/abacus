@@ -1,9 +1,9 @@
 use chrono::TimeDelta;
 use serde::{Deserialize, Serialize};
-use user::User;
 use utoipa::ToSchema;
 
 pub use self::api::*;
+pub use user::{User, Users};
 
 #[cfg(test)]
 pub use self::session::Sessions;

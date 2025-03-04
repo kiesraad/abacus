@@ -1,15 +1,15 @@
-CREATE TABLE audit_log_events
+CREATE TABLE audit_log
 (
     id                 INTEGER         PRIMARY KEY AUTOINCREMENT NOT NULL,
+    event              JSONB           NOT NULL,
+    event_name         TEXT            NOT NULL,
     event_type         TEXT CHECK( event_type IN ('error','warning','info','success') ) NOT NULL DEFAULT 'info',
-    event              TEXT            NOT NULL,
     message            TEXT            ,
-    metadata           JSONB           ,
-    workstation_number TEXT            ,
-    ip                 TEXT            NOT NULL,
+    workstation        INTEGER         ,
+    ip                 TEXT            ,
     user_id            INTEGER         NOT NULL,
     username           TEXT            NOT NULL,
-    created_at         DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    time               DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id) REFERENCES users (id),
     UNIQUE(id)

@@ -60,9 +60,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
             trace!("failed to set TCP_NODELAY on incoming connection: {err:#}");
         }
     });
-    axum::serve(listener, app.into_make_service())
-        .with_graceful_shutdown(shutdown_signal())
-        .await?;
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .with_graceful_shutdown(shutdown_signal())
+    .await?;
     Ok(())
 }
 

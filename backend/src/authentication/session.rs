@@ -143,6 +143,19 @@ impl Sessions {
         Ok(())
     }
 
+    /// Count the number of active sessions
+    pub async fn count(&self) -> Result<u32, AuthenticationError> {
+        let now = Utc::now();
+        let count = sqlx::query_scalar!(
+            r#"SELECT COUNT(*) AS "count: u32" FROM sessions WHERE expires_at <= ?"#,
+            now
+        )
+        .fetch_one(&self.0)
+        .await?;
+
+        Ok(count)
+    }
+
     pub(super) async fn extend_session(
         &self,
         session_key: &str,

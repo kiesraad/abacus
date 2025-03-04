@@ -40,6 +40,7 @@ pub enum ErrorReference {
     InvalidUsernameOrPassword,
     InvalidVoteCandidate,
     InvalidVoteGroup,
+    CouldNotDetermineClientIP,
     PdfGenerationError,
     PollingStationDataValidation,
     PollingStationFirstEntryAlreadyFinalised,

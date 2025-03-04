@@ -358,6 +358,7 @@ export type ErrorReference =
   | "InvalidUsernameOrPassword"
   | "InvalidVoteCandidate"
   | "InvalidVoteGroup"
+  | "CouldNotDetermineClientIP"
   | "PdfGenerationError"
   | "PollingStationDataValidation"
   | "PollingStationFirstEntryAlreadyFinalised"

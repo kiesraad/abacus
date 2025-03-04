@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT COUNT(*) AS \"count: u32\" FROM sessions WHERE expires_at <= ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "count: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "0bcf9ea7e7a24637c326033f0cd59716e12e6cfda162cf962717b4e36e815eca"
+}

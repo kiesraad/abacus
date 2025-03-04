@@ -28,7 +28,6 @@ import { t } from "@kiesraad/i18n";
 import { ErrorBoundary } from "./component/error/ErrorBoundary";
 import { AccountSetupPage, LoginLayout, LoginPage, UserHomePage } from "./module/account";
 import { Logout } from "./module/account/Logout";
-import { ChangePasswordPage } from "./module/account/page/ChangePasswordPage";
 import {
   ApportionmentFullSeatsPage,
   ApportionmentLayout,
@@ -58,7 +57,6 @@ export const routes = createRoutesFromElements(
       <Route path="login" element={<LoginPage />} />
       <Route path="logout" element={<Logout />} />
       <Route path="setup" element={<AccountSetupPage />} />
-      <Route path="change-password" element={<ChangePasswordPage />} />
     </Route>
     <Route path="elections" element={<OverviewLayout />}>
       <Route index element={<OverviewPage />} />

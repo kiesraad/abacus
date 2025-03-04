@@ -10,4 +10,8 @@ export class UserListPgObj {
     this.create = page.getByRole("link", { name: "Gebruiker toevoegen" });
     this.table = page.getByRole("table");
   }
+
+  row(text: string): Locator {
+    return this.table.locator(`tr:has-text("${text}")`);
+  }
 }

@@ -84,7 +84,7 @@ export function UserUpdateForm({ user, onSave, onAbort, saving }: UserUpdateForm
                 error={validationErrors?.temp_password}
               />
             ) : (
-              <FormLayout.Field label={t("user.password")}>
+              <FormLayout.Field label={t("account.password")}>
                 {t("users.change_password_hint")}
 
                 <Button

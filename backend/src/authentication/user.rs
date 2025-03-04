@@ -86,6 +86,10 @@ impl User {
         self.role
     }
 
+    pub fn needs_password_change(&self) -> bool {
+        self.needs_password_change
+    }
+
     #[cfg(test)]
     pub fn test_user(role: Role) -> Self {
         Self {
@@ -316,6 +320,23 @@ impl Users {
         .await?;
 
         tx.commit().await?;
+        Ok(())
+    }
+
+    /// Update a user's fullname
+    pub async fn update_fullname(
+        &self,
+        user_id: u32,
+        fullname: &str,
+    ) -> Result<(), AuthenticationError> {
+        sqlx::query!(
+            r#"UPDATE users SET fullname = ? WHERE id = ?"#,
+            fullname,
+            user_id
+        )
+        .execute(&self.0)
+        .await?;
+
         Ok(())
     }
 

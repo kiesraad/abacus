@@ -189,14 +189,13 @@ async fn test_user_update_password_invalid(pool: SqlitePool) {
 async fn test_user_change_to_same_password_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
-    let url = format!("http://{addr}/api/user/change-password");
+    let url = format!("http://{addr}/api/user/account");
 
     let response = reqwest::Client::new()
-        .post(&url)
+        .put(&url)
         .json(&json!({
             "username": "typist",
             "password": "TypistPassword01",
-            "new_password": "TypistPassword01"
         }))
         .header("cookie", typist_cookie)
         .send()
@@ -255,4 +254,20 @@ async fn test_user_delete(pool: SqlitePool) {
 
     let response = reqwest::Client::new().delete(&url).send().await.unwrap();
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_can_delete_logged_in_user(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let url = format!("http://{addr}/api/user/2");
+    shared::typist_login(&addr).await;
+    let admin_cookie = shared::admin_login(&addr).await;
+
+    let response = reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", &admin_cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
 }

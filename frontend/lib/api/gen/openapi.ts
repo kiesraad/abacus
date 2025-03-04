@@ -107,10 +107,10 @@ export type USER_CREATE_REQUEST_PARAMS = Record<string, never>;
 export type USER_CREATE_REQUEST_PATH = `/api/user`;
 export type USER_CREATE_REQUEST_BODY = CreateUserRequest;
 
-// /api/user/change-password
-export type CHANGE_PASSWORD_REQUEST_PARAMS = Record<string, never>;
-export type CHANGE_PASSWORD_REQUEST_PATH = `/api/user/change-password`;
-export type CHANGE_PASSWORD_REQUEST_BODY = ChangePasswordRequest;
+// /api/user/account
+export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
+export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/user/account`;
+export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
 
 // /api/user/login
 export type LOGIN_REQUEST_PARAMS = Record<string, never>;
@@ -148,6 +148,12 @@ export type USER_DELETE_REQUEST_PATH = `/api/user/${number}`;
 export interface AbsoluteMajorityChange {
   pg_assigned_seat: number;
   pg_retracted_seat: number;
+}
+
+export interface AccountUpdateRequest {
+  fullname?: string;
+  password: string;
+  username: string;
 }
 
 /**
@@ -205,12 +211,6 @@ export type CandidateGender = "Male" | "Female" | "X";
 export interface CandidateVotes {
   number: number;
   votes: number;
-}
-
-export interface ChangePasswordRequest {
-  new_password: string;
-  password: string;
-  username: string;
 }
 
 export interface CreateUserRequest {
@@ -434,6 +434,7 @@ export interface LargestRemainderAssignedSeat {
 
 export interface LoginResponse {
   fullname?: string;
+  needs_password_change: boolean;
   role: Role;
   user_id: number;
   username: string;

@@ -297,6 +297,7 @@ pub struct UpdateUserRequest {
     responses(
         (status = 201, description = "User created", body = User),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]

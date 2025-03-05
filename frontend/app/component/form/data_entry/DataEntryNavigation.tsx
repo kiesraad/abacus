@@ -55,7 +55,7 @@ export function DataEntryNavigation({ onSubmit, currentValues }: DataEntryNaviga
   }
 
   const onModalSave = async () => {
-    if (await onSubmit({ aborting: false, continueToNextSection: true, showAcceptWarnings: false })) {
+    if (await onSubmit({ aborting: false, continueToNextSection: false, showAcceptWarnings: false })) {
       blocker.proceed();
     } else {
       blocker.reset();
